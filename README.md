@@ -12,6 +12,25 @@ Backronym: **NI**mble and **R**obust **VA**riant a**N**not**A**tor
 
 <br clear=left>
 
-## Wiki
+## Resources
 
-More information about the Nirvana Variant Annotator can be found on our **[GitHub wiki](https://github.com/Illumina/Nirvana/wiki)**.
+* [Release Notes](https://github.com/Illumina/Nirvana/releases)
+* [Wiki](https://github.com/Illumina/Nirvana/wiki)
+
+## Installing
+
+Nirvana is written in C# and targeted for 64-bit operating systems.
+
+### Linux
+
+Many Linux distributions already have mono installed. If you need to install it, however, please refer to the [Install Mono on Linux](http://www.mono-project.com/docs/getting-started/install/linux/) page.
+
+For example, the following should suffice on Ubuntu:
+
+```Bash
+sudo apt-get install mono-complete
+```
+
+### Windows
+
+No additional dependencies are required. Nirvana can be executed at the command-line.
