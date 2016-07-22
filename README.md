@@ -9,28 +9,10 @@ The input to Nirvana are VCFs and the output is a structured JSON representation
 The software is being developed under a rigorous SDLC and testing process to ensure accuracy of the results and enable embedding in other software with regulatory needs. Nirvana uses a continuous integration pipeline where millions of variant annotations are monitored against baseline values on a daily basis.
 
 Backronym: **NI**mble and **R**obust **VA**riant a**N**not**A**tor
-
 <br clear=left>
 
 ## Resources
 
-* [Release Notes](https://github.com/Illumina/Nirvana/releases)
+* [Getting Started](https://github.com/Illumina/Nirvana/wiki/Getting-Started)
 * [Wiki](https://github.com/Illumina/Nirvana/wiki)
-
-## Installing
-
-Nirvana is written in C# and targeted for 64-bit operating systems.
-
-### Linux
-
-Many Linux distributions already have mono installed. If you need to install it, however, please refer to the [Install Mono on Linux](http://www.mono-project.com/docs/getting-started/install/linux/) page.
-
-For example, the following should suffice on Ubuntu:
-
-```Bash
-sudo apt-get install mono-complete
-```
-
-### Windows
-
-No additional dependencies are required. Nirvana can be executed at the command-line.
+* [Release Notes](https://github.com/Illumina/Nirvana/releases)
