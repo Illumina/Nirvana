@@ -42,7 +42,7 @@ namespace UnitTests.Compression
                 Assert.IsType<CompressionException>(exception);
             }
 
-            const long expectedPosition = 4191;
+            const long expectedPosition = 270;
             Assert.Equal(expectedPosition, observedPosition);
 
             // decompress the data
@@ -176,7 +176,7 @@ namespace UnitTests.Compression
                 }
             }
 
-            Assert.Equal(15038, observedCompressedBuffer.Length);
+            Assert.Equal(15061, observedCompressedBuffer.Length);
             Assert.Equal(_expectedDecompressedBuffer, observedDecompressedBuffer);
         }
 
