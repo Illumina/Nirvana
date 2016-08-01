@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
+    <ProjectGuid>{32D648A2-DF7A-454A-AB14-01618F9EE36A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Illumina.DataDumperImport</RootNamespace>
+    <AssemblyName>Illumina.DataDumperImport</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>..\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\Illumina.VariantAnnotation\Properties\CommonAssemblyInfo.cs">
+      <Link>Properties\CommonAssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="DataStructures\AbstractData.cs" />
+    <Compile Include="DataStructures\GeneInfo.cs" />
+    <Compile Include="DataStructures\ImportDataStore.cs" />
+    <Compile Include="DataStructures\KeyValue.cs" />
+    <Compile Include="DataStructures\Values.cs" />
+    <Compile Include="DataStructures\VEP\Exon.cs" />
+    <Compile Include="DataStructures\VEP\Gene.cs" />
+    <Compile Include="DataStructures\VEP\Intron.cs" />
+    <Compile Include="DataStructures\VEP\Mapper.cs" />
+    <Compile Include="DataStructures\VEP\MapperPair.cs" />
+    <Compile Include="DataStructures\VEP\MapperUnit.cs" />
+    <Compile Include="DataStructures\VEP\PairCodingDna.cs" />
+    <Compile Include="DataStructures\VEP\PairGenomic.cs" />
+    <Compile Include="DataStructures\VEP\PolyPhen.cs" />
+    <Compile Include="DataStructures\VEP\ProteinFunctionPredictions.cs" />
+    <Compile Include="DataStructures\VEP\RegulatoryFeature.cs" />
+    <Compile Include="DataStructures\VEP\Sift.cs" />
+    <Compile Include="DataStructures\VEP\Slice.cs" />
+    <Compile Include="DataStructures\VEP\SortableCoordinate.cs" />
+    <Compile Include="DataStructures\VEP\Transcript.cs" />
+    <Compile Include="DataStructures\VEP\TranscriptMapper.cs" />
+    <Compile Include="DataStructures\VEP\Translation.cs" />
+    <Compile Include="DataStructures\VEP\VariantEffectFeatureCache.cs" />
+    <Compile Include="FileHandling\DataDumperReader.cs" />
+    <Compile Include="Import\Attribute.cs" />
+    <Compile Include="Import\Exon.cs" />
+    <Compile Include="Import\Gene.cs" />
+    <Compile Include="Import\Intron.cs" />
+    <Compile Include="Import\Mapper.cs" />
+    <Compile Include="Import\MapperPair.cs" />
+    <Compile Include="Import\MapperUnit.cs" />
+    <Compile Include="Import\PairCodingDna.cs" />
+    <Compile Include="Import\PairGenomic.cs" />
+    <Compile Include="Import\PolyPhen.cs" />
+    <Compile Include="Import\ProteinFunctionPredictions.cs" />
+    <Compile Include="Import\RegulatoryFeature.cs" />
+    <Compile Include="Import\Sift.cs" />
+    <Compile Include="Import\Slice.cs" />
+    <Compile Include="Import\TranscriptMapper.cs" />
+    <Compile Include="Import\Transcript.cs" />
+    <Compile Include="Import\Translation.cs" />
+    <Compile Include="Import\VariantEffectFeatureCache.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Utilities\DataStoreUtilities.cs" />
+    <Compile Include="Utilities\DumperUtilities.cs" />
+    <Compile Include="Utilities\TranscriptUtilities.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Illumina.VariantAnnotation\Illumina.VariantAnnotation.csproj">
+      <Project>{689462c1-ffb2-408b-bec8-7f5a0c58fd40}</Project>
+      <Name>Illumina.VariantAnnotation</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

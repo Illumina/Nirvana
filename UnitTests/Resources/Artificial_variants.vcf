@@ -1,0 +1,11 @@
+##fileformat=VCFv4.2									
+##fileDate=November 18, 2014									
+##reference=hg19									
+##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	TEST_MUTATIONS
+1	10177	.	A	AC	100	PASS	.	GT	0/1
+1	10235	.	T	TA	100	PASS	.	GT	0/1
+1	10352	rs145072688	T	TA	100	PASS	.	GT	0/1
+1	15274	rs201931625	A	G	100	PASS	.	GT	0/1
+1	69224	.	A	C	100	PASS	.	GT	0/1
+1	69230	.	A	C	100	PASS	.	GT	0/1

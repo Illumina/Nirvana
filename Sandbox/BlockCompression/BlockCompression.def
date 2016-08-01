@@ -1,0 +1,10 @@
+LIBRARY
+; file compression library
+
+EXPORTS
+	bgzf_compress
+	uncompress_block
+	GetVersion
+	QuickLzCompress
+	QuickLzDecompress
+	qlz_size_decompressed

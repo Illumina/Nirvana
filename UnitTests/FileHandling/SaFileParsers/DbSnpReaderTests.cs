@@ -1,0 +1,250 @@
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using SAUtils.InputFileParsers.DbSnp;
+using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using Xunit;
+
+namespace UnitTests.FileHandling.SaFileParsers
+{
+    public sealed class DbSnpReaderTests
+    {
+        private static IEnumerable<DbSnpItem> CreateTruthDbSnpItemSequence()
+        {
+			yield return new DbSnpItem("1", 820164, 74632680, "A",0, "G" ,0 );
+            yield return new DbSnpItem("1", 820181, 191755837, "C", 0.9995, "T", 0.0004591);
+            yield return new DbSnpItem("4", 78820304, 112709112, "C", 0.9913, "A", 0.008724);
+			yield return new DbSnpItem("4", 78820304, 112709112, "C", 0.9913, "T", 0.008724);
+        }
+
+        [Fact]
+        public void TestDbSnpReader()
+        {
+	        var dbSnpReader = new DbSnpReader(new FileInfo(Path.Combine("Resources", "TestDbSnpParser.vcf")));
+            Assert.True(dbSnpReader.SequenceEqual(CreateTruthDbSnpItemSequence()));
+        }
+
+	    
+		[Fact]
+        public void MissingEntry()
+        {
+            const string vcfLine =
+                "1	241369	rs11490246	C	T	.	.	RS=11490246;RSPOS=241369;dbSNPBuildID=120;SSR=0;SAO=0;VP=0x050000000005000126000100;WGT=1;VC=SNV;ASP;GNO;KGPhase3;CAF=0,1;COMMON=0";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+            Assert.Equal(11490246, dbSnpEntry.RsId);
+            Assert.Equal(1, dbSnpEntry.AltAlleleFreq);
+        }
+
+	    [Fact]
+	    public void EqualFrequencies()
+	    {
+			// NIR-942
+			const string vcfLine =
+				"1	1242707	rs2274262	A	G	.	.	RS=2274262;RSPOS=1242707;RV;dbSNPBuildID=100;SSR=0;SAO=0;VP=0x0501004a000507013e000100;WGT=1;VC=SNV;SLO;U5;INT;R5;ASP;VLD;G5A;G5;GNO;KGPhase1;KGPhase3;CAF=0.5,0.5;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+			var sa = new SupplementaryAnnotation(1242707);
+		    dbSnpEntry.SetSupplementaryAnnotations(sa);
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("A", sa.GlobalMajorAllele);
+			Assert.Equal("G", sa.GlobalMinorAllele);
+			
+	    }
+
+		[Fact]
+		public void RefGlobalMajor()
+		{
+			// NIR-942
+			const string vcfLine =
+				"1	1242707	rs2274262	A	G,T	.	.	RS=2274262;RSPOS=1242707;RV;dbSNPBuildID=100;SSR=0;SAO=0;VP=0x0501004a000507013e000100;WGT=1;VC=SNV;SLO;U5;INT;R5;ASP;VLD;G5A;G5;GNO;KGPhase1;KGPhase3;CAF=0.4,0.4,0.2;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+			var sa = new SupplementaryAnnotation(1242707);
+			dbSnpEntry.SetSupplementaryAnnotations(sa);
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("A", sa.GlobalMajorAllele);
+			Assert.Equal("G", sa.GlobalMinorAllele);
+
+
+		}
+
+	    
+		[Fact]
+		public void RefGlobalMinor()
+		{
+			// NIR-942
+			const string vcfLine =
+				"1	1242707	rs2274262	A	G,T	.	.	RS=2274262;RSPOS=1242707;RV;dbSNPBuildID=100;SSR=0;SAO=0;VP=0x0501004a000507013e000100;WGT=1;VC=SNV;SLO;U5;INT;R5;ASP;VLD;G5A;G5;GNO;KGPhase1;KGPhase3;CAF=0.2,0.2,0.6;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var sa = new SupplementaryAnnotation(1242707);
+			foreach (var dbSnpEntry in dbsnpReader.ExtractItem(vcfLine))
+			{
+				dbSnpEntry.SetSupplementaryAnnotations(sa);
+			}
+
+			sa.FinalizePositionalAnnotations();
+			
+			Assert.Equal("T", sa.GlobalMajorAllele);
+			Assert.Equal("G", sa.GlobalMinorAllele);
+			
+		}
+
+		[Fact]
+		public void ArbitraryGlobalAlleles()
+		{
+			// NIR-942
+			const string vcfLine =
+				"1	1242707	rs2274262	A	G,T	.	.	RS=2274262;RSPOS=1242707;RV;dbSNPBuildID=100;SSR=0;SAO=0;VP=0x0501004a000507013e000100;WGT=1;VC=SNV;SLO;U5;INT;R5;ASP;VLD;G5A;G5;GNO;KGPhase1;KGPhase3;CAF=0.2,0.4,0.4;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var sa = new SupplementaryAnnotation(1242707);
+			foreach (var dbSnpEntry in dbsnpReader.ExtractItem(vcfLine))
+			{
+				dbSnpEntry.SetSupplementaryAnnotations(sa);
+			}
+			
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("G", sa.GlobalMajorAllele);
+			Assert.Equal("T", sa.GlobalMinorAllele);
+		}
+
+	    [Fact]
+        public void MissingEntry2()
+        {
+            const string vcfLine =
+                "17	828	rs62053745	T	C	.	.	RS=62053745;RSPOS=828;dbSNPBuildID=129;SSR=0;SAO=0;VP=0x050100080005140136000100;WGT=1;VC=SNV;SLO;INT;ASP;VLD;GNO;KGPhase1;KGPhase3;CAF=0.2576,0.7424;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+            Assert.Equal(62053745, dbSnpEntry.RsId);
+            
+        }
+
+        
+	    [Fact]
+	    public void GlobalMajorTest()
+	    {
+			const string vcfLine =
+				"17	828	rs62053745	T	C	.	.	RS=62053745;RSPOS=828;dbSNPBuildID=129;SSR=0;SAO=0;VP=0x050100080005140136000100;WGT=1;VC=SNV;SLO;INT;ASP;VLD;GNO;KGPhase1;KGPhase3;CAF=0.2576,0.7424;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+			var sa = new SupplementaryAnnotation(1242707);
+			dbSnpEntry.SetSupplementaryAnnotations(sa);
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("C", sa.GlobalMajorAllele);
+			Assert.Equal("T", sa.GlobalMinorAllele);
+
+			Assert.Equal("0.7424", sa.GlobalMajorAlleleFrequency);
+			Assert.Equal("0.2576", sa.GlobalMinorAlleleFrequency);
+			
+	    }
+
+	    [Fact]
+	    public void MissingDbsnpId()
+	    {
+			// refactorSA. Annotation for C is missing in the database. have to debug that.
+			
+			const string vcfLine =
+				"X	21505833	rs12395602	G	A,C,T	.	.	RS=12395602;RSPOS=21505833;dbSNPBuildID=120;SSR=0;SAO=0;VP=0x05010008000505051f000101;WGT=1;VC=SNV;SLO;INT;ASP;VLD;G5;HD;GNO;KGPhase1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntries = dbsnpReader.ExtractItem(vcfLine);
+
+		    var sa = new SupplementaryAnnotation(21505833);
+		    foreach (var dbSnpEntry in dbSnpEntries)
+		    {
+			    dbSnpEntry.SetSupplementaryAnnotations(sa);
+		    }
+
+		    Assert.Equal(12395602, sa.AlleleSpecificAnnotations["A"].DbSnp[0]);
+			Assert.Equal(12395602, sa.AlleleSpecificAnnotations["C"].DbSnp[0]);
+			Assert.Equal(12395602, sa.AlleleSpecificAnnotations["T"].DbSnp[0]);
+		    
+
+	    }
+
+	    [Fact]
+		public void NoMinorAllele()
+		{
+			const string vcfLine =
+				"17	828	rs62053745	T	C	.	.	RS=62053745;RSPOS=828;dbSNPBuildID=129;SSR=0;SAO=0;VP=0x050100080005140136000100;WGT=1;VC=SNV;SLO;INT;ASP;VLD;GNO;KGPhase1;KGPhase3;CAF=.,0.7424;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+			var sa = new SupplementaryAnnotation(828);
+			dbSnpEntry.SetSupplementaryAnnotations(sa);
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("C", sa.GlobalMajorAllele);
+			Assert.Equal("0.7424", sa.GlobalMajorAlleleFrequency);
+			Assert.Null(sa.GlobalMinorAllele);
+			Assert.Null(sa.GlobalMinorAlleleFrequency);
+		}
+
+	    [Fact]
+	    public void DisregardZeroFreq()
+	    {
+		    const string vcfLine =
+			    "1	241369	rs11490246	C	T	.	.	RS=11490246;RSPOS=241369;dbSNPBuildID=120;SSR=0;SAO=0;VP=0x050100000005000126000100;WGT=1;VC=SNV;SLO;ASP;GNO;KGPhase3;CAF=0,1;COMMON=0";
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+			var sa = new SupplementaryAnnotation(828);
+			dbSnpEntry.SetSupplementaryAnnotations(sa);
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("T", sa.GlobalMajorAllele);
+			Assert.Equal("1", sa.GlobalMajorAlleleFrequency);
+			Assert.Null(sa.GlobalMinorAllele);
+			Assert.Null(sa.GlobalMinorAlleleFrequency);
+		}
+
+	    [Fact]
+		public void NoMinorAllele1()
+		{
+			const string vcfLine =
+				"17	828	rs62053745	T	C	.	.	RS=62053745;RSPOS=828;dbSNPBuildID=129;SSR=0;SAO=0;VP=0x050100080005140136000100;WGT=1;VC=SNV;SLO;INT;ASP;VLD;GNO;KGPhase1;KGPhase3;CAF=0.7424,.;COMMON=1";
+
+			var dbsnpReader = new DbSnpReader();
+			var dbSnpEntry = dbsnpReader.ExtractItem(vcfLine)[0];
+
+			var sa = new SupplementaryAnnotation(828);
+			dbSnpEntry.SetSupplementaryAnnotations(sa);
+			sa.FinalizePositionalAnnotations();
+
+			Assert.Equal("T", sa.GlobalMajorAllele);
+			Assert.Equal("0.7424", sa.GlobalMajorAlleleFrequency);
+			Assert.Null(sa.GlobalMinorAllele);
+			Assert.Null(sa.GlobalMinorAlleleFrequency);
+			
+		}
+
+	    [Fact]
+	    public void EqualityAndHash()
+	    {
+			var dbsnpItem = new DbSnpItem("chr1", 100, 101, "A", 0, "C",0);
+
+			var dbsnpHash = new HashSet<DbSnpItem> {dbsnpItem};
+
+			Assert.Equal(1, dbsnpHash.Count);
+			Assert.True(dbsnpHash.Contains(dbsnpItem));
+	    }
+
+    }
+}

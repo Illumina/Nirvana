@@ -1,0 +1,34 @@
+##fileformat=VCFv4.1
+##Copyright=HGMD. Not for redistribution.
+##source=HGMD_PRO_2015.2
+##reference=hg19
+##comment="REF and ALT sequences are both on forward strand of reference assembly"
+##IAE_TOP=<KEY=HGMD,MATCH=Position>
+##IAE_INFO=<INFO=CLASS,Type=String,JSON=class>
+##IAE_INFO=<INFO=MUT,Type=String,JSON=mutant>
+##IAE_INFO=<INFO=GENE,Type=String,JSON=gene>
+##IAE_INFO=<INFO=STRAND,Type=String,JSON=strand>
+##IAE_INFO=<INFO=DNA,Type=String,JSON=hgvsc>
+##IAE_INFO=<INFO=PROT,Type=String,JSON=hgvsp>
+##IAE_INFO=<INFO=DB,Type=String,JSON=dbsnp137>
+##IAE_INFO=<INFO=PHEN,Type=String,JSON=phenotype>
+##IAE_INFO=<INFO=ACC,Type=String,JSON=accession>
+##INFO=<ID=CLASS,Number=1,Type=String,Description="Mutation Category, https://portal.biobase-international.com/hgmd/pro/global.php#cats">
+##INFO=<ID=MUT,Number=1,Type=String,Description="HGMD mutant allele">
+##INFO=<ID=GENE,Number=1,Type=String,Description="Gene symbol">
+##INFO=<ID=STRAND,Number=1,Type=String,Description="Gene strand">
+##INFO=<ID=DNA,Number=1,Type=String,Description="DNA annotation">
+##INFO=<ID=PROT,Number=1,Type=String,Description="Protein annotation">
+##INFO=<ID=DB,Number=1,Type=String,Description="dbSNP identifier, build 137">
+##INFO=<ID=PHEN,Number=1,Type=String,Description="HGMD primary phenotype">
+##INFO=<ID=ACC,Number=1,Type=String,Description="HGMD accession"
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	899318	.	CCT	C	.	.	CLASS=DM?;MUT=ALT;GENE=KLHL17;STRAND=+;DNA=NM_198317.2:c.1375_1376delCT;PHEN=Schizophrenia;ACC=CD142720
+chr1	949523	.	C	T	.	.	CLASS=DM;MUT=ALT;GENE=ISG15;STRAND=+;DNA=NM_005101.3:c.163C>T;PROT=NP_005092.1:p.Q55*;PHEN=Idiopathic_basal_ganglia_calcification;ACC=CM1411641
+chr1	949696	.	C	CG	.	.	CLASS=DM;MUT=ALT;GENE=ISG15;STRAND=+;DNA=NM_005101.3:c.339dupG;PHEN=Mycobacterial_disease_mendelian_susceptibility_to;ACC=CI128669
+chr3	361508	.	C	T	.	.	CLASS=DP;MUT=ALT;GENE=CHL1;STRAND=+;DNA=NM_006614.3:c.49C>T;PROT=NP_006605.2:p.L17F;DB=rs2272522;PHEN=Schizophrenia_association_with;ACC=CM023348
+chr3	1269501	.	G	A	.	.	CLASS=DM?;MUT=ALT;GENE=CNTN6;STRAND=+;DNA=NM_014461.3:c.183-1G>A;PHEN=Adenomatous_polyposis_coli;ACC=CS1410394
+chr3	1363515	.	TA	T	.	.	CLASS=DM?;MUT=ALT;GENE=CNTN6;STRAND=+;DNA=NM_014461.3:c.944delA;PHEN=Adenomatous_polyposis_coli;ACC=CD1410396
+chr4	367647	.	C	T	.	.	CLASS=DM;MUT=ALT;GENE=ZNF141;STRAND=+;DNA=NM_003441.2:c.1421C>T;PROT=NP_003432.1:p.T474I;PHEN=Postaxial_polydactyly_type_A;ACC=CM130005
+chr4	437663	.	C	T	.	.	CLASS=DM?;MUT=ALT;GENE=ZNF721;STRAND=-;DNA=NM_133474.3:c.593G>A;PROT=NP_597731.2:p.R198H;PHEN=Schizophrenia;ACC=CM142691
+chr4	619535	.	CCCGCC	CGAGGACGGCCTGCGA	.	.	CLASS=DM;MUT=ALT;GENE=PDE6B;STRAND=+;DNA=NM_000283.3:c.121_125delCCGCCinsGAGGACGGCCTGCGA;PHEN=Retinitis_pigmentosa_autosomal_recessive;ACC=CX148735
