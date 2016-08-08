@@ -6,7 +6,7 @@
     "copyToOutput": {
       "mappings": {
         "BlockCompression.dll": "../VariantAnnotation/Packages/BlockCompression.dll",
-        "libBlockCompression.so": "../VariantAnnotation/Packages/libBlockCompression.so"
+        "libBlockCompression.so": "../VariantAnnotation/Packages/libBlockCompression.so",
         "libBlockCompression.dylib": "../VariantAnnotation/Packages/libBlockCompression.dylib"
       }
     }

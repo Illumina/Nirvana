@@ -105,7 +105,7 @@ namespace VariantAnnotation.CommandLine
             if (_showVersion || _showHelpMenu) return;
 
             Console.WriteLine();
-            Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(_peakMemoryUsageBytes));
+            if (_peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(_peakMemoryUsageBytes));
             Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(_wallTimeSpan));
         }
 

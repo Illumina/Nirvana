@@ -282,7 +282,7 @@ namespace VariantAnnotation.CommandLine
             if (!_showVersion && !_showHelpMenu)
             {
                 Console.WriteLine();
-                Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(PeakMemoryUsageBytes));
+                if(PeakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(PeakMemoryUsageBytes));
                 Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(WallTimeSpan));
             }
         }
