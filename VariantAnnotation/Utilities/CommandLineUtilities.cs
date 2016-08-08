@@ -90,7 +90,7 @@ namespace VariantAnnotation.Utilities
 
             // display the actual banner
             Console.WriteLine(line);
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Magenta;
             Console.Write(Title);
             Console.ResetColor();
             Console.WriteLine("{0}{1}", filler, Copyright);

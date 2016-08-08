@@ -117,7 +117,7 @@ namespace VariantAnnotation.DataStructures
             // display the reference time
             Console.WriteLine(_divider);
             Console.Write("reference:  {0}{1}", _referenceTime, filler);
-            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine(_referenceName);
             Console.ResetColor();
         }

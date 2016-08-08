@@ -7,7 +7,7 @@ namespace NDesk.Options
     {
         public static void WriteLabel(string label)
         {
-            Console.ForegroundColor = ConsoleColor.Green;
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.Write(label);
             Console.ResetColor();
         }
