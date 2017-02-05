@@ -1,113 +1,156 @@
 using System;
 using System.IO;
 using System.Text;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.FileHandling
 {
-    public class ExtendedBinaryReader
+    public sealed class ExtendedBinaryReader : BinaryReader
     {
         #region members
 
-        private readonly BinaryReader _reader;
+        private readonly Stream _stream;
+
+        // allows 9-digit precision for floating-point numbers
+        internal const int PrecisionConst = 1000000000;
 
         #endregion
 
-        // constructor
-        public ExtendedBinaryReader(BinaryReader reader)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public ExtendedBinaryReader(Stream s) : this(s, new UTF8Encoding()) { }
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public ExtendedBinaryReader(Stream input, Encoding encoding) : base(input, encoding)
         {
-            _reader = reader;
+            _stream = input;
         }
 
         /// <summary>
-        /// returns a boolean from the binary reader
+        /// returns a nullable (7-bit) byte from the binary reader
         /// </summary>
-        public bool ReadBoolean()
+        public byte? ReadOptNullByte()
         {
-            return _reader.ReadBoolean();
+            if (_stream == null) throw new GeneralException("File not open");
+
+            int i = _stream.ReadByte();
+            if (i == -1) throw new EndOfStreamException();
+
+            var b = (byte)i;
+            if ((b & 128) != 0) return null;
+            return (byte)(b & 127);
         }
 
         /// <summary>
-        /// returns a byte from the binary reader
+        /// returns a double-precision floating-point number from the binary reader
         /// </summary>
-        public byte ReadByte()
+        public double ReadOptDouble()
         {
-            return _reader.ReadByte();
-        }
+            if (_stream == null) throw new GeneralException("File not open");
 
-        public double ReadDouble()
-        {
-            //note that our float is limited to 9 digit precision
-            var i = ReadInt();
-            var f = 1.0 * i / SupplementaryAnnotation.PrecisionConst;
+            var i = ReadOptInt32();
+            var f = 1.0 * i / PrecisionConst;
             return f;
         }
 
         /// <summary>
-        /// returns a byte array from the binary reader
+        /// returns a single-precision floating-point number from the binary reader
         /// </summary>
-        public byte[] ReadBytes(int numBytes)
+        public float ReadOptSingle()
         {
-            var buffer    = new byte[numBytes];
-            int byteCount = _reader.Read(buffer, 0, numBytes);
-
-            if (byteCount != numBytes) throw new EndOfStreamException();
-
-            return buffer;
+            return (float)ReadOptDouble();
         }
 
         /// <summary>
         /// returns an integer from the binary reader
         /// </summary>
-        public int ReadInt()
+        public int ReadOptInt32()
         {
-            int num1 = 0;
-            int num2 = 0;
+            if (_stream == null) throw new GeneralException("File not open");
 
-            while (num2 != 35)
+            int count = 0;
+            int shift = 0;
+
+            while (shift != 35)
             {
-                byte num3 = _reader.ReadByte();
-                num1 |= (num3 & sbyte.MaxValue) << num2;
-                num2 += 7;
+                byte b = ReadByte();
+                count |= (b & sbyte.MaxValue) << shift;
+                shift += 7;
 
-                if ((num3 & 128) == 0) return num1;
+                if ((b & 128) == 0) return count;
             }
 
             throw new FormatException("Unable to read the 7-bit encoded integer");
         }
 
         /// <summary>
+        /// returns an integer from the binary reader
+        /// </summary>
+        public int? ReadOptNullableInt32()
+        {
+            if (_stream == null) throw new GeneralException("File not open");
+
+            var value = ReadOptInt32();
+            return value == -1 ? null : (int?)value;
+        }
+
+        /// <summary>
+        /// returns an unsigned integer from the binary reader
+        /// </summary>
+        public uint ReadOptUInt32()
+        {
+            return (uint)ReadOptInt32();
+        }
+
+        /// <summary>
         /// returns a long from the binary reader
         /// </summary>
-        public long ReadLong()
+        public long ReadOptInt64()
         {
-            long num1 = 0;
-            int num2 = 0;
+            if (_stream == null) throw new GeneralException("File not open");
 
-            while (num2 != 70)
+            long count = 0;
+            int shift = 0;
+
+            while (shift != 70)
             {
-                byte num3 = _reader.ReadByte();
-                num1 |= (long)(num3 & sbyte.MaxValue) << num2;
-                num2 += 7;
+                byte b = ReadByte();
+                count |= (long)(b & sbyte.MaxValue) << shift;
+                shift += 7;
 
-                if ((num3 & 128) == 0) return num1;
+                if ((b & 128) == 0) return count;
             }
 
             throw new FormatException("Unable to read the 7-bit encoded long");
         }
 
-        /// <summary>
-        /// returns an ASCII string from the binary reader
-        /// </summary>
-        public string ReadAsciiString()
+        public T[] ReadOptArray<T>(Func<T> readOptFunc)
         {
-            int numBytes = ReadInt();
+            if (_stream == null) throw new GeneralException("File not open");
 
-            // sanity check: handle null strings
-            if (numBytes == 0) return null;
+            var count = ReadOptInt32();
+            if (count == 0) return null;
+
+            var values = new T[count];
+            for (var i = 0; i < count; i++) values[i] = readOptFunc();
+            return values;
+        }
+
+		/// <summary>
+		/// returns an ASCII string from the binary reader
+		/// </summary>
+		public string ReadAsciiString()
+        {
+            if (_stream == null) throw new GeneralException("File not open");
+
+            int numBytes = ReadOptInt32();
 
             // grab the ASCII characters
-            return Encoding.ASCII.GetString(ReadBytes(numBytes));
+            // ReSharper disable once AssignNullToNotNullAttribute
+            return numBytes == 0 ? null : Encoding.ASCII.GetString(ReadBytes(numBytes));
         }
 
         /// <summary>
@@ -115,13 +158,10 @@ namespace VariantAnnotation.FileHandling
         /// </summary>
         public string ReadUtf8String()
         {
-            int numBytes = ReadInt();
+            int numBytes = ReadOptInt32();
 
-            // sanity check: handle null strings
-            if (numBytes == 0) return null;
-
-            // grab the utf-8 characters
-            return Encoding.UTF8.GetString(ReadBytes(numBytes));
+            // grab the UTF8 characters
+            return numBytes == 0 ? null : Encoding.UTF8.GetString(ReadBytes(numBytes));
         }
     }
 }

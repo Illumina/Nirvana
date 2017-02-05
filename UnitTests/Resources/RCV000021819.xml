@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+
+  <ClinVarSet ID="10331778">
+  <RecordStatus>current</RecordStatus>
+  <Title>NM_020975.4(RET):c.1896_1900delGCTGTinsCGTGC (p.Glu632_Cys634delinsAspValArg) AND MEN2A and Unclassified</Title>
+  <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-02-17" ID="79322">
+    <ClinVarAccession Acc="RCV000021819" Version="1" Type="RCV" DateUpdated="2016-02-17"/>
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2012-12-04">
+      <ReviewStatus>no assertion criteria provided</ReviewStatus>
+      <Description>Pathogenic</Description>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease"/>
+    <ObservedIn>
+      <Sample>
+        <Origin>not provided</Origin>
+        <Species TaxonomyId="9606">human</Species>
+        <AffectedStatus>not provided</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>clinical testing</MethodType>
+      </Method>
+      <ObservedData ID="9749387">
+        <Attribute Type="Description">not provided</Attribute>
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant" ID="38624">
+      <Measure Type="Indel" ID="47228">
+        <Name>
+          <ElementValue Type="Preferred">NM_020975.4(RET):c.1896_1900delGCTGTinsCGTGC (p.Glu632_Cys634delinsAspValArg)</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding" Change="c.1896_1900delinsCGTGC">NM_020630.4:c.1896_1900delinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, LRG" Change="c.1896_1900delGCTGTinsCGTGC">LRG_518t1:c.1896_1900delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, LRG" Change="c.1896_1900delGCTGTinsCGTGC">LRG_518t2:c.1896_1900delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, RefSeq" Change="c.1896_1900delGCTGTinsCGTGC">NM_020630.4:c.1896_1900delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, RefSeq" Change="c.1896_1900delGCTGTinsCGTGC">NM_020975.4:c.1896_1900delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, LRG" Change="g.42428_42432delGCTGTinsCGTGC">LRG_518:g.42428_42432delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.42428_42432delGCTGTinsCGTGC">NG_007489.1:g.42428_42432delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level" Change="g.43114496_43114500delGCTGTinsCGTGC" integerValue="38">NC_000010.11:g.43114496_43114500delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level, previous" Change="g.43609944_43609948delGCTGTinsCGTGC" integerValue="37">NC_000010.10:g.43609944_43609948delGCTGTinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein" Change="p.Glu632_Cys634delinsAspValArg">LRG_518p1:p.Glu632_Cys634delinsAspValArg</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein" Change="p.Glu632_Cys634delinsAspValArg">LRG_518p2:p.Glu632_Cys634delinsAspValArg</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein, RefSeq" Change="p.Glu632_Cys634delinsAspValArg">NP_065681.1:p.Glu632_Cys634delinsAspValArg</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein, RefSeq" Change="p.Glu632_Cys634delinsAspValArg">NP_066124.1:p.Glu632_Cys634delinsAspValArg</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="Location">Exon 11</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="MolecularConsequence">missense variant</Attribute>
+          <XRef ID="SO:0001583" DB="Sequence Ontology"/>
+          <XRef ID="NM_020630.4:c.1896_1900delGCTGTinsCGTGC" DB="RefSeq"/>
+        </AttributeSet>
+        <CytogeneticLocation>10q11.21</CytogeneticLocation>
+        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="43114496" stop="43114500" display_start="43114496" display_stop="43114500" variantLength="5" referenceAllele="GCTGT" alternateAllele="CGTGC"/>
+        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="43609944" stop="43609948" display_start="43609944" display_stop="43609948" variantLength="5" referenceAllele="GCTGT" alternateAllele="CGTGC"/>
+        <MeasureRelationship Type="variant in gene">
+          <Name>
+            <ElementValue Type="Preferred">ret proto-oncogene</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">RET</ElementValue>
+          </Symbol>
+          <AttributeSet>
+            <Attribute dateValue="2011-10-28" Type="Haploinsufficiency">Sufficient evidence for dosage pathogenicity</Attribute>
+            <Citation>
+              <URL>http://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=RET</URL>
+            </Citation>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute dateValue="2011-10-28" Type="Triplosensitivity">No evidence available</Attribute>
+            <Citation>
+              <URL>http://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=RET</URL>
+            </Citation>
+          </AttributeSet>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="43077026" stop="43130350" display_start="43077026" display_stop="43130350" variantLength="53283" Strand="+"/>
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="43572516" stop="43625798" display_start="43572516" display_stop="43625798" variantLength="53283" Strand="+"/>
+          <XRef ID="5979" DB="Gene"/>
+          <XRef Type="MIM" ID="164761" DB="OMIM"/>
+          <XRef ID="HGNC:9967" DB="HGNC"/>
+          <Comment DataSource="NCBI curation" Type="public">This gene is cited in the ACMG recommendations of 2013 (PubMed 23788249) for reporting incidental findings in exons.</Comment>
+        </MeasureRelationship>
+        <Citation Type="general">
+          <ID Source="PubMed">8099202</ID>
+        </Citation>
+        <XRef Type="rs" ID="377767408" DB="dbSNP"/>
+      </Measure>
+      <Name>
+        <ElementValue Type="Preferred">NM_020975.4(RET):c.1896_1900delGCTGTinsCGTGC (p.Glu632_Cys634delinsAspValArg)</ElementValue>
+      </Name>
+    </MeasureSet>
+    <TraitSet Type="Disease" ID="6759">
+      <Trait ID="16002" Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">MEN2A and Unclassified</ElementValue>
+        </Name>
+      </Trait>
+    </TraitSet>
+  </ReferenceClinVarAssertion>
+  <ClinVarAssertion ID="46066">
+    <ClinVarSubmissionID localKey="NM_020630.4:c.1896_1900delinsCGTGC|ARUP_RET" submitter="ARUP" submitterDate="2012-12-21" title="NM_020630.4:c.1896_1900delinsCGTGC and MEN2A and Unclassified"/>
+    <ClinVarAccession Acc="SCV000042485" Version="1" Type="SCV" OrgID="500009" DateUpdated="2015-06-27"/>
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2012-12-04">
+      <ReviewStatus>no assertion criteria provided</ReviewStatus>
+      <Description>Pathogenic</Description>
+      <Comment>Converted during submission to pathogenic.</Comment>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease"/>
+    <ObservedIn>
+      <Sample>
+        <Origin>not provided</Origin>
+        <Species>human</Species>
+        <AffectedStatus>not provided</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>clinical testing</MethodType>
+      </Method>
+      <ObservedData>
+        <Attribute Type="Description">not provided</Attribute>
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant">
+      <Measure Type="Indel">
+        <AttributeSet>
+          <Attribute Type="HGVS">NM_020630.4:c.1896_1900delinsCGTGC</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="Location">Exon 11</Attribute>
+        </AttributeSet>
+        <MeasureRelationship Type="variant in gene">
+          <Symbol>
+            <ElementValue Type="Preferred">RET</ElementValue>
+          </Symbol>
+        </MeasureRelationship>
+        <Citation Type="general">
+          <ID Source="PubMed">8099202</ID>
+        </Citation>
+      </Measure>
+    </MeasureSet>
+    <TraitSet Type="Disease">
+      <Trait Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">MEN2A and Unclassified</ElementValue>
+        </Name>
+      </Trait>
+    </TraitSet>
+    <Comment>This indel changes three amino acids (ELC&gt;DVR) which results in a C634R mutation. In vitro studies: RET activation (PMID 8612479). In the oldest reference, codon 634 was called codon 380. Additional reference: PMID 7595167.</Comment>
+  </ClinVarAssertion>
+</ClinVarSet>
+</ReleaseSet>

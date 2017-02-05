@@ -1,37 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.DataStructures.JsonAnnotations
 {
     /// <summary>
-    /// The JsonVariant represents an individual variant record in the
-    /// Elasticsearch schema. While one vcf record may contain many alternate
-    /// alleles and overlap with many genes, this class represents a single allele
-    /// and gene combination. This was desired because each record has a parent that
-    /// links to the gene and each record represents an individual alternate allele.
+    /// The JsonVariant represents an individual variant record. While one vcf record 
+	/// may contain many alternate alleles and overlap with many genes, this class
+	/// represents a single allele and gene combination. This was desired because each
+	/// record has a parent that links to the gene and each record represents an
+	/// individual alternate allele.
     /// </summary>
-    public sealed class JsonVariant : IAnnotatedAlternateAllele
-    {
+    public class JsonVariant : IAnnotatedAlternateAllele
+	{
         #region members
 
         // -----------------
         // position-specific
         // -----------------
 
-        public string VariantId { get; }
-        public string VariantType { get; }
-		public string ReferenceName { get; }    // 1
-        public int? ReferenceBegin { get; }     // 3452643
-        public int? ReferenceEnd { get; }
-        public Tuple<int, int> CiPos { get; }
-        public Tuple<int, int> CiEnd { get; }
+        public string VariantId { get; private set; }
+        public string VariantType { get; private set; }
+		public string ReferenceName { get; private set; }    // 1
+        public int? ReferenceBegin { get; private set; }     // 3452643
+        public int? ReferenceEnd { get; private set; }
 
 
         public string PhylopScore { get; set; } // 11.612
@@ -40,36 +36,41 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         public string EvsCoverage { get; set; }
         public string EvsSamples { get; set; }
         public string GlobalMinorAllele { get; set; }
-        public string RefAllele { get; }
+        public string RefAllele { get; private set; }
         public string GlobalMinorAlleleFrequency { get; set; }
 
-        public int GenotypeIndex { get; private set; }
+        public int GenotypeIndex { get; }
 
         // ---------------
         // allele-specific
         // ---------------
 
-        public string AltAllele { get; }
-        public readonly string SaAltAllele;
-        public bool IsReferenceMinor { get; }
-        public bool IsReference { get; }
-        public bool IsReferenceNoCall { get; }
+        public string AltAllele { get; private set; }
+        public string SaAltAllele { get; }
+        public bool IsReferenceMinor { get; private set; }
+        public bool IsReference { get; private set; }
+        public bool IsReferenceNoCall { get; private set; }
         public bool IsIntergenic { get; set; }
-        public IEnumerable<ITranscript> RefSeqTranscripts => _refSeqTranscripts;
-        public IEnumerable<ITranscript> EnsemblTranscripts => _ensemblTranscripts;
-        IEnumerable<IClinVar> IAnnotatedAlternateAllele.ClinVarEntries => ClinVarEntries;
-        IEnumerable<ICosmic> IAnnotatedAlternateAllele.CosmicEntries => CosmicEntries;
-        IEnumerable<ICustomAnnotation> IAnnotatedAlternateAllele.CustomItems => CustomItems;
+        public IList<IAnnotatedTranscript> RefSeqTranscripts { get; set; }
+        public IList<IAnnotatedTranscript> EnsemblTranscripts { get; set; }
+		public ISet<IClinVar> ClinVarEntries {get;}
+	    public IList<ICosmic> CosmicEntries { get; }
+	    public IList<ICustomAnnotation> CustomItems { get; }
 
-        IEnumerable<IRegulatoryRegion> IAnnotatedAlternateAllele.RegulatoryRegions => RegulatoryRegions;
+	    public ISet<IRegulatoryRegion> RegulatoryRegions { get; }
 
-        IEnumerable<string> IAnnotatedAlternateAllele.OverlappingGenes => OverlappingGenes;
-        public string[] DbSnpIds {  get; set; } // rs6025
+		public ISet<string> OverlappingGenes { get; }
+
+		public IList<IOverlapTranscript> SvOverlappingTranscripts { get; }
+
+		public string[] DbSnpIds {  get; set; } // rs6025
 
         //---------------
         // custom intervals
         //-----------------
-        IEnumerable<ICustomInterval> IAnnotatedAlternateAllele.CustomIntervals => CustomIntervals;
+	    public IList<ICustomInterval>  CustomIntervals { get; }
+
+
 
 
         // super populations
@@ -127,23 +128,8 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         public string ExacAlleleCountNonFinish { get; set; }
         public string ExacAlleleCountOther { get; set; }
         public string ExacAlleleCountSouthAsian { get; set; }
-        // -----------
-        // transcripts
-        // -----------
 
-        private readonly List<Transcript> _refSeqTranscripts;
-        private readonly List<Transcript> _ensemblTranscripts;
 
-        public HashSet<ClinVarItem> ClinVarEntries { get; }
-        public List<CosmicItem> CosmicEntries { get; }
-        public List<CustomItem> CustomItems { get; }
-        public HashSet<RegulatoryRegion> RegulatoryRegions { get; }
-        public HashSet<string> OverlappingGenes { get; }
-
-        //-------------
-        // custom intervals
-        //-------------
-        public List<CustomInterval> CustomIntervals { get; }
 
         #endregion
 
@@ -169,6 +155,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 		const string TranscriptsTag             = "transcripts";
 		const string RefseqTag                 = "refSeq";
 		const string EnsemblTag                = "ensembl";
+		const string OverlappingTranscriptsTag = "overlappingTranscripts";
 
 		const string OneKgAllTag = "oneKgAll";
 		const string OneKgAfrTag = "oneKgAfr";
@@ -227,10 +214,43 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 		#endregion
 
 		
-        public class RegulatoryRegion : IJsonSerializer, IRegulatoryRegion
+		public sealed class SvOverlapTranscript:IOverlapTranscript
+		{
+			#region members
+			public string TranscriptID { get;  }
+			public string IsCanonical { get; }
+			public string Hgnc { get;}
+			public string IsPartialOverlap { get; }
+			#endregion
+
+			public void SerializeJson(StringBuilder sb)
+			{
+				var jsonObject = new JsonObject(sb);
+
+				sb.Append(JsonObject.OpenBrace);
+				jsonObject.AddStringValue("transcript", TranscriptID);
+				jsonObject.AddStringValue("hgnc", Hgnc);
+				jsonObject.AddStringValue("isCanonical",IsCanonical,false);
+				jsonObject.AddStringValue("partialOverlap", IsPartialOverlap,false);
+				sb.Append(JsonObject.CloseBrace);
+			}
+
+			public SvOverlapTranscript(DataStructures.Transcript transcript, VariantAlternateAllele altAllele)
+			{
+				TranscriptID = transcript.Id.ToString();
+				IsCanonical = transcript.IsCanonical ? "true" : null;
+				Hgnc = transcript.Gene.Symbol;
+				var isFullOverlap = altAllele.Start <= transcript.Start && altAllele.End >= transcript.End;
+				IsPartialOverlap = isFullOverlap ? null : "true";
+			}
+		}
+
+        public sealed class RegulatoryRegion :  IRegulatoryRegion
         {
             #region members
+
             public string ID { get; set; }
+            public string Type { get; set; }
             public IEnumerable<string> Consequence { get; set; }
 
             #endregion
@@ -244,6 +264,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
                 sb.Append(JsonObject.OpenBrace);
                 jsonObject.AddStringValue("id", ID);
+                jsonObject.AddStringValue("type", Type);
                 jsonObject.AddStringValues("consequence", Consequence.ToArray());
                 sb.Append(JsonObject.CloseBrace);
             }
@@ -267,7 +288,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
         }
 
-        public class Transcript : ITranscript
+        public class Transcript : IAnnotatedTranscript
         {
             #region members
 
@@ -281,7 +302,8 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             public string Gene { get; set; }                     // ENSESTG00000032903
             public string Hgnc { get; set; }                     // OR4F5
             public string HgvsCodingSequenceName { get; set; }   // NM_001127612.1:c.382C>T
-            public string HgvsProteinSequenceName { get; set; }  // NP_000271.1:p.Arg128Cys
+            public string HgvsProteinSequenceName { get; set; }
+			public string GeneFusion { get; set; }
             public string IsCanonical { get; set; }              // true
             public string PolyPhenPrediction { get; set; }       // benign
             public string PolyPhenScore { get; set; }            // 0.002
@@ -290,37 +312,44 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             public string SiftPrediction { get; set; }           // deleterious
             public string SiftScore { get; set; }                // 0.01
             public string TranscriptID { get; set; }             // ENSESTT00000083143
+			public string BioType { private get; set; }                 // proteinCoding	
 
             #endregion
-			#region stringConstants
-			const string TranscriptTag= "transcript";
-			const string AminoAcidsTag         = "aminoAcids";
-			const string CdnaPosTag            = "cDnaPos";
-			const string CodonsTag             = "codons";
-			const string CdsPosTag             = "cdsPos";
-			const string ExonsTag              = "exons";
-			const string IntronsTag            = "introns";
-			const string GeneIdTag             = "geneId";
-			const string HgncTag               = "hgnc";
-			const string ConsequenceTag        = "consequence";
-			const string HgvscTag              = "hgvsc";
-			const string HgvspTag              = "hgvsp";
-			const string IsCanonicalTag        = "isCanonical";
-			const string PolyPhenScoreTag      = "polyPhenScore";
-			const string PolyPhenPredictionTag = "polyPhenPrediction";
-			const string ProteinIdTag          = "proteinId";
-			const string ProteinPosTag         = "proteinPos"; 
-			const string SiftScoreTag          = "siftScore";
-			const string SiftPredictionTag     = "siftPrediction";
-#endregion
 
-			public override string ToString()
+            #region stringConstants
+
+            const string TranscriptTag         = "transcript";
+            const string AminoAcidsTag         = "aminoAcids";
+            const string CdnaPosTag            = "cDnaPos";
+            const string CodonsTag             = "codons";
+            const string CdsPosTag             = "cdsPos";
+            const string ExonsTag              = "exons";
+            const string IntronsTag            = "introns";
+            const string GeneIdTag             = "geneId";
+            const string HgncTag               = "hgnc";
+            const string ConsequenceTag        = "consequence";
+            const string HgvscTag              = "hgvsc";
+            const string HgvspTag              = "hgvsp";
+            const string GeneFusionTag         = "geneFusion";
+            const string IsCanonicalTag        = "isCanonical";
+            const string PolyPhenScoreTag      = "polyPhenScore";
+            const string PolyPhenPredictionTag = "polyPhenPrediction";
+            const string ProteinIdTag          = "proteinId";
+            const string ProteinPosTag         = "proteinPos";
+            const string SiftScoreTag          = "siftScore";
+            const string SiftPredictionTag     = "siftPrediction";
+            const string BioTypeTag            = "bioType";
+
+            #endregion
+
+            public override string ToString()
             {
                 var sb = new StringBuilder();
                 var jsonObject = new JsonObject(sb);
 
                 sb.Append(JsonObject.OpenBrace);
 				jsonObject.AddStringValue(TranscriptTag, TranscriptID);
+				jsonObject.AddStringValue(BioTypeTag, BioType);
 				jsonObject.AddStringValue(AminoAcidsTag, AminoAcids);
 				jsonObject.AddStringValue(CdnaPosTag, ComplementaryDnaPosition);
 				jsonObject.AddStringValue(CodonsTag, Codons);
@@ -332,6 +361,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 				jsonObject.AddStringValues(ConsequenceTag, Consequence?.ToArray());
 				jsonObject.AddStringValue(HgvscTag, HgvsCodingSequenceName);
 				jsonObject.AddStringValue(HgvspTag, HgvsProteinSequenceName);
+				jsonObject.AddStringValue(GeneFusionTag,GeneFusion,false);
 				jsonObject.AddStringValue(IsCanonicalTag, IsCanonical, false);
 				jsonObject.AddStringValue(PolyPhenScoreTag, PolyPhenScore, false);
 				jsonObject.AddStringValue(PolyPhenPredictionTag, PolyPhenPrediction);
@@ -343,31 +373,36 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                 sb.Append(JsonObject.CloseBrace);
                 return sb.ToString();
             }
+
+
         }
 
         //-------
         // custom intervals
         //--------
 
+
+
         // constructor
-        private JsonVariant()
+        public JsonVariant()
         {
-            _refSeqTranscripts  = new List<Transcript>();
-            _ensemblTranscripts = new List<Transcript>();
-            ClinVarEntries      = new HashSet<ClinVarItem>();
-            CosmicEntries       = new List<CosmicItem>();
-            CustomItems         = new List<CustomItem>();
-            RegulatoryRegions   = new HashSet<RegulatoryRegion>();
-            CustomIntervals     = new List<CustomInterval>();
+            RefSeqTranscripts  = new List<IAnnotatedTranscript>();
+            EnsemblTranscripts = new List<IAnnotatedTranscript>();
+            ClinVarEntries      = new HashSet<IClinVar>();
+            CosmicEntries       = new List<ICosmic>();
+            CustomItems         = new List<ICustomAnnotation>();
+            RegulatoryRegions   = new HashSet<IRegulatoryRegion>();
+            CustomIntervals     = new List<ICustomInterval>();
             OverlappingGenes    = new HashSet<string>();
+			SvOverlappingTranscripts = new List<IOverlapTranscript>();
         }
 
         private JsonVariant(VariantAlternateAllele altAllele) : this()
         {
             VariantId = altAllele.VariantId;
             VariantType = altAllele.NirvanaVariantType.ToString();
-            ReferenceBegin = altAllele.ReferenceBegin;
-            ReferenceEnd = altAllele.ReferenceEnd;
+            ReferenceBegin = altAllele.Start;
+            ReferenceEnd = altAllele.End;
             RefAllele = altAllele.ReferenceAllele;
             AltAllele = altAllele.AlternateAllele;
             SaAltAllele = altAllele.SuppAltAllele;
@@ -376,8 +411,6 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
         public JsonVariant(VariantAlternateAllele altAllele, VariantFeature variant) : this(altAllele)
         {
-            CiPos = variant.CiPos == null ? null : new Tuple<int, int>(Convert.ToInt32(variant.CiPos[0]), Convert.ToInt32(variant.CiPos[1]));
-            CiEnd = variant.CiEnd == null ? null : new Tuple<int, int>(Convert.ToInt32(variant.CiEnd[0]), Convert.ToInt32(variant.CiEnd[1]));
             IsReferenceMinor = variant.IsRefMinor;
             IsReference = variant.IsReference;
             IsReferenceNoCall = variant.IsRefNoCall;
@@ -395,15 +428,15 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         /// </summary>
         public void AddTranscript(Transcript transcript, TranscriptDataSource transcriptDataSource)
         {
-            List<Transcript> transcripts;
+            IList<IAnnotatedTranscript> transcripts;
 
             switch (transcriptDataSource)
             {
                 case TranscriptDataSource.Ensembl:
-                    transcripts = _ensemblTranscripts;
+                    transcripts = EnsemblTranscripts;
                     break;
                 case TranscriptDataSource.RefSeq:
-                    transcripts = _refSeqTranscripts;
+                    transcripts = RefSeqTranscripts;
                     break;
                 default:
                     throw new GeneralException($"Found a transcript ({transcript.TranscriptID}) with an unexpected transcript data source ({transcriptDataSource})");
@@ -412,7 +445,102 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             transcripts.Add(transcript);
         }
 
+
         /// <summary>
+        /// clears the data structure
+        /// </summary>
+        public void Clear()
+        {
+            AncestralAllele = null;
+            AltAllele = null;
+            ReferenceBegin = null;
+            ReferenceName = null;
+            DbSnpIds = null;
+            ReferenceEnd = null;
+            EvsCoverage = null;
+            EvsSamples = null;
+            ExacCoverage = null;
+            GlobalMinorAllele = null;
+            RefAllele = null;
+            IsReferenceMinor = false;
+            IsIntergenic = false;
+            IsReference = false;
+            IsReferenceNoCall = false;
+            GlobalMinorAlleleFrequency = null;
+            VariantId = null;
+            VariantType = null;
+            PhylopScore = null;
+
+
+            AlleleFrequencyAdMixedAmerican = null;
+            AlleleFrequencyAfrican = null;
+            AlleleFrequencyAll = null;
+            AlleleFrequencyEastAsian = null;
+            AlleleFrequencyEuropean = null;
+            AlleleFrequencySouthAsian = null;
+
+
+            EvsAlleleFrequencyAfricanAmerican = null;
+            EvsAlleleFrequencyEuropeanAmerican = null;
+            EvsAlleleFrequencyAll = null;
+
+            ExacAlleleFrequencyAll = null;
+            ExacAlleleFrequencyAfrican = null;
+            ExacAlleleFrequencyAmerican = null;
+            ExacAlleleFrequencyEastAsian = null;
+            ExacAlleleFrequencyFinish = null;
+            ExacAlleleFrequencyNonFinish = null;
+            ExacAlleleFrequencyOther = null;
+            ExacAlleleFrequencySouthAsian = null;
+
+            ExacAlleleNumberAfrican = null;
+            ExacAlleleNumberAmerican = null;
+            ExacAlleleNumberAll = null;
+            ExacAlleleNumberEastAsian = null;
+            ExacAlleleNumberFinish = null;
+            ExacAlleleNumberNonFinish = null;
+            ExacAlleleNumberOther = null;
+            ExacAlleleNumberSouthAsian = null;
+
+            ExacAlleleCountAfrican = null;
+            ExacAlleleCountAmerican = null;
+            ExacAlleleCountAll = null;
+            ExacAlleleCountEastAsian = null;
+            ExacAlleleCountFinish = null;
+            ExacAlleleCountNonFinish = null;
+            ExacAlleleCountOther = null;
+            ExacAlleleCountSouthAsian = null;
+
+
+            OneKgAlleleNumberAfrican = null;
+            OneKgAlleleNumberAmerican = null;
+            OneKgAlleleNumberAll = null;
+            OneKgAlleleNumberEastAsian = null;
+            OneKgAlleleNumberEuropean = null;
+            OneKgAlleleNumberSouthAsian = null;
+
+            OneKgAlleleCountAfrican = null;
+            OneKgAlleleCountAmerican = null;
+            OneKgAlleleCountAll = null;
+            OneKgAlleleCountEastAsian = null;
+            OneKgAlleleCountEuropean = null;
+            OneKgAlleleCountSouthAsian = null;
+
+            RefSeqTranscripts.Clear();
+            EnsemblTranscripts.Clear();
+
+            CosmicEntries.Clear();
+            ClinVarEntries.Clear();
+            RegulatoryRegions.Clear();
+            CustomItems.Clear();
+            CustomIntervals.Clear();
+			OverlappingGenes.Clear();
+			SvOverlappingTranscripts.Clear();
+        }
+
+		
+
+		/// <summary>
 		/// returns a string representation of our variant
 		/// </summary>
 		public override string ToString()
@@ -458,69 +586,44 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             if (ClinVarEntries.Count > 0) jsonObject.AddObjectValues(ClinVarTag, ClinVarEntries);
             if (CosmicEntries.Count > 0) jsonObject.AddObjectValues(CosmicTag, CosmicEntries);
             // Custom annotations
-            if (CustomItems.Count > 0)
-            {
-                var customGroups = new Dictionary<string, List<CustomItem>>();
-                foreach (var customItem in CustomItems)
-                {
-                    var type = customItem.AnnotationType;
-                    if (customGroups.ContainsKey(type))
-                        customGroups[type].Add(customItem);
-                    else
-                    {
-                        customGroups[type] = new List<CustomItem> { customItem };
-                    }
-                }
-                foreach (var customGroup in customGroups)
-                {
-                    jsonObject.AddObjectValues(customGroup.Key, customGroup.Value);
-                }
+            if (CustomItems.Count > 0) AddCustomeItems(jsonObject);
 
-            }
             // Custom Intervals
             // if (CustomIntervals.Count > 0) jsonObject.AddObjectValues(CustomIntervals[0].Type, CustomIntervals);
-            if (CustomIntervals.Count > 0)
-            {
-                var intervalGroups = new Dictionary<string, List<CustomInterval>>();
-                foreach (var customInterval in CustomIntervals)
-                {
-                    var type = customInterval.Type;
-                    if (intervalGroups.ContainsKey(type))
-                        intervalGroups[type].Add(customInterval);
-                    else
-                    {
-                        intervalGroups[type] = new List<CustomInterval> { customInterval };
-                    }
-                }
-                foreach (var intervalGroup in intervalGroups)
-                {
-                    jsonObject.AddObjectValues(intervalGroup.Key, intervalGroup.Value);
-                }
-            }
+            if (CustomIntervals.Count > 0) AddCustomeIntervals(jsonObject);
 
-            // =================
-            // Overlapping Genes
-            // =================
 
-            if (OverlappingGenes.Count > 0)
+			// =================
+			// Overlapping Genes
+			// =================
+
+			if (OverlappingGenes.Count > 0)
             {
                 jsonObject.AddStringValues(OverlappingGenesTag, OverlappingGenes.ToArray());
             }
 
-            // ==========
-            // transcript
-            // ==========
+			// =================
+			// Overlapping Transcripts
+			// =================
+			if (SvOverlappingTranscripts.Any())
+			{
+				jsonObject.AddObjectValues(OverlappingTranscriptsTag, SvOverlappingTranscripts);
+			}
 
-            bool hasRefSeq = _refSeqTranscripts.Count > 0;
-            bool hasEnsembl = _ensemblTranscripts.Count > 0;
+			// ==========
+			// transcript
+			// ==========
+
+			var hasRefSeq = RefSeqTranscripts.Any();
+			var hasEnsembl = EnsemblTranscripts.Any();
 
             if (hasRefSeq || hasEnsembl)
             {
                 jsonObject.OpenObject(TranscriptsTag);
                 jsonObject.Reset();
 
-                if (hasRefSeq) jsonObject.AddStringValues(RefseqTag, _refSeqTranscripts.Select(t => t.ToString()), false);
-                if (hasEnsembl) jsonObject.AddStringValues(EnsemblTag, _ensemblTranscripts.Select(t => t.ToString()), false);
+                if (hasRefSeq) jsonObject.AddStringValues(RefseqTag, RefSeqTranscripts.Select(t => t.ToString()), false);
+                if (hasEnsembl) jsonObject.AddStringValues(EnsemblTag, EnsemblTranscripts.Select(t => t.ToString()), false);
 
                 jsonObject.CloseObject();
             }
@@ -591,50 +694,43 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             sb.Append(JsonObject.CloseBrace);
             return sb.ToString();
         }
-		
 
-  
+	    private void AddCustomeItems(JsonObject jsonObject)
+	    {
+		    var customGroups = new Dictionary<string, IList<ICustomAnnotation>>();
+		    foreach (var customItem in CustomItems)
+		    {
+			    var type = customItem.AnnotationType;
+			    if (customGroups.ContainsKey(type))
+				    customGroups[type].Add(customItem);
+			    else
+			    {
+				    customGroups[type] = new List<ICustomAnnotation> {customItem};
+			    }
+		    }
+		    foreach (var customGroup in customGroups)
+		    {
+			    jsonObject.AddObjectValues(customGroup.Key, customGroup.Value);
+		    }
+	    }
 
-        public class CustomInterval : DataStructures.CustomInterval, IJsonSerializer
-        {
-            public CustomInterval(DataStructures.CustomInterval customInterval)
-            {
-                Start = customInterval.Start;
-                End = customInterval.End;
-                ReferenceName = customInterval.ReferenceName;
-                Type = customInterval.Type;
-                StringValues = customInterval.StringValues;
-                NonStringValues = customInterval.NonStringValues;
-            }
-
-            public void SerializeJson(StringBuilder sb)
-            {
-                var jsonObject = new JsonObject(sb);
-
-                sb.Append(JsonObject.OpenBrace);
-                jsonObject.AddStringValue("Start", Start.ToString(), false);
-                jsonObject.AddStringValue("End", End.ToString(), false);
-                // jsonObject.AddStringValue("ReferenceName", ReferenceName);//should be a quoted string
-                // jsonObject.AddStringValue("Type",Type);//should be a quoted string
-
-                if (StringValues != null)
-                {
-                    foreach (var kvp in StringValues)
-                    {
-                        jsonObject.AddStringValue(kvp.Key, kvp.Value);
-                    }
-                }
-
-                if (NonStringValues != null)
-                {
-                    foreach (var kvp in NonStringValues)
-                    {
-                        jsonObject.AddStringValue(kvp.Key, kvp.Value, false);
-                    }
-                }
-
-                sb.Append(JsonObject.CloseBrace);
-            }
-        }
+	    private void AddCustomeIntervals(JsonObject jsonObject)
+		{
+			var intervalGroups = new Dictionary<string, List<ICustomInterval>>();
+			foreach (var customInterval in CustomIntervals)
+			{
+				var type = customInterval.Type;
+				if (intervalGroups.ContainsKey(type))
+					intervalGroups[type].Add(customInterval);
+				else
+				{
+					intervalGroups[type] = new List<ICustomInterval> { customInterval };
+				}
+			}
+			foreach (var intervalGroup in intervalGroups)
+			{
+				jsonObject.AddObjectValues(intervalGroup.Key, intervalGroup.Value);
+			}
+		}
     }
 }

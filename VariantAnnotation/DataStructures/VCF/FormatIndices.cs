@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class FormatIndices
+    internal sealed class FormatIndices
     {
         #region members
 
@@ -18,10 +18,14 @@
         internal int? DP;
         internal int? DPI;
         internal int? AD;
-        internal int? MCC;
+        internal int? VF;
+	    internal int? MCC;
 	    internal int? CN;
         internal int? NR;
         internal int? NV;
+	    internal int? DQ;
+	    internal int? PR;
+	    internal int? SR;
         // ReSharper restore InconsistentNaming
 
         #endregion
@@ -37,7 +41,7 @@
             var formatIndices = new FormatIndices();
             var formatCols = formatColumn.Split(':');
 
-            for (int index = 0; index < formatCols.Length; index++)
+            for (var index = 0; index < formatCols.Length; index++)
             {
                 switch (formatCols[index])
                 {
@@ -81,6 +85,7 @@
                         formatIndices.AD = index;
                         break;
                     case "VF":
+                        formatIndices.VF = index;
                         break;
 					case "MCC":
 		                formatIndices.MCC = index;
@@ -94,6 +99,15 @@
                     case "NV":
                         formatIndices.NV = index;
                         break;
+					case "DQ":
+		                formatIndices.DQ = index;
+		                break;
+					case "PR":
+		                formatIndices.PR = index;
+		                break;
+					case "SR":
+		                formatIndices.SR = index;
+						break;
                 }
             }
 

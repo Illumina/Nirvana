@@ -9,5 +9,5 @@
 
 // grab the zlib version
 char* GetVersion();
-// inflate the block in compressed_block into uncompressed_block
-int uncompress_block(char* uncompressed_block, char* compressed_block, int block_length);
+// inflate the block in source array into the destination array
+int bgzf_decompress(char* destination, int destinationLen, char* source, int sourceLen);

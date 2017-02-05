@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using VariantAnnotation.DataStructures.CytogeneticBands;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.CompressedSequence
 {
-    public class CompressedSequence : ICompressedSequence
+    public sealed class CompressedSequence : ICompressedSequence
     {
         #region members
 
+        public ChromosomeRenamer Renamer { get; } = new ChromosomeRenamer();
+        public ICytogeneticBands CytogeneticBands { get; set; }
+        public GenomeAssembly GenomeAssembly { get; set; }
         public int NumBases { get; private set; }
+        private int _sequenceOffset;
         private byte[] _buffer;
 
-        private IntervalTree<MaskedEntry> _maskedIntervalTree;
+        private IIntervalSearch<MaskedEntry> _maskedIntervalSearch;
 
         private readonly char[] _convertNumberToBase;
 
@@ -20,8 +27,6 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
         // constructor
         public CompressedSequence()
         {
-            _maskedIntervalTree = new IntervalTree<MaskedEntry>();
-
             const string bases = "GCTA";
             _convertNumberToBase = bases.ToCharArray();
         }
@@ -49,11 +54,12 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
         /// <summary>
         /// sets the underlying data for the compressed sequence
         /// </summary>
-        public void Set(int numBases, byte[] buffer, IntervalTree<MaskedEntry> maskedIntervalTree)
+        public void Set(int numBases, byte[] buffer, IIntervalSearch<MaskedEntry> maskedIntervalSearch, int sequenceOffset = 0)
         {
-            NumBases            = numBases;
-            _buffer             = buffer;
-            _maskedIntervalTree = maskedIntervalTree;
+            NumBases              = numBases;
+            _buffer               = buffer;
+            _maskedIntervalSearch = maskedIntervalSearch;
+            _sequenceOffset     = sequenceOffset;
         }
 
         /// <summary>
@@ -61,8 +67,10 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
         /// </summary>
         public string Substring(int offset, int length)
         {
+            offset -= _sequenceOffset;
+
             // handle negative offsets and lengths
-            if ((offset < 0) || (length < 1) || (offset >= NumBases)) return null;
+            if (offset < 0 || length < 1 || offset >= NumBases) return null;
 
             // sanity check: avoid going past the end of the sequence
             if (offset + length > NumBases) length = NumBases - offset;
@@ -79,8 +87,7 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
 
             // get the overlapping masked interval
             var maskedIntervals = new List<MaskedEntry>();
-            var overlapInterval = new IntervalTree<MaskedEntry>.Interval(string.Empty, offset, offset + length - 1);
-            _maskedIntervalTree.GetAllOverlappingValues(overlapInterval, maskedIntervals);
+            _maskedIntervalSearch.GetAllOverlappingValues(offset, offset + length - 1, maskedIntervals);
 
             // get the first masked interval
             int numIntervals = maskedIntervals.Count;
@@ -92,10 +99,10 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
             {
                 int currentPosition = offset + baseIndex;
 
-                if (hasMaskedIntervals && (currentPosition >= currentInterval.Begin) && (currentPosition <= currentInterval.End))
+                if (hasMaskedIntervals && currentPosition >= currentInterval.Begin && currentPosition <= currentInterval.End)
                 {
                     // evaluate the masked bases
-                    for (; baseIndex <= currentInterval.End - offset && (baseIndex < length); baseIndex++) decompressBuffer[baseIndex] = 'N';
+                    for (; baseIndex <= currentInterval.End - offset && baseIndex < length; baseIndex++) decompressBuffer[baseIndex] = 'N';
                     baseIndex--;
 
                     indexAndShiftTuple = GetBaseIndexAndShift(offset + baseIndex);

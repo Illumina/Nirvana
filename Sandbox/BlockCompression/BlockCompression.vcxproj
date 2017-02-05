@@ -28,7 +28,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <WholeProgramOptimization>PGOptimize</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -77,7 +77,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;BLOCKGZIPCOMPRESSION_EXPORTS;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_DEPRECATE;HAVE_BUILTIN_CTZL;MEDIUM_STRATEGY;X86_64;X86_NOCHECK_SSE2;UNALIGNED_OK;UNROLL_LESS;X86_CPUID;X86_SSE2_FILL_WINDOW;X86_SSE4_2_CRC_HASH;X86_PCLMULQDQ_CRC;X86_QUICK_STRATEGY;HAVE_PTW32_CONFIG_H;PTW32_BUILD_INLINED;PTW32_STATIC_LIB;CLEANUP=__CLEANUP_C;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <CompileAs>CompileAsC</CompileAs>
-      <AdditionalIncludeDirectories>$(ProjectDir)\zlib-ng;$(ProjectDir)\htslib;$(ProjectDir)\htslib\htslib;$(ProjectDir)\illumina;$(ProjectDir)\pthreads-w32-2-9-1-release;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\zlib-ng;$(ProjectDir)\htslib;$(ProjectDir)\htslib\htslib;$(ProjectDir)\illumina;$(ProjectDir)\pthreads-w32-2-9-1-release;$(ProjectDir)\zstd\lib;$(ProjectDir)\zstd\lib\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <EnableEnhancedInstructionSet>AdvancedVectorExtensions</EnableEnhancedInstructionSet>
     </ClCompile>
@@ -97,6 +97,7 @@
     <ClCompile Include="pthreads-w32-2-9-1-release\pthread.c" />
     <ClCompile Include="quicklz-1.5.0\quicklz.c" />
     <ClCompile Include="zlib-ng\adler32.c" />
+    <ClCompile Include="zlib-ng\compress.c" />
     <ClCompile Include="zlib-ng\crc32.c" />
     <ClCompile Include="zlib-ng\deflate.c" />
     <ClCompile Include="zlib-ng\deflate_fast.c" />
@@ -113,6 +114,16 @@
     <ClCompile Include="zlib-ng\arch\x86\insert_string_sse.c" />
     <ClCompile Include="zlib-ng\arch\x86\crc_folding.c" />
     <ClCompile Include="zlib-ng\arch\x86\deflate_quick.c" />
+    <ClCompile Include="zstd\lib\common\entropy_common.c" />
+    <ClCompile Include="zstd\lib\common\fse_decompress.c" />
+    <ClCompile Include="zstd\lib\common\xxhash.c" />
+    <ClCompile Include="zstd\lib\common\zstd_common.c" />
+    <ClCompile Include="zstd\lib\compress\fse_compress.c" />
+    <ClCompile Include="zstd\lib\compress\huf_compress.c" />
+    <ClCompile Include="zstd\lib\compress\zstd_compress.c" />
+    <ClCompile Include="zstd\lib\decompress\huf_decompress.c" />
+    <ClCompile Include="zstd\lib\decompress\zbuff_decompress.c" />
+    <ClCompile Include="zstd\lib\decompress\zstd_decompress.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="illumina\BlockGZipUtils.h" />
@@ -131,6 +142,7 @@
     <ClInclude Include="zlib-ng\zconf.h" />
     <ClInclude Include="zlib-ng\zlib.h" />
     <ClInclude Include="zlib-ng\zutil.h" />
+    <ClInclude Include="zstd\lib\zstd.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BlockCompression.def" />

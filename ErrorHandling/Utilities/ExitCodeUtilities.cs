@@ -11,7 +11,7 @@ namespace ErrorHandling.Utilities
         #region members
 
         private static readonly Dictionary<Type, int> ExceptionsToExitCodes;
-        private static readonly HashSet<Type> UserFriendlyExceptions; 
+        private static readonly HashSet<Type> UserFriendlyExceptions;
 
         #endregion
         
@@ -67,11 +67,6 @@ namespace ErrorHandling.Utilities
 
             if (!UserFriendlyExceptions.Contains(exceptionType))
             {
-                // Grab the line number and filename
-                //var st = new StackTrace(e, true);
-                //var sf = st.GetFrame(0);
-                //if (sf != null) Console.WriteLine("       File: {0}, Line: {1}", Path.GetFileName(sf.GetFileName()), sf.GetFileLineNumber());
-
                 // print the stack trace
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("\nStack trace:");

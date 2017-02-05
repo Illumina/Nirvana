@@ -3,7 +3,7 @@ using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Algorithms.Consequences
 {
-    public class BasicVariantEffects
+    public sealed class BasicVariantEffects
     {
         #region members
 
@@ -11,7 +11,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
         public bool IsDeletion { get; private set; }
 
-        public bool IsInsertion { get; private set; }
+        public bool IsInsertion { get; }
 
         // Nirvana additions
         public readonly string ReferenceCodon;
@@ -50,11 +50,14 @@ namespace VariantAnnotation.Algorithms.Consequences
             AlternateAminoAcidsLen = AlternateAminoAcids.Length;
 
             // variant type-specific
-            IsDeletion  = altAllele.VepVariantType == VariantType.deletion;
-            IsInsertion = altAllele.VepVariantType == VariantType.insertion;
+	        IsDeletion = altAllele.NirvanaVariantType == VariantType.deletion;
+	        IsInsertion = altAllele.NirvanaVariantType == VariantType.insertion;
 
             // within coding region
             if (ta.HasValidCdsStart || ta.HasValidCdsEnd) IsCoding = true;
+
+			//insertion in start codon and do not change start codon
+	        if (IsInsertion && ta.ProteinBegin <= 1 && AlternateAminoAcids.EndsWith(ReferenceAminoAcids)) IsCoding = false;
         }
     }
 }

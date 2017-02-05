@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\SAUtils\SAUtils.csproj" />
+    <ProjectReference Include="..\..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+    <ProjectReference Include="..\..\VariantAnnotation\VariantAnnotation.csproj" />
+    <ProjectReference Include="..\Piano\Piano.csproj" />
+    <ProjectReference Include="..\TrimAndUnifyVcfs\TrimAndUnifyVcfs.csproj" />
+    <ProjectReference Include="..\UnifyClinGenFiles\UnifyClinGenFiles.csproj" />
+  </ItemGroup>
+  <Import Project="..\..\VariantAnnotation\CommonAssemblyInfo.props" />
+</Project>

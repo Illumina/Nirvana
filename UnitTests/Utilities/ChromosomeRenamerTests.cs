@@ -6,19 +6,16 @@ using Xunit;
 
 namespace UnitTests.Utilities
 {
-    [Collection("Chromosome 1 collection")]
     public class ChromosomeRenamerTests
     {
         #region members
 
-        private readonly ChromosomeRenamer _chromosomeRenamer;
+        private readonly ChromosomeRenamer _renamer = new ChromosomeRenamer();
 
         #endregion
 
         public ChromosomeRenamerTests()
         {
-            _chromosomeRenamer = new ChromosomeRenamer();
-
             var referenceMetadata = new List<ReferenceMetadata>
             {
                 new ReferenceMetadata("chr1", "1", true),
@@ -29,7 +26,7 @@ namespace UnitTests.Utilities
                 new ReferenceMetadata("chrEBV", "EBV", false)
             };
 
-            _chromosomeRenamer.AddReferenceMetadata(referenceMetadata);
+            _renamer.AddReferenceMetadata(referenceMetadata);
         }
 
         [Theory]
@@ -39,17 +36,17 @@ namespace UnitTests.Utilities
         [InlineData("dummy", "dummy")]
         public void GetUcscReferenceName(string ensemblReferenceName, string expectedReferenceName)
         {
-            string observedReferenceName = _chromosomeRenamer.GetUcscReferenceName(ensemblReferenceName);
+            var observedReferenceName = _renamer.GetUcscReferenceName(ensemblReferenceName);
             Assert.Equal(expectedReferenceName, observedReferenceName);
         }
 
         [Fact]
         public void DisableOriginalOnFailedLookup()
         {
-            string observedReferenceName = _chromosomeRenamer.GetUcscReferenceName("dummy", false);
+            var observedReferenceName = _renamer.GetUcscReferenceName("dummy", false);
             Assert.Equal(null, observedReferenceName);
 
-            observedReferenceName = _chromosomeRenamer.GetEnsemblReferenceName("dummy", false);
+            observedReferenceName = _renamer.GetEnsemblReferenceName("dummy", false);
             Assert.Equal(null, observedReferenceName);
         }
 
@@ -106,7 +103,7 @@ namespace UnitTests.Utilities
         [InlineData("dummy", "dummy")]
         public void GetEnsemblReferenceName(string ucscReferenceName, string expectedReferenceName)
         {
-            string observedReferenceName = _chromosomeRenamer.GetEnsemblReferenceName(ucscReferenceName);
+            var observedReferenceName = _renamer.GetEnsemblReferenceName(ucscReferenceName);
             Assert.Equal(expectedReferenceName, observedReferenceName);
         }
 
@@ -118,7 +115,7 @@ namespace UnitTests.Utilities
         [InlineData("dummy", false)]
         public void InReferenceAndVep(string referenceName, bool expectedResult)
         {
-            var observedResult = _chromosomeRenamer.InReferenceAndVep(referenceName);
+            var observedResult = _renamer.InReferenceAndVep(referenceName);
             Assert.Equal(expectedResult, observedResult);
         }
     }

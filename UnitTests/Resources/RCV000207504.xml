@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+<ClinVarSet ID="13286458">
+  <RecordStatus>current</RecordStatus>
+  <Title>NM_005343.3(HRAS):c.37G&gt;T (p.Gly13Cys) AND not provided</Title>
+  <ReferenceClinVarAssertion DateCreated="2016-02-20" DateLastUpdated="2016-08-29" ID="492539">
+    <ClinVarAccession Acc="RCV000207504" Version="1" Type="RCV" DateUpdated="2016-08-29" />
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2014-06-04">
+      <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+      <Description>Pathogenic</Description>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease" />
+    <ObservedIn>
+      <Sample>
+        <Origin>unknown</Origin>
+        <Species TaxonomyId="9606">human</Species>
+        <AffectedStatus>yes</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>clinical testing</MethodType>
+      </Method>
+      <ObservedData ID="12775338">
+        <Attribute integerValue="1" Type="VariantAlleles" />
+      </ObservedData>
+      <ObservedData ID="12775338">
+        <Attribute integerValue="1" Type="VariantChromosomes" />
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant" ID="12606">
+      <Measure Type="single nucleotide variant" ID="27645">
+        <Name>
+          <ElementValue Type="Preferred">NM_005343.3(HRAS):c.37G&gt;T (p.Gly13Cys)</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Change="c.-283G&gt;T" Accession="NM_001318054" Version="1" Type="HGVS, coding, RefSeq">NM_001318054.1:c.-283G&gt;T</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Change="c.37G&gt;T" Accession="NM_005343" Version="3" Type="HGVS, coding, RefSeq">NM_005343.3:c.37G&gt;T</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Change="g.6265G&gt;T" Accession="NG_007666" Version="1" Type="HGVS, genomic, RefSeqGene">NG_007666.1:g.6265G&gt;T</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Change="g.534286C&gt;A" Accession="NC_000011" Version="10" Type="HGVS, genomic, top level" integerValue="38">NC_000011.10:g.534286C&gt;A</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Change="g.534286C&gt;A" Accession="NC_000011" Version="9" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000011.9:g.534286C&gt;A</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, incomplete">c.37G&gt;T</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Change="c.37G&gt;T" Accession="NM_005343" Version="2" Type="HGVS, previous">NM_005343.2:c.37G&gt;T</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein">p.G13C:GGT&gt;TGT</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Change="p.Gly13Cys" Accession="NP_005334" Version="1" Type="HGVS, protein, RefSeq">NP_005334.1:p.Gly13Cys</Attribute>
+          <XRef Type="rs" ID="104894228" DB="dbSNP" />
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="Location">NM_005343.2:exon 2</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="MolecularConsequence">5 prime UTR variant</Attribute>
+          <XRef ID="SO:0001623" DB="Sequence Ontology" />
+          <XRef ID="NM_001318054.1:c.-283G&gt;T" DB="RefSeq" />
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="MolecularConsequence">missense variant</Attribute>
+          <XRef ID="SO:0001583" DB="Sequence Ontology" />
+          <XRef ID="NM_005343.3:c.37G&gt;T" DB="RefSeq" />
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="ProteinChange1LetterCode">G13C</Attribute>
+          <XRef Type="Allelic variant" ID="190020.0007" DB="OMIM" />
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="ProteinChange3LetterCode">GLY13CYS</Attribute>
+          <XRef Type="Allelic variant" ID="190020.0007" DB="OMIM" />
+        </AttributeSet>
+        <CytogeneticLocation>11p15.5</CytogeneticLocation>
+        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="534286" stop="534286" display_start="534286" display_stop="534286" variantLength="1" referenceAllele="C" alternateAllele="A" />
+        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="534286" stop="534286" display_start="534286" display_stop="534286" variantLength="1" referenceAllele="C" alternateAllele="A" />
+        <MeasureRelationship Type="variant in gene">
+          <Name>
+            <ElementValue Type="Preferred">HRas proto-oncogene, GTPase</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">HRAS</ElementValue>
+          </Symbol>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="532242" stop="535567" display_start="532242" display_stop="535567" Strand="-" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NT_187586.1" start="61883" stop="65208" display_start="61883" display_stop="65208" Strand="-" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="532241" stop="535549" display_start="532241" display_stop="535549" variantLength="3309" Strand="-" />
+          <XRef ID="3265" DB="Gene" />
+          <XRef Type="MIM" ID="190020" DB="OMIM" />
+          <XRef ID="HGNC:5173" DB="HGNC" />
+        </MeasureRelationship>
+        <MeasureRelationship Type="variant in gene">
+          <Name>
+            <ElementValue Type="Preferred">leucine rich repeat containing 56</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">LRRC56</ElementValue>
+          </Symbol>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="518967" stop="554916" display_start="518967" display_stop="554916" Strand="+" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NT_187586.1" start="67163" stop="84556" display_start="67163" display_stop="84556" Strand="+" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="537521" stop="554915" display_start="537521" display_stop="554915" variantLength="17395" Strand="+" />
+          <XRef ID="115399" DB="Gene" />
+          <XRef ID="HGNC:25430" DB="HGNC" />
+        </MeasureRelationship>
+        <XRef Type="Allelic variant" ID="190020.0007" DB="OMIM" />
+        <XRef Type="rs" ID="104894228" DB="dbSNP" />
+      </Measure>
+      <Name>
+        <ElementValue Type="Preferred">NM_005343.3(HRAS):c.37G&gt;T (p.Gly13Cys)</ElementValue>
+      </Name>
+    </MeasureSet>
+    <TraitSet Type="Disease" ID="9460">
+      <Trait ID="17556" Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">not provided</ElementValue>
+        </Name>
+        <XRef ID="CN221809" DB="MedGen" />
+      </Trait>
+    </TraitSet>
+  </ReferenceClinVarAssertion>
+  <ClinVarAssertion ID="492524">
+    <ClinVarSubmissionID localKey="NM_005343.2:c.37G&gt;T|none provided" submittedAssembly="GRCh37" submitter="Molecular Diagnostics Lab,Nemours Alfred I. duPont Hospital for Children" submitterDate="2015-12-22" />
+    <ClinVarAccession Acc="SCV000263057" Version="1" Type="SCV" OrgID="28338" DateUpdated="2016-03-15" />
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2014-06-04">
+      <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+      <Description>Pathogenic</Description>
+      <Citation>
+        <ID Source="PubMed">168335863</ID>
+      </Citation>
+      <Citation>
+        <ID Source="PubMed">19213030</ID>
+      </Citation>
+      <Citation>
+        <ID Source="PubMed">21438134</ID>
+      </Citation>
+      <Citation>
+        <ID Source="PubMed">16372351</ID>
+      </Citation>
+      <Citation>
+        <ID Source="PubMed">16329078</ID>
+      </Citation>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease" />
+    <AttributeSet>
+      <Attribute Type="AssertionMethod">ACMG guidelines 2015</Attribute>
+      <Citation>
+        <ID Source="PubMed">25741868</ID>
+      </Citation>
+    </AttributeSet>
+    <ObservedIn>
+      <Sample>
+        <Origin>unknown</Origin>
+        <Species TaxonomyId="9606">human</Species>
+        <Age Type="minimum" age_unit="years">10</Age>
+        <Age Type="maximum" age_unit="years">19</Age>
+        <AffectedStatus>yes</AffectedStatus>
+        <Gender>female</Gender>
+      </Sample>
+      <Method>
+        <MethodType>clinical testing</MethodType>
+      </Method>
+      <ObservedData>
+        <Attribute Type="VariantAlleles" integerValue="1" />
+      </ObservedData>
+      <ObservedData>
+        <Attribute Type="VariantChromosomes" integerValue="1" />
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant">
+      <Measure Type="Variation">
+        <Name>
+          <ElementValue Type="Alternate">p.Gly13Cys</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="Location">NM_005343.2:exon 2</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS">NM_005343.2:c.37G&gt;T</Attribute>
+        </AttributeSet>
+        <MeasureRelationship Type="variant in gene">
+          <Symbol>
+            <ElementValue Type="Preferred">HRAS</ElementValue>
+          </Symbol>
+        </MeasureRelationship>
+        <XRef DB="dbSNP" ID="104894228" Type="rsNumber" />
+      </Measure>
+    </MeasureSet>
+    <TraitSet Type="Disease">
+      <Trait Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">none provided</ElementValue>
+        </Name>
+      </Trait>
+    </TraitSet>
+  </ClinVarAssertion>
+</ClinVarSet>
+
+</ReleaseSet>

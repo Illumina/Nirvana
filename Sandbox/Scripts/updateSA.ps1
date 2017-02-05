@@ -12,7 +12,7 @@ $NirvanaSourceDir="D:\Projects\Nirvana"
 $ExternalDataRootDir="\\ussd-prd-isi04\Nirvana\Development\ExternalDataSources"
 
 $RefVersion=5.2
-$currentSAversion=32.3
+$currentSAversion=36.7
 
 $GRCh37="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh37.Nirvana.dat"
 $GRCh38="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh38.Nirvana.dat"
@@ -30,28 +30,24 @@ $ExtractMiniSAdb="$NirvanaSourceDir\sandbox\x64\Release\ExtractMiniSAdb.exe"
 
 $SAisilonPath="\\ussd-prd-isi04\Nirvana\Development\SupplementaryDatabase\$currentSAversion"
 $PhylopFolder="\\ussd-prd-isi04\Nirvana\SupplementaryDatabase\PhyloP\latest"
-
+$OmimDatabase="\\ussd-prd-isi04\Nirvana\Development\OmimDatabase\1\genePhenotypeMap.mim"
 # ================
 # update files
 # ================
 
+$CVR="$ExternalDataRootDir\ClinVar\20160831\xml\ClinVarFullRelease_2016-09.xml.gz"
+
 $DBS37="$ExternalDataRootDir\dbSNP\147\GRCh37\dbSNP_v147.lexi.vcf.gz"
-$CSM37="$ExternalDataRootDir\COSMIC\v77\GRCh37\NirvanaFiles\allCosmicMutations_sorted.vcf.gz"
-$TSV37="$ExternalDataRootDir\COSMIC\v77\GRCh37\NirvanaFiles\combinedMutationStudies.tsv.gz"
-$CVR37="$ExternalDataRootDir\ClinVar\20160705\GRCh37\clinvar_20160705.lexi.vcf.gz"
+$CSM37="$ExternalDataRootDir\COSMIC\v78\GRCh37\VCF\allCosmicMutations_lexi.vcf.gz"
+$TSV37="$ExternalDataRootDir\COSMIC\v78\GRCh37\combinedMutationStudies.tsv.gz"
 $DGV37="$ExternalDataRootDir\DGV\2016-05-15\GRCh37\GRCh37_hg19_variants_2016-05-15_sorted.txt.gz"
 $CLINGEN37="$ExternalDataRootDir\ClinGen\2016-04-14_UCSC\GRCh37\ClinGen_GRCh37_unified_sorted.tsv.gz"
-$PUB37="$ExternalDataRootDir\ClinVar\20160705\GRCh37\var_citations.txt.gz"
-$EVAL37="$ExternalDataRootDir\ClinVar\20160705\GRCh37\variant_summary.txt.gz"
 
 $DBS38="$ExternalDataRootDir\dbSNP\147\GRCh38\dbSNP_v147.lexi.vcf.gz"
-$CSM38="$ExternalDataRootDir\COSMIC\v77\GRCh38\NirvanaFiles\allCosmicMutations_sorted.vcf.gz"
-$TSV38="$ExternalDataRootDir\COSMIC\v77\GRCh38\NirvanaFiles\combinedMutationStudies.tsv.gz"
-$CVR38="$ExternalDataRootDir\ClinVar\20160705\GRCh38\clinvar_20160705.lexi.vcf.gz"
+$CSM38="$ExternalDataRootDir\COSMIC\v78\GRCh38\VCF\allCosmicMutations_lexi.vcf.gz"
+$TSV38="$ExternalDataRootDir\COSMIC\v78\GRCh38\combinedMutationStudies.tsv.gz"
 $DGV38="$ExternalDataRootDir\DGV\2016-05-15\GRCh38\GRCh38_hg38_variants_2016-05-15_sorted.txt.gz"
 $CLINGEN38="$ExternalDataRootDir\ClinGen\2016-04-14_UCSC\GRCh38\ClinGen_GRCh38_unified_sorted.tsv.gz"
-$PUB38="$ExternalDataRootDir\ClinVar\20160705\GRCh38\var_citations.txt.gz"
-$EVAL38="$ExternalDataRootDir\ClinVar\20160705\GRCh38\variant_summary.txt.gz"
 
 # ==================
 # files won't update
@@ -97,10 +93,18 @@ function updateMiniSA(){
 mkdir $SAOutGRCh37
 mkdir $SAOutGRCh38
 
-bg "SA-37" "$CreateSupplementaryDatabase --out $SAOutGRCh37 --ref $GRCh37 --dbs $DBS37 --csm $CSM37 --tsv $TSV37 --evs $EVS37 --cvr $CVR37 --pub $PUB37 --eval $EVAL37 --onek $ONEK37  --onekSv $ONEKSV37 --dgv $DGV37 --clinGen $CLINGEN37 --exac $EXAC37"
+#============================
+# copy OMIM
+#============================
+	Copy-Item $OmimDatabase $SAOutGRCh37
+	Copy-Item $OmimDatabase $SAOutGRCh38
+
+	
+
+bg "SA-37" "$CreateSupplementaryDatabase --out $SAOutGRCh37 --ref $GRCh37 --dbs $DBS37 --csm $CSM37 --tsv $TSV37 --evs $EVS37 --cvr $CVR --onek $ONEK37  --onekSv $ONEKSV37 --dgv $DGV37 --clinGen $CLINGEN37 --exac $EXAC37"
 
 
-bg "SA-38" "$CreateSupplementaryDatabase --out $SAOutGRCh38 --ref $GRCh38 --dbs $DBS38 --csm $CSM38 --tsv $TSV38 --evs $EVS38 --cvr $CVR38 --pub $PUB38 --eval $EVAL38 --onek $ONEK38  --dgv $DGV38 --clinGen $CLINGEN38"
+bg "SA-38" "$CreateSupplementaryDatabase --out $SAOutGRCh38 --ref $GRCh38 --dbs $DBS38 --csm $CSM38 --tsv $TSV38 --evs $EVS38 --cvr $CVR --onek $ONEK38  --dgv $DGV38 --clinGen $CLINGEN38"
 
 get-job|wait-job
 
@@ -131,6 +135,7 @@ function updateMiniCA(){
 	}
 
 }
+
 
 
 ##########

@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using VariantAnnotation.Algorithms;
+using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class VariantAlternateAllele : IEquatable<VariantAlternateAllele>
+    public sealed class VariantAlternateAllele : IEquatable<VariantAlternateAllele>, IInterval, IAllele
     {
         #region members
 
-        public int ReferenceBegin;
-        public int ReferenceEnd;
+        public int Start { get; set; }
+        public int End { get; set; }
 
         public string ReferenceAllele;
         public string AlternateAllele;
@@ -20,13 +21,13 @@ namespace VariantAnnotation.DataStructures
         public bool IsStructuralVariant;
 
         public string CopyNumber;
-        public BreakEnd BreakEnd;
+        public List<BreakEnd> BreakEnds;
 
         // will be used for consequence reporting
-        public VariantType VepVariantType     = VariantType.unknown;
+        public VariantType VepVariantType = VariantType.unknown;
 
         // this is the real variant type that will be output into the VCF and JSON files
-        public VariantType NirvanaVariantType = VariantType.unknown;
+        public VariantType NirvanaVariantType { get; set; } = VariantType.unknown;
 
         public readonly int GenotypeIndex;
 
@@ -37,31 +38,30 @@ namespace VariantAnnotation.DataStructures
         public string ConservationScore;
         public string VariantId;
 
-        public SupplementaryAnnotation SupplementaryAnnotation;
-	    public readonly List<CustomInterval> CustomIntervals;
-	    
+        public ISupplementaryAnnotationPosition SupplementaryAnnotationPosition;
+        public readonly List<ICustomInterval> CustomIntervals;
 
         // This is the SA's alternate allele representation of this variant's alternate allele . We need this for extracting the appropriate allele specific annotation.
         public string SuppAltAllele;
 
         public readonly bool IsSymbolicAllele;
-		  
+
         #endregion
 
         // constructor
         public VariantAlternateAllele(int begin, int end, string refAllele, string altAllele, int genotypeIndex = 1)
         {
-            ReferenceBegin  = begin;
-            ReferenceEnd    = end;
+            Start           = begin;
+            End             = end;
             AlternateAllele = altAllele.ToUpperInvariant();
             ReferenceAllele = refAllele.ToUpperInvariant();
             GenotypeIndex   = genotypeIndex;
 
-            int dummyInt = ReferenceBegin;
-            SuppAltAllele = SupplementaryAnnotation.GetReducedAlleles(ReferenceAllele, AlternateAllele, ref dummyInt).Item2;
+            int dummyInt  = Start;
+            SuppAltAllele = SupplementaryAnnotationUtilities.GetReducedAlleles(dummyInt, ReferenceAllele, AlternateAllele).Item3;
 
             IsSymbolicAllele = StructuralVariant.IsSymbolicAllele(altAllele);
-			CustomIntervals= new List<CustomInterval>();
+            CustomIntervals  = new List<ICustomInterval>();
         }
 
         /// <summary>
@@ -69,90 +69,88 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         public VariantAlternateAllele(VariantAlternateAllele altAllele)
         {
-            AlternateAllele              = altAllele.AlternateAllele;
-            BreakEnd                     = altAllele.BreakEnd;
-            ConservationScore            = altAllele.ConservationScore;
-            CopyNumber                   = altAllele.CopyNumber;
-            GenotypeIndex                = altAllele.GenotypeIndex;
-            _isForwardTranscriptDuplicate = altAllele._isForwardTranscriptDuplicate;
-            _isReverseTranscriptDuplicate = altAllele._isReverseTranscriptDuplicate;
-            IsStructuralVariant          = altAllele.IsStructuralVariant;
-            IsSymbolicAllele             = altAllele.IsSymbolicAllele;
-            NirvanaVariantType           = altAllele.NirvanaVariantType;
-            ReferenceAllele              = altAllele.ReferenceAllele;
-            ReferenceBegin               = altAllele.ReferenceBegin;
-            ReferenceEnd                 = altAllele.ReferenceEnd;
-            SuppAltAllele                = altAllele.SuppAltAllele;
-            SupplementaryAnnotation      = altAllele.SupplementaryAnnotation;
-            VariantId                    = altAllele.VariantId;
-            VepVariantType               = altAllele.VepVariantType;
+            AlternateAllele                 = altAllele.AlternateAllele;
+            BreakEnds                       = altAllele.BreakEnds;
+            ConservationScore               = altAllele.ConservationScore;
+            CopyNumber                      = altAllele.CopyNumber;
+            GenotypeIndex                   = altAllele.GenotypeIndex;
+            _isForwardTranscriptDuplicate   = altAllele._isForwardTranscriptDuplicate;
+            _isReverseTranscriptDuplicate   = altAllele._isReverseTranscriptDuplicate;
+            IsStructuralVariant             = altAllele.IsStructuralVariant;
+            IsSymbolicAllele                = altAllele.IsSymbolicAllele;
+            NirvanaVariantType              = altAllele.NirvanaVariantType;
+            ReferenceAllele                 = altAllele.ReferenceAllele;
+            Start                           = altAllele.Start;
+            End                             = altAllele.End;
+            SuppAltAllele                   = altAllele.SuppAltAllele;
+            SupplementaryAnnotationPosition = altAllele.SupplementaryAnnotationPosition;
+            VariantId                       = altAllele.VariantId;
+            VepVariantType                  = altAllele.VepVariantType;
         }
 
-        public void CheckForDuplicationForAltAllele()
-	    {
-			if (VepVariantType != VariantType.insertion) return;
-			int altAlleleLen = AlternateAllele.Length;
+        public void CheckForDuplicationForAltAllele(ICompressedSequence compressedSequence)
+        {
+            if (VepVariantType != VariantType.insertion) return;
+            int altAlleleLen = AlternateAllele.Length;
 
-	        var compressedSequence = AnnotationLoader.Instance.CompressedSequence;
-			var forwardRegion = compressedSequence.Substring(ReferenceBegin - 1, altAlleleLen);
-			var reverseRegion = compressedSequence.Substring(ReferenceEnd - altAlleleLen, altAlleleLen);
+            var forwardRegion = compressedSequence.Substring(Start - 1, altAlleleLen);
+            var reverseRegion = compressedSequence.Substring(End - altAlleleLen, altAlleleLen);
 
-			_isForwardTranscriptDuplicate = forwardRegion == AlternateAllele;
-			_isReverseTranscriptDuplicate = reverseRegion == AlternateAllele;
-		}
+            _isForwardTranscriptDuplicate = forwardRegion == AlternateAllele;
+            _isReverseTranscriptDuplicate = reverseRegion == AlternateAllele;
+        }
 
-	    public bool CheckForDuplicationForAltAlleleWithinTranscript(Transcript transcript)
-	    {
-			if (VepVariantType != VariantType.insertion) return false;
-			int altAlleleLen = AlternateAllele.Length;
-			var compressedSequence = AnnotationLoader.Instance.CompressedSequence;
-		    string compareRegion;
+        public bool CheckForDuplicationForAltAlleleWithinTranscript(ICompressedSequence compressedSequence, Transcript transcript)
+        {
+            if (VepVariantType != VariantType.insertion) return false;
+            int altAlleleLen = AlternateAllele.Length;
+            string compareRegion;
 
-            if (transcript.OnReverseStrand)
-		    {
-				if( ReferenceEnd+altAlleleLen > transcript.End) return false;
-			    compareRegion = compressedSequence.Substring(ReferenceBegin - 1, altAlleleLen);
-		    }
-		    else
-		    {
-				if(ReferenceBegin - altAlleleLen < transcript.Start) return false;
-			    compareRegion = compressedSequence.Substring(ReferenceEnd - altAlleleLen, altAlleleLen);
+            if (transcript.Gene.OnReverseStrand)
+            {
+                if (End + altAlleleLen > transcript.End) return false;
+                compareRegion = compressedSequence.Substring(Start - 1, altAlleleLen);
+            }
+            else
+            {
+                if (Start - altAlleleLen < transcript.Start) return false;
+                compareRegion = compressedSequence.Substring(End - altAlleleLen, altAlleleLen);
 
-		    }
+            }
 
-			if (compareRegion == AlternateAllele) return true;
-			return false;
-		}
+            if (compareRegion == AlternateAllele) return true;
+            return false;
+        }
 
-		public void AddCustomAnnotation(SupplementaryAnnotation sa)
-		{
-			// sanity check: SVs don't use supplementary annotations for now
-			if (IsStructuralVariant) return;
-
-			sa.SetIsAlleleSpecific(SuppAltAllele);
-
-			if (SupplementaryAnnotation == null)
-			{
-				SupplementaryAnnotation = sa;
-				return;
-			}
-			
-			if (SupplementaryAnnotation.CustomItems != null)
-				SupplementaryAnnotation.CustomItems.AddRange(sa.CustomItems);
-			else SupplementaryAnnotation.CustomItems = sa.CustomItems;
-
-		}
-        /// <summary>
-        /// sets the supplementary annotation allele
-        /// </summary>
-        public void SetSupplementaryAnnotation(SupplementaryAnnotation sa)
+        public void AddCustomAnnotation(ISupplementaryAnnotationPosition sa)
         {
             // sanity check: SVs don't use supplementary annotations for now
             if (IsStructuralVariant) return;
 
             sa.SetIsAlleleSpecific(SuppAltAllele);
 
-            SupplementaryAnnotation = sa;
+            if (SupplementaryAnnotationPosition == null)
+            {
+                SupplementaryAnnotationPosition = sa;
+                return;
+            }
+
+            if (SupplementaryAnnotationPosition.CustomItems != null)
+                SupplementaryAnnotationPosition.CustomItems.AddRange(sa.CustomItems);
+            else SupplementaryAnnotationPosition.CustomItems = sa.CustomItems;
+
+        }
+        /// <summary>
+        /// sets the supplementary annotation allele
+        /// </summary>
+        public void SetSupplementaryAnnotation(ISupplementaryAnnotationPosition sa)
+        {
+            // sanity check: SVs don't use supplementary annotations for now
+            if (IsStructuralVariant) return;
+
+            sa.SetIsAlleleSpecific(SuppAltAllele);
+
+            SupplementaryAnnotationPosition = sa;
         }
 
         /// <summary>
@@ -163,10 +161,10 @@ namespace VariantAnnotation.DataStructures
             if (ReferenceEquals(this, other)) return true;
             if (other == null) return false;
 
-            return (ReferenceBegin  == other.ReferenceBegin)  &&
-                   (ReferenceEnd    == other.ReferenceEnd)    &&
-                   (ReferenceAllele == other.ReferenceAllele) &&
-                   (AlternateAllele == other.AlternateAllele);
+            return Start           == other.Start           &&
+                   End             == other.End             &&
+                   ReferenceAllele == other.ReferenceAllele &&
+                   AlternateAllele == other.AlternateAllele;
         }
 
         /// <summary>
@@ -180,24 +178,22 @@ namespace VariantAnnotation.DataStructures
 
             sb.AppendFormat("reference allele: {0}\n", ReferenceAllele);
             sb.AppendFormat("variant allele:   {0}\n", AlternateAllele);
-            sb.AppendFormat("reference range:  {0} - {1}\n", ReferenceBegin, ReferenceEnd);
+            sb.AppendFormat("reference range:  {0} - {1}\n", Start, End);
             sb.AppendFormat("variant type:     {0}\n", VepVariantType);
 
             sb.AppendLine(new string('-', 42));
 
             return sb.ToString();
-		}
+        }
 
-	    public void AddCustomIntervals(List<CustomInterval> overlappingCustomIntervals)
-	    {
-		    if (overlappingCustomIntervals == null) return;
+        public void AddCustomIntervals(List<ICustomInterval> overlappingCustomIntervals)
+        {
+            if (overlappingCustomIntervals == null) return;
 
-		    foreach (var customInterval in overlappingCustomIntervals)
-		    {
-			    if (customInterval.Overlaps(ReferenceBegin,ReferenceEnd)) CustomIntervals.Add(customInterval);
-		    }
-	    }
-
-	    
+            foreach (var customInterval in overlappingCustomIntervals)
+            {
+                if (Overlap.Partial(this, customInterval)) CustomIntervals.Add(customInterval);
+            }
+        }
     }
 }

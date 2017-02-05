@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.DataStructures;
+﻿using VariantAnnotation.DataStructures.IntervalSearch;
+using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.FileHandling
 {
@@ -11,9 +12,20 @@ namespace VariantAnnotation.FileHandling
         public const ulong EofTag       = 0xBE5D111165CF8CF6;
 
         public const int NumBasesPerByte = 4;
+
+        public const int NumBasesMask      = 0x3FFFFFFF;
+        public const int SequenceOffsetBit = 0x40000000;
+
+        public static bool HasSequenceOffset(int num) => (num & SequenceOffsetBit) != 0;
     }
 
-    public class ReferenceMetadata
+    public sealed class ReferenceSequence
+    {
+        public string Name;
+        public string Bases;
+    }
+
+    public sealed class ReferenceMetadata
     {
         public readonly string UcscName;
         public readonly string EnsemblName;
@@ -29,9 +41,9 @@ namespace VariantAnnotation.FileHandling
 
         public void Write(ExtendedBinaryWriter writer)
         {
-            writer.WriteAsciiString(UcscName);
-            writer.WriteAsciiString(EnsemblName);
-            writer.WriteBoolean(InVep);
+            writer.WriteOptAscii(UcscName);
+            writer.WriteOptAscii(EnsemblName);
+            writer.Write(InVep);
         }
 
         public static ReferenceMetadata Read(ExtendedBinaryReader reader)
@@ -44,16 +56,11 @@ namespace VariantAnnotation.FileHandling
         }
     }
 
-    public class MaskedEntry
+    public sealed class MaskedEntry
     {
-        #region members
-
         public readonly int Begin;
         public readonly int End;
 
-        #endregion
-
-        // constructor
         public MaskedEntry(int begin, int end)
         {
             Begin = begin;
@@ -61,10 +68,12 @@ namespace VariantAnnotation.FileHandling
         }
     }
 
-    public class SequenceIndexEntry
+    public sealed class SequenceIndexEntry
     {
+        public string Name;
         public int NumBases;
-        public long Offset;
-        public IntervalTree<MaskedEntry> MaskedEntries = new IntervalTree<MaskedEntry>();
+        public long FileOffset;
+        public int SequenceOffset;
+        public IIntervalSearch<MaskedEntry> MaskedEntries = new NullIntervalSearch<MaskedEntry>();
     }
 }

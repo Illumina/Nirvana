@@ -22,13 +22,13 @@ namespace VariantAnnotation.CommandLine
         private readonly string _programDescription;
         private readonly string _programAuthors;
 
-        protected readonly StringBuilder ErrorBuilder;
-        protected readonly string ErrorSpacer;
+        private readonly StringBuilder _errorBuilder;
+        private readonly string _errorSpacer;
 
         private readonly IVersionProvider _versionProvider;
 
-        protected long PeakMemoryUsageBytes;
-        protected TimeSpan WallTimeSpan;
+        private long _peakMemoryUsageBytes;
+        private TimeSpan _wallTimeSpan;
 
         #endregion
 
@@ -50,9 +50,31 @@ namespace VariantAnnotation.CommandLine
             if (versionProvider == null) versionProvider = new NirvanaVersionProvider();
             _versionProvider = versionProvider;
 
-            ErrorBuilder = new StringBuilder();
-            ErrorSpacer  = new string(' ', 7);
+            _errorBuilder = new StringBuilder();
+            _errorSpacer  = new string(' ', 7);
         }
+
+        /// <summary>
+        /// checks that the output filename has been specified and that it contains the appropriate suffix
+        /// </summary>
+        protected void CheckOutputFilenameSuffix(string filePath, string fileSuffix, string description)
+        {
+            // check that a path was specified
+            if (string.IsNullOrEmpty(filePath))
+            {
+                _errorBuilder.AppendFormat("{0}ERROR: The {1} filename was not specified\n", _errorSpacer, description);
+                SetExitCode(ExitCodes.MissingCommandLineOption);
+                return;
+            }
+
+            // check that the path ends in the suffix
+            if (!filePath.EndsWith(fileSuffix))
+            {
+                _errorBuilder.AppendFormat("{0}ERROR: The {1} filename ({2}) does not end with a {3}\n", _errorSpacer, description, Path.GetFileName(filePath), fileSuffix);
+                SetExitCode(ExitCodes.MissingFilenameSuffix);
+            }
+        }
+
 
         /// <summary>
         /// checks if an input directory exists
@@ -63,13 +85,13 @@ namespace VariantAnnotation.CommandLine
             {
                 if (isRequired)
                 {
-                    ErrorBuilder.AppendFormat("{0}ERROR: The {1} directory was not specified. Please use the {2} parameter.\n", ErrorSpacer, description, commandLineOption);
+                    _errorBuilder.AppendFormat("{0}ERROR: The {1} directory was not specified. Please use the {2} parameter.\n", _errorSpacer, description, commandLineOption);
                     SetExitCode(ExitCodes.MissingCommandLineOption);
                 }
             }
             else if (!Directory.Exists(directoryPath))
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: The {1} directory ({2}) does not exist.\n", ErrorSpacer, description, directoryPath);
+                _errorBuilder.AppendFormat("{0}ERROR: The {1} directory ({2}) does not exist.\n", _errorSpacer, description, directoryPath);
                 SetExitCode(ExitCodes.PathNotFound);
             }
         }
@@ -80,7 +102,7 @@ namespace VariantAnnotation.CommandLine
 			{
 				if (isRequired)
 				{
-					ErrorBuilder.AppendFormat("{0}ERROR: The {1} directory was not specified. Please use the {2} parameter.\n", ErrorSpacer, description, commandLineOption);
+					_errorBuilder.AppendFormat("{0}ERROR: The {1} directory was not specified. Please use the {2} parameter.\n", _errorSpacer, description, commandLineOption);
 					SetExitCode(ExitCodes.MissingCommandLineOption);
 				}
 			}
@@ -99,13 +121,13 @@ namespace VariantAnnotation.CommandLine
             {
                 if (isRequired)
                 {
-                    ErrorBuilder.AppendFormat("{0}ERROR: The {1} file was not specified. Please use the {2} parameter.\n", ErrorSpacer, description, commandLineOption);
+                    _errorBuilder.AppendFormat("{0}ERROR: The {1} file was not specified. Please use the {2} parameter.\n", _errorSpacer, description, commandLineOption);
                     SetExitCode(ExitCodes.MissingCommandLineOption);
                 }
             }
             else if (!File.Exists(filePath))
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: The {1} file ({2}) does not exist.\n", ErrorSpacer, description, filePath);
+                _errorBuilder.AppendFormat("{0}ERROR: The {1} file ({2}) does not exist.\n", _errorSpacer, description, filePath);
                 SetExitCode(ExitCodes.FileNotFound);
             }
         }
@@ -117,7 +139,7 @@ namespace VariantAnnotation.CommandLine
         {
             if (EqualityComparer<T>.Default.Equals(parameterValue, default(T)))
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: The {1} was not specified. Please use the {2} parameter.\n", ErrorSpacer, description, commandLineOption);
+                _errorBuilder.AppendFormat("{0}ERROR: The {1} was not specified. Please use the {2} parameter.\n", _errorSpacer, description, commandLineOption);
                 SetExitCode(ExitCodes.MissingCommandLineOption);
             }
         }
@@ -129,7 +151,7 @@ namespace VariantAnnotation.CommandLine
         {
             if (date == null)
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: The {1} was not specified. Please use the {2} parameter.\n", ErrorSpacer, description, commandLineOption);
+                _errorBuilder.AppendFormat("{0}ERROR: The {1} was not specified. Please use the {2} parameter.\n", _errorSpacer, description, commandLineOption);
                 SetExitCode(ExitCodes.MissingCommandLineOption);
             }
             else
@@ -137,7 +159,7 @@ namespace VariantAnnotation.CommandLine
                 DateTime result;
                 if (!DateTime.TryParse(date, out result))
                 {
-                    ErrorBuilder.AppendFormat("{0}ERROR: {1} was not specified as a date (YYYY-MM-dd). Please use the {2} parameter.\n", ErrorSpacer, description, commandLineOption);
+                    _errorBuilder.AppendFormat("{0}ERROR: {1} was not specified as a date (YYYY-MM-dd). Please use the {2} parameter.\n", _errorSpacer, description, commandLineOption);
                     SetExitCode(ExitCodes.BadArguments);
                 }   
             }
@@ -148,9 +170,9 @@ namespace VariantAnnotation.CommandLine
         /// </summary>
         protected void HasOneOptionSelected(bool a, string aCommandLineOption, bool b, string bCommandLineOption)
         {
-            if ((!a && !b) || (a && b))
+            if (!a && !b || a && b)
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: Either the {1} or the {2} option should be selected.\n", ErrorSpacer, aCommandLineOption, bCommandLineOption);
+                _errorBuilder.AppendFormat("{0}ERROR: Either the {1} or the {2} option should be selected.\n", _errorSpacer, aCommandLineOption, bCommandLineOption);
                 SetExitCode(ExitCodes.BadArguments);
             }
         }
@@ -162,7 +184,7 @@ namespace VariantAnnotation.CommandLine
         {
             if (num == 0)
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: At least one {1} should be provided.\n", ErrorSpacer, description);
+                _errorBuilder.AppendFormat("{0}ERROR: At least one {1} should be provided.\n", _errorSpacer, description);
                 SetExitCode(ExitCodes.MissingCommandLineOption);
             }
         }
@@ -174,12 +196,12 @@ namespace VariantAnnotation.CommandLine
         {
             if (num == 0)
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: One option must be selected: {1}.\n", ErrorSpacer, possibleCommandLineOptions);
+                _errorBuilder.AppendFormat("{0}ERROR: One option must be selected: {1}.\n", _errorSpacer, possibleCommandLineOptions);
                 SetExitCode(ExitCodes.BadArguments);
             }
             else if (num > 1)
             {
-                ErrorBuilder.AppendFormat("{0}ERROR: Only one of the options can be selected: {1}.\n", ErrorSpacer, possibleCommandLineOptions);
+                _errorBuilder.AppendFormat("{0}ERROR: Only one of the options can be selected: {1}.\n", _errorSpacer, possibleCommandLineOptions);
                 SetExitCode(ExitCodes.BadArguments);
             }
         }
@@ -187,7 +209,7 @@ namespace VariantAnnotation.CommandLine
         /// <summary>
         /// sets the exit code
         /// </summary>
-        protected void SetExitCode(ExitCodes exitCode)
+        private void SetExitCode(ExitCodes exitCode)
         {
             if (ExitCode == 0) ExitCode = (int)exitCode;
         }
@@ -232,7 +254,7 @@ namespace VariantAnnotation.CommandLine
                     }
                     catch (OptionException oe)
                     {
-                        ErrorBuilder.AppendFormat("{0}ERROR: {1}\n", ErrorSpacer, oe.Message);
+                        _errorBuilder.AppendFormat("{0}ERROR: {1}\n", _errorSpacer, oe.Message);
                         SetExitCode(ExitCodes.UnknownCommandLineOption);
                         _showHelpMenu = true;
                     }
@@ -276,14 +298,14 @@ namespace VariantAnnotation.CommandLine
                 ExitCode = ExitCodeUtilities.ShowException(e);
             }
 
-            PeakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
-            WallTimeSpan         = bench.GetElapsedTime();
+            _peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
+            _wallTimeSpan         = bench.GetElapsedTime();
 
             if (!_showVersion && !_showHelpMenu)
             {
                 Console.WriteLine();
-                if(PeakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(PeakMemoryUsageBytes));
-                Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(WallTimeSpan));
+                if(_peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(_peakMemoryUsageBytes));
+                Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(_wallTimeSpan));
             }
         }
 
@@ -296,7 +318,7 @@ namespace VariantAnnotation.CommandLine
             if (ExitCode == (int) ExitCodes.Success) return false;
 
             Console.WriteLine("Some problems were encountered when parsing the command line options:");
-            Console.WriteLine("{0}", ErrorBuilder);
+            Console.WriteLine("{0}", _errorBuilder);
             Console.WriteLine("For a complete list of command line options, type \"{0} -h\"", Path.GetFileName(Environment.GetCommandLineArgs()[0]));
 
             return true;

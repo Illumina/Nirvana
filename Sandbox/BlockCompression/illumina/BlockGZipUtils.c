@@ -1,15 +1,15 @@
 #include "BlockGZipUtils.h"
 
 // inflate the block in compressed_block into uncompressed_block
-int uncompress_block(char* uncompressed_block, char* compressed_block, int block_length)
+int bgzf_decompress(char* destination, int destinationLen, char* source, int sourceLen)
 {
 	z_stream zs;
 	zs.zalloc    = NULL;
 	zs.zfree     = NULL;
-	zs.next_in   = (Bytef*)compressed_block + 18;
-	zs.avail_in  = block_length - 16;
-	zs.next_out  = (Bytef*)uncompressed_block;
-	zs.avail_out = BGZF_MAX_BLOCK_SIZE;
+	zs.next_in   = (Bytef*)source + 18;
+	zs.avail_in  = sourceLen - 16;
+	zs.next_out  = (Bytef*)destination;
+	zs.avail_out = destinationLen;
 
 	if (inflateInit2(&zs, -15) != Z_OK) return -1;
 

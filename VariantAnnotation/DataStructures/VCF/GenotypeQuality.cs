@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class GenotypeQuality
+    internal sealed class GenotypeQuality
     {
         #region members
 
@@ -24,11 +24,11 @@
 
             if (!hasGqx && !hasGq)  return null;
 
-            int gqIndex = hasGqx ? _tmp.FormatIndices.GQX.Value : _tmp.FormatIndices.GQ.Value;
+            var gqIndex = hasGqx ? _tmp.FormatIndices.GQX.Value : _tmp.FormatIndices.GQ.Value;
             if (_tmp.SampleColumns.Length <= gqIndex) return null;
 
             var gq = _tmp.SampleColumns[gqIndex];
-            return (gq == ".") || (gq == "./.") ? null : gq;
+            return gq == "." || gq == "./." ? null : gq;
         }
     }
 }

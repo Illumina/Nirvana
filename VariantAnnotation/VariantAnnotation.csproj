@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="..\Packages\BlockCompression\BlockCompression.dll" Link="BlockCompression.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Packages\BlockCompression\BlockCompression.pdb" Link="BlockCompression.pdb">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\Packages\BlockCompression\libBlockCompression.so" Link="libBlockCompression.so">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\NDesk.Options\NDesk.Options.csproj" />
+    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+  </ItemGroup>
+  <Import Project="CommonAssemblyInfo.props" />
+</Project>

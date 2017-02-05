@@ -36,6 +36,7 @@
         // file (220 - 239)
         InvalidFileFormat         = 220,
         FileNotSorted             = 221,
+        MissingFilenameSuffix     = 222,
         MissingCompressionLibrary = 223
     }
 }

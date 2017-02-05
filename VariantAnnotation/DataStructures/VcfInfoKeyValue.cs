@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.DataStructures
 {
-    public class VcfInfoKeyValue
+    public sealed class VcfInfoKeyValue
     {
         #region members
 

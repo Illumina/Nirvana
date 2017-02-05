@@ -1,18 +1,20 @@
-﻿using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 
 namespace SAUtils.InputFileParsers.ClinGen
 {
-    public class ClinGenReader : IEnumerable<ClinGenItem>
+    public sealed class ClinGenReader : IEnumerable<ClinGenItem>
     {
         #region members
+
         private readonly FileInfo _clinGenFileInfo;
-        private readonly ChromosomeRenamer _chromosomeRenamer;
+        private readonly ChromosomeRenamer _renamer;
+
         #endregion
 
         #region IEnumerable implementation
@@ -30,15 +32,11 @@ namespace SAUtils.InputFileParsers.ClinGen
         #endregion
 
         // constructor
-        public ClinGenReader(FileInfo clinGenFileInfo)
+        public ClinGenReader(FileInfo clinGenFileInfo, ChromosomeRenamer renamer)
         {
             _clinGenFileInfo = clinGenFileInfo;
-            _chromosomeRenamer = AnnotationLoader.Instance.ChromosomeRenamer;
-
+            _renamer = renamer;
         }
-
-
-
 
         private IEnumerable<ClinGenItem> GetClinGenItems()
         {
@@ -48,20 +46,23 @@ namespace SAUtils.InputFileParsers.ClinGen
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (IsClinGenHeader(line)) continue;
-                    var cols = line.Split('\t');
-                    string id = cols[0];
-                    string ucscChrom = cols[1];
-                    string chrom = _chromosomeRenamer.GetEnsemblReferenceName(ucscChrom);
 
-                    int start = int.Parse(cols[2]);
-                    int end = int.Parse(cols[3]);
-                    int observedGains = int.Parse(cols[4]);
-                    int observedLosses = int.Parse(cols[5]);
-                    var variantType = GetVariantType(cols[6]);
-                    ClinicalInterpretation clinInterpretation = GetClinInterpretation(cols[7]);
-                    bool validated = cols[8].Equals("True");
-                    var phenotypes = cols[9] == "" ? null : new HashSet<string>(cols[9].Split(','));
-                    var phenotypeIds = cols[10] == "" ? null : new HashSet<string>(cols[10].Split(','));
+                    var cols         = line.Split('\t');
+                    string id        = cols[0];
+                    string ucscChrom = cols[1];
+                    string chrom     = _renamer.GetEnsemblReferenceName(ucscChrom);
+
+                    if (!InputFileParserUtilities.IsDesiredChromosome(chrom, _renamer)) continue;
+
+                    int start              = int.Parse(cols[2]);
+                    int end                = int.Parse(cols[3]);
+                    int observedGains      = int.Parse(cols[4]);
+                    int observedLosses     = int.Parse(cols[5]);
+                    var variantType        = GetVariantType(cols[6]);
+                    var clinInterpretation = GetClinInterpretation(cols[7]);
+                    bool validated         = cols[8].Equals("True");
+                    var phenotypes         = cols[9] == "" ? null : new HashSet<string>(cols[9].Split(','));
+                    var phenotypeIds       = cols[10] == "" ? null : new HashSet<string>(cols[10].Split(','));
 
                     var currentItem = new ClinGenItem(id, chrom, start, end, variantType, observedGains, observedLosses,
                         clinInterpretation, validated, phenotypes, phenotypeIds);
@@ -69,6 +70,7 @@ namespace SAUtils.InputFileParsers.ClinGen
                 }
             }
         }
+
         private static VariantType GetVariantType(string variantTypeDescription)
         {
             switch (variantTypeDescription)
@@ -84,8 +86,7 @@ namespace SAUtils.InputFileParsers.ClinGen
             }
         }
 
-
-        private ClinicalInterpretation GetClinInterpretation(string s)
+        private static ClinicalInterpretation GetClinInterpretation(string s)
         {
             switch (s)
             {
@@ -104,10 +105,9 @@ namespace SAUtils.InputFileParsers.ClinGen
             }
         }
 
-        private bool IsClinGenHeader(string line)
+        private static bool IsClinGenHeader(string line)
         {
             return line.StartsWith("#");
         }
     }
-
 }

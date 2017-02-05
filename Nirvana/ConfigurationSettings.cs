@@ -4,10 +4,8 @@ namespace Nirvana
 {
     public static class ConfigurationSettings
     {
-        #region members
-
         // filenames
-        public static string CacheDirectory;
+        public static string InputCachePrefix;
         public static string SupplementaryAnnotationDirectory;
 		public static readonly List<string> CustomAnnotationDirectories = new List<string>();
 		public static readonly List<string> CustomIntervalDirectories = new List<string>();
@@ -20,8 +18,7 @@ namespace Nirvana
         public static bool EnableReferenceNoCalls;
         public static bool LimitReferenceNoCallsToTranscripts;
 	    public static bool ForceMitochondrialAnnotation;
-        public static bool EnableTelemetry;
-
-        #endregion
+	    public static bool ReportAllSvOverlappingTranscripts;
+	    public static bool EnableLoftee;
     }
 }

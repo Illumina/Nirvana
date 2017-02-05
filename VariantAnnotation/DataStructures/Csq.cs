@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class CsqCommon
+    public sealed class CsqCommon
     {
         #region members
 
+        private const string CsqInfoTag            = "CSQ=";
+        private const int NumColumns               = 28;
         public const string TranscriptFeatureType = "Transcript";
         public const string RegulatoryFeatureType = "RegulatoryFeature";
 
@@ -103,6 +106,91 @@ namespace VariantAnnotation.DataStructures
         }
 
         /// <summary>
+        /// returns the CSQ value if the colIndex is non-negative, returns null otherwise
+        /// </summary>
+        private static string GetCsqValue(string[] cols, int colIndex)
+        {
+            if (colIndex == -1 || colIndex >= cols.Length) return null;
+            return cols[colIndex];
+        }
+
+        /// <summary>
+        /// populates a list containing the CSQ entries found in the info field
+        /// </summary>
+        public static void GetCsqEntries(string vcfInfoField, List<CsqEntry> csqEntries)
+        {
+            csqEntries.Clear();
+
+            // grab the CSQ field
+            var cols   = vcfInfoField.Split(';');
+            var foundCsq   = false;
+            var csqField = string.Empty;
+
+            foreach (var col in cols)
+            {
+                if (col.StartsWith(CsqInfoTag))
+                {
+                    foundCsq = true;
+                    csqField = col;
+                }
+            }
+
+            if (!foundCsq) return;
+
+            var csqEntryCols = csqField.Substring(CsqInfoTag.Length).Split(',');
+
+            // populate each CSQ entry
+            foreach (var s in csqEntryCols)
+            {
+                var csqCols = s.Split('|');
+
+                // sanity check: check the column count
+                if (csqCols.Length < NumColumns)
+                {
+                    throw new GeneralException($"Expected at least {NumColumns} columns in each CSQ field entry, but {csqCols.Length} columns were found.");
+                }
+
+                var newEntry = new CsqEntry
+                {
+                    Allele                   = GetCsqValue(csqCols, _alleleIndex),
+                    AminoAcids               = GetCsqValue(csqCols, _aminoAcidsIndex),
+                    BioType                  = GetCsqValue(csqCols, _bioTypeIndex),
+                    Canonical                = GetCsqValue(csqCols, _canonicalIndex),
+                    Ccds                     = GetCsqValue(csqCols, _ccdsIndex),
+                    CdsPosition              = GetCsqValue(csqCols, _cdsPositionIndex),
+                    CellType                 = GetCsqValue(csqCols, _cellTypeIndex),
+                    Codons                   = GetCsqValue(csqCols, _codonsIndex),
+                    ComplementaryDnaPosition = GetCsqValue(csqCols, _codingDnaPositionIndex),
+                    Consequence              = GetCsqValue(csqCols, _consequenceIndex),
+                    Distance                 = GetCsqValue(csqCols, _distanceIndex),
+                    Domains                  = GetCsqValue(csqCols, _domainsIndex),
+                    EnsemblProteinId         = GetCsqValue(csqCols, _ensemblProteinIdIndex),
+                    ExistingVariation        = GetCsqValue(csqCols, _existingVariationIndex),
+                    Exon                     = GetCsqValue(csqCols, _exonIndex),
+                    Feature                  = GetCsqValue(csqCols, _featureIndex),
+                    FeatureType              = GetCsqValue(csqCols, _featureTypeIndex),
+                    Gene                     = GetCsqValue(csqCols, _geneIndex),
+                    HgncId                   = GetCsqValue(csqCols, _hgncIdIndex),
+                    HgvsCodingSequenceName   = GetCsqValue(csqCols, _hgvsCodingSequenceNameIndex),
+                    HgvsProteinSequenceName  = GetCsqValue(csqCols, _hgvsProteinSequenceNameIndex),
+                    HighInfPos               = GetCsqValue(csqCols, _highInfPosIndex),
+                    Intron                   = GetCsqValue(csqCols, _intronIndex),
+                    MotifName                = GetCsqValue(csqCols, _motifNameIndex),
+                    MotifPos                 = GetCsqValue(csqCols, _motifPosIndex),
+                    MotifScoreChange         = GetCsqValue(csqCols, _motifScoreChangeIndex),
+                    PolyPhen                 = GetCsqValue(csqCols, _polyPhenIndex),
+                    ProteinPosition          = GetCsqValue(csqCols, _proteinPositionIndex),
+                    Sift                     = GetCsqValue(csqCols, _siftIndex),
+                    Strand                   = GetCsqValue(csqCols, _strandIndex),
+                    Symbol                   = GetCsqValue(csqCols, _symbolIndex),
+                    SymbolSource             = GetCsqValue(csqCols, _symbolSourceIndex)
+                };
+
+                csqEntries.Add(newEntry);
+            }
+        }
+
+        /// <summary>
         /// returns the current known CSQ tags
         /// </summary>
         private static HashSet<string> GetKnownCsqTags()
@@ -154,7 +242,7 @@ namespace VariantAnnotation.DataStructures
         {
             var dict = new Dictionary<string, int>();
 
-            for (int colIndex = 0; colIndex < cols.Length; colIndex++)
+            for (var colIndex = 0; colIndex < cols.Length; colIndex++)
             {
                 var tagName = cols[colIndex];
 
@@ -184,7 +272,7 @@ namespace VariantAnnotation.DataStructures
         private static void ClearIndices()
         {
             var type   = typeof(CsqCommon);
-            var fields = type.GetTypeInfo().GetFields(BindingFlags.Public | BindingFlags.Static);
+            var fields = type.GetFields(BindingFlags.Public | BindingFlags.Static);
 
             foreach (var field in fields)
             {
@@ -252,7 +340,7 @@ namespace VariantAnnotation.DataStructures
             const string formatTag = "Format: ";
             const string endTag    = "\">";
 
-            int formatIndex = csqVcfInfoLine.LastIndexOf(formatTag, StringComparison.Ordinal);
+            var formatIndex = csqVcfInfoLine.LastIndexOf(formatTag, StringComparison.Ordinal);
 
             if (formatIndex == -1)
             {
@@ -260,10 +348,19 @@ namespace VariantAnnotation.DataStructures
                     $"Could not find the format tag ({formatTag}) in the following string: {csqVcfInfoLine}");
             }
 
-            string csqFieldOrder = csqVcfInfoLine.Substring(formatIndex + formatTag.Length);
+            var csqFieldOrder = csqVcfInfoLine.Substring(formatIndex + formatTag.Length);
             if (csqFieldOrder.EndsWith(endTag)) csqFieldOrder = csqFieldOrder.Substring(0, csqFieldOrder.Length - endTag.Length);
 
             return csqFieldOrder.Split('|');
+        }
+
+        /// <summary>
+        /// returns the csq entry specified by the feature ID and the allele. Returns null
+        /// if the entry could not be found.
+        /// </summary>
+        public static CsqEntry GetEntry(List<CsqEntry> csqEntries, string featureId, string allele)
+        {
+            return csqEntries.FirstOrDefault(csqEntry => csqEntry.Feature == featureId && csqEntry.Allele == allele);
         }
     }
 
@@ -272,16 +369,49 @@ namespace VariantAnnotation.DataStructures
     /// parameters have been passed to VEP. As a result, we need to keep all of the key
     /// value pairs in a dictionary.
     /// </summary>
-    public class CsqEntry
+    public sealed class CsqEntry
     {
         #region members
 
         public string Allele;
+        public string AminoAcids;
+        public string BioType;
+        public string Ccds;
+        public string CdsPosition;
+        public string Codons;
+        public string ComplementaryDnaPosition;
         public string Consequence;
+        public string Distance;
+        public string Domains;
+        public string EnsemblProteinId;
+        public string ExistingVariation;
+        public string Exon;
         public string Feature;
         public string FeatureType;
+        public string Gene;
+        public string HgncId;
+        public string HgvsCodingSequenceName;
+        public string HgvsProteinSequenceName;
+        public string HighInfPos;
+        public string Intron;
+        public string MotifName;
+        public string MotifPos;
+        public string MotifScoreChange;
+        public string PolyPhen;
+        public string ProteinPosition;
+        public string Sift;
+        public string Strand;
         public string Symbol;
+        public string SymbolSource;
+
+        // For human, the canonical transcript for a gene is set according to the following
+        // hierarchy: 1. Longest CCDS translation with no stop codons. 2. If no (1), choose
+        // the longest Ensembl/Havana merged translation with no stop codons. 3. If no (2),
+        // choose the longest translation with no stop codons. 4. If no translation, choose
+        // the longest non-protein-coding transcript.
         public string Canonical;
+
+        public string CellType;
 
         #endregion
 
@@ -291,7 +421,7 @@ namespace VariantAnnotation.DataStructures
         public override int GetHashCode()
         {
             // ReSharper disable NonReadonlyFieldInGetHashCode
-            int hashCode = FowlerNollVoPrimeHash.ComputeHash(Allele, Feature);
+            var hashCode = FowlerNollVoPrimeHash.ComputeHash(Allele, Feature);
             // ReSharper restore NonReadonlyFieldInGetHashCode
             return hashCode;
         }
@@ -311,16 +441,43 @@ namespace VariantAnnotation.DataStructures
         /// <summary>
         /// returns a string representation of our CSQ entry
         /// </summary>
+        /// TODO: CC 29
         public override string ToString()
         {
             var sb = new StringBuilder();
 
-            AddString(sb, "Allele", Allele);
-            AddString(sb, "Canonical", Canonical);
-            AddString(sb, "Consequence", Consequence);
-            AddString(sb, "Feature", Feature);
-            AddString(sb, "FeatureType", FeatureType);
-            AddString(sb, "Symbol", Symbol);
+            AddPresentString(sb, "Allele", Allele);
+            AddPresentString(sb, "AminoAcids", AminoAcids);
+            AddPresentString(sb, "BioType", BioType);
+            AddPresentString(sb, "Canonical", Canonical);
+            AddPresentString(sb, "Ccds", Ccds);
+            AddPresentString(sb, "CdsPosition", CdsPosition);
+            AddPresentString(sb, "CellType", CellType);
+            AddPresentString(sb, "Codons", Codons);
+            AddPresentString(sb, "ComplementaryDnaPosition", ComplementaryDnaPosition);
+            AddPresentString(sb, "Consequence", Consequence);
+            AddPresentString(sb, "Distance", Distance);
+            AddPresentString(sb, "Domains", Domains);
+            AddPresentString(sb, "EnsemblProteinId", EnsemblProteinId);
+            AddPresentString(sb, "ExistingVariation", ExistingVariation);
+            AddPresentString(sb, "Exon", Exon);
+            AddPresentString(sb, "Feature", Feature);
+            AddPresentString(sb, "FeatureType", FeatureType);
+            AddPresentString(sb, "Gene", Gene);
+            AddPresentString(sb, "HgncId", HgncId);
+            AddPresentString(sb, "HgvsCodingSequenceName", HgvsCodingSequenceName);
+            AddPresentString(sb, "HgvsProteinSequenceName", HgvsProteinSequenceName);
+            AddPresentString(sb, "HighInfPos", HighInfPos);
+            AddPresentString(sb, "Intron", Intron);
+            AddPresentString(sb, "MotifName", MotifName);
+            AddPresentString(sb, "MotifPos", MotifPos);
+            AddPresentString(sb, "MotifScoreChange", MotifScoreChange);
+            AddPresentString(sb, "PolyPhen", PolyPhen);
+            AddPresentString(sb, "ProteinPosition", ProteinPosition);
+            AddPresentString(sb, "Sift", Sift);
+            AddPresentString(sb, "Strand", Strand);
+            AddPresentString(sb, "Symbol", Symbol);
+            AddPresentString(sb, "SymbolSource", SymbolSource);
 			
             return sb.ToString();
         }
@@ -328,11 +485,11 @@ namespace VariantAnnotation.DataStructures
         /// <summary>
         /// adds a string to the string builder if it's not empty or null
         /// </summary>
-        private static void AddString(StringBuilder sb, string description, string value)
+        private static void AddPresentString(StringBuilder sb, string description, string value)
         {
             if (string.IsNullOrEmpty(value)) return;
             const int fieldWidth = 28;
-            int numSpaces = fieldWidth - description.Length - 1;
+            var numSpaces = fieldWidth - description.Length - 1;
             sb.AppendFormat("{0}:{1}{2}\n", description, new string(' ', numSpaces), value);
         }
     }

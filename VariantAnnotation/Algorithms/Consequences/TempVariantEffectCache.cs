@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.Algorithms.Consequences
 {
-    internal class TempVariantEffectCache
+    internal sealed class TempVariantEffectCache
     {
         #region members
 
@@ -24,7 +24,7 @@ namespace VariantAnnotation.Algorithms.Consequences
         /// </summary>
         public void Add(TempConsequenceType consequence, bool result)
         {
-            int index = (int)consequence;
+            var index = (int)consequence;
 
             _isCached[index]      = true;
             _cachedResults[index] = result;

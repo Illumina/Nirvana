@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class Genotype
+    internal sealed class Genotype
     {
         #region members
 

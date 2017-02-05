@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class TotalDepth
+    internal sealed class TotalDepth
     {
         #region members
 
@@ -20,7 +20,7 @@
         public string GetTotalDepth(int? infoDepth)
         {
             // use TAR & TIR
-            if ((_tmp.Tar != null) && (_tmp.Tir != null)) return GetTotalDepthUsingTarTir();
+            if (_tmp.Tar != null && _tmp.Tir != null) return GetTotalDepthUsingTarTir();
 
             // use base counts
             if (_tmp.TotalAlleleCount != null) return GetTotalDepthUsingAlleleCounts();
@@ -32,7 +32,7 @@
             if (_tmp.FormatIndices.DP != null) return GetTotalDepthUsingDp();
 
             // use NR
-            if ((_tmp.NR != null) && (_tmp.AltAlleles.Length == 1)) return _tmp.NR.ToString();
+            if (_tmp.NR != null && _tmp.AltAlleles.Length == 1) return _tmp.NR.ToString();
 
             // use INFO DP (Pisces)
             return infoDepth?.ToString();
@@ -59,7 +59,7 @@
         /// </summary>
         private string GetTotalDepthUsingDpi()
         {
-            if ((_tmp.FormatIndices.DPI == null) || (_tmp.SampleColumns.Length <= _tmp.FormatIndices.DPI.Value)) return null;
+            if (_tmp.FormatIndices.DPI == null || _tmp.SampleColumns.Length <= _tmp.FormatIndices.DPI.Value) return null;
             var depth = _tmp.SampleColumns[_tmp.FormatIndices.DPI.Value];
             return depth == "." ? null : depth;
         }
@@ -69,7 +69,7 @@
         /// </summary>
         private string GetTotalDepthUsingDp()
         {
-            if ((_tmp.FormatIndices.DP == null) || (_tmp.SampleColumns.Length <= _tmp.FormatIndices.DP.Value)) return null;
+            if (_tmp.FormatIndices.DP == null || _tmp.SampleColumns.Length <= _tmp.FormatIndices.DP.Value) return null;
             var depth = _tmp.SampleColumns[_tmp.FormatIndices.DP.Value];
             return depth == "." ? null : depth;
         }

@@ -1,63 +1,67 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.FileHandling.Phylop
 {
-	public static class PhylopCommon
-	{
-		public const string Header        = "NirvanaPhylopDB";
-		public const ushort SchemaVersion = 4;
-		public const ushort DataVersion   = 1;
+    public static class PhylopCommon
+    {
+        public const string Header = "NirvanaPhylopDB";
+        public const ushort SchemaVersion = 4;
+        public const ushort DataVersion = 1;
 
-		public const int MaxIntervalLength = 4048;
+        public const int MaxIntervalLength = 4048;
 
-		public static void CheckDirectoryIntegrity(string phylopDir, List<DataSourceVersion> mainDataSourceVersions, out PhylopDirectory phylopDirectory)
-		{
-			DataSourceVersion version = null;
-			if (string.IsNullOrEmpty(phylopDir))
-			{
-				phylopDirectory = null;
-				return ;
-			}
-			var genomeAssemblies = new HashSet<GenomeAssembly>();
+        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(string saDir)
+        {
+			if (saDir == null)
+				return new List<IDataSourceVersion>();
+			var phylopFiles = Directory.GetFiles(saDir, "*.npd");
 
-			foreach (var saPath in Directory.GetFiles(phylopDir, "*.npd"))
-			{
-				using (var reader = new PhylopReader(new BinaryReader(FileUtilities.GetFileStream(saPath))))
-				{
-					if (version == null) version = reader.GetDataSourceVersion();
-					else
-					{
-						var newVersion = reader.GetDataSourceVersion();
-						if (newVersion != version)
-							throw new UserErrorException($"Found more than one phylop data version represented in the following directory: {phylopDir}");
-					}
-					genomeAssemblies.Add(reader.GetGenomeAssembly());
-				}
-				
-			}
-			if (version !=null)
-				mainDataSourceVersions.Add(version);
+			return  phylopFiles.Length == 0 ? new List<IDataSourceVersion>() : new List<IDataSourceVersion> { GetPhylopHeader(saDir)?.Item2 };
+        }
 
-			if(genomeAssemblies.Count>1)
-				throw new UserErrorException($"Found more than one GenomeAssemblies represented in the following directory: {phylopDir}");
+        public static GenomeAssembly GetGenomeAssembly(string saDir)
+        {
+			if (saDir == null)
+				return GenomeAssembly.Unknown;
 
-			phylopDirectory = genomeAssemblies.Count > 0 ? new PhylopDirectory(genomeAssemblies.First()) : null;
-		}
-	}
+			var phylopFiles = Directory.GetFiles(saDir, "*.npd");
 
-	public class PhylopDirectory
-	{
-		public readonly GenomeAssembly GenomeAssembly;
+			return phylopFiles.Length == 0 ? GenomeAssembly.Unknown : GetPhylopHeader(saDir).Item1;
+        }
 
-		public PhylopDirectory(GenomeAssembly genomeAssembly)
-		{
-			GenomeAssembly = genomeAssembly;
-		}
-	}
+        private static Tuple<GenomeAssembly, DataSourceVersion> GetPhylopHeader(string saDir)
+        {
+            var phylopFiles = Directory.GetFiles(saDir, "*.npd");
+            if (phylopFiles == null || phylopFiles.Length==0) throw new UserErrorException($"Unable to find any phyloP files in the following directory: {saDir}");
+
+            DataSourceVersion version;
+            GenomeAssembly genomeAssembly;
+
+            using (var reader = new PhylopReader(FileUtilities.GetReadStream(phylopFiles.First())))
+            {
+                version        = reader.GetDataSourceVersion();
+                genomeAssembly = reader.GetGenomeAssembly();
+            }
+
+            return new Tuple<GenomeAssembly, DataSourceVersion>(genomeAssembly, version);
+        }
+
+        public static Stream GetStream(string directory, string ucscReferenceName)
+        {
+            if (string.IsNullOrEmpty(directory)) return null;
+
+            var phylopPath = Path.Combine(directory, ucscReferenceName + ".npd");
+
+            return !File.Exists(phylopPath)
+                ? null
+                : FileUtilities.GetReadStream(phylopPath);
+        }
+    }
 }

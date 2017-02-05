@@ -57,7 +57,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void FileNotSorted()
         {
-            var exception = new FileNotSortedException("test");
+            var exception = new FileNotSortedException("not sorted");
             var observedExitCode = ExitCodeUtilities.ShowException(exception);
 
             Assert.Equal((int)ExitCodes.FileNotSorted, observedExitCode);
@@ -75,7 +75,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void InvalidFileFormat()
         {
-            var exception = new InvalidFileFormatException("test");
+            var exception = new InvalidFileFormatException("invalid format");
             var observedExitCode = ExitCodeUtilities.ShowException(exception);
 
             Assert.Equal((int)ExitCodes.InvalidFileFormat, observedExitCode);
@@ -84,7 +84,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void InvalidFunction()
         {
-            var exception = new GeneralException("test");
+            var exception = new GeneralException("");
             var observedExitCode = ExitCodeUtilities.ShowException(exception);
 
             Assert.Equal((int)ExitCodes.InvalidFunction, observedExitCode);
@@ -103,7 +103,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void MissingCompressionLibrary()
         {
-            var exception = new MissingCompressionLibraryException("test");
+            var exception = new MissingCompressionLibraryException("compression file");
             var observedExitCode = ExitCodeUtilities.ShowException(exception);
 
             Assert.Equal((int)ExitCodes.MissingCompressionLibrary, observedExitCode);
@@ -121,7 +121,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void SharingViolation()
         {
-            var exception = new ProcessLockedFileException("test");
+            var exception = new ProcessLockedFileException("locked file");
             var observedExitCode = ExitCodeUtilities.ShowException(exception);
 
             Assert.Equal((int)ExitCodes.SharingViolation, observedExitCode);
@@ -130,7 +130,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void UserError()
         {
-            var exception = new UserErrorException("test");
+            var exception = new UserErrorException("user error");
             var observedExitCode = ExitCodeUtilities.ShowException(exception);
 
             Assert.Equal((int)ExitCodes.UserError, observedExitCode);

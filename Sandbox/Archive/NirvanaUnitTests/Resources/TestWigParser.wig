@@ -1,8 +1,0 @@
-fixedStep chrom=chr3 start=400601 step=100
-11
-22
-33
-fixedStep chrom=chr3 start=400601 step=100 span=5
-11
-22
-33

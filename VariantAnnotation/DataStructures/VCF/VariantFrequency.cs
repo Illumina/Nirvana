@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class VariantFrequency
+    internal sealed class VariantFrequency
     {
         #region members
 
@@ -22,16 +22,16 @@
             string vf = null;
 
             // use TAR & TIR
-            if ((_tmp.Tar != null) && (_tmp.Tir != null)) vf = GetVariantFrequencyUsingTarTir();
+            if (_tmp.Tar != null && _tmp.Tir != null) vf = GetVariantFrequencyUsingTarTir();
 
             // use allele counts
-            if ((vf == null) && (_tmp.TotalAlleleCount != null)) vf = GetVariantFrequencyUsingAlleleCounts();
+            if (vf == null && _tmp.TotalAlleleCount != null) vf = GetVariantFrequencyUsingAlleleCounts();
 
             // use allele depths
-            if ((vf == null) && (_tmp.FormatIndices.AD != null)) vf = GetVariantFrequencyUsingAlleleDepths();
+            if (vf == null && _tmp.FormatIndices.AD != null) vf = GetVariantFrequencyUsingAlleleDepths();
 
             // use NR & NV
-            if ((vf == null) && (_tmp.NR != null) && (_tmp.NV != null)) vf = GetVariantFrequencyUsingNrNv();
+            if (vf == null && _tmp.NR != null && _tmp.NV != null) vf = GetVariantFrequencyUsingNrNv();
 
             return vf;
         }
@@ -43,7 +43,7 @@
         {
             // for this to work we need a single-base reference allele and all raw allele
             // counts must be available
-            if ((_tmp.TotalAlleleCount == null) || (_tmp.VcfRefAllele == null) || (_tmp.VcfRefAllele.Length != 1)) return null;
+            if (_tmp.TotalAlleleCount == null || _tmp.VcfRefAllele == null || _tmp.VcfRefAllele.Length != 1) return null;
 
 	        if (_tmp.TotalAlleleCount == 0) return "0";
 			
@@ -70,7 +70,7 @@
             if (refCount == null) return null;
 
             // calculate the variant frequency
-            double vf = ((double)_tmp.TotalAlleleCount - (double)refCount) / (double)_tmp.TotalAlleleCount;
+            var vf = ((double)_tmp.TotalAlleleCount - (double)refCount) / (double)_tmp.TotalAlleleCount;
             return vf.ToString("0.####");
         }
 
@@ -79,11 +79,11 @@
         /// </summary>
         private string GetVariantFrequencyUsingTarTir()
         {
-            if ((_tmp.Tir == null) || (_tmp.Tar == null)) return null;
+            if (_tmp.Tir == null || _tmp.Tar == null) return null;
 	        if (_tmp.Tir + _tmp.Tar == 0) return "0";
-            double tir = (double)_tmp.Tir;
-            double tar = (double)_tmp.Tar;
-            double vf = tir / (tar + tir);
+            var tir = (double)_tmp.Tir;
+            var tar = (double)_tmp.Tar;
+            var vf = tir / (tar + tir);
             return vf.ToString("0.####");
         }
 
@@ -92,7 +92,7 @@
         /// </summary>
         private string GetVariantFrequencyUsingNrNv()
         {
-            if ((_tmp.NR == null) || (_tmp.NV == null) || (_tmp.AltAlleles.Length > 1)) return null;
+            if (_tmp.NR == null || _tmp.NV == null || _tmp.AltAlleles.Length > 1) return null;
             if (_tmp.NR == 0) return "0";
             var nr = (double)_tmp.NR;
             var nv = (double)_tmp.NV;
@@ -104,7 +104,7 @@
         /// </summary>
         private string GetVariantFrequencyUsingAlleleDepths()
         {
-            if ((_tmp.FormatIndices.AD == null) || (_tmp.SampleColumns.Length <= _tmp.FormatIndices.AD.Value)) return null;
+            if (_tmp.FormatIndices.AD == null || _tmp.SampleColumns.Length <= _tmp.FormatIndices.AD.Value) return null;
             var alleleDepths = _tmp.SampleColumns[_tmp.FormatIndices.AD.Value].Split(',');
 
             // one allele depth
@@ -114,9 +114,9 @@
                 return int.TryParse(alleleDepths[0], out num) ? "0" : null;
             }
 
-            bool hasRefDepth = false;
-            int refDepth = 0;
-            int totalDepth = 0;
+            var hasRefDepth = false;
+            var refDepth = 0;
+            var totalDepth = 0;
 
             foreach (var depthString in alleleDepths)
             {
@@ -135,7 +135,7 @@
             // sanity check: make sure we handle NaNs properly
             if (totalDepth == 0) return "0";
 
-            double vf = (totalDepth - refDepth) / (double)totalDepth;
+            var vf = (totalDepth - refDepth) / (double)totalDepth;
             return vf.ToString("0.####");
         }
     }

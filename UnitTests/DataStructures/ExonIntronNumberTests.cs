@@ -3,13 +3,12 @@ using Xunit;
 
 namespace UnitTests.DataStructures
 {
-    [Collection("Chromosome 1 collection")]
     public sealed class ExonIntronNumberTests
     {
         [Fact]
         public void UnwantedExonNumber()
         {
-            var transcriptAllele = DataUtilities.GetTranscript("ENST00000569425_chr1_Ensembl84.ndb",
+            var transcriptAllele = DataUtilities.GetTranscript(Resources.CacheGRCh37("ENST00000569425_chr1_Ensembl84"),
                 "chr1\t56714872\t.\tT\tTC\t1087.00\tPASS\t.", "ENST00000569425", "C");
             Assert.NotNull(transcriptAllele);
 
@@ -20,7 +19,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void ExonNumber11()
         {
-            var transcriptAllele = DataUtilities.GetTranscript("ENST00000255416_chr1_Ensembl84.ndb",
+            var transcriptAllele = DataUtilities.GetTranscript(Resources.CacheGRCh37("ENST00000255416_chr1_Ensembl84"),
                 "chr1\t203136983\t.\tA\tT\t1087.00\tPASS\t.", "ENST00000255416", "T");
             Assert.NotNull(transcriptAllele);
 
@@ -31,7 +30,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void IntronNumber18()
         {
-            var transcriptAllele = DataUtilities.GetTranscript("ENST00000327044_chr1_Ensembl84.ndb",
+            var transcriptAllele = DataUtilities.GetTranscript(Resources.CacheGRCh37("ENST00000327044_chr1_Ensembl84"),
                 "chr1\t880238\t.\tA\tG\t1087.00\tPASS\t.", "ENST00000327044", "G");
             Assert.NotNull(transcriptAllele);
 

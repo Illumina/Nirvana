@@ -13,12 +13,7 @@ namespace VariantAnnotation.Utilities
             return fs == null ? "(stream)" : fs.Name;
         }
 
-        /// <summary>
-        /// returns a read-only file stream specified by the path
-        /// </summary>
-        public static FileStream GetFileStream(string path)
-        {
-            return new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
-        }
+        public static FileStream GetReadStream(string path) => new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        public static FileStream GetCreateStream(string path) => new FileStream(path, FileMode.Create);
     }
 }

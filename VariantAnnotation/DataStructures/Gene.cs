@@ -3,55 +3,47 @@ using VariantAnnotation.FileHandling;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class Gene : AnnotationInterval, IEquatable<Gene>
+    public sealed class Gene : ReferenceAnnotationInterval, IEquatable<Gene>, ICacheSerializable
     {
-        #region members
+        public readonly bool OnReverseStrand;
+        public readonly string Symbol;
+        public readonly CompactId EntrezGeneId;
+        public readonly CompactId EnsemblId;
+        private readonly int _hgncId;
+        private readonly int _mimNumber;
 
-        public string Symbol { get; }
-        private readonly int _hashCode;
-
-        #endregion
-
-        // constructor
-        private Gene(string symbol, int start, int end) : base(start, end)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public Gene(ushort referenceIndex, int start, int end, bool onReverseStrand, string symbol, int hgncId,
+            CompactId entrezGeneId, CompactId ensemblId, int mimNumber) : base(referenceIndex, start, end)
         {
-            Symbol    = symbol;
-            _hashCode = symbol.GetHashCode() ^ End.GetHashCode() ^ Start.GetHashCode();
+            OnReverseStrand = onReverseStrand;
+            Symbol          = symbol;
+            _hgncId         = hgncId;
+            EntrezGeneId    = entrezGeneId;
+            EnsemblId       = ensemblId;
+            _mimNumber      = mimNumber;
         }
 
         #region IEquatable methods
 
-        public override bool Equals(object obj)
-        {
-            var other = obj as Gene;
-            if (other == null) return false;
-
-            return this == other;
-        }
-
         public override int GetHashCode()
         {
-            return _hashCode;
+            var hashCode = ReferenceIndex.GetHashCode() ^ Start.GetHashCode() ^ End.GetHashCode() ^
+                           EntrezGeneId.GetHashCode() ^ EnsemblId.GetHashCode() ^ _hgncId.GetHashCode();
+            if (Symbol != null) hashCode ^= Symbol.GetHashCode();
+            return hashCode;
         }
 
-        bool IEquatable<Gene>.Equals(Gene other)
+        public bool Equals(Gene value)
         {
-            return this == other;
-        }
-        public static bool operator ==(Gene a, Gene b)
-        {
-            // If both are null, or both are same instance, return true.
-            if (ReferenceEquals(a, b)) return true;
-
-            // If one is null, but not both, return false.
-            if (((object)a == null) || ((object)b == null)) return false;
-
-            return (a.End == b.End) && (a.Start == b.Start);
-        }
-
-        public static bool operator !=(Gene a, Gene b)
-        {
-            return !(a == b);
+            if (this == null) throw new NullReferenceException();
+            if (value == null) return false;
+            if (this == value) return true;
+            return ReferenceIndex == value.ReferenceIndex && End == value.End && Start == value.Start &&
+                   _hgncId == value._hgncId && Symbol == value.Symbol && EntrezGeneId.Equals(value.EntrezGeneId) &&
+                   EnsemblId.Equals(value.EnsemblId);
         }
 
         #endregion
@@ -61,11 +53,17 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         public static Gene Read(ExtendedBinaryReader reader)
         {
+            ushort referenceIndex = reader.ReadUInt16();
+            int start = reader.ReadOptInt32();
+            int end = reader.ReadOptInt32();
+            bool onReverseStrand = reader.ReadBoolean();
             string symbol = reader.ReadAsciiString();
-            int start     = reader.ReadInt();
-            int end       = reader.ReadInt();
+            int hgncId = reader.ReadOptInt32();
+            var entrezId = CompactId.Read(reader);
+            var ensemblId = CompactId.Read(reader);
+            int mimNumber = reader.ReadOptInt32();
 
-            return new Gene(symbol, start, end);
+            return new Gene(referenceIndex, start, end, onReverseStrand, symbol, hgncId, entrezId, ensemblId, mimNumber);
         }
 
         /// <summary>
@@ -73,7 +71,9 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         public override string ToString()
         {
-            return $"gene: {Start} - {End} ({Symbol})";
+            var strand = OnReverseStrand ? 'R' : 'F';
+            var hgncId = _hgncId == -1 ? "" : _hgncId.ToString();
+            return $"{ReferenceIndex}\t{Start}\t{End}\t{strand}\t{Symbol}\t{hgncId}\t{EntrezGeneId}\t{EnsemblId}\t{_mimNumber}";
         }
 
         /// <summary>
@@ -81,9 +81,17 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         public void Write(ExtendedBinaryWriter writer)
         {
-            writer.WriteAsciiString(Symbol);
-            writer.WriteInt(Start);
-            writer.WriteInt(End);
+            writer.Write(ReferenceIndex);
+            writer.WriteOpt(Start);
+            writer.WriteOpt(End);
+            writer.Write(OnReverseStrand);
+            writer.WriteOptAscii(Symbol);
+            writer.WriteOpt(_hgncId);
+            // ReSharper disable ImpureMethodCallOnReadonlyValueField
+            EntrezGeneId.Write(writer);
+            EnsemblId.Write(writer);
+            // ReSharper restore ImpureMethodCallOnReadonlyValueField
+            writer.WriteOpt(_mimNumber);
         }
     }
 }

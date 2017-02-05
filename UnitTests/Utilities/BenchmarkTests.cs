@@ -41,7 +41,7 @@ namespace UnitTests.Utilities
 
             var observedElapsedTime = bench.GetElapsedIterationTime(3, "foobar", out unitsPerSecond);
             Assert.Contains("foobar/s", observedElapsedTime);
-            Assert.InRange(unitsPerSecond, 14, 16);
+            Assert.InRange(unitsPerSecond, 12, 16);
         }
     }
 }

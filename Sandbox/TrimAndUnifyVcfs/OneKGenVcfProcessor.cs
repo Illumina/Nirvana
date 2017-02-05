@@ -7,18 +7,19 @@ using System.Text;
 using System.Text.RegularExpressions;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.JSON;
+using VariantAnnotation.Utilities;
 
 namespace TrimAndUnifyVcfs
 {
-    public class OneKGenVcfProcessor
+    public sealed class OneKGenVcfProcessor
     {
-        #region members
 
         private const int KeptColumnCount = 8;
 
         private readonly string _inputDirectory;
         private readonly string _smallVariantOutputFile;
         private readonly string _structuralVariantOutputFile;
+
 
         private readonly Dictionary<string, Tuple<string, bool>> _sampleInfo; //sampleID-->population,isFemale
         private readonly Dictionary<string, List<string>> _superPopulation;
@@ -28,33 +29,31 @@ namespace TrimAndUnifyVcfs
         private static int _problematicSv;
         private readonly HashSet<Tuple<string, bool>> _svTypeSet;
 
+        //private info for each variants;
         private double[] _allFrequencies;
         private int[] _altAlleleCounts;
         private int _totalAlleleNumber;
         private Dictionary<string, double[]> _originalFrequencies;
         private string _ancestralAllele;
 
-        #endregion
 
         public OneKGenVcfProcessor(string inputDirectory, string smallVariantOutputFile, string structuralVariantOutputFile,
             string sampleInfoFile, string popInfoFile)
         {
-            _inputDirectory              = inputDirectory;
-            _smallVariantOutputFile      = smallVariantOutputFile;
+            _inputDirectory = inputDirectory;
+            _smallVariantOutputFile = smallVariantOutputFile;
             _structuralVariantOutputFile = structuralVariantOutputFile;
-            _sampleInfo                  = new Dictionary<string, Tuple<string, bool>>();
-            _superPopulation             = new Dictionary<string, List<string>>();
-            _availablePopulations        = new List<string>();
-            _sampleColumn                = new Dictionary<int, string>();
-            _svTypeSet                   = new HashSet<Tuple<string, bool>>();
-            
-            // read sample information;
-            using (var sampleReader = new StreamReader(new FileStream(sampleInfoFile, FileMode.Open)))
+            _sampleInfo = new Dictionary<string, Tuple<string, bool>>();
+            _superPopulation = new Dictionary<string, List<string>>();
+            _availablePopulations = new List<string>();
+            _sampleColumn = new Dictionary<int, string>();
+            _svTypeSet = new HashSet<Tuple<string, bool>>();
+            //read sample information;
+            using (var sampleReader = new StreamReader(FileUtilities.GetReadStream(sampleInfoFile)))
             {
-                // skip the first line
+                //skip the first line
                 string line;
                 sampleReader.ReadLine();
-
                 while ((line = sampleReader.ReadLine()) != null)
                 {
                     var fields = line.Split('\t');
@@ -63,20 +62,18 @@ namespace TrimAndUnifyVcfs
                 }
             }
 
-            // read population information
-            using (var popReader = new StreamReader(new FileStream(popInfoFile, FileMode.Open)))
+            //read population information
+            using (var popReader = new StreamReader(FileUtilities.GetReadStream(popInfoFile)))
             {
-                // skip the first line
+                //skip the first line
                 string line;
                 popReader.ReadLine();
-
                 while ((line = popReader.ReadLine()) != null)
                 {
                     var fields = line.Split('\t');
                     var population = fields[0];
                     var superPopulation = fields[2];
                     _availablePopulations.Add(population);
-
                     if (_superPopulation.ContainsKey(superPopulation))
                     {
                         _superPopulation[superPopulation].Add(population);
@@ -87,21 +84,22 @@ namespace TrimAndUnifyVcfs
                     }
                 }
 
-                // add super populations
+                //add super populations
                 foreach (var key in _superPopulation.Keys)
                 {
                     _availablePopulations.Add(key);
                 }
             }
+
         }
 
         public void DividAndUnifyVcfFiles()
         {
-            // write the header for structrual variants
+            //write the header for structrual variants
             var svHeaderStringBuilder = BuildSvHeaderString();
-            var vcfHeaderSb           = BuildVcfHeader();
+            var vcfHeaderSb = BuildVcfHeader();
 
-            using (var smallVariantWriter      = new StreamWriter(new GZipStream(new FileStream(_smallVariantOutputFile, FileMode.Create), CompressionMode.Compress, false)))
+            using (var smallVariantWriter = new StreamWriter(new GZipStream(new FileStream(_smallVariantOutputFile, FileMode.Create), CompressionMode.Compress, false)))
             using (var structuralVariantWriter = new StreamWriter(new GZipStream(new FileStream(_structuralVariantOutputFile, FileMode.Create), CompressionMode.Compress, false)))
             {
                 structuralVariantWriter.WriteLine(svHeaderStringBuilder.ToString());
@@ -111,11 +109,13 @@ namespace TrimAndUnifyVcfs
                 {
                     if (!fileName.EndsWith(".vcf.gz")) continue; //only work for GRCh37
 
+                    //if (!fileName.EndsWith("vcf.gz")) continue;
+
                     Console.WriteLine("reading file " + fileName);
 
-                    int smallVarCount     = 0;
-                    int structualVarCount = 0;
-                    _problematicSv        = 0;
+                    var smallVarCount = 0;
+                    var structualVarCount = 0;
+                    _problematicSv = 0;
 
                     using (var inFile = GZipUtilities.GetAppropriateStreamReader(fileName))
                     {
@@ -128,15 +128,15 @@ namespace TrimAndUnifyVcfs
                                 continue;
                             }
 
-                            // read the header and record the column number for each sample
+                            //read the header and record the column number for each sample
                             if (vcfLine.StartsWith("#"))
                             {
                                 ReadHeader(vcfLine);
 
                                 vcfLine = inFile.ReadLine();
                                 continue;
-                            }
 
+                            }
                             var vcfFields = vcfLine.Split('\t');
 
                             var altAlleles = vcfFields[VcfCommon.AltIndex].Split(',');
@@ -145,8 +145,8 @@ namespace TrimAndUnifyVcfs
                             if (!hasSymbolicAllele)
                             {
                                 smallVarCount++;
+                                //process the sample field to extract the 
 
-                                // process the sample field to extract the 
                                 var infoBuilder = new StringBuilder(vcfFields[VcfCommon.InfoIndex]);
 
                                 ParseSmallVariantSamples(vcfFields, infoBuilder);
@@ -157,15 +157,15 @@ namespace TrimAndUnifyVcfs
                                 {
                                     smallVariantWriter.Write(vcfFields[i] + '\t');
                                 }
-
                                 smallVariantWriter.Write('\n');
                                 vcfLine = inFile.ReadLine();
                                 continue;
                             }
 
-                            bool hasCnvAllele = altAlleles.Any(x => x.StartsWith("<CN") && x.EndsWith(">"));
-                            var newSvLine = ParseStructuralVariatVcfLine(vcfFields, hasCnvAllele);
 
+
+                            var hasCnvAllele = altAlleles.Any(x => x.StartsWith("<CN") && x.EndsWith(">"));
+                            var newSvLine = ParseStructuralVariatVcfLine(vcfFields, hasCnvAllele);
                             if (newSvLine != null)
                             {
                                 structuralVariantWriter.WriteLine(newSvLine);
@@ -173,7 +173,9 @@ namespace TrimAndUnifyVcfs
                             }
 
                             vcfLine = inFile.ReadLine();
+
                         }
+
 
                         Console.WriteLine("small variants:                     {0}", smallVarCount);
                         Console.WriteLine("structural variants:                {0}", structualVarCount);
@@ -181,10 +183,12 @@ namespace TrimAndUnifyVcfs
                         Console.WriteLine("--------------------------------------------------------------------------------");
                         Console.WriteLine("\n");
                     }
+
                 }
+
             }
 
-            using (var summaryWriter = new StreamWriter(new FileStream(@"E:\Data\Nirvana\bugfixes\oneKGenSvTypeSummary.txt", FileMode.Create)))
+            using (var summaryWriter = new StreamWriter(FileUtilities.GetReadStream(@"E:\Data\Nirvana\bugfixes\oneKGenSvTypeSummary.txt")))
             {
                 foreach (var type in _svTypeSet)
                 {
@@ -193,21 +197,25 @@ namespace TrimAndUnifyVcfs
             }
         }
 
+
+
         private void ParseSmallVariantSamples(string[] vcfFields, StringBuilder infoBuilder)
         {
             var sampleRecorder = new Dictionary<string, int[]>(); //record AN and AC for each population 
                                                                   //get the number of alternative alleles
             var altAlleles = vcfFields[VcfCommon.AltIndex].Split(',');
-            int numberOfAlts = altAlleles.Length;
+            var numberOfAlts = altAlleles.Length;
+
+
 
             foreach (var col in _sampleColumn.Keys)
             {
-                int[] alleleCounts = new int[numberOfAlts + 1]; //pos 0 for total counts
+                var alleleCounts = new int[numberOfAlts + 1]; //pos 0 for total counts
                 var sampleId = _sampleColumn[col];
 
-                var samplePopulation = _sampleInfo[sampleId].Item1;
-                string sampleGenotype = GetGenotype(vcfFields[VcfCommon.FormatIndex], vcfFields[col]);
 
+                var samplePopulation = _sampleInfo[sampleId].Item1;
+                var sampleGenotype = GetGenotype(vcfFields[VcfCommon.FormatIndex], vcfFields[col]);
                 if (!sampleRecorder.ContainsKey(samplePopulation))
                     sampleRecorder[samplePopulation] = new int[numberOfAlts + 1];
 
@@ -266,7 +274,9 @@ namespace TrimAndUnifyVcfs
                 {
                     throw new Exception($"unknown error {vcfFields[0]} {vcfFields[1]} {vcfFields[3]}");
                 }
+
             }
+
 
             var superpopulationSampleRecorder = new Dictionary<string, int[]>();
 
@@ -274,11 +284,11 @@ namespace TrimAndUnifyVcfs
             {
                 if (_superPopulation.ContainsKey(population))
                 {
-                    int[] superPopulationAlleleCounts = new int[numberOfAlts + 1];
+                    var superPopulationAlleleCounts = new int[numberOfAlts + 1];
 
                     foreach (var subPopulation in _superPopulation[population])
                     {
-                        for (int i = 0; i <= numberOfAlts; i++)
+                        for (var i = 0; i <= numberOfAlts; i++)
                             superPopulationAlleleCounts[i] += sampleRecorder[subPopulation][i];
                     }
                     superpopulationSampleRecorder[population] = superPopulationAlleleCounts;
@@ -286,8 +296,8 @@ namespace TrimAndUnifyVcfs
 
             }
 
-            // validate the AC AN from each populations by comparing the total AN, AC and AF of each super population to info field
-            bool validated = ValidateAcAndAn(superpopulationSampleRecorder, vcfFields[VcfCommon.InfoIndex], numberOfAlts);
+            //validate the AC AN from each populations by comparing the total AN, AC and AF of each super population to info field
+            var validated = ValidateAcAndAn(superpopulationSampleRecorder, vcfFields[VcfCommon.InfoIndex], numberOfAlts);
 
             if (!validated)
             {
@@ -295,7 +305,7 @@ namespace TrimAndUnifyVcfs
                 return;
             }
 
-            // append information to infoFiled
+            //append information to infoFiled
 
             infoBuilder.Clear();
 
@@ -304,13 +314,14 @@ namespace TrimAndUnifyVcfs
             infoBuilder.Append(";AF=" + string.Join(",", _allFrequencies.Select(x => x.ToString(JsonCommon.FrequencyRoundingFormat))) + ";AA=" +
                                _ancestralAllele);
 
+
             foreach (var population in _superPopulation.Keys)
             {
                 infoBuilder.Append(";");
                 infoBuilder.Append(population + "_AN=" + superpopulationSampleRecorder[population][0] + ";");
                 infoBuilder.Append(population + "_AC=");
 
-                for (int i = 1; i < numberOfAlts; i++)
+                for (var i = 1; i < numberOfAlts; i++)
                     infoBuilder.Append(superpopulationSampleRecorder[population][i] + ",");
 
                 infoBuilder.Append(superpopulationSampleRecorder[population][numberOfAlts]);
@@ -319,6 +330,7 @@ namespace TrimAndUnifyVcfs
                                    string.Join(",",
                                        _originalFrequencies[population].Select(x => x.ToString(JsonCommon.FrequencyRoundingFormat))));
             }
+
         }
 
         private bool ValidateAcAndAn(Dictionary<string, int[]> superpopulationSampleRecorder, string infoFields, int numberOfAlts)
@@ -326,13 +338,13 @@ namespace TrimAndUnifyVcfs
             //parse vcf info fields to extract AC, AN, and AF
             ParseInfoField(infoFields);
 
-            int totalAn = 0;
-            int[] totalAc = new int[numberOfAlts];
+            var totalAn = 0;
+            var totalAc = new int[numberOfAlts];
             foreach (var population in _superPopulation.Keys)
             {
-                int currentAn = superpopulationSampleRecorder[population][0];
+                var currentAn = superpopulationSampleRecorder[population][0];
                 totalAn += currentAn;
-                for (int i = 0; i < numberOfAlts; i++)
+                for (var i = 0; i < numberOfAlts; i++)
                 {
                     var currentAc = superpopulationSampleRecorder[population][i + 1];
                     totalAc[i] += currentAc;
@@ -347,6 +359,7 @@ namespace TrimAndUnifyVcfs
 
             if (totalAn != _totalAlleleNumber) return false;
 
+
             for (var i = 0; i < numberOfAlts; i++)
             {
                 if (totalAc[i] != _altAlleleCounts[i]) return false;
@@ -355,16 +368,18 @@ namespace TrimAndUnifyVcfs
                 if (Math.Abs(currentTotalFreq - _allFrequencies[i]) > 0.00001) return false;
             }
 
+
             return true;
         }
 
+
         private void ClearInfo()
         {
-            _allFrequencies      = null;
-            _altAlleleCounts     = null;
-            _totalAlleleNumber   = 0;
+            _allFrequencies = null;
+            _altAlleleCounts = null;
+            _totalAlleleNumber = 0;
             _originalFrequencies = new Dictionary<string, double[]>();
-            _ancestralAllele     = null;
+            _ancestralAllele = null;
         }
 
         private void ParseInfoField(string infoFields)
@@ -462,9 +477,9 @@ namespace TrimAndUnifyVcfs
 
         }
 
-        private StringBuilder BuildSvHeaderString()
+        internal StringBuilder BuildSvHeaderString()
         {
-            StringBuilder headerStringBuilder =
+            var headerStringBuilder =
                 new StringBuilder("#Id\tChr\tStart\tEnd\tSvType\tSampleSize\tObservedGains\tObservedLosses\tVariantFreqAll");
             foreach (var population in _availablePopulations)
             {
@@ -476,7 +491,7 @@ namespace TrimAndUnifyVcfs
             return headerStringBuilder;
         }
 
-        private void ReadHeader(string vcfLine)
+        internal void ReadHeader(string vcfLine)
         {
             _sampleColumn.Clear();
 
@@ -495,15 +510,16 @@ namespace TrimAndUnifyVcfs
             }
         }
 
-        private string ParseStructuralVariatVcfLine(string[] vcfFields, bool isCnv)
+        internal string ParseStructuralVariatVcfLine(string[] vcfFields, bool isCnv)
         {
-            var outStringBuilder = new StringBuilder(vcfFields[VcfCommon.IdIndex] + "\t" + vcfFields[VcfCommon.ChromIndex]);
+            var outStringBuilder =
+                new StringBuilder(vcfFields[VcfCommon.IdIndex] + "\t" + vcfFields[VcfCommon.ChromIndex]);
 
-            // add the start, shoud be pos+1 
-            int start = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]) + 1;
+            //add the start, shoud be pos+1 
+            var start = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]) + 1;
             outStringBuilder.Append("\t" + start);
 
-            // decide the type of variants
+            //decide the type of variants
             string svType;
             int? svEnd;
 
@@ -518,8 +534,9 @@ namespace TrimAndUnifyVcfs
             }
             outStringBuilder.Append("\t" + svEnd);
 
-            // add svType
+            //add svType
             outStringBuilder.Append("\t" + svType);
+
 
             try
             {
@@ -534,9 +551,10 @@ namespace TrimAndUnifyVcfs
             return outStringBuilder.ToString();
         }
 
+
         private void ParseStructuralVarSamples(string[] vcfFields, StringBuilder sb, bool isCnv)
         {
-            List<int> hapCopyNumbers = new List<int>() { 1 };
+            var hapCopyNumbers = new List<int>() { 1 };
             if (isCnv)
             {
                 //parse the copynumber
@@ -557,20 +575,22 @@ namespace TrimAndUnifyVcfs
                 }
             }
 
-            // parse the sample information
-            int totalSampleSize = 0;
-            int nonRefSample    = 0;
-            int observedGains   = 0;
-            int observedLosses  = 0;
-            var sampleRecorder  = new Dictionary<string, int[]>();
+
+            //parse the sample information
+            var totalSampleSize = 0;
+            var nonRefSample = 0;
+            var observedGains = 0;
+            var observedLosses = 0;
+            var sampleRecorder = new Dictionary<string, int[]>();
 
             foreach (var col in _sampleColumn.Keys)
             {
-                var sampleId          = _sampleColumn[col];
-                var samplePopulation  = _sampleInfo[sampleId].Item1;
-                var isSampleFemale    = _sampleInfo[sampleId].Item2;
-                string sampleGenotype = GetGenotype(vcfFields[VcfCommon.FormatIndex], vcfFields[col]);
+                var sampleId = _sampleColumn[col];
 
+
+                var samplePopulation = _sampleInfo[sampleId].Item1;
+                var isSampleFemale = _sampleInfo[sampleId].Item2;
+                var sampleGenotype = GetGenotype(vcfFields[VcfCommon.FormatIndex], vcfFields[col]);
                 if (sampleGenotype.Contains("."))
                 {
                     if (!sampleGenotype.Equals(".") || !sampleGenotype.Equals(".|.") || !sampleGenotype.Equals("./."))
@@ -579,13 +599,12 @@ namespace TrimAndUnifyVcfs
                     }
                     continue;
                 }
-
                 if (vcfFields[VcfCommon.ChromIndex].Contains("Y") && isSampleFemale) continue;
 
                 totalSampleSize++;
 
                 var sampleCopynumber = GetCopyNumber(vcfFields[VcfCommon.FormatIndex], vcfFields[col], isCnv, hapCopyNumbers);
-                int expectedCopyNumber = GetExpectedCopyNumber(vcfFields[VcfCommon.FormatIndex], vcfFields[col], isCnv, vcfFields[VcfCommon.IdIndex]);
+                var expectedCopyNumber = GetExpectedCopyNumber(vcfFields[VcfCommon.FormatIndex], vcfFields[col], isCnv, vcfFields[VcfCommon.IdIndex]);
 
                 if (!vcfFields[VcfCommon.ChromIndex].Contains("Y"))
                 {
@@ -615,12 +634,12 @@ namespace TrimAndUnifyVcfs
 
                 if (sampleCopynumber > expectedCopyNumber) observedGains++;
                 if (sampleCopynumber < expectedCopyNumber) observedLosses++;
+
             }
 
             sb.Append("\t" + totalSampleSize + "\t" + observedGains + "\t" + observedLosses);
-            var freqAll = nonRefSample / (double)totalSampleSize;
+            var freqAll = nonRefSample / (double)(totalSampleSize);
             sb.Append("\t" + freqAll.ToString("0.#####"));
-
             foreach (var population in _availablePopulations)
             {
                 if (_superPopulation.ContainsKey(population))
@@ -668,10 +687,9 @@ namespace TrimAndUnifyVcfs
         }
 
 
-        private int GetExpectedCopyNumber(string format, string sampleCol, bool isCnv, string varID)
+        private static int GetExpectedCopyNumber(string format, string sampleCol, bool isCnv, string varID)
         {
             if (!isCnv) return -1;
-
             //for chrY
             if (!format.Equals("GT"))
             {
@@ -683,18 +701,18 @@ namespace TrimAndUnifyVcfs
             return 2;
         }
 
-        private bool IsReference(string sampleGenotype)
+        private static bool IsReference(string sampleGenotype)
         {
-            return sampleGenotype.Equals("0/0") || sampleGenotype.Equals("0|0") || sampleGenotype.Equals("0");
+            return (sampleGenotype.Equals("0/0") || sampleGenotype.Equals("0|0") || sampleGenotype.Equals("0"));
         }
 
-        private int GetCopyNumber(string format, string sampleCol, bool isCnv, List<int> hapCopyNumbers)
+        private static int GetCopyNumber(string format, string sampleCol, bool isCnv, List<int> hapCopyNumbers)
         {
             if (!isCnv) return -1;
             if (!format.Equals("GT")) return Convert.ToInt32(sampleCol.Split(':')[1]); //chrY
 
             int copyNum;
-            var copyNumMatch    = Regex.Match(sampleCol, @"^(\d+)[\\|\|](\d+)$");
+            var copyNumMatch = Regex.Match(sampleCol, @"^(\d+)[\\|\|](\d+)$");
             var hapCopyNumMatch = Regex.Match(sampleCol, @"^(\d+)$");
 
             if (copyNumMatch.Success)
@@ -712,17 +730,18 @@ namespace TrimAndUnifyVcfs
                 throw new Exception($"unknown genotype {sampleCol}");
             }
 
+
             return copyNum;
         }
 
-        private string GetGenotype(string format, string sampleCol)
+        private static string GetGenotype(string format, string sampleCol)
         {
             if (!format.Equals("GT")) return sampleCol.Split(':')[0];
 
             return sampleCol;
         }
 
-        private void ParseSvInfoField(string infoFields, out string svType, out int? svEnd)
+        private static void ParseSvInfoField(string infoFields, out string svType, out int? svEnd)
         {
             svType = null;
             svEnd = null;

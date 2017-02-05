@@ -15,7 +15,7 @@ namespace UnitTests.FileHandling
             const string expectedLine2 =
                 "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
-            string randomPath = GetRandomPath();
+            var randomPath = GetRandomPath();
 
             using (var writer = GZipUtilities.GetStreamWriter(randomPath))
             {
@@ -42,7 +42,7 @@ namespace UnitTests.FileHandling
         [Fact]
         public void HandleEmptyFile()
         {
-            string randomPath = GetRandomPath();
+            var randomPath = GetRandomPath();
             string observedLine;
 
             using (File.Create(randomPath))

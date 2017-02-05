@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using VariantAnnotation.DataStructures.JsonAnnotations;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
-	public class CosmicItem: SupplementaryDataItem, ICosmic,IJsonSerializer, IEquatable<CosmicItem>
+	public sealed class CosmicItem: SupplementaryDataItem, ICosmic, IEquatable<CosmicItem>
 	{
 		#region members
 		public string ID { get; }
@@ -16,11 +16,13 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 		public string AltAllele { get; }
 		public string SaAltAllele { get; }
 		public string Gene { get; }
+	    private int? SampleCount { get; }
+	
 
 	    public string IsAlleleSpecific { get; set; }
 		IEnumerable<ICosmicStudy> ICosmic.Studies => Studies;
 
-		public HashSet<CosmicStudy> Studies { get; internal set; }
+		public HashSet<CosmicStudy> Studies { get; private set; }
 
 		#endregion
 		//constructors
@@ -30,27 +32,28 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
 			ID          = reader.ReadAsciiString();
 			SaAltAllele = reader.ReadAsciiString();
-			AltAllele   = SupplementaryAnnotation.ReverseSaReducedAllele(SaAltAllele);
+			AltAllele   = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(SaAltAllele);
 			RefAllele   = reader.ReadAsciiString();
 			Gene        = reader.ReadAsciiString();
+			SampleCount = reader.ReadOptNullableInt32();
 
-			int countStudy = reader.ReadInt();
+			var countStudy = reader.ReadOptInt32();
 			if (countStudy>0) Studies=new HashSet<CosmicStudy>();
 
-			for (int i = 0; i < countStudy; i++)
+			for (var i = 0; i < countStudy; i++)
 			{
 				Studies.Add(new CosmicStudy(reader));
 			}
 		}
 
-	    public CosmicItem(
+		public CosmicItem(
 			string chromosome,
 			int start,
 			string id,
 			string refAllele,
 			string altAllele,
 			string gene,
-			HashSet<CosmicStudy> studies,
+			HashSet<CosmicStudy> studies, int? sampleCount,
 			string saAltAllele=null)
 		{
 			Chromosome  = chromosome;
@@ -62,10 +65,11 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			Gene        = gene;
 
 			Studies = studies;
+			SampleCount = sampleCount;
 
 		}
 
-		public class CosmicStudy : ICosmicStudy, IEquatable<CosmicStudy>,IJsonSerializer
+		public sealed class CosmicStudy : ICosmicStudy, IEquatable<CosmicStudy>
 		{
 			#region members
 
@@ -90,9 +94,9 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
 			public bool Equals(CosmicStudy other)
 			{
-				return ID.Equals(other.ID) &&
-					   Histology.Equals(other.Histology) &&
-					   PrimarySite.Equals(other.PrimarySite);
+				return ID.Equals(other?.ID) &&
+					   Histology.Equals(other?.Histology) &&
+					   PrimarySite.Equals(other?.PrimarySite);
 			}
 
 		    public override int GetHashCode()
@@ -105,9 +109,9 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
 			public void Write(ExtendedBinaryWriter writer)
 			{
-				writer.WriteAsciiString(ID);
-				writer.WriteAsciiString(Histology);
-				writer.WriteAsciiString(PrimarySite);
+				writer.WriteOptAscii(ID);
+				writer.WriteOptAscii(Histology);
+				writer.WriteOptAscii(PrimarySite);
 			}
 
 			public void SerializeJson(StringBuilder sb)
@@ -122,39 +126,62 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			}
 		}
 
-		public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryAnnotation sa, string refBases = null)
+		public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryPositionCreator saCreator, string refBases = null)
 		{
 			// check if the ref allele matches the refBases as a prefix
-			if (!SupplementaryAnnotation.ValidateRefAllele(RefAllele, refBases))
+			if (!SupplementaryAnnotationUtilities.ValidateRefAllele(RefAllele, refBases))
 			{
 				return null; //the ref allele for this entry did not match the reference bases.
 			}
 
-			int newStart = Start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(RefAllele, AltAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(Start, RefAllele, AltAllele);
 
-			var newRefAllele = newAlleles.Item1;
-			var newAltAllele = newAlleles.Item2;
+			var newStart     = newAlleles.Item1;
+			var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
 
 			if (newRefAllele != RefAllele)
 			{
-				return new CosmicItem(Chromosome, newStart, ID,newRefAllele,newAltAllele,Gene, Studies);
+				return new CosmicItem(Chromosome, newStart, ID,newRefAllele,newAltAllele,Gene, Studies, SampleCount);
 			}
 			
 			var newRefAlleleParsed = string.IsNullOrEmpty(newRefAllele) ? "-" : newRefAllele;
-
-			sa.AddCosmic(new CosmicItem(Chromosome, Start, ID, newRefAlleleParsed, newAltAllele,Gene, Studies));
+			var newItem = new CosmicItem(Chromosome, Start, ID, newRefAlleleParsed, newAltAllele, Gene, Studies,SampleCount);
+			newItem.AddCosmicToSa(saCreator);
 
 			return null;
 		}
 
-		public override SupplementaryInterval GetSupplementaryInterval()
+		public override SupplementaryInterval GetSupplementaryInterval(ChromosomeRenamer renamer)
 		{
 			throw new NotImplementedException();
 		}
 
+		public void AddCosmicToSa(SupplementaryPositionCreator saCreator)
+		{
+			var sa = saCreator.SaPosition;
+			var index = sa.CosmicItems.IndexOf(this);
 
-	
+			if (index == -1)
+			{
+				sa.CosmicItems.Add(this);
+				return;
+			}
+
+			//get the existing cosmic item in dictionary
+			if (sa.CosmicItems[index].Studies == null)
+			{
+				sa.CosmicItems[index].Studies = Studies;
+				return;
+			}
+
+			foreach (var study in Studies)
+			{
+				sa.CosmicItems[index].Studies.Add(study);
+			}
+
+		}
+
 		public bool Equals(CosmicItem otherItem)
 		{
 			// If parameter is null return false.
@@ -186,18 +213,19 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
 	    public void Write(ExtendedBinaryWriter writer)
 		{
-			writer.WriteAsciiString(ID);
-			writer.WriteAsciiString(SaAltAllele);
-			writer.WriteAsciiString(RefAllele);
-			writer.WriteAsciiString(Gene);
+			writer.WriteOptAscii(ID);
+			writer.WriteOptAscii(SaAltAllele);
+			writer.WriteOptAscii(RefAllele);
+			writer.WriteOptAscii(Gene);
+			writer.WriteOpt(SampleCount);
 
 			if (Studies == null)
 			{
-				writer.WriteInt(0);
+				writer.WriteOpt(0);
 				return;
 			}
 
-			writer.WriteInt(Studies.Count);
+			writer.WriteOpt(Studies.Count);
 
 			foreach (var study in Studies)
 			{
@@ -215,6 +243,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			jsonObject.AddStringValue("refAllele", RefAllele);
 			jsonObject.AddStringValue("altAllele", AltAllele);
 			jsonObject.AddStringValue("gene", Gene);
+			jsonObject.AddIntValue("sampleCount",SampleCount);
 			jsonObject.AddObjectValues("studies", Studies);
 			sb.Append(JsonObject.CloseBrace);
 		}

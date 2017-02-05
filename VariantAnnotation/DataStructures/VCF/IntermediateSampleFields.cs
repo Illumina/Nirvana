@@ -3,7 +3,7 @@ using VariantAnnotation.FileHandling;
 
 namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class IntermediateSampleFields : IIntermediateSampleFields
+    internal sealed class IntermediateSampleFields : IIntermediateSampleFields
     {
         public FormatIndices FormatIndices { get; }
         public string[] SampleColumns { get; }
@@ -21,6 +21,7 @@ namespace VariantAnnotation.DataStructures.VCF
         public int? NR { get; private set; }
         public int? NV { get; private set; }
         public string[] AltAlleles { get; }
+		public int? DenovoQuality { get; private set; }
 
         // constructor
         public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols, bool fixGatkGenomeVcf = false)
@@ -43,6 +44,10 @@ namespace VariantAnnotation.DataStructures.VCF
 	        {
 				sampleCols[formatIndices.AD.Value] = CorrectAdInGatkGenomeVcf(sampleCols[formatIndices.AD.Value]);
 	        }
+	        if (formatIndices.DQ != null)
+	        {
+		        DenovoQuality = GetDenovoQuality(sampleCols[formatIndices.DQ.Value]);
+	        }
 
             AltAlleles = vcfColumns[VcfCommon.AltIndex].Split(',');
 
@@ -51,7 +56,18 @@ namespace VariantAnnotation.DataStructures.VCF
             GetPlatypusCounts();
         }
 
-        private static string CorrectAdInGatkGenomeVcf(string adString)
+	    private static int? GetDenovoQuality(string sampleDqCol)
+	    {
+		    int denovoQuality;
+		    var parse = int.TryParse(sampleDqCol, out denovoQuality);
+
+		    if (!parse) return null;
+
+		    return denovoQuality;
+		    
+	    }
+
+	    private static string CorrectAdInGatkGenomeVcf(string adString)
         {
             var ads = adString.Split(',');
             if (ads.Length < 3) return adString;
@@ -65,12 +81,12 @@ namespace VariantAnnotation.DataStructures.VCF
         /// </summary>
         private void CalculateTirTar()
         {
-            if ((FormatIndices.TAR == null) || (FormatIndices.TIR == null)) return;
+            if (FormatIndices.TAR == null || FormatIndices.TIR == null) return;
 
             var tarString = SampleColumns[FormatIndices.TAR.Value];
             var tirString = SampleColumns[FormatIndices.TIR.Value];
 
-            if ((tarString == ".") || (tirString == ".")) return;
+            if (tarString == "." || tirString == ".") return;
 
             Tar = int.Parse(tarString.Split(',')[0]);
             Tir = int.Parse(tirString.Split(',')[0]);
@@ -81,8 +97,8 @@ namespace VariantAnnotation.DataStructures.VCF
         /// </summary>
         private void CalculateRawAlleleCounts()
         {
-            if ((FormatIndices.AU == null) || (FormatIndices.CU == null) || (FormatIndices.GU == null) ||
-                (FormatIndices.TU == null))
+            if (FormatIndices.AU == null || FormatIndices.CU == null || FormatIndices.GU == null ||
+                FormatIndices.TU == null)
                 return;
 
             ACount = GetTier1RawCount(FormatIndices.AU.Value);
@@ -90,7 +106,7 @@ namespace VariantAnnotation.DataStructures.VCF
             GCount = GetTier1RawCount(FormatIndices.GU.Value);
             TCount = GetTier1RawCount(FormatIndices.TU.Value);
 
-            if ((ACount == null) || (CCount == null) || (GCount == null) || (TCount == null)) return;
+            if (ACount == null || CCount == null || GCount == null || TCount == null) return;
 
             TotalAlleleCount = ACount + CCount + GCount + TCount;
         }
@@ -100,12 +116,12 @@ namespace VariantAnnotation.DataStructures.VCF
         /// </summary>
         private void GetPlatypusCounts()
         {
-            if ((FormatIndices.NR == null) || (FormatIndices.NV == null)) return;
+            if (FormatIndices.NR == null || FormatIndices.NV == null) return;
 
             var nrString = SampleColumns[FormatIndices.NR.Value];
             var nvString = SampleColumns[FormatIndices.NV.Value];
 
-            if ((nrString == ".") || (nvString == ".")) return;
+            if (nrString == "." || nvString == ".") return;
 
             NR = int.Parse(nrString);
             NV = int.Parse(nvString);

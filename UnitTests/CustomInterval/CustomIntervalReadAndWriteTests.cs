@@ -23,14 +23,14 @@ namespace UnitTests.CustomInterval
         {
             _intervalType = "TestInterval";
 
-            for (int i = 0; i < _totalIntervals; i++)
+            for (var i = 0; i < _totalIntervals; i++)
             {
-                int start = 100 + i * 10000;
-                int end = 200 + i * 100 + i * 10000;
+                var start = 100 + i * 10000;
+                var end = 200 + i * 100 + i * 10000;
 
-                string geneName = "TestGene" + i;
-                string evidence = "Class" + i;
-                int length = end - start + 1;
+                var geneName = "TestGene" + i;
+                var evidence = "Class" + i;
+                var length = end - start + 1;
                 // ReSharper disable once PossibleLossOfFraction
                 float score = i * 3 / 5;
 
@@ -60,16 +60,16 @@ namespace UnitTests.CustomInterval
 
             _randomPath = GetRandomPath();
 
-            WriteCustomIntervalFile(_randomPath);
+            WriteCustomIntevalFile(_randomPath);
         }
 
 
-        private void WriteCustomIntervalFile(string filePath)
+        private void WriteCustomIntevalFile(string filePath)
         {
-            var dataVersion = new DataSourceVersion("customInterval", "00", DateTime.Now.Ticks);
+			var dataVersion = new DataSourceVersion("customInterval", "00", DateTime.Now.Ticks);
             using (var writer = new CustomIntervalWriter(filePath, "chr1", _intervalType, dataVersion))
             {
-                for (int i = 0; i < _totalIntervals; i++)
+                for (var i = 0; i < _totalIntervals; i++)
                 {
                     writer.WriteInterval(_expectedCustomIntervals[i]);
                 }
@@ -81,7 +81,7 @@ namespace UnitTests.CustomInterval
             // read the supplementary annotation file
             using (var reader = new CustomIntervalReader(_randomPath))
             {
-                for (int i = 0; i < _totalIntervals; i++)
+                for (var i = 0; i < _totalIntervals; i++)
                 {
                     reader.GetNextCustomInterval();
                 }
@@ -101,7 +101,15 @@ namespace UnitTests.CustomInterval
         {
             using (var reader = new CustomIntervalReader(_randomPath))
             {
-                for (int i = 0; i < _totalIntervals; i++)
+                var observedType = reader.GetIntervalType();
+                var observedRefName = reader.GetReferenceName();
+
+                Assert.Equal(_intervalType, observedType);
+                Assert.Equal("chr1", observedRefName);
+
+
+
+                for (var i = 0; i < _totalIntervals; i++)
                 {
                     var observedInterval = reader.GetNextCustomInterval();
 
@@ -130,11 +138,11 @@ namespace UnitTests.CustomInterval
                 null, null);
             var randomPath = GetRandomPath();
 
-            var dataVersion = new DataSourceVersion("customInterval", "00", DateTime.Now.Ticks);
-            using (var writer = new CustomIntervalWriter(randomPath, "chr1", _intervalType, dataVersion))
+			var dataVersion = new DataSourceVersion("customInterval", "00", DateTime.Now.Ticks);
+			using (var writer = new CustomIntervalWriter(randomPath, "chr1", _intervalType, dataVersion))
             {
                 // ReSharper disable once AccessToDisposedClosure
-                Exception ex = Assert.Throws<Exception>(() => writer.WriteInterval(customInterval));
+                var ex = Assert.Throws<Exception>(() => writer.WriteInterval(customInterval));
 
                 Assert.Equal("Unexpected interval in custom interval writer.\nExpected reference name: chr1, observed reference name: chr2", ex.Message);
             }
@@ -147,11 +155,11 @@ namespace UnitTests.CustomInterval
                 null, null);
             var randomPath = GetRandomPath();
 
-            var dataVersion = new DataSourceVersion("customInterval", "00", DateTime.Now.Ticks);
-            using (var writer = new CustomIntervalWriter(randomPath, "chr1", _intervalType, dataVersion))
+			var dataVersion = new DataSourceVersion("customInterval", "00", DateTime.Now.Ticks);
+			using (var writer = new CustomIntervalWriter(randomPath, "chr1", _intervalType, dataVersion))
             {
                 // ReSharper disable once AccessToDisposedClosure
-                Exception ex = Assert.Throws<Exception>(() => writer.WriteInterval(customInterval));
+                var ex = Assert.Throws<Exception>(() => writer.WriteInterval(customInterval));
 
                 Assert.Equal($"Unexpected interval in custom interval writer.\nExpected interval type: {_intervalType}, observed interval type: WrongType", ex.Message);
             }

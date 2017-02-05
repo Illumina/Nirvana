@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
@@ -10,7 +11,7 @@ namespace VariantAnnotation.Algorithms.Consequences
     /// has been added to prevent unneeded calculations. The caching layer is reset when each new
     /// variant has been read.
     /// </summary>
-    public class VariantEffect
+    public sealed class VariantEffect
     {
         #region members
 
@@ -29,7 +30,7 @@ namespace VariantAnnotation.Algorithms.Consequences
         /// <summary>
         /// constructor
         /// </summary>
-        public VariantEffect(TranscriptAnnotation ta, Transcript transcript,VariantType internalCopyNumberType)
+        public VariantEffect(TranscriptAnnotation ta, Transcript transcript, VariantType internalCopyNumberType = VariantType.unknown)
         {
             _ta = ta;
             _transcript = transcript;
@@ -41,7 +42,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             _tempCache = new TempVariantEffectCache();
 
             _featureVariantEffects = new FeatureVariantEffects(transcript, _altAllele.NirvanaVariantType,
-                _altAllele.ReferenceBegin, _altAllele.ReferenceEnd, _altAllele.IsStructuralVariant,internalCopyNumberType);
+                _altAllele.Start, _altAllele.End, _altAllele.IsStructuralVariant, internalCopyNumberType);
         }
 
         /// <summary>
@@ -52,11 +53,11 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             if (internalCopyNumberType == VariantType.copy_number_loss) return ConsequenceType.CopyNumberDecrease;
 
-			if(internalCopyNumberType == VariantType.copy_number_gain) return ConsequenceType.CopyNumberIncrease;
+            if (internalCopyNumberType == VariantType.copy_number_gain) return ConsequenceType.CopyNumberIncrease;
 
-			if(internalCopyNumberType == VariantType.copy_number_variation) return ConsequenceType.CopyNumberChange;
+            if (internalCopyNumberType == VariantType.copy_number_variation) return ConsequenceType.CopyNumberChange;
 
-	        return ConsequenceType.Unknown;
+            return ConsequenceType.Unknown;
 
         }
 
@@ -65,7 +66,7 @@ namespace VariantAnnotation.Algorithms.Consequences
         /// </summary>
         private static bool HasOverlap(int start1, int end1, int start2, int end2)
         {
-            return (end1 >= start2) && (start1 <= end2);
+            return end1 >= start2 && start1 <= end2;
         }
 
 
@@ -82,7 +83,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             if (!_altAllele.IsStructuralVariant)
             {
-                result = _transcript.OnReverseStrand ? _ta.IsStartSpliceSite : _ta.IsEndSpliceSite;
+                result = _transcript.Gene.OnReverseStrand ? _ta.IsStartSpliceSite : _ta.IsEndSpliceSite;
             }
 
             _cache.Add(ct, result);
@@ -104,7 +105,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             }
 
             // special case to handle insertions after the CDS end
-            if ((variantRefBegin == variantRefEnd + 1) && (variantRefEnd == codingRegionEnd))
+            if (variantRefBegin == variantRefEnd + 1 && variantRefEnd == codingRegionEnd)
             {
                 _tempCache.Add(ct, true);
                 return true;
@@ -131,7 +132,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             }
 
             // special case to handle insertions before the CDS start
-            if ((variantRefBegin == variantRefEnd + 1) && (variantRefBegin == codingRegionStart))
+            if (variantRefBegin == variantRefEnd + 1 && variantRefBegin == codingRegionStart)
             {
                 _tempCache.Add(ct, true);
                 return true;
@@ -175,7 +176,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
             bool result = false;
-            if (!_altAllele.IsStructuralVariant) result = _transcript.OnReverseStrand ? _ta.IsEndSpliceSite : _ta.IsStartSpliceSite;
+            if (!_altAllele.IsStructuralVariant) result = _transcript.Gene.OnReverseStrand ? _ta.IsEndSpliceSite : _ta.IsStartSpliceSite;
 
             _cache.Add(ct, result);
             return result;
@@ -206,13 +207,13 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             bool result = false;
 
-            if (!_altAllele.IsStructuralVariant)
+            if (!_altAllele.IsStructuralVariant && _transcript.Translation != null)
             {
-                bool hasTranslation = _transcript.HasTranslation;
+                var hasTranslation = _transcript.Translation != null;
 
-                bool isFivePrimeOfCoding = _transcript.OnReverseStrand
-                    ? IsAfterCoding(_altAllele.ReferenceBegin, _altAllele.ReferenceEnd, _transcript.End, _transcript.CodingRegionEnd, hasTranslation)
-                    : IsBeforeCoding(_altAllele.ReferenceBegin, _altAllele.ReferenceEnd, _transcript.Start, _transcript.CodingRegionStart, hasTranslation);
+                var isFivePrimeOfCoding = _transcript.Gene.OnReverseStrand
+                    ? IsAfterCoding(_altAllele.Start, _altAllele.End, _transcript.End, _transcript.Translation.CodingRegion.GenomicEnd, hasTranslation)
+                    : IsBeforeCoding(_altAllele.Start, _altAllele.End, _transcript.Start, _transcript.Translation.CodingRegion.GenomicStart, hasTranslation);
 
                 result = isFivePrimeOfCoding && IsWithinCdna();
             }
@@ -249,8 +250,9 @@ namespace VariantAnnotation.Algorithms.Consequences
                 int varLen = _ta.CodingDnaSequenceEnd - _ta.CodingDnaSequenceBegin + 1;
                 int alleleLen = _altAllele.AlternateAllele?.Length ?? 0;
 
-                result = !Codons.IsTriplet(alleleLen - varLen);
+                result = !Codons.IsTriplet(alleleLen - varLen) && !IsStopRetained();
             }
+            result = result && !IsTruncatedByStop();
 
             _cache.Add(ct, result);
             return result;
@@ -264,14 +266,17 @@ namespace VariantAnnotation.Algorithms.Consequences
             const ConsequenceType ct = ConsequenceType.IncompleteTerminalCodonVariant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            if (!_ta.HasValidCdsStart || _altAllele.IsStructuralVariant)
+            if (_transcript.Translation == null || _altAllele.IsStructuralVariant)
             {
                 _cache.Add(ct, false);
                 return false;
             }
 
-            int cdsLength = _transcript.TranslateableSeq.Length;
-            int codonCdsStart = _ta.ProteinBegin * 3 - 2;
+            int cdsLength = CodingSequence.GetCodingSequenceLength(_transcript.CdnaMaps,
+                _transcript.Translation.CodingRegion.GenomicStart, _transcript.Translation.CodingRegion.GenomicEnd,
+                _transcript.StartExonPhase);
+
+            int codonCdsStart   = _ta.ProteinBegin * 3 - 2;
             int lastCodonLength = cdsLength - (codonCdsStart - 1);
 
             bool result = lastCodonLength < 3 && lastCodonLength > 0;
@@ -299,9 +304,10 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             if (!_altAllele.IsStructuralVariant)
             {
-                if ((_preCache.ReferenceCodonLen == 0) //|| (PreCache.ReferenceCodonLen < PreCache.AlternateCodonLen) 
+                if (_preCache.ReferenceCodonLen == 0 //|| (PreCache.ReferenceCodonLen < PreCache.AlternateCodonLen) 
                     || IsFrameshiftVariant()
-                    || IsIncompleteTerminalCodonVariant())
+                    || IsIncompleteTerminalCodonVariant()
+                    || IsStopGained())
                 {
                     _cache.Add(ct, false);
                     return false;
@@ -348,24 +354,41 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             if (!_altAllele.IsStructuralVariant)
             {
-                if (//IsStopGained()||
+                if (IsStopRetained() ||
                     IsFrameshiftVariant() ||
                     IsStartLost() ||
-                    (_preCache.AlternateCodonLen < _preCache.ReferenceCodonLen))
+                    _preCache.AlternateCodonLen <= _preCache.ReferenceCodonLen ||
+                    IsIncompleteTerminalCodonVariant())
                 {
                     _cache.Add(ct, false);
                     return false;
                 }
 
-                if (_preCache.AlternateAminoAcids.StartsWith(_preCache.ReferenceAminoAcids) ||
-                    _preCache.AlternateAminoAcids.EndsWith(_preCache.ReferenceAminoAcids))
-                {
-                    result = true;
-                }
+
+
+                if (!IsTruncatedByStop()) result = true;
+
+
             }
 
             _cache.Add(ct, result);
             return result;
+        }
+
+
+
+
+        private bool IsTruncatedByStop()
+        {
+            if (_preCache.AlternateAminoAcids != null && _preCache.AlternateAminoAcids.Contains(AminoAcids.StopCodon))
+            {
+                var stopPos = _preCache.AlternateAminoAcids.IndexOf(AminoAcids.StopCodon, StringComparison.Ordinal);
+                var altAminoAcidesBeforeStop = _preCache.AlternateAminoAcids.Substring(0, stopPos);
+                if (_preCache.AlternateAminoAcids.StartsWith(AminoAcids.StopCodon) ||
+                    _preCache.ReferenceAminoAcids.StartsWith(altAminoAcidesBeforeStop))
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -387,13 +410,13 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             if (!_altAllele.IsStructuralVariant)
             {
-                if ((_ta.ProteinBegin != 1) || (_preCache.ReferenceAminoAcidsLen == 0) || (_preCache.AlternateAminoAcidsLen == 0))
+                if (_ta.ProteinBegin != 1 || _preCache.ReferenceAminoAcidsLen == 0)
                 {
                     _cache.Add(ct, false);
                     return false;
                 }
 
-                result = _preCache.ReferenceAminoAcids[0] != _preCache.AlternateAminoAcids[0];
+                result = _preCache.AlternateAminoAcidsLen == 0 || _preCache.AlternateAminoAcids[0] != _preCache.ReferenceAminoAcids[0];
             }
 
             _cache.Add(ct, result);
@@ -430,8 +453,8 @@ namespace VariantAnnotation.Algorithms.Consequences
                 return false;
             }
 
-            if ((_preCache.ReferenceAminoAcids != _preCache.AlternateAminoAcids) &&
-                (_preCache.ReferenceAminoAcidsLen == _preCache.AlternateAminoAcidsLen))
+            if (_preCache.ReferenceAminoAcids != _preCache.AlternateAminoAcids &&
+                _preCache.ReferenceAminoAcidsLen == _preCache.AlternateAminoAcidsLen)
                 result = true;
 
             _cache.Add(ct, result);
@@ -474,19 +497,17 @@ namespace VariantAnnotation.Algorithms.Consequences
                 return false;
             }
 
-            bool result = true;
+            var result = true;
 
-            bool sameLen = _preCache.ReferenceAminoAcidsLen == _preCache.AlternateAminoAcidsLen;
-            bool startsWithTer = _preCache.ReferenceAminoAcids.StartsWith("X") || _preCache.AlternateAminoAcids.StartsWith("X");
-            bool startsWithOrEndsWithRef = _preCache.AlternateAminoAcids.StartsWith(_preCache.ReferenceAminoAcids) ||
-                                           _preCache.AlternateAminoAcids.EndsWith(_preCache.ReferenceAminoAcids);
+            var sameLen = _preCache.ReferenceAminoAcidsLen == _preCache.AlternateAminoAcidsLen;
+            var startsWithTer = _preCache.ReferenceAminoAcids.StartsWith("X") || _preCache.AlternateAminoAcids.StartsWith("X");
 
             var isInframeDeletion = IsInframeDeletion();
             // Note: sequence ontology says that stop retained should not be here (http://www.sequenceontology.org/browser/current_svn/term/SO:0001567)
             var isStopCodonVarinat = IsStopLost() || IsStopGained();//|| IsStopRetained() 
 
-            if (sameLen || startsWithTer || startsWithOrEndsWithRef || isInframeDeletion || isStopCodonVarinat ||
-                IsStartLost() || IsFrameshiftVariant())
+            if (sameLen || startsWithTer || isInframeDeletion || isStopCodonVarinat ||
+                IsStartLost() || IsFrameshiftVariant() || IsInframeInsertion() || IsStopRetained() || !_preCache.IsCoding)
             {
                 result = false;
             }
@@ -542,7 +563,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             bool result = false;
 
             if (!_altAllele.IsStructuralVariant)
-                result = ((_ta.ReferenceAminoAcids == null) || !_ta.ReferenceAminoAcids.Contains(AminoAcids.StopCodon)) && (_ta.AlternateAminoAcids != null) && _ta.AlternateAminoAcids.Contains(AminoAcids.StopCodon);
+                result = !IsStopRetained() && (_ta.ReferenceAminoAcids == null || !_ta.ReferenceAminoAcids.Contains(AminoAcids.StopCodon)) && _ta.AlternateAminoAcids != null && _ta.AlternateAminoAcids.Contains(AminoAcids.StopCodon);
 
             _cache.Add(ct, result);
             return result;
@@ -557,7 +578,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
             bool result = false;
-            if (!_altAllele.IsStructuralVariant && !string.IsNullOrEmpty(_ta.ReferenceAminoAcids) && (_ta.AlternateAminoAcids != null))
+            if (!_altAllele.IsStructuralVariant && !string.IsNullOrEmpty(_ta.ReferenceAminoAcids) && _ta.AlternateAminoAcids != null)
                 result = _ta.ReferenceAminoAcids.Contains(AminoAcids.StopCodon) &&
                           !_ta.AlternateAminoAcids.Contains(AminoAcids.StopCodon);
 
@@ -575,13 +596,28 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             bool result = false;
 
+
+            var alternateAminoAcids = TrimPeptides(_ta.AlternateAminoAcids);
+
             if (!_altAllele.IsStructuralVariant)
-                result = (_ta.ReferenceAminoAcids != null) && (_ta.AlternateAminoAcids != null) &&
-                         (_ta.ReferenceAminoAcids == _ta.AlternateAminoAcids) &&
-                         _ta.ReferenceAminoAcids.Contains(AminoAcids.StopCodon);
+                result = _ta.ReferenceAminoAcids != null && alternateAminoAcids != null &&
+                         _ta.ReferenceAminoAcids == alternateAminoAcids &&
+                         _ta.ReferenceAminoAcids.Contains(AminoAcids.StopCodon) ||
+                         string.IsNullOrEmpty(_ta.ReferenceAminoAcids) && alternateAminoAcids != null &&
+                         _ta.ProteinBegin == _transcript.Translation.PeptideSeq.Length + 1 &&
+                         alternateAminoAcids == AminoAcids.StopCodon;
+
 
             _cache.Add(ct, result);
             return result;
+        }
+
+        private static string TrimPeptides(string alternateAminoAcids)
+        {
+            if (alternateAminoAcids == null) return null;
+            if (!alternateAminoAcids.Contains(AminoAcids.StopCodon)) return alternateAminoAcids;
+            var pos = alternateAminoAcids.IndexOf(AminoAcids.StopCodon, StringComparison.Ordinal);
+            return pos < 0 ? alternateAminoAcids : alternateAminoAcids.Substring(0, pos + 1);
         }
 
         /// <summary>
@@ -595,9 +631,9 @@ namespace VariantAnnotation.Algorithms.Consequences
             bool result = false;
 
             if (!_altAllele.IsStructuralVariant)
-                result = (_ta.ReferenceAminoAcids != null) &&
+                result = _ta.ReferenceAminoAcids != null &&
                          (_altAllele.VepVariantType == VariantType.SNV || _altAllele.VepVariantType == VariantType.MNV) &&
-                         (_ta.ReferenceAminoAcids == _ta.AlternateAminoAcids) && !_ta.ReferenceAminoAcids.Contains("X") && !_ta.AlternateAminoAcids.Contains("X") && !IsStopRetained();
+                         _ta.ReferenceAminoAcids == _ta.AlternateAminoAcids && !_ta.ReferenceAminoAcids.Contains("X") && !_ta.AlternateAminoAcids.Contains("X") && !IsStopRetained();
 
             _cache.Add(ct, result);
             return result;
@@ -613,13 +649,13 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             bool result = false;
 
-            if (!_altAllele.IsStructuralVariant)
+            if (!_altAllele.IsStructuralVariant && _transcript.Translation != null)
             {
-                bool hasTranslation = _transcript.HasTranslation;
+                var hasTranslation = _transcript.Translation != null;
 
-                bool isThreePrimeOfCoding = _transcript.OnReverseStrand
-                    ? IsBeforeCoding(_altAllele.ReferenceBegin, _altAllele.ReferenceEnd, _transcript.Start, _transcript.CodingRegionStart, hasTranslation)
-                    : IsAfterCoding(_altAllele.ReferenceBegin, _altAllele.ReferenceEnd, _transcript.End, _transcript.CodingRegionEnd, hasTranslation);
+                var isThreePrimeOfCoding = _transcript.Gene.OnReverseStrand
+                    ? IsBeforeCoding(_altAllele.Start, _altAllele.End, _transcript.Start, _transcript.Translation.CodingRegion.GenomicStart, hasTranslation)
+                    : IsAfterCoding(_altAllele.Start, _altAllele.End, _transcript.End, _transcript.Translation.CodingRegion.GenomicEnd, hasTranslation);
 
                 result = isThreePrimeOfCoding && IsWithinCdna();
             }
@@ -636,7 +672,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             const TempConsequenceType ct = TempConsequenceType.WithinCdna;
             if (_tempCache.Contains(ct)) return _tempCache.Get(ct);
 
-            bool result = (_ta.BackupCdnaEnd > 0) && (_ta.BackupCdnaEnd <= _transcript.TotalExonLength);
+            bool result = _ta.BackupCdnaEnd > 0 && _ta.BackupCdnaEnd <= _transcript.TotalExonLength;
 
             _tempCache.Add(ct, result);
             return result;
@@ -650,24 +686,26 @@ namespace VariantAnnotation.Algorithms.Consequences
             const TempConsequenceType ct = TempConsequenceType.WithinCds;
             if (_tempCache.Contains(ct)) return _tempCache.Get(ct);
 
+            if (_transcript.Translation == null) return false;
+
             // Here I have a complete refactoring of this code.
             // the name seems to suggests that any overlap between the variant and transcript coding region should set it to true
             bool result = false;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var cdnaCoordinateMap in _transcript.CdnaCoordinateMaps)
+            foreach (var cdnaCoordinateMap in _transcript.CdnaMaps)
             {
-                int cdsStartGenomic = cdnaCoordinateMap.Genomic.Start > _transcript.CodingRegionStart ?
-                    cdnaCoordinateMap.Genomic.Start : _transcript.CodingRegionStart;
+                var cdsStartGenomic = cdnaCoordinateMap.GenomicStart > _transcript.Translation.CodingRegion.GenomicStart ?
+                    cdnaCoordinateMap.GenomicStart : _transcript.Translation.CodingRegion.GenomicStart;
 
                 // this is the genomic start position of the cds of this cdnaCoordinate if it exists
                 // it does not exist if this exon is completely a UTR. In that case, it is set to the transcript
                 // coding region start
-                int cdsEndGenomic = cdnaCoordinateMap.Genomic.End < _transcript.CodingRegionEnd ?
-                    cdnaCoordinateMap.Genomic.End : _transcript.CodingRegionEnd;
+                var cdsEndGenomic = cdnaCoordinateMap.GenomicEnd < _transcript.Translation.CodingRegion.GenomicEnd ?
+                    cdnaCoordinateMap.GenomicEnd : _transcript.Translation.CodingRegion.GenomicEnd;
 
-                if (_altAllele.ReferenceBegin <= cdsEndGenomic &&
-                    _altAllele.ReferenceEnd >= cdsStartGenomic)
+                if (_altAllele.Start <= cdsEndGenomic &&
+                    _altAllele.End >= cdsStartGenomic)
                 {
                     _tempCache.Add(ct, true);
                     return true;
@@ -675,11 +713,11 @@ namespace VariantAnnotation.Algorithms.Consequences
             }
 
             // we also need to check if the vf is in a frameshift intron within the CDS
-            if (_transcript.HasTranslation && _ta.IsWithinFrameshiftIntron)
+            if (_transcript.Translation != null && _ta.IsWithinFrameshiftIntron)
             {
                 // if the variant and transcript coding region overlaps
-                result = (_altAllele.ReferenceBegin <= _transcript.CodingRegionEnd)
-                         && (_transcript.CodingRegionStart <= _altAllele.ReferenceEnd);
+                result = _altAllele.Start <= _transcript.Translation.CodingRegion.GenomicEnd
+                         && _transcript.Translation.CodingRegion.GenomicStart <= _altAllele.End;
             }
 
             _tempCache.Add(ct, result);
@@ -694,8 +732,6 @@ namespace VariantAnnotation.Algorithms.Consequences
             return !_altAllele.IsStructuralVariant && _ta.IsWithinIntron;
         }
 
-
-
         /// <summary>
         /// returns true if the variant is within a non-coding gene [VariationEffect.pm:398 within_non_coding_gene]
         /// </summary>
@@ -706,7 +742,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             // TODO: Isn't IsWithinTranscript always true? and not within mature miRNA is always true
             // For Ensembl transcript, miRNA may be a valid attribute. We have their location and we would like to check if the variant overlaps with the miRNA
-            bool result = !_altAllele.IsStructuralVariant && !_transcript.HasTranslation && !IsMatureMirnaVariant();
+            var result = !_altAllele.IsStructuralVariant && _transcript.Translation == null && !IsMatureMirnaVariant();
 
             _cache.Add(ct, result);
             return result;
@@ -725,9 +761,9 @@ namespace VariantAnnotation.Algorithms.Consequences
             if (!_altAllele.IsStructuralVariant)
             {
                 result = IsWithinCds() &&
-                         (string.IsNullOrEmpty(_transcript.Peptide) ||
+                         (string.IsNullOrEmpty(_transcript.Translation.PeptideSeq) ||
                           string.IsNullOrEmpty(_ta.AlternateAminoAcids) || _ta.AlternateAminoAcids.Contains("X"))
-                         && !(IsFrameshiftVariant() || IsInframeDeletion() || IsIncompleteTerminalCodonVariant());
+                         && !(IsFrameshiftVariant() || IsInframeDeletion() || IsIncompleteTerminalCodonVariant() || IsProteinAlteringVariant() || IsStopGained() || IsStopRetained());
             }
 
             _cache.Add(ct, result);
@@ -769,5 +805,32 @@ namespace VariantAnnotation.Algorithms.Consequences
         {
             return _featureVariantEffects.Elongation();
         }
+
+	    public bool IsGeneFusion()
+	    {
+			const ConsequenceType ct = ConsequenceType.GeneFusion;
+			if (_cache.Contains(ct)) return _cache.Get(ct);
+
+		    if (_ta.BreakendTranscriptAnnotation == null || _ta.BreakendPos2Annotations == null ||
+		        _ta.BreakendPos2Annotations.Count <= 0 || !_ta.BreakendTranscriptAnnotation.InCodingRegion)
+		    {
+				_cache.Add(ConsequenceType.GeneFusion,false);
+			    return false;
+		    }
+		    var result = _ta.BreakendPos2Annotations.Any(
+			    x =>
+				    x.GeneName != _ta.BreakendTranscriptAnnotation.GeneName && x.InCodingRegion &&
+				    !x.IsTranscriptCodingRegionOverlapped(_ta.BreakendTranscriptAnnotation) &&
+				    x.TranscriptDataSource == _ta.BreakendTranscriptAnnotation.TranscriptDataSource);
+
+
+			_cache.Add(ConsequenceType.GeneFusion, result);
+			return result;
+
+		}
+
+
+
+
     }
 }

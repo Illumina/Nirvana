@@ -13,13 +13,13 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "A";
             const string altAllele = "C";
 
-            int newStart=start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-			var newAltAllele = newAlleles.Item2;
+			var newStart = newAlleles.Item1;
+			var newAltAllele = newAlleles.Item3;
 			// in this case the alt allele should be the same as new alt allele
-            // and the start position should not change;
-            Assert.Equal(start, newStart);
+			// and the start position should not change;
+			Assert.Equal(start, newStart);
             Assert.Equal(altAllele, newAltAllele);
         }
 
@@ -30,10 +30,10 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "A";
             const string altAllele = "AC";
 
-            int newStart = start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+            var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-			var newAltAllele = newAlleles.Item2;
+			var newStart = newAlleles.Item1;
+			var newAltAllele = newAlleles.Item3;
 			// in this case the alt allele should be the same as new alt allele
             // and the start position should not change;
             Assert.Equal(start+1, newStart);
@@ -47,10 +47,10 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "ATCG";
             const string altAllele = "AT";
 
-            int newStart = start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+            var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-			var newAltAllele = newAlleles.Item2;
+			var newStart = newAlleles.Item1;
+			var newAltAllele = newAlleles.Item3;
 			
 			// in this case the alt allele should be the same as new alt allele
             // and the start position should not change;
@@ -65,14 +65,14 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "ATCGGA";
             const string altAllele = "ATGA";
 
-            int newStart = start;
-            var newAlleles = SupplementaryAnnotation.GetReducedAlleles( referenceAllele, altAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-            var newRefAllele = newAlleles.Item1;
-            var newAltAllele = newAlleles.Item2;
-            // in this case the alt allele should be the same as new alt allele
-            // and the start position should not change;
-            Assert.Equal("CG", newRefAllele);
+            var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
+
+			// in this case the alt allele should be the same as new alt allele
+			// and the start position should not change;
+			Assert.Equal("CG", newRefAllele);
             Assert.Equal("2", newAltAllele);
         }
 
@@ -83,15 +83,14 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "ATCG";
             const string altAllele = "CGT";
 
-            int newStart = start;
-            var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-            var newRefAllele = newAlleles.Item1;
-            var newAltAllele = newAlleles.Item2;
-            
-            // in this case the alt allele should be the same as new alt allele
-            // and the start position should not change;
-            Assert.Equal(referenceAllele , newRefAllele);
+			var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
+
+			// in this case the alt allele should be the same as new alt allele
+			// and the start position should not change;
+			Assert.Equal(referenceAllele , newRefAllele);
             Assert.Equal("4CGT", newAltAllele);
         }
 
@@ -102,14 +101,13 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "AT";
             const string altAllele = "ATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA";
 
-            int newStart = start;
-            var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-            var newRefAllele = newAlleles.Item1;
-            var newAltAllele = newAlleles.Item2;
-            // in this case the alt allele should be the same as new alt allele
-            // and the start position should not change;
-            Assert.Equal("", newRefAllele);
+			var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
+			// in this case the alt allele should be the same as new alt allele
+			// and the start position should not change;
+			Assert.Equal("", newRefAllele);
 
             var expectedAltAllele = 'i' + altAllele.Substring(2); 
             Assert.Equal(expectedAltAllele, newAltAllele);
@@ -122,10 +120,10 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "ATGCTTTAACGGGTATTTTTAAAAGGGGG";
             const string altAllele = "ATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA";
 
-            int newStart = start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+            var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-			var newAltAllele = newAlleles.Item2;
+	        var newStart = newAlleles.Item1;
+			var newAltAllele = newAlleles.Item3;
 			// in this case the alt allele should be the same as new alt allele
             // and the start position should not change;
             Assert.Equal(start + 2, newStart);
@@ -141,10 +139,9 @@ namespace UnitTests.DataStructures
 			const string referenceAllele = "AATGTGAAAAATATATTTTATATAATTTCAATATTTTTAACA";
 			const string altAllele = "ATTGAAAAATATATTTTATATAATTTCAATATTTTTAACAT";
 
-			int newStart = start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-			var newAltAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
 			// in this case the alt allele should be the same as new alt allele
 			// and the start position should not change;
 
@@ -159,13 +156,13 @@ namespace UnitTests.DataStructures
             const string referenceAllele = "ATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA";
             const string altAllele = "AT";
 
-            int newStart = start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(referenceAllele, altAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(start, referenceAllele, altAllele);
 
-			var newAltAllele = newAlleles.Item2;
+			var newStart = newAlleles.Item1;
+			var newAltAllele = newAlleles.Item3;
 			// in this case the alt allele should be the same as new alt allele
-            // and the start position should not change;
-            Assert.Equal(start + 2, newStart);
+			// and the start position should not change;
+			Assert.Equal(start + 2, newStart);
 
             Assert.Equal("39", newAltAllele);
         }
@@ -175,7 +172,7 @@ namespace UnitTests.DataStructures
         {
             const string reducedAllele = "iACT";
 
-            var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(reducedAllele);
+            var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(reducedAllele);
 
             Assert.Equal("ACT", altAllele);
         }
@@ -185,7 +182,7 @@ namespace UnitTests.DataStructures
         {
             const string reducedAllele = "15";
 
-            var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(reducedAllele);
+            var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(reducedAllele);
 
             Assert.Equal("-", altAllele);
         }
@@ -195,7 +192,7 @@ namespace UnitTests.DataStructures
         {
             const string reducedAllele = "T";
 
-            var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(reducedAllele);
+            var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(reducedAllele);
 
             Assert.Equal(reducedAllele, altAllele);
         }
@@ -205,7 +202,7 @@ namespace UnitTests.DataStructures
         {
             const string reducedAllele = "TCGG";
 
-            var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(reducedAllele);
+            var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(reducedAllele);
 
             Assert.Equal(reducedAllele, altAllele);
         }
@@ -215,7 +212,7 @@ namespace UnitTests.DataStructures
         {
             const string reducedAllele = "15ATC";
 
-            var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(reducedAllele);
+            var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(reducedAllele);
 
             Assert.Equal("ATC", altAllele);
         }
@@ -225,7 +222,7 @@ namespace UnitTests.DataStructures
         {
             const string originalAlt = "iATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA";
 
-            var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(originalAlt);
+            var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(originalAlt);
 
 			Assert.Equal("ATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA", altAllele);
         }
@@ -235,7 +232,7 @@ namespace UnitTests.DataStructures
 		{
 			const string originalAlt = "47ATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA";
 
-			var altAllele = SupplementaryAnnotation.ReverseSaReducedAllele(originalAlt);
+			var altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(originalAlt);
 
 			Assert.Equal("ATCGGGGGAAAAAATTTTTCGCGCGTATATGAGACATTAAA", altAllele);
 		}

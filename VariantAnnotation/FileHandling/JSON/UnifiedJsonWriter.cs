@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using VariantAnnotation.AnnotationSources;
 using VariantAnnotation.DataStructures.JsonAnnotations;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
@@ -51,16 +52,16 @@ namespace VariantAnnotation.FileHandling.JSON
 
         #endregion
 
-		public UnifiedJsonWriter(string outputPath, string creationTime, string vepDataVersion, IEnumerable<IDataSourceVersion> iDataSourceVersions, string[] sampleNames)
+		public UnifiedJsonWriter(string outputPath, string creationTime, string vepDataVersion, IEnumerable<IDataSourceVersion> iDataSourceVersions,string genomeAssembly, string[] sampleNames)
 		{
 			// open the vcf file
 			_writer = GZipUtilities.GetStreamWriter(outputPath);
 			_writer.NewLine = "\n";
 
-			var dataSourceVersions = iDataSourceVersions as List<DataSourceVersion>;
+			var dataSourceVersions = iDataSourceVersions?.Select(iDataSourceVersion => iDataSourceVersion as DataSourceVersion).ToList();
 
 			// write the header
-			_writer.Write(UnifiedJson.GetHeader(NirvanaAnnotationSource.GetVersion(), creationTime,
+			_writer.Write(UnifiedJson.GetHeader(NirvanaAnnotationSource.GetVersion(), creationTime, genomeAssembly,
 				JsonCommon.SchemaVersion, vepDataVersion, dataSourceVersions, sampleNames));
 		}
 

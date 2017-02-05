@@ -3,7 +3,7 @@ using System.IO;
 
 namespace VariantAnnotation.DataStructures
 {
-	public class PhylopInterval : IEquatable<PhylopInterval>, IComparable<PhylopInterval>
+	public sealed class PhylopInterval : IEquatable<PhylopInterval>, IComparable<PhylopInterval>
 	{
 		#region member
 
@@ -57,8 +57,7 @@ namespace VariantAnnotation.DataStructures
 			Begin        = binaryReader.ReadInt32();
 			Length       = binaryReader.ReadInt32();
 			StepSize     = binaryReader.ReadInt16();
-			FilePosition = binaryReader.ReadInt64();
-			
+			FilePosition = binaryReader.ReadInt64();			
 		}
 
 		public override string ToString()
@@ -68,7 +67,7 @@ namespace VariantAnnotation.DataStructures
 
 		public bool ContainsPosition(int position)
 		{
-			return (position >= Begin) && (position < Begin + Length);
+			return position >= Begin && position < Begin + Length;
 		}
 	}
 }

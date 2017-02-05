@@ -3,7 +3,7 @@ using ErrorHandling.DataStructures;
 using ErrorHandling.Exceptions;
 using NDesk.Options;
 using VariantAnnotation.CommandLine;
-using VariantAnnotation.Utilities;
+using VariantAnnotation.DataStructures;
 using Xunit;
 
 namespace UnitTests.Utilities
@@ -40,7 +40,7 @@ namespace UnitTests.Utilities
                 },
             };
 
-            _example = new CommandLineExample("Tests the command-line parameters", ops, "command-line example", VariantAnnotation.DataStructures.Constants.Authors);
+            _example = new CommandLineExample("Tests the command-line parameters", ops, "command-line example", Constants.Authors);
         }
 
         [Fact]
@@ -136,12 +136,6 @@ namespace UnitTests.Utilities
         public void Execute()
         {
             _example.ExecuteTest();
-        }
-
-        [Fact]
-        public void ConfigurationSettings()
-        {
-            _example.ConfigurationSettings();
         }
     }
 
@@ -335,19 +329,6 @@ namespace UnitTests.Utilities
         }
 
         /// <summary>
-        /// makes sure that our configuration settings are set properly
-        /// </summary>
-        public void ConfigurationSettings()
-        {
-            var args = "--id oscar --if charlie --num 123".Split(' ');
-            Execute(args);
-            Assert.Equal("oscar",   ConfigurationSettingsExample.InputDirectory);
-            Assert.Equal("charlie", ConfigurationSettingsExample.InputFilename);
-            Assert.Equal(123,       ConfigurationSettingsExample.Number);
-            ExitCode = 0;
-        }
-
-        /// <summary>
         /// tests execute that outputs the version info
         /// </summary>
         public void ExecuteVersionTest()
@@ -416,7 +397,7 @@ namespace UnitTests.Utilities
         protected override void ProgramExecution()
         {
             _executed = true;
-            if (_throwException) throw new MissingCompressionLibraryException("The compression library is missing.");
+            if (_throwException) throw new MissingCompressionLibraryException("test");
         }
     }
 
@@ -424,9 +405,11 @@ namespace UnitTests.Utilities
     {
         #region members
 
-        public static string InputDirectory;
+        // ReSharper disable NotAccessedField.Global
+        public static string InputDirectory;        
         public static string InputFilename;
         public static int Number;
+        // ReSharper restore NotAccessedField.Global
 
         #endregion
     }

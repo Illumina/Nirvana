@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Reflection;
 using ErrorHandling.Exceptions;
 
@@ -10,8 +9,8 @@ namespace VariantAnnotation.Utilities
 
         #region members
 
-        private static readonly string Copyright;
-        private static readonly string Title;
+        public static readonly string Copyright;
+        public static readonly string Title;
         public static readonly string InformationalVersion;
         public static readonly string Version;
 
@@ -22,38 +21,36 @@ namespace VariantAnnotation.Utilities
         /// </summary>
         static CommandLineUtilities()
         {
-            var entryAssembly = Assembly.GetEntryAssembly();
-            if (entryAssembly == null) return;
+            var assembly = Assembly.GetEntryAssembly();
 
-            // get the assembly fields
-            Copyright            = GetCopyright(entryAssembly);
-            Title                = GetTitle(entryAssembly);
-            Version              = GetVersion(entryAssembly);
-            InformationalVersion = GetInformationalVersion(entryAssembly);
+            Copyright            = GetCopyright(assembly);
+            Title                = GetTitle(assembly);
+            Version              = GetVersion(assembly);
+            InformationalVersion = GetInformationalVersion(assembly);
         }
 
         private static string GetCopyright(Assembly entryAssembly)
         {
             var attr = GetAssemblyAttributes<AssemblyCopyrightAttribute>(entryAssembly);
-            return attr == null ? $"(c) {DateTime.Now.Year} Illumina, Inc." : attr.Copyright.Replace("©", "(c)");
+            return attr?.Copyright.Replace("©", "(c)") ?? $"(c) {DateTime.Now.Year} Illumina, Inc.";
         }
 
         private static string GetVersion(Assembly entryAssembly)
         {
             var attr = GetAssemblyAttributes<AssemblyFileVersionAttribute>(entryAssembly);
-            return attr == null ? "1.0.0" : attr.Version;
+            return attr?.Version;
         }
 
         private static string GetInformationalVersion(Assembly entryAssembly)
         {
             var attr = GetAssemblyAttributes<AssemblyInformationalVersionAttribute>(entryAssembly);
-            return attr == null ? "1.0.0" : attr.InformationalVersion;
+            return attr?.InformationalVersion;
         }
 
         private static string GetTitle(Assembly entryAssembly)
         {
             var attr = GetAssemblyAttributes<AssemblyTitleAttribute>(entryAssembly);
-            return attr == null ? entryAssembly.GetName().Name : attr.Title;
+            return attr?.Title;
         }
 
         private static T GetAssemblyAttributes<T>(Assembly entryAssembly)
@@ -103,7 +100,7 @@ namespace VariantAnnotation.Utilities
         /// </summary>
         public static void ShowUnsupportedOptions(List<string> unsupportedOps)
         {
-            if ((unsupportedOps == null) || (unsupportedOps.Count == 0)) return;
+            if (unsupportedOps == null || unsupportedOps.Count == 0) return;
 
             Console.WriteLine();
             Console.ForegroundColor = ConsoleColor.Red;

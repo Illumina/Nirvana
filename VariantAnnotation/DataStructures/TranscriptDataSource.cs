@@ -2,9 +2,9 @@
 {
     public enum TranscriptDataSource : byte
     {
-        None, // TODO: Remove this, but only after we create new cache files
+        None,
         RefSeq,
         Ensembl,
-        BothRefSeqAndEnsembl
-    }
+		BothRefSeqAndEnsembl
+	}
 }

@@ -2,16 +2,18 @@
 using System.Collections.Generic;
 using System.IO;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 {
-    public class SaIndex
+    public sealed class SaIndex
     {
         #region members
 
         // a sorted array of SaIndexNodes that will be used for binary searching
         private readonly SaIndexNode[] _saIndexNodes;//will be used for searching by SA reader
         private readonly List<SaIndexNode> _saIndexNodesList;
+        public readonly string RefSeqName;
 
         // some private variables for caching search
         private uint _lastSearchPosition = uint.MinValue;
@@ -28,16 +30,16 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
         }
 
         // for the SA reader
-        public SaIndex(BinaryReader reader)
+        public SaIndex(ExtendedBinaryReader reader)
         {
-            string header = reader.ReadString();
-            ushort version = reader.ReadUInt16();
-            reader.ReadInt64();
-            reader.ReadString();
+            var header = reader.ReadString();
+            var version = reader.ReadUInt16();
+            reader.ReadInt64(); // skip timestamp
+            RefSeqName = reader.ReadString();
             SupplementaryAnnotationCommon.CheckGuard(reader);
 
 
-            if ((header != SupplementaryAnnotationCommon.IndexHeader) || (version != SupplementaryAnnotationCommon.IndexVersion))
+            if (header != SupplementaryAnnotationCommon.IndexHeader || version != SupplementaryAnnotationCommon.IndexVersion)
             {
                 throw new UserErrorException($"The header check failed for the supplementary annotation index file ({reader.BaseStream}): ID: exp: {SupplementaryAnnotationCommon.IndexHeader} obs: {header}, version: exp: {SupplementaryAnnotationCommon.IndexVersion} obs: {version}");
             }
@@ -45,9 +47,11 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             var count = reader.ReadInt32();
             _saIndexNodes = new SaIndexNode[count];
 
-            for (int i = 0; i < count; i++) _saIndexNodes[i] = new SaIndexNode(reader);
+            for (var i = 0; i < count; i++)
+                _saIndexNodes[i] = new SaIndexNode(reader);
 
             SupplementaryAnnotationCommon.CheckGuard(reader);
+
         }
 
         public void Add(uint position, uint fileLocation, bool isRefMinor)
@@ -65,6 +69,14 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             _saIndexNodesList.Add(new SaIndexNode(position, fileLocation, isRefMinor));
         }
 
+        internal int Count()
+        {
+            if (_saIndexNodesList != null) return _saIndexNodesList.Count;
+            if (_saIndexNodes != null) return _saIndexNodes.Length;
+
+            return 0;
+        }
+
         private int GetNodeIndex(uint position)
         {
             if (_lastSearchPosition == position)
@@ -74,7 +86,7 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             _searchNode.Position = position;//reusing _searchNode
             _lastSearchIndex = Array.BinarySearch(_saIndexNodes, _searchNode);
 
-            //If value is not found and value is less than one or more elements in array, the negative number returned is the bitwise complement of the index of the first element that is larger than value
+            // If value is not found and value is less than one or more elements in array, the negative number returned is the bitwise complement of the index of the first element that is larger than value
 
             return _lastSearchIndex < 0 ? ~_lastSearchIndex - 1 : _lastSearchIndex;
 
@@ -96,7 +108,7 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 
         public void Write(string fileName, string refSeq)
         {
-            using (var stream = new FileStream(fileName, FileMode.Create))
+            using (var stream = FileUtilities.GetCreateStream(fileName))
             using (var writer = new BinaryWriter(stream))
             {
                 writer.Write(SupplementaryAnnotationCommon.IndexHeader);
@@ -117,7 +129,5 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
                 writer.Write(SupplementaryAnnotationCommon.GuardInt);
             }
         }
-
-
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
+﻿using VariantAnnotation.Utilities;
+
+namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
-	public class EvsItem:SupplementaryDataItem
+	public sealed class EvsItem:SupplementaryDataItem
 	{
 		#region members
 
@@ -42,19 +44,19 @@
 		}
 
 
-		public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryAnnotation sa, string refBases = null)
+		public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryPositionCreator sa, string refBases = null)
 		{
 			// check if the ref allele matches the refBases as a prefix
-			if (!SupplementaryAnnotation.ValidateRefAllele(ReferenceAllele, refBases))
+			if (!SupplementaryAnnotationUtilities.ValidateRefAllele(ReferenceAllele, refBases))
 			{
 				return null; //the ref allele for this entry did not match the reference bases.
 			}
 
-			int newStart = Start;
-			var newAlleles = SupplementaryAnnotation.GetReducedAlleles(ReferenceAllele, AlternateAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(Start, ReferenceAllele, AlternateAllele);
 
-			var newRefAllele = newAlleles.Item1;
-			var newAltAllele = newAlleles.Item2;
+			var newStart = newAlleles.Item1;
+			var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
 
 			if (newRefAllele != ReferenceAllele)
 			{
@@ -66,14 +68,14 @@
 			return null;
 		}
 
-		public override SupplementaryInterval GetSupplementaryInterval()
+		public override SupplementaryInterval GetSupplementaryInterval(ChromosomeRenamer renamer)
 		{
 			throw new System.NotImplementedException();
 		}
 
-		private void SetSaFields(SupplementaryAnnotation sa, string newAltAllele)
+		private void SetSaFields(SupplementaryPositionCreator saCreator, string newAltAllele)
 		{
-			var asa = new SupplementaryAnnotation.AlleleSpecificAnnotation
+			var annotation = new EvsAnnotation
 			{
 				EvsAll = AllFreq,
 				EvsAfr = AfrFreq,
@@ -82,11 +84,7 @@
 				NumEvsSamples = NumSamples
 			};
 
-
-			if (!sa.AlleleSpecificAnnotations.ContainsKey(newAltAllele))
-				sa.AlleleSpecificAnnotations[newAltAllele] = asa;
-			else
-				sa.AlleleSpecificAnnotations[newAltAllele].MergeEvsAnnotations(asa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.Evs,newAltAllele,annotation);
 
 		}
 

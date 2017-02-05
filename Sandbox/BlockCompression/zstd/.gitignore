@@ -1,0 +1,32 @@
+# Object files
+*.o
+*.ko
+
+# Libraries
+*.lib
+*.a
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+zstd
+*.exe
+*.out
+*.app
+
+# Test artefacts
+tmp*
+dictionary
+
+# Other files
+.directory
+_codelite/
+_zstdbench/
+.clang_complete
+*.idea
+*.swp
+.DS_Store

@@ -1,94 +1,74 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using VariantAnnotation.DataStructures;
+﻿using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.JsonAnnotations;
+using VariantAnnotation.DataStructures.VCF;
 using VariantAnnotation.FileHandling;
-using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.Utilities
 {
-    internal class VcfUtilities : RandomFileBase
+    internal static class VcfUtilities
     {
-        internal static VariantFeature GetVariantFeature(string vcfLine, bool isGatkGenomeVcf = false)
+        public static string GetVcfColumn(ISupplementaryAnnotationReader saReader, string vcfLine,
+            int vcfColumn)
         {
-            return new VariantFeature(GetVariant(vcfLine, isGatkGenomeVcf));
+            var vcfVariant = GetVcfVariant(vcfLine);
+            var annotationSource = ResourceUtilities.GetAnnotationSource(DataUtilities.EmptyCachePrefix, saReader);
+
+            UnifiedJson.NeedsVariantComma = false;
+            var annotatedVariant = annotationSource?.Annotate(vcfVariant);
+            Assert.NotNull(annotatedVariant);
+
+            var vcf = new VcfConversion();
+            return vcf.Convert(vcfVariant, annotatedVariant).Split('\t')[vcfColumn];
         }
 
-        internal static VcfVariant GetVariant(string vcfLine, bool isGatkGenomeVcf = false)
+        public static void FieldEquals(ISupplementaryAnnotationReader saReader, string vcfLine,
+            string expected, int vcfColumn)
+        {
+            var column = GetVcfColumn(saReader, vcfLine, vcfColumn);
+            Assert.Equal(expected, column);
+        }
+
+        public static void FieldContains(ISupplementaryAnnotationReader saReader, string vcfLine,
+            string expected, int vcfColumn)
+        {
+            var column = GetVcfColumn(saReader, vcfLine, vcfColumn);
+            Assert.Contains(expected, column);
+        }
+
+        public static void FieldDoesNotContain(ISupplementaryAnnotationReader saReader,
+            string vcfLine, string expected, int vcfColumn)
+        {
+            var column = GetVcfColumn(saReader, vcfLine, vcfColumn);
+            Assert.DoesNotContain(expected, column);
+        }
+
+        internal static VariantFeature GetNextVariant(LiteVcfReader reader, ChromosomeRenamer renamer,
+            bool isGatkGenomeVcf = false)
+        {
+            var vcfLine = reader.ReadLine();
+            return GetVariant(vcfLine, renamer, isGatkGenomeVcf);
+        }
+
+        internal static VariantFeature GetVariant(string vcfLine, ChromosomeRenamer renamer,
+            bool isGatkGenomeVcf = false)
+        {
+            if (string.IsNullOrEmpty(vcfLine)) return null;
+
+            var fields = vcfLine.Split('\t');
+            if (fields.Length < VcfCommon.MinNumColumns) return null;
+
+            var variant = new VariantFeature(GetVcfVariant(vcfLine, isGatkGenomeVcf), renamer, new VID());
+            variant.AssignAlternateAlleles();
+            return variant;
+        }
+
+        internal static VcfVariant GetVcfVariant(string vcfLine, bool isGatkGenomeVcf = false)
         {
             var fields = vcfLine.Split('\t');
             return new VcfVariant(fields, vcfLine, isGatkGenomeVcf);
-        }
-
-        internal void FieldEquals(string vcfLine, string supplementaryFile, string expected, int vcfColumn)
-        {
-            var observed = GetObservedField(vcfLine, supplementaryFile, vcfColumn);
-            Assert.Equal(expected, observed);
-        }
-
-        internal void FieldContains(string vcfLine, string supplementaryFile, string expected, int vcfColumn)
-        {
-            var observed = GetObservedField(vcfLine, supplementaryFile, vcfColumn);
-            Assert.Contains(expected, observed);
-        }
-
-        internal void FieldDoesNotContain(string vcfLine, string supplementaryFile, string expected, int vcfColumn)
-        {
-            var observed = GetObservedField(vcfLine, supplementaryFile, vcfColumn);
-            Assert.DoesNotContain(expected, observed);
-        }
-
-        /// <summary>
-        /// given a key in the info field, this method will return the value if the key exists. Returns
-        /// null otherwise.
-        /// </summary>
-        internal static string FindInfoValue(string key, string infoField)
-        {
-            return (from kvpString in infoField.Split(';')
-                    select kvpString.Split('=')
-                into keyValuePair
-                    where keyValuePair[0] == key
-                    select keyValuePair[1]).FirstOrDefault();
-        }
-
-        internal string GetObservedField(string vcfLine, string supplementaryFile, int vcfColumn)
-        {
-            var annotatedVariant = DataUtilities.GetVariant(null, supplementaryFile, vcfLine);
-            Assert.NotNull(annotatedVariant);
-
-            var observedVcfLine = WriteAndGetFirstVcfLine(vcfLine, annotatedVariant);
-            return observedVcfLine.Split('\t')[vcfColumn];
-        }
-
-        /// <summary>
-        /// writes an annotated variant to a VCF file and then returns the first line
-        /// </summary>
-        internal string WriteAndGetFirstVcfLine(string vcfLine, IAnnotatedVariant annotatedVariant)
-        {
-            var randomPath  = GetRandomPath();
-            var headerLines = new List<string> { "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO" };
-
-            using (var writer = new LiteVcfWriter(randomPath, headerLines, string.Empty, new List<DataSourceVersion>()))
-            {
-                Write(writer, vcfLine, annotatedVariant);
-            }
-
-            string observedVcfLine;
-            using (var reader = new LiteVcfReader(randomPath))
-            {
-                observedVcfLine = reader.ReadLine();
-            }
-
-            return observedVcfLine;
-        }
-
-        private static void Write(LiteVcfWriter writer, string vcfLine, IAnnotatedVariant annotatedVariant)
-        {
-            var fields = vcfLine.Split('\t');
-            if (fields.Length < VcfCommon.MinNumColumns) return;
-            var vcfVariant = new VcfVariant(fields, vcfLine, false);
-            writer.Write(vcfVariant, annotatedVariant);
         }
     }
 }

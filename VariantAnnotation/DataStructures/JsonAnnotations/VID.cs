@@ -1,79 +1,90 @@
-﻿using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
+﻿using System.Security.Cryptography;
+using System.Text;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.JsonAnnotations
 {
-	public static class VID
-	{
-		/// <summary>
-		/// constructs a VID based on the supplied feature
-		/// </summary>
-		public static string Create(string referenceName, VariantAlternateAllele altAllele)
-		{
-			return GetVid(referenceName, altAllele.NirvanaVariantType, altAllele.ReferenceBegin, altAllele.ReferenceEnd, altAllele.AlternateAllele, altAllele.CopyNumber, altAllele.BreakEnd?.ToString(),altAllele.IsStructuralVariant);
+    public class VID
+    {
+        private readonly StringBuilder _md5Builder = new StringBuilder();
+        private readonly MD5 _md5Hash = MD5.Create();
 
-		}
-
-	    private static string GetVid(string referenceName, VariantType variantType, int refBegin, int refEnd, string altAllele, string copyNumber = null, string breakEnd = null,bool isStructuralVariant = false)
-		{
-			referenceName = AnnotationLoader.Instance.ChromosomeRenamer.GetEnsemblReferenceName(referenceName);
+        /// <summary>
+        /// constructs a VID based on the supplied feature
+        /// </summary>
+        public string Create(ChromosomeRenamer renamer, string referenceName, VariantAlternateAllele altAllele)
+        {
+            referenceName = renamer.GetEnsemblReferenceName(referenceName);
             string vid;
-			switch (variantType)
-			{
-				case VariantType.SNV:
-					vid = $"{referenceName}:{refBegin}:{altAllele}";
-					break;
+            switch (altAllele.NirvanaVariantType)
+            {
+                case VariantType.SNV:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.AlternateAllele}";
+                    break;
 
-				case VariantType.insertion:
-					vid = isStructuralVariant ? $"{referenceName}:{refBegin}:{refEnd}:INS" : $"{referenceName}:{refBegin}:{refEnd}:{(altAllele.Length > 32 ? SupplementaryAnnotation.GetMd5HashString(altAllele) : altAllele)}";
-					break;
+                case VariantType.insertion:
+                    vid = altAllele.IsStructuralVariant
+                        ? $"{referenceName}:{altAllele.Start}:{altAllele.End}:INS"
+                        : $"{referenceName}:{altAllele.Start}:{altAllele.End}:{GetInsertedAltAllele(altAllele.AlternateAllele)}";
+                    break;
 
-				case VariantType.deletion:
-					vid = $"{referenceName}:{refBegin}:{refEnd}";
-					break;
+                case VariantType.deletion:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}";
+                    break;
 
-				case VariantType.MNV:
-				case VariantType.indel:
-					vid =
-						$"{referenceName}:{refBegin}:{refEnd}:{(altAllele.Length > 32 ? SupplementaryAnnotation.GetMd5HashString(altAllele) : altAllele)}";
-					break;
+                case VariantType.MNV:
+                case VariantType.indel:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:{GetInsertedAltAllele(altAllele.AlternateAllele)}";
+                    break;
 
-				case VariantType.duplication:
-					vid = $"{referenceName}:{refBegin}:{refEnd}:DUP";
-					break;
+                case VariantType.duplication:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:DUP";
+                    break;
 
-				case VariantType.tandem_duplication:
-					vid = $"{referenceName}:{refBegin}:{refEnd}:TDUP";
-					break;
+                case VariantType.tandem_duplication:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:TDUP";
+                    break;
 
-				case VariantType.translocation_breakend:
-					vid = breakEnd;
-					break;
+                case VariantType.translocation_breakend:
+                    vid = altAllele.BreakEnds?[0].ToString();
+                    break;
 
-				case VariantType.inversion:
-					vid = $"{referenceName}:{refBegin}:{refEnd}:Inverse";
-					break;
+                case VariantType.inversion:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:Inverse";
+                    break;
 
-				case VariantType.mobile_element_insertion:
-					vid = $"{referenceName}:{refBegin}:{refEnd}:MEI";
-					break;
+                case VariantType.mobile_element_insertion:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:MEI";
+                    break;
 
-				case VariantType.copy_number_gain:
-				case VariantType.copy_number_loss:
-				case VariantType.copy_number_variation:
-					vid = $"{referenceName}:{refBegin}:{refEnd}:{copyNumber}";
-					break;
+                case VariantType.copy_number_gain:
+                case VariantType.copy_number_loss:
+                case VariantType.copy_number_variation:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:{altAllele.CopyNumber}";
+                    break;
 
-				case VariantType.reference_no_call:
-					vid = $"{referenceName}:{refBegin}:{refEnd}:NC";
-					break;
+                case VariantType.reference_no_call:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:NC";
+                    break;
 
-				default:
-					vid = $"{referenceName}:{refBegin}:{refEnd}";
-					break;
-			}
-			return vid;
-		}
-	}
+                default:
+                    vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}";
+                    break;
+            }
+
+            return vid;
+        }
+
+        private string GetInsertedAltAllele(string altAllele)
+        {
+            if (altAllele.Length <= 32) return altAllele;
+
+            var data = _md5Hash.ComputeHash(Encoding.UTF8.GetBytes(altAllele));
+
+            _md5Builder.Clear();
+            foreach (var b in data) _md5Builder.Append(b.ToString("x2"));
+            return _md5Builder.ToString();
+        }
+    }
 }

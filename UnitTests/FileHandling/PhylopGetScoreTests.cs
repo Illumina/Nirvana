@@ -1,30 +1,28 @@
-﻿using UnitTests.Fixtures;
+﻿using UnitTests.Utilities;
 using VariantAnnotation.FileHandling.Phylop;
 using Xunit;
 
 namespace UnitTests.FileHandling
 {
-    public sealed class PhylopGetScoreTests : IClassFixture<PhylopDatabaseFixture>
+    public sealed class PhylopGetScoreTests
     {
-        #region memebers
+        #region members
 
         private readonly PhylopReader _npdReader;
-
 
         #endregion
 
         //constructor
-        public PhylopGetScoreTests(PhylopDatabaseFixture context)
+        public PhylopGetScoreTests()
         {
-            _npdReader = context.NpdDatabase;
+            _npdReader = new PhylopReader(ResourceUtilities.GetReadStream(Resources.TopPath("chr1_10918_150000.npd")));
         }
 
         [Fact]
         public void BeforeFirstPosition()
         {
-            string obtainedValue = _npdReader.GetScore(10910);
+            var obtainedValue = _npdReader.GetScore(10910);
             Assert.Null(obtainedValue);
-
         }
 
         [Fact]
@@ -32,7 +30,7 @@ namespace UnitTests.FileHandling
         {
             const string desiredValue = "0.064";
 
-            string obtainedValue = _npdReader.GetScore(10918);
+            var obtainedValue = _npdReader.GetScore(10918);
 
             Assert.Equal(desiredValue, obtainedValue);
         }
@@ -42,7 +40,7 @@ namespace UnitTests.FileHandling
         {
             const string desiredValue = "0.179";
 
-            string obtainedValue = _npdReader.GetScore(34041);
+            var obtainedValue = _npdReader.GetScore(34041);
 
             Assert.Equal(desiredValue, obtainedValue);
         }
@@ -50,7 +48,7 @@ namespace UnitTests.FileHandling
         [Fact]
         public void BetweenFirstAndSecondInterval()
         {
-            string obtainedValue = _npdReader.GetScore(34044);
+            var obtainedValue = _npdReader.GetScore(34044);
 
             Assert.Null(obtainedValue);
 
@@ -61,7 +59,7 @@ namespace UnitTests.FileHandling
         {
             const string desiredValue = "0.058";
 
-            string obtainedValue = _npdReader.GetScore(84285); // this is in the 5th interval
+            var obtainedValue = _npdReader.GetScore(84285); // this is in the 5th interval
 
             Assert.Equal(desiredValue, obtainedValue);
         }
@@ -69,18 +67,15 @@ namespace UnitTests.FileHandling
         [Fact]
         public void LastPosition()
         {
-            string obtainedValue = _npdReader.GetScore(168044);
+            var obtainedValue = _npdReader.GetScore(168044);
             Assert.Equal("0.301", obtainedValue);
         }
 
         [Fact]
         public void PastLastInterval()
         {
-            string obtainedValue = _npdReader.GetScore(168045); //this should be past the last position of our tiny npd file
+            var obtainedValue = _npdReader.GetScore(168045); //this should be past the last position of our tiny npd file
             Assert.Null(obtainedValue);
-
         }
-
-
     }
 }

@@ -7,23 +7,21 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 	public sealed class JsonSupplementaryInterval : IAnnotatedSupplementaryInterval
 	{
 		public double? ReciprocalOverlap { get; set; }
+		public ISupplementaryInterval SupplementaryInterval { get; }
 
-		public ISupplementaryInterval SupplementaryInterval => _supplementaryInterval;
-		private SupplementaryInterval _supplementaryInterval { get; }
-
-	    public JsonSupplementaryInterval(SupplementaryInterval suppInterval)
+	    public JsonSupplementaryInterval(ISupplementaryInterval suppInterval)
 		{
-			_supplementaryInterval = suppInterval;
+            SupplementaryInterval = suppInterval;
 		}
 
-		public string GetJsonEntry()
+		public override string ToString()
 		{
-			StringBuilder sb = new StringBuilder();
+			var sb = new StringBuilder();
 			
 
 			// data section
 			sb.Append(JsonObject.OpenBrace);
-			sb.Append(_supplementaryInterval.GetJsonContent());
+			sb.Append(SupplementaryInterval.GetJsonContent());
 
 			//add reciprocal overlap
 			if (ReciprocalOverlap != null)

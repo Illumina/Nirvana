@@ -12,7 +12,7 @@ namespace UnitTests.DataStructures
         [Fact]
         public void HashCode()
         {
-            var originalIntron = new Intron(100, 200);
+            var originalIntron = new SimpleInterval(100, 200);
 
             const int expectedHashCode = 172;
             var observedHashCode = originalIntron.GetHashCode();
@@ -23,40 +23,34 @@ namespace UnitTests.DataStructures
         [Fact]
         public void SerializationAndEquality()
         {
-            string intronPath = Path.GetTempPath() + Guid.NewGuid() + ".dat";
-            var originalIntron = new Intron(100, 200);
+            var intronPath = Path.GetTempPath() + Guid.NewGuid() + ".dat";
+            var originalIntron = new SimpleInterval(100, 200);
 
             // serialize the intron
-            using (var writer = new BinaryWriter(new FileStream(intronPath, FileMode.Create)))
+            using (var writer = new ExtendedBinaryWriter(FileUtilities.GetCreateStream(intronPath)))
             {
-                var extWriter = new ExtendedBinaryWriter(writer);
-                originalIntron.Write(extWriter);
+                originalIntron.Write(writer);
             }
 
             // deserialize the intron
-            Intron newIntron;
-            using (
-                var reader = new BinaryReader(FileUtilities.GetFileStream(intronPath))
-                )
+            SimpleInterval newIntron;
+            using (var reader = new ExtendedBinaryReader(FileUtilities.GetReadStream(intronPath)))
             {
-                var extReader = new ExtendedBinaryReader(reader);
-                newIntron = Intron.Read(extReader);
+                newIntron = SimpleInterval.Read(reader);
             }
 
             Assert.Equal(originalIntron, newIntron);
 
             // test the equality operations
             Assert.True(originalIntron.Equals(newIntron));
-            Assert.True(originalIntron == newIntron);
-            Assert.False(originalIntron != newIntron);
 
-            Intron nullIntron = null;
-            Intron nullIntron2 = null;
+            SimpleInterval nullIntron = null;
 
-            Assert.True(nullIntron == nullIntron2);
-            Assert.False(originalIntron == nullIntron);
+            // ReSharper disable once ExpressionIsAlwaysNull
+            Assert.False(originalIntron.Equals(nullIntron));
 
             object nullObject = null;
+            // ReSharper disable once ExpressionIsAlwaysNull
             Assert.False(originalIntron.Equals(nullObject));
         }
     }

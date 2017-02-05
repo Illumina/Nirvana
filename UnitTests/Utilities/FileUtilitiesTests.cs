@@ -11,7 +11,7 @@ namespace UnitTests.Utilities
         {
             var randomPath = GetRandomPath();
 
-            using (var writer = new FileStream(randomPath, FileMode.Create))
+            using (var writer = FileUtilities.GetCreateStream(randomPath))
             {
                 Assert.Equal(randomPath, FileUtilities.GetPath(writer));
             }

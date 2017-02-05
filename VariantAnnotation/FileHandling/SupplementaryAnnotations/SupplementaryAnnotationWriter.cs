@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 {
@@ -10,7 +12,6 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
     {
         #region members
 
-        private BinaryWriter _binaryWriter;
         private readonly ExtendedBinaryWriter _writer;
         private FileStream _stream;
 
@@ -28,8 +29,8 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
         private List<SupplementaryInterval> _supplementaryIntervals;
 
         private SaIndex _index;
-	    public int RefMinorCount;
-        
+        public int RefMinorCount;
+
         private long _intervalOffset;
 
         #endregion
@@ -53,32 +54,31 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             if (disposing)
             {
                 // write a negative length
-                _writer.WriteInt(-1);
+                _writer.WriteOpt(-1);
 
-                
+
                 // write the intervals
                 WriteSupplementaryIntervals();
 
                 // write the guard integer
-                _binaryWriter.Flush();
+                _writer.Flush();
                 _eofOffset = _stream.Position;
-                _binaryWriter.Write(SupplementaryAnnotationCommon.GuardInt);
+                _writer.Write(SupplementaryAnnotationCommon.GuardInt);
 
                 // update the offsets in the header
                 _stream.Position = _offsetHeader;
-                _binaryWriter.Write(_dataSourceVersionsOffset);
-                _binaryWriter.Write(_dataOffset);
-                _binaryWriter.Write(_intervalOffset);
-                _binaryWriter.Write(_eofOffset);
+                _writer.Write(_dataSourceVersionsOffset);
+                _writer.Write(_dataOffset);
+                _writer.Write(_intervalOffset);
+                _writer.Write(_eofOffset);
 
                 // close the file streams
-                _binaryWriter.Dispose();
+                _writer.Dispose();
                 _stream.Dispose();
                 _index.Write(_saPath + ".idx", _currentRefSeq);
             }
 
             // reset all the class variables
-            _binaryWriter = null;
             _stream = null;
 
             _dataSourceVersionsOffset = 0;
@@ -93,22 +93,21 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
         #endregion
 
         // constructor
-        public SupplementaryAnnotationWriter(string saPath, string currentRefSeq, List<DataSourceVersion> dataSourceVersions,GenomeAssembly genomeAssembly =GenomeAssembly.Unknown)
+        public SupplementaryAnnotationWriter(string saPath, string currentRefSeq, List<DataSourceVersion> dataSourceVersions, GenomeAssembly genomeAssembly = GenomeAssembly.Unknown)
         {
-            _dataSourceVersions    = dataSourceVersions;
-            _saPath                = saPath;
-            _currentRefSeq         = currentRefSeq;
-	        _currentGenomeAssembly = genomeAssembly;
+            _dataSourceVersions = dataSourceVersions;
+            _saPath = saPath;
+            _currentRefSeq = currentRefSeq;
+            _currentGenomeAssembly = genomeAssembly;
 
-            _stream       = new FileStream(saPath, FileMode.Create);
-            _binaryWriter = new BinaryWriter(_stream);
-            _writer       = new ExtendedBinaryWriter(_binaryWriter);
-			_index        = new SaIndex();
+            _stream = FileUtilities.GetCreateStream(saPath);
+            _writer = new ExtendedBinaryWriter(_stream);
+            _index = new SaIndex();
 
             WriteHeader();
         }
 
-        
+
         public void SetIntervalList(List<SupplementaryInterval> intervalList)
         {
             _supplementaryIntervals = intervalList;
@@ -117,7 +116,7 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 
         private void WriteSupplementaryIntervals()
         {
-            _binaryWriter.Flush();
+            _writer.Flush();
             if (null == _supplementaryIntervals)
             {
                 _intervalOffset = -1;
@@ -131,142 +130,70 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             }
 
             _intervalOffset = _stream.Position;
-            _binaryWriter.Write(_supplementaryIntervals.Count);
-            var extendedWriter = new ExtendedBinaryWriter(_binaryWriter);
+            _writer.Write(_supplementaryIntervals.Count);
 
             foreach (var interval in _supplementaryIntervals)
             {
-                interval.Write(extendedWriter);
+                interval.Write(_writer);
             }
+
             _supplementaryIntervals?.Clear();
         }
 
         /// <summary>
         /// writes the annotations to the current database file
         /// </summary>
-        public void Write(SupplementaryAnnotation sa, int referencePos)
+        public void Write(SupplementaryPositionCreator spCreator, int referencePos, bool finalizePositinalAnnotation = true)
         {
-			sa.FinalizePositionalAnnotations();
-            var positionalRecords = sa.GetPositionalRecords();
+            if (finalizePositinalAnnotation)
+                spCreator.FinalizePositionalAnnotations();
 
-            // sanity check: make sure we have some data to write
-            if ((positionalRecords.Count == 0) &&
-                (sa.AlleleSpecificAnnotations.Count == 0) &&
-                (sa.CosmicItems.Count == 0) &&
-                (sa.ClinVarItems.Count == 0) &&
-                (sa.CustomItems.Count == 0)
-                )
-            {
+            if (spCreator.IsEmpty())
                 return;
-            }
 
             // add this entry to the index
-            long currentOffset = _stream.Position;
-            _index.Add((uint)referencePos, (uint)currentOffset, AnnotationLoader.Instance.GenomeAssembly == GenomeAssembly.GRCh37 && sa.IsRefMinorAllele);
-	        if (sa.IsRefMinorAllele) RefMinorCount++;
+            var currentOffset = _stream.Position;
+            _index.Add((uint)referencePos, (uint)currentOffset, spCreator.IsRefMinor());
+            if (spCreator.IsRefMinor()) RefMinorCount++;
 
-            WriteAnnotation(sa, positionalRecords, _writer);
+            spCreator.WriteAnnotation(_writer);
         }
 
-        /// <summary>
-        /// writes the supplementary annotation to disk
-        /// </summary>
-        private static void WriteAnnotation(SupplementaryAnnotation sa, List<AbstractAnnotationRecord> positionalRecords, ExtendedBinaryWriter writer)
-        {
-			byte[] annotationBytes;
-
-            // add everything to a memory stream so we can capture the length
-            using (var ms = new MemoryStream())
-            {
-                using (var memoryWriter = new BinaryWriter(ms))
-                {
-                    var extendedWriter = new ExtendedBinaryWriter(memoryWriter);
-
-                    // write the position-specific records
-                    extendedWriter.WriteInt(positionalRecords.Count);
-
-                    foreach (var record in positionalRecords) record.Write(extendedWriter);
-
-                    // write the allele-specific records
-                    extendedWriter.WriteInt(sa.AlleleSpecificAnnotations.Count);
-
-                    foreach (var alleleKvp in sa.AlleleSpecificAnnotations)
-                    {
-                        // write the allele
-                        extendedWriter.WriteAsciiString(alleleKvp.Key);
-
-                        // grab all of the allele-specific records for that allele
-                        var alleleSpecificRecords = sa.GetAlleleSpecificRecords(alleleKvp.Value);
-
-                        extendedWriter.WriteInt(alleleSpecificRecords.Count);
-                        foreach (var record in alleleSpecificRecords) record.Write(extendedWriter);
-                    }
-
-                    // write the cosmic items
-                    extendedWriter.WriteInt(sa.CosmicItems.Count);
-                    foreach (var cosmicItem in sa.CosmicItems)
-                    {
-                        cosmicItem.Write(extendedWriter);
-                    }
-
-                    // writing ClinVar items
-                    extendedWriter.WriteInt(sa.ClinVarItems.Count);
-                    foreach (var clinVarItem in sa.ClinVarItems)
-                    {
-                        clinVarItem.Write(extendedWriter);
-                    }
-
-                    // writing custom Annotations
-                    extendedWriter.WriteInt(sa.CustomItems.Count);
-                    foreach (var customItem in sa.CustomItems)
-                    {
-                        customItem.Write(extendedWriter);
-                    }
-                }
-
-                annotationBytes = ms.ToArray();
-            }
-
-            // write the supplementary annotation to disk
-            //writer.WriteInt(referencePos);
-            //writer.WriteInt(annotationBytes.Length);
-            writer.WriteBytes(annotationBytes);
-        }
 
         /// <summary>
         /// writes the header to the current database file
         /// </summary>
         private void WriteHeader()
         {
-            _binaryWriter.Write(System.Text.Encoding.ASCII.GetBytes(SupplementaryAnnotationCommon.DataHeader));
-            _binaryWriter.Write(SupplementaryAnnotationCommon.DataVersion);
-            _binaryWriter.Write(SupplementaryAnnotationCommon.SchemaVersion);
-			_binaryWriter.Write((byte)_currentGenomeAssembly);
-            _binaryWriter.Write(DateTime.UtcNow.Ticks);
-            _binaryWriter.Write(_currentRefSeq);
+            _writer.Write(System.Text.Encoding.ASCII.GetBytes(SupplementaryAnnotationCommon.DataHeader));
+            _writer.Write(SupplementaryAnnotationCommon.DataVersion);
+            _writer.Write(SupplementaryAnnotationCommon.SchemaVersion);
+            _writer.Write((byte)_currentGenomeAssembly);
+            _writer.Write(DateTime.UtcNow.Ticks);
+            _writer.Write(_currentRefSeq);
 
             // reserve space for the offsets
-            _binaryWriter.Flush();
+            _writer.Flush();
             _offsetHeader = _stream.Position;
-            _binaryWriter.Write(_dataSourceVersionsOffset);
-            _binaryWriter.Write(_dataOffset);
-            _binaryWriter.Write(_intervalOffset);
-            _binaryWriter.Write(_eofOffset);
+            _writer.Write(_dataSourceVersionsOffset);
+            _writer.Write(_dataOffset);
+            _writer.Write(_intervalOffset);
+            _writer.Write(_eofOffset);
 
             // write the data source versions
-            _binaryWriter.Flush();
+            _writer.Flush();
             _dataSourceVersionsOffset = _stream.Position;
 
-            int numDataSourceVersions = _dataSourceVersions?.Count ?? 0;
-            _writer.WriteInt(numDataSourceVersions);
+            var numDataSourceVersions = _dataSourceVersions?.Count ?? 0;
+            _writer.WriteOpt(numDataSourceVersions);
 
             if (_dataSourceVersions != null)
             {
-                foreach (var dataSourceVersion in _dataSourceVersions) dataSourceVersion.Write(_binaryWriter);
+                foreach (var dataSourceVersion in _dataSourceVersions) dataSourceVersion.Write(_writer);
             }
 
             // grab the data offset
-            _binaryWriter.Flush();
+            _writer.Flush();
             _dataOffset = _stream.Position;
         }
     }

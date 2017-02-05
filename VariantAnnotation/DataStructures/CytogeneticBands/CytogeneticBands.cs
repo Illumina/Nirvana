@@ -1,43 +1,41 @@
-﻿using System.Collections.Generic;
-using VariantAnnotation.FileHandling;
+﻿using VariantAnnotation.FileHandling;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.CytogeneticBands
 {
-    public class CytogeneticBands : ICytogeneticBands
+    public sealed class CytogeneticBands : ICytogeneticBands
     {
         #region members
 
         private readonly Band[][] _cytogeneticBands;
-        private readonly Dictionary<string, int> _ensemblReferenceIndex;
-
-        private string _currentReferenceName;
-        private int _currentReferenceIndex;
+        private readonly ChromosomeRenamer _renamer;
 
         #endregion
 
         /// <summary>
         /// constructor
         /// </summary>
-        public CytogeneticBands(Dictionary<string, int> ensemblReferenceIndex, Band[][] cytogeneticBands)
+        public CytogeneticBands(Band[][] cytogeneticBands, ChromosomeRenamer renamer)
         {
-            _ensemblReferenceIndex = ensemblReferenceIndex;
-            _cytogeneticBands      = cytogeneticBands;
+            _cytogeneticBands = cytogeneticBands;
+            _renamer          = renamer;
         }
 
         /// <summary>
         /// returns the correct cytogenetic band representation for this chromosome given
         /// the start and end coordinates
         /// </summary>
-        public string GetCytogeneticBand(string ensemblRefName, int start, int end)
+        public string GetCytogeneticBand(ushort referenceIndex, int start, int end)
         {
-            var startCytogeneticBand = GetCytogeneticBand(ensemblRefName, start);
+            var startCytogeneticBand = GetCytogeneticBand(referenceIndex, start);
             if (startCytogeneticBand == null) return null;
 
             // handle the single coordinate case
+            var ensemblRefName = _renamer.EnsemblReferenceNames[referenceIndex];
             if (start == end) return $"{ensemblRefName}{startCytogeneticBand}";
 
             // handle the dual coordinate case
-            var endCytogeneticBand = GetCytogeneticBand(ensemblRefName, end);
+            var endCytogeneticBand = GetCytogeneticBand(referenceIndex, end);
             if (endCytogeneticBand == null) return null;
 
             return startCytogeneticBand == endCytogeneticBand
@@ -48,22 +46,13 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
         /// <summary>
         /// returns the cytogenetic band corresponding to the specified position
         /// </summary>
-        private string GetCytogeneticBand(string ensemblRefName, int pos)
+        private string GetCytogeneticBand(ushort referenceIndex, int pos)
         {
-            if (ensemblRefName != _currentReferenceName)
-            {
-                _currentReferenceName  = ensemblRefName;
+            if (referenceIndex >= _cytogeneticBands.Length || referenceIndex == ChromosomeRenamer.UnknownReferenceIndex)
+                return null;
 
-                if (!_ensemblReferenceIndex.TryGetValue(ensemblRefName, out _currentReferenceIndex))
-                {
-                    _currentReferenceIndex = -1;
-                }
-            }
-
-            if (_currentReferenceIndex == -1) return null;
-
-            var bands = _cytogeneticBands[_currentReferenceIndex];
-            int index = BinarySearch(bands, pos);
+            var bands = _cytogeneticBands[referenceIndex];
+            var index = BinarySearch(bands, pos);
 
             return index < 0 ? null : bands[index].Name;
         }
@@ -73,14 +62,14 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
         /// </summary>
         private static int BinarySearch(Band[] array, int position)
         {
-            int begin = 0;
-            int end = array.Length - 1;
+            var begin = 0;
+            var end = array.Length - 1;
 
             while (begin <= end)
             {
-                int index = begin + (end - begin >> 1);
+                var index = begin + (end - begin >> 1);
 
-                int ret = array[index].Compare(position);
+                var ret = array[index].Compare(position);
                 if (ret == 0) return index;
                 if (ret < 0) begin = index + 1;
                 else end = index - 1;
@@ -94,19 +83,19 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
         /// </summary>
         public static Band[][] Read(ExtendedBinaryReader reader)
         {
-            int numReferences    = reader.ReadInt();
+            var numReferences    = reader.ReadOptInt32();
             var cytogeneticBands = new Band[numReferences][];
 
-            for (int refIndex = 0; refIndex < numReferences; refIndex++)
+            for (var refIndex = 0; refIndex < numReferences; refIndex++)
             {
-                int numBands = reader.ReadInt();
+                var numBands = reader.ReadOptInt32();
                 cytogeneticBands[refIndex] = new Band[numBands];
 
-                for (int bandIndex = 0; bandIndex < numBands; bandIndex++)
+                for (var bandIndex = 0; bandIndex < numBands; bandIndex++)
                 {
-                    int begin   = reader.ReadInt();
-                    int end     = reader.ReadInt();
-                    string name = reader.ReadAsciiString();
+                    var begin   = reader.ReadOptInt32();
+                    var end     = reader.ReadOptInt32();
+                    var name = reader.ReadAsciiString();
 
                     cytogeneticBands[refIndex][bandIndex] = new Band(begin, end, name);
                 }
@@ -120,19 +109,19 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
         /// </summary>
         public void Write(ExtendedBinaryWriter writer)
         {
-            int numReferences = _cytogeneticBands.Length;
-            writer.WriteInt(numReferences);
+            var numReferences = _cytogeneticBands.Length;
+            writer.WriteOpt(numReferences);
 
-            for (int refIndex = 0; refIndex < numReferences; refIndex++)
+            for (var refIndex = 0; refIndex < numReferences; refIndex++)
             {
-                int numRefEntries = _cytogeneticBands[refIndex].Length;
-                writer.WriteInt(numRefEntries);
+                var numRefEntries = _cytogeneticBands[refIndex].Length;
+                writer.WriteOpt(numRefEntries);
 
                 foreach (var band in _cytogeneticBands[refIndex])
                 {
-                    writer.WriteInt(band.Begin);
-                    writer.WriteInt(band.End);
-                    writer.WriteAsciiString(band.Name);
+                    writer.WriteOpt(band.Begin);
+                    writer.WriteOpt(band.End);
+                    writer.WriteOptAscii(band.Name);
                 }
             }
         }

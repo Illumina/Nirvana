@@ -2,7 +2,7 @@
 
 namespace ErrorHandling.Exceptions
 {
-    public class MissingCompressionLibraryException : Exception
+    public sealed class MissingCompressionLibraryException : Exception
     {
         // constructor
         public MissingCompressionLibraryException(string missingLibraryFilename) : base(GetErrorMessage(missingLibraryFilename)) { }

@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.CommandLine
 {
-    public class TopLevelOption
+    public sealed class TopLevelOption
     {
         public readonly string Description;
         public readonly Func<string, string[], int> CommandMethod;

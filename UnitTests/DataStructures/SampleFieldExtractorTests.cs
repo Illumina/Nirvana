@@ -1,12 +1,24 @@
-﻿using UnitTests.Utilities;
+﻿using UnitTests.Fixtures;
+using UnitTests.Utilities;
 using VariantAnnotation.DataStructures.VCF;
+using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.DataStructures
 {
-    [Collection("Chromosome 1 collection")]
+    [Collection("ChromosomeRenamer")]
     public sealed class SampleFieldExtractorTests
     {
+        private readonly ChromosomeRenamer _renamer;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public SampleFieldExtractorTests(ChromosomeRenamerFixture fixture)
+        {
+            _renamer = fixture.Renamer;
+        }
+
         [Fact]
         public void FormatIndicesTest()
         {
@@ -25,6 +37,7 @@ namespace UnitTests.DataStructures
             Assert.Equal(4, formatIndicies.GQ);
             Assert.Equal(11, formatIndicies.GQX);
             Assert.Equal(5, formatIndicies.DP);
+            Assert.Equal(6, formatIndicies.VF);
             Assert.Equal(13, formatIndicies.DPI);
             Assert.Equal(14, formatIndicies.NV);
 
@@ -186,8 +199,7 @@ namespace UnitTests.DataStructures
         public void PiscesTotalDepth()
         {
             const string vcfLine = "chr1\t115251293\t.\tGA\tG\t100\tSB;LowVariantFreq\tDP=7882\tGT:GQ:AD:VF:NL:SB:GQX\t0/1:100:7588,294:0:20:-100.0000:100";
-
-            var jsonVariant = VcfUtilities.GetVariantFeature(vcfLine);
+            var jsonVariant = VcfUtilities.GetVariant(vcfLine, _renamer);
 
             // get the sample info
             var samples = jsonVariant.ExtractSampleInfo();
@@ -247,7 +259,7 @@ namespace UnitTests.DataStructures
         {
             // data from NIR-1095
             // for NIR-1218
-            string vcfLine = "1	9314202	Canvas:GAIN:1:9314202:9404148	N	<CNV>	36	PASS	SVTYPE=CNV;END=9404148;ensembl_gene_id=ENSG00000049239,ENSG00000252841,ENSG00000171621	RC:BC:CN:MCC	.	151:108:6:4";
+            var vcfLine = "1	9314202	Canvas:GAIN:1:9314202:9404148	N	<CNV>	36	PASS	SVTYPE=CNV;END=9404148;ensembl_gene_id=ENSG00000049239,ENSG00000252841,ENSG00000171621	RC:BC:CN:MCC	.	151:108:6:4";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
@@ -266,7 +278,7 @@ namespace UnitTests.DataStructures
         {
 
             // for NIR-1306
-            string vcfLine = "chrX	2735147	.	G	A	38.25	VQSRTrancheSNP99.90to100.00	AC=3;AF=0.500;AN=6;BaseQRankSum=-0.602;DP=56;Dels=0.00;FS=30.019;HaplotypeScore=7.7259;MLEAC=3;MLEAF=0.500;MQ=41.18;MQ0=0;MQRankSum=0.098;QD=1.06;ReadPosRankSum=0.266;SB=-8.681e-03;VQSLOD=-6.0901;culprit=QD	GT:AD:DP:GQ:PL	0:7,0:7:3:0,3,39	./.	0/1:14,3:17:35:35,0,35	1/1:9,10:19:3:41,3,0";
+            var vcfLine = "chrX	2735147	.	G	A	38.25	VQSRTrancheSNP99.90to100.00	AC=3;AF=0.500;AN=6;BaseQRankSum=-0.602;DP=56;Dels=0.00;FS=30.019;HaplotypeScore=7.7259;MLEAC=3;MLEAF=0.500;MQ=41.18;MQ0=0;MQRankSum=0.098;QD=1.06;ReadPosRankSum=0.266;SB=-8.681e-03;VQSLOD=-6.0901;culprit=QD	GT:AD:DP:GQ:PL	0:7,0:7:3:0,3,39	./.	0/1:14,3:17:35:35,0,35	1/1:9,10:19:3:41,3,0";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
@@ -290,7 +302,7 @@ namespace UnitTests.DataStructures
 
             // For NIR-1320
             // the original AD= 15,11,0
-            string vcfLine =
+            var vcfLine =
                 "1	30923	rs140337953	G	T,<NON_REF>	264.77	PASS	BaseQRankSum=0.259;DB;DP=26;MLEAC=1,0;MLEAF=0.500,0.00;MQ=43.87;MQ0=0;MQRankSum=-0.830;ReadPosRankSum=-0.156	GT:AD:GQ:PL:SB	0/1:15,11,20:99:293,0,330,337,363,700:8,7,3,8";
             var vcfColumns = vcfLine.Split('\t');
 
@@ -300,7 +312,7 @@ namespace UnitTests.DataStructures
             Assert.Equal(1, samples.Count);
             var sample = samples[0];
             var observedVariantFrequency = sample?.VariantFrequency;
-            string expectedVariantFrequency = "0.4231";
+            var expectedVariantFrequency = "0.4231";
             Assert.Equal(expectedVariantFrequency, observedVariantFrequency);
             var expectedAlleleDepths = new[] { "15", "11" };
             var observedAlleleDepths = sample?.AlleleDepths;
@@ -331,5 +343,27 @@ namespace UnitTests.DataStructures
             var observedVariantFrequency = sample?.VariantFrequency;
             Assert.Equal(expectedVariantFrequency, observedVariantFrequency);
         }
+
+		[Fact]
+	    public void SplitReadCounts()
+	    {
+		    var vcfLine =
+			    "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	78,0:65,0	157,42:252,63";
+
+			var vcfColumns = vcfLine.Split('\t');
+
+			var extractor = new SampleFieldExtractor(vcfColumns);
+			var samples = extractor.ExtractSamples();
+
+			Assert.Equal(2, samples.Count);
+		    var sample1 = samples[0];
+			Assert.Equal(new[] { "78", "0" }, sample1.PairEndReadCounts);
+			Assert.Equal(new[] { "65", "0" }, sample1.SplitReadCounts);
+
+			var sample2 = samples[1];
+			Assert.Equal(new[] { "157", "42" }, sample2.PairEndReadCounts);
+			Assert.Equal(new[] { "252", "63" }, sample2.SplitReadCounts);
+
+		}
     }
 }

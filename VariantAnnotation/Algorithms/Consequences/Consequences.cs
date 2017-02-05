@@ -4,56 +4,60 @@ using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Algorithms.Consequences
 {
-    public class Consequences
+    public sealed class Consequences
     {
         #region members
 
         private readonly VariantEffect _variantEffect;
         private readonly List<ConsequenceType> _consequences;
-        
+
         private readonly Dictionary<ConsequenceType, string> _consequenceDescriptors;
 
         #endregion
 
         #region Sequence Ontology strings
 
-        private const string CodingSequenceVariantKey                  = "coding_sequence_variant";
-        private const string CopyNumberIncreaseKey                         = "copy_number_increase";
-        private const string CopyNumberDecreaseKey                         = "copy_number_decrease";
-        private const string CopyNumberChangeKey                    = "copy_number_change";
-        private const string DownstreamGeneVariantKey                  = "downstream_gene_variant";
-        private const string FeatureElongationKey                      = "feature_elongation";
-        private const string FeatureTruncationKey                      = "feature_truncation";
-        private const string FivePrimeUtrVariantKey                    = "5_prime_UTR_variant";
-        private const string FrameshiftVariantKey                      = "frameshift_variant";
-        private const string IncompleteTerminalCodonVariantKey         = "incomplete_terminal_codon_variant";
-        private const string InframeDeletionKey                        = "inframe_deletion";
-        private const string InframeInsertionKey                       = "inframe_insertion";
-        private const string StartLostKey                              = "start_lost";
-        private const string IntronVariantKey                          = "intron_variant";
-        private const string MissenseVariantKey                        = "missense_variant";
-        private const string MatureMirnaVariantKey                     = "mature_miRNA_variant";
-        private const string NonCodingExonVariantKey                   = "non_coding_transcript_exon_variant";
-        private const string NonCodingTranscriptVariantKey             = "non_coding_transcript_variant";
+        private const string CodingSequenceVariantKey = "coding_sequence_variant";
+        private const string CopyNumberIncreaseKey = "copy_number_increase";
+        private const string CopyNumberDecreaseKey = "copy_number_decrease";
+        private const string CopyNumberChangeKey = "copy_number_change";
+        private const string DownstreamGeneVariantKey = "downstream_gene_variant";
+        private const string FeatureElongationKey = "feature_elongation";
+        private const string FeatureTruncationKey = "feature_truncation";
+        private const string FivePrimeUtrVariantKey = "5_prime_UTR_variant";
+        private const string FrameshiftVariantKey = "frameshift_variant";
+        private const string IncompleteTerminalCodonVariantKey = "incomplete_terminal_codon_variant";
+        private const string InframeDeletionKey = "inframe_deletion";
+        private const string InframeInsertionKey = "inframe_insertion";
+        private const string StartLostKey = "start_lost";
+        private const string IntronVariantKey = "intron_variant";
+        private const string MissenseVariantKey = "missense_variant";
+        private const string MatureMirnaVariantKey = "mature_miRNA_variant";
+        private const string NonCodingExonVariantKey = "non_coding_transcript_exon_variant";
+        private const string NonCodingTranscriptVariantKey = "non_coding_transcript_variant";
         private const string NonsenseMediatedDecayTranscriptVariantKey = "NMD_transcript_variant";
-        private const string ProteinAlteringVariantKey                 = "protein_altering_variant";
-        private const string RegulatoryRegionVariantKey                = "regulatory_region_variant";
-        private const string RegulatoryRegionAblationVariantKey        = "regulatory_region_ablation";
-        private const string RegulatoryRegionAmplificationVariantKey   = "regulatory_region_amplification";
-        private const string SpliceAcceptorVariantKey                  = "splice_acceptor_variant";
-        private const string SpliceDonorVariantKey                     = "splice_donor_variant";
-        private const string SpliceRegionVariantKey                    = "splice_region_variant";
-        private const string StopGainedKey                             = "stop_gained";
-        private const string StopLostKey                               = "stop_lost";
-        private const string StopRetainedVariantKey                    = "stop_retained_variant";
-        private const string SynonymousVariantKey                      = "synonymous_variant";
-        private const string ThreePrimeUtrVariantKey                   = "3_prime_UTR_variant";
-        private const string TranscriptAmplificationKey                = "transcript_amplification";
-        private const string TranscriptAblatioinKey                    = "transcript_ablation";
-        private const string TranscriptTruncationKey                   = "transcript_truncation";
-        private const string UnknownKey                                = "unknown";
-        private const string UpstreamGeneVariantKey                    = "upstream_gene_variant";
-        private const string TranscriptVariantKey                      = "transcript_variant";
+        private const string ProteinAlteringVariantKey = "protein_altering_variant";
+        internal const string RegulatoryRegionVariantKey = "regulatory_region_variant";
+        private const string RegulatoryRegionAblationVariantKey = "regulatory_region_ablation";
+        private const string RegulatoryRegionAmplificationVariantKey = "regulatory_region_amplification";
+        private const string SpliceAcceptorVariantKey = "splice_acceptor_variant";
+        private const string SpliceDonorVariantKey = "splice_donor_variant";
+        private const string SpliceRegionVariantKey = "splice_region_variant";
+        private const string StopGainedKey = "stop_gained";
+        private const string StopLostKey = "stop_lost";
+        private const string StopRetainedVariantKey = "stop_retained_variant";
+        private const string SynonymousVariantKey = "synonymous_variant";
+        private const string ThreePrimeUtrVariantKey = "3_prime_UTR_variant";
+        private const string TranscriptAmplificationKey = "transcript_amplification";
+        private const string TranscriptAblatioinKey = "transcript_ablation";
+        private const string TranscriptTruncationKey = "transcript_truncation";
+        private const string UnknownKey = "unknown";
+        private const string UpstreamGeneVariantKey = "upstream_gene_variant";
+        private const string TranscriptVariantKey = "transcript_variant";
+        private const string GeneFusionKey = "gene_fusion";
+        private const string UnidirectionalGeneFusionKey = "unidirectional_gene_fusion";
+        private const string BidirectionalGeneFusionKey = "bidirectional_gene_fusion";
+
 
         #endregion
 
@@ -63,48 +67,57 @@ namespace VariantAnnotation.Algorithms.Consequences
         public Consequences(VariantEffect variantEffect)
         {
             _variantEffect = variantEffect;
-            _consequences  = new List<ConsequenceType>();
+            _consequences = new List<ConsequenceType>();
 
             _consequenceDescriptors = new Dictionary<ConsequenceType, string>
             {
-                [ConsequenceType.CodingSequenceVariant]                  = CodingSequenceVariantKey,
-                [ConsequenceType.CopyNumberIncrease]                         = CopyNumberIncreaseKey,
-                [ConsequenceType.CopyNumberDecrease]                         = CopyNumberDecreaseKey,
-                [ConsequenceType.CopyNumberChange]                    = CopyNumberChangeKey,
-                [ConsequenceType.DownstreamGeneVariant]                  = DownstreamGeneVariantKey,
-                [ConsequenceType.FeatureElongation]                      = FeatureElongationKey,
-                [ConsequenceType.FeatureTruncation]                      = FeatureTruncationKey,
-                [ConsequenceType.FivePrimeUtrVariant]                    = FivePrimeUtrVariantKey,
-                [ConsequenceType.FrameshiftVariant]                      = FrameshiftVariantKey,
-                [ConsequenceType.IncompleteTerminalCodonVariant]         = IncompleteTerminalCodonVariantKey,
-                [ConsequenceType.InframeDeletion]                        = InframeDeletionKey,
-                [ConsequenceType.InframeInsertion]                       = InframeInsertionKey,
-                [ConsequenceType.StartLost]                              = StartLostKey,
-                [ConsequenceType.IntronVariant]                          = IntronVariantKey,
-                [ConsequenceType.MissenseVariant]                        = MissenseVariantKey,
-                [ConsequenceType.MatureMirnaVariant]                     = MatureMirnaVariantKey,
-                [ConsequenceType.NonCodingTranscriptExonVariant]         = NonCodingExonVariantKey,
-                [ConsequenceType.NonCodingTranscriptVariant]             = NonCodingTranscriptVariantKey,
+                [ConsequenceType.CodingSequenceVariant] = CodingSequenceVariantKey,
+                [ConsequenceType.CopyNumberIncrease] = CopyNumberIncreaseKey,
+                [ConsequenceType.CopyNumberDecrease] = CopyNumberDecreaseKey,
+                [ConsequenceType.CopyNumberChange] = CopyNumberChangeKey,
+                [ConsequenceType.DownstreamGeneVariant] = DownstreamGeneVariantKey,
+                [ConsequenceType.FeatureElongation] = FeatureElongationKey,
+                [ConsequenceType.FeatureTruncation] = FeatureTruncationKey,
+                [ConsequenceType.FivePrimeUtrVariant] = FivePrimeUtrVariantKey,
+                [ConsequenceType.FrameshiftVariant] = FrameshiftVariantKey,
+                [ConsequenceType.IncompleteTerminalCodonVariant] = IncompleteTerminalCodonVariantKey,
+                [ConsequenceType.InframeDeletion] = InframeDeletionKey,
+                [ConsequenceType.InframeInsertion] = InframeInsertionKey,
+                [ConsequenceType.StartLost] = StartLostKey,
+                [ConsequenceType.IntronVariant] = IntronVariantKey,
+                [ConsequenceType.MissenseVariant] = MissenseVariantKey,
+                [ConsequenceType.MatureMirnaVariant] = MatureMirnaVariantKey,
+                [ConsequenceType.NonCodingTranscriptExonVariant] = NonCodingExonVariantKey,
+                [ConsequenceType.NonCodingTranscriptVariant] = NonCodingTranscriptVariantKey,
                 [ConsequenceType.NonsenseMediatedDecayTranscriptVariant] = NonsenseMediatedDecayTranscriptVariantKey,
-                [ConsequenceType.ProteinAlteringVariant]                 = ProteinAlteringVariantKey,
-                [ConsequenceType.RegulatoryRegionAblation]               = RegulatoryRegionAblationVariantKey,
-				[ConsequenceType.RegulatoryRegionAmplification]          = RegulatoryRegionAmplificationVariantKey,
-                [ConsequenceType.RegulatoryRegionVariant]                = RegulatoryRegionVariantKey,
-                [ConsequenceType.SpliceAcceptorVariant]                  = SpliceAcceptorVariantKey,
-                [ConsequenceType.SpliceDonorVariant]                     = SpliceDonorVariantKey,
-                [ConsequenceType.SpliceRegionVariant]                    = SpliceRegionVariantKey,
-                [ConsequenceType.StopGained]                             = StopGainedKey,
-                [ConsequenceType.StopLost]                               = StopLostKey,
-                [ConsequenceType.StopRetainedVariant]                    = StopRetainedVariantKey,
-                [ConsequenceType.SynonymousVariant]                      = SynonymousVariantKey,
-                [ConsequenceType.ThreePrimeUtrVariant]                   = ThreePrimeUtrVariantKey,
-                [ConsequenceType.TranscriptAmplification]                = TranscriptAmplificationKey,
-				[ConsequenceType.TranscriptTruncation]                   = TranscriptTruncationKey,
-				[ConsequenceType.TranscriptAblation]                     = TranscriptAblatioinKey,
-				[ConsequenceType.Unknown]                                = UnknownKey,
-                [ConsequenceType.UpstreamGeneVariant]                    = UpstreamGeneVariantKey,
-				[ConsequenceType.TranscriptVariant]                      = TranscriptVariantKey
+                [ConsequenceType.ProteinAlteringVariant] = ProteinAlteringVariantKey,
+                [ConsequenceType.RegulatoryRegionAblation] = RegulatoryRegionAblationVariantKey,
+                [ConsequenceType.RegulatoryRegionAmplification] = RegulatoryRegionAmplificationVariantKey,
+                [ConsequenceType.RegulatoryRegionVariant] = RegulatoryRegionVariantKey,
+                [ConsequenceType.SpliceAcceptorVariant] = SpliceAcceptorVariantKey,
+                [ConsequenceType.SpliceDonorVariant] = SpliceDonorVariantKey,
+                [ConsequenceType.SpliceRegionVariant] = SpliceRegionVariantKey,
+                [ConsequenceType.StopGained] = StopGainedKey,
+                [ConsequenceType.StopLost] = StopLostKey,
+                [ConsequenceType.StopRetainedVariant] = StopRetainedVariantKey,
+                [ConsequenceType.SynonymousVariant] = SynonymousVariantKey,
+                [ConsequenceType.ThreePrimeUtrVariant] = ThreePrimeUtrVariantKey,
+                [ConsequenceType.TranscriptAmplification] = TranscriptAmplificationKey,
+                [ConsequenceType.TranscriptTruncation] = TranscriptTruncationKey,
+                [ConsequenceType.TranscriptAblation] = TranscriptAblatioinKey,
+                [ConsequenceType.Unknown] = UnknownKey,
+                [ConsequenceType.UpstreamGeneVariant] = UpstreamGeneVariantKey,
+                [ConsequenceType.TranscriptVariant] = TranscriptVariantKey,
+                [ConsequenceType.GeneFusion] = GeneFusionKey,
+                [ConsequenceType.UnidirectionalGeneFusion] = UnidirectionalGeneFusionKey,
+                [ConsequenceType.BidirectionalGeneFusion] = BidirectionalGeneFusionKey
             };
+        }
+
+        public Consequences(List<ConsequenceType> consequences, VariantEffect variantEffect) : this(variantEffect)
+        {
+            _consequences.AddRange(consequences);
+
         }
 
         /// <summary>
@@ -125,8 +138,11 @@ namespace VariantAnnotation.Algorithms.Consequences
             if (_consequences.Count == 0) GetTier2Types();
             if (_consequences.Count == 0) GetTier3Types();
 
-            if(internalCopyNumberType != VariantType.unknown) AssignCnvTypes(internalCopyNumberType);
-			if(_consequences.Count == 0) _consequences.Add(ConsequenceType.TranscriptVariant);
+            if (internalCopyNumberType != VariantType.unknown) AssignCnvTypes(internalCopyNumberType);
+
+            AssignGeneFusion();
+
+            if (_consequences.Count == 0) _consequences.Add(ConsequenceType.TranscriptVariant);
         }
 
         /// <summary>
@@ -152,7 +168,7 @@ namespace VariantAnnotation.Algorithms.Consequences
         /// <summary>
         /// determines the regulatory region variant's functional consequence
         /// </summary>
-        public void DetermineRegulatoryVariantEffects(AnnotationInterval feature, VariantType vt, int refBegin, int refEnd, bool isSv,VariantType internalCopyNumberType)
+        public void DetermineRegulatoryVariantEffects(ReferenceAnnotationInterval feature, VariantType vt, int refBegin, int refEnd, bool isSv, VariantType internalCopyNumberType)
         {
             var regulatoryVariantEffects = new FeatureVariantEffects(feature, vt, refBegin, refEnd, isSv, internalCopyNumberType);
 
@@ -166,16 +182,25 @@ namespace VariantAnnotation.Algorithms.Consequences
             _consequences.Add(ConsequenceType.RegulatoryRegionVariant);
         }
 
+        private void AssignGeneFusion()
+        {
+            if (!_variantEffect.IsGeneFusion()) return;
+
+            _consequences.Add(ConsequenceType.GeneFusion);
+
+        }
+
         /// <summary>
         /// populates the consequences list with tier 1 consequences if found (NOTE: Tests are done in rank order)
         /// </summary>
         private void GetTier1Types()
         {
-			// TranscriptAblation
-			if (_variantEffect.HasTranscriptAblation()) _consequences.Add(ConsequenceType.TranscriptAblation);
-			
-			// TranscriptAmplification
+            // TranscriptAblation
+            if (_variantEffect.HasTranscriptAblation()) _consequences.Add(ConsequenceType.TranscriptAblation);
+
+            // TranscriptAmplification
             if (_variantEffect.HasTranscriptAmplification()) _consequences.Add(ConsequenceType.TranscriptAmplification);
+
         }
 
         /// <summary>
@@ -184,7 +209,7 @@ namespace VariantAnnotation.Algorithms.Consequences
         private void GetTier2Types()
         {
             // MatureMirnaVariant
-			if (_variantEffect.IsMatureMirnaVariant()) _consequences.Add(ConsequenceType.MatureMirnaVariant);
+            if (_variantEffect.IsMatureMirnaVariant()) _consequences.Add(ConsequenceType.MatureMirnaVariant);
 
             // TfbsAblation
             // TfbsAmplification
@@ -204,7 +229,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             // StopGained
             if (_variantEffect.IsStopGained()) _consequences.Add(ConsequenceType.StopGained);
-            
+
             // FrameshiftVariant
             if (_variantEffect.IsFrameshiftVariant()) _consequences.Add(ConsequenceType.FrameshiftVariant);
 
@@ -219,7 +244,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             // InframeDeletion
             if (_variantEffect.IsInframeDeletion()) _consequences.Add(ConsequenceType.InframeDeletion);
-            
+
             // MissenseVariant
             if (_variantEffect.IsMissenseVariant()) _consequences.Add(ConsequenceType.MissenseVariant);
 
@@ -231,7 +256,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             // IncompleteTerminalCodonVariant
             if (_variantEffect.IsIncompleteTerminalCodonVariant()) _consequences.Add(ConsequenceType.IncompleteTerminalCodonVariant);
-            
+
             // StopRetainedVariant
             if (_variantEffect.IsStopRetained()) _consequences.Add(ConsequenceType.StopRetainedVariant);
 
@@ -240,7 +265,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             // CodingSequenceVariant
             if (_variantEffect.IsCodingSequenceVariant()) _consequences.Add(ConsequenceType.CodingSequenceVariant);
-            
+
             // FivePrimeUtrVariant
             if (_variantEffect.IsFivePrimeUtrVariant()) _consequences.Add(ConsequenceType.FivePrimeUtrVariant);
 
@@ -249,7 +274,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 
             // NonCodingTranscriptExonVariant
             if (_variantEffect.IsNonCodingTranscriptExonVariant()) _consequences.Add(ConsequenceType.NonCodingTranscriptExonVariant);
-            
+
             // IntronVariant
             if (_variantEffect.IsWithinIntron()) _consequences.Add(ConsequenceType.IntronVariant);
 
@@ -273,7 +298,7 @@ namespace VariantAnnotation.Algorithms.Consequences
         {
             var consequenceStrings = new string[_consequences.Count];
 
-            for (int i = 0; i < _consequences.Count; i++)
+            for (var i = 0; i < _consequences.Count; i++)
             {
                 consequenceStrings[i] = _consequenceDescriptors[_consequences[i]];
             }

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VariantAnnotation.DataStructures.JsonAnnotations;
+using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.FileHandling.JSON
 {
-    public class JsonObject
+    public sealed class JsonObject
     {
         #region members
 
@@ -70,7 +70,7 @@ namespace VariantAnnotation.FileHandling.JSON
         /// </summary>
         public void AddStringValue(string description, string s, bool useQuote = true)
         {
-            if (string.IsNullOrEmpty(s) || (s == ".")) return;
+            if (string.IsNullOrEmpty(s) || s == ".") return;
 
 			if (_needsComma) _sb.Append(Comma);
             AddKey(description);
@@ -116,7 +116,7 @@ namespace VariantAnnotation.FileHandling.JSON
 		    _sb.Append(valueList[0]);
 		    if (useQuote) _sb.Append(DoubleQuote);
 
-		    for (int i = 1; i < valueList.Count; i++)
+		    for (var i = 1; i < valueList.Count; i++)
 		    {
 			    _sb.Append(Comma);
 			    if (useQuote) _sb.Append(DoubleQuote);
@@ -140,7 +140,7 @@ namespace VariantAnnotation.FileHandling.JSON
             AddKey(description);
             _sb.Append(OpenBracket);
 
-            bool needsComma = false;
+            var needsComma = false;
 
             foreach (var value in values)
             {

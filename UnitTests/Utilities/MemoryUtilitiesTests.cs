@@ -18,17 +18,17 @@ namespace UnitTests.Utilities
             _output = output;
         }
 
-        [Fact]
-        public void GetPeakMemoryUsage()
-        {
-            var peakMemoryUsage = MemoryUtilities.ToHumanReadable(MemoryUtilities.GetPeakMemoryUsage());
+        //[Fact]
+        //public void GetPeakMemoryUsage()
+        //{
+        //    var peakMemoryUsage = MemoryUtilities.ToHumanReadable(MemoryUtilities.GetPeakMemoryUsage());
 
-            var cols = peakMemoryUsage.Split(' ');
-            Assert.Equal(2, cols.Length);
+        //    var cols = peakMemoryUsage.Split(' ');
+        //    Assert.Equal(2, cols.Length);
 
-            var units = cols[1];
-            Assert.Equal("MB", units);
-        }
+        //    var units = cols[1];
+        //    Assert.Equal("MB", units);
+        //}
 
         [Theory]
         [InlineData(10, "10 B")]
@@ -40,16 +40,16 @@ namespace UnitTests.Utilities
             Assert.Equal(expectedResult, MemoryUtilities.ToHumanReadable(numBytes));
         }
 
-        [Theory]
+        [Theory(Skip = "Flaky test")]
         [InlineData(524288, 35000)]
         public void NumBytesUsed(int numInts, int epsilon)
         {
             const int maxNumMeasurements = 10;
-            int expectedNumBytesUsed = numInts * 4;
+            var expectedNumBytesUsed = numInts * 4;
 
-            long minDiff = long.MaxValue;
+            var minDiff = long.MaxValue;
 
-            for (int i = 0; i < maxNumMeasurements; i++)
+            for (var i = 0; i < maxNumMeasurements; i++)
             {
                 var numBytesUsed = GetNumBytesUsed(numInts);
                 var diff = Math.Abs(numBytesUsed - expectedNumBytesUsed);
@@ -65,26 +65,17 @@ namespace UnitTests.Utilities
             Assert.InRange(minDiff, 0, epsilon);
         }
 
-        /// <summary>
-        /// returns the number of bytes used
-        /// </summary>
-        private static long NumBytesUsed(bool forceFullCollection)
-        {
-            return GC.GetTotalMemory(forceFullCollection);
-        }
-
         private static long GetNumBytesUsed(int numInts)
         {
             // force garbage collection
             GC.Collect();
-            GC.WaitForPendingFinalizers();
 
-            var begin = NumBytesUsed(true);
+            var begin = MemoryUtilities.NumBytesUsed(true);
 
             var ints = new int[numInts];
             ints[0] = 123;
 
-            var end = NumBytesUsed(true);            
+            var end = MemoryUtilities.NumBytesUsed(true);            
 
             // force the array to be in memory until we have our measurements
             Assert.Equal(123, ints[0]);

@@ -7,176 +7,214 @@ using VariantAnnotation.Algorithms;
 using VariantAnnotation.Algorithms.Consequences;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.IntervalSearch;
 using VariantAnnotation.DataStructures.JsonAnnotations;
+using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
-using VariantAnnotation.FileHandling.CustomInterval;
-using VariantAnnotation.FileHandling.Phylop;
+using VariantAnnotation.FileHandling.Omim;
+using VariantAnnotation.FileHandling.PredictionCache;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
+using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotationSources
 {
-    public class NirvanaAnnotationSource : IAnnotationSource
+    public sealed class NirvanaAnnotationSource : IAnnotationSource
     {
         #region members
 
-        private readonly NirvanaDataStore _dataStore;
-        private IntervalTree<Transcript> TranscriptIntervalTree { get; }
-        private readonly IntervalTree<RegulatoryFeature> _regulatoryIntervalTree;
-        private readonly IntervalTree<Gene> _geneIntervalTree;
+        // caches
+        private readonly GlobalCache _transcriptCache;
+        private PredictionCache _siftCache;
+        private PredictionCache _polyPhenCache;
 
-        private List<Transcript> OverlappingTranscripts { get; }
-        private List<CustomInterval> OverlappingCustomIntervals { get; }
-        private readonly List<SupplementaryInterval> _overlappingSupplementaryIntervals;
-        private List<RegulatoryFeature> OverlappingRegulatoryFeatures { get; }
-        private List<Gene> OverlappingGenes { get; }
+        // readers
+        private readonly PredictionCacheReader _siftReader;
+        private readonly PredictionCacheReader _polyPhenReader;
+        private readonly IConservationScoreReader _conservationScoreReader;
 
-        private readonly ICompressedSequence _compressedSequence;
+        private readonly ISupplementaryAnnotationProvider _customAnnotationProvider;
+        private readonly ISupplementaryAnnotationProvider _customIntervalProvider;
+        private readonly ISupplementaryAnnotationProvider _saProvider;
 
-        private const int FlankingLength = 5000;
+        // interval forests
+        private readonly IIntervalForest<Transcript> _transcriptIntervalForest;
+        private readonly IIntervalForest<RegulatoryElement> _regulatoryIntervalForest;
 
-        private readonly Dictionary<string, string> _knownReferenceSequences;
-
-        private readonly bool _useOnlyCanonicalTranscripts;
-
+        // flags
+        private bool _enableMitochondrialAnnotation;
+        private bool _reportAllSvOverlappingTranscripts;
         private bool _hasConservationScores;
-        private bool _hasSupplementaryAnnotations;
-        private bool _hasCustomAnnotations;
-        private bool _hasCustomIntervals;
-
-        private PhylopReader _conservationScoreReader;
-        private SupplementaryAnnotationReader _supplementaryAnnotationReader;
-        private List<SupplementaryAnnotationReader> _customAnnotationReaders;
-
-        private readonly IntervalTree<CustomInterval> _customIntervalTree;
-        private readonly IntervalTree<SupplementaryInterval> _suppIntervalTree;
-
-        private readonly string _supplementaryAnnotationDir;
-        private readonly IEnumerable<string> _customAnnotationDirs;
-        private readonly IEnumerable<string> _customIntervalDirs;
-
-        private readonly PerformanceMetrics _performanceMetrics;
-
-        private const int MaxDownstreamLength = 5000;
-
+        private readonly bool _hasOmimAnnotations;
         private bool _enableReferenceNoCalls;
         private bool _limitReferenceNoCallsToTranscripts;
 
-        private readonly List<DataSourceVersion> _dataSourceVersions;
-        private readonly string _nirvanaDataVersion;
+        private readonly List<IPlugin> _plugins = new List<IPlugin>();
 
-        private bool _enableMitochondrialAnnotation;
+        private List<Transcript> OverlappingTranscripts { get; }
+        private List<RegulatoryElement> OverlappingRegulatoryFeatures { get; }
+
+        private HashSet<string> OverlappingGeneSymbols { get; }
+        private HashSet<int> PartialOverlappingGeneHashCodes { get; }
 
         private UnifiedJson _json;
-        private bool _useAnnotationLoader = true;
+        private readonly ILookup<string, OmimAnnotation> _omimGeneLookup;
+
+        private readonly List<IDataSourceVersion> _dataSourceVersions = new List<IDataSourceVersion>();
+        private readonly ICompressedSequence _compressedSequence;
+        private readonly PerformanceMetrics _performanceMetrics;
+
+        public const int FlankingLength = 5000;
+        private const int MaxDownstreamLength = 5000;
+
+        private readonly HashSet<string> _affectedGeneSymbols;
+        private IEnumerable<string> AffectedGeneSymbols => _affectedGeneSymbols;
+
+        private readonly DataFileManager _dataFileManager;
+        private readonly AminoAcids _aminoAcids;
+        private readonly VID _vid;
 
         #endregion
 
+        string IAnnotationSource.GetDataVersion()
+            =>  CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." +
+                SupplementaryAnnotationCommon.DataVersion;
+
+	    public void EnableMitochondrialAnnotation() => _enableMitochondrialAnnotation = true;
+
+        public void EnableReportAllSvOverlappingTranscripts() => _reportAllSvOverlappingTranscripts = true;
+
+        public void AddPlugin(IPlugin plugin) => _plugins.Add(plugin);
+
         /// <summary>
         /// constructor
+        /// NOTE: we want to set up most "normal" things here. Leave custom annotations and custom intervals to other methods
         /// </summary>
-        private NirvanaAnnotationSource(string supplementaryAnnotationDir, Dictionary<string, string> refSeqsToPaths,
-            bool useOnlyCanonicalTranscripts, IEnumerable<string> customAnnotationDirs = null,
-            IEnumerable<string> customIntervalDirs = null)
+        public NirvanaAnnotationSource(AnnotationSourceStreams streams, ISupplementaryAnnotationProvider saProvider,
+            IConservationScoreReader conservationScoreReader, ISupplementaryAnnotationProvider caProvider,
+            ISupplementaryAnnotationProvider ciProvider, string saDir)
         {
-            _dataStore                         = new NirvanaDataStore();
-            TranscriptIntervalTree             = new IntervalTree<Transcript>();
-            _regulatoryIntervalTree            = new IntervalTree<RegulatoryFeature>();
-            _geneIntervalTree                  = new IntervalTree<Gene>();
-            _customIntervalTree                = new IntervalTree<CustomInterval>();
-            _suppIntervalTree                  = new IntervalTree<SupplementaryInterval>();
-            OverlappingTranscripts             = new List<Transcript>();
-            OverlappingCustomIntervals         = new List<CustomInterval>();
-            OverlappingRegulatoryFeatures      = new List<RegulatoryFeature>();
-            OverlappingGenes                   = new List<Gene>();
-            _overlappingSupplementaryIntervals = new List<SupplementaryInterval>();
-            _knownReferenceSequences           = refSeqsToPaths ?? new Dictionary<string, string>();
-            _useOnlyCanonicalTranscripts       = useOnlyCanonicalTranscripts;
-            _supplementaryAnnotationDir        = supplementaryAnnotationDir;
-            _customAnnotationDirs              = customAnnotationDirs;
-            _customIntervalDirs                = customIntervalDirs;
-            _customAnnotationReaders           = new List<SupplementaryAnnotationReader>();
+            OverlappingTranscripts          = new List<Transcript>();
+            OverlappingRegulatoryFeatures   = new List<RegulatoryElement>();
+            OverlappingGeneSymbols          = new HashSet<string>();
+            PartialOverlappingGeneHashCodes = new HashSet<int>();
 
-            _compressedSequence = AnnotationLoader.Instance.CompressedSequence;
-            _performanceMetrics = PerformanceMetrics.Instance;
+            _omimGeneLookup      = null;
+            _affectedGeneSymbols = new HashSet<string>();
+            _aminoAcids          = new AminoAcids();
+            _vid                 = new VID();
 
-            AnnotationLoader.Instance.Changed += LoadData;
+            // create omim database dictionary
+            var omimDatabaseReader = OmimDatabaseCommon.GetOmimDatabaseReader(saDir);
+            _hasOmimAnnotations = omimDatabaseReader != null;
+            _omimGeneLookup = _hasOmimAnnotations ? OmimDatabaseCommon.CreateGeneMapLookup(omimDatabaseReader) : null;
+            if (omimDatabaseReader != null) _dataSourceVersions.Add(omimDatabaseReader.DataVersion);
+
+            _compressedSequence = new CompressedSequence();
+            var compressedSequenceReader = new CompressedSequenceReader(streams.CompressedSequence, _compressedSequence);
+            _dataFileManager = new DataFileManager(compressedSequenceReader, _compressedSequence);
+            _dataFileManager.Changed += LoadData;
+
+            //_transcriptCache = LoadTranscriptCache(streams.Transcript, _compressedSequence.Renamer.NumRefSeqs,
+            //    out _transcriptIntervalForest, out _regulatoryIntervalForest, out _geneIntervalForest);
+
+	        _transcriptCache = InitiateCache(streams.Transcript);
+
+            _siftReader              = streams.Sift != null ? new PredictionCacheReader(streams.Sift) : null;
+            _polyPhenReader          = streams.PolyPhen != null ? new PredictionCacheReader(streams.PolyPhen) : null;
+
+            _customAnnotationProvider = caProvider;
+            _customIntervalProvider   = ciProvider;
+            _saProvider               = saProvider;
+			_conservationScoreReader  = conservationScoreReader;
+
+			LoadDataSourceVersions();
+            CheckGenomeAssemblies();
+
+			LoadTranscriptCache(_transcriptCache, _compressedSequence.Renamer.NumRefSeqs, out _transcriptIntervalForest, out _regulatoryIntervalForest);
+
+			_performanceMetrics = PerformanceMetrics.Instance;
         }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public NirvanaAnnotationSource(IAnnotatorPaths annotatorPaths) : this(annotatorPaths.SupplementaryAnnotation, null, false, annotatorPaths.CustomAnnotation, annotatorPaths.CustomIntervals)
+        private void CheckGenomeAssemblies()
         {
-            _performanceMetrics = PerformanceMetrics.Instance;
+            var assemblies = new HashSet<GenomeAssembly> {_compressedSequence.GenomeAssembly};
+            if (_transcriptCache          != null) assemblies.Add(_transcriptCache.GenomeAssembly);
+            if (_siftCache                != null) assemblies.Add(_siftCache.GenomeAssembly);
+            if (_polyPhenCache            != null) assemblies.Add(_polyPhenCache.GenomeAssembly);
+            if (_saProvider               != null) assemblies.Add(_saProvider.GenomeAssembly);
+            if (_customAnnotationProvider != null) assemblies.Add(_customAnnotationProvider.GenomeAssembly);
+            if (_customIntervalProvider   != null) assemblies.Add(_customIntervalProvider.GenomeAssembly);
+            if (_conservationScoreReader  != null) assemblies.Add(_conservationScoreReader.GenomeAssembly);
 
-            _dataSourceVersions = new List<DataSourceVersion>();
-            CacheDirectory cacheDirectory;
-            SupplementaryAnnotationDirectory saDirectory;
-
-	        var observedGenomeAssemblies = new HashSet<GenomeAssembly>();
-
-			NirvanaDatabaseCommon.CheckDirectoryIntegrity(annotatorPaths.Cache, _dataSourceVersions, out cacheDirectory);
-	        observedGenomeAssemblies.Add(cacheDirectory.GenomeAssembly);
-
-	        PhylopDirectory phylopDirectory;
-            PhylopCommon.CheckDirectoryIntegrity(annotatorPaths.SupplementaryAnnotation, _dataSourceVersions, out phylopDirectory);
-
-	        if (phylopDirectory != null)
-		        observedGenomeAssemblies.Add(phylopDirectory.GenomeAssembly);
-
-            SupplementaryAnnotationCommon.CheckDirectoryIntegrity(annotatorPaths.SupplementaryAnnotation, _dataSourceVersions, out saDirectory);
-
-			if (saDirectory?.GenomeAssembly != null) observedGenomeAssemblies.Add(saDirectory.GenomeAssembly);
-
-			foreach (var caPath in annotatorPaths.CustomAnnotation)
+			//todo: temp fix, needs rethinking
+			// the mockSAprovider or any mock provider has GenomeAssembly set to unknown by default. That is why the unit tests are failing.
+			//I will temporarily remove unknown.
+	        assemblies.Remove(GenomeAssembly.Unknown);
+            if (assemblies.Count > 1)
             {
-                SupplementaryAnnotationCommon.CheckDirectoryIntegrity(caPath, _dataSourceVersions, out saDirectory);
+                throw new UserErrorException("Found more than one genome assembly represented in the selected data sources.");
             }
-
-	        if (saDirectory?.GenomeAssembly != null) observedGenomeAssemblies.Add(saDirectory.GenomeAssembly);
-			
-
-            ushort saDataVersion = saDirectory?.DataVersion ?? 0;
-            _nirvanaDataVersion = cacheDirectory.GetVepVersion(saDataVersion);
-
-            _knownReferenceSequences = cacheDirectory.RefSeqsToPaths;
-			AnnotationLoader.Instance.Clear();
-            AnnotationLoader.Instance.LoadCompressedSequence(annotatorPaths.CompressedReference);
-
-	        observedGenomeAssemblies.Add(AnnotationLoader.Instance.GenomeAssembly);
-
-	        if (observedGenomeAssemblies.Count > 1)
-	        {
-		        throw new UserErrorException("Found more than one genome assemblies from the input ref cache,sa or phylop");
-	        }
-
         }
 
-        public IEnumerable<IDataSourceVersion> GetDataSourceVersions()
+        private void LoadDataSourceVersions()
+        {
+            if (_transcriptCache          != null) _dataSourceVersions.AddRange(_transcriptCache.DataSourceVersions);
+            if (_saProvider               != null) _dataSourceVersions.AddRange(_saProvider.DataSourceVersions);
+            if (_customAnnotationProvider != null) _dataSourceVersions.AddRange(_customAnnotationProvider.DataSourceVersions);
+            if (_customIntervalProvider   != null) _dataSourceVersions.AddRange(_customIntervalProvider.DataSourceVersions);
+            if (_conservationScoreReader  != null) _dataSourceVersions.AddRange(_conservationScoreReader.DataSourceVersions);
+        }
+
+        /// <summary>
+        /// loads the transcript cache
+        /// </summary>
+        //private static GlobalCache LoadTranscriptCache(Stream stream, int numRefSeqs,
+        //    out IIntervalForest<Transcript> transcriptIntervalForest,
+        //    out IIntervalForest<RegulatoryElement> regulatoryIntervalForest,
+        //    out IIntervalForest<Gene> geneIntervalForest)
+        //{
+        //    GlobalCache cache;
+        //    using (var reader = new GlobalCacheReader(stream)) cache = reader.Read();
+
+        //    transcriptIntervalForest = IntervalArrayFactory.CreateIntervalForest(cache.Transcripts, numRefSeqs);
+        //    regulatoryIntervalForest = IntervalArrayFactory.CreateIntervalForest(cache.RegulatoryElements, numRefSeqs);
+        //    geneIntervalForest       = IntervalArrayFactory.CreateIntervalForest(cache.Genes, numRefSeqs);
+
+        //    return cache;
+        //}
+
+	    private static GlobalCache InitiateCache(Stream stream)
+	    {
+			GlobalCache cache;
+			using (var reader = new GlobalCacheReader(stream)) cache = reader.Read();
+
+		    return cache;
+	    }
+
+		private static void LoadTranscriptCache(GlobalCache cache, int numRefSeqs,
+		    out IIntervalForest<Transcript> transcriptIntervalForest,
+		    out IIntervalForest<RegulatoryElement> regulatoryIntervalForest)
+	    {
+			transcriptIntervalForest = IntervalArrayFactory.CreateIntervalForest(cache.Transcripts, numRefSeqs);
+			regulatoryIntervalForest = IntervalArrayFactory.CreateIntervalForest(cache.RegulatoryElements, numRefSeqs);			
+		}
+
+	    public IEnumerable<IDataSourceVersion> GetDataSourceVersions()
         {
             return _dataSourceVersions;
         }
 
-        internal void SetSupplementaryAnnotationReader(SupplementaryAnnotationReader saReader)
+        public string GetGenomeAssembly()
         {
-            _hasSupplementaryAnnotations = true;
-            _supplementaryAnnotationReader = saReader;
-
-            var suppIntervals = saReader.GetSupplementaryIntervals();
-            if (suppIntervals == null) return;
-
-            foreach (var interval in suppIntervals)
-            {
-                _suppIntervalTree.Add(new IntervalTree<SupplementaryInterval>.Interval(interval.ReferenceName, interval.Start, interval.End, interval));
-            }
+            return _transcriptCache.Header.GenomeAssembly.ToString();
         }
 
-        internal void SetCustomAnnotationReader(List<SupplementaryAnnotationReader> caReaders)
+        public void AddGeneLevelAnnotation( List<string> annotatedGenes)
         {
-            _hasCustomAnnotations = true;
-            _customAnnotationReaders = caReaders;
+            if (!_hasOmimAnnotations) return;
+            annotatedGenes.AddRange(from gene in AffectedGeneSymbols where _omimGeneLookup.Contains(gene) from annotation in _omimGeneLookup[gene] select annotation.ToString());
         }
 
         /// <summary>
@@ -187,19 +225,19 @@ namespace VariantAnnotation.AnnotationSources
             var altAllele = ta.AlternateAllele;
 
             // flanking distance doesn't seem to exhaustively use distance like distanceToVariant
-            int flankingDistance = Math.Min(Math.Abs(transcript.Start - altAllele.ReferenceEnd),
-                Math.Abs(transcript.End - altAllele.ReferenceBegin));
+            var flankingDistance = Math.Min(Math.Abs(transcript.Start - altAllele.End),
+                Math.Abs(transcript.End - altAllele.Start));
 
             if (flankingDistance > FlankingLength) return;
 
             // figure out if we should label this as a downstream or upstream transcript
-            bool isDownstream = altAllele.ReferenceEnd < transcript.Start == transcript.OnReverseStrand;
+            var isDownstream = altAllele.End < transcript.Start == transcript.Gene.OnReverseStrand;
 
             // determine the cDNA position                        
-            CdnaMapper.MapCoordinates(altAllele.ReferenceBegin, altAllele.ReferenceEnd, ta, transcript);
+            CdnaMapper.MapCoordinates(altAllele.Start, altAllele.End, ta, transcript);
 
             // set the functional consequence
-            var consequence = new Consequences(new VariantEffect(ta, transcript,variant.InternalCopyNumberType));
+            var consequence = new Consequences(new VariantEffect(ta, transcript, variant.InternalCopyNumberType));
             consequence.DetermineFlankingVariantEffects(isDownstream, variant.InternalCopyNumberType);
 
             _json.AddFlankingTranscript(transcript, ta, consequence.GetConsequenceStrings());
@@ -214,7 +252,7 @@ namespace VariantAnnotation.AnnotationSources
             foreach (var transcript in OverlappingTranscripts)
             {
                 var overlapInterval = new AnnotationInterval(transcript.Start - FlankingLength, transcript.End + FlankingLength);
-                if (variant.AlternateAlleles.Any(altAllele => overlapInterval.Overlaps(altAllele.ReferenceBegin, altAllele.ReferenceEnd))) return true;
+                if (variant.AlternateAlleles.Any(altAllele => overlapInterval.Overlaps(altAllele.Start, altAllele.End))) return true;
             }
 
             return false;
@@ -224,7 +262,7 @@ namespace VariantAnnotation.AnnotationSources
         /// </summary>
         public static string GetVersion()
         {
-            return "Nirvana " + CommandLineUtilities.Version;
+            return "Illumina Annotation Engine " + CommandLineUtilities.Version;
         }
 
         private static void AddConservationScore(ref string varConservationScore, string altConservationScore)
@@ -235,10 +273,8 @@ namespace VariantAnnotation.AnnotationSources
                 return;
             }
 
-            if (altConservationScore == null)
-                varConservationScore += ",.";
-            else
-                varConservationScore += "," + altConservationScore;
+            if (altConservationScore == null) varConservationScore += ",.";
+            else varConservationScore += "," + altConservationScore;
         }
 
         /// <summary>
@@ -247,13 +283,22 @@ namespace VariantAnnotation.AnnotationSources
         public IAnnotatedVariant Annotate(IVariant variant)
         {
             if (variant == null) return null;
-            var variantFeature = new VariantFeature(variant as VcfVariant, _enableReferenceNoCalls, _limitReferenceNoCallsToTranscripts, TranscriptIntervalTree);
 
+            var variantFeature = new VariantFeature(variant as VcfVariant, _compressedSequence.Renamer, _vid);
+
+            // load the reference sequence
+            _dataFileManager.LoadReference(variantFeature.ReferenceIndex, ClearDataSources, _performanceMetrics);
+
+            // handle ref no-calls and assign the alternate alleles
+            if (_enableReferenceNoCalls) ReferenceNoCall.Check(variantFeature, _limitReferenceNoCallsToTranscripts, _transcriptIntervalForest);
+            variantFeature.AssignAlternateAlleles();
+
+            // annotate the variant
             _json = new UnifiedJson(variantFeature);
 
-            if (_useAnnotationLoader) AnnotationLoader.Instance.Load(variantFeature.UcscReferenceName);
-
             Annotate(variantFeature);
+
+            RunPlugins(variantFeature);
 
             _performanceMetrics.Increment();
 
@@ -267,63 +312,41 @@ namespace VariantAnnotation.AnnotationSources
         {
             if (variant.IsReference && !variant.IsSingletonRefSite && !variant.IsRefNoCall) return;
 
-            if ((variant.IsReference && !variant.IsSingletonRefSite && variant.IsRefNoCall) ||
-                (variant.UcscReferenceName == "chrM" && !_enableMitochondrialAnnotation))
+            if (variant.IsReference && !variant.IsSingletonRefSite && variant.IsRefNoCall ||
+                variant.UcscReferenceName == "chrM" && !_enableMitochondrialAnnotation)
             {
                 _json.AddVariantData(variant);
                 return;
             }
 
             // retrieve the supplementary annotations
-            if (_hasSupplementaryAnnotations)
+            _saProvider?.AddAnnotation(variant);
+
+            // return if this is not a ref but not ref minor
+            if (variant.IsReference && !variant.IsRefMinor)
             {
-                // get overlapping supplementary intervals.
-                _overlappingSupplementaryIntervals.Clear();
-
-                if (variant.IsStructuralVariant)
-                {
-                    var variantBegin = variant.AlternateAlleles[0].NirvanaVariantType == VariantType.insertion
-                        ? variant.AlternateAlleles[0].ReferenceEnd
-                        : variant.AlternateAlleles[0].ReferenceBegin;
-                    var variantEnd = variant.AlternateAlleles[0].ReferenceEnd;
-                    var suppInterval = new IntervalTree<SupplementaryInterval>.Interval(variant.EnsemblReferenceName,
-                        variantBegin, variantEnd);
-                    _suppIntervalTree.GetAllOverlappingValues(suppInterval, _overlappingSupplementaryIntervals);
-
-                    variant.AddSupplementaryIntervals(_overlappingSupplementaryIntervals);
-                }
-                else variant.SetSupplementaryAnnotation(_supplementaryAnnotationReader);
-            }
-		
-			// return if this is not a ref but not ref minor
-			if (variant.IsReference && !variant.IsRefMinor)
-			{
-				_json.AddVariantData(variant);
-				return;
-			}
-
-
-
-			if (_hasCustomAnnotations) variant.AddCustomAnnotation(_customAnnotationReaders);
-
-			AssignConservationScores(variant);
-			AssignCytogeneticBand(variant);
-			AssignConservationScores(variant);
-			// grab overlapping custom intervals
-			GetCustomIntervals(variant);
-
-			_json.AddVariantData(variant);
-
-          
-			AddRegulatoryFeatures(variant);
-
-			// add overlapping genes for CNV or SVs
-			if (variant.IsStructuralVariant)
-            {
-                ExtractTanscriptsForCnv(variant);
+                _json.AddVariantData(variant);
                 return;
             }
 
+            _customAnnotationProvider?.AddAnnotation(variant);
+            _customIntervalProvider?.AddAnnotation(variant);
+
+            AssignConservationScores(variant);
+            _dataFileManager.AssignCytogeneticBand(variant);
+            AssignConservationScores(variant);
+
+            _json.AddVariantData(variant);
+
+            AddRegulatoryFeatures(variant);
+
+            // add overlapping genes for CNV or SVs
+            if (variant.IsStructuralVariant)
+            {
+                AnnotateTanscriptsForSv(variant);
+                return;
+            }
+	        
             GetOverlappingTranscripts(variant);
 
             // handle intergenic variants
@@ -334,10 +357,12 @@ namespace VariantAnnotation.AnnotationSources
             }
 
             // check each allele to see if it is a genomic duplicate
-            if (_compressedSequence != null) variant.CheckForGenomicDuplicates();
+            if (_compressedSequence != null) variant.CheckForGenomicDuplicates(_compressedSequence);
 
             // setting the protein coding scheme 
-            AminoAcids.CodonConversionScheme = variant.UcscReferenceName == "chrM" ? AminoAcids.CodonConversion.HumanMitochondria : AminoAcids.CodonConversion.HumanChromosome;
+            _aminoAcids.CodonConversionScheme = variant.UcscReferenceName == "chrM"
+                ? AminoAcids.CodonConversion.HumanMitochondria
+                : AminoAcids.CodonConversion.HumanChromosome;
 
             foreach (var transcript in OverlappingTranscripts)
             {
@@ -345,73 +370,111 @@ namespace VariantAnnotation.AnnotationSources
             }
         }
 
-        private void ExtractTanscriptsForCnv(VariantFeature variant)
+        private void RunPlugins(IVariantFeature variant)
         {
-            GetOverlappingGenes(variant);
+            foreach (var plugin in _plugins)
+            {
+                plugin.AnnotateVariant(variant, OverlappingTranscripts, _json, _compressedSequence);
+            }
+        }
 
-            if (OverlappingGenes.Count <= 0) return;
+        private static List<BreakendTranscriptAnnotation> AnnotateBreakendTranscripts(List<Transcript> transcripts,
+            int pos, char orientation)
+        {
+            if (transcripts == null || transcripts.Count == 0) return null;
+            var res = new List<BreakendTranscriptAnnotation>();
+
+            foreach (var transcript in transcripts)
+            {
+                var annotation = new BreakendTranscriptAnnotation(transcript, pos, orientation);
+                res.Add(annotation);
+            }
+
+            return res;
+        }
+
+        private void AnnotateTanscriptsForSv(VariantFeature variant)
+        {
+            _transcriptIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex, variant.AlternateAlleles[0].Start,
+                variant.AlternateAlleles[0].End, OverlappingTranscripts);
+            if (OverlappingTranscripts.Count == 0) return;
+
+            FindOverlappingGenes(variant);
 
             foreach (var altAllele in variant.AlternateAlleles)
             {
-                _json.AddOverlappingGenes(OverlappingGenes, altAllele);
+                _json.AddOverlappingGenes(OverlappingGeneSymbols, altAllele);
+                if (!_reportAllSvOverlappingTranscripts) continue;
+
+                foreach (var transcript in OverlappingTranscripts)
+                {
+                    _json.AddOverlappingTranscript(transcript, altAllele);
+                }
             }
 
-            // get transcripts for partial overlap genes
-            OverlappingTranscripts.Clear();
-
-            var partialOverlappingGenes = new HashSet<Tuple<string, int, int>>();
-            foreach (var gene in OverlappingGenes.Where(gene => !InternalGene(gene, variant)))
+            foreach (var transcript in OverlappingTranscripts)
             {
-                partialOverlappingGenes.Add(Tuple.Create(gene.Symbol, gene.Start, gene.End));
-            }
-            var transcriptInterval = new IntervalTree<Transcript>.Interval(variant.UcscReferenceName,
-                variant.AlternateAlleles[0].ReferenceBegin, variant.AlternateAlleles[0].ReferenceEnd);
-            TranscriptIntervalTree.GetAllOverlappingValues(transcriptInterval, OverlappingTranscripts);
-
-            foreach (Transcript transcript in OverlappingTranscripts.Where(transcript => partialOverlappingGenes.Contains(Tuple.Create(transcript.GeneSymbol, transcript.GeneStart, transcript.GeneEnd))))
-            {
+                if (!PartialOverlappingGeneHashCodes.Contains(transcript.Gene.GetHashCode())) continue;
                 AddTranscriptToVariant(variant, transcript);
             }
         }
 
+        private List<BreakendTranscriptAnnotation> AnnotatePos2Transcripts(BreakEnd breakendAllele)
+        {
+            if (breakendAllele == null) return null;
+
+            List<BreakendTranscriptAnnotation> breakendTas = null;
+
+            var pos2OverlappingTranscripts = new List<Transcript>();
+
+            _transcriptIntervalForest.GetAllOverlappingValues(breakendAllele.ReferenceIndex2, breakendAllele.Position2,
+                breakendAllele.Position2, pos2OverlappingTranscripts);
+
+            if (pos2OverlappingTranscripts.Count != 0)
+                breakendTas = AnnotateBreakendTranscripts(pos2OverlappingTranscripts, breakendAllele.Position2,
+                    breakendAllele.IsSuffix2);
+
+            return breakendTas;
+        }
+
         private void AddTranscriptToVariant(VariantFeature variant, Transcript transcript)
         {
-            // skip non-canonical transcripts in some cases
-            if (_useOnlyCanonicalTranscripts && !transcript.IsCanonical) return;
-
-            // evaluate each alternate allele
-            // Parallel.ForEach(variant.AlternateAlleles, altAllele =>
-            //{
-            //    AnnotateAltAllele(variant, altAllele, transcript);
-            //});
-
             foreach (var altAllele in variant.AlternateAlleles)
             {
                 AnnotateAltAllele(variant, altAllele, transcript);
             }
         }
 
-        private static bool InternalGene(Gene gene, VariantFeature variant)
+        private static bool IsInternalGene(Gene gene, VariantFeature variant)
         {
-            if (gene.Start >= variant.AlternateAlleles[0].ReferenceBegin && gene.End <= variant.AlternateAlleles[0].ReferenceEnd) return true;
-            return false;
+	        return gene.Start >= variant.AlternateAlleles[0].Start && gene.End <= variant.AlternateAlleles[0].End;
         }
 
-        private void GetOverlappingGenes(VariantFeature variant)
+        private void FindOverlappingGenes(VariantFeature variant)
         {
-            // cosidering the start base for CNV/SV is one base after VcfReferenceStart/OverlapReferenceStart
-            OverlappingGenes.Clear();
-            var geneInterval = new IntervalTree<Gene>.Interval(variant.UcscReferenceName, variant.AlternateAlleles[0].ReferenceBegin, variant.AlternateAlleles[0].ReferenceEnd);
-            _geneIntervalTree.GetAllOverlappingValues(geneInterval, OverlappingGenes);
+            // considering the start base for CNV/SV is one base after VcfReferenceStart/OverlapReferenceStart
+            _transcriptIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex, variant.AlternateAlleles[0].Start,
+                variant.AlternateAlleles[0].End, OverlappingTranscripts);
+
+            var overlappingGenes = new HashSet<Gene>();
+            foreach (var transcript in OverlappingTranscripts) overlappingGenes.Add(transcript.Gene);
+
+            OverlappingGeneSymbols.Clear();
+            PartialOverlappingGeneHashCodes.Clear();
+
+            foreach (var gene in overlappingGenes)
+            {
+                OverlappingGeneSymbols.Add(gene.Symbol);
+                _affectedGeneSymbols.Add(gene.Symbol);
+                if (!IsInternalGene(gene, variant)) PartialOverlappingGeneHashCodes.Add(gene.GetHashCode());
+            }
         }
+
         private void GetOverlappingTranscripts(VariantFeature variant)
         {
-            OverlappingTranscripts.Clear();
-
-            // grab the overlapping transcripts (including non-overlapping upstream and downstream)
-            var transcriptInterval = new IntervalTree<Transcript>.Interval(variant.UcscReferenceName,
-                variant.OverlapReferenceBegin - FlankingLength, variant.OverlapReferenceEnd + FlankingLength);
-            TranscriptIntervalTree.GetAllOverlappingValues(transcriptInterval, OverlappingTranscripts);
+            _transcriptIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex,
+                variant.OverlapReferenceBegin - FlankingLength, variant.OverlapReferenceEnd + FlankingLength,
+                OverlappingTranscripts);
         }
 
         private void AnnotateAltAllele(VariantFeature variant, VariantAlternateAllele altAllele, Transcript transcript)
@@ -419,49 +482,62 @@ namespace VariantAnnotation.AnnotationSources
             var ta = new TranscriptAnnotation
             {
                 AlternateAllele = altAllele,
-                HasValidCdnaCodingStart = transcript.CompDnaCodingStart > 0,
+                HasValidCdnaCodingStart = false,
                 HasValidCdsStart = false
             };
 
-            GetAnnotationBeforeHgvs(transcript, ta, altAllele);
+            if (transcript.Translation != null)
+            {
+                ta.HasValidCdnaCodingStart = transcript.Translation.CodingRegion.CdnaStart > 0;
+            }
+
+            MapCdnaCoordinates(transcript, ta, altAllele);
             _json.CreateAnnotationObject(transcript, altAllele);
 
             // handle upstream or downstream transcripts
-            if (!transcript.Overlaps(altAllele.ReferenceBegin, altAllele.ReferenceEnd))
+            if (!Overlap.Partial(transcript.Start, transcript.End, altAllele.Start, altAllele.End))
             {
                 AddFlankingTranscript(ta, variant, transcript);
                 return;
             }
 
+            // added transcript gene to the annotated gene list
+            _affectedGeneSymbols.Add(transcript.Gene.Symbol);
+
             string exonNumber;
             string intronNumber;
-            transcript.ExonIntronNumber(ta, out exonNumber, out intronNumber);
+            TranscriptUtilities.ExonIntronNumber(transcript.CdnaMaps, transcript.Introns,
+                transcript.Gene.OnReverseStrand, ta, out exonNumber, out intronNumber);
 
             // generate new TranscriptAnnotation for Hgvs
             // transcript 3 prime shift
-            bool shiftToEnd = false;
+            var shiftToEnd = false;
             var altAlleleAfterRotating = CodingSequenceRotate3Prime(altAllele, transcript, ref shiftToEnd);
 
-            bool isGenomicDuplicateAfterRotating =
-                altAlleleAfterRotating.CheckForDuplicationForAltAlleleWithinTranscript(transcript);
+            var isGenomicDuplicateAfterRotating =
+                altAlleleAfterRotating.CheckForDuplicationForAltAlleleWithinTranscript(_compressedSequence, transcript);
 
             var taForHgvs = new TranscriptAnnotation
             {
-                AlternateAllele = altAlleleAfterRotating,
-                HasValidCdnaCodingStart = transcript.CompDnaCodingStart > 0,
-                HasValidCdsStart = false
+                AlternateAllele         = altAlleleAfterRotating,
+                HasValidCdnaCodingStart = false,
+                HasValidCdsStart        = false
             };
 
-            GetAnnotationBeforeHgvs(transcript, taForHgvs, altAlleleAfterRotating);
+            if (transcript.Translation != null)
+            {
+                taForHgvs.HasValidCdnaCodingStart = transcript.Translation.CodingRegion.CdnaStart > 0;
+            }
 
-            GetCodingAnnotations(transcript, ta, taForHgvs);
-
+            MapCdnaCoordinates(transcript, taForHgvs, altAlleleAfterRotating);
+            GetCodingAnnotations(transcript, ta, taForHgvs, _compressedSequence);
             AssignHgvsNotations(variant, altAllele, transcript, shiftToEnd, taForHgvs, isGenomicDuplicateAfterRotating, ta);
-
             GetSiftPolyphen(variant, altAllele, transcript, ta);
 
+	        AnnotateBreakends(altAllele, transcript, ta);
+
             // exon overlap-specific CSQ tags
-            _json.AddExonData(ta, exonNumber);
+            _json.AddExonData(ta, exonNumber,altAllele.IsStructuralVariant);
 
             // intronic annotations
             IntronicAnnotation(variant, altAllele, transcript, ta, intronNumber, taForHgvs, isGenomicDuplicateAfterRotating);
@@ -471,6 +547,38 @@ namespace VariantAnnotation.AnnotationSources
             consequence.DetermineVariantEffects(variant.InternalCopyNumberType);
 
             _json.FinalizeAndAddAnnotationObject(transcript, ta, consequence.GetConsequenceStrings());
+        }
+
+        private void AnnotateBreakends(VariantAlternateAllele altAllele, Transcript transcript,
+            TranscriptAnnotation ta)
+        {
+            if (altAllele.BreakEnds == null || transcript.Translation == null || altAllele.BreakEnds.Count <= 0) return;
+
+            ta.GeneFusionAnnotations = new List<GeneFusionAnnotation>();
+
+            foreach (var breakend in altAllele.BreakEnds)
+            {
+                if (breakend.Position < transcript.Translation.CodingRegion.GenomicStart ||
+                    breakend.Position > transcript.Translation.CodingRegion.GenomicEnd) continue;
+
+                var pos1Annotation = new BreakendTranscriptAnnotation(transcript, breakend.Position,
+                    breakend.IsSuffix);
+                var pos2Annotations = AnnotatePos2Transcripts(breakend);
+                ta.BreakendTranscriptAnnotation = pos1Annotation;
+                ta.BreakendPos2Annotations = pos2Annotations;
+                var variantEffect = new VariantEffect(ta, transcript);
+
+                if (!variantEffect.IsGeneFusion()) continue;
+
+                var geneFusion = new GeneFusionAnnotation(pos1Annotation);
+
+                foreach (var annotation in pos2Annotations)
+                {
+                    geneFusion.AddGeneFusion(annotation);
+                }
+
+                ta.GeneFusionAnnotations.Add(geneFusion);
+            }
         }
 
         private void IntronicAnnotation(VariantFeature variant, VariantAlternateAllele altAllele, Transcript transcript,
@@ -487,7 +595,8 @@ namespace VariantAnnotation.AnnotationSources
                 if (!altAllele.IsStructuralVariant && !altAllele.AlternateAllele.Contains("N"))
                 {
                     // set our HGVS nomenclature only if its not a SV
-                    var hgvsCoding = new HgvsCodingNomenclature(taForHgvs, transcript, variant, isGenomicDuplicateAfterRotating);
+                    var hgvsCoding = new HgvsCodingNomenclature(taForHgvs, transcript, variant, _compressedSequence,
+                        isGenomicDuplicateAfterRotating);
                     hgvsCoding.SetAnnotation();
                 }
             }
@@ -497,19 +606,25 @@ namespace VariantAnnotation.AnnotationSources
         private void GetSiftPolyphen(VariantFeature variant, VariantAlternateAllele altAllele, Transcript transcript,
             TranscriptAnnotation ta)
         {
-            if (!ta.HasValidCdnaStart && !ta.HasValidCdnaEnd) return;
-            // the protein begin and end ought to be set by now if they are to be. If it involves only 1 AA change, we will extract sift and polyphen annotation
-            if ((altAllele.VepVariantType == VariantType.SNV || altAllele.VepVariantType == VariantType.MNV) &&
-                ta.AlternateAminoAcids != null
-                && ta.ProteinBegin == ta.ProteinEnd)
-            {
-                variant.SiftPrediction = null;
-                variant.PolyPhenPrediction = null;
+            // TODO: We really should move this to TranscriptAnnotation
+            variant.SiftPrediction     = null;
+            variant.PolyPhenPrediction = null;
 
-                transcript.Sift?.GetPrediction(ta.AlternateAminoAcids[0], ta.ProteinBegin, out variant.SiftPrediction,
-                    out variant.SiftScore);
-                transcript.PolyPhen?.GetPrediction(ta.AlternateAminoAcids[0], ta.ProteinBegin, out variant.PolyPhenPrediction,
-                    out variant.PolyPhenScore);
+            if (!ta.HasValidCdnaStart && !ta.HasValidCdnaEnd) return;
+
+            // the protein begin and end ought to be set by now if they are to be. If it involves only 1 AA change, 
+            // we will extract sift and polyphen annotation
+            if ((altAllele.VepVariantType == VariantType.SNV || altAllele.VepVariantType == VariantType.MNV) &&
+                ta.AlternateAminoAcids != null && ta.ProteinBegin == ta.ProteinEnd)
+            {
+                if (transcript.SiftIndex != -1)
+                    GetProteinFunctionPrediction(_siftCache, transcript.SiftIndex, ta.AlternateAminoAcids[0],
+                        ta.ProteinBegin, Sift.Descriptions, out variant.SiftPrediction, out variant.SiftScore);
+
+                if (transcript.PolyPhenIndex != -1)
+                    GetProteinFunctionPrediction(_polyPhenCache, transcript.PolyPhenIndex, ta.AlternateAminoAcids[0],
+                        ta.ProteinBegin, PolyPhen.Descriptions, out variant.PolyPhenPrediction,
+                        out variant.PolyPhenScore);
 
                 if (variant.SiftPrediction != null || variant.PolyPhenPrediction != null)
                 {
@@ -518,42 +633,68 @@ namespace VariantAnnotation.AnnotationSources
             }
         }
 
-        private static void AssignHgvsNotations(VariantFeature variant, VariantAlternateAllele altAllele, Transcript transcript,
+        private static void GetProteinFunctionPrediction(PredictionCache cache, int predictionIndex, char newAminoAcid,
+            int aaPosition, string[] descriptions, out string description, out string score)
+        {
+			//todo: remove this block. It is a temp fix to make nirvana run without crashing on sift/polyphen
+	        //if (predictionIndex >= cache.PredictionCount)
+	        //{
+		       // description = null;
+		       // score = null;
+		       // return;
+	        //}
+	        var entry = cache.Predictions[predictionIndex].GetPrediction(newAminoAcid, aaPosition);
+
+            if (entry == null)
+            {
+                description = null;
+                score       = null;
+                return;
+            }
+
+            description = descriptions[entry.EnumIndex];
+            score       = entry.Score.ToString("0.###");
+        }
+
+        private void AssignHgvsNotations(VariantFeature variant, VariantAlternateAllele altAllele, Transcript transcript,
             bool shiftToEnd, TranscriptAnnotation taForHgvs, bool isGenomicDuplicateAfterRotating, TranscriptAnnotation ta)
         {
             if (!altAllele.IsStructuralVariant && !altAllele.AlternateAllele.Contains("N") && !shiftToEnd)
             {
                 if (taForHgvs.HasValidCdnaStart && taForHgvs.HasValidCdnaEnd)
                 {
-                    var hgvsCoding = new HgvsCodingNomenclature(taForHgvs, transcript, variant, isGenomicDuplicateAfterRotating);
+                    var hgvsCoding = new HgvsCodingNomenclature(taForHgvs, transcript, variant, _compressedSequence,
+                        isGenomicDuplicateAfterRotating);
                     hgvsCoding.SetAnnotation();
                 }
 
                 if (taForHgvs.HasValidCdsStart && taForHgvs.HasValidCdsEnd)
                 {
-                    var variantEffect = new VariantEffect(taForHgvs, transcript,variant.InternalCopyNumberType);
-                    var hgvsProtein = new HgvsProteinNomenclature(variantEffect, taForHgvs, transcript, variant);
+                    var variantEffect = new VariantEffect(taForHgvs, transcript, variant.InternalCopyNumberType);
+                    var hgvsProtein = new HgvsProteinNomenclature(variantEffect, taForHgvs, transcript, variant,
+                        _compressedSequence, _aminoAcids);
                     hgvsProtein.SetAnnotation();
                 }
             }
 
-            ta.HgvsCodingSequenceName = taForHgvs.HgvsCodingSequenceName;
+            ta.HgvsCodingSequenceName  = taForHgvs.HgvsCodingSequenceName;
             ta.HgvsProteinSequenceName = taForHgvs.HgvsProteinSequenceName;
         }
 
-        private static void GetCodingAnnotations(Transcript transcript, TranscriptAnnotation ta, TranscriptAnnotation taForHgvs)
+        private void GetCodingAnnotations(Transcript transcript, TranscriptAnnotation ta,
+            TranscriptAnnotation taForHgvs, ICompressedSequence compressedSequence)
         {
             // coding annotations
-            if (!ta.HasValidCdnaStart && !ta.HasValidCdnaEnd && !taForHgvs.HasValidCdnaEnd && !taForHgvs.HasValidCdnaStart)
-                return;
+            if (transcript.Translation == null ||
+                !ta.HasValidCdnaStart && !ta.HasValidCdnaEnd && !taForHgvs.HasValidCdnaEnd &&
+                !taForHgvs.HasValidCdnaStart) return;
             CalculateCdsPositions(transcript, taForHgvs);
             CalculateCdsPositions(transcript, ta);
 
             // determine the protein position
-            if (!taForHgvs.HasValidCdsStart && !taForHgvs.HasValidCdsEnd && !ta.HasValidCdsStart && !ta.HasValidCdsEnd)
-                return;
-            GetProteinPosition(taForHgvs, transcript);
-            GetProteinPosition(ta, transcript);
+            if (!taForHgvs.HasValidCdsStart && !taForHgvs.HasValidCdsEnd && !ta.HasValidCdsStart && !ta.HasValidCdsEnd) return;
+            GetProteinPosition(taForHgvs, transcript, compressedSequence);
+            GetProteinPosition(ta, transcript, compressedSequence);
         }
 
         private void HandleIntergenicVariant(VariantFeature variant)
@@ -567,25 +708,13 @@ namespace VariantAnnotation.AnnotationSources
             }
         }
 
-        /// <summary>
-        /// assigns the cytogenetic band
-        /// </summary>
-        private static void AssignCytogeneticBand(VariantFeature variant)
-        {
-            var cytogeneticBands = AnnotationLoader.Instance.CytogeneticBands;
-            if (cytogeneticBands == null) return;
-
-            variant.CytogeneticBand = cytogeneticBands.GetCytogeneticBand(variant.EnsemblReferenceName,
-                variant.VcfReferenceBegin, variant.VcfReferenceEnd);
-        }
-
         private void AssignConservationScores(VariantFeature variant)
         {
             // grab the phyloP conservation score (position-specific)
-            bool hasConservationScore = false;
+            var hasConservationScore = false;
 
             // for refMinors with no global major, we shall not create any alt alleles. But we still want the conservation scores
-            if (variant.IsRefMinor && variant.SupplementaryAnnotation.GlobalMajorAllele == null)
+            if (variant.IsRefMinor && variant.SupplementaryAnnotationPosition.GlobalMajorAllele == null)
             {
                 variant.ConservationScore = GetConservationScore(variant.VcfReferenceBegin);
             }
@@ -595,51 +724,35 @@ namespace VariantAnnotation.AnnotationSources
                 // to make sure that the scores set for unit tests are not overwritten.
                 if (altAllele.ConservationScore == null)
                     altAllele.ConservationScore = altAllele.VepVariantType == VariantType.SNV
-                        ? GetConservationScore(altAllele.ReferenceBegin)
+                        ? GetConservationScore(altAllele.Start)
                         : null;
                 if (altAllele.ConservationScore != null) hasConservationScore = true;
             }
 
-            if (hasConservationScore)
-            {
-                foreach (var alternateAllele in variant.AlternateAlleles)
-                {
-                    AddConservationScore(ref variant.ConservationScore, alternateAllele.ConservationScore);
-                }
-            }
+	        if (!hasConservationScore) return;
+	        foreach (var alternateAllele in variant.AlternateAlleles)
+	        {
+		        AddConservationScore(ref variant.ConservationScore, alternateAllele.ConservationScore);
+	        }
         }
 
-        private void GetCustomIntervals(VariantFeature variant)
-        {
-            if (!_hasCustomIntervals) return;
-
-            OverlappingCustomIntervals.Clear();
-            var customInterval = new IntervalTree<CustomInterval>.Interval(variant.UcscReferenceName,
-                variant.OverlapReferenceBegin, variant.OverlapReferenceEnd);
-            _customIntervalTree.GetAllOverlappingValues(customInterval, OverlappingCustomIntervals);
-
-            if (OverlappingCustomIntervals.Count > 0)
-                foreach (var altAllele in variant.AlternateAlleles)
-                    altAllele.AddCustomIntervals(OverlappingCustomIntervals);
-        }
-
-        private static void GetProteinPosition(TranscriptAnnotation ta, Transcript transcript)
+        private void GetProteinPosition(TranscriptAnnotation ta, Transcript transcript, ICompressedSequence compressedSequence)
         {
             const int shift = 0;
             if (ta.HasValidCdsStart) ta.ProteinBegin = (int)((ta.CodingDnaSequenceBegin + shift + 2.0) / 3.0);
             if (ta.HasValidCdsEnd) ta.ProteinEnd = (int)((ta.CodingDnaSequenceEnd + shift + 2.0) / 3.0);
 
             // assign our codons and amino acids
-            Codons.Assign(ta, transcript);
-            AminoAcids.Assign(ta);
+            Codons.Assign(ta, transcript, compressedSequence);
+            _aminoAcids.Assign(ta);
         }
 
         /// <summary>
         /// Calculates the cDNA coordinates before we evaluate using HGVS criteria
         /// </summary>
-		private static void GetAnnotationBeforeHgvs(Transcript transcript, TranscriptAnnotation ta, VariantAlternateAllele altAllele)
+		private static void MapCdnaCoordinates(Transcript transcript, TranscriptAnnotation ta, VariantAlternateAllele altAllele)
         {
-            if (transcript.OnReverseStrand)
+            if (transcript.Gene.OnReverseStrand)
             {
                 ta.TranscriptReferenceAllele = SequenceUtilities.GetReverseComplement(altAllele.ReferenceAllele);
                 ta.TranscriptAlternateAllele = SequenceUtilities.GetReverseComplement(altAllele.AlternateAllele);
@@ -651,7 +764,7 @@ namespace VariantAnnotation.AnnotationSources
             }
 
             SetIntronEffects(transcript.Introns, ta);
-            CdnaMapper.MapCoordinates(altAllele.ReferenceBegin, altAllele.ReferenceEnd, ta, transcript);
+            CdnaMapper.MapCoordinates(altAllele.Start, altAllele.End, ta, transcript);
         }
 
         /// <summary>
@@ -659,26 +772,28 @@ namespace VariantAnnotation.AnnotationSources
         /// </summary>
         private void AddRegulatoryFeatures(VariantFeature variant)
         {
-            int intervalBegin = 0;
-            int intervalEnd = 0;
+            var intervalBegin = 0;
+            var intervalEnd = 0;
 
             foreach (var altAllele in variant.AlternateAlleles)
             {
                 // In case of insertions, the base(s) are assumed to be inserted at the end position
 
                 // if this is an insertion just before the beginning of the regulatory element, this takes care of it
-                var altBegin = altAllele.NirvanaVariantType == VariantType.insertion ? altAllele.ReferenceEnd : altAllele.ReferenceBegin;
-                var altEnd = altAllele.ReferenceEnd;
+                var altBegin = altAllele.NirvanaVariantType == VariantType.insertion ? altAllele.End : altAllele.Start;
+                var altEnd = altAllele.End;
 
-                if (intervalBegin != altBegin || intervalEnd != altEnd)
+				// disable regulatory region for SV larger than 50kb
+				if (altEnd - altBegin + 1 > 50000) continue;
+
+				if (intervalBegin != altBegin || intervalEnd != altEnd)
                 {
                     intervalBegin = altBegin;
                     intervalEnd = altEnd;
-                    // extract overlapping regulatory regions only if needed
-                    OverlappingRegulatoryFeatures.Clear();
 
-                    var regulatoryInterval = new IntervalTree<RegulatoryFeature>.Interval(variant.UcscReferenceName, intervalBegin, intervalEnd);
-                    _regulatoryIntervalTree.GetAllOverlappingValues(regulatoryInterval, OverlappingRegulatoryFeatures);
+                    // extract overlapping regulatory regions only if needed
+                    _regulatoryIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex, intervalBegin, intervalEnd,
+                        OverlappingRegulatoryFeatures);
                 }
 
                 foreach (var regulatoryFeature in OverlappingRegulatoryFeatures)
@@ -691,7 +806,7 @@ namespace VariantAnnotation.AnnotationSources
 
                     var consequence = new Consequences(null);
                     consequence.DetermineRegulatoryVariantEffects(regulatoryFeature, altAllele.NirvanaVariantType,
-                        altAllele.ReferenceBegin, altAllele.ReferenceEnd, altAllele.IsStructuralVariant,variant.InternalCopyNumberType);
+                        altAllele.Start, altAllele.End, altAllele.IsStructuralVariant, variant.InternalCopyNumberType);
 
                     _json.AddRegulatoryFeature(regulatoryFeature, altAllele, consequence.GetConsequenceStrings());
                 }
@@ -707,8 +822,8 @@ namespace VariantAnnotation.AnnotationSources
             ta.HasValidCdsStart = true;
             ta.HasValidCdsEnd = true;
 
-            if ((ta.BackupCdnaEnd < transcript.CompDnaCodingStart) ||
-                (ta.BackupCdnaBegin > transcript.CompDnaCodingEnd))
+            if (ta.BackupCdnaEnd < transcript.Translation.CodingRegion.CdnaStart ||
+                ta.BackupCdnaBegin > transcript.Translation.CodingRegion.CdnaEnd)
             {
                 // if the variant is completely non overlapping with the transcript's coding start
                 ta.HasValidCdsStart = false;
@@ -717,25 +832,17 @@ namespace VariantAnnotation.AnnotationSources
             }
 
             // calculate the CDS position
-            int posStartExonPhase;
-            if (transcript.StartExon == null)
-            {
-                posStartExonPhase = 0;
-            }
-            else posStartExonPhase = transcript.StartExon.Phase > 0
-                ? transcript.StartExon.Phase
-                : 0;
-
-            int beginOffset = posStartExonPhase - transcript.CompDnaCodingStart + 1;
+            int beginOffset           = transcript.StartExonPhase - transcript.Translation.CodingRegion.CdnaStart + 1;
             ta.CodingDnaSequenceBegin = ta.BackupCdnaBegin + beginOffset;
-            ta.CodingDnaSequenceEnd = ta.BackupCdnaEnd + beginOffset;
+            ta.CodingDnaSequenceEnd   = ta.BackupCdnaEnd + beginOffset;
 
             if (ta.CodingDnaSequenceBegin < 1 || ta.HasValidCdnaStart == false)
             {
                 ta.HasValidCdsStart = false;
             }
-            if ((ta.CodingDnaSequenceEnd > transcript.CompDnaCodingEnd + beginOffset)
-                || ta.HasValidCdnaEnd == false)
+
+            if (ta.CodingDnaSequenceEnd > transcript.Translation.CodingRegion.CdnaEnd + beginOffset ||
+                ta.HasValidCdnaEnd == false)
             {
                 ta.HasValidCdsEnd = false;
             }
@@ -746,7 +853,6 @@ namespace VariantAnnotation.AnnotationSources
         /// </summary>
         private string GetConservationScore(int referencePosition)
         {
-            //return _hasConservationScores ? _conservationScoreReader.GetPhylopScore(referencePosition) : null;
             return _hasConservationScores ? _conservationScoreReader.GetScore(referencePosition) : null;
         }
 
@@ -754,19 +860,19 @@ namespace VariantAnnotation.AnnotationSources
         /// This is a recommissioning of the GetIntronIndex function above.
         /// It also characterize intronic effects [BaseTranscriptVariation.pm:531 _intron_effects]
         /// </summary>
-        private static void SetIntronEffects(Intron[] introns, TranscriptAnnotation ta)
+        private static void SetIntronEffects(SimpleInterval[] introns, TranscriptAnnotation ta)
         {
             // sanity check: make sure we have some introns defined
             if (introns == null) return;
 
             var altAllele = ta.AlternateAllele;
 
-            int min = Math.Min(altAllele.ReferenceBegin, altAllele.ReferenceEnd);
-            int max = Math.Max(altAllele.ReferenceBegin, altAllele.ReferenceEnd);
+            var min = Math.Min(altAllele.Start, altAllele.End);
+            var max = Math.Max(altAllele.Start, altAllele.End);
 
-            var variantInterval = new AnnotationInterval(altAllele.ReferenceBegin, altAllele.ReferenceEnd);
+            var variantInterval = new AnnotationInterval(altAllele.Start, altAllele.End);
             var minMaxInterval = new AnnotationInterval(min, max);
-            bool isInsertion = ta.AlternateAllele.NirvanaVariantType == VariantType.insertion;
+            var isInsertion = ta.AlternateAllele.NirvanaVariantType == VariantType.insertion;
 
             foreach (var intron in introns)
             {
@@ -809,13 +915,12 @@ namespace VariantAnnotation.AnnotationSources
                 if (intron.Start <= intron.End - 4)
                 {
                     if (variantInterval.Overlaps(intron.Start + 2, intron.End - 2) ||
-                        (isInsertion && ((altAllele.ReferenceBegin == intron.Start + 2)
-                                         || (altAllele.ReferenceEnd == intron.End - 2))))
+                        isInsertion && (altAllele.Start == intron.Start + 2
+                                        || altAllele.End == intron.End - 2))
                     {
                         ta.IsWithinIntron = true;
                     }
                 }
-
 
                 // the definition of splice_region (SO:0001630) is "within 1-3 bases of the
                 // exon or 3-8 bases of the intron." We also need to special case insertions
@@ -826,287 +931,147 @@ namespace VariantAnnotation.AnnotationSources
                                               variantInterval.Overlaps(intron.Start - 3, intron.Start - 1) ||
                                               variantInterval.Overlaps(intron.End + 1, intron.End + 3) ||
                                               isInsertion &&
-                                              ((altAllele.ReferenceBegin == intron.Start) ||
-                                               (altAllele.ReferenceEnd == intron.End) ||
-                                               (altAllele.ReferenceBegin == intron.Start + 2) ||
-                                               (altAllele.ReferenceEnd == intron.End - 2));
+                                              (altAllele.Start == intron.Start ||
+                                               altAllele.End   == intron.End ||
+                                               altAllele.Start == intron.Start + 2 ||
+                                               altAllele.End   == intron.End - 2);
             }
         }
 
         /// <summary>
         /// loads the annotation data for this particular reference sequence
         /// </summary>
-        private void 
-			LoadData(object sender, EventArgs e)
+        private void LoadData(object sender, NewReferenceEventArgs e)
         {
-            var ucscReferenceName = AnnotationLoader.Instance.CurrentReferenceName;
-	        var ensemblReferenceName = AnnotationLoader.Instance.ChromosomeRenamer.GetEnsemblReferenceName(ucscReferenceName);
+            var referenceNameData = e.Data;
 
-            if (AnnotationLoader.Instance.GenomeAssembly == GenomeAssembly.GRCh38)
-                EnableMitochondrialAnnotation();
+            if (_compressedSequence.GenomeAssembly == GenomeAssembly.GRCh38) EnableMitochondrialAnnotation();
 
-            // add conservation score support to the data store
-            _hasConservationScores = false;
-
-            if (!string.IsNullOrEmpty(_supplementaryAnnotationDir))
+            // load our conservation scores
+            if (_conservationScoreReader != null)
             {
-                string conservationScorePath = Path.Combine(_supplementaryAnnotationDir, ucscReferenceName + ".npd");
-
-                if (File.Exists(conservationScorePath))
-                {
-                    _conservationScoreReader = new PhylopReader(new BinaryReader(File.Open(conservationScorePath, FileMode.Open, FileAccess.Read, FileShare.Read)));
-                    _hasConservationScores = true;
-                }
+                _conservationScoreReader.LoadReference(referenceNameData.UcscReferenceName);
+                _hasConservationScores = _conservationScoreReader.IsInitialized;
             }
 
-            if (!_hasConservationScores) _conservationScoreReader = null;
+			// load reference-specific files for our supplementary annotation providers
+			_saProvider?.Load(referenceNameData.UcscReferenceName,               _compressedSequence.Renamer);
+            _customAnnotationProvider?.Load(referenceNameData.UcscReferenceName, _compressedSequence.Renamer);
+            _customIntervalProvider?.Load(referenceNameData.UcscReferenceName,   _compressedSequence.Renamer);
 
-            // add supplementary database support to the data store
-            _hasSupplementaryAnnotations = false;
-
-            if (!string.IsNullOrEmpty(_supplementaryAnnotationDir))
-            {
-                string supplementaryAnnotationPath = Path.Combine(_supplementaryAnnotationDir, ucscReferenceName + ".nsa");
-
-                if (File.Exists(supplementaryAnnotationPath))
-                {
-                    _hasSupplementaryAnnotations = true;
-                    _supplementaryAnnotationReader = new SupplementaryAnnotationReader(supplementaryAnnotationPath);
-                    _suppIntervalTree.Clear();
-                    var intervalList = _supplementaryAnnotationReader.GetSupplementaryIntervals();
-
-                    if (intervalList != null)
-                        foreach (var interval in intervalList)
-                        {
-                            _suppIntervalTree.Add(new IntervalTree<SupplementaryInterval>.Interval(ensemblReferenceName, interval.Start, interval.End, interval));
-                        }
-
-                }
-            }
-
-            if (!_hasSupplementaryAnnotations) _supplementaryAnnotationReader = null;
-
-            // support for multiple custom annotation dbs
-            if (_customAnnotationDirs != null)
-            {
-                foreach (var customAnnotationPath in _customAnnotationDirs)
-                {
-                    if (string.IsNullOrEmpty(customAnnotationPath)) continue;
-                    var fullCustomAnnotationPath = Path.Combine(customAnnotationPath, ucscReferenceName + ".nsa");
-
-                    if (!File.Exists(fullCustomAnnotationPath)) continue;
-                    _customAnnotationReaders.Add(new SupplementaryAnnotationReader(fullCustomAnnotationPath));
-                    _hasCustomAnnotations = true;
-                }
-            }
-
-            if (!_hasCustomAnnotations) _customAnnotationReaders.Clear();
-
-            _customIntervalTree.Clear();
-
-            // support for multiple custom interval dbs
-            if (_customIntervalDirs != null)
-            {
-                foreach (var customIntervalPath in _customIntervalDirs)
-                {
-                    if (!string.IsNullOrEmpty(customIntervalPath))
-                    {
-                        string fullcustomIntervalPath = Path.Combine(customIntervalPath, ucscReferenceName + ".nci");
-
-                        if (File.Exists(fullcustomIntervalPath))
-                        {
-                            var customIntervalReader = new CustomIntervalReader(fullcustomIntervalPath);
-
-                            var customInterval = customIntervalReader.GetNextCustomInterval();
-
-                            while (customInterval != null)
-                            {
-                                _customIntervalTree.Add(new IntervalTree<CustomInterval>.Interval(ucscReferenceName, customInterval.Start, customInterval.End, customInterval));
-                                customInterval = customIntervalReader.GetNextCustomInterval();
-                            }
-
-                            _hasCustomIntervals = true;
-                        }
-                    }
-                }
-            }
-
-            // grab the path for the reference sequence database
-            string refSeqPath;
-            if (!_knownReferenceSequences.TryGetValue(ucscReferenceName, out refSeqPath))
-            {
-                Console.WriteLine($"Unable to find the file associated with the supplied reference sequence ({ucscReferenceName})");
-                return;
-            }
+            // load our prediction caches
             _performanceMetrics.StartCache();
-
-            // populate the data store with our VEP annotations
-            using (var reader = new NirvanaDatabaseReader(refSeqPath))
-            {
-                reader.PopulateData(_dataStore, TranscriptIntervalTree, _regulatoryIntervalTree, _geneIntervalTree);
-            }
-
+            LoadPredictionCaches(referenceNameData.ReferenceIndex);
             _performanceMetrics.StopCache();
         }
 
-        /// <summary>
-        /// loads the annotation data for this particular reference sequence
-        /// </summary>
-        public void LoadData(Stream stream)
+        private void ClearDataSources()
         {
-            using (var reader = new NirvanaDatabaseReader(stream))
-            {
-                reader.PopulateData(_dataStore, TranscriptIntervalTree, _regulatoryIntervalTree, _geneIntervalTree);
-            }
+            _conservationScoreReader?.Clear();
+            _saProvider?.Clear();
+            _customAnnotationProvider?.Clear();
+            _customIntervalProvider?.Clear();
 
-            // TODO: add the ability to refer to our conservation score database by stream
+            _siftCache     = PredictionCache.Empty;
+            _polyPhenCache = PredictionCache.Empty;
+        }
+
+        private void LoadPredictionCaches(ushort refIndex)
+        {
+            _siftCache     = LoadPredictionCache(_siftReader, refIndex);
+            _polyPhenCache = LoadPredictionCache(_polyPhenReader, refIndex);
+        }
+
+        private static PredictionCache LoadPredictionCache(PredictionCacheReader reader, ushort refIndex)
+        {
+            if (reader == null || refIndex == ChromosomeRenamer.UnknownReferenceIndex) return PredictionCache.Empty;
+            return reader.Read(refIndex);
         }
 
         private VariantAlternateAllele CodingSequenceRotate3Prime(VariantAlternateAllele altAllele, Transcript transcript, ref bool shiftToEnd)
         {
-
-            bool onReverseStrand = transcript.OnReverseStrand;
+            var onReverseStrand = transcript.Gene.OnReverseStrand;
             var altAlleleAfterRotating = new VariantAlternateAllele(altAllele);
             if (_compressedSequence == null) return altAlleleAfterRotating;
 
-            if (altAllele.VepVariantType != VariantType.deletion && altAllele.VepVariantType != VariantType.insertion)
+            if (altAllele.NirvanaVariantType != VariantType.deletion && altAllele.NirvanaVariantType != VariantType.insertion)
                 return altAlleleAfterRotating;
 
-            // insertionDeletion is not correctly handled here
-            if ((altAllele.VepVariantType == VariantType.deletion) && (altAllele.AlternateAllele != "")) return altAlleleAfterRotating;
-            if ((altAllele.VepVariantType == VariantType.insertion) && (altAllele.ReferenceAllele != "")) return altAlleleAfterRotating;
 
-            // if variant is before the transcript start, do not perform 3 prime shift
-            if (onReverseStrand && altAllele.ReferenceEnd > transcript.End) return altAlleleAfterRotating;
+			// if variant is before the transcript start, do not perform 3 prime shift
+            if (onReverseStrand && altAllele.End > transcript.End) return altAlleleAfterRotating;
 
-            if (!onReverseStrand && altAllele.ReferenceBegin < transcript.Start) return altAlleleAfterRotating;
+            if (!onReverseStrand && altAllele.Start < transcript.Start) return altAlleleAfterRotating;
 
-            // consider insertion since insertion Begin is larger than end
-            if (!onReverseStrand && altAllele.ReferenceBegin >= transcript.End) return altAlleleAfterRotating;
+			// consider insertion since insertion Begin is larger than end
+            if (!onReverseStrand && altAllele.Start >= transcript.End) return altAlleleAfterRotating;
 
-            if (onReverseStrand && altAllele.ReferenceEnd <= transcript.Start) return altAlleleAfterRotating;
+            if (onReverseStrand && altAllele.End <= transcript.Start) return altAlleleAfterRotating;
 
-            var rotatingBases = altAllele.VepVariantType == VariantType.insertion
+			var rotatingBases = altAllele.NirvanaVariantType == VariantType.insertion
                 ? altAllele.AlternateAllele
                 : altAllele.ReferenceAllele;
 
-            int numBases = rotatingBases.Length;
+            var numBases = rotatingBases.Length;
 
             rotatingBases = onReverseStrand ? SequenceUtilities.GetReverseComplement(rotatingBases) : rotatingBases;
-            int downStreamLength = onReverseStrand ? altAllele.ReferenceBegin - transcript.Start : transcript.End - altAllele.ReferenceEnd;
+            var basesToEnd = onReverseStrand ? altAllele.Start - transcript.Start : transcript.End - altAllele.End;
 
-            downStreamLength = Math.Min(downStreamLength, MaxDownstreamLength);
+            var downStreamLength = Math.Min(basesToEnd, MaxDownstreamLength);
 
             var downStreamSeq = onReverseStrand
                 ? SequenceUtilities.GetReverseComplement(
-                    _compressedSequence.Substring(altAllele.ReferenceBegin - 1 - downStreamLength, downStreamLength))
-                : _compressedSequence.Substring(altAllele.ReferenceEnd, downStreamLength);
+                    _compressedSequence.Substring(altAllele.Start - 1 - downStreamLength, downStreamLength))
+                : _compressedSequence.Substring(altAllele.End, downStreamLength);
 
             var combinedSequence = rotatingBases + downStreamSeq;
 
             int shiftStart, shiftEnd;
             var hasShifted = false;
 
+			//seems bugs in VEP, just use it for consistence
             for (shiftStart = 0, shiftEnd = numBases; shiftEnd <= combinedSequence.Length - numBases; shiftStart++, shiftEnd++)
             {
                 if (combinedSequence[shiftStart] != combinedSequence[shiftEnd]) break;
                 hasShifted = true;
             }
 
-            if (shiftStart >= combinedSequence.Length - numBases) shiftToEnd = true;
+			if (shiftStart >= basesToEnd) shiftToEnd = true;
 
-            if (!hasShifted) return altAlleleAfterRotating;
+			if (!hasShifted) return altAlleleAfterRotating;
 
-            var referenceBeginAfterRotating = onReverseStrand
-                 ? altAllele.ReferenceBegin - shiftStart
-                 : altAllele.ReferenceBegin + shiftStart;
+			var referenceBeginAfterRotating = onReverseStrand
+                 ? altAllele.Start - shiftStart
+                 : altAllele.Start + shiftStart;
 
-            int referenceEndAfterRotating = onReverseStrand
-                ? altAllele.ReferenceEnd - shiftStart
-                : altAllele.ReferenceEnd + shiftStart;
+            var referenceEndAfterRotating = onReverseStrand
+                ? altAllele.End - shiftStart
+                : altAllele.End + shiftStart;
 
             // create a new alternative allele 
-            string seqAfterRotating = combinedSequence.Substring(shiftStart, numBases);
-            string seqToUpdate = onReverseStrand ? SequenceUtilities.GetReverseComplement(seqAfterRotating) : seqAfterRotating;
+            var seqAfterRotating = combinedSequence.Substring(shiftStart, numBases);
+            var seqToUpdate = onReverseStrand ? SequenceUtilities.GetReverseComplement(seqAfterRotating) : seqAfterRotating;
 
-            string referenceAlleleAfterRotating = altAllele.ReferenceAllele;
-            string alternateAlleleAfterRotating = altAllele.AlternateAllele;
+            var referenceAlleleAfterRotating = altAllele.ReferenceAllele;
+            var alternateAlleleAfterRotating = altAllele.AlternateAllele;
 
             if (altAllele.VepVariantType == VariantType.insertion)
                 alternateAlleleAfterRotating = seqToUpdate;
             else referenceAlleleAfterRotating = seqToUpdate;
 
-            altAlleleAfterRotating.ReferenceBegin = referenceBeginAfterRotating;
-            altAlleleAfterRotating.ReferenceEnd = referenceEndAfterRotating;
-            altAlleleAfterRotating.ReferenceAllele = referenceAlleleAfterRotating;
-            altAlleleAfterRotating.AlternateAllele = alternateAlleleAfterRotating;
-            altAlleleAfterRotating.SupplementaryAnnotation = altAllele.SupplementaryAnnotation;
+            altAlleleAfterRotating.Start                           = referenceBeginAfterRotating;
+            altAlleleAfterRotating.End                             = referenceEndAfterRotating;
+            altAlleleAfterRotating.ReferenceAllele                 = referenceAlleleAfterRotating;
+            altAlleleAfterRotating.AlternateAllele                 = alternateAlleleAfterRotating;
+            altAlleleAfterRotating.SupplementaryAnnotationPosition = altAllele.SupplementaryAnnotationPosition;
 
             return altAlleleAfterRotating;
-        }
-
-        string IAnnotationSource.GetDataVersion()
-        {
-            return _nirvanaDataVersion;
-        }
-
-        /// <summary>
-        /// disables the annotation loader (useful when unit testing)
-        /// </summary>
-        public void DisableAnnotationLoader()
-        {
-            _useAnnotationLoader = false;
         }
 
         public void EnableReferenceNoCalls(bool limitReferenceNoCallsToTranscripts)
         {
             _enableReferenceNoCalls = true;
             _limitReferenceNoCallsToTranscripts = limitReferenceNoCallsToTranscripts;
-        }
-
-        /// <summary>
-        /// enables the annotation of the mitochondrial genome
-        /// </summary>
-	    public void EnableMitochondrialAnnotation()
-        {
-            _enableMitochondrialAnnotation = true;
-        }
-
-        /// <summary>
-        /// adds custom intervals to the annotation source
-        /// </summary>
-        public void AddCustomIntervals(IEnumerable<ICustomInterval> customIntervals)
-        {
-            foreach (var interval in customIntervals)
-            {
-                _customIntervalTree.Add(new IntervalTree<CustomInterval>.Interval(interval.ReferenceName,
-                    interval.Start, interval.End, interval as CustomInterval));
-            }
-
-            _hasCustomIntervals = true;
-        }
-
-        /// <summary>
-        /// adds supplementary intervals to the annotation source
-        /// </summary>
-        public void AddSupplementaryIntervals(IEnumerable<ISupplementaryInterval> supplementaryIntervals)
-        {
-            foreach (var interval in supplementaryIntervals)
-            {
-                _suppIntervalTree.Add(new IntervalTree<SupplementaryInterval>.Interval(interval.ReferenceName,
-                    interval.Start, interval.End, interval as SupplementaryInterval));
-            }
-
-            _hasSupplementaryAnnotations = true;
-        }
-
-        /// <summary>
-        /// finalizes the annotator metrics before disposal
-        /// </summary>
-        public void FinalizeMetrics()
-        {
-            // force the output of the annotation time
-            _performanceMetrics.StartReference("");
         }
     }
 }

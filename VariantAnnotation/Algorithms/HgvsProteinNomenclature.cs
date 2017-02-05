@@ -1,11 +1,12 @@
 ﻿using System;
 using VariantAnnotation.Algorithms.Consequences;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Algorithms
 {
-    public class HgvsProteinNomenclature
+    public sealed class HgvsProteinNomenclature
     {
         #region members
 
@@ -13,12 +14,14 @@ namespace VariantAnnotation.Algorithms
         private readonly Transcript _transcript;
         private readonly TranscriptAnnotation _ta;
         private readonly VariantFeature _variant;
+        private readonly ICompressedSequence _compressedSequence;
 
         private readonly HgvsNotation _hgvsNotation;
+        private readonly AminoAcids _aminoAcids;
 
         #endregion
 
-        internal class HgvsNotation
+        internal sealed class HgvsNotation
         {
             public string ReferenceAminoAcids;
             public string AlternateAminoAcids;
@@ -33,14 +36,15 @@ namespace VariantAnnotation.Algorithms
             public readonly string ProteinId;
 
             // constructor
-            public HgvsNotation(string referenceAminoAcids, string alternateAminoAcids, string proteinId, int start, int end)
+            public HgvsNotation(string referenceAminoAcids, string alternateAminoAcids, string proteinId, int start,
+                int end)
             {
                 SetAminoAcids(referenceAminoAcids, ref ReferenceAminoAcids, ref ReferenceAminoAcidsLen);
                 SetAminoAcids(alternateAminoAcids, ref AlternateAminoAcids, ref AlternateAminoAcidsLen);
 
                 ProteinId = proteinId;
-                Start = start;
-                End = end;
+                Start     = start;
+                End       = end;
             }
 
             public void SetReferenceAminoAcids(string aminoAcids)
@@ -57,7 +61,7 @@ namespace VariantAnnotation.Algorithms
             private static void SetAminoAcids(string aminoAcids, ref string s, ref int len)
             // ReSharper restore RedundantAssignment
             {
-                s   = aminoAcids;
+                s = aminoAcids;
                 len = s?.Length ?? 0;
             }
         }
@@ -65,16 +69,19 @@ namespace VariantAnnotation.Algorithms
         /// <summary>
         /// constructor
         /// </summary>
-        public HgvsProteinNomenclature(VariantEffect variantEffect, TranscriptAnnotation ta, Transcript transcript, VariantFeature variant)
+        public HgvsProteinNomenclature(VariantEffect variantEffect, TranscriptAnnotation ta, Transcript transcript,
+            VariantFeature variant, ICompressedSequence compressedSequence, AminoAcids aminoAcids)
         {
-            _variantEffect = variantEffect;
-            _ta            = ta;
-            _transcript    = transcript;
-            _variant       = variant;
+            _variantEffect      = variantEffect;
+            _ta                 = ta;
+            _transcript         = transcript;
+            _variant            = variant;
+            _compressedSequence = compressedSequence;
+            _aminoAcids         = aminoAcids;
 
             _hgvsNotation = new HgvsNotation(_ta.ReferenceAminoAcids, _ta.AlternateAminoAcids,
-                FormatUtilities.GetVersion(_transcript.ProteinId, _transcript.ProteinVersion), _ta.ProteinBegin,
-                _ta.ProteinEnd);
+                FormatUtilities.CombineIdAndVersion(_transcript.Translation.ProteinId, _transcript.Translation.ProteinVersion),
+                _ta.ProteinBegin, _ta.ProteinEnd);
         }
 
         /// <summary>
@@ -106,7 +113,7 @@ namespace VariantAnnotation.Algorithms
                 _hgvsNotation.Type = GetSpecificProteinChange();
 
                 // convert ref & alt peptides taking into account HGVS rules
-				GetHgvsPeptides(_ta);
+                GetHgvsPeptides(_ta);
             }
 
             // no protein change - return transcript nomenclature with flag for neutral protein consequence
@@ -126,8 +133,8 @@ namespace VariantAnnotation.Algorithms
         private ProteinChange GetGeneralProteinChange()
         {
             if (_hgvsNotation.ReferenceAminoAcids == _hgvsNotation.AlternateAminoAcids) return ProteinChange.None;
-            if ((_hgvsNotation.ReferenceAminoAcidsLen == 0) && (_hgvsNotation.AlternateAminoAcidsLen != 0)) return ProteinChange.Insertion;
-            if ((_hgvsNotation.ReferenceAminoAcidsLen != 0) && (_hgvsNotation.AlternateAminoAcidsLen == 0)) return ProteinChange.Deletion;
+            if (_hgvsNotation.ReferenceAminoAcidsLen == 0 && _hgvsNotation.AlternateAminoAcidsLen != 0) return ProteinChange.Insertion;
+            if (_hgvsNotation.ReferenceAminoAcidsLen != 0 && _hgvsNotation.AlternateAminoAcidsLen == 0) return ProteinChange.Deletion;
             return ProteinChange.Unknown;
         }
 
@@ -143,14 +150,14 @@ namespace VariantAnnotation.Algorithms
             if (_hgvsNotation.Type == ProteinChange.Insertion) return ProteinChange.Insertion;
 
             // SNVs
-            if ((_hgvsNotation.ReferenceAminoAcidsLen == 1) && (_hgvsNotation.AlternateAminoAcidsLen == 1)) return ProteinChange.Substitution;
+            if (_hgvsNotation.ReferenceAminoAcidsLen == 1 && _hgvsNotation.AlternateAminoAcidsLen == 1) return ProteinChange.Substitution;
 
             // deletions
             if (_hgvsNotation.Type == ProteinChange.Deletion) return ProteinChange.Deletion;
 
             // duplications
-            if ((_hgvsNotation.AlternateAminoAcidsLen > _hgvsNotation.ReferenceAminoAcidsLen) &&
-                _hgvsNotation.AlternateAminoAcids.Contains(_hgvsNotation.ReferenceAminoAcids))
+            if (_hgvsNotation.AlternateAminoAcidsLen > _hgvsNotation.ReferenceAminoAcidsLen &&
+                IsDuplicatedAminoAcids(_hgvsNotation.ReferenceAminoAcids, _hgvsNotation.AlternateAminoAcids))
             {
                 return ProteinChange.Duplication;
             }
@@ -161,6 +168,23 @@ namespace VariantAnnotation.Algorithms
             return ProteinChange.Substitution;
         }
 
+        internal static bool IsDuplicatedAminoAcids(string refAminoAcids, string altAminoAcids)
+        {
+            if (refAminoAcids.Length < 1) return false;
+            if (refAminoAcids.Length >= altAminoAcids.Length) return false;
+            if (altAminoAcids.Length % refAminoAcids.Length != 0) return false;
+
+            var refAaLen = refAminoAcids.Length;
+            var repeats = altAminoAcids.Length / refAaLen;
+
+            for (var i = 0; i < repeats; i++)
+            {
+                if (altAminoAcids.Substring(i * refAaLen, refAaLen) != refAminoAcids) return false;
+            }
+
+            return true;
+
+        }
         /// <summary>
         /// gets the reference and alternative amino acids [TranscriptVariationAllele.pm:1204 _get_hgvs_peptides]
         /// </summary>
@@ -176,24 +200,28 @@ namespace VariantAnnotation.Algorithms
             }
             else if (_hgvsNotation.Type == ProteinChange.Insertion)
             {
-				AminoAcids.Rotate3Prime(_hgvsNotation, _transcript.Peptide);
-				// check that inserted bases do not duplicate 3' reference sequence [set to type = dup and return if so]
-				if (IsAminoAcidDuplicate(_hgvsNotation, _transcript.Peptide)) return;
+                AminoAcids.Rotate3Prime(_hgvsNotation, _transcript.Translation.PeptideSeq);
+                // check that inserted bases do not duplicate 3' reference sequence [set to type = dup and return if so]
+                if (IsAminoAcidDuplicate(_hgvsNotation, _transcript.Translation.PeptideSeq)) return;
 
                 // HGVS ref are peptides flanking insertion
                 var min = Math.Min(_hgvsNotation.Start, _hgvsNotation.End);
-                // the peptide positions start from 1. In case of insertions, the end might become 0
-                if (min == 0) min++;
+                // the peptide positions start from 1. In case of insertions, the end might become 0,i.e., inserted before protein 
+                if (min == 0)
+                {
+                    _hgvsNotation.Type = ProteinChange.None;
+                    return;
+                }
                 _hgvsNotation.SetReferenceAminoAcids(GetSurroundingPeptides(min));
             }
             else if (_hgvsNotation.Type == ProteinChange.Deletion)
             {
-                AminoAcids.Rotate3Prime(_hgvsNotation, _transcript.Peptide);
+                AminoAcids.Rotate3Prime(_hgvsNotation, _transcript.Translation.PeptideSeq);
             }
 
             // set the three-letter abbreviations
-            if (_hgvsNotation.ReferenceAminoAcidsLen > 0) _hgvsNotation.ReferenceAbbreviation = AminoAcids.GetAbbreviations(_hgvsNotation.ReferenceAminoAcids);
-            _hgvsNotation.AlternateAbbreviation = _hgvsNotation.AlternateAminoAcidsLen == 0 ? "del" : AminoAcids.GetAbbreviations(_hgvsNotation.AlternateAminoAcids);
+            if (_hgvsNotation.ReferenceAminoAcidsLen > 0) _hgvsNotation.ReferenceAbbreviation = _aminoAcids.GetAbbreviations(_hgvsNotation.ReferenceAminoAcids);
+            _hgvsNotation.AlternateAbbreviation = _hgvsNotation.AlternateAminoAcidsLen == 0 ? "del" : _aminoAcids.GetAbbreviations(_hgvsNotation.AlternateAminoAcids);
 
             // handle special cases
             if (_variantEffect.IsStartLost())
@@ -216,25 +244,25 @@ namespace VariantAnnotation.Algorithms
         /// <summary>
         /// returns true if this insertion has the same amino acids preceding it [TranscriptVariationAllele.pm:1494 _check_for_peptide_duplication]
         /// </summary>
-        private static bool IsAminoAcidDuplicate(HgvsNotation hn, string transcriptPeptides)
+        private bool IsAminoAcidDuplicate(HgvsNotation hn, string transcriptPeptides)
         {
             // sanity check: return false if the alternate amino acid is null
             if (hn.AlternateAminoAcids == null) return false;
 
-            int testAminoAcidPos = hn.Start - hn.AlternateAminoAcidsLen - 1;
+            var testAminoAcidPos = hn.Start - hn.AlternateAminoAcidsLen - 1;
             if (testAminoAcidPos < 0) return false;
 
-            string precedingAminoAcids = testAminoAcidPos + hn.AlternateAminoAcidsLen <= transcriptPeptides.Length
+            var precedingAminoAcids = testAminoAcidPos + hn.AlternateAminoAcidsLen <= transcriptPeptides.Length
                 ? transcriptPeptides.Substring(testAminoAcidPos, hn.AlternateAminoAcidsLen)
                 : "";
 
             // update our HGVS notation
-            if ((testAminoAcidPos >= 0) && (precedingAminoAcids == hn.AlternateAminoAcids))
+            if (testAminoAcidPos >= 0 && precedingAminoAcids == hn.AlternateAminoAcids)
             {
                 hn.Type = ProteinChange.Duplication;
                 hn.End = hn.Start - 1;
                 hn.Start -= hn.AlternateAminoAcidsLen;
-                hn.AlternateAbbreviation = AminoAcids.GetAbbreviations(hn.AlternateAminoAcids);
+                hn.AlternateAbbreviation = _aminoAcids.GetAbbreviations(hn.AlternateAminoAcids);
                 return true;
             }
 
@@ -246,43 +274,19 @@ namespace VariantAnnotation.Algorithms
         /// </summary>
         private string GetHgvsProteinFormat(TranscriptAnnotation ta)
         {
-            string ret = _hgvsNotation.ProteinId + ":p.";
+            var ret = _hgvsNotation.ProteinId + ":p.";
 
             // handle stop_lost seperately regardless of cause by del/delins => p.TerposAA1extnum_AA_to_stop
             if (_variantEffect.IsStopLost())
             {
-                _hgvsNotation.AlternateAbbreviation = _hgvsNotation.AlternateAbbreviation.FirstAminoAcid3();
-                var translatedCds = GetTranslatedCodingSequence(ta);
-
-                if (_hgvsNotation.Type == ProteinChange.Deletion)
-                {
-                    int numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, false);
-                    if (numExtraAminoAcids != -1) _hgvsNotation.AlternateAbbreviation += "extTer" + numExtraAminoAcids;
-                }
-                else if (_hgvsNotation.Type == ProteinChange.Substitution)
-                {
-                    int numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, false);
-                    if (numExtraAminoAcids != -1) _hgvsNotation.AlternateAbbreviation += "extTer" + numExtraAminoAcids;
-                    else _hgvsNotation.AlternateAbbreviation += "extTer?";
-                }
-
-                return ret + _hgvsNotation.ReferenceAbbreviation + _hgvsNotation.Start + _hgvsNotation.AlternateAbbreviation;
+                return GetStopLostHgvsProtein(ta, ret);
             }
 
             // handle the non stop-lost cases
             switch (_hgvsNotation.Type)
             {
                 case ProteinChange.Duplication:
-                    if (_hgvsNotation.Start < _hgvsNotation.End)
-                    {
-                        var firstRefPeptide = _hgvsNotation.AlternateAbbreviation.FirstAminoAcid3();
-                        var lastRefPeptide = _hgvsNotation.AlternateAbbreviation.LastAminoAcid3();
-                        ret += firstRefPeptide + _hgvsNotation.Start + '_' + lastRefPeptide + _hgvsNotation.End + "dup";
-                    }
-                    else
-                    {
-                        ret += _hgvsNotation.AlternateAbbreviation + _hgvsNotation.Start + "dup";
-                    }
+                    ret = GetDupHgvsProtein(ret);
                     break;
 
                 case ProteinChange.Substitution:
@@ -291,76 +295,15 @@ namespace VariantAnnotation.Algorithms
 
                 case ProteinChange.InDel:
                 case ProteinChange.Insertion:
-                    if (_hgvsNotation.AlternateAbbreviation.StartsWith("Ter"))
-                        _hgvsNotation.AlternateAbbreviation = "Ter";
-
-                    // list the first and last AA in reference only
-                    var firstInsPeptide = _hgvsNotation.ReferenceAbbreviation.FirstAminoAcid3();
-                    var lastInsPeptide = _hgvsNotation.ReferenceAbbreviation.LastAminoAcid3();
-
-                    // for stops & add extX & distance to next stop to alt pep
-                    if ((_hgvsNotation.ReferenceAminoAcids != null) && _hgvsNotation.ReferenceAminoAcids.EndsWith("X"))
-                    {
-                        var translatedCds = GetTranslatedCodingSequence(ta);
-                        int numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, false);
-                        if (numExtraAminoAcids != -1) _hgvsNotation.AlternateAbbreviation += "extTer" + numExtraAminoAcids;
-                    }
-
-                    if ((_hgvsNotation.Start == _hgvsNotation.End) && (_hgvsNotation.Type == ProteinChange.InDel))
-                    {
-                        ret += firstInsPeptide + _hgvsNotation.Start + "delins" + _hgvsNotation.AlternateAbbreviation;
-                    }
-                    else
-                    {
-	                    if (_hgvsNotation.Start > _hgvsNotation.End)
-		                    Swap.Int(ref _hgvsNotation.Start, ref _hgvsNotation.End);
-	                    if (_hgvsNotation.End > _transcript.Peptide.Length)
-	                    {
-		                    ret = null;
-	                    }
-	                    else
-	                    {
-		                    ret += firstInsPeptide + _hgvsNotation.Start + '_' + lastInsPeptide + _hgvsNotation.End +
-		                           (_hgvsNotation.Type == ProteinChange.Insertion ? "ins" : "delins") +
-		                           _hgvsNotation.AlternateAbbreviation;
-	                    }
-
-					}
+                    ret = GetInsertionHgvsProtein(ta, ret);
                     break;
 
                 case ProteinChange.Frameshift:
-                    ret += _hgvsNotation.ReferenceAbbreviation + _hgvsNotation.Start +
-                           _hgvsNotation.AlternateAbbreviation;
-
-                    if (_hgvsNotation.AlternateAbbreviation != "Ter")
-                    {
-                        // not immediate stop - count aa until next
-                        var translatedCds = GetTranslatedCodingSequence(ta);
-                        int numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, true);
-                        if (numExtraAminoAcids == -1)
-                        {
-                            // new - ? to show new stop not predicted
-                            ret += "fsTer?";
-                        }
-                        else
-                        {
-                            // use long form if new stop found
-                            ret += "fsTer" + numExtraAminoAcids;
-                        }
-                    }
+                    ret = GetFrameshiftHgvsProtein(ta, ret);
                     break;
 
                 case ProteinChange.Deletion:
-                    if (_hgvsNotation.ReferenceAbbreviation.Length > 3)
-                    {
-                        var firstRefPeptide = _hgvsNotation.ReferenceAbbreviation.FirstAminoAcid3();
-                        var lastRefPeptide = _hgvsNotation.ReferenceAbbreviation.LastAminoAcid3();
-                        ret += firstRefPeptide + _hgvsNotation.Start + '_' + lastRefPeptide + _hgvsNotation.End + "del";
-                    }
-                    else
-                    {
-                        ret += GetHgvsRangeString(_hgvsNotation);
-                    }
+                    ret = GetDelHgvsProtein(ret);
                     break;
 
                 default:
@@ -372,6 +315,124 @@ namespace VariantAnnotation.Algorithms
             return ret;
         }
 
+        private string GetDupHgvsProtein(string ret)
+        {
+            if (_hgvsNotation.Start < _hgvsNotation.End)
+            {
+                var firstRefPeptide = _hgvsNotation.AlternateAbbreviation.FirstAminoAcid3();
+                var lastRefPeptide = _hgvsNotation.AlternateAbbreviation.LastAminoAcid3();
+                ret += firstRefPeptide + _hgvsNotation.Start + '_' + lastRefPeptide + _hgvsNotation.End + "dup";
+            }
+            else
+            {
+                ret += _hgvsNotation.AlternateAbbreviation + _hgvsNotation.Start + "dup";
+            }
+            return ret;
+        }
+
+        private string GetDelHgvsProtein(string ret)
+        {
+            if (_hgvsNotation.ReferenceAbbreviation.Length > 3)
+            {
+                var firstRefPeptide = _hgvsNotation.ReferenceAbbreviation.FirstAminoAcid3();
+                var lastRefPeptide = _hgvsNotation.ReferenceAbbreviation.LastAminoAcid3();
+                ret += firstRefPeptide + _hgvsNotation.Start + '_' + lastRefPeptide + _hgvsNotation.End + "del";
+            }
+            else
+            {
+                ret += GetHgvsRangeString(_hgvsNotation);
+            }
+            return ret;
+        }
+
+        private string GetFrameshiftHgvsProtein(TranscriptAnnotation ta, string ret)
+        {
+            ret += _hgvsNotation.ReferenceAbbreviation + _hgvsNotation.Start +
+                   _hgvsNotation.AlternateAbbreviation;
+
+            if (_hgvsNotation.AlternateAbbreviation != "Ter")
+            {
+                // not immediate stop - count aa until next
+                var translatedCds = GetTranslatedCodingSequence(ta);
+                var numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, true);
+                if (numExtraAminoAcids == -1)
+                {
+                    // new - ? to show new stop not predicted
+                    ret += "fsTer?";
+                }
+                else
+                {
+                    // use long form if new stop found
+                    ret += "fsTer" + numExtraAminoAcids;
+                }
+            }
+            return ret;
+        }
+
+        private string GetInsertionHgvsProtein(TranscriptAnnotation ta, string ret)
+        {
+            // list the first and last AA in reference only
+            var firstInsPeptide = _hgvsNotation.ReferenceAbbreviation.FirstAminoAcid3();
+            var lastInsPeptide = _hgvsNotation.ReferenceAbbreviation.LastAminoAcid3();
+
+            if (_hgvsNotation.AlternateAbbreviation.StartsWith("Ter"))
+            {
+                var originalPepetide = _hgvsNotation.Type == ProteinChange.Insertion ? lastInsPeptide : firstInsPeptide;
+                _hgvsNotation.AlternateAbbreviation = "Ter";
+                ret += originalPepetide + _hgvsNotation.Start +
+                       _hgvsNotation.AlternateAbbreviation;
+                return ret;
+            }
+            // for stops & add extX & distance to next stop to alt pep
+            if (_hgvsNotation.ReferenceAminoAcids != null && _hgvsNotation.ReferenceAminoAcids.EndsWith("X"))
+            {
+                var translatedCds = GetTranslatedCodingSequence(ta);
+                var numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, false);
+                if (numExtraAminoAcids != -1) _hgvsNotation.AlternateAbbreviation += "extTer" + numExtraAminoAcids;
+            }
+
+            if (_hgvsNotation.Start == _hgvsNotation.End && _hgvsNotation.Type == ProteinChange.InDel)
+            {
+                ret += firstInsPeptide + _hgvsNotation.Start + "delins" + _hgvsNotation.AlternateAbbreviation;
+            }
+            else
+            {
+                if (_hgvsNotation.Start > _hgvsNotation.End)
+                    Swap.Int(ref _hgvsNotation.Start, ref _hgvsNotation.End);
+                if (_hgvsNotation.End > _transcript.Translation.PeptideSeq.Length)
+                {
+                    ret = null;
+                }
+                else
+                {
+                    ret += firstInsPeptide + _hgvsNotation.Start + '_' + lastInsPeptide + _hgvsNotation.End +
+                           (_hgvsNotation.Type == ProteinChange.Insertion ? "ins" : "delins") +
+                           _hgvsNotation.AlternateAbbreviation;
+                }
+            }
+            return ret;
+        }
+
+        private string GetStopLostHgvsProtein(TranscriptAnnotation ta, string ret)
+        {
+            _hgvsNotation.AlternateAbbreviation = _hgvsNotation.AlternateAbbreviation.FirstAminoAcid3();
+            var translatedCds = GetTranslatedCodingSequence(ta);
+
+            if (_hgvsNotation.Type == ProteinChange.Deletion)
+            {
+                var numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, false);
+                if (numExtraAminoAcids != -1) _hgvsNotation.AlternateAbbreviation += "extTer" + numExtraAminoAcids;
+            }
+            else if (_hgvsNotation.Type == ProteinChange.Substitution)
+            {
+                var numExtraAminoAcids = GetNumAminoAcidsUntilStopCodon(translatedCds, _hgvsNotation.Start - 1, false);
+                if (numExtraAminoAcids != -1) _hgvsNotation.AlternateAbbreviation += "extTer" + numExtraAminoAcids;
+                else _hgvsNotation.AlternateAbbreviation += "extTer?";
+            }
+
+            return ret + _hgvsNotation.ReferenceAbbreviation + _hgvsNotation.Start + _hgvsNotation.AlternateAbbreviation;
+        }
+
         /// <summary>
         /// gets the reference and alternative amino acids for frameshifts [TranscriptVariationAllele.pm:1377 _get_fs_peptides]
         /// </summary>
@@ -379,9 +440,9 @@ namespace VariantAnnotation.Algorithms
         {
             var translatedCds = GetTranslatedCodingSequence(ta);
             if (translatedCds == null) return;
-			
-            var refTrans = _transcript.Peptide + '*';
-            int translatedCdsLen = translatedCds.Length;
+
+            var refTrans = _transcript.Translation.PeptideSeq + '*';
+            var translatedCdsLen = translatedCds.Length;
 
             _hgvsNotation.Start = ta.ProteinBegin;
 
@@ -393,45 +454,50 @@ namespace VariantAnnotation.Algorithms
                 return;
             }
 
-			
 
-			while (_hgvsNotation.Start <= translatedCdsLen)
-			{
-				char refAminoAcid = refTrans[_hgvsNotation.Start - 1];
-				char altAminoAcid = translatedCds[_hgvsNotation.Start - 1];
 
-				// variation at stop codon, but maintains stop codon - set to synonymous
-				if ((refAminoAcid == '*') && (altAminoAcid == '*'))
-				{
-					_hgvsNotation.Type = ProteinChange.None;
-					return;
-				}
+            while (_hgvsNotation.Start <= translatedCdsLen)
+            {
+                var refAminoAcid = refTrans[_hgvsNotation.Start - 1];
+                var altAminoAcid = translatedCds[_hgvsNotation.Start - 1];
 
-				if (refAminoAcid != altAminoAcid)
-				{
-					_hgvsNotation.SetReferenceAminoAcids(refAminoAcid.ToString());
-					_hgvsNotation.SetAlternateAminoAcids(altAminoAcid.ToString());
+                // variation at stop codon, but maintains stop codon - set to synonymous
+                if (refAminoAcid == '*' && altAminoAcid == '*')
+                {
+                    _hgvsNotation.Type = ProteinChange.None;
+                    return;
+                }
 
-					break;
-				}
-				_hgvsNotation.SetReferenceAminoAcids(refAminoAcid.ToString());
-				_hgvsNotation.SetAlternateAminoAcids(altAminoAcid.ToString());
+                if (refAminoAcid != altAminoAcid)
+                {
+                    _hgvsNotation.SetReferenceAminoAcids(refAminoAcid.ToString());
+                    _hgvsNotation.SetAlternateAminoAcids(altAminoAcid.ToString());
 
-				_hgvsNotation.Start++;
-			}
-		}
+                    break;
+                }
 
-		/// <summary>
-		/// returns the translated coding sequence including the variant and the 3' UTR
-		/// </summary>
-		private string GetTranslatedCodingSequence(TranscriptAnnotation ta)
+                _hgvsNotation.SetReferenceAminoAcids(refAminoAcid.ToString());
+                _hgvsNotation.SetAlternateAminoAcids(altAminoAcid.ToString());
+
+                _hgvsNotation.Start++;
+            }
+        }
+
+        /// <summary>
+        /// returns the translated coding sequence including the variant and the 3' UTR
+        /// </summary>
+        private string GetTranslatedCodingSequence(TranscriptAnnotation ta)
         {
             // get the sequence with the variant added
-            string altCds = _transcript.GetAlternateCds(ta.CodingDnaSequenceBegin, ta.CodingDnaSequenceEnd, ta.TranscriptAlternateAllele);
+            string altCds = TranscriptUtilities.GetAlternateCds(_compressedSequence, ta.CodingDnaSequenceBegin,
+                ta.CodingDnaSequenceEnd, ta.TranscriptAlternateAllele, _transcript.CdnaMaps,
+                _transcript.Gene.OnReverseStrand, _transcript.StartExonPhase,
+                _transcript.Translation.CodingRegion.CdnaStart);
+
             if (string.IsNullOrEmpty(altCds)) return null;
 
             // get the new translation
-            return AminoAcids.TranslateBases(altCds, true);
+            return _aminoAcids.TranslateBases(altCds, true);
         }
 
         /// <summary>
@@ -439,13 +505,13 @@ namespace VariantAnnotation.Algorithms
         /// </summary>
         private string GetSurroundingPeptides(int pos)
         {
-            var peptide = _transcript.Peptide;
+            var peptide = _transcript.Translation.PeptideSeq;
 
-			//removed since we do not want to change the peptide in transcript
+            //removed since we do not want to change the peptide in transcript
             //if (_hgvsNotation.OriginalReferenceAminoAcids != null) peptide += _hgvsNotation.OriginalReferenceAminoAcids;
 
             // sanity check: make sure we have enough peptides
-            if (peptide.Length < pos+1) return null;
+            if (peptide.Length < pos + 1) return null;
 
             return peptide.Substring(pos - 1, 2);
         }
@@ -455,11 +521,11 @@ namespace VariantAnnotation.Algorithms
         /// </summary>
         private int GetNumAminoAcidsUntilStopCodon(string altCds, int refVarPos, bool isFrameshift)
         {
-            int numExtraAminoAcids = -1;
-            int refLen = _transcript.Peptide.Length;
+            var numExtraAminoAcids = -1;
+            var refLen = _transcript.Translation.PeptideSeq.Length;
 
             // sanity check: 
-            if ((altCds == null) || (refVarPos > altCds.Length)) return numExtraAminoAcids;
+            if (altCds == null || refVarPos > altCds.Length) return numExtraAminoAcids;
 
             // find the number of residues that are translated until a termination codon is encountered
             var terPos = altCds.IndexOf('*');

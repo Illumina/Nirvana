@@ -1,20 +1,28 @@
-﻿using System.IO;
+﻿using UnitTests.Fixtures;
 using UnitTests.Utilities;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.FileHandling
 {
-    [Collection("Chromosome 1 collection")]
+    [Collection("ChromosomeRenamer")]
     public sealed class MultiSampleVcfTests
     {
-        private const string DummyVcfLine = "1	883516	rs267598747	G	A	.	.	.";
+        private readonly ChromosomeRenamer _renamer;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public MultiSampleVcfTests(ChromosomeRenamerFixture fixture)
+        {
+            _renamer = fixture.Renamer;
+        }
 
         [Fact]
 		public void MultiSampleVcf()
 		{
-			using (var reader = new LiteVcfReader(Path.Combine("Resources", "OneKMultiSample.vcf")))
+			using (var reader = new LiteVcfReader(ResourceUtilities.GetReadStream(Resources.TopPath("OneKMultiSample.vcf"))))
 			{
 				// HG00096	HG00097	HG00099	HG00100	HG00101	HG00102......
 				Assert.Equal("HG00096", reader.SampleNames[0]);
@@ -28,20 +36,19 @@ namespace UnitTests.FileHandling
 		[Fact]
 		public void JsonSamplesOutput()
 		{
-			using (var reader = new LiteVcfReader(Path.Combine("Resources", "InputFiles", "Nirvana_unified_json_format.vcf")))
+			using (var reader = new LiteVcfReader(ResourceUtilities.GetReadStream(Resources.InputFiles("Nirvana_unified_json_format.vcf"))))
 			{
 				// LP2000021	LP2000022	LP2000023
 				Assert.Equal("LP2000021", reader.SampleNames[0]);
 				Assert.Equal("LP2000022", reader.SampleNames[1]);
 				Assert.Equal("LP2000023", reader.SampleNames[2]);
 
-			    var variant = VcfUtilities.GetVariantFeature(DummyVcfLine);
-                GetNextVariant(reader, variant);
+			    var variant = VcfUtilities.GetNextVariant(reader, _renamer);
 
-                // chr9	138685463	.	A	C	.	PASS	BaseQRankSum=-1.61165;GQ=120;DP=43;ReadPosRankSum=0;MQ=60;SNVHPOL=3;SNVSB=-65.7;MQRankSum=0	GT:GQX:GQ:DP:DPF:AD	0/0:90:0:31:0:.	0/0:75:0:26:0:.	0/1:161:194:36:0:20,16
+				// chr9	138685463	.	A	C	.	PASS	BaseQRankSum=-1.61165;GQ=120;DP=43;ReadPosRankSum=0;MQ=60;SNVHPOL=3;SNVSB=-65.7;MQRankSum=0	GT:GQX:GQ:DP:DPF:AD	0/0:90:0:31:0:.	0/0:75:0:26:0:.	0/1:161:194:36:0:20,16
 
-                // the unified json will call this function to get all the samples and can print them out using GetEntry as shown below
-                var sampleVariants = variant.ExtractSampleInfo();
+				// the unified json will call this function to get all the samples and can print them out using GetEntry as shown below
+				var sampleVariants = variant.ExtractSampleInfo();
 
 				Assert.Equal("0/0", sampleVariants[0].Genotype);
 				Assert.Equal("0/0", sampleVariants[1].Genotype);
@@ -61,18 +68,16 @@ namespace UnitTests.FileHandling
         [Fact]
         public void MultipleAllelesMultipleSamples()
         {
-            using (var reader = new LiteVcfReader(Path.Combine("Resources", "InputFiles", "Nirvana_unified_json_format.vcf")))
+            using (var reader = new LiteVcfReader(ResourceUtilities.GetReadStream(Resources.InputFiles("Nirvana_unified_json_format.vcf"))))
             {
                 // LP2000021	LP2000022	LP2000023
                 Assert.Equal("LP2000021", reader.SampleNames[0]);
                 Assert.Equal("LP2000022", reader.SampleNames[1]);
                 Assert.Equal("LP2000023", reader.SampleNames[2]);
 
-                var variant = VcfUtilities.GetVariantFeature(DummyVcfLine);
-
                 // skip the first variant
-                GetNextVariant(reader, variant);
-                GetNextVariant(reader, variant);
+                VcfUtilities.GetNextVariant(reader, _renamer);
+                var variant = VcfUtilities.GetNextVariant(reader, _renamer);
 
                 // GT:GQ:GQX:DPI:AD	
                 // 1/2:46:1:32:0,22,3	
@@ -88,7 +93,7 @@ namespace UnitTests.FileHandling
 
 
 				// 1/2 - A
-				string expectedEntry =
+				var expectedEntry =
 				"{\"variantFreq\":1,\"totalDepth\":32,\"genotypeQuality\":1,\"alleleDepths\":[0,22,3],\"genotype\":\"1/2\"}";
                 var observedEntry    = sampleVariants[0].ToString();
                 Assert.Equal(expectedEntry, observedEntry);
@@ -108,7 +113,7 @@ namespace UnitTests.FileHandling
 		[Fact]
 		public void NoSamples()
 		{
-			using (var reader = new LiteVcfReader(Path.Combine("Resources", "InputFiles", "NoSamples.vcf")))
+			using (var reader = new LiteVcfReader(ResourceUtilities.GetReadStream(Resources.InputFiles("NoSamples.vcf"))))
 			{
 				Assert.Null(reader.SampleNames);
 			}
@@ -117,15 +122,13 @@ namespace UnitTests.FileHandling
 		[Fact]
 		public void EmptySamplesTest()
 		{
-            using (var reader = new LiteVcfReader(Path.Combine("Resources", "InputFiles", "Nirvana_unified_json_format.vcf")))
-            {
-                var variant = VcfUtilities.GetVariantFeature(DummyVcfLine);
-
+			using (var reader = new LiteVcfReader(ResourceUtilities.GetReadStream(Resources.InputFiles("Nirvana_unified_json_format.vcf"))))
+			{
                 // getting the 4th variant
-                GetNextVariant(reader, variant);
-                GetNextVariant(reader, variant);
-                GetNextVariant(reader, variant);
-                GetNextVariant(reader, variant);
+                VcfUtilities.GetNextVariant(reader, _renamer);
+                VcfUtilities.GetNextVariant(reader, _renamer);
+                VcfUtilities.GetNextVariant(reader, _renamer);
+                var variant = VcfUtilities.GetNextVariant(reader, _renamer);
 
                 // GT:GQ:GQX:DPI:AD	
                 // 0/1:124:19:5:11,8:P:.	
@@ -137,7 +140,7 @@ namespace UnitTests.FileHandling
 
 
 
-				string expectedEntry =
+				var expectedEntry =
 				"{\"variantFreq\":0.4211,\"genotypeQuality\":124,\"alleleDepths\":[11,8],\"genotype\":\"0/1\"}";
 				var observedEntry = sampleVariants[0].ToString();
 				Assert.Equal(expectedEntry, observedEntry);
@@ -156,22 +159,20 @@ namespace UnitTests.FileHandling
 		[Fact]
 		public void SamplesWithFilterAndGq()
 		{
-			using (var reader = new LiteVcfReader(Path.Combine("Resources", "InputFiles", "Nirvana_unified_json_format.vcf")))
+			using (var reader = new LiteVcfReader(ResourceUtilities.GetReadStream(Resources.InputFiles("Nirvana_unified_json_format.vcf"))))
 			{
-				var variant = VcfUtilities.GetVariantFeature(DummyVcfLine);
+                // skip the first two variants
+                VcfUtilities.GetNextVariant(reader, _renamer);
+                VcfUtilities.GetNextVariant(reader, _renamer);
+                var variant = VcfUtilities.GetNextVariant(reader, _renamer);
 
-                // skip the first two variant
-                GetNextVariant(reader, variant);
-				GetNextVariant(reader, variant);
-				GetNextVariant(reader, variant);
+                // GT:GQ:DP:DPF:AD:FT:DPI      
+                // 0/1:124:19:5:11,8:P:.        
+                // 2/2:58:55:.:0,23:F:21	
+                // 1/2:55:59:.:0,21:F:20
 
-				// GT:GQ:DP:DPF:AD:FT:DPI      
-				// 0/1:124:19:5:11,8:P:.        
-				// 2/2:58:55:.:0,23:F:21	
-				// 1/2:55:59:.:0,21:F:20
-
-				// the unified json will call this function to get all the samples and can print them out using GetEntry as shown below
-				var sampleVariants = variant.ExtractSampleInfo();
+                // the unified json will call this function to get all the samples and can print them out using GetEntry as shown below
+                var sampleVariants = variant.ExtractSampleInfo();
 
 				Assert.Equal("0/1", sampleVariants[0].Genotype);
 				Assert.Equal("2/2", sampleVariants[1].Genotype);
@@ -179,7 +180,7 @@ namespace UnitTests.FileHandling
 
 
 
-				string expectedEntry =
+				var expectedEntry =
 				"{\"variantFreq\":0.4211,\"genotypeQuality\":124,\"alleleDepths\":[11,8],\"genotype\":\"0/1\"}";
 				var observedEntry = sampleVariants[0].ToString();
 				Assert.Equal(expectedEntry, observedEntry);
@@ -198,16 +199,5 @@ namespace UnitTests.FileHandling
 			}
 		}
 
-        /// <summary>
-        /// retrieves the next variantFeature. Returns false if there are no more variants available
-        /// </summary>
-        private static void GetNextVariant(LiteVcfReader reader, VariantFeature variantFeature)
-        {
-            // get the next line
-            string line = reader.ReadLine();
-            if (line == null) return;
-
-            variantFeature.ParseVcfLine(line);
-        }
-    }
+	}
 }

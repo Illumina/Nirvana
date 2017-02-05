@@ -5,7 +5,6 @@ using Xunit;
 
 namespace UnitTests.Utilities
 {
-    [Collection("Entry Assembly")]
     public class CommandLineUtilitiesTests
     {
         [Fact]
@@ -20,10 +19,10 @@ namespace UnitTests.Utilities
                 redirector.Close();
             }
 
-            Assert.Contains("xUnit.net Test Runner", result);
+            Assert.Contains("testhost", result);
             Assert.Contains("BOB", result);
-            Assert.Contains("Copyright (C) Outercurve Foundation", result);
-            Assert.Contains("2.2.0", result);
+            Assert.Contains("(c) 2017 Illumina, Inc.", result);
+            Assert.Contains("15.0.0", result);
         }
 
         [Fact]
@@ -36,9 +35,21 @@ namespace UnitTests.Utilities
         }
 
         [Fact]
+        public void GetAssemblyCopyright()
+        {
+            Assert.Equal("(c) 2017 Illumina, Inc.", CommandLineUtilities.Copyright);
+        }
+
+        [Fact]
         public void GetAssemblyVersion()
         {
-            Assert.StartsWith("2.2.0", CommandLineUtilities.Version);
+            Assert.StartsWith("15.0.0", CommandLineUtilities.Version);
+        }
+
+        [Fact]
+        public void GetAssemblyTitle()
+        {
+            Assert.StartsWith("testhost", CommandLineUtilities.Title);
         }
 
         [Fact]

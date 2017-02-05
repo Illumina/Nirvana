@@ -1,19 +1,20 @@
 ﻿using System.Linq;
 using System.Text;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.Utilities;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.Algorithms
 {
-    public class HgvsCodingNomenclature
+    public sealed class HgvsCodingNomenclature
     {
         #region members
 
         private readonly TranscriptAnnotation _ta;
         private readonly Transcript _transcript;
         private readonly VariantFeature _variant;
+        private readonly ICompressedSequence _compressedSequence;
         private readonly bool _isGenomicDuplicate;
 
         private readonly HgvsNotation _hgvsNotation;
@@ -23,7 +24,7 @@ namespace VariantAnnotation.Algorithms
 
         #endregion
 
-        private class PositionOffset
+        private sealed class PositionOffset
         {
             #region members
 
@@ -34,14 +35,16 @@ namespace VariantAnnotation.Algorithms
 
             #endregion
 
-            // constructor
+            /// <summary>
+            /// constructor
+            /// </summary>
             public PositionOffset(int position)
             {
                 Position = position;
             }
         }
 
-        private class HgvsNotation
+        private sealed class HgvsNotation
         {
             #region members
 
@@ -58,18 +61,21 @@ namespace VariantAnnotation.Algorithms
             public GenomicChange Type;
             public int AlleleMultiple;
 
-            private const char CodingType = 'c';
+            private const char CodingType    = 'c';
             private const char NonCodingType = 'n';
 
             #endregion
 
-            // constructor
-            public HgvsNotation(string referenceBases, string alternateBases, string transcriptId, int start, int end, bool isCoding)
+            /// <summary>
+            /// constructor
+            /// </summary>
+            public HgvsNotation(string referenceBases, string alternateBases, string transcriptId, int start, int end,
+                bool isCoding)
             {
                 TranscriptId = transcriptId;
 
                 Start = new PositionOffset(start);
-                End = new PositionOffset(end);
+                End   = new PositionOffset(end);
 
                 ReferenceBases = referenceBases ?? "";
                 AlternateBases = alternateBases ?? "";
@@ -81,17 +87,19 @@ namespace VariantAnnotation.Algorithms
         /// <summary>
         /// constructor
         /// </summary>
-        public HgvsCodingNomenclature(TranscriptAnnotation ta, Transcript transcript, VariantFeature variant, bool isGenomicDuplicate)
+        public HgvsCodingNomenclature(TranscriptAnnotation ta, Transcript transcript, VariantFeature variant,
+            ICompressedSequence compressedSequence, bool isGenomicDuplicate)
         {
             _ta                 = ta;
             _transcript         = transcript;
             _variant            = variant;
+            _compressedSequence = compressedSequence;
             _isGenomicDuplicate = isGenomicDuplicate;
 
             _sb = new StringBuilder();
 
             // get reference sequence strand
-            bool transcriptOnReverseStrand = transcript.OnReverseStrand;
+            var transcriptOnReverseStrand = transcript.Gene.OnReverseStrand;
 
             // this may be different to the input one for insertions/deletions
             var altAllele = ta.AlternateAllele;
@@ -108,8 +116,8 @@ namespace VariantAnnotation.Algorithms
 
             // decide event type from HGVS nomenclature
             _hgvsNotation = new HgvsNotation(ta.TranscriptReferenceAllele, variationFeatureSequence,
-                FormatUtilities.GetVersion(transcript.StableId, transcript.CodingVersion), _hgvsStart, _hgvsEnd,
-                _transcript.CompDnaCodingStart != -1);
+                FormatUtilities.CombineIdAndVersion(transcript.Id, transcript.Version), _hgvsStart, _hgvsEnd,
+                _transcript.Translation != null);
         }
 
         /// <summary>
@@ -128,12 +136,12 @@ namespace VariantAnnotation.Algorithms
             else GetCdnaPosition(_hgvsNotation.End);
 
             // sanity check: make sure we have coordinates
-            if ((_hgvsNotation.Start.Position == null) || (_hgvsNotation.End.Position == null)) return;
+            if (_hgvsNotation.Start.Position == null || _hgvsNotation.End.Position == null) return;
 
-	        var transcriptLen = _transcript.End - _transcript.Start + 1;
+            var transcriptLen = _transcript.End - _transcript.Start + 1;
 
-			//_hgvs notation past the transcript
-			if(_hgvsNotation.Start.Position > transcriptLen || _hgvsNotation.End.Position > transcriptLen) return;
+            //_hgvs notation past the transcript
+            if (_hgvsNotation.Start.Position > transcriptLen || _hgvsNotation.End.Position > transcriptLen) return;
 
             // make sure that start is always less than end
             SwapEndpoints(_hgvsNotation);
@@ -151,13 +159,13 @@ namespace VariantAnnotation.Algorithms
         private static void SwapEndpoints(HgvsNotation hn)
         {
             if (hn.Start.Offset == null) hn.Start.Offset = 0;
-            if (hn.End.Offset == null) hn.End.Offset = 0;
+            if (hn.End.Offset   == null) hn.End.Offset   = 0;
 
-            if (!hn.End.HasStopCodonNotation && (hn.Start.Position + hn.Start.Offset > hn.End.Position + hn.End.Offset))
+            if (!hn.End.HasStopCodonNotation && hn.Start.Position + hn.Start.Offset > hn.End.Position + hn.End.Offset)
             {
                 var temp = hn.Start;
                 hn.Start = hn.End;
-                hn.End = temp;
+                hn.End   = temp;
             }
         }
 
@@ -205,18 +213,19 @@ namespace VariantAnnotation.Algorithms
             return _sb.ToString();
         }
 
-        private static void GetReferenceCoordinates(Transcript transcript, VariantAlternateAllele altAllele, out int hgvsStart, out int hgvsEnd)
+        private static void GetReferenceCoordinates(Transcript transcript, VariantAlternateAllele altAllele,
+            out int hgvsStart, out int hgvsEnd)
         {
             // calculate the HGVS position: use HGVS coordinates not variation feature coordinates due to duplications
-            if (transcript.OnReverseStrand)
+            if (transcript.Gene.OnReverseStrand)
             {
-                hgvsStart = transcript.End - altAllele.ReferenceEnd + 1;
-                hgvsEnd = transcript.End - altAllele.ReferenceBegin + 1;
+                hgvsStart = transcript.End - altAllele.End + 1;
+                hgvsEnd   = transcript.End - altAllele.Start + 1;
             }
             else
             {
-                hgvsStart = altAllele.ReferenceBegin - transcript.Start + 1;
-                hgvsEnd = altAllele.ReferenceEnd - transcript.Start + 1;
+                hgvsStart = altAllele.Start - transcript.Start + 1;
+                hgvsEnd   = altAllele.End - transcript.Start + 1;
             }
         }
 
@@ -229,33 +238,34 @@ namespace VariantAnnotation.Algorithms
 
             // start and stop coordinate relative to transcript. Take into account which
             // strand we're working on
-            position = _transcript.OnReverseStrand
+            position = _transcript.Gene.OnReverseStrand
                 ? _transcript.End - position + 1
                 : _transcript.Start + position - 1;
 
             // loop over the exons and get the coordinates of the variation in exon+intron notation
-            var exons = _transcript.Exons;
+            var exons = _transcript.CdnaMaps;
 
             for (int exonIndex = 0; exonIndex < exons.Length; exonIndex++)
             {
                 var exon = exons[exonIndex];
 
                 // skip if the start point is beyond this exon
-                if (position > exon.End) continue;
+                if (position > exon.GenomicEnd) continue;
 
                 // EXONIC: if the start coordinate is within this exon
-                if (position >= exon.Start)
+                if (position >= exon.GenomicStart)
                 {
                     // get the cDNA start coordinate of the exon and add the number of nucleotides
                     // from the exon boundary to the variation. If the transcript is in the opposite
                     // direction, count from the end instead
                     int tempCdnaEnd, tempCdnaBegin;
 
-                    _transcript.GetCodingDnaEndpoints(exon.Start, exon.End, out tempCdnaBegin, out tempCdnaEnd);
+                    TranscriptUtilities.GetCodingDnaEndpoints(_transcript.CdnaMaps, exon.GenomicStart, exon.GenomicEnd,
+                        out tempCdnaBegin, out tempCdnaEnd);
 
-                    po.Position = tempCdnaBegin + (_transcript.OnReverseStrand
-                        ? exon.End - position
-                        : position - exon.Start);
+                    po.Position = tempCdnaBegin + (_transcript.Gene.OnReverseStrand
+                        ? exon.GenomicEnd - position
+                        : position - exon.GenomicStart);
 
                     break;
                 }
@@ -275,8 +285,8 @@ namespace VariantAnnotation.Algorithms
             }
 
             // start by correcting for the stop codon
-            int startCodon = _transcript.CompDnaCodingStart;
-            int stopCodon  = _transcript.CompDnaCodingEnd;
+            int startCodon = _transcript.Translation == null ? -1 : _transcript.Translation.CodingRegion.CdnaStart;
+            int stopCodon  = _transcript.Translation == null ? -1 : _transcript.Translation.CodingRegion.CdnaEnd;
 
             string cdnaCoord = po.Position.ToString();
             po.HasStopCodonNotation = false;
@@ -289,7 +299,7 @@ namespace VariantAnnotation.Algorithms
                     cdnaCoord = '*' + (po.Position - stopCodon).ToString();
                     po.HasStopCodonNotation = true;
                 }
-                else if ((po.Offset != null) && (po.Position == stopCodon))
+                else if (po.Offset != null && po.Position == stopCodon)
                 {
                     cdnaCoord = "*";
                     po.HasStopCodonNotation = true;
@@ -297,7 +307,7 @@ namespace VariantAnnotation.Algorithms
                 }
             }
 
-            if (!po.HasStopCodonNotation && (startCodon != -1))
+            if (!po.HasStopCodonNotation && startCodon != -1)
             {
                 cdnaCoord = (po.Position + (po.Position >= startCodon ? 1 : 0) - startCodon).ToString();
             }
@@ -310,12 +320,12 @@ namespace VariantAnnotation.Algorithms
         /// <summary>
         /// get the genomic change that resulted from this variation [Sequence.pm:482 hgvs_variant_notation]
         /// </summary>
-        private static void GetGenomicChange(Transcript transcript, HgvsNotation hn, bool isGenomicDuplicate)
+        private void GetGenomicChange(Transcript transcript, HgvsNotation hn, bool isGenomicDuplicate)
         {
             hn.Type = GenomicChange.Unknown;
 
             // make sure our positions are defined
-            if ((hn.Start.Position == null) || (hn.End.Position == null)) return;
+            if (hn.Start.Position == null || hn.End.Position == null) return;
 
             int displayStart = (int)hn.Start.Position;
             int displayEnd   = (int)hn.End.Position;
@@ -357,13 +367,13 @@ namespace VariantAnnotation.Algorithms
             if (refLength == 0)
             {
                 int prevPosition = displayEnd - altLength;
-                var compressedSequence = AnnotationLoader.Instance.CompressedSequence;
 
-                if (!isGenomicDuplicate && (compressedSequence != null) && (prevPosition >= 0))
+                if (!isGenomicDuplicate && _compressedSequence != null && prevPosition >= 0)
                 {
                     // Get the same number of nucleotides preceding the insertion as the length of
                     // the insertion
-                    var precedingBases = SequenceUtilities.GetSubSubstring(transcript.Start, transcript.End, transcript.OnReverseStrand, prevPosition, prevPosition + altLength - 1, compressedSequence);
+                    var precedingBases = SequenceUtilities.GetSubSubstring(transcript.Start, transcript.End,
+                        transcript.Gene.OnReverseStrand, prevPosition, prevPosition + altLength - 1, _compressedSequence);
                     if (precedingBases == hn.AlternateBases) isGenomicDuplicate = true;
                 }
 
@@ -374,7 +384,7 @@ namespace VariantAnnotation.Algorithms
                     // for duplication, the hgvs positions are deceremented by alt allele length
                     var incrementLength = altLength;
                     hn.Start.Position   = displayStart - incrementLength;
-	                hn.End.Position = hn.Start.Position + incrementLength - 1;
+                    hn.End.Position     = hn.Start.Position + incrementLength - 1;
 
                     hn.AlleleMultiple = 2;
                     hn.ReferenceBases = hn.AlternateBases;
@@ -410,43 +420,45 @@ namespace VariantAnnotation.Algorithms
         /// <summary>
         /// get the shorted intron offset from the nearest exon
         /// </summary>
-        private void GetIntronOffset(Exon prevExon, Exon exon, int? position, PositionOffset po)
+        private void GetIntronOffset(CdnaCoordinateMap prevExon, CdnaCoordinateMap exon, int? position, PositionOffset po)
         {
-            int? upDist = position - prevExon.End;
-            int? downDist = exon.Start - position;
+            int? upDist   = position - prevExon.GenomicEnd;
+            int? downDist = exon.GenomicStart - position;
 
             int tempCdnaBegin, tempCdnaEnd;
 
-            if ((upDist < downDist) || ((upDist == downDist) && !_transcript.OnReverseStrand))
+            if (upDist < downDist || upDist == downDist && !_transcript.Gene.OnReverseStrand)
             {
                 // distance to upstream exon is the shortest (or equal and in the positive orientation)
-                _transcript.GetCodingDnaEndpoints(prevExon.Start, prevExon.End, out tempCdnaBegin, out tempCdnaEnd);
+                TranscriptUtilities.GetCodingDnaEndpoints(_transcript.CdnaMaps, prevExon.GenomicStart,
+                    prevExon.GenomicEnd, out tempCdnaBegin, out tempCdnaEnd);
 
-                if (_transcript.OnReverseStrand)
+                if (_transcript.Gene.OnReverseStrand)
                 {
                     po.Position = tempCdnaBegin;
-                    po.Offset = -upDist;
+                    po.Offset   = -upDist;
                 }
                 else
                 {
                     po.Position = tempCdnaEnd;
-                    po.Offset = upDist;
+                    po.Offset   = upDist;
                 }
             }
             else
             {
                 // distance to downstream exon is the shortest
-                _transcript.GetCodingDnaEndpoints(exon.Start, exon.End, out tempCdnaBegin, out tempCdnaEnd);
+                TranscriptUtilities.GetCodingDnaEndpoints(_transcript.CdnaMaps, exon.GenomicStart, exon.GenomicEnd,
+                    out tempCdnaBegin, out tempCdnaEnd);
 
-                if (_transcript.OnReverseStrand)
+                if (_transcript.Gene.OnReverseStrand)
                 {
                     po.Position = tempCdnaEnd;
-                    po.Offset = downDist;
+                    po.Offset   = downDist;
                 }
                 else
                 {
                     po.Position = tempCdnaBegin;
-                    po.Offset = -downDist;
+                    po.Offset   = -downDist;
                 }
             }
         }

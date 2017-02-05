@@ -1,14 +1,16 @@
-﻿using System;
+﻿
+using System;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
-    public abstract class SupplementaryDataItem : IComparable<SupplementaryDataItem>, IEquatable<SupplementaryDataItem>
-    {
-        public string Chromosome { get; protected set; }
-        public int Start { get; protected set; }
-        public bool IsInterval { get; protected set; }
-        public abstract SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryAnnotation sa, string refBases = null);
-        public abstract SupplementaryInterval GetSupplementaryInterval();
+	public abstract class SupplementaryDataItem: IComparable<SupplementaryDataItem>, IEquatable<SupplementaryDataItem>
+	{
+		public string Chromosome { get; protected set; }
+		public int Start { get; protected set; }
+		public bool IsInterval { get; protected set; }
+		public abstract SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryPositionCreator sa, string refBases = null);
+		public abstract SupplementaryInterval GetSupplementaryInterval(ChromosomeRenamer renamer);
 
         public int CompareTo(SupplementaryDataItem otherItem)
         {

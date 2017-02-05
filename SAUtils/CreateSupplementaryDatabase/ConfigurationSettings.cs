@@ -7,28 +7,27 @@ namespace SAUtils.CreateSupplementaryDatabase
         #region members
 
         // filenames
-        public static string CompressedReference;
+		public static string CompressedReference;
         public static string InputDbSnpFileName;
-        public static string InputCosmicVcfFileName;
-        public static string InputCosmicTsvFileName;
-        public static string InputClinVarFileName;
-        public static string InputClinVarPubmedFileName;
-        public static string InputClinVarEvaluatedDateFileName;
-        public static string Input1000GFileName;
+		public static string InputCosmicVcfFileName;
+		public static string InputCosmicTsvFileName;
+		public static string InputClinVarFileName;
+		public static string InputClinvarXml;
+		public static string Input1000GFileName;
         public static string InputEvsFile;
-        public static string InputExacFile;
-        public static string InputDgvFile;
-        public static string Input1000GSvFileName;
-        public static string InputClinGenFileName;
+		public static string InputExacFile;
+	    public static string InputDgvFile;
+	    public static string Input1000GSvFileName;
+	    public static string InputClinGenFileName;
         public static string OutputSupplementaryDirectory;
-        public static readonly List<string> CustomAnnotationFiles = new List<string>();
+	    public static readonly List<string> CustomAnnotationFiles= new List<string>();
+	    public static string ChromosomeList;
 
-
-        #endregion
+	    #endregion
 
         public static int NumberOfProvidedInputFiles()
         {
-            int count = 0;
+            var count = 0;
 
             if (Input1000GFileName   != null) count++;
 	        if (InputClinVarFileName != null) count++;

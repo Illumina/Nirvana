@@ -1,6 +1,0 @@
-Population Code	Population Description	Super Population Code	Sequence Data Available	Alignment Data Available	Variant Data Available
-CHB	Han Chinese in Bejing, China	EAS	1	1	1
-JPT	Japanese in Tokyo, Japan	EAS	1	1	1
-CEU	Utah Residents (CEPH) with Northern and Western Ancestry	EUR	1	1	1
-TSI	Toscani in Italia	EUR	1	1	1
-FIN	Finnish in Finland	EUR	1	1	1

@@ -1,124 +1,151 @@
+using System;
 using System.IO;
 using System.Text;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using VariantAnnotation.Interface;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.FileHandling
 {
-    public class ExtendedBinaryWriter
+    public sealed class ExtendedBinaryWriter : BinaryWriter, IExtendedBinaryWriter
     {
         #region members
 
-        private readonly BinaryWriter _writer;
+        private readonly Stream _stream;
 
         #endregion
 
-        // constructor
-        public ExtendedBinaryWriter(BinaryWriter writer)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public ExtendedBinaryWriter(Stream output) : this(output, new UTF8Encoding(false, true)) { }
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public ExtendedBinaryWriter(Stream output, Encoding encoding, bool leaveOpen = false)
+            : base(output, encoding, leaveOpen)
         {
-            _writer = writer;
+            _stream = output;
         }
 
         /// <summary>
-        /// writes a boolean to the binary writer
+        /// writes a nullable byte to the binary writer
         /// </summary>
-        public void WriteBoolean(bool b)
+        public void WriteOpt(byte? b)
         {
-            _writer.Write(b);
+            if (_stream == null) throw new GeneralException("File not open");
+            Write(b == null ? (byte)128 : (byte)(b.Value & 127));
         }
 
         /// <summary>
-        /// writes a byte to the binary writer
+        /// writes a double-precision floating-point number to the binary writer
         /// </summary>
-        public void WriteByte(byte b)
+        public void WriteOpt(double d)
         {
-            _writer.Write(b);
-        }
-
-        public void WriteDouble(double value)
-        {
-            var i = (int)(value * SupplementaryAnnotation.PrecisionConst);
-            WriteInt(i);
+            if (_stream == null) throw new GeneralException("File not open");
+            Write((int)(d * ExtendedBinaryReader.PrecisionConst));
         }
 
         /// <summary>
-        /// writes a byte array to the binary writer
+        /// writes a single-precision floating-point number to the binary writer
         /// </summary>
-        public void WriteBytes(byte[] buffer)
+        public void WriteOpt(float f)
         {
-            _writer.Write(buffer);
-        }
-
-        /// <summary>
-        /// writes a byte array to the binary writer
-        /// </summary>
-        public void WriteBytes(byte[] buffer, int offset, int count)
-        {
-            _writer.Write(buffer, offset, count);
+            if (_stream == null) throw new GeneralException("File not open");
+            Write((int)(f * ExtendedBinaryReader.PrecisionConst));
         }
 
         /// <summary>
         /// writes an integer to the binary writer
         /// </summary>
-        public void WriteInt(int value)
+        public void WriteOpt(int value)
         {
+            if (_stream == null) throw new GeneralException("File not open");
             uint num = (uint)value;
 
             while (num >= 128U)
             {
-                _writer.Write((byte)(num | 128U));
+                Write((byte)(num | 128U));
                 num >>= 7;
             }
 
-            _writer.Write((byte)num);
+            Write((byte)num);
+        }
+
+        /// <summary>
+        /// writes a nullable integer to the binary writer
+        /// </summary>
+        public void WriteOpt(int? value)
+        {
+            if (_stream == null) throw new GeneralException("File not open");
+            WriteOpt(value ?? -1);
         }
 
         /// <summary>
         /// writes a long to the binary writer
         /// </summary>
-        public void WriteLong(long value)
+        public void WriteOpt(long value)
         {
+            if (_stream == null) throw new GeneralException("File not open");
             ulong num = (ulong)value;
 
             while (num >= 128U)
             {
-                _writer.Write((byte)(num | 128U));
+                Write((byte)(num | 128U));
                 num >>= 7;
             }
 
-            _writer.Write((byte)num);
+            Write((byte)num);
         }
 
         /// <summary>
         /// writes an ASCII string to the binary writer
         /// </summary>
-        public void WriteAsciiString(string s)
+        public void WriteOptAscii(string s)
         {
+            if (_stream == null) throw new GeneralException("File not open");
             int numBytes = s?.Length ?? 0;
-            WriteInt(numBytes);
+            WriteOpt(numBytes);
 
             // sanity check: handle null strings
             if (s == null) return;
 
             // write the ASCII bytes
-            WriteBytes(Encoding.ASCII.GetBytes(s));
+            Write(Encoding.ASCII.GetBytes(s));
         }
 
         /// <summary>
-        /// writes an utf-8 string to the binary writer
+        /// writes an UTF8 string to the binary writer
         /// </summary>
-        public void WriteUtf8String(string s)
+        public void WriteOptUtf8(string s)
         {
+            if (_stream == null) throw new GeneralException("File not open");
+            // sanity check: handle null strings
             if (s == null)
             {
-                WriteInt(0);
+                WriteOpt(0);
                 return;
             }
+
             var encodedBytes = Encoding.UTF8.GetBytes(s);
+            WriteOpt(encodedBytes.Length);
 
-            WriteInt(encodedBytes.Length);
+            // write the UTF8 bytes
+            Write(encodedBytes);
+        }
 
-            // write the utf-8 bytes
-            WriteBytes(encodedBytes);
+        public void WriteOptArray<T>(T[] values, Action<T> writeOptAction)
+        {
+            if (_stream == null) throw new GeneralException("File not open");
+
+            if (values == null)
+            {
+                WriteOpt(0);
+                return;
+            }
+
+            WriteOpt(values.Length);
+            foreach (var v in values) writeOptAction(v);
         }
     }
 }

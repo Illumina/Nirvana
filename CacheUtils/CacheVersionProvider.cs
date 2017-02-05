@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.FileHandling;
+﻿using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Utilities;
 
 namespace CacheUtils
@@ -7,6 +7,6 @@ namespace CacheUtils
     {
         public string GetProgramVersion() => $"Nirvana {CommandLineUtilities.InformationalVersion}";
 
-        public string GetDataVersion() => $"Cache version: {NirvanaDatabaseCommon.DataVersion}";
+        public string GetDataVersion() => $"Cache version: {CacheConstants.DataVersion}";
     }
 }

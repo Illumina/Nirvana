@@ -2,11 +2,10 @@
 
 namespace VariantAnnotation.Utilities
 {
-    public class Benchmark
+    public sealed class Benchmark
     {
         #region members
 
-        // ReSharper disable once MemberCanBePrivate.Global
         internal DateTime StartTime;
 
         #endregion
@@ -38,7 +37,7 @@ namespace VariantAnnotation.Utilities
         /// </summary>
         public string GetElapsedIterationTime(int numUnits, string unitName, out double unitsPerSecond)
         {
-            DateTime stopTime = DateTime.Now;
+            var stopTime = DateTime.Now;
             var span = new TimeSpan(stopTime.Ticks - StartTime.Ticks);
 
             unitsPerSecond = numUnits / span.TotalSeconds;

@@ -9,12 +9,14 @@ ILLUMINA_DIR=illumina
 QUICKLZ_DIR=quicklz-1.5.0
 ZLIB_DIR=zlib-ng
 TBC_DIR=TestBlockCompression
+ZSTD_DIR=zstd
 
 # define our include directories
 HTSLIB_INCLUDE=-I $(TOP_DIR)/$(HTSLIB_DIR) -I $(TOP_DIR)/$(HTSLIB_DIR)/htslib
 ILLUMINA_INCLUDE=-I $(TOP_DIR)/$(ILLUMINA_DIR)
 QUICKLZ_INCLUDE=-I $(TOP_DIR)/$(QUICKLZ_DIR)
 ZLIB_INCLUDE=-I $(TOP_DIR)/$(ZLIB_DIR)
+ZSTD_INCLUDE=-I $(TOP_DIR)/$(ZSTD_DIR)/lib -I $(TOP_DIR)/$(ZSTD_DIR)/lib/common
 
 # define our output library
 SHAREDLIB=$(BIN_DIR)/libBlockCompression.so
@@ -53,7 +55,18 @@ SOURCES=$(ILLUMINA_DIR)/BlockGZipUtils.c \
 	$(ZLIB_DIR)/arch/x86/fill_window_sse.c \
 	$(ZLIB_DIR)/arch/x86/insert_string_sse.c \
 	$(ZLIB_DIR)/arch/x86/crc_folding.c \
-	$(ZLIB_DIR)/arch/x86/deflate_quick.c
+	$(ZLIB_DIR)/arch/x86/deflate_quick.c \
+	$(ZSTD_DIR)/lib/common/entropy_common.c \
+	$(ZSTD_DIR)/lib/common/fse_decompress.c \
+	$(ZSTD_DIR)/lib/common/xxhash.c \
+	$(ZSTD_DIR)/lib/common/zstd_common.c \
+	$(ZSTD_DIR)/lib/compress/fse_compress.c \
+	$(ZSTD_DIR)/lib/compress/huf_compress.c \
+	$(ZSTD_DIR)/lib/compress/zstd_compress.c \
+	$(ZSTD_DIR)/lib/decompress/huf_decompress.c \
+	$(ZSTD_DIR)/lib/decompress/zbuff_decompress.c \
+	$(ZSTD_DIR)/lib/decompress/zstd_decompress.c
+
 OBJS=$(addprefix obj/,$(notdir $(SOURCES:.c=.o))) 
 
 all: $(SHAREDLIB) $(TESTBLOCKCOMPRESSION)
@@ -70,7 +83,7 @@ $(SHAREDLIB): $(OBJS)
 
 $(TESTBLOCKCOMPRESSION): $(SHAREDLIB)
 	@echo "- creating TestBlockCompression"
-	$(CC) $(CFLAGS) $(MARCH) $(ZLIB_INCLUDE) $(HTSLIB_INCLUDE) $(ILLUMINA_INCLUDE) $(QUICKLZ_INCLUDE) -o $(TESTBLOCKCOMPRESSION) $(TBC_DIR)/Test.c $(LIBS)
+	$(CC) $(CFLAGS) $(MARCH) $(ZLIB_INCLUDE) $(HTSLIB_INCLUDE) $(ILLUMINA_INCLUDE) $(QUICKLZ_INCLUDE) $(ZSTD_INCLUDE) -o $(TESTBLOCKCOMPRESSION) $(TBC_DIR)/Test.c $(LIBS)
 
 obj/%.o : $(ILLUMINA_DIR)/%.c
 	@mkdir -p $(dir $@)
@@ -102,3 +115,17 @@ obj/crc_folding.o : $(ZLIB_DIR)/arch/x86/crc_folding.c
 	@echo "- compiling" $(*F).c
 	@$(CC) $(CFLAGS) -mpclmul -msse4 $(DEFINES) $(ZLIB_INCLUDE) -c $< -o $@
 
+obj/%.o : $(ZSTD_DIR)/lib/common/%.c
+	@mkdir -p $(dir $@)
+	@echo "- compiling" $(*F).c
+	@$(CC) $(CFLAGS) $(MARCH) $(DEFINES) $(ZSTD_INCLUDE) -c $< -o $@
+
+obj/%.o : $(ZSTD_DIR)/lib/compress/%.c
+	@mkdir -p $(dir $@)
+	@echo "- compiling" $(*F).c
+	@$(CC) $(CFLAGS) $(MARCH) $(DEFINES) $(ZSTD_INCLUDE) -c $< -o $@
+
+obj/%.o : $(ZSTD_DIR)/lib/decompress/%.c
+	@mkdir -p $(dir $@)
+	@echo "- compiling" $(*F).c
+	@$(CC) $(CFLAGS) $(MARCH) $(DEFINES) $(ZSTD_INCLUDE) -c $< -o $@

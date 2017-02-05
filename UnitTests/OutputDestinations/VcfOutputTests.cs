@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnitTests.Mocks;
 using UnitTests.Utilities;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
@@ -6,38 +7,33 @@ using Xunit;
 
 namespace UnitTests.OutputDestinations
 {
-    [Collection("Chromosome 1 collection")]
-    public sealed class VcfOutputTests : RandomFileBase
+    public sealed class VcfOutputTests
     {
-        #region members
-
-        private readonly VcfUtilities _vcfUtilities = new VcfUtilities();
-
-        #endregion
-
         [Fact]
         public void AlleleFrequency1KgOutputTest()
         {
-            var sa = new SupplementaryAnnotation(115256529)
-            {
-                AlleleSpecificAnnotations =
-                {
-                    ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                    {
-                        DbSnp = new List<long> {11554290},
-						OneKgAllAn = 5008,
-						OneKgAllAc = 2130,
-						OneKgAmrAn = 694,
-						OneKgAmrAc = 250
-                    }
-                }
-            };
+	        var sa = new SupplementaryAnnotationPosition(115256529);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+			var oneKg = new OneKGenAnnotation
+			{
+				OneKgAllAn = 5008,
+				OneKgAllAc = 2130,
+				OneKgAmrAn = 694,
+				OneKgAmrAc = 250
+			};
 
-            _vcfUtilities.FieldContains("chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", saFilename,
-                "AF1000G=0.425319", VcfCommon.InfoIndex);
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 11554290 }
+			};
+
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.OneKg,"C",oneKg);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "C", dbSnp);
+
+			var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", "AF1000G=0.425319", VcfCommon.InfoIndex);
         }
 
         [Fact]
@@ -45,261 +41,247 @@ namespace UnitTests.OutputDestinations
         {
             const string altAllele = "C";
 
-            var sa = new SupplementaryAnnotation(115256529)
-            {
-	            AlleleSpecificAnnotations =
-	            {
-		            ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-		            {
-			            DbSnp = new List<long> {11554290},
-			            OneKgAllAn = 5008,
-			            OneKgAllAc = 2130,
-			            OneKgAmrAn = 694,
-			            OneKgAmrAc = 250
-		            }
-	            }
-            };
+			var sa = new SupplementaryAnnotationPosition(115256529);
 
-	        var cosmicItem1 = new CosmicItem("chr1", 115256529, "COSM1000", "T", altAllele, "TP53",
-		        new HashSet<CosmicItem.CosmicStudy>() {new CosmicItem.CosmicStudy("", "carcinoma", "oesophagus")},
+			var oneKg = new OneKGenAnnotation
+			{
+				OneKgAllAn = 5008,
+				OneKgAllAc = 2130,
+				OneKgAmrAn = 694,
+				OneKgAmrAc = 250
+			};
+
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 11554290 }
+			};
+
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.OneKg, "C", oneKg);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "C", dbSnp);
+
+			var cosmicItem1 = new CosmicItem("chr1", 115256529, "COSM1000", "T", altAllele, "TP53",
+		        new HashSet<CosmicItem.CosmicStudy> {new CosmicItem.CosmicStudy("", "carcinoma", "oesophagus")},1,
 		        altAllele);
            
             var cosmicItem2 = new CosmicItem("chr1", 115256529, "COSM1001", "T", altAllele, "TP53",
-				new HashSet<CosmicItem.CosmicStudy>() { new CosmicItem.CosmicStudy("01", "carcinoma", "large_intestine") },
+				new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy("01", "carcinoma", "large_intestine") },1,
 				altAllele);
 			
-            sa.AddCosmic(cosmicItem1);
-            sa.AddCosmic(cosmicItem2);
+			cosmicItem1.AddCosmicToSa(saCreator);
+			cosmicItem2.AddCosmicToSa(saCreator);
 
-            var clinvarItem1 = new ClinVarItem(null, 0, "A", altAllele, 0, "")
-            {
-                AltAllele    = altAllele,
-                SaAltAllele  = altAllele,
-                ID           = "NM_003036.3:c.100G>A|164780.0004",
-                OrphanetID   = "ORPHA2462",
-                Significance = "other"
-            };
+			var clinvarItem1 = new ClinVarItem(null, 0, null, altAllele, null, "RCV001",
+		        null, null, new List<string> { "ORPHA2462"}, null, null,"other");
 
             sa.ClinVarItems.Add(clinvarItem1);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            var infoColumn = VcfUtilities.GetVcfColumn(saReader,
+                "chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", VcfCommon.InfoIndex);
 
-            var infoField = _vcfUtilities.GetObservedField("chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1",
-                saFilename, VcfCommon.InfoIndex);
-            Assert.NotNull(infoField);
-
-            Assert.Contains("AF1000G=0.425319", infoField);
-            Assert.Contains("cosmic=1|COSM1000,1|COSM1001", infoField);
-            Assert.Contains("clinvar=1|other", infoField);
+            Assert.Contains("AF1000G=0.425319", infoColumn);
+            Assert.Contains("cosmic=1|COSM1000,1|COSM1001", infoColumn);
+            Assert.Contains("clinvar=1|other", infoColumn);
         }
 
         [Fact]
         public void ClinVarOutputTest()
         {
-            var sa = new SupplementaryAnnotation(115256529);
-
-            var clinvarItem1 = new ClinVarItem(null, 0, "A", "C", 0, "")
-            {
-                SaAltAllele = "C",
-                ID = "NM_003036.3:c.100G>A|164780.0004",
-                OrphanetID = "ORPHA2462",
-                Significance = "other"
-            };
+            var sa = new SupplementaryAnnotationPosition(115256529);
+			
+			var clinvarItem1 = new ClinVarItem(null, 0, null, "C", null, "RCV001",
+				null, null, new List<string> { "ORPHA2462" }, null, null, "other");
 
             sa.ClinVarItems.Add(clinvarItem1);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
-
-            _vcfUtilities.FieldContains("chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", saFilename,
-                "clinvar=1|other", VcfCommon.InfoIndex);
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", "clinvar=1|other", VcfCommon.InfoIndex);
         }
 
         [Fact]
         public void CosmicOutputTest()
         {
-            var sa = new SupplementaryAnnotation(115256529);
+            var sa = new SupplementaryAnnotationPosition(115256529);
+			var saCreator = new SupplementaryPositionCreator(sa);
 	        var altAllele = "C";
 
 			var cosmicItem1 = new CosmicItem("chr1", 115256529, "COSM1000", "T", altAllele, "TP53",
-							new HashSet<CosmicItem.CosmicStudy>() { new CosmicItem.CosmicStudy("", "carcinoma", "oesophagus") },
+							new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy("", "carcinoma", "oesophagus") },1,
 							altAllele);
 
 			var cosmicItem2 = new CosmicItem("chr1", 115256529, "COSM1001", "T", altAllele, "TP53",
-				new HashSet<CosmicItem.CosmicStudy>() { new CosmicItem.CosmicStudy("01", "carcinoma", "large_intestine") },
+				new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy("01", "carcinoma", "large_intestine") },1,
 				altAllele);
 
-			sa.AddCosmic(cosmicItem1);
-            sa.AddCosmic(cosmicItem2);
+			cosmicItem1.AddCosmicToSa(saCreator);
+			cosmicItem2.AddCosmicToSa(saCreator);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
-
-            _vcfUtilities.FieldContains("chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", saFilename,
-                "cosmic=1|COSM1000", VcfCommon.InfoIndex);
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", "cosmic=1|COSM1000", VcfCommon.InfoIndex);
         }
 
         [Fact]
         public void DbSnpOutputTest()
         {
-            var sa = new SupplementaryAnnotation(115256529)
-            {
-                AlleleSpecificAnnotations =
-                    {
-                        ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                        {
-                            DbSnp = new List<long> {11554290}
-                        }
-                    }
-            };
+            var sa = new SupplementaryAnnotationPosition(115256529);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 11554290 }
+			};
 
-            _vcfUtilities.FieldContains("chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", saFilename,
-                "rs11554290", VcfCommon.IdIndex);
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "C", dbSnp);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", "rs11554290", VcfCommon.IdIndex);
         }
 
         [Fact]
         public void EvsOutputTest()
         {
-            var sa = new SupplementaryAnnotation(115256529)
-            {
-                AlleleSpecificAnnotations =
-                    {
-                        ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                        {
-                            DbSnp = new List<long> {121913237},
-                            EvsAll = "0.0001",
-                            EvsCoverage = "102",
-                            NumEvsSamples = "3456"
-                        }
-                    }
-            };
+            var sa = new SupplementaryAnnotationPosition(115256529);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 121913237 }
+			};
+			var evs = new EvsAnnotation
+			{
+				EvsAll = "0.0001",
+				EvsCoverage = "102",
+				NumEvsSamples = "3456"
+			};
 
-            _vcfUtilities.FieldContains("chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1",
-                saFilename, "EVS=0.0001|102|3456", VcfCommon.InfoIndex);
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.Evs, "C", evs);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "C", dbSnp);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\t.\tT\tC\t1000\tPASS\t.\tGT\t0/1", "EVS=0.0001|102|3456", VcfCommon.InfoIndex);
         }
 
         [Fact]
         public void ExistingIdTrimming()
         {
-            var sa = new SupplementaryAnnotation(115256529)
-            {
-                AlleleSpecificAnnotations =
-                    {
-                        ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                        {
-                            DbSnp = new List<long> {11554290} // dummy rsid for testing only
-                        }
-                    }
-            };
+			var sa = new SupplementaryAnnotationPosition(115256529);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 11554290 }
+			};
 
-            _vcfUtilities.FieldContains("chr1\t115256529\tCanvas:LOSS:2:89432494:89444410;rs11554291\tT\tC\t1000\tPASS\t.\tGT\t0/1",
-                saFilename, "Canvas:LOSS:2:89432494:89444410;rs11554290", VcfCommon.IdIndex);
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "C", dbSnp);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\tCanvas:LOSS:2:89432494:89444410;rs11554291\tT\tC\t1000\tPASS\t.\tGT\t0/1",
+                "Canvas:LOSS:2:89432494:89444410;rs11554290", VcfCommon.IdIndex);
         }
 
         [Fact]
         public void MultiAlleleTest()
         {
-            var sa = new SupplementaryAnnotation(4634317)
-            {
-                AlleleSpecificAnnotations =
-                {
-                    ["A"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                    {
-                        DbSnp = new List<long> {11078537},
-						OneKgAllAn = 5008,
-						OneKgAllAc = 2049
-					},
-                    ["T"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                    {
-                        DbSnp = new List<long> {11078537},
-						OneKgAllAn = 5008,
-						OneKgAllAc = 1200
-					}
-                }
-            };
+            var sa = new SupplementaryAnnotationPosition(4634317);
+			
+			var oneKg1 = new OneKGenAnnotation
+			{
+				AncestralAllele = "C",
+				OneKgAllAn = 5008,
+				OneKgAllAc = 2049
+			};
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr17", saFilename);
+			var oneKg2 = new OneKGenAnnotation
+			{
+				AncestralAllele = "C",
+				OneKgAllAn = 5008,
+				OneKgAllAc = 1200
+			};
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 11078537 }
+			};
 
-            _vcfUtilities.FieldContains("17\t4634317\trs11078537\tC\tA,T\t256\tPASS\t.\tGT\t0/1",
-                saFilename, "AF1000G=0.409145,0.239617", VcfCommon.InfoIndex);
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "A", dbSnp);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "T", dbSnp);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.OneKg, "A", oneKg1);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.OneKg, "T", oneKg2);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "17\t4634317\trs11078537\tC\tA,T\t256\tPASS\t.\tGT\t0/1", "AF1000G=0.409145,0.239617", VcfCommon.InfoIndex);
         }
 
         [Fact]
         public void MultipleDbSnpIds()
         {
-            var sa = new SupplementaryAnnotation(115256529)
-            {
-                AlleleSpecificAnnotations =
-                    {
-                        ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                        {
-                            DbSnp = new List<long> {111, 222, 333}
-                        }
-                    }
-            };
+            var sa = new SupplementaryAnnotationPosition(115256529);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 111, 222, 333 }
+			};
 
-            _vcfUtilities.FieldContains("chr1\t115256529\tMantaFluff\tT\tC\t1000\tPASS\t.\tGT\t0/1",
-                saFilename, "MantaFluff;rs111;rs222;rs333", VcfCommon.IdIndex);
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "C", dbSnp);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
+                "chr1\t115256529\tMantaFluff\tT\tC\t1000\tPASS\t.\tGT\t0/1", "MantaFluff;rs111;rs222;rs333",
+                VcfCommon.IdIndex);
         }
 
         [Fact]
         public void NullVcfFieldTest()
         {
-            var sa = new SupplementaryAnnotation(9580071)
-            {
-                AlleleSpecificAnnotations =
-                {
-                    ["T"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-                    {
-                        DbSnp = null
-                    }
-                }
-            };
+            var sa = new SupplementaryAnnotationPosition(9580071);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr12", saFilename);
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = null
+			};
 
-            var idField = _vcfUtilities.GetObservedField("chr12\t9580071\t.\tA\tC,T\t394.00\tPASS\t.\tGT\t0/1",
-                saFilename, VcfCommon.IdIndex);
-            Assert.NotNull(idField);
+			var saCreator = new SupplementaryPositionCreator(sa);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp, "T", dbSnp);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            var idColumn = VcfUtilities.GetVcfColumn(saReader,
+                "chr12\t9580071\t.\tA\tC,T\t394.00\tPASS\t.\tGT\t0/1", VcfCommon.IdIndex);
+            Assert.NotNull(idColumn);
         }
 
         [Fact]
         public void OneAlleleFreqMissing()
         {
-            var sa = new SupplementaryAnnotation(825069)
-            {
-	            AlleleSpecificAnnotations =
-	            {
-		            ["C"] = new SupplementaryAnnotation.AlleleSpecificAnnotation
-		            {
-			            DbSnp = new List<long> {4475692},
-			            OneKgAllAn = 5008,
-			            OneKgAllAc = 3392
-		            }
-	            }
-            };
+	        var sa = new SupplementaryAnnotationPosition(825069);
 
-            var saFilename = GetRandomPath(true);
-            SupplementaryAnnotationUtilities.Write(sa, "chr1", saFilename);
+	        var saCreator = new SupplementaryPositionCreator(sa);
 
-            _vcfUtilities.FieldContains(
+			var dbSnp = new DbSnpAnnotation
+			{
+				DbSnp = new List<long> { 4475692 }
+			};
+
+			var oneKg = new OneKGenAnnotation
+			{
+				OneKgAllAn = 5008,
+				OneKgAllAc = 3392
+			};
+			
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.DbSnp,"C",dbSnp);
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.OneKg, "C", oneKg);
+
+            var saReader = new MockSupplementaryAnnotationReader(sa);
+            VcfUtilities.FieldContains(saReader,
                 "chr1	825069	rs4475692	G	A,C	362.00	LowGQX;HighDPFRatio	SNVSB=-36.9;SNVHPOL=3	GT:GQ:GQX:DP:DPF:AD	1/2:4:0:52:38:8,11,33",
-                saFilename, "AF1000G=.,0.677316", VcfCommon.InfoIndex);
+                "AF1000G=.,0.677316", VcfCommon.InfoIndex);
         }
     }
 }

@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="10318081">
+  <RecordStatus>current</RecordStatus>
+  <Title>NM_007262.4(PARK7):c.[-24+75_-24+92dup;487G&gt;A] AND Parkinson disease 7</Title>
+  <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-02-17" ID="64987">
+    <ClinVarAccession Acc="RCV000007484" Version="1" Type="RCV" DateUpdated="2016-02-17"/>
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2012-10-08">
+      <ReviewStatus>no assertion criteria provided</ReviewStatus>
+      <Description>Pathogenic</Description>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease"/>
+    <ObservedIn>
+      <Sample>
+        <Origin>germline</Origin>
+        <Species TaxonomyId="9606">human</Species>
+        <AffectedStatus>not provided</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>literature only</MethodType>
+      </Method>
+      <ObservedData ID="9735905">
+        <Attribute Type="Description">In 3 affected sibs from a consanguineous southern Italian family with early-onset parkinsonism (606324), Annesi et al. (2005) identified double homozygosity for mutations in the DJ1 gene. One was a 3385G-A transition in exon 7, resulting in a glu163-to-lys (E163K) substitution, and the other was an 18-bp duplication (168-185dup) in the promoter region. Age at disease onset was 36, 35, and 24 years, respectively. Severe amyotrophic lateral sclerosis and cognitive impairment were prominent in 1 sib, while the other 2 had prominent parkinsonism and behavioral abnormalities.</Attribute>
+        <Citation Type="general">
+          <ID Source="PubMed">16240358</ID>
+        </Citation>
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Haplotype" ID="60700">
+      <Measure Type="single nucleotide variant" ID="22107">
+        <Name>
+          <ElementValue Type="Preferred">NM_007262.4(PARK7):c.487G&gt;A (p.Glu163Lys)</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, RefSeq" Change="c.487G&gt;A">NM_007262.4:c.487G&gt;A</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.28318G&gt;A">NG_008271.1:g.28318G&gt;A</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level" Change="g.7984971G&gt;A" integerValue="38">NC_000001.11:g.7984971G&gt;A</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level, previous" Change="g.8045031G&gt;A" integerValue="37">NC_000001.10:g.8045031G&gt;A</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein, RefSeq" Change="p.Glu163Lys">NP_009193.2:p.Glu163Lys</Attribute>
+          <XRef Type="rs" ID="74315354" DB="dbSNP"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="MolecularConsequence">missense variant</Attribute>
+          <XRef ID="SO:0001583" DB="Sequence Ontology"/>
+          <XRef ID="NM_007262.4:c.487G&gt;A" DB="RefSeq"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="ProteinChange1LetterCode">E163K</Attribute>
+          <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="ProteinChange3LetterCode">GLU163LYS</Attribute>
+          <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM"/>
+        </AttributeSet>
+        <CytogeneticLocation>1p36.23</CytogeneticLocation>
+        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7984971" stop="7984971" display_start="7984971" display_stop="7984971" variantLength="1" referenceAllele="G" alternateAllele="A"/>
+        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8045031" stop="8045031" display_start="8045031" display_stop="8045031" variantLength="1" referenceAllele="G" alternateAllele="A"/>
+        <MeasureRelationship Type="variant in gene">
+          <Name>
+            <ElementValue Type="Preferred">parkinson protein 7</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">PARK7</ElementValue>
+          </Symbol>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961653" stop="7985282" display_start="7961653" display_stop="7985282" variantLength="23629" Strand="+"/>
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021713" stop="8045341" display_start="8021713" display_stop="8045341" variantLength="23629" Strand="+"/>
+          <XRef ID="11315" DB="Gene"/>
+          <XRef Type="MIM" ID="602533" DB="OMIM"/>
+          <XRef ID="HGNC:16369" DB="HGNC"/>
+        </MeasureRelationship>
+        <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM"/>
+        <XRef Type="rs" ID="74315354" DB="dbSNP"/>
+      </Measure>
+      <Measure Type="Duplication" ID="75266">
+        <Name>
+          <ElementValue Type="Preferred">NM_007262.4(PARK7):c.-24+75_-24+92dup</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, RefSeq" Change="c.-24+75_-24+92dup">NM_007262.4:c.-24+75_-24+92dup</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic" Change="g.5215_5232dup">NG_008271.1:g.5215_5232dup</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.5215_5232dup18">NG_008271.1:g.5215_5232dup18</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level" Change="g.7961868_7961885dup18" integerValue="38">NC_000001.11:g.7961868_7961885dup18</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level, previous" Change="g.8021928_8021945dup18" integerValue="37">NC_000001.10:g.8021928_8021945dup18</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="MolecularConsequence">intron variant</Attribute>
+          <XRef ID="SO:0001627" DB="Sequence Ontology"/>
+          <XRef ID="NM_007262.4:c.-24+75_-24+92dup" DB="RefSeq"/>
+        </AttributeSet>
+        <CytogeneticLocation>1p36.23</CytogeneticLocation>
+        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961868" stop="7961885" display_start="7961868" display_stop="7961885" variantLength="18"/>
+        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021928" stop="8021945" display_start="8021928" display_stop="8021945" variantLength="18"/>
+        <MeasureRelationship Type="variant in gene">
+          <Name>
+            <ElementValue Type="Preferred">parkinson protein 7</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">PARK7</ElementValue>
+          </Symbol>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961653" stop="7985282" display_start="7961653" display_stop="7985282" variantLength="23629" Strand="+"/>
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021713" stop="8045341" display_start="8021713" display_stop="8045341" variantLength="23629" Strand="+"/>
+          <XRef ID="11315" DB="Gene"/>
+          <XRef Type="MIM" ID="602533" DB="OMIM"/>
+          <XRef ID="HGNC:16369" DB="HGNC"/>
+        </MeasureRelationship>
+        <Citation Type="general">
+          <ID Source="PubMed">16240358</ID>
+        </Citation>
+        <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM"/>
+        <XRef Type="rs" ID="864309640" DB="dbSNP"/>
+      </Measure>
+      <Name>
+        <ElementValue Type="Preferred">NM_007262.4(PARK7):c.[-24+75_-24+92dup;487G&gt;A]</ElementValue>
+      </Name>
+      <Name>
+        <ElementValue Type="Alternate">PARK7, GLU163LYS AND 18-BP DUP</ElementValue>
+      </Name>
+      <AttributeSet>
+        <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.[5215_5232dup;28318G&gt;A]">NG_008271.1:g.[5215_5232dup;28318G&gt;A]</Attribute>
+      </AttributeSet>
+      <AttributeSet>
+        <Attribute Type="HGVS, coding, RefSeq" Change="c.[-24+75_-24+92dup;487G&gt;A]">NM_007262.4:c.[-24+75_-24+92dup;487G&gt;A]</Attribute>
+      </AttributeSet>
+      <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM"/>
+    </MeasureSet>
+    <TraitSet Type="Disease" ID="1946">
+      <Trait ID="3764" Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">Parkinson disease 7</ElementValue>
+          <XRef ID="Parkinson+disease+7/9090" DB="Genetic Alliance"/>
+        </Name>
+        <Name>
+          <ElementValue Type="Alternate">PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET</ElementValue>
+          <XRef Type="MIM" ID="606324" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="602533.0001" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="602533.0002" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="602533.0003" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="602533.0004" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="602533.0005" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM"/>
+        </Name>
+        <Symbol>
+          <ElementValue Type="Preferred">PARK7</ElementValue>
+          <XRef Type="MIM" ID="606324" DB="OMIM"/>
+        </Symbol>
+        <AttributeSet>
+          <Attribute Type="public definition">Parkinsonism refers to all clinical states characterized by tremor, muscle rigidity, slowed movement (bradykinesia) and often postural instability. Parkinson disease is the primary and most common form of parkinsonism. Psychiatric manifestations, which include depression and visual hallucinations, are common but not uniformly present. Dementia eventually occurs in at least 20% of cases. The most common sporadic form of Parkinson disease manifests around age 60; however, young-onset and even juvenile presentations are seen.</Attribute>
+          <XRef ID="NBK1223" DB="GeneReviews"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="age of onset">Adult</Attribute>
+          <XRef ID="2828" DB="Orphanet"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="prevalence">1-5 / 10 000</Attribute>
+          <XRef ID="2828" DB="Orphanet"/>
+        </AttributeSet>
+        <Citation Type="review" Abbrev="GeneReviews">
+          <ID Source="PubMed">20301402</ID>
+          <ID Source="BookShelf">NBK1223</ID>
+        </Citation>
+        <XRef ID="C1853445" DB="MedGen"/>
+        <XRef ID="2828" DB="Orphanet"/>
+        <XRef Type="MIM" ID="606324" DB="OMIM"/>
+      </Trait>
+    </TraitSet>
+  </ReferenceClinVarAssertion>
+  <ClinVarAssertion ID="27684">
+    <ClinVarSubmissionID localKey="602533.0006_PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET" submitter="OMIM" submitterDate="2012-10-08" title="PARK7, GLU163LYS AND 18-BP DUP _PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET"/>
+    <ClinVarAccession Acc="SCV000027684" Version="1" Type="SCV" OrgID="3" DateUpdated="2015-06-27"/>
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2012-10-08">
+      <ReviewStatus>no assertion criteria provided</ReviewStatus>
+      <Description>Pathogenic</Description>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease"/>
+    <ExternalID DB="OMIM" ID="602533.0006" Type="Allelic variant"/>
+    <ObservedIn>
+      <Sample>
+        <Origin>germline</Origin>
+        <Species>human</Species>
+        <AffectedStatus>not provided</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>literature only</MethodType>
+      </Method>
+      <ObservedData>
+        <Attribute Type="Description">In 3 affected sibs from a consanguineous southern Italian family with early-onset parkinsonism (606324), Annesi et al. (2005) identified double homozygosity for mutations in the DJ1 gene. One was a 3385G-A transition in exon 7, resulting in a glu163-to-lys (E163K) substitution, and the other was an 18-bp duplication (168-185dup) in the promoter region. Age at disease onset was 36, 35, and 24 years, respectively. Severe amyotrophic lateral sclerosis and cognitive impairment were prominent in 1 sib, while the other 2 had prominent parkinsonism and behavioral abnormalities.</Attribute>
+        <Citation>
+          <ID Source="PubMed">16240358</ID>
+        </Citation>
+        <XRef DB="OMIM" ID="606324" Type="MIM"/>
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant">
+      <Measure Type="Variation">
+        <Name>
+          <ElementValue Type="Preferred">PARK7, GLU163LYS AND 18-BP DUP</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="NonHGVS">GLU163LYS AND 18-BP DUP</Attribute>
+        </AttributeSet>
+        <MeasureRelationship Type="variant in gene">
+          <Symbol>
+            <ElementValue Type="Preferred">PARK7</ElementValue>
+          </Symbol>
+        </MeasureRelationship>
+        <XRef DB="OMIM" ID="602533.0006" Type="Allelic variant"/>
+      </Measure>
+    </MeasureSet>
+    <TraitSet Type="Disease">
+      <Trait Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET</ElementValue>
+        </Name>
+      </Trait>
+    </TraitSet>
+  </ClinVarAssertion>
+</ClinVarSet>
+</ReleaseSet>

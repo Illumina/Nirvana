@@ -1,11 +1,10 @@
-﻿using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.CompressedSequence;
+﻿using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.IntervalSearch;
 using VariantAnnotation.FileHandling;
 using Xunit;
 
 namespace UnitTests.DataStructures
 {
-    [Collection("Chromosome 1 collection")]
     public class CompressedSequenceTests
     {
         #region members
@@ -24,14 +23,14 @@ namespace UnitTests.DataStructures
             // create the following sequence: NNATGTTTCCACTTTCTCCTCATTAGANNNTAACGAATGGGTGATTTCCCTAN
             var buffer = new byte[] { 14, 42, 93, 169, 150, 122, 204, 11, 211, 224, 35, 169, 91, 0 };
 
-            var maskedIntervalTree = new IntervalTree<MaskedEntry>
-            {
-                new IntervalTree<MaskedEntry>.Interval(string.Empty, 0, 1, new MaskedEntry(0, 1)),
-                new IntervalTree<MaskedEntry>.Interval(string.Empty, 27, 29, new MaskedEntry(27, 29)),
-                new IntervalTree<MaskedEntry>.Interval(string.Empty, 52, 52, new MaskedEntry(52, 52))
-            };
+            var maskedIntervals = new IntervalArray<MaskedEntry>.Interval[3];
+            maskedIntervals[0] = new IntervalArray<MaskedEntry>.Interval(0, 1, new MaskedEntry(0, 1));
+            maskedIntervals[1] = new IntervalArray<MaskedEntry>.Interval(27, 29, new MaskedEntry(27, 29));
+            maskedIntervals[2] = new IntervalArray<MaskedEntry>.Interval(52, 52, new MaskedEntry(52, 52));
 
-            _compressedSequence.Set(NumBases, buffer, maskedIntervalTree);
+            var maskedIntervalArray = new IntervalArray<MaskedEntry>(maskedIntervals);
+
+            _compressedSequence.Set(NumBases, buffer, maskedIntervalArray);
         }
 
         [Theory]
@@ -44,16 +43,8 @@ namespace UnitTests.DataStructures
         [InlineData(23, 0, null)]
         public void Substring(int offset, int length, string expectedSubstring)
         {
-            string observedSubstring = _compressedSequence.Substring(offset, length);
+            var observedSubstring = _compressedSequence.Substring(offset, length);
             Assert.Equal(expectedSubstring, observedSubstring);
-        }
-
-        [Fact]
-        public void GenomeAssemblyTest()
-        {
-            const GenomeAssembly expectedGenomeAssembly = GenomeAssembly.GRCh37;
-            var observedGenomeAssembly = AnnotationLoader.Instance.GenomeAssembly;
-            Assert.Equal(expectedGenomeAssembly, observedGenomeAssembly);
         }
     }
 }

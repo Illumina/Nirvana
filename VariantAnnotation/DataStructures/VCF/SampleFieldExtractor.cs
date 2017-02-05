@@ -4,7 +4,7 @@ using VariantAnnotation.FileHandling;
 
 namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class SampleFieldExtractor
+    internal sealed class SampleFieldExtractor
     {
         #region members
 
@@ -35,7 +35,7 @@ namespace VariantAnnotation.DataStructures.VCF
             _formatIndices = FormatIndices.Extract(_vcfColumns[VcfCommon.FormatIndex]);
 
             // add each sample
-            for (int index = VcfCommon.GenotypeIndex; index < _vcfColumns.Length; index++)
+            for (var index = VcfCommon.GenotypeIndex; index < _vcfColumns.Length; index++)
             {
                 samples.Add(ExtractSample(_vcfColumns[index], fixGatkGenomeVcf));
             }
@@ -55,7 +55,7 @@ namespace VariantAnnotation.DataStructures.VCF
             var sampleColumns = sampleColumn.Split(':');
 
 			// handle missing sample columns
-			if ((sampleColumns.Length == 1) && sampleColumns[0] == ".") return EmptySample();
+			if (sampleColumns.Length == 1 && sampleColumns[0] == ".") return EmptySample();
 			
 			var tmp = new IntermediateSampleFields(_vcfColumns, _formatIndices, sampleColumns, fixGatkGenomeVcf);
 
@@ -69,7 +69,10 @@ namespace VariantAnnotation.DataStructures.VCF
 	            VariantFrequency                                        = new VariantFrequency(tmp).GetVariantFrequency(),
 	            CopyNumber                                              = tmp.CopyNumber?.ToString(),
 	            IsLossOfHeterozygosity                                  = tmp.MajorChromosomeCount != null && tmp.CopyNumber != null &&
-	                                     tmp.MajorChromosomeCount.Value == tmp.CopyNumber.Value
+																		  tmp.MajorChromosomeCount.Value == tmp.CopyNumber.Value,
+				DenovoQuality                                           = tmp.DenovoQuality?.ToString(),
+				SplitReadCounts                                         =  new ReadCounts(tmp).GetSplitReadCounts(),
+				PairEndReadCounts                                       = new ReadCounts(tmp).GetPairEndReadCounts()
             };
 
             // sanity check: handle empty samples

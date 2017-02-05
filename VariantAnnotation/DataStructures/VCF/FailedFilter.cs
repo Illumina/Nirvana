@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class FailedFilter
+    internal sealed class FailedFilter
     {
         #region members
 

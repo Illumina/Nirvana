@@ -2,7 +2,7 @@
 
 namespace ErrorHandling.Exceptions
 {
-    public class ProcessLockedFileException : Exception
+    public sealed class ProcessLockedFileException : Exception
     {
         // constructor
         public ProcessLockedFileException(string message) : base(message) { }

@@ -29,9 +29,6 @@ namespace VariantAnnotation.CommandLine
 
         private readonly IVersionProvider _versionProvider;
 
-        private long _peakMemoryUsageBytes;
-        private TimeSpan _wallTimeSpan;
-
         #endregion
 
         protected TopLevelCommandLineHandler(string programDescription, string executableName, Dictionary<string, TopLevelOption> ops, string authors, IVersionProvider versionProvider = null)
@@ -50,8 +47,6 @@ namespace VariantAnnotation.CommandLine
 
         protected void ParseCommandLine(string[] args)
         {
-            Benchmark benchmark = new Benchmark();
-
             try
             {
                 _commandLineOps["version"] = new TopLevelOption("displays the version", null);
@@ -81,16 +76,15 @@ namespace VariantAnnotation.CommandLine
                 }
                 else
                 {
-                    CommandLineUtilities.DisplayBanner(_programAuthors);
-
                     if (_showHelpMenu)
                     {
+                        CommandLineUtilities.DisplayBanner(_programAuthors);
                         ShowHelpMenu(unsupportedOp);
                     }
                     else
                     {
                         if (FoundParsingErrors()) return;
-                        ExitCode = commandMethod(command, args.Skip(1).ToArray());
+                        if (commandMethod != null) ExitCode = commandMethod(command, args.Skip(1).ToArray());
                     }
                 }
             }
@@ -98,15 +92,6 @@ namespace VariantAnnotation.CommandLine
             {
                 ExitCode = ExitCodeUtilities.ShowException(e);
             }
-
-            _peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
-            _wallTimeSpan         = benchmark.GetElapsedTime();
-
-            if (_showVersion || _showHelpMenu) return;
-
-            Console.WriteLine();
-            if (_peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(_peakMemoryUsageBytes));
-            Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(_wallTimeSpan));
         }
 
         private Func<string, string[], int> GetCommandMethod(string command)
@@ -129,7 +114,7 @@ namespace VariantAnnotation.CommandLine
 
             OutputHelper.WriteLabel("USAGE: ");
 
-            Console.WriteLine(string.Format("dotnet {0} <command> [options]", _executableName));
+            Console.WriteLine($"{_executableName} <command> [options]");
             Console.WriteLine();
 
             DisplayCommands(_commandLineOps);
@@ -140,7 +125,7 @@ namespace VariantAnnotation.CommandLine
             Console.WriteLine(_versionProvider.GetDataVersion());
         }
 
-        private void DisplayCommands(Dictionary<string, TopLevelOption> ops)
+        private static void DisplayCommands(Dictionary<string, TopLevelOption> ops)
         {
             string label  = "COMMAND: ";
             string filler = new string(' ', label.Length);
@@ -162,7 +147,7 @@ namespace VariantAnnotation.CommandLine
             }
         }
 
-        private int GetMaxCommandLen(IEnumerable<string> ops)
+        private static int GetMaxCommandLen(IEnumerable<string> ops)
         {
             return ops.Select(op => op.Length).Concat(new int[1]).Max();
         }
@@ -178,7 +163,7 @@ namespace VariantAnnotation.CommandLine
             if (ExitCode == 0) return false;
             Console.WriteLine("Some problems were encountered when parsing the command line options:");
             Console.WriteLine("{0}", _errorBuilder);
-            Console.WriteLine("For a complete list of command line options, type \"dotnet {0}\"", _executableName);
+            Console.WriteLine("For a complete list of command line options, type \"{0}\"", _executableName);
             return true;
         }
     }

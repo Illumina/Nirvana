@@ -1,6 +1,8 @@
-﻿namespace VariantAnnotation.DataStructures
+﻿using System.Collections.Generic;
+
+namespace VariantAnnotation.DataStructures
 {
-    public class TranscriptAnnotation
+    public sealed class TranscriptAnnotation
     {
         #region members
 
@@ -72,6 +74,11 @@
 
         // true if a frameshift was observed
         public bool HasFrameShift;
+
+        //for breakend
+	    public BreakendTranscriptAnnotation BreakendTranscriptAnnotation;
+	    public List<BreakendTranscriptAnnotation> BreakendPos2Annotations;
+	    public List<GeneFusionAnnotation> GeneFusionAnnotations;
 
         #endregion
 

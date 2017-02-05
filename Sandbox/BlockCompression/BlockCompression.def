@@ -3,8 +3,11 @@ LIBRARY
 
 EXPORTS
 	bgzf_compress
-	uncompress_block
+	bgzf_decompress
 	GetVersion
 	QuickLzCompress
 	QuickLzDecompress
 	qlz_size_decompressed
+	ZSTD_compress
+	ZSTD_decompress
+	ZSTD_getDecompressedSize

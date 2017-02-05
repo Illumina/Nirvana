@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.DataStructures.CytogeneticBands;
-using VariantAnnotation.Utilities;
+using VariantAnnotation.DataStructures.IntervalSearch;
+using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.FileHandling
 {
@@ -13,27 +14,23 @@ namespace VariantAnnotation.FileHandling
     {
         #region members
 
+        public readonly List<ReferenceMetadata> Metadata = new List<ReferenceMetadata>();
+
         // buffer specific
         public const int MaxShift = 6;
 
         private readonly ExtendedBinaryReader _reader;
-        private readonly BinaryReader _binaryReader;
         private readonly Stream _stream;
+        private readonly ICompressedSequence _compressedSequence;
 
-        private Dictionary<string, int> _nameToIndex;
-
-        private List<SequenceIndexEntry> _refSeqIndex;
-        private List<ReferenceMetadata> RefMetadataList { get; set; }
+        private readonly Dictionary<string, int> _nameToIndex  = new Dictionary<string, int>();
+        private readonly List<SequenceIndexEntry> _refSeqIndex = new List<SequenceIndexEntry>();
 
         private long _dataStartOffset;
         private long _indexOffset;
 
         // ReSharper disable once NotAccessedField.Local
         private long _maskedIntervalsOffset;
-
-        public ICytogeneticBands CytogeneticBands { get; private set; }
-        public GenomeAssembly GenomeAssembly { get; private set; }
-        private ChromosomeRenamer _chromosomeRenamer;
 
         #endregion
 
@@ -56,7 +53,6 @@ namespace VariantAnnotation.FileHandling
             {
                 // Free any other managed objects here
                 _stream.Dispose();
-                _binaryReader.Dispose();
             }
 
             // Free any unmanaged objects here
@@ -65,27 +61,13 @@ namespace VariantAnnotation.FileHandling
         #endregion
 
         /// <summary>
-        /// file constructor
+        /// stream constructor
         /// </summary>
-        public CompressedSequenceReader(string path)
+        public CompressedSequenceReader(Stream stream, ICompressedSequence compressedSequence)
         {
-            if (!File.Exists(path))
-            {
-                throw new UserErrorException($"The supplied compressed sequence filename ({path}) does not exist.");
-            }
-
-            _stream       = FileUtilities.GetFileStream(path);
-            _binaryReader = new BinaryReader(_stream);
-            _reader       = new ExtendedBinaryReader(_binaryReader);
-
-            Initialize();
-        }
-
-        private void Initialize()
-        {
-            _chromosomeRenamer = AnnotationLoader.Instance.ChromosomeRenamer;
-            _nameToIndex       = new Dictionary<string, int>();
-            _refSeqIndex       = new List<SequenceIndexEntry>();
+            _stream = stream;
+            _reader = new ExtendedBinaryReader(stream);
+            _compressedSequence = compressedSequence;
 
             CheckHeaderVersion();
             LoadHeader();
@@ -106,11 +88,11 @@ namespace VariantAnnotation.FileHandling
         /// </summary>
         private void CheckHeaderVersion()
         {
-            string headerTag  = _binaryReader.ReadString();
-            int headerVersion = _binaryReader.ReadInt32();
+            string headerTag  = _reader.ReadString();
+            int headerVersion = _reader.ReadInt32();
 
-            if ((headerTag != CompressedSequenceCommon.HeaderTag) ||
-                (headerVersion != CompressedSequenceCommon.HeaderVersion))
+            if (headerTag     != CompressedSequenceCommon.HeaderTag ||
+                headerVersion != CompressedSequenceCommon.HeaderVersion)
             {
                 throw new UserErrorException($"The header identifiers do not match the expected values: Obs: {headerTag} {headerVersion} vs Exp: {CompressedSequenceCommon.HeaderTag} {CompressedSequenceCommon.HeaderVersion}");
             }
@@ -119,28 +101,27 @@ namespace VariantAnnotation.FileHandling
         /// <summary>
         /// returns a 2-bit sequence corresponding to the specified name
         /// </summary>
-        public void GetCompressedSequence(string name, ref ICompressedSequence compressedSequence)
+        public void GetCompressedSequence(string ensemblReferenceName)
         {
-            var indexEntry = GetIndexEntry(name);
+            var indexEntry = GetIndexEntry(ensemblReferenceName);
             if (indexEntry == null) return;
 
             // jump to that offset
-            _stream.Position = indexEntry.Offset;
+            _stream.Position = indexEntry.FileOffset;
 
             // set the data
-            int numBufferBytes = CompressedSequence.GetNumBufferBytes(indexEntry.NumBases);
-            compressedSequence.Set(indexEntry.NumBases, _reader.ReadBytes(numBufferBytes), indexEntry.MaskedEntries);
+            var numBufferBytes = CompressedSequence.GetNumBufferBytes(indexEntry.NumBases);
+            _compressedSequence.Set(indexEntry.NumBases, _reader.ReadBytes(numBufferBytes), indexEntry.MaskedEntries, indexEntry.SequenceOffset);
         }
 
         /// <summary>
         /// returns the index entry that corresponds to the specified name. Returns null if the
         /// sequence doesn't exist.
         /// </summary>
-        private SequenceIndexEntry GetIndexEntry(string name)
+        private SequenceIndexEntry GetIndexEntry(string ensemblReferenceName)
         {
-            // grab the reference index
             int refIndex;
-            if (!_nameToIndex.TryGetValue(name, out refIndex)) return null;
+            if (!_nameToIndex.TryGetValue(ensemblReferenceName, out refIndex)) return null;
             return _refSeqIndex[refIndex];
         }
 
@@ -150,34 +131,27 @@ namespace VariantAnnotation.FileHandling
         private void LoadHeader()
         {
             // grab the index and masked intervals offsets
-            _indexOffset = _binaryReader.ReadInt64();
-            _maskedIntervalsOffset = _binaryReader.ReadInt64();
+            _indexOffset           = _reader.ReadInt64();
+            _maskedIntervalsOffset = _reader.ReadInt64();
 
-            // grab the creation time
-            _reader.ReadLong();
+            // skip the creation time
+            _reader.ReadOptInt64();
 
             // grab the reference metadata
-            RefMetadataList = new List<ReferenceMetadata>();
-            int numRefSeqs = _reader.ReadInt();
-
-            for (int i = 0; i < numRefSeqs; i++)
-            {
-                RefMetadataList.Add(ReferenceMetadata.Read(_reader));
-            }
+            int numRefSeqs = _reader.ReadOptInt32();
+            for (int i = 0; i < numRefSeqs; i++) Metadata.Add(ReferenceMetadata.Read(_reader));
 
             // update the chromosome renamer
-            var chromosomeRenamer = AnnotationLoader.Instance.ChromosomeRenamer;
-            chromosomeRenamer.AddReferenceMetadata(RefMetadataList);
+            _compressedSequence.Renamer.AddReferenceMetadata(Metadata);
 
             // read the cytogenetic bands
-            var cytogeneticBands = DataStructures.CytogeneticBands.CytogeneticBands.Read(_reader);
-            CytogeneticBands = new CytogeneticBands(chromosomeRenamer.EnsemblReferenceSequenceIndex, cytogeneticBands);
+            _compressedSequence.CytogeneticBands = new CytogeneticBands(CytogeneticBands.Read(_reader), _compressedSequence.Renamer);
 
             // read the genome assembly
-            GenomeAssembly = (GenomeAssembly)_reader.ReadByte();
+            _compressedSequence.GenomeAssembly = (GenomeAssembly)_reader.ReadByte();
 
             // grab the data start tag
-            ulong dataStartTag = _binaryReader.ReadUInt64();
+            ulong dataStartTag = _reader.ReadUInt64();
 
             if (dataStartTag != CompressedSequenceCommon.DataStartTag)
             {
@@ -193,17 +167,19 @@ namespace VariantAnnotation.FileHandling
         private void LoadIndex()
         {
             // grab the number of reference sequences
-            int numRefSeqs = _reader.ReadInt();
+            var numRefSeqs = _reader.ReadOptInt32();
 
             // read the index
             for (int refIndex = 0; refIndex < numRefSeqs; refIndex++)
             {
-                string refName  = _chromosomeRenamer.GetEnsemblReferenceName(_reader.ReadAsciiString());
-                int numBases    = _reader.ReadInt();
-                long refOffset  = _reader.ReadLong();
-                
-                _refSeqIndex.Add(new SequenceIndexEntry { NumBases = numBases, Offset = refOffset });
-                _nameToIndex[refName] = refIndex;
+                string name         = _compressedSequence.Renamer.GetEnsemblReferenceName(_reader.ReadAsciiString());
+                int encodedNumBases = _reader.ReadOptInt32();
+                int numBases        = encodedNumBases & CompressedSequenceCommon.NumBasesMask;
+                long fileOffset     = _reader.ReadOptInt64();
+                var sequenceOffset  = CompressedSequenceCommon.HasSequenceOffset(encodedNumBases) ? _reader.ReadOptInt32() : 0;
+
+                _refSeqIndex.Add(new SequenceIndexEntry { Name = name, NumBases = numBases, FileOffset = fileOffset, SequenceOffset = sequenceOffset });
+                _nameToIndex[name] = refIndex;
             }
         }
 
@@ -213,23 +189,24 @@ namespace VariantAnnotation.FileHandling
         private void LoadMaskedIntervals()
         {
             // grab the number of reference sequences
-            int numRefSeqs = _reader.ReadInt();
+            int numRefSeqs = _reader.ReadOptInt32();
 
             // read the index
             for (int refIndex = 0; refIndex < numRefSeqs; refIndex++)
             {
-                int numMaskedIntervals = _reader.ReadInt();
-                var maskedIntervalTree = new IntervalTree<MaskedEntry>();
+                int numMaskedIntervals = _reader.ReadOptInt32();
+                var maskedIntervals = new List<IntervalArray<MaskedEntry>.Interval>();
 
                 for (int intervalIndex = 0; intervalIndex < numMaskedIntervals; intervalIndex++)
                 {
-                    int begin = _reader.ReadInt();
-                    int end = _reader.ReadInt();
+                    int begin = _reader.ReadOptInt32();
+                    int end = _reader.ReadOptInt32();
 
-                    maskedIntervalTree.Add(new IntervalTree<MaskedEntry>.Interval(string.Empty, begin, end, new MaskedEntry(begin, end)));
+                    maskedIntervals.Add(new IntervalArray<MaskedEntry>.Interval(begin, end, new MaskedEntry(begin, end)));
                 }
 
-                _refSeqIndex[refIndex].MaskedEntries = maskedIntervalTree;
+                var sortedIntervals = maskedIntervals.OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray();
+                _refSeqIndex[refIndex].MaskedEntries = new IntervalArray<MaskedEntry>(sortedIntervals);
             }
         }
 
@@ -239,7 +216,7 @@ namespace VariantAnnotation.FileHandling
         private void VerifyEofTag()
         {
             // verify our EOF tag
-            ulong eofTag = _binaryReader.ReadUInt64();
+            ulong eofTag = _reader.ReadUInt64();
 
             if (eofTag != CompressedSequenceCommon.EofTag)
             {

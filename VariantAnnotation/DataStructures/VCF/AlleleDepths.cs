@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.DataStructures.VCF
 {
-    internal class AlleleDepths
+    internal sealed class AlleleDepths
     {
         #region members
 
@@ -24,16 +24,16 @@ namespace VariantAnnotation.DataStructures.VCF
             string[] ad = null;
 
             // use TAR & TIR
-            if ((_tmp.Tar != null) && (_tmp.Tir != null)) ad = GetAlleleDepthsUsingTarTir();
+            if (_tmp.Tar != null && _tmp.Tir != null) ad = GetAlleleDepthsUsingTarTir();
 
             // use allele counts
-            if ((ad == null) && (_tmp.TotalAlleleCount != null)) ad = GetAlleleDepthsUsingAlleleCounts();
+            if (ad == null && _tmp.TotalAlleleCount != null) ad = GetAlleleDepthsUsingAlleleCounts();
 
             // use allele depths
-            if ((ad == null) && (_tmp.FormatIndices.AD != null)) ad = GetAlleleDepthsUsingAd();
+            if (ad == null && _tmp.FormatIndices.AD != null) ad = GetAlleleDepthsUsingAd();
 
             // use NR & NV
-            if ((ad == null) && (_tmp.NR != null) && (_tmp.NV != null)) ad = GetAlleleDepthsUsingNrNv();
+            if (ad == null && _tmp.NR != null && _tmp.NV != null) ad = GetAlleleDepthsUsingNrNv();
 
             return ad;
         }
@@ -43,7 +43,7 @@ namespace VariantAnnotation.DataStructures.VCF
         /// </summary>
         private string[] GetAlleleDepthsUsingTarTir()
         {
-            if ((_tmp.Tir == null) || (_tmp.Tar == null) || (_tmp.AltAlleles.Length > 1)) return null;
+            if (_tmp.Tir == null || _tmp.Tar == null || _tmp.AltAlleles.Length > 1) return null;
             return new[] { _tmp.Tar.ToString(), _tmp.Tir.ToString() };
         }
 
@@ -55,7 +55,7 @@ namespace VariantAnnotation.DataStructures.VCF
             if (_tmp.TotalAlleleCount == null) return null;
 
             // sanity check: make sure all alternate alleles are SNVs
-            if ((_tmp.VcfRefAllele.Length != 1) || _tmp.AltAlleles.Any(altAllele => altAllele.Length != 1)) return null;
+            if (_tmp.VcfRefAllele.Length != 1 || _tmp.AltAlleles.Any(altAllele => altAllele.Length != 1)) return null;
 
             var ad = new string[_tmp.AltAlleles.Length + 1];
 
@@ -65,7 +65,7 @@ namespace VariantAnnotation.DataStructures.VCF
             ad[0] = ac;
 
             // handle alternate alleles
-            int index = 1;
+            var index = 1;
             foreach (var altAllele in _tmp.AltAlleles)
             {
                 ac = GetAlleleCountString(altAllele);
@@ -107,7 +107,7 @@ namespace VariantAnnotation.DataStructures.VCF
         /// </summary>
         private string[] GetAlleleDepthsUsingAd()
         {
-            if ((_tmp.FormatIndices.AD == null) || (_tmp.SampleColumns.Length <= _tmp.FormatIndices.AD.Value)) return null;
+            if (_tmp.FormatIndices.AD == null || _tmp.SampleColumns.Length <= _tmp.FormatIndices.AD.Value) return null;
             var ad = _tmp.SampleColumns[_tmp.FormatIndices.AD.Value].Split(',');
             return ad[0] == "." ? null : ad;
         }

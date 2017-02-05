@@ -8,7 +8,7 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
         /// returns the correct cytogenetic band representation for this chromosome given
         /// the start and end coordinates
         /// </summary>
-        string GetCytogeneticBand(string ensemblRefName, int start, int end);
+        string GetCytogeneticBand(ushort referenceIndex, int start, int end);
 
         /// <summary>
         /// serializes a reference cytogenetic band to disk

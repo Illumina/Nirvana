@@ -17,18 +17,16 @@ namespace UnitTests.FileHandling
 
             using (var ms = new MemoryStream())
             {
-                using (var binaryWriter = new BinaryWriter(ms, Encoding.UTF8, true))
+                using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true))
                 {
-                    var writer = new ExtendedBinaryWriter(binaryWriter);
-                    writer.WriteInt(expectedNum);
+                    writer.WriteOpt(expectedNum);
                 }
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                using (var binaryReader = new BinaryReader(ms))
+                using (var reader = new ExtendedBinaryReader(ms))
                 {
-                    var reader = new ExtendedBinaryReader(binaryReader);
-                    observedNum = reader.ReadInt();
+                    observedNum = reader.ReadOptInt32();
                 }
             }
 
@@ -45,18 +43,16 @@ namespace UnitTests.FileHandling
 
             using (var ms = new MemoryStream())
             {
-                using (var binaryWriter = new BinaryWriter(ms, Encoding.UTF8, true))
+                using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true))
                 {
-                    var writer = new ExtendedBinaryWriter(binaryWriter);
-                    writer.WriteLong(expectedNum);
+                    writer.WriteOpt(expectedNum);
                 }
 
                 ms.Seek(0, SeekOrigin.Begin);
 
-                using (var binaryReader = new BinaryReader(ms))
+                using (var reader = new ExtendedBinaryReader(ms))
                 {
-                    var reader = new ExtendedBinaryReader(binaryReader);
-                    observedNum = reader.ReadLong();
+                    observedNum = reader.ReadOptInt64();
                 }
             }
 

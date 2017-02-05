@@ -2,7 +2,7 @@
 
 namespace ErrorHandling.Exceptions
 {
-    public class CompressionException : Exception
+    public sealed class CompressionException : Exception
     {
         // constructor
         public CompressionException(string message) : base(message) { }

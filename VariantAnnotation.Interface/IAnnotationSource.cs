@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace VariantAnnotation.Interface
 {
@@ -14,36 +13,22 @@ namespace VariantAnnotation.Interface
 
 		IEnumerable<IDataSourceVersion> GetDataSourceVersions();
 
-        /// <summary>
-        /// adds custom intervals to the annotation source
-        /// </summary>
-	    void AddCustomIntervals(IEnumerable<ICustomInterval> customIntervals);
+		string GetGenomeAssembly();
 
-        /// <summary>
-        /// adds supplementary intervals to the annotation source
-        /// </summary>
-        void AddSupplementaryIntervals(IEnumerable<ISupplementaryInterval> supplementaryIntervals);
+	    void AddGeneLevelAnnotation(List<string> annotatedGenes);
 
-        /// <summary>
-        /// disables the annotation loader (useful when unit testing)
-        /// </summary>
-	    void DisableAnnotationLoader();
-
-        /// <summary>
-        /// enables the annotation of the mitochondrial genome
-        /// </summary>
 	    void EnableReferenceNoCalls(bool limitReferenceNoCallsToTranscripts);
 
-        /// <summary>
-        /// enables the annotation of the mitochondrial genome
-        /// </summary>
         void EnableMitochondrialAnnotation();
 
         string GetDataVersion();
+	}
 
-        /// <summary>
-        /// finalizes the annotator metrics before disposal
-        /// </summary>
-	    void FinalizeMetrics();
+	public interface IDataSourceVersion
+	{
+		string Name { get; }
+		string Description { get; }
+		string Version { get; }
+		long ReleaseDateTicks { get; }
 	}
 }

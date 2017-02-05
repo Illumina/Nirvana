@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using VariantAnnotation.DataStructures.JsonAnnotations;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
-    public class CustomItem : SupplementaryDataItem, ICustomAnnotation, IJsonSerializer
+    public sealed class CustomItem : SupplementaryDataItem, ICustomAnnotation, ICustomItem
     {
 		public string Id { get; }
 		public string AnnotationType { get; }
@@ -41,15 +41,15 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			Id             = reader.ReadAsciiString();
 			AnnotationType = reader.ReadAsciiString();
 			SaAltAllele    = reader.ReadAsciiString();
-			AltAllele      = SupplementaryAnnotation.ReverseSaReducedAllele(SaAltAllele);
+			AltAllele      = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(SaAltAllele);
 			IsPositional   = reader.ReadBoolean();
 
-			var numStringFields = reader.ReadInt();
+			var numStringFields = reader.ReadOptInt32();
 			if (numStringFields > 0)
 			{
 				StringFields = new Dictionary<string, string>();
 
-				for (int i = 0; i < numStringFields; i++)
+				for (var i = 0; i < numStringFields; i++)
 				{
 					var key = reader.ReadAsciiString();
 					var value = reader.ReadAsciiString();
@@ -58,12 +58,12 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			}
 			else StringFields = null;
 
-			var numBoolFields = reader.ReadInt();
+			var numBoolFields = reader.ReadOptInt32();
 			if (numBoolFields > 0)
 			{
 				BooleanFields = new List<string>();
 
-				for (int i = 0; i < numBoolFields; i++)
+				for (var i = 0; i < numBoolFields; i++)
 				{
 					BooleanFields.Add(reader.ReadAsciiString());
 				}
@@ -94,58 +94,58 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			return hashCode;
 		}
 
-		public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryAnnotation sa, string refBases = null)
+		public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryPositionCreator saCreator, string refBases = null)
         {
 
             // check if the ref allele matches the refBases as a prefix
-            if (!SupplementaryAnnotation.ValidateRefAllele(RefAllele, refBases))
+            if (!SupplementaryAnnotationUtilities.ValidateRefAllele(RefAllele, refBases))
             {
                 return null; //the ref allele for this entry did not match the reference bases.
             }
 
-            int newStart = Start;
-            var newAlleles = SupplementaryAnnotation.GetReducedAlleles(RefAllele, AltAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(Start, RefAllele, AltAllele);
 
-            var newRefAllele = newAlleles.Item1;
-            var newAltAllele = newAlleles.Item2;
-
-            if (newRefAllele != RefAllele)
+			var newStart = newAlleles.Item1;
+			var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
+			
+			if (newRefAllele != RefAllele)
             {
                 return new CustomItem(Chromosome, newStart, newRefAllele, newAltAllele, AnnotationType, Id, IsPositional, StringFields, BooleanFields);
             }
-
-            sa.CustomItems.Add(this);
+			//for ins, del, indel without padding base, the altAllele will change even though the ref does not.
+            saCreator.SaPosition.CustomItems.Add(new CustomItem(Chromosome, newStart, newRefAllele, newAltAllele, AnnotationType, Id, IsPositional, StringFields, BooleanFields));
 
             return null;
         }
 
-		public void Write(ExtendedBinaryWriter writer)
+		public void Write(IExtendedBinaryWriter writer)
 		{
-			writer.WriteAsciiString(Id);
-			writer.WriteAsciiString(AnnotationType);
-			writer.WriteAsciiString(SaAltAllele);
-			writer.WriteBoolean(IsPositional);
+			writer.WriteOptAscii(Id);
+			writer.WriteOptAscii(AnnotationType);
+			writer.WriteOptAscii(SaAltAllele);
+			writer.Write(IsPositional);
 
 			if (StringFields != null)
 			{
-				writer.WriteInt(StringFields.Count);
+				writer.WriteOpt(StringFields.Count);
 				foreach (var stringField in StringFields)
 				{
-					writer.WriteAsciiString(stringField.Key);
-					writer.WriteAsciiString(stringField.Value);
+					writer.WriteOptAscii(stringField.Key);
+					writer.WriteOptAscii(stringField.Value);
 				}
 			}
-			else writer.WriteInt(0);
+			else writer.WriteOpt(0);
 
 			if (BooleanFields != null)
 			{
-				writer.WriteInt(BooleanFields.Count);
+				writer.WriteOpt(BooleanFields.Count);
 				foreach (var booleanField in BooleanFields)
 				{
-					writer.WriteAsciiString(booleanField);
+					writer.WriteOptAscii(booleanField);
 				}
 			}
-			else writer.WriteInt(0);
+			else writer.WriteOpt(0);
 		}
 
 		
@@ -171,7 +171,8 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 				}
 			sb.Append(JsonObject.CloseBrace);
 		}
-		public override SupplementaryInterval GetSupplementaryInterval()
+
+		public override SupplementaryInterval GetSupplementaryInterval(ChromosomeRenamer renamer)
         {
             throw new System.NotImplementedException();
         }

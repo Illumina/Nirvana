@@ -133,7 +133,7 @@ using System.Text.RegularExpressions;
 
 namespace NDesk.Options
 {
-    public class OptionValueCollection : IList, IList<string>
+    public sealed class OptionValueCollection : IList, IList<string>
     {
         private readonly OptionContext _c;
         private readonly List<string> _values = new List<string>();
@@ -284,8 +284,7 @@ namespace NDesk.Options
                 throw new ArgumentOutOfRangeException(nameof(index));
             if (_c.Option.OptionValueType == OptionValueType.Required &&
                 index >= _values.Count)
-                throw new OptionException(string.Format(
-                    "Missing required value for option '{0}'.", _c.OptionName));
+                throw new OptionException($"Missing required value for option '{_c.OptionName}'.");
         }
 
         #endregion
@@ -296,7 +295,7 @@ namespace NDesk.Options
         }
     }
 
-    public class OptionContext
+    public sealed class OptionContext
     {
         public OptionContext()
         {
@@ -349,11 +348,11 @@ namespace NDesk.Options
                     nameof(maxValueCount));
             if (_type == OptionValueType.None && maxValueCount > 1)
                 throw new ArgumentException(
-                    string.Format("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
+                    $"Cannot provide maxValueCount of {maxValueCount} for OptionValueType.None.",
                     nameof(maxValueCount));
             if (Array.IndexOf(_names, "<>") >= 0 &&
-                ((_names.Length == 1 && _type != OptionValueType.None) ||
-                 (_names.Length > 1 && MaxValueCount > 1)))
+                (_names.Length == 1 && _type != OptionValueType.None ||
+                 _names.Length > 1 && MaxValueCount > 1))
                 throw new ArgumentException(
                     "The default option handler '<>' cannot require values.",
                     nameof(prototype));
@@ -382,9 +381,7 @@ namespace NDesk.Options
             catch (Exception e)
             {
                 throw new OptionException(
-                    string.Format(
-                        "Could not convert string `{0}' to type {1} for option `{2}'.",
-                        value, typeof(T).Name, c.OptionName), e);
+                    $"Could not convert string `{value}' to type {typeof(T).Name} for option `{c.OptionName}'.", e);
             }
 
             return t;
@@ -408,7 +405,7 @@ namespace NDesk.Options
                     c = name[end];
                 else
                     throw new ArgumentException(
-                        string.Format("Conflicting option types: '{0}' vs. '{1}'.", c, name[end]));
+                        $"Conflicting option types: '{c}' vs. '{name[end]}'.");
                 AddSeparators(name, end, seps);
             }
 
@@ -417,7 +414,7 @@ namespace NDesk.Options
 
             if (_count <= 1 && seps.Count != 0)
                 throw new ArgumentException(
-                    string.Format("Cannot provide key/value separators for Options taking {0} value(s).", _count));
+                    $"Cannot provide key/value separators for Options taking {_count} value(s).");
             if (_count > 1)
             {
                 if (seps.Count == 0)
@@ -441,14 +438,14 @@ namespace NDesk.Options
                     case '{':
                         if (start != -1)
                             throw new ArgumentException(
-                                string.Format("Ill-formed name/value separator found in \"{0}\".", name),
+                                $"Ill-formed name/value separator found in \"{name}\".",
                                 nameof(name));
                         start = i + 1;
                         break;
                     case '}':
                         if (start == -1)
                             throw new ArgumentException(
-                                string.Format("Ill-formed name/value separator found in \"{0}\".", name),
+                                $"Ill-formed name/value separator found in \"{name}\".",
                                 nameof(name));
                         seps.Add(name.Substring(start, i - start));
                         start = -1;
@@ -461,7 +458,7 @@ namespace NDesk.Options
             }
             if (start != -1)
                 throw new ArgumentException(
-                    string.Format("Ill-formed name/value separator found in \"{0}\".", name),
+                    $"Ill-formed name/value separator found in \"{name}\".",
                     nameof(name));
         }
 
@@ -481,7 +478,7 @@ namespace NDesk.Options
         }
     }
 
-    public class OptionException : Exception
+    public sealed class OptionException : Exception
     {
         public OptionException(string message)
             : base(message)
@@ -608,7 +605,7 @@ namespace NDesk.Options
             Add(new ActionOption<T>(prototype, description, action));
         }
 
-        private OptionContext CreateOptionContext()
+        private static OptionContext CreateOptionContext()
         {
             return new OptionContext();
         }
@@ -717,7 +714,7 @@ namespace NDesk.Options
             return false;
         }
 
-        private void ParseValue(string option, OptionContext c)
+        private static void ParseValue(string option, OptionContext c)
         {
             if (option != null)
                 foreach (string o in c.Option.ValueSeparators != null
@@ -731,9 +728,8 @@ namespace NDesk.Options
                 c.Option.Invoke(c);
             else if (c.OptionValues.Count > c.Option.MaxValueCount)
             {
-                throw new OptionException(string.Format(
-                    "Error: Found {0} option values when expecting {1}.",
-                    c.OptionValues.Count, c.Option.MaxValueCount));
+                throw new OptionException(
+                    $"Error: Found {c.OptionValues.Count} option values when expecting {c.Option.MaxValueCount}.");
             }
         }
 
@@ -766,8 +762,7 @@ namespace NDesk.Options
                 {
                     if (i == 0)
                         return false;
-                    throw new OptionException(string.Format(
-                        "Cannot bundle unregistered option '{0}'.", opt));
+                    throw new OptionException($"Cannot bundle unregistered option '{opt}'.");
                 }
                 Option p = this[rn];
                 switch (p.OptionValueType)
@@ -817,7 +812,7 @@ namespace NDesk.Options
                     o.Write(new string(' ', OptionWidth));
                 }
 
-                List<string> lines = GetLines(GetDescription(p.Description));
+                var lines = GetLines(GetDescription(p.Description));
                 o.WriteLine(lines[0]);
                 var prefix = new string(' ', OptionWidth + 2);
                 for (int i = 1; i < lines.Count; ++i)
@@ -828,9 +823,9 @@ namespace NDesk.Options
             }
         }
 
-        private bool WriteOptionPrototype(TextWriter o, Option p, ref int written)
+        private static bool WriteOptionPrototype(TextWriter o, Option p, ref int written)
         {
-            string[] names = p.Names;
+            var names = p.Names;
 
             int i = GetNextOptionIndex(names, 0);
             if (i == names.Length)
@@ -898,7 +893,7 @@ namespace NDesk.Options
         {
             if (description == null)
                 return maxIndex == 1 ? "VALUE" : "VALUE" + (index + 1);
-            string[] nameStart = maxIndex == 1 ? new[] { "{0:", "{" } : new[] { "{" + index + ":" };
+            var nameStart = maxIndex == 1 ? new[] { "{0:", "{" } : new[] { "{" + index + ":" };
             foreach (string t in nameStart)
             {
                 int start, j = 0;
@@ -980,7 +975,7 @@ namespace NDesk.Options
                 if (end < description.Length)
                 {
                     char c = description[end];
-                    if (c == '-' || (char.IsWhiteSpace(c) && c != '\n'))
+                    if (c == '-' || char.IsWhiteSpace(c) && c != '\n')
                         ++end;
                     else if (c != '\n')
                     {

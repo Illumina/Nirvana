@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.JsonAnnotations;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
 
@@ -18,14 +16,42 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
         public const uint GuardInt = 4041327495;
 
         public const string DataHeader    = "NirvanaData";
-        public const ushort DataVersion   = 32;
-        public const ushort SchemaVersion = 15;
+        public const ushort DataVersion   = 36;
+        public const ushort SchemaVersion = 17;
 
         public const string IndexHeader  = "NirvanaDataIndex";
         public const ushort IndexVersion = 1;
 
         #endregion
 
+        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(string saDir)
+        {
+            var dataSourceVersions = new List<IDataSourceVersion>();
+            if (saDir == null) return dataSourceVersions;
+
+            var header = GetSaHeader(saDir);
+            if (header == null) return dataSourceVersions;
+
+            dataSourceVersions.AddRange(header.DataSourceVersions);
+            return dataSourceVersions;
+        }
+
+        private static SupplementaryAnnotationHeader GetSaHeader(string saDir)
+        {
+            var saFiles = Directory.GetFiles(saDir, "*.nsa");
+            if (saFiles == null) throw new UserErrorException($"Unable to find any supplementary annotation files in the following directory: {saDir}");
+
+            long intervalsPosition;
+			return saFiles.Length>0 ? SupplementaryAnnotationReader.GetHeader(saFiles.First(), out intervalsPosition) : null;
+        }
+
+        public static GenomeAssembly GetGenomeAssembly(string saDir)
+        {
+            if (saDir == null) return GenomeAssembly.Unknown;
+
+            var header = GetSaHeader(saDir);
+            return header?.GenomeAssembly ?? GenomeAssembly.Unknown;
+        }
 
         /// <summary>
         /// checks the supplementary annotation directory to ensure that the directory only contains files for one
@@ -45,16 +71,17 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             var refSeqsToPaths       = new Dictionary<string, string>();
 			var observedGenomeAssemblies = new HashSet<GenomeAssembly>();
 
-            long earliestCreationTime = long.MaxValue;
+            var earliestCreationTime = long.MaxValue;
 
-            bool hasDataSourceVersions            = false;
-            bool foundDifferentDataSourceVersions = false;
+            var hasDataSourceVersions            = false;
+            var foundDifferentDataSourceVersions = false;
             var dataSourceVersions                = new List<DataSourceVersion>();
 
             // grab the header data from each cache file
             foreach (var saPath in Directory.GetFiles(saDir, "*.nsa"))
             {
-                var header = SupplementaryAnnotationReader.GetHeader(saPath);
+                long intervalsPosition;
+                var header = SupplementaryAnnotationReader.GetHeader(saPath, out intervalsPosition);
                 if (header == null) continue;
 
                 observedDataVersions.Add(header.DataVersion);
@@ -78,7 +105,7 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
             }
 
             // sanity check: no references were found
-            if ((refSeqsToPaths.Count == 0) || (observedDataVersions.Count == 0))
+            if (refSeqsToPaths.Count == 0 || observedDataVersions.Count == 0)
             {
                 throw new UserErrorException($"Unable to find any supplementary annotation files in the following directory: {saDir}");
             }
@@ -109,17 +136,35 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 	    /// </summary>
 	    public static void CheckGuard(BinaryReader reader)
 	    {
-		    uint observedGuard = reader.ReadUInt32();
+		    var observedGuard = reader.ReadUInt32();
 		    if (observedGuard != GuardInt)
 		    {
 			    throw new GeneralException($"Expected a guard integer ({GuardInt}), but found another value: ({observedGuard})");
 		    }
 	    }
 
-	    
+        private static SupplementaryAnnotationReader GetReader(string saDir, string ucscReferenceName)
+        {
+            if (string.IsNullOrEmpty(saDir)) return null;
+
+            var saPath = Path.Combine(saDir, ucscReferenceName + ".nsa");
+            return !File.Exists(saPath)
+                ? null
+                : new SupplementaryAnnotationReader(saPath);
+        }
+
+        public static List<ISupplementaryAnnotationReader> GetReaders(IEnumerable<string> saDirs, string ucscReferenceName)
+        {
+            var readers = new List<ISupplementaryAnnotationReader>();
+            if (saDirs == null) return readers;
+
+            readers.AddRange(saDirs.Select(dir => GetReader(dir, ucscReferenceName)).Where(reader => reader != null));
+            return readers;
+        }
     }
 
-    public class DataSourceVersion : IDataSourceVersion, IJsonSerializer, IEquatable<DataSourceVersion>
+
+	public sealed class DataSourceVersion : IDataSourceVersion, IJsonSerializer, IEquatable<DataSourceVersion>
     {
 		#region members
 
@@ -149,19 +194,15 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 			_hashCode = Name.GetHashCode() ^ Version.GetHashCode() ^ ReleaseDateTicks.GetHashCode();
         }
 
-        private DataSourceVersion(ExtendedBinaryReader reader) 
+        internal DataSourceVersion(ExtendedBinaryReader reader) 
 	    {
 			Name             = reader.ReadAsciiString();
 			Version          = reader.ReadAsciiString();
-			ReleaseDateTicks = reader.ReadLong();
+			ReleaseDateTicks = reader.ReadOptInt64();
 			Description      = reader.ReadAsciiString();
 
 		    _hashCode = Name.GetHashCode() ^ Version.GetHashCode() ^ ReleaseDateTicks.GetHashCode();
 		}
-
-	    public DataSourceVersion(BinaryReader reader) : this(new ExtendedBinaryReader(reader))
-	    {
-	    }
 
 		#region Equality Overrides
 
@@ -199,11 +240,11 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 			if (ReferenceEquals(a, b)) return true;
 
 			// If one is null, but not both, return false.
-			if (((object)a == null) || ((object)b == null)) return false;
+			if ((object)a == null || (object)b == null) return false;
 
-			return (a.Name == b.Name) &&
-				   (a.Version == b.Version) &&
-				   (a.ReleaseDateTicks == b.ReleaseDateTicks);
+			return a.Name == b.Name &&
+				   a.Version == b.Version &&
+				   a.ReleaseDateTicks == b.ReleaseDateTicks;
 		}
 
 		public static bool operator !=(DataSourceVersion a, DataSourceVersion b)
@@ -257,78 +298,16 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
         /// <summary>
         /// writes the data source version to the specified writer
         /// </summary>
-        private void Write(ExtendedBinaryWriter writer)
+        internal void Write(ExtendedBinaryWriter writer)
         {
-            writer.WriteAsciiString(Name);
-            writer.WriteAsciiString(Version);
-            writer.WriteLong(ReleaseDateTicks);
-			writer.WriteAsciiString(Description);
+            writer.WriteOptAscii(Name);
+            writer.WriteOptAscii(Version);
+            writer.WriteOpt(ReleaseDateTicks);
+			writer.WriteOptAscii(Description);
         }
-
-		public void Write(BinaryWriter writer)
-		{
-			Write(new ExtendedBinaryWriter(writer));
-		}
     }
 
-    public enum AlleleSpecificId
-    {
-		DbSnp,
-        AncestralAllele,
-
-        EvsCoverage,
-        NumEvsSamples,
-        EvsAfr,
-        EvsAll,
-        EvsEur,
-
-		ExacCoverage,
-		ExacDepth, // TODO: remove this, but only when we update the SA files
-
-		ExacAfrAn,
-		ExacAllAn,
-		ExacAmrAn,
-		ExacEasAn,
-		ExacFinAn,
-		ExacNfeAn,
-		ExacOthAn,
-		ExacSasAn,
-
-		ExacAfrAc,
-		ExacAllAc,
-		ExacAmrAc,
-		ExacEasAc,
-		ExacFinAc,
-		ExacNfeAc,
-		ExacOthAc,
-		ExacSasAc,
-
-
-		OneKgAfrAn,
-		OneKgAllAn,
-		OneKgAmrAn,
-		OneKgEasAn,
-		OneKgEurAn,
-		OneKgSasAn,
-
-		OneKgAfrAc,
-		OneKgAllAc,
-		OneKgAmrAc,
-		OneKgEasAc,
-		OneKgEurAc,
-		OneKgSasAc
-	}
-
-    public enum PositionalId : byte
-    {
-        GlobalMinorAllele,
-        GlobalMinorAlleleFrequency,
-		GlobalMajorAllele,
-		GlobalMajorAlleleFrequency,
-        IsRefMinorAllele,
-    }
-
-    public class SupplementaryAnnotationDirectory
+    public sealed class SupplementaryAnnotationDirectory
     {
         #region members
 
@@ -346,7 +325,7 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
         }
     }
 
-    public class SupplementaryAnnotationHeader
+    public sealed class SupplementaryAnnotationHeader
     {
         public string ReferenceSequenceName                { get; }
         public long CreationTimeTicks                      { get; }

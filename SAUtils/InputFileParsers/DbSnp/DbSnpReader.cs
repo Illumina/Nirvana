@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.DbSnp
 {
@@ -14,20 +15,22 @@ namespace SAUtils.InputFileParsers.DbSnp
     public sealed class DbSnpReader : IEnumerable<DbSnpItem>
     {
         // Key in VCF info field of the allele frequencies subfield.
-	    public readonly FileInfo DbSnpFile;
+	    private readonly FileInfo _dbSnpFile;
 	    private readonly Stream _stream;
+        private readonly ChromosomeRenamer _renamer;
 
-	    internal DbSnpReader()
-	    {
-	    }
-
-	    public DbSnpReader(FileInfo dbSnpFile)
+        public DbSnpReader(ChromosomeRenamer renamer)
         {
-            DbSnpFile = dbSnpFile;
+            _renamer = renamer;
         }
 
-	    internal DbSnpReader(Stream stream)
-	    {
+	    public DbSnpReader(FileInfo dbSnpFile, ChromosomeRenamer renamer) : this(renamer)
+        {
+            _dbSnpFile = dbSnpFile;
+        }
+
+	    public DbSnpReader(Stream stream, ChromosomeRenamer renamer) : this(renamer)
+        {
 		    _stream = stream;
 	    }
 
@@ -38,7 +41,7 @@ namespace SAUtils.InputFileParsers.DbSnp
         /// <returns></returns>
         private IEnumerable<DbSnpItem> GetDbSnpItems()
         {
-            using (var reader = _stream == null? GZipUtilities.GetAppropriateStreamReader(DbSnpFile.FullName): new StreamReader(_stream))
+            using (var reader = _stream == null? GZipUtilities.GetAppropriateStreamReader(_dbSnpFile.FullName): new StreamReader(_stream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -69,6 +72,8 @@ namespace SAUtils.InputFileParsers.DbSnp
             if (splitLine.Length < 8) return null;
 
 			var chromosome = splitLine[VcfCommon.ChromIndex];
+			if (!InputFileParserUtilities.IsDesiredChromosome(chromosome, _renamer)) return null;
+
 			var position   = int.Parse(splitLine[VcfCommon.PosIndex]);
 			var dbSnpId    = Convert.ToInt64(splitLine[VcfCommon.IdIndex].Substring(2));
 			var refAllele  = splitLine[VcfCommon.RefIndex];
@@ -81,7 +86,7 @@ namespace SAUtils.InputFileParsers.DbSnp
         }
 
 
-	    private Dictionary<string, double> GetAlleleFrequencies(string infoField, string refAllele, string[] altAlleles)
+	    private static Dictionary<string, double> GetAlleleFrequencies(string infoField, string refAllele, string[] altAlleles)
 	    {
 		    var freqDict = new Dictionary<string, double> {[refAllele] = double.MinValue};
 
@@ -115,7 +120,7 @@ namespace SAUtils.InputFileParsers.DbSnp
 			
 	    }
 
-	    private double GetFrequency(string alleleFrequency)
+	    private static double GetFrequency(string alleleFrequency)
 	    {
 		    return alleleFrequency == "." || alleleFrequency == "0" ? double.MinValue : Convert.ToDouble(alleleFrequency);
 	    }

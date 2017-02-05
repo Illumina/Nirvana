@@ -5,88 +5,95 @@ using System.IO;
 using System.Linq;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
     public sealed class OneKGenReader : IEnumerable<OneKGenItem>
     {
         private readonly FileInfo _oneKGenFile;
+        private readonly ChromosomeRenamer _renamer;
+
+        private  string _ancestralAllele;
+	    private  string _svType;
+	    private  int _svEnd;
+	    private  Tuple<int, int> _ciEnd;
+		private  Tuple<int, int> _ciPos;
+		private  string _refAllele;
+		private  string[] _altAlleles;
+
+	    private int? _allAlleleNumber;
+	    private int? _afrAlleleNumber;
+	    private int? _amrAlleleNumber;
+	    private int? _eurAlleleNumber;
+	    private int? _easAlleleNumber;
+	    private int? _sasAlleleNumber;
+
+		private int[] _allAlleleCounts;
+		private int[] _afrAlleleCounts;
+		private int[] _amrAlleleCounts;
+		private int[] _eurAlleleCounts;
+		private int[] _easAlleleCounts;
+		private int[] _sasAlleleCounts;
 
 
-        private string _ancestralAllele;
-        private string _svType;
-        private int _svEnd;
-        private Tuple<int, int> _ciEnd;
-        private Tuple<int, int> _ciPos;
-        private string _refAllele;
-        private string[] _altAlleles;
-
-        private int? _allAlleleNumber;
-        private int? _afrAlleleNumber;
-        private int? _amrAlleleNumber;
-        private int? _eurAlleleNumber;
-        private int? _easAlleleNumber;
-        private int? _sasAlleleNumber;
-
-        private int[] _allAlleleCounts;
-        private int[] _afrAlleleCounts;
-        private int[] _amrAlleleCounts;
-        private int[] _eurAlleleCounts;
-        private int[] _easAlleleCounts;
-        private int[] _sasAlleleCounts;
 
 
-
-
-        // grch38 liftover related fields
+		// grch38 liftover related fields
 #pragma warning disable 414
-        private string _minorAllele;
-        private double _minorAlleleFreq;
-        private int _minorAlleleCount;
+		private  string _minorAllele;
+	    private  double _minorAlleleFreq;
+	    private  int _minorAlleleCount;
 #pragma warning disable 169
-        private bool _hasSymbolicAllele;
+	    private bool _hasSymbolicAllele;
 #pragma warning restore 169
 #pragma warning restore 414
 
-        public OneKGenReader(FileInfo oneKGenFile)
+        // empty constructor for onekg reader for unit tests.
+        public OneKGenReader(ChromosomeRenamer renamer)
+        {
+            _renamer = renamer;
+        }
+
+	    public OneKGenReader(FileInfo oneKGenFile, ChromosomeRenamer renamer) : this(renamer)
         {
             _oneKGenFile = oneKGenFile;
         }
 
         private void Clear()
-        {
-            _ancestralAllele = null;
-            _refAllele = null;
-            _altAlleles = null;
+	    {
+		    _ancestralAllele = null;
+		    _refAllele = null;
+		    _altAlleles = null;
 
-            _allAlleleNumber = null;
-            _afrAlleleNumber = null;
-            _amrAlleleNumber = null;
-            _eurAlleleNumber = null;
-            _easAlleleNumber = null;
-            _sasAlleleNumber = null;
+			_allAlleleNumber = null;
+			_afrAlleleNumber = null;
+			_amrAlleleNumber = null;
+			_eurAlleleNumber = null;
+			_easAlleleNumber = null;
+			_sasAlleleNumber = null;
 
-            _allAlleleCounts = null;
-            _afrAlleleCounts = null;
-            _amrAlleleCounts = null;
-            _eurAlleleCounts = null;
-            _easAlleleCounts = null;
-            _sasAlleleCounts = null;
+			_allAlleleCounts = null;
+			_afrAlleleCounts = null;
+			_amrAlleleCounts = null;
+			_eurAlleleCounts = null;
+			_easAlleleCounts = null;
+			_sasAlleleCounts = null;
 
-            // SV fields
-            _svEnd = -1;
-            _svType = null;
-            _ciPos = null;
-            _ciEnd = null;
+			// SV fields
+			_svEnd  = -1;
+			_svType = null;
+			_ciPos  = null;
+			_ciEnd  = null;
 
-            // grch38 fields
-            _minorAlleleCount = 0;
-            _minorAlleleFreq = 0;
-            _minorAllele = null;
+			// grch38 fields
+			_minorAlleleCount = 0;
+			_minorAlleleFreq  = 0;
+			_minorAllele      = null;
 
-        }
+	    }
 
-        /// <summary>
+	    /// <summary>
         /// Parses a OneKGen file and return an enumeration object containing 
         /// all the OneKGen objects that have been extracted.
         /// </summary>
@@ -103,12 +110,12 @@ namespace SAUtils.InputFileParsers.OneKGen
                     // Skip comments.
                     if (line.StartsWith("#")) continue;
                     var oneKGenItemsList = ExtractItems(line);
-                    if (oneKGenItemsList == null) continue;
-                    foreach (var oneKGenItem in oneKGenItemsList)
-                    {
-                        yield return oneKGenItem;
-                    }
-
+	                if (oneKGenItemsList == null) continue;
+	                foreach (var oneKGenItem in oneKGenItemsList)
+	                {
+						yield return oneKGenItem;
+	                }
+					
                 }
             }
         }
@@ -118,169 +125,176 @@ namespace SAUtils.InputFileParsers.OneKGen
         /// </summary>
         /// <param name="vcfline"></param>
         /// <returns></returns>
-        internal List<OneKGenItem> ExtractItems(string vcfline)
+		public  List<OneKGenItem> ExtractItems(string vcfline)
         {
-            var splitLine = vcfline.Split(new[] { '\t' }, 9);// we don't care about the many fields after info field
+            var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;
 
-            Clear();
+			Clear();
+			
+            var chromosome  = splitLine[VcfCommon.ChromIndex];
+			if (!InputFileParserUtilities.IsDesiredChromosome(chromosome, _renamer)) return null;
 
-            var chromosome = splitLine[VcfCommon.ChromIndex];
-            var position = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
-            var rsId = splitLine[VcfCommon.IdIndex];
-            _refAllele = splitLine[VcfCommon.RefIndex];
-            _altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
-            var infoFields = splitLine[VcfCommon.InfoIndex];
+			var position    = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
+            var rsId        = splitLine[VcfCommon.IdIndex];
+            _refAllele      = splitLine[VcfCommon.RefIndex];
+			_altAlleles     = splitLine[VcfCommon.AltIndex].Split(',');
+			var infoFields  = splitLine[VcfCommon.InfoIndex];
 
-            // parses the info fields and extract frequencies, ancestral allele, allele counts, etc.
-            var hasSymbolicAllele = _altAlleles.Any(x => x.StartsWith("<") && x.EndsWith(">"));
-            if (hasSymbolicAllele) return null;
+			// parses the info fields and extract frequencies, ancestral allele, allele counts, etc.
+			var hasSymbolicAllele = _altAlleles.Any(x => x.StartsWith("<") && x.EndsWith(">"));
+	        if (hasSymbolicAllele) return null;
 
-            ParseInfoField(infoFields);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+			ParseInfoField(infoFields, hasSymbolicAllele);
 
-            var okgItemsList = new List<OneKGenItem>();
-
-            for (var i = 0; i < _altAlleles.Length; i++)
-            {
-                okgItemsList.Add(new OneKGenItem(
-                    chromosome,
-                    position,
-                    rsId,
-                    _refAllele,
-                    _altAlleles[i],
-                    _ancestralAllele,
-                    GetAlleleCount(_allAlleleCounts, i),
-                    GetAlleleCount(_afrAlleleCounts, i),
-                    GetAlleleCount(_amrAlleleCounts, i),
-                    GetAlleleCount(_eurAlleleCounts, i),
-                    GetAlleleCount(_easAlleleCounts, i),
-                    GetAlleleCount(_sasAlleleCounts, i),
-                    _allAlleleNumber,
-                    _afrAlleleNumber,
-                    _amrAlleleNumber,
-                    _eurAlleleNumber,
-                    _easAlleleNumber,
-                    _sasAlleleNumber,
-                    _svType,
-                    _svEnd,
-                    _ciPos,
-                    _ciEnd
-                    ));
-            }
-
-            return okgItemsList;
-
+			var okgItemsList = new List<OneKGenItem>();
+	        
+			for (var i = 0; i < _altAlleles.Length; i++)
+			{
+				okgItemsList.Add(new OneKGenItem(
+					chromosome,
+					position,
+					rsId,
+					_refAllele,
+					_altAlleles[i],
+					_ancestralAllele,
+					GetAlleleCount(_allAlleleCounts, i),
+					GetAlleleCount(_afrAlleleCounts,i),
+					GetAlleleCount(_amrAlleleCounts,i),
+					GetAlleleCount(_eurAlleleCounts,i),
+					GetAlleleCount(_easAlleleCounts,i),
+					GetAlleleCount(_sasAlleleCounts, i),
+					_allAlleleNumber,
+					_afrAlleleNumber,
+					_amrAlleleNumber,
+					_eurAlleleNumber,
+					_easAlleleNumber,
+					_sasAlleleNumber,
+					_svType,
+					_svEnd,
+					_ciPos,
+					_ciEnd
+					));
+			}
+			
+			return okgItemsList;
+           
         }
 
-        private int? GetAlleleCount(int[] alleleCounts, int i)
-        {
-            if (alleleCounts == null) return null;
-            if (i >= alleleCounts.Length) return null;
-            return alleleCounts[i];
-        }
+	    private static int? GetAlleleCount(int[] alleleCounts, int i)
+	    {
+		    if (alleleCounts == null) return null;
+		    if (i >= alleleCounts.Length) return null;
+		    return alleleCounts[i];
+	    }
 
-        private void ParseInfoField(string infoFields)
-        {
-            if (infoFields == "" || infoFields == ".") return;
+	    private  void ParseInfoField(string infoFields, bool hasSymbolicAllele)
+		{
+			if (infoFields == "" || infoFields == ".") return;
 
-            var infoItems = infoFields.Split(';');
-            foreach (var infoItem in infoItems)
-            {
-                var infoKeyValue = infoItem.Split('=');
-                if (infoKeyValue.Length == 2)//sanity check
-                {
-                    var key = infoKeyValue[0];
-                    var value = infoKeyValue[1];
+			var infoItems = infoFields.Split(';');
+			foreach (var infoItem in infoItems)
+			{
+				var infoKeyValue = infoItem.Split('=');
+				if (infoKeyValue.Length == 2)//sanity check
+				{
+					var key = infoKeyValue[0];
+					var value = infoKeyValue[1];
 
-                    SetInfoField(key, value, false);
-                }
+					SetInfoField(key, value, hasSymbolicAllele);
+				}
 
-            }
+			}
 
-        }
+		}
 
-        private void SetInfoField(string vcfAfId, string value, bool hasSymbolicAllele)
-        {
-            switch (vcfAfId)
-            {
-                case "AA":
-                    _ancestralAllele = GetAncestralAllele(value);
-                    break;
-                // the following are for SVs
-                case "SVTYPE":
-                    if (hasSymbolicAllele)
-                        _svType = value;// for SVs there is only one value in SVTYPE
-                    break;
-                case "END":
-                    if (hasSymbolicAllele)
-                        _svEnd = Convert.ToInt32(value);
-                    break;
-                case "CIEND":
-                    if (hasSymbolicAllele)
-                    {
-                        var endBoundaries = value.Split(',');
-                        _ciEnd = Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
-                    }
-                    break;
-                case "CIPOS":
-                    if (hasSymbolicAllele)
-                    {
-                        var beginBoundaries = value.Split(',');
-                        _ciPos = Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
+		private  void SetInfoField(string vcfAfId, string value, bool hasSymbolicAllele)
+		{
+			switch (vcfAfId)
+			{
+				case "AA":
+					_ancestralAllele = GetAncestralAllele(value);
+					break;
+				// the following are for SVs
+				case "SVTYPE":
+					if (hasSymbolicAllele)
+						_svType = value;// for SVs there is only one value in SVTYPE
+					break;
+				case "END":
+					if (hasSymbolicAllele)
+						_svEnd = Convert.ToInt32(value);
+					break;
+				case "CIEND":
+					if (hasSymbolicAllele)
+					{
+						var endBoundaries = value.Split(',');
+						_ciEnd = Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
+					}
+					break;
+				case "CIPOS":
+					if (hasSymbolicAllele)
+					{
+						var beginBoundaries = value.Split(',');
+						_ciPos = Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
 
-                    }
-                    break;
-                case "AN":
-                    _allAlleleNumber = Convert.ToInt32(value);
-                    break;
-                case "AFR_AN":
-                    _afrAlleleNumber = Convert.ToInt32(value);
-                    break;
-                case "AMR_AN":
-                    _amrAlleleNumber = Convert.ToInt32(value);
-                    break;
-                case "EUR_AN":
-                    _eurAlleleNumber = Convert.ToInt32(value);
-                    break;
-                case "EAS_AN":
-                    _easAlleleNumber = Convert.ToInt32(value);
-                    break;
-                case "SAS_AN":
-                    _sasAlleleNumber = Convert.ToInt32(value);
-                    break;
-                case "AC":
-                    _allAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
-                    break;
-                case "AMR_AC":
-                    _amrAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
-                    break;
-                case "AFR_AC":
-                    _afrAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
-                    break;
-                case "EUR_AC":
-                    _eurAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
-                    break;
-                case "EAS_AC":
-                    _easAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
-                    break;
-                case "SAS_AC":
-                    _sasAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
-                    break;
+					}
+					break;
+				case "AN":
+					_allAlleleNumber = Convert.ToInt32(value);
+					break;
+				case "AFR_AN":
+					_afrAlleleNumber = Convert.ToInt32(value);
+					break;
+				case "AMR_AN":
+					_amrAlleleNumber = Convert.ToInt32(value);
+					break;
+				case "EUR_AN":
+					_eurAlleleNumber = Convert.ToInt32(value);
+					break;
+				case "EAS_AN":
+					_easAlleleNumber = Convert.ToInt32(value);
+					break;
+				case "SAS_AN":
+					_sasAlleleNumber = Convert.ToInt32(value);
+					break;
+				case "AC":
+					_allAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					break;
+				case "AMR_AC":
+					_amrAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					break;
+				case "AFR_AC":
+					_afrAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					break;
+				case "EUR_AC":
+					_eurAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					break;
+				case "EAS_AC":
+					_easAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					break;
+				case "SAS_AC":
+					_sasAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					break;
 
-            }
+			}
 
-        }
+		}
 
-        private string GetAncestralAllele(string value)
-        {
-            if (value == "" || value == ".") return null;
+		private static string GetAncestralAllele(string value)
+		{
+			if (value == "" || value == ".") return null;
 
-            var ancestralAllele = value.Split('|')[0];
-            if (string.IsNullOrEmpty(ancestralAllele)) return null;
-            return ancestralAllele.All(SupplementaryAnnotation.IsNucleotide) ? ancestralAllele : null;
-        }
-
-        public IEnumerator<OneKGenItem> GetEnumerator()
+			var ancestralAllele = value.Split('|')[0];
+			if (string.IsNullOrEmpty(ancestralAllele)) return null;
+			return ancestralAllele.All(IsNucleotide) ? ancestralAllele : null;
+		}
+		private static bool IsNucleotide(char c)
+		{
+			c = Char.ToUpper(c);
+			return c == 'A' || c == 'C' || c == 'G' || c == 'T' || c == 'N';
+		}
+		public IEnumerator<OneKGenItem> GetEnumerator()
         {
             return GetOneKGenItems().GetEnumerator();
         }

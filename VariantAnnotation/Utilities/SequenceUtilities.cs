@@ -20,8 +20,8 @@ namespace VariantAnnotation.Utilities
             const string reverseBases = "TVGHCDMKYABRTVGHCDMKYABR";
             ReverseComplementLookupTable = new char[256];
 
-            for (int i = 0; i < 256; i++) ReverseComplementLookupTable[i] = 'N';
-            for (int i = 0; i < forwardBases.Length; i++)
+            for (var i = 0; i < 256; i++) ReverseComplementLookupTable[i] = 'N';
+            for (var i = 0; i < forwardBases.Length; i++)
             {
                 ReverseComplementLookupTable[forwardBases[i]] = reverseBases[i];
             }
@@ -37,10 +37,10 @@ namespace VariantAnnotation.Utilities
             // sanity check
             if (bases == null) return null;
 
-            int numBases = bases.Length;
+            var numBases = bases.Length;
             var reverseChars = new char[numBases];
 
-            for (int i = 0; i < numBases; ++i)
+            for (var i = 0; i < numBases; ++i)
             {
                 reverseChars[i] = ReverseComplementLookupTable[bases[numBases - i - 1]];
             }
@@ -64,7 +64,7 @@ namespace VariantAnnotation.Utilities
         /// </summary>
         public static string GetSubSubstring(int seqStart, int seqEnd, bool seqOnReverseStrand, int subStart, int subEnd, ICompressedSequence cs)
         {
-            int start = seqOnReverseStrand ? seqEnd - subEnd : seqStart + subStart;
+            var start = seqOnReverseStrand ? seqEnd - subEnd : seqStart + subStart;
 
             var precedingBases = cs.Substring(start - 1, subEnd - subStart + 1);
             if (seqOnReverseStrand) precedingBases = GetReverseComplement(precedingBases);

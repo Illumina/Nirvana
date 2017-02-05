@@ -1,6 +1,6 @@
 ﻿using System;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.Utilities;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.DataStructures
 {
@@ -11,6 +11,8 @@ namespace VariantAnnotation.DataStructures
         private readonly Benchmark _referenceBenchmark;
         private readonly Benchmark _cacheBenchmark;
         private readonly Benchmark _annotationBenchmark;
+
+        public static bool DisableOutput = false;
 
         private string _referenceName;
         private string _referenceTime;
@@ -56,8 +58,7 @@ namespace VariantAnnotation.DataStructures
         public void StopReference()
         {
             _referenceTime = Benchmark.ToHumanReadable(_referenceBenchmark.GetElapsedTime());
-
-            ShowReferenceTime();
+            if (!DisableOutput) ShowReferenceTime();
         }
 
         /// <summary>
@@ -73,7 +74,7 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         public void StopCache()
         {
-            Console.WriteLine("cache & sa: {0}", Benchmark.ToHumanReadable(_cacheBenchmark.GetElapsedTime()));
+            if (!DisableOutput) Console.WriteLine("cache & sa: {0}", Benchmark.ToHumanReadable(_cacheBenchmark.GetElapsedTime()));
             _annotationBenchmark.Reset();
             _hasStartedAnnotation = true;
         }
@@ -86,7 +87,7 @@ namespace VariantAnnotation.DataStructures
             if (!_hasStartedAnnotation) return;
 
             double dummy;
-            Console.WriteLine("annotation: {0}", _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
+            if (!DisableOutput) Console.WriteLine("annotation: {0}", _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
             _numVariantsInReference = 0;
         }
 
@@ -117,7 +118,7 @@ namespace VariantAnnotation.DataStructures
             // display the reference time
             Console.WriteLine(_divider);
             Console.Write("reference:  {0}{1}", _referenceTime, filler);
-            Console.ForegroundColor = ConsoleColor.Magenta;
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine(_referenceName);
             Console.ResetColor();
         }

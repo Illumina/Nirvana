@@ -6,7 +6,7 @@ namespace VariantAnnotation.DataStructures
 	{
 		public static VariantType GetSequenceAlteration(string dgvType, string dgvSubType)
 		{
-			VariantType sequenceAlterationType = VariantType.unknown;
+			var sequenceAlterationType = VariantType.unknown;
 			if (dgvType == "CNV")
 			{
 				switch (dgvSubType)

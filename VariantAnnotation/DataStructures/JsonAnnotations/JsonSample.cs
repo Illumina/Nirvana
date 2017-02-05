@@ -16,6 +16,9 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 		public string GenotypeQuality { get; set; }  // 790 (GQX)
 		public string CopyNumber { get; set; }//CN in CANVAs
 		public bool IsLossOfHeterozygosity { get; set; }
+		public string DenovoQuality { get; set; }
+		public string[] SplitReadCounts { get; set; }
+		public string[] PairEndReadCounts { get; set; }
 
 		public bool IsEmpty { get; set; }
 		#endregion
@@ -30,7 +33,9 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                    && FailedFilter == false
                    && AlleleDepths == null
                    && GenotypeQuality == null
-                   && CopyNumber == null;
+                   && CopyNumber == null
+				   && SplitReadCounts ==null
+				   && PairEndReadCounts == null;
         }
 
         public override string ToString()
@@ -49,8 +54,14 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 			jsonObject.AddStringValues("alleleDepths", AlleleDepths,false);
 			jsonObject.AddStringValue("genotype", Genotype);
 			jsonObject.AddBoolValue("failedFilter", FailedFilter,true,"true");
+
+			jsonObject.AddStringValues("splitReadCounts",SplitReadCounts,false);
+			jsonObject.AddStringValues("pairedEndReadCounts",PairEndReadCounts,false);
+
 			jsonObject.AddBoolValue("isEmpty", IsEmpty, true, "true");
 			jsonObject.AddBoolValue("lossOfHeterozygosity", IsLossOfHeterozygosity, true, "true");
+
+			jsonObject.AddStringValue("deNovoQuality", DenovoQuality, false);
 
 			sb.Append(JsonObject.CloseBrace);
             return sb.ToString();

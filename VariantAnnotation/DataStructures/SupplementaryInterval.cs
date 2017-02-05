@@ -8,7 +8,7 @@ using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class SupplementaryInterval : AnnotationInterval, IComparable<SupplementaryInterval>, ISupplementaryInterval
+    public sealed class SupplementaryInterval : AnnotationInterval, IComparable<SupplementaryInterval>, ISupplementaryInterval
     {
         #region members
 
@@ -34,27 +34,27 @@ namespace VariantAnnotation.DataStructures
         #endregion
 
         // constructor
-        public SupplementaryInterval(int start, int end, string refName, string altAllele, VariantType variantType, string source,
-            Dictionary<string, int> intValues = null, Dictionary<string, double> doubleValues = null,
-            Dictionary<string, double> freqValues = null, Dictionary<string, string> stringValues = null, List<string> boolValues = null, Dictionary<string, IEnumerable<string>> stringLists = null)
+        public SupplementaryInterval(int start, int end, string refName, string altAllele, VariantType variantType,
+            string source, IChromosomeRenamer renamer, Dictionary<string, int> intValues = null,
+            Dictionary<string, double> doubleValues = null, Dictionary<string, double> freqValues = null,
+            Dictionary<string, string> stringValues = null, List<string> boolValues = null,
+            Dictionary<string, IEnumerable<string>> stringLists = null) : base(start, end)
         {
-            Start = start;
-            End = end;
-            //ReferenceName = refName;
+            Start           = start;
+            End             = end;
             AlternateAllele = altAllele;
-            VariantType = variantType;
-            Source = source;
+            VariantType     = variantType;
+            Source          = source;
 
             _intValues = intValues ?? new Dictionary<string, int>();
 
-            _boolList = boolValues ?? new List<string>();
+            _boolList     = boolValues ?? new List<string>();
             _doubleValues = doubleValues ?? new Dictionary<string, double>();
-            _freqValues = freqValues ?? new Dictionary<string, double>();
+            _freqValues   = freqValues ?? new Dictionary<string, double>();
             _stringValues = stringValues ?? new Dictionary<string, string>();
-            _stringLists = stringLists ?? new Dictionary<string, IEnumerable<string>>();
+            _stringLists  = stringLists ?? new Dictionary<string, IEnumerable<string>>();
 
-            var chromosomeRenamer = AnnotationLoader.Instance.ChromosomeRenamer;
-	        ReferenceName = chromosomeRenamer.GetEnsemblReferenceName(refName);
+            ReferenceName = renamer.GetEnsemblReferenceName(refName);
         }
 
         #region compareFunctions
@@ -75,7 +75,7 @@ namespace VariantAnnotation.DataStructures
                    && Start.Equals(otherItem.Start)
                    && End.Equals(otherItem.End)
                    && VariantType.Equals(otherItem.VariantType)
-                   && Source.Equals(otherItem.Source);
+                   && (Source?.Equals(otherItem.Source) ?? otherItem.Source == null);
         }
 
         public override int GetHashCode()
@@ -118,140 +118,141 @@ namespace VariantAnnotation.DataStructures
             _freqValues[key] = value;
         }
 
-        public static SupplementaryInterval Read(ExtendedBinaryReader reader)
+        public static SupplementaryInterval Read(ExtendedBinaryReader reader, IChromosomeRenamer renamer)
         {
-			var referenceName = reader.ReadAsciiString();
-			var start = reader.ReadInt();
-            var end = reader.ReadInt();
-            var alternateAllele = reader.ReadAsciiString();
+            var referenceName      = reader.ReadAsciiString();
+            var start              = reader.ReadOptInt32();
+            var end                = reader.ReadOptInt32();
+            var alternateAllele    = reader.ReadAsciiString();
             var sequenceAlteration = (VariantType)reader.ReadByte();
-            var source = reader.ReadAsciiString();
+            var source             = reader.ReadAsciiString();
 
             // strings
-            var count = reader.ReadInt();
+            var count = reader.ReadOptInt32();
             var stringValues = new Dictionary<string, string>(count);
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                var key = reader.ReadAsciiString();
+                var key   = reader.ReadAsciiString();
                 var value = reader.ReadAsciiString();
                 stringValues[key] = value;
             }
 
             // integers
-            count = reader.ReadInt();
+            count = reader.ReadOptInt32();
             var intValues = new Dictionary<string, int>(count);
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                var key = reader.ReadAsciiString();
-                var value = reader.ReadInt();
+                var key   = reader.ReadAsciiString();
+                var value = reader.ReadOptInt32();
                 intValues[key] = value;
             }
 
             // booleans
-            count = reader.ReadInt();
+            count = reader.ReadOptInt32();
             var boolList = new List<string>(count);
 
-            for (int i = 0; i < count; i++) boolList.Add(reader.ReadAsciiString());
+            for (var i = 0; i < count; i++) boolList.Add(reader.ReadAsciiString());
 
             // doubles
-            count = reader.ReadInt();
+            count = reader.ReadOptInt32();
             var doubleValues = new Dictionary<string, double>(count);
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                var key = reader.ReadAsciiString();
-                var value = reader.ReadDouble();
+                var key   = reader.ReadAsciiString();
+                var value = reader.ReadOptDouble();
                 doubleValues[key] = value;
             }
 
             // frequencies
-            count = reader.ReadInt();
+            count = reader.ReadOptInt32();
             var freqValues = new Dictionary<string, double>(count);
 
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                var key = reader.ReadAsciiString();
-                var value = reader.ReadDouble();
+                var key   = reader.ReadAsciiString();
+                var value = reader.ReadOptDouble();
                 freqValues[key] = value;
             }
+
             //stringLists
-            count = reader.ReadInt();
+            count = reader.ReadOptInt32();
             var stringLists = new Dictionary<string, IEnumerable<string>>(count);
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
             {
-                var key = reader.ReadAsciiString();
-                int valueCount = reader.ReadInt();
-                var values = ReadStringLists(reader, valueCount);
+                var key        = reader.ReadAsciiString();
+                var valueCount = reader.ReadOptInt32();
+                var values     = ReadStringLists(reader, valueCount);
                 stringLists[key] = values;
             }
 
-            return new SupplementaryInterval(start, end, referenceName, alternateAllele, sequenceAlteration, source, intValues, doubleValues, freqValues, stringValues, boolList, stringLists);
+            return new SupplementaryInterval(start, end, referenceName, alternateAllele, sequenceAlteration, source,
+                renamer, intValues, doubleValues, freqValues, stringValues, boolList, stringLists);
         }
 
         private static List<string> ReadStringLists(ExtendedBinaryReader reader, int count)
         {
             var values = new List<string>();
-            for (int i = 0; i < count; i++)
+            for (var i = 0; i < count; i++)
                 values.Add(reader.ReadAsciiString());
             return values;
         }
 
         public void Write(ExtendedBinaryWriter writer)
         {
-            writer.WriteAsciiString(ReferenceName);//reference name
-            writer.WriteInt(Start); // start
-            writer.WriteInt(End); // end
-            writer.WriteAsciiString(AlternateAllele);// alternate allele
-            writer.WriteByte((byte)VariantType); // variant type
-            writer.WriteAsciiString(Source); // source
+            writer.WriteOptAscii(ReferenceName);//reference name
+            writer.WriteOpt(Start); // start
+            writer.WriteOpt(End); // end
+            writer.WriteOptAscii(AlternateAllele);// alternate allele
+            writer.Write((byte)VariantType); // variant type
+            writer.WriteOptAscii(Source); // source
 
             // write the dictionaries
 
-            writer.WriteInt(_stringValues.Count);// size of string values dict
+            writer.WriteOpt(_stringValues.Count);// size of string values dict
             foreach (var keyValue in _stringValues)
             {
-                writer.WriteAsciiString(keyValue.Key);
-                writer.WriteAsciiString(keyValue.Value);
+                writer.WriteOptAscii(keyValue.Key);
+                writer.WriteOptAscii(keyValue.Value);
             }
 
-            writer.WriteInt(_intValues.Count);// size of int values dict
+            writer.WriteOpt(_intValues.Count);// size of int values dict
             foreach (var keyValue in _intValues)
             {
-                writer.WriteAsciiString(keyValue.Key);
-                writer.WriteInt(keyValue.Value);
+                writer.WriteOptAscii(keyValue.Key);
+                writer.WriteOpt(keyValue.Value);
             }
 
-            writer.WriteInt(_boolList.Count);// size of bool values list
+            writer.WriteOpt(_boolList.Count);// size of bool values list
             foreach (var value in _boolList)
-                writer.WriteAsciiString(value);
+                writer.WriteOptAscii(value);
 
-            writer.WriteInt(_doubleValues.Count);// size of double values dict
+            writer.WriteOpt(_doubleValues.Count);// size of double values dict
             foreach (var keyValue in _doubleValues)
             {
-                writer.WriteAsciiString(keyValue.Key);
-                writer.WriteDouble(keyValue.Value);
+                writer.WriteOptAscii(keyValue.Key);
+                writer.WriteOpt(keyValue.Value);
             }
 
-            writer.WriteInt(_freqValues.Count);// size of frequency values dict
+            writer.WriteOpt(_freqValues.Count);// size of frequency values dict
             foreach (var keyValue in _freqValues)
             {
-                writer.WriteAsciiString(keyValue.Key);
-                writer.WriteDouble(keyValue.Value);
+                writer.WriteOptAscii(keyValue.Key);
+                writer.WriteOpt(keyValue.Value);
             }
 
-            writer.WriteInt(_stringLists.Count);// size of stringLists values dict
+            writer.WriteOpt(_stringLists.Count);// size of stringLists values dict
             foreach (var keyValue in _stringLists)
             {
-                writer.WriteAsciiString(keyValue.Key);
-                writer.WriteInt(keyValue.Value.Count());
+                writer.WriteOptAscii(keyValue.Key);
+                writer.WriteOpt(keyValue.Value.Count());
                 foreach (var value in keyValue.Value)
                 {
-                    writer.WriteAsciiString(value);
+                    writer.WriteOptAscii(value);
                 }
             }
-
         }
 
         public string GetJsonContent()
@@ -273,7 +274,6 @@ namespace VariantAnnotation.DataStructures
                 {
                     jsonObject.AddStringValue(kvp.Key, kvp.Value.ToString("0.#####"), false);
                 }
-
             }
 
             foreach (var kvp in StringValues)

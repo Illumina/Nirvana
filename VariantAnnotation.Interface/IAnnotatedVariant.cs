@@ -8,14 +8,17 @@ namespace VariantAnnotation.Interface
 	/// </summary>
 	public interface IAnnotatedVariant
 	{
+		#region members
+
 		// mandatory positional fields
 		string ReferenceName{ get; }
 		int? ReferenceBegin{ get; }
 		string ReferenceAllele{ get; }
-		IEnumerable<string> AlternateAlleles{ get; }
+		IEnumerable<string> AlternateAlleles { get; }
 
 		// optional
-
+		string[] Filters { get; }
+		string Quality { get; }
 		string CytogeneticBand { get; }
 
 		// now we place the samples and variant objects
@@ -23,9 +26,30 @@ namespace VariantAnnotation.Interface
 		string RecalibratedQuality { get; }
 		string JointSomaticNormalQuality { get; }
 		string CopyNumber { get; }
+		string Depth { get; }
+		bool ColocalizedWithCnv { get; }
+
+		string[] CiPos { get; }
+		string[] CiEnd { get; }
+
+		int? SvLength { get; }
+
 
 		IEnumerable<IAnnotatedSample> AnnotatedSamples { get; }
-		IEnumerable<IAnnotatedAlternateAllele> AnnotatedAlternateAlleles { get; }
+		IList<IAnnotatedAlternateAllele> AnnotatedAlternateAlleles { get; }
 		IEnumerable<IAnnotatedSupplementaryInterval> SupplementaryIntervals { get; }
+
+		#endregion
 	}
+
+	public interface IAnnotatedSupplementaryInterval
+	{
+		#region members
+
+		ISupplementaryInterval SupplementaryInterval { get; }
+		double? ReciprocalOverlap { get; }
+
+		#endregion
+	}
+	
 }

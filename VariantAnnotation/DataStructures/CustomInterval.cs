@@ -1,46 +1,37 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
+using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class CustomInterval : AnnotationInterval, IComparable<CustomInterval>, ICustomInterval
+    public class CustomInterval : IComparable<CustomInterval>, ICustomInterval
     {
-        int ICustomInterval.Start => Start;
-        int ICustomInterval.End => End;
-        public string ReferenceName { get; protected set; }
-        public string Type { get; protected set; }
+        public string ReferenceName { get; }
+        public int Start { get; }
+        public int End { get; }
+        public string Type { get; }
         public IDictionary<string, string> StringValues { get; set; }
         public IDictionary<string, string> NonStringValues { get; set; }
 
-        public CustomInterval(string referenceName, int start, int end, string type, Dictionary<string, string> stringValues, Dictionary<string, string> nonStringValues) : base(start, end)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public CustomInterval(string referenceName, int start, int end, string type,
+            IDictionary<string, string> stringValues, IDictionary<string, string> nonStringValues)
         {
-            ReferenceName = referenceName;
-            Start = start;
-            End = end;
-            Type = type;
-            StringValues = stringValues;
+            ReferenceName   = referenceName;
+            Start           = start;
+            End             = end;
+            Type            = type;
+            StringValues    = stringValues;
             NonStringValues = nonStringValues;
-        }
-
-        protected CustomInterval()
-        {
-            Clear();
         }
 
         public static CustomInterval GetEmptyInterval()
         {
             return new CustomInterval(null, -1, -1, null, null, null);
-        }
-
-        private void Clear()
-        {
-            ReferenceName = null;
-            Start = -1;
-            End = -1;
-            Type = null;
-            StringValues = null;
-            NonStringValues = null;
         }
 
         public bool IsEmpty()
@@ -76,5 +67,34 @@ namespace VariantAnnotation.DataStructures
 
             return hashCode;
         }
-    }
+
+		public void SerializeJson(StringBuilder sb)
+		{
+			var jsonObject = new JsonObject(sb);
+
+			sb.Append(JsonObject.OpenBrace);
+			jsonObject.AddStringValue("Start", Start.ToString(), false);
+			jsonObject.AddStringValue("End", End.ToString(), false);
+			// jsonObject.AddStringValue("ReferenceName", ReferenceName);//should be a quoted string
+			// jsonObject.AddStringValue("Type",Type);//should be a quoted string
+
+			if (StringValues != null)
+			{
+				foreach (var kvp in StringValues)
+				{
+					jsonObject.AddStringValue(kvp.Key, kvp.Value);
+				}
+			}
+
+			if (NonStringValues != null)
+			{
+				foreach (var kvp in NonStringValues)
+				{
+					jsonObject.AddStringValue(kvp.Key, kvp.Value, false);
+				}
+			}
+
+			sb.Append(JsonObject.CloseBrace);
+		}
+	}
 }

@@ -1,11 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 
 namespace VariantAnnotation.Utilities
 {
     public static class MemoryUtilities
     {
         // ReSharper disable InconsistentNaming
-        public const long NumBytesInGB  = 1073741824;
+        private const long NumBytesInGB = 1073741824;
         private const long NumBytesInMB = 1048576;
         private const long NumBytesInKB = 1024;
         // ReSharper restore InconsistentNaming
@@ -16,6 +17,14 @@ namespace VariantAnnotation.Utilities
         public static long GetPeakMemoryUsage()
         {
             return Process.GetCurrentProcess().PeakWorkingSet64;
+        }
+
+        /// <summary>
+        /// returns the number of bytes used
+        /// </summary>
+        public static long NumBytesUsed(bool forceFullCollection)
+        {
+            return GC.GetTotalMemory(forceFullCollection);
         }
 
         /// <summary>

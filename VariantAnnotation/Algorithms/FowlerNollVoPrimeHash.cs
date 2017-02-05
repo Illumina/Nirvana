@@ -14,14 +14,9 @@ namespace VariantAnnotation.Algorithms
         private const uint FnvOffsetBasis = 2166136261;
         private const uint FnvPrime       = 16777619;
 
-        public static int ComputeHash(byte[] bArray)
-        {
-            return (int)GenerateHash(bArray, FnvOffsetBasis);
-        }
-
         private static uint GenerateHash(byte[] bArray, uint hash)
         {
-            foreach (byte b in bArray)
+            foreach (var b in bArray)
             {
                 hash ^= b;
                 hash *= FnvPrime;
@@ -32,14 +27,14 @@ namespace VariantAnnotation.Algorithms
 
         public static int ComputeHash(string s)
         {
-            uint hash = FnvOffsetBasis;
+            var hash = FnvOffsetBasis;
             if (!string.IsNullOrEmpty(s)) hash = GenerateHash(Encoding.ASCII.GetBytes(s), FnvOffsetBasis);
             return (int)hash;
         }
 
         public static int ComputeHash(string s, string s2)
         {
-            uint hash = FnvOffsetBasis;
+            var hash = FnvOffsetBasis;
             if (!string.IsNullOrEmpty(s)) hash = GenerateHash(Encoding.ASCII.GetBytes(s), hash);
             if (!string.IsNullOrEmpty(s2)) hash = GenerateHash(Encoding.ASCII.GetBytes(s2), hash);
             return (int)hash;

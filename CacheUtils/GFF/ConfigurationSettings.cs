@@ -2,12 +2,8 @@
 {
     public static class ConfigurationSettings
     {
-        #region members
-
-        // filenames
-        public static string InputCacheDir;
+        public static string CompressedReferencePath;
+        public static string CachePrefix;
         public static string OutputFileName;
-
-	    #endregion
     }
 }

@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
@@ -15,62 +17,62 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
         // ReSharper restore InconsistentNaming
     }
 
-    public class ClinGenItem : SupplementaryDataItem
+    public sealed class ClinGenItem : SupplementaryDataItem
     {
-        internal string Id { get; }
-        internal int End { get; }
+        public string Id { get; }
+        public int End { get; }
         private VariantType VariantType { get; }
-        internal ClinicalInterpretation ClinicalInterpretation { get; }
-        internal IEnumerable<string> Phenotypes => _phenotypes;
+        public ClinicalInterpretation ClinicalInterpretation { get; private set; }
+        public IEnumerable<string> Phenotypes => _phenotypes;
         private HashSet<string> _phenotypes { get; }
-        internal IEnumerable<string> PhenotypeIds => _phenotypeIds;
+        public IEnumerable<string> PhenotypeIds => _phenotypeIds;
         private HashSet<string> _phenotypeIds { get; }
-        private int ObservedGains { get; }
-        private int ObservedLosses { get; }
-        private bool Validated { get; }
+        public int ObservedGains { get; private set; }
+        public int ObservedLosses { get; private set; }
+        public bool Validated { get; private set; }
 
         public ClinGenItem(string id, string chromosome, int start, int end, VariantType variantType, int observedGains, int observedLosses,
             ClinicalInterpretation clinicalInterpretation, bool validated, HashSet<string> phenotypes = null, HashSet<string> phenotypeIds = null)
         {
-            Id = id;
-            Chromosome = chromosome;
-            Start = start;
-            End = end;
-            VariantType = variantType;
+            Id                     = id;
+            Chromosome             = chromosome;
+            Start                  = start;
+            End                    = end;
+            VariantType            = variantType;
             ClinicalInterpretation = clinicalInterpretation;
-            _phenotypes = phenotypes ?? new HashSet<string>();
-            _phenotypeIds = phenotypeIds ?? new HashSet<string>();
-            ObservedGains = observedGains;
-            ObservedLosses = observedLosses;
-            Validated = validated;
-            IsInterval = true;
+            _phenotypes            = phenotypes ?? new HashSet<string>();
+            _phenotypeIds          = phenotypeIds ?? new HashSet<string>();
+            ObservedGains          = observedGains;
+            ObservedLosses         = observedLosses;
+            Validated              = validated;
+            IsInterval             = true;
         }
 
-        public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryAnnotation sa, string refBases = null)
+        public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryPositionCreator sa, string refBases = null)
         {
             return null;
         }
 
-        public override SupplementaryInterval GetSupplementaryInterval()
+        public override SupplementaryInterval GetSupplementaryInterval(ChromosomeRenamer renamer)
         {
             if (!IsInterval) return null;
 
-            var intValues = new Dictionary<string, int>();
+            var intValues    = new Dictionary<string, int>();
             var doubleValues = new Dictionary<string, double>();
-            var freqValues = new Dictionary<string, double>();
+            var freqValues   = new Dictionary<string, double>();
             var stringValues = new Dictionary<string, string>();
-            var boolValues = new List<string>();
-            var stringLists = new Dictionary<string, IEnumerable<string>>();
+            var boolValues   = new List<string>();
+            var stringLists  = new Dictionary<string, IEnumerable<string>>();
 
             var suppInterval = new SupplementaryInterval(Start, End, Chromosome, null, VariantType,
-                "ClinGen", intValues, doubleValues, freqValues, stringValues, boolValues, stringLists);
+                "ClinGen", renamer, intValues, doubleValues, freqValues, stringValues, boolValues, stringLists);
 
-            if (Id != null) suppInterval.AddStringValue("id", Id);
+            if (Id                     != null) suppInterval.AddStringValue("id", Id);
             if (ClinicalInterpretation != ClinicalInterpretation.unknown) suppInterval.AddStringValue("clinicalInterpretation", GetClinicalDescription(ClinicalInterpretation));
-            if (Phenotypes != null) suppInterval.AddStringList("phenotypes", Phenotypes);
-            if (PhenotypeIds != null) suppInterval.AddStringList("phenotypeIds", PhenotypeIds);
-            if (ObservedGains != 0) suppInterval.AddIntValue("observedGains", ObservedGains);
-            if (ObservedLosses != 0) suppInterval.AddIntValue("observedLosses", ObservedLosses);
+            if (Phenotypes             != null) suppInterval.AddStringList("phenotypes", Phenotypes);
+            if (PhenotypeIds           != null) suppInterval.AddStringList("phenotypeIds", PhenotypeIds);
+            if (ObservedGains          != 0) suppInterval.AddIntValue("observedGains", ObservedGains);
+            if (ObservedLosses         != 0) suppInterval.AddIntValue("observedLosses", ObservedLosses);
             if (Validated) suppInterval.AddBoolValue("validated");
 
             return suppInterval;
@@ -106,7 +108,46 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
                 hashCode = (hashCode * 397) ^ ObservedLosses.GetHashCode();
 
                 return hashCode;
-			}
-		}
+            }
+        }
+
+        public void MergeItem(ClinGenItem other)
+        {
+            //sanity check 
+            if (!Id.Equals(other.Id) || !Chromosome.Equals(other.Chromosome) || Start != other.Start || End != other.End)
+            {
+                throw new Exception($"different region with same parent ID {Id}\n");
+            }
+
+            //check if the validate status and clinical interpretation are consistent
+            if (Validated || other.Validated)
+            {
+                Validated = true;
+            }
+
+            if (!ClinicalInterpretation.Equals(other.ClinicalInterpretation))
+            {
+                if (ClinicalInterpretation < other.ClinicalInterpretation)
+                    ClinicalInterpretation = other.ClinicalInterpretation;
+            }
+
+            if (other.VariantType == VariantType.copy_number_gain)
+            {
+                ObservedGains++;
+            }
+            else if (other.VariantType == VariantType.copy_number_loss)
+            {
+                ObservedLosses++;
+            }
+            foreach (var phenotype in other.Phenotypes)
+            {
+                _phenotypes.Add(phenotype);
+            }
+
+            foreach (var phenotypeId in other.PhenotypeIds)
+            {
+                _phenotypeIds.Add(phenotypeId);
+            }
+        }
     }
 }

@@ -1,0 +1,79 @@
+##fileformat=VCFv4.0
+##fileDate=20150106
+##source=ClinVar and dbSNP
+##dbSNP_BUILD_ID=142
+##reference=GRCh37.p13
+##phasing=partial
+##variationPropertyDocumentationUrl=ftp://ftp.ncbi.nlm.nih.gov/snp/specs/dbSNP_BitField_latest.pdf	
+##INFO=<ID=RS,Number=1,Type=Integer,Description="dbSNP ID (i.e. rs number)">
+##INFO=<ID=RSPOS,Number=1,Type=Integer,Description="Chr position reported in dbSNP">
+##INFO=<ID=RV,Number=0,Type=Flag,Description="RS orientation is reversed">
+##INFO=<ID=VP,Number=1,Type=String,Description="Variation Property.  Documentation is at ftp://ftp.ncbi.nlm.nih.gov/snp/specs/dbSNP_BitField_latest.pdf">
+##INFO=<ID=GENEINFO,Number=1,Type=String,Description="Pairs each of gene symbol:gene id.  The gene symbol and id are delimited by a colon (:) and each pair is delimited by a vertical bar (|)">
+##INFO=<ID=dbSNPBuildID,Number=1,Type=Integer,Description="First dbSNP Build for RS">
+##INFO=<ID=SAO,Number=1,Type=Integer,Description="Variant Allele Origin: 0 - unspecified, 1 - Germline, 2 - Somatic, 3 - Both">
+##INFO=<ID=SSR,Number=1,Type=Integer,Description="Variant Suspect Reason Codes (may be more than one value added together) 0 - unspecified, 1 - Paralog, 2 - byEST, 4 - oldAlign, 8 - Para_EST, 16 - 1kg_failed, 1024 - other">
+##INFO=<ID=WGT,Number=1,Type=Integer,Description="Weight, 00 - unmapped, 1 - weight 1, 2 - weight 2, 3 - weight 3 or more">
+##INFO=<ID=VC,Number=1,Type=String,Description="Variation Class">
+##INFO=<ID=PM,Number=0,Type=Flag,Description="Variant is Precious(Clinical,Pubmed Cited)">
+##INFO=<ID=TPA,Number=0,Type=Flag,Description="Provisional Third Party Annotation(TPA) (currently rs from PHARMGKB who will give phenotype data)">
+##INFO=<ID=PMC,Number=0,Type=Flag,Description="Links exist to PubMed Central article">
+##INFO=<ID=S3D,Number=0,Type=Flag,Description="Has 3D structure - SNP3D table">
+##INFO=<ID=SLO,Number=0,Type=Flag,Description="Has SubmitterLinkOut - From SNP->SubSNP->Batch.link_out">
+##INFO=<ID=NSF,Number=0,Type=Flag,Description="Has non-synonymous frameshift A coding region variation where one allele in the set changes all downstream amino acids. FxnClass = 44">
+##INFO=<ID=NSM,Number=0,Type=Flag,Description="Has non-synonymous missense A coding region variation where one allele in the set changes protein peptide. FxnClass = 42">
+##INFO=<ID=NSN,Number=0,Type=Flag,Description="Has non-synonymous nonsense A coding region variation where one allele in the set changes to STOP codon (TER). FxnClass = 41">
+##INFO=<ID=REF,Number=0,Type=Flag,Description="Has reference A coding region variation where one allele in the set is identical to the reference sequence. FxnCode = 8">
+##INFO=<ID=SYN,Number=0,Type=Flag,Description="Has synonymous A coding region variation where one allele in the set does not change the encoded amino acid. FxnCode = 3">
+##INFO=<ID=U3,Number=0,Type=Flag,Description="In 3' UTR Location is in an untranslated region (UTR). FxnCode = 53">
+##INFO=<ID=U5,Number=0,Type=Flag,Description="In 5' UTR Location is in an untranslated region (UTR). FxnCode = 55">
+##INFO=<ID=ASS,Number=0,Type=Flag,Description="In acceptor splice site FxnCode = 73">
+##INFO=<ID=DSS,Number=0,Type=Flag,Description="In donor splice-site FxnCode = 75">
+##INFO=<ID=INT,Number=0,Type=Flag,Description="In Intron FxnCode = 6">
+##INFO=<ID=R3,Number=0,Type=Flag,Description="In 3' gene region FxnCode = 13">
+##INFO=<ID=R5,Number=0,Type=Flag,Description="In 5' gene region FxnCode = 15">
+##INFO=<ID=OTH,Number=0,Type=Flag,Description="Has other variant with exactly the same set of mapped positions on NCBI refernce assembly.">
+##INFO=<ID=CFL,Number=0,Type=Flag,Description="Has Assembly conflict. This is for weight 1 and 2 variant that maps to different chromosomes on different assemblies.">
+##INFO=<ID=ASP,Number=0,Type=Flag,Description="Is Assembly specific. This is set if the variant only maps to one assembly">
+##INFO=<ID=MUT,Number=0,Type=Flag,Description="Is mutation (journal citation, explicit fact): a low frequency variation that is cited in journal and other reputable sources">
+##INFO=<ID=VLD,Number=0,Type=Flag,Description="Is Validated.  This bit is set if the variant has 2+ minor allele count based on frequency or genotype data.">
+##INFO=<ID=G5A,Number=0,Type=Flag,Description=">5% minor allele frequency in each and all populations">
+##INFO=<ID=G5,Number=0,Type=Flag,Description=">5% minor allele frequency in 1+ populations">
+##INFO=<ID=HD,Number=0,Type=Flag,Description="Marker is on high density genotyping kit (50K density or greater).  The variant may have phenotype associations present in dbGaP.">
+##INFO=<ID=GNO,Number=0,Type=Flag,Description="Genotypes available. The variant has individual genotype (in SubInd table).">
+##INFO=<ID=KGPhase1,Number=0,Type=Flag,Description="1000 Genome phase 1 (incl. June Interim phase 1)">
+##INFO=<ID=KGPhase3,Number=0,Type=Flag,Description="1000 Genome phase 3">
+##INFO=<ID=CDA,Number=0,Type=Flag,Description="Variation is interrogated in a clinical diagnostic assay">
+##INFO=<ID=LSD,Number=0,Type=Flag,Description="Submitted from a locus-specific database">
+##INFO=<ID=MTP,Number=0,Type=Flag,Description="Microattribution/third-party annotation(TPA:GWAS,PAGE)">
+##INFO=<ID=OM,Number=0,Type=Flag,Description="Has OMIM/OMIA">
+##INFO=<ID=NOC,Number=0,Type=Flag,Description="Contig allele not present in variant allele list. The reference sequence allele at the mapped position is not present in the variant allele list, adjusted for orientation.">
+##INFO=<ID=WTD,Number=0,Type=Flag,Description="Is Withdrawn by submitter If one member ss is withdrawn by submitter, then this bit is set.  If all member ss' are withdrawn, then the rs is deleted to SNPHistory">
+##INFO=<ID=NOV,Number=0,Type=Flag,Description="Rs cluster has non-overlapping allele sets. True when rs set has more than 2 alleles from different submissions and these sets share no alleles in common.">
+##FILTER=<ID=NC,Description="Inconsistent Genotype Submission For At Least One Sample">
+##INFO=<ID=CAF,Number=.,Type=String,Description="An ordered, comma delimited list of allele frequencies based on 1000Genomes, starting with the reference allele followed by alternate alleles as ordered in the ALT column. Where a 1000Genomes alternate allele is not in the dbSNPs alternate allele set, the allele is added to the ALT column.  The minor allele is the second largest value in the list, and was previuosly reported in VCF as the GMAF.  This is the GMAF reported on the RefSNP and EntrezSNP pages and VariationReporter">
+##INFO=<ID=COMMON,Number=1,Type=Integer,Description="RS is a common SNP.  A common SNP is one that has at least one 1000Genomes population with a minor allele of frequency >= 1% and for which 2 or more founders contribute to that minor allele frequency.">
+##INFO=<ID=CLNHGVS,Number=.,Type=String,Description="Variant names from HGVS.    The order of these variants corresponds to the order of the info in the other clinical  INFO tags.">
+##INFO=<ID=CLNALLE,Number=.,Type=Integer,Description="Variant alleles from REF or ALT columns.  0 is REF, 1 is the first ALT allele, etc.  This is used to match alleles with other corresponding clinical (CLN) INFO tags.  A value of -1 indicates that no allele was found to match a corresponding HGVS allele name.">
+##INFO=<ID=CLNSRC,Number=.,Type=String,Description="Variant Clinical Chanels">
+##INFO=<ID=CLNORIGIN,Number=.,Type=String,Description="Allele Origin. One or more of the following values may be added: 0 - unknown; 1 - germline; 2 - somatic; 4 - inherited; 8 - paternal; 16 - maternal; 32 - de-novo; 64 - biparental; 128 - uniparental; 256 - not-tested; 512 - tested-inconclusive; 1073741824 - other">
+##INFO=<ID=CLNSRCID,Number=.,Type=String,Description="Variant Clinical Channel IDs">
+##INFO=<ID=CLNSIG,Number=.,Type=String,Description="Variant Clinical Significance, 0 - Uncertain significance, 1 - not provided, 2 - Benign, 3 - Likely benign, 4 - Likely pathogenic, 5 - Pathogenic, 6 - drug response, 7 - histocompatibility, 255 - other">
+##INFO=<ID=CLNDSDB,Number=.,Type=String,Description="Variant disease database name">
+##INFO=<ID=CLNDSDBID,Number=.,Type=String,Description="Variant disease database ID">
+##INFO=<ID=CLNDBN,Number=.,Type=String,Description="Variant disease name">
+##INFO=<ID=CLNREVSTAT,Number=.,Type=String,Description="ClinVar Review Status, mult - Classified by multiple submitters, single - Classified by single submitter, not - Not classified by submitter, exp - Reviewed by expert panel, prof - Reviewed by professional society">
+##INFO=<ID=CLNACC,Number=.,Type=String,Description="Variant Accession and Versions">
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+1	883516	rs267598747	G	A	.	.	RS=267598747;RSPOS=883516;dbSNPBuildID=137;SSR=0;SAO=3;VP=0x050060000305000002100120;GENEINFO=NOC2L:26155;WGT=1;VC=SNV;PM;REF;SYN;ASP;LSD;CLNALLE=1;CLNHGVS=NC_000001.10:g.883516G>A;CLNSRC=ClinVar;CLNORIGIN=2;CLNSRCID=NM_015658.3:c.1654C>T;CLNSIG=255;CLNDSDB=MedGen:SNOMED_CT;CLNDSDBID=C0025202:2092003;CLNDBN=Malignant_melanoma;CLNREVSTAT=not;CLNACC=RCV000064926.2
+1	984971	rs111818381	G	A,C	.	.	RS=111818381;RSPOS=984971;dbSNPBuildID=132;SSR=0;SAO=0;VP=0x050360000a05040536100100;GENEINFO=AGRN:375790;WGT=1;VC=SNV;PM;S3D;SLO;NSM;REF;ASP;VLD;HD;GNO;KGPhase1;KGPhase3;LSD;CLNALLE=1;CLNHGVS=NC_000001.10:g.984971G>A;CLNSRC=ClinVar|.|University_of_Chicago;CLNORIGIN=1;CLNSRCID=NM_198576.3:c.4540G>A|.|NM_198576.2(AGRN):c.4540;CLNSIG=3;CLNDSDB=MedGen;CLNDSDBID=CN169374;CLNDBN=not_specified;CLNREVSTAT=single;CLNACC=RCV000116271.2;CAF=0.9956,0.004393,.;COMMON=1
+1	1119314	rs267597921	C	G,T	.	.	RS=267597921;RSPOS=1119314;dbSNPBuildID=137;SSR=0;SAO=3;VP=0x050260000a05000026100120;GENEINFO=TTLL10:254173;WGT=1;VC=SNV;PM;S3D;NSM;REF;ASP;KGPhase3;LSD;CLNALLE=1;CLNHGVS=NC_000001.10:g.1119314C>G;CLNSRC=ClinVar;CLNORIGIN=2;CLNSRCID=NM_001130045.1:c.1103C>G;CLNSIG=255;CLNDSDB=MedGen:SNOMED_CT;CLNDSDBID=C0025202:2092003;CLNDBN=Malignant_melanoma;CLNREVSTAT=not;CLNACC=RCV000064015.2;CAF=0.9998,.,0.0001997;COMMON=0
+1	2160305	rs387907306	G	A,T	.	.	RS=387907306;RSPOS=2160305;dbSNPBuildID=137;SSR=0;SAO=0;VP=0x050060000a05000002110100;GENEINFO=SKI:6497;WGT=1;VC=SNV;PM;NSM;REF;ASP;LSD;OM;CLNALLE=1,2;CLNHGVS=NC_000001.10:g.2160305G>A,NC_000001.10:g.2160305G>T;CLNSRC=ClinVar|OMIM_Allelic_Variant,ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1,1;CLNSRCID=NM_003036.3:c.100G>A|164780.0004,NM_003036.3:c.100G>T|164780.0005;CLNSIG=5,5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT,GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT;CLNDSDBID=NBK1277:C1321551:182212:ORPHA2462:83092002,NBK1277:C1321551:182212:ORPHA2462:83092002;CLNDBN=Shprintzen-Goldberg_syndrome,Shprintzen-Goldberg_syndrome;CLNREVSTAT=single,single;CLNACC=RCV000030819.24,RCV000030820.24
+1	2160306	rs387907305	G	A,T	.	.	RS=387907305;RSPOS=2160306;dbSNPBuildID=136;SSR=0;SAO=0;VP=0x050060000a05000002110100;GENEINFO=SKI:6497;WGT=1;VC=SNV;PM;NSM;REF;ASP;LSD;OM;CLNALLE=1,2;CLNHGVS=NC_000001.10:g.2160306G>A,NC_000001.10:g.2160306G>T;CLNSRC=ClinVar|OMIM_Allelic_Variant,ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1,0;CLNSRCID=NM_003036.3:c.101G>A|164780.0003,NM_003036.3:c.101G>T|164780.0007;CLNSIG=5,5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT,GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT;CLNDSDBID=NBK1277:C1321551:182212:ORPHA2462:83092002,NBK1277:C1321551:182212:ORPHA2462:83092002;CLNDBN=Shprintzen-Goldberg_syndrome,Shprintzen-Goldberg_syndrome;CLNREVSTAT=single,single;CLNACC=RCV000030818.24,RCV000033005.24
+1	2160308	rs397514590	C	T	.	.	RS=397514590;RSPOS=2160308;dbSNPBuildID=136;SSR=0;SAO=0;VP=0x050060000a05000002110100;GENEINFO=SKI:6497;WGT=1;VC=SNV;PM;NSM;REF;ASP;LSD;OM;CLNALLE=1;CLNHGVS=NC_000001.10:g.2160308C>T;CLNSRC=ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1;CLNSRCID=NM_003036.3:c.103C>T|164780.0010;CLNSIG=5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT;CLNDSDBID=NBK1277:C1321551:182212:ORPHA2462:83092002;CLNDBN=Shprintzen-Goldberg_syndrome;CLNREVSTAT=single;CLNACC=RCV000033008.24
+1	2160309	rs397514589	C	A	.	.	RS=397514589;RSPOS=2160309;dbSNPBuildID=136;SSR=0;SAO=0;VP=0x050060000a05000002110100;GENEINFO=SKI:6497;WGT=1;VC=SNV;PM;NSM;REF;ASP;LSD;OM;CLNALLE=1;CLNHGVS=NC_000001.10:g.2160309C>A;CLNSRC=ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1;CLNSRCID=NM_003036.3:c.104C>A|164780.0009;CLNSIG=5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT;CLNDSDBID=NBK1277:C1321551:182212:ORPHA2462:83092002;CLNDBN=Shprintzen-Goldberg_syndrome;CLNREVSTAT=single;CLNACC=RCV000033007.20
+1	2160390	rs28384811	C	G	.	.	RS=28384811;RSPOS=2160390;dbSNPBuildID=125;SSR=0;SAO=0;VP=0x050068000a05140036100100;GENEINFO=SKI:6497;WGT=1;VC=SNV;PM;PMC;NSM;REF;ASP;VLD;KGPhase1;KGPhase3;LSD;CLNALLE=1;CLNHGVS=NC_000001.10:g.2160390C>G;CLNSRC=ClinVar|.|GeneDx;CLNORIGIN=1;CLNSRCID=NM_003036.3:c.185C>G|.|736213;CLNSIG=2;CLNDSDB=MedGen;CLNDSDBID=CN221809;CLNDBN=not_provided;CLNREVSTAT=single;CLNACC=RCV000128047.1;CAF=0.9543,0.04573;COMMON=1
+1	24122692	rs3180383	G	A,C	.	.	RS=3180383;RSPOS=24122692;dbSNPBuildID=105;SSR=0;SAO=1;VP=0x050260000b05000002110100;GENEINFO=GALE:2582;WGT=1;VC=SNV;PM;S3D;NSM;REF;SYN;ASP;LSD;OM;CLNALLE=-1;CLNHGVS=NC_000001.10:g.24122692G>T;CLNSRC=ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1;CLNSRCID=NM_001008216.1:c.937C>A|606953.0006;CLNSIG=5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:Orphanet:SNOMED_CT;CLNDSDBID=NBK51671:C0751161:230350:ORPHA352:ORPHA79238:8849004;CLNDBN=UDPglucose-4-epimerase_deficiency;CLNREVSTAT=single;CLNACC=RCV000003865.1
+1	2160484	rs398122889	GTCCGACCGC	G	.	.	RS=398122889;RSPOS=2160488;dbSNPBuildID=138;SSR=0;SAO=0;VP=0x050060000005000002110200;GENEINFO=SKI:6497;WGT=1;VC=DIV;PM;ASP;LSD;OM;CLNALLE=1;CLNHGVS=NC_000001.10:g.2160488_2160496delGACCGCTCC;CLNSRC=ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1;CLNSRCID=NM_003036.3:c.283_291delGACCGCTCC|164780.0006;CLNSIG=5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT;CLNDSDBID=NBK1277:C1321551:182212:ORPHA2462:83092002;CLNDBN=Shprintzen-Goldberg_syndrome;CLNREVSTAT=single;CLNACC=RCV000030821.20
+1	2160484	rs398122914	GTCCGACCGCTCC	G	.	.	RS=398122914;RSPOS=2160485;dbSNPBuildID=138;SSR=0;SAO=0;VP=0x050060000005000002110200;GENEINFO=SKI:6497;WGT=1;VC=DIV;PM;ASP;LSD;OM;CLNALLE=1;CLNHGVS=NC_000001.10:g.2160485_2160496delTCCGACCGCTCC;CLNSRC=ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1;CLNSRCID=NM_003036.3:c.280_291delTCCGACCGCTCC|164780.0008;CLNSIG=5;CLNDSDB=GeneReviews:MedGen:OMIM:Orphanet:SNOMED_CT;CLNDSDBID=NBK1277:C1321551:182212:ORPHA2462:83092002;CLNDBN=Shprintzen-Goldberg_syndrome;CLNREVSTAT=single;CLNACC=RCV000033006.20
+1	1959699	rs41307846	G	A	.	.	RS=41307846;RSPOS=1959699;dbSNPBuildID=127;SSR=0;SAO=1;VP=0x050260000a05040136110100;GENEINFO=GABRD:2563;WGT=1;VC=SNV;PM;S3D;NSM;REF;ASP;VLD;GNO;KGPhase1;KGPhase3;LSD;OM;CLNALLE=1;CLNHGVS=NC_000001.10:g.1959699G>A;CLNSRC=ClinVar|OMIM_Allelic_Variant;CLNORIGIN=1;CLNSRCID=NM_000815.4:c.659G>A|137163.0002;CLNSIG=255|255|255;CLNDSDB=MedGen|MedGen|MedGen:OMIM;CLNDSDBID=C3150401|CN043549|C2751603:613060;CLNDBN=Generalized_epilepsy_with_febrile_seizures_plus_type_5|Epilepsy\x2c_juvenile_myoclonic_7|Epilepsy\x2c_idiopathic_generalized_10;CLNREVSTAT=single|single|single;CLNACC=RCV000017599.1|RCV000017600.1|RCV000022558.1;CAF=0.9942,0.005791;COMMON=1

@@ -1,40 +1,46 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Utilities;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.FileHandling.CustomInterval
 {
     public sealed class CustomIntervalReader : IDisposable
     {
-        private readonly BinaryReader _binaryReader;
         private readonly ExtendedBinaryReader _reader;
         private string _referenceName;
         private string _intervalType;
         // ReSharper disable once NotAccessedField.Local
         private long _creationTime;
-        private int _count = 0;
 
         private bool _reachedEnd;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public CustomIntervalReader(string fileName)
-            : this(FileUtilities.GetFileStream(fileName))
-        { }
+        public DataSourceVersion DataVersion { get; private set; }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        private CustomIntervalReader(Stream stream)
+        public CustomIntervalReader(string fileName)
         {
-            // open the database file
-            _binaryReader = new BinaryReader(stream);
-            _reader       = new ExtendedBinaryReader(_binaryReader);
-            _reachedEnd   = false;
+            _reader = new ExtendedBinaryReader(FileUtilities.GetReadStream(fileName));
+            _reachedEnd = false;
+
+            ReadHeader();
+        }
+
+        public string GetIntervalType()
+        {
+            return _intervalType;
+        }
+
+        public string GetReferenceName()
+        {
+            return _referenceName;
+        }
+
+        public CustomIntervalReader(Stream stream)
+        {
+            _reader = new ExtendedBinaryReader(stream);
+            _reachedEnd = false;
 
             ReadHeader();
         }
@@ -45,8 +51,8 @@ namespace VariantAnnotation.FileHandling.CustomInterval
 
             var chromosome = _referenceName;
             var type = _intervalType;
-            var start = _reader.ReadInt();
-            var end = _reader.ReadInt();
+            var start = _reader.ReadOptInt32();
+            var end = _reader.ReadOptInt32();
 
             var interval = new DataStructures.CustomInterval(chromosome, start, end, type, null, null);
             if (interval.IsEmpty())
@@ -55,25 +61,24 @@ namespace VariantAnnotation.FileHandling.CustomInterval
                 return null;
             }
 
-            var stringDictCount = _reader.ReadInt();
+            var stringDictCount = _reader.ReadOptInt32();
             if (stringDictCount > 0)
             {
                 interval.StringValues = new Dictionary<string, string>(stringDictCount);
-                for (int i = 0; i < stringDictCount; i++)
+                for (var i = 0; i < stringDictCount; i++)
                 {
                     var key = _reader.ReadUtf8String();
                     var val = _reader.ReadUtf8String();
 
                     interval.StringValues.Add(key, val);
                 }
-
             }
 
-            var nonStringDictCount = _reader.ReadInt();
+            var nonStringDictCount = _reader.ReadOptInt32();
             if (nonStringDictCount > 0)
             {
                 interval.NonStringValues = new Dictionary<string, string>(nonStringDictCount);
-                for (int i = 0; i < nonStringDictCount; i++)
+                for (var i = 0; i < nonStringDictCount; i++)
                 {
                     var key = _reader.ReadUtf8String();
                     var val = _reader.ReadUtf8String();
@@ -81,47 +86,42 @@ namespace VariantAnnotation.FileHandling.CustomInterval
                     interval.NonStringValues.Add(key, val);
                 }
             }
-
             return interval;
 
         }
 
         private void ReadHeader()
         {
-            var header = _binaryReader.ReadString();
+            var header = _reader.ReadString();
             if (header != CustomIntervalCommon.DataHeader)
-            {
                 throw new GeneralException("Unrecognized header in custom interval database");
-            }
 
-            var schema = _binaryReader.ReadUInt16();
+            var schema = _reader.ReadUInt16();
             if (schema != CustomIntervalCommon.SchemaVersion)
-            {
-                throw new GeneralException($"Custom interval database schema mismatch. Expected {CustomIntervalCommon.SchemaVersion}, observed {schema}");
-            }
+                throw new GeneralException(
+                    $"Custom interval database schema mismatch. Expected {CustomIntervalCommon.SchemaVersion}, observed {schema}");
 
-            _creationTime  = _binaryReader.ReadInt64();
-            _referenceName = _binaryReader.ReadString();
-            _intervalType  = _binaryReader.ReadString();
+            _creationTime = _reader.ReadInt64();
+            _referenceName = _reader.ReadString();
+            _intervalType = _reader.ReadString();
 
-            // ReSharper disable once UnusedVariable
-            var dataVersion = new DataSourceVersion(_binaryReader);
+            DataVersion = new DataSourceVersion(_reader);
 
             CheckGuard();
         }
 
         private void CheckGuard()
         {
-            uint observedGuard = _binaryReader.ReadUInt32();
+            var observedGuard = _reader.ReadUInt32();
             if (observedGuard != CustomIntervalCommon.GuardInt)
             {
                 throw new GeneralException($"Expected a guard integer ({CustomIntervalCommon.GuardInt}), but found another value: ({observedGuard})");
             }
         }
 
-        private void Close()
+        private static void Close()
         {
-            Console.WriteLine("Read {0} intervals for {1}", _count, _referenceName);
+            //Console.WriteLine("Read {0} intervals for {1}", _count, _referenceName);
         }
 
         #region IDisposable
@@ -150,7 +150,7 @@ namespace VariantAnnotation.FileHandling.CustomInterval
                 if (disposing)
                 {
                     // Free any other managed objects here. 
-                    _binaryReader.Dispose();
+                    _reader.Dispose();
                 }
 
                 // Free any unmanaged objects here. 

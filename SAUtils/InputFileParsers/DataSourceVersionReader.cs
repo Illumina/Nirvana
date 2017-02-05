@@ -24,8 +24,10 @@ namespace SAUtils.InputFileParsers
         /// <summary>
         /// constructor
         /// </summary>
-        public DataSourceVersionReader(string fileName) : this(FileUtilities.GetFileStream(fileName))
-        { }
+        public DataSourceVersionReader(string fileName)
+        {
+            _reader = new StreamReader(FileUtilities.GetReadStream(fileName));
+        }
 
         /// <summary>
         /// constructor
@@ -35,7 +37,21 @@ namespace SAUtils.InputFileParsers
             _reader = new StreamReader(stream);
         }
 
-        public DataSourceVersion GetVersion()
+		public static DataSourceVersion GetSourceVersion(string versionFileName)
+		{
+			if (!File.Exists(versionFileName))
+			{
+				throw new FileNotFoundException(versionFileName);
+			}
+
+			using (var versionReader = new DataSourceVersionReader(versionFileName))
+			{
+				var version = versionReader.GetVersion();
+				return version;
+			}
+		}
+
+		public DataSourceVersion GetVersion()
         {
             // NAME = dbSNP
             // VERSION = 147

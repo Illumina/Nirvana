@@ -2,21 +2,25 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using ErrorHandling.Exceptions;
-using VariantAnnotation.Compression;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
+using VariantAnnotation.FileHandling.TranscriptCache;
+using VariantAnnotation.Interface;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.FileHandling.Phylop
 {
     /// <summary>
     /// This is the database object that gives the user the ability to query phylop score for any chormosome location.
     /// </summary>
-    public sealed class PhylopReader : IDisposable
+    public sealed class PhylopReader : IConservationScoreReader, IDisposable
     {
         #region members
 
-        private readonly BinaryReader _reader;
+        private readonly string _saDirectory;
+        private ExtendedBinaryReader _reader;
+        private readonly ICompressionAlgorithm _qlz;
 
         //in wigFix files, values for all positions are not available.
         //They come as contiguous intervals and knowing the file location of the score of a particular location is not possible.
@@ -25,9 +29,13 @@ namespace VariantAnnotation.FileHandling.Phylop
         private readonly List<PhylopInterval> _phylopIntervals;
         private int _currentIntervalIndex;
         private long _intervalListPosition;
-        internal readonly short[] Scores;
+        private readonly short[] _scores;
         private int _scoreCount;
         private byte[] _scoreBytes;
+
+        public bool IsInitialized { get; private set; }
+
+        private string _currentReferenceName;
 
         #endregion
         #region IDisposable
@@ -65,27 +73,65 @@ namespace VariantAnnotation.FileHandling.Phylop
         }
         #endregion
 
+        public GenomeAssembly GenomeAssembly => PhylopCommon.GetGenomeAssembly(_saDirectory);
+
+        public IEnumerable<IDataSourceVersion> DataSourceVersions => PhylopCommon.GetDataSourceVersions(_saDirectory);
+
         private void Close()
         {
             _reader.Dispose();
         }
 
-        private PhylopReader(int intervalLength = PhylopCommon.MaxIntervalLength)
+        /// <summary>
+        /// constructor
+        /// </summary>
+        private PhylopReader()
         {
-            _phylopIntervals = new List<PhylopInterval>();
+            _phylopIntervals      = new List<PhylopInterval>();
             _currentIntervalIndex = -1;
 
-            Scores = new short[intervalLength];
-            _scoreBytes = new byte[intervalLength * 2];
+            _scores     = new short[PhylopCommon.MaxIntervalLength];
+            _scoreBytes = new byte[PhylopCommon.MaxIntervalLength * 2];
+            _qlz        = new QuickLZ();
         }
 
         /// <summary>
-        /// constructor for the database. 
+        /// constructor (stream)
         /// </summary>
-        public PhylopReader(BinaryReader reader, int intervalLength = PhylopCommon.MaxIntervalLength) : this(intervalLength)
+        public PhylopReader(Stream stream) : this()
         {
-            if (reader == null) return;
-            _reader = reader;
+            if (stream == null) return;
+            _reader = new ExtendedBinaryReader(stream);
+            LoadHeader();
+        }
+
+        /// <summary>
+        /// constructor (SA directory)
+        /// </summary>
+        public PhylopReader(string saDirectory) : this()
+        {
+            _saDirectory = saDirectory;
+        }
+
+        public void LoadReference(string ucscReferenceName)
+        {
+            IsInitialized = false;
+            if (_saDirectory == null || ucscReferenceName == _currentReferenceName) return;
+            _currentReferenceName = ucscReferenceName;
+
+            _currentIntervalIndex = -1;
+            _phylopIntervals.Clear();
+
+            // load the appropriate phyloP file
+            var stream = PhylopCommon.GetStream(_saDirectory, ucscReferenceName);
+
+            if (stream == null)
+            {
+                _reader = null;
+                return;
+            }
+
+            _reader = new ExtendedBinaryReader(stream);
             LoadHeader();
         }
 
@@ -106,8 +152,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             _genomeAssembly = (GenomeAssembly)_reader.ReadByte();
             _version = new DataSourceVersion(_reader);
 
-
-
+            // skip the reference name
             _reader.ReadString();
 
             _intervalListPosition = _reader.ReadInt64();
@@ -115,6 +160,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             CheckGuard();
 
             LoadChromosomeIntervals();
+            IsInitialized = true;
         }
 
         public DataSourceVersion GetDataSourceVersion()
@@ -129,8 +175,8 @@ namespace VariantAnnotation.FileHandling.Phylop
 
         private void CheckGuard()
         {
-            uint observedGuard = _reader.ReadUInt32();
-            if (observedGuard != NirvanaDatabaseCommon.GuardInt)
+            var observedGuard = _reader.ReadUInt32();
+            if (observedGuard != CacheConstants.GuardInt)
             {
                 throw new GeneralException($"Expected a guard integer ({SupplementaryAnnotationCommon.GuardInt}), but found another value: ({observedGuard})");
             }
@@ -146,7 +192,7 @@ namespace VariantAnnotation.FileHandling.Phylop
 
             var intervalCount = _reader.ReadInt32();
 
-            for (int i = 0; i < intervalCount; i++)
+            for (var i = 0; i < intervalCount; i++)
             {
                 var chromosomeInterval = new PhylopInterval(_reader);
                 _phylopIntervals.Add(chromosomeInterval);
@@ -155,26 +201,28 @@ namespace VariantAnnotation.FileHandling.Phylop
             _reader.BaseStream.Position = currentPos;
         }
 
-        internal void ReadIntervalScores(PhylopInterval interval)
+        public int ReadIntervalScores(PhylopInterval interval)
         {
-            if (interval == null) return;
+            if (interval == null) return 0;
 
             var filePosition = interval.FilePosition;
             //going to the file location that contains this interval.
             if (filePosition != -1)
                 _reader.BaseStream.Position = filePosition;
-            else return;
+            else return 0; //the interval does not contain any file location for the scores
 
             var length = _reader.ReadInt32();
             var compressedScores = _reader.ReadBytes(length);
 
-            var qlz = new QuickLZ();
+            int requiredBufferSize = _qlz.GetDecompressedLength(compressedScores, length);
+            if (requiredBufferSize > _scoreBytes.Length) _scoreBytes = new byte[requiredBufferSize];
 
-            var uncompressedLength = qlz.Decompress(compressedScores, ref _scoreBytes);
+            var uncompressedLength = _qlz.Decompress(compressedScores, length, _scoreBytes, _scoreBytes.Length);
 
-            BytesToScores(uncompressedLength, _scoreBytes, Scores);
+            BytesToScores(uncompressedLength, _scoreBytes, _scores);
 
             _scoreCount = uncompressedLength / 2;
+            return _scoreCount;
         }
 
         internal void BytesToScores(int uncompressedLength, byte[] uncompressedScores, short[] scores)
@@ -233,9 +281,21 @@ namespace VariantAnnotation.FileHandling.Phylop
             if (_scoreCount == 0 || !interval.ContainsPosition(position))
                 return null;
 
-            var score = Scores[position - interval.Begin];
+            var score = _scores[position - interval.Begin];
 
             return (score * 0.001).ToString(CultureInfo.InvariantCulture);
+        }
+
+        internal short[] GetAllScores()
+        {
+            return _scores;
+        }
+
+        public void Clear()
+        {
+            IsInitialized = false;
+            _currentIntervalIndex = -1;
+            _phylopIntervals.Clear();
         }
     }
 }

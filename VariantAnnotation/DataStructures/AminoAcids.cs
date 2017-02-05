@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
+using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.DataStructures
 {
-    public static class AminoAcids
+    public class AminoAcids
     {
-        #region  members
+        #region members
 
         public const string StopCodon   = "*";
         public const char StopCodonChar = '*';
 
-        public static CodonConversion CodonConversionScheme = CodonConversion.HumanChromosome;
+        public CodonConversion CodonConversionScheme = CodonConversion.HumanChromosome;
 
-        private static readonly Dictionary<string, char> AminoAcidLookupTable;
-        private static readonly Dictionary<string, char> MitoDifferences;
-        private static readonly Dictionary<char, string> SingleToThreeAminoAcids;
-        private static readonly StringBuilder AbbrevBuilder = new StringBuilder();
+        private readonly Dictionary<string, char> _aminoAcidLookupTable;
+        private readonly Dictionary<string, char> _mitoDifferences;
+        private readonly Dictionary<char, string> _singleToThreeAminoAcids;
 
         #endregion
 
@@ -28,9 +27,9 @@ namespace VariantAnnotation.DataStructures
             HumanMitochondria
         }
 
-        static AminoAcids()
+        public AminoAcids()
         {
-            AminoAcidLookupTable = new Dictionary<string, char>
+            _aminoAcidLookupTable = new Dictionary<string, char>
             {
                 // 2nd base: T
                 {"TTT", 'F'},
@@ -105,7 +104,7 @@ namespace VariantAnnotation.DataStructures
                 {"GGG", 'G'}
             };
 
-            MitoDifferences = new Dictionary<string, char>
+            _mitoDifferences = new Dictionary<string, char>
             {
                 {"ATA", 'M'},
                 {"TGA", 'W'},
@@ -115,7 +114,7 @@ namespace VariantAnnotation.DataStructures
 
             // converts single letter amino acid ambiguity codes to three
             // letter abbreviations
-            SingleToThreeAminoAcids = new Dictionary<char, string>
+            _singleToThreeAminoAcids = new Dictionary<char, string>
             {
                 {'A', "Ala"},
                 {'B', "Asx"},
@@ -152,13 +151,13 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         private static string AddAnyAminoAcid(string aminoAcids)
         {
-            return aminoAcids == "*" ? aminoAcids : aminoAcids + 'X';
+            return aminoAcids=="*" ? aminoAcids : aminoAcids + 'X';
         }
 
         /// <summary>O
         /// sets the amino acids given the reference and variant codons
         /// </summary>
-        public static void Assign(TranscriptAnnotation transcriptAnnotation)
+        public void Assign(TranscriptAnnotation transcriptAnnotation)
         {
             if (string.IsNullOrEmpty(transcriptAnnotation.ReferenceCodon) &&
                 string.IsNullOrEmpty(transcriptAnnotation.AlternateCodon)) return;
@@ -174,11 +173,11 @@ namespace VariantAnnotation.DataStructures
         /// <summary>
         /// converts a DNA triplet to the appropriate amino acid abbreviation
         /// </summary>
-        private static string ConvertAminoAcidToAbbreviation(char aminoAcid)
+        private string ConvertAminoAcidToAbbreviation(char aminoAcid)
         {
             string abbreviation;
 
-            if (!SingleToThreeAminoAcids.TryGetValue(aminoAcid, out abbreviation))
+            if (!_singleToThreeAminoAcids.TryGetValue(aminoAcid, out abbreviation))
             {
                 throw new GeneralException($"Unable to convert the following string to an amino acid abbreviation: {aminoAcid}");
             }
@@ -190,21 +189,21 @@ namespace VariantAnnotation.DataStructures
         /// converts a DNA triplet to the appropriate amino acid abbreviation
         /// The default conversion is human chromosomes. The second parameter also allows the user to specify other codon conversions like mitochondria, etc.
         /// </summary>
-        private static char ConvertTripletToAminoAcid(string triplet)
+        private char ConvertTripletToAminoAcid(string triplet)
         {
-            char aminoAcid      = 'X';
-            bool foundAminoAcid = false;
-            string upperTriplet = triplet.ToUpper();
+            var aminoAcid      = 'X';
+            var foundAminoAcid = false;
+            var upperTriplet = triplet.ToUpper();
 
             // check our exceptions first
-            if ((CodonConversionScheme == CodonConversion.HumanMitochondria) &&
-                MitoDifferences.TryGetValue(upperTriplet, out aminoAcid))
+            if (CodonConversionScheme == CodonConversion.HumanMitochondria &&
+                _mitoDifferences.TryGetValue(upperTriplet, out aminoAcid))
             {
                 foundAminoAcid = true;
             }
 
             // the default case
-            if (!foundAminoAcid && AminoAcidLookupTable.TryGetValue(upperTriplet, out aminoAcid))
+            if (!foundAminoAcid && _aminoAcidLookupTable.TryGetValue(upperTriplet, out aminoAcid))
             {
                 foundAminoAcid = true;
             }
@@ -217,17 +216,17 @@ namespace VariantAnnotation.DataStructures
         /// returns a string of 3-letter amino acid abbreviations up until the first
         /// stop codon.
         /// </summary>
-        public static string GetAbbreviations(string aminoAcids)
+        public string GetAbbreviations(string aminoAcids)
         {
             if (string.IsNullOrEmpty(aminoAcids)) return "";
-            AbbrevBuilder.Clear();
+			var abbrevBuilder = new StringBuilder();
 
-            foreach (char aminoAcid in aminoAcids)
+            foreach (var aminoAcid in aminoAcids)
             {
-                AbbrevBuilder.Append(ConvertAminoAcidToAbbreviation(aminoAcid));
+                abbrevBuilder.Append(ConvertAminoAcidToAbbreviation(aminoAcid));
             }
 
-            return AbbrevBuilder.ToString();
+            return abbrevBuilder.ToString();
         }
 
         /// <summary>
@@ -237,19 +236,19 @@ namespace VariantAnnotation.DataStructures
         internal static void RemovePrefixAndSuffix(HgvsProteinNomenclature.HgvsNotation hn)
         {
             // nothing to do if we have a pure insertion or deletion
-            if ((hn.ReferenceAminoAcids == null) || (hn.AlternateAminoAcids == null)) return;
+            if (hn.ReferenceAminoAcids == null || hn.AlternateAminoAcids == null) return;
 
             // skip this if the amino acids are already the same
             if (hn.ReferenceAminoAcids == hn.AlternateAminoAcids) return;
 
             // calculate how many shared amino acids we have from the beginning of each amino acid
-            int numSharedPrefixPos = 0;
-            bool isClipped         = false;
-            int refLen             = hn.ReferenceAminoAcids.Length;
-            int altLen             = hn.AlternateAminoAcids.Length;
-            int minLength          = Math.Min(refLen, altLen);
+            var numSharedPrefixPos = 0;
+            var isClipped         = false;
+            var refLen             = hn.ReferenceAminoAcids.Length;
+            var altLen             = hn.AlternateAminoAcids.Length;
+            var minLength          = Math.Min(refLen, altLen);
 
-            for (int pos = 0; pos < minLength; pos++, numSharedPrefixPos++, hn.Start++)
+            for (var pos = 0; pos < minLength; pos++, numSharedPrefixPos++, hn.Start++)
             {
                 if (hn.ReferenceAminoAcids[pos] != hn.AlternateAminoAcids[pos]) break;
                 refLen--;
@@ -260,10 +259,10 @@ namespace VariantAnnotation.DataStructures
             // calculate how many shared amino acids we have from the end of each amino acid
             minLength = Math.Min(refLen, altLen);
 
-            for (int pos = 0; pos < minLength; pos++, hn.End--)
+            for (var pos = 0; pos < minLength; pos++, hn.End--)
             {
-                int refPos = hn.ReferenceAminoAcids.Length - pos - 1;
-                int altPos = hn.AlternateAminoAcids.Length - pos - 1;
+                var refPos = hn.ReferenceAminoAcids.Length - pos - 1;
+                var altPos = hn.AlternateAminoAcids.Length - pos - 1;
                 if (hn.ReferenceAminoAcids[refPos] != hn.AlternateAminoAcids[altPos]) break;
                 refLen--;
                 altLen--;
@@ -282,15 +281,15 @@ namespace VariantAnnotation.DataStructures
         /// returns a string of single-letter amino acids translated from a string of bases. 
         /// The bases must already be grouped by triplets (i.e. len must be a multiple of 3)
         /// </summary>
-        public static string TranslateBases(string bases, bool forceNonTriplet)
+        public string TranslateBases(string bases, bool forceNonTriplet)
         {
             // sanity check: handle the empty case
             if (bases == null) return null;
 
-            int numAminoAcids = bases.Length / 3;
+            var numAminoAcids = bases.Length / 3;
 
             // sanity check: make sure the length is a multiple of 3
-            bool nonTriplet = !forceNonTriplet && numAminoAcids * 3 != bases.Length;
+            var nonTriplet = !forceNonTriplet && numAminoAcids * 3 != bases.Length;
 
             // special case: single amino acid
             string aminoAcidString;
@@ -304,7 +303,7 @@ namespace VariantAnnotation.DataStructures
 
             // multiple amino acid case
             var aminoAcids = new char[numAminoAcids];
-            for (int i = 0; i < numAminoAcids; i++)
+            for (var i = 0; i < numAminoAcids; i++)
             {
                 aminoAcids[i] = ConvertTripletToAminoAcid(bases.Substring(i * 3, 3));
             }
@@ -313,7 +312,7 @@ namespace VariantAnnotation.DataStructures
             return nonTriplet ? AddAnyAminoAcid(aminoAcidString) : aminoAcidString;
         }
 
-        internal static void Rotate3Prime(HgvsProteinNomenclature.HgvsNotation hn, string peptides)
+		internal static void Rotate3Prime(HgvsProteinNomenclature.HgvsNotation hn, string peptides)
 		{
 			if (hn.Type != ProteinChange.Deletion
 				&& hn.Type != ProteinChange.Duplication
@@ -333,7 +332,7 @@ namespace VariantAnnotation.DataStructures
 
 			int shiftStart, shiftEnd;
 			var hasShifted = false;
-			for (shiftStart = 0, shiftEnd = numBases; shiftEnd <= combinedSequence.Length -numBases; shiftStart++, shiftEnd++)
+			for (shiftStart = 0, shiftEnd = numBases; shiftEnd < combinedSequence.Length ; shiftStart++, shiftEnd++)
 			{
 				if (combinedSequence[shiftStart] != combinedSequence[shiftEnd]) break;
 				hn.Start++;
@@ -363,7 +362,5 @@ namespace VariantAnnotation.DataStructures
 				hn.ReferenceAminoAcids= hn.AlternateAminoAcids;
 			}
 		}
-
-
 	}
 }

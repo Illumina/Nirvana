@@ -1,13 +1,13 @@
 ﻿using NDesk.Options;
 using VariantAnnotation.CommandLine;
-using VariantAnnotation.Utilities;
+using VariantAnnotation.DataStructures;
 
 namespace CreateCompressedReference
 {
     class CreateCompressedReferenceMain : AbstractCommandLineHandler
     {
         // constructor
-        private CreateCompressedReferenceMain(string programDescription, OptionSet ops, string commandLineExample, string programAuthors)
+        public CreateCompressedReferenceMain(string programDescription, OptionSet ops, string commandLineExample, string programAuthors)
             : base(programDescription, ops, commandLineExample, programAuthors)
         { }
 
@@ -70,7 +70,7 @@ namespace CreateCompressedReference
 
             var commandLineExample = "--in <FASTA filename> --cn <chromosome names filename> --out <compressed filename>";
 
-            var creator = new CreateCompressedReferenceMain("Converts a FASTA file to a compressed reference file.", ops, commandLineExample, VariantAnnotation.DataStructures.Constants.Authors);
+            var creator = new CreateCompressedReferenceMain("Converts a FASTA file to a compressed reference file.", ops, commandLineExample, Constants.Authors);
             creator.Execute(args);
             return creator.ExitCode;
         }

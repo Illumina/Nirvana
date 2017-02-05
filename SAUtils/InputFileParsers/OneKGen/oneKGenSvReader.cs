@@ -1,21 +1,25 @@
-﻿using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using VariantAnnotation.FileHandling;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
-	public class OneKGenSvReader: IEnumerable<OneKGenItem>
+	public sealed class OneKGenSvReader: IEnumerable<OneKGenItem>
 	{
 		#region members
 
 		private readonly FileInfo _oneKGenSvFile;
+	    private readonly ChromosomeRenamer _renamer;
 
 		#endregion
-		public OneKGenSvReader(FileInfo oneKGenSvFile)
+
+		public OneKGenSvReader(FileInfo oneKGenSvFile, ChromosomeRenamer renamer)
 		{
 			_oneKGenSvFile = oneKGenSvFile;
+		    _renamer       = renamer;
 		}
 
 		public IEnumerator<OneKGenItem> GetEnumerator()
@@ -34,22 +38,23 @@ namespace SAUtils.InputFileParsers.OneKGen
 					if (string.IsNullOrWhiteSpace(line)) continue;
 					// Skip comments.
 					if (line.StartsWith("#")) continue;
-					var oneKSvGenItem = ExtractOneKGenSvItem(line);
-					
-						yield return oneKSvGenItem;
-				
+					var oneKSvGenItem = ExtractOneKGenSvItem(line, _renamer);
+					if (oneKSvGenItem == null ) continue;
+					yield return oneKSvGenItem;
 
 				}
 			}
 		}
 
-		private OneKGenItem ExtractOneKGenSvItem(string line)
+		private static OneKGenItem ExtractOneKGenSvItem(string line, ChromosomeRenamer renamer)
 		{
 			var cols = line.Split('\t');
 			if (cols.Length < 8) return null;
 
 			var id = cols[0];
 			var chromosome = cols[1];
+			if (!InputFileParserUtilities.IsDesiredChromosome(chromosome, renamer)) return null;
+
 			var start = int.Parse(cols[2]);
 			var end = int.Parse(cols[3]);
 			var variantType = cols[4];

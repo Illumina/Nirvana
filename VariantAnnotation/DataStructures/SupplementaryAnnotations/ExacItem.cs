@@ -1,15 +1,17 @@
 ﻿
 
+using VariantAnnotation.Utilities;
+
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
-    public class ExacItem : SupplementaryDataItem
+    public sealed class ExacItem : SupplementaryDataItem
     {
         #region members
 
         private string ReferenceAllele { get; }
         private string AlternateAllele { get; }
 
-        internal int? AllAlleleCount { get; private set; }
+        public int? AllAlleleCount { get; private set; }
         private int? AfrAlleleCount { get; set; }
         private int? AmrAlleleCount { get; set; }
         private int? EasAlleleCount { get; set; }
@@ -17,7 +19,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
         private int? NfeAlleleCount { get; set; }
         private int? OthAlleleCount { get; set; }
         private int? SasAlleleCount { get; set; }
-        internal int? AllAlleleNumber { get; private set; }
+        public int? AllAlleleNumber { get; private set; }
         private int? AfrAlleleNumber { get; set; }
         private int? AmrAlleleNumber { get; set; }
         private int? EasAlleleNumber { get; set; }
@@ -26,7 +28,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
         private int? OthAlleleNumber { get; set; }
         private int? SasAlleleNumber { get; set; }
 
-        internal int Coverage { get; }
+        public int Coverage { get; }
 
         #endregion
 
@@ -120,21 +122,21 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
             }
         }
 
-        public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryAnnotation sa, string refBases = null)
+        public override SupplementaryDataItem SetSupplementaryAnnotations(SupplementaryPositionCreator sa, string refBases = null)
         {
             // check if the ref allele matches the refBases as a prefix
-            if (!SupplementaryAnnotation.ValidateRefAllele(ReferenceAllele, refBases))
+            if (!SupplementaryAnnotationUtilities.ValidateRefAllele(ReferenceAllele, refBases))
             {
                 return null; //the ref allele for this entry did not match the reference bases.
             }
 
-            int newStart = Start;
-            var newAlleles = SupplementaryAnnotation.GetReducedAlleles(ReferenceAllele, AlternateAllele, ref newStart);
+			var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(Start, ReferenceAllele, AlternateAllele);
 
-            var newRefAllele = newAlleles.Item1;
-            var newAltAllele = newAlleles.Item2;
+			var newStart = newAlleles.Item1;
+			var newRefAllele = newAlleles.Item2;
+			var newAltAllele = newAlleles.Item3;
 
-            if (newRefAllele != ReferenceAllele)
+			if (newRefAllele != ReferenceAllele)
             {
                 return new ExacItem(Chromosome, newStart, newRefAllele, newAltAllele, Coverage,
                     AllAlleleNumber, AfrAlleleNumber, AmrAlleleNumber, EasAlleleNumber, FinAlleleNumber, NfeAlleleNumber, OthAlleleNumber, SasAlleleNumber,
@@ -146,44 +148,38 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
             return null;
         }
 
-        public override SupplementaryInterval GetSupplementaryInterval()
+        public override SupplementaryInterval GetSupplementaryInterval(ChromosomeRenamer renamer)
         {
             throw new System.NotImplementedException();
         }
 
-        private void SetSaFields(SupplementaryAnnotation sa, string newAltAllele)
+        private void SetSaFields(SupplementaryPositionCreator saCreator, string newAltAllele)
         {
-            var asa = new SupplementaryAnnotation.AlleleSpecificAnnotation
-            {
+			var annotation = new ExacAnnotation
+			{
+				ExacCoverage = Coverage,
 
-                ExacCoverage = Coverage,
+				ExacAllAn = AllAlleleNumber,
+				ExacAfrAn = AfrAlleleNumber,
+				ExacAmrAn = AmrAlleleNumber,
+				ExacEasAn = EasAlleleNumber,
+				ExacFinAn = FinAlleleNumber,
+				ExacNfeAn = NfeAlleleNumber,
+				ExacOthAn = OthAlleleNumber,
+				ExacSasAn = SasAlleleNumber,
 
-                ExacAllAn = AllAlleleNumber,
-                ExacAfrAn = AfrAlleleNumber,
-                ExacAmrAn = AmrAlleleNumber,
-                ExacEasAn = EasAlleleNumber,
-                ExacFinAn = FinAlleleNumber,
-                ExacNfeAn = NfeAlleleNumber,
-                ExacOthAn = OthAlleleNumber,
-                ExacSasAn = SasAlleleNumber,
+				ExacAllAc = AllAlleleCount,
+				ExacAfrAc = AfrAlleleCount,
+				ExacAmrAc = AmrAlleleCount,
+				ExacEasAc = EasAlleleCount,
+				ExacFinAc = FinAlleleCount,
+				ExacNfeAc = NfeAlleleCount,
+				ExacOthAc = OthAlleleCount,
+				ExacSasAc = SasAlleleCount
+			};
 
-                ExacAllAc = AllAlleleCount,
-                ExacAfrAc = AfrAlleleCount,
-                ExacAmrAc = AmrAlleleCount,
-                ExacEasAc = EasAlleleCount,
-                ExacFinAc = FinAlleleCount,
-                ExacNfeAc = NfeAlleleCount,
-                ExacOthAc = OthAlleleCount,
-                ExacSasAc = SasAlleleCount
-
-            };
-
-            if (!sa.AlleleSpecificAnnotations.ContainsKey(newAltAllele))
-                sa.AlleleSpecificAnnotations[newAltAllele] = asa;
-            else
-                sa.AlleleSpecificAnnotations[newAltAllele].MergeExacAnnotations(asa);
-
-        }
+			saCreator.AddExternalDataToAsa(DataSourceCommon.DataSource.Exac, newAltAllele, annotation);
+		}
 
         // note that for an ExacItem, the chromosome, position and alt allele should uniquely identify it. If not, there is an error in the data source.
         public override bool Equals(object other)

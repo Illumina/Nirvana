@@ -1,5 +1,5 @@
-﻿using Xunit;
-using VariantAnnotation.Utilities;
+﻿using VariantAnnotation.Utilities;
+using Xunit;
 
 namespace UnitTests.Utilities
 {

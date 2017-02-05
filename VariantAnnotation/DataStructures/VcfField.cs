@@ -3,7 +3,7 @@ using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class VcfField
+    public sealed class VcfField
     {
         #region members
 
@@ -35,7 +35,7 @@ namespace VariantAnnotation.DataStructures
                 var keyValuePair = infoPair.Split('=');
 
                 // sanity check: make sure we only have one or two entries
-                if ((keyValuePair.Length == 0) || (keyValuePair.Length > 2))
+                if (keyValuePair.Length == 0 || keyValuePair.Length > 2)
                 {
                     throw new GeneralException($"Expected one or two entries in the key/value pair, but found {keyValuePair.Length} entries: {infoPair}");
                 }

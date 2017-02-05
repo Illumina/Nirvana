@@ -1,94 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Utilities
 {
     /// <summary>
     /// converts between UCSC-style and Ensembl-style chromosome names
     /// </summary>
-    public class ChromosomeRenamer
+    public class ChromosomeRenamer : IChromosomeRenamer
     {
-        #region members
+        private readonly Dictionary<string, string> _ensemblToUcscReferenceNames = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _ucscToEnsemblReferenceNames = new Dictionary<string, string>();
+        private readonly HashSet<string> _inVepReferenceNames                    = new HashSet<string>();
+        private readonly Dictionary<string, ushort> _referenceIndex              = new Dictionary<string, ushort>();
 
-        private readonly Dictionary<string, string> _ensemblToUcscReferenceSequenceNames;
-        private readonly Dictionary<string, string> _ucscToEnsemblReferenceSequenceNames;
-        private readonly HashSet<string> _inVepReferenceSequenceNames; 
-        private bool _hasReferenceMetadata;
+        public int NumRefSeqs { get; private set; }
 
-        public readonly Dictionary<string, int> EnsemblReferenceSequenceIndex;  
+        public string[] EnsemblReferenceNames { get; private set; }
+        public string[] UcscReferenceNames { get; private set; }
 
-        #endregion
+        public const ushort UnknownReferenceIndex = ushort.MaxValue;
 
         /// <summary>
-        /// constructor
+        /// returns true if the specified reference sequence is in the standard reference sequences and in VEP
         /// </summary>
-        public ChromosomeRenamer()
-        {
-            EnsemblReferenceSequenceIndex        = new Dictionary<string, int>();
-            _ensemblToUcscReferenceSequenceNames = new Dictionary<string, string>();
-            _ucscToEnsemblReferenceSequenceNames = new Dictionary<string, string>();
-            _inVepReferenceSequenceNames         = new HashSet<string>();
-        }
+        public bool InReferenceAndVep(string referenceName) => _inVepReferenceNames.Contains(referenceName);
 
         /// <summary>
-        /// adds reference metadata from the 
+        /// adds reference metadata from the compressed sequence reader
         /// </summary>
         public void AddReferenceMetadata(List<ReferenceMetadata> refMetadataList)
         {
-            _hasReferenceMetadata = true;
-            var ensemblReferenceNames = new List<string>();
-            int index = 0;
+            ushort index = 0;
+            NumRefSeqs = refMetadataList.Count;
+
+            _ensemblToUcscReferenceNames.Clear();
+            _ucscToEnsemblReferenceNames.Clear();
+            _inVepReferenceNames.Clear();
+            _referenceIndex.Clear();
+
+            var ensemblRefNames = new List<string>();
+            var ucscRefNames    = new List<string>();
 
             foreach (var refMetadata in refMetadataList)
             {
-                AddReferenceName(refMetadata.EnsemblName, refMetadata.UcscName);
+                AddReferenceName(refMetadata.EnsemblName, refMetadata.UcscName, index, ensemblRefNames, ucscRefNames);
 
                 if (refMetadata.InVep)
                 {
-                    _inVepReferenceSequenceNames.Add(refMetadata.EnsemblName);
-                    _inVepReferenceSequenceNames.Add(refMetadata.UcscName);
+                    _inVepReferenceNames.Add(refMetadata.EnsemblName);
+                    _inVepReferenceNames.Add(refMetadata.UcscName);
                 }
 
-                var ensemblReferenceName = refMetadata.EnsemblName;
-                if (string.IsNullOrEmpty(ensemblReferenceName)) ensemblReferenceName = refMetadata.UcscName;
-                if (string.IsNullOrEmpty(ensemblReferenceName)) continue;
-
-                ensemblReferenceNames.Add(ensemblReferenceName);
-                EnsemblReferenceSequenceIndex[ensemblReferenceName] = index++;
+                index++;
             }
 
-            ensemblReferenceNames.ToArray();
+            EnsemblReferenceNames = ensemblRefNames.ToArray();
+            UcscReferenceNames    = ucscRefNames.ToArray();
+        }
+
+        private void AddReferenceSequenceIndexEntry(string refName, ushort refIndex)
+        {
+            if (!_referenceIndex.ContainsKey(refName)) _referenceIndex[refName] = refIndex;
         }
 
         /// <summary>
         /// adds a Ensembl/UCSC reference name pair to the current dictionary
         /// </summary>
-        private void AddReferenceName(string ensemblReferenceName, string ucscReferenceName)
+        private void AddReferenceName(string ensemblReferenceName, string ucscReferenceName, ushort refIndex,
+            List<string> ensemblRefNames, List<string> ucscRefNames)
         {
-            bool isUcscEmpty    = string.IsNullOrEmpty(ucscReferenceName);
-            bool isEnsemblEmpty = string.IsNullOrEmpty(ensemblReferenceName);
+            var isUcscEmpty    = string.IsNullOrEmpty(ucscReferenceName);
+            var isEnsemblEmpty = string.IsNullOrEmpty(ensemblReferenceName);
 
             // sanity check: make sure we have at least one reference name
-            if (isUcscEmpty && isEnsemblEmpty) return;
-
-            if (isUcscEmpty)
+            if (isUcscEmpty && isEnsemblEmpty)
             {
-                _ucscToEnsemblReferenceSequenceNames[ensemblReferenceName] = ensemblReferenceName;
-                _ensemblToUcscReferenceSequenceNames[ensemblReferenceName] = ensemblReferenceName;
+                ensemblRefNames.Add(ensemblReferenceName);
+                ucscRefNames.Add(ucscReferenceName);
                 return;
             }
 
-            if (isEnsemblEmpty)
-            {
-                _ucscToEnsemblReferenceSequenceNames[ucscReferenceName] = ucscReferenceName;
-                _ensemblToUcscReferenceSequenceNames[ucscReferenceName] = ucscReferenceName;
-                return;
-            }
+            if (isUcscEmpty) ucscReferenceName       = ensemblReferenceName;
+            if (isEnsemblEmpty) ensemblReferenceName = ucscReferenceName;
 
-            // normal situation
-            _ucscToEnsemblReferenceSequenceNames[ucscReferenceName]    = ensemblReferenceName;
-            _ensemblToUcscReferenceSequenceNames[ensemblReferenceName] = ucscReferenceName;
+            _ucscToEnsemblReferenceNames[ucscReferenceName]    = ensemblReferenceName;
+            _ensemblToUcscReferenceNames[ensemblReferenceName] = ucscReferenceName;
+
+            AddReferenceSequenceIndexEntry(ensemblReferenceName, refIndex);
+            AddReferenceSequenceIndexEntry(ucscReferenceName, refIndex);
+            ensemblRefNames.Add(ensemblReferenceName);
+            ucscRefNames.Add(ucscReferenceName);
         }
 
         /// <summary>
@@ -96,21 +101,9 @@ namespace VariantAnnotation.Utilities
         /// </summary>
         public string GetEnsemblReferenceName(string ucscReferenceName, bool useOriginalOnFailedLookup = true)
         {
-            if (!_hasReferenceMetadata)
-            {
-                throw new InvalidOperationException("Tried to use the chromosome renamer before it was initialized.");
-            }
-
+            if (NumRefSeqs == 0) throw new InvalidOperationException("Tried to use the chromosome renamer before it was initialized.");
             if (ucscReferenceName == null) return null;
-
-            string ensemblReferenceName;
-
-            if (_ucscToEnsemblReferenceSequenceNames.TryGetValue(ucscReferenceName, out ensemblReferenceName))
-            {
-                return ensemblReferenceName;
-            }
-
-            return useOriginalOnFailedLookup ? ucscReferenceName : null;
+            return GetReferenceName(_ucscToEnsemblReferenceNames, ucscReferenceName, useOriginalOnFailedLookup);
         }
 
         /// <summary>
@@ -118,28 +111,30 @@ namespace VariantAnnotation.Utilities
         /// </summary>
         public string GetUcscReferenceName(string ensemblReferenceName, bool useOriginalOnFailedLookup = true)
         {
-            if (!_hasReferenceMetadata)
-            {
-                throw new InvalidOperationException("Tried to use the chromosome renamer before it was initialized.");
-            }
-
+            if (NumRefSeqs == 0) throw new InvalidOperationException("Tried to use the chromosome renamer before it was initialized.");
             if (ensemblReferenceName == null) return null;
-
-            string ucscReferenceName;
-            if (_ensemblToUcscReferenceSequenceNames.TryGetValue(ensemblReferenceName, out ucscReferenceName))
-            {
-                return ucscReferenceName;
-            }
-
-            return useOriginalOnFailedLookup ? ensemblReferenceName : null;
+            return GetReferenceName(_ensemblToUcscReferenceNames, ensemblReferenceName, useOriginalOnFailedLookup);
         }
 
-        /// <summary>
-        /// returns true if the specified reference sequence is in the standard reference sequences and in VEP
-        /// </summary>
-        public bool InReferenceAndVep(string referenceName)
+        private string GetReferenceName(Dictionary<string, string> dict, string referenceName, bool useOriginalOnFailedLookup)
         {
-            return _inVepReferenceSequenceNames.Contains(referenceName);
+            string newReferenceName;
+            if (dict.TryGetValue(referenceName, out newReferenceName)) return newReferenceName;
+            return useOriginalOnFailedLookup ? referenceName : null;
+        }
+
+        public ushort GetReferenceIndex(string referenceName)
+        {
+            ushort refIndex;
+            return _referenceIndex.TryGetValue(referenceName, out refIndex) ? refIndex : UnknownReferenceIndex;
+        }
+
+        public static ChromosomeRenamer GetChromosomeRenamer(Stream stream)
+        {
+            var sequence = new CompressedSequence();
+            // ReSharper disable once UnusedVariable
+            var reader = new CompressedSequenceReader(stream, sequence);
+            return sequence.Renamer;
         }
     }
 }

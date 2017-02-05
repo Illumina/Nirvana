@@ -1,17 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.FileHandling;
-using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Utilities;
+using NDesk.Options;
+using VariantAnnotation.CommandLine;
+using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.FileHandling.TranscriptCache;
 
 namespace CacheUtils.RegulatoryGFF
 {
-    public class CreateRegulatoryGff : AbstractCommandLineHandler
+    sealed class CreateRegulatoryGff : AbstractCommandLineHandler
     {
         public static int Run(string command, string[] args)
         {
@@ -19,17 +18,22 @@ namespace CacheUtils.RegulatoryGFF
             {
                 {
                     "in|i=",
-                    "input cache {directory}",
-                    v => ConfigurationSettings.InputCacheDir = v
+                    "input cache {prefix}",
+                    v => ConfigurationSettings.CachePrefix = v
                 },
                 {
                     "out|o=",
                     "output {file name}",
                     v => ConfigurationSettings.OutputFileName = v
+                },
+                {
+                    "ref|r=",
+                    "reference {file}",
+                    v => ConfigurationSettings.CompressedReferencePath = v
                 }
             };
 
-            var commandLineExample = $"{command} --in <cache dir> --out <GFF path>";
+            var commandLineExample = $"{command} --in <cache prefix> --out <GFF path>";
 
             var extractor = new CreateRegulatoryGff("Outputs regulatory regions in a database.", ops, commandLineExample, Constants.Authors);
             extractor.Execute(args);
@@ -42,81 +46,72 @@ namespace CacheUtils.RegulatoryGFF
 
         protected override void ValidateCommandLine()
         {
-            CheckDirectoryExists(ConfigurationSettings.InputCacheDir, "input cache", "--in");
+            CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
+            HasRequiredParameter(ConfigurationSettings.CachePrefix, "input cache", "--in");
         }
 
         /// <summary>
         /// returns a datastore specified by the filepath
         /// </summary>
-        private static NirvanaDataStore GetDataStore(string dataStorePath)
+        private static GlobalCache GetCache(string cachePath)
         {
-            var ds = new NirvanaDataStore
-            {
-                Transcripts = new List<Transcript>(),
-                RegulatoryFeatures = new List<RegulatoryFeature>()
-            };
+            if (!File.Exists(cachePath)) throw new FileNotFoundException($"Could not find {cachePath}");
 
-            // sanity check: make sure the path exists
-            if (!File.Exists(dataStorePath)) return ds;
-
-            var transcriptIntervalTree = new IntervalTree<Transcript>();
-
-            using (var reader = new NirvanaDatabaseReader(dataStorePath))
-            {
-                reader.PopulateData(ds, transcriptIntervalTree);
-            }
-
-            return ds;
+            GlobalCache cache;
+            using (var reader = new GlobalCacheReader(cachePath)) cache = reader.Read();
+            return cache;
         }
 
         protected override void ProgramExecution()
         {
-            // check the cache directory integrity
-            CacheDirectory cacheDirectory;
-            var dataSourceVersions = new List<DataSourceVersion>();
-            NirvanaDatabaseCommon.CheckDirectoryIntegrity(ConfigurationSettings.InputCacheDir, dataSourceVersions, out cacheDirectory);
-
-            // grab the cache files
-            var cacheFiles = Directory.GetFiles(ConfigurationSettings.InputCacheDir, "*.ndb").Select(Path.GetFileName).ToList();
+            var referenceNames = GetUcscReferenceNames(ConfigurationSettings.CompressedReferencePath);
 
             using (var writer = GZipUtilities.GetStreamWriter(ConfigurationSettings.OutputFileName))
             {
-                foreach (var cacheFile in cacheFiles)
+                var cachePath = CacheConstants.TranscriptPath(ConfigurationSettings.CachePrefix);
+
+                // load the cache
+                Console.Write("- reading {0}... ", Path.GetFileName(cachePath));
+                var cache = GetCache(cachePath);
+                Console.WriteLine("found {0:N0} regulatory regions. ", cache.RegulatoryElements.Length);
+
+                Console.Write("- writing GFF entries... ");
+                foreach (var regulatoryFeature in cache.RegulatoryElements)
                 {
-                    var cachePath = Path.Combine(ConfigurationSettings.InputCacheDir, cacheFile);
-                    var ucscReferenceName = Path.GetFileNameWithoutExtension(cacheFile);
-
-                    Console.Write("- reading {0}... ", cacheFile);
-
-                    // load the datastore
-                    var inputDataStore = GetDataStore(cachePath);
-                    Console.Write("{0} regulatory regions. ", inputDataStore.RegulatoryFeatures.Count);
-
-                    Console.Write("Writing GFF entries... ");
-                    foreach (var regulatoryFeature in inputDataStore.RegulatoryFeatures) Write(writer, ucscReferenceName, regulatoryFeature);
-                    Console.WriteLine("finished.");
+                    WriteRegulatoryFeature(writer, referenceNames, regulatoryFeature);
                 }
+                Console.WriteLine("finished.");
             }
         }
 
-        private static void WriteRegulatoryFeature(StreamWriter writer, string ucscReferenceName, RegulatoryFeature regulatoryFeature)
+        private static string[] GetUcscReferenceNames(string compressedReferencePath)
         {
-            // write the general data
-            writer.Write($"{ucscReferenceName}\t.\tregulatory feature\t{regulatoryFeature.Start}\t{regulatoryFeature.End}\t.\t.\t.\t");
+            string[] refNames;
+            var compressedSequence = new CompressedSequence();
 
+            using (var reader = new CompressedSequenceReader(FileUtilities.GetReadStream(compressedReferencePath), compressedSequence))
+            {
+                refNames = new string[reader.Metadata.Count];
+                for (int refIndex = 0; refIndex < reader.Metadata.Count; refIndex++)
+                {
+                    refNames[refIndex] = reader.Metadata[refIndex].UcscName;
+                }
+            }
+
+            return refNames;
+        }
+
+        private static void WriteRegulatoryFeature(StreamWriter writer, string[] referenceNames, RegulatoryElement regulatoryFeature)
+        {
+            writer.Write($"{referenceNames[regulatoryFeature.ReferenceIndex]}\t.\tregulatory feature\t{regulatoryFeature.Start}\t{regulatoryFeature.End}\t.\t.\t.\t");
             WriteGeneralAttributes(writer, regulatoryFeature);
             writer.WriteLine();
         }
 
-        private static void WriteGeneralAttributes(StreamWriter writer, RegulatoryFeature regulatoryFeature)
+        private static void WriteGeneralAttributes(StreamWriter writer, RegulatoryElement regulatoryFeature)
         {
-            if (!string.IsNullOrEmpty(regulatoryFeature.StableId)) writer.Write($"regulatory_feature_id \"{regulatoryFeature.StableId}\"; ");
-        }
-
-        private static void Write(StreamWriter writer, string ucscReferenceName, RegulatoryFeature regulatoryFeature)
-        {
-            // write the regulatory feature
-            WriteRegulatoryFeature(writer, ucscReferenceName, regulatoryFeature);
+            if (!regulatoryFeature.Id.IsEmpty) writer.Write($"regulatory_feature_id \"{regulatoryFeature.Id}\"; ");
+            writer.Write($"regulatory_feature_type \"{regulatoryFeature.Type}\"; ");
         }
     }
 }

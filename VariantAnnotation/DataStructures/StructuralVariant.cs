@@ -5,10 +5,11 @@ using VariantAnnotation.Algorithms;
 using VariantAnnotation.DataStructures.JsonAnnotations;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures
 {
-    public class StructuralVariant
+    public sealed class StructuralVariant
     {
         #region members
 
@@ -22,6 +23,8 @@ namespace VariantAnnotation.DataStructures
         private const string CopyNumberTag = "CN";
 
         private const string TandemDuplicationAltAllele = "<DUP:TANDEM>";
+        private const string Inv3Tag = "INV3";
+        private const string Inv5Tag = "INV5";
 
         private const string AluElement = "ALU";
         private const string CopyNumberVariation = "CNV";
@@ -39,20 +42,24 @@ namespace VariantAnnotation.DataStructures
         private readonly int? _svEnd;
 
         private string _copyNumber;
-        private readonly BreakEnd _breakEnd;
+        private readonly List<BreakEnd> _breakEnds;
         private readonly string _referenceName;
 
         private readonly VariantType _variantType;
         private string _altAllele;
+        private readonly ChromosomeRenamer _renamer;
+        private readonly VID _vid;
 
         #endregion
 
         // constructor
-        public StructuralVariant(string[] vcfColumns, int minBegin, int maxEnd)
+        public StructuralVariant(string[] vcfColumns, int minBegin, int maxEnd, ChromosomeRenamer renamer, VID vid)
         {
-            MinBegin = minBegin;
-            MaxEnd = maxEnd;
+            MinBegin       = minBegin;
+            MaxEnd         = maxEnd;
             _referenceName = vcfColumns[VcfCommon.ChromIndex];
+            _renamer       = renamer;
+            _vid           = vid;
 
             // create a dictionary containing all of the INFO fields
             var infoKeyValues = VcfField.GetKeysAndValues(vcfColumns[VcfCommon.InfoIndex]);
@@ -62,8 +69,11 @@ namespace VariantAnnotation.DataStructures
             _svLength = ExtractIntValue(infoKeyValues, SvLengthTag);
             _svEnd = ExtractIntValue(infoKeyValues, EndTag);
 
+            var isInv3 = ExtractBoolValue(infoKeyValues, Inv3Tag);
+            var isInv5 = ExtractBoolValue(infoKeyValues, Inv5Tag);
+
             // check for tandem duplications
-            if ((svType == Duplication) && (vcfColumns[VcfCommon.AltIndex] == TandemDuplicationAltAllele))
+            if (svType == Duplication && vcfColumns[VcfCommon.AltIndex] == TandemDuplicationAltAllele)
             {
                 svType = TandemDuplication;
             }
@@ -75,15 +85,78 @@ namespace VariantAnnotation.DataStructures
             GetAltAllele(vcfColumns, svType);
 
             // check for breakends
-            if (_variantType == VariantType.translocation_breakend)
+            var refName = vcfColumns[VcfCommon.ChromIndex];
+            var vcfPos = Convert.ToInt32(vcfColumns[VcfCommon.PosIndex]);
+
+
+            switch (_variantType)
             {
-                _breakEnd = new BreakEnd(
-                    vcfColumns[VcfCommon.ChromIndex],
-                    vcfColumns[VcfCommon.PosIndex],
-                    vcfColumns[VcfCommon.RefIndex],
-                    _altAllele);
+                case VariantType.translocation_breakend:
+                    _breakEnds = new List<BreakEnd>
+                    {
+                        new BreakEnd(
+                            vcfColumns[VcfCommon.ChromIndex],
+                            vcfColumns[VcfCommon.PosIndex],
+                            vcfColumns[VcfCommon.RefIndex],
+                            _altAllele, renamer)
+                    };
+                    break;
+
+                case VariantType.deletion:
+                    if (_svEnd == null)
+                        break;
+
+                    _breakEnds = new List<BreakEnd>
+                    {
+                        new BreakEnd(refName,refName,vcfPos,_svEnd.Value + 1,'-','+', renamer),
+                        new BreakEnd(refName,refName,_svEnd.Value + 1,vcfPos,'+','-', renamer)
+                    };
+                    break;
+
+                case VariantType.tandem_duplication:
+                case VariantType.duplication:
+                    if (_svEnd == null)
+                        break;
+
+                    _breakEnds = new List<BreakEnd>
+                    {
+                        new BreakEnd(refName, refName, _svEnd.Value, vcfPos, '-', '+', renamer),
+                        new BreakEnd(refName, refName, vcfPos, _svEnd.Value, '+', '-', renamer)
+                    };
+                    break;
+                case VariantType.inversion:
+                    if (_svEnd == null)
+                        break;
+                    if (isInv3)
+                    {
+                        _breakEnds = new List<BreakEnd>
+                        {
+                            new BreakEnd(refName,refName,vcfPos,_svEnd.Value,'-','-', renamer),
+                            new BreakEnd(refName,refName,_svEnd.Value,vcfPos,'-','-', renamer)
+                        };
+                        break;
+
+                    }
+                    if (isInv5)
+                    {
+                        _breakEnds = new List<BreakEnd>
+                        {
+                            new BreakEnd(refName,refName,vcfPos + 1,_svEnd.Value + 1,'+','+', renamer),
+                            new BreakEnd(refName,refName,_svEnd.Value + 1,vcfPos + 1,'+','+', renamer)
+                        };
+                        break;
+                    }
+                    _breakEnds = new List<BreakEnd>
+                    {
+                        new BreakEnd(refName,refName,vcfPos,_svEnd.Value,'-','-', renamer),
+                        new BreakEnd(refName,refName,_svEnd.Value+1,vcfPos+1,'+','+', renamer)
+                    };
+                    break;
+
             }
         }
+
+
 
         private void GetAltAllele(string[] vcfColumns, string svType)
         {
@@ -179,17 +252,17 @@ namespace VariantAnnotation.DataStructures
             if (_variantType == VariantType.unknown)
             {
                 // the only thing we do for unknown SV types is to increment the begin if it has a symbolic allele
-                if (altAllele.IsSymbolicAllele) altAllele.ReferenceBegin++;
+                if (altAllele.IsSymbolicAllele) altAllele.Start++;
                 return;
             }
 
             var oldAltAllele = altAllele.AlternateAllele;
-            bool has1KgCnv = false;
+            var has1KgCnv = false;
 
             // add the copy number if applicable
             if (_variantType == VariantType.copy_number_variation)
             {
-                has1KgCnv = altAllele.IsSymbolicAllele && (_copyNumber == "?");
+                has1KgCnv = altAllele.IsSymbolicAllele && _copyNumber == "?";
                 altAllele.CopyNumber = has1KgCnv
                     ? ExtractCopyNumberFromAltAllele(oldAltAllele)
                     : _copyNumber;
@@ -201,14 +274,18 @@ namespace VariantAnnotation.DataStructures
             altAllele.AlternateAllele = has1KgCnv ? ExtractCnvSymbolicAllele(oldAltAllele) : _altAllele;
 
             // handle breakends
-            if (_variantType == VariantType.translocation_breakend) altAllele.BreakEnd = _breakEnd;
+            if (_breakEnds?.Count > 0)
+            {
+                altAllele.BreakEnds = new List<BreakEnd>();
+                altAllele.BreakEnds.AddRange(_breakEnds);
+            }
 
             // update the reference begin position
             //
             // NOTE: If any of the ALT alleles is a symbolic allele (an angle-bracketed
             //       ID String “<ID>”) then the padding base is required and POS denotes
             //       the coordinate of the base preceding the polymorphism.
-            if (altAllele.IsSymbolicAllele) altAllele.ReferenceBegin++;
+            if (altAllele.IsSymbolicAllele) altAllele.Start++;
             else
             {
                 // if the alt allele is not symbolic and its not a breakend, we call the regular trimmer
@@ -222,17 +299,17 @@ namespace VariantAnnotation.DataStructures
             // adjust the end coordinates after adjusted the begin
             if (_svEnd != null)
             {
-                altAllele.ReferenceEnd = (int)_svEnd;
+                altAllele.End = (int)_svEnd;
                 MaxEnd = Math.Max(MaxEnd, (int)_svEnd);
             }
             else if (_svLength != null)
             {
-                altAllele.ReferenceEnd = altAllele.ReferenceBegin + Math.Abs(_svLength.Value) - 1;
+                altAllele.End = altAllele.Start + Math.Abs(_svLength.Value) - 1;
                 MaxEnd = Math.Max(MaxEnd, (int)_svLength);
             }
 
             // set the VID
-            altAllele.VariantId = VID.Create(_referenceName, altAllele);
+            altAllele.VariantId = _vid.Create(_renamer, _referenceName, altAllele);
         }
 
         /// <summary>
@@ -249,7 +326,7 @@ namespace VariantAnnotation.DataStructures
             var formalCols = vcfColumns[VcfCommon.FormatIndex].Split(':');
             string[] sampleCols = null;
 
-            for (int i = VcfCommon.MinNumColumnsSampleGenotypes - 1; i < vcfColumns.Length; i++)
+            for (var i = VcfCommon.MinNumColumnsSampleGenotypes - 1; i < vcfColumns.Length; i++)
             {
                 if (vcfColumns[i] != ".")
                 {
@@ -257,9 +334,9 @@ namespace VariantAnnotation.DataStructures
                 }
             }
 
-            bool foundCopyNumberIndex = false;
-            int copyNumberIndex = 0;
-            for (int colIndex = 0; colIndex < formalCols.Length; colIndex++)
+            var foundCopyNumberIndex = false;
+            var copyNumberIndex = 0;
+            for (var colIndex = 0; colIndex < formalCols.Length; colIndex++)
             {
                 if (formalCols[colIndex] == CopyNumberTag)
                 {
@@ -270,7 +347,7 @@ namespace VariantAnnotation.DataStructures
             }
 
             if (sampleCols != null)
-                if (foundCopyNumberIndex && (sampleCols.Length > copyNumberIndex))
+                if (foundCopyNumberIndex && sampleCols.Length > copyNumberIndex)
                 {
                     _copyNumber = sampleCols[copyNumberIndex];
                 }
@@ -296,6 +373,12 @@ namespace VariantAnnotation.DataStructures
             return altAllele.Substring(1, altAllele.Length - 2);
         }
 
+
+        private static bool ExtractBoolValue(Dictionary<string, string> infoKeyValues, string tag)
+        {
+            return infoKeyValues.ContainsKey(tag);
+        }
+
         /// <summary>
         /// returns the value if present in the dictionary, null otherwise
         /// </summary>
@@ -311,7 +394,7 @@ namespace VariantAnnotation.DataStructures
         /// </summary>
         private static int? ExtractIntValue(Dictionary<string, string> infoKeyValues, string tag)
         {
-            string retString = ExtractValue(infoKeyValues, tag);
+            var retString = ExtractValue(infoKeyValues, tag);
             if (retString == null) return null;
 
             int retNum;

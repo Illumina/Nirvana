@@ -1,12 +1,11 @@
 ﻿using System;
-using System.IO;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.FileHandling.CustomInterval
 {
 	public sealed class CustomIntervalWriter : IDisposable
 	{
-		private readonly BinaryWriter _binaryWriter;
 		private readonly ExtendedBinaryWriter _writer;
 		private readonly string _referenceName;
 		private readonly string _intervalType;
@@ -17,9 +16,8 @@ namespace VariantAnnotation.FileHandling.CustomInterval
 								 // constructor
 		public CustomIntervalWriter(string fileName, string referenceName, string intervalType, DataSourceVersion version)
 		{
-			var stream = new FileStream(fileName, FileMode.Create);
-			_binaryWriter = new BinaryWriter(stream);
-			_writer = new ExtendedBinaryWriter(_binaryWriter);
+			var stream = FileUtilities.GetCreateStream(fileName);
+			_writer = new ExtendedBinaryWriter(stream);
 
 			_referenceName = referenceName;
 			_intervalType  = intervalType;
@@ -30,27 +28,27 @@ namespace VariantAnnotation.FileHandling.CustomInterval
 
 		private void WriteHeader()
 		{
-			_binaryWriter.Write(CustomIntervalCommon.DataHeader);
-			_binaryWriter.Write(CustomIntervalCommon.SchemaVersion);
-			_binaryWriter.Write(DateTime.UtcNow.Ticks);
-			_binaryWriter.Write(_referenceName);
-			_binaryWriter.Write(_intervalType);
+			_writer.Write(CustomIntervalCommon.DataHeader);
+            _writer.Write(CustomIntervalCommon.SchemaVersion);
+            _writer.Write(DateTime.UtcNow.Ticks);
+            _writer.Write(_referenceName);
+            _writer.Write(_intervalType);
 
-			_version.Write(_binaryWriter);
+			_version.Write(_writer);
 
-			// marking end of header with guard int
-			_binaryWriter.Write(CustomIntervalCommon.GuardInt);
+            // marking end of header with guard int
+            _writer.Write(CustomIntervalCommon.GuardInt);
 		}
 
-	    public void WriteInterval(DataStructures.CustomInterval interval)
+		public void WriteInterval(DataStructures.CustomInterval interval)
 		{
 			if (interval.IsEmpty())
 			{
 				// marks the last interval
-				_writer.WriteInt(interval.Start);
-				_writer.WriteInt(interval.End);
-				_writer.WriteInt(0);// for the null string dictionary
-				_writer.WriteInt(0);// for the null non-string dictionary
+				_writer.WriteOpt(interval.Start);
+				_writer.WriteOpt(interval.End);
+				_writer.WriteOpt(0);// for the null string dictionary
+				_writer.WriteOpt(0);// for the null non-string dictionary
 				return;
 			}
 
@@ -65,32 +63,32 @@ namespace VariantAnnotation.FileHandling.CustomInterval
 					$"Unexpected interval in custom interval writer.\nExpected interval type: {_intervalType}, observed interval type: {interval.Type}");
 			}
 
-			_writer.WriteInt(interval.Start);
-			_writer.WriteInt(interval.End);
+			_writer.WriteOpt(interval.Start);
+			_writer.WriteOpt(interval.End);
 
 			if (interval.StringValues != null)
 			{
-				_writer.WriteInt(interval.StringValues.Count);
+				_writer.WriteOpt(interval.StringValues.Count);
 
 				foreach (var keyVal in interval.StringValues)
 				{
-					_writer.WriteUtf8String(keyVal.Key);
-					_writer.WriteUtf8String(keyVal.Value);
+					_writer.WriteOptUtf8(keyVal.Key);
+					_writer.WriteOptUtf8(keyVal.Value);
 				}
 			}
-			else _writer.WriteInt(0);
+			else _writer.WriteOpt(0);
 
 			if (interval.NonStringValues != null)
 			{
-				_writer.WriteInt(interval.NonStringValues.Count);
+				_writer.WriteOpt(interval.NonStringValues.Count);
 
 				foreach (var keyVal in interval.NonStringValues)
 				{
-					_writer.WriteUtf8String(keyVal.Key);
-					_writer.WriteUtf8String(keyVal.Value);
+					_writer.WriteOptUtf8(keyVal.Key);
+					_writer.WriteOptUtf8(keyVal.Value);
 				}
 			}
-			else _writer.WriteInt(0);
+			else _writer.WriteOpt(0);
 
 			_count++;
 
@@ -123,8 +121,8 @@ namespace VariantAnnotation.FileHandling.CustomInterval
 
 				if (disposing)
 				{
-					// Free any other managed objects here. 
-					_binaryWriter.Dispose();
+                    // Free any other managed objects here. 
+                    _writer.Dispose();
 				}
 
 				// Free any unmanaged objects here. 

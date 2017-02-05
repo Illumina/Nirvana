@@ -1,17 +1,30 @@
-﻿using UnitTests.Utilities;
+﻿using System.IO;
+using UnitTests.Fixtures;
+using UnitTests.Mocks;
+using UnitTests.Utilities;
+using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.CustomInterval
 {
-    [Collection("Chromosome 1 collection")]
+    [Collection("ChromosomeRenamer")]
     public sealed class CustomIntervalOutput
     {
+        private readonly ChromosomeRenamer _renamer;
+
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public CustomIntervalOutput(ChromosomeRenamerFixture fixture)
+        {
+            _renamer = fixture.Renamer;
+        }
+
         [Fact]
         public void BasicCustomIntervalOutput()
         {
-            var customIntervals  = ResourceUtilities.GetCustomIntervals("chr1_IcslIntervals_69090_69091.nci");
-            var annotationSource = ResourceUtilities.GetAnnotationSource("ENST00000483270_chr1_Ensembl84.ndb");
-            annotationSource.AddCustomIntervals(customIntervals);
+            var customIntervalProvider = new MockCustomIntervalProvider(ResourceUtilities.GetReadStream(Resources.CustomIntervals("chr1_IcslIntervals_69090_69091.nci")), _renamer);
+            var annotationSource = ResourceUtilities.GetAnnotationSource(DataUtilities.EmptyCachePrefix, null, null, customIntervalProvider);
 
             var annotatedVariant = DataUtilities.GetVariant(annotationSource,
                 "chr1	69092	.	T	C	.	LowGQX;HighDPFRatio	END=10244;BLOCKAVG_min30p3a	GT:GQX:DP:DPF	.:.:0:1");
