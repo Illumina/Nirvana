@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using VariantAnnotation.Algorithms;
 
 namespace VariantAnnotation.DataStructures
 {
@@ -24,7 +25,7 @@ namespace VariantAnnotation.DataStructures
 
         public BreakendTranscriptAnnotation(Transcript transcript, int breakendPosition, char isBreakendSuffix)
         {
-            var transcriptId = transcript.Id;
+            var transcriptId = TranscriptUtilities.GetTranscriptId(transcript);
 			TranscriptDataSource = transcript.TranscriptSource;
 
             GeneName = transcript.Gene.Symbol;
@@ -52,12 +53,12 @@ namespace VariantAnnotation.DataStructures
 
             if (ConsistentOrientation)
             {
-                HgvsDescription = GeneName + "{" + transcriptId + "." + transcript.Version+ "}" + ":c." + complementaryCdnaPosDescription + "_" +
+                HgvsDescription = GeneName + "{" + transcriptId + "}" + ":c." + complementaryCdnaPosDescription + "_" +
                                   transcriptCdnaLength;
             }
             else
             {
-                HgvsDescription = GeneName + "{" + transcriptId + "." + transcript.Version + "}" + ":c." + 1 + "_" + complementaryCdnaPosDescription;
+                HgvsDescription = GeneName + "{" + transcriptId + "}" + ":c." + 1 + "_" + complementaryCdnaPosDescription;
             }
         }
 

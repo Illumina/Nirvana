@@ -13,6 +13,9 @@
     <None Include="..\Packages\BlockCompression\libBlockCompression.so" Link="libBlockCompression.so">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="..\Packages\BlockCompression\libBlockCompression.dylib" Link="libBlockCompression.dylib">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />

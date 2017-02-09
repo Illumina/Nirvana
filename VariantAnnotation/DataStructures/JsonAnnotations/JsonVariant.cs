@@ -237,7 +237,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
 			public SvOverlapTranscript(DataStructures.Transcript transcript, VariantAlternateAllele altAllele)
 			{
-				TranscriptID = transcript.Id.ToString();
+			    TranscriptID = TranscriptUtilities.GetTranscriptId(transcript);
 				IsCanonical = transcript.IsCanonical ? "true" : null;
 				Hgnc = transcript.Gene.Symbol;
 				var isFullOverlap = altAllele.Start <= transcript.Start && altAllele.End >= transcript.End;
