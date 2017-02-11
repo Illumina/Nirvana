@@ -1073,5 +1073,11 @@ namespace VariantAnnotation.AnnotationSources
             _enableReferenceNoCalls = true;
             _limitReferenceNoCallsToTranscripts = limitReferenceNoCallsToTranscripts;
         }
+
+        public void FinalizeMetrics()
+        {
+            // force the output of the annotation time
+            _performanceMetrics.StartReference("");
+        }
     }
 }

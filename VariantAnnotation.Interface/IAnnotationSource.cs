@@ -22,7 +22,9 @@ namespace VariantAnnotation.Interface
         void EnableMitochondrialAnnotation();
 
         string GetDataVersion();
-	}
+
+        void FinalizeMetrics();
+    }
 
 	public interface IDataSourceVersion
 	{

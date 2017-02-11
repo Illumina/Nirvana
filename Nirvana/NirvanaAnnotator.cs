@@ -148,6 +148,8 @@ namespace Nirvana
                     }
                 }
             }
+
+            annotator.FinalizeMetrics();
         }
 
         private static IVariant CreateVcfVariant(string vcfLine, bool isGatkGenomeVcf)
