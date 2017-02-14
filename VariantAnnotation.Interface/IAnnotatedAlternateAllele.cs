@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 
 namespace VariantAnnotation.Interface
 {
     public interface IAnnotatedAlternateAllele
     {
-        #region members
-
         // permanent records
         string VariantId { get; }
         string VariantType { get; }
@@ -120,13 +119,10 @@ namespace VariantAnnotation.Interface
         // ----------------------------
         IList<ICustomInterval> CustomIntervals { get; }
 
-        //------------------------------
-        //Overllaping Transcripts for sv
-        //------------------------------
-        IList<IOverlapTranscript> SvOverlappingTranscripts { get; }
-
-
-        #endregion
+        //-------------------------------
+        // Overlapping transcripts for SV
+        //-------------------------------
+        ISet<IOverlapTranscript> SvOverlappingTranscripts { get; }
     }
 
     public interface ICustomInterval : IInterval, IJsonSerializer
@@ -253,6 +249,9 @@ namespace VariantAnnotation.Interface
         string SiftPrediction { get; }
         string SiftScore { get; }
         string TranscriptID { get; }
+		string BioType { get; }
+	    Dictionary<string, string> AdditionalInfo { get; set; }
+
     }
 
     public interface IRegulatoryRegion : IJsonSerializer
@@ -262,7 +261,7 @@ namespace VariantAnnotation.Interface
         IEnumerable<string> Consequence { get; }
     }
 
-    public interface IOverlapTranscript : IJsonSerializer
+    public interface IOverlapTranscript : IJsonSerializer, IEquatable<IOverlapTranscript>
     {
         string TranscriptID { get; }
         string IsCanonical { get; }
@@ -274,5 +273,4 @@ namespace VariantAnnotation.Interface
     {
         void SerializeJson(StringBuilder sb);
     }
-
 }

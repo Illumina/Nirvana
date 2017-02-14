@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VariantAnnotation.Algorithms;
@@ -61,7 +62,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
 		public ISet<string> OverlappingGenes { get; }
 
-		public IList<IOverlapTranscript> SvOverlappingTranscripts { get; }
+		public ISet<IOverlapTranscript> SvOverlappingTranscripts { get; }
 
 		public string[] DbSnpIds {  get; set; } // rs6025
 
@@ -211,39 +212,58 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 		const string ExacOthAcTag = "exacOthAc";
 		const string ExacSasAcTag = "exacSasAc";
 
-		#endregion
+        #endregion
 
-		
-		public sealed class SvOverlapTranscript:IOverlapTranscript
-		{
-			#region members
-			public string TranscriptID { get;  }
-			public string IsCanonical { get; }
-			public string Hgnc { get;}
-			public string IsPartialOverlap { get; }
-			#endregion
 
-			public void SerializeJson(StringBuilder sb)
-			{
-				var jsonObject = new JsonObject(sb);
+        public sealed class SvOverlapTranscript : IOverlapTranscript
+        {
+            #region members
 
-				sb.Append(JsonObject.OpenBrace);
-				jsonObject.AddStringValue("transcript", TranscriptID);
-				jsonObject.AddStringValue("hgnc", Hgnc);
-				jsonObject.AddStringValue("isCanonical",IsCanonical,false);
-				jsonObject.AddStringValue("partialOverlap", IsPartialOverlap,false);
-				sb.Append(JsonObject.CloseBrace);
-			}
+            public string TranscriptID { get; }
+            public string IsCanonical { get; }
+            public string Hgnc { get; }
+            public string IsPartialOverlap { get; }
 
-			public SvOverlapTranscript(DataStructures.Transcript transcript, VariantAlternateAllele altAllele)
-			{
-			    TranscriptID = TranscriptUtilities.GetTranscriptId(transcript);
-				IsCanonical = transcript.IsCanonical ? "true" : null;
-				Hgnc = transcript.Gene.Symbol;
-				var isFullOverlap = altAllele.Start <= transcript.Start && altAllele.End >= transcript.End;
-				IsPartialOverlap = isFullOverlap ? null : "true";
-			}
-		}
+            #endregion
+
+            public void SerializeJson(StringBuilder sb)
+            {
+                var jsonObject = new JsonObject(sb);
+
+                sb.Append(JsonObject.OpenBrace);
+                jsonObject.AddStringValue("transcript", TranscriptID);
+                jsonObject.AddStringValue("hgnc", Hgnc);
+                jsonObject.AddStringValue("isCanonical", IsCanonical, false);
+                jsonObject.AddStringValue("partialOverlap", IsPartialOverlap, false);
+                sb.Append(JsonObject.CloseBrace);
+            }
+
+            public SvOverlapTranscript(DataStructures.Transcript transcript, VariantAlternateAllele altAllele)
+            {
+                TranscriptID      = TranscriptUtilities.GetTranscriptId(transcript);
+                IsCanonical       = transcript.IsCanonical ? "true" : null;
+                Hgnc              = transcript.Gene.Symbol;
+                var isFullOverlap = altAllele.Start <= transcript.Start && altAllele.End >= transcript.End;
+                IsPartialOverlap  = isFullOverlap ? null : "true";
+            }
+
+            #region IEquatable methods
+
+            public override int GetHashCode()
+            {
+                return TranscriptID?.GetHashCode() ?? 0;
+            }
+
+            public bool Equals(IOverlapTranscript value)
+            {
+                if (this == null) throw new NullReferenceException();
+                if (value == null) return false;
+                if (this == value) return true;
+                return TranscriptID == value.TranscriptID;
+            }
+
+            #endregion
+        }
 
         public sealed class RegulatoryRegion :  IRegulatoryRegion
         {
@@ -312,7 +332,9 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             public string SiftPrediction { get; set; }           // deleterious
             public string SiftScore { get; set; }                // 0.01
             public string TranscriptID { get; set; }             // ENSESTT00000083143
-			public string BioType { private get; set; }                 // proteinCoding	
+			public string BioType {get; set; }
+	        public Dictionary<string, string> AdditionalInfo { get; set; }
+// proteinCoding	
 
             #endregion
 
@@ -370,6 +392,12 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 				jsonObject.AddStringValue(SiftScoreTag, SiftScore, false);
 				jsonObject.AddStringValue(SiftPredictionTag, SiftPrediction);
 
+				if(AdditionalInfo !=null &&AdditionalInfo.Count>0)
+	            foreach (var kvp in AdditionalInfo)
+	            {
+		            jsonObject.AddStringValue(kvp.Key,kvp.Value,false);
+	            }
+
                 sb.Append(JsonObject.CloseBrace);
                 return sb.ToString();
             }
@@ -386,15 +414,15 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         // constructor
         public JsonVariant()
         {
-            RefSeqTranscripts  = new List<IAnnotatedTranscript>();
-            EnsemblTranscripts = new List<IAnnotatedTranscript>();
-            ClinVarEntries      = new HashSet<IClinVar>();
-            CosmicEntries       = new List<ICosmic>();
-            CustomItems         = new List<ICustomAnnotation>();
-            RegulatoryRegions   = new HashSet<IRegulatoryRegion>();
-            CustomIntervals     = new List<ICustomInterval>();
-            OverlappingGenes    = new HashSet<string>();
-			SvOverlappingTranscripts = new List<IOverlapTranscript>();
+            RefSeqTranscripts        = new List<IAnnotatedTranscript>();
+            EnsemblTranscripts       = new List<IAnnotatedTranscript>();
+            ClinVarEntries           = new HashSet<IClinVar>();
+            CosmicEntries            = new List<ICosmic>();
+            CustomItems              = new List<ICustomAnnotation>();
+            RegulatoryRegions        = new HashSet<IRegulatoryRegion>();
+            CustomIntervals          = new List<ICustomInterval>();
+            OverlappingGenes         = new HashSet<string>();
+            SvOverlappingTranscripts = new HashSet<IOverlapTranscript>();
         }
 
         private JsonVariant(VariantAlternateAllele altAllele) : this()

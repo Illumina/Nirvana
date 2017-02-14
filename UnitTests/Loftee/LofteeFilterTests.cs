@@ -21,6 +21,7 @@ namespace UnitTests.Loftee
 
             Assert.Equal(containLoftee, annotatedVariant.ToString().Contains("loftee"));
             Assert.Equal(containLoftee, annotatedVariant.ToString().Contains("end_trunc"));
+			
         }
 
         [Fact]
@@ -33,7 +34,8 @@ namespace UnitTests.Loftee
 
             Assert.Contains("loftee", annotatedVariant.ToString());
             Assert.Contains("nagnag_site", annotatedVariant.ToString());
-        }
+			Assert.Contains("bioType", annotatedVariant.ToString());
+		}
 
         [Fact]
         public void SingleExon()

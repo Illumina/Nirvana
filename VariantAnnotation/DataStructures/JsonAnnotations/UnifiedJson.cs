@@ -405,8 +405,8 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         {
             if (!altAllele.IsStructuralVariant) return;
             FindCorrespondingJsonVariant(altAllele);
-            var svOveralpTranscript = new JsonVariant.SvOverlapTranscript(transcript, altAllele);
-            _currJsonVariant.SvOverlappingTranscripts.Add(svOveralpTranscript);
+            var svOverlapTranscript = new JsonVariant.SvOverlapTranscript(transcript, altAllele);
+            _currJsonVariant.SvOverlappingTranscripts.Add(svOverlapTranscript);
 
         }
 

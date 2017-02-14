@@ -26,7 +26,7 @@ namespace VariantAnnotation.FileHandling
 
         private readonly VcfConversion _conversion = new VcfConversion();
 
-        private const string CsqtHeaderLine = "##INFO=<ID=CSQT,Number=.,Type=String,Description=\"Consequence type as predicted by IAE. Format: GenotypeIndex|HGNC|Transcript ID|Consequence\">";
+        private const string CsqtHeaderLine = "##INFO=<ID=CSQT,Number=.,Type=String,Description=\"Consequence type as predicted by Nirvana. Format: GenotypeIndex|HGNC|TranscriptID|Consequence\">";
         private const string CsqrHeaderLine = "##INFO=<ID=CSQR,Number=.,Type=String,Description=\"Predicted regulatory consequence type. Format: GenotypeIndex|RegulatoryID|Consequence\">";
 
         private const string InfoHeaderLines =
