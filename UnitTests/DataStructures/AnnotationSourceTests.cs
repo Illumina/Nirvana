@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UnitTests.Utilities;
+﻿using UnitTests.Utilities;
 using VariantAnnotation.AnnotationSources;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.CustomInterval;

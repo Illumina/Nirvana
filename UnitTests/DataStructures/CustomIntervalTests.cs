@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using UnitTests.Fixtures;
 using UnitTests.Mocks;
 using UnitTests.Utilities;

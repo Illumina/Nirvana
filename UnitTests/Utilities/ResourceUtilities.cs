@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using ErrorHandling.Exceptions;
 using UnitTests.Mocks;
 using VariantAnnotation.AnnotationSources;
 using VariantAnnotation.DataStructures;

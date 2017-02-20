@@ -120,6 +120,7 @@ namespace UnitTests.OutputDestinations
 				new DataSourceVersion("COSMIC","78",Convert.ToDateTime("09/05/2016").Ticks)
 				
 			};
+
 		    using (new LiteVcfWriter(outputVcfPath, new List<string> { "##source=SpliceGirl 1.0.0.28", "##reference=file:/illumina/scratch/Zodiac/Software/Jenkins/R2/Genomes/Homo_sapiens/UCSC/hg19/Sequence/WholeGenomeFasta" }, "84.22.34",dataSourceVersions))
 		    {
 			    

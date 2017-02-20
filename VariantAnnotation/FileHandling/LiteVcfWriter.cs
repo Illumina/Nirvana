@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using VariantAnnotation.DataStructures.VCF;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.FileHandling
 {
-    public sealed class LiteVcfWriter : IDisposable, IStringWriter
+    public sealed class LiteVcfWriter : IDisposable
     {
         #region members
 
