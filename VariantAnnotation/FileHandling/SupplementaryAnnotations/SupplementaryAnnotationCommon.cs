@@ -6,6 +6,7 @@ using System.Text;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 {
@@ -255,14 +256,10 @@ namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 		#endregion
 
 
-		/// <summary>
-		/// returns the release date
-		/// </summary>
-		private string GetReleaseDate()
-        {
-            return new DateTime(ReleaseDateTicks, DateTimeKind.Utc).ToString("yyyy-MM-dd");
-        }
-
+        /// <summary>
+        /// returns the release date
+        /// </summary>
+        private string GetReleaseDate() => Date.GetDate(ReleaseDateTicks);
 		
 		public override string ToString()
         {

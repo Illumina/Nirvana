@@ -8,13 +8,11 @@ namespace VariantAnnotation.Interface
 	/// </summary>
 	public interface IAnnotatedVariant
 	{
-		#region members
-
 		// mandatory positional fields
 		string ReferenceName{ get; }
 		int? ReferenceBegin{ get; }
 		string ReferenceAllele{ get; }
-		IEnumerable<string> AlternateAlleles { get; }
+		IList<string> AlternateAlleles { get; }
 
 		// optional
 		string[] Filters { get; }
@@ -38,8 +36,6 @@ namespace VariantAnnotation.Interface
 		IEnumerable<IAnnotatedSample> AnnotatedSamples { get; }
 		IList<IAnnotatedAlternateAllele> AnnotatedAlternateAlleles { get; }
 		IEnumerable<IAnnotatedSupplementaryInterval> SupplementaryIntervals { get; }
-
-		#endregion
 	}
 
 	public interface IAnnotatedSupplementaryInterval

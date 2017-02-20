@@ -56,7 +56,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         public string ReferenceName { get; }
 		public int? ReferenceBegin { get; }
 		public string ReferenceAllele { get; }
-	    public IEnumerable<string> AlternateAlleles { get; }
+	    public IList<string> AlternateAlleles { get; }
 
 		public IEnumerable<IAnnotatedSample> AnnotatedSamples { get; }
 
