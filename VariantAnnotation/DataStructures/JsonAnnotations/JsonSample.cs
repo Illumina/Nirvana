@@ -50,12 +50,12 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 			jsonObject.AddStringValue("totalDepth", TotalDepth,false);
 			jsonObject.AddStringValue("genotypeQuality", GenotypeQuality, false);
 			jsonObject.AddStringValue("copyNumber", CopyNumber, false);
-			
-			jsonObject.AddStringValues("alleleDepths", AlleleDepths,false);
-			jsonObject.AddStringValue("genotype", Genotype);
-			jsonObject.AddBoolValue("failedFilter", FailedFilter,true,"true");
 
-			jsonObject.AddStringValues("splitReadCounts",SplitReadCounts,false);
+            jsonObject.AddStringValues("alleleDepths", AlleleDepths, false);
+            jsonObject.AddStringValue("genotype", Genotype);
+            jsonObject.AddBoolValue("failedFilter", FailedFilter, true, "true");
+
+            jsonObject.AddStringValues("splitReadCounts",SplitReadCounts,false);
 			jsonObject.AddStringValues("pairedEndReadCounts",PairEndReadCounts,false);
 
 			jsonObject.AddBoolValue("isEmpty", IsEmpty, true, "true");

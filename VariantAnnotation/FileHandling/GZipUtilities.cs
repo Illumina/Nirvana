@@ -9,6 +9,8 @@ namespace VariantAnnotation.FileHandling
 {
     public static class GZipUtilities
     {
+        private const int NumHeaderBytes = 18;
+
         private enum CompressionAlgorithm
         {
             Uncompressed,
@@ -24,6 +26,33 @@ namespace VariantAnnotation.FileHandling
             return new StreamReader(GetAppropriateReadStream(filePath));
         }
 
+        public static Stream GetAppropriateStream(PeekStream peekStream)
+        {
+            var header = peekStream.PeekBytes(NumHeaderBytes);
+            var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
+            return GetAppropriateStream(peekStream, compressionAlgorithm);
+        }
+
+        private static Stream GetAppropriateStream(Stream stream, CompressionAlgorithm compressionAlgorithm)
+        {
+            Stream newStream;
+
+            switch (compressionAlgorithm)
+            {
+                case CompressionAlgorithm.BlockGZip:
+                    newStream = new BlockGZipStream(stream, CompressionMode.Decompress);
+                    break;
+                case CompressionAlgorithm.GZip:
+                    newStream = new GZipStream(stream, CompressionMode.Decompress);
+                    break;
+                default:
+                    newStream = stream;
+                    break;
+            }
+
+            return newStream;
+        }
+
         /// <summary>
         /// returns a stream reader that handles compressed or uncompressed files.
         /// </summary>
@@ -37,24 +66,10 @@ namespace VariantAnnotation.FileHandling
         /// </summary>
         private static Stream GetAppropriateReadStream(string filePath)
         {
-            var compressionAlgorithm = IdentifyCompressionAlgorithm(filePath);
+            var header = GetHeader(filePath);
+            var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
             var fileStream = FileUtilities.GetReadStream(filePath);
-            Stream s;
-
-            switch (compressionAlgorithm)
-            {
-                case CompressionAlgorithm.BlockGZip:
-                    s = new BlockGZipStream(fileStream, CompressionMode.Decompress);
-                    break;
-                case CompressionAlgorithm.GZip:
-                    s = new GZipStream(fileStream, CompressionMode.Decompress);
-                    break;
-                default:
-                    s = fileStream;
-                    break;
-            }
-
-            return s;
+            return GetAppropriateStream(fileStream, compressionAlgorithm);
         }
 
         /// <summary>
@@ -81,16 +96,15 @@ namespace VariantAnnotation.FileHandling
             return new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
         }
 
-        private static CompressionAlgorithm IdentifyCompressionAlgorithm(string filePath)
+        private static byte[] GetHeader(string filePath)
         {
-            const int numHeaderBytes = 18;
             byte[] header = null;
 
             try
             {
                 using (var reader = new BinaryReader(FileUtilities.GetReadStream(filePath)))
                 {
-                    header = reader.ReadBytes(numHeaderBytes);
+                    header = reader.ReadBytes(NumHeaderBytes);
                 }
             }
             catch (Exception e)
@@ -101,8 +115,13 @@ namespace VariantAnnotation.FileHandling
                 }
             }
 
+            return header;
+        }
+
+        private static CompressionAlgorithm IdentifyCompressionAlgorithm(byte[] header)
+        {
             var result = CompressionAlgorithm.Uncompressed;
-            if (header == null || header.Length != numHeaderBytes) return result;
+            if (header == null || header.Length != NumHeaderBytes) return result;
 
             // check if this is a gzip file
             if (header[0] != 31 || header[1] != 139 || header[2] != 8) return result;

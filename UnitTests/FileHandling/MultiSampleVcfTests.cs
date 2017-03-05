@@ -131,14 +131,12 @@ namespace UnitTests.FileHandling
                 var variant = VcfUtilities.GetNextVariant(reader, _renamer);
 
                 // GT:GQ:GQX:DPI:AD	
-                // 0/1:124:19:5:11,8:P:.	
+                // 0/1:124:19:5:11,8:PASS:.	
                 // .	
-                // 1/2:55:59:.:0,21:F:20
+                // 1/2:55:59:.:0,21:LowGQX:20
 
                 // the unified json will call this function to get all the samples and can print them out using GetEntry as shown below
                 var sampleVariants = variant.ExtractSampleInfo();
-
-
 
 				var expectedEntry =
 				"{\"variantFreq\":0.4211,\"genotypeQuality\":124,\"alleleDepths\":[11,8],\"genotype\":\"0/1\"}";
@@ -167,9 +165,9 @@ namespace UnitTests.FileHandling
                 var variant = VcfUtilities.GetNextVariant(reader, _renamer);
 
                 // GT:GQ:DP:DPF:AD:FT:DPI      
-                // 0/1:124:19:5:11,8:P:.        
-                // 2/2:58:55:.:0,23:F:21	
-                // 1/2:55:59:.:0,21:F:20
+                // 0/1:124:19:5:11,8:PASS:.        
+                // 2/2:58:55:.:0,23:LowGQX:21	
+                // 1/2:55:59:.:0,21:LowGQX:20
 
                 // the unified json will call this function to get all the samples and can print them out using GetEntry as shown below
                 var sampleVariants = variant.ExtractSampleInfo();

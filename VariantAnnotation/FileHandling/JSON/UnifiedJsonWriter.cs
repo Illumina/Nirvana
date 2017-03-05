@@ -52,10 +52,12 @@ namespace VariantAnnotation.FileHandling.JSON
 
         #endregion
 
-		public UnifiedJsonWriter(string outputPath, string creationTime, string vepDataVersion, IEnumerable<IDataSourceVersion> iDataSourceVersions,string genomeAssembly, string[] sampleNames)
+        /// <summary>
+        /// constructor
+        /// </summary>
+		public UnifiedJsonWriter(StreamWriter writer, string creationTime, string vepDataVersion, IEnumerable<IDataSourceVersion> iDataSourceVersions,string genomeAssembly, string[] sampleNames)
 		{
-			// open the vcf file
-			_writer = GZipUtilities.GetStreamWriter(outputPath);
+			_writer = writer;
 			_writer.NewLine = "\n";
 
 			var dataSourceVersions = iDataSourceVersions?.Select(iDataSourceVersion => iDataSourceVersion as DataSourceVersion).ToList();
