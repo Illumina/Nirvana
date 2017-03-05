@@ -26,7 +26,11 @@ namespace Nirvana
 
         protected override void ValidateCommandLine()
         {
-            CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
+            if (ConfigurationSettings.VcfPath != "-")
+            {
+                CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
+            }
+
             CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
             CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache");
             CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache");
@@ -53,7 +57,7 @@ namespace Nirvana
             var processedReferences  = new HashSet<string>();
             string previousReference = null;
 
-            Console.WriteLine("Running Nirvana on {0}:", Path.GetFileName(ConfigurationSettings.VcfPath));
+            Console.WriteLine("Running Nirvana on {0}:", GetFileName());
 
             var outputVcfPath      = ConfigurationSettings.OutputFileName + ".vcf.gz";
             var outputGvcfPath     = ConfigurationSettings.OutputFileName + ".genome.vcf.gz";
@@ -62,7 +66,7 @@ namespace Nirvana
             var jsonCreationTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
             // parse the vcf header
-            var reader = new LiteVcfReader(ConfigurationSettings.VcfPath);
+            var reader = GetVcfReader();
 
             var booleanArguments = new List<string>();
             if (ConfigurationSettings.EnableReferenceNoCalls)                                     booleanArguments.Add(AnnotatorInfoCommon.ReferenceNoCall);
@@ -150,6 +154,23 @@ namespace Nirvana
             }
 
             annotator.FinalizeMetrics();
+        }
+
+        private static string GetFileName()
+        {
+            return Console.IsInputRedirected ? "stdin" : Path.GetFileName(ConfigurationSettings.VcfPath);
+        }
+
+        private LiteVcfReader GetVcfReader()
+        {
+            var useStdInput = ConfigurationSettings.VcfPath == "-";
+
+            var peekStream =
+                new PeekStream(useStdInput
+                    ? Console.OpenStandardInput()
+                    : FileUtilities.GetReadStream(ConfigurationSettings.VcfPath));
+
+            return new LiteVcfReader(GZipUtilities.GetAppropriateStream(peekStream));
         }
 
         private static IVariant CreateVcfVariant(string vcfLine, bool isGatkGenomeVcf)

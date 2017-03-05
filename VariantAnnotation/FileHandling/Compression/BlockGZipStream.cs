@@ -167,7 +167,7 @@ namespace VariantAnnotation.FileHandling.Compression
         private void ReadBlock()
         {
             var header = new byte[BlockGZipFormatCommon.BlockHeaderLength];
-            long blockAddress = _stream.Position;
+            long blockAddress = _stream.CanSeek ? _stream.Position : 0;
             int count  = _stream.Read(header, 0, BlockGZipFormatCommon.BlockHeaderLength);
 
             // handle the case where no data was read
@@ -243,7 +243,7 @@ namespace VariantAnnotation.FileHandling.Compression
 
             if (_blockOffset == _blockLength)
             {
-                _blockAddress = _stream.Position;
+                _blockAddress = _stream.CanSeek ? _stream.Position : 0;
                 _blockOffset  = _blockLength = 0;
             }
 

@@ -61,21 +61,9 @@ namespace VariantAnnotation.FileHandling
 
         #endregion
 
-		// constructor
-        public LiteVcfReader(string vcfPath)
-        {
-            // sanity check
-            if (!File.Exists(vcfPath))
-            {
-                throw new FileNotFoundException($"The specified vcf file ({vcfPath}) does not exist.");
-            }
-
-            // open the vcf file and parse the header
-            _reader = GZipUtilities.GetAppropriateStreamReader(vcfPath);
-            ParseHeader();
-        }
-
-        // constructor
+        /// <summary>
+        /// constructor
+        /// </summary>
         public LiteVcfReader(Stream stream)
         {
             // open the vcf file and parse the header
