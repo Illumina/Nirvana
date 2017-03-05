@@ -267,7 +267,7 @@ namespace VariantAnnotation.CommandLine
                 }
                 else
                 {
-                    CommandLineUtilities.DisplayBanner(_programAuthors);
+                    if (!Console.IsOutputRedirected) CommandLineUtilities.DisplayBanner(_programAuthors);
 
                     if (_showHelpMenu)
                     {
@@ -301,7 +301,7 @@ namespace VariantAnnotation.CommandLine
             _peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
             _wallTimeSpan         = bench.GetElapsedTime();
 
-            if (!_showVersion && !_showHelpMenu)
+            if (!_showVersion && !_showHelpMenu && !Console.IsOutputRedirected)
             {
                 Console.WriteLine();
                 if(_peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(_peakMemoryUsageBytes));

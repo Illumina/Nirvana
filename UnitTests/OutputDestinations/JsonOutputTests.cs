@@ -31,11 +31,10 @@ namespace UnitTests.OutputDestinations
         public void UnifiedJsonWriterTest()
         {
             var randomPath = GetRandomPath();
-            using (
-                var uJsonWriter = new UnifiedJsonWriter(randomPath, DateTime.Now.ToString(CultureInfo.InvariantCulture), "testing", null, null,
-                    null))
+            using (var streamWriter = new StreamWriter(FileUtilities.GetCreateStream(randomPath)))
+            using (var writer       = new UnifiedJsonWriter(streamWriter, DateTime.Now.ToString(CultureInfo.InvariantCulture), "testing", null, null, null))
             {
-                uJsonWriter.Write("test json string");
+                writer.Write("test json string");
             }
 
             File.Delete(randomPath);
