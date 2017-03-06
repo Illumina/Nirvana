@@ -1,5 +1,4 @@
-﻿using System.IO;
-using UnitTests.Fixtures;
+﻿using UnitTests.Fixtures;
 using UnitTests.Mocks;
 using UnitTests.Utilities;
 using VariantAnnotation.Utilities;

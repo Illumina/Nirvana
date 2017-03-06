@@ -20,7 +20,8 @@
         public bool GetFailedFilter()
         {
             if (_tmp.FormatIndices.FT == null) return false;
-            return _tmp.SampleColumns[_tmp.FormatIndices.FT.Value] == "F";
+            var filterValue = _tmp.SampleColumns[_tmp.FormatIndices.FT.Value];
+            return filterValue != "PASS" && filterValue != ".";
         }
     }
 }

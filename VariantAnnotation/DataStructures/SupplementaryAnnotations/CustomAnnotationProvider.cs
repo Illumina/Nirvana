@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Interface;

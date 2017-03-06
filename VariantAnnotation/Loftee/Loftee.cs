@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
@@ -31,25 +33,28 @@ namespace VariantAnnotation.Loftee
 
             foreach (var altAllele in annotatedVariant.AnnotatedAlternateAlleles)
             {
-                var ensemblTranscripts = new List<IAnnotatedTranscript>();
 
                 foreach (var transcript in altAllele.EnsemblTranscripts)
                 {
-                    var ta = LofteeAnalysis(transcript, altAllele, sequence);
-                    ensemblTranscripts.Add(ta);
+                    var lofteeOut = LofteeAnalysis(transcript, altAllele, sequence);
+	                if (lofteeOut != null)
+	                {
+						if(transcript.AdditionalInfo == null) transcript.AdditionalInfo = new Dictionary<string, string>();
+		                transcript.AdditionalInfo["loftee"] = lofteeOut;
+	                }
                 }
 
-                altAllele.EnsemblTranscripts = ensemblTranscripts;
-
-                var refSeqTranscripts = new List<IAnnotatedTranscript>();
 
                 foreach (var transcript in altAllele.RefSeqTranscripts)
                 {
-                    var ta = LofteeAnalysis(transcript, altAllele, sequence);
-                    refSeqTranscripts.Add(ta);
-                }
+					var lofteeOut = LofteeAnalysis(transcript, altAllele, sequence);
+					if (lofteeOut != null)
+					{
+						if (transcript.AdditionalInfo == null) transcript.AdditionalInfo = new Dictionary<string, string>();
+						transcript.AdditionalInfo["loftee"] = lofteeOut;
+					}
+				}
 
-                altAllele.RefSeqTranscripts = refSeqTranscripts;
             }
         }
 
@@ -63,10 +68,10 @@ namespace VariantAnnotation.Loftee
             }
         }
 
-        private IAnnotatedTranscript LofteeAnalysis(IAnnotatedTranscript ta, IAnnotatedAlternateAllele allele,
+        private string LofteeAnalysis(IAnnotatedTranscript ta, IAnnotatedAlternateAllele allele,
             ICompressedSequence sequence)
         {
-            if (!LofteeUtilities.IsApplicable(ta)) return ta;
+            if (!LofteeUtilities.IsApplicable(ta)) return null;
 
             var filters    = new HashSet<LofteeFilter.Filter>();
             var flags      = new HashSet<LofteeFilter.Flag>();
@@ -90,10 +95,39 @@ namespace VariantAnnotation.Loftee
                 CheckNagnagSite(transcript, allele, flags, sequence);
             }
 
-            return new LofteeTranscript(ta, filters, flags);
+            return GetLofteeString(filters,flags);
+
         }
 
-        private void CheckNagnagSite(Transcript transcript, IAnnotatedAlternateAllele allele,
+	    private string GetLofteeString(HashSet<LofteeFilter.Filter> filters, HashSet<LofteeFilter.Flag> flags)
+	    {
+		    if (filters.Count == 0 && flags.Count == 0) return null;
+		    bool addComma = false;
+			var sb = new StringBuilder();
+		    sb.Append(JsonObject.OpenBrace);
+			if (filters.Count > 0)
+			{
+				sb.Append("\"filters\":[" + string.Join(",", filters.Select(v => GetString(v))) + "]");
+				addComma = true;
+			}
+
+			if (flags.Count > 0)
+			{
+				if (addComma)
+					sb.Append(JsonObject.Comma);
+				sb.Append("\"flags\":[" + string.Join(",", flags.Select(v => GetString(v))) + "]");
+			}
+		    sb.Append(JsonObject.CloseBrace);
+
+		    return sb.ToString();
+
+	    }
+		private string GetString(object value)
+		{
+			return "\"" + value + "\"";
+		}
+
+		private void CheckNagnagSite(Transcript transcript, IAnnotatedAlternateAllele allele,
             HashSet<LofteeFilter.Flag> flags, ICompressedSequence sequence)
         {
             if (allele.ReferenceBegin == null || allele.ReferenceEnd == null ||

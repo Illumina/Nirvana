@@ -77,9 +77,6 @@ namespace VariantAnnotation.FileHandling.JSON
         /// <summary>
         /// writes the variant to the current output stream
         /// </summary>
-        public void Write(string variantString)
-        {
-            _writer.Write(variantString);
-        }
-	}
+        public void Write(string s) => _writer.WriteLine(s);
+    }
 }

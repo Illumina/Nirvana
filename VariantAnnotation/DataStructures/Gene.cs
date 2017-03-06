@@ -54,14 +54,14 @@ namespace VariantAnnotation.DataStructures
         public static Gene Read(ExtendedBinaryReader reader)
         {
             ushort referenceIndex = reader.ReadUInt16();
-            int start = reader.ReadOptInt32();
-            int end = reader.ReadOptInt32();
-            bool onReverseStrand = reader.ReadBoolean();
-            string symbol = reader.ReadAsciiString();
-            int hgncId = reader.ReadOptInt32();
-            var entrezId = CompactId.Read(reader);
-            var ensemblId = CompactId.Read(reader);
-            int mimNumber = reader.ReadOptInt32();
+            int start             = reader.ReadOptInt32();
+            int end               = reader.ReadOptInt32();
+            bool onReverseStrand  = reader.ReadBoolean();
+            string symbol         = reader.ReadAsciiString();
+            int hgncId            = reader.ReadOptInt32();
+            var entrezId          = CompactId.Read(reader);
+            var ensemblId         = CompactId.Read(reader);
+            int mimNumber         = reader.ReadOptInt32();
 
             return new Gene(referenceIndex, start, end, onReverseStrand, symbol, hgncId, entrezId, ensemblId, mimNumber);
         }

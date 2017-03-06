@@ -56,7 +56,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         public string ReferenceName { get; }
 		public int? ReferenceBegin { get; }
 		public string ReferenceAllele { get; }
-	    public IEnumerable<string> AlternateAlleles { get; }
+	    public IList<string> AlternateAlleles { get; }
 
 		public IEnumerable<IAnnotatedSample> AnnotatedSamples { get; }
 
@@ -405,8 +405,8 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         {
             if (!altAllele.IsStructuralVariant) return;
             FindCorrespondingJsonVariant(altAllele);
-            var svOveralpTranscript = new JsonVariant.SvOverlapTranscript(transcript, altAllele);
-            _currJsonVariant.SvOverlappingTranscripts.Add(svOveralpTranscript);
+            var svOverlapTranscript = new JsonVariant.SvOverlapTranscript(transcript, altAllele);
+            _currJsonVariant.SvOverlappingTranscripts.Add(svOverlapTranscript);
 
         }
 

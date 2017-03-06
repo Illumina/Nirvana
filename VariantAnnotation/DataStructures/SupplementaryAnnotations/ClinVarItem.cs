@@ -307,7 +307,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			jsonObject.AddStringValue("significance", Significance);
 
 			if (LastUpdatedDate != long.MinValue)
-				jsonObject.AddStringValue("lastUpdatedDate", new DateTime(LastUpdatedDate).ToString("yyyy-MM-dd"));
+				jsonObject.AddStringValue("lastUpdatedDate", Date.GetDate(LastUpdatedDate));
 
 			jsonObject.AddStringValues("pubMedIds", PubmedIds?.Select(id => id.ToString()));
 			sb.Append(JsonObject.CloseBrace);

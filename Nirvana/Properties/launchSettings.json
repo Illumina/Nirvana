@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Nirvana": {
+      "commandName": "Project",
+      "commandLineArgs": "-c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd SupplementaryDatabase\\36\\GRCh37 -i Data\\Mother\\Mother.vcf.gz -o mother",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    }
+  }
+}
