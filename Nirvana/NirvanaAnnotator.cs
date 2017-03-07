@@ -26,13 +26,13 @@ namespace Nirvana
 
         protected override void ProgramExecution()
         {
-            Console.WriteLine("Running Nirvana on {0}:", Path.GetFileName(ConfigurationSettings.VcfPath));
+            if (!Console.IsOutputRedirected) Console.WriteLine("Running Nirvana on {0}:", GetFileName());
 
             var outputVcfPath      = ConfigurationSettings.OutputFileName + ".vcf.gz";
             var outputGvcfPath     = ConfigurationSettings.OutputFileName + ".genome.vcf.gz";
             var outputVariantsPath = ConfigurationSettings.OutputFileName + ".json.gz";
 
-            using (var reader = new LiteVcfReader(ConfigurationSettings.VcfPath))
+            using (var reader = GetVcfReader())
             {
                 var booleanArguments = SetAnnotationFlags(reader.IsRcrsMitochondrion);
                 var annotator        = GetAnnotator(reader.SampleNames, booleanArguments);
@@ -42,9 +42,10 @@ namespace Nirvana
                     throw new InvalidOperationException("Unable to perform annotation because no annotation sources could be created");
                 }
 
-                using (var jsonWriter = new UnifiedJsonWriter(outputVariantsPath, Date.GetTimeStamp, annotator.GetDataVersion(), annotator.GetDataSourceVersions(), annotator.GetGenomeAssembly(), reader.SampleNames))
-                using (var vcfWriter  = ConfigurationSettings.Vcf  ? new LiteVcfWriter(outputVcfPath, reader.HeaderLines, annotator.GetDataVersion(), annotator.GetDataSourceVersions())  : null)
-                using (var gvcfWriter = ConfigurationSettings.Gvcf ? new LiteVcfWriter(outputGvcfPath, reader.HeaderLines, annotator.GetDataVersion(), annotator.GetDataSourceVersions()) : null)
+                using (var jsonStreamWriter = GetJsonStreamWriter(outputVariantsPath))
+                using (var jsonWriter       = GetJsonWriter(jsonStreamWriter, Date.GetTimeStamp, annotator, reader))
+                using (var vcfWriter        = ConfigurationSettings.Vcf  ? new LiteVcfWriter(outputVcfPath, reader.HeaderLines, annotator.GetDataVersion(), annotator.GetDataSourceVersions())  : null)
+                using (var gvcfWriter       = ConfigurationSettings.Gvcf ? new LiteVcfWriter(outputGvcfPath, reader.HeaderLines, annotator.GetDataVersion(), annotator.GetDataSourceVersions()) : null)
                 {
                     string vcfLine = null;
                     var checker = new SortedVcfChecker();
@@ -80,6 +81,35 @@ namespace Nirvana
 
                 annotator.FinalizeMetrics();
             }
+        }
+
+        private static StreamWriter GetJsonStreamWriter(string outputPath)
+        {
+            return ConfigurationSettings.OutputFileName == "-"
+                ? new StreamWriter(Console.OpenStandardOutput())
+                : GZipUtilities.GetStreamWriter(outputPath);
+        }
+
+        private static UnifiedJsonWriter GetJsonWriter(StreamWriter streamWriter, string jsonCreationTime, IAnnotationSource annotator, LiteVcfReader reader)
+        {
+            return new UnifiedJsonWriter(streamWriter, jsonCreationTime, annotator.GetDataVersion(), annotator.GetDataSourceVersions(), annotator.GetGenomeAssembly(), reader.SampleNames);
+        }
+
+        private static string GetFileName()
+        {
+            return Console.IsInputRedirected ? "stdin" : Path.GetFileName(ConfigurationSettings.VcfPath);
+        }
+
+        private LiteVcfReader GetVcfReader()
+        {
+            var useStdInput = ConfigurationSettings.VcfPath == "-";
+
+            var peekStream =
+                new PeekStream(useStdInput
+                    ? Console.OpenStandardInput()
+                    : FileUtilities.GetReadStream(ConfigurationSettings.VcfPath));
+
+            return new LiteVcfReader(GZipUtilities.GetAppropriateStream(peekStream));
         }
 
         private string GetVcfString(IVariant variant, IAnnotatedVariant annotatedVariant)
@@ -151,7 +181,11 @@ namespace Nirvana
 
         protected override void ValidateCommandLine()
         {
-            CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
+            if (ConfigurationSettings.VcfPath != "-")
+            {
+                CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
+            }
+
             CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
             CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache");
             CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache");
@@ -165,6 +199,14 @@ namespace Nirvana
             foreach (var customAnnotationDirectory in ConfigurationSettings.CustomIntervalDirectories)
             {
                 CheckDirectoryExists(customAnnotationDirectory, "custom interval", "--ci", false);
+            }
+
+            // if we're using stdout, it doesn't make sense to output the VCF and gVCF
+            if (ConfigurationSettings.OutputFileName == "-")
+            {
+                ConfigurationSettings.Vcf        = false;
+                ConfigurationSettings.Gvcf       = false;
+                PerformanceMetrics.DisableOutput = true;
             }
 
             HasRequiredParameter(ConfigurationSettings.OutputFileName, "output file stub", "--out");
