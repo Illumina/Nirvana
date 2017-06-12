@@ -28,6 +28,7 @@ namespace Nirvana
         {
             if (!Console.IsOutputRedirected) Console.WriteLine("Running Nirvana on {0}:", GetFileName());
 
+
             var outputVcfPath      = ConfigurationSettings.OutputFileName + ".vcf.gz";
             var outputGvcfPath     = ConfigurationSettings.OutputFileName + ".genome.vcf.gz";
             var outputVariantsPath = ConfigurationSettings.OutputFileName + ".json.gz";
