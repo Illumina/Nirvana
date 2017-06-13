@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface;
+﻿using VariantAnnotation.DataStructures.Variants;
+using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.DataStructures
 {
@@ -8,7 +9,7 @@ namespace VariantAnnotation.DataStructures
         /// checks if the variant is a reference no-call and sets the flag accordingly
         /// </summary>
         public static void Check(VariantFeature variant, bool limitToTranscript,
-            IIntervalForest<Transcript> transcriptIntervals)
+            IIntervalForest<Transcript.Transcript> transcriptIntervals)
         {
             // make sure we enabled reference no-call checking and that this is a reference site
             if (!variant.IsReference) return;

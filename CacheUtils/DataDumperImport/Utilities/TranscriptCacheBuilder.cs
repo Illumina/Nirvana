@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.UpdateMiniCacheFiles.DataStructures;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.TranscriptCache;
 

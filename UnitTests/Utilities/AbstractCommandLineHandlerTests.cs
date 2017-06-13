@@ -1,8 +1,8 @@
 ﻿using System.IO;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
 using ErrorHandling.DataStructures;
 using ErrorHandling.Exceptions;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
 using VariantAnnotation.DataStructures;
 using Xunit;
 

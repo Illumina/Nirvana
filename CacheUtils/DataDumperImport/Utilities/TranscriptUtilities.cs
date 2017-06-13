@@ -3,6 +3,7 @@ using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.VEP;
 using VariantAnnotation.DataStructures;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.DataDumperImport.Utilities
 {

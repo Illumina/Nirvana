@@ -2,8 +2,13 @@
   "profiles": {
     "Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "-c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd SupplementaryDatabase\\36\\GRCh37 -i Data\\Mother\\Mother.vcf.gz -o mother",
+      "commandLineArgs": "-c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd SupplementaryDatabase\\38\\GRCh37 -i Data\\Confluence\\VariantRepresentationRgtDot.vcf -o invariant",
       "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "RR_nirvana": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --sd C:\\Development\\SupplementaryDatabase\\debug\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in NewExpansionHunter-NA12877-hg19.vcf.gz -o repExp",
+      "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
 }

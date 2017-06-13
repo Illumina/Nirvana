@@ -1,5 +1,5 @@
 ﻿using System;
-using VariantAnnotation.Utilities;
+using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 
 namespace VariantAnnotation.DataStructures

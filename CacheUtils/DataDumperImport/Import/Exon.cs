@@ -137,10 +137,6 @@ namespace CacheUtils.DataDumperImport.Import
                     $"Unable to link the exon reference: exon index: [{exonIndex}], current # of exons: [{dataStore.Transcripts[transcriptIndex].VariantEffectCache.Exons.Length}]");
             }
 
-            // Console.WriteLine("reference: {0}", reference);
-            // Console.WriteLine("transcript index: {0}", transcriptIndex);
-            // Console.WriteLine("exon index: {0}", exonIndex);
-
             return dataStore.Transcripts[transcriptIndex].VariantEffectCache.Exons[exonIndex];
         }
 
@@ -174,10 +170,6 @@ namespace CacheUtils.DataDumperImport.Import
                     $"Unable to link the exon reference: exon index: [{exonIndex}], current # of exons: [{dataStore.Transcripts[transcriptIndex].TransExons.Length}]");
             }
 
-            // Console.WriteLine("reference: {0}", reference);
-            // Console.WriteLine("transcript index: {0}", transcriptIndex);
-            // Console.WriteLine("exon index: {0}", exonIndex);
-
             return dataStore.Transcripts[transcriptIndex].TransExons[exonIndex];
         }
 
@@ -201,10 +193,6 @@ namespace CacheUtils.DataDumperImport.Import
             }
 
             string exonKey = referenceMatch.Groups[2].Value;
-
-            // Console.WriteLine("reference: {0}", reference);
-            // Console.WriteLine("transcript index: {0}", transcriptIndex);
-            // Console.WriteLine("exon key: {0}", exonKey);
 
             DataStructures.VEP.Exon ret;
 
@@ -240,16 +228,7 @@ namespace CacheUtils.DataDumperImport.Import
                 if (objectValue != null)
                 {
                     var newExon = Parse(objectValue, dataStore.CurrentReferenceIndex);
-                    // DS.VEP.Exon oldExon;
-                    // if (dataStore.Exons.TryGetValue(newExon, out oldExon))
-                    //{
-                    //    exons[exonIndex] = oldExon;
-                    //}
-                    // else
-                    //{
                     exons[exonIndex] = newExon;
-                    //    dataStore.Exons[newExon] = newExon;
-                    //}
                 }
                 else
                 {

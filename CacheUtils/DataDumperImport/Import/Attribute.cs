@@ -2,8 +2,8 @@
 using System.Text.RegularExpressions;
 using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.Utilities;
-using VariantAnnotation.DataStructures;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
 
 namespace CacheUtils.DataDumperImport.Import
 {
@@ -54,23 +54,12 @@ namespace CacheUtils.DataDumperImport.Import
                     var newMicroRna = Parse(objectValue);
                     if (newMicroRna != null)
                     {
-                        // MicroRna oldMicroRna;
-
-                        // if (dataStore.MicroRnas.TryGetValue(newMicroRna, out oldMicroRna))
-                        //{
-                        //    microRnas.Add(oldMicroRna);
-                        //}
-                        // else
-                        //{
-                            microRnas.Add(newMicroRna);
-                            // dataStore.MicroRnas[newMicroRna] = newMicroRna;
-                        //}
+                        microRnas.Add(newMicroRna);
                     }
                 }
                 else
                 {
-                    throw new GeneralException(
-                        $"Could not transform the AbstractData object into an ObjectValue: [{ad.GetType()}]");
+                    throw new GeneralException($"Could not transform the AbstractData object into an ObjectValue: [{ad.GetType()}]");
                 }
             }
 
@@ -116,7 +105,6 @@ namespace CacheUtils.DataDumperImport.Import
             // sanity check: make sure this is a miRNA object
             if (key != "miRNA" || value == null)
             {
-                // Console.WriteLine("DEBUG: Found alternate attribute: {0}", key);
                 return null;
             }
 

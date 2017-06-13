@@ -52,16 +52,7 @@ namespace CacheUtils.DataDumperImport.Import
                         if (sliceNode != null)
                         {
                             var newSlice = Slice.Parse(sliceNode.Value, dataStore.CurrentReferenceIndex);
-                            // DS.VEP.Slice oldSlice;
-                            // if (dataStore.Slices.TryGetValue(newSlice, out oldSlice))
-                            //{
-                            //    intron.Slice = oldSlice;
-                            //}
-                            // else
-                            //{
                             intron.Slice = newSlice;
-                            //    dataStore.Slices[newSlice] = newSlice;
-                            //}
                         }
                         else if (DumperUtilities.IsReference(ad))
                         {

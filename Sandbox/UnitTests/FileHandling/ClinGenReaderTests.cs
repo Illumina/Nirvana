@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using SAUtils.InputFileParsers.ClinGen;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using SAUtils.DataStructures;
 using VariantAnnotation.Interface;
 using UnifyClinGenFiles;
 using VariantAnnotation.Utilities;

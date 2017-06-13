@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.DataStructures;
+﻿using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Algorithms.Consequences
@@ -36,6 +36,7 @@ namespace VariantAnnotation.Algorithms.Consequences
                                  vt == VariantType.tandem_duplication || internalCopyNumberType == VariantType.copy_number_gain;
             _isInsertionDeletion = vt == VariantType.indel;
             _isInsertion = vt == VariantType.insertion;
+
         }
 
         /// <summary>

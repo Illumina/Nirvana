@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using CacheUtils.DataDumperImport.FileHandling;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.Interface;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.CreateCache.FileHandling
 {

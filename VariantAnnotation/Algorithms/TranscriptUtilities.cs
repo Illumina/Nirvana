@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Annotation;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace VariantAnnotation.Algorithms
 {
@@ -60,6 +62,7 @@ namespace VariantAnnotation.Algorithms
         {
             int totalExonLength = 0;
 
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (int mapIndex = 0; mapIndex < maps.Length; mapIndex++)
             {
                 var cdnaMap = maps[mapIndex];
@@ -79,6 +82,7 @@ namespace VariantAnnotation.Algorithms
             var coordinateMap = CdnaCoordinateMap.Null();
             bool foundOverlap = false;
 
+            // ReSharper disable once ForCanBeConvertedToForeach
             for (int i = 0; i < cdnaMaps.Length; i++)
             {
                 coordinateMap = cdnaMaps[i];

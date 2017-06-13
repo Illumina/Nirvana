@@ -4,8 +4,8 @@ using CacheUtils.CombineAndUpdateGenes.DataStructures;
 using CacheUtils.CreateCache.FileHandling;
 using CacheUtils.DataDumperImport.FileHandling;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.CombineAndUpdateGenes.FileHandling
 {

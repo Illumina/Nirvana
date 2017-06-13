@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures;
-using VariantAnnotation.DataStructures;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.DataDumperImport.Utilities
 {

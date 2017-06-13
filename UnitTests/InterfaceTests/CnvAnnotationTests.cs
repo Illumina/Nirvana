@@ -11,7 +11,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void PartiallyOverlappingGene()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"), null as List<string>,
                 "14	19443800	14_19462000	G	<CNV>	.	PASS	SVTYPE=CNV;END=19462000;CN=0;CNscore=13.41;LOH=0;ensembl_gene_id=ENSG00000257990,ENSG00000257558");
             Assert.NotNull(annotatedVariant);
 
@@ -22,7 +22,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void InternalGene()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"), null as List<string>,
                 "14	19431000	14_19462000	G	<CNV>	.	PASS	SVTYPE=CNV;END=19462000;CN=0;CNscore=13.41;LOH=0;ensembl_gene_id=ENSG00000257990,ENSG00000257558");
             Assert.NotNull(annotatedVariant);
 
@@ -33,7 +33,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void InGene()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"), null as List<string>,
                 "14	19443780	14_19443800	G	<CNV>	.	PASS	SVTYPE=CNV;END=19443800;CN=0;CNscore=13.41;LOH=0;ensembl_gene_id=ENSG00000257990,ENSG00000257558");
             Assert.NotNull(annotatedVariant);
 
@@ -44,7 +44,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void IsTheSameAsGene()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"), null as List<string>,
                 "14	19443725	14_19443847	G	<CNV>	.	PASS	SVTYPE=CNV;END=19443847;CN=0;CNscore=13.41;LOH=0;ensembl_gene_id=ENSG00000257990,ENSG00000257558");
             Assert.NotNull(annotatedVariant);
 
@@ -55,7 +55,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void NextToGene()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"), null as List<string>,
                 "14	19443847	14_19462000	G	<CNV>	.	PASS	SVTYPE=CNV;END=19462000;CN=0;CNscore=13.41;LOH=0;ensembl_gene_id=ENSG00000257990,ENSG00000257558");
             Assert.NotNull(annotatedVariant);
 
@@ -66,7 +66,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void FlankingTranscript()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000427857_chr1_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000427857_chr1_Ensembl84"), null as List<string>,
                 "1	816800	Canvas:GAIN:1:816801:821943	N	<CNV>	2	q10;CLT10kb	SVTYPE=CNV;END=821943	RC:BC:CN	174:2:4");
             Assert.NotNull(annotatedVariant);
 
@@ -77,7 +77,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void SvDelPartiallyOverlappingGene()
         {
-            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"),
+            var annotatedVariant = DataUtilities.GetVariant(Resources.CacheGRCh37("ENST00000546909_chr14_Ensembl84"), null as List<string>,
                 "14	19443800	.	G	<DEL>	.	PASS	SVTYPE=DEL;END=19452000");
             Assert.NotNull(annotatedVariant);
 
@@ -110,7 +110,7 @@ namespace UnitTests.InterfaceTests
         [Fact]
         public void LossOfHeterozygosityTest()
         {
-            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, null,
+            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, null as List<string>,
                 "1	11131485	Canvas:REF:1:11131486:16833263	N	<CNV>	61	PASS	SVTYPE=LOH;END=16833263	RC:BC:CN:MCC	.	84:9227:2:2");
             Assert.NotNull(annotatedVariant);
 
@@ -131,7 +131,7 @@ namespace UnitTests.InterfaceTests
             Assert.NotNull(annotatedVariant);
 
             Assert.Contains(
-                "{\"chromosome\":\"1\",\"begin\":10324455,\"end\":16107335,\"source\":\"ClinGen\",\"variantType\":\"copy_number_loss\",\"id\":\"nsv993553\",\"clinicalInterpretation\":\"pathogenic\",\"observedLosses\":1,\"phenotypes\":[\"Developmental delay AND/OR other significant developmental or morphological phenotypes\"],\"reciprocalOverlap\":0.0083}",
+                "{\"chromosome\":\"1\",\"begin\":10324455,\"end\":16107335,\"variantType\":\"copy_number_loss\",\"id\":\"nsv993553\",\"clinicalInterpretation\":\"pathogenic\",\"observedLosses\":1,\"phenotypes\":[\"Developmental delay AND/OR other significant developmental or morphological phenotypes\"],\"reciprocalOverlap\":0.0083}",
                 annotatedVariant.ToString());
             Assert.DoesNotContain("nsv995427", annotatedVariant.ToString());
         }
@@ -143,7 +143,7 @@ namespace UnitTests.InterfaceTests
                 "chr1	145361282	.	G	<DEL>	.	PASS	SVTYPE=DEL;END=146000000");
             Assert.NotNull(annotatedVariant);
 
-            Assert.Contains("{\"chromosome\":\"1\",\"begin\":145415190,\"end\":148809863,\"source\":\"ClinGen\",\"variantType\":\"copy_number_variation\",\"id\":\"nsv931930\",\"clinicalInterpretation\":\"pathogenic\",\"observedGains\":2,\"observedLosses\":2,\"validated\":true,\"phenotypes\":[\"Developmental delay AND/OR other significant developmental or morphological phenotypes\",\"Global developmental delay\",\"Microcephaly\"],\"phenotypeIds\":[\"HP:0001263\",\"MedGen:CN001157\",\"HP:0000252\",\"MedGen:C1845868\"],\"reciprocalOverlap\":0.17227}", annotatedVariant.ToString());
+            Assert.Contains("{\"chromosome\":\"1\",\"begin\":145415190,\"end\":148809863,\"variantType\":\"copy_number_variation\",\"id\":\"nsv931930\",\"clinicalInterpretation\":\"pathogenic\",\"observedGains\":2,\"observedLosses\":2,\"validated\":true,\"phenotypes\":[\"Developmental delay AND/OR other significant developmental or morphological phenotypes\",\"Global developmental delay\",\"Microcephaly\"],\"phenotypeIds\":[\"HP:0001263\",\"MedGen:CN001157\",\"HP:0000252\",\"MedGen:C1845868\"],\"reciprocalOverlap\":0.17227}", annotatedVariant.ToString());
             Assert.DoesNotContain("nsv497249", annotatedVariant.ToString());
         }
 
@@ -153,7 +153,7 @@ namespace UnitTests.InterfaceTests
             var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, Resources.MiniSuppAnnot("chr1_12000_12300.nsa"),
                 "chr1	12000	.	G	<DEL>	.	PASS	SVTYPE=DEL;END=12300");
             Assert.NotNull(annotatedVariant);
-            Assert.Contains("\"chromosome\":\"1\",\"begin\":11189,\"end\":36787,\"source\":\"DGV\",\"variantType\":\"copy_number_gain\",\"variantFreqAll\":0.01081,\"id\":\"dgv1e59\",\"sampleSize\":185,\"observedGains\":2,\"reciprocalOverlap\":0.01172", annotatedVariant.ToString());
+            Assert.Contains("\"chromosome\":\"1\",\"begin\":11189,\"end\":36787,\"variantType\":\"copy_number_gain\",\"variantFreqAll\":0.01081,\"id\":\"dgv1e59\",\"sampleSize\":185,\"observedGains\":2,\"reciprocalOverlap\":0.01172", annotatedVariant.ToString());
         }
 
         [Fact]
@@ -162,7 +162,7 @@ namespace UnitTests.InterfaceTests
             var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, Resources.MiniSuppAnnot("chr14_19000001_19000101.nsa"),
                 "chr14	19000001	.	G	<DEL>	.	PASS	SVTYPE=DEL;END=19000101");
             Assert.NotNull(annotatedVariant);
-            Assert.Contains("{\"chromosome\":\"14\",\"begin\":19000001,\"end\":19057950,\"source\":\"DGV\",\"variantType\":\"copy_number_gain\",\"variantFreqAll\":0.02703,\"id\":\"dgv1139e59\",\"sampleSize\":185,\"observedGains\":5,\"reciprocalOverlap\":0.00173}", annotatedVariant.ToString());
+            Assert.Contains("{\"chromosome\":\"14\",\"begin\":19000001,\"end\":19057950,\"variantType\":\"copy_number_gain\",\"variantFreqAll\":0.02703,\"id\":\"dgv1139e59\",\"sampleSize\":185,\"observedGains\":5,\"reciprocalOverlap\":0.00173}", annotatedVariant.ToString());
         }
 
         //[Fact]
@@ -183,7 +183,7 @@ namespace UnitTests.InterfaceTests
             var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, Resources.MiniSuppAnnot("chr14_19000001_19000101.nsa"),
                 "chr14	19000001	.	G	<DEL>	.	PASS	SVTYPE=DEL;END=19000801");
             Assert.NotNull(annotatedVariant);
-            Assert.Contains("{\"chromosome\":\"14\",\"begin\":19000001,\"end\":19057950,\"source\":\"DGV\",\"variantType\":\"copy_number_gain\",\"variantFreqAll\":0.02703,\"id\":\"dgv1139e59\",\"sampleSize\":185,\"observedGains\":5,\"reciprocalOverlap\":0.01381}", annotatedVariant.ToString());
+            Assert.Contains("{\"chromosome\":\"14\",\"begin\":19000001,\"end\":19057950,\"variantType\":\"copy_number_gain\",\"variantFreqAll\":0.02703,\"id\":\"dgv1139e59\",\"sampleSize\":185,\"observedGains\":5,\"reciprocalOverlap\":0.01381}", annotatedVariant.ToString());
         }
 
         [Fact]
@@ -210,11 +210,10 @@ namespace UnitTests.InterfaceTests
         public void OverlappingTranscripts()
         {
             var annotationSource = ResourceUtilities.GetAnnotationSource(Resources.CacheGRCh37("chr1_89500_911300_Ensembl84_pos"), null) as NirvanaAnnotationSource;
-
             annotationSource?.EnableReportAllSvOverlappingTranscripts();
 
             var annotatedVariant = DataUtilities.GetVariant(annotationSource,
-                "chr1\t900000\t.\tG\t<DEL>\t.\tPASS\tEND=911300;SVTYPE=DEL");
+                VcfUtilities.GetVcfVariant("chr1\t900000\t.\tG\t<DEL>\t.\tPASS\tEND=911300;SVTYPE=DEL"));
             Assert.NotNull(annotatedVariant);
 
             var overlappingTranscriptIds =

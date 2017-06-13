@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using CacheUtils.DataDumperImport.FileHandling;
-using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.CreateCache.FileHandling
 {

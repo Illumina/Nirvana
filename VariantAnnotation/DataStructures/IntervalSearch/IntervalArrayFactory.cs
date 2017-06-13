@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
@@ -12,20 +13,13 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
         {
             if (refIntervals == null) return new NullIntervalSearch<T>();
 
-			//Array.Sort(refIntervals);
-            var intervalLists = new List<IntervalArray<T>.Interval>[numRefSeqs];
-            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<IntervalArray<T>.Interval>();
+            var intervalLists = new List<Interval<T>>[numRefSeqs];
+            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<T>>();
 
             foreach (var transcript in refIntervals)
             {
-				//debugging to see if both ensembl and refseq transcripts come up
-
-				//var Transcript = transcript as Transcript;
-				//if (Transcript?.TranscriptSource == TranscriptDataSource.RefSeq)
-				//	Console.WriteLine("found refseq transcript");
-
 				intervalLists[transcript.ReferenceIndex].Add(
-                    new IntervalArray<T>.Interval(transcript.Start, transcript.End, transcript));
+                    new Interval<T>(transcript.Start, transcript.End, transcript));
             }
 
             // create the interval arrays
@@ -38,61 +32,33 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
             return new IntervalForest<T>(refIntervalArrays);
         }
 
-        public static IIntervalForest<ISupplementaryInterval> CreateIntervalArray(
-            IEnumerable<ISupplementaryInterval> intervals, IChromosomeRenamer renamer)
+        public static IIntervalForest<IInterimInterval> CreateIntervalArray(
+            List<IInterimInterval> intervals, IChromosomeRenamer renamer)
         {
-            if (intervals == null) return new NullIntervalSearch<ISupplementaryInterval>();
-
+            if (intervals == null || intervals.Count == 0) return new NullIntervalSearch<IInterimInterval>();
             var numRefSeqs = renamer.NumRefSeqs;
 
-            var intervalLists = new List<IntervalArray<ISupplementaryInterval>.Interval>[numRefSeqs];
-            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<IntervalArray<ISupplementaryInterval>.Interval>();
+            var intervalLists = new List<Interval<IInterimInterval>>[numRefSeqs];
+            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<IInterimInterval>>();
 
             foreach (var interval in intervals)
             {
                 ushort index = renamer.GetReferenceIndex(interval.ReferenceName);
                 if (index == ChromosomeRenamer.UnknownReferenceIndex) continue;
 
-                intervalLists[index].Add(new IntervalArray<ISupplementaryInterval>.Interval(interval.Start, interval.End, interval));
+                intervalLists[index].Add(new Interval<IInterimInterval>(interval.Start, interval.End, interval));
             }
 
             // create the interval arrays
-            var refIntervalArrays = new IntervalArray<ISupplementaryInterval>[numRefSeqs];
+            var refIntervalArrays = new IntervalArray<IInterimInterval>[numRefSeqs];
             for (var i = 0; i < numRefSeqs; i++)
             {
                 var sortedIntervals = intervalLists[i].OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray();
-                refIntervalArrays[i] = new IntervalArray<ISupplementaryInterval>(sortedIntervals);
+                refIntervalArrays[i] = new IntervalArray<IInterimInterval>(sortedIntervals);
             }
 
-            return new IntervalForest<ISupplementaryInterval>(refIntervalArrays);
+            return new IntervalForest<IInterimInterval>(refIntervalArrays);
         }
 
-        public static IIntervalForest<ICustomInterval> CreateIntervalArray(IEnumerable<ICustomInterval> intervals, IChromosomeRenamer renamer)
-        {
-            if (intervals == null) return new NullIntervalSearch<ICustomInterval>();
-
-            var numRefSeqs = renamer.NumRefSeqs;
-
-            var intervalLists = new List<IntervalArray<ICustomInterval>.Interval>[numRefSeqs];
-            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<IntervalArray<ICustomInterval>.Interval>();
-
-            foreach (var interval in intervals)
-            {
-                ushort index = renamer.GetReferenceIndex(interval.ReferenceName);
-                if (index == ChromosomeRenamer.UnknownReferenceIndex) continue;
-
-                intervalLists[index].Add(new IntervalArray<ICustomInterval>.Interval(interval.Start, interval.End, interval));
-            }
-
-            // create the interval arrays
-            var refIntervalArrays = new IntervalArray<ICustomInterval>[numRefSeqs];
-            for (var i = 0; i < numRefSeqs; i++)
-            {
-                var sortedIntervals = intervalLists[i].OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray();
-                refIntervalArrays[i] = new IntervalArray<ICustomInterval>(sortedIntervals);
-            }
-
-            return new IntervalForest<ICustomInterval>(refIntervalArrays);
-        }
     }
 }

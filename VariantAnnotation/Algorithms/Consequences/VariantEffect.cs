@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Annotation;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
@@ -60,6 +62,7 @@ namespace VariantAnnotation.Algorithms.Consequences
             return ConsequenceType.Unknown;
 
         }
+
 
         /// <summary>
         /// returns true if the two intervals overlap (VariationEffect.pm:57)
@@ -821,7 +824,7 @@ namespace VariantAnnotation.Algorithms.Consequences
 			    x =>
 				    x.GeneName != _ta.BreakendTranscriptAnnotation.GeneName && x.InCodingRegion &&
 				    !x.IsTranscriptCodingRegionOverlapped(_ta.BreakendTranscriptAnnotation) &&
-				    x.TranscriptDataSource == _ta.BreakendTranscriptAnnotation.TranscriptDataSource);
+				    x.TranscriptDataSource == _ta.BreakendTranscriptAnnotation.TranscriptDataSource && x.IsTranscriptSuffix != _ta.BreakendTranscriptAnnotation.IsTranscriptSuffix);
 
 
 			_cache.Add(ConsequenceType.GeneFusion, result);
@@ -830,7 +833,18 @@ namespace VariantAnnotation.Algorithms.Consequences
 		}
 
 
+	    private bool IsShortTandemRepeatVariant()
+        {
+            return _altAllele.NirvanaVariantType == VariantType.short_tandem_repeat_variant
+                   || _altAllele.NirvanaVariantType == VariantType.short_tandem_repeat_expansion
+                   || _altAllele.NirvanaVariantType == VariantType.short_tandem_repeat_contraction;
+        }
 
-
+	    public ConsequenceType GetStrConsequenceType()
+	    {
+		    if (!IsShortTandemRepeatVariant()) return ConsequenceType.Unknown;
+			if (_altAllele.RefRepeatCount == _altAllele.RepeatCount) return ConsequenceType.ShortTandemRepeatChange;
+		    return _altAllele.RefRepeatCount > _altAllele.RepeatCount? ConsequenceType.ShortTandemRepeatContraction: ConsequenceType.ShortTandemRepeatExpansion;
+	    }
     }
 }

@@ -22,11 +22,13 @@
 		mobile_element_insertion      = 16,
 		mobile_element_deletion       = 17,
 		novel_sequence_insertion      = 18,
-		repeat_expansion              = 19,
-		
+		short_tandem_repeat_variant   = 19,
+	    short_tandem_repeat_expansion = 20,
+	    short_tandem_repeat_contraction = 21,
 
-		// CNVs
-		copy_number_variation         = 30,
+
+        // CNVs
+        copy_number_variation         = 30,
 		copy_number_loss              = 31,
 		copy_number_gain              = 32,
 

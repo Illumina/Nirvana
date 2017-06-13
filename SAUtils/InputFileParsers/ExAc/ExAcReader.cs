@@ -3,16 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.ExAc
 {
 	public sealed class ExacReader : IEnumerable<ExacItem>
 	{
 	    private readonly FileInfo _exacFileInfo;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
         private int[] _acAdj;
 		private int[] _acAfr;
@@ -35,13 +36,13 @@ namespace SAUtils.InputFileParsers.ExAc
 		private int _totalDepth;
 
 
-		public ExacReader(FileInfo exacInfo, ChromosomeRenamer renamer) : this(renamer)
+		public ExacReader(FileInfo exacInfo, IChromosomeRenamer renamer) : this(renamer)
 		{
 			_exacFileInfo = exacInfo;
 		}
 
         // for unit testing methods in exac reader
-        public ExacReader(ChromosomeRenamer renamer)
+        public ExacReader(IChromosomeRenamer renamer)
 		{
 		    _renamer = renamer;
 		}

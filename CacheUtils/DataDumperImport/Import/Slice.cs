@@ -174,11 +174,6 @@ namespace CacheUtils.DataDumperImport.Import
                     $"Unable to link the intron reference: intron index: [{intronIndex}], current # of introns: [{dataStore.Transcripts[transcriptIndex].VariantEffectCache.Introns.Length}]");
             }
 
-            // Console.WriteLine("reference: {0}", reference);
-            // Console.WriteLine("transcript index: {0}", transcriptIndex);
-            // Console.WriteLine("intron index: {0}", intronIndex);
-            // Environment.Exit(1);
-
             return dataStore.Transcripts[transcriptIndex].VariantEffectCache.Introns[intronIndex].Slice;
         }
     }

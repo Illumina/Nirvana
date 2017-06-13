@@ -5,8 +5,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.JSON;
+using VariantAnnotation.FileHandling.VCF;
 using VariantAnnotation.Utilities;
 
 namespace TrimAndUnifyVcfs

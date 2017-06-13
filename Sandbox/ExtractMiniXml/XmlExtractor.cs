@@ -2,7 +2,7 @@
 using System.IO;
 using System.Xml;
 using XmlTextReader = System.Xml.XmlReader;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Utilities;
 
 namespace ExtractMiniXml
@@ -41,7 +41,8 @@ namespace ExtractMiniXml
 					findRcv = rcvContents.Contains(_rcvId);
 					if (findRcv)
 						targetedContent = rcvContents;
-					existVarSet = xmlReader.ReadToNextSibling("ClinVarSet");
+					if(!xmlReader.IsStartElement("ClinVarSet"))
+						existVarSet = xmlReader.ReadToNextSibling("ClinVarSet");
 				}
 			
 

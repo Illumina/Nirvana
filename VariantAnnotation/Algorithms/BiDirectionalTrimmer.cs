@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Variants;
 
 namespace VariantAnnotation.Algorithms
 {
@@ -36,6 +36,9 @@ namespace VariantAnnotation.Algorithms
         {
             // do not trim if ref and alt are same
             if (refAllele == altAllele) return new Tuple<int, string, string>(start, refAllele, altAllele);
+
+	        if (refAllele == null) refAllele = "";
+	        if (altAllele == null) altAllele = "";
 
             // trimming at the start
             var i = 0;

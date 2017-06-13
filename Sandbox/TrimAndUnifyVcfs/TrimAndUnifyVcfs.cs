@@ -1,6 +1,6 @@
-﻿using VariantAnnotation.DataStructures;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
+﻿using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using VariantAnnotation.DataStructures;
 
 namespace TrimAndUnifyVcfs
 {

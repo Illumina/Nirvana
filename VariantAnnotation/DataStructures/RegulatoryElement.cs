@@ -1,5 +1,7 @@
 ﻿using System;
+using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace VariantAnnotation.DataStructures
 {
@@ -73,6 +75,7 @@ namespace VariantAnnotation.DataStructures
             writer.WriteOpt(Start);
             writer.WriteOpt(End);
             writer.Write((byte)Type);
+            // ReSharper disable once ImpureMethodCallOnReadonlyValueField
             Id.Write(writer);
         }
     }

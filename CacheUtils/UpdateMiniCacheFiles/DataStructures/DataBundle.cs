@@ -1,5 +1,6 @@
 ﻿using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.PredictionCache;
 using VariantAnnotation.Interface;

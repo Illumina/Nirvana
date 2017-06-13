@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
@@ -12,11 +12,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 		#region members
 
 		private readonly FileInfo _oneKGenSvFile;
-	    private readonly ChromosomeRenamer _renamer;
+	    private readonly IChromosomeRenamer _renamer;
 
 		#endregion
 
-		public OneKGenSvReader(FileInfo oneKGenSvFile, ChromosomeRenamer renamer)
+		public OneKGenSvReader(FileInfo oneKGenSvFile, IChromosomeRenamer renamer)
 		{
 			_oneKGenSvFile = oneKGenSvFile;
 		    _renamer       = renamer;
@@ -46,13 +46,13 @@ namespace SAUtils.InputFileParsers.OneKGen
 			}
 		}
 
-		private static OneKGenItem ExtractOneKGenSvItem(string line, ChromosomeRenamer renamer)
+		private static OneKGenItem ExtractOneKGenSvItem(string line, IChromosomeRenamer renamer)
 		{
 			var cols = line.Split('\t');
 			if (cols.Length < 8) return null;
 
 			var id = cols[0];
-			var chromosome = cols[1];
+			var chromosome = renamer.GetEnsemblReferenceName(cols[1]);
 			if (!InputFileParserUtilities.IsDesiredChromosome(chromosome, renamer)) return null;
 
 			var start = int.Parse(cols[2]);
@@ -76,14 +76,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 			var amrAlleleNumber = int.Parse(cols[67]);
 			var sasAlleleNumber = int.Parse(cols[69]);
 
-
-			//var seqAltType = SequenceAlteration.GetSequenceAlteration(variantType);
 			return new OneKGenItem(chromosome, start, id, null, null, null, 
 				afrFrequency, allFrequency, amrFrequency,easFrequency, eurFrequency, sasFrequency,
 				null,null,null,null,null,null,
 				allAlleleNumber, afrAlleleNumber, amrAlleleNumber, eurAlleleNumber, easAlleleNumber, sasAlleleNumber,
-				variantType, end, null, null, observedGains, observedLosses);
-
+				variantType, end, observedGains, observedLosses);
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()

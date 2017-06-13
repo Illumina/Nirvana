@@ -9,58 +9,59 @@
 
 $NirvanaRootDir="E:\Data\Nirvana"
 $NirvanaSourceDir="D:\Projects\Nirvana"
-$ExternalDataRootDir="\\ussd-prd-isi04\Nirvana\Development\ExternalDataSources"
+$ExternalDataRootDir="\\ussd-prd-isi04\Nirvana\Development\IntermediateTsvs"
 
 $RefVersion=5.2
-$currentSAversion=36.7
+$currentSAversion=39.1
 
 $GRCh37="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh37.Nirvana.dat"
 $GRCh38="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh38.Nirvana.dat"
 
 
-$miniSAGRCh37="$NirvanaSourceDir\NirvanaUnitTests\Resources\MiniSuppAnnot"
-$miniSAGRCh38="$NirvanaSourceDir\NirvanaUnitTests\Resources\MiniSuppAnnot\hg38"
+$miniSAGRCh37="$NirvanaSourceDir\UnitTests\Resources\MiniSuppAnnot"
+$miniSAGRCh38="$NirvanaSourceDir\UnitTests\Resources\MiniSuppAnnot\hg38"
 
 $SAOutGRCh37="$NirvanaRootDir\SupplementaryAnnotation\$currentSAversion\GRCh37"
 $SAOutGRCh38="$NirvanaRootDir\SupplementaryAnnotation\$currentSAversion\GRCh38"
 
 
-$CreateSupplementaryDatabase="$NirvanaSourceDir\x64\Release\SAUtils.exe createSA"
-$ExtractMiniSAdb="$NirvanaSourceDir\sandbox\x64\Release\ExtractMiniSAdb.exe"
+$CreateSupplementaryDatabase="dotnet $NirvanaSourceDir\bin\Release\netcoreapp1.1\SAUtils.dll createSA"
+$ExtractMiniSAdb="dotnet $NirvanaSourceDir\bin\Release\netcoreapp1.1\SAUtils.dll extractMiniSA"
 
 $SAisilonPath="\\ussd-prd-isi04\Nirvana\Development\SupplementaryDatabase\$currentSAversion"
 $PhylopFolder="\\ussd-prd-isi04\Nirvana\SupplementaryDatabase\PhyloP\latest"
-$OmimDatabase="\\ussd-prd-isi04\Nirvana\Development\OmimDatabase\1\genePhenotypeMap.mim"
+$OmimDatabase="\\ussd-prd-isi04\Nirvana\Development\OmimDatabase\3\genePhenotypeMap.mim"
 # ================
 # update files
 # ================
 
-$CVR="$ExternalDataRootDir\ClinVar\20160831\xml\ClinVarFullRelease_2016-09.xml.gz"
+$CVR37="$ExternalDataRootDir\2017-04\GRCh37\clinvar_20170403.tsv.gz"
+$DBS37="$ExternalDataRootDir\2017-04\GRCh37\dbsnp_150.tsv.gz"
+$GLOBAl37="$ExternalDataRootDir\2017-04\GRCh37\globalAllele_150.tsv.gz"
+$CSM37="$ExternalDataRootDir\2017-04\GRCh37\cosmic_80.tsv.gz"
+$DGV37="$ExternalDataRootDir\2017-04\GRCh37\dgv_20160515.interval.tsv.gz"
+$CLINGEN37="$ExternalDataRootDir\2017-04\GRCh37\clinGen_20160414.interval.tsv.gz"
 
-$DBS37="$ExternalDataRootDir\dbSNP\147\GRCh37\dbSNP_v147.lexi.vcf.gz"
-$CSM37="$ExternalDataRootDir\COSMIC\v78\GRCh37\VCF\allCosmicMutations_lexi.vcf.gz"
-$TSV37="$ExternalDataRootDir\COSMIC\v78\GRCh37\combinedMutationStudies.tsv.gz"
-$DGV37="$ExternalDataRootDir\DGV\2016-05-15\GRCh37\GRCh37_hg19_variants_2016-05-15_sorted.txt.gz"
-$CLINGEN37="$ExternalDataRootDir\ClinGen\2016-04-14_UCSC\GRCh37\ClinGen_GRCh37_unified_sorted.tsv.gz"
 
-$DBS38="$ExternalDataRootDir\dbSNP\147\GRCh38\dbSNP_v147.lexi.vcf.gz"
-$CSM38="$ExternalDataRootDir\COSMIC\v78\GRCh38\VCF\allCosmicMutations_lexi.vcf.gz"
-$TSV38="$ExternalDataRootDir\COSMIC\v78\GRCh38\combinedMutationStudies.tsv.gz"
-$DGV38="$ExternalDataRootDir\DGV\2016-05-15\GRCh38\GRCh38_hg38_variants_2016-05-15_sorted.txt.gz"
-$CLINGEN38="$ExternalDataRootDir\ClinGen\2016-04-14_UCSC\GRCh38\ClinGen_GRCh38_unified_sorted.tsv.gz"
+$CVR38="$ExternalDataRootDir\2017-04\GRCh38\clinvar_20170403.tsv.gz"
+$DBS38="$ExternalDataRootDir\2017-04\GRCh38\dbsnp_150.tsv.gz"
+$GLOBAl38="$ExternalDataRootDir\2017-04\GRCh38\globalAllele_150.tsv.gz"
+$CSM38="$ExternalDataRootDir\2017-04\GRCh38\cosmic_80.tsv.gz"
+$DGV38="$ExternalDataRootDir\2017-04\GRCh38\dgv_20160515.interval.tsv.gz"
+$CLINGEN38="$ExternalDataRootDir\2017-04\GRCh38\clinGen_unknown.interval.tsv.gz"
 
 # ==================
 # files won't update
 # ==================
-$ONEK37="$ExternalDataRootDir\1000Genomes\v5a\GRCh37\ALL_1000Genome_GRCh37_snvRes_5_20_2016_remove_conflicting_entries.removeExtraField.vcf.gz"
-$ONEKSV37="$ExternalDataRootDir\1000Genomes\v5a\GRCh37\ALL_1000Genome_svRes_4_6.txt.gz"
-$EXAC37="$ExternalDataRootDir\ExAc\0.3.1\GRCh37\ExAC.r0.3.1.sites.vep.sorted.vcf.gz"
-$EVS37="$ExternalDataRootDir\EVS\V2-SSA137\GRCh37\NirvanaFile\ESP6500SI-V2-SSA137.all.vcf.gz"
+$ONEK37="$ExternalDataRootDir\2017-04\GRCh37\oneKg_Phase_3_v5a.tsv.gz"
+$ONEKSV37="$ExternalDataRootDir\2017-04\GRCh37\oneKg_Phase_3_v5a.interval.tsv.gz"
+$EXAC37="$ExternalDataRootDir\2017-04\GRCh37\exac_0.3.1.tsv.gz"
+$EVS37="$ExternalDataRootDir\2017-04\GRCh37\evs_2.tsv.gz"
+$RefMinor37="$ExternalDataRootDir\2017-04\GRCh37\RefMinor_Phase_3_v5a.tsv.gz"
 
-$EVS38="$ExternalDataRootDir\EVS\V2-SSA137\GRCh38\allEvsSorted.vcf.gz"
-$ONEK38="$ExternalDataRootDir\1000Genomes\v5a\GRCh38\ALL_1000Genome_GRCh38_snvRes_5_23_2016_remove_conflicting_entries.removeExtraField.vcf.gz"
-
-
+$EVS38="$ExternalDataRootDir\2017-04\GRCh38\evs_2.tsv.gz"
+$ONEK38="$ExternalDataRootDir\2017-04\GRCh38\oneKg_Phase_3_v3plus.tsv.gz"
+$RefMinor38="$ExternalDataRootDir\2017-04\GRCh38\RefMinor_Phase_3_v3plus.tsv.gz"
 
 
 
@@ -101,10 +102,10 @@ mkdir $SAOutGRCh38
 
 	
 
-bg "SA-37" "$CreateSupplementaryDatabase --out $SAOutGRCh37 --ref $GRCh37 --dbs $DBS37 --csm $CSM37 --tsv $TSV37 --evs $EVS37 --cvr $CVR --onek $ONEK37  --onekSv $ONEKSV37 --dgv $DGV37 --clinGen $CLINGEN37 --exac $EXAC37"
+bg "SA-37" "$CreateSupplementaryDatabase --out $SAOutGRCh37 --ref $GRCh37 -t $DBS37 -t $CSM37 -t $EVS37 -t $CVR37 -t $ONEK37  -i $ONEKSV37 -i $DGV37 -i $CLINGEN37 -t $EXAC37 -t $GLOBAl37 -t $RefMinor37"
 
 
-bg "SA-38" "$CreateSupplementaryDatabase --out $SAOutGRCh38 --ref $GRCh38 --dbs $DBS38 --csm $CSM38 --tsv $TSV38 --evs $EVS38 --cvr $CVR --onek $ONEK38  --dgv $DGV38 --clinGen $CLINGEN38"
+bg "SA-38" "$CreateSupplementaryDatabase --out $SAOutGRCh38 --ref $GRCh38 -t $DBS38 -t $CSM38 -t $EVS38 -t $CVR38 -t $ONEK38  -i $DGV38 -i $CLINGEN38  -t $GLOBAl38 -t $RefMinor38"
 
 get-job|wait-job
 

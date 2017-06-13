@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Annotation;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Algorithms

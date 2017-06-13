@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace GffComparison
 {

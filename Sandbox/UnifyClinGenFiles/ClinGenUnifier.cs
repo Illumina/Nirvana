@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Interface;
 
 namespace UnifyClinGenFiles

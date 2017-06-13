@@ -1,5 +1,6 @@
 ﻿using System;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace CacheUtils.DataDumperImport.DataStructures
 {

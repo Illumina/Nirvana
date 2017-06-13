@@ -2,14 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Algorithms.Consequences;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Annotation;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.DataStructures.IntervalSearch;
 using VariantAnnotation.DataStructures.JsonAnnotations;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.Omim;
 using VariantAnnotation.FileHandling.PredictionCache;
@@ -34,8 +39,6 @@ namespace VariantAnnotation.AnnotationSources
         private readonly PredictionCacheReader _polyPhenReader;
         private readonly IConservationScoreReader _conservationScoreReader;
 
-        private readonly ISupplementaryAnnotationProvider _customAnnotationProvider;
-        private readonly ISupplementaryAnnotationProvider _customIntervalProvider;
         private readonly ISupplementaryAnnotationProvider _saProvider;
 
         // interval forests
@@ -46,8 +49,7 @@ namespace VariantAnnotation.AnnotationSources
         private bool _enableMitochondrialAnnotation;
         private bool _reportAllSvOverlappingTranscripts;
         private bool _hasConservationScores;
-        private readonly bool _hasOmimAnnotations;
-        private bool _enableReferenceNoCalls;
+	    private bool _enableReferenceNoCalls;
         private bool _limitReferenceNoCallsToTranscripts;
 
         private readonly List<IPlugin> _plugins = new List<IPlugin>();
@@ -59,7 +61,7 @@ namespace VariantAnnotation.AnnotationSources
         private HashSet<int> PartialOverlappingGeneHashCodes { get; }
 
         private UnifiedJson _json;
-        private readonly ILookup<string, OmimAnnotation> _omimGeneLookup;
+        private readonly Dictionary<string, List<OmimAnnotation>> _omimGeneDict;
 
         private readonly List<IDataSourceVersion> _dataSourceVersions = new List<IDataSourceVersion>();
         private readonly ICompressedSequence _compressedSequence;
@@ -92,23 +94,22 @@ namespace VariantAnnotation.AnnotationSources
         /// NOTE: we want to set up most "normal" things here. Leave custom annotations and custom intervals to other methods
         /// </summary>
         public NirvanaAnnotationSource(AnnotationSourceStreams streams, ISupplementaryAnnotationProvider saProvider,
-            IConservationScoreReader conservationScoreReader, ISupplementaryAnnotationProvider caProvider,
-            ISupplementaryAnnotationProvider ciProvider, string saDir)
+            IConservationScoreReader conservationScoreReader, IEnumerable<string> saDirs)
         {
-            OverlappingTranscripts          = new List<Transcript>();
+	        OverlappingTranscripts          = new List<Transcript>();
             OverlappingRegulatoryFeatures   = new List<RegulatoryElement>();
             OverlappingGeneSymbols          = new HashSet<string>();
             PartialOverlappingGeneHashCodes = new HashSet<int>();
 
-            _omimGeneLookup      = null;
+            _omimGeneDict      = null;
             _affectedGeneSymbols = new HashSet<string>();
             _aminoAcids          = new AminoAcids();
             _vid                 = new VID();
 
             // create omim database dictionary
-            var omimDatabaseReader = OmimDatabaseCommon.GetOmimDatabaseReader(saDir);
-            _hasOmimAnnotations = omimDatabaseReader != null;
-            _omimGeneLookup = _hasOmimAnnotations ? OmimDatabaseCommon.CreateGeneMapLookup(omimDatabaseReader) : null;
+            var omimDatabaseReader = OmimDatabaseCommon.GetOmimDatabaseReader(saDirs);
+            var hasOmimAnnotations = omimDatabaseReader != null;
+            _omimGeneDict = hasOmimAnnotations ? OmimDatabaseCommon.CreateGeneMapDict(omimDatabaseReader) : null;
             if (omimDatabaseReader != null) _dataSourceVersions.Add(omimDatabaseReader.DataVersion);
 
             _compressedSequence = new CompressedSequence();
@@ -116,16 +117,10 @@ namespace VariantAnnotation.AnnotationSources
             _dataFileManager = new DataFileManager(compressedSequenceReader, _compressedSequence);
             _dataFileManager.Changed += LoadData;
 
-            //_transcriptCache = LoadTranscriptCache(streams.Transcript, _compressedSequence.Renamer.NumRefSeqs,
-            //    out _transcriptIntervalForest, out _regulatoryIntervalForest, out _geneIntervalForest);
-
 	        _transcriptCache = InitiateCache(streams.Transcript);
 
             _siftReader              = streams.Sift != null ? new PredictionCacheReader(streams.Sift) : null;
             _polyPhenReader          = streams.PolyPhen != null ? new PredictionCacheReader(streams.PolyPhen) : null;
-
-            _customAnnotationProvider = caProvider;
-            _customIntervalProvider   = ciProvider;
             _saProvider               = saProvider;
 			_conservationScoreReader  = conservationScoreReader;
 
@@ -144,8 +139,6 @@ namespace VariantAnnotation.AnnotationSources
             if (_siftCache                != null) assemblies.Add(_siftCache.GenomeAssembly);
             if (_polyPhenCache            != null) assemblies.Add(_polyPhenCache.GenomeAssembly);
             if (_saProvider               != null) assemblies.Add(_saProvider.GenomeAssembly);
-            if (_customAnnotationProvider != null) assemblies.Add(_customAnnotationProvider.GenomeAssembly);
-            if (_customIntervalProvider   != null) assemblies.Add(_customIntervalProvider.GenomeAssembly);
             if (_conservationScoreReader  != null) assemblies.Add(_conservationScoreReader.GenomeAssembly);
 
 			//todo: temp fix, needs rethinking
@@ -162,28 +155,8 @@ namespace VariantAnnotation.AnnotationSources
         {
             if (_transcriptCache          != null) _dataSourceVersions.AddRange(_transcriptCache.DataSourceVersions);
             if (_saProvider               != null) _dataSourceVersions.AddRange(_saProvider.DataSourceVersions);
-            if (_customAnnotationProvider != null) _dataSourceVersions.AddRange(_customAnnotationProvider.DataSourceVersions);
-            if (_customIntervalProvider   != null) _dataSourceVersions.AddRange(_customIntervalProvider.DataSourceVersions);
             if (_conservationScoreReader  != null) _dataSourceVersions.AddRange(_conservationScoreReader.DataSourceVersions);
         }
-
-        /// <summary>
-        /// loads the transcript cache
-        /// </summary>
-        //private static GlobalCache LoadTranscriptCache(Stream stream, int numRefSeqs,
-        //    out IIntervalForest<Transcript> transcriptIntervalForest,
-        //    out IIntervalForest<RegulatoryElement> regulatoryIntervalForest,
-        //    out IIntervalForest<Gene> geneIntervalForest)
-        //{
-        //    GlobalCache cache;
-        //    using (var reader = new GlobalCacheReader(stream)) cache = reader.Read();
-
-        //    transcriptIntervalForest = IntervalArrayFactory.CreateIntervalForest(cache.Transcripts, numRefSeqs);
-        //    regulatoryIntervalForest = IntervalArrayFactory.CreateIntervalForest(cache.RegulatoryElements, numRefSeqs);
-        //    geneIntervalForest       = IntervalArrayFactory.CreateIntervalForest(cache.Genes, numRefSeqs);
-
-        //    return cache;
-        //}
 
 	    private static GlobalCache InitiateCache(Stream stream)
 	    {
@@ -211,10 +184,18 @@ namespace VariantAnnotation.AnnotationSources
             return _transcriptCache.Header.GenomeAssembly.ToString();
         }
 
-        public void AddGeneLevelAnnotation( List<string> annotatedGenes)
+        public List<IGeneAnnotation> GetGeneAnnotations()
         {
-            if (!_hasOmimAnnotations) return;
-            annotatedGenes.AddRange(from gene in AffectedGeneSymbols where _omimGeneLookup.Contains(gene) from annotation in _omimGeneLookup[gene] select annotation.ToString());
+            var annotatedGenes = new List<IGeneAnnotation>();
+            
+                foreach (var geneSymbol in AffectedGeneSymbols)
+                {
+                    if(_omimGeneDict.ContainsKey(geneSymbol))
+                        annotatedGenes.AddRange(_omimGeneDict[geneSymbol]);
+                       
+                }          
+            
+            return annotatedGenes;
         }
 
         /// <summary>
@@ -319,18 +300,16 @@ namespace VariantAnnotation.AnnotationSources
                 return;
             }
 
-            // retrieve the supplementary annotations
+			// retrieve the supplementary annotations
             _saProvider?.AddAnnotation(variant);
 
-            // return if this is not a ref but not ref minor
+            // return if this is a ref but not ref minor
             if (variant.IsReference && !variant.IsRefMinor)
             {
                 _json.AddVariantData(variant);
                 return;
             }
 
-            _customAnnotationProvider?.AddAnnotation(variant);
-            _customIntervalProvider?.AddAnnotation(variant);
 
             AssignConservationScores(variant);
             _dataFileManager.AssignCytogeneticBand(variant);
@@ -472,9 +451,14 @@ namespace VariantAnnotation.AnnotationSources
 
         private void GetOverlappingTranscripts(VariantFeature variant)
         {
-            _transcriptIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex,
-                variant.OverlapReferenceBegin - FlankingLength, variant.OverlapReferenceEnd + FlankingLength,
-                OverlappingTranscripts);
+			if (variant.IsRepeatExpansion)
+				_transcriptIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex,
+					variant.VcfReferenceBegin, variant.VcfReferenceEnd,
+					OverlappingTranscripts);
+			else 
+				_transcriptIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex,
+					variant.OverlapReferenceBegin - FlankingLength, variant.OverlapReferenceEnd + FlankingLength,
+					OverlappingTranscripts);
         }
 
         private void AnnotateAltAllele(VariantFeature variant, VariantAlternateAllele altAllele, Transcript transcript)
@@ -495,7 +479,7 @@ namespace VariantAnnotation.AnnotationSources
             _json.CreateAnnotationObject(transcript, altAllele);
 
             // handle upstream or downstream transcripts
-            if (!Overlap.Partial(transcript.Start, transcript.End, altAllele.Start, altAllele.End))
+            if (!Overlap.Partial(transcript.Start, transcript.End, altAllele.Start, altAllele.End) && !variant.IsRepeatExpansion)
             {
                 AddFlankingTranscript(ta, variant, transcript);
                 return;
@@ -529,15 +513,19 @@ namespace VariantAnnotation.AnnotationSources
                 taForHgvs.HasValidCdnaCodingStart = transcript.Translation.CodingRegion.CdnaStart > 0;
             }
 
-            MapCdnaCoordinates(transcript, taForHgvs, altAlleleAfterRotating);
-            GetCodingAnnotations(transcript, ta, taForHgvs, _compressedSequence);
-            AssignHgvsNotations(variant, altAllele, transcript, shiftToEnd, taForHgvs, isGenomicDuplicateAfterRotating, ta);
-            GetSiftPolyphen(variant, altAllele, transcript, ta);
+	        if (!variant.IsRepeatExpansion)
+	        {
+		        MapCdnaCoordinates(transcript, taForHgvs, altAlleleAfterRotating);
+		        GetCodingAnnotations(transcript, ta, taForHgvs, _compressedSequence);
+		        AssignHgvsNotations(variant, altAllele, transcript, shiftToEnd, taForHgvs, isGenomicDuplicateAfterRotating, ta);
+		        GetSiftPolyphen(variant, altAllele, transcript, ta);
 
-	        AnnotateBreakends(altAllele, transcript, ta);
+		        AnnotateBreakends(altAllele, transcript, ta);
 
-            // exon overlap-specific CSQ tags
-            _json.AddExonData(ta, exonNumber,altAllele.IsStructuralVariant);
+			}
+
+			// exon overlap-specific CSQ tags
+			_json.AddExonData(ta, exonNumber,altAllele.IsStructuralVariant);
 
             // intronic annotations
             IntronicAnnotation(variant, altAllele, transcript, ta, intronNumber, taForHgvs, isGenomicDuplicateAfterRotating);
@@ -636,13 +624,6 @@ namespace VariantAnnotation.AnnotationSources
         private static void GetProteinFunctionPrediction(PredictionCache cache, int predictionIndex, char newAminoAcid,
             int aaPosition, string[] descriptions, out string description, out string score)
         {
-			//todo: remove this block. It is a temp fix to make nirvana run without crashing on sift/polyphen
-	        //if (predictionIndex >= cache.PredictionCount)
-	        //{
-		       // description = null;
-		       // score = null;
-		       // return;
-	        //}
 	        var entry = cache.Predictions[predictionIndex].GetPrediction(newAminoAcid, aaPosition);
 
             if (entry == null)
@@ -955,9 +936,7 @@ namespace VariantAnnotation.AnnotationSources
             }
 
 			// load reference-specific files for our supplementary annotation providers
-			_saProvider?.Load(referenceNameData.UcscReferenceName,               _compressedSequence.Renamer);
-            _customAnnotationProvider?.Load(referenceNameData.UcscReferenceName, _compressedSequence.Renamer);
-            _customIntervalProvider?.Load(referenceNameData.UcscReferenceName,   _compressedSequence.Renamer);
+			_saProvider?.Load(referenceNameData.UcscReferenceName);
 
             // load our prediction caches
             _performanceMetrics.StartCache();
@@ -969,9 +948,6 @@ namespace VariantAnnotation.AnnotationSources
         {
             _conservationScoreReader?.Clear();
             _saProvider?.Clear();
-            _customAnnotationProvider?.Clear();
-            _customIntervalProvider?.Clear();
-
             _siftCache     = PredictionCache.Empty;
             _polyPhenCache = PredictionCache.Empty;
         }

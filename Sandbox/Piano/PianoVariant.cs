@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.DataStructures.Annotation;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
+using VariantAnnotation.FileHandling.VCF;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 

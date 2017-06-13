@@ -1,5 +1,5 @@
 ﻿using System;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures

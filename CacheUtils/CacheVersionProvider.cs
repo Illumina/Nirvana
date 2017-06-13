@@ -1,5 +1,6 @@
-﻿using VariantAnnotation.FileHandling.TranscriptCache;
-using VariantAnnotation.Utilities;
+﻿using CommandLine.Utilities;
+using CommandLine.VersionProvider;
+using VariantAnnotation.FileHandling.TranscriptCache;
 
 namespace CacheUtils
 {

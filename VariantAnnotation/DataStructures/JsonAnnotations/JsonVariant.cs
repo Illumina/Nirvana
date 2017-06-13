@@ -6,6 +6,8 @@ using VariantAnnotation.Algorithms;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace VariantAnnotation.DataStructures.JsonAnnotations
 {
@@ -20,202 +22,69 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 	{
         #region members
 
-        // -----------------
-        // position-specific
-        // -----------------
+	    private readonly IAllele _altAllele;
+	    private readonly IVariantFeature _variangFeature;
+	    public string VariantId => _altAllele.VariantId;
+	    public string VariantType => _altAllele.NirvanaVariantType.ToString();
+	    public string ReferenceName => _variangFeature.ReferenceName;
+	    public int? ReferenceBegin => _altAllele.Start;
+	    public int? ReferenceEnd => _altAllele.End;
 
-        public string VariantId { get; private set; }
-        public string VariantType { get; private set; }
-		public string ReferenceName { get; private set; }    // 1
-        public int? ReferenceBegin { get; private set; }     // 3452643
-        public int? ReferenceEnd { get; private set; }
+		public IList<IAnnotatedSA> SuppAnnotations { get; set; }
 
-
-        public string PhylopScore { get; set; } // 11.612
+		public string PhylopScore { get; internal set; } // 11.612
 
         public string AncestralAllele { get; set; }
-        public string EvsCoverage { get; set; }
-        public string EvsSamples { get; set; }
-        public string GlobalMinorAllele { get; set; }
-        public string RefAllele { get; private set; }
-        public string GlobalMinorAlleleFrequency { get; set; }
 
-        public int GenotypeIndex { get; }
+	    public string RefAllele => _variangFeature.IsRefMinor ? _altAllele.AlternateAllele : _altAllele.ReferenceAllele;
 
-        // ---------------
-        // allele-specific
-        // ---------------
+	    public int GenotypeIndex => _altAllele.GenotypeIndex;
 
-        public string AltAllele { get; private set; }
-        public string SaAltAllele { get; }
-        public bool IsReferenceMinor { get; private set; }
-        public bool IsReference { get; private set; }
-        public bool IsReferenceNoCall { get; private set; }
+
+        public string AltAllele => _variangFeature.IsRefMinor ? null : _altAllele.AlternateAllele;
+	    public string SaAltAllele => _altAllele.SuppAltAllele;
+	    public bool IsReferenceMinor => _variangFeature.IsRefMinor;
+	    public bool IsReference => _variangFeature.IsReference;
+	    public bool IsReferenceNoCall => _variangFeature.IsRefNoCall;
         public bool IsIntergenic { get; set; }
+        public bool IsRecomposedVariant { get; }
+
         public IList<IAnnotatedTranscript> RefSeqTranscripts { get; set; }
         public IList<IAnnotatedTranscript> EnsemblTranscripts { get; set; }
-		public ISet<IClinVar> ClinVarEntries {get;}
-	    public IList<ICosmic> CosmicEntries { get; }
-	    public IList<ICustomAnnotation> CustomItems { get; }
+
 
 	    public ISet<IRegulatoryRegion> RegulatoryRegions { get; }
 
 		public ISet<string> OverlappingGenes { get; }
 
-		public ISet<IOverlapTranscript> SvOverlappingTranscripts { get; }
+		public IList<IOverlapTranscript> SvOverlappingTranscripts { get; }
 
-		public string[] DbSnpIds {  get; set; } // rs6025
-
-        //---------------
-        // custom intervals
-        //-----------------
-	    public IList<ICustomInterval>  CustomIntervals { get; }
-
-
-
-
-        // super populations
-        public string AlleleFrequencyAll { get; set; }                      // ALL 0.1239
-        public string AlleleFrequencyAdMixedAmerican {  get; set; }          // AMR 0.1239
-        public string AlleleFrequencyAfrican {  get; set; }                  // AFR 0.1239
-        public string AlleleFrequencyEastAsian {  get; set; }                // EAS 0.1239
-        public string AlleleFrequencyEuropean {  get; set; }                 // EUR 0.1239
-        public string AlleleFrequencySouthAsian {  get; set; }               // SAS 0.1239
-
-
-        public string OneKgAlleleNumberAfrican {  get; set; }
-        public string OneKgAlleleNumberAmerican {  get; set; }
-        public string OneKgAlleleNumberAll {  get; set; }
-        public string OneKgAlleleNumberEastAsian {  get; set; }
-        public string OneKgAlleleNumberEuropean {  get; set; }
-        public string OneKgAlleleNumberSouthAsian {  get; set; }
-
-        public string OneKgAlleleCountAfrican {  get; set; }
-        public string OneKgAlleleCountAmerican {  get; set; }
-        public string OneKgAlleleCountAll {  get; set; }
-        public string OneKgAlleleCountEastAsian {  get; set; }
-        public string OneKgAlleleCountEuropean {  get; set; }
-        public string OneKgAlleleCountSouthAsian {  get; set; }
-
-
-        public string EvsAlleleFrequencyAfricanAmerican {  get; set; }       // African American 0.1239
-        public string EvsAlleleFrequencyEuropeanAmerican {  get; set; }      // European American 0.1239
-        public string EvsAlleleFrequencyAll { get; set; }
-
-        public string ExacCoverage { get; set; }
-        public string ExacAlleleFrequencyAfrican { get; set; }
-        public string ExacAlleleFrequencyAmerican { get; set; }
-        public string ExacAlleleFrequencyAll { get; set; }
-        public string ExacAlleleFrequencyEastAsian { get; set; }
-        public string ExacAlleleFrequencyFinish { get; set; }
-        public string ExacAlleleFrequencyNonFinish { get; set; }
-        public string ExacAlleleFrequencyOther { get; set; }
-        public string ExacAlleleFrequencySouthAsian { get; set; }
-
-        public string ExacAlleleNumberAfrican { get; set; }
-        public string ExacAlleleNumberAmerican { get; set; }
-        public string ExacAlleleNumberAll { get; set; }
-        public string ExacAlleleNumberEastAsian { get; set; }
-        public string ExacAlleleNumberFinish { get; set; }
-        public string ExacAlleleNumberNonFinish { get; set; }
-        public string ExacAlleleNumberOther { get; set; }
-        public string ExacAlleleNumberSouthAsian { get; set; }
-
-        public string ExacAlleleCountAfrican { get; set; }
-        public string ExacAlleleCountAmerican { get; set; }
-        public string ExacAlleleCountAll { get; set; }
-        public string ExacAlleleCountEastAsian { get; set; }
-        public string ExacAlleleCountFinish { get; set; }
-        public string ExacAlleleCountNonFinish { get; set; }
-        public string ExacAlleleCountOther { get; set; }
-        public string ExacAlleleCountSouthAsian { get; set; }
-
-
-
+        
         #endregion
 
-		#region stringConstants
+        #region stringConstants
 
-		const string AncestralAlleleTag        = "ancestralAllele";
-		const string AltAlleleTag              = "altAllele";
-		const string RefAlleleTag              = "refAllele";
-		const string BeginTag                  = "begin";
-		const string EndTag                    = "end";
-		const string ChromosomeTag             = "chromosome";
-		const string PhylopScoreTag            = "phylopScore";
-		const string DbsnpTag                  = "dbsnp";
-		const string GlobalMinorAlleleTag      = "globalMinorAllele";
-		const string GmafTag                   = "gmaf";
-		const string IsReferenceMinorAlleleTag = "isReferenceMinorAllele";
-		const string VariantTypeTag            = "variantType";
-		const string VidTag                    = "vid";
-		const string RegulatoryRegionsTag      = "regulatoryRegions";
-		const string ClinVarTag                = "clinVar";
-		const string CosmicTag                 = "cosmic";
-		const string OverlappingGenesTag       = "overlappingGenes";
-		const string TranscriptsTag             = "transcripts";
-		const string RefseqTag                 = "refSeq";
-		const string EnsemblTag                = "ensembl";
-		const string OverlappingTranscriptsTag = "overlappingTranscripts";
-
-		const string OneKgAllTag = "oneKgAll";
-		const string OneKgAfrTag = "oneKgAfr";
-		const string OneKgAmrTag = "oneKgAmr";
-		const string OneKgEasTag = "oneKgEas";
-		const string OneKgEurTag = "oneKgEur";
-		const string OneKgSasTag = "oneKgSas";
-		const string OneKgAllAnTag = "oneKgAllAn";
-		const string OneKgAfrAnTag = "oneKgAfrAn";
-		const string OneKgAmrAnTag = "oneKgAmrAn";
-		const string OneKgEasAnTag = "oneKgEasAn";
-		const string OneKgEurAnTag = "oneKgEurAn";
-		const string OneKgSasAnTag = "oneKgSasAn";
-		const string OneKgAllAcTag = "oneKgAllAc";
-		const string OneKgAfrAcTag = "oneKgAfrAc";
-		const string OneKgAmrAcTag = "oneKgAmrAc";
-		const string OneKgEasAcTag = "oneKgEasAc";
-		const string OneKgEurAcTag = "oneKgEurAc";
-		const string OneKgSasAcTag = "oneKgSasAc";
-
-		const string EvsCoverageTag = "evsCoverage";
-		const string EvsSamplesTag = "evsSamples";
-		const string EvsAllTag = "evsAll";
-		const string EvsAfrTag = "evsAfr";
-		const string EvsEurTag = "evsEur";
-
-		const string ExacCoverageTag = "exacCoverage";
-
-		const string ExacAllTag = "exacAll";
-		const string ExacAfrTag = "exacAfr";
-		const string ExacAmrTag = "exacAmr";
-		const string ExacEasTag = "exacEas";
-		const string ExacFinTag = "exacFin";
-		const string ExacNfeTag = "exacNfe";
-		const string ExacOthTag = "exacOth";
-		const string ExacSasTag = "exacSas";
-
-		const string ExacAllAnTag = "exacAllAn";
-		const string ExacAfrAnTag = "exacAfrAn";
-		const string ExacAmrAnTag = "exacAmrAn";
-		const string ExacEasAnTag = "exacEasAn";
-		const string ExacFinAnTag = "exacFinAn";
-		const string ExacNfeAnTag = "exacNfeAn";
-		const string ExacOthAnTag = "exacOthAn";
-		const string ExacSasAnTag = "exacSasAn";
-
-		const string ExacAllAcTag = "exacAllAc";
-		const string ExacAfrAcTag = "exacAfrAc";
-		const string ExacAmrAcTag = "exacAmrAc";
-		const string ExacEasAcTag = "exacEasAc";
-		const string ExacFinAcTag = "exacFinAc";
-		const string ExacNfeAcTag = "exacNfeAc";
-		const string ExacOthAcTag = "exacOthAc";
-		const string ExacSasAcTag = "exacSasAc";
-
-        #endregion
+        const string AncestralAlleleTag        = "ancestralAllele";
+        const string AltAlleleTag              = "altAllele";
+        const string RefAlleleTag              = "refAllele";
+        const string BeginTag                  = "begin";
+        const string EndTag                    = "end";
+        const string ChromosomeTag             = "chromosome";
+        const string PhylopScoreTag            = "phylopScore";
+        const string IsReferenceMinorAlleleTag = "isReferenceMinorAllele";
+        const string VariantTypeTag            = "variantType";
+        const string VidTag                    = "vid";
+        const string RegulatoryRegionsTag      = "regulatoryRegions";
+        const string OverlappingGenesTag       = "overlappingGenes";
+        const string TranscriptsTag            = "transcripts";
+        const string RefseqTag                 = "refSeq";
+        const string EnsemblTag                = "ensembl";
+        const string OverlappingTranscriptsTag = "overlappingTranscripts";
+		
+		#endregion
 
 
-        public sealed class SvOverlapTranscript : IOverlapTranscript
+		public sealed class SvOverlapTranscript : IOverlapTranscript
         {
             #region members
 
@@ -238,7 +107,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                 sb.Append(JsonObject.CloseBrace);
             }
 
-            public SvOverlapTranscript(DataStructures.Transcript transcript, VariantAlternateAllele altAllele)
+            public SvOverlapTranscript(DataStructures.Transcript.Transcript transcript, IAllele altAllele)
             {
                 TranscriptID      = TranscriptUtilities.GetTranscriptId(transcript);
                 IsCanonical       = transcript.IsCanonical ? "true" : null;
@@ -292,20 +161,12 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             public override bool Equals(object obj)
             {
                 var other = obj as RegulatoryRegion;
-
                 if (other == null) return false;
-
                 return ID == other.ID; //consequences are not the determinant factor
-
             }
 
-            public override int GetHashCode()
-            {
-                // ReSharper disable once NonReadonlyMemberInGetHashCode
-                return FowlerNollVoPrimeHash.ComputeHash(ID);
-            }
-
-
+            // ReSharper disable once NonReadonlyMemberInGetHashCode
+            public override int GetHashCode() => ID.GetHashCode();
         }
 
         public class Transcript : IAnnotatedTranscript
@@ -401,55 +262,27 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                 sb.Append(JsonObject.CloseBrace);
                 return sb.ToString();
             }
-
-
         }
 
-        //-------
-        // custom intervals
-        //--------
-
-
-
-        // constructor
-        public JsonVariant()
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public JsonVariant(IAllele altAllele, IVariantFeature variant)
         {
+            _altAllele = altAllele;
+            _variangFeature = variant;
+
+            PhylopScore    = altAllele.ConservationScore;
+            IsRecomposedVariant = altAllele.IsRecomposedVariant;
+	        
             RefSeqTranscripts        = new List<IAnnotatedTranscript>();
             EnsemblTranscripts       = new List<IAnnotatedTranscript>();
-            ClinVarEntries           = new HashSet<IClinVar>();
-            CosmicEntries            = new List<ICosmic>();
-            CustomItems              = new List<ICustomAnnotation>();
             RegulatoryRegions        = new HashSet<IRegulatoryRegion>();
-            CustomIntervals          = new List<ICustomInterval>();
             OverlappingGenes         = new HashSet<string>();
-            SvOverlappingTranscripts = new HashSet<IOverlapTranscript>();
+            SvOverlappingTranscripts = new List<IOverlapTranscript>();
+            SuppAnnotations          = new List<IAnnotatedSA>();
+
         }
-
-        private JsonVariant(VariantAlternateAllele altAllele) : this()
-        {
-            VariantId = altAllele.VariantId;
-            VariantType = altAllele.NirvanaVariantType.ToString();
-            ReferenceBegin = altAllele.Start;
-            ReferenceEnd = altAllele.End;
-            RefAllele = altAllele.ReferenceAllele;
-            AltAllele = altAllele.AlternateAllele;
-            SaAltAllele = altAllele.SuppAltAllele;
-            GenotypeIndex = altAllele.GenotypeIndex;
-        }
-
-        public JsonVariant(VariantAlternateAllele altAllele, VariantFeature variant) : this(altAllele)
-        {
-            IsReferenceMinor = variant.IsRefMinor;
-            IsReference = variant.IsReference;
-            IsReferenceNoCall = variant.IsRefNoCall;
-            PhylopScore = altAllele.ConservationScore;
-            ReferenceName = variant.ReferenceName;
-
-            // change the ref and alternate allele for ref minor
-            RefAllele = variant.IsRefMinor ? altAllele.AlternateAllele : altAllele.ReferenceAllele;
-            AltAllele = variant.IsRefMinor ? null : altAllele.AlternateAllele;
-        }
-
 
         /// <summary>
         /// adds a transcript to this variant
@@ -473,102 +306,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             transcripts.Add(transcript);
         }
 
-
-        /// <summary>
-        /// clears the data structure
-        /// </summary>
-        public void Clear()
-        {
-            AncestralAllele = null;
-            AltAllele = null;
-            ReferenceBegin = null;
-            ReferenceName = null;
-            DbSnpIds = null;
-            ReferenceEnd = null;
-            EvsCoverage = null;
-            EvsSamples = null;
-            ExacCoverage = null;
-            GlobalMinorAllele = null;
-            RefAllele = null;
-            IsReferenceMinor = false;
-            IsIntergenic = false;
-            IsReference = false;
-            IsReferenceNoCall = false;
-            GlobalMinorAlleleFrequency = null;
-            VariantId = null;
-            VariantType = null;
-            PhylopScore = null;
-
-
-            AlleleFrequencyAdMixedAmerican = null;
-            AlleleFrequencyAfrican = null;
-            AlleleFrequencyAll = null;
-            AlleleFrequencyEastAsian = null;
-            AlleleFrequencyEuropean = null;
-            AlleleFrequencySouthAsian = null;
-
-
-            EvsAlleleFrequencyAfricanAmerican = null;
-            EvsAlleleFrequencyEuropeanAmerican = null;
-            EvsAlleleFrequencyAll = null;
-
-            ExacAlleleFrequencyAll = null;
-            ExacAlleleFrequencyAfrican = null;
-            ExacAlleleFrequencyAmerican = null;
-            ExacAlleleFrequencyEastAsian = null;
-            ExacAlleleFrequencyFinish = null;
-            ExacAlleleFrequencyNonFinish = null;
-            ExacAlleleFrequencyOther = null;
-            ExacAlleleFrequencySouthAsian = null;
-
-            ExacAlleleNumberAfrican = null;
-            ExacAlleleNumberAmerican = null;
-            ExacAlleleNumberAll = null;
-            ExacAlleleNumberEastAsian = null;
-            ExacAlleleNumberFinish = null;
-            ExacAlleleNumberNonFinish = null;
-            ExacAlleleNumberOther = null;
-            ExacAlleleNumberSouthAsian = null;
-
-            ExacAlleleCountAfrican = null;
-            ExacAlleleCountAmerican = null;
-            ExacAlleleCountAll = null;
-            ExacAlleleCountEastAsian = null;
-            ExacAlleleCountFinish = null;
-            ExacAlleleCountNonFinish = null;
-            ExacAlleleCountOther = null;
-            ExacAlleleCountSouthAsian = null;
-
-
-            OneKgAlleleNumberAfrican = null;
-            OneKgAlleleNumberAmerican = null;
-            OneKgAlleleNumberAll = null;
-            OneKgAlleleNumberEastAsian = null;
-            OneKgAlleleNumberEuropean = null;
-            OneKgAlleleNumberSouthAsian = null;
-
-            OneKgAlleleCountAfrican = null;
-            OneKgAlleleCountAmerican = null;
-            OneKgAlleleCountAll = null;
-            OneKgAlleleCountEastAsian = null;
-            OneKgAlleleCountEuropean = null;
-            OneKgAlleleCountSouthAsian = null;
-
-            RefSeqTranscripts.Clear();
-            EnsemblTranscripts.Clear();
-
-            CosmicEntries.Clear();
-            ClinVarEntries.Clear();
-            RegulatoryRegions.Clear();
-            CustomItems.Clear();
-            CustomIntervals.Clear();
-			OverlappingGenes.Clear();
-			SvOverlappingTranscripts.Clear();
-        }
-
-		
-
-		/// <summary>
+	    /// <summary>
 		/// returns a string representation of our variant
 		/// </summary>
 		public override string ToString()
@@ -585,10 +323,11 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
             jsonObject.AddStringValue(AncestralAlleleTag, AncestralAllele);
 
+
             if (!IsReferenceMinor)
             {
-	            jsonObject.AddStringValue(AltAlleleTag, string.IsNullOrEmpty(AltAllele) ? "-" : AltAllele);
-                jsonObject.AddStringValue(RefAlleleTag, string.IsNullOrEmpty(RefAllele) ? "-" : RefAllele);
+				jsonObject.AddStringValue(AltAlleleTag, string.IsNullOrEmpty(AltAllele) ? "-" : AltAllele);
+				jsonObject.AddStringValue(RefAlleleTag, string.IsNullOrEmpty(RefAllele) ? "-" : RefAllele);
             }
             else
             {
@@ -599,26 +338,18 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 			jsonObject.AddStringValue(ChromosomeTag, ReferenceName);
 
 			jsonObject.AddStringValue(PhylopScoreTag , PhylopScore, false);
-            jsonObject.AddStringValues(DbsnpTag, DbSnpIds);
             jsonObject.AddIntValue(EndTag, ReferenceEnd);
-			jsonObject.AddStringValue(GlobalMinorAlleleTag, GlobalMinorAllele);
-			jsonObject.AddStringValue(GmafTag, GlobalMinorAlleleFrequency, false);
             jsonObject.AddBoolValue(IsReferenceMinorAlleleTag, true, IsReferenceMinor, "true");
 			jsonObject.AddStringValue(VariantTypeTag, VariantType);
 			jsonObject.AddStringValue(VidTag, VariantId);
+            jsonObject.AddBoolValue("isRecomposedVariant", true, IsRecomposedVariant, "true");
 
             // regulatory regions
             if (RegulatoryRegions.Count > 0) jsonObject.AddObjectValues(RegulatoryRegionsTag, RegulatoryRegions);
 
-            // ClinVar & COSMIC
-            if (ClinVarEntries.Count > 0) jsonObject.AddObjectValues(ClinVarTag, ClinVarEntries);
-            if (CosmicEntries.Count > 0) jsonObject.AddObjectValues(CosmicTag, CosmicEntries);
-            // Custom annotations
-            if (CustomItems.Count > 0) AddCustomeItems(jsonObject);
+			//add SA 
 
-            // Custom Intervals
-            // if (CustomIntervals.Count > 0) jsonObject.AddObjectValues(CustomIntervals[0].Type, CustomIntervals);
-            if (CustomIntervals.Count > 0) AddCustomeIntervals(jsonObject);
+			if (SuppAnnotations.Count > 0) AddSAstoJsonObject(jsonObject);
 
 
 			// =================
@@ -656,109 +387,58 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                 jsonObject.CloseObject();
             }
 
-            // =======
-            // allelic
-            // =======
-
-            jsonObject.Reset(true);
-
-			jsonObject.AddStringValue(OneKgAllTag, AlleleFrequencyAll, false);
-			jsonObject.AddStringValue(OneKgAfrTag, AlleleFrequencyAfrican, false);
-			jsonObject.AddStringValue(OneKgAmrTag, AlleleFrequencyAdMixedAmerican, false);
-			jsonObject.AddStringValue(OneKgEasTag, AlleleFrequencyEastAsian, false);
-			jsonObject.AddStringValue(OneKgEurTag, AlleleFrequencyEuropean, false);
-			jsonObject.AddStringValue(OneKgSasTag, AlleleFrequencySouthAsian, false);
-
-
-			jsonObject.AddStringValue(OneKgAllAnTag, OneKgAlleleNumberAll, false);
-			jsonObject.AddStringValue(OneKgAfrAnTag, OneKgAlleleNumberAfrican, false);
-			jsonObject.AddStringValue(OneKgAmrAnTag, OneKgAlleleNumberAmerican, false);
-			jsonObject.AddStringValue(OneKgEasAnTag, OneKgAlleleNumberEastAsian, false);
-			jsonObject.AddStringValue(OneKgEurAnTag, OneKgAlleleNumberEuropean, false);
-			jsonObject.AddStringValue(OneKgSasAnTag, OneKgAlleleNumberSouthAsian, false);
-
-			jsonObject.AddStringValue(OneKgAllAcTag, OneKgAlleleCountAll, false);
-			jsonObject.AddStringValue(OneKgAfrAcTag, OneKgAlleleCountAfrican, false);
-			jsonObject.AddStringValue(OneKgAmrAcTag, OneKgAlleleCountAmerican, false);
-			jsonObject.AddStringValue(OneKgEasAcTag, OneKgAlleleCountEastAsian, false);
-			jsonObject.AddStringValue(OneKgEurAcTag, OneKgAlleleCountEuropean, false);
-			jsonObject.AddStringValue(OneKgSasAcTag, OneKgAlleleCountSouthAsian, false);
-
-
-			jsonObject.AddStringValue(EvsCoverageTag, EvsCoverage, false);
-			jsonObject.AddStringValue(EvsSamplesTag, EvsSamples, false);
-			jsonObject.AddStringValue(EvsAllTag, EvsAlleleFrequencyAll, false);
-            jsonObject.AddStringValue(EvsAfrTag, EvsAlleleFrequencyAfricanAmerican, false);
-            jsonObject.AddStringValue(EvsEurTag, EvsAlleleFrequencyEuropeanAmerican, false);
-
-
-			jsonObject.AddStringValue(ExacCoverageTag, ExacCoverage , false);
-			jsonObject.AddStringValue(ExacAllTag, ExacAlleleFrequencyAll, false);
-			jsonObject.AddStringValue(ExacAfrTag, ExacAlleleFrequencyAfrican, false);
-			jsonObject.AddStringValue(ExacAmrTag, ExacAlleleFrequencyAmerican, false);
-			jsonObject.AddStringValue(ExacEasTag, ExacAlleleFrequencyEastAsian, false);
-			jsonObject.AddStringValue(ExacFinTag, ExacAlleleFrequencyFinish, false);
-			jsonObject.AddStringValue(ExacNfeTag, ExacAlleleFrequencyNonFinish, false);
-			jsonObject.AddStringValue(ExacOthTag, ExacAlleleFrequencyOther, false);
-			jsonObject.AddStringValue(ExacSasTag, ExacAlleleFrequencySouthAsian, false);
-
-			jsonObject.AddStringValue(ExacAllAnTag, ExacAlleleNumberAll, false);
-			jsonObject.AddStringValue(ExacAfrAnTag, ExacAlleleNumberAfrican, false);
-			jsonObject.AddStringValue(ExacAmrAnTag, ExacAlleleNumberAmerican, false);
-			jsonObject.AddStringValue(ExacEasAnTag, ExacAlleleNumberEastAsian, false);
-			jsonObject.AddStringValue(ExacFinAnTag, ExacAlleleNumberFinish, false);
-			jsonObject.AddStringValue(ExacNfeAnTag, ExacAlleleNumberNonFinish, false);
-			jsonObject.AddStringValue(ExacOthAnTag, ExacAlleleNumberOther, false);
-			jsonObject.AddStringValue(ExacSasAnTag, ExacAlleleNumberSouthAsian, false);
-
-			jsonObject.AddStringValue(ExacAllAcTag, ExacAlleleCountAll, false);
-			jsonObject.AddStringValue(ExacAfrAcTag, ExacAlleleCountAfrican, false);
-			jsonObject.AddStringValue(ExacAmrAcTag, ExacAlleleCountAmerican, false);
-			jsonObject.AddStringValue(ExacEasAcTag, ExacAlleleCountEastAsian, false);
-			jsonObject.AddStringValue(ExacFinAcTag, ExacAlleleCountFinish, false);
-			jsonObject.AddStringValue(ExacNfeAcTag, ExacAlleleCountNonFinish, false);
-			jsonObject.AddStringValue(ExacOthAcTag, ExacAlleleCountOther, false);
-			jsonObject.AddStringValue(ExacSasAcTag, ExacAlleleCountSouthAsian, false);
             sb.Append(JsonObject.CloseBrace);
             return sb.ToString();
         }
 
-	    private void AddCustomeItems(JsonObject jsonObject)
-	    {
-		    var customGroups = new Dictionary<string, IList<ICustomAnnotation>>();
-		    foreach (var customItem in CustomItems)
-		    {
-			    var type = customItem.AnnotationType;
-			    if (customGroups.ContainsKey(type))
-				    customGroups[type].Add(customItem);
-			    else
-			    {
-				    customGroups[type] = new List<ICustomAnnotation> {customItem};
-			    }
-		    }
-		    foreach (var customGroup in customGroups)
-		    {
-			    jsonObject.AddObjectValues(customGroup.Key, customGroup.Value);
-		    }
-	    }
+        private void AddSAstoJsonObject(JsonObject jsonObject)
+        {
+            var saDict = new Dictionary<string, Tuple<bool, List<string>>>();
+            foreach (var sa in SuppAnnotations)
+            {
+                if (!saDict.ContainsKey(sa.KeyName))
+                {
+                    saDict[sa.KeyName] = new Tuple<bool, List<string>>(sa.IsArray, new List<string>());
+                }
 
-	    private void AddCustomeIntervals(JsonObject jsonObject)
-		{
-			var intervalGroups = new Dictionary<string, List<ICustomInterval>>();
-			foreach (var customInterval in CustomIntervals)
-			{
-				var type = customInterval.Type;
-				if (intervalGroups.ContainsKey(type))
-					intervalGroups[type].Add(customInterval);
-				else
-				{
-					intervalGroups[type] = new List<ICustomInterval> { customInterval };
-				}
-			}
-			foreach (var intervalGroup in intervalGroups)
-			{
-				jsonObject.AddObjectValues(intervalGroup.Key, intervalGroup.Value);
-			}
-		}
-    }
+                var jsonStrings = sa.GetStrings("json");
+                if (jsonStrings != null) saDict[sa.KeyName].Item2.AddRange(jsonStrings);
+            }
+
+            foreach (var kvp in saDict)
+            {
+                if (kvp.Value.Item1)
+                {
+                    jsonObject.AddStringValues(kvp.Key, kvp.Value.Item2, false);
+                }
+                else
+                {
+                    jsonObject.AddStringValue(kvp.Key, kvp.Value.Item2[0], false);
+                }
+            }
+        }
+
+        public void AddSaDataSources(List<ISaDataSource> saDataSources)
+	    {
+            if (SuppAnnotations == null) SuppAnnotations = new List<IAnnotatedSA>();
+	        if (saDataSources.Count == 0) return;
+
+	        foreach (var dataSource in saDataSources)
+	        {
+                if (dataSource.MatchByAllele && dataSource.AltAllele != SaAltAllele) continue;
+
+                AnnotatedSaItem annotatedSaItem;
+
+                if (!dataSource.MatchByAllele && dataSource.AltAllele == SaAltAllele)
+                {
+                    annotatedSaItem = new AnnotatedSaItem(dataSource, true);
+                    SuppAnnotations.Add(annotatedSaItem);
+                    continue;
+                }
+
+                annotatedSaItem = new AnnotatedSaItem(dataSource, null);
+                SuppAnnotations.Add(annotatedSaItem);
+            }
+	    }
+	}
 }

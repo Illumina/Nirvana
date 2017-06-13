@@ -53,10 +53,7 @@ namespace VariantAnnotation.FileHandling
                 EnsureCanSeek();
                 return _stream.Position + (_readPos - _readLen);
             }
-            set
-            {
-                throw new NotImplementedException();
-            }
+            set => throw new NotImplementedException();
         }
 
         public override int ReadByte()
@@ -117,10 +114,9 @@ namespace VariantAnnotation.FileHandling
         /// </summary>
         public PeekStream(Stream stream, int bufferSize = DefaultBufferSize)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (bufferSize <= 0) throw new ArgumentOutOfRangeException(nameof(bufferSize));
+	        if (bufferSize <= 0) throw new ArgumentOutOfRangeException(nameof(bufferSize));
 
-            _stream = stream;
+            _stream = stream ?? throw new ArgumentNullException(nameof(stream));
             _bufferSize = bufferSize;
             _buffer = new byte[_bufferSize];
 

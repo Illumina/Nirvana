@@ -4,14 +4,16 @@
     <OutputPath>..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170125-04" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
-    <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
+    <PackageReference Include="Moq" Version="4.7.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
+    <PackageReference Include="xunit" Version="2.2.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
-    <ProjectReference Include="..\NDesk.Options\NDesk.Options.csproj" />
+    <ProjectReference Include="..\Jasix\Jasix.csproj" />
+    <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
     <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />

@@ -1,7 +1,9 @@
 ﻿using System;
 using VariantAnnotation.Algorithms.Consequences;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Annotation;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Algorithms
@@ -98,7 +100,7 @@ namespace VariantAnnotation.Algorithms
             // check if this is a stop retained variant
             if (_variantEffect.IsStopRetained())
             {
-                _ta.HgvsProteinSequenceName = $"{_ta.HgvsCodingSequenceName}(p.=)";
+                _ta.HgvsProteinSequenceName = GetSilentHgvsProteinFormat(_ta);
                 return;
             }
 
@@ -111,20 +113,32 @@ namespace VariantAnnotation.Algorithms
             if (_hgvsNotation.Type != ProteinChange.None)
             {
                 _hgvsNotation.Type = GetSpecificProteinChange();
-
-                // convert ref & alt peptides taking into account HGVS rules
-                GetHgvsPeptides(_ta);
             }
+
+            // convert ref & alt peptides taking into account HGVS rules
+            GetHgvsPeptides(_ta);
 
             // no protein change - return transcript nomenclature with flag for neutral protein consequence
             if (_hgvsNotation.Type == ProteinChange.None)
             {
-                _ta.HgvsProteinSequenceName = $"{_ta.HgvsCodingSequenceName}(p.=)";
+                _ta.HgvsProteinSequenceName = GetSilentHgvsProteinFormat(_ta);
                 return;
             }
 
             // string formatting
             _ta.HgvsProteinSequenceName = GetHgvsProteinFormat(_ta);
+        }
+
+        /// <summary>
+        /// return the hgvs protein nomenclature for silent mutation
+        /// </summary>
+        /// <param name="ta"></param>
+        /// <returns></returns>
+        private string GetSilentHgvsProteinFormat(TranscriptAnnotation ta)
+        {
+
+            if(_variantEffect.IsStopRetained()) return ta.HgvsCodingSequenceName + "(p.(Ter" + ta.ProteinBegin + "=))";
+            return ta.HgvsCodingSequenceName + "(p.(" + _hgvsNotation.ReferenceAbbreviation + ta.ProteinBegin + "=))";
         }
 
         /// <summary>
@@ -274,7 +288,7 @@ namespace VariantAnnotation.Algorithms
         /// </summary>
         private string GetHgvsProteinFormat(TranscriptAnnotation ta)
         {
-            var ret = _hgvsNotation.ProteinId + ":p.";
+            var ret = _hgvsNotation.ProteinId + ":p.(";
 
             // handle stop_lost seperately regardless of cause by del/delins => p.TerposAA1extnum_AA_to_stop
             if (_variantEffect.IsStopLost())
@@ -312,7 +326,7 @@ namespace VariantAnnotation.Algorithms
                     break;
             }
 
-            return ret;
+            return ret == null?null: ret +")";
         }
 
         private string GetDupHgvsProtein(string ret)
@@ -430,7 +444,7 @@ namespace VariantAnnotation.Algorithms
                 else _hgvsNotation.AlternateAbbreviation += "extTer?";
             }
 
-            return ret + _hgvsNotation.ReferenceAbbreviation + _hgvsNotation.Start + _hgvsNotation.AlternateAbbreviation;
+            return ret + _hgvsNotation.ReferenceAbbreviation + _hgvsNotation.Start + _hgvsNotation.AlternateAbbreviation+")";
         }
 
         /// <summary>
@@ -506,9 +520,6 @@ namespace VariantAnnotation.Algorithms
         private string GetSurroundingPeptides(int pos)
         {
             var peptide = _transcript.Translation.PeptideSeq;
-
-            //removed since we do not want to change the peptide in transcript
-            //if (_hgvsNotation.OriginalReferenceAminoAcids != null) peptide += _hgvsNotation.OriginalReferenceAminoAcids;
 
             // sanity check: make sure we have enough peptides
             if (peptide.Length < pos + 1) return null;

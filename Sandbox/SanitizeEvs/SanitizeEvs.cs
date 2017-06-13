@@ -3,10 +3,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
 
 namespace SanitizeEvs
 {

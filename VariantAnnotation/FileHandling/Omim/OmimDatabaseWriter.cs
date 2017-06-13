@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Utilities;
 

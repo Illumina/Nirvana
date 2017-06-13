@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 
@@ -15,17 +16,38 @@ namespace VariantAnnotation.FileHandling.Omim
         public const string OmimDatabaseFileName = "genePhenotypeMap.mim";
         #endregion
 
-        public static ILookup<string, OmimAnnotation> CreateGeneMapLookup(OmimDatabaseReader omimDatabaseReader)
+        public static Dictionary<string, List<OmimAnnotation>> CreateGeneMapDict(OmimDatabaseReader omimDatabaseReader)
         {
-            var omimLookup = omimDatabaseReader?.Read().ToLookup((omimEntry) => omimEntry.Hgnc, (omimEntry) => omimEntry);
-            return omimLookup;
+
+            if (omimDatabaseReader == null) return null;
+            var omimGeneDict = new Dictionary<string,List<OmimAnnotation>>(); 
+
+            foreach (var omimAnnotation in omimDatabaseReader.Read())
+            {
+                if (!omimGeneDict.ContainsKey(omimAnnotation.Hgnc))
+                {
+                    omimGeneDict[omimAnnotation.Hgnc] = new List<OmimAnnotation>();
+                }
+                omimGeneDict[omimAnnotation.Hgnc].Add(omimAnnotation);
+            }
+
+            return omimGeneDict;
         }
 
-        public static OmimDatabaseReader GetOmimDatabaseReader(string omimDatabaseDir)
+        public static OmimDatabaseReader GetOmimDatabaseReader(IEnumerable<string> omimDatabaseDirs)
         {
-            if (string.IsNullOrEmpty(omimDatabaseDir)) return null;
-            var omimFile = Path.Combine(omimDatabaseDir, OmimDatabaseFileName);
-            return !File.Exists(omimFile) ? null : new OmimDatabaseReader(omimFile);
+            if (omimDatabaseDirs == null) return null;
+
+            var omimDirs = omimDatabaseDirs.ToList();
+            if (!omimDirs.Any()) return null;
+
+	        foreach (var omimDatabaseDir in omimDirs)
+	        {
+				var omimFile = Path.Combine(omimDatabaseDir, OmimDatabaseFileName);
+				if(File.Exists(omimFile)) return new OmimDatabaseReader(omimFile);
+			}
+
+	        return null;
         }
     }
 }

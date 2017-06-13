@@ -1,7 +1,8 @@
-﻿using Piano;
+﻿using System;
+using Piano;
 using UnitTests.Utilities;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.FileHandling;
 using Xunit;
 
@@ -40,6 +41,7 @@ namespace UnitTests
         [Fact]
         public void MissenseMutationAtTss()
         {
+            Console.WriteLine(Resources.Top);
             var annotationSource = GetAnnotationSource("ENST00000339381_chr1_Ensembl84.ndb");
             var annotatedVariant = GetVariant(annotationSource, "chr1	1266726	.	A	T	.	.	.");
             var expectedOut = "chr1\t1266726\tA\tT\tTAS1R3\tENSG00000169962\tENST00000339381\tENSP00000344411\t1\t.\tM/L\tLGPAVLGLSLWALLH\tstart_lost\n";

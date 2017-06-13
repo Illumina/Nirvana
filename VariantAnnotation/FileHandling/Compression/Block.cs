@@ -13,28 +13,29 @@ namespace VariantAnnotation.FileHandling.Compression
 
         private readonly byte[] _compressedBlock;
         private readonly byte[] _uncompressedBlock;
+
+        public long FileOffset { get; private set; }
         public int Offset { get; internal set; }
 
-        internal const int Size = 16777216;
+        internal const int DefaultSize = 16777216;
+        private readonly int _size;
         private readonly int _compressedBlockSize;
 
-        public bool IsFull => Offset == Size;
+        public bool IsFull => Offset == _size;
         public bool HasMoreData => Offset < _header.NumUncompressedBytes;
-
-        public int NumFullBlocks;
 
         #endregion
 
         /// <summary>
         /// constructor
         /// </summary>
-        public Block(ICompressionAlgorithm compressionAlgorithm)
+        public Block(ICompressionAlgorithm compressionAlgorithm,int size=DefaultSize)
         {
             _compressionAlgorithm = compressionAlgorithm;
             Offset = 0;
-
-            _uncompressedBlock   = new byte[Size];
-            _compressedBlockSize = compressionAlgorithm.GetCompressedBufferBounds(Size);
+	        _size = size;
+            _uncompressedBlock   = new byte[_size];
+            _compressedBlockSize = compressionAlgorithm.GetCompressedBufferBounds(_size);
             _compressedBlock     = new byte[_compressedBlockSize];
             
             _header = new BlockHeader();
@@ -48,7 +49,7 @@ namespace VariantAnnotation.FileHandling.Compression
         /// <param name="count">The maximum number of bytes to copy.</param>
         public int CopyTo(byte[] array, int offset, int count)
         {
-            int copyLength = Math.Min(Size - Offset, count);
+            int copyLength = Math.Min(_size - Offset, count);
             if (copyLength == 0) return 0;
 
             Buffer.BlockCopy(array, offset, _uncompressedBlock, Offset, copyLength);
@@ -98,7 +99,6 @@ namespace VariantAnnotation.FileHandling.Compression
             }
 
             Offset = 0;
-            NumFullBlocks++;
         }
 
         /// <summary>
@@ -118,6 +118,8 @@ namespace VariantAnnotation.FileHandling.Compression
         /// <param name="stream">The stream that will read the compressed data.</param>
         public int Read(Stream stream)
         {
+            FileOffset = stream.Position;
+
             _header.Read(stream);
 
             if (_header.IsEmpty) return -1;
@@ -127,7 +129,6 @@ namespace VariantAnnotation.FileHandling.Compression
                 : ReadCompressedBlock(stream);
 
             Offset = 0;
-            NumFullBlocks++;
 
             return BlockHeader.HeaderSize + numBytesRead;
         }
@@ -140,7 +141,7 @@ namespace VariantAnnotation.FileHandling.Compression
                 throw new IOException($"Expected {_header.NumCompressedBytes} bytes from the block, but received only {numBytesRead} bytes.");
             }
 
-            int numUncompressedBytes = _compressionAlgorithm.Decompress(_compressedBlock, _header.NumCompressedBytes, _uncompressedBlock, Size);
+            int numUncompressedBytes = _compressionAlgorithm.Decompress(_compressedBlock, _header.NumCompressedBytes, _uncompressedBlock, _size);
             if (numUncompressedBytes != _header.NumUncompressedBytes)
             {
                 throw new CompressionException($"Expected {_header.NumUncompressedBytes} bytes after decompression, but found only {numUncompressedBytes} bytes.");

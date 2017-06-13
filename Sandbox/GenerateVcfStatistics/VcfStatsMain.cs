@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.JsonAnnotations;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.DataStructures.Variants;
+using VariantAnnotation.FileHandling.VCF;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 

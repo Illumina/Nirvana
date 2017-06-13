@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.VCF;
 
 namespace VariantAnnotation.DataStructures.VCF
 {
@@ -21,7 +21,9 @@ namespace VariantAnnotation.DataStructures.VCF
         public int? NR { get; private set; }
         public int? NV { get; private set; }
         public string[] AltAlleles { get; }
-		public int? DenovoQuality { get; private set; }
+		public string RepeatNumber { get; }
+        public string RepeatNumberSpan { get; }
+        public int? DenovoQuality { get; }
 
         // constructor
         public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols, bool fixGatkGenomeVcf = false)
@@ -32,15 +34,28 @@ namespace VariantAnnotation.DataStructures.VCF
 
 	        if (formatIndices.MCC != null)
 	        {
-		        MajorChromosomeCount = int.Parse(sampleCols[formatIndices.MCC.Value]);
+				if (sampleCols[formatIndices.MCC.Value] != ".")
+					MajorChromosomeCount = int.Parse(sampleCols[formatIndices.MCC.Value]);
 	        }
 
 	        if (formatIndices.CN != null)
 	        {
-		        CopyNumber = int.Parse(sampleCols[formatIndices.CN.Value]);
-	        }
+		        if (vcfColumns[VcfCommon.AltIndex].Contains("STR"))
+		        {
+			        RepeatNumber = sampleCols[formatIndices.CN.Value];
+			        CopyNumber = null;
+		        }
+				else CopyNumber = int.Parse(sampleCols[formatIndices.CN.Value]);
+			}
+            if (formatIndices.CI != null)
+            {
+                if (sampleCols[formatIndices.CI.Value] != ".")
+                {
+                    RepeatNumberSpan = sampleCols[formatIndices.CI.Value];
+                }
+            }
 
-	        if (fixGatkGenomeVcf && formatIndices.AD !=null)
+            if (fixGatkGenomeVcf && formatIndices.AD !=null)
 	        {
 				sampleCols[formatIndices.AD.Value] = CorrectAdInGatkGenomeVcf(sampleCols[formatIndices.AD.Value]);
 	        }

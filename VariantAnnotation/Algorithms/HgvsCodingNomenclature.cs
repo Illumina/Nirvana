@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using System.Text;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Annotation;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
 
 namespace VariantAnnotation.Algorithms
 {
@@ -242,8 +244,16 @@ namespace VariantAnnotation.Algorithms
                 ? _transcript.End - position + 1
                 : _transcript.Start + position - 1;
 
-            // loop over the exons and get the coordinates of the variation in exon+intron notation
+            if (position > _transcript.End || position < _transcript.Start)
+            {
+                po.Position = null;
+                return;
+            }
+
+
             var exons = _transcript.CdnaMaps;
+
+            // loop over the exons and get the coordinates of the variation in exon+intron notation
 
             for (int exonIndex = 0; exonIndex < exons.Length; exonIndex++)
             {

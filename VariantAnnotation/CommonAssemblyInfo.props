@@ -2,9 +2,9 @@
   <PropertyGroup>
     <Company>Illumina</Company>
     <Copyright>© 2017 Illumina, Inc.</Copyright>
-    <FileVersion>1.5.4.0</FileVersion>
-    <AssemblyVersion>1.5.4.0</AssemblyVersion>
-    <Version>1.5.4</Version>
+    <FileVersion>1.6.2.0</FileVersion>
+    <AssemblyVersion>1.6.2.0</AssemblyVersion>
+    <Version>1.6.2</Version>
     <Authors>Stromberg, Roy, Lajugie, Jiang, and Li</Authors>
   </PropertyGroup>
 </Project>

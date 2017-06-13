@@ -1,23 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26127.3
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VariantAnnotation", "VariantAnnotation\VariantAnnotation.csproj", "{F9724D13-841E-4CCA-AF98-126816D618C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation", "VariantAnnotation\VariantAnnotation.csproj", "{F9724D13-841E-4CCA-AF98-126816D618C6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheUtils", "CacheUtils\CacheUtils.csproj", "{15110E0A-CBFB-45C4-8D1C-F40DD9D54E3A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheUtils", "CacheUtils\CacheUtils.csproj", "{15110E0A-CBFB-45C4-8D1C-F40DD9D54E3A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ErrorHandling", "ErrorHandling\ErrorHandling.csproj", "{447B5E98-3AB7-40A5-B3B9-F2E2956D6058}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ErrorHandling", "ErrorHandling\ErrorHandling.csproj", "{447B5E98-3AB7-40A5-B3B9-F2E2956D6058}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NDesk.Options", "NDesk.Options\NDesk.Options.csproj", "{C02F2FA9-CF8C-4C83-8CE6-1C65BACB1780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "CommandLine\CommandLine.csproj", "{C02F2FA9-CF8C-4C83-8CE6-1C65BACB1780}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nirvana", "Nirvana\Nirvana.csproj", "{DF42012E-E0D6-48A9-944D-C598FBCDADD7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nirvana", "Nirvana\Nirvana.csproj", "{DF42012E-E0D6-48A9-944D-C598FBCDADD7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAUtils", "SAUtils\SAUtils.csproj", "{D7595733-B795-4A40-BABF-6C1D9D5276DB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAUtils", "SAUtils\SAUtils.csproj", "{D7595733-B795-4A40-BABF-6C1D9D5276DB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{1D9248A6-FF11-4EF9-82BF-8787B5967390}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{1D9248A6-FF11-4EF9-82BF-8787B5967390}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VariantAnnotation.Interface", "VariantAnnotation.Interface\VariantAnnotation.Interface.csproj", "{97F946CB-3AAC-4954-8354-0E52C7602BD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation.Interface", "VariantAnnotation.Interface\VariantAnnotation.Interface.csproj", "{97F946CB-3AAC-4954-8354-0E52C7602BD0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jasix", "Jasix\Jasix.csproj", "{0ED3667D-802E-4AA0-8487-843128FF1717}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,6 +59,10 @@ Global
 		{97F946CB-3AAC-4954-8354-0E52C7602BD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97F946CB-3AAC-4954-8354-0E52C7602BD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97F946CB-3AAC-4954-8354-0E52C7602BD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0ED3667D-802E-4AA0-8487-843128FF1717}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0ED3667D-802E-4AA0-8487-843128FF1717}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0ED3667D-802E-4AA0-8487-843128FF1717}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0ED3667D-802E-4AA0-8487-843128FF1717}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

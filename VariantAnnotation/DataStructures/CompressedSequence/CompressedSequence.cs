@@ -11,7 +11,7 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
     {
         #region members
 
-        public ChromosomeRenamer Renamer { get; } = new ChromosomeRenamer();
+        public ChromosomeRenamer Renamer { get; set; } = new ChromosomeRenamer();
         public ICytogeneticBands CytogeneticBands { get; set; }
         public GenomeAssembly GenomeAssembly { get; set; }
         public int NumBases { get; private set; }
@@ -133,5 +133,19 @@ namespace VariantAnnotation.DataStructures.CompressedSequence
 
             return new string(decompressBuffer, 0, length);
         }
+		/// <summary>
+		/// validate reference sequence provided is consistent with the compressed sequence we are using
+		/// 
+		/// </summary>
+		/// <param name="start"></param>
+		/// <param name="end"></param>
+		/// <param name="testSequence"></param>
+		/// <returns></returns>
+	    public bool Validate(int start, int end, string testSequence)
+		{
+			var expSequence = Substring(start - 1, end - start + 1);
+			return testSequence == expSequence;
+
+		}
     }
 }

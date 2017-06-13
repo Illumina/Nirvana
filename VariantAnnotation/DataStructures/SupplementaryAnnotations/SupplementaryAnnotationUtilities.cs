@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using VariantAnnotation.Algorithms;
 
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
@@ -57,17 +55,10 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 		/// <returns>Trimmed position, reference allele and reduced alternate allele as expected by SA</returns>
 		public static Tuple<int, string, string> GetReducedAlleles(int start, string refAllele, string altAllele)
 		{
-			// we have a deletion
-			if (string.IsNullOrEmpty(altAllele))
-				return Tuple.Create(start, refAllele, refAllele.Length.ToString(CultureInfo.InvariantCulture));
-
-			// when we have a supplementary annotation for the ref allele (as in clinVar sometimes), we should not apply any trimming or modification to the alleles.
-			if (refAllele == altAllele)
-				return Tuple.Create(start, refAllele, altAllele);
-
-			// When we have a item that is derived from an entry, the alt alleles may have already been processed. We can detect the inserts and deletions and just return without any further processing. For MNVs, we have no way of detecting
-			// we should also avoid any modifications for symbolic allele
-			if (altAllele[0] == 'i' || altAllele[0] == '<' || char.IsDigit(altAllele[0]) || altAllele.All(x => x == 'N'))
+            // we have a deletion
+            if (refAllele == "-") refAllele = "";
+            if (altAllele == "-") altAllele = "";
+			if (! NeedsReduction(refAllele, altAllele))
 				return Tuple.Create(start, refAllele, altAllele);
 
 			var trimmedTuple = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
@@ -93,37 +84,20 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 			return Tuple.Create(start, refAllele, altAllele);
 		}
 
-		public static List<string> ConvertMixedFormatStrings(List<string> strings)
+		private static bool NeedsReduction(string refAllele, string altAllele)
 		{
-			return strings?.Select(ConvertMixedFormatString).ToList();
+			if (string.IsNullOrEmpty(altAllele)) return true;
+
+			if (!string.IsNullOrEmpty(refAllele) && altAllele.All(x => x == 'N')) return false;
+
+			return !(altAllele[0] == 'i' || altAllele[0] == '<' || char.IsDigit(altAllele[0])) ;
 		}
 
-		public static string ConvertMixedFormatString(string s)
+		public static string ConvertToVcfInfoString(string s)
 		{
-			if (s == null) return null;
-
-			// no hex characters to convert
-			if (!s.Contains(@"\x")) return s;
-
-			var sb = new StringBuilder();
-
-			for (var i = 0; i < s.Length - 1; i++)
-			{
-				if (s[i] == '\\' && s[i + 1] == 'x')
-				{
-					var hexString = s.Substring(i + 2, 2);
-					var value = Convert.ToInt32(hexString, 16);
-					sb.Append(char.ConvertFromUtf32(value));
-					i += 3;
-				}
-				else sb.Append(s[i]);
-			}
-
-			// the last char has to be added
-			sb.Append(s[s.Length - 1]);
-			return sb.ToString();
+			//characters such as comma, space, etc. are not allowed in vcfinfo strings.
+			s = s.Replace(" ", "_");
+			return s.Replace(",", "\\x2c");
 		}
-
-
 	}
 }

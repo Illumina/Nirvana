@@ -1,13 +1,17 @@
-﻿using NDesk.Options;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.CommandLine;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.TranscriptCache;
+using VariantAnnotation.FileHandling.VCF;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 

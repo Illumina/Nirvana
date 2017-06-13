@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.EVS
 {
@@ -18,15 +19,15 @@ namespace SAUtils.InputFileParsers.EVS
 		private double[] _africanFrequencies;
 	    private string _coverage;
 	    private string _numSamples;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
-        public EvsReader(FileInfo evsInfo, ChromosomeRenamer renamer) : this(renamer)
+        public EvsReader(FileInfo evsInfo, IChromosomeRenamer renamer) : this(renamer)
         {
             _evsFileInfo = evsInfo;
         }
 
         // for unit tests to check methods
-        public EvsReader(ChromosomeRenamer renamer)
+        private EvsReader(IChromosomeRenamer renamer)
 		{
 		    _renamer = renamer;
 		}
@@ -84,7 +85,7 @@ namespace SAUtils.InputFileParsers.EVS
         /// </summary>
         /// <param name="vcfline"></param>
         /// <returns></returns>
-        public List<EvsItem> ExtractItems(string vcfline)
+        private List<EvsItem> ExtractItems(string vcfline)
         {
             var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;

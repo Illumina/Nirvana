@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExtractMiniXml": {
+      "commandName": "Project",
+      "commandLineArgs": "--in \\\\ussd-prd-isi04\\Nirvana\\Development\\ExternalDataSources\\ClinVar\\20170227\\ClinVarFullRelease_2017-03.xml.gz  --rcv RCV000401212 -o E:\\Data\\Nirvana\\bugfixes\\testOut"
+    }
+  }
+}

@@ -1,7 +1,8 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnitTests.Utilities;
 using VariantAnnotation.DataStructures.VCF;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.VCF;
 using Xunit;
 
 namespace UnitTests.InterfaceTests
@@ -14,7 +15,7 @@ namespace UnitTests.InterfaceTests
             const string vcfLine = "1	4004037	.	CG	CA,TG	0	LowDP;LowGQ	DP=0	GT:GQ:AD:VF:NL:SB:GQX	./.:0:0:0.000:20:-100.0000:0";
             var vcfVariant = VcfUtilities.GetVcfVariant(vcfLine);
 
-            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, vcfLine);
+            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, null as List<string>, vcfLine);
             Assert.NotNull(annotatedVariant);
 
             AssertUtilities.CheckAlleleCount(2, annotatedVariant);
@@ -36,7 +37,7 @@ namespace UnitTests.InterfaceTests
         {
             const string vcfLine = "1	10005	.	C	.	.	LowGQX	END=10034;BLOCKAVG_min30p3a	GT:GQX:DP:DPF	0/0:3:1:0";
             var vcfVariant = VcfUtilities.GetVcfVariant(vcfLine);
-            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, vcfLine);
+            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, null as List<string>, vcfLine);
 
             var vcf = new VcfConversion();
             var observedVcfLine = vcf.Convert(vcfVariant, annotatedVariant);
@@ -49,7 +50,7 @@ namespace UnitTests.InterfaceTests
             const string vcfLine = "1	4004037	.	CG	CA,TG	0	LowDP;LowGQ	DP=0	GT:GQ:AD:VF:NL:SB:GQX	./.:0:0:0.000:20:-100.0000:0";
             var vcfVariant = VcfUtilities.GetVcfVariant(vcfLine);
 
-            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, vcfLine);
+            var annotatedVariant = DataUtilities.GetVariant(DataUtilities.EmptyCachePrefix, null as List<string>, vcfLine);
             Assert.NotNull(annotatedVariant);
 
             AssertUtilities.CheckAlleleCount(2, annotatedVariant);
@@ -77,7 +78,7 @@ namespace UnitTests.InterfaceTests
             var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(Resources.MiniSuppAnnot("chr17_38858134_38858135.nsa"));
             VcfUtilities.FieldEquals(saReader,
                 "17	38858134	.	CA	C	233	LowGQX	CIGAR=1M1D;RU=A;REFREP=1;IDREP=0	GT:GQ:GQX:DPI:AD	1/1:15:12:6:0,5",
-                "CIGAR=1M1D;RU=A;REFREP=1;IDREP=0;AA=A;AF1000G=0.464856;EVS=0.368669|79|6259;cosmic=1|COSM1684505",
+				"CIGAR=1M1D;RU=A;REFREP=1;IDREP=0;cosmic=1|COSM1684505;EVS=0.368669|79|6259;AA=A;AF1000G=0.464856",
                 VcfCommon.InfoIndex);
         }
 
@@ -87,7 +88,7 @@ namespace UnitTests.InterfaceTests
             var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(Resources.MiniSuppAnnot("chr17_641334_641337.nsa"));
             VcfUtilities.FieldEquals(saReader,
                 "17	641336	rs60947910	C	T	9	LowGQX	SNVSB=0.0;SNVHPOL=19;AA=C;GMAF=T|0.1835;AF1000G=0.183506;EVS=|22|6254;phyloP=-1.271	GT:GQ:GQX:DP:DPF:AD	0/1:17:9:3:2:1,2",
-                "SNVSB=0.0;SNVHPOL=19;AA=C;GMAF=T|0.1835;AF1000G=0.183506;cosmic=1|COSN6415581", VcfCommon.InfoIndex);
+				"SNVSB=0.0;SNVHPOL=19;cosmic=1|COSN6415581;GMAF=T|0.1835;AA=C;AF1000G=0.183506", VcfCommon.InfoIndex);
         }
 
         [Fact]
@@ -96,7 +97,7 @@ namespace UnitTests.InterfaceTests
             var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(Resources.MiniSuppAnnot("chr1_116609125_116609128.nsa"));
             VcfUtilities.FieldEquals(saReader,
                 "1	116609125	rs548438731;rs3833541	CTC	CC,CT	531	PASS	CIGAR=1M1D1M,2M1D;RU=T,C;REFREP=1,4;IDREP=0,3;AA=T,.;GMAF=C|0.03674,.;AF1000G=0.0367412,.;EVS=0.624324|44|5731;CSQT=1|SLC22A15|ENST00000369503|intron_variant&feature_truncation,2|SLC22A15|ENST00000369503|intron_variant&feature_truncation	GT:GQ:GQX:DPI:AD	1/2:574:9:58:0,13,26",
-                "CIGAR=1M1D1M,2M1D;RU=T,C;REFREP=1,4;IDREP=0,3;AA=T,.;AF1000G=0.036741,.;EVS=.,0.624324|44|5731",
+				"CIGAR=1M1D1M,2M1D;RU=T,C;REFREP=1,4;IDREP=0,3;EVS=.,0.624324|44|5731;AA=T,.;AF1000G=0.036741,.",
                 VcfCommon.InfoIndex);
         }
 
@@ -142,7 +143,7 @@ namespace UnitTests.InterfaceTests
             var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(Resources.MiniSuppAnnot("chr1_825069_825070.nsa"));
             VcfUtilities.FieldEquals(saReader,
                 "chr1	825069	rs4475692	G	A,C	362.00	LowGQX;HighDPFRatio	SNVSB=-36.9;SNVHPOL=3	GT:GQ:GQX:DP:DPF:AD	1/2:4:0:52:38:8,11,33",
-                "SNVSB=-36.9;SNVHPOL=3;AA=.,g;GMAF=G|0.3227,G|0.3227;AF1000G=.,0.677316;cosmic=1|COSN16256566,2|COSN16256389",
+				"SNVSB=-36.9;SNVHPOL=3;cosmic=1|COSN16256566,2|COSN16256389;GMAF=G|0.3227,G|0.3227;AA=.,g;AF1000G=.,0.677316",
                 VcfCommon.InfoIndex);
         }
 

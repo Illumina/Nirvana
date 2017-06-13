@@ -5,12 +5,15 @@ using CacheUtils.CombineAndUpdateGenes.DataStructures;
 using CacheUtils.CombineAndUpdateGenes.FileHandling;
 using CacheUtils.CreateCache.Algorithms;
 using CacheUtils.CreateCache.FileHandling;
+using CommandLine.Utilities;
 using VariantAnnotation.DataStructures.IntervalSearch;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
 using VD = VariantAnnotation.DataStructures;
 using VepCombinedGeneReader = CacheUtils.CreateCache.FileHandling.VepCombinedGeneReader;
 
@@ -24,16 +27,16 @@ namespace CacheUtils.CreateCache
         private readonly IVepReader<VD.RegulatoryElement> _regulatoryReader;
         private readonly IVepReader<MutableGene> _geneReader;
         private readonly IVepReader<MutableGene> _mergedGeneReader;
-        private readonly IVepReader<VD.SimpleInterval> _intronReader;
-        private readonly IVepReader<VD.SimpleInterval> _microRnaReader;
+        private readonly IVepReader<SimpleInterval> _intronReader;
+        private readonly IVepReader<SimpleInterval> _microRnaReader;
         private readonly IVepReader<string> _peptideReader;
 
-        private readonly List<VD.Transcript> _transcripts;
+        private readonly List<Transcript> _transcripts;
         private readonly List<VD.RegulatoryElement> _regulatoryElements;
         private readonly List<MutableGene> _genes;
         private readonly List<MutableGene> _mergedGenes;
-        private readonly List<VD.SimpleInterval> _introns;
-        private readonly List<VD.SimpleInterval> _microRnas;
+        private readonly List<SimpleInterval> _introns;
+        private readonly List<SimpleInterval> _microRnas;
         private readonly List<string> _peptideSeqs;
 
         private readonly long _currentTimeTicks = DateTime.Now.Ticks;
@@ -59,12 +62,12 @@ namespace CacheUtils.CreateCache
             _peptideReader    = peptideReader;
             _renamer          = renamer;
 
-            _transcripts        = new List<VD.Transcript>();
+            _transcripts        = new List<Transcript>();
             _regulatoryElements = new List<VD.RegulatoryElement>();
             _genes              = new List<MutableGene>();
             _mergedGenes        = new List<MutableGene>();
-            _introns            = new List<VD.SimpleInterval>();
-            _microRnas          = new List<VD.SimpleInterval>();
+            _introns            = new List<SimpleInterval>();
+            _microRnas          = new List<SimpleInterval>();
             _peptideSeqs        = new List<string>();
         }
 
@@ -102,13 +105,13 @@ namespace CacheUtils.CreateCache
         {
             if (genes == null) return new NullIntervalSearch<MutableGene>();
 
-            var intervalLists = new List<IntervalArray<MutableGene>.Interval>[numRefSeqs];
-            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<IntervalArray<MutableGene>.Interval>();
+            var intervalLists = new List<Interval<MutableGene>>[numRefSeqs];
+            for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<MutableGene>>();
 
             foreach (var transcript in genes)
             {
                 intervalLists[transcript.ReferenceIndex].Add(
-                    new IntervalArray<MutableGene>.Interval(transcript.Start, transcript.End, transcript));
+                    new Interval<MutableGene>(transcript.Start, transcript.End, transcript));
             }
 
             // create the interval arrays
@@ -186,7 +189,7 @@ namespace CacheUtils.CreateCache
         public void MarkCanonicalTranscripts(string lrgPath)
         {
             // sanity check: make sure we're only doing this for RefSeq
-            if (_transcriptReader.Header.TranscriptSource != VD.TranscriptDataSource.RefSeq) return;
+            if (_transcriptReader.Header.TranscriptSource != TranscriptDataSource.RefSeq) return;
 
             Console.Write("- marking canonical transcripts... ");
             var canonical = new CanonicalTranscriptMarker(lrgPath);

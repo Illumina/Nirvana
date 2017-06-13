@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using CacheUtils.CombineAndUpdateGenes.DataStructures;
-using VariantAnnotation.FileHandling;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.CombineAndUpdateGenes.FileHandling
 {

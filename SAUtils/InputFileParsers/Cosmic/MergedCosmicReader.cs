@@ -2,9 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.Cosmic
 {
@@ -27,23 +28,18 @@ namespace SAUtils.InputFileParsers.Cosmic
         private const string HistologyTag = "Primary histology";
         private const string StudyIdTag = "ID_STUDY";
 
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
         private readonly Dictionary<string, HashSet<CosmicItem.CosmicStudy>> _studies;
 
         #endregion
 
         // constructor
-        public MergedCosmicReader(string vcfFileName, string tsvFileName, ChromosomeRenamer renamer)
+        public MergedCosmicReader(string vcfFileName, string tsvFileName, IChromosomeRenamer renamer)
         {
             _vcfFileName = vcfFileName;
             _tsvFileName = tsvFileName;
             _renamer     = renamer;
             _studies     = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
-        }
-
-        public MergedCosmicReader()
-        {
-            _studies = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
         }
 
         public IEnumerator<CosmicItem> GetEnumerator()
@@ -137,8 +133,6 @@ namespace SAUtils.InputFileParsers.Cosmic
                 }
             }
 
-            //Console.WriteLine($"TSV column indices \n MutationID:{_mutationIdIndex}, Study Id:{_studyIdIndex}, Primary Site: {_primarySiteIndex}, Histology:{_primaryHistologyIndex} ");
-
             if (_mutationIdIndex == -1)
                 throw new InvalidDataException("Column for mutation Id could not be detected");
             if (_studyIdIndex == -1)
@@ -149,7 +143,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 throw new InvalidDataException("Column for primary histology could not be detected");
         }
 
-        public List<CosmicItem> ExtractCosmicItems(string vcfLine)
+        private List<CosmicItem> ExtractCosmicItems(string vcfLine)
         {
             var splitLine = vcfLine.Split(new[] { '\t' }, 8);
 

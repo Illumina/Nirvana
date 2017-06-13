@@ -6,9 +6,7 @@ namespace Nirvana
     {
         // filenames
         public static string InputCachePrefix;
-        public static string SupplementaryAnnotationDirectory;
-		public static readonly List<string> CustomAnnotationDirectories = new List<string>();
-		public static readonly List<string> CustomIntervalDirectories = new List<string>();
+        public static readonly List<string> SupplementaryAnnotationDirectories = new List<string>();
 		public static string VcfPath;
         public static string CompressedReferencePath;
         public static string OutputFileName;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using VariantAnnotation.DataStructures.CytogeneticBands;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 

@@ -21,26 +21,23 @@ namespace VariantAnnotation.FileHandling.Compression
         private bool _foundEof;
         private bool _isDisposed;
 
-        #endregion
+		#endregion
 
-        #region Stream
+		#region Stream
 
-        public override bool CanRead => _stream.CanRead;
+		public override bool CanRead => _stream.CanRead;
 
         public override bool CanWrite => _stream.CanWrite;
 
         public override bool CanSeek => _stream.CanSeek;
 
-        public override long Length
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override long Length => throw new NotSupportedException();
 
-        public override long Position
+	    public override long Position
         {
-            get { return _stream.Position; }
-            set { throw new NotSupportedException(); }
-        }
+            get => _stream.Position;
+		    set => throw new NotSupportedException();
+	    }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -102,15 +99,14 @@ namespace VariantAnnotation.FileHandling.Compression
         /// <param name="stream">The stream to compress or decompress.</param>
         /// <param name="compressionMode">One of the enumeration values that indicates whether to compress or decompress the stream.</param>
         /// <param name="leaveStreamOpen">true to leave the stream open after disposing the object; otherwise, false.</param>
+        /// <param name="size">The size of the compression block</param>
         public BlockStream(ICompressionAlgorithm compressionAlgorithm, Stream stream, CompressionMode compressionMode,
-            bool leaveStreamOpen = false)
+            bool leaveStreamOpen = false, int size = 16777216)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
-
-            _stream          = stream;
+	        _stream          = stream ?? throw new ArgumentNullException(nameof(stream));
             _isCompressor    = compressionMode == CompressionMode.Compress;
             _leaveStreamOpen = leaveStreamOpen;
-            _block           = new Block(compressionAlgorithm);
+            _block           = new Block(compressionAlgorithm, size);
 
             // sanity check: make sure we can use the stream for reading or writing
             if (_isCompressor && !_stream.CanWrite) throw new ArgumentException("A stream lacking write capability was provided to the block GZip compressor.");
@@ -210,7 +206,6 @@ namespace VariantAnnotation.FileHandling.Compression
 
         public class BlockPosition
         {
-            public int Id;
             public long FileOffset;
             public int InternalOffset;
         }
@@ -220,16 +215,19 @@ namespace VariantAnnotation.FileHandling.Compression
         /// </summary>
         public void GetBlockPosition(BlockPosition bp)
         {
-            bp.Id             = _block.NumFullBlocks;
             bp.FileOffset     = _stream.Position;
             bp.InternalOffset = _block.Offset;
         }
 
         public void SetBlockPosition(BlockPosition bp)
         {
-            _stream.Position = bp.FileOffset;
-            _block.Read(_stream);
+            if (bp.FileOffset != _block.FileOffset)
+            {
+                _stream.Position = bp.FileOffset;
+                _block.Read(_stream);
+            }
+
             _block.Offset = bp.InternalOffset;
-        }
+		}
     }
 }

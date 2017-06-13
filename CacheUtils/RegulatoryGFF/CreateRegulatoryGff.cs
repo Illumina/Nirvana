@@ -1,11 +1,13 @@
 ﻿using System;
 using System.IO;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.Utilities;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.TranscriptCache;
 
 namespace CacheUtils.RegulatoryGFF

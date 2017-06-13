@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Loftee

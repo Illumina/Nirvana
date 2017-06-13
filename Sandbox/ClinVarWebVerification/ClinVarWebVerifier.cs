@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.DataStructures.CompressedSequence;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.Utilities;
 

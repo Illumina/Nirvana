@@ -2,6 +2,7 @@
 using CacheUtils.CombineAndUpdateGenes.Algorithms;
 using CacheUtils.CombineAndUpdateGenes.DataStructures;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 using Xunit;
 
 namespace UnitTests.CacheUtils

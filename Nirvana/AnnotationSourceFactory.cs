@@ -1,8 +1,6 @@
 ﻿using System.Linq;
 using VariantAnnotation;
 using VariantAnnotation.AnnotationSources;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling.CustomInterval;
 using VariantAnnotation.FileHandling.Phylop;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.TranscriptCache;
@@ -16,7 +14,7 @@ namespace Nirvana
     {
         public IAnnotationSource CreateAnnotationSource(IAnnotatorInfo annotatorInfo, IAnnotatorPaths annotatorPaths)
         {
-            var conservationScoreReader = new PhylopReader(annotatorPaths.SupplementaryAnnotation);
+            var conservationScoreReader = new PhylopReader(annotatorPaths.SupplementaryAnnotations);
 
             var transcriptStream = FileUtilities.GetReadStream(CacheConstants.TranscriptPath(annotatorPaths.CachePrefix));
             var siftStream       = FileUtilities.GetReadStream(CacheConstants.SiftPath(annotatorPaths.CachePrefix));
@@ -25,12 +23,10 @@ namespace Nirvana
 
             var streams = new AnnotationSourceStreams(transcriptStream, siftStream, polyPhenStream, referenceStream);
 
-            var caProvider = annotatorPaths.CustomAnnotation.Any()          ? new CustomAnnotationProvider(annotatorPaths.CustomAnnotation)               : null;
-            var ciProvider = annotatorPaths.CustomIntervals.Any()           ? new CustomIntervalProvider(annotatorPaths.CustomIntervals)                  : null;
-            var saProvider = annotatorPaths.SupplementaryAnnotation != null ? new SupplementaryAnnotationProvider(annotatorPaths.SupplementaryAnnotation) : null;
+            var saProvider = annotatorPaths.SupplementaryAnnotations.Any() ? new SupplementaryAnnotationProvider(annotatorPaths.SupplementaryAnnotations) : null;
 
 			//adding the saPath because OMIM needs it
-            var annotationSource = new NirvanaAnnotationSource(streams, saProvider, conservationScoreReader, caProvider, ciProvider, annotatorPaths.SupplementaryAnnotation);
+            var annotationSource = new NirvanaAnnotationSource(streams, saProvider, conservationScoreReader, annotatorPaths.SupplementaryAnnotations);
 
             if (annotatorInfo.BooleanArguments.Contains(AnnotatorInfoCommon.ReferenceNoCall))
                 annotationSource.EnableReferenceNoCalls(annotatorInfo.BooleanArguments.Contains(AnnotatorInfoCommon.TranscriptOnlyRefNoCall));

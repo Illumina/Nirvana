@@ -55,7 +55,7 @@ namespace SAUtils.InputFileParsers
         {
             // NAME = dbSNP
             // VERSION = 147
-            // DATE = 2016 - 04 - 08
+            // DATE = 2016-04-08
             // DESCRIPTION =
 
             string line, name = null, version = null, date = null, description = null;
@@ -80,6 +80,14 @@ namespace SAUtils.InputFileParsers
                         description = words[1];
                         break;
                 }
+            }
+
+            if (date == null)
+            {
+                date = DateTime.Now.ToString("yyyy-MM-dd");
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"WARNING: Date was missing from the data source. Using {date} instead.");
+                Console.ResetColor();
             }
 
             return new DataSourceVersion(name, version, DateTime.Parse(date).Ticks, description);

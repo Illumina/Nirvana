@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using CacheUtils.DataDumperImport.FileHandling;
-using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.ParseVepCacheDirectory.PredictionConversion
 {

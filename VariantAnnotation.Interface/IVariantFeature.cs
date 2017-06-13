@@ -9,9 +9,14 @@ namespace VariantAnnotation.Interface
         IAllele FirstAlternateAllele { get; }
         int OverlapReferenceBegin { get; }
         int OverlapReferenceEnd { get; }
-        void AddSupplementaryIntervals(List<ISupplementaryInterval> overlappingSupplementaryIntervals);
-        void AddCustomAnnotation(List<ISupplementaryAnnotationReader> saReaders);
-        void AddCustomIntervals(List<ICustomInterval> intervals);
-        void SetSupplementaryAnnotation(ISupplementaryAnnotationReader saReader);
+        void AddSupplementaryIntervals(List<IInterimInterval> overlappingSupplementaryIntervals);
+
+		void SetSupplementaryAnnotation(ISupplementaryAnnotationReader saReader);
+
+        string ReferenceName { get; }
+        bool IsRefMinor { get; }
+        bool IsReference { get; }
+        bool IsRefNoCall { get; }
+		bool IsRepeatExpansion { get; }
     }
 }

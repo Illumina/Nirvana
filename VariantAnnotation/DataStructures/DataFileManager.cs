@@ -1,5 +1,6 @@
 ﻿using System;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.Utilities;
 
@@ -32,8 +33,6 @@ namespace VariantAnnotation.DataStructures
             variant.CytogeneticBand = cytogeneticBands.GetCytogeneticBand(variant.ReferenceIndex,
                 variant.VcfReferenceBegin, variant.VcfReferenceEnd);
         }
-
-        public void Clear() => _currentReferenceIndex = ushort.MaxValue;
 
         public void LoadReference(ushort refIndex, Action clearDataSources, PerformanceMetrics metrics = null)
         {

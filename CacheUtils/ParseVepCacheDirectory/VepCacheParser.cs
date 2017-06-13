@@ -6,13 +6,13 @@ using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.VEP;
 using CacheUtils.DataDumperImport.FileHandling;
 using CacheUtils.DataDumperImport.Utilities;
-using VariantAnnotation.DataStructures;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
 using Exon              = CacheUtils.DataDumperImport.DataStructures.VEP.Exon;
 using Gene              = VariantAnnotation.DataStructures.Gene;
 using Intron            = CacheUtils.DataDumperImport.DataStructures.VEP.Intron;
 using RegulatoryFeature = CacheUtils.DataDumperImport.Import.RegulatoryFeature;
-using SimpleInterval    = VariantAnnotation.DataStructures.SimpleInterval;
+using SimpleInterval    = VariantAnnotation.DataStructures.Intervals.SimpleInterval;
 using Translation       = CacheUtils.DataDumperImport.DataStructures.VEP.Translation;
 
 namespace CacheUtils.ParseVepCacheDirectory
@@ -224,7 +224,6 @@ namespace CacheUtils.ParseVepCacheDirectory
                         int transcriptIndex = 0;
                         foreach (AbstractData abTranscriptNode in transcriptNodes)
                         {
-                            // Console.WriteLine("transcript index: {0}", transcriptIndex);
                             var transcriptNode = abTranscriptNode as ObjectValue;
 
                             // sanity check: make sure this node is an object value
@@ -235,7 +234,7 @@ namespace CacheUtils.ParseVepCacheDirectory
                             }
 
                             // sanity check: make sure this is a transcript data type
-                            if (transcriptNode.DataType != DataDumperImport.Import.Transcript.DataType)
+                            if (transcriptNode != null && transcriptNode.DataType != DataDumperImport.Import.Transcript.DataType)
                             {
                                 Console.WriteLine("Expected a transcript node, but the current data type is: [{0}]", transcriptNode.DataType);
                                 Environment.Exit(1);
@@ -305,7 +304,7 @@ namespace CacheUtils.ParseVepCacheDirectory
                     }
 
                     // sanity check: make sure this is a regulatory element data type
-                    if (regulatoryFeatureNode.DataType != RegulatoryFeature.DataType)
+                    if (regulatoryFeatureNode != null && regulatoryFeatureNode.DataType != RegulatoryFeature.DataType)
                     {
                         Console.WriteLine("Expected a regulatory element node, but the current data type is: [{0}]", regulatoryFeatureNode.DataType);
                         Environment.Exit(1);

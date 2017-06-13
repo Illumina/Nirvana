@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 using CacheUtils.UpdateMiniCacheFiles.Updaters;
 using CacheUtils.UpdateMiniCacheFiles.Utilities;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.Utilities;
 
 namespace CacheUtils.UpdateMiniCacheFiles.DataStructures

@@ -3,40 +3,72 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.CustomAnnotation
 {
 	public sealed class CustomAnnotationReader: IEnumerable<CustomItem>
 	{
 		private readonly FileInfo _customFileInfo;
-		private readonly Dictionary<string, string> _stringFields;
-		private readonly Dictionary<string, string> _stringValues;
-		private readonly Dictionary<string, string> _boolFields;
+		private readonly Dictionary<string, string> _desiredStringFields;
+		private readonly Dictionary<string, string> _desiredBoolFields;
+		private readonly Dictionary<string, string> _desiredNumberFields;
+
+		private readonly Dictionary<string, List<string>> _stringValues;
+		private readonly Dictionary<string, List<double>> _numberValues;
 		private readonly List<string> _boolValues;
+
 		private string _topKey;
-		private bool _isPositional;
+	    public bool IsPositional { get; private set; }
 
-	    private readonly ChromosomeRenamer _renamer;
-		private readonly List<CustomItem> _customItemList;
+	    readonly List<CustomItem> _customItemList;
+		private readonly IChromosomeRenamer _renamer;
 
-		public CustomAnnotationReader(FileInfo customFileInfo, ChromosomeRenamer renamer)
+
+		public CustomAnnotationReader(FileInfo customFileInfo, IChromosomeRenamer renamer)
 		{
-            _customFileInfo = customFileInfo;
-            _stringFields   = new Dictionary<string, string>();
-            _stringValues   = new Dictionary<string, string>();
-            _boolFields     = new Dictionary<string, string>();
-            _boolValues     = new List<string>();
-            _customItemList = new List<CustomItem>();
-            _isPositional   = false;
-            _renamer        = renamer;
+			_customFileInfo   = customFileInfo;
+			_renamer = renamer;
+			_desiredStringFields  = new Dictionary<string, string>();
+			_desiredNumberFields  = new Dictionary<string, string>();
+			_desiredBoolFields    = new Dictionary<string, string>();
+
+			_stringValues  = new Dictionary<string, List<string>>();
+			_numberValues  = new Dictionary<string, List<double>>();
+			_boolValues    = new List<string>();
+
+			_customItemList   = new List<CustomItem>();
+			IsPositional     = false;
+
+		    ReadHeader();
+		}
+
+	    private void ReadHeader()
+	    {
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_customFileInfo.FullName))
+            {
+                string line;
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    // Skip empty lines.
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    if (line.StartsWith("#"))
+                    {
+                        ParseHeaderLine(line);
+                    }
+                    else break;
+                }
+            }
         }
 
-        private void Clear()
+	    private void Clear()
 		{
 			_stringValues.Clear();
+			_numberValues.Clear();
 			_boolValues.Clear();
 			_customItemList.Clear();
 		}
@@ -63,7 +95,6 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 					if (string.IsNullOrWhiteSpace(line)) continue;
 					if (line.StartsWith("#"))
 					{
-						ParseHeaderLine(line);
 						continue;
 					}
 					var customItemsList = ExtractCustomItems(line);
@@ -96,7 +127,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 						break;
 					case "MATCH":
 						// default is allele specific
-						_isPositional = value == "Position";
+						IsPositional = value == "Position";
 						break;
 					default:
 						throw new Exception("Unknown field in top level key line :\n "+ line);
@@ -149,10 +180,13 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 			switch (type)
 			{
 				case "String":
-					_stringFields[info] = json;
+					_desiredStringFields[info] = json;
+					break;
+				case "Number":
+					_desiredNumberFields[info] = json;
 					break;
 				case "Boolean":
-					_boolFields[info] = json;
+					_desiredBoolFields[info] = json;
 					break;
 				default:
 					throw new Exception("Unsupported data type: "+type+ " in:\n"+ line);
@@ -196,7 +230,13 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 				var stringValues = new Dictionary<string, string>();
 				foreach (var keyValue in _stringValues)
 				{
-					stringValues[keyValue.Key] = keyValue.Value.Split(',')[i];
+					stringValues[keyValue.Key] = keyValue.Value[i];
+				}
+
+				var numberValues = new Dictionary<string, double>();
+				foreach (var keyValue in _numberValues)
+				{
+					numberValues[keyValue.Key] = keyValue.Value[i];
 				}
 
 				var boolValues   = _boolValues.Select(value => value.Split(',')[i]).ToList();
@@ -208,8 +248,8 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 					altAlleles[i],
 					_topKey,
 					id,
-					_isPositional,
 					stringValues,
+					numberValues,
 					boolValues
 					));
 			}
@@ -226,16 +266,20 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 				if (keyValue.Length == 1)
 				{
 					// undefined boolean keys will be skipped
-					if (_boolFields.ContainsKey(key))
-						_boolValues.Add(_boolFields[key]);
+					if (_desiredBoolFields.ContainsKey(key))
+						_boolValues.Add(_desiredBoolFields[key]);
 					continue;
 				}
 
 				var value = keyValue[1];
 
 				// undefined string keys will be skipped
-				if (_stringFields.ContainsKey(key))
-					_stringValues[_stringFields[key]] = value;
+				if (_desiredStringFields.ContainsKey(key))
+					_stringValues[_desiredStringFields[key]] = value.Split(',').ToList();
+
+				// undefined number keys will be skipped
+				if (_desiredNumberFields.ContainsKey(key))
+					_numberValues[_desiredNumberFields[key]] = value.Split(',').Select(double.Parse).ToList();
 			}
 		}
 

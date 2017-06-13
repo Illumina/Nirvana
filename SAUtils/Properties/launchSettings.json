@@ -1,0 +1,17 @@
+{
+  "profiles": {
+    "SAUtils": {
+      "commandName": "Project",
+      "commandLineArgs": "createSA -d IntermediateTsvs\\2017-03\\GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o test",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "SA_yj": {
+      "commandName": "Project",
+      "commandLineArgs": "createSA --ref e:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat -m E:\\Data\\Nirvana\\bugfixes\\testOut\\RefMinor_Phase_3_v5a.misc.tsv.gz -o E:\\Data\\Nirvana\\SupplementaryAnnotation\\debug3\\GRCh37",
+      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+    }
+  }
+}
+    }
+  }
+}

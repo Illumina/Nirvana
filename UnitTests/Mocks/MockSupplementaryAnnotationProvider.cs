@@ -1,57 +1,29 @@
 ﻿using System.Collections.Generic;
+using VariantAnnotation.DataStructures.IntervalSearch;
+using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Utilities;
 
 namespace UnitTests.Mocks
 {
-    public class MockSupplementaryAnnotationProvider : ISupplementaryAnnotationProvider
+    public class MockSupplementaryAnnotationProvider : SupplementaryAnnotationProviderBase, ISupplementaryAnnotationProvider
     {
-        private ISupplementaryAnnotationReader _saReader;
-
-        // supplementary intervals
-        private readonly List<ISupplementaryInterval> _overlappingSupplementaryIntervals;
-        private readonly IIntervalForest<ISupplementaryInterval> _suppIntervalForest;
-        public GenomeAssembly GenomeAssembly => GenomeAssembly.Unknown;
-        public IEnumerable<IDataSourceVersion> DataSourceVersions => new List<IDataSourceVersion>();
-        public void Clear() => _saReader = null;
-
         /// <summary>
         /// constructor
         /// </summary>
-        public MockSupplementaryAnnotationProvider(ISupplementaryAnnotationReader saReader, ChromosomeRenamer renamer)
+        public MockSupplementaryAnnotationProvider(List<ISupplementaryAnnotationReader> saReaders)
         {
-            if (saReader == null) return;
-            _saReader = saReader;
+            SaReaders = saReaders;
 
-            _overlappingSupplementaryIntervals = new List<ISupplementaryInterval>();
-            _suppIntervalForest = _saReader.GetIntervalForest(renamer);
+            BuildIntervalForests();
+
+            HasSmallVariantIntervals = !(SmallVariantIntervalArray is NullIntervalSearch<IInterimInterval>);
+            HasSvIntervals           = !(SvIntervalArray           is NullIntervalSearch<IInterimInterval>);
+            HasAllVariantIntervals   = !(AllVariantIntervalArray   is NullIntervalSearch<IInterimInterval>);
         }
 
-        public void AddAnnotation(IVariantFeature variant)
-        {
-            if (_saReader == null) return;
-            if (variant.IsStructuralVariant) AddOverlappingIntervals(variant);
-            else variant.SetSupplementaryAnnotation(_saReader);
-        }
-
-        private void AddOverlappingIntervals(IVariantFeature variant)
-        {
-            // get overlapping supplementary intervals.
-            _overlappingSupplementaryIntervals.Clear();
-
-            var firstAltAllele = variant.FirstAlternateAllele;
-
-            var variantBegin = firstAltAllele.NirvanaVariantType == VariantType.insertion
-                ? firstAltAllele.End
-                : firstAltAllele.Start;
-            var variantEnd = firstAltAllele.End;
-
-            _suppIntervalForest.GetAllOverlappingValues(variant.ReferenceIndex, variantBegin, variantEnd,
-                _overlappingSupplementaryIntervals);
-
-            variant.AddSupplementaryIntervals(_overlappingSupplementaryIntervals);
-        }
-
-        public void Load(string ucscReferenceName, IChromosomeRenamer renamer) {}
+        public GenomeAssembly GenomeAssembly => GenomeAssembly.Unknown;
+        public IEnumerable<IDataSourceVersion> DataSourceVersions => new List<IDataSourceVersion>();
+        public void Clear() => SaReaders.Clear();
+        public void Load(string ucscReferenceName) { }
     }
 }

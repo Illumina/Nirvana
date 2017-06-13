@@ -1,80 +1,48 @@
 ﻿using System.Collections.Generic;
-using System.IO;
+using System.Linq;
 using VariantAnnotation.DataStructures.IntervalSearch;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.FileHandling.SupplementaryAnnotations
 {
-    public class SupplementaryAnnotationProvider : ISupplementaryAnnotationProvider
-    {        
+    public class SupplementaryAnnotationProvider : SupplementaryAnnotationProviderBase, ISupplementaryAnnotationProvider
+    {
         private string _currentUcscReferenceName;
+        private readonly List<string> _saDirs;
 
-        // supplementary annotation
-        private readonly string _saDir;
-        private ISupplementaryAnnotationReader _saReader;
+        public GenomeAssembly GenomeAssembly => SupplementaryAnnotationCommon.GetGenomeAssembly(_saDirs);
 
-        // supplementary intervals
-        private bool _hasIntervals;
-        private readonly List<ISupplementaryInterval> _overlappingIntervals;
-        private IIntervalForest<ISupplementaryInterval> _intervalForest;
-
-        public GenomeAssembly GenomeAssembly => SupplementaryAnnotationCommon.GetGenomeAssembly(_saDir);
-
-        public IEnumerable<IDataSourceVersion> DataSourceVersions
-            => SupplementaryAnnotationCommon.GetDataSourceVersions(_saDir);
+        public IEnumerable<IDataSourceVersion> DataSourceVersions => SupplementaryAnnotationCommon.GetDataSourceVersions(_saDirs);
 
         /// <summary>
         /// constructor
         /// </summary>
-        public SupplementaryAnnotationProvider(string saDir)
+        public SupplementaryAnnotationProvider(IEnumerable<string> saDirs)
         {
-            _saDir                = saDir;
-            _overlappingIntervals = new List<ISupplementaryInterval>();
-            _intervalForest       = new NullIntervalSearch<ISupplementaryInterval>();
+            _saDirs = saDirs.ToList();
         }
 
-        public void Load(string ucscReferenceName, IChromosomeRenamer renamer)
+        public void Load(string ucscReferenceName)
         {
-            if (string.IsNullOrEmpty(_saDir) || ucscReferenceName == _currentUcscReferenceName) return;
+            if (_saDirs == null || _saDirs.Count == 0 || ucscReferenceName == _currentUcscReferenceName) return;
 
-            var saPath = Path.Combine(_saDir, ucscReferenceName + ".nsa");
-            _saReader = File.Exists(saPath) ? new SupplementaryAnnotationReader(saPath) : null;
+            SaReaders = SupplementaryAnnotationCommon.GetReaders(_saDirs, ucscReferenceName);
 
-            _intervalForest = _saReader?.GetIntervalForest(renamer);
-            _hasIntervals = !(_intervalForest is NullIntervalSearch<ISupplementaryInterval>);
+            BuildIntervalForests();
+
+            HasSmallVariantIntervals = !(SmallVariantIntervalArray is NullIntervalSearch<IInterimInterval>);
+            HasSvIntervals           = !(SvIntervalArray is NullIntervalSearch<IInterimInterval>);
+            HasAllVariantIntervals   = !(AllVariantIntervalArray is NullIntervalSearch<IInterimInterval>);
 
             _currentUcscReferenceName = ucscReferenceName;
         }
 
-        public void AddAnnotation(IVariantFeature variant)
-        {
-            if (_saReader == null) return;
-            if (variant.IsStructuralVariant) AddOverlappingIntervals(variant);
-            else variant.SetSupplementaryAnnotation(_saReader);
-        }
-
-        private void AddOverlappingIntervals(IVariantFeature variant)
-        {
-            if (!_hasIntervals) return;
-
-            _overlappingIntervals.Clear();
-            var firstAltAllele = variant.FirstAlternateAllele;
-
-            var variantBegin = firstAltAllele.NirvanaVariantType == VariantType.insertion
-                ? firstAltAllele.End
-                : firstAltAllele.Start;
-            var variantEnd = firstAltAllele.End;
-
-            _intervalForest.GetAllOverlappingValues(variant.ReferenceIndex, variantBegin, variantEnd,
-                _overlappingIntervals);
-
-            variant.AddSupplementaryIntervals(_overlappingIntervals);
-        }
-
         public void Clear()
         {
-            _hasIntervals = false;
-            _saReader     = null;
+            HasSmallVariantIntervals = false;
+            HasSvIntervals           = false;
+            HasAllVariantIntervals   = false;
+            SaReaders.Clear();
         }
     }
 }

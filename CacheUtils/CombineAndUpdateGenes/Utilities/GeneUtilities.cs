@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.CombineAndUpdateGenes.DataStructures;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.CombineAndUpdateGenes.Utilities
 {

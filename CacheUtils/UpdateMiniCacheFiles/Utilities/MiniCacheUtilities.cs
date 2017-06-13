@@ -10,7 +10,11 @@ using VariantAnnotation.FileHandling.Reference;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.DataStructures.JsonAnnotations;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
+using VariantAnnotation.FileHandling.VCF;
 
 namespace CacheUtils.UpdateMiniCacheFiles.Utilities
 {
