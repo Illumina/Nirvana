@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CacheUtils.DataDumperImport.DataStructures.VEP;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.DataDumperImport.DataStructures
 {

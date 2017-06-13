@@ -2,6 +2,8 @@
 using System.Linq;
 using System.Text;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.DataDumperImport.DataStructures.VEP
 {

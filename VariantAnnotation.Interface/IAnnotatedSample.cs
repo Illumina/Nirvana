@@ -1,4 +1,7 @@
-﻿namespace VariantAnnotation.Interface
+﻿using System;
+using System.Collections.Generic;
+
+namespace VariantAnnotation.Interface
 {
 	public interface IAnnotatedSample
 	{
@@ -12,7 +15,9 @@
 		string CopyNumber { get; }//CN in CANVAs
 		bool IsLossOfHeterozygosity { get; }
 		string DenovoQuality { get; }
-
+		string RepeatNumber { get; }
+        string RepeatNumberSpan { get; }
 		bool IsEmpty { get; }
+        List<String> RecomposedGenotype { get; }
 	}
 }

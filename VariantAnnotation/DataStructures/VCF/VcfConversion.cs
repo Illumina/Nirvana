@@ -3,14 +3,18 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using VariantAnnotation.DataStructures.JsonAnnotations;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.VCF;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.DataStructures.VCF
 {
     public class VcfConversion
     {
-        private readonly StringBuilder _sb             = new StringBuilder();
+		private const string DbSnpKeyName = "dbsnp";
+		private const string OneKgKeyName = "oneKg";
+		private const string RefMinorKeyName = "RefMinor";
+
+		private readonly StringBuilder _sb             = new StringBuilder();
         private readonly StringBuilder _csqInfoBuilder = new StringBuilder();
         private readonly List<string> _csqtStrings     = new List<string>();
         private readonly List<string> _csqrStrings     = new List<string>();
@@ -161,11 +165,10 @@ namespace VariantAnnotation.DataStructures.VCF
                     jsonVariant.EnsemblTranscripts.Where(transcript => transcript.IsCanonical == "true")
                         .Select(transcript => new CsqEntry
                         {
-                            Allele = jsonVariant.GenotypeIndex.ToString(),
-                            Canonical = transcript.IsCanonical,
-                            Feature = transcript.TranscriptID,
+                            Allele      = jsonVariant.GenotypeIndex.ToString(),
+                            Feature     = transcript.TranscriptID,
                             FeatureType = CsqCommon.TranscriptFeatureType,
-                            Symbol = transcript.Hgnc,
+                            Symbol      = transcript.Hgnc,
                             Consequence = transcript.Consequence == null ? null : string.Join("&", transcript.Consequence)
                         }));
 
@@ -173,19 +176,18 @@ namespace VariantAnnotation.DataStructures.VCF
                               where transcript.IsCanonical == "true"
                               select new CsqEntry
                               {
-                                  Allele = jsonVariant.GenotypeIndex.ToString(),
-                                  Canonical = transcript.IsCanonical,
-                                  Feature = transcript.TranscriptID,
+                                  Allele      = jsonVariant.GenotypeIndex.ToString(),
+                                  Feature     = transcript.TranscriptID,
                                   FeatureType = CsqCommon.TranscriptFeatureType,
-                                  Symbol = transcript.Hgnc,
+                                  Symbol      = transcript.Hgnc,
                                   Consequence = transcript.Consequence == null ? null : string.Join("&", transcript.Consequence)
                               });
 
                 csqs.AddRange(jsonVariant.RegulatoryRegions.Select(regulatoryRegion => new CsqEntry
                 {
-                    Allele = jsonVariant.GenotypeIndex.ToString(),
+                    Allele      = jsonVariant.GenotypeIndex.ToString(),
                     Consequence = string.Join("&", regulatoryRegion.Consequence),
-                    Feature = regulatoryRegion.ID,
+                    Feature     = regulatoryRegion.ID,
                     FeatureType = CsqCommon.RegulatoryFeatureType
                 }));
             }
@@ -193,19 +195,26 @@ namespace VariantAnnotation.DataStructures.VCF
 
         private static string ExtractDbId(IAnnotatedVariant annotatedVariant, string idField)
         {
-            var dbSnp = new VcfField();
+			var dbSnp = new VcfField();
 
-            var nonDbsnpIds = GetNonDbsnpIds(idField);
-            if (nonDbsnpIds != null) foreach (var nonDbsnpId in nonDbsnpIds) dbSnp.Add(nonDbsnpId);
+			var nonDbsnpIds = GetNonDbsnpIds(idField);
+			if (nonDbsnpIds != null) foreach (var nonDbsnpId in nonDbsnpIds) dbSnp.Add(nonDbsnpId);
 
-            foreach (var altAllele in annotatedVariant.AnnotatedAlternateAlleles)
-            {
-                if (altAllele.DbSnpIds == null) continue;
-                foreach (var id in altAllele.DbSnpIds) dbSnp.Add(id);
-            }
+			foreach (var altAllele in annotatedVariant.AnnotatedAlternateAlleles)
+			{
+				foreach (var suppAnnotation in altAllele.SuppAnnotations)
+				{
+					if (suppAnnotation.KeyName != DbSnpKeyName) continue;
+					foreach (var s in suppAnnotation.GetStrings("vcf"))
+					{
+						dbSnp.Add(s);
+					}
+				}
 
-            return dbSnp.GetString("");
-        }
+			}
+
+			return dbSnp.GetString("");
+		}
 
         private static IEnumerable<string> GetNonDbsnpIds(string idField)
         {
@@ -219,69 +228,84 @@ namespace VariantAnnotation.DataStructures.VCF
         {
             var alleleFreq1000G = new VcfInfoKeyValue("AF1000G");
             var ancestralAllele = new VcfInfoKeyValue("AA");
-            var clinVar = new VcfInfoKeyValue("clinvar");
-            var cosmic = new VcfInfoKeyValue("cosmic");
-            var evs = new VcfInfoKeyValue("EVS");
-            var globalMinorAllele = new VcfInfoKeyValue("GMAF");
-            var phyloP = new VcfInfoKeyValue("phyloP");
+            var phyloP          = new VcfInfoKeyValue("phyloP");
 
+            var suppAnnotationSources = new Dictionary<string, VcfInfoKeyValue>();
+            var isSaArrayInfo         = new Dictionary<string, bool>();
+
+            int numAltAlleles = unifiedJson.AnnotatedAlternateAlleles.Count(allele => !allele.IsRecomposedVariant);
+
+            foreach (var alternateAllele in unifiedJson.AnnotatedAlternateAlleles)
+            {
+                foreach (var sa in alternateAllele.SuppAnnotations)
+                {
+                    if (!suppAnnotationSources.ContainsKey(sa.KeyName))
+                    {
+                        suppAnnotationSources[sa.KeyName] = new VcfInfoKeyValue(sa.VcfKeyName);
+                        isSaArrayInfo[sa.KeyName] = sa.IsArray;
+                    }
+                }
+            }
+
+            foreach (var kvp in suppAnnotationSources)
+            {
+                if (isSaArrayInfo[kvp.Key]) continue;
+                for (var i = 0; i < numAltAlleles; i++) kvp.Value.Add(null);
+            }
+
+            for (var i = 0; i < numAltAlleles; i++)
+            {
+                alleleFreq1000G.Add(null);
+                ancestralAllele.Add(null);
+            }
+
+            // understand the number of annotation contains in the whole vcf line
             foreach (var jsonVariant in unifiedJson.AnnotatedAlternateAlleles)
             {
+                if (jsonVariant.GenotypeIndex == -1) continue;
                 if (jsonVariant.IsReferenceMinor) infoEntries.Add("RefMinor");
 
                 phyloP.Add(jsonVariant.PhylopScore);
 
-                ancestralAllele.Add(jsonVariant.AncestralAllele);
-
-                foreach (var cosmicEntry in jsonVariant.CosmicEntries)
+                foreach (var sa in jsonVariant.SuppAnnotations)
                 {
-                    if (cosmicEntry.ID == null) continue;
-                    if (cosmicEntry.SaAltAllele != jsonVariant.SaAltAllele) continue;
+                    if (sa.IsAlleleSpecific != null && !sa.IsAlleleSpecific.Value) continue;
+                    if (sa.KeyName == DbSnpKeyName) continue;
+                    if (sa.KeyName == RefMinorKeyName) continue;
 
-                    cosmic.Add(jsonVariant.GenotypeIndex.ToString(CultureInfo.InvariantCulture) + '|' + cosmicEntry.ID);
-                }
+                    foreach (var vcfAnnotation in sa.GetStrings("vcf"))
+                    {
+                        if (string.IsNullOrEmpty(vcfAnnotation)) continue;
 
-                foreach (var clinVarEntry in jsonVariant.ClinVarEntries)
-                {
-                    if (clinVarEntry.Significance == null) continue;
-                    if (clinVarEntry.SaAltAllele != jsonVariant.SaAltAllele) continue;
+                        if (sa.KeyName == OneKgKeyName)
+                        {
+                            var contents       = vcfAnnotation.Split(';');
+                            var freq           = contents[0];
+                            var ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
 
-                    clinVar.Add(jsonVariant.GenotypeIndex.ToString(CultureInfo.InvariantCulture) + '|' + RemoveWhiteSpaceAndComma(clinVarEntry.Significance));
-                }
+                            alleleFreq1000G.Add(freq, jsonVariant.GenotypeIndex);
+                            ancestralAllele.Add(ancestryAllele, jsonVariant.GenotypeIndex);
+                            continue;
+                        }
 
-                if (jsonVariant.GlobalMinorAllele != null || jsonVariant.GlobalMinorAlleleFrequency != null)
-                {
-                    globalMinorAllele.Add(jsonVariant.GlobalMinorAllele + '|' + jsonVariant.GlobalMinorAlleleFrequency);
-                }
-                else
-                {
-                    // for multi allelic variants, we need to add a . for the entries that do not have a Global minor allele.
-                    globalMinorAllele.Add(null);
-                }
-
-                alleleFreq1000G.Add(jsonVariant.AlleleFrequencyAll);
-                if (jsonVariant.EvsAlleleFrequencyAll != null || jsonVariant.EvsCoverage != null || jsonVariant.EvsSamples != null)
-                {
-                    evs.Add(jsonVariant.EvsAlleleFrequencyAll + '|' + jsonVariant.EvsCoverage + '|' + jsonVariant.EvsSamples);
-                }
-                else
-                {
-                    evs.Add(null);
+                        if (sa.IsAlleleSpecific != null && sa.IsArray && sa.IsAlleleSpecific.Value)
+                        {
+                            suppAnnotationSources[sa.KeyName].Add(
+                                jsonVariant.GenotypeIndex.ToString(CultureInfo.InvariantCulture) + '|' + vcfAnnotation);
+                        }
+                        else if (!sa.IsArray)
+                        {
+                            suppAnnotationSources[sa.KeyName].Add(vcfAnnotation, jsonVariant.GenotypeIndex);
+                        }
+                    }
                 }
             }
 
-            infoEntries.Add(ancestralAllele.GetString());
-            infoEntries.Add(globalMinorAllele.GetString());
-            infoEntries.Add(alleleFreq1000G.GetString());
-            infoEntries.Add(evs.GetString());
-            infoEntries.Add(phyloP.GetString());
-            infoEntries.Add(cosmic.GetString());
-            infoEntries.Add(clinVar.GetString());
-        }
+            foreach (var value in suppAnnotationSources.Values) infoEntries.Add(value.GetString());
 
-        private static string RemoveWhiteSpaceAndComma(string s)
-        {
-            return s.Replace(' ', '_').Replace(",", "\\x2c");
+            infoEntries.Add(ancestralAllele.GetString());
+            infoEntries.Add(alleleFreq1000G.GetString());
+            infoEntries.Add(phyloP.GetString());
         }
     }
 }

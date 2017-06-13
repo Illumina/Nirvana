@@ -7,8 +7,8 @@ using CacheUtils.CombineAndUpdateGenes.DataStructures;
 using CacheUtils.CombineAndUpdateGenes.FileHandling;
 using CacheUtils.DataDumperImport.FileHandling;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.CombineAndUpdateGenes
 {

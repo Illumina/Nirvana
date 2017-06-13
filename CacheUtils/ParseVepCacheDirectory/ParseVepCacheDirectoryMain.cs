@@ -2,10 +2,11 @@
 using System.IO;
 using CacheUtils.DataDumperImport.FileHandling;
 using CacheUtils.ParseVepCacheDirectory.PredictionConversion;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 
@@ -156,9 +157,6 @@ namespace CacheUtils.ParseVepCacheDirectory
 
                 foreach (var refTuple in vepDirectories)
                 {
-                    // DEBUG
-                    //if (refTuple.Item1 != "chr7") continue;
-
                     Console.WriteLine("Parsing reference sequence [{0}]:", refTuple.Item1);
                     numDirectoriesProcessed++;
 

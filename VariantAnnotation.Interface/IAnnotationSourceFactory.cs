@@ -21,9 +21,7 @@ namespace VariantAnnotation.Interface
 	{
 		string CachePrefix { get; }
 		string CompressedReference { get; }
-		string SupplementaryAnnotation { get; }
-		IEnumerable<string> CustomAnnotation { get; }
-		IEnumerable<string> CustomIntervals { get; }
+		IEnumerable<string> SupplementaryAnnotations { get; }
 	}
 
 	/// <summary>

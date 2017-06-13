@@ -4,6 +4,8 @@ using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.Utilities;
 using VariantAnnotation.DataStructures;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.DataDumperImport.Import
 {
@@ -113,8 +115,6 @@ namespace CacheUtils.DataDumperImport.Import
         /// </summary>
         public static void Parse(ObjectValue objectValue, int transcriptIndex, ImportDataStore dataStore)
         {
-            // Console.WriteLine("*** Parse {0} ***", transcriptIndex + 1);
-
             var bioType          = BioType.Unknown;
             var geneSymbolSource = GeneSymbolSource.Unknown; // HGNC
 
@@ -332,7 +332,6 @@ namespace CacheUtils.DataDumperImport.Import
         /// </summary>
         public static void ParseReferences(ObjectValue objectValue, int transcriptIndex, ImportDataStore dataStore)
         {
-            // Console.WriteLine("*** ParseReferences {0} / {1} ***", transcriptIndex + 1, _tempTranscripts.Count);
             var transcript = dataStore.Transcripts[transcriptIndex];
 
             // loop over all of the key/value pairs in the transcript object

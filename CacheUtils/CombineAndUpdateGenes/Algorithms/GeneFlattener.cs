@@ -5,7 +5,7 @@ using CacheUtils.CombineAndUpdateGenes.DataStructures;
 using CacheUtils.CombineAndUpdateGenes.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.CombineAndUpdateGenes.Algorithms
 {

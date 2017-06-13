@@ -3,23 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
     public sealed class OneKGenReader : IEnumerable<OneKGenItem>
     {
         private readonly FileInfo _oneKGenFile;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
         private  string _ancestralAllele;
 	    private  string _svType;
 	    private  int _svEnd;
-	    private  Tuple<int, int> _ciEnd;
-		private  Tuple<int, int> _ciPos;
-		private  string _refAllele;
+        private  string _refAllele;
 		private  string[] _altAlleles;
 
 	    private int? _allAlleleNumber;
@@ -50,12 +49,12 @@ namespace SAUtils.InputFileParsers.OneKGen
 #pragma warning restore 414
 
         // empty constructor for onekg reader for unit tests.
-        public OneKGenReader(ChromosomeRenamer renamer)
+        private OneKGenReader(IChromosomeRenamer renamer)
         {
             _renamer = renamer;
         }
 
-	    public OneKGenReader(FileInfo oneKGenFile, ChromosomeRenamer renamer) : this(renamer)
+	    public OneKGenReader(FileInfo oneKGenFile, IChromosomeRenamer renamer) : this(renamer)
         {
             _oneKGenFile = oneKGenFile;
         }
@@ -83,10 +82,8 @@ namespace SAUtils.InputFileParsers.OneKGen
 			// SV fields
 			_svEnd  = -1;
 			_svType = null;
-			_ciPos  = null;
-			_ciEnd  = null;
 
-			// grch38 fields
+	        // grch38 fields
 			_minorAlleleCount = 0;
 			_minorAlleleFreq  = 0;
 			_minorAllele      = null;
@@ -125,7 +122,7 @@ namespace SAUtils.InputFileParsers.OneKGen
         /// </summary>
         /// <param name="vcfline"></param>
         /// <returns></returns>
-		public  List<OneKGenItem> ExtractItems(string vcfline)
+        private List<OneKGenItem> ExtractItems(string vcfline)
         {
             var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;
@@ -172,9 +169,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 					_easAlleleNumber,
 					_sasAlleleNumber,
 					_svType,
-					_svEnd,
-					_ciPos,
-					_ciEnd
+					_svEnd
 					));
 			}
 			
@@ -229,14 +224,14 @@ namespace SAUtils.InputFileParsers.OneKGen
 					if (hasSymbolicAllele)
 					{
 						var endBoundaries = value.Split(',');
-						_ciEnd = Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
+						Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
 					}
 					break;
 				case "CIPOS":
 					if (hasSymbolicAllele)
 					{
 						var beginBoundaries = value.Split(',');
-						_ciPos = Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
+						Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
 
 					}
 					break;

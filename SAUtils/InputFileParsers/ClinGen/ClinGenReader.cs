@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.ClinGen
 {
@@ -13,7 +12,7 @@ namespace SAUtils.InputFileParsers.ClinGen
         #region members
 
         private readonly FileInfo _clinGenFileInfo;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
         #endregion
 
@@ -32,7 +31,7 @@ namespace SAUtils.InputFileParsers.ClinGen
         #endregion
 
         // constructor
-        public ClinGenReader(FileInfo clinGenFileInfo, ChromosomeRenamer renamer)
+        public ClinGenReader(FileInfo clinGenFileInfo, IChromosomeRenamer renamer)
         {
             _clinGenFileInfo = clinGenFileInfo;
             _renamer = renamer;

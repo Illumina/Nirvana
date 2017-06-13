@@ -7,6 +7,9 @@ using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace VariantAnnotation.FileHandling.TranscriptCache
 {

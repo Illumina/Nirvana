@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace VariantAnnotation.DataStructures.ProteinFunction
 {

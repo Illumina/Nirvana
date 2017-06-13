@@ -6,6 +6,7 @@ using ErrorHandling.Exceptions;
 using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.DataStructures.CytogeneticBands;
 using VariantAnnotation.DataStructures.IntervalSearch;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.FileHandling
@@ -22,6 +23,7 @@ namespace VariantAnnotation.FileHandling
         private readonly ExtendedBinaryReader _reader;
         private readonly Stream _stream;
         private readonly ICompressedSequence _compressedSequence;
+	    public GenomeAssembly Assembly => _compressedSequence.GenomeAssembly;
 
         private readonly Dictionary<string, int> _nameToIndex  = new Dictionary<string, int>();
         private readonly List<SequenceIndexEntry> _refSeqIndex = new List<SequenceIndexEntry>();
@@ -81,6 +83,7 @@ namespace VariantAnnotation.FileHandling
 
             // jump back to the data start position
             _stream.Position = _dataStartOffset;
+			
         }
 
         /// <summary>
@@ -195,14 +198,14 @@ namespace VariantAnnotation.FileHandling
             for (int refIndex = 0; refIndex < numRefSeqs; refIndex++)
             {
                 int numMaskedIntervals = _reader.ReadOptInt32();
-                var maskedIntervals = new List<IntervalArray<MaskedEntry>.Interval>();
+                var maskedIntervals = new List<Interval<MaskedEntry>>();
 
                 for (int intervalIndex = 0; intervalIndex < numMaskedIntervals; intervalIndex++)
                 {
                     int begin = _reader.ReadOptInt32();
                     int end = _reader.ReadOptInt32();
 
-                    maskedIntervals.Add(new IntervalArray<MaskedEntry>.Interval(begin, end, new MaskedEntry(begin, end)));
+                    maskedIntervals.Add(new Interval<MaskedEntry>(begin, end, new MaskedEntry(begin, end)));
                 }
 
                 var sortedIntervals = maskedIntervals.OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray();
@@ -223,5 +226,6 @@ namespace VariantAnnotation.FileHandling
                 throw new UserErrorException($"The EOF tag does not match the expected values: Obs: {eofTag} vs Exp: {CompressedSequenceCommon.EofTag}");
             }
         }
+		
     }
 }

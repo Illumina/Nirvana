@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.CompressedSequence;
+﻿using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace UnitTests.Utilities
 {

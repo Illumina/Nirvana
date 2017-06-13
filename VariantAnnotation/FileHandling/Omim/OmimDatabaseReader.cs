@@ -4,6 +4,7 @@ using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace VariantAnnotation.FileHandling.Omim
 {
@@ -36,7 +37,7 @@ namespace VariantAnnotation.FileHandling.Omim
             var schema = _reader.ReadUInt16();
             if (schema != OmimDatabaseCommon.SchemaVersion)
                 throw new GeneralException(
-                    $"Custom interval database schema mismatch. Expected {OmimDatabaseCommon.SchemaVersion}, observed {schema}");
+                    $"Omim database schema mismatch. Expected {OmimDatabaseCommon.SchemaVersion}, observed {schema}");
 
             _creationTime = _reader.ReadInt64();
 

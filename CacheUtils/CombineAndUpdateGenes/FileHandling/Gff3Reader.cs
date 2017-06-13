@@ -2,7 +2,7 @@
 using System.IO;
 using CacheUtils.CombineAndUpdateGenes.DataStructures;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.CombineAndUpdateGenes.FileHandling
 {

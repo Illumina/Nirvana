@@ -1,5 +1,5 @@
-﻿using NDesk.Options;
-using VariantAnnotation.CommandLine;
+﻿using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
 using VariantAnnotation.DataStructures;
 
 namespace CacheUtils.CombineAndUpdateGenes
@@ -65,7 +65,6 @@ namespace CacheUtils.CombineAndUpdateGenes
             CheckInputFilenameExists(ConfigurationSettings.InputPath, "input genes", "--in");
             CheckInputFilenameExists(ConfigurationSettings.InputPath2, "input genes 2", "--in2");
             CheckInputFilenameExists(ConfigurationSettings.HgncPath, "HGNC", "--hgnc");
-            //CheckInputFilenameExists(ConfigurationSettings.MergedGeneInfoPath, "merged gene info", "--gi");
 
             foreach (var geneInfoPath in ConfigurationSettings.GeneInfoPaths)
             {

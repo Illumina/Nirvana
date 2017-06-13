@@ -4,9 +4,11 @@ namespace VariantAnnotation.Interface
 {
     public interface ISupplementaryAnnotationReader
     {
+        IEnumerable<Interval<IInterimInterval>> SmallVariantIntervals { get; }
+        IEnumerable<Interval<IInterimInterval>> SvIntervals { get; }
+        IEnumerable<Interval<IInterimInterval>> AllVariantIntervals { get; }
+        ISupplementaryAnnotationHeader Header { get; }
         bool IsRefMinor(int position);
-        ISupplementaryAnnotationPosition GetAnnotation(int referencePos);
-        IIntervalForest<ISupplementaryInterval> GetIntervalForest(IChromosomeRenamer renamer);
-        IEnumerable<ISupplementaryInterval> GetSupplementaryIntervals(IChromosomeRenamer renamer);
+        ISaPosition GetAnnotation(int position);
     }
 }

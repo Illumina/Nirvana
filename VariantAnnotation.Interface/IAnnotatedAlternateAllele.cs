@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace VariantAnnotation.Interface
@@ -22,74 +23,14 @@ namespace VariantAnnotation.Interface
         bool IsReferenceNoCall { get; }
         int GenotypeIndex { get; }
         string SaAltAllele { get; }
+        bool IsRecomposedVariant { get; }
 
         // extensible records
 
         string PhylopScore { get; } // 11.612
 
         string AncestralAllele { get; set; }
-        string EvsCoverage { get; set; }
-        string EvsSamples { get; set; }
-        string GlobalMinorAllele { get; set; }
-        string GlobalMinorAlleleFrequency { get; set; }
 
-
-        string AlleleFrequencyAll { get; set; }                      // ALL 0.1239
-        string AlleleFrequencyAdMixedAmerican { get; set; }          // AMR 0.1239
-        string AlleleFrequencyAfrican { get; set; }                  // AFR 0.1239
-        string AlleleFrequencyEastAsian { get; set; }                // EAS 0.1239
-        string AlleleFrequencyEuropean { get; set; }                 // EUR 0.1239
-        string AlleleFrequencySouthAsian { get; set; }               // SAS 0.1239
-
-
-        string OneKgAlleleNumberAfrican { get; set; }
-        string OneKgAlleleNumberAmerican { get; set; }
-        string OneKgAlleleNumberAll { get; set; }
-        string OneKgAlleleNumberEastAsian { get; set; }
-        string OneKgAlleleNumberEuropean { get; set; }
-        string OneKgAlleleNumberSouthAsian { get; set; }
-
-        string OneKgAlleleCountAfrican { get; set; }
-        string OneKgAlleleCountAmerican { get; set; }
-        string OneKgAlleleCountAll { get; set; }
-        string OneKgAlleleCountEastAsian { get; set; }
-        string OneKgAlleleCountEuropean { get; set; }
-        string OneKgAlleleCountSouthAsian { get; set; }
-
-
-        string EvsAlleleFrequencyAfricanAmerican { get; set; }       // African American 0.1239
-        string EvsAlleleFrequencyEuropeanAmerican { get; set; }      // European American 0.1239
-        string EvsAlleleFrequencyAll { get; set; }
-
-        string ExacCoverage { get; set; }
-        string ExacAlleleFrequencyAfrican { get; set; }
-        string ExacAlleleFrequencyAmerican { get; set; }
-        string ExacAlleleFrequencyAll { get; set; }
-        string ExacAlleleFrequencyEastAsian { get; set; }
-        string ExacAlleleFrequencyFinish { get; set; }
-        string ExacAlleleFrequencyNonFinish { get; set; }
-        string ExacAlleleFrequencyOther { get; set; }
-        string ExacAlleleFrequencySouthAsian { get; set; }
-
-        string ExacAlleleNumberAfrican { get; set; }
-        string ExacAlleleNumberAmerican { get; set; }
-        string ExacAlleleNumberAll { get; set; }
-        string ExacAlleleNumberEastAsian { get; set; }
-        string ExacAlleleNumberFinish { get; set; }
-        string ExacAlleleNumberNonFinish { get; set; }
-        string ExacAlleleNumberOther { get; set; }
-        string ExacAlleleNumberSouthAsian { get; set; }
-
-        string ExacAlleleCountAfrican { get; set; }
-        string ExacAlleleCountAmerican { get; set; }
-        string ExacAlleleCountAll { get; set; }
-        string ExacAlleleCountEastAsian { get; set; }
-        string ExacAlleleCountFinish { get; set; }
-        string ExacAlleleCountNonFinish { get; set; }
-        string ExacAlleleCountOther { get; set; }
-        string ExacAlleleCountSouthAsian { get; set; }
-
-        string[] DbSnpIds { get; set; }
 
 
 
@@ -106,32 +47,18 @@ namespace VariantAnnotation.Interface
         // -----------------
         ISet<string> OverlappingGenes { get; }
 
-        // -------------------------
-        // Supplementary annotations
-        // -------------------------
+		// -------------------------
+		// Supplementary annotations
+		// -------------------------
+		IList<IAnnotatedSA> SuppAnnotations { get; set; }
 
-        ISet<IClinVar> ClinVarEntries { get; }
-        IList<ICosmic> CosmicEntries { get; }
-        IList<ICustomAnnotation> CustomItems { get; }
-
-        // ----------------------------
-        // customIntervals
-        // ----------------------------
-        IList<ICustomInterval> CustomIntervals { get; }
 
         //-------------------------------
         // Overlapping transcripts for SV
         //-------------------------------
-        ISet<IOverlapTranscript> SvOverlappingTranscripts { get; }
+        IList<IOverlapTranscript> SvOverlappingTranscripts { get; }
     }
 
-    public interface ICustomInterval : IInterval, IJsonSerializer
-    {
-        string ReferenceName { get; }
-        string Type { get; }
-        IDictionary<string, string> StringValues { get; }
-        IDictionary<string, string> NonStringValues { get; }
-    }
 
     public interface ISupplementaryInterval
     {
@@ -150,84 +77,33 @@ namespace VariantAnnotation.Interface
         IReadOnlyDictionary<string, double> PopulationFrequencies { get; }
         IReadOnlyDictionary<string, IEnumerable<string>> StringLists { get; }
 
-        string GetJsonContent();
+        string GetJsonString();
         double OverlapFraction(int begin, int end);
     }
 
-    public enum ReviewStatusEnum
-    {
-        // ReSharper disable InconsistentNaming
-        no_assertion,
-        no_criteria,
-        single_submitter,
-        multiple_submitters,
-        multiple_submitters_no_conflict,
-        conflicting_interpretations,
-        expert_panel,
-        practice_guideline
-        // ReSharper restore InconsistentNaming
-    }
+	public interface IInterimInterval:IInterval
+	{
+		string KeyName { get; }
+		string ReferenceName { get; }
+		string JsonString { get; }
+		ReportFor ReportingFor { get; }
+		void Write(BinaryWriter writer);
 
-    public interface IClinVar : IJsonSerializer
-    {
-        #region members
 
-        IEnumerable<string> AlleleOrigins { get; }
-        string AltAllele { get; }
-        string ID { get; }
-        ReviewStatusEnum ReviewStatus { get; }
-        string IsAlleleSpecific { get; }
-        IEnumerable<string> MedGenIDs { get; }
-        IEnumerable<string> OmimIDs { get; }
-        IEnumerable<string> OrphanetIDs { get; }
-        IEnumerable<string> Phenotypes { get; }
-        string Significance { get; }
-        IEnumerable<long> PubmedIds { get; }
-        long LastUpdatedDate { get; }
-        string SaAltAllele { get; }
+	}
 
-        #endregion
+	public enum ReportFor
+	{
+		None,
+		AllVariants,
+		SmallVariants,
+		StructuralVariants
 
-    }
+	}
 
-    public interface ICosmic : IJsonSerializer
-    {
-        #region members
 
-        string AltAllele { get; }
-        string Gene { get; }
-        string ID { get; }
-        string IsAlleleSpecific { get; }
-        IEnumerable<ICosmicStudy> Studies { get; }
-        string SaAltAllele { get; }
 
-        #endregion
-    }
-
-    public interface ICosmicStudy : IJsonSerializer
-    {
-        #region members
-        string ID { get; }
-        string Histology { get; }
-        string PrimarySite { get; }
-        #endregion
-
-    }
-
-    public interface ICustomAnnotation : IJsonSerializer
-    {
-        #region members
-        string Id { get; }
-        string AnnotationType { get; }
-        string AltAllele { get; }
-        bool IsPositional { get; }
-        string IsAlleleSpecific { get; }
-        IDictionary<string, string> StringFields { get; }
-        IEnumerable<string> BooleanFields { get; }
-        #endregion
-    }
-
-    public interface IAnnotatedTranscript
+	public interface IAnnotatedTranscript
     {
         string AminoAcids { get; }
         string CdsPosition { get; }
@@ -273,4 +149,15 @@ namespace VariantAnnotation.Interface
     {
         void SerializeJson(StringBuilder sb);
     }
+
+	public interface IAnnotatedSA
+	{
+		bool? IsAlleleSpecific { get; }
+
+		string KeyName { get; }
+		string VcfKeyName { get; }
+		IList<string> GetStrings(string format);
+		bool IsArray { get; }
+
+	}
 }

@@ -129,10 +129,6 @@ namespace CacheUtils.DataDumperImport.Import
                     $"Unable to link the mapper pair reference: mapper pair index: [{genomicMapperPairIndex}], current # of mapper pairs: [{numGenomicMapperPairs}]");
             }
 
-            // Console.WriteLine("reference:         {0}", reference);
-            // Console.WriteLine("transcript index:  {0}", transcriptIndex);
-            // Console.WriteLine("mapper pair index: {0}", genomicMapperPairIndex);
-
             return dataStore.Transcripts[transcriptIndex].VariantEffectCache.Mapper.ExonCoordinateMapper.PairGenomic.Genomic[genomicMapperPairIndex];
         }
 
@@ -178,10 +174,6 @@ namespace CacheUtils.DataDumperImport.Import
                     $"Unable to link the mapper pair reference: mapper pair index: [{codingDnaMapperPairIndex}], current # of mapper pairs: [{numGenomicMapperPairs}]");
             }
 
-            // Console.WriteLine("reference:         {0}", reference);
-            // Console.WriteLine("transcript index:  {0}", transcriptIndex);
-            // Console.WriteLine("mapper pair index: {0}", genomicMapperPairIndex);
-
             return dataStore.Transcripts[transcriptIndex].VariantEffectCache.Mapper.ExonCoordinateMapper.PairCodingDna.CodingDna[codingDnaMapperPairIndex];
         }
 
@@ -214,16 +206,7 @@ namespace CacheUtils.DataDumperImport.Import
                 }
 
                 var newMapperPair = Parse(mapperPairNode, dataStore.CurrentReferenceIndex);
-                // DS.VEP.MapperPair oldMapperPair;
-                // if (dataStore.MapperPairs.TryGetValue(newMapperPair, out oldMapperPair))
-                //{
-                //    mapperPairs[mapperPairIndex] = oldMapperPair;
-                //}
-                // else
-                //{
                 mapperPairs[mapperPairIndex] = newMapperPair;
-                //    dataStore.MapperPairs[newMapperPair] = newMapperPair;
-                //}
             }
 
             return mapperPairs;

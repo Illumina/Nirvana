@@ -1,15 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using NDesk.Options;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
 using VariantAnnotation;
-using VariantAnnotation.CommandLine;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Annotation;
 using VariantAnnotation.DataStructures.JsonAnnotations;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.DataStructures.VCF;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.FileHandling.TranscriptCache;
+using VariantAnnotation.FileHandling.VCF;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
@@ -24,9 +29,42 @@ namespace Nirvana
             : base(programDescription, ops, commandLineExample, programAuthors, versionProvider)
         {}
 
+        protected override void ValidateCommandLine()
+        {
+            if (ConfigurationSettings.VcfPath != "-")
+            {
+                CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
+            }
+
+            CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
+            CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache");
+            CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache");
+            CheckInputFilenameExists(CacheConstants.PolyPhenPath(ConfigurationSettings.InputCachePrefix), "PolyPhen cache", "--cache");
+
+			foreach (var saDir in ConfigurationSettings.SupplementaryAnnotationDirectories)
+			{
+			    CheckDirectoryExists(saDir, "supplementary annotation", "--sd", false);
+			    CheckDirectoryContainsFiles(saDir, "supplementary annotation", "--sd", "*.nsa");
+			}
+
+            // if we're using stdout, it doesn't make sense to output the VCF and gVCF
+            if (ConfigurationSettings.OutputFileName == "-")
+            {
+                ConfigurationSettings.Vcf        = false;
+                ConfigurationSettings.Gvcf       = false;
+                PerformanceMetrics.DisableOutput = true;
+                DisableConsoleOutput();
+            }
+
+            HasRequiredParameter(ConfigurationSettings.OutputFileName, "output file stub", "--out");
+
+            if (ConfigurationSettings.LimitReferenceNoCallsToTranscripts)
+                ConfigurationSettings.EnableReferenceNoCalls = true;
+        }
+
         protected override void ProgramExecution()
         {
-            if (!Console.IsOutputRedirected) Console.WriteLine("Running Nirvana on {0}:", GetFileName());
+            if (!DisableOutput) Console.WriteLine("Running Nirvana on {0}:", GetFileName());
 
             var outputVcfPath      = ConfigurationSettings.OutputFileName + ".vcf.gz";
             var outputGvcfPath     = ConfigurationSettings.OutputFileName + ".genome.vcf.gz";
@@ -123,8 +161,7 @@ namespace Nirvana
         {
             var annotatorInfo  = new AnnotatorInfo(sampleNames, booleanArguments);
             var annotatorPaths = new AnnotatorPath(ConfigurationSettings.InputCachePrefix,
-                ConfigurationSettings.CompressedReferencePath, ConfigurationSettings.SupplementaryAnnotationDirectory,
-                ConfigurationSettings.CustomAnnotationDirectories, ConfigurationSettings.CustomIntervalDirectories);
+                ConfigurationSettings.CompressedReferencePath, ConfigurationSettings.SupplementaryAnnotationDirectories);
             return new AnnotationSourceFactory().CreateAnnotationSource(annotatorInfo, annotatorPaths);
         }
 
@@ -141,9 +178,8 @@ namespace Nirvana
 
         private static void WriteOmim(IAnnotationSource annotator, UnifiedJsonWriter unifiedJsonWriter)
         {
-            var omimAnnotations = new List<string>();
-            annotator.AddGeneLevelAnnotation(omimAnnotations);
-            var annotionOutput = UnifiedJson.GetGeneAnnotation(omimAnnotations, "omim");
+            var geneAnnotations = annotator.GetGeneAnnotations();
+            var annotionOutput = UnifiedJson.FormatGeneAnnotations(geneAnnotations);
             unifiedJsonWriter.Write(annotionOutput);
         }
 
@@ -178,57 +214,10 @@ namespace Nirvana
             if (firstAllele.IsReference && !firstAllele.IsReferenceMinor && !firstAllele.IsReferenceNoCall) return;
             writer.Write(annotatedVariant.ToString());
         }
-
-        protected override void ValidateCommandLine()
-        {
-            if (ConfigurationSettings.VcfPath != "-")
-            {
-                CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
-            }
-
-            CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
-            CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache");
-            CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache");
-            CheckInputFilenameExists(CacheConstants.PolyPhenPath(ConfigurationSettings.InputCachePrefix), "PolyPhen cache", "--cache");
-            CheckDirectoryExists(ConfigurationSettings.SupplementaryAnnotationDirectory, "supplementary annotation", "--sd", false);
-            foreach (var customAnnotationDirectory in ConfigurationSettings.CustomAnnotationDirectories)
-            {
-                CheckDirectoryExists(customAnnotationDirectory, "custom annotation", "--ca", false);
-            }
-
-            foreach (var customAnnotationDirectory in ConfigurationSettings.CustomIntervalDirectories)
-            {
-                CheckDirectoryExists(customAnnotationDirectory, "custom interval", "--ci", false);
-            }
-
-            // if we're using stdout, it doesn't make sense to output the VCF and gVCF
-            if (ConfigurationSettings.OutputFileName == "-")
-            {
-                ConfigurationSettings.Vcf        = false;
-                ConfigurationSettings.Gvcf       = false;
-                PerformanceMetrics.DisableOutput = true;
-            }
-
-            HasRequiredParameter(ConfigurationSettings.OutputFileName, "output file stub", "--out");
-
-            if (ConfigurationSettings.LimitReferenceNoCallsToTranscripts)
-                ConfigurationSettings.EnableReferenceNoCalls = true;
-        }
-
         static int Main(string[] args)
         {
             var ops = new OptionSet
             {
-                {
-                    "ca=",
-                    "input custom annotation {directory}",
-                    v => ConfigurationSettings.CustomAnnotationDirectories.Add(v)
-                },
-                {
-                    "ci=",
-                    "input custom intervals {directory}",
-                    v => ConfigurationSettings.CustomIntervalDirectories.Add(v)
-                },
                 {
                     "cache|c=",
                     "input cache {prefix}",
@@ -244,11 +233,11 @@ namespace Nirvana
                     "enables reference no-calls",
                     v => ConfigurationSettings.EnableReferenceNoCalls = v != null
                 },
-                {
-                    "loftee",
-                    "enables loftee",
-                    v => ConfigurationSettings.EnableLoftee = v != null
-                },
+				{
+					"loftee",
+					"enables loftee",
+					v => ConfigurationSettings.EnableLoftee = v != null
+				},
                 {
                     "gvcf",
                     "enables genome vcf output",
@@ -272,7 +261,7 @@ namespace Nirvana
                 {
                     "sd=",
                     "input supplementary annotation {directory}",
-                    v => ConfigurationSettings.SupplementaryAnnotationDirectory = v
+                    v => ConfigurationSettings.SupplementaryAnnotationDirectories.Add(v)
                 },
                 {
                     "transcript-nc",
@@ -293,7 +282,7 @@ namespace Nirvana
 
             var commandLineExample = "-i <vcf path> -c <cache prefix> --sd <sa dir> -r <ref path> -o <base output filename>";
 
-            var nirvana = new NirvanaAnnotator("Annotates a set of variants", ops, commandLineExample, Constants.Authors);
+            var nirvana = new NirvanaAnnotator("Annotates a set of variants", ops, commandLineExample, Constants.Authors,new NirvanaVersionProvider());
             nirvana.Execute(args);
 
             return nirvana.ExitCode;

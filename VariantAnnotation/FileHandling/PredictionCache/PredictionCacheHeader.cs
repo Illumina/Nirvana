@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 

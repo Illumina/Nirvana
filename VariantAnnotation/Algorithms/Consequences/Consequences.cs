@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Algorithms.Consequences
@@ -53,10 +53,11 @@ namespace VariantAnnotation.Algorithms.Consequences
         private const string TranscriptTruncationKey = "transcript_truncation";
         private const string UnknownKey = "unknown";
         private const string UpstreamGeneVariantKey = "upstream_gene_variant";
+        private const string ShortTandemRepeatChangeKey = "short_tandem_repeat_change";
+        private const string ShortTandemRepeatExpansionKey = "short_tandem_repeat_expansion";
+        private const string ShortTandemRepeatContractionKey = "short_tandem_repeat_contraction";
         private const string TranscriptVariantKey = "transcript_variant";
-        private const string GeneFusionKey = "gene_fusion";
-        private const string UnidirectionalGeneFusionKey = "unidirectional_gene_fusion";
-        private const string BidirectionalGeneFusionKey = "bidirectional_gene_fusion";
+        private const string GeneFusionKey = "unidirectional_gene_fusion";
 
 
         #endregion
@@ -107,18 +108,14 @@ namespace VariantAnnotation.Algorithms.Consequences
                 [ConsequenceType.TranscriptAblation] = TranscriptAblatioinKey,
                 [ConsequenceType.Unknown] = UnknownKey,
                 [ConsequenceType.UpstreamGeneVariant] = UpstreamGeneVariantKey,
+                [ConsequenceType.ShortTandemRepeatChange] = ShortTandemRepeatChangeKey,
+                [ConsequenceType.ShortTandemRepeatExpansion] = ShortTandemRepeatExpansionKey,
+                [ConsequenceType.ShortTandemRepeatContraction] = ShortTandemRepeatContractionKey,
                 [ConsequenceType.TranscriptVariant] = TranscriptVariantKey,
-                [ConsequenceType.GeneFusion] = GeneFusionKey,
-                [ConsequenceType.UnidirectionalGeneFusion] = UnidirectionalGeneFusionKey,
-                [ConsequenceType.BidirectionalGeneFusion] = BidirectionalGeneFusionKey
+                [ConsequenceType.GeneFusion] = GeneFusionKey
             };
         }
 
-        public Consequences(List<ConsequenceType> consequences, VariantEffect variantEffect) : this(variantEffect)
-        {
-            _consequences.AddRange(consequences);
-
-        }
 
         /// <summary>
         /// adds the CNV consequences
@@ -134,17 +131,26 @@ namespace VariantAnnotation.Algorithms.Consequences
         /// </summary>
         public void DetermineVariantEffects(VariantType internalCopyNumberType)
         {
-            GetTier1Types();
+	        var strConsequenceType = _variantEffect.GetStrConsequenceType();
+	        if (strConsequenceType != ConsequenceType.Unknown)
+	        {
+				_consequences.Clear();
+		        _consequences.Add(strConsequenceType);
+		        return;
+	        }
+
+			GetTier1Types();
             if (_consequences.Count == 0) GetTier2Types();
             if (_consequences.Count == 0) GetTier3Types();
 
             if (internalCopyNumberType != VariantType.unknown) AssignCnvTypes(internalCopyNumberType);
-
+	        
             AssignGeneFusion();
 
             if (_consequences.Count == 0) _consequences.Add(ConsequenceType.TranscriptVariant);
         }
 
+        
         /// <summary>
         /// determines the flanking variant's functional consequence
         /// </summary>

@@ -47,8 +47,9 @@
         CopyNumberChange,                    // tier CNV
         //IntergenicVariant,                      // tier 4, rank 38 (not used)
 		GeneFusion,								//tier breakend
-		UnidirectionalGeneFusion,
-		BidirectionalGeneFusion,
-		TranscriptVariant                      //default for variant overlap with transcript	
+        ShortTandemRepeatChange,
+        ShortTandemRepeatExpansion,
+        ShortTandemRepeatContraction,
+        TranscriptVariant                      //default for variant overlap with transcript	
 	}
 }

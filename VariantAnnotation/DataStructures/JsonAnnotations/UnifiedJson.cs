@@ -3,13 +3,16 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
+using VariantAnnotation.DataStructures.Annotation;
+using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.DataStructures.Variants;
+using VariantAnnotation.FileHandling.VCF;
 
 namespace VariantAnnotation.DataStructures.JsonAnnotations
 {
@@ -17,84 +20,73 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
     {
         #region members        
 
-        // first comes the vcf positional records
-	    private readonly int? _referenceEnd;
-        public string[] Filters { get; }
-        public string Quality { get; }
+        private readonly VariantFeature _variant;
 
+        private int? ReferenceEnd => _variant.VcfReferenceEnd;
         public string CytogeneticBand { get; private set; }
 
-        // now we place the samples and variant objects
-        public string StrandBias { get; }
-        public string RecalibratedQuality { get; }
-        public string JointSomaticNormalQuality { get; }
-        public string CopyNumber { get; }
+        // ReSharper disable once UnassignedGetOnlyAutoProperty
         public string Depth { get; }
-        public bool ColocalizedWithCnv { get; }
-	    public string[] CiPos { get; }
-	    public string[] CiEnd { get; }
-	    public int? SvLength { get; }
 
 		internal static bool NeedsVariantComma;
+
+        // The following two private variables keep track of the variant and transcript currently being annotated by NirvanaAnnotationSource.Annotate()
+        private JsonVariant _currJsonVariant;
+        private JsonVariant.Transcript _currTranscript;
 
         #endregion
 
         #region stringConstants
 
-        const string RefAlleleTag = "refAllele";
-        const string PositionTag = "position";
+        const string RefAlleleTag  = "refAllele";
+        const string PositionTag   = "position";
         const string ChromosomeTag = "chromosome";
-        const string SamplesTag = "samples";
-        const string VariantsTag = "variants";
-        const string StructuralVariantsTag = "structuralVariants";
-        const string TrueTag = "true";
+        const string SamplesTag    = "samples";
+        const string VariantsTag   = "variants";
+        const string TrueTag       = "true";
 
         #endregion
 
         #region interfaceProperties
 
-        public string ReferenceName { get; }
-		public int? ReferenceBegin { get; }
-		public string ReferenceAllele { get; }
-	    public IList<string> AlternateAlleles { get; }
+        public IEnumerable<string> AlternateAlleles
+            => _variant.AlternateAlleles[0].NirvanaVariantType == VariantType.translocation_breakend
+                ? _variant.VcfColumns[VcfCommon.AltIndex].Split(',')
+                : _variant.VcfColumns[VcfCommon.AltIndex].ToUpperInvariant().Split(',');
 
-		public IEnumerable<IAnnotatedSample> AnnotatedSamples { get; }
+        public IEnumerable<IAnnotatedSample> AnnotatedSamples { get; }
 
-	    public IList<IAnnotatedAlternateAllele> AnnotatedAlternateAlleles { get; }
+	    public IList<IAnnotatedAlternateAllele> AnnotatedAlternateAlleles { get; } = new List<IAnnotatedAlternateAllele>();
 
 	    public IEnumerable<IAnnotatedSupplementaryInterval> SupplementaryIntervals { get; private set; }
 
-	    public readonly string InfoFromVcf;
+        public string ReferenceName             => _variant.ReferenceName;
+        public int? ReferenceBegin              => _variant.VcfReferenceBegin;
+        public string ReferenceAllele           => _variant.VcfColumns[VcfCommon.RefIndex].ToUpperInvariant();
+        public string InfoFromVcf               => _variant.VcfColumns[VcfCommon.InfoIndex];
+        public int? SvEnd                       => _variant.SvEnd;
+        public string[] Filters                 => _variant.VcfColumns[VcfCommon.FilterIndex].Split(';');
+        public string Quality                   => _variant.VcfColumns[VcfCommon.QualIndex];
+        public string StrandBias                => _variant.StrandBias?.ToString();
+        public string RecalibratedQuality       => _variant.RecalibratedQuality?.ToString();
+        public string JointSomaticNormalQuality => _variant.JointSomaticNormalQuality?.ToString();
+        public string CopyNumber                => _variant.CopyNumber?.ToString();
+        public bool ColocalizedWithCnv          => _variant.ColocalizedWithCnv;
+        public string[] CiPos                   => _variant.CiPos;
+        public string[] CiEnd                   => _variant.CiEnd;
+        public int? SvLength                    => _variant.SvLength;
 
-		// The following two private variables keep track of the variant and transcript currently being annotated by NirvanaAnnotationSource.Annotate()
-		private JsonVariant _currJsonVariant;
-		private JsonVariant.Transcript _currTranscript;
-	    #endregion
+        #endregion
 
-		// constructor
-		public UnifiedJson(VariantFeature variant)
-		{
-			ReferenceName             = variant.ReferenceName;
-			ReferenceBegin            = variant.VcfReferenceBegin;
-			_referenceEnd             = variant.VcfReferenceEnd;
-			ReferenceAllele           = variant.VcfColumns[VcfCommon.RefIndex].ToUpperInvariant();
-			AlternateAlleles          = variant.AlternateAlleles[0].NirvanaVariantType == VariantType.translocation_breakend
-										? variant.VcfColumns[VcfCommon.AltIndex].Split(',')
-										: variant.VcfColumns[VcfCommon.AltIndex].ToUpperInvariant().Split(',');
-			Quality                   = variant.VcfColumns[VcfCommon.QualIndex];
-			Filters                   = variant.VcfColumns[VcfCommon.FilterIndex].Split(';');
-			StrandBias                = variant.StrandBias?.ToString(CultureInfo.InvariantCulture);
-			JointSomaticNormalQuality = variant.JointSomaticNormalQuality?.ToString();
-			RecalibratedQuality       = variant.RecalibratedQuality?.ToString();
-			CopyNumber                = variant.CopyNumber?.ToString();
-			InfoFromVcf               = variant.VcfColumns[VcfCommon.InfoIndex];
-			AnnotatedAlternateAlleles             = new List<IAnnotatedAlternateAllele>();
-			AnnotatedSamples          = variant.ExtractSampleInfo();
-			ColocalizedWithCnv        = variant.ColocalizedWithCnv;
-			CiPos                     = variant.CiPos;
-			CiEnd                     = variant.CiEnd;
-			SvLength                  = variant.SvLength;
-		}
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public UnifiedJson(VariantFeature variant)
+        {
+            _variant = variant;
+            AnnotatedSamples = variant.ExtractSampleInfo();
+        }
+
         public override string ToString()
         {
             // return if this is a reference site
@@ -121,6 +113,14 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 			jsonObject.AddStringValue(ChromosomeTag, ReferenceName);
 			jsonObject.AddStringValue(RefAlleleTag, ReferenceAllele);
 			jsonObject.AddIntValue(PositionTag, ReferenceBegin);
+	        if (_variant.IsRepeatExpansion)
+	        {
+		        jsonObject.AddIntValue("svEnd", _variant.VcfReferenceEnd);
+				jsonObject.AddStringValue("repeatUnit", _variant.RepeatUnit);
+		        jsonObject.AddIntValue("refRepeatCount", _variant.RefRepeatCount);
+			}
+				
+			jsonObject.AddIntValue("svEnd", SvEnd);
 			jsonObject.AddStringValues("ciPos", CiPos, false);
 			jsonObject.AddStringValues("ciEnd", CiEnd, false);
 			jsonObject.AddIntValue("svLength",SvLength);
@@ -139,7 +139,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 			if (AnnotatedSamples != null) jsonObject.AddStringValues(SamplesTag, AnnotatedSamples.Select(s => s.ToString()).ToArray(), false);
 
 			if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
-					jsonObject.AddStringValues(StructuralVariantsTag, SupplementaryIntervals.Select(s => s.ToString()).ToArray(), false);
+				AddSuppIntervalToJsonObject(jsonObject);
 
 			jsonObject.AddStringValues(VariantsTag, AnnotatedAlternateAlleles.Select(v => v.ToString()).ToArray(), false);
 
@@ -147,9 +147,25 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 			return sb.ToString();
         }
 
+		private void AddSuppIntervalToJsonObject(JsonObject jsonObject)
+		{
+			var saDict = new Dictionary<string, List<string>>();
+			foreach (var si in SupplementaryIntervals)
+			{
+				if (!saDict.ContainsKey(si.KeyName))
+				{
+					saDict[si.KeyName] = new List<string>();
+				}
+				saDict[si.KeyName].AddRange(si.GetStrings("json"));
+			}
 
+			foreach (var kvp in saDict)
+			{
+				jsonObject.AddStringValues(kvp.Key, kvp.Value, false);
+			}
+		}
 
-        public static string GetHeader(string annotator, string creationTime, string genomeAssembly, int jsonSchemaVersion, string vepDataVersion, List<DataSourceVersion> dataSourceVersions, string[] sampleNames = null)
+		public static string GetHeader(string annotator, string creationTime, string genomeAssembly, int jsonSchemaVersion, string vepDataVersion, List<DataSourceVersion> dataSourceVersions, string[] sampleNames = null)
         {
             var sb = new StringBuilder();
             var jsonObject = new JsonObject(sb);
@@ -198,7 +214,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             }
         }
 
-	    private void FindCorrespondingJsonVariant(VariantAlternateAllele altAllele)
+	    private void FindCorrespondingJsonVariant(IAllele altAllele)
 	    {
 		    _currJsonVariant = null;
 		    foreach (var annotatedAllele in AnnotatedAlternateAlleles)
@@ -207,12 +223,12 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
 		        if (jsonVariant?.ReferenceBegin != altAllele.Start) continue;
                 if (jsonVariant.SaAltAllele != altAllele.SuppAltAllele) continue;
-
+                if (jsonVariant.IsRecomposedVariant != altAllele.IsRecomposedVariant) continue;
                 _currJsonVariant = jsonVariant;
 			}
 		}
 
-        public void AddFlankingTranscript(Transcript transcript, TranscriptAnnotation ta, string[] consequences)
+        public void AddFlankingTranscript(Transcript.Transcript transcript, TranscriptAnnotation ta, string[] consequences)
         {
             _currTranscript = new JsonVariant.Transcript
             {
@@ -266,7 +282,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 	        CytogeneticBand = variant.CytogeneticBand;
 
             // populating supplementary interval specific fields
-            PopulateSuppIntervalFields(variant.GetSupplementaryIntervals());
+            PopulateSuppIntervalFields(variant.GetSupplementaryIntervals(),variant.IsStructuralVariant);
 
             foreach (var altAllele in variant.AlternateAlleles)
             {
@@ -274,60 +290,58 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
 
                 AnnotatedAlternateAlleles.Add(jsonVariant);
 
-                // custom intervals are not part of SA as they are a separate data structure
-                AddCustomIntervals(altAllele, jsonVariant);
-
                 if (altAllele.SupplementaryAnnotationPosition == null) continue;
 
                 var sa = altAllele.SupplementaryAnnotationPosition;
-
-                sa.AddSaPositionToVariant(jsonVariant);
+                jsonVariant.AddSaDataSources(sa);
             }
         }
 
-        private static void AddCustomIntervals(VariantAlternateAllele altAllele, JsonVariant jsonVariant)
+        private void PopulateSuppIntervalFields(List<IInterimInterval> suppIntervals, bool isStructualVariant)
         {
-            // adding the custom intervals
-            if (altAllele.CustomIntervals == null) return;
-            jsonVariant.CustomIntervals.Clear();
+			if (suppIntervals == null) return;
+			var supplementaryIntervals = new List<IAnnotatedSupplementaryInterval>();
 
-            foreach (var custInterval in altAllele.CustomIntervals)
-            {
-			    jsonVariant.CustomIntervals.Add(custInterval);
-            }
-        }
+			foreach (var interval in suppIntervals)
+			{
+				if (isStructualVariant &&
+					interval.ReportingFor != ReportFor.AllVariants && interval.ReportingFor != ReportFor.StructuralVariants)
+					continue;
 
-        private void PopulateSuppIntervalFields(List<ISupplementaryInterval> suppIntervals)
-        {
-            if (suppIntervals == null) return;
-			var supplementaryIntervals = new List<JsonSupplementaryInterval>();
+				if (!isStructualVariant && interval.ReportingFor != ReportFor.AllVariants && interval.ReportingFor != ReportFor.SmallVariants)
+					continue;
 
-            foreach (var interval in suppIntervals)
-            {
-                var jsonSuppInterval = new JsonSupplementaryInterval(interval);
+				var jsonSuppInterval = new JsonSupplementaryInterval(interval);
 
 				supplementaryIntervals.Add(jsonSuppInterval);
 
-                //compute reciprocal overlap
+				//compute reciprocal overlap
 
-				if (ReferenceBegin == null || _referenceEnd == null) continue;
-				if (ReferenceBegin >= _referenceEnd) continue; //do not calculate reciprocal overlap for insertion
-                if (interval.Start >= interval.End) continue; //donot compute reciprocal overlap if supp interval is insertion
+				if ( !isStructualVariant || ReferenceBegin == null || ReferenceEnd == null ) continue;
+				if (ReferenceBegin >= ReferenceEnd) continue; //do not calculate reciprocal overlap for insertion
+				if (interval.Start >= interval.End) continue; //donot compute reciprocal overlap if supp interval is insertion
 
-				var variantInterval = new AnnotationInterval(ReferenceBegin.Value + 1, _referenceEnd.Value);
 
-                var intervalOverlap = interval.OverlapFraction(variantInterval.Start, variantInterval.End);
-                var variantOverlap = variantInterval.OverlapFraction(interval.Start, interval.End);
-
-                jsonSuppInterval.ReciprocalOverlap = Math.Min(intervalOverlap, variantOverlap);
-            }
+				jsonSuppInterval.ReciprocalOverlap = GetReciprocalOverlap(interval.Start, interval.End, ReferenceBegin.Value + 1,
+					ReferenceEnd.Value);
+			}
 
 			SupplementaryIntervals = supplementaryIntervals;
-        }
+		}
+
+		private double GetReciprocalOverlap(int start1, int end1, int start2, int end2)
+		{
+			var overlapStart = Math.Max(start1, start2);
+			var overlapEnd = Math.Min(end1, end2);
+
+			var maxLen = Math.Max(end2 - start2 + 1, end1 - start1 + 1);
+
+			return Math.Max(0, (overlapEnd - overlapStart + 1) * 1.0 / maxLen);
+		}
 
 
 
-        public void CreateAnnotationObject(Transcript transcript, VariantAlternateAllele altAllele)
+		public void CreateAnnotationObject(Transcript.Transcript transcript, VariantAlternateAllele altAllele)
         {
             // while annotating alternate allele, the first output function to be called is AddExonData. 
             // So, we set the current json variant and transcript here.
@@ -349,7 +363,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             };
         }
 
-        public void FinalizeAndAddAnnotationObject(Transcript transcript, TranscriptAnnotation ta, string[] consequences)
+        public void FinalizeAndAddAnnotationObject(Transcript.Transcript transcript, TranscriptAnnotation ta, string[] consequences)
         {
             if (!ta.AlternateAllele.IsStructuralVariant)
             {
@@ -401,7 +415,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
             }
         }
 
-        public void AddOverlappingTranscript(Transcript transcript, VariantAlternateAllele altAllele)
+        public void AddOverlappingTranscript(Transcript.Transcript transcript, IAllele altAllele)
         {
             if (!altAllele.IsStructuralVariant) return;
             FindCorrespondingJsonVariant(altAllele);
@@ -477,17 +491,37 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         /// <summary>
         /// return the unified json string of gene annotation
         /// </summary>
-        public static string GetGeneAnnotation(List<string> annotations, string description)
+        public static string FormatGeneAnnotations(List<IGeneAnnotation> annotations)
         {
             if (annotations.Count == 0) return null;
+
+            var geneAnnotations = new Dictionary<string,Dictionary<string,List<IGeneAnnotation>>>();
+
+            foreach (var annotation in annotations)
+            {
+                if (!geneAnnotations.ContainsKey(annotation.GeneName))
+                {
+                    geneAnnotations[annotation.GeneName] = new Dictionary<string, List<IGeneAnnotation>>();
+                }
+                if (!geneAnnotations[annotation.GeneName].ContainsKey(annotation.DataSource))
+                {
+                    geneAnnotations[annotation.GeneName][annotation.DataSource] = new List<IGeneAnnotation>();
+                }
+                geneAnnotations[annotation.GeneName][annotation.DataSource].Add(annotation);
+            }
+
+
             var sb = new StringBuilder();
             var needComma = false;
 
 
             sb.Append("\n]");
-            sb.Append($"{JsonObject.Comma}\"{description}\":[\n");
-            foreach (var annotation in annotations)
+            sb.Append($"{JsonObject.Comma}\"genes\":[\n");
+
+            
+            foreach (var geneAnnotationPair in geneAnnotations)
             {
+
                 if (needComma)
                 {
                     sb.Append(JsonObject.Comma);
@@ -497,8 +531,22 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                 {
                     needComma = true;
                 }
+                sb.Append(JsonObject.OpenBrace);
+                var geneSb = new StringBuilder();
+                var jsonObject = new JsonObject(geneSb);
+                jsonObject.AddStringValue("name",geneAnnotationPair.Key);
+                foreach (var kvp in geneAnnotationPair.Value)
+                {
+                    if (kvp.Value[0].IsArray)
+                    {
+                        jsonObject.AddStringValues(kvp.Key,kvp.Value.Select(x=>x.ToString()),false);
+                        continue;
+                    }
+                    jsonObject.AddStringValue(kvp.Key,kvp.Value[0].ToString(),false);
+                }
+                sb.Append(geneSb);
+                sb.Append(JsonObject.CloseBrace);
 
-                sb.Append(annotation);
             }
             return sb.ToString();
         }

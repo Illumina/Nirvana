@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
+using VariantAnnotation.DataStructures.Variants;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.JsonAnnotations
 {
@@ -13,7 +13,7 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
         /// <summary>
         /// constructs a VID based on the supplied feature
         /// </summary>
-        public string Create(ChromosomeRenamer renamer, string referenceName, VariantAlternateAllele altAllele)
+        public string Create(IChromosomeRenamer renamer, string referenceName, VariantAlternateAllele altAllele)
         {
             referenceName = renamer.GetEnsemblReferenceName(referenceName);
             string vid;
@@ -67,7 +67,9 @@ namespace VariantAnnotation.DataStructures.JsonAnnotations
                 case VariantType.reference_no_call:
                     vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:NC";
                     break;
-
+				case VariantType.short_tandem_repeat_variant:
+					vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}:{altAllele.RepeatUnit}:{altAllele.RepeatCount}";
+					break;
                 default:
                     vid = $"{referenceName}:{altAllele.Start}:{altAllele.End}";
                     break;

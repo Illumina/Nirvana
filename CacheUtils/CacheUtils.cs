@@ -8,9 +8,9 @@ using CacheUtils.GFF;
 using CacheUtils.ParseVepCacheDirectory;
 using CacheUtils.RegulatoryGFF;
 using CacheUtils.UpdateMiniCacheFiles;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
-using VariantAnnotation.Utilities;
+using CommandLine.Handlers;
+using CommandLine.Utilities;
+using CommandLine.VersionProvider;
 
 namespace CacheUtils
 {

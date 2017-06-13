@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.DataStructures;
+﻿using VariantAnnotation.DataStructures.Annotation;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Algorithms.Consequences
@@ -7,9 +7,9 @@ namespace VariantAnnotation.Algorithms.Consequences
     {
         #region members
 
-        public bool IsCoding { get; private set; }
+        public bool IsCoding { get; }
 
-        public bool IsDeletion { get; private set; }
+        public bool IsDeletion { get; }
 
         public bool IsInsertion { get; }
 

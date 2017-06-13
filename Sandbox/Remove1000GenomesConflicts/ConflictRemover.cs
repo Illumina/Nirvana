@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
 
 namespace Remove1000GenomesConflicts
 {

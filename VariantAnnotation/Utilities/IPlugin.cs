@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.Utilities

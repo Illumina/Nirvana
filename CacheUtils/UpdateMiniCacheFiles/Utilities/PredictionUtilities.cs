@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CacheUtils.UpdateMiniCacheFiles.DataStructures;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.ProteinFunction;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling.PredictionCache;
 
 namespace CacheUtils.UpdateMiniCacheFiles.Utilities

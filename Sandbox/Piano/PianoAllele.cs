@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Variants;
 
 namespace Piano
 {

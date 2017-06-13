@@ -52,8 +52,6 @@ namespace CacheUtils.DataDumperImport.Import
         /// </summary>
         public static void Parse(ObjectValue objectValue, int regulatoryFeatureIndex, ImportDataStore dataStore)
         {
-            // Console.WriteLine("*** Parse {0} ***", regulatoryFeatureIndex + 1);
-
             int start       = -1;
             int end         = -1;
             string stableId = null;

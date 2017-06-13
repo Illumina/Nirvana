@@ -1,4 +1,6 @@
-﻿namespace VariantAnnotation.FileHandling
+﻿using VariantAnnotation.FileHandling.Binary;
+
+namespace VariantAnnotation.FileHandling
 {
     public interface ICacheSerializable
     {

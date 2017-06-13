@@ -1,7 +1,7 @@
-﻿using VariantAnnotation.DataStructures;
-using VariantAnnotation.Utilities;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
+﻿using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
+using VariantAnnotation.DataStructures;
 
 namespace CacheUtils.GFF
 {

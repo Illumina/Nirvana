@@ -15,7 +15,7 @@ namespace VariantAnnotation.Interface
 
 		string GetGenomeAssembly();
 
-	    void AddGeneLevelAnnotation(List<string> annotatedGenes);
+	  List<IGeneAnnotation> GetGeneAnnotations();
 
 	    void EnableReferenceNoCalls(bool limitReferenceNoCallsToTranscripts);
 
@@ -25,12 +25,4 @@ namespace VariantAnnotation.Interface
 
         void FinalizeMetrics();
     }
-
-	public interface IDataSourceVersion
-	{
-		string Name { get; }
-		string Description { get; }
-		string Version { get; }
-		long ReleaseDateTicks { get; }
-	}
 }

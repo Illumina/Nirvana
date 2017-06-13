@@ -5,12 +5,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CacheUtils.UpdateMiniCacheFiles.DataStructures;
 using CacheUtils.UpdateMiniCacheFiles.Utilities;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Utilities;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.UpdateMiniCacheFiles
 {

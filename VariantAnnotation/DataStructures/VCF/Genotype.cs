@@ -23,5 +23,6 @@
             var genotype = _tmp.SampleColumns[_tmp.FormatIndices.GT.Value];
             return genotype == "." ? null : genotype;
         }
+
     }
 }

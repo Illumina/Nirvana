@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using VariantAnnotation.DataStructures.JsonAnnotations;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.VCF;
 
 namespace VariantAnnotation.DataStructures.VCF
 {
@@ -11,14 +11,15 @@ namespace VariantAnnotation.DataStructures.VCF
         private readonly string[] _vcfColumns;
         private FormatIndices _formatIndices;
         private readonly int? _infoDepth;
-
+        private readonly List<string> _recomposedVariantIds;
         #endregion
 
         // constructor
-        internal SampleFieldExtractor(string[] vcfColumns, int? depth = null)
+        internal SampleFieldExtractor(string[] vcfColumns, int? depth = null,List<string> recomposedVariantIds = null)
         {
             _vcfColumns = vcfColumns;
             _infoDepth  = depth;
+            _recomposedVariantIds = recomposedVariantIds;
         }
 
         /// <summary>
@@ -64,12 +65,15 @@ namespace VariantAnnotation.DataStructures.VCF
 	            AlleleDepths                                            = new AlleleDepths(tmp).GetAlleleDepths(),
 	            FailedFilter                                            = new FailedFilter(tmp).GetFailedFilter(),
 	            Genotype                                                = new Genotype(tmp).GetGenotype(),
+                RecomposedGenotype                                      = new RecomposedGenotype(tmp,_recomposedVariantIds).GetRecomposedGenotype(),
 	            GenotypeQuality                                         = new GenotypeQuality(tmp).GetGenotypeQuality(),
 	            TotalDepth                                              = new TotalDepth(tmp).GetTotalDepth(_infoDepth),
 	            VariantFrequency                                        = new VariantFrequency(tmp).GetVariantFrequency(),
 	            CopyNumber                                              = tmp.CopyNumber?.ToString(),
-	            IsLossOfHeterozygosity                                  = tmp.MajorChromosomeCount != null && tmp.CopyNumber != null &&
-																		  tmp.MajorChromosomeCount.Value == tmp.CopyNumber.Value,
+                RepeatNumberSpan										= tmp.RepeatNumberSpan,
+				RepeatNumber											= tmp.RepeatNumber,
+                IsLossOfHeterozygosity                                  = tmp.MajorChromosomeCount != null && tmp.CopyNumber != null &&
+																		  tmp.MajorChromosomeCount.Value == tmp.CopyNumber.Value && tmp.CopyNumber.Value>1,
 				DenovoQuality                                           = tmp.DenovoQuality?.ToString(),
 				SplitReadCounts                                         =  new ReadCounts(tmp).GetSplitReadCounts(),
 				PairEndReadCounts                                       = new ReadCounts(tmp).GetPairEndReadCounts()

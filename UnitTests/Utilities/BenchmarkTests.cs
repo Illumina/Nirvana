@@ -1,5 +1,6 @@
 ﻿using System;
-using VariantAnnotation.Utilities;
+using System.Threading;
+using CommandLine.Utilities;
 using Xunit;
 
 namespace UnitTests.Utilities
@@ -9,15 +10,10 @@ namespace UnitTests.Utilities
         [Fact]
         public void GetElapsedTime()
         {
-            var bench = new Benchmark
-            {
-                StartTime = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, 200))
-            };
-
-            var observedElapsedTime = bench.GetElapsedTime();
-
-            var tenths = observedElapsedTime.Milliseconds/100;
-            Assert.Equal(tenths, 2);
+            var bench = new Benchmark();
+            Thread.Sleep(100);
+            var observedElapsedTime = bench.GetElapsedTime().TotalMilliseconds;
+            Assert.True(observedElapsedTime > 0);
         }
 
         [Theory]
@@ -34,14 +30,12 @@ namespace UnitTests.Utilities
         {
             double unitsPerSecond;
 
-            var bench = new Benchmark
-            {
-                StartTime = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, 200))
-            };
+            var bench = new Benchmark();
+            Thread.Sleep(100);
 
             var observedElapsedTime = bench.GetElapsedIterationTime(3, "foobar", out unitsPerSecond);
             Assert.Contains("foobar/s", observedElapsedTime);
-            Assert.InRange(unitsPerSecond, 12, 16);
+            Assert.True(unitsPerSecond > 0);
         }
     }
 }

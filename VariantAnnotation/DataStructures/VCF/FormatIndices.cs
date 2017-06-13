@@ -21,11 +21,13 @@
         internal int? VF;
 	    internal int? MCC;
 	    internal int? CN;
+        internal int? CI;//confidence interval for STRs
         internal int? NR;
         internal int? NV;
 	    internal int? DQ;
 	    internal int? PR;
 	    internal int? SR;
+        internal int? RGT;
         // ReSharper restore InconsistentNaming
 
         #endregion
@@ -93,6 +95,9 @@
 					case "CN":
 		                formatIndices.CN = index;
 		                break;
+                    case "CI":
+                        formatIndices.CI = index;
+                        break;
                     case "NR":
                         formatIndices.NR = index;
                         break;
@@ -108,6 +113,9 @@
 					case "SR":
 		                formatIndices.SR = index;
 						break;
+                    case "RGT":
+                        formatIndices.RGT = index;
+                        break;
                 }
             }
 

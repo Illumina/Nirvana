@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using SAUtils.DataStructures;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.DGV
 {
@@ -13,7 +13,7 @@ namespace SAUtils.InputFileParsers.DGV
 		#region members
 
 		private readonly FileInfo _dgvFileInfo;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
         #endregion
 
@@ -32,7 +32,7 @@ namespace SAUtils.InputFileParsers.DGV
 		#endregion
 
 		// constructor
-		public DgvReader(FileInfo dgvFileInfo, ChromosomeRenamer renamer)
+		public DgvReader(FileInfo dgvFileInfo, IChromosomeRenamer renamer)
 		{
 			_dgvFileInfo = dgvFileInfo;
 		    _renamer     = renamer;
@@ -41,7 +41,7 @@ namespace SAUtils.InputFileParsers.DGV
 		/// <summary>
 		/// returns a ClinVar object given the vcf line
 		/// </summary>
-		public static DgvItem ExtractDgvItem(string line, ChromosomeRenamer renamer)
+		public static DgvItem ExtractDgvItem(string line, IChromosomeRenamer renamer)
 		{
 			var cols = line.Split('\t');
 			if (cols.Length < 8) return null;

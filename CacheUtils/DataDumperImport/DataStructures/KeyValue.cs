@@ -30,7 +30,6 @@ namespace CacheUtils.DataDumperImport.DataStructures
         internal override string Search(string[] searchKeys, int currentKeyIndex)
         {
             // check the current key value
-            // Console.WriteLine("StringKeyValue: current key: {0}, desired key: {1}, index: {2}", Key, searchKeys[currentKeyIndex], currentKeyIndex);
             bool same = Key == searchKeys[currentKeyIndex];
 
             // return the appropriate string
@@ -81,7 +80,6 @@ namespace CacheUtils.DataDumperImport.DataStructures
         internal override string Search(string[] searchKeys, int currentKeyIndex)
         {
             // check the current key value
-            // Console.WriteLine("StringKeyValue: current key: {0}, desired key: {1}, index: {2}", Key, searchKeys[currentKeyIndex], currentKeyIndex);
             bool same = Key == searchKeys[currentKeyIndex];
 
             // return the appropriate string
@@ -143,13 +141,8 @@ namespace CacheUtils.DataDumperImport.DataStructures
         /// </summary>
         internal override string Search(string[] searchKeys, int currentKeyIndex)
         {
-            // check the current key value
-            // Console.WriteLine("ObjectKeyValue: current key: {0}, desired key: {1}, index: {2}", Key, searchKeys[currentKeyIndex], currentKeyIndex);
-
             // return the appropriate string
             bool same = Key == searchKeys[currentKeyIndex];
-
-            // if (!same) Console.WriteLine("- different: [{0}] - [{1}]", Key, searchKeys[currentKeyIndex]);
 
             return same ? Value.Search(searchKeys, currentKeyIndex + 1) : null;
         }
@@ -250,9 +243,6 @@ namespace CacheUtils.DataDumperImport.DataStructures
         {
             currentKeyIndex++;
 
-            // check the current key value
-            // Console.WriteLine("ListObjectKeyValue: key: [{0}], desired key: {1}, index: {2}", Key, searchKeys[currentKeyIndex], currentKeyIndex);
-
             // convert the key to an integer
             int foundKeyIndex;
             if (!int.TryParse(searchKeys[currentKeyIndex], out foundKeyIndex)) return null;
@@ -269,9 +259,6 @@ namespace CacheUtils.DataDumperImport.DataStructures
         internal override ObjectValue SearchObjectValue(string[] searchKeys, int currentKeyIndex)
         {
             currentKeyIndex++;
-
-            // check the current key value
-            // Console.WriteLine("ListObjectKeyValue: key: [{0}], desired key: {1}, index: {2}", Key, searchKeys[currentKeyIndex], currentKeyIndex);
 
             // convert the key to an integer
             int foundKeyIndex;
@@ -293,14 +280,10 @@ namespace CacheUtils.DataDumperImport.DataStructures
 
             if (isLastKey)
             {
-                // Console.WriteLine("Last key!");
                 return Key != lastKey ? null : Values;
             }
 
             currentKeyIndex++;
-
-            // check the current key value
-            // Console.WriteLine("ListObjectKeyValue: key: [{0}], desired key: {1}, index: {2}", Key, searchKeys[currentKeyIndex], currentKeyIndex);
 
             // convert the key to an integer
             int foundKeyIndex;

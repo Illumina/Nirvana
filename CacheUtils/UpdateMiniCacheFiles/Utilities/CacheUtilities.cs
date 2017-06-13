@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.IntervalSearch;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling.PredictionCache;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;

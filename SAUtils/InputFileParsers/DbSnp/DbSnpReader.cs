@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using SAUtils.DataStructures;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.DbSnp
 {
@@ -17,23 +18,23 @@ namespace SAUtils.InputFileParsers.DbSnp
         // Key in VCF info field of the allele frequencies subfield.
 	    private readonly FileInfo _dbSnpFile;
 	    private readonly Stream _stream;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
-        public DbSnpReader(ChromosomeRenamer renamer)
+	    public DbSnpReader(IChromosomeRenamer renamer)
         {
             _renamer = renamer;
         }
+		public DbSnpReader(Stream stream, IChromosomeRenamer renamer) : this(renamer)
+		{
+			_stream = stream;
+		}
 
-	    public DbSnpReader(FileInfo dbSnpFile, ChromosomeRenamer renamer) : this(renamer)
+		public DbSnpReader(FileInfo dbSnpFile, IChromosomeRenamer renamer) : this(GZipUtilities.GetAppropriateReadStream(dbSnpFile.FullName), renamer)
         {
             _dbSnpFile = dbSnpFile;
         }
 
-	    public DbSnpReader(Stream stream, ChromosomeRenamer renamer) : this(renamer)
-        {
-		    _stream = stream;
-	    }
-
+	    
 	    /// <summary>
         /// Parses a dbSNP file and return an enumeration object containing 
         /// all the dbSNP objects that have been extracted.
@@ -82,7 +83,7 @@ namespace SAUtils.InputFileParsers.DbSnp
 			
 			var alleleFrequencies = GetAlleleFrequencies(infoField, refAllele, altAlleles);
 	        
-	        return altAlleles.Select(altAllele => new DbSnpItem(chromosome, position, dbSnpId, refAllele, alleleFrequencies[refAllele], altAllele, alleleFrequencies[altAllele], infoField)).ToList();
+	        return altAlleles.Select(altAllele => new DbSnpItem(chromosome, position, dbSnpId, refAllele, alleleFrequencies[refAllele], altAllele, alleleFrequencies[altAllele])).ToList();
         }
 
 

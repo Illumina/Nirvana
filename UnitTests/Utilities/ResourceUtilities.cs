@@ -3,8 +3,7 @@ using System.IO;
 using UnitTests.Mocks;
 using VariantAnnotation.AnnotationSources;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling.SupplementaryAnnotations;
+using VariantAnnotation.FileHandling.SA;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
@@ -15,18 +14,15 @@ namespace UnitTests.Utilities
         /// <summary>
         /// creates a new annotation source with data from the micro-cache file
         /// </summary>
-        internal static IAnnotationSource GetAnnotationSource(string cachePath, ISupplementaryAnnotationReader saReader,
-            IConservationScoreReader conservationScoreReader          = null,
-            ISupplementaryAnnotationProvider customAnnotationProvider = null,
-            ISupplementaryAnnotationProvider customIntervalProvider   = null)
+        internal static IAnnotationSource GetAnnotationSource(string cachePath, List<ISupplementaryAnnotationReader> saReaders,
+            IConservationScoreReader conservationScoreReader = null)
         {
             var streams    = GetAnnotationSourceStreams(cachePath);
-            var renamer    = ChromosomeRenamer.GetChromosomeRenamer(GetReadStream($"{cachePath}.bases"));
-            var saProvider = new MockSupplementaryAnnotationProvider(saReader, renamer);
+            //var renamer    = ChromosomeRenamer.GetChromosomeRenamer(GetReadStream($"{cachePath}.bases"));
+            var saProvider = new MockSupplementaryAnnotationProvider(saReaders);
             PerformanceMetrics.DisableOutput = true;
 
-            return new NirvanaAnnotationSource(streams, saProvider, conservationScoreReader, customAnnotationProvider,
-                customIntervalProvider, null);
+            return new NirvanaAnnotationSource(streams, saProvider, conservationScoreReader, null);
         }
 
         private static AnnotationSourceStreams GetAnnotationSourceStreams(string cachePath)
@@ -46,29 +42,14 @@ namespace UnitTests.Utilities
             return new AnnotationSourceStreams(transcriptStream, siftStream, polyPhenStream, referenceStream);
         }
 
-        internal static SupplementaryAnnotationReader GetSupplementaryAnnotationReader(string saPath)
+        internal static ISupplementaryAnnotationReader GetSupplementaryAnnotationReader(string saPath)
         {
             if (saPath == null) return null;
 
             var saStream      = GetReadStream(saPath);
             var saIndexStream = GetReadStream(saPath + ".idx");
-            return new SupplementaryAnnotationReader(saStream, saIndexStream);
+            return new SaReader(saStream, saIndexStream);
         }
-
-		internal static CustomAnnotationProvider GetCustomAnnotationReaders(List<string> caPaths)
-		{
-			if (caPaths == null) return null;
-
-			var customReaders = new List<ISupplementaryAnnotationReader>();
-			foreach (var caPath in caPaths)
-			{
-				var saStream = GetReadStream(caPath);
-				var saIndexStream = GetReadStream(caPath + ".idx");
-				customReaders.Add(new SupplementaryAnnotationReader(saStream, saIndexStream));
-			}
-
-			return new CustomAnnotationProvider(customReaders);
-		}
 
         /// <summary>
         /// given a path, this method returns a stream corresponding to the file if

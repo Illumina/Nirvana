@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.ProteinFunction;
+﻿using VariantAnnotation.DataStructures.ProteinFunction;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.UpdateMiniCacheFiles.DataStructures
 {

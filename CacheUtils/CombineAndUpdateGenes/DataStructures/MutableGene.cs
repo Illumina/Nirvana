@@ -1,4 +1,5 @@
 ﻿using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 
 namespace CacheUtils.CombineAndUpdateGenes.DataStructures
 {

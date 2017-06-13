@@ -8,8 +8,10 @@
         public static string OneKGenomeVcf;
 	    public static string ClinVarVcf;
 	    public static string CosmicVcf;
-		public static string Assembly;
+        public static string CompressedReferencePath;
 
-		#endregion
-	}
+        public static bool IsHg19;
+
+        #endregion
+    }
 }

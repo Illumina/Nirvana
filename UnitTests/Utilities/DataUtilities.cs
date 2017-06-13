@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using VariantAnnotation.AnnotationSources;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
 using VariantAnnotation.DataStructures.JsonAnnotations;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.SA;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
@@ -14,6 +15,11 @@ namespace UnitTests.Utilities
 {
     internal static class DataUtilities
     {
+        public static IAnnotationSource EmptyAnnotationSource => ResourceUtilities.GetAnnotationSource(EmptyCachePrefix, null);
+        public static string EmptyCachePrefix                 => Resources.CacheGRCh37("ENSR00001584270_chr1_Ensembl84_reg");
+
+        #region GetTranscript
+
         /// <summary>
         /// returns the desired JSON transcript given an annotated variant, a transcript ID, and an alt allele
         /// </summary>
@@ -45,6 +51,22 @@ namespace UnitTests.Utilities
         /// <summary>
         /// returns the desired JSON transcript given an annotated variant, a transcript ID, and an alt allele
         /// </summary>
+        internal static IAnnotatedTranscript GetTranscript(string cacheFile, string vcfLine, string transcriptId, string altAllele = null, string refAllele = null)
+        {
+            var annotatedVariant = GetVariant(cacheFile, null as List<string>, vcfLine);
+            return GetTranscript(annotatedVariant, transcriptId, altAllele, refAllele);
+        }
+
+        #endregion
+
+        #region GetRegulatoryRegion
+
+        internal static IRegulatoryRegion GetRegulatoryRegion(string cacheFile, string vcfLine, string regulatoryRegionId)
+        {
+            var annotatedVariant = GetVariant(cacheFile, null as List<string>, vcfLine);
+            return GetRegulatoryRegion(annotatedVariant, regulatoryRegionId);
+        }
+
         private static IRegulatoryRegion GetRegulatoryRegion(IAnnotatedVariant annotatedVariant, string regulatoryRegionId)
         {
             // ReSharper disable once LoopCanBeConvertedToQuery
@@ -59,107 +81,64 @@ namespace UnitTests.Utilities
             return null;
         }
 
-        /// <summary>
-        /// returns the desired JSON variant
-        /// </summary>
-        internal static IAnnotatedVariant GetVariant(string cachePath, string vcfLine)
+        #endregion
+
+        #region GetVariant
+
+        internal static IAnnotatedVariant GetVariant(string cacheFile, string saPath, string vcfLine,
+            bool enableRefNoCall = false, bool limitRefNoCallToTranscripts = false)
         {
-            var annotationSource = ResourceUtilities.GetAnnotationSource(cachePath, null);
-            return GetVariant(annotationSource, vcfLine);
+            return GetVariant(cacheFile, new List<string> { saPath }, vcfLine, enableRefNoCall,
+                limitRefNoCallToTranscripts);
         }
 
-        internal static IAnnotatedVariant GetVariant(string cacheFile, ISupplementaryAnnotationReader saReader,
-            string vcfLine)
+        internal static IAnnotatedVariant GetVariant(string cacheFile, List<string> saPaths, string vcfLine,
+            bool enableRefNoCall = false, bool limitRefNoCallToTranscripts = false)
         {
-            var annotationSource = ResourceUtilities.GetAnnotationSource(cacheFile, saReader);
-            return GetVariant(annotationSource, vcfLine);
-        }
-
-        /// <summary>
-        /// returns the desired JSON variant
-        /// </summary>
-        internal static IAnnotatedVariant GetVariant(string cacheFile, string supplementaryAnnotationPath,
-            string vcfLine, bool enableRefNoCall = false, bool limitRefNoCallToTranscripts = false)
-        {
-            var saReader         = ResourceUtilities.GetSupplementaryAnnotationReader(supplementaryAnnotationPath);
-            var annotationSource = ResourceUtilities.GetAnnotationSource(cacheFile, saReader) as NirvanaAnnotationSource;
+            var saReaders = GetSupplementaryAnnotationReaders(saPaths);
+            var annotationSource = ResourceUtilities.GetAnnotationSource(cacheFile, saReaders) as NirvanaAnnotationSource;
             if (enableRefNoCall) annotationSource?.EnableReferenceNoCalls(limitRefNoCallToTranscripts);
 
-            return GetVariant(annotationSource, vcfLine);
-        }
-
-		internal static IAnnotatedVariant GetVariant(string cachePath, ISupplementaryAnnotationReader saReader,
-            string vcfLine, IConservationScoreReader csReader)
-        {
-            var annotationSource = ResourceUtilities.GetAnnotationSource(cachePath, saReader, csReader);
-            return GetVariant(annotationSource, vcfLine);
-        }
-
-		internal static IAnnotatedVariant GetCustomVariant(string cacheFile, string  supplementaryAnnotationPath, List<string> customAnnotationPaths,
-			string vcfLine)
-		{
-			var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(supplementaryAnnotationPath);
-			var caReader = ResourceUtilities.GetCustomAnnotationReaders(customAnnotationPaths);
-			var annotationSource = ResourceUtilities.GetAnnotationSource(cacheFile, saReader, null, caReader) as NirvanaAnnotationSource;
-			
-			return GetVariant(annotationSource, vcfLine);
-		}
-
-		/// <summary>
-		/// returns the desired JSON variant
-		/// </summary>
-		internal static IAnnotatedVariant GetVariant(string cacheFile, IVariant variant)
-        {
-            var annotationSource = ResourceUtilities.GetAnnotationSource(cacheFile, null);
-            return annotationSource?.Annotate(variant);
-        }
-
-        /// <summary>
-        /// returns the desired JSON variant (using only supplementary intervals)
-        /// </summary>
-        internal static IAnnotatedVariant GetSuppIntervalVariant(string supplementaryAnnotationPath, string vcfLine)
-        {
-            var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(supplementaryAnnotationPath);
-            var annotationSource = ResourceUtilities.GetAnnotationSource(EmptyCachePrefix, saReader);
-            return GetVariant(annotationSource, vcfLine);
-        }
-
-        /// <summary>
-        /// returns the desired JSON variant
-        /// </summary>
-        internal static IAnnotatedVariant GetVariant(IAnnotationSource annotationSource, string vcfLine)
-        {
             var variant = VcfUtilities.GetVcfVariant(vcfLine);
+            return GetVariant(annotationSource, variant);
+        }
+
+        internal static IAnnotatedVariant GetVariant(IAnnotationSource annotationSource, IVariant variant)
+        {
             UnifiedJson.NeedsVariantComma = false;
             return annotationSource?.Annotate(variant);
         }
 
-        /// <summary>
-        /// returns the desired JSON transcript given an annotated variant, a transcript ID, and an alt allele
-        /// </summary>
-        internal static IAnnotatedTranscript GetTranscript(string cacheFile, string vcfLine, string transcriptId, string altAllele = null, string refAllele = null)
+        private static List<ISupplementaryAnnotationReader> GetSupplementaryAnnotationReaders(List<string> saPaths)
         {
-            var annotatedVariant = GetVariant(cacheFile, vcfLine);
-            return GetTranscript(annotatedVariant, transcriptId, altAllele, refAllele);
+            var saReaders = new List<ISupplementaryAnnotationReader>();
+            if (saPaths == null) return saReaders;
+
+            foreach (var saPath in saPaths)
+            {
+                var saReader = ResourceUtilities.GetSupplementaryAnnotationReader(saPath);
+                if (saReader != null) saReaders.Add(saReader);
+            }
+
+            return saReaders;
         }
 
+        #endregion
+
+        internal static List<ISupplementaryAnnotationReader> GetReaders(ISupplementaryAnnotationReader saReader)
+        {
+            var saReaders = new List<ISupplementaryAnnotationReader>();
+            if (saReader != null) saReaders.Add(saReader);
+            return saReaders;
+        }
+
+/*
         internal static int GetCount(string s, string substring)
         {
             return Regex.Matches(s, substring).Count;
         }
+*/
 
-        /// <summary>
-        /// returns the desired JSON regulatory region given an annotated variant and regulatory region ID
-        /// </summary>
-        internal static IRegulatoryRegion GetRegulatoryRegion(string cacheFile, string vcfLine, string regulatoryRegionId)
-        {
-            var annotatedVariant = GetVariant(cacheFile, vcfLine);
-            return GetRegulatoryRegion(annotatedVariant, regulatoryRegionId);
-        }
-
-        /// <summary>
-        /// adds a phyloP score to the specified alternate allele
-        /// </summary>
         internal static void SetConservationScore(IAnnotatedAlternateAllele altAllele, string phylopScore)
         {
             var jsonVariant = altAllele as JsonVariant;
@@ -167,23 +146,10 @@ namespace UnitTests.Utilities
             jsonVariant.PhylopScore = phylopScore;
         }
 
-        public static CacheData GetFirstTranscript(string cacheStub, string ensemblRefName)
-        {
-            var cache              = GetTranscriptCache(cacheStub);
-            var compressedSequence = GetCompressedSequence(cacheStub, ensemblRefName);
-            return new CacheData(compressedSequence, cache.Transcripts[0]);
-        }
-
-        public static Transcript GetTranscript(string cacheStub, string transcriptId)
-        {
-            var cache = GetTranscriptCache(cacheStub);
-            return cache.Transcripts.FirstOrDefault(transcript => transcript.Id.ToString() == transcriptId);
-        }
-
         public static ICompressedSequence GetCompressedSequence(string cacheStub, string ensemblRefName)
         {
             var basesStream = ResourceUtilities.GetReadStream($"{cacheStub}.bases");
-            var sequence    = new CompressedSequence();
+            var sequence = new CompressedSequence();
 
             using (var reader = new CompressedSequenceReader(basesStream, sequence))
             {
@@ -191,6 +157,12 @@ namespace UnitTests.Utilities
             }
 
             return sequence;
+        }
+
+        public static Transcript FindTranscript(string cacheStub, string transcriptId)
+        {
+            var cache = GetTranscriptCache(cacheStub);
+            return cache.Transcripts.FirstOrDefault(transcript => transcript.Id.ToString() == transcriptId);
         }
 
         public static GlobalCache GetTranscriptCache(string cacheStub)
@@ -201,9 +173,13 @@ namespace UnitTests.Utilities
             return cache;
         }
 
-        public static IAnnotationSource EmptyAnnotationSource
-            => ResourceUtilities.GetAnnotationSource(EmptyCachePrefix, null);
+        public static ISaPosition CreateSaPosition(string globalMajorAllele = null)
+        {
+            var dataSources = new ISaDataSource[1];
+            dataSources[0]  = new SaDataSource("test", "GMAF", "-", false, false, "", new[] { "" });
 
-        public static string EmptyCachePrefix => Resources.CacheGRCh37("ENSR00001584270_chr1_Ensembl84_reg");
+            var saPos = new SaPosition(dataSources, globalMajorAllele);
+            return saPos;
+        }
     }
 }

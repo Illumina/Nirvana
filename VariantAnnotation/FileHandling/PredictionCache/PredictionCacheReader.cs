@@ -67,12 +67,12 @@ namespace VariantAnnotation.FileHandling.PredictionCache
         /// <summary>
         /// parses the database cache file and populates the specified lists and interval trees
         /// </summary>
-        public DataStructures.PredictionCache Read(ushort refIndex)
+        public DataStructures.Transcript.PredictionCache Read(ushort refIndex)
         {
             var indexEntry = GetIndexEntry(refIndex);
             var bp = new BlockStream.BlockPosition { FileOffset = indexEntry.FileOffset };
             _blockStream.SetBlockPosition(bp);
-            return DataStructures.PredictionCache.Read(_reader, _lut, indexEntry, FileHeader);
+            return DataStructures.Transcript.PredictionCache.Read(_reader, _lut, indexEntry, FileHeader);
         }
 
 	    /// <summary>

@@ -1,4 +1,6 @@
-﻿using VariantAnnotation.FileHandling;
+﻿using CommandLine.Utilities;
+using CommandLine.VersionProvider;
+using VariantAnnotation.FileHandling;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.TranscriptCache;
 

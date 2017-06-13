@@ -58,21 +58,8 @@ namespace CacheUtils.DataDumperImport.DataStructures
         /// </summary>
         internal override string Search(string[] searchKeys, int currentKeyIndex)
         {
-            // Console.WriteLine("ObjectValue: desired key: {0}, index: {1}", searchKeys[currentKeyIndex], currentKeyIndex);
-
             string nextKey = searchKeys[currentKeyIndex];
             AbstractData nextKeyValue = _keyValuePairs.FirstOrDefault(currentPair => currentPair.Key == nextKey);
-
-            //// check the current key value
-            // if (nextKeyValue != null)
-            //{
-            //    Console.WriteLine("ObjectValue: current key: {0}, desired key: {1}, index: {2}", nextKeyValue.Key, searchKeys[currentKeyIndex], currentKeyIndex);
-            //}
-            // else
-            //{
-            //    Console.WriteLine("ObjectValue: current key: null, desired key: {0}, index: {1}", nextKey[currentKeyIndex], currentKeyIndex);
-            //}
-
             return nextKeyValue?.Search(searchKeys, currentKeyIndex);
         }
 
@@ -81,8 +68,6 @@ namespace CacheUtils.DataDumperImport.DataStructures
         /// </summary>
         internal override ObjectValue SearchObjectValue(string[] searchKeys, int currentKeyIndex)
         {
-            // Console.WriteLine("ObjectValue: desired key: {0}, index: {1}", searchKeys[currentKeyIndex], currentKeyIndex);
-
             bool isLastKey = currentKeyIndex == searchKeys.Length - 1;
             string lastKey = searchKeys[searchKeys.Length - 1];
 
@@ -91,20 +76,9 @@ namespace CacheUtils.DataDumperImport.DataStructures
 
             if (isLastKey)
             {
-                // Console.WriteLine("Last key!");
                 if (nextKeyValue == null || nextKeyValue.Key != lastKey || !(nextKeyValue is ObjectKeyValue)) return null;
                 return ((ObjectKeyValue)nextKeyValue).Value;
             }
-
-            // check the current key value
-            // if (nextKeyValue != null)
-            //{
-            //    Console.WriteLine("ObjectValue: current key: {0}, desired key: {1}, index: {2}", nextKeyValue.Key, searchKeys[currentKeyIndex], currentKeyIndex);
-            //}
-            // else
-            //{
-            //    Console.WriteLine("ObjectValue: current key: null, desired key: {0}, index: {1}", nextKey[currentKeyIndex], currentKeyIndex);
-            //}
 
             return nextKeyValue?.SearchObjectValue(searchKeys, currentKeyIndex);
         }
@@ -114,8 +88,6 @@ namespace CacheUtils.DataDumperImport.DataStructures
         /// </summary>
         internal override List<AbstractData> SearchObjectValues(string[] searchKeys, int currentKeyIndex)
         {
-            // Console.WriteLine("ObjectValue: desired key: {0}, index: {1}", searchKeys[currentKeyIndex], currentKeyIndex);
-
             string nextKey = searchKeys[currentKeyIndex];
             AbstractData nextKeyValue = _keyValuePairs.FirstOrDefault(currentPair => currentPair.Key == nextKey);
 

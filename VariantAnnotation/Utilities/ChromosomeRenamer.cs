@@ -136,5 +136,15 @@ namespace VariantAnnotation.Utilities
             var reader = new CompressedSequenceReader(stream, sequence);
             return sequence.Renamer;
         }
+
+	    public string GetEnsemblReferenceName(int referenceIndex)
+	    {
+		    return EnsemblReferenceNames[referenceIndex];
+	    }
+
+	    public string GetUcscReferenceName(int referenceIndex)
+	    {
+		    return UcscReferenceNames[referenceIndex];
+	    }
     }
 }

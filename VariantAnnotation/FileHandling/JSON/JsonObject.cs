@@ -16,8 +16,8 @@ namespace VariantAnnotation.FileHandling.JSON
         private const char DoubleQuote = '\"';
         private const char OpenBracket = '[';
         private const char CloseBracket = ']';
-        internal const char OpenBrace = '{';
-        internal const char CloseBrace = '}';
+        public const char OpenBrace = '{';
+        public const char CloseBrace = '}';
         private const string ColonString = "\":";
 
         #endregion
@@ -50,11 +50,21 @@ namespace VariantAnnotation.FileHandling.JSON
 
             _needsComma = true;
         }
+		public void AddBoolValue(string description, bool val)
+		{
+			if (val == false) return;//we do not want to print out false flags.
 
-        /// <summary>
-        /// adds the string KVP to the string builder
-        /// </summary>
-        public void AddIntValue(string description, int? i)
+			if (_needsComma) _sb.Append(Comma);
+			AddKey(description);
+
+			_sb.Append("true");
+
+			_needsComma = true;
+		}
+		/// <summary>
+		/// adds the string KVP to the string builder
+		/// </summary>
+		public void AddIntValue(string description, int? i)
         {
             if (i == null) return;
 

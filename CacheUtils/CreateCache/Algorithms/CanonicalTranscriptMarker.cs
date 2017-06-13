@@ -4,6 +4,7 @@ using System.Linq;
 using CacheUtils.CreateCache.FileHandling;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.Utilities;
 
 namespace CacheUtils.CreateCache.Algorithms

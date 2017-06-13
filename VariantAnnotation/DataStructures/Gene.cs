@@ -1,5 +1,7 @@
 ﻿using System;
+using VariantAnnotation.DataStructures.Intervals;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace VariantAnnotation.DataStructures
 {

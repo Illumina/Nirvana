@@ -2,24 +2,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.FileHandling.JSON;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 {
-    public sealed class OmimAnnotation : IEquatable<OmimAnnotation>
+    public sealed class OmimAnnotation :IGeneAnnotation,  IEquatable<OmimAnnotation>
     {
         #region members
 
+        public string GeneName => Hgnc;
+        public string DataSource => "omim";
+        public bool IsArray => true;
+
         public readonly string Hgnc;
         private readonly string _description;
-        private readonly long _mimNumber;
+        private readonly int _mimNumber;
         private readonly List<Phenotype> _phenotypes;
 
         #endregion
 
-        public OmimAnnotation(string hgnc, string description, long mimNumber, List<Phenotype> phenotypes)
+        public OmimAnnotation(string hgnc, string description, int mimNumber, List<Phenotype> phenotypes)
         {
             Hgnc = hgnc;
             _description = description;
@@ -51,8 +55,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
             sb.Append(JsonObject.OpenBrace);
 
-            jsonObject.AddStringValue("mimNumber", _mimNumber.ToString());
-            jsonObject.AddStringValue("hgnc", Hgnc);
+			jsonObject.AddIntValue("mimNumber",_mimNumber);
             jsonObject.AddStringValue("description", _description);
             if (_phenotypes.Count > 0) jsonObject.AddObjectValues("phenotypes", _phenotypes);
             sb.Append(JsonObject.CloseBrace.ToString());
@@ -73,7 +76,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
         {
             var hgnc = reader.ReadAsciiString();
             var description = reader.ReadAsciiString();
-            var mimNumber = reader.ReadOptInt64();
+            var mimNumber = reader.ReadOptInt32();
             var phenotypeCount = reader.ReadOptInt32();
             var phenotypes = new List<Phenotype>();
 
@@ -89,7 +92,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
         {
             #region member
 
-            private readonly long _mimNumber;
+            private readonly int _mimNumber;
             private readonly string _phenotype;
             private readonly Mapping _mapping;
             private readonly Comments _comments;
@@ -97,7 +100,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
             #endregion
 
-            public Phenotype(long mimNumber, string phenotype, Mapping mapping, Comments comments, HashSet<string> inheritance)
+            public Phenotype(int mimNumber, string phenotype, Mapping mapping, Comments comments, HashSet<string> inheritance)
             {
                 _mimNumber = mimNumber;
                 _phenotype = phenotype;
@@ -113,7 +116,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
                 sb.Append(JsonObject.OpenBrace);
 
                 if (_mimNumber >= 100000)
-                    jsonObject.AddStringValue("mimNumber", _mimNumber.ToString());
+                    jsonObject.AddIntValue("mimNumber", _mimNumber);
                 jsonObject.AddStringValue("phenotype", _phenotype);
                 if (_mapping != Mapping.unknown)
                     jsonObject.AddStringValue("mapping", _mapping.ToString().Replace("_", " "));
@@ -127,7 +130,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
 
             public static Phenotype ReadPhenotype(ExtendedBinaryReader reader)
             {
-                var mimNumber = reader.ReadOptInt64();
+                var mimNumber = reader.ReadOptInt32();
                 var phenotype = reader.ReadAsciiString();
                 var mapping = (Mapping)reader.ReadByte();
                 var comments = (Comments)reader.ReadByte();
@@ -168,5 +171,7 @@ namespace VariantAnnotation.DataStructures.SupplementaryAnnotations
             unconfirmed_or_possibly_spurious_mapping
             // ReSharper restore InconsistentNaming
         }
+
+
     }
 }

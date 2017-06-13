@@ -1,7 +1,7 @@
-﻿using NDesk.Options;
-using VariantAnnotation.CommandLine;
+﻿using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.Utilities;
 
 namespace GenerateMustGenotypeVcf
 {
@@ -28,9 +28,14 @@ namespace GenerateMustGenotypeVcf
 				},
 				{
 					"ref=",
-					"genome assembly",
-					v => ConfigurationSettings.Assembly= v
-				}
+					"compressed reference sequence",
+					v => ConfigurationSettings.CompressedReferencePath= v
+                },
+			    {
+			        "hg19",
+                    "need file for hg19",
+                    v=>ConfigurationSettings.IsHg19 = v !=null
+			    }
 
 			};
 
@@ -50,14 +55,14 @@ namespace GenerateMustGenotypeVcf
 			CheckInputFilenameExists(ConfigurationSettings.OneKGenomeVcf, "input 1000 genomes vcf", "--onek", false);
 			CheckInputFilenameExists(ConfigurationSettings.ClinVarVcf, "input clinvar vcf", "--cvr",false);
 			CheckInputFilenameExists(ConfigurationSettings.CosmicVcf, "input cosmic vcf", "--cos", false);
-			HasRequiredParameter(ConfigurationSettings.Assembly, "Genome assembly", "--gen");
+			CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
 		}
 
 		protected override void ProgramExecution()
 		{
-			using (var refMinorExtractor = new MustGenotypeExtractor(ConfigurationSettings.Assembly,ConfigurationSettings.OneKGenomeVcf,
+			using (var refMinorExtractor = new MustGenotypeExtractor(ConfigurationSettings.CompressedReferencePath,ConfigurationSettings.OneKGenomeVcf,
 				ConfigurationSettings.ClinVarVcf,
-				ConfigurationSettings.CosmicVcf
+				ConfigurationSettings.CosmicVcf,ConfigurationSettings.IsHg19
 				))
 			{
 				refMinorExtractor.ExtractEntries();

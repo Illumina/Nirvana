@@ -7,14 +7,15 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
     {
         #region members
 
-        private readonly Interval[] _array;
+        private readonly Interval<T>[] _array;
+        public static readonly Interval<T> EmptyInterval = new Interval<T>(-1, -1, default(T));
 
         #endregion
 
         /// <summary>
         /// constructor
         /// </summary>
-        public IntervalArray(Interval[] array)
+        public IntervalArray(Interval<T>[] array)
         {
             _array = array;
             SetMaxIntervals();
@@ -26,6 +27,19 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
         public bool OverlapsAny(int begin, int end)
         {
             return GetFirstIndexAny(begin, end) >= 0;
+        }
+
+        public bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval)
+        {
+            var firstIndex = GetFirstIndex(begin, end);
+            if (firstIndex == -1)
+            {
+                interval = EmptyInterval;
+                return false;
+            }
+
+            interval = _array[firstIndex];
+            return true;
         }
 
         /// <summary>
@@ -111,51 +125,6 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
             {
                 if (_array[i].End > currentMax) currentMax = _array[i].End;
                 _array[i].Max = currentMax;
-            }
-        }
-
-        public struct Interval
-        {
-            public readonly int Begin;
-            public readonly int End;
-            public readonly T Value;
-            public int Max;
-
-            /// <summary>
-            /// constructor
-            /// </summary>
-            public Interval(int begin, int end, T value)
-            {
-                Begin = begin;
-                End = end;
-                Value = value;
-                Max = -1;
-            }
-
-            /// <summary>
-            /// our compare function
-            /// </summary>
-            public int CompareMax(int position)
-            {
-                if (position < Max) return -1;
-                if (position > Max) return 1;
-                return 0;
-            }
-
-            /// <summary>
-            /// returns true if this interval overlaps with the specified interval
-            /// </summary>
-            public bool Overlaps(int intervalBegin, int intervalEnd)
-            {
-                return End >= intervalBegin && Begin <= intervalEnd;
-            }
-
-            /// <summary>
-            /// returns a string representation of this interval
-            /// </summary>
-            public override string ToString()
-            {
-                return $"{Begin} - {End} ({Max}). Value: {Value}";
             }
         }
     }

@@ -1,4 +1,5 @@
 ﻿using VariantAnnotation.DataStructures.IntervalSearch;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.Interface;
 
 namespace VariantAnnotation.FileHandling

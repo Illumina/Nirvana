@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.FileHandling.Binary;
 using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.TranscriptCache;
@@ -31,7 +32,7 @@ namespace VariantAnnotation.FileHandling.Phylop
         private readonly byte[] _compressedBuffer;
 
 
-        public readonly List<PhylopInterval> ChromosomeIntervals;
+        private readonly List<PhylopInterval> _chromosomeIntervals;
         private PhylopInterval _currentInterval;
 
         private int _maxValue = int.MinValue;
@@ -117,7 +118,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             _intervalListOffset   = -1;
             _intervalListPosition = -1;
 
-            ChromosomeIntervals.Clear();
+            _chromosomeIntervals.Clear();
         }
 
         private void OpenWriter(string refSeqName)
@@ -146,33 +147,11 @@ namespace VariantAnnotation.FileHandling.Phylop
             _refSeqName         = refSeqName;
             _version            = version;
             _compressor         = new QuickLZ();
-            ChromosomeIntervals = new List<PhylopInterval>();
+            _chromosomeIntervals = new List<PhylopInterval>();
             _genomeAssembly     = genomeAssembly;
 
             var requiredBufferSize = _compressor.GetCompressedBufferBounds(_scoreBytes.Length);
             _compressedBuffer      = new byte[requiredBufferSize];
-        }
-
-        internal PhylopWriter(string refSeqName, DataSourceVersion version, GenomeAssembly genomeAssembly,
-            short[] scores, ExtendedBinaryWriter writer) : this(refSeqName, version, genomeAssembly, scores.Length)
-        {
-            _scores     = scores;
-            _scoreCount = scores.Length;
-            _writer     = writer;
-
-            WriteHeader();
-            _currentInterval = new PhylopInterval(100, 0, 1);
-        }
-
-        // create a phylopWriter with a certain interval length and empty score buffer
-        internal PhylopWriter(string refSeqName, DataSourceVersion version, GenomeAssembly genomeAssembly,
-            int intervalLength, ExtendedBinaryWriter writer) : this(refSeqName, version, genomeAssembly, intervalLength)
-        {
-            _scoreCount = 0; // tbe score buffer is empty
-            _writer     = writer;
-
-            WriteHeader();
-            _currentInterval = new PhylopInterval(100, 0, 1);
         }
 
         public PhylopWriter(string inputWigFixFile, DataSourceVersion version, GenomeAssembly genomeAssembly,
@@ -241,7 +220,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             _currentInterval = new PhylopInterval(start, 0, step);
         }
 
-        internal void AddScore(short score)
+        private void AddScore(short score)
         {
             UpdateMinMaxScore(score);
             _scores[_scoreCount++] = score;
@@ -262,7 +241,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             if (score > _maxValue) _maxValue = score;
         }
 
-        internal void ScoresToBytes(byte[] bytes, short[] scores, int count)
+        private void ScoresToBytes(byte[] bytes, short[] scores, int count)
         {
             for (var i = 0; i < count; i++)
             {
@@ -272,7 +251,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             }
         }
 
-        internal void WriteInterval(PhylopInterval interval, ExtendedBinaryWriter writer)
+        private void WriteInterval(PhylopInterval interval, ExtendedBinaryWriter writer)
         {
             if (_scoreCount == 0) return;
             ScoresToBytes(_scoreBytes, _scores, _scoreCount);
@@ -282,7 +261,7 @@ namespace VariantAnnotation.FileHandling.Phylop
             // finalizing the file position for this chromosome interval
             interval.FilePosition   = _writer.BaseStream.Position;
             _currentInterval.Length = _scoreCount;
-            ChromosomeIntervals.Add(interval);
+            _chromosomeIntervals.Add(interval);
 
             _scoreCount = 0;
 
@@ -334,15 +313,15 @@ namespace VariantAnnotation.FileHandling.Phylop
         {
             _writer.Write(CacheConstants.GuardInt);
 
-            if (ChromosomeIntervals != null)
-                _writer.Write(ChromosomeIntervals.Count);
+            if (_chromosomeIntervals != null)
+                _writer.Write(_chromosomeIntervals.Count);
             else
             {
                 _writer.Write(0);
                 return;
             }
 
-            foreach (var chromosomeInterval in ChromosomeIntervals)
+            foreach (var chromosomeInterval in _chromosomeIntervals)
             {
                 chromosomeInterval.Write(_writer);
             }

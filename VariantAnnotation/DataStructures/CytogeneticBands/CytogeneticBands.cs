@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.FileHandling;
+﻿using VariantAnnotation.FileHandling.Binary;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.DataStructures.CytogeneticBands
@@ -8,14 +9,14 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
         #region members
 
         private readonly Band[][] _cytogeneticBands;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
 
         #endregion
 
         /// <summary>
         /// constructor
         /// </summary>
-        public CytogeneticBands(Band[][] cytogeneticBands, ChromosomeRenamer renamer)
+        public CytogeneticBands(Band[][] cytogeneticBands, IChromosomeRenamer renamer)
         {
             _cytogeneticBands = cytogeneticBands;
             _renamer          = renamer;
@@ -31,7 +32,7 @@ namespace VariantAnnotation.DataStructures.CytogeneticBands
             if (startCytogeneticBand == null) return null;
 
             // handle the single coordinate case
-            var ensemblRefName = _renamer.EnsemblReferenceNames[referenceIndex];
+            var ensemblRefName = _renamer.GetEnsemblReferenceName(referenceIndex);
             if (start == end) return $"{ensemblRefName}{startCytogeneticBand}";
 
             // handle the dual coordinate case

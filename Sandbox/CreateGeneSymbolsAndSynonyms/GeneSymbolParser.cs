@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Utilities;
 
 namespace CreateGeneSymbolsAndSynonyms

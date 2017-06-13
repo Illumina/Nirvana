@@ -1,7 +1,7 @@
-﻿using NDesk.Options;
-using VariantAnnotation.CommandLine;
+﻿using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
+using CommandLine.VersionProvider;
 using VariantAnnotation.DataStructures;
-using VariantAnnotation.Utilities;
 
 namespace ExtractMiniXml
 {

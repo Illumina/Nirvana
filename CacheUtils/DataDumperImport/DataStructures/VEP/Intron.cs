@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.DataStructures;
+﻿using VariantAnnotation.DataStructures.Intervals;
 
 namespace CacheUtils.DataDumperImport.DataStructures.VEP
 {

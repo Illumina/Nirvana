@@ -35,6 +35,12 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
             values.Clear();
         }
 
+        public bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval)
+        {
+            interval = IntervalArray<T>.EmptyInterval;
+            return false;
+        }
+
         #endregion
     }
 }

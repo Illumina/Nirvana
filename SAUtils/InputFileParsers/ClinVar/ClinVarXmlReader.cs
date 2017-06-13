@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml;
-using XmlTextReader = System.Xml.XmlReader;
 using ErrorHandling.Exceptions;
+using SAUtils.DataStructures;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.DataStructures.CompressedSequence;
-using VariantAnnotation.DataStructures.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Utilities;
 
@@ -25,16 +25,40 @@ namespace SAUtils.InputFileParsers.ClinVar
 		public readonly string AltAllele;
 		public string DbSnp;
 		public string VariantType;
+	    public readonly List<string> AllelicOmimIds;
 
-		public ClinvarVariant(string chr, int start, int stop, string refAllele, string altAllele)
+		public ClinvarVariant(string chr, int start, int stop, string refAllele, string altAllele, List<string> allilicOmimIds =null)
 		{
 			Chromosome      = chr;
 			Start           = start;
 			Stop            = stop;
 			ReferenceAllele = refAllele;
 			AltAllele       = altAllele;
+            AllelicOmimIds  = allilicOmimIds ?? new List<string>();
 		}
 
+	    public override int GetHashCode()
+	    {
+	        return Chromosome.GetHashCode()
+	               ^ ReferenceAllele.GetHashCode()
+	               ^ AltAllele.GetHashCode()
+	               ^ Start
+	               ^ Stop;
+	    }
+
+	    public override bool Equals(object obj)
+	    {
+	        var other = obj as ClinvarVariant;
+	        if (other == null) return false;
+
+	        return Chromosome.Equals(other.Chromosome)
+	               && Start == other.Start
+	               && Stop == other.Stop
+	               && ReferenceAllele.Equals(other.ReferenceAllele)
+	               && AltAllele.Equals(other.AltAllele);
+	    }
+
+	    
 	}
 
 	/// <summary>
@@ -63,6 +87,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		private List<string> _medGenIDs;
 		private List<string> _omimIDs;
+        private HashSet<string> _allilicOmimIDs;
 		private List<string> _orphanetIDs;
 
 		List<long> _pubMedIds= new List<long>();
@@ -84,7 +109,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 			_id                = null;
 			_medGenIDs         = new List<string>();
 			_omimIDs           = new List<string>();
-			_orphanetIDs       = new List<string>();
+            _allilicOmimIDs    = new HashSet<string>();
+            _orphanetIDs       = new List<string>();
 			_pubMedIds         = new List<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
 			_lastUpdatedDate   = long.MinValue;
 
@@ -141,7 +167,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		private IEnumerable<ClinVarItem> GetItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_clinVarXmlFileInfo.FullName))
-			using (var xmlReader = XmlTextReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true }))
+			using (var xmlReader = XmlReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true }))
 			{
 				string elementName = null;
 				
@@ -208,62 +234,97 @@ namespace SAUtils.InputFileParsers.ClinVar
 			}
 
 			var clinvarList = new List<ClinVarItem>();
+            var clinvarSet = new HashSet<ClinvarVariant>();
 			foreach (var variant in _variantList)
 			{
-				// in order to match the VCF, we leave out the ones that do not have dbsnp id
+                // in order to match the VCF, we leave out the ones that do not have dbsnp id
 				if (variant.DbSnp == null) continue;
 				if (!InputFileParserUtilities.IsDesiredChromosome(variant.Chromosome, _compressedSequence.Renamer)) continue;
-				if (variant.VariantType == "Microsatellite") continue;
+
+                if (variant.VariantType == "Microsatellite" 
+                    && string.IsNullOrEmpty(variant.AltAllele)) continue;
 
                 var refIndex = _compressedSequence.Renamer.GetReferenceIndex(variant.Chromosome);
                 if (refIndex == ChromosomeRenamer.UnknownReferenceIndex) throw new GeneralException($"Could not find the reference index for: {variant.Chromosome}");
                 _dataFileManager.LoadReference(refIndex, () => {});
 
-                ClinvarVariant shiftedVariant= variant;
+
+                if (!ValidateRefAllele(variant)) continue;
+                
+
+				ClinvarVariant shiftedVariant= variant;
 				//some entries do not have ref allele in the xml file. For those, we extract them from our ref sequence
 				if (variant.ReferenceAllele == null && variant.VariantType=="Deletion")
 					shiftedVariant = GenerateRefAllele(variant, _compressedSequence);
 				if (variant.AltAllele == null && variant.VariantType == "Duplication")
 					shiftedVariant = GenerateAltAllele(variant, _compressedSequence);
 
+				
 
 				//left align the variant
 				shiftedVariant = LeftShift(shiftedVariant);
-
-				if (variant.ReferenceAllele == null && variant.VariantType == "Indel" && variant.AltAllele != null)
+                
+                if (variant.ReferenceAllele == null && variant.VariantType == "Indel" && variant.AltAllele != null)
 					shiftedVariant = GenerateRefAllele(variant, _compressedSequence);
 
 				_pubMedIds.Sort();
 				
 				if(string.IsNullOrEmpty(shiftedVariant.ReferenceAllele) && string.IsNullOrEmpty(shiftedVariant.AltAllele)) continue;
 
-				clinvarList.Add(
-					new ClinVarItem(shiftedVariant.Chromosome, 
-					shiftedVariant.Start, 
-					_alleleOrigins.Distinct().ToList(), 
-					shiftedVariant.AltAllele??"", 
-					_id, 
-					_reviewStatus,
-					_medGenIDs.Distinct().ToList(),
-					_omimIDs.Distinct().ToList(), 
-					_orphanetIDs.Distinct().ToList(), 
-					_prefPhenotypes.Count > 0? _prefPhenotypes.Distinct().ToList(): _altPhenotypes.Distinct().ToList(), 
-					shiftedVariant.ReferenceAllele??"", 
-					_significance, 
-					_pubMedIds.Distinct().ToList(), 
-					_lastUpdatedDate));
+                //getting the unique ones
+			    clinvarSet.Add(shiftedVariant);
+                
 			}
+
+		    foreach (var clinvarVariant in clinvarSet)
+		    {
+		        var extendedOmimIds = new List<string>();
+		        extendedOmimIds.AddRange(_omimIDs);
+		        if (clinvarVariant.AllelicOmimIds.Count != 0)
+		            extendedOmimIds.AddRange(clinvarVariant.AllelicOmimIds);
+
+
+		        clinvarList.Add(
+		            new ClinVarItem(clinvarVariant.Chromosome,
+		                clinvarVariant.Start,
+		                _alleleOrigins.Distinct().ToList(),
+		                clinvarVariant.AltAllele ?? "",
+		                _id,
+		                _reviewStatus,
+		                _medGenIDs.Distinct().ToList(),
+		                extendedOmimIds.Distinct().ToList(),
+		                _orphanetIDs.Distinct().ToList(),
+		                _prefPhenotypes.Count > 0 ? _prefPhenotypes.Distinct().ToList() : _altPhenotypes.Distinct().ToList(),
+		                clinvarVariant.ReferenceAllele ?? "",
+		                _significance,
+		                _pubMedIds.Distinct().ToList(),
+		                _lastUpdatedDate));
+            }
 
 			return clinvarList.Count > 0 ? clinvarList: null;
 		}
 
-		
-		private static ClinvarVariant GenerateAltAllele(ClinvarVariant variant, ICompressedSequence compressedSequence)
+	    private bool ValidateRefAllele(ClinvarVariant clinvarVariant)
+	    {
+	        if (string.IsNullOrEmpty(clinvarVariant.ReferenceAllele) || clinvarVariant.ReferenceAllele == "-") return true;
+
+		    var refAllele = clinvarVariant.ReferenceAllele;
+		    if (string.IsNullOrEmpty(refAllele)) return true;
+
+		    var refLength = clinvarVariant.Stop - clinvarVariant.Start + 1;
+		    if (refLength != refAllele.Length) return false;
+
+		    return _compressedSequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
+
+	    }
+
+
+	    private static ClinvarVariant GenerateAltAllele(ClinvarVariant variant, ICompressedSequence compressedSequence)
 		{
 			if (variant == null) return null;
 			var extractedAlt = compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
 
-			return new ClinvarVariant(variant.Chromosome, variant.Start, variant.Stop, variant.ReferenceAllele ?? "", extractedAlt);
+			return new ClinvarVariant(variant.Chromosome, variant.Start, variant.Stop, variant.ReferenceAllele ?? "", extractedAlt, variant.AllelicOmimIds);
 		}
 
 		private static ClinvarVariant GenerateRefAllele(ClinvarVariant variant, ICompressedSequence compressedSequence)
@@ -271,7 +332,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			if (variant == null) return null;
 			var extractedRef = compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
 
-			return new ClinvarVariant(variant.Chromosome, variant.Start, variant.Stop, extractedRef, variant.AltAllele?? "");
+			return new ClinvarVariant(variant.Chromosome, variant.Start, variant.Stop, extractedRef, variant.AltAllele?? "", variant.AllelicOmimIds);
 		}
 
 		private ClinvarVariant LeftShift(ClinvarVariant variant)
@@ -281,10 +342,10 @@ namespace SAUtils.InputFileParsers.ClinVar
 			var alignedVariant = _aligner.LeftAlign(variant.Start, variant.ReferenceAllele, variant.AltAllele);
 			if (alignedVariant == null) return variant;
 
-			return new ClinvarVariant(variant.Chromosome, alignedVariant.Item1, variant.Stop, alignedVariant.Item2,alignedVariant.Item3);
+			return new ClinvarVariant(variant.Chromosome, alignedVariant.Item1, variant.Stop, alignedVariant.Item2,alignedVariant.Item3, variant.AllelicOmimIds);
 		}
 
-		private static LiteXmlElement ParseXmlElement(XmlTextReader xmlReader)
+		private static LiteXmlElement ParseXmlElement(XmlReader xmlReader)
 		{
 			var xmlElement = new LiteXmlElement(xmlReader.Name);
 
@@ -483,28 +544,39 @@ namespace SAUtils.InputFileParsers.ClinVar
 			
 		}
 
-		private void ParseXref(LiteXmlElement xmlElement)
+        
+
+        private void ParseXref(LiteXmlElement xmlElement)
 		{
 			if (! xmlElement.Attributes.ContainsKey("DB")) return;
-			
+
+			var idAttributes = xmlElement.Attributes["ID"].Trim(' ');
 			switch (xmlElement.Attributes["DB"])
 			{
 				case "MedGen":
-					_medGenIDs.Add(xmlElement.Attributes["ID"]);
+					_medGenIDs.Add(idAttributes);
 					break;
 				case "Orphanet":
-					_orphanetIDs.Add(xmlElement.Attributes["ID"]);
+					_orphanetIDs.Add(idAttributes);
 					break;
 				case "OMIM":
 					if (xmlElement.Attributes.ContainsKey("Type"))
-						if (xmlElement.Attributes["Type"]=="MIM")
-							_omimIDs.Add(xmlElement.Attributes["ID"]);
+					    if (xmlElement.Attributes["Type"] == "Allelic variant" )
+                            _allilicOmimIDs.Add(TrimOmimId(idAttributes));
+                        else
+                            _omimIDs.Add(TrimOmimId(idAttributes));
 					break;
 				case "dbSNP":
-					_dbSnp = string.IsNullOrEmpty(_dbSnp) ? xmlElement.Attributes["ID"] : _dbSnp + "," + xmlElement.Attributes["ID"];
+					_dbSnp = string.IsNullOrEmpty(_dbSnp) ? idAttributes : _dbSnp + "," + idAttributes;
 					break;
 			}
 		}
+
+        
+        private String TrimOmimId(string id)
+	    {
+		    return id.TrimStart('P','S');
+	    }
 
 		private void ParseCitation(LiteXmlElement xmlElement)
 		{
@@ -552,12 +624,28 @@ namespace SAUtils.InputFileParsers.ClinVar
 			}
 
 		}
+/*
+        private void ParseAttributeSet(LiteXmlElement xmlElement)
+        {
+            if (xmlElement.Children == null) return;
 
-		private void ParseMeasure(LiteXmlElement xmlElement)
+            foreach (var child in xmlElement.Children)
+            {
+                switch (child.Name)
+                {
+                    case "XRef":
+                        ParseXref(child);
+                        break;
+                }
+            }
+        }
+*/
+        private void ParseMeasure(LiteXmlElement xmlElement)
 		{
 			if (xmlElement.Children == null) return;
 
 			_dbSnp = null;
+            _allilicOmimIDs.Clear();
 
 			//the variant type is available in the attributes
 			string varType = null;
@@ -566,44 +654,62 @@ namespace SAUtils.InputFileParsers.ClinVar
 				if (attribute.Key == "Type")
 					varType = attribute.Value;
 			}
-
+            var variantList = new List<ClinvarVariant>();
 			foreach (var child in xmlElement.Children)
 			{
 				switch (child.Name)
 				{
 					case "SequenceLocation":
 						var variant = GetClinvarVariant(child, _compressedSequence.GenomeAssembly);
-						if (variant != null)
+				        
+				        if (variant != null)
 						{
 							variant.VariantType = varType;
 							if (variant.AltAllele !=null && variant.AltAllele.Length == 1 && _iupacBases.ContainsKey(variant.AltAllele[0]))
-								AddIupacVariants(variant);
-							else _variantList.Add(variant);
-						}
+								AddIupacVariants(variant, variantList);
+							else
+                                variantList.Add(variant);
+                        }
 						break;
 					case "XRef":
 						ParseXref(child);
 						break;
-					
+            //        case "AttributeSet":
+				        //ParseAttributeSet(child);
+				        //break;
+
+
 				}
 			}
-			//if we don't have a dbSNP for this variant, we will skip it
-			if (_dbSnp == null)
-			{
-				_variantList.Clear();
-				return;
-			}
-			foreach (var variant in _variantList)
+            if (_dbSnp == null)
+            {
+                _variantList.Clear();
+                return;
+            }
+
+            if (_allilicOmimIDs.Count != 0) 
+            {
+                foreach (var variant in variantList)
+                {
+                    variant.AllelicOmimIds.AddRange(_allilicOmimIDs);
+                }
+            }
+            _variantList.AddRange(variantList);
+            //if we don't have a dbSNP for this variant, we will skip it
+            foreach (var variant in _variantList)
 			{
 				variant.DbSnp = _dbSnp;
 			}
+            
+		    
 		}
 
-		private void AddIupacVariants(ClinvarVariant variant)
+        
+        private void AddIupacVariants(ClinvarVariant variant, List<ClinvarVariant> variantList)
 		{
 			foreach (var altAllele in _iupacBases[variant.AltAllele[0]])
 			{
-				_variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop, variant.ReferenceAllele, altAllele.ToString()));
+				variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop, variant.ReferenceAllele, altAllele.ToString()));
 			}
 		}
 
@@ -655,18 +761,18 @@ namespace SAUtils.InputFileParsers.ClinVar
 			}
 
 			AdjustVariant(ref start,ref stop, ref referenceAllele, ref altAllele);
-			return new ClinvarVariant(chromosome, start, stop, referenceAllele, altAllele);
+            return new ClinvarVariant(chromosome, start, stop, referenceAllele, altAllele);
 		}
 
 		private static void AdjustVariant(ref int start, ref int stop, ref string referenceAllele, ref string altAllele)
 		{
             if (referenceAllele == "-" && !string.IsNullOrEmpty(altAllele) && stop == start + 1)
             {
-                referenceAllele = "";
-                start++;
-            }
+				referenceAllele = "";
+				start++;
+			}
 
-            if (altAllele == "-")
+			if (altAllele == "-")
 				altAllele = "";
 		}
 

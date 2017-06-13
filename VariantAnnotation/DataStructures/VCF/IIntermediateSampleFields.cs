@@ -21,5 +21,7 @@
         int? NV { get; }
         string[] AltAlleles { get; }
         // ReSharper restore InconsistentNaming
+		string RepeatNumber { get; }
+        string RepeatNumberSpan { get; }
     }
 }

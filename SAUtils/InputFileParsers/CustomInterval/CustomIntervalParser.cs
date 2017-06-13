@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using VariantAnnotation.FileHandling;
-using VariantAnnotation.Utilities;
+using VariantAnnotation.FileHandling.Compression;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.InputFileParsers.CustomInterval
 {
-	public sealed class CustomIntervalParser : IEnumerable<VariantAnnotation.DataStructures.CustomInterval>
+	public sealed class CustomIntervalParser : IEnumerable<DataStructures.CustomInterval>
 	{
 		#region member
 		private readonly FileInfo _customFileInfo;
@@ -15,15 +16,14 @@ namespace SAUtils.InputFileParsers.CustomInterval
 		private readonly Dictionary<string, string> _stringValues;
 		private readonly Dictionary<string, string> _nonstringValues;
 		private readonly List<string> _nonstringFields;
-		private string _type;
+		public string KeyName;
 		private readonly Dictionary<int, string> _fieldIndex;
-        private readonly ChromosomeRenamer _renamer;
+        private readonly IChromosomeRenamer _renamer;
         #endregion
 
         // constructor
-        public CustomIntervalParser(FileInfo customFileInfo, ChromosomeRenamer renamer)
+        public CustomIntervalParser(FileInfo customFileInfo, IChromosomeRenamer renamer)
 		{
-            _type            = null;
             _customFileInfo  = customFileInfo;
             _stringFields    = new List<string>();
             _stringValues    = new Dictionary<string, string>();
@@ -31,6 +31,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
             _nonstringValues = new Dictionary<string, string>();
             _fieldIndex      = new Dictionary<int, string>();
             _renamer         = renamer;
+			ReadHeader();
         }
 
         private void Clear()
@@ -39,8 +40,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			_nonstringValues.Clear();
 		}
 
-
-	    private IEnumerable<VariantAnnotation.DataStructures.CustomInterval> GetCustomIntervals()
+		private void ReadHeader()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_customFileInfo.FullName))
 			{
@@ -53,8 +53,28 @@ namespace SAUtils.InputFileParsers.CustomInterval
 					if (line.StartsWith("#"))
 					{
 						ParseHeaderLine(line);
-						continue;
 					}
+					else
+					{
+						break;
+					}
+
+				}
+			}
+		}
+
+		private IEnumerable<DataStructures.CustomInterval> GetCustomIntervals()
+		{
+			using (var reader = GZipUtilities.GetAppropriateStreamReader(_customFileInfo.FullName))
+			{
+				string line;
+
+				while ((line = reader.ReadLine()) != null)
+				{
+					// Skip empty lines.
+					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.StartsWith("#")) continue;
+
 					var customInterval = ExtractCustomInterval(line);
 					if (customInterval == null) continue;
 					yield return customInterval;
@@ -63,7 +83,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			}
 		}
 
-		private VariantAnnotation.DataStructures.CustomInterval ExtractCustomInterval(string bedLine)
+		private DataStructures.CustomInterval ExtractCustomInterval(string bedLine)
 		{
 			if (bedLine == null) return null;
 			var bedFields = bedLine.Split('\t');
@@ -96,7 +116,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 				nonStringValues[keyValue.Key] = keyValue.Value;
 			}
 
-			return new VariantAnnotation.DataStructures.CustomInterval(chromosome, start, end, _type, stringValues, nonStringValues);
+			return new DataStructures.CustomInterval(chromosome, start, end, KeyName, stringValues, nonStringValues);
 		}
 
 		void ParseInfoField(string infoFieldsLine)
@@ -139,7 +159,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			switch (key)
 			{
 				case "TYPE":
-					_type = val;
+					KeyName = val;
 					break;
 				default:
 					throw new Exception("Unknown field in top level key line :\n " + line);
@@ -209,7 +229,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			}
 
 		}
-		public IEnumerator<VariantAnnotation.DataStructures.CustomInterval> GetEnumerator()
+		public IEnumerator<DataStructures.CustomInterval> GetEnumerator()
 		{
 			return GetCustomIntervals().GetEnumerator();
 		}

@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using VariantAnnotation.DataStructures;
+using VariantAnnotation.DataStructures.Transcript;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 
@@ -68,18 +68,6 @@ namespace VariantAnnotation.FileHandling
 
             return new FileHeader(identifier, schemaVersion, dataVersion, transcriptSource, creationTimeTicks,
                 genomeAssembly, customHeader);
-        }
-    }
-
-    public class NullFileHeader : ICustomFileHeader
-    {
-        public int Size => 0;
-
-        public void Write(BinaryWriter writer) { }
-
-        public ICustomFileHeader Read(BinaryReader reader)
-        {
-            return new NullFileHeader();
         }
     }
 }

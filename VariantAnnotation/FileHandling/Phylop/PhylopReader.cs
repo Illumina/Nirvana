@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using VariantAnnotation.DataStructures;
 using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.FileHandling.SupplementaryAnnotations;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Interface;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.DataStructures.Intervals;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace VariantAnnotation.FileHandling.Phylop
 {
@@ -108,9 +109,18 @@ namespace VariantAnnotation.FileHandling.Phylop
         /// <summary>
         /// constructor (SA directory)
         /// </summary>
-        public PhylopReader(string saDirectory) : this()
+        public PhylopReader(IEnumerable<string> saDirectories) : this()
         {
-            _saDirectory = saDirectory;
+	        _saDirectory = null;
+	        foreach (var saDir in saDirectories)
+	        {
+				var phylopFiles = Directory.GetFiles(saDir, "*.npd");
+		        if (phylopFiles.Length > 0)
+		        {
+			        _saDirectory = saDir;
+					break;
+		        }
+			}
         }
 
         public void LoadReference(string ucscReferenceName)
@@ -201,15 +211,15 @@ namespace VariantAnnotation.FileHandling.Phylop
             _reader.BaseStream.Position = currentPos;
         }
 
-        public int ReadIntervalScores(PhylopInterval interval)
+        private void ReadIntervalScores(PhylopInterval interval)
         {
-            if (interval == null) return 0;
+            if (interval == null) return;
 
             var filePosition = interval.FilePosition;
             //going to the file location that contains this interval.
             if (filePosition != -1)
                 _reader.BaseStream.Position = filePosition;
-            else return 0; //the interval does not contain any file location for the scores
+            else return;
 
             var length = _reader.ReadInt32();
             var compressedScores = _reader.ReadBytes(length);
@@ -222,10 +232,9 @@ namespace VariantAnnotation.FileHandling.Phylop
             BytesToScores(uncompressedLength, _scoreBytes, _scores);
 
             _scoreCount = uncompressedLength / 2;
-            return _scoreCount;
         }
 
-        internal void BytesToScores(int uncompressedLength, byte[] uncompressedScores, short[] scores)
+        private void BytesToScores(int uncompressedLength, byte[] uncompressedScores, short[] scores)
         {
             for (var i = 0; i < uncompressedLength / 2; i++)
             {
@@ -284,11 +293,6 @@ namespace VariantAnnotation.FileHandling.Phylop
             var score = _scores[position - interval.Begin];
 
             return (score * 0.001).ToString(CultureInfo.InvariantCulture);
-        }
-
-        internal short[] GetAllScores()
-        {
-            return _scores;
         }
 
         public void Clear()

@@ -35,11 +35,10 @@ namespace VariantAnnotation.DataStructures.IntervalSearch
         {
 	        if (refIndex > _maxIndex)
 	        {
-		        //throw new ArgumentOutOfRangeException($"The specified reference index ({refIndex}) is larger than the max index ({_maxIndex}).");
-				//we should not throw an exception, just return empty list, since this can happen for any unknown refSeq and Nirvana should not crash because of that
 				values.Clear();
 		        return;
 	        }
+
             var intervalArray = _intervalArrays[refIndex];
             intervalArray.GetAllOverlappingValues(begin, end, values);
         }

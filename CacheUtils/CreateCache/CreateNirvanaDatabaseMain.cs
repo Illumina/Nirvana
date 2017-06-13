@@ -1,8 +1,8 @@
 ﻿using CacheUtils.CombineAndUpdateGenes.FileHandling;
 using CacheUtils.CreateCache.FileHandling;
 using CacheUtils.DataDumperImport.FileHandling;
-using NDesk.Options;
-using VariantAnnotation.CommandLine;
+using CommandLine.Handlers;
+using CommandLine.NDesk.Options;
 using VariantAnnotation.DataStructures;
 using VariantAnnotation.FileHandling.TranscriptCache;
 using VariantAnnotation.Utilities;

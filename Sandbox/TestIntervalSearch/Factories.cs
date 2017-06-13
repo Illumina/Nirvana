@@ -12,12 +12,12 @@ namespace TestIntervalSearch
 
         public static IIntervalForest<int> CreateIntervalArray(List<Tuple<ushort, int, int, int>> items)
         {
-            var intervalLists = new List<IntervalArray<int>.Interval>[NumRefSeqs];
-            for (int i = 0; i < NumRefSeqs; i++) intervalLists[i] = new List<IntervalArray<int>.Interval>();
+            var intervalLists = new List<Interval<int>>[NumRefSeqs];
+            for (int i = 0; i < NumRefSeqs; i++) intervalLists[i] = new List<Interval<int>>();
 
             foreach (var item in items)
             {
-                intervalLists[item.Item1].Add(new IntervalArray<int>.Interval(item.Item2, item.Item3, item.Item4));
+                intervalLists[item.Item1].Add(new Interval<int>(item.Item2, item.Item3, item.Item4));
             }
 
             // create the interval arrays

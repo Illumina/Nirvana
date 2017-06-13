@@ -49,16 +49,13 @@ namespace VariantAnnotation.FileHandling.Compression
 
         public override bool CanSeek => _stream != null && !_isCompressor && _stream.CanSeek;
 
-        public override long Length
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public override long Length => throw new NotSupportedException();
 
-        public override long Position
+	    public override long Position
         {
-            get { return (_blockAddress << 16) | ((long)_blockOffset & 0xffff); }
-            set { throw new NotSupportedException(); }
-        }
+            get => (_blockAddress << 16) | ((long)_blockOffset & 0xffff);
+		    set => SeekVirtualFilePointer((ulong)value);
+	    }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
@@ -144,6 +141,7 @@ namespace VariantAnnotation.FileHandling.Compression
             _blockOffset    = 0;
 
             _stream.Write(_compressedBlock, 0, blockLength);
+			_blockAddress = _stream.Position;	
         }
 
         /// <summary>
@@ -273,5 +271,49 @@ namespace VariantAnnotation.FileHandling.Compression
                 if (_blockOffset == BlockGZipFormatCommon.BlockSize) Flush(_blockOffset);
             }
         }
-    }
+
+		/// <summary>
+		/// Method to seek to a virtual position within the filestream.
+		/// </summary>
+		/// <param name="virtualPosition">Virtual positions are comprised of the first 48 bits being the file byte offset
+		/// and the last 16 bits being the offset within the uncompressed data block.</param>
+		private void SeekVirtualFilePointer(ulong virtualPosition)
+		{
+			var compressedOffset = GetCompressedOffset(virtualPosition);
+			var uncompressedOffset = GetUncompressedOffset(virtualPosition);
+			// if we're already in the right block, no need to reload buffer.
+			if (_blockAddress != compressedOffset)
+			{
+				_blockAddress = compressedOffset;
+				_stream.Position = _blockAddress;
+				ReadBlock();
+			}
+			_blockOffset = uncompressedOffset;
+		}
+		/// <summary>
+		/// Extract the file byte offset from the Virtual Position.
+		/// </summary>
+		/// <param name="virtualPosition">64-bit number with the first 48 bits being the position to extract.</param>
+		/// <returns>A long file byte offset.</returns>
+		private static long GetCompressedOffset(ulong virtualPosition)
+		{
+			unchecked
+			{
+				return (long)((virtualPosition >> 16) & 0xFFFFFFFFFFFFL);
+			}
+		}
+
+		/// <summary>
+		/// Extract the offset within the uncompressed block from the Virtual Position.
+		/// </summary>
+		/// <param name="virtualPosition">64-bit number with the last 16 bits being the position to extract.</param>
+		/// <returns>An int offset of the uncompressed block.</returns>
+		private static int GetUncompressedOffset(ulong virtualPosition)
+		{
+			unchecked
+			{
+				return (int)(virtualPosition & 0xffff);
+			}
+		}
+	}
 }

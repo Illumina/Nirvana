@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.DataStructures;
+﻿using VariantAnnotation.DataStructures.Transcript;
+using VariantAnnotation.FileHandling.Binary;
 
 namespace VariantAnnotation.FileHandling.TranscriptCache
 {

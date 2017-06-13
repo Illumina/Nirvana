@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using VariantAnnotation.DataStructures.SupplementaryAnnotations;
-using VariantAnnotation.FileHandling;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace SAUtils.InputFileParsers.Omim
 {
@@ -14,11 +14,11 @@ namespace SAUtils.InputFileParsers.Omim
 		#region members
 
 		private readonly FileInfo _omimFileInfo;
-		//private HashSet<string> _processedGeneSymbols;
 		private int _mimNumberCol;
 		private int _hgncCol;
 		private int _geneDescriptionCol;
 		private int _phenotypeCol;
+
 		#endregion
 
 
@@ -41,7 +41,6 @@ namespace SAUtils.InputFileParsers.Omim
 
 		private IEnumerable<OmimAnnotation> GetOmimItems()
 		{
-			//_processedGeneSymbols = new HashSet<string>();
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_omimFileInfo.FullName))
 			{
 				string line;
@@ -55,7 +54,7 @@ namespace SAUtils.InputFileParsers.Omim
 					if(!IsContentLine(line)) continue;
 
 					var contents = line.Split('\t');
-					var mimNumber =Convert.ToInt64(contents[_mimNumberCol]);
+					var mimNumber =Convert.ToInt32(contents[_mimNumberCol]);
 					var geneSymbol = contents[_hgncCol];
 					var description = contents[_geneDescriptionCol].Replace(@"\\'",@"'");
 					var phenotypeInfo = contents[_phenotypeCol].Replace(@",,", @",");
@@ -118,20 +117,16 @@ namespace SAUtils.InputFileParsers.Omim
 			OmimAnnotation.Comments comments;
 			ParsePhenotypeMapping(phenotypeGroup, out phenotype, out comments);
 
-			var mimNumber = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt64(match.Groups[2].Value);
+			var mimNumber = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
 			var mapping = (OmimAnnotation.Mapping) Convert.ToInt16(match.Groups[3].Value);
 
 			var inheritance = string.IsNullOrEmpty(match.Groups[4].Value) ? null : match.Groups[4].ToString();
 			var inheritances = ExtractInheritances(inheritance);
 			return new OmimAnnotation.Phenotype(mimNumber,phenotype,mapping,comments,inheritances);
-
-
-
 		}
 
 		private static HashSet<string> ExtractInheritances(string inheritance)
-		{
-			
+		{			
 			var inheritances = new HashSet<string>();
 			if (string.IsNullOrEmpty(inheritance)) return inheritances;
 

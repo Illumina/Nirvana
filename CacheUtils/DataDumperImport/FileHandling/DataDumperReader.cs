@@ -3,8 +3,8 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using CacheUtils.DataDumperImport.DataStructures;
-using VariantAnnotation.FileHandling;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.FileHandling.Compression;
 
 namespace CacheUtils.DataDumperImport.FileHandling
 {
@@ -128,9 +128,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
             {
                 BuildDumperHierarchy();
             }
-
-            // dump the tree
-            // Console.WriteLine(_rootNode);
         }
 
         /// <summary>
@@ -138,8 +135,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
         /// </summary>
         private void BuildDumperHierarchy()
         {
-            // Console.WriteLine("*** BuildDumperHierarchy ***");
-
             // grab the next line
             string line = _reader.ReadLine();
 
@@ -150,7 +145,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
 
             // retrieve the entry type
             EntryType entryType = GetEntryType(line);
-            // Console.WriteLine(entryType);
 
             if (entryType != EntryType.RootObjectKeyValue)
             {
@@ -241,7 +235,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
         private StringKeyValue GetBinaryKeyValue(string s)
         {
             var stringMatch = _binaryKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: binary key: {0}", stringMatch.Groups[1].Value);
 
             // keep on reading lines until one ends with a single apostrophe
             while (true)
@@ -267,21 +260,18 @@ namespace CacheUtils.DataDumperImport.FileHandling
         private StringKeyValue GetDigitKeyValue(string s)
         {
             var digitMatch = _digitKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: digit key: {0}, value: {1}", digitMatch.Groups[1].Value, digitMatch.Groups[2].Value);
             return new StringKeyValue(digitMatch.Groups[1].Value, digitMatch.Groups[2].Value);
         }
 
         private StringKeyValue GetEmptyListKeyValue(string s)
         {
             var stringMatch = _emptyListKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: empty list key: {0}", stringMatch.Groups[1].Value);
             return new StringKeyValue(stringMatch.Groups[1].Value, null);
         }
 
         private StringKeyValue GetEmptyValueKeyValue(string s)
         {
             var stringMatch = _emptyValueKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: empty value key: {0}", stringMatch.Groups[1].Value);
             return new StringKeyValue(stringMatch.Groups[1].Value, null);
         }
 
@@ -307,7 +297,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
 
                 // retrieve the object type
                 EntryType entryType = GetEntryType(line);
-                // Console.WriteLine(entryType);
 
                 switch (entryType)
                 {
@@ -361,7 +350,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
         private ObjectKeyValue GetObjectKeyValue(string s)
         {
             var objectMatch = _objectKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: object key: {0}", objectMatch.Groups[1].Value);
             return new ObjectKeyValue(objectMatch.Groups[1].Value, GetObjectValue());
         }
 
@@ -383,7 +371,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
 
                 // retrieve the object type
                 EntryType entryType = GetEntryType(line);
-                // Console.WriteLine("--- DEBUG: entryType: {0}", entryType);
 
                 if (entryType == EntryType.EndBraces)
                 {
@@ -391,7 +378,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
                     if (dataTypeMatch.Success)
                     {
                         objectValue.DataType = dataTypeMatch.Groups[1].Value;
-                        // Console.WriteLine("DEBUG: data type: {0}", dataTypeMatch.Groups[1].Value);
                     }
                     break;
                 }
@@ -445,7 +431,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
         private ReferenceKeyValue GetReferenceKeyValue(string s)
         {
             var stringMatch = _referenceStringKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: reference string key: {0}, value: {1}", stringMatch.Groups[1].Value, stringMatch.Groups[2].Value);
             return new ReferenceKeyValue(stringMatch.Groups[1].Value, stringMatch.Groups[2].Value);
         }
 
@@ -453,8 +438,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
         {
             var value = new ReferenceStringValue();
             var stringMatch = _referenceStringKeyRegex.Match(s);
-            // Console.WriteLine("DEBUG: s: [{0}]", s);
-            // Console.WriteLine("DEBUG: reference string key: [{0}]", stringMatch.Groups[1].Value);
             value.Add(new StringKeyValue(stringMatch.Groups[1].Value, null));
             return value;
         }
@@ -470,7 +453,6 @@ namespace CacheUtils.DataDumperImport.FileHandling
         private StringKeyValue GetStringKeyValue(string s)
         {
             var stringMatch = _stringKeyValueRegex.Match(s);
-            // Console.WriteLine("DEBUG: string key: {0}, value: {1}", stringMatch.Groups[1].Value, stringMatch.Groups[2].Value);
             return new StringKeyValue(stringMatch.Groups[1].Value, stringMatch.Groups[2].Value);
         }
 
