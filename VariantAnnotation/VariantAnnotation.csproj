@@ -4,23 +4,15 @@
     <OutputPath>..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="..\Packages\BlockCompression\BlockCompression.dll" Link="BlockCompression.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Packages\BlockCompression\BlockCompression.pdb" Link="BlockCompression.pdb">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Packages\BlockCompression\libBlockCompression.so" Link="libBlockCompression.so">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="..\Packages\BlockCompression\libBlockCompression.dylib" Link="libBlockCompression.dylib">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <None Include="Algorithms\IntervalExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
-    <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
+    <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
+    <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="PhyloP\" />
   </ItemGroup>
   <Import Project="CommonAssemblyInfo.props" />
 </Project>

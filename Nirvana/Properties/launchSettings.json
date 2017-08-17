@@ -2,13 +2,36 @@
   "profiles": {
     "Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "-c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd SupplementaryDatabase\\38\\GRCh37 -i Data\\Confluence\\VariantRepresentationRgtDot.vcf -o invariant",
+      "commandLineArgs": " -c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in breakEnd_dup.vcf -o test",
+      "workingDirectory": "C:\\Development\\TestDatasets"
+    },
+    "YJ_Nirvana": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Data\\Nirvana\\bugfixes\\test_input2_GRCh37.vcf -c D:\\Projects\\NewNirvana\\UnitTests\\Resources\\GRCh37_chr12_7018490_7086889\\chr12_7018490_7086889_BothRefSeqAndEnsembl84_pos -r D:\\Projects\\NewNirvana\\UnitTests\\Resources\\GRCh37_chr12_7018490_7086889\\chr12_7018490_7086889_BothRefSeqAndEnsembl84_pos.bases -o test_out3 --sd D:\\Projects\\NewNirvana\\UnitTests\\Resources\\GRCh37_chr12_7018490_7086889\\SA",
+      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+    },
+    "RR_Nirvana": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --sd C:\\Development\\SupplementaryDatabase\\39\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in HCC1187BL_HCC1187C_HSX-somatic-SV-chr1-GRCh37.vcf.gz --out hcc",
+      "workingDirectory": "C:\\Development\\TestDatasets"
+    },
+    "MS_ClinVar": {
+      "commandName": "Project",
+      "commandLineArgs": " -c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\ClinVar\\clinvar_20170130.vcf.gz -o clinvar",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-    "RR_nirvana": {
+    "MS_Mother": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --sd C:\\Development\\SupplementaryDatabase\\debug\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in NewExpansionHunter-NA12877-hg19.vcf.gz -o repExp",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": "-c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "Nirvana_sk": {
+      "commandName": "Project",
+      "commandLineArgs": "--in E:\\temp\\test_input.vcf --cache E:\\Cache\\24\\GRCh37\\Ensembl84 --sd E:\\SupplementaryDatabase\\39.1\\GRCh37 --ref E:\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o sk_test",
+      "workingDirectory": "E:\\temp",
+      "environmentVariables": {
+        "Key": "Value"
+      }
     }
   }
 }

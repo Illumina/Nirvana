@@ -1,0 +1,22 @@
+﻿using VariantAnnotation.Algorithms;
+using Xunit;
+
+namespace UnitTests.VariantAnnotation.Algorithms
+{
+    public sealed class SwapTests
+    {
+        [Fact]
+        public void Swap_Int()
+        {
+            int expectedA = 5;
+            int expectedB = 3;
+
+            int observedA = expectedB;
+            int observedB = expectedA;
+            Swap.Int(ref observedA, ref observedB);
+
+            Assert.Equal(expectedA, observedA);
+            Assert.Equal(expectedB, observedB);
+        }
+    }
+}
