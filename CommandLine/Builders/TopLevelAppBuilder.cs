@@ -117,9 +117,8 @@ namespace CommandLine.Builders
         {
             if (_data.Errors.Count > 0)
             {
-                Console.WriteLine("Some problems were encountered when parsing the command line options:");
+                Console.WriteLine("\nSome problems were encountered when parsing the command line options:");
                 PrintErrors();
-                Console.WriteLine("\nFor a complete list of command line options, type \"dotnet {0} -h\"", CommandLineUtilities.CommandFileName);
             }
 
             return new TopLevelAppErrors(_data);
