@@ -38,11 +38,11 @@ namespace VariantAnnotation.AnnotatedPositions
 	        jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
 			jsonObject.AddIntValue("svEnd",          Position.InfoData.End);
             jsonObject.AddStringValue("refAllele",   Position.RefAllele);
-            jsonObject.AddStringValues("altAlleles", Position.AltAlleles, true);
+            jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
 
             jsonObject.AddDoubleValue("quality", Position.Quality);
 
-            jsonObject.AddStringValues("filters", Position.Filters, true);
+            jsonObject.AddStringValues("filters", Position.Filters);
 
             jsonObject.AddIntValues("ciPos",   Position.InfoData.CiPos);
             jsonObject.AddIntValues("ciEnd",   Position.InfoData.CiEnd);

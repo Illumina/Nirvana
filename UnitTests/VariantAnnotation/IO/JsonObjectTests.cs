@@ -109,7 +109,7 @@ namespace UnitTests.VariantAnnotation.IO
             var strings = new[] { "A", "B", "C" };
             var strings2 = new[] { "D", "E", "F" };
 
-            json.AddStringValues("test1", strings, true);
+            json.AddStringValues("test1", strings);
             json.AddStringValues("test2", strings2, false);
 
             const string expectedResult = "\"test1\":[\"A\",\"B\",\"C\"],\"test2\":[D,E,F]";
@@ -124,7 +124,7 @@ namespace UnitTests.VariantAnnotation.IO
             var sb = new StringBuilder();
             var json = new JsonObject(sb);
 
-            json.AddStringValues("test1", null, true);
+            json.AddStringValues("test1", null);
             var observedResult = sb.ToString();
 
             Assert.Equal(string.Empty, observedResult);
@@ -274,7 +274,7 @@ namespace UnitTests.VariantAnnotation.IO
             var sb = new StringBuilder();
             var json = new JsonObject(sb);
 
-            json.AddStringValues("test1", new string[0], true);
+            json.AddStringValues("test1", new string[0]);
             var observedResult = sb.ToString();
 
             Assert.Equal(string.Empty, observedResult);

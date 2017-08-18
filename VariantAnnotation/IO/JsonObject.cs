@@ -99,7 +99,7 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote)
+        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote=true)
         {
 	        if (values == null) return;
 		    var index = 0;

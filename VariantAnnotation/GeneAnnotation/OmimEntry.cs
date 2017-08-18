@@ -116,7 +116,7 @@ namespace VariantAnnotation.GeneAnnotation
                 if (_mapping != Mapping.unknown)
                     jsonObject.AddStringValue("mapping", _mapping.ToString().Replace("_", " "));
                 if (_inheritance != null && _inheritance.Count > 0)
-                    jsonObject.AddStringValues("inheritances", _inheritance, true);
+                    jsonObject.AddStringValues("inheritances", _inheritance);
                 if (_comments != Comments.unknown)
                     jsonObject.AddStringValue("comments", _comments.ToString().Replace("_", " "));
 
