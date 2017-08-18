@@ -1,4 +1,4 @@
-﻿namespace Nirvana
+﻿namespace VariantAnnotation.Interface
 {
 	public static class Constants
 	{

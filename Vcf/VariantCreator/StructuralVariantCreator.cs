@@ -1,5 +1,4 @@
-﻿using System;
-using VariantAnnotation.Interface.Positions;
+﻿using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf.VariantCreator
