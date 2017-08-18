@@ -38,11 +38,11 @@ namespace VariantAnnotation.AnnotatedPositions
 	        jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
 			jsonObject.AddIntValue("svEnd",          Position.InfoData.End);
             jsonObject.AddStringValue("refAllele",   Position.RefAllele);
-            jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
+            jsonObject.AddStringValues("altAlleles", Position.AltAlleles, true);
 
             jsonObject.AddDoubleValue("quality", Position.Quality);
 
-            jsonObject.AddStringValues("filters", Position.Filters);
+            jsonObject.AddStringValues("filters", Position.Filters, true);
 
             jsonObject.AddIntValues("ciPos",   Position.InfoData.CiPos);
             jsonObject.AddIntValues("ciEnd",   Position.InfoData.CiEnd);
@@ -57,14 +57,17 @@ namespace VariantAnnotation.AnnotatedPositions
 	        
 			jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
 
-            if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()).ToArray(), false);
+			//if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()).ToArray(), false);
 
-            if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
+			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
+
+			if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
                 AddSuppIntervalToJsonObject(jsonObject);
 
-            jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)).ToArray(), false);
+			//jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)).ToArray(), false);
+			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
 
-            sb.Append(JsonObject.CloseBrace);
+			sb.Append(JsonObject.CloseBrace);
             return sb.ToString();
         }
 

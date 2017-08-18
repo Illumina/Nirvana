@@ -39,7 +39,7 @@ namespace VariantAnnotation.IO
 
             jsonObject.AddObjectValues("dataSources", dataSourceVersions);
 
-            if (sampleNames != null) jsonObject.AddStringValues("samples", sampleNames);
+            if (sampleNames != null) jsonObject.AddStringValues("samples", sampleNames, true);
             sb.Append("},\"positions\":[\n");
 
             _writer.Write(sb.ToString());

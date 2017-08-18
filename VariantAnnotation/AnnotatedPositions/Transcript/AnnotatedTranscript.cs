@@ -73,7 +73,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             jsonObject.AddStringValue("geneId", geneId);
             jsonObject.AddStringValue("hgnc", Transcript.Gene.Symbol);
-            jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence).ToArray());
+            jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence), true);
             jsonObject.AddStringValue("hgvsc", HgvsCoding);
             jsonObject.AddStringValue("hgvsp", HgvsProtein);
             jsonObject.AddStringValue("geneFusion",GeneFusionAnnotation?.ToString(),false);
