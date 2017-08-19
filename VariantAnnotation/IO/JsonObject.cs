@@ -103,7 +103,7 @@ namespace VariantAnnotation.IO
         /// adds the string KVP to the string builder
         /// TODO: Should dot (.) removal actually be part of this method?
         /// </summary>
-        public void AddStringValues(string description, string[] values, bool useQuote = true)
+        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote = true)
         {
             if (values == null) return;
 
@@ -139,7 +139,7 @@ namespace VariantAnnotation.IO
         /// <summary>
         /// adds the object values to this current JSON object
         /// </summary>
-        public void AddObjectValues<T>(string description, IList<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
+        public void AddObjectValues<T>(string description, IEnumerable<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
         {
             if (values == null) return;
 
