@@ -200,7 +200,7 @@ namespace Nirvana
             var exitCode = new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
-                .CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in", "-")
+                .CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in",true, "-")
                 .CheckInputFilenameExists(ConfigurationSettings.RefSequencePath, "reference sequence", "--ref")
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache")
