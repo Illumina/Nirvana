@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.SA
             var saMs = new MemoryStream();
             var indexMs = new MemoryStream();
 
-            var dataSourceVersions = new DataSourceVersion[]
+            var dataSourceVersions = new[]
             {
                 new DataSourceVersion("clinvar","20",DateTime.Today.Ticks,"clinvar dataset"),
                 new DataSourceVersion("dbSnp","18",DateTime.Parse("12/20/2010").Ticks,"dbSNP") 

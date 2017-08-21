@@ -80,7 +80,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
-            var transcripts = new ITranscript[] {transcript1.Object, transcript2.Object};
+            var transcripts = new[] {transcript1.Object, transcript2.Object};
 
             variant.SetupGet(x => x.Behavior).Returns(new AnnotationBehavior(true, false, false, true, false, false));
             variant.SetupGet(x => x.Start).Returns(123456);
