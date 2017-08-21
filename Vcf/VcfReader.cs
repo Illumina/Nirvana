@@ -6,8 +6,6 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
-using Vcf.Info;
-using Vcf.Sample;
 using Vcf.VariantCreator;
 
 namespace Vcf

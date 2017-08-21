@@ -6,7 +6,6 @@ using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
-using Compression.Utilities;
 using ErrorHandling;
 using VariantAnnotation;
 using VariantAnnotation.Interface.GeneAnnotation;
