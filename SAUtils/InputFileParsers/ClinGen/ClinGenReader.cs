@@ -32,7 +32,7 @@ namespace SAUtils.InputFileParsers.ClinGen
         #endregion
 
         // constructor
-        public ClinGenReader(FileInfo clinGenFileInfo, Dictionary<string, IChromosome> refNameDict)
+        public ClinGenReader(FileInfo clinGenFileInfo, IDictionary<string, IChromosome> refNameDict)
         {
             _clinGenFileInfo = clinGenFileInfo;
             _refNameDict = refNameDict;

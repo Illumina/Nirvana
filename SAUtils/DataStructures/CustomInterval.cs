@@ -8,7 +8,7 @@ namespace SAUtils.DataStructures
 {
     public class CustomInterval : IComparable<CustomInterval>
     {
-        public IChromosome ReferenceName { get; }
+        public IChromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }
         public string Type { get; }
@@ -18,10 +18,10 @@ namespace SAUtils.DataStructures
         /// <summary>
         /// constructor
         /// </summary>
-        public CustomInterval(IChromosome referenceName, int start, int end, string type,
+        public CustomInterval(IChromosome chromosome, int start, int end, string type,
             IDictionary<string, string> stringValues, IDictionary<string, string> nonStringValues)
         {
-            ReferenceName   = referenceName;
+            Chromosome   = chromosome;
             Start           = start;
             End             = end;
             Type            = type;
@@ -31,8 +31,8 @@ namespace SAUtils.DataStructures
 
         public int CompareTo(CustomInterval other)
         {
-            if (ReferenceName != other.ReferenceName)
-                return ReferenceName.Index.CompareTo(other.ReferenceName.Index);
+            if (Chromosome != other.Chromosome)
+                return Chromosome.Index.CompareTo(other.Chromosome.Index);
 
             return Start.CompareTo(other.Start);
         }
@@ -42,7 +42,7 @@ namespace SAUtils.DataStructures
             var otherItem = other as CustomInterval;
             if (otherItem == null) return false;
 
-            return ReferenceName.Equals(otherItem.ReferenceName)
+            return Chromosome.Equals(otherItem.Chromosome)
                    && Start.Equals(otherItem.Start)
                    && End.Equals(otherItem.End)
                    && Type.Equals(otherItem.Type);
@@ -50,7 +50,7 @@ namespace SAUtils.DataStructures
 
         public override int GetHashCode()
         {
-            var hashCode = Start.GetHashCode() ^ ReferenceName.GetHashCode();
+            var hashCode = Start.GetHashCode() ^ Chromosome.GetHashCode();
             hashCode = (hashCode * 397) ^ End.GetHashCode();
             hashCode = (hashCode * 397) ^ Type.GetHashCode();
 

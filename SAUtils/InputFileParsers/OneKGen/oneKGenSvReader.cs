@@ -12,10 +12,10 @@ namespace SAUtils.InputFileParsers.OneKGen
 		#region members
 
 		private readonly FileInfo _oneKGenSvFile;
-	    private readonly Dictionary<string, IChromosome> _refNameDict;
+	    private readonly IDictionary<string, IChromosome> _refNameDict;
         #endregion
 
-        public OneKGenSvReader(FileInfo oneKGenSvFile, Dictionary<string, IChromosome> refNameDict)
+        public OneKGenSvReader(FileInfo oneKGenSvFile, IDictionary<string, IChromosome> refNameDict)
 		{
 			_oneKGenSvFile = oneKGenSvFile;
 		    _refNameDict = refNameDict;
@@ -45,7 +45,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 			}
 		}
 
-		private static OneKGenItem ExtractOneKGenSvItem(string line, Dictionary<string,IChromosome> refNameDict)
+		private static OneKGenItem ExtractOneKGenSvItem(string line, IDictionary<string,IChromosome> refNameDict)
 		{
 			var cols = line.Split('\t');
 			if (cols.Length < 8) return null;
