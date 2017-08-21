@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
     public class CustomInterval : IComparable<CustomInterval>
     {
-        public string ReferenceName { get; }
+        public IChromosome ReferenceName { get; }
         public int Start { get; }
         public int End { get; }
         public string Type { get; }
@@ -17,7 +18,7 @@ namespace SAUtils.DataStructures
         /// <summary>
         /// constructor
         /// </summary>
-        public CustomInterval(string referenceName, int start, int end, string type,
+        public CustomInterval(IChromosome referenceName, int start, int end, string type,
             IDictionary<string, string> stringValues, IDictionary<string, string> nonStringValues)
         {
             ReferenceName   = referenceName;
@@ -31,7 +32,7 @@ namespace SAUtils.DataStructures
         public int CompareTo(CustomInterval other)
         {
             if (ReferenceName != other.ReferenceName)
-                return string.Compare(ReferenceName, other.ReferenceName, StringComparison.Ordinal);
+                return ReferenceName.Index.CompareTo(other.ReferenceName.Index);
 
             return Start.CompareTo(other.Start);
         }
