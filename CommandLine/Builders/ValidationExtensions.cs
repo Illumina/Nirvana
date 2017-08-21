@@ -23,9 +23,30 @@ namespace CommandLine.Builders
             }
             return validator;
         }
+
         /// <summary>
-        /// 
-        /// 
+        /// check if directory exist,if not, create the directory
+        /// </summary>
+        public static IConsoleAppValidator CheckAndCreateDirectory(this IConsoleAppValidator validator,
+            string directoryPath, string description, string commandLineOption, bool isReuired = true)
+        {
+            if (string.IsNullOrEmpty(directoryPath))
+            {
+                if (isReuired)
+                    validator.Data.AddError(
+                        $"The {description} file was not specified. Please use the {commandLineOption} parameter.",
+                        ExitCodes.MissingCommandLineOption);
+            }
+            else if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
+
+            return validator;
+        }
+
+        /// <summary>
+        /// check if each file exists
         /// </summary>
 
         /// <returns></returns>
