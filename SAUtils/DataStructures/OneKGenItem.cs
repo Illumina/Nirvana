@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using SAUtils.InputFileParsers.DataStructures;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
-using VariantAnnotation.SA;
 
 namespace SAUtils.DataStructures
 {

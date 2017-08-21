@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SAUtils.InputFileParsers.DataStructures;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 

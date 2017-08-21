@@ -1,5 +1,0 @@
-﻿namespace SAUtils.DataStructures
-{
-   
-
-}

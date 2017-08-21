@@ -3,11 +3,10 @@ using System.Linq;
 using System.Text;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
-namespace SAUtils.InputFileParsers.DataStructures
+namespace SAUtils.DataStructures
 {
     public class SupplementaryIntervalItem:IChromosomeInterval
     {
@@ -124,7 +123,7 @@ namespace SAUtils.InputFileParsers.DataStructures
             }
             foreach (var kvp in StringLists)
             {
-                jsonObject.AddStringValues(kvp.Key, kvp.Value.ToArray());
+                jsonObject.AddStringValues(kvp.Key, Enumerable.ToArray<string>(kvp.Value));
             }
 
 
