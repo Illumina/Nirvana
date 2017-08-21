@@ -87,5 +87,12 @@ namespace SAUtils
             return !(altAllele[0] == 'i' || altAllele[0] == '<' || char.IsDigit(altAllele[0]));
         }
 
+        public static string ConvertToVcfInfoString(string s)
+        {
+            //characters such as comma, space, etc. are not allowed in vcfinfo strings.
+            s = s.Replace(" ", "_");
+            return s.Replace(",", "\\x2c");
+        }
+
     }
 }
