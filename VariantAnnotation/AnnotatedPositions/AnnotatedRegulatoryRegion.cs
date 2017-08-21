@@ -24,7 +24,7 @@ namespace VariantAnnotation.AnnotatedPositions
             sb.Append(JsonObject.OpenBrace);
             jsonObject.AddStringValue("id", RegulatoryRegion.Id.ToString());
             jsonObject.AddStringValue("type", RegulatoryRegion.Type.ToString());
-            jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence).ToArray());
+            jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
             sb.Append(JsonObject.CloseBrace);
         }
     }
