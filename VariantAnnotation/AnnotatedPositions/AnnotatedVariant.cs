@@ -62,7 +62,7 @@ namespace VariantAnnotation.AnnotatedPositions
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
             if (SupplementaryAnnotations.Count > 0) AddSAstoJsonObject(jsonObject);
 
-            if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes.ToArray());
+            if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes);
             if(OverlappingTranscripts.Count>0) jsonObject.AddObjectValues("overlappingTranscripts",OverlappingTranscripts);
             if (EnsemblTranscripts?.Count > 0 || RefSeqTranscripts?.Count > 0)
             {
