@@ -53,7 +53,7 @@ namespace VariantAnnotation.Providers
                 annotatedPosition.Position.End);
         }
 
-        private void LoadChromosome(IChromosome chromosome)
+        public void LoadChromosome(IChromosome chromosome)
         {
             var refIndex = chromosome.Index;
             if (refIndex == _currentReferenceIndex) return;
