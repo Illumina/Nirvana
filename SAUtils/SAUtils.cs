@@ -2,6 +2,7 @@
 using CommandLine.Builders;
 using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimDatabase;
+using SAUtils.ExtractMiniSa;
 using SAUtils.MergeInterimTsvs;
 using Constants = VariantAnnotation.Interface.Constants;
 
@@ -17,7 +18,7 @@ namespace SAUtils
                 ["createOMIM"] = new TopLevelOption("create omim database", CreateOmimDatabaseMain.Run),
                 ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvsMain.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
-                //["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
+                ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
 
             };
 
