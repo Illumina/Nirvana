@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
+    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+  </ItemGroup>
+</Project>

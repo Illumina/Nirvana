@@ -3,7 +3,7 @@ using ErrorHandling.Exceptions;
 
 namespace Nirvana
 {
-    public class SortedVcfChecker
+    public sealed class SortedVcfChecker
     {
         private readonly HashSet<string> _processedReferences = new HashSet<string>();
         private string _currentReferenceName;

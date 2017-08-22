@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 
 namespace CommandLine.Utilities
@@ -8,7 +8,7 @@ namespace CommandLine.Utilities
 
         #region members
 
-        public static readonly string Copyright;
+        private static readonly string Copyright;
         public static readonly string Title;
         public static readonly string InformationalVersion;
         public static readonly string Version;
@@ -94,23 +94,6 @@ namespace CommandLine.Utilities
             Console.WriteLine("{0}\n", line);
         }
 
-        /// <summary>
-        /// Displays a list of the unsupported options encountered on the command line
-        /// </summary>
-        public static void ShowUnsupportedOptions(List<string> unsupportedOps)
-        {
-            if (unsupportedOps == null || unsupportedOps.Count == 0) return;
-
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Unsupported options:");
-            Console.ResetColor();
-
-            var spacer = new string(' ', 3);
-            foreach (var option in unsupportedOps)
-            {
-                Console.WriteLine(spacer + option);
-            }
-        }
+        public static string CommandFileName => Path.GetFileName(Environment.GetCommandLineArgs()[0]);
     }
 }

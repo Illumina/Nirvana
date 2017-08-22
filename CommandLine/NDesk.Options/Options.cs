@@ -25,106 +25,16 @@
 // OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 //
-
-// Compile With:
-//   gmcs -debug+ -r:System.Core Options.cs -o:NDesk.Options.dll
-//   gmcs -debug+ -d:LINQ -r:System.Core Options.cs -o:NDesk.Options.dll
-//
 // The LINQ version just changes the implementation of
 // OptionSet.Parse(IEnumerable<string>), and confers no semantic changes.
-
 //
 // A Getopt::Long-inspired option parsing library for C#.
 //
 // NDesk.Options.OptionSet is built upon a key/value table, where the
 // key is a option format string and the value is a delegate that is 
 // invoked when the format string is matched.
-//
-// Option format strings:
-//  Regex-like BNF Grammar: 
-//    name: .+
-//    type: [=:]
-//    sep: ( [^{}]+ | '{' .+ '}' )?
-//    aliases: ( name type sep ) ( '|' name type sep )*
-// 
-// Each '|'-delimited name is an alias for the associated action.  If the
-// format string ends in a '=', it has a required value.  If the format
-// string ends in a ':', it has an optional value.  If neither '=' or ':'
-// is present, no value is supported.  `=' or `:' need only be defined on one
-// alias, but if they are provided on more than one they must be consistent.
-//
-// Each alias portion may also end with a "key/value separator", which is used
-// to split option values if the option accepts > 1 value.  If not specified,
-// it defaults to '=' and ':'.  If specified, it can be any character except
-// '{' and '}' OR the *string* between '{' and '}'.  If no separator should be
-// used (i.e. the separate values should be distinct arguments), then "{}"
-// should be used as the separator.
-//
-// Options are extracted either from the current option by looking for
-// the option name followed by an '=' or ':', or is taken from the
-// following option IFF:
-//  - The current option does not contain a '=' or a ':'
-//  - The current option requires a value (i.e. not a Option type of ':')
-//
-// The `name' used in the option format string does NOT include any leading
-// option indicator, such as '-', '--', or '/'.  All three of these are
-// permitted/required on any named option.
-//
-// Option bundling is permitted so long as:
-//   - '-' is used to start the option group
-//   - all of the bundled options are a single character
-//   - at most one of the bundled options accepts a value, and the value
-//     provided starts from the next character to the end of the string.
-//
-// This allows specifying '-a -b -c' as '-abc', and specifying '-D name=value'
-// as '-Dname=value'.
-//
-// Option processing is disabled by specifying "--".  All options after "--"
-// are returned by OptionSet.Parse() unchanged and unprocessed.
-//
-// Unprocessed options are returned from OptionSet.Parse().
-//
-// Examples:
-//  int verbose = 0;
-//  OptionSet p = new OptionSet ()
-//    .Add ("v", v => ++verbose)
-//    .Add ("name=|value=", v => Console.WriteLine (v));
-//  p.Parse (new string[]{"-v", "--v", "/v", "-name=A", "/name", "B", "extra"});
-//
-// The above would parse the argument string array, and would invoke the
-// lambda expression three times, setting `verbose' to 3 when complete.  
-// It would also print out "A" and "B" to standard output.
-// The returned array would contain the string "extra".
-//
-// C# 3.0 collection initializers are supported and encouraged:
-//  var p = new OptionSet () {
-//    { "h|?|help", v => ShowHelp () },
-//  };
-//
-// System.ComponentModel.TypeConverter is also supported, allowing the use of
-// custom data types in the callback type; TypeConverter.ConvertFromString()
-// is used to convert the value option to an instance of the specified
-// type:
-//
-//  var p = new OptionSet () {
-//    { "foo=", (Foo f) => Console.WriteLine (f.ToString ()) },
-//  };
-//
-// Random other tidbits:
-//  - Boolean options (those w/o '=' or ':' in the option format string)
-//    are explicitly enabled if they are followed with '+', and explicitly
-//    disabled if they are followed with '-':
-//      string a = null;
-//      var p = new OptionSet () {
-//        { "a", s => a = s },
-//      };
-//      p.Parse (new string[]{"-a"});   // sets v != null
-//      p.Parse (new string[]{"-a+"});  // sets v != null
-//      p.Parse (new string[]{"-a-"});  // sets v == null
-//
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -133,148 +43,27 @@ using System.Text.RegularExpressions;
 
 namespace CommandLine.NDesk.Options
 {
-    public sealed class OptionValueCollection : IList, IList<string>
+    public sealed class OptionValueCollection
     {
-        private readonly OptionContext _c;
         private readonly List<string> _values = new List<string>();
+        private readonly OptionContext _c;
 
         internal OptionValueCollection(OptionContext c)
         {
             _c = c;
         }
 
-        #region ICollection
-
-        void ICollection.CopyTo(Array array, int index)
-        {
-            (_values as ICollection).CopyTo(array, index);
-        }
-
-        bool ICollection.IsSynchronized => (_values as ICollection).IsSynchronized;
-
-        object ICollection.SyncRoot => (_values as ICollection).SyncRoot;
-
-        #endregion
-
         #region ICollection<T>
-
-        public void Clear()
-        {
-            _values.Clear();
-        }
-
+        public void Add(string item) { _values.Add(item); }
+        public void Clear() { _values.Clear(); }
         public int Count => _values.Count;
 
-        public bool IsReadOnly => false;
-
-        public void Add(string item)
-        {
-            _values.Add(item);
-        }
-
-        public bool Contains(string item)
-        {
-            return _values.Contains(item);
-        }
-
-        public void CopyTo(string[] array, int arrayIndex)
-        {
-            _values.CopyTo(array, arrayIndex);
-        }
-
-        public bool Remove(string item)
-        {
-            return _values.Remove(item);
-        }
-
         #endregion
 
-        #region IEnumerable
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return _values.GetEnumerator();
-        }
-
-        #endregion
-
-        #region IEnumerable<T>
-
-        public IEnumerator<string> GetEnumerator()
-        {
-            return _values.GetEnumerator();
-        }
-
-        #endregion
-
-        #region IList
-
-        int IList.Add(object value)
-        {
-            return (_values as IList).Add(value);
-        }
-
-        bool IList.Contains(object value)
-        {
-            return (_values as IList).Contains(value);
-        }
-
-        int IList.IndexOf(object value)
-        {
-            return (_values as IList).IndexOf(value);
-        }
-
-        void IList.Insert(int index, object value)
-        {
-            (_values as IList).Insert(index, value);
-        }
-
-        void IList.Remove(object value)
-        {
-            (_values as IList).Remove(value);
-        }
-
-        void IList.RemoveAt(int index)
-        {
-            (_values as IList).RemoveAt(index);
-        }
-
-        bool IList.IsFixedSize => false;
-
-        object IList.this[int index]
-        {
-            get => this[index];
-	        set => (_values as IList)[index] = value;
-        }
-
-        #endregion
 
         #region IList<T>
 
-        public int IndexOf(string item)
-        {
-            return _values.IndexOf(item);
-        }
-
-        public void Insert(int index, string item)
-        {
-            _values.Insert(index, item);
-        }
-
-        public void RemoveAt(int index)
-        {
-            _values.RemoveAt(index);
-        }
-
-        public string this[int index]
-        {
-            get
-            {
-                AssertValid(index);
-                return index >= _values.Count ? null : _values[index];
-            }
-            set => _values[index] = value;
-        }
 
         private void AssertValid(int index)
         {
@@ -287,12 +76,15 @@ namespace CommandLine.NDesk.Options
                 throw new OptionException($"Missing required value for option '{_c.OptionName}'.");
         }
 
-        #endregion
-
-        public override string ToString()
+        public string this[int index]
         {
-            return string.Join(", ", _values.ToArray());
+            get
+            {
+                AssertValid(index);
+                return index >= _values.Count ? null : _values[index];
+            }
         }
+        #endregion
     }
 
     public sealed class OptionContext
@@ -315,17 +107,11 @@ namespace CommandLine.NDesk.Options
     {
         None,
         Optional,
-        Required,
+        Required
     }
 
     public abstract class Option
     {
-        private static readonly char[] NameTerminator = { '=', ':' };
-        private readonly int _count;
-        private readonly string[] _names;
-        private readonly OptionValueType _type;
-        private string[] _separators;
-
         protected Option(string prototype, string description, int maxValueCount)
         {
             if (prototype == null)
@@ -335,45 +121,37 @@ namespace CommandLine.NDesk.Options
             if (maxValueCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(maxValueCount));
 
-            Prototype = prototype;
-            _names = prototype.Split('|');
+            Names = prototype.Split('|');
             Description = description;
-            _count = maxValueCount;
-            _type = ParsePrototype();
+            MaxValueCount = maxValueCount;
+            OptionValueType = ParsePrototype();
 
-            if (_count == 0 && _type != OptionValueType.None)
+            if (MaxValueCount == 0 && OptionValueType != OptionValueType.None)
                 throw new ArgumentException(
                     "Cannot provide maxValueCount of 0 for OptionValueType.Required or " +
                     "OptionValueType.Optional.",
                     nameof(maxValueCount));
-            if (_type == OptionValueType.None && maxValueCount > 1)
+            if (OptionValueType == OptionValueType.None && maxValueCount > 1)
                 throw new ArgumentException(
-                    $"Cannot provide maxValueCount of {maxValueCount} for OptionValueType.None.",
+                    string.Format("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
                     nameof(maxValueCount));
-            if (Array.IndexOf(_names, "<>") >= 0 &&
-                (_names.Length == 1 && _type != OptionValueType.None ||
-                 _names.Length > 1 && MaxValueCount > 1))
+            if (Array.IndexOf(Names, "<>") >= 0 &&
+                (Names.Length == 1 && OptionValueType != OptionValueType.None ||
+                 Names.Length > 1 && MaxValueCount > 1))
                 throw new ArgumentException(
                     "The default option handler '<>' cannot require values.",
                     nameof(prototype));
         }
 
-        private string Prototype { get; }
-
         public string Description { get; }
 
-        public OptionValueType OptionValueType => _type;
+        public OptionValueType OptionValueType { get; }
 
-        public int MaxValueCount => _count;
-
-        public string[] Names => _names;
-
-        internal string[] ValueSeparators => _separators;
+        public int MaxValueCount { get; }
 
         protected static T Parse<T>(string value, OptionContext c)
         {
             T t;
-
             try
             {
                 t = (T)Convert.ChangeType(value, typeof(T));
@@ -383,49 +161,54 @@ namespace CommandLine.NDesk.Options
                 throw new OptionException(
                     $"Could not convert string `{value}' to type {typeof(T).Name} for option `{c.OptionName}'.", e);
             }
-
             return t;
         }
 
+        public string[] Names { get; }
+
+        internal string[] ValueSeparators { get; private set; }
+
+        private static readonly char[] NameTerminator = { '=', ':' };
+
         private OptionValueType ParsePrototype()
         {
-            char c = '\0';
-            var seps = new List<string>();
-            for (int i = 0; i < _names.Length; ++i)
+            char type = '\0';
+            List<string> seps = new List<string>();
+            for (int i = 0; i < Names.Length; ++i)
             {
-                string name = _names[i];
+                string name = Names[i];
                 if (name.Length == 0)
-                    throw new ArgumentException("Empty option names are not supported.");
+                    throw new ArgumentException("Empty option names are not supported.", nameof(name));
 
                 int end = name.IndexOfAny(NameTerminator);
                 if (end == -1)
                     continue;
-                _names[i] = name.Substring(0, end);
-                if (c == '\0' || c == name[end])
-                    c = name[end];
+                Names[i] = name.Substring(0, end);
+                if (type == '\0' || type == name[end])
+                    type = name[end];
                 else
                     throw new ArgumentException(
-                        $"Conflicting option types: '{c}' vs. '{name[end]}'.");
+                        string.Format("Conflicting option types: '{0}' vs. '{1}'.", type, name[end]),
+                        nameof(type));
                 AddSeparators(name, end, seps);
             }
 
-            if (c == '\0')
+            if (type == '\0')
                 return OptionValueType.None;
 
-            if (_count <= 1 && seps.Count != 0)
+            if (MaxValueCount <= 1 && seps.Count != 0)
                 throw new ArgumentException(
-                    $"Cannot provide key/value separators for Options taking {_count} value(s).");
-            if (_count > 1)
-            {
-                if (seps.Count == 0)
-                    _separators = new[] { ":", "=" };
-                else if (seps.Count == 1 && seps[0].Length == 0)
-                    _separators = null;
-                else
-                    _separators = seps.ToArray();
-            }
+                    string.Format("Cannot provide key/value separators for Options taking {0} value(s).", MaxValueCount),
+                    nameof(MaxValueCount));
+            if (MaxValueCount <= 1) return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
+            if (seps.Count == 0)
+                ValueSeparators = new[] { ":", "=" };
+            else if (seps.Count == 1 && seps[0].Length == 0)
+                ValueSeparators = null;
+            else
+                ValueSeparators = seps.ToArray();
 
-            return c == '=' ? OptionValueType.Required : OptionValueType.Optional;
+            return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
         }
 
         private static void AddSeparators(string name, int end, ICollection<string> seps)
@@ -438,14 +221,14 @@ namespace CommandLine.NDesk.Options
                     case '{':
                         if (start != -1)
                             throw new ArgumentException(
-                                $"Ill-formed name/value separator found in \"{name}\".",
+                                string.Format("Ill-formed name/value separator found in \"{0}\".", name),
                                 nameof(name));
                         start = i + 1;
                         break;
                     case '}':
                         if (start == -1)
                             throw new ArgumentException(
-                                $"Ill-formed name/value separator found in \"{name}\".",
+                                string.Format("Ill-formed name/value separator found in \"{0}\".", name),
                                 nameof(name));
                         seps.Add(name.Substring(start, i - start));
                         start = -1;
@@ -471,11 +254,6 @@ namespace CommandLine.NDesk.Options
         }
 
         protected abstract void OnParseComplete(OptionContext c);
-
-        public override string ToString()
-        {
-            return Prototype;
-        }
     }
 
     public sealed class OptionException : Exception
@@ -510,29 +288,11 @@ namespace CommandLine.NDesk.Options
             AddImpl(item);
         }
 
-        protected override void RemoveItem(int index)
-        {
-            base.RemoveItem(index);
-            Option p = Items[index];
-            // KeyedCollection.RemoveItem() handles the 0th item
-            for (int i = 1; i < p.Names.Length; ++i)
-            {
-                Dictionary.Remove(p.Names[i]);
-            }
-        }
-
-        protected override void SetItem(int index, Option item)
-        {
-            base.SetItem(index, item);
-            RemoveItem(index);
-            AddImpl(item);
-        }
-
         private void AddImpl(Option option)
         {
             if (option == null)
                 throw new ArgumentNullException(nameof(option));
-            var added = new List<string>(option.Names.Length);
+            List<string> added = new List<string>(option.Names.Length);
             try
             {
                 // KeyedCollection.InsertItem/SetItem handle the 0th name.
@@ -550,7 +310,7 @@ namespace CommandLine.NDesk.Options
             }
         }
 
-        private new void Add(Option option)
+        public new void Add(Option option)
         {
             base.Add(option);
         }
@@ -562,7 +322,7 @@ namespace CommandLine.NDesk.Options
             public ActionOption(string prototype, string description, int count, Action<OptionValueCollection> action)
                 : base(prototype, description, count)
             {
-	            _action = action ?? throw new ArgumentNullException(nameof(action));
+                _action = action ?? throw new ArgumentNullException(nameof(action));
             }
 
             protected override void OnParseComplete(OptionContext c)
@@ -576,7 +336,7 @@ namespace CommandLine.NDesk.Options
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
             Option p = new ActionOption(prototype, description, 1,
-                                        v => action(v[0]));
+                delegate (OptionValueCollection v) { action(v[0]); });
             base.Add(p);
         }
 
@@ -587,7 +347,7 @@ namespace CommandLine.NDesk.Options
             public ActionOption(string prototype, string description, Action<T> action)
                 : base(prototype, description, 1)
             {
-	            _action = action ?? throw new ArgumentNullException(nameof(action));
+                _action = action ?? throw new ArgumentNullException(nameof(action));
             }
 
             protected override void OnParseComplete(OptionContext c)
@@ -611,7 +371,7 @@ namespace CommandLine.NDesk.Options
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
             bool process = true;
-            var unprocessed = new List<string>();
+            List<string> unprocessed = new List<string>();
             Option def = Contains("<>") ? this["<>"] : null;
             foreach (string argument in arguments)
             {
@@ -648,14 +408,13 @@ namespace CommandLine.NDesk.Options
         private readonly Regex _valueOption = new Regex(
             @"^(?<flag>--|-|/)(?<name>[^:=]+)((?<sep>[:=])(?<value>.*))?$");
 
-        private bool GetOptionParts(string argument, out string flag, out string name, out string sep,
-                                      out string value)
+        private bool GetOptionParts(string argument, out string flag, out string name, out string sep, out string value)
         {
             if (argument == null)
                 throw new ArgumentNullException(nameof(argument));
 
             flag = name = sep = value = null;
-            Match m = _valueOption.Match(argument);
+            var m = _valueOption.Match(argument);
             if (!m.Success)
             {
                 return false;
@@ -684,7 +443,7 @@ namespace CommandLine.NDesk.Options
 
             if (Contains(n))
             {
-                Option p = this[n];
+                var p = this[n];
                 c.OptionName = f + n;
                 c.Option = p;
                 switch (p.OptionValueType)
@@ -700,22 +459,17 @@ namespace CommandLine.NDesk.Options
                 }
                 return true;
             }
-            // no match; is it a bool option?
-            if (ParseBool(argument, n, c))
-                return true;
-            // is it a bundled option?
-            if (ParseBundledValue(f, string.Concat(n, s, v), c))
-                return true;
 
-            return false;
+            // no match; is it a bool option?
+            return ParseBool(argument, n, c) || ParseBundledValue(f, n + s + v, c);
         }
 
         private static void ParseValue(string option, OptionContext c)
         {
             if (option != null)
                 foreach (string o in c.Option.ValueSeparators != null
-                                         ? option.Split(c.Option.ValueSeparators, StringSplitOptions.None)
-                                         : new[] { option })
+                    ? option.Split(c.Option.ValueSeparators, StringSplitOptions.None)
+                    : new[] { option })
                 {
                     c.OptionValues.Add(o);
                 }
@@ -724,8 +478,7 @@ namespace CommandLine.NDesk.Options
                 c.Option.Invoke(c);
             else if (c.OptionValues.Count > c.Option.MaxValueCount)
             {
-                throw new OptionException(
-                    $"Error: Found {c.OptionValues.Count} option values when expecting {c.Option.MaxValueCount}.");
+                throw new OptionException($"Error: Found {c.OptionValues.Count} option values when expecting {c.Option.MaxValueCount}.");
             }
         }
 
@@ -735,7 +488,7 @@ namespace CommandLine.NDesk.Options
             if (n.Length >= 1 && (n[n.Length - 1] == '+' || n[n.Length - 1] == '-') &&
                 Contains(rn = n.Substring(0, n.Length - 1)))
             {
-                Option p = this[rn];
+                var p = this[rn];
                 string v = n[n.Length - 1] == '+' ? option : null;
                 c.OptionName = option;
                 c.Option = p;
@@ -760,7 +513,7 @@ namespace CommandLine.NDesk.Options
                         return false;
                     throw new OptionException($"Cannot bundle unregistered option '{opt}'.");
                 }
-                Option p = this[rn];
+                var p = this[rn];
                 switch (p.OptionValueType)
                 {
                     case OptionValueType.None:
@@ -808,20 +561,21 @@ namespace CommandLine.NDesk.Options
                     o.Write(new string(' ', OptionWidth));
                 }
 
-                var lines = GetLines(GetDescription(p.Description));
-                o.WriteLine(lines[0]);
-                var prefix = new string(' ', OptionWidth + 2);
-                for (int i = 1; i < lines.Count; ++i)
+                bool indent = false;
+                string prefix = new string(' ', OptionWidth + 2);
+                foreach (string line in GetLines(GetDescription(p.Description)))
                 {
-                    o.Write(prefix);
-                    o.WriteLine(lines[i]);
+                    if (indent)
+                        o.Write(prefix);
+                    o.WriteLine(line);
+                    indent = true;
                 }
             }
         }
 
         private static bool WriteOptionPrototype(TextWriter o, Option p, ref int written)
         {
-            var names = p.Names;
+            string[] names = p.Names;
 
             int i = GetNextOptionIndex(names, 0);
             if (i == names.Length)
@@ -839,8 +593,7 @@ namespace CommandLine.NDesk.Options
             }
 
             for (i = GetNextOptionIndex(names, i + 1);
-                 i < names.Length;
-                 i = GetNextOptionIndex(names, i + 1))
+                i < names.Length; i = GetNextOptionIndex(names, i + 1))
             {
                 Write(o, ref written, ", ");
                 Write(o, ref written, names[i].Length == 1 ? "-" : "--");
@@ -850,14 +603,15 @@ namespace CommandLine.NDesk.Options
             if (p.OptionValueType == OptionValueType.Optional ||
                 p.OptionValueType == OptionValueType.Required)
             {
+                Write(o, ref written, " ");
                 if (p.OptionValueType == OptionValueType.Optional)
                 {
                     Write(o, ref written, "[");
                 }
-                Write(o, ref written, " " + GetArgumentName(0, p.MaxValueCount, p.Description));
+                Write(o, ref written, "<" + GetArgumentName(0, p.MaxValueCount, p.Description) + '>');
                 string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
-                                 ? p.ValueSeparators[0]
-                                 : " ";
+                    ? p.ValueSeparators[0]
+                    : " ";
                 for (int c = 1; c < p.MaxValueCount; ++c)
                 {
                     Write(o, ref written, sep + GetArgumentName(c, p.MaxValueCount, p.Description));
@@ -902,7 +656,7 @@ namespace CommandLine.NDesk.Options
                 int end = description.IndexOf("}", start, StringComparison.Ordinal);
                 if (end == -1)
                     continue;
-                return "<" + description.Substring(start + t.Length, end - start - t.Length) + ">";
+                return description.Substring(start + t.Length, end - start - t.Length);
             }
             return maxIndex == 1 ? "VALUE" : "VALUE" + (index + 1);
         }
@@ -911,7 +665,7 @@ namespace CommandLine.NDesk.Options
         {
             if (description == null)
                 return string.Empty;
-            var sb = new StringBuilder(description.Length);
+            StringBuilder sb = new StringBuilder(description.Length);
             int start = -1;
             for (int i = 0; i < description.Length; ++i)
             {
@@ -954,63 +708,49 @@ namespace CommandLine.NDesk.Options
             return sb.ToString();
         }
 
-        private static List<string> GetLines(string description)
+        private static IEnumerable<string> GetLines(string description)
         {
-            var lines = new List<string>();
             if (string.IsNullOrEmpty(description))
             {
-                lines.Add(string.Empty);
-                return lines;
+                yield return string.Empty;
+                yield break;
             }
-            const int length = 80 - OptionWidth - 2;
+
+            description = description.Trim();
+            int length = 80 - OptionWidth - 1;
             int start = 0, end;
             do
             {
                 end = GetLineEnd(start, length, description);
-                bool cont = false;
-                if (end < description.Length)
-                {
-                    char c = description[end];
-                    if (c == '-' || char.IsWhiteSpace(c) && c != '\n')
-                        ++end;
-                    else if (c != '\n')
-                    {
-                        cont = true;
-                        --end;
-                    }
-                }
-                lines.Add(description.Substring(start, end - start));
-                if (cont)
-                {
-                    lines[lines.Count - 1] += "-";
-                }
+                char c = description[end - 1];
+                if (char.IsWhiteSpace(c))
+                    --end;
+                bool writeContinuation = end != description.Length && !IsEolChar(c);
+                string line = description.Substring(start, end - start) +
+                              (writeContinuation ? "-" : "");
+                yield return line;
                 start = end;
-                if (start < description.Length && description[start] == '\n')
+                if (char.IsWhiteSpace(c))
                     ++start;
+                length = 80 - OptionWidth - 2 - 1;
             } while (end < description.Length);
-            return lines;
+        }
+
+        private static bool IsEolChar(char c)
+        {
+            return !char.IsLetterOrDigit(c);
         }
 
         private static int GetLineEnd(int start, int length, string description)
         {
             int end = Math.Min(start + length, description.Length);
             int sep = -1;
-            for (int i = start; i < end; ++i)
+            for (int i = start + 1; i < end; ++i)
             {
-                switch (description[i])
-                {
-                    case ' ':
-                    case '\t':
-                    case '\v':
-                    case '-':
-                    case ',':
-                    case '.':
-                    case ';':
-                        sep = i;
-                        break;
-                    case '\n':
-                        return i;
-                }
+                if (description[i] == '\n')
+                    return i + 1;
+                if (IsEolChar(description[i]))
+                    sep = i + 1;
             }
             if (sep == -1 || end == description.Length)
                 return end;
