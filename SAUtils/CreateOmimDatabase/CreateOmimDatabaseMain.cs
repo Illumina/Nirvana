@@ -1,6 +1,8 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
+using VariantAnnotation.Interface;
+using VariantAnnotation.Providers;
 
 
 namespace SAUtils.CreateOmimDatabase
@@ -38,9 +40,11 @@ namespace SAUtils.CreateOmimDatabase
 			var commandLineExample = $"{command} [options]";
 
             var exitCode = new ConsoleAppBuilder(commandArgs,ops)
+                //.UseVersionProvider(new VersionProvider())
                 .Parse().CheckInputFilenameExists(ConfigurationSettings.OmimFile, "Omim GeneMap file", "--mim")
                 .CheckAndCreateDirectory(ConfigurationSettings.OutputOmimDirectory, "output Omim database directory", "--out")
-                .ShowBanner(null).ShowHelpMenu("Reads omim gene map file and creates Omim database",commandLineExample)
+                .ShowBanner(Constants.Authors)
+                .ShowHelpMenu("Reads omim gene map file and creates Omim database",commandLineExample)
                 .ShowErrors()
                 .Execute(creator.ProgramExecution);
 

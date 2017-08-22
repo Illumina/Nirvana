@@ -4,7 +4,7 @@ using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimDatabase;
 using SAUtils.ExtractMiniSa;
 using SAUtils.MergeInterimTsvs;
-using Constants = VariantAnnotation.Interface.Constants;
+using VariantAnnotation.Interface;
 
 namespace SAUtils
 {

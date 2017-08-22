@@ -50,7 +50,8 @@ namespace CommandLine.Builders
 
         public ITopLevelAppBanner ShowBanner(string authors)
         {
-            CommandLineUtilities.DisplayBanner(authors);
+            if(_data.ShowHelpMenu || _data.Errors.Count >0)
+                CommandLineUtilities.DisplayBanner(authors);
             return new TopLevelAppBanner(_data);
         }
     }

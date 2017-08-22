@@ -1,6 +1,7 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
+using VariantAnnotation.Interface;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
@@ -137,7 +138,7 @@ namespace SAUtils.CreateIntermediateTsvs
             .CheckEachFilenameExists(ConfigurationSettings.CustomAnnotationFiles, "Custom Annotation file name", "--cust", false)
             .CheckEachFilenameExists(ConfigurationSettings.CustomIntervalFiles, "Custom interval file name", "--bed", false)
             .CheckNonZero(ConfigurationSettings.NumberOfProvidedInputFiles(), "supplementary data source") 
-            .ShowBanner(null)
+            .ShowBanner(Constants.Authors)
             .ShowHelpMenu("Reads provided supplementary data files and populates tsv files",commandLineExample)
             .ShowErrors()
             .Execute(creator.ProgramExecution);
