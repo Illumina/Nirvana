@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="10329984">
+  <RecordStatus>current</RecordStatus>
+  <Title>NM_198576.3(AGRN):c.5125G&gt;C (p.Gly1709Arg) AND Myasthenic syndrome, congenital, with pre- and postsynaptic defects</Title>
+  <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-02-17" ID="77405">
+    <ClinVarAccession Acc="RCV000019902" Version="29" Type="RCV" DateUpdated="2016-02-17"/>
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2009-08-01">
+      <ReviewStatus>no assertion criteria provided</ReviewStatus>
+      <Description>Pathogenic</Description>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease"/>
+    <ObservedIn>
+      <Sample>
+        <Origin>germline</Origin>
+        <Species TaxonomyId="9606">human</Species>
+        <AffectedStatus>not provided</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>literature only</MethodType>
+      </Method>
+      <ObservedData ID="9747219">
+        <Attribute Type="Description">In a sister and brother with congenital myasthenic syndrome-8 (CMS8; 615120), Huze et al. (2009) identified a homozygous 5125G-C transversion in exon 29 of the AGRN gene, resulting in a gly1709-to-arg (G1709R) substitution in the C-terminal laminin G-like 2 (LG2) domain. Both patients had been unable to run since childhood and had mild muscle weakness as adults. Neither had diplopia, bulbar symptoms, or dyspnea. The mutation was not found in 200 control alleles. Skeletal muscle biopsy showed pre- and postsynaptic defects at the neuromuscular junction (NMJ), although mutant agrin staining was localized correctly. In vitro functional expression studies in myotubes showed that mutant agrin did not significantly impair AChR clustering, activation of MuSK (601296), or the interaction with alpha-dystroglycan (DAG; 128239). Injection of the mutant protein into rat muscle did not affect AChR recruit or expression at the NMJ. However, the NMJ showed remodeling and denervation: the presynaptic department had disheveled neurofilaments, and the postsynaptic compartment had increased synaptic gutter fragments. Huze et al. (2009) concluded that the mutant agrin destabilized the preexisting NMJ, suggesting that wildtype agrin is involved in the maintenance of the NMJ.</Attribute>
+        <Citation Type="general">
+          <ID Source="PubMed">19631309</ID>
+        </Citation>
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant" ID="18241">
+      <Measure Type="single nucleotide variant" ID="33280">
+        <Name>
+          <ElementValue Type="Preferred">NM_198576.3(AGRN):c.5125G&gt;C (p.Gly1709Arg)</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, RefSeq" Change="c.5125G&gt;C">NM_198576.3:c.5125G&gt;C</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, LRG" Change="g.35453G&gt;C">LRG_198:g.35453G&gt;C</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.35453G&gt;C">NG_016346.1:g.35453G&gt;C</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level" Change="g.1050575G&gt;C" integerValue="38">NC_000001.11:g.1050575G&gt;C</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, genomic, top level, previous" Change="g.985955G&gt;C" integerValue="37">NC_000001.10:g.985955G&gt;C</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein" Change="p.Gly1709Arg">LRG_198p1:p.Gly1709Arg</Attribute>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="HGVS, protein, RefSeq" Change="p.Gly1709Arg">NP_940978.2:p.Gly1709Arg</Attribute>
+          <XRef Type="rs" ID="199476396" DB="dbSNP"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="MolecularConsequence">missense variant</Attribute>
+          <XRef ID="SO:0001583" DB="Sequence Ontology"/>
+          <XRef ID="NM_198576.3:c.5125G&gt;C" DB="RefSeq"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="ProteinChange1LetterCode">G1709R</Attribute>
+          <XRef Type="Allelic variant" ID="103320.0001" DB="OMIM"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="ProteinChange3LetterCode">GLY1709ARG</Attribute>
+          <XRef Type="Allelic variant" ID="103320.0001" DB="OMIM"/>
+        </AttributeSet>
+        <CytogeneticLocation>1p36.33</CytogeneticLocation>
+        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="1050575" stop="1050575" display_start="1050575" display_stop="1050575" variantLength="1" referenceAllele="G" alternateAllele="C"/>
+        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="985955" stop="985955" display_start="985955" display_stop="985955" variantLength="1" referenceAllele="G" alternateAllele="C"/>
+        <MeasureRelationship Type="variant in gene">
+          <Name>
+            <ElementValue Type="Preferred">agrin</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">AGRN</ElementValue>
+          </Symbol>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="1020100" stop="1056118" display_start="1020100" display_stop="1056118" variantLength="35997" Strand="+"/>
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="955502" stop="991498" display_start="955502" display_stop="991498" variantLength="35997" Strand="+"/>
+          <XRef ID="375790" DB="Gene"/>
+          <XRef Type="MIM" ID="103320" DB="OMIM"/>
+          <XRef ID="HGNC:329" DB="HGNC"/>
+        </MeasureRelationship>
+        <XRef Type="Allelic variant" ID="103320.0001" DB="OMIM"/>
+        <XRef Type="rs" ID="199476396" DB="dbSNP"/>
+      </Measure>
+      <Name>
+        <ElementValue Type="Preferred">NM_198576.3(AGRN):c.5125G&gt;C (p.Gly1709Arg)</ElementValue>
+      </Name>
+    </MeasureSet>
+    <TraitSet Type="Disease" ID="13478">
+      <Trait ID="18690" Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">Myasthenic syndrome, congenital, with pre- and postsynaptic defects</ElementValue>
+        </Name>
+        <Name>
+          <ElementValue Type="Alternate">MYASTHENIC SYNDROME, CONGENITAL, DUE TO AGRIN DEFICIENCY</ElementValue>
+          <XRef Type="MIM" ID="615120" DB="OMIM"/>
+        </Name>
+        <Name>
+          <ElementValue Type="Alternate">MYASTHENIC SYNDROME, CONGENITAL, 8</ElementValue>
+          <XRef Type="MIM" ID="615120" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="103320.0001" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="103320.0002" DB="OMIM"/>
+          <XRef Type="Allelic variant" ID="103320.0003" DB="OMIM"/>
+        </Name>
+        <Symbol>
+          <ElementValue Type="Preferred">CMS8</ElementValue>
+          <XRef Type="MIM" ID="615120" DB="OMIM"/>
+        </Symbol>
+        <Symbol>
+          <ElementValue Type="Alternate">CMSPPD</ElementValue>
+          <XRef Type="MIM" ID="615120" DB="OMIM"/>
+        </Symbol>
+        <AttributeSet>
+          <Attribute Type="age of onset">Neonatal</Attribute>
+          <XRef ID="590" DB="Orphanet"/>
+        </AttributeSet>
+        <AttributeSet>
+          <Attribute Type="prevalence">1-9 / 1 000 000</Attribute>
+          <XRef ID="590" DB="Orphanet"/>
+        </AttributeSet>
+        <XRef ID="C3808739" DB="MedGen"/>
+        <XRef ID="590" DB="Orphanet"/>
+        <XRef Type="MIM" ID="615120" DB="OMIM"/>
+      </Trait>
+    </TraitSet>
+  </ReferenceClinVarAssertion>
+  <ClinVarAssertion ID="40200">
+    <ClinVarSubmissionID localKey="103320.0001_MYASTHENIC SYNDROME, CONGENITAL, 8" submitter="OMIM" submitterDate="2015-04-27" title="AGRN, GLY1709ARG _MYASTHENIC SYNDROME, CONGENITAL, 8"/>
+    <ClinVarAccession Acc="SCV000040200" Version="3" Type="SCV" OrgID="3" DateUpdated="2015-10-11"/>
+    <RecordStatus>current</RecordStatus>
+    <ClinicalSignificance DateLastEvaluated="2009-08-01">
+      <ReviewStatus>no assertion criteria provided</ReviewStatus>
+      <Description>Pathogenic</Description>
+    </ClinicalSignificance>
+    <Assertion Type="variation to disease"/>
+    <ExternalID DB="OMIM" ID="103320.0001" Type="Allelic variant"/>
+    <ObservedIn>
+      <Sample>
+        <Origin>germline</Origin>
+        <Species>human</Species>
+        <AffectedStatus>not provided</AffectedStatus>
+      </Sample>
+      <Method>
+        <MethodType>literature only</MethodType>
+      </Method>
+      <ObservedData>
+        <Attribute Type="Description">In a sister and brother with congenital myasthenic syndrome-8 (CMS8; 615120), Huze et al. (2009) identified a homozygous 5125G-C transversion in exon 29 of the AGRN gene, resulting in a gly1709-to-arg (G1709R) substitution in the C-terminal laminin G-like 2 (LG2) domain. Both patients had been unable to run since childhood and had mild muscle weakness as adults. Neither had diplopia, bulbar symptoms, or dyspnea. The mutation was not found in 200 control alleles. Skeletal muscle biopsy showed pre- and postsynaptic defects at the neuromuscular junction (NMJ), although mutant agrin staining was localized correctly. In vitro functional expression studies in myotubes showed that mutant agrin did not significantly impair AChR clustering, activation of MuSK (601296), or the interaction with alpha-dystroglycan (DAG; 128239). Injection of the mutant protein into rat muscle did not affect AChR recruit or expression at the NMJ. However, the NMJ showed remodeling and denervation: the presynaptic department had disheveled neurofilaments, and the postsynaptic compartment had increased synaptic gutter fragments. Huze et al. (2009) concluded that the mutant agrin destabilized the preexisting NMJ, suggesting that wildtype agrin is involved in the maintenance of the NMJ.</Attribute>
+        <Citation>
+          <ID Source="PubMed">19631309</ID>
+        </Citation>
+        <XRef DB="OMIM" ID="615120" Type="MIM"/>
+        <XRef DB="OMIM" ID="601296" Type="MIM"/>
+        <XRef DB="OMIM" ID="128239" Type="MIM"/>
+      </ObservedData>
+    </ObservedIn>
+    <MeasureSet Type="Variant">
+      <Measure Type="Variation">
+        <Name>
+          <ElementValue Type="Preferred">AGRN, GLY1709ARG</ElementValue>
+        </Name>
+        <AttributeSet>
+          <Attribute Type="NonHGVS">GLY1709ARG</Attribute>
+        </AttributeSet>
+        <MeasureRelationship Type="variant in gene">
+          <Symbol>
+            <ElementValue Type="Preferred">AGRN</ElementValue>
+          </Symbol>
+        </MeasureRelationship>
+        <XRef DB="OMIM" ID="103320.0001" Type="Allelic variant"/>
+      </Measure>
+    </MeasureSet>
+    <TraitSet Type="Disease">
+      <Trait Type="Disease">
+        <Name>
+          <ElementValue Type="Preferred">MYASTHENIC SYNDROME, CONGENITAL, 8</ElementValue>
+        </Name>
+      </Trait>
+    </TraitSet>
+  </ClinVarAssertion>
+</ClinVarSet>
+</ReleaseSet>

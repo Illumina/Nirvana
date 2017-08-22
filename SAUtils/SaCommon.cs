@@ -2,6 +2,7 @@
 {
     public static class SaCommon
     {
+
         public const int DbSnpSchemaVersion = 1;
         public const int OneKgenSchemaVersion = 1;
         public const int CosmicSchemaVersion = 1;

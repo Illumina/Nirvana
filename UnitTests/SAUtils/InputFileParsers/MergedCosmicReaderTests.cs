@@ -21,7 +21,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             _refChromDict = new Dictionary<string, IChromosome>
             {
                 {"1",new Chromosome("chr1", "1",0) },
-                {"4",new Chromosome("chr4", "4", 3) }
+                {"3",new Chromosome("chr3", "3", 2) }
             };
         }
 

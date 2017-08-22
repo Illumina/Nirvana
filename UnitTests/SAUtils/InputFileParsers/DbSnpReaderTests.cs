@@ -15,25 +15,30 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
         private static readonly Stream TestDbSnpStream = ResourceUtilities.GetReadStream(Resources.TopPath("TestDbSnpParser.vcf"));
 
         private readonly IDictionary<string, IChromosome> _refChromDict;
+        private static IChromosome chr1 = new Chromosome("chr1","1",0);
+        private static IChromosome chr4 = new Chromosome("chr4", "4", 3);
+        private static IChromosome chr17 = new Chromosome("chr17", "17", 16);
 
         /// <summary>
         /// constructor
         /// </summary>
         public DbSnpReaderTests()
         {
+            
             _refChromDict = new Dictionary<string, IChromosome>
             {
-                {"1",new Chromosome("chr1", "1",0) },
-                {"4",new Chromosome("chr4", "4", 3) }
+                {"1",chr1 },
+                {"4",chr4 },
+                {"17",chr17}
             };
         }
 
         private static IEnumerable<DbSnpItem> CreateTruthDbSnpItemSequence()
         {
-            yield return new DbSnpItem(new Chromosome("chr1", "1",0), 820164, 74632680, "A", 0, "G", 0);
-            yield return new DbSnpItem(new Chromosome("chr1", "1", 0), 820181, 191755837, "C", 0.9995, "T", 0.0004591);
-            yield return new DbSnpItem(new Chromosome("chr4", "4", 3), 78820304, 112709112, "C", 0.9913, "A", 0.008724);
-            yield return new DbSnpItem(new Chromosome("chr4", "4", 3), 78820304, 112709112, "C", 0.9913, "T", 0.008724);
+            yield return new DbSnpItem(chr1, 820164, 74632680, "A", 0, "G", 0);
+            yield return new DbSnpItem(chr1, 820181, 191755837, "C", 0.9995, "T", 0.0004591);
+            yield return new DbSnpItem(chr4, 78820304, 112709112, "C", 0.9913, "A", 0.008724);
+            yield return new DbSnpItem(chr4, 78820304, 112709112, "C", 0.9913, "T", 0.008724);
         }
 
         [Fact]
