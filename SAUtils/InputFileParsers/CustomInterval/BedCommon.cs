@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace SAUtils.InputFileParsers.CustomInterval
+﻿namespace SAUtils.InputFileParsers.CustomInterval
 {
     public static class BedCommon
     {

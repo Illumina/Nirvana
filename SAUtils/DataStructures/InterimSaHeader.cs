@@ -1,5 +1,4 @@
 ﻿using System;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.DataStructures
 {

@@ -5,18 +5,16 @@ using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using SAUtils.DataStructures;
-using VariantAnnotation;
 using VariantAnnotation.IO;
-using VariantAnnotation.SA;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-	public class SaTsvReader:IEnumerable<InterimSaItem>
+    public class SaTsvReader:IEnumerable<InterimSaItem>
 	{
 		private readonly FileInfo _inputFileInfo;
 		private readonly Dictionary<string, long> _refNameOffsets;
 
-		private InterimHeader _header;
+		private InterimSaHeader _header;
 		private string _name;
 		private string _genomeAssembly;
 		private string _version;
@@ -130,7 +128,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 		        vcfString, jsonStrings.ToArray());
 		}
 
-		public InterimHeader GetHeader()
+		public InterimSaHeader GetHeader()
 		{
 			if (_header != null) return _header;
 

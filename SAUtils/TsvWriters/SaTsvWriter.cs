@@ -6,9 +6,6 @@ using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
-using Compression;
 using Compression.FileHandling;
 
 namespace SAUtils.TsvWriters

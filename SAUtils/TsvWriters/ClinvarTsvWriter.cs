@@ -5,12 +5,11 @@ using System.Linq;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class ClinvarTsvWriter:ISaItemTsvWriter
+    public class ClinvarTsvWriter:ISaItemTsvWriter
 	{
 		#region members
 		private readonly SaTsvWriter _writer;

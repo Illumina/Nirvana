@@ -8,11 +8,10 @@ using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-	public sealed class ClinvarVariant
+    public sealed class ClinvarVariant
 	{
 		public readonly IChromosome Chromosome;
 		public int Start { get; }

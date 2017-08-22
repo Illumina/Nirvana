@@ -20,14 +20,12 @@ using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
-	internal class CreateInterimFiles
+    internal class CreateInterimFiles
 	{
 		#region fileNames
 		private readonly List<string> _customAnnotationFiles;

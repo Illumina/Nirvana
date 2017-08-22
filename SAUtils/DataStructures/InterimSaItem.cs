@@ -1,7 +1,6 @@
 ﻿using SAUtils.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.DataStructures
 {
