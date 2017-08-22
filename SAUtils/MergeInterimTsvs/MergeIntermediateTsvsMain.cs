@@ -9,28 +9,6 @@ namespace SAUtils.MergeInterimTsvs
 {
     public class MergeIntermediateTsvsMain 
 	{
-
-
-		private static void GetTsvAndIntervalFiles(string tsvFilesDirectory, List<string> intermediateFiles, List<string> intervalFiles)
-		{
-			if(!Directory.Exists(tsvFilesDirectory)) return;
-			foreach (var file in Directory.GetFiles(tsvFilesDirectory))
-			{
-				if(!file.EndsWith(".tsv.gz")) continue;
-				if (file.EndsWith(".interval.tsv.gz"))
-				{
-					intervalFiles.Add(file);
-					continue;
-				}
-			    if (file.EndsWith(".misc.tsv.gz"))
-			    {
-			        ConfigurationSettings.MiscFile = file;
-                    continue;
-                }
-				intermediateFiles.Add(file);
-			}
-		}
-
 		private ExitCodes ProgramExecution()
 		{
 			var intermediateSaMerger = new MergeInterimTsvs(ConfigurationSettings.IntermediateFiles,
@@ -83,18 +61,16 @@ namespace SAUtils.MergeInterimTsvs
 			var commandLineExample = $"{command} [options]";
 
 
-		    //Get files in tsv file Directory and add them to intermediate files or interval files
-		    GetTsvAndIntervalFiles(ConfigurationSettings.TsvFilesDirectory, ConfigurationSettings.IntermediateFiles,
-		        ConfigurationSettings.IntervalFiles);
-		    var fileCount = ConfigurationSettings.MiscFile == null
-		        ? ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count
-		        : ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count + 1;
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
 		        .Parse()
+                .GetTsvAndIntervalFiles(ConfigurationSettings.TsvFilesDirectory, ConfigurationSettings.IntermediateFiles,
+                    ConfigurationSettings.IntervalFiles)
                 .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "Onput compressed reference file", "--ref")
 		        .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "Output Supplementary directory", "--out")
-                .CheckNonZero(fileCount, "No intermediate files were provided, use --dir or --tsv /--int")
+                .CheckNonZero(ConfigurationSettings.MiscFile == null
+                    ? ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count
+                    : ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count + 1, "No intermediate files were provided, use --dir or --tsv /--int")
                 .CheckEachFilenameExists(ConfigurationSettings.IntermediateFiles, "Intermediate Annotation file name", "--tsv", false)
 		        .CheckEachFilenameExists(ConfigurationSettings.IntervalFiles, "Intermediate interval file name", "--int",false)
 		        .CheckInputFilenameExists(ConfigurationSettings.MiscFile, "Intermediate misc file name", "--misc", false)
@@ -109,5 +85,7 @@ namespace SAUtils.MergeInterimTsvs
 
 
         }
-	}
+
+
+    }
 }

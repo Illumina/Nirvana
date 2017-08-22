@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers;
 using SAUtils.InputFileParsers.ClinGen;
@@ -279,7 +280,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
 			using (var tsvWriter = new DbsnpGaTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
 			{
-				var dbSnpReader = new DbSnpReader(new FileInfo(fileName), _refNamesDictionary);
+				var dbSnpReader = new DbSnpReader( GZipUtilities.GetAppropriateReadStream(fileName) , _refNamesDictionary);
 				WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
 			}
 

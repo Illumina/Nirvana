@@ -68,7 +68,7 @@ namespace CommandLine.Builders
         {
             if (validator.SkipValidation) return validator;
 
-            if (string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath) && isRequired)
             {
                 validator.Data.AddError(
                     $"The {description} file was not specified. Please use the {commandLineOption} parameter.",

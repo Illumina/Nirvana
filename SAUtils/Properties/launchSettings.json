@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "SAUtils": {
+      "commandName": "Project",
+      "commandLineArgs": "createSA --ref e:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat  -d \\\\ussd-prd-isi04\\Nirvana\\Development\\IntermediateTsvs\\2017-05\\GRCh37 -o E:\\Data\\Nirvana\\SupplementaryAnnotation\\tmp\\GRCh37",
+      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+    }
+  }
+}

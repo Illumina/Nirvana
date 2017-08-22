@@ -154,7 +154,7 @@ namespace CommandLine.Builders
 
             try
             {
-                exitCode = _data.ExecuteMethod(_data.Command, _data.Arguments);
+                exitCode = _data.ExecuteMethod(_data.Command, _data.Arguments.Skip(1).ToArray());
                 ShowPerformanceData(benchmark);
             }
             catch (Exception e)

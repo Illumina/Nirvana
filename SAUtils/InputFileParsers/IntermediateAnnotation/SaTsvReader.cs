@@ -191,8 +191,8 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 					break;
 				case "#schemaVersion":
 					var schemaVersion = int.Parse(value);
-					if (schemaVersion != JsonCommon.SupplementarySchemaVersion)
-						throw new InvalidDataException($"Expected Schema version:{JsonCommon.SupplementarySchemaVersion}, oberved: {value}");
+					if (schemaVersion != SaCommon.SupplementarySchemaVersion)
+						throw new InvalidDataException($"Expected Schema version:{SaCommon.SupplementarySchemaVersion}, oberved: {value}");
 					break;
 			}
 		}

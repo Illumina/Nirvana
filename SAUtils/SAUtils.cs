@@ -26,7 +26,7 @@ namespace SAUtils
             var exitCode = new TopLevelAppBuilder(args,ops)
                 .Parse()
                 .ShowBanner(Constants.Authors)
-                .ShowHelpMenu("Utilities focused on querying the cache directory")
+                .ShowHelpMenu("Utilities focused on supplementary annotation")
                 .ShowErrors().Execute();
             return (int) exitCode;
         }

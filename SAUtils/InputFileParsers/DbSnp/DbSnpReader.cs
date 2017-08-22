@@ -16,15 +16,14 @@ namespace SAUtils.InputFileParsers.DbSnp
     public sealed class DbSnpReader : IEnumerable<DbSnpItem>
     {
         // Key in VCF info field of the allele frequencies subfield.
-	    private readonly FileInfo _dbSnpFile;
 	    private readonly Stream _stream;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
 
 
-        public DbSnpReader(FileInfo dbSnpFile, IDictionary<string, IChromosome> refChromDict) 
+        public DbSnpReader(Stream stream, IDictionary<string, IChromosome> refChromDict)
         {
-            _dbSnpFile = dbSnpFile;
+            _stream = stream;
             _refChromDict = refChromDict;
         }
 
@@ -36,7 +35,7 @@ namespace SAUtils.InputFileParsers.DbSnp
         /// <returns></returns>
         private IEnumerable<DbSnpItem> GetDbSnpItems()
         {
-            using (var reader = _stream == null? GZipUtilities.GetAppropriateStreamReader(_dbSnpFile.FullName): new StreamReader(_stream))
+            using (var reader = new StreamReader(_stream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
