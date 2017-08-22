@@ -123,7 +123,7 @@ namespace SAUtils.DataStructures
             }
             foreach (var kvp in StringLists)
             {
-                jsonObject.AddStringValues(kvp.Key, Enumerable.ToArray<string>(kvp.Value));
+                jsonObject.AddStringValues(kvp.Key, kvp.Value.ToArray());
             }
 
 

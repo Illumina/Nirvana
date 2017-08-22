@@ -26,7 +26,7 @@ using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
-    internal class CreateInterimFiles
+    internal sealed class CreateInterimFiles
 	{
 		#region fileNames
 		private readonly List<string> _customAnnotationFiles;
@@ -49,9 +49,7 @@ namespace SAUtils.CreateIntermediateTsvs
 		private readonly GenomeAssembly _genomeAssembly;
 	    private readonly ISequenceProvider _sequenceProvider;
 
-        private readonly string _compressedReferencePath;
-
-		#endregion
+	    #endregion
 		public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles )
 		{
 			_outputDirectory         = outputDirectory;
@@ -71,8 +69,7 @@ namespace SAUtils.CreateIntermediateTsvs
 		    _sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReferencePath));
 
 
-            _compressedReferencePath = compressedReferencePath;
-			_refNamesDictionary     = _sequenceProvider.GetChromosomeDictionary();
+		    _refNamesDictionary     = _sequenceProvider.GetChromosomeDictionary();
 
             _genomeAssembly     = _sequenceProvider.GenomeAssembly;
 

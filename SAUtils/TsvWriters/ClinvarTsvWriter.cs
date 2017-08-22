@@ -9,7 +9,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-    public class ClinvarTsvWriter:ISaItemTsvWriter
+    public sealed class ClinvarTsvWriter:ISaItemTsvWriter
 	{
 		#region members
 		private readonly SaTsvWriter _writer;

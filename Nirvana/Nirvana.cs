@@ -121,11 +121,7 @@ namespace Nirvana
             jsonObject.AddObjectValues("genes",annotatedGenes,true);
             writer.WriteAnnotatedGenes(sb.ToString());
         }
-        private void WriteHeader(StreamWriter vcfWriter, IEnumerable<string> headerLines)
-        {
-            if (vcfWriter == null) return;
-            foreach (var headerLine in headerLines) vcfWriter.WriteLine(headerLine);
-        }
+
 
         private int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome)
         {

@@ -5,11 +5,9 @@ using VariantAnnotation.Interface;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
-    public class CreateIntermediateTsvsMain 
+    public sealed class CreateIntermediateTsvsMain 
 	{
-		
-    
-		protected ExitCodes  ProgramExecution()
+	    private ExitCodes  ProgramExecution()
 		{
 			// load the reference sequence
 			
