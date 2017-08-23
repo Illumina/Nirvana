@@ -2,7 +2,7 @@
 using System.IO;
 using System.Linq;
 using SAUtils.InputFileParsers;
-using SAUtils.InputFileParsers.Omim;
+using SAUtils.CreateOmimTsv;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Providers;
 
