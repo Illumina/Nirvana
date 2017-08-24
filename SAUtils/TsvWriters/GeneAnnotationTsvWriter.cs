@@ -52,14 +52,14 @@ namespace SAUtils.TsvWriters
         }
         #endregion
 
-        public GeneAnnotationTsvWriter(string outputPath, DataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
+        public GeneAnnotationTsvWriter(string outputDirectory, DataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
             bool isArray)
         {
-            var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".interval.tsv.gz";
-            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputPath, fileName));
+            var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".gene.tsv.gz";
+            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputDirectory, fileName));
 
             _bgzipTextWriter.Write(GetHeader(dataSourceVersion, dataVersion, assembly, keyName, isArray));
-            _tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName) + ".tvi");
+            _tsvIndex = new TsvIndex(Path.Combine(outputDirectory, fileName) + ".tvi");
         }
 
         private string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)

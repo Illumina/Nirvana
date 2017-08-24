@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using VariantAnnotation.GeneAnnotation;
 using System.Linq;
+using Compression.Utilities;
 using SAUtils.TsvWriters;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
@@ -12,16 +13,18 @@ namespace SAUtils.CreateOmimTsv
 {
     public class OmimTsvCreator
     {
-        private Stream _geneMap2FileStream;
-        private Stream _mim2GenefileStream;
+        private const string _jsonKeyName = "omim";
+        private FileInfo _geneMap2File;
+        private FileInfo _mim2Genefile;
         private GeneSymbolUpdater _geneSymbolUpdater;
         private SortedList<string, List<OmimEntry>> _gene2Mims;
         private string _outputDirectory;
 
-        public OmimTsvCreator(Stream geneMap2FileStream, Stream mim2GenefileStream, GeneSymbolUpdater geneSymbolUpdater, string outputDirectory)
+        public OmimTsvCreator(FileInfo geneMap2File, FileInfo mim2Genefile,  GeneSymbolUpdater geneSymbolUpdater, string outputDirectory)
         {
-            _geneMap2FileStream = geneMap2FileStream;
-            _mim2GenefileStream = mim2GenefileStream;
+            _geneMap2File = geneMap2File;
+            _mim2Genefile = mim2Genefile;
+
             _geneSymbolUpdater = geneSymbolUpdater;
             _outputDirectory = outputDirectory;
             _gene2Mims = new SortedList<string, List<OmimEntry>> { };
@@ -29,8 +32,8 @@ namespace SAUtils.CreateOmimTsv
 
         public void Create()
         {
-            var geneMap2Reader = new OmimReader(_geneMap2FileStream, _geneSymbolUpdater);
-            var mimToGeneReader = new OmimReader(_mim2GenefileStream, _geneSymbolUpdater);
+            var geneMap2Reader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_geneMap2File.Name), _geneSymbolUpdater);
+            var mimToGeneReader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_mim2Genefile.Name), _geneSymbolUpdater);
 
             foreach(var entry in geneMap2Reader)
             {
@@ -52,9 +55,9 @@ namespace SAUtils.CreateOmimTsv
                 throw new Exception($"{entry.Hgnc} exist in geneMap2.txt but {entry.MimNumber} not exist");
             }
 
-            var dataSourceVersion = GetSourceVersion("");
-            var outPutPath = "";
-            using (var omimWriter = new GeneAnnotationTsvWriter(outPutPath, dataSourceVersion, null, 0, "omim", true))
+            var dataSourceVersion = GetSourceVersion(_geneMap2File.Name);
+
+            using (var omimWriter = new GeneAnnotationTsvWriter(_outputDirectory, dataSourceVersion, null, 0, _jsonKeyName, true))
             {
                 foreach (var kvp in _gene2Mims)
                 {           
