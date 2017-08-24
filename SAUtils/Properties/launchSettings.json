@@ -4,6 +4,11 @@
       "commandName": "Project",
       "commandLineArgs": "createSA --ref e:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat  -d \\\\ussd-prd-isi04\\Nirvana\\Development\\IntermediateTsvs\\2017-05\\GRCh37 -o E:\\Data\\Nirvana\\SupplementaryAnnotation\\tmp\\GRCh37",
       "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+    },
+    "OMIM_SK": {
+      "commandName": "Project",
+      "commandLineArgs": "createOMIM --gi ..\\gene_info_2016-10-17 --gi ..\\gene_info_2011-08-28 --hgnc ..\\hgnc_complete_set_2016-10-17.txt --mim mim2gene.txt --in genemap2.txt --out test",
+      "workingDirectory": "E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15"
     }
   }
 }

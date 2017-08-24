@@ -44,7 +44,12 @@ namespace SAUtils.MergeInterimTsvs
                      "misc|m=",
                      "refminor and global major allele in tsv format",
                      v => ConfigurationSettings.MiscFile = v
-                 },
+                },
+                {
+                    "gene|g=",
+                    "gene annotation files in intermediate format",
+                    v=>ConfigurationSettings.GeneTsvFiles.Add(v)
+                },
 				 {
 					 "out|o=",
 					 "output Nirvana Supplementary directory",
@@ -65,16 +70,18 @@ namespace SAUtils.MergeInterimTsvs
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
 		        .Parse()
                 .GetTsvAndIntervalFiles(ConfigurationSettings.TsvFilesDirectory, ConfigurationSettings.IntermediateFiles,
-                    ConfigurationSettings.IntervalFiles)
+                    ConfigurationSettings.IntervalFiles,ConfigurationSettings.GeneTsvFiles)
                 .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "Onput compressed reference file", "--ref")
 		        .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "Output Supplementary directory", "--out")
                 .CheckNonZero(ConfigurationSettings.MiscFile == null
-                    ? ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count
-                    : ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count + 1, "No intermediate files were provided, use --dir or --tsv /--int")
+                    ? ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count + ConfigurationSettings.GeneTsvFiles.Count
+                    : ConfigurationSettings.IntermediateFiles.Count + ConfigurationSettings.IntervalFiles.Count + 
+                    ConfigurationSettings.GeneTsvFiles.Count + 1, "No intermediate files were provided, use --dir or --tsv /--int")
                 .CheckEachFilenameExists(ConfigurationSettings.IntermediateFiles, "Intermediate Annotation file name", "--tsv", false)
 		        .CheckEachFilenameExists(ConfigurationSettings.IntervalFiles, "Intermediate interval file name", "--int",false)
 		        .CheckInputFilenameExists(ConfigurationSettings.MiscFile, "Intermediate misc file name", "--misc", false)
-    .ShowBanner(Constants.Authors)
+                .CheckEachFilenameExists(ConfigurationSettings.GeneTsvFiles,"Intermediate gene file name","--gene",false)
+                .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Reads provided intermediate TSV files and creates supplementary database", commandLineExample)
 		        .ShowErrors()
 		        .Execute(merger.ProgramExecution);

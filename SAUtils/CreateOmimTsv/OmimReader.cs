@@ -55,8 +55,8 @@ namespace SAUtils.CreateOmimTsv
 					var contents = line.Split('\t');
 					var mimNumber =Convert.ToInt32(contents[_mimNumberCol]);
 					var geneSymbol = contents[_hgncCol];
-					var description = contents[_geneDescriptionCol].Replace(@"\\'",@"'");
-					var phenotypeInfo = contents[_phenotypeCol].Replace(@",,", @",");
+					var description = _geneDescriptionCol >=0 ?contents[_geneDescriptionCol].Replace(@"\\'",@"'"):null;
+					var phenotypeInfo = _phenotypeCol>=0? contents[_phenotypeCol].Replace(@",,", @","):null;
 					var phenotypes = ParsePhenotypes(phenotypeInfo);
 
                     if(string.IsNullOrEmpty(geneSymbol)) continue;
@@ -167,7 +167,7 @@ namespace SAUtils.CreateOmimTsv
 
 		private static bool IsHeader(string line)
 		{
-			return line.StartsWith("# Chromosome");
+			return line.StartsWith("# Chromosome\t") || line.StartsWith("# MIM Number\t");
 		}
 
 		private static bool IsContentLine(string line)

@@ -6,7 +6,7 @@ namespace SAUtils.MergeInterimTsvs
 {
     public static class ValidatorInSaExtensions
     {
-        public static IConsoleAppValidator GetTsvAndIntervalFiles(this IConsoleAppValidator validator, string tsvFilesDirectory, List<string> intermediateFiles, List<string> intervalFiles)
+        public static IConsoleAppValidator GetTsvAndIntervalFiles(this IConsoleAppValidator validator, string tsvFilesDirectory, List<string> intermediateFiles, List<string> intervalFiles,List<string> geneTsvFiles)
         {
             if (!Directory.Exists(tsvFilesDirectory)) return validator;
             foreach (var file in Directory.GetFiles(tsvFilesDirectory))
@@ -21,6 +21,10 @@ namespace SAUtils.MergeInterimTsvs
                 {
                     ConfigurationSettings.MiscFile = file;
                     continue;
+                }
+                if (file.EndsWith(".gene.tsv.gz"))
+                {
+                    geneTsvFiles.Add(file);
                 }
                 intermediateFiles.Add(file);
             }

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
 using SAUtils.CreateIntermediateTsvs;
-using SAUtils.CreateOmimDatabase;
+using SAUtils.CreateOmimTsv;
 using SAUtils.ExtractMiniSa;
 using SAUtils.MergeInterimTsvs;
 using VariantAnnotation.Interface;
@@ -15,7 +15,8 @@ namespace SAUtils
         {
             var ops = new Dictionary<string, TopLevelOption>
             {
-                ["createOMIM"] = new TopLevelOption("create omim database", CreateOmimDatabaseMain.Run),
+                ["createOMIM"] = new TopLevelOption("create omim database", CreateOmimTsvMain.Run),
+
                 ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvsMain.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),

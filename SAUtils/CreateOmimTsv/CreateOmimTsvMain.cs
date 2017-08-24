@@ -1,7 +1,7 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Text;
 using VariantAnnotation.Interface;
@@ -12,14 +12,15 @@ namespace SAUtils.CreateOmimTsv
     {
         private ExitCodes ProgramExecution()
         {
-
+            var geneSymbolUpdater = new GeneSymbolUpdater(ConfigurationSettings.GeneInfoPaths, ConfigurationSettings.HgncPath);
+            var omimTsvCreator = new OmimTsvCreator(new FileInfo(ConfigurationSettings.InputGeneMap2Path), new FileInfo (ConfigurationSettings.Mim2GenePath), geneSymbolUpdater,ConfigurationSettings.OutputDirectory);
+            omimTsvCreator.Create();
             return ExitCodes.Success;
         }
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
             var creator = new CreateOmimTsvMain();
-
 
             var ops = new OptionSet
             {
