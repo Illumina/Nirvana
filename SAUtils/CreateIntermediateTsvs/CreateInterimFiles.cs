@@ -125,10 +125,13 @@ namespace SAUtils.CreateIntermediateTsvs
 		{
 			if (string.IsNullOrEmpty(fileName)) return;
 
-			Console.WriteLine($"Creating TSV from {fileName}");
+            var benchMark = new Benchmark();
+			//Console.WriteLine($"Creating TSV from {fileName}");
+		    var dataSource = "";
 			switch (sourceName)
 			{
 				case InterimSaCommon.DgvTag:
+				    dataSource = "DGV";
 					using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
 						_genomeAssembly.ToString(), SaCommon.DgvSchemaVersion, InterimSaCommon.DgvTag, ReportFor.StructuralVariants))
 					{
@@ -136,7 +139,8 @@ namespace SAUtils.CreateIntermediateTsvs
 					}
 					break;
 				case InterimSaCommon.ClinGenTag:
-					using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
+				    dataSource = "ClinGen";
+                    using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
 						_genomeAssembly.ToString(), SaCommon.ClinGenSchemaVersion, InterimSaCommon.ClinGenTag,
 						ReportFor.StructuralVariants))
 					{
@@ -145,7 +149,8 @@ namespace SAUtils.CreateIntermediateTsvs
 					
 					break;
 				case InterimSaCommon.OnekSvTag:
-					using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
+				    dataSource = "OnekSv";
+                    using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
 						_genomeAssembly.ToString(), SaCommon.OneKgenSchemaVersion, InterimSaCommon.OnekSvTag,
 						ReportFor.StructuralVariants))
 					{
@@ -157,7 +162,10 @@ namespace SAUtils.CreateIntermediateTsvs
 					Console.WriteLine("invalid source name");
 					break;
 			}
-			Console.WriteLine($"Completed {fileName}");
+
+		    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
+            WriteCompleteInfo(dataSource,fileName,timeSpan);
+			//Console.WriteLine($"Completed {fileName}");
 		}
 
 		private void CreateSvTsv( IEnumerator<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
@@ -173,7 +181,7 @@ namespace SAUtils.CreateIntermediateTsvs
 		{
 			if (string.IsNullOrEmpty(fileName)) return;
 
-			Console.WriteLine($"Creating TSV from {fileName}");
+		//	Console.WriteLine($"Creating TSV from {fileName}");
 
 			var version = GetDataSourceVersion(fileName);
 			var reader = new CustomIntervalParser(new FileInfo(fileName),_refNamesDictionary);
@@ -186,7 +194,7 @@ namespace SAUtils.CreateIntermediateTsvs
 					writer.AddEntry(custInterval.Chromosome.UcscName, custInterval.Start, custInterval.End, custInterval.GetJsonString());
 				}
 			}
-			Console.WriteLine($"Completed {fileName}");
+		//	Console.WriteLine($"Completed {fileName}");
 		}
 
 		private void CreateCutomAnnoTsv(string fileName)
@@ -327,11 +335,11 @@ namespace SAUtils.CreateIntermediateTsvs
 					{
 						//flushing out the remaining items in buffer
 						WriteToPosition(writer, itemsMinHeap, int.MaxValue);
-						Console.WriteLine($"Wrote out chr{currentRefIndex} items in {benchmark.GetElapsedTime()}");
+						//Console.WriteLine($"Wrote out chr{currentRefIndex} items in {benchmark.GetElapsedTime()}");
 						benchmark.Reset();
 					}
 					currentRefIndex = saItem.Chromosome.Index;
-					Console.WriteLine("Writing items from chromosome:" + currentRefIndex);
+					//Console.WriteLine("Writing items from chromosome:" + currentRefIndex);
 				}
 
 				//the items come in sorted order of the pre-trimmed position. 
@@ -370,6 +378,31 @@ namespace SAUtils.CreateIntermediateTsvs
 			}
 			
 		}
-		
-	}
+
+	    private static void WriteCompleteInfo(string dataSourceDescription, string inputFileName, string timeSpan)
+	    {
+	        // create the filler string
+	        const int LineLength = 75;
+	        var divider = new string('-', LineLength);
+
+	        int fillerLength = LineLength - timeSpan.Length - dataSourceDescription.Length;
+
+	        if (fillerLength < 1)
+	        {
+	            throw new InvalidOperationException("Unable to display the performance metrics, the reference sequence name is too long.");
+	        }
+
+	        var filler = new string(' ', fillerLength);
+
+	        // display the reference time
+            Console.WriteLine($"Input {inputFileName}");
+	        Console.Write($"{dataSourceDescription}"+ filler);
+	        Console.ForegroundColor = ConsoleColor.Yellow;
+	        Console.WriteLine(timeSpan);
+	        Console.ResetColor();
+	        Console.WriteLine(divider);
+
+        }
+
+    }
 }
