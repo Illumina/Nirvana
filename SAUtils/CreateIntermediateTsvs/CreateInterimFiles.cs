@@ -47,10 +47,11 @@ namespace SAUtils.CreateIntermediateTsvs
 		#region members
 		private readonly IDictionary<string,IChromosome> _refNamesDictionary;
 		private readonly GenomeAssembly _genomeAssembly;
-	    private readonly ISequenceProvider _sequenceProvider;
+	    //private readonly ISequenceProvider _sequenceProvider;
+	    private readonly string _compressedReferencePath;
 
-	    #endregion
-		public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles )
+        #endregion
+        public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles )
 		{
 			_outputDirectory         = outputDirectory;
 			_dbSnpFileName           = dbSnpFileName;
@@ -66,12 +67,13 @@ namespace SAUtils.CreateIntermediateTsvs
 			_clinGenFileName         = clinGenFileName;
 			_customIntervalFiles = customIntervalFiles;
 
-		    _sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReferencePath));
+		    _compressedReferencePath = compressedReferencePath;
+		   var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
 
 
-		    _refNamesDictionary     = _sequenceProvider.GetChromosomeDictionary();
+		    _refNamesDictionary     = sequenceProvider.GetChromosomeDictionary();
 
-            _genomeAssembly     = _sequenceProvider.GenomeAssembly;
+            _genomeAssembly     = sequenceProvider.GenomeAssembly;
 
 		}
 
@@ -195,7 +197,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			var version = GetDataSourceVersion(fileName);
 
             var customReader = new CustomAnnotationReader(new FileInfo(fileName),_refNamesDictionary);
-            using (var writer = new CustomAnnoTsvWriter(version, _outputDirectory, _genomeAssembly, customReader.IsPositional, _sequenceProvider))
+            using (var writer = new CustomAnnoTsvWriter(version, _outputDirectory, _genomeAssembly, customReader.IsPositional, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				WriteSortedItems(customReader.GetEnumerator(), writer);
 			}
@@ -211,7 +213,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			Console.WriteLine($"Creating TSV from {vcfFile} and {tsvFile}");
 
 			var version = GetDataSourceVersion(vcfFile);
-			using (var writer = new CosmicTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
+			using (var writer = new CosmicTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var cosmicReader = new MergedCosmicReader(vcfFile,tsvFile,_refNamesDictionary);
 				WriteSortedItems(cosmicReader.GetEnumerator(), writer);
@@ -226,7 +228,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			Console.WriteLine($"Creating TSV from {fileName}");
 
 			var version = GetDataSourceVersion(fileName);
-			using (var writer = new EvsTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
+			using (var writer = new EvsTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var evsReader = new EvsReader(new FileInfo(fileName), _refNamesDictionary);
 				WriteSortedItems(evsReader.GetEnumerator(), writer);
@@ -240,7 +242,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			Console.WriteLine($"Creating TSV from {fileName}");
 
 			var version = GetDataSourceVersion(fileName);
-			using (var writer = new ExacTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
+			using (var writer = new ExacTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var exacReader = new ExacReader(new FileInfo(fileName), _refNamesDictionary);
 				WriteSortedItems(exacReader.GetEnumerator(), writer);
@@ -256,9 +258,9 @@ namespace SAUtils.CreateIntermediateTsvs
 
 			var version = GetDataSourceVersion(fileName);
 			//clinvar items do not come in sorted order, hence we need to store them in an array, sort them and then flush them out
-			using (var writer = new ClinvarTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
+			using (var writer = new ClinvarTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
-				var clinvarReader = new ClinVarXmlReader(new FileInfo(fileName),_sequenceProvider);
+				var clinvarReader = new ClinVarXmlReader(new FileInfo(fileName), new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
 				var clinvarList = clinvarReader.ToList();
 				clinvarList.Sort();
 				WriteSortedItems(clinvarList.GetEnumerator(), writer);
@@ -275,7 +277,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
 			var version = GetDataSourceVersion(fileName);
 
-			using (var tsvWriter = new DbsnpGaTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
+			using (var tsvWriter = new DbsnpGaTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var dbSnpReader = new DbSnpReader( GZipUtilities.GetAppropriateReadStream(fileName) , _refNamesDictionary);
 				WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
@@ -292,7 +294,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
 			var version = GetDataSourceVersion(fileName);
 
-			using (var tsvWriter = new OnekgTsvWriter(version, _outputDirectory, _genomeAssembly, _sequenceProvider))
+			using (var tsvWriter = new OnekgTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var onekgReader = new OneKGenReader(new FileInfo(fileName), _refNamesDictionary);
 				WriteSortedItems(onekgReader.GetEnumerator(), tsvWriter);
