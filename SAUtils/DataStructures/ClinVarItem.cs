@@ -139,11 +139,11 @@ namespace SAUtils.DataStructures
 			jsonObject.AddStringValue("id", ID);
 			jsonObject.AddStringValue("reviewStatus", ReviewStatusStrings[ReviewStatus]);
 			jsonObject.AddStringValue("isAlleleSpecific", IsAlleleSpecific, false);
-			jsonObject.AddStringValues("alleleOrigins", _alleleOrigins.ToArray());
+			jsonObject.AddStringValues("alleleOrigins", _alleleOrigins);
 			jsonObject.AddStringValue("refAllele", "N" == refAllele ? null : refAllele);
 			jsonObject.AddStringValue("altAllele", "N" == altAllele ? null : altAllele);
-			jsonObject.AddStringValues("phenotypes", Phenotypes.ToArray());
-			jsonObject.AddStringValues("medGenIds", _medgenIds.ToArray());
+			jsonObject.AddStringValues("phenotypes", Phenotypes);
+			jsonObject.AddStringValues("medGenIds", _medgenIds);
 			jsonObject.AddStringValues("omimIds", OmimIDs);
 			jsonObject.AddStringValues("orphanetIds", OrphanetIDs);
 			jsonObject.AddStringValue("significance", Significance);

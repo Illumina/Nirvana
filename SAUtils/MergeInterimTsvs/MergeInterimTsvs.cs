@@ -214,6 +214,7 @@ namespace SAUtils.MergeInterimTsvs
             Console.WriteLine("=======================================================================================");
             Console.ResetColor();
 
+
             _allRefNames = _allRefNames.Distinct().ToList();
             Parallel.ForEach(_allRefNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
 
