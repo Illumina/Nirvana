@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneAnnotation
@@ -34,6 +35,19 @@ namespace VariantAnnotation.GeneAnnotation
             }
             
             sb.Append(JsonObject.CloseBrace);
+        }
+
+        public void Write(IExtendedBinaryWriter writer)
+        {
+            writer.Write(GeneName);
+            writer.WriteOpt(Annotations.Length);
+            for (int i = 0; i < Annotations.Length; i++)
+                Annotations[i].Write(writer);
+        }
+
+        public int CompareTo(IAnnotatedGene other)
+        {
+            return GeneName.CompareTo(other.GeneName);
         }
     }
 }

@@ -13,7 +13,7 @@ namespace SAUtils.DataStructures
         private string Description { get; }
 
 
-        protected InterimHeader(string name, string assembly, string version, string releaseDate, string description)
+        public InterimHeader(string name, string assembly, string version, string releaseDate, string description)
         {
             Name = name;
             GenomeAssembly = GenomeAssemblyUtilities.Convert(assembly);
