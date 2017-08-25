@@ -1,10 +1,14 @@
-﻿namespace VariantAnnotation.Interface.GeneAnnotation
+﻿using VariantAnnotation.Interface.IO;
+
+namespace VariantAnnotation.Interface.GeneAnnotation
 {
-    public interface IGeneAnnotation
+    public interface IGeneAnnotation 
     {
         string DataSource { get; }
         string[] JsonStrings { get; }
         bool IsArray { get; }
+
+        void Write(IExtendedBinaryWriter writer);
 
     }
 }

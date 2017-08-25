@@ -16,7 +16,7 @@ namespace VariantAnnotation.GeneAnnotation
         public IGeneAnnotation Annotate(string geneName)
         {
             if (!_omimGeneDict.ContainsKey(geneName)) return null;
-            return new OmimAnnotation(_omimGeneDict[geneName].Select(x=>x.ToString()).ToArray());
+            return new GeneAnnotation("omim",_omimGeneDict[geneName].Select(x=>x.ToString()).ToArray(),true);
 
         }
 

@@ -14,7 +14,8 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
-
+using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs
 {
@@ -22,9 +23,11 @@ namespace SAUtils.MergeInterimTsvs
     {
         private List<SaTsvReader> _tsvReaders;
         private List<IntervalTsvReader> _intervalReaders;
+        private List<GeneTsvReader> _geneReaders;
         private SaMiscellaniesReader _miscReader;
         private readonly List<InterimSaHeader> _interimSaHeaders;
         private readonly List<InterimIntervalHeader> _intervalHeaders;
+        private readonly List<InterimHeader> _geneHeaders;
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
         private readonly IDictionary<string, IChromosome> _refChromDict;
@@ -33,7 +36,7 @@ namespace SAUtils.MergeInterimTsvs
         /// <summary>
         /// constructor
         /// </summary>
-        public MergeInterimTsvs(List<string> annotationFiles, List<string> intervalFiles,string miscFile, string compressedReference, string outputDirectory, List<string> chrWhiteList = null)
+        public MergeInterimTsvs(List<string> annotationFiles, List<string> intervalFiles, string miscFile, List<string> geneFiles, string compressedReference, string outputDirectory, List<string> chrWhiteList = null)
         {
             _outputDirectory        = outputDirectory;
 
@@ -42,16 +45,34 @@ namespace SAUtils.MergeInterimTsvs
             _refChromDict           = refSequenceProvider.GetChromosomeDictionary();
             _interimSaHeaders       = new List<InterimSaHeader>();
             _intervalHeaders        = new List<InterimIntervalHeader>();
+            _geneHeaders = new List<InterimHeader>();
             _allRefNames            = new List<string>();
-
             var headers             = new List<InterimHeader>();
             SetSaTsvReaders(annotationFiles, headers);
             SetIntervalReaders(intervalFiles, headers);
+            SetGeneReaders(geneFiles, headers);
             SetMiscTsvReader(miscFile);
             DisplayDataSources(headers);
 
             //SetChrWhiteList(chrWhiteList);
             CheckAssemblyConsistancy();
+        }
+
+        private void SetGeneReaders(List<string> geneFiles, List<InterimHeader> headers)
+        {
+            if (geneFiles == null) return;
+
+            _geneReaders = new List<GeneTsvReader>(geneFiles.Count);
+            foreach (var fileName in geneFiles)
+            {
+                var geneReader = new GeneTsvReader(new FileInfo(fileName));
+
+                var header = geneReader.GetHeader();
+                if (header == null) throw new InvalidDataException("Data file lacks version information!!");
+                headers.Add(header);
+                _geneHeaders.Add(header);
+                _geneReaders.Add(geneReader);
+            }
         }
 
         private void DisplayDataSources(List<InterimHeader> headers)
@@ -112,6 +133,20 @@ namespace SAUtils.MergeInterimTsvs
             var dataEnumerator = _miscReader.GetEnumerator(refName);
             if (!dataEnumerator.MoveNext()) return null;
             return dataEnumerator;
+        }
+
+        private List<IEnumerator<IAnnotatedGene>> GetGeneAnnotationEnumerator()
+        {
+            var geneAnnotationList = new List<IEnumerator<IAnnotatedGene>>();
+            if (_geneReaders == null) return geneAnnotationList;
+
+            foreach(var geneReader in _geneReaders)
+            {
+                var dataEnumerator = geneReader.GetEnumerator();
+                if (!dataEnumerator.MoveNext()) continue;
+                geneAnnotationList.Add(dataEnumerator);
+            }
+            return geneAnnotationList;
         }
 
         private List<IEnumerator<IInterimSaItem>> GetSaEnumerators(string refName)
@@ -214,6 +249,8 @@ namespace SAUtils.MergeInterimTsvs
             Console.WriteLine("=======================================================================================");
             Console.ResetColor();
 
+
+
             _allRefNames = _allRefNames.Distinct().ToList();
             Parallel.ForEach(_allRefNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
 
@@ -222,6 +259,31 @@ namespace SAUtils.MergeInterimTsvs
             //     if (refName !="1") continue;
             //    MergeChrom(refName);
             //}
+        }
+
+        private void MergeGene()
+        {
+            var geneAnnotationList = GetGeneAnnotationEnumerator();
+            var geneMinheap = new MinHeap<IAnnotatedGene>();
+            List<IAnnotatedGene> geneAnnotations = null;
+
+            var geneAnnotationStream = FileUtilities.GetCreateStream("");
+            using(var writer = new GeneDatabaseWriter(geneAnnotationStream,null))
+            while((geneAnnotations = GetMinItems(geneAnnotationList)) != null)
+            {
+                var mergedGeneAnnotation = MergeGeneAnnotations(geneAnnotations);
+                    writer.Write(mergedGeneAnnotation);
+            }
+
+
+        }
+
+        private IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
+        {
+            if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
+            var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
+
+            return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);
         }
 
         private void MergeChrom(string refName)
@@ -324,13 +386,13 @@ namespace SAUtils.MergeInterimTsvs
             return interimSaPosition;
         }
 
-        private List<IInterimSaItem> GetMinItems(List<IEnumerator<IInterimSaItem>> interimSaItemsList)
+        private List<T> GetMinItems<T>(List<IEnumerator<T>> interimSaItemsList) where T: IComparable<T>
         {
             if (interimSaItemsList.Count == 0) return null;
 
             var minItem    = GetMinItem(interimSaItemsList);
-            var minItems   = new List<IInterimSaItem>();
-            var removeList = new List<IEnumerator<IInterimSaItem>>();
+            var minItems   = new List<T>();
+            var removeList = new List<IEnumerator<T>>();
 
             foreach (var saEnumerator in interimSaItemsList)
             {
@@ -349,7 +411,7 @@ namespace SAUtils.MergeInterimTsvs
             return minItems.Count == 0 ? null : minItems;
         }
 
-        private IInterimSaItem GetMinItem(List<IEnumerator<IInterimSaItem>> interimSaItemsList)
+        private T GetMinItem<T>(List<IEnumerator<T>> interimSaItemsList) where T :IComparable<T>
         {
             var minItem = interimSaItemsList[0].Current;
             foreach (var saEnumerator in interimSaItemsList)
@@ -360,7 +422,7 @@ namespace SAUtils.MergeInterimTsvs
             return minItem;
         }
 
-        private void RemoveEnumerators(List<IEnumerator<IInterimSaItem>> removeList, List<IEnumerator<IInterimSaItem>> interimSaItemsList)
+        private void RemoveEnumerators<T>(List<IEnumerator<T>> removeList, List<IEnumerator<T>> interimSaItemsList)
         {
             if (removeList.Count == 0) return;
 
