@@ -40,7 +40,7 @@ namespace Compression.FileHandling
             if (disposing)
             {
                 // Free any other managed objects here.
-                Console.WriteLine($"disposing bgzipTextWriter, total bytes written:{_totalBytesWritten}");
+                //Console.WriteLine($"disposing bgzipTextWriter, total bytes written:{_totalBytesWritten}");
                 Flush();
                 _bgzipStream.Dispose();
             }
