@@ -12,32 +12,31 @@ namespace VariantAnnotation.GeneAnnotation
 	    public GenomeAssembly GenomeAssembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
-        private readonly Dictionary<string, List<OmimEntry>> _omimGeneDict;
-        public IGeneAnnotation Annotate(string geneName)
+        private readonly Dictionary<string, IAnnotatedGene> _omimGeneDict;
+        public IAnnotatedGene Annotate(string geneName)
         {
             if (!_omimGeneDict.ContainsKey(geneName)) return null;
-            return new GeneAnnotation("omim",_omimGeneDict[geneName].Select(x=>x.ToString()).ToArray(),true);
+            return _omimGeneDict[geneName];
 
         }
 
-        public OmimAnnotationProvider(OmimDatabaseReader omimDatabaseReader)
+        public OmimAnnotationProvider(GeneDatabaseReader omimDatabaseReader)
         {
 	        Name = "Omim annotation provider";
             DataSourceVersions = new []{ omimDatabaseReader.DataVersion};
-            _omimGeneDict = new Dictionary<string, List<OmimEntry>>();
+            _omimGeneDict = new Dictionary<string, IAnnotatedGene>();
             CreateGeneMapDict(omimDatabaseReader);
         }
 
-        private  void CreateGeneMapDict(OmimDatabaseReader omimDatabaseReader)
+        private void CreateGeneMapDict(GeneDatabaseReader omimDatabaseReader)
         {
 
             foreach (var omimAnnotation in omimDatabaseReader.Read())
             {
-                if (!_omimGeneDict.ContainsKey(omimAnnotation.Hgnc))
+                if (!_omimGeneDict.ContainsKey(omimAnnotation.GeneName))
                 {
-                    _omimGeneDict[omimAnnotation.Hgnc] = new List<OmimEntry>();
+                    _omimGeneDict[omimAnnotation.GeneName] = omimAnnotation;
                 }
-                _omimGeneDict[omimAnnotation.Hgnc].Add(omimAnnotation);
             }
 
         }

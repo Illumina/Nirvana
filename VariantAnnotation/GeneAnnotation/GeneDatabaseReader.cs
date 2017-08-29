@@ -10,7 +10,7 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    class GeneDatabaseReader
+    public class GeneDatabaseReader
     {
         private readonly string _geneDatabaseFile;
         private readonly ExtendedBinaryReader _reader;

@@ -12,12 +12,12 @@ namespace VariantAnnotation.GeneAnnotation
 
         public const string DataHeader = "NirvanaOmimDatabase";
         public const ushort SchemaVersion = 1;
-        public const string OmimDatabaseFileName = "genePhenotypeMap.mim";
+        public const string OmimDatabaseFileName = "gene.mim";
         #endregion
 
        
 
-        public static OmimDatabaseReader GetOmimDatabaseReader(IEnumerable<string> omimDatabaseDirs)
+        public static GeneDatabaseReader GetOmimDatabaseReader(IEnumerable<string> omimDatabaseDirs)
         {
             if (omimDatabaseDirs == null) return null;
 
@@ -27,7 +27,7 @@ namespace VariantAnnotation.GeneAnnotation
             foreach (var omimDatabaseDir in omimDirs)
             {
                 var omimFile = Path.Combine(omimDatabaseDir, OmimDatabaseFileName);
-                if (File.Exists(omimFile)) return new OmimDatabaseReader(omimFile);
+                if (File.Exists(omimFile)) return new GeneDatabaseReader(omimFile);
             }
 
             return null;

@@ -150,8 +150,8 @@ namespace UnitTests.VariantAnnotation
             annotator.TrackAffectedGenes(annotatedPosition.Object);
 	        
             var geneAnnotation = new Mock<IGeneAnnotation>();
-	        geneAnnotationProvider.Setup(x => x.Annotate("ensembl1")).Returns(geneAnnotation.Object);
-	        geneAnnotationProvider.Setup(x => x.Annotate("refseq1")).Returns((IGeneAnnotation)null);
+	        //geneAnnotationProvider.Setup(x => x.Annotate("ensembl1")).Returns(geneAnnotation.Object);
+	        //geneAnnotationProvider.Setup(x => x.Annotate("refseq1")).Returns((IGeneAnnotation)null);
 
 	        var annotatedGenes = annotator.GetAnnotatedGenes();
             Assert.Equal(1,annotatedGenes.Count);
