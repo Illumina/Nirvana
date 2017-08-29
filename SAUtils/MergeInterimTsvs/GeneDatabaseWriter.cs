@@ -29,16 +29,16 @@ namespace SAUtils.MergeInterimTsvs
 
         private void WriteHeader(ISupplementaryAnnotationHeader header)
         {
-            _writer.WriteOptAscii(SupplementaryAnnotationCommon.DataHeader);
+            _writer.Write(SupplementaryAnnotationCommon.DataHeader);
             _writer.Write(SupplementaryAnnotationCommon.DataVersion);
             _writer.Write(SupplementaryAnnotationCommon.SchemaVersion);
             _writer.Write((byte)header.GenomeAssembly);
             _writer.Write(DateTime.Now.Ticks);
-            _writer.WriteOptAscii(header.ReferenceSequenceName);
 
             var dataSourceVersions = header.DataSourceVersions.ToList();
             _writer.WriteOpt(dataSourceVersions.Count);
             foreach (var version in dataSourceVersions) version.Write(_writer);
+            _writer.Write(SupplementaryAnnotationCommon.GuardInt);
         }
 
         public void Dispose()
@@ -48,7 +48,6 @@ namespace SAUtils.MergeInterimTsvs
             _writer.Dispose();
 
         }
-
 
         public void Write(IAnnotatedGene annotatedGene)
         {

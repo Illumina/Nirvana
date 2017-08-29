@@ -79,9 +79,9 @@ namespace VariantAnnotation.GeneAnnotation
         private void CheckGuard()
         {
             var observedGuard = _reader.ReadUInt32();
-            if (observedGuard != OmimDatabaseCommon.GuardInt)
+            if (observedGuard != SupplementaryAnnotationCommon.GuardInt)
             {
-                throw new UserErrorException($"Expected a guard integer ({OmimDatabaseCommon.GuardInt}), but found another value: ({observedGuard})");
+                throw new UserErrorException($"Expected a guard integer ({SupplementaryAnnotationCommon.GuardInt}), but found another value: ({observedGuard})");
             }
         }
 

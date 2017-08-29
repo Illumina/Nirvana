@@ -25,5 +25,19 @@ namespace VariantAnnotation.GeneAnnotation
             foreach (var jsonString in JsonStrings)
                 writer.Write(jsonString);
         }
+
+        public static IGeneAnnotation Read(IExtendedBinaryReader reader)
+        {
+            var dataSource = reader.ReadAsciiString();
+            var isArray = reader.ReadBoolean();
+            var jsonStringLength = reader.ReadOptInt32();
+            var jsonStrings = new string[jsonStringLength];
+            for (int i=0; i<jsonStringLength; i++)
+            {
+                jsonStrings[i] = reader.ReadString();
+            }
+
+            return new GeneAnnotation(dataSource, jsonStrings, isArray);
+        }
     }
 }

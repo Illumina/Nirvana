@@ -45,7 +45,7 @@ namespace SAUtils.MergeInterimTsvs
             _refChromDict           = refSequenceProvider.GetChromosomeDictionary();
             _interimSaHeaders       = new List<InterimSaHeader>();
             _intervalHeaders        = new List<InterimIntervalHeader>();
-            _geneHeaders = new List<InterimHeader>();
+            _geneHeaders            = new List<InterimHeader>();
             _allRefNames            = new List<string>();
             var headers             = new List<InterimHeader>();
             SetSaTsvReaders(annotationFiles, headers);
@@ -66,7 +66,6 @@ namespace SAUtils.MergeInterimTsvs
             foreach (var fileName in geneFiles)
             {
                 var geneReader = new GeneTsvReader(new FileInfo(fileName));
-
                 var header = geneReader.GetHeader();
                 if (header == null) throw new InvalidDataException("Data file lacks version information!!");
                 headers.Add(header);
@@ -254,6 +253,9 @@ namespace SAUtils.MergeInterimTsvs
             _allRefNames = _allRefNames.Distinct().ToList();
             Parallel.ForEach(_allRefNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
 
+            //TODO
+            //add MergeGene() here
+
             //foreach (var refName in _allRefNames)
             //{
             //     if (refName !="1") continue;
@@ -274,8 +276,6 @@ namespace SAUtils.MergeInterimTsvs
                 var mergedGeneAnnotation = MergeGeneAnnotations(geneAnnotations);
                     writer.Write(mergedGeneAnnotation);
             }
-
-
         }
 
         private IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
