@@ -249,6 +249,8 @@ namespace SAUtils.MergeInterimTsvs
             Console.ResetColor();
 
 
+            //Merge gene Annotation and create the database
+            MergeGene();
 
             _allRefNames = _allRefNames.Distinct().ToList();
             Parallel.ForEach(_allRefNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
