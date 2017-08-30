@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using SAUtils;
 using SAUtils.InputFileParsers.ExAc;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;

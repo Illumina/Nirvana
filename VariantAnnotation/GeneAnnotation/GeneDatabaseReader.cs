@@ -1,7 +1,6 @@
 ﻿using ErrorHandling.Exceptions;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;

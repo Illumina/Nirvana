@@ -1,15 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Collections;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
-using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.GeneAnnotation;
 

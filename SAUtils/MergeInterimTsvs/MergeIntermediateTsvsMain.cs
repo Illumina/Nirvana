@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using CommandLine.Builders;
+﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 using VariantAnnotation.Interface;

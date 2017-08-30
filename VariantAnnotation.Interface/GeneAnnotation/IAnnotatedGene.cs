@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.Interface.GeneAnnotation

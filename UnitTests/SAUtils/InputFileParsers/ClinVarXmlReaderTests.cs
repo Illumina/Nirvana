@@ -3,14 +3,12 @@ using System.IO;
 using System.Linq;
 using Moq;
 using SAUtils.DataStructures;
-using SAUtils.InputFileParsers;
 using SAUtils.InputFileParsers.ClinVar;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
 using Xunit;
-using Xunit.Sdk;
 
 namespace UnitTests.SaUtilsTests.InputFileParsers
 {

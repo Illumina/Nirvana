@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;

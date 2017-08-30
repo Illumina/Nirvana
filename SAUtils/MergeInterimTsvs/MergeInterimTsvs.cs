@@ -7,7 +7,6 @@ using CommandLine.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
-using VariantAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;

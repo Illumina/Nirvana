@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
 using ErrorHandling;
-using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Positions;

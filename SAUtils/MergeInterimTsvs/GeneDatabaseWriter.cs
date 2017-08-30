@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Compression.Algorithms;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
-using VariantAnnotation;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.GeneAnnotation;
 

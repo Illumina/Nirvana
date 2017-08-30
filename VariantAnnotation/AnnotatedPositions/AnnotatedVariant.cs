@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;

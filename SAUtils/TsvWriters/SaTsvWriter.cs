@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using Compression.FileHandling;
 

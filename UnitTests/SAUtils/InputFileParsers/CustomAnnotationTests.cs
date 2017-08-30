@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Moq;
 using SAUtils.InputFileParsers.CustomAnnotation;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using Xunit;
 

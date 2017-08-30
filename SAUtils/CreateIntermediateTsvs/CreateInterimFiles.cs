@@ -18,7 +18,6 @@ using SAUtils.InputFileParsers.EVS;
 using SAUtils.InputFileParsers.ExAc;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.TsvWriters;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;

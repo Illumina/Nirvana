@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using SAUtils.DataStructures;
-using VariantAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
@@ -10,7 +9,7 @@ using VariantAnnotation.SA;
 
 namespace SAUtils.TsvWriters
 {
-	public class OnekgTsvWriter:ISaItemTsvWriter
+	public sealed class OnekgTsvWriter:ISaItemTsvWriter
 	{
 		#region members
 		private readonly SaTsvWriter _onekgWriter;
