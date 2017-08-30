@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
@@ -12,21 +13,24 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation
 {
-    public static class SupplementaryAnnotationCommon
+    public static class SaReaderUtils
     {
-        #region members
 
-        public const uint GuardInt = 4041327495;
+        public static GeneDatabaseReader GetGeneAnnotationDatabaseReader(IEnumerable<string> omimDatabaseDirs)
+        {
+            if (omimDatabaseDirs == null) return null;
 
-        public const string DataHeader = "NirvanaData";
-        public const ushort DataVersion = 39;
-        public const ushort SchemaVersion = 20;
+            var omimDirs = omimDatabaseDirs.ToList();
+            if (!omimDirs.Any()) return null;
 
-        public const double RefMinorThreshold = 0.95;
+            foreach (var omimDatabaseDir in omimDirs)
+            {
+                var omimFile = Path.Combine(omimDatabaseDir, SaDataBaseCommon.OmimDatabaseFileName);
+                if (File.Exists(omimFile)) return new GeneDatabaseReader(omimFile);
+            }
 
-        #endregion
-
-
+            return null;
+        }
 
         private static ISupplementaryAnnotationReader GetReader(string saDir, string ucscReferenceName)
         {

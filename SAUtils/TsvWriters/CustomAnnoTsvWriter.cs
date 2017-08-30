@@ -55,7 +55,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_writer = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaCommon.CustomItemSchemaVersion, version.Name, null, !isPositional,sequenceProvider, true);
+				SaTSVCommon.CustomItemSchemaVersion, version.Name, null, !isPositional,sequenceProvider, true);
 		}
 
 		public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)

@@ -56,7 +56,7 @@ namespace SAUtils.TsvWriters
 		}
 	
 		public ClinvarTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider) :this(new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaCommon.ClinvarSchemaVersion, InterimSaCommon.ClinvarTag, InterimSaCommon.ClinvarVcfTag, false, sequenceProvider, true))
+				SaTSVCommon.ClinvarSchemaVersion, InterimSaCommon.ClinvarTag, InterimSaCommon.ClinvarVcfTag, false, sequenceProvider, true))
 		{
 			Console.WriteLine(version.ToString());
 			

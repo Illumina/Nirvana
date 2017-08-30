@@ -55,7 +55,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_writer = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaCommon.CosmicSchemaVersion, InterimSaCommon.CosmicTag, InterimSaCommon.CosmicVcfTag, false, sequenceProvider, true);
+				SaTSVCommon.CosmicSchemaVersion, InterimSaCommon.CosmicTag, InterimSaCommon.CosmicVcfTag, false, sequenceProvider, true);
 
 		}
 

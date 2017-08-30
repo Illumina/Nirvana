@@ -6,6 +6,7 @@ using VariantAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 
 namespace SAUtils.TsvWriters
 {
@@ -58,7 +59,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_onekgWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaCommon.OneKgenSchemaVersion, InterimSaCommon.OneKgenTag, "AF1000G",true, sequenceProvider);
+				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.OneKgenTag, "AF1000G",true, sequenceProvider);
 
             _refMinorWriter = new SaMiscTsvWriter(outputDirectory,version,genomeAssembly.ToString(),InterimSaCommon.RefMinorTag, sequenceProvider);
 
@@ -98,7 +99,7 @@ namespace SAUtils.TsvWriters
 
 			}
 
-			var isRefMinor = totalAltAlleleFreq >= SupplementaryAnnotationCommon.RefMinorThreshold;
+			var isRefMinor = totalAltAlleleFreq >= SaDataBaseCommon.RefMinorThreshold;
 
 
 			if(isRefMinor)

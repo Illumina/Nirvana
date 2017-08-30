@@ -30,16 +30,16 @@ namespace SAUtils.MergeInterimTsvs
 
         private void WriteHeader(ISupplementaryAnnotationHeader header)
         {
-            _writer.Write(SupplementaryAnnotationCommon.DataHeader);
-            _writer.Write(SupplementaryAnnotationCommon.DataVersion);
-            _writer.Write(SupplementaryAnnotationCommon.SchemaVersion);
+            _writer.Write(SaDataBaseCommon.DataHeader);
+            _writer.Write(SaDataBaseCommon.DataVersion);
+            _writer.Write(SaDataBaseCommon.SchemaVersion);
             _writer.Write((byte)header.GenomeAssembly);
             _writer.Write(DateTime.Now.Ticks);
 
             var dataSourceVersions = header.DataSourceVersions.ToList();
             _writer.WriteOpt(dataSourceVersions.Count);
             foreach (var version in dataSourceVersions) version.Write(_writer);
-            _writer.Write(SupplementaryAnnotationCommon.GuardInt);
+            _writer.Write(SaDataBaseCommon.GuardInt);
         }
 
         public void Dispose()

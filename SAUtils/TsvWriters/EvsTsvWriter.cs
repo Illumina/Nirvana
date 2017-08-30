@@ -52,7 +52,7 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		public EvsTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider) :this(new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaCommon.OneKgenSchemaVersion, InterimSaCommon.EvsTag, InterimSaCommon.EvsVcfTag, true, sequenceProvider))
+				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.EvsTag, InterimSaCommon.EvsVcfTag, true, sequenceProvider))
 		{
 			Console.WriteLine(version.ToString());
 		}

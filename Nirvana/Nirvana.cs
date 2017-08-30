@@ -17,6 +17,7 @@ using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
 
 namespace Nirvana
@@ -55,7 +56,7 @@ namespace Nirvana
 
             if(conservationProvider != null) dataSourceVesions.AddRange(conservationProvider.DataSourceVersions);
 
-            var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SupplementaryAnnotationCommon.DataVersion;
+            var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
 
             using (var vcfReader  = ReadWriteUtilities.GetVcfReader(ConfigurationSettings.VcfPath, sequenceProvider.GetChromosomeDictionary(), refMinorProvider,ConfigurationSettings.ReportAllSvOverlappingTranscripts))
             using (var jsonWriter = new JsonWriter(ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName), _nirvanaVersion, Date.CurrentTimeStamp, vepDataVersion, dataSourceVesions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))

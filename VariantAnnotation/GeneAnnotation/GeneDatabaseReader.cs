@@ -7,6 +7,7 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.GeneAnnotation
@@ -33,18 +34,18 @@ namespace VariantAnnotation.GeneAnnotation
         private void ReadHeader()
         {
             var header = _reader.ReadString();
-            if (header != SupplementaryAnnotationCommon.DataHeader)
+            if (header != SaDataBaseCommon.DataHeader)
                 throw new FormatException("Unrecognized header in this database");
 
             var dataVersion = _reader.ReadUInt16();
-            if (dataVersion != SupplementaryAnnotationCommon.DataVersion)
+            if (dataVersion != SaDataBaseCommon.DataVersion)
                 throw new UserErrorException(
-                    $"Gene database data version mismatch. Expected {SupplementaryAnnotationCommon.DataVersion}, observed {dataVersion}");
+                    $"Gene database data version mismatch. Expected {SaDataBaseCommon.DataVersion}, observed {dataVersion}");
 
             var schema = _reader.ReadUInt16();
-            if (schema != SupplementaryAnnotationCommon.SchemaVersion)
+            if (schema != SaDataBaseCommon.SchemaVersion)
                 throw new UserErrorException(
-                    $"Gene database schema mismatch. Expected {SupplementaryAnnotationCommon.SchemaVersion}, observed {schema}");
+                    $"Gene database schema mismatch. Expected {SaDataBaseCommon.SchemaVersion}, observed {schema}");
 
             GenomeAssembly = (GenomeAssembly)_reader.ReadByte();
 
@@ -73,9 +74,9 @@ namespace VariantAnnotation.GeneAnnotation
         private void CheckGuard()
         {
             var observedGuard = _reader.ReadUInt32();
-            if (observedGuard != SupplementaryAnnotationCommon.GuardInt)
+            if (observedGuard != SaDataBaseCommon.GuardInt)
             {
-                throw new UserErrorException($"Expected a guard integer ({SupplementaryAnnotationCommon.GuardInt}), but found another value: ({observedGuard})");
+                throw new UserErrorException($"Expected a guard integer ({SaDataBaseCommon.GuardInt}), but found another value: ({observedGuard})");
             }
         }
     }

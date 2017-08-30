@@ -270,7 +270,7 @@ namespace SAUtils.MergeInterimTsvs
             List<IAnnotatedGene> geneAnnotations = null;
             var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, "gene.mim");
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
-            var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SupplementaryAnnotationCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
+            var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))
                 while ((geneAnnotations = GetMinItems(geneAnnotationList)) != null)
                 {
@@ -302,7 +302,7 @@ namespace SAUtils.MergeInterimTsvs
             var dataSourceVersions = GetDataSourceVersions(_interimSaHeaders, _intervalHeaders);
 
             var header = new SupplementaryAnnotationHeader(ucscRefName, DateTime.Now.Ticks,
-                SupplementaryAnnotationCommon.DataVersion, dataSourceVersions, _genomeAssembly);
+                SaDataBaseCommon.DataVersion, dataSourceVersions, _genomeAssembly);
 
             var interimIntervalEnumerators = GetIntervalEnumerators(refName);
             var intervals = GetIntervals(interimIntervalEnumerators).OrderBy(x => x.Start).ThenBy(x => x.End).ToList();

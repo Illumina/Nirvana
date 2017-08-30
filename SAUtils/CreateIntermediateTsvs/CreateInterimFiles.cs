@@ -133,7 +133,7 @@ namespace SAUtils.CreateIntermediateTsvs
 				case InterimSaCommon.DgvTag:
 				    dataSource = "DGV";
 					using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
-						_genomeAssembly.ToString(), SaCommon.DgvSchemaVersion, InterimSaCommon.DgvTag, ReportFor.StructuralVariants))
+						_genomeAssembly.ToString(), SaTSVCommon.DgvSchemaVersion, InterimSaCommon.DgvTag, ReportFor.StructuralVariants))
 					{
 						CreateSvTsv(new DgvReader(new FileInfo(fileName),_refNamesDictionary ).GetEnumerator(),writer);
 					}
@@ -141,7 +141,7 @@ namespace SAUtils.CreateIntermediateTsvs
 				case InterimSaCommon.ClinGenTag:
 				    dataSource = "ClinGen";
                     using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
-						_genomeAssembly.ToString(), SaCommon.ClinGenSchemaVersion, InterimSaCommon.ClinGenTag,
+						_genomeAssembly.ToString(), SaTSVCommon.ClinGenSchemaVersion, InterimSaCommon.ClinGenTag,
 						ReportFor.StructuralVariants))
 					{
 						CreateSvTsv(new ClinGenReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
@@ -151,7 +151,7 @@ namespace SAUtils.CreateIntermediateTsvs
 				case InterimSaCommon.OnekSvTag:
 				    dataSource = "OnekSv";
                     using (var writer = new IntervalTsvWriter(_outputDirectory, GetDataSourceVersion(fileName),
-						_genomeAssembly.ToString(), SaCommon.OneKgenSchemaVersion, InterimSaCommon.OnekSvTag,
+						_genomeAssembly.ToString(), SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.OnekSvTag,
 						ReportFor.StructuralVariants))
 					{
 						CreateSvTsv(new OneKGenSvReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(),writer);
@@ -186,7 +186,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			var version = GetDataSourceVersion(fileName);
 			var reader = new CustomIntervalParser(new FileInfo(fileName),_refNamesDictionary);
 			using (var writer = new IntervalTsvWriter(_outputDirectory, version ,
-				_genomeAssembly.ToString(), SaCommon.CustIntervalSchemaVersion, reader.KeyName,
+				_genomeAssembly.ToString(), SaTSVCommon.CustIntervalSchemaVersion, reader.KeyName,
 				ReportFor.AllVariants))
 			{
 				foreach (var custInterval in reader)

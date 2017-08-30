@@ -56,7 +56,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_writer= new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaCommon.OneKgenSchemaVersion, InterimSaCommon.ExacTag, null, true, sequenceProvider);
+				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.ExacTag, null, true, sequenceProvider);
 
 		}
 
