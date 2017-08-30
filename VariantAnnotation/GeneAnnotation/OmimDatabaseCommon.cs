@@ -17,7 +17,7 @@ namespace VariantAnnotation.GeneAnnotation
 
        
 
-        public static GeneDatabaseReader GetOmimDatabaseReader(IEnumerable<string> omimDatabaseDirs)
+        public static GeneDatabaseReader GetGeneAnnotationDatabaseReader(IEnumerable<string> omimDatabaseDirs)
         {
             if (omimDatabaseDirs == null) return null;
 

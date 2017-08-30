@@ -50,7 +50,7 @@ namespace Nirvana
 	    public static IGeneAnnotationProvider[] GetGeneAnnotationProviders(List<string> supplementaryAnnotationDirectories)
 	    {
 
-	        var reader = OmimDatabaseCommon.GetOmimDatabaseReader(supplementaryAnnotationDirectories);
+	        var reader = OmimDatabaseCommon.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories);
 	        if (reader == null) return null;
             var geneAnnotationProviders = new IGeneAnnotationProvider[1];
 	        geneAnnotationProviders[0] = new OmimAnnotationProvider(reader);
