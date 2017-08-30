@@ -248,7 +248,6 @@ namespace SAUtils.MergeInterimTsvs
             Console.ResetColor();
 
 
-            //Merge gene Annotation and create the database
             MergeGene();
 
             _allRefNames = _allRefNames.Distinct().ToList();
@@ -267,7 +266,7 @@ namespace SAUtils.MergeInterimTsvs
             var geneAnnotationList = GetGeneAnnotationEnumerator();
             var geneMinheap = new MinHeap<IAnnotatedGene>();
             List<IAnnotatedGene> geneAnnotations = null;
-            var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, "gene.mim");
+            var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))

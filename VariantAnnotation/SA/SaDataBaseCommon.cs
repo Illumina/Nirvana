@@ -10,6 +10,6 @@
 
         public const double RefMinorThreshold = 0.95;
 
-        public const string OmimDatabaseFileName = "gene.mim";
+        public const string OmimDatabaseFileName = "mim.nga";
     }
 }
