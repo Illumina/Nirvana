@@ -79,7 +79,7 @@ namespace SAUtils.TsvWriters
 
             foreach (var evsItem in evsItems)
 			{
-				_writer.AddEntry(evsItem.Chromosome.UcscName, evsItem.Start, evsItem.ReferenceAllele, evsItem.AlternateAllele, evsItem.GetVcfString(),
+				_writer.AddEntry(evsItem.Chromosome.EnsemblName, evsItem.Start, evsItem.ReferenceAllele, evsItem.AlternateAllele, evsItem.GetVcfString(),
 					new List<string> {evsItem.GetJsonString()});
 			}
 		}

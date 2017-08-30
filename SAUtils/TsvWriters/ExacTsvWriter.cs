@@ -78,7 +78,7 @@ namespace SAUtils.TsvWriters
 
             foreach (var exacItem in exacItems)
 			{
-				_writer.AddEntry(exacItem.Chromosome.UcscName, exacItem.Start, exacItem.ReferenceAllele, exacItem.AlternateAllele, null, new List<string> {exacItem.GetJsonString()});
+				_writer.AddEntry(exacItem.Chromosome.EnsemblName, exacItem.Start, exacItem.ReferenceAllele, exacItem.AlternateAllele, null, new List<string> {exacItem.GetJsonString()});
 			}
 		}
 

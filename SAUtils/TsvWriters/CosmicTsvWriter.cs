@@ -85,7 +85,7 @@ namespace SAUtils.TsvWriters
 				var jsonStrings = groupedItems.OrderBy(x => x.ID).Select(x => x.GetJsonString()).ToList();
 
 				var firstItem = groupedItems[0];
-				_writer.AddEntry(firstItem.Chromosome.UcscName,
+				_writer.AddEntry(firstItem.Chromosome.EnsemblName,
 					firstItem.Start,
 					refAllele,
 					altAllele, vcfString, jsonStrings);

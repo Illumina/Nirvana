@@ -86,7 +86,7 @@ namespace SAUtils.DataStructures
             var jsonObject = new JsonObject(sb);
 
             // data section
-            jsonObject.AddStringValue("chromosome", Chromosome.UcscName);
+            jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
             jsonObject.AddIntValue("begin", Start);
             jsonObject.AddIntValue("end", End);
             jsonObject.AddStringValue("variantType", VariantType.ToString());

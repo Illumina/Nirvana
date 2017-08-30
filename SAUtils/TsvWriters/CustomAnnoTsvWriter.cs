@@ -77,7 +77,7 @@ namespace SAUtils.TsvWriters
 				var jsonStrings = groupedItem.Select(x => x.GetJsonString()).ToList();
 
 				// since the reference allele for different items in the group may be different, we only use the first base as it is supposed to be the common padding base.
-				_writer.AddEntry(groupedItem.First().Chromosome.UcscName,
+				_writer.AddEntry(groupedItem.First().Chromosome.EnsemblName,
 					groupedItem.First().Start,
 					groupedItem.First().ReferenceAllele,
 					groupedItem.Key, null, jsonStrings);

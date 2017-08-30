@@ -172,7 +172,7 @@ namespace SAUtils.TsvWriters
 				var chromosome = itemsGroup[0].Chromosome;
 				var position   = itemsGroup[0].Start;
 				
-				_dbsnpWriter.AddEntry(chromosome.UcscName, position, refAllele, altAllele, vcfString, new List<string> {jsonString});
+				_dbsnpWriter.AddEntry(chromosome.EnsemblName, position, refAllele, altAllele, vcfString, new List<string> {jsonString});
 			}
 		}
 

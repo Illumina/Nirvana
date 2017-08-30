@@ -84,7 +84,7 @@ namespace SAUtils.TsvWriters
             var alleleFrequencies = new Dictionary<string,double>();
 			foreach (var onekGenItem in onekGenItems)
 			{
-				_onekgWriter.AddEntry(onekGenItem.Chromosome.UcscName, onekGenItem.Start,
+				_onekgWriter.AddEntry(onekGenItem.Chromosome.EnsemblName, onekGenItem.Start,
 					onekGenItem.ReferenceAllele, onekGenItem.AlternateAllele,
 					onekGenItem.GetVcfString(), new List<string> { onekGenItem.GetJsonString() });
 				if(!IsSnv(onekGenItem.ReferenceAllele) || !IsSnv(onekGenItem.AlternateAllele)) continue;
@@ -102,7 +102,7 @@ namespace SAUtils.TsvWriters
 
 
 			if(isRefMinor)
-				_refMinorWriter.AddEntry(onekGenItems[0].Chromosome.UcscName, onekGenItems[0].Start,GetMajorAllele(alleleFrequencies),onekGenItems[0].ReferenceAllele);
+				_refMinorWriter.AddEntry(onekGenItems[0].Chromosome.EnsemblName, onekGenItems[0].Start,GetMajorAllele(alleleFrequencies),onekGenItems[0].ReferenceAllele);
 		}
 
 	    private string GetMajorAllele(Dictionary<string, double> alleleFrequencies)
