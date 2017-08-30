@@ -11,11 +11,10 @@ namespace VariantAnnotation.GeneAnnotation
             var annotatedGenes = new List<IAnnotatedGene>();
             foreach (var geneName in geneNames)
             {
-                var annotations = new List<IAnnotatedGene>();
                 foreach (var geneAnnotationProvider in annotationProviders)
                 {
                     var annotation = geneAnnotationProvider.Annotate(geneName);
-                    if (annotation != null) annotations.Add(annotation);
+                    if (annotation != null) annotatedGenes.Add(annotation);
                 }
             }
 

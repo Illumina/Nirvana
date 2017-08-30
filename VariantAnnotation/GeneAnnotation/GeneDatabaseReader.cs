@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Utilities;
@@ -14,11 +15,9 @@ namespace VariantAnnotation.GeneAnnotation
     {
         private readonly string _geneDatabaseFile;
         private readonly ExtendedBinaryReader _reader;
-        public byte GenomeAssembly;
+        public GenomeAssembly GenomeAssembly;
         private long _creationTime;
         public List<IDataSourceVersion> DataSourceVersions;
-
-        public IDataSourceVersion DataVersion { get; private set; }
         private bool _isDisposed;
 
 
@@ -27,28 +26,31 @@ namespace VariantAnnotation.GeneAnnotation
             // open the database file
             _geneDatabaseFile = geneDatabaseFile;
             _reader = new ExtendedBinaryReader(FileUtilities.GetReadStream(geneDatabaseFile));
-
+            DataSourceVersions = new List<IDataSourceVersion>();
             ReadHeader();
         }
 
         private void ReadHeader()
         {
-            var header = _reader.ReadAsciiString();
+            var header = _reader.ReadString();
             if (header != SupplementaryAnnotationCommon.DataHeader)
                 throw new FormatException("Unrecognized header in this database");
 
-            DataVersion = DataSourceVersion.Read(_reader);
+            var dataVersion = _reader.ReadUInt16();
+            if (dataVersion != SupplementaryAnnotationCommon.DataVersion)
+                throw new UserErrorException(
+                    $"Gene database data version mismatch. Expected {SupplementaryAnnotationCommon.DataVersion}, observed {dataVersion}");
 
             var schema = _reader.ReadUInt16();
             if (schema != SupplementaryAnnotationCommon.SchemaVersion)
                 throw new UserErrorException(
                     $"Gene database schema mismatch. Expected {SupplementaryAnnotationCommon.SchemaVersion}, observed {schema}");
 
-            GenomeAssembly = _reader.ReadByte();
+            GenomeAssembly = (GenomeAssembly)_reader.ReadByte();
 
             _creationTime = _reader.ReadInt64();
 
-            var dataSourseVersionsCount = _reader.ReadInt32();
+            var dataSourseVersionsCount = _reader.ReadOptInt32();
 
             for (var i = 0; i < dataSourseVersionsCount; i++)
             {
@@ -62,7 +64,7 @@ namespace VariantAnnotation.GeneAnnotation
         {
 
             IAnnotatedGene annotatedGene;
-            while((annotatedGene = AnnotatedGene.Read(_reader)) != null)
+            while ((annotatedGene = AnnotatedGene.Read(_reader)) != null)
             {
                 yield return annotatedGene;
             }

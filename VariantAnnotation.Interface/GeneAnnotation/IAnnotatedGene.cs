@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.Interface.GeneAnnotation
@@ -9,4 +10,6 @@ namespace VariantAnnotation.Interface.GeneAnnotation
         IGeneAnnotation[] Annotations { get; }
         void Write(IExtendedBinaryWriter writer);
 	}
+
+
 }

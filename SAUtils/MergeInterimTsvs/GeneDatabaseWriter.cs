@@ -10,6 +10,7 @@ using VariantAnnotation.IO;
 using VariantAnnotation.SA;
 using VariantAnnotation;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs
 {
@@ -56,6 +57,8 @@ namespace SAUtils.MergeInterimTsvs
 
         private void Flush()
         {
+            var nullGene = AnnotatedGene.CreateEmptyGene();
+            nullGene.Write(_writer);
             _stream.Flush();
         }
 

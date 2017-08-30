@@ -7,6 +7,7 @@ namespace VariantAnnotation.GeneAnnotation
 {
     public class AnnotatedGene:IAnnotatedGene
     {
+        private const string NullGene = "nullGene";
         public string GeneName { get; }
         public IGeneAnnotation[] Annotations { get; }
 
@@ -54,12 +55,19 @@ namespace VariantAnnotation.GeneAnnotation
             {
                 annotations[i] = GeneAnnotation.Read(reader);
             }
+
+            if (geneName == NullGene) return null;
             return new AnnotatedGene(geneName, annotations);
         }
 
         public int CompareTo(IAnnotatedGene other)
         {
             return GeneName.CompareTo(other.GeneName);
+        }
+
+        public static IAnnotatedGene CreateEmptyGene()
+        {
+            return new AnnotatedGene(NullGene, new IGeneAnnotation[0]);
         }
     }
 }

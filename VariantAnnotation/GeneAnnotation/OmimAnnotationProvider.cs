@@ -23,7 +23,7 @@ namespace VariantAnnotation.GeneAnnotation
         public OmimAnnotationProvider(GeneDatabaseReader omimDatabaseReader)
         {
 	        Name = "Omim annotation provider";
-            DataSourceVersions = new []{ omimDatabaseReader.DataVersion};
+            DataSourceVersions = omimDatabaseReader.DataSourceVersions;
             _omimGeneDict = new Dictionary<string, IAnnotatedGene>();
             CreateGeneMapDict(omimDatabaseReader);
         }
