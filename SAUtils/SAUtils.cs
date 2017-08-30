@@ -15,8 +15,7 @@ namespace SAUtils
         {
             var ops = new Dictionary<string, TopLevelOption>
             {
-                ["createOMIM"] = new TopLevelOption("create omim database", CreateOmimTsvMain.Run),
-
+                ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
                 ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvsMain.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),

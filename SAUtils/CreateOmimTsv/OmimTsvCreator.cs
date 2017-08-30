@@ -32,8 +32,8 @@ namespace SAUtils.CreateOmimTsv
 
         public void Create()
         {
-            var geneMap2Reader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_geneMap2File.Name), _geneSymbolUpdater);
-            var mimToGeneReader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_mim2Genefile.Name), _geneSymbolUpdater);
+            var geneMap2Reader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_geneMap2File.FullName), _geneSymbolUpdater);
+            var mimToGeneReader = _mim2Genefile != null? new OmimReader(GZipUtilities.GetAppropriateReadStream(_mim2Genefile.FullName), _geneSymbolUpdater):null;
 
             foreach(var entry in geneMap2Reader)
             {
@@ -43,19 +43,24 @@ namespace SAUtils.CreateOmimTsv
                 _gene2Mims[entry.Hgnc].Add(entry);
             }
 
-            foreach(var entry in mimToGeneReader)
+            if (mimToGeneReader != null)
             {
-                if (!_gene2Mims.ContainsKey(entry.Hgnc))
+                foreach (var entry in mimToGeneReader)
                 {
-                    _gene2Mims[entry.Hgnc] = new List<OmimEntry> { entry};
-                    continue;
+                    if (!_gene2Mims.ContainsKey(entry.Hgnc))
+                    {
+                        _gene2Mims[entry.Hgnc] = new List<OmimEntry> { entry };
+                        continue;
+                    }
+                    if (_gene2Mims[entry.Hgnc].Select(x => x.MimNumber).Contains(entry.MimNumber)) continue;
+
+                    throw new Exception($"{entry.Hgnc} exist in geneMap2.txt but {entry.MimNumber} not exist");
                 }
-                if (_gene2Mims[entry.Hgnc].Select(x => x.MimNumber).Contains(entry.MimNumber)) continue;
 
-                throw new Exception($"{entry.Hgnc} exist in geneMap2.txt but {entry.MimNumber} not exist");
             }
+            
 
-            var dataSourceVersion = GetSourceVersion(_geneMap2File.Name);
+            var dataSourceVersion = GetSourceVersion(_geneMap2File.FullName);
 
             using (var omimWriter = new GeneAnnotationTsvWriter(_outputDirectory, dataSourceVersion, null, 0, _jsonKeyName, true))
             {

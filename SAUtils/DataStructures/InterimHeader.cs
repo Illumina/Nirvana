@@ -41,9 +41,11 @@ namespace SAUtils.DataStructures
 
         }
 
+
+
         public override string ToString()
         {
-            return "dataSource=" + Name + ",version:" + Version + ",release date:" + ReleaseDate;
+            return $"{Name,-20}   {Version,-14}   {ReleaseDate,-10}";
         }
     }
 }

@@ -13,7 +13,7 @@ namespace SAUtils.CreateOmimTsv
         private ExitCodes ProgramExecution()
         {
             var geneSymbolUpdater = new GeneSymbolUpdater(ConfigurationSettings.GeneInfoPaths, ConfigurationSettings.HgncPath);
-            var omimTsvCreator = new OmimTsvCreator(new FileInfo(ConfigurationSettings.InputGeneMap2Path), new FileInfo (ConfigurationSettings.Mim2GenePath), geneSymbolUpdater,ConfigurationSettings.OutputDirectory);
+            var omimTsvCreator = new OmimTsvCreator(new FileInfo(ConfigurationSettings.InputGeneMap2Path), ConfigurationSettings.Mim2GenePath ==null? null: new FileInfo (ConfigurationSettings.Mim2GenePath), geneSymbolUpdater,ConfigurationSettings.OutputDirectory);
             omimTsvCreator.Create();
             return ExitCodes.Success;
         }

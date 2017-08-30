@@ -25,6 +25,7 @@ namespace SAUtils.MergeInterimTsvs
                 if (file.EndsWith(".gene.tsv.gz"))
                 {
                     geneTsvFiles.Add(file);
+                    continue;
                 }
                 intermediateFiles.Add(file);
             }
