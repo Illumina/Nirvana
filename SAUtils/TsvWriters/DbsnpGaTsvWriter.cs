@@ -110,7 +110,7 @@ namespace SAUtils.TsvWriters
 			jsonObject.AddStringValue("globalMinorAllele", globalMinorAllele);
 			jsonObject.AddStringValue("globalMinorAlleleFrequency", globalMinorAlleleFrequency,false);
 			
-			_globalAlleleWriter.AddEntry(chromosome.UcscName, position, refAllele, "N", vcfString, new List<string> { sb.ToString() });
+			_globalAlleleWriter.AddEntry(chromosome.EnsemblName, position, refAllele, "N", vcfString, new List<string> { sb.ToString() });
 		}
 
 		private static string GetMostFrequentAllele(Dictionary<string, double> alleleFreqDict, string refAllele, bool isRefPreferred = true)

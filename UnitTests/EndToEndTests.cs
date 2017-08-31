@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnitTests.TestUtilities;
 using Xunit;
 
@@ -52,7 +53,6 @@ namespace UnitTests
             var output = annotatedPosition.GetJsonString();
             Assert.Equal(expectedOutPut, output);
         }
-
 
 
 
