@@ -12,6 +12,8 @@ namespace VariantAnnotation.TranscriptAnnotation
     public static class TranscriptAnnotationFactory
     {
         internal const int FlankingLength = 5000;
+        internal static AminoAcids AminoAcidsProvider = new AminoAcids(false);
+        internal static AminoAcids MitoAminoAcidsProvider = new AminoAcids(true);
 
         public static void GetAnnotatedTranscripts(IVariant variant, ITranscript[] transcriptCandidates,
             ISequence compressedSequence, IList<IAnnotatedTranscript> annotatedTranscripts,
@@ -62,8 +64,11 @@ namespace VariantAnnotation.TranscriptAnnotation
                     annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant,geneFusionCandidates);
                     break;
                 case Status.FullAnnotation:
+                    var aminoAcidsPrider = variant.Chromosome.UcscName == "chrM"
+                        ? MitoAminoAcidsProvider
+                        : AminoAcidsProvider;
                     annotatedTranscript =
-                        FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, compressedSequence,siftCache,polyphenCache);
+                        FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, compressedSequence,siftCache,polyphenCache,aminoAcidsPrider);
                     break;
                 default:
                     break;
