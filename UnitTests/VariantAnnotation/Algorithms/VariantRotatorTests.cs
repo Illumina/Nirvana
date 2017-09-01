@@ -16,7 +16,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         private readonly ISequence _refSequence =
             new SimpleSequence(
                 new string('A', VariantRotator.MaxDownstreamLength) + "ATGTGTGTGTGCAGT" +
-                new string('A', VariantRotator.MaxDownstreamLength), 961391);
+                new string('A', VariantRotator.MaxDownstreamLength), 965891);
 
         [Fact]
         public void Right_Deletion()
@@ -122,7 +122,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
 
             ISequence refSequence = new SimpleSequence(
                 new string('A', VariantRotator.MaxDownstreamLength) + "GAGAGTTAGGTA" +
-                new string('A', VariantRotator.MaxDownstreamLength), 961391);
+                new string('A', VariantRotator.MaxDownstreamLength), 965891);
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Start).Returns(966300);
