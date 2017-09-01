@@ -11,17 +11,17 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Providers
 {
-	public class SupplementaryAnnotationProvider : IAnnotationProvider
+	public sealed class SupplementaryAnnotationProvider : IAnnotationProvider
 	{
 		public string Name { get; }
-		public GenomeAssembly GenomeAssembly => SupplementaryAnnotationCommon.GetGenomeAssembly(_saDirs);
+		public GenomeAssembly GenomeAssembly => SaReaderUtils.GetGenomeAssembly(_saDirs);
 
 		public IEnumerable<IDataSourceVersion> DataSourceVersions =>
-			SupplementaryAnnotationCommon.GetDataSourceVersions(_saDirs);
+			SaReaderUtils.GetDataSourceVersions(_saDirs);
 
 
-		protected List<ISupplementaryAnnotationReader> _saReaders;
-	    protected string _currentUcscReferenceName;
+	    private List<ISupplementaryAnnotationReader> _saReaders;
+	    private string _currentUcscReferenceName;
 		private bool _hasSmallVariantIntervals;
 		private bool _hasSvIntervals;
 		private bool _hasAllVariantIntervals;
@@ -70,7 +70,7 @@ namespace VariantAnnotation.Providers
 		{
 			foreach (var dataSource in saPosition.DataSources)
 			{
-				var saAltAllele = SupplementaryAnnotationCommon.GetReducedAllele(annotatedVariant.Variant.RefAllele,
+				var saAltAllele = SaReaderUtils.GetReducedAllele(annotatedVariant.Variant.RefAllele,
 					annotatedVariant.Variant.AltAllele);
 				if (dataSource.MatchByAllele && dataSource.AltAllele != saAltAllele) continue;
 				annotatedVariant.SupplementaryAnnotations.Add(new AnnotatedSaDataSource(dataSource, saAltAllele));
@@ -121,7 +121,7 @@ namespace VariantAnnotation.Providers
 
 			if (_saDirs == null || _saDirs.Count == 0 || ucscReferenceName == _currentUcscReferenceName) return;
 
-			_saReaders = SupplementaryAnnotationCommon.GetReaders(_saDirs, ucscReferenceName);
+			_saReaders = SaReaderUtils.GetReaders(_saDirs, ucscReferenceName);
 
 			BuildIntervalForests();
 

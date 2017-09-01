@@ -70,10 +70,10 @@ namespace VariantAnnotation.SA
             var schemaVersion = reader.ReadUInt16();
             var genomeAssembly = (GenomeAssembly)reader.ReadByte();
 
-            if (header != SupplementaryAnnotationCommon.DataHeader ||
-                schemaVersion != SupplementaryAnnotationCommon.SchemaVersion)
+            if (header != SaDataBaseCommon.DataHeader ||
+                schemaVersion != SaDataBaseCommon.SchemaVersion)
             {
-                throw new UserErrorException($"The header check failed for the supplementary annotation file: ID: exp: {SupplementaryAnnotationCommon.DataHeader} obs: {header}, schema version: exp:{SupplementaryAnnotationCommon.SchemaVersion} obs: {schemaVersion}");
+                throw new UserErrorException($"The header check failed for the supplementary annotation file: ID: exp: {SaDataBaseCommon.DataHeader} obs: {header}, schema version: exp:{SaDataBaseCommon.SchemaVersion} obs: {schemaVersion}");
             }
 
             var creationTimeTicks = reader.ReadInt64();
