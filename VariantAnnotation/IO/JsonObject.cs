@@ -136,7 +136,7 @@ namespace VariantAnnotation.IO
 	    /// <summary>
         /// adds the object values to this current JSON object
         /// </summary>
-        public void AddObjectValues<T>(string description, IList<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
+        public void AddObjectValues<T>(string description, IEnumerable<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
         {
             if (values == null) return;
 

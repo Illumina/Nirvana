@@ -27,7 +27,7 @@
     },
     "Nirvana_sk": {
       "commandName": "Project",
-      "commandLineArgs": "--in E:\\temp\\test_input.vcf --cache E:\\Cache\\24\\GRCh37\\Ensembl84 --sd E:\\SupplementaryDatabase\\39.1\\GRCh37 --ref E:\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o sk_test",
+      "commandLineArgs": "-i \\\\ussd-prd-isi04\\Nirvana\\Data\\Zodiac\\Zodiac_Eco.vcf -c \\\\ussd-prd-isi04\\Nirvana\\Cache\\latest\\GRCh37\\Both84 -r \\\\ussd-prd-isi04\\Nirvana\\References\\latest\\Homo_sapiens.GRCh37.Nirvana.dat -o test_out --sd E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15\\test\\createSA\\",
       "workingDirectory": "E:\\temp",
       "environmentVariables": {
         "Key": "Value"

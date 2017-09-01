@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.15
+VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation.Interface", "VariantAnnotation.Interface\VariantAnnotation.Interface.csproj", "{248C8736-3A76-4F45-A131-A776BD3257C9}"
 EndProject
@@ -15,13 +15,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation", "Varian
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ErrorHandling", "ErrorHandling\ErrorHandling.csproj", "{A65F4919-CDB8-49C5-ADA4-66055A3F4923}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{0CB1644A-BEA1-4CF6-AD5F-E544512769C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{0CB1644A-BEA1-4CF6-AD5F-E544512769C2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommandLine", "CommandLine\CommandLine.csproj", "{147C336A-6A6E-43F4-BDDC-8C8B72199C5D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommonUtilities", "CommonUtilities\CommonUtilities.csproj", "{6688B01D-5352-4747-B411-456CBA6A4B8A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CacheUtils", "CacheUtils\CacheUtils.csproj", "{986CF15B-DFAE-4C39-98D0-75A15271B34A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheUtils", "CacheUtils\CacheUtils.csproj", "{986CF15B-DFAE-4C39-98D0-75A15271B34A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SAUtils", "SAUtils\SAUtils.csproj", "{F1F05D39-1BE0-4CFD-AD60-F27FB31D925A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +71,10 @@ Global
 		{986CF15B-DFAE-4C39-98D0-75A15271B34A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{986CF15B-DFAE-4C39-98D0-75A15271B34A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{986CF15B-DFAE-4C39-98D0-75A15271B34A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1F05D39-1BE0-4CFD-AD60-F27FB31D925A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1F05D39-1BE0-4CFD-AD60-F27FB31D925A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1F05D39-1BE0-4CFD-AD60-F27FB31D925A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1F05D39-1BE0-4CFD-AD60-F27FB31D925A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

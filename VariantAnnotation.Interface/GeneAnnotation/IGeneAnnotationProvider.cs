@@ -4,6 +4,6 @@ namespace VariantAnnotation.Interface.GeneAnnotation
 {
     public interface IGeneAnnotationProvider:IProvider
     {
-        IGeneAnnotation Annotate(string geneName);
+        IAnnotatedGene Annotate(string geneName);
     }
 }

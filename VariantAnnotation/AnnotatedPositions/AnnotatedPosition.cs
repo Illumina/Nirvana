@@ -62,14 +62,11 @@ namespace VariantAnnotation.AnnotatedPositions
 	        
 			jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
 
-			//if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()).ToArray(), false);
-
 			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
 
 			if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
                 AddSuppIntervalToJsonObject(jsonObject);
 
-			//jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)).ToArray(), false);
 			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
 
 			sb.Append(JsonObject.CloseBrace);

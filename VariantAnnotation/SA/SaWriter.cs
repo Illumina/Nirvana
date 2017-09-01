@@ -50,9 +50,9 @@ namespace VariantAnnotation.SA
 
         private void WriteHeader(ISupplementaryAnnotationHeader header)
         {
-            _writer.WriteOptAscii(SupplementaryAnnotationCommon.DataHeader);
-            _writer.Write(SupplementaryAnnotationCommon.DataVersion);
-            _writer.Write(SupplementaryAnnotationCommon.SchemaVersion);
+            _writer.WriteOptAscii(SaDataBaseCommon.DataHeader);
+            _writer.Write(SaDataBaseCommon.DataVersion);
+            _writer.Write(SaDataBaseCommon.SchemaVersion);
             _writer.Write((byte)header.GenomeAssembly);
             _writer.Write(DateTime.Now.Ticks);
             _writer.WriteOptAscii(header.ReferenceSequenceName);
