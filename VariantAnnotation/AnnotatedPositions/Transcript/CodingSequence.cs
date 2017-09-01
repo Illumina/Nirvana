@@ -5,7 +5,7 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
-    public sealed class CodingSequence:ISequence
+    public sealed class CodingSequence : ISequence
     {
         #region members
 
@@ -14,7 +14,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private readonly ICdnaCoordinateMap[] _cdnaMaps;
         private readonly bool _geneOnReverseStrand;
         private readonly int _startExonPhase;
-        private readonly string _sequence;
+        private string _sequence;
+        private readonly ISequence _compressedSequence;
 
         #endregion
 
@@ -24,12 +25,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public CodingSequence(ISequence compressedSequence, int start, int end, ICdnaCoordinateMap[] cdnaMaps,
             bool geneOnReverseStrand, byte? startExonPhase)
         {
-            _start = start;
-            _end = end;
-            _cdnaMaps = cdnaMaps;
+            _start               = start;
+            _end                 = end;
+            _cdnaMaps            = cdnaMaps;
             _geneOnReverseStrand = geneOnReverseStrand;
-            _startExonPhase = startExonPhase ?? 0;            
-            _sequence = GetCodingSequence(compressedSequence);
+            _startExonPhase      = startExonPhase ?? 0;
+            _compressedSequence  = compressedSequence;
         }
 
         /// <summary>
@@ -85,9 +86,15 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return length;
         }
 
-        public int Length => _sequence.Length;
+        public int Length
+        {
+            get { if (_sequence == null) _sequence = GetCodingSequence(_compressedSequence); return _sequence.Length; }
+        }
+
         public string Substring(int offset, int length)
         {
+            if (_sequence == null) _sequence = GetCodingSequence(_compressedSequence);
+
             return _sequence.Substring(offset, length);
         }
     }
