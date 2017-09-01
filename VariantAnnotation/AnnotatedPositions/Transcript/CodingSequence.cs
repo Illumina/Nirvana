@@ -30,7 +30,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             _cdnaMaps = cdnaMaps;
             _geneOnReverseStrand = geneOnReverseStrand;
             _startExonPhase = startExonPhase ?? 0;            
-           // _sequence = GetCodingSequence(compressedSequence);
             _compressedSequence = compressedSequence;
         }
 
