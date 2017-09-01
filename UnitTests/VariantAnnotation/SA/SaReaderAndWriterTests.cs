@@ -45,7 +45,7 @@ namespace UnitTests.VariantAnnotation.SA
 
             var saPos = new SaPosition(saDataSources, "A");
 
-            using (var saWriter = new SaWriter(saMs, indexMs, header, smallIntervals, svIntervals, allIntervals, null,true))
+            using (var saWriter = new SaWriter(saMs, indexMs, header, smallIntervals, svIntervals, allIntervals, new List<Tuple<int, string>>(),true))
             {
                 saWriter.Write(saPos, 150);
             }

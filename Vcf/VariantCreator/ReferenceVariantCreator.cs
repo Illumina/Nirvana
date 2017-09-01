@@ -31,7 +31,7 @@ namespace Vcf.VariantCreator
         
         public static IVariant Create(IChromosome chromosome, int start, int end, string refallele, string altAllele, string refMinorGlobalMajorAllele)
         {
-            var isRefMinor = end != start || refMinorGlobalMajorAllele != null;
+            var isRefMinor = end == start && refMinorGlobalMajorAllele != null;
             var annotationBehavior =!isRefMinor ? null: RefVariantBehavior;
 
             var variantType = DetermineVariantType(isRefMinor);
