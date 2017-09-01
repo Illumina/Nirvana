@@ -50,7 +50,7 @@ namespace VariantAnnotation.AnnotatedPositions
             else
             {
                 jsonObject.AddStringValue("refAllele",
-                    string.IsNullOrEmpty(Variant.RefAllele) ? "-" : Variant.RefAllele);
+                    string.IsNullOrEmpty(Variant.AltAllele) ? "-" : Variant.AltAllele);
             }
 
 	        var variantType = GetVariantType(Variant.Type);

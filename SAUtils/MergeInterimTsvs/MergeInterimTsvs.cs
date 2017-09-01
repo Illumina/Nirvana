@@ -123,15 +123,17 @@ namespace SAUtils.MergeInterimTsvs
         }
 
 
-
-        private IEnumerator<IInterimSaItem> GetMiscEnumerator(string refName)
+        private List<Tuple<int, string>> GetGlobalMajorAlleleForRefMinors(string refName)
         {
-            if (_miscReader == null) return null;
-
-            var dataEnumerator = _miscReader.GetEnumerator(refName);
-            if (!dataEnumerator.MoveNext()) return null;
-            return dataEnumerator;
+            var globalAlleles = new List<Tuple<int,string>>();
+            if (_miscReader == null) return globalAlleles;
+            foreach (var saMiscellaniese in _miscReader.GetAnnotationItems(refName))
+            {
+               globalAlleles.Add( Tuple.Create(saMiscellaniese.Position, saMiscellaniese.GlobalMajorAllele));
+            }
+            return globalAlleles;
         }
+
 
         private List<IEnumerator<IAnnotatedGene>> GetGeneAnnotationEnumerator()
         {
@@ -292,9 +294,8 @@ namespace SAUtils.MergeInterimTsvs
             int refMinorCount;
 
             var iInterimSaItemsList = GetSaEnumerators(refName);
-            var miscEnumerator = GetMiscEnumerator(refName);
-            if (miscEnumerator != null)
-                iInterimSaItemsList.Add(miscEnumerator);
+
+            var globalMajorAlleleInRefMinors = GetGlobalMajorAlleleForRefMinors(refName);
 
             var ucscRefName = _refChromDict[refName].UcscName;
             var dataSourceVersions = GetDataSourceVersions(_interimSaHeaders, _intervalHeaders);
@@ -313,13 +314,13 @@ namespace SAUtils.MergeInterimTsvs
 
             using (var stream = FileUtilities.GetCreateStream(saPath))
             using (var idxStream = FileUtilities.GetCreateStream(saPath + ".idx"))
-            using (var blockSaWriter = new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantsIntervals))
+            using (var blockSaWriter = new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantsIntervals,globalMajorAlleleInRefMinors))
             {
                 InterimSaPosition currPosition;
                 while ((currPosition = GetNextInterimPosition(iInterimSaItemsList)) != null)
                 {
                     var saPosition = currPosition.Convert();
-                    blockSaWriter.Write(saPosition, currPosition.Position, currPosition.IsReferenceMinor);
+                    blockSaWriter.Write(saPosition, currPosition.Position);
                     currentChrAnnotationCount++;
                 }
 

@@ -13,17 +13,17 @@ namespace VariantAnnotation.SA
     public class SaIndex : ISaIndex
     {
         private readonly IIntervalSearch<long> _fileOffsetIntervals;
-        public int[] RefMinorPositions { get; }
+        public Tuple<int,string>[] GlobalMajorAlleleForRefMinor { get; }
 
         private Interval<long> _cachedInterval = IntervalArray<long>.EmptyInterval;
 
         /// <summary>
         /// constructor
         /// </summary>
-        private SaIndex(IIntervalSearch<long> fileOffsetIntervals, int[] refMinorPositions)
+        private SaIndex(IIntervalSearch<long> fileOffsetIntervals, Tuple<int, string>[] globalMajorAlleleForRefMinor)
         {
             _fileOffsetIntervals = fileOffsetIntervals;
-            RefMinorPositions = refMinorPositions;
+            GlobalMajorAlleleForRefMinor = globalMajorAlleleForRefMinor;
         }
 
 
@@ -41,16 +41,11 @@ namespace VariantAnnotation.SA
             return interval.Value;
         }
 
-        public bool IsRefMinor(int position)
-        {
-            int index = Array.BinarySearch<int>(RefMinorPositions, position);
-            return index >= 0;
-        }
 
         public static ISaIndex Read(Stream stream)
         {
             IntervalArray<long> intervalArray;
-            int[] refMinorPositions;
+            Tuple<int, string>[] globalMajorAlleleForRefMinors;
 
             using (var reader = new ExtendedBinaryReader(stream))
             {
@@ -68,31 +63,33 @@ namespace VariantAnnotation.SA
 
                 intervalArray = new IntervalArray<long>(intervals);
 
-                refMinorPositions = GetRefMinor(reader);
+                globalMajorAlleleForRefMinors = GetGlobalMajorAlleleInRefMinor(reader);
             }
 
-            return new SaIndex(intervalArray, refMinorPositions);
+            return new SaIndex(intervalArray, globalMajorAlleleForRefMinors);
         }
 
-        private static int[] GetRefMinor(ExtendedBinaryReader reader)
+        private static Tuple<int,string>[] GetGlobalMajorAlleleInRefMinor(ExtendedBinaryReader reader)
         {
             var numPositions = reader.ReadOptInt32();
-            var refMinorPositions = new int[numPositions];
-
+            var globalMajorAlleleForRefMinors = new Tuple<int,string>[numPositions];
             int oldPosition = 0;
 
             for (int i = 0; i < numPositions; i++)
             {
                 var deltaPosition = reader.ReadOptInt32();
-                refMinorPositions[i] = oldPosition + deltaPosition;
-                oldPosition = refMinorPositions[i];
+                var refMinorPosition = oldPosition + deltaPosition;
+                oldPosition = refMinorPosition;
+                var globalMajorAllele = reader.ReadAsciiString();
+                globalMajorAlleleForRefMinors[i] = Tuple.Create(refMinorPosition,globalMajorAllele);
+
             }
 
-            return refMinorPositions;
+            return globalMajorAlleleForRefMinors;
         }
 
         public static void Write(IExtendedBinaryWriter writer, List<Interval<long>> intervals,
-            List<int> refMinorPositions)
+            List<Tuple<int,string>> refMinorPositions)
         {
             writer.WriteOpt(intervals.Count);
 
@@ -106,17 +103,19 @@ namespace VariantAnnotation.SA
             WriteRefMinor(writer, refMinorPositions);
         }
 
-        private static void WriteRefMinor(IExtendedBinaryWriter writer, List<int> refMinorPositions)
+        private static void WriteRefMinor(IExtendedBinaryWriter writer, List<Tuple<int, string>> refMinorPositions)
         {
             writer.WriteOpt(refMinorPositions.Count);
 
             int oldPosition = 0;
 
-            foreach (var position in refMinorPositions.OrderBy(x => x))
+            foreach (var globalMajorAllele in refMinorPositions.OrderBy(x => x))
             {
+                var position = globalMajorAllele.Item1;
                 int deltaPosition = position - oldPosition;
                 writer.WriteOpt(deltaPosition);
                 oldPosition = position;
+                writer.WriteOptAscii(globalMajorAllele.Item2);
             }
         }
     }

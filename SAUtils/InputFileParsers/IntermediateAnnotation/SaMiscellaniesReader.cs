@@ -58,11 +58,8 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         }
 
 
-        public IEnumerator<SaMiscellanies> GetEnumerator(string refName)
-        {
-            return GetAnnotationItems(refName).GetEnumerator();
-        }
-        private IEnumerable<SaMiscellanies> GetAnnotationItems(string refName)
+
+        public IEnumerable<SaMiscellanies> GetAnnotationItems(string refName)
         {
             if (!_refNameOffsets.ContainsKey(refName)) yield break;
 

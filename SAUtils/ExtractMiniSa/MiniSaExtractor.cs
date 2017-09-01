@@ -67,11 +67,11 @@ namespace SAUtils.ExtractMiniSa
 
         private SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
             List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
-            List<ISupplementaryInterval> allVariantIntervals)
+            List<ISupplementaryInterval> allVariantIntervals,List<Tuple<int,string>> globalMajorAlleleInRefMinors)
         {
             var stream    = FileUtilities.GetCreateStream(saPath);
             var idxStream = FileUtilities.GetCreateStream(saPath + ".idx");
-            return new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantIntervals);
+            return new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantIntervals,globalMajorAlleleInRefMinors);
         }
 
         private SaReader GetSaReader(string saPath)
@@ -90,23 +90,34 @@ namespace SAUtils.ExtractMiniSa
                 var smallVariantIntervals = GetIntervals("small variants", reader.SmallVariantIntervals);
                 var svIntervals           = GetIntervals("SVs",            reader.SvIntervals);
                 var allVariantIntervals   = GetIntervals("all variants",   reader.AllVariantIntervals);
+                var globalMajorAlleles = GetGlobaleMajorAllleAndRefMinors(reader.GlobalMajorAlleleInRefMinors);
 
                 using (var writer = GetSaWriter(_miniSaPath, reader.Header, smallVariantIntervals, svIntervals,
-                        allVariantIntervals))
+                        allVariantIntervals,globalMajorAlleles))
                 {
                     for (var position = _begin; position <= _end; position++)
                     {
                         var saPosition = reader.GetAnnotation(position);
                         if (saPosition == null) continue;
 
-                        var isRefMinor = reader.IsRefMinor(position);
-                        writer.Write(saPosition, position, isRefMinor);
+                        writer.Write(saPosition, position);
                         count++;
                     }
                 }
             }
 
             return count;
+        }
+
+        private List<Tuple<int,string>> GetGlobaleMajorAllleAndRefMinors(IEnumerable<Tuple<int, string>> readerGlobalMajorAlleleInRefMinors)
+        {
+            var overlappedRefMinors = new List<Tuple<int,string>>();
+            foreach (var refMinor in readerGlobalMajorAlleleInRefMinors)
+            {
+                if(refMinor.Item1>=_begin && refMinor.Item1<=_end)
+                    overlappedRefMinors.Add(refMinor);
+            }
+            return overlappedRefMinors;
         }
 
         private List<ISupplementaryInterval> GetIntervals(string description,

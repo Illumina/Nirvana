@@ -64,8 +64,8 @@ namespace Vcf.VariantCreator
 		    switch (category)
 		    {
 				case VariantCategory.Reference:
-					var isRefMinor = _refMinorProvider?.IsReferenceMinor(chromosome, start) ?? false;
-				    return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, isRefMinor);
+					var refMinorGlobalMajorAllele = _refMinorProvider?.GetGlobalMajorAlleleForRefMinor(chromosome, start) ?? null;
+				    return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, refMinorGlobalMajorAllele);
 			    case VariantCategory.SmallVariant:
 				    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele);
 

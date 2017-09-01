@@ -29,14 +29,16 @@ namespace Vcf.VariantCreator
         }
 
         
-        public static IVariant Create(IChromosome chromosome, int start, int end, string refallele, string altAllele, bool isRefMinor)
+        public static IVariant Create(IChromosome chromosome, int start, int end, string refallele, string altAllele, string refMinorGlobalMajorAllele)
         {
-            var annotationBehavior = end != start || !isRefMinor ? null: RefVariantBehavior;
+            var isRefMinor = end != start || refMinorGlobalMajorAllele != null;
+            var annotationBehavior =!isRefMinor ? null: RefVariantBehavior;
 
             var variantType = DetermineVariantType(isRefMinor);
 	        var vid = GetVid(chromosome.EnsemblName, start, end, refallele, variantType);
 
-			return new Variant(chromosome, start, end, refallele, altAllele, variantType, vid, isRefMinor, false, null, null, annotationBehavior);
+            if(isRefMinor) return new Variant(chromosome, start, end, refMinorGlobalMajorAllele,refallele, variantType, vid, isRefMinor, false, null, null, annotationBehavior);
+            return new Variant(chromosome, start, end, refallele, altAllele, variantType, vid, isRefMinor, false, null, null, annotationBehavior);
         }
     }
 }
