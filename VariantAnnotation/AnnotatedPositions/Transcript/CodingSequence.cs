@@ -14,7 +14,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private readonly ICdnaCoordinateMap[] _cdnaMaps;
         private readonly bool _geneOnReverseStrand;
         private readonly int _startExonPhase;
-        private readonly string _sequence;
+        private readonly ISequence _compressedSequence;
+        private string _sequence;
 
         #endregion
 
@@ -29,7 +30,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             _cdnaMaps = cdnaMaps;
             _geneOnReverseStrand = geneOnReverseStrand;
             _startExonPhase = startExonPhase ?? 0;            
-            _sequence = GetCodingSequence(compressedSequence);
+            _compressedSequence = compressedSequence;
         }
 
         /// <summary>
@@ -85,9 +86,17 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return length;
         }
 
-        public int Length => _sequence.Length;
+        public int Length
+        {
+            get
+            {
+                if (_sequence == null) _sequence = GetCodingSequence(_compressedSequence);
+                return _sequence.Length;
+            }
+        }
         public string Substring(int offset, int length)
         {
+            if(_sequence ==null) _sequence = GetCodingSequence(_compressedSequence);
             return _sequence.Substring(offset, length);
         }
     }

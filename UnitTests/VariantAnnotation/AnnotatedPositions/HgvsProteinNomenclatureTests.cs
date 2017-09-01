@@ -70,7 +70,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence,null,null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence,null,null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -85,7 +85,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -100,7 +100,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -115,7 +115,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -130,7 +130,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -145,7 +145,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -160,7 +160,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -175,7 +175,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -190,7 +190,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(ENST00000343938_genomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, new AminoAcids(false)); 
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 

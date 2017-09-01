@@ -9,7 +9,7 @@ namespace VariantAnnotation.Algorithms
 {
     public static class VariantRotator
     {
-        internal const int MaxDownstreamLength = 5000;
+        internal const int MaxDownstreamLength = 500;
 
         public static ISimpleVariant Right(ISimpleVariant simpleVariant, ITranscript transcript, ISequence refSequence,
             out bool shiftToEnd)
