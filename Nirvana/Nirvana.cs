@@ -97,7 +97,7 @@ namespace Nirvana
                         _performanceMetrics.Increment();
                     }
 
-                    _performanceMetrics.StopReference();
+                    if (previousChromIndex != -1) _performanceMetrics.StopReference();
 
                     //add gene annotation
                     WriteGeneAnnotations(annotator.GetAnnotatedGenes(), jsonWriter);

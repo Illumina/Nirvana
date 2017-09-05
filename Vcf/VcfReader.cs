@@ -116,7 +116,7 @@ namespace Vcf
         public IPosition GetNextPosition()
         {
             VcfLine = _reader.ReadLine();
-            return VcfLine == null ? null :VcfReaderUtils.ParseVcfLine(VcfLine,_variantFactory, _refNameToChromosome);
+            return String.IsNullOrEmpty(VcfLine) ? null :VcfReaderUtils.ParseVcfLine(VcfLine,_variantFactory, _refNameToChromosome);
         }
 
         public string VcfLine { get; private set; }
