@@ -109,7 +109,7 @@ namespace VariantAnnotation.SA
 
             int oldPosition = 0;
 
-            foreach (var globalMajorAllele in refMinorPositions.OrderBy(x => x))
+            foreach (var globalMajorAllele in refMinorPositions.OrderBy(x => x.Item1))
             {
                 var position = globalMajorAllele.Item1;
                 int deltaPosition = position - oldPosition;
