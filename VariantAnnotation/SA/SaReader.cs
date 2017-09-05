@@ -31,6 +31,7 @@ namespace VariantAnnotation.SA
         public IEnumerable<Interval<ISupplementaryInterval>> SvIntervals { get; }
         public IEnumerable<Interval<ISupplementaryInterval>> AllVariantIntervals { get; }
         public ISupplementaryAnnotationHeader Header { get; }
+        public IEnumerable<Tuple<int, string>> GlobalMajorAlleleInRefMinors { get; }
 
         /// <summary>
         /// constructor
@@ -51,9 +52,9 @@ namespace VariantAnnotation.SA
             SmallVariantIntervals = GetIntervals();
             SvIntervals = GetIntervals();
             AllVariantIntervals = GetIntervals();
+            GlobalMajorAlleleInRefMinors = _index.GlobalMajorAlleleForRefMinor;
         }
 
-        public bool IsRefMinor(int position) => _index.IsRefMinor(position);
 
         public void Dispose()
         {

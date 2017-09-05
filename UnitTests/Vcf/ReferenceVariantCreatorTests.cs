@@ -12,7 +12,7 @@ namespace UnitTests.Vcf
         {
             var chrom = new Mock<IChromosome>();
             chrom.Setup(x => x.EnsemblName).Returns("1");
-	        var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 101, "A", ".", false);
+	        var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 101, "A", ".", null);
             Assert.False(variant.IsRefMinor);
             Assert.Null(variant.Behavior);
         }
@@ -22,7 +22,7 @@ namespace UnitTests.Vcf
         {
             var chrom = new Mock<IChromosome>();
             chrom.Setup(x => x.EnsemblName).Returns("1");
-            var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 100, "A", ".", true);
+            var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 100, "A", ".", "T");
 			Assert.True(variant.IsRefMinor);
             Assert.NotNull(variant.Behavior);
             Assert.True(variant.Behavior.NeedFlankingTranscript);
@@ -32,11 +32,11 @@ namespace UnitTests.Vcf
             Assert.False(variant.Behavior.ReportOverlappingGenes);
             Assert.False(variant.Behavior.StructuralVariantConsequence);
 
-	        var variant2 = ReferenceVariantCreator.Create(chrom.Object, 101, 101, "A", ".", false);
+	        var variant2 = ReferenceVariantCreator.Create(chrom.Object, 101, 101, "A", ".", null);
 			Assert.False(variant2.IsRefMinor);
             Assert.Null(variant2.Behavior);
 
-	        var variant3 = ReferenceVariantCreator.Create(chrom.Object, 100, 110, "A", ".", false);
+	        var variant3 = ReferenceVariantCreator.Create(chrom.Object, 100, 110, "A", ".", null);
 			Assert.False(variant3.IsRefMinor);
             Assert.Null(variant3.Behavior);
         }

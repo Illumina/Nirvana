@@ -2,8 +2,6 @@
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 using System.IO;
-using System.Collections.Generic;
-using System.Text;
 using VariantAnnotation.Interface;
 
 namespace SAUtils.CreateOmimTsv

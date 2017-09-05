@@ -127,12 +127,16 @@ namespace VariantAnnotation.Providers
         {
             if (breakEnds == null || breakEnds.Length == 0) return null;
 
-            var geneFusionCandidates = new List<ITranscript>();
+            var geneFusionCandidates = new HashSet<ITranscript>();
             foreach (var breakEnd in breakEnds)
             {
                 var candiates = _transcriptCache.GetOverlappingTranscripts(breakEnd.Chromosome2,
                     breakEnd.Position2, breakEnd.Position2);
-                if (candiates != null) geneFusionCandidates.AddRange(candiates);
+                if (candiates == null) continue;
+                foreach (var candiate in candiates)
+                {
+                    geneFusionCandidates.Add(candiate);
+                }
             }
 
             return geneFusionCandidates;
