@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches;
