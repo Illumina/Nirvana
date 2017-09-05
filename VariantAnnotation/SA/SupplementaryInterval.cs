@@ -49,7 +49,7 @@ namespace VariantAnnotation.SA
 
         public double? GetReciprocalOverlap(IInterval variant)
         {
-            if (Start >= End || variant.Start >= variant.End) return null;
+            if (Start >= End || variant.Start > variant.End) return null;
             var overlapStart = Math.Max(Start, variant.Start);
             var overlapEnd = Math.Min(End, variant.End);
             var maxLen = Math.Max(variant.End - variant.Start + 1, End - Start + 1);
