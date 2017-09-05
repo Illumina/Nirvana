@@ -90,7 +90,7 @@ namespace SAUtils.ExtractMiniSa
                 var smallVariantIntervals = GetIntervals("small variants", reader.SmallVariantIntervals);
                 var svIntervals           = GetIntervals("SVs",            reader.SvIntervals);
                 var allVariantIntervals   = GetIntervals("all variants",   reader.AllVariantIntervals);
-                var globalMajorAlleles = GetGlobaleMajorAllleAndRefMinors(reader.GlobalMajorAlleleInRefMinors);
+                var globalMajorAlleles = GetGlobaleMajorAlleleAndRefMinors(reader.GlobalMajorAlleleInRefMinors);
 
                 using (var writer = GetSaWriter(_miniSaPath, reader.Header, smallVariantIntervals, svIntervals,
                         allVariantIntervals,globalMajorAlleles))
@@ -109,7 +109,7 @@ namespace SAUtils.ExtractMiniSa
             return count;
         }
 
-        private List<Tuple<int,string>> GetGlobaleMajorAllleAndRefMinors(IEnumerable<Tuple<int, string>> readerGlobalMajorAlleleInRefMinors)
+        private List<Tuple<int,string>> GetGlobaleMajorAlleleAndRefMinors(IEnumerable<Tuple<int, string>> readerGlobalMajorAlleleInRefMinors)
         {
             var overlappedRefMinors = new List<Tuple<int,string>>();
             foreach (var refMinor in readerGlobalMajorAlleleInRefMinors)
