@@ -21,14 +21,14 @@ namespace VariantAnnotation.SA
         private readonly ExtendedBinaryWriter _msWriter;
 
         private readonly List<Interval<long>> _intervals;
-        private readonly List<int> _refMinorPositions;
+        private readonly List<Tuple<int, string>> _globalMajorAllleInRefMinors;
         private readonly bool _leaveOpen;
 
-        public int RefMinorCount => _refMinorPositions.Count;
+        public int RefMinorCount => _globalMajorAllleInRefMinors.Count;
 
         public SaWriter(Stream stream, Stream idxStream, ISupplementaryAnnotationHeader header,
             List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
-            List<ISupplementaryInterval> allVariantIntervals,bool leaveOpen=false)
+            List<ISupplementaryInterval> allVariantIntervals,List<Tuple<int,string>> globalMajorAllelesInRefMinors,bool leaveOpen=false)
         {
             _leaveOpen = leaveOpen;
             _stream = stream;
@@ -39,8 +39,8 @@ namespace VariantAnnotation.SA
             _msWriter = new ExtendedBinaryWriter(_memoryStream);
 
             _intervals = new List<Interval<long>>(34000);
-            _refMinorPositions = new List<int>(22000);
 
+            _globalMajorAllleInRefMinors = globalMajorAllelesInRefMinors;
             
             WriteHeader(header);
             WriteIntervals(smallVariantIntervals);
@@ -81,18 +81,17 @@ namespace VariantAnnotation.SA
         {
             using (var writer = new ExtendedBinaryWriter(_idxStream, new UTF8Encoding(false, true), _leaveOpen))
             {
-                SaIndex.Write(writer, _intervals, _refMinorPositions);
+                SaIndex.Write(writer, _intervals, _globalMajorAllleInRefMinors);
             }
         }
 
-        public void Write(ISaPosition saPosition, int position, bool isRefMinor)
+        public void Write(ISaPosition saPosition, int position)
         {
             var uncompressedBytes = GetUncompressedBytes(saPosition);
             if (!_block.HasSpace(uncompressedBytes.Length)) Flush();
 
             // add new content to the block
             _block.Add(uncompressedBytes, position);
-            if (isRefMinor) _refMinorPositions.Add(position);
         }
 
         private void Flush()

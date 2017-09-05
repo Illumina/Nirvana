@@ -2,8 +2,8 @@
   "profiles": {
     "Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": " -c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in breakEnd_dup.vcf -o test",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": "-i E:\\Data\\Nirvana\\bugfixes\\test_input2_GRCh37.vcf -c E:\\Data\\Nirvana\\Cache\\24\\GRCh37\\Both84 -r E:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat -o test_mother_new --sd \\\\ussd-prd-isi04\\Nirvana\\Development\\SupplementaryDatabase\\40\\GRCh37",
+      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
     },
     "YJ_Nirvana": {
       "commandName": "Project",
