@@ -109,7 +109,7 @@ namespace VariantAnnotation.Providers
 		    if (intervals == null) return;
 			foreach (var overlappingInterval in intervals)
 			{
-				var reciprocalOverlap = overlappingInterval.GetReciprocalOverlap(annotatedPosition.AnnotatedVariants[0].Variant);
+				var reciprocalOverlap = annotatedPosition.Position.Start>=annotatedPosition.Position.End? null: overlappingInterval.GetReciprocalOverlap(annotatedPosition.AnnotatedVariants[0].Variant);
 				annotatedPosition.SupplementaryIntervals.Add(
 					new AnnotatedSupplementaryInterval(overlappingInterval, reciprocalOverlap));
 			}
