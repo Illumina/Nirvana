@@ -13,14 +13,8 @@ namespace VariantAnnotation.IO
 
 		#endregion
 
-		/// <summary>
-		/// constructor
-		/// </summary>
 		public ExtendedBinaryReader(Stream s) : this(s, new UTF8Encoding()) { }
 
-		/// <summary>
-		/// constructor
-		/// </summary>
 		public ExtendedBinaryReader(Stream input, Encoding encoding, bool leaveOpen = false)
 			: base(input, encoding, leaveOpen)
 		{
