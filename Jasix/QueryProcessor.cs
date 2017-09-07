@@ -54,10 +54,10 @@ namespace Jasix
 		}
 		#endregion
 
-		public QueryProcessor(StreamReader jsonReader, Stream indexStream, Stream writeStream=null)
+		public QueryProcessor(StreamReader jsonReader, Stream indexStream, StreamWriter writer=null)
 		{
 			_jsonReader  = jsonReader;
-		    _writer      = new StreamWriter(writeStream ?? Console.OpenStandardOutput());
+		    _writer      = writer ?? new StreamWriter(Console.OpenStandardOutput());
 			_indexStream = indexStream;
 			_jasixIndex  = new JasixIndex(_indexStream);
 

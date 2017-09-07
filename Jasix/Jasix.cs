@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -30,7 +28,8 @@ namespace Jasix
             var indexFileName = ConfigurationSettings.InputJson + JasixCommons.FileExt;
 
             ValidateIndexFile(indexFileName);
-            var writer = string.IsNullOrEmpty(ConfigurationSettings.OutputFile)? Console.OpenStandardOutput(): FileUtilities.GetCreateStream(ConfigurationSettings.OutputFile);
+            var writer = string.IsNullOrEmpty(ConfigurationSettings.OutputFile)
+                ? null : GZipUtilities.GetStreamWriter(ConfigurationSettings.OutputFile);
 
             using (var queryProcessor = new QueryProcessor(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputJson),
                     FileUtilities.GetReadStream(indexFileName), writer))
@@ -100,7 +99,7 @@ namespace Jasix
                 },
                 {
                     "out|o=",
-                    "output(default:console)",
+                    "compressed output file name (default:console)",
                     v => ConfigurationSettings.OutputFile = v
                 },
                 {
