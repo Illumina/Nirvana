@@ -21,8 +21,6 @@ namespace Jasix
         private const string SectionToIndex = "positions";
         private readonly HashSet<string> _processedChromosome;
 
-        //private readonly PerformanceMetrics _performanceMetrics;
-        
         private readonly Benchmark _chromBenchmark;
         private readonly Benchmark _benchmark;
 
@@ -114,8 +112,6 @@ namespace Jasix
                 previousPos = chrPos.Item2;
 
             }
-
-            //_performanceMetrics.StopReference();
 
             index.Write(_writeStream);
 
