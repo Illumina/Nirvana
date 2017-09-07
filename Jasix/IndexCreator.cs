@@ -162,7 +162,7 @@ namespace Jasix
             {
                 if (previousChr != "")
                 {
-                    Console.WriteLine($"{previousChr} indexed in {Benchmark.ToHumanReadable(_chromBenchmark.GetElapsedTime())}");
+                    Console.WriteLine($"Ref Sequence {previousChr} indexed in {Benchmark.ToHumanReadable(_chromBenchmark.GetElapsedTime())}");
                     _chromBenchmark.Reset();
                 }
             }

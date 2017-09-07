@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Jasix": {
+      "commandName": "Project",
+      "commandLineArgs": " momGen.json.gz",
+      "workingDirectory": "C:\\Development\\TestDatasets"
+    }
+  }
+}

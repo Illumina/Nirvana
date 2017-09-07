@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -15,13 +17,8 @@ namespace Jasix
     {
         private ExitCodes ProgramExecution()
         {
-            var indexFileName = ConfigurationSettings.InputJson + JasixCommons.FileExt;
-            if (!ConfigurationSettings.ListChromosomeName && !ConfigurationSettings.PrintHeader &&
-                !ConfigurationSettings.PrintHeaderOnly && string.IsNullOrEmpty(ConfigurationSettings.Query))
+            if (ConfigurationSettings.CreateIndex)
             {
-                if (File.Exists(indexFileName) && !ConfigurationSettings.OverWriteIndex)
-                    throw new UserErrorException("Index File already exist, please run dotnet jasix.dll -f [in.json.gz] to generate new index file ");
-
                 using (var indexCreator = new IndexCreator(ConfigurationSettings.InputJson))
                 {
                     indexCreator.CreateIndex();
@@ -29,6 +26,8 @@ namespace Jasix
 
                 return ExitCodes.Success;
             }
+
+            var indexFileName = ConfigurationSettings.InputJson + JasixCommons.FileExt;
 
             ValidateIndexFile(indexFileName);
 
@@ -47,13 +46,16 @@ namespace Jasix
                     return ExitCodes.Success;
                 }
 
-                if (ConfigurationSettings.Query == null)
+                if (ConfigurationSettings.Queries == null)
                 {
                     Console.WriteLine("Plese specify query region");
                     return ExitCodes.BadArguments;
                 }
-
-                queryProcessor.ProcessQuery(ConfigurationSettings.Query, ConfigurationSettings.PrintHeader);
+                foreach (var query in ConfigurationSettings.Queries)
+                {
+                    queryProcessor.ProcessQuery(query, ConfigurationSettings.PrintHeader);
+                }
+                
             }
             return ExitCodes.Success;
         }
@@ -61,11 +63,11 @@ namespace Jasix
         private static void ValidateIndexFile(string indexFileName)
         {
             if (!File.Exists(indexFileName))
-                throw new UserErrorException("No index file found,please run jasix.exe  [in.json.gz] to generate index file ");
+                throw new UserErrorException("No index file found,please generate index file first.");
             var indexFileCreateTime = File.GetCreationTime(indexFileName);
             var fileCreateTime = File.GetCreationTime(ConfigurationSettings.InputJson);
             if (fileCreateTime > indexFileCreateTime)
-                throw new UserErrorException("Index file is created before json file, please run jasix.exe -f [in.json.gz] to generate new index file");
+                throw new UserErrorException("Index file is older than the input file, please re-generate the index.");
         }
 
         public static int Main(string[] args)
@@ -73,25 +75,41 @@ namespace Jasix
             var ops = new OptionSet
             {
                 {
-                    "h",
+                    "header|t",
                     "print also the header lines",
                     v => ConfigurationSettings.PrintHeader = v != null
                 },
                 {
-                    "H",
+                    "only-header|H",
                     "print only the header lines",
                     v => ConfigurationSettings.PrintHeaderOnly = v != null
                 },
                 {
-                    "l",
+                    "chromosomes|l",
                     "list chromosome names",
                     v => ConfigurationSettings.ListChromosomeName = v != null
                 },
                 {
-                    "f",
-                    "force to overwrite the index",
-                    v => ConfigurationSettings.OverWriteIndex = v != null
+                    "index|c",
+                    "create index",
+                    v => ConfigurationSettings.CreateIndex = v != null
+                },
+                {
+                    "in|i=",
+                    "input",
+                    v => ConfigurationSettings.InputJson = v
+                },
+                {
+                    "out|o=",
+                    "output(default:console)",
+                    v => ConfigurationSettings.OutputFile = v
+                },
+                {
+                    "query|q=",
+                    "query range",
+                    v => ConfigurationSettings.Queries.Add(v)
                 }
+
             };
 
             var jasix = new Jasix();
@@ -99,37 +117,14 @@ namespace Jasix
                 .UseVersionProvider(new JasixVersionProvider())
                 .Parse()
                 .CheckInputFilenameExists(ConfigurationSettings.InputJson, "input Json file", "[in.json.gz]")
+                .DisableOutput(!ConfigurationSettings.CreateIndex && ConfigurationSettings.OutputFile == null)
                 .ShowBanner(Constants.Authors)
-                .ShowHelpMenu("Indexes a Nirvana annotated JSON file", "<in.json.gz> [region1 [region2 [...]]]")
+                .ShowHelpMenu("Indexes a Nirvana annotated JSON file", "-i in.json.gz [options]")
                 .ShowErrors()
                 .Execute(jasix.ProgramExecution);
 
             return (int)exitCode;
         }
-
-        //protected override void ParseArguments(string[] args, out string[] updatedArgs, out int positionalArgsCount)
-        //{
-        //    positionalArgsCount = 0;
-
-        //    foreach (var arg in args)
-        //    {
-        //        if (arg.StartsWith("-")) continue;
-        //        if (ConfigurationSettings.InputJson == null)
-        //        {
-        //            ConfigurationSettings.InputJson = arg;
-        //            positionalArgsCount++;
-        //            continue;
-        //        }
-        //        if (ConfigurationSettings.Query == null)
-        //        {
-        //            positionalArgsCount++;
-        //            ConfigurationSettings.Query = arg;
-        //        }
-        //    }
-
-        //    var argslist = args.ToList();
-        //    argslist.RemoveAll(x => x == ConfigurationSettings.InputJson || x == ConfigurationSettings.Query);
-        //    updatedArgs = argslist.ToArray();
-        //}
+        
     }
 }
