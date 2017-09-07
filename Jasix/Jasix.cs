@@ -30,9 +30,10 @@ namespace Jasix
             var indexFileName = ConfigurationSettings.InputJson + JasixCommons.FileExt;
 
             ValidateIndexFile(indexFileName);
+            var writer = string.IsNullOrEmpty(ConfigurationSettings.OutputFile)? Console.OpenStandardOutput(): FileUtilities.GetCreateStream(ConfigurationSettings.OutputFile);
 
             using (var queryProcessor = new QueryProcessor(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputJson),
-                    FileUtilities.GetReadStream(indexFileName)))
+                    FileUtilities.GetReadStream(indexFileName), writer))
             {
                 if (ConfigurationSettings.ListChromosomeName)
                 {
@@ -51,10 +52,8 @@ namespace Jasix
                     Console.WriteLine("Plese specify query region");
                     return ExitCodes.BadArguments;
                 }
-                foreach (var query in ConfigurationSettings.Queries)
-                {
-                    queryProcessor.ProcessQuery(query, ConfigurationSettings.PrintHeader);
-                }
+                
+                queryProcessor.ProcessQuery(ConfigurationSettings.Queries, ConfigurationSettings.PrintHeader);
                 
             }
             return ExitCodes.Success;

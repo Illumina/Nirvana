@@ -11,6 +11,7 @@ namespace Jasix
 	{
 		#region members
 		private readonly StreamReader _jsonReader;
+	    private readonly StreamWriter _writer;
 		private readonly Stream _indexStream;
 		private readonly JasixIndex _jasixIndex;
 
@@ -42,6 +43,7 @@ namespace Jasix
 				// Free any other managed objects here.
 				_jsonReader.Dispose();
 				_indexStream.Dispose();
+                _writer.Dispose();
 			}
 
 			// Free any unmanaged objects here.
@@ -52,9 +54,10 @@ namespace Jasix
 		}
 		#endregion
 
-		public QueryProcessor(StreamReader jsonReader, Stream indexStream)
+		public QueryProcessor(StreamReader jsonReader, Stream indexStream, Stream writeStream=null)
 		{
 			_jsonReader  = jsonReader;
+		    _writer      = new StreamWriter(writeStream ?? Console.OpenStandardOutput());
 			_indexStream = indexStream;
 			_jasixIndex  = new JasixIndex(_indexStream);
 
@@ -70,7 +73,7 @@ namespace Jasix
 		{
 			foreach (var chrName in _jasixIndex.GetChromosomeList())
 			{
-				Console.WriteLine(chrName);
+                _writer.WriteLine(chrName);
 			}
 		}
 
@@ -78,27 +81,29 @@ namespace Jasix
 		{
 
 			var headerString = _jasixIndex.HeaderLine;
-			Console.WriteLine("{" + headerString+"}");
+			_writer.WriteLine("{" + headerString+"}");
 		}
 
 		
-		public void ProcessQuery(string queryString, bool printHeader = false)
+		public void ProcessQuery(IEnumerable<string> queryStrings, bool printHeader = false)
 		{
-			var query = Utilities.ParseJasixPosition(queryString);
-			
-			Console.Write("{");
+			_writer.Write("{");
 			if (printHeader)
 			{
 				var headerString = _jasixIndex.HeaderLine;
-				Console.Write(headerString + ",");
+				_writer.Write(headerString + ",");
 			}
-			Utilities.PrintQuerySectionOpening(JasixCommons.SectionToIndex);
+			Utilities.PrintQuerySectionOpening(JasixCommons.SectionToIndex, _writer);
 
-			var needComma = PrintLargeVariantsExtendingIntoQuery(query);
-			PrintAllVariantsFromQueryBegin(query,needComma);
+		    foreach (var queryString in queryStrings)
+            {
+                var query = Utilities.ParseQuery(queryString);
+                var needComma = PrintLargeVariantsExtendingIntoQuery(query);
+                PrintAllVariantsFromQueryBegin(query, needComma);
+            }
 
-			Utilities.PrintQuerySectionClosing();
-			Console.WriteLine("}");
+            Utilities.PrintQuerySectionClosing(_writer);
+			_writer.WriteLine("}");
 
 		}
 
@@ -106,7 +111,7 @@ namespace Jasix
 		{
 			foreach (var line in ReadOverlappingJsonLines(query))
 			{
-				Utilities.PrintJsonEntry(line, needComma);
+				Utilities.PrintJsonEntry(line, needComma, _writer);
 				needComma = true;
 			}
 
@@ -116,7 +121,7 @@ namespace Jasix
 			var needComma = false;
 			foreach (var line in ReadJsonLinesExtendingInto(query))
 			{
-				Utilities.PrintJsonEntry(line, needComma);
+				Utilities.PrintJsonEntry(line, needComma, _writer);
 				needComma = true;
 			}
 

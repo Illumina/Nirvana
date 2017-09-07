@@ -95,7 +95,7 @@ namespace UnitTests.Jasix
 			    Assert.Equal("\"header\":{\"annotator\":\"Illumina Annotation Engine 1.3.3.1633\",\"creationTime\":\"2016-12-09 09:49:24\",\"genomeAssembly\":\"GRCh37\",\"schemaVersion\":4,\"dataVersion\":\"84.22.36\",\"dataSources\":[{\"name\":\"VEP\",\"version\":\"84\",\"description\":\"Ensembl\",\"releaseDate\":\"2016-04-29\"},{\"name\":\"phyloP\",\"version\":\"hg19\",\"description\":\"46 way conservation score between humans and 45 other vertebrates\",\"releaseDate\":\"2009-11-10\"},{\"name\":\"OMIM\",\"version\":\"unknown\",\"description\":\"An Online Catalog of Human Genes and Genetic Disorders\",\"releaseDate\":\"2016-09-02\"},{\"name\":\"dbSNP\",\"version\":\"147\",\"description\":\"Identifiers for observed variants\",\"releaseDate\":\"2016-06-01\"},{\"name\":\"COSMIC\",\"version\":\"78\",\"description\":\"Somatic mutation and related details and information relating to human cancers\",\"releaseDate\":\"2016-09-05\"},{\"name\":\"1000 Genomes Project\",\"version\":\"Phase 3 v5a\",\"description\":\"A public catalogue of human variation and genotype data\",\"releaseDate\":\"2013-05-27\"},{\"name\":\"EVS\",\"version\":\"2\",\"releaseDate\":\"2013-11-13\"},{\"name\":\"ExAC\",\"version\":\"0.3.1\",\"description\":\"Allele frequency data from the ExAC project\",\"releaseDate\":\"2016-03-16\"},{\"name\":\"ClinVar\",\"version\":\"unknown\",\"description\":\"A freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence\",\"releaseDate\":\"2016-09-01\"},{\"name\":\"DGV\",\"version\":\"unknown\",\"description\":\"Provides a comprehensive summary of structural variation in the human genome\",\"releaseDate\":\"2016-05-15\"},{\"name\":\"ClinGen\",\"version\":\"unknown\",\"releaseDate\":\"2016-04-14\"}]}", header);
 
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:9775924"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:9775924"));
 			    Assert.Equal(1, results.Count());
 		    }
 	    }
@@ -109,7 +109,7 @@ namespace UnitTests.Jasix
 		    using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
 		    {
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:9775924-9778952"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:9775924-9778952"));
 			    Assert.Equal(3, results.Count());
 
 		    }
@@ -125,7 +125,7 @@ namespace UnitTests.Jasix
 		    using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
 		    {
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:27023180-27023190"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:27023180-27023190"));
 			    Assert.Equal(2, results.Count());
 		    }
 	    }
@@ -139,7 +139,7 @@ namespace UnitTests.Jasix
 		    using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
 		    {
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1"));
 
 			    Assert.Equal(422, results.Count());
 		    }
@@ -154,12 +154,12 @@ namespace UnitTests.Jasix
 		    using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
 		    {
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:16378-17000"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:16378-17000"));
 
 			    Assert.Equal(3, results.Count());
 
 			    results =
-				    qp.ReadJsonLinesExtendingInto(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:16378-17000"));
+				    qp.ReadJsonLinesExtendingInto(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:16378-17000"));
 
 			    Assert.Equal(1, results.Count());
 			}
@@ -174,12 +174,12 @@ namespace UnitTests.Jasix
 		    using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
 		    {
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:19004-20000"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:19004-20000"));
 
 			    Assert.Equal(3, results.Count());
 
 			    results =
-				    qp.ReadJsonLinesExtendingInto(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:19004-20000"));
+				    qp.ReadJsonLinesExtendingInto(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:19004-20000"));
 
 			    Assert.Equal(2, results.Count());
 		    }
@@ -194,12 +194,12 @@ namespace UnitTests.Jasix
 		    using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
 		    {
 			    var results =
-				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:46993-50000"));
+				    qp.ReadOverlappingJsonLines(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:46993-50000"));
 
 			    Assert.Equal(5, results.Count());
 
 			    results =
-				    qp.ReadJsonLinesExtendingInto(global::Jasix.DataStructures.Utilities.ParseJasixPosition("chr1:46993-50000"));
+				    qp.ReadJsonLinesExtendingInto(global::Jasix.DataStructures.Utilities.ParseQuery("chr1:46993-50000"));
 
 			    Assert.Equal(0, results.Count());
 		    }

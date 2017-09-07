@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
@@ -11,7 +12,7 @@ namespace Jasix.DataStructures
         private const char OpenBracket  = '[';
         private const char CloseBracket = ']';
 
-        public static Tuple<string, int, int> ParseJasixPosition(string position)
+        public static Tuple<string, int, int> ParseQuery(string position)
         {
             //chr1:100-101
             //chr1:100
@@ -33,21 +34,21 @@ namespace Jasix.DataStructures
             return Tuple.Create(chromosome, start, end);
         }
 
-	    public static void PrintQuerySectionOpening(string sectionName)
+	    public static void PrintQuerySectionOpening(string sectionName, StreamWriter writer)
 	    {
-		    Console.Write(DoubleQuote + sectionName + DoubleQuote+ ":" + OpenBracket + Environment.NewLine);
+		    writer.Write(DoubleQuote + sectionName + DoubleQuote+ ":" + OpenBracket + Environment.NewLine);
 	    }
 
-	    public static void PrintQuerySectionClosing()
+	    public static void PrintQuerySectionClosing(StreamWriter writer)
 	    {
-		    Console.Write(Environment.NewLine + CloseBracket);
+		    writer.Write(Environment.NewLine + CloseBracket);
 	    }
 
-	    public static void PrintJsonEntry(string entry, bool needComma)
+	    public static void PrintJsonEntry(string entry, bool needComma, StreamWriter writer)
 	    {
 		    if (needComma)
-			    Console.Write("," + Environment.NewLine);
-			Console.Write(entry);
+			    writer.Write("," + Environment.NewLine);
+			writer.Write(entry);
 		}
 
 	    public static bool IsLargeVariant(int start, int end)
