@@ -10,6 +10,7 @@ namespace VariantAnnotation.AnnotatedPositions
     public sealed class AnnotatedVariant : IAnnotatedVariant
     {
         public IVariant Variant { get; }
+        public string HgvsgNotation { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; }    = new List<IAnnotatedRegulatoryRegion>();
         public IList<IAnnotatedTranscript> EnsemblTranscripts { get; }         = new List<IAnnotatedTranscript>();
         public IList<IAnnotatedTranscript> RefSeqTranscripts { get; }          = new List<IAnnotatedTranscript>();
@@ -55,6 +56,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
 	        var variantType = GetVariantType(Variant.Type);
 			jsonObject.AddStringValue("variantType", variantType.ToString());
+            jsonObject.AddStringValue("hgvsg",HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
 
