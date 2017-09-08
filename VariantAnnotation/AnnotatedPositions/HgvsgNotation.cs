@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
@@ -29,51 +28,12 @@ namespace VariantAnnotation.AnnotatedPositions
                 start = end - referenceBases.Length + 1;
             }
 
-            return FormatNotation(start,end,referenceAssertion,referenceBases,alternateBases,type);
+            return  HgvsUtilities.FormatDnaNotation(start.ToString(),end.ToString(),referenceAssertion,referenceBases,alternateBases,type,NotationType);
         }
 
 
 
 
-        private static string FormatNotation(int start,int end,string referenceAsserionNumber,string referenceBases,string alternateBases, GenomicChange type)
-        {
-            var sb = new StringBuilder();
-            // all start with transcript name & numbering type
-            sb.Append(referenceAsserionNumber + ':' + NotationType + '.');
 
-            // handle single and multiple positions
-            string coordinates = start == end
-                ? start.ToString()
-                : start.ToString() + '_' + end;
-
-            // format rest of string according to type
-            // note: inversion and multiple are never assigned as genomic changes
-            switch (type)
-            {
-                case GenomicChange.Deletion:
-                    sb.Append(coordinates + "del" + referenceBases);
-                    break;
-                case GenomicChange.Inversion:
-                    sb.Append(coordinates + "inv" + referenceBases);
-                    break;
-                case GenomicChange.Duplication:
-                    sb.Append(coordinates + "dup" + referenceBases);
-                    break;
-                case GenomicChange.Substitution:
-                    sb.Append(start + referenceBases + '>' + alternateBases);
-                    break;
-                case GenomicChange.DelIns:
-                    sb.Append(coordinates + "delins" + alternateBases);
-                    break;
-                case GenomicChange.Insertion:
-                    sb.Append(coordinates + "ins" + alternateBases);
-                    break;
-
-                default:
-                    throw new InvalidOperationException("Unhandled genomic change found: " + type);
-            }
-
-            return sb.ToString();
-        }
     }
 }

@@ -18,7 +18,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [InlineData(5, 7, "GTG", "", VariantType.deletion, "NC_012920.1:g.5_7delGTG")]
         [InlineData(10, 12, "GAC", "", VariantType.deletion, "NC_012920.1:g.12_14delCGA")]
         [InlineData(16, 15, "", "GATA", VariantType.insertion, "NC_012920.1:g.15_16insGATA")]
-        [InlineData(19,22, "TGAC", "GATA", VariantType.MNV, "NC_012920.1:g.19_22delinsGATA")]
+        //[InlineData(19,22, "TGAC", "GATA", VariantType.MNV, "NC_012920.1:g.19_22delinsGATA")]
         [InlineData(19,22, "TGAC", "GTCA", VariantType.MNV, "NC_012920.1:g.19_22invTGAC")]
         [InlineData(10, 9, "","GAC", VariantType.insertion, "NC_012920.1:g.12_14dupCGA")]
         public void GetNotation_tests(int start,int end,string referenceAllele,string altAllele, VariantType type, string expectedHgvsg)
@@ -26,9 +26,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var simpleVariant = new SimpleVariant(null,start,end,referenceAllele,altAllele,type);
             var observedHgvsg = HgvsgNotation.GetNotation(ReferenceAssertion, simpleVariant, _simpleSequence, _referenceInterval);
             Assert.Equal(expectedHgvsg,observedHgvsg);
-
-
-
         }
     }
 }

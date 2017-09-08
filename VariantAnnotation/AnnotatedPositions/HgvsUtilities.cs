@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using CommonUtilities;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions.Transcript;
@@ -292,5 +293,47 @@ namespace VariantAnnotation.AnnotatedPositions
 		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(variantAllele) : variantAllele;
 	    }
 
-	}
+        public static string FormatDnaNotation(string start, string end, string referenceId, string referenceBases, string alternateBases, GenomicChange type,char notationType)
+        {
+            var sb = new StringBuilder();
+            // all start with transcript name & numbering type
+            sb.Append(referenceId + ':' + notationType + '.');
+
+            // handle single and multiple positions
+            string coordinates = start == end
+                ? start
+                : start + '_' + end;
+
+            // format rest of string according to type
+            // note: inversion and multiple are never assigned as genomic changes
+            switch (type)
+            {
+                case GenomicChange.Deletion:
+                    sb.Append(coordinates + "del" + referenceBases);
+                    break;
+                case GenomicChange.Inversion:
+                    sb.Append(coordinates + "inv" + referenceBases);
+                    break;
+                case GenomicChange.Duplication:
+                    sb.Append(coordinates + "dup" + referenceBases);
+                    break;
+                case GenomicChange.Substitution:
+                    sb.Append(start + referenceBases + '>' + alternateBases);
+                    break;
+                case GenomicChange.DelIns:
+                    sb.Append(coordinates + "del" + referenceBases + "ins" + alternateBases); //TODO: change to delins, now use del--ins-- to reduce anavarin differences
+                    //sb.Append(coordinates + "delins" + alternateBases);
+                    break;
+                case GenomicChange.Insertion:
+                    sb.Append(coordinates + "ins" + alternateBases);
+                    break;
+
+                default:
+                    throw new InvalidOperationException("Unhandled genomic change found: " + type);
+            }
+
+            return sb.ToString();
+        }
+
+    }
 }
