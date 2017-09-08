@@ -67,7 +67,7 @@ namespace VariantAnnotation.AnnotatedPositions
 		/// <summary>
 		/// get the genomic change that resulted from this variation [Sequence.pm:482 hgvsvariant_notation]
 		/// </summary>
-		private static GenomicChange GetGenomicChange(IInterval interval, bool onReverseStrand, ISequence refSequence, ISimpleVariant variant)
+		public static GenomicChange GetGenomicChange(IInterval interval, bool onReverseStrand, ISequence refSequence, ISimpleVariant variant)
 		{
 			
 			// length of the reference allele. Negative lengths make no sense

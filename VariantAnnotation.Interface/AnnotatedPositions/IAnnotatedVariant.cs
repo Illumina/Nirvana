@@ -7,6 +7,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 	{
 		IVariant Variant { get; }
 
+        string HgvsgNotation { get; set; }
         IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get;  }
 	    IList<IAnnotatedTranscript> EnsemblTranscripts { get; }
 	    IList<IAnnotatedTranscript> RefSeqTranscripts { get; }

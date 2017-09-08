@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
@@ -51,6 +53,13 @@ namespace VariantAnnotation.Providers
 
             annotatedPosition.CytogeneticBand = _cytogeneticBands.GetCytogeneticBand(annotatedPosition.Position.Chromosome, annotatedPosition.Position.Start,
                 annotatedPosition.Position.End);
+
+            if (annotatedPosition.Position.Chromosome.UcscName != "chrM") return;
+            var assertionNumber = "NC_012920.1";
+            foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
+            {
+                annotatedVariant.HgvsgNotation =  HgvsgNotation.GetNotation(assertionNumber,annotatedVariant.Variant,Sequence,new Interval(0,Sequence.Length));
+            }
         }
 
         public void LoadChromosome(IChromosome chromosome)

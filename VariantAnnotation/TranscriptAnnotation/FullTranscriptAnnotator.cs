@@ -45,7 +45,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var consequences = GetConsequences(transcript, variant, variantEffect);
 
             bool shiftToEnd;
-            var rightShiftedVariant = VariantRotator.Right(variant, transcript, refSequence, out shiftToEnd);
+            var rightShiftedVariant = VariantRotator.Right(variant, transcript, refSequence, transcript.Gene.OnReverseStrand, out shiftToEnd);
             var hgvsCoding = shiftToEnd
                 ? null
                 : HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant ?? variant, refSequence);
