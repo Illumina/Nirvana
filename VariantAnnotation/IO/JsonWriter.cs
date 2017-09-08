@@ -11,6 +11,8 @@ namespace VariantAnnotation.IO
         private readonly StreamWriter _writer;
         private bool _firstEntry;
         private bool _positionFieldClosed;
+        public string Header { get; private set; }
+        public long Location => _writer.BaseStream.Position;
 
         public JsonWriter(StreamWriter writer, string annotator, string creationTime, string vepDataVersion,
             List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
@@ -42,7 +44,8 @@ namespace VariantAnnotation.IO
             if (sampleNames != null) jsonObject.AddStringValues("samples", sampleNames);
             sb.Append("},\"positions\":[\n");
 
-            _writer.Write(sb.ToString());
+            Header = sb.ToString();
+            _writer.Write(Header);
         }
 
         public void Dispose()
