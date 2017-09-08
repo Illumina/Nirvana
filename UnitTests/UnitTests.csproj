@@ -14,6 +14,7 @@
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\Jasix\Jasix.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
     <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />

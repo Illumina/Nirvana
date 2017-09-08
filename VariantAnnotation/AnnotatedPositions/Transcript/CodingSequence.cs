@@ -5,7 +5,7 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
-    public sealed class CodingSequence:ISequence
+    public sealed class CodingSequence : ISequence
     {
         #region members
 
@@ -25,11 +25,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public CodingSequence(ISequence compressedSequence, int start, int end, ICdnaCoordinateMap[] cdnaMaps,
             bool geneOnReverseStrand, byte? startExonPhase)
         {
-            _start = start;
-            _end = end;
-            _cdnaMaps = cdnaMaps;
+            _start               = start;
+            _end                 = end;
+            _cdnaMaps            = cdnaMaps;
             _geneOnReverseStrand = geneOnReverseStrand;
-            _startExonPhase = startExonPhase ?? 0;            
+            _startExonPhase      = startExonPhase ?? 0;
             _compressedSequence = compressedSequence;
         }
 
@@ -97,6 +97,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public string Substring(int offset, int length)
         {
             if(_sequence ==null) _sequence = GetCodingSequence(_compressedSequence);
+
             return _sequence.Substring(offset, length);
         }
     }
