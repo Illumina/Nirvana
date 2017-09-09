@@ -12,8 +12,7 @@ namespace VariantAnnotation.IO
         private bool _firstEntry;
         private bool _positionFieldClosed;
         public string Header { get; private set; }
-        public long Location => _writer.BaseStream.Position;
-
+        
         public JsonWriter(StreamWriter writer, string annotator, string creationTime, string vepDataVersion,
             List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
         {

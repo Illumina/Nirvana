@@ -1,11 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Compression.Utilities;
 
 namespace Compression.FileHandling
 {
-    public class BgzipTextWriter : IDisposable
+    public sealed class BgzipTextWriter : StreamWriter, IDisposable
     {
         readonly BlockGZipStream _bgzipStream;
         private readonly byte[] _buffer;
@@ -13,7 +14,6 @@ namespace Compression.FileHandling
         private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
 
         public long Position => _bgzipStream.Position + _bufferIndex;
-        private long _totalBytesWritten;
 
 
         #region IDisposable
@@ -57,23 +57,28 @@ namespace Compression.FileHandling
         {
         }
 
-        public BgzipTextWriter(BlockGZipStream bgzipStream)
+        public BgzipTextWriter(BlockGZipStream bgzipStream):base(bgzipStream)
         {
             _buffer = new byte[BufferSize];//4kb blocks
             _bgzipStream = bgzipStream;
         }
 
-        private void Flush()
+        public override void Flush()
         {
             if (_bufferIndex == 0) return;
             _bgzipStream.Write(_buffer, 0, _bufferIndex);
             _bufferIndex = 0;
         }
-        public void Write(string line)
+
+        public override void WriteLine(string s)
+        {
+            Write(s+"\n");
+        }
+
+        public override void Write(string line)
         {
             if (string.IsNullOrEmpty(line)) return;
             var lineBytes = Encoding.UTF8.GetBytes(line);
-            _totalBytesWritten += lineBytes.Length;
 
             if (lineBytes.Length <= BufferSize - _bufferIndex)
             {

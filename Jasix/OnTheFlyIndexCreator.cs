@@ -6,6 +6,7 @@ using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 
 namespace Jasix
@@ -67,7 +68,7 @@ namespace Jasix
 
         public void Add(IPosition position, long fileLocation)
         {
-            var chromName = position.Chromosome.UcscName;
+            var chromName = position.VcfFields[VcfCommon.ChromIndex];//we want to preserve the chrom name from input
             var start     = position.Start;
             var end       = position.InfoData.End;
 

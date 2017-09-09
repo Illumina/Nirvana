@@ -5,6 +5,7 @@ using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
+using Compression.FileHandling;
 using ErrorHandling;
 using Jasix;
 using Jasix.DataStructures;
@@ -58,9 +59,10 @@ namespace Nirvana
 
             var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
             var jasixFileName = ConfigurationSettings.OutputFileName + ".json.gz" + JasixCommons.FileExt;
+            var outputWriter = ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName);
 
             using (var vcfReader  = ReadWriteUtilities.GetVcfReader(ConfigurationSettings.VcfPath, sequenceProvider.GetChromosomeDictionary(), refMinorProvider,ConfigurationSettings.ReportAllSvOverlappingTranscripts))
-            using (var jsonWriter = new JsonWriter(ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName), _nirvanaVersion, Date.CurrentTimeStamp, vepDataVersion, dataSourceVesions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
+            using (var jsonWriter = new JsonWriter(outputWriter, _nirvanaVersion, Date.CurrentTimeStamp, vepDataVersion, dataSourceVesions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
             using (var vcfWriter = ConfigurationSettings.Vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(ConfigurationSettings.OutputFileName), vcfReader.GetHeaderLines(), _nirvanaVersion, vepDataVersion, dataSourceVesions) : null)
             using (var gvcfWriter = ConfigurationSettings.Gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(ConfigurationSettings.OutputFileName), vcfReader.GetHeaderLines(), _nirvanaVersion, vepDataVersion, dataSourceVesions) : null)
             using (var jasixIndexCreator = new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)))
@@ -88,7 +90,12 @@ namespace Nirvana
                         var annotatedPosition = annotator.Annotate(position);
 
                         var jsonOutput = annotatedPosition.GetJsonString();
-                        if (jsonOutput!=null) jasixIndexCreator.Add(annotatedPosition.Position, jsonWriter.Location);
+                        if (jsonOutput != null)
+                        {
+                            var bgzipTextWriter = outputWriter as BgzipTextWriter;
+                            if (bgzipTextWriter!=null)
+                                jasixIndexCreator.Add(annotatedPosition.Position, bgzipTextWriter.Position);
+                        }
                         jsonWriter.WriteJsonEntry(jsonOutput);
 
                         if (annotatedPosition.AnnotatedVariants?.Length > 0) vcfWriter?.Write(_conversion.Convert(annotatedPosition));

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Compression.FileHandling;
 using Compression.Utilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
@@ -15,9 +16,10 @@ namespace Nirvana
 		{
 		    return ConfigurationSettings.OutputFileName == "-"
 		        ? new StreamWriter(Console.OpenStandardOutput())
-		        : GZipUtilities.GetStreamWriter(outputPath+".json.gz");
+		        : new BgzipTextWriter(outputPath + ".json.gz");
+		    //: GZipUtilities.GetStreamWriter(outputPath+".json.gz");
 
-        }
+		}
 
 	    internal static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary,IRefMinorProvider refMinorProvider,bool verboseTranscript)
 		{
