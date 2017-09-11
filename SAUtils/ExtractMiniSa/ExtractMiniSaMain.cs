@@ -76,7 +76,7 @@ namespace SAUtils.ExtractMiniSa
 	                commandLineExample)
 	            .ShowErrors()
 	            .Execute(extractor.ProgramExecution);
-	        ;
+	        
 	        return exitCode;
 	    }
 	}

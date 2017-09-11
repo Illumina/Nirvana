@@ -1,9 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
-using XmlTextReader = System.Xml.XmlReader;
-using VariantAnnotation.FileHandling.Compression;
 using VariantAnnotation.Utilities;
+using Compression.Utilities;
 
 namespace ExtractMiniXml
 {
