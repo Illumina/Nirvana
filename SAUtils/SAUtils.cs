@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
+using ExtractMiniXml;
 using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimTsv;
 using SAUtils.ExtractMiniSa;
@@ -15,11 +16,11 @@ namespace SAUtils
         {
             var ops = new Dictionary<string, TopLevelOption>
             {
-                ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
                 ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvsMain.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
+                ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
-
+                ["extractMiniXml"] = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
             };
 
 
