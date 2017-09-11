@@ -1,7 +1,7 @@
 ﻿using System;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Utilities;
 
@@ -11,7 +11,7 @@ namespace VariantAnnotation.Algorithms
     {
         internal const int MaxDownstreamLength = 500;
 
-        public static ISimpleVariant Right(ISimpleVariant simpleVariant, ITranscript transcript, ISequence refSequence,
+        public static ISimpleVariant Right(ISimpleVariant simpleVariant, IInterval rotateRegion, ISequence refSequence, bool onReverseStrand,
             out bool shiftToEnd)
         {
             shiftToEnd = false;
@@ -20,22 +20,21 @@ namespace VariantAnnotation.Algorithms
             if (simpleVariant.Type != VariantType.deletion && simpleVariant.Type != VariantType.insertion)
                 return simpleVariant;
 
-            var onReverseStrand = transcript.Gene.OnReverseStrand;
 
             // if variant is before the transcript start, do not perform 3 prime shift
-            if (onReverseStrand  && simpleVariant.End   > transcript.End)   return simpleVariant;
-            if (!onReverseStrand && simpleVariant.Start < transcript.Start) return simpleVariant;
+            if (onReverseStrand  && simpleVariant.End   > rotateRegion.End)   return simpleVariant;
+            if (!onReverseStrand && simpleVariant.Start < rotateRegion.Start) return simpleVariant;
 
             // consider insertion since insertion begin is larger than end
             // TODO: we shouldn't need special logic for insertions
-            if (!onReverseStrand && simpleVariant.Start >= transcript.End)   return simpleVariant;
+            if (!onReverseStrand && simpleVariant.Start >= rotateRegion.End)   return simpleVariant;
             // TODO: unable to find a situation where this is true
-            if (onReverseStrand  && simpleVariant.End   <= transcript.Start) return simpleVariant;
+            if (onReverseStrand  && simpleVariant.End   <= rotateRegion.Start) return simpleVariant;
 
             var rotatingBases = simpleVariant.Type == VariantType.insertion ? simpleVariant.AltAllele : simpleVariant.RefAllele;
             rotatingBases     = onReverseStrand ? SequenceUtilities.GetReverseComplement(rotatingBases) : rotatingBases;
 
-            var basesToEnd       = onReverseStrand ? simpleVariant.Start - transcript.Start : transcript.End - simpleVariant.End;
+            var basesToEnd       = onReverseStrand ? simpleVariant.Start - rotateRegion.Start : rotateRegion.End - simpleVariant.End;
             var downStreamLength = Math.Min(basesToEnd, MaxDownstreamLength);
 
             var downStreamSeq = onReverseStrand
