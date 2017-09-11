@@ -9,6 +9,11 @@
       "commandName": "Project",
       "commandLineArgs": "createOMIM --gi ..\\gene_info_2016-10-17 --gi ..\\gene_info_2011-08-28 --hgnc ..\\hgnc_complete_set_2016-10-17.txt --mim mim2gene.txt --in genemap2.txt --out test",
       "workingDirectory": "E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15"
+    },
+    "RR_sautils": {
+      "commandName": "Project",
+      "commandLineArgs": "createTSV --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cvr C:\\Development\\TestDatasets\\OneMillion.xml -o TestSa",
+      "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
 }
