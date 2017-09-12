@@ -17,8 +17,6 @@ namespace Nirvana
 		    return ConfigurationSettings.OutputFileName == "-"
 		        ? new StreamWriter(Console.OpenStandardOutput())
 		        : new BgzipTextWriter(outputPath + ".json.gz");
-		    //: GZipUtilities.GetStreamWriter(outputPath+".json.gz");
-
 		}
 
 	    internal static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary,IRefMinorProvider refMinorProvider,bool verboseTranscript)
@@ -38,7 +36,6 @@ namespace Nirvana
 	        return ConfigurationSettings.OutputFileName == "-"
 	            ? new StreamWriter(Console.OpenStandardOutput())
 	            : GZipUtilities.GetStreamWriter(outputPath + ".genome.vcf.gz");
-
 	    }
     }
 }
