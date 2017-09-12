@@ -587,12 +587,12 @@ namespace SAUtils.InputFileParsers.ClinVar
 							{
 								case "PubMed":
 									var value = child.StringValues[0].TrimEnd('.');
-									value = value.TrimStart('0');
-									if (value.All(char.IsDigit) && value.Length <= 8)//pubmed ids with more than 9 digits are bad
-										_pubMedIds.Add(Convert.ToInt64(value));
-
-									break;
-
+								    {
+                                        if (long.TryParse(value, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
+                                            _pubMedIds.Add(l);
+                                        else Console.WriteLine($"WARNING:unexpected pubmedID {value}.");
+								    }
+								    break;
 							}
 						}
 						break;
