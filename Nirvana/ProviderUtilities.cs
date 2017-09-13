@@ -6,7 +6,6 @@ using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Utilities;
 
@@ -51,7 +50,7 @@ namespace Nirvana
 	    public static IGeneAnnotationProvider[] GetGeneAnnotationProviders(List<string> supplementaryAnnotationDirectories)
 	    {
 
-	        var reader = OmimDatabaseCommon.GetOmimDatabaseReader(supplementaryAnnotationDirectories);
+	        var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories);
 	        if (reader == null) return null;
             var geneAnnotationProviders = new IGeneAnnotationProvider[1];
 	        geneAnnotationProviders[0] = new OmimAnnotationProvider(reader);

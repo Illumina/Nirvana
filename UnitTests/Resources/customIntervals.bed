@@ -1,0 +1,17 @@
+##fileformat=BED
+##IAE_TOP=<TYPE=IcslIntervals>
+##IAE_INFO=<Index=0,Type=String,JSON=gene>
+##IAE_INFO=<Index=1,Type=decimal,JSON=score>
+##IAE_INFO=<Index=2,Type=decimal,JSON=exacScore>
+##IAE_INFO=<Index=3,Type=String,JSON=assesment>
+chr1	69090	70008	OR4F5;0.0;3.60208899915;Some_evidence_of_constraint
+chr1	861120	879582	SAMD11;0.997960686608;-3.7861959419;Minimal_evidence_of_constraint
+chr1	879582	894679	NOC2L;1.06377909819;-2.27589188516;Minimal_evidence_of_constraint
+chr1	895966	901099	KLHL17;2.19552871985;0.5755863106;Some_evidence_of_constraint
+chr1	901876	910484	PLEKHN1;1.14858456842;-3.32894156577;Minimal_evidence_of_constraint
+chr1	910578	917497	PERM1;0.0;0.0;No_basis_for_assertions_regarding_constraint
+chr1	934343	935552	HES4;-0.42231915795;1.80096446546;Some_evidence_of_constraint
+chr1	948846	949919	ISG15;0.0;0.21278581045;Minimal_evidence_of_constraint
+chr1	955502	991499	AGRN;1.92178342222;0.140544378073;Some_evidence_of_constraint
+chr1	1007125	1009687	RNF223;-1.12440088649;0.0;Minimal_evidence_of_constraint
+chr1	1017197	1051736	C1orf159;-1.25678031393;-0.419915664663;Minimal_evidence_of_constraint

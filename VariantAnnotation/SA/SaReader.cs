@@ -31,6 +31,7 @@ namespace VariantAnnotation.SA
         public IEnumerable<Interval<ISupplementaryInterval>> SvIntervals { get; }
         public IEnumerable<Interval<ISupplementaryInterval>> AllVariantIntervals { get; }
         public ISupplementaryAnnotationHeader Header { get; }
+        public IEnumerable<Tuple<int, string>> GlobalMajorAlleleInRefMinors { get; }
 
         /// <summary>
         /// constructor
@@ -51,9 +52,9 @@ namespace VariantAnnotation.SA
             SmallVariantIntervals = GetIntervals();
             SvIntervals = GetIntervals();
             AllVariantIntervals = GetIntervals();
+            GlobalMajorAlleleInRefMinors = _index.GlobalMajorAlleleForRefMinor;
         }
 
-        public bool IsRefMinor(int position) => _index.IsRefMinor(position);
 
         public void Dispose()
         {
@@ -70,10 +71,10 @@ namespace VariantAnnotation.SA
             var schemaVersion = reader.ReadUInt16();
             var genomeAssembly = (GenomeAssembly)reader.ReadByte();
 
-            if (header != SupplementaryAnnotationCommon.DataHeader ||
-                schemaVersion != SupplementaryAnnotationCommon.SchemaVersion)
+            if (header != SaDataBaseCommon.DataHeader ||
+                schemaVersion != SaDataBaseCommon.SchemaVersion)
             {
-                throw new UserErrorException($"The header check failed for the supplementary annotation file: ID: exp: {SupplementaryAnnotationCommon.DataHeader} obs: {header}, schema version: exp:{SupplementaryAnnotationCommon.SchemaVersion} obs: {schemaVersion}");
+                throw new UserErrorException($"The header check failed for the supplementary annotation file: ID: exp: {SaDataBaseCommon.DataHeader} obs: {header}, schema version: exp:{SaDataBaseCommon.SchemaVersion} obs: {schemaVersion}");
             }
 
             var creationTimeTicks = reader.ReadInt64();

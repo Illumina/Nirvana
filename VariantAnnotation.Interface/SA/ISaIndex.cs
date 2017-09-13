@@ -1,9 +1,10 @@
-﻿namespace VariantAnnotation.Interface.SA
+﻿using System;
+
+namespace VariantAnnotation.Interface.SA
 {
     public interface ISaIndex
     {
-        int[] RefMinorPositions { get; }
+        Tuple<int, string>[] GlobalMajorAlleleForRefMinor { get; }
         long GetOffset(int position);
-        bool IsRefMinor(int position);
     }
 }

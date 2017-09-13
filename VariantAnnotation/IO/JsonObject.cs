@@ -99,47 +99,44 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// adds the string KVP to the string builder
-        /// TODO: Should dot (.) removal actually be part of this method?
-        /// </summary>
-        public void AddStringValues(string description, string[] values, bool useQuote = true)
+        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote=true)
         {
-            if (values == null) return;
+	        if (values == null) return;
+		    var index = 0;
 
-            // removing '.'s from the list of values
-            var valueList = values.Where(value => value != ".").ToList();
-            AddStringValues(description, valueList, useQuote);
-        }
+		    foreach (var value in values)
+		    {
+			    if (value == ".") continue;
 
-        private void AddStringValues(string description, List<string> valueList, bool useQuote)
-        {
-            if (valueList.Count == 0) return;
+			    if (index == 0)
+			    {
+				    if (_needsComma) _sb.Append(Comma);
+				    AddKey(description);
+				    _sb.Append(OpenBracket);
 
-            if (_needsComma) _sb.Append(Comma);
-            AddKey(description);
-            _sb.Append(OpenBracket);
+				    if (useQuote) _sb.Append(DoubleQuote);
+				    _sb.Append(value);
+				    if (useQuote) _sb.Append(DoubleQuote);
+			    }
+			    else
+			    {
+				    _sb.Append(Comma);
+				    if (useQuote) _sb.Append(DoubleQuote);
+				    _sb.Append(value);
+				    if (useQuote) _sb.Append(DoubleQuote);
+				}
+			    index++;
+		    }
 
-            if (useQuote) _sb.Append(DoubleQuote);
-            _sb.Append(valueList[0]);
-            if (useQuote) _sb.Append(DoubleQuote);
+			if (index > 0)
+				_sb.Append(CloseBracket);
+		    _needsComma = true;
+		}
 
-            for (var i = 1; i < valueList.Count; i++)
-            {
-                _sb.Append(Comma);
-                if (useQuote) _sb.Append(DoubleQuote);
-                _sb.Append(valueList[i]);
-                if (useQuote) _sb.Append(DoubleQuote);
-            }
-
-            _sb.Append(CloseBracket);
-            _needsComma = true;
-        }
-
-        /// <summary>
+	    /// <summary>
         /// adds the object values to this current JSON object
         /// </summary>
-        public void AddObjectValues<T>(string description, IList<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
+        public void AddObjectValues<T>(string description, IEnumerable<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
         {
             if (values == null) return;
 

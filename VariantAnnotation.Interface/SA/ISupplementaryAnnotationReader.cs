@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Interface.Intervals;
 
 namespace VariantAnnotation.Interface.SA
@@ -9,7 +10,7 @@ namespace VariantAnnotation.Interface.SA
         IEnumerable<Interval<ISupplementaryInterval>> SvIntervals { get; }
         IEnumerable<Interval<ISupplementaryInterval>> AllVariantIntervals { get; }
         ISupplementaryAnnotationHeader Header { get; }
-        bool IsRefMinor(int position);
+        IEnumerable<Tuple<int,string>> GlobalMajorAlleleInRefMinors { get; }
         ISaPosition GetAnnotation(int position);
     }
 }

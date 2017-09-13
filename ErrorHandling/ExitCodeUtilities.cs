@@ -63,7 +63,9 @@ namespace ErrorHandling
 			Console.Write("\nERROR: ");
 			Console.ResetColor();
 
-			Console.WriteLine("{0}", e.Message);
+            while (e.InnerException != null) e = e.InnerException;
+
+            Console.WriteLine("{0}", e.Message);
 
 			var exceptionType = e.GetType();
 

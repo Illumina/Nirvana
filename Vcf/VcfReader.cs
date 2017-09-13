@@ -6,8 +6,6 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
-using Vcf.Info;
-using Vcf.Sample;
 using Vcf.VariantCreator;
 
 namespace Vcf
@@ -118,7 +116,7 @@ namespace Vcf
         public IPosition GetNextPosition()
         {
             VcfLine = _reader.ReadLine();
-            return VcfLine == null ? null :VcfReaderUtils.ParseVcfLine(VcfLine,_variantFactory, _refNameToChromosome);
+            return String.IsNullOrEmpty(VcfLine) ? null :VcfReaderUtils.ParseVcfLine(VcfLine,_variantFactory, _refNameToChromosome);
         }
 
         public string VcfLine { get; private set; }

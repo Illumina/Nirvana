@@ -8,6 +8,7 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 
 namespace VariantAnnotation.PhyloP
 {
@@ -187,7 +188,7 @@ namespace VariantAnnotation.PhyloP
             var observedGuard = _reader.ReadUInt32();
             if (observedGuard != CacheConstants.GuardInt)
             {
-                throw new InvalidFileFormatException($"Expected a guard integer ({SupplementaryAnnotationCommon.GuardInt}), but found another value: ({observedGuard})");
+                throw new InvalidFileFormatException($"Expected a guard integer ({SaDataBaseCommon.GuardInt}), but found another value: ({observedGuard})");
             }
         }
 

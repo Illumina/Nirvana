@@ -2,8 +2,8 @@
   "profiles": {
     "Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": " -c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in breakEnd_dup.vcf -o test",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": "-i E:\\Data\\Nirvana\\bugfixes\\test_input2_GRCh37.vcf -c E:\\Data\\Nirvana\\Cache\\24\\GRCh37\\Both84 -r E:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat -o test_mother_new --sd \\\\ussd-prd-isi04\\Nirvana\\Development\\SupplementaryDatabase\\40\\GRCh37",
+      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
     },
     "YJ_Nirvana": {
       "commandName": "Project",
@@ -27,7 +27,7 @@
     },
     "Nirvana_sk": {
       "commandName": "Project",
-      "commandLineArgs": "--in E:\\temp\\test_input.vcf --cache E:\\Cache\\24\\GRCh37\\Ensembl84 --sd E:\\SupplementaryDatabase\\39.1\\GRCh37 --ref E:\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o sk_test",
+      "commandLineArgs": "-i \\\\ussd-prd-isi04\\Nirvana\\Data\\Zodiac\\Zodiac_Eco.vcf -c \\\\ussd-prd-isi04\\Nirvana\\Cache\\latest\\GRCh37\\Both84 -r \\\\ussd-prd-isi04\\Nirvana\\References\\latest\\Homo_sapiens.GRCh37.Nirvana.dat -o test_out --sd E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15\\test\\createSA\\",
       "workingDirectory": "E:\\temp",
       "environmentVariables": {
         "Key": "Value"

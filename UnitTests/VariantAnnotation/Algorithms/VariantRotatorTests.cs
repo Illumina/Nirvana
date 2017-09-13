@@ -16,7 +16,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         private readonly ISequence _refSequence =
             new SimpleSequence(
                 new string('A', VariantRotator.MaxDownstreamLength) + "ATGTGTGTGTGCAGT" +
-                new string('A', VariantRotator.MaxDownstreamLength), 961391);
+                new string('A', VariantRotator.MaxDownstreamLength), 965891);
 
         [Fact]
         public void Right_Deletion()
@@ -30,7 +30,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
             bool shiftToEnd;
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, out shiftToEnd);
+            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence,transcript.Object.Gene.OnReverseStrand,out shiftToEnd);
 
             Assert.NotNull(rotatedVariant);
             Assert.False(ReferenceEquals(variant.Object, rotatedVariant));
@@ -50,7 +50,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
             bool shiftToEnd;
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, out shiftToEnd);
+            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out shiftToEnd);
 
             Assert.NotNull(rotatedVariant);
             Assert.False(ReferenceEquals(variant.Object, rotatedVariant));
@@ -63,7 +63,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         public void Right_Identity_WhenRefSequenceNull()
         {
             var originalVariant = GetDeletion();
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, null, out _);
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, null, false, out _);
             Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
         }
 
@@ -72,7 +72,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         {
             var originalVariant = GetDeletion();
             originalVariant.SetupGet(x => x.Type).Returns(VariantType.SNV);
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, _refSequence, out _);
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, _refSequence, false, out _);
             Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
         }
 
@@ -85,7 +85,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.Start).Returns(966397);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, out _);
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out _);
             Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
         }
 
@@ -98,7 +98,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966390);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, out _);
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out _);
             Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
         }
 
@@ -111,7 +111,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966392);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, out _);
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out _);
             Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
         }
 
@@ -122,14 +122,14 @@ namespace UnitTests.VariantAnnotation.Algorithms
 
             ISequence refSequence = new SimpleSequence(
                 new string('A', VariantRotator.MaxDownstreamLength) + "GAGAGTTAGGTA" +
-                new string('A', VariantRotator.MaxDownstreamLength), 961391);
+                new string('A', VariantRotator.MaxDownstreamLength), 965891);
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Start).Returns(966300);
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, refSequence, out _);
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, refSequence, transcript.Object.Gene.OnReverseStrand, out _);
             Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
         }
 

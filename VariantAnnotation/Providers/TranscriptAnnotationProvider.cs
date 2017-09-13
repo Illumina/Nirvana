@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.Interface.Positions;
@@ -21,13 +18,13 @@ namespace VariantAnnotation.Providers
     {
         private const int MaxSvLengthForRegulatoryRegionAnnotation = 50000;
 
-        private static readonly string[] _siftDescriptions =
+        private static readonly string[] SiftDescriptions =
         {
             "tolerated", "deleterious", "tolerated - low confidence",
             "deleterious - low confidence"
         };
 
-        private static readonly string[] _polyphenDescriptions =
+        private static readonly string[] PolyphenDescriptions =
             {"probably damaging", "possibly damaging", "benign", "unknown"};
         private readonly ITranscriptCache _transcriptCache;
         private readonly ISequence _sequence;
@@ -50,8 +47,8 @@ namespace VariantAnnotation.Providers
             GenomeAssembly     = _transcriptCache.GenomeAssembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
-	        _siftReader     = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(pathPrefix)),_siftDescriptions);
-            _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)),_polyphenDescriptions);
+	        _siftReader     = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(pathPrefix)),SiftDescriptions);
+            _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)),PolyphenDescriptions);
         }
 
         private static TranscriptCache InitiateCache(Stream stream,
@@ -130,12 +127,16 @@ namespace VariantAnnotation.Providers
         {
             if (breakEnds == null || breakEnds.Length == 0) return null;
 
-            var geneFusionCandidates = new List<ITranscript>();
+            var geneFusionCandidates = new HashSet<ITranscript>();
             foreach (var breakEnd in breakEnds)
             {
                 var candiates = _transcriptCache.GetOverlappingTranscripts(breakEnd.Chromosome2,
                     breakEnd.Position2, breakEnd.Position2);
-                if (candiates != null) geneFusionCandidates.AddRange(candiates);
+                if (candiates == null) continue;
+                foreach (var candiate in candiates)
+                {
+                    geneFusionCandidates.Add(candiate);
+                }
             }
 
             return geneFusionCandidates;

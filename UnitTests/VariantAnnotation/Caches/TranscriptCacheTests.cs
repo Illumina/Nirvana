@@ -19,22 +19,22 @@ namespace UnitTests.VariantAnnotation.Caches
     public sealed class TranscriptCacheTests
     {
         private readonly ITranscriptCache _cache;
-        private readonly IEnumerable<IDataSourceVersion> expectedDataSourceVersions;
-        private readonly GenomeAssembly expectedGenomeAssembly = GenomeAssembly.hg19;
-        private readonly ITranscript[] expectedTranscripts;
-        private readonly IRegulatoryRegion[] expectedRegulatoryRegions;
+        private readonly IEnumerable<IDataSourceVersion> _expectedDataSourceVersions;
+        private readonly GenomeAssembly _expectedGenomeAssembly = GenomeAssembly.hg19;
+        private readonly ITranscript[] _expectedTranscripts;
+        private readonly IRegulatoryRegion[] _expectedRegulatoryRegions;
 
         private readonly IChromosome _chr1  = new Chromosome("chr1", "1", 0);
         private readonly IChromosome _chr11 = new Chromosome("chr11", "11", 10);
 
         public TranscriptCacheTests()
         {
-            expectedDataSourceVersions = GetDataSourceVersions();
-            expectedTranscripts        = GetTranscripts();
-            expectedRegulatoryRegions  = GetRegulatoryRegions();
+            _expectedDataSourceVersions = GetDataSourceVersions();
+            _expectedTranscripts        = GetTranscripts();
+            _expectedRegulatoryRegions  = GetRegulatoryRegions();
 
-            _cache = new TranscriptCache(expectedDataSourceVersions, expectedGenomeAssembly, expectedTranscripts,
-                expectedRegulatoryRegions, 25);
+            _cache = new TranscriptCache(_expectedDataSourceVersions, _expectedGenomeAssembly, _expectedTranscripts,
+                _expectedRegulatoryRegions, 25);
         }
 
         [Fact]
@@ -95,7 +95,7 @@ namespace UnitTests.VariantAnnotation.Caches
         public void GenomeAssembly_Get()
         {
             var observedGenomeAssembly = _cache.GenomeAssembly;
-            Assert.Equal(expectedGenomeAssembly, observedGenomeAssembly);
+            Assert.Equal(_expectedGenomeAssembly, observedGenomeAssembly);
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace UnitTests.VariantAnnotation.Caches
             var observedDataSourceVersions = _cache.DataSourceVersions.ToArray();
             Assert.Equal(1, observedDataSourceVersions.Length);
 
-            var expectedDataSourceVersion = expectedDataSourceVersions.ToArray()[0];
+            var expectedDataSourceVersion = _expectedDataSourceVersions.ToArray()[0];
             var observedDataSourceVersion = observedDataSourceVersions[0];
             Assert.Equal(expectedDataSourceVersion.Name, observedDataSourceVersion.Name);
         }

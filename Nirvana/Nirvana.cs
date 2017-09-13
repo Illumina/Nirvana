@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
-using Compression.Utilities;
 using ErrorHandling;
-using VariantAnnotation;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -17,6 +15,7 @@ using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
 
 namespace Nirvana
@@ -55,7 +54,7 @@ namespace Nirvana
 
             if(conservationProvider != null) dataSourceVesions.AddRange(conservationProvider.DataSourceVersions);
 
-            var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SupplementaryAnnotationCommon.DataVersion;
+            var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
 
             using (var vcfReader  = ReadWriteUtilities.GetVcfReader(ConfigurationSettings.VcfPath, sequenceProvider.GetChromosomeDictionary(), refMinorProvider,ConfigurationSettings.ReportAllSvOverlappingTranscripts))
             using (var jsonWriter = new JsonWriter(ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName), _nirvanaVersion, Date.CurrentTimeStamp, vepDataVersion, dataSourceVesions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
@@ -98,7 +97,7 @@ namespace Nirvana
                         _performanceMetrics.Increment();
                     }
 
-                    _performanceMetrics.StopReference();
+                    if (previousChromIndex != -1) _performanceMetrics.StopReference();
 
                     //add gene annotation
                     WriteGeneAnnotations(annotator.GetAnnotatedGenes(), jsonWriter);
@@ -121,11 +120,7 @@ namespace Nirvana
             jsonObject.AddObjectValues("genes",annotatedGenes,true);
             writer.WriteAnnotatedGenes(sb.ToString());
         }
-        private void WriteHeader(StreamWriter vcfWriter, IEnumerable<string> headerLines)
-        {
-            if (vcfWriter == null) return;
-            foreach (var headerLine in headerLines) vcfWriter.WriteLine(headerLine);
-        }
+
 
         private int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome)
         {
@@ -200,7 +195,7 @@ namespace Nirvana
             var exitCode = new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
-                .CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in", "-")
+                .CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in",true, "-")
                 .CheckInputFilenameExists(ConfigurationSettings.RefSequencePath, "reference sequence", "--ref")
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache")

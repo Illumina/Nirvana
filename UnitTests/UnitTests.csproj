@@ -4,8 +4,8 @@
     <OutputPath>..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0" />
-    <PackageReference Include="Moq" Version="4.7.25" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
+    <PackageReference Include="Moq" Version="4.7.99" />
     <PackageReference Include="xunit" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0" />
   </ItemGroup>
@@ -14,22 +14,15 @@
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\Jasix\Jasix.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
+    <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\GRCh37_chr1_1_480114\SA\" />
-    <Folder Include="VariantAnnotation\Caches\GRCh37\" />
-    <Folder Include="VariantAnnotation\Caches\GRCh38\" />
-    <Folder Include="Resources\SA\GRCh37\" />
-    <Folder Include="Resources\SA\GRCh38\" />
-    <Folder Include="Resources\SA\CustomAnnotation\" />
-    <Folder Include="Resources\SA\CustomIntervals\" />
   </ItemGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
 </Project>

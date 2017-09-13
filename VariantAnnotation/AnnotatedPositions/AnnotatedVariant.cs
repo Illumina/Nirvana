@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using System.Text;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
@@ -12,6 +10,7 @@ namespace VariantAnnotation.AnnotatedPositions
     public sealed class AnnotatedVariant : IAnnotatedVariant
     {
         public IVariant Variant { get; }
+        public string HgvsgNotation { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; }    = new List<IAnnotatedRegulatoryRegion>();
         public IList<IAnnotatedTranscript> EnsemblTranscripts { get; }         = new List<IAnnotatedTranscript>();
         public IList<IAnnotatedTranscript> RefSeqTranscripts { get; }          = new List<IAnnotatedTranscript>();
@@ -52,18 +51,19 @@ namespace VariantAnnotation.AnnotatedPositions
             else
             {
                 jsonObject.AddStringValue("refAllele",
-                    string.IsNullOrEmpty(Variant.RefAllele) ? "-" : Variant.RefAllele);
+                    string.IsNullOrEmpty(Variant.AltAllele) ? "-" : Variant.AltAllele);
             }
 
 	        var variantType = GetVariantType(Variant.Type);
 			jsonObject.AddStringValue("variantType", variantType.ToString());
+            jsonObject.AddStringValue("hgvsg",HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
             if (SupplementaryAnnotations.Count > 0) AddSAstoJsonObject(jsonObject);
 
-            if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes.ToArray());
+            if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes);
             if(OverlappingTranscripts.Count>0) jsonObject.AddObjectValues("overlappingTranscripts",OverlappingTranscripts);
             if (EnsemblTranscripts?.Count > 0 || RefSeqTranscripts?.Count > 0)
             {

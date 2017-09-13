@@ -9,5 +9,7 @@ namespace VariantAnnotation.Interface.Providers
         ISequence Sequence { get; }
         IDictionary<string, IChromosome> GetChromosomeDictionary();
 	    IDictionary<ushort, IChromosome> GetChromosomeIndexDictionary();
-	}
+        void LoadChromosome(IChromosome chromosome);
+
+    }
 }

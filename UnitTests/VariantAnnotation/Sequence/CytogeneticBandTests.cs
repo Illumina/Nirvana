@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Text;
-using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;

@@ -1,5 +1,6 @@
 ﻿using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
+using VariantAnnotation.SA;
 using VariantAnnotation.Sequence;
 
 namespace VariantAnnotation.Providers
@@ -12,6 +13,6 @@ namespace VariantAnnotation.Providers
         }
 
         public string GetDataVersion() =>
-            $"Cache version: {CacheConstants.DataVersion}, Supplementary annotation version: {SupplementaryAnnotationCommon.DataVersion}, Reference version: {CompressedSequenceCommon.HeaderVersion}";
+            $"Cache version: {CacheConstants.DataVersion}, Supplementary annotation version: {SaDataBaseCommon.DataVersion}, Reference version: {CompressedSequenceCommon.HeaderVersion}";
     }
 }

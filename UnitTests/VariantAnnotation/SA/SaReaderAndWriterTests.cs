@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.SA
             var saMs = new MemoryStream();
             var indexMs = new MemoryStream();
 
-            var dataSourceVersions = new DataSourceVersion[]
+            var dataSourceVersions = new[]
             {
                 new DataSourceVersion("clinvar","20",DateTime.Today.Ticks,"clinvar dataset"),
                 new DataSourceVersion("dbSnp","18",DateTime.Parse("12/20/2010").Ticks,"dbSNP") 
@@ -45,9 +45,9 @@ namespace UnitTests.VariantAnnotation.SA
 
             var saPos = new SaPosition(saDataSources, "A");
 
-            using (var saWriter = new SaWriter(saMs, indexMs, header, smallIntervals, svIntervals, allIntervals, true))
+            using (var saWriter = new SaWriter(saMs, indexMs, header, smallIntervals, svIntervals, allIntervals, new List<Tuple<int, string>>(),true))
             {
-                saWriter.Write(saPos, 150, true);
+                saWriter.Write(saPos, 150);
             }
             saMs.Position = 0;
             indexMs.Position = 0;
