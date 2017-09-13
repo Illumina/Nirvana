@@ -59,18 +59,19 @@ namespace Nirvana
 
             var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
             var jasixFileName = ConfigurationSettings.OutputFileName + ".json.gz" + JasixCommons.FileExt;
-            var outputWriter = ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName);
-
+            
+            
+            using (var outputWriter = ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName))
             using (var vcfReader  = ReadWriteUtilities.GetVcfReader(ConfigurationSettings.VcfPath, sequenceProvider.GetChromosomeDictionary(), refMinorProvider,ConfigurationSettings.ReportAllSvOverlappingTranscripts))
             using (var jsonWriter = new JsonWriter(outputWriter, _nirvanaVersion, Date.CurrentTimeStamp, vepDataVersion, dataSourceVesions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
             using (var vcfWriter = ConfigurationSettings.Vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(ConfigurationSettings.OutputFileName), vcfReader.GetHeaderLines(), _nirvanaVersion, vepDataVersion, dataSourceVesions) : null)
             using (var gvcfWriter = ConfigurationSettings.Gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(ConfigurationSettings.OutputFileName), vcfReader.GetHeaderLines(), _nirvanaVersion, vepDataVersion, dataSourceVesions) : null)
             using (var jasixIndexCreator = new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)))
             {
+                var bgzipTextWriter = outputWriter as BgzipTextWriter;
+
                 try
                 {
-                    //WriteHeader(vcfWriter, vcfReader.GetHeaderLines());
-                    //WriteHeader(gvcfWriter, vcfReader.GetHeaderLines());
                     jasixIndexCreator.SetHeader(jsonWriter.Header);
 
                     if (vcfReader.IsRcrsMitochondrion && annotator.GenomeAssembly == GenomeAssembly.GRCh37
@@ -82,6 +83,7 @@ namespace Nirvana
                     IPosition position;
                     var sortedVcfChecker = new SortedVcfChecker();
 
+                    
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
                         sortedVcfChecker.CheckVcfOrder(position.Chromosome.UcscName);
@@ -92,7 +94,6 @@ namespace Nirvana
                         var jsonOutput = annotatedPosition.GetJsonString();
                         if (jsonOutput != null)
                         {
-                            var bgzipTextWriter = outputWriter as BgzipTextWriter;
                             if (bgzipTextWriter!=null)
                                 jasixIndexCreator.Add(annotatedPosition.Position, bgzipTextWriter.Position);
                         }

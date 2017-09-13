@@ -20,8 +20,8 @@ namespace Compression.FileHandling
         public BgzipTextWriter(string path) : this(new BlockGZipStream(FileUtilities.GetCreateStream(path), CompressionMode.Compress))
         {
         }
-
-        public BgzipTextWriter(BlockGZipStream bgzipStream):base(bgzipStream)
+        // the stream writer needs to have a stream but we cannot provide it with 
+        public BgzipTextWriter(BlockGZipStream bgzipStream):base(Console.OpenStandardError())
         {
             _buffer = new byte[BufferSize];//4kb blocks
             _bgzipStream = bgzipStream;
@@ -74,7 +74,7 @@ namespace Compression.FileHandling
             }
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Flush();
             _bgzipStream.Dispose();
