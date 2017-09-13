@@ -34,6 +34,11 @@ namespace Compression.FileHandling
             _bufferIndex = 0;
         }
 
+        public override void WriteLine()
+        {
+            Write("\n");
+        }
+
         public override void WriteLine(string s)
         {
             Write(s+"\n");
