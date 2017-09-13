@@ -8,7 +8,7 @@ using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.IO.VcfWriter
 {
-    public class LiteVcfWriter : IDisposable
+    public sealed class LiteVcfWriter : IDisposable
     {
         #region members
 
@@ -73,25 +73,15 @@ namespace VariantAnnotation.IO.VcfWriter
 
         #endregion
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        private LiteVcfWriter(StreamWriter vcfWriter, IEnumerable<string> headerLines, string csqInfoTag)
+     
+        public LiteVcfWriter(StreamWriter vcfWriter, IEnumerable<string> headerLines,string nirvanaVersion, string nirvanaDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions)
         {
             // open the vcf file
-            _writer = vcfWriter; 
+            _writer = vcfWriter;
             _writer.NewLine = "\n";
 
             // write out the header lines                
-            WriteHeader(headerLines, csqInfoTag);
-        }
-
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public LiteVcfWriter(StreamWriter vcfWriter, IEnumerable<string> headerLines,string nirvanaVersion, string nirvanaDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions)
-            : this(vcfWriter, headerLines, BuildVcfHeaderLines( nirvanaVersion,nirvanaDataVersion, dataSourceVersions))
-        {
+            WriteHeader(headerLines, BuildVcfHeaderLines(nirvanaVersion, nirvanaDataVersion, dataSourceVersions));
         }
 
         private static string BuildVcfHeaderLines(string nirvanaVersion,string nirvanaDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions)

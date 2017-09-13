@@ -65,10 +65,12 @@ namespace Jasix.DataStructures
             return Math.Max(jsonEntry.refAllele.Length - 1, altAlleleOffset) + jsonEntry.position;
         }
 
-        private static bool IsNucleotideAllele(string altAllele)
+        public static bool IsNucleotideAllele(string altAllele)
         {
             if (string.IsNullOrEmpty(altAllele)) return true;
             return altAllele.ToCharArray().All(x => x == 'A' || x == 'T' || x == 'C' || x == 'G');
         }
+
+
     }
 }

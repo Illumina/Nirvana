@@ -1,11 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Compression.Utilities;
 
 namespace Compression.FileHandling
 {
-    public class BgzipTextWriter : IDisposable
+    public sealed class BgzipTextWriter : StreamWriter, IDisposable
     {
         readonly BlockGZipStream _bgzipStream;
         private readonly byte[] _buffer;
@@ -13,67 +14,40 @@ namespace Compression.FileHandling
         private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
 
         public long Position => _bgzipStream.Position + _bufferIndex;
-        private long _totalBytesWritten;
 
 
-        #region IDisposable
-        bool _disposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.
-                //Console.WriteLine($"disposing bgzipTextWriter, total bytes written:{_totalBytesWritten}");
-                Flush();
-                _bgzipStream.Dispose();
-            }
-
-            // Free any unmanaged objects here.
-            //
-            _disposed = true;
-            // Free any other managed objects here.
-
-        }
-        #endregion
-
+        
         public BgzipTextWriter(string path) : this(new BlockGZipStream(FileUtilities.GetCreateStream(path), CompressionMode.Compress))
         {
         }
-
-        public BgzipTextWriter(BlockGZipStream bgzipStream)
+        // the stream writer needs to have a stream but we cannot provide it with 
+        public BgzipTextWriter(BlockGZipStream bgzipStream):base(Console.OpenStandardError())
         {
             _buffer = new byte[BufferSize];//4kb blocks
             _bgzipStream = bgzipStream;
         }
 
-        private void Flush()
+        public override void Flush()
         {
             if (_bufferIndex == 0) return;
             _bgzipStream.Write(_buffer, 0, _bufferIndex);
             _bufferIndex = 0;
         }
-        public void Write(string line)
+
+        public override void WriteLine()
+        {
+            Write("\n");
+        }
+
+        public override void WriteLine(string s)
+        {
+            Write(s+"\n");
+        }
+
+        public override void Write(string line)
         {
             if (string.IsNullOrEmpty(line)) return;
             var lineBytes = Encoding.UTF8.GetBytes(line);
-            _totalBytesWritten += lineBytes.Length;
 
             if (lineBytes.Length <= BufferSize - _bufferIndex)
             {
@@ -105,5 +79,10 @@ namespace Compression.FileHandling
             }
         }
 
+        public new void Dispose()
+        {
+            Flush();
+            _bgzipStream.Dispose();
+        }
     }
 }

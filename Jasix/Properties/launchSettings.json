@@ -2,7 +2,7 @@
   "profiles": {
     "Jasix": {
       "commandName": "Project",
-      "commandLineArgs": "  -i momGen.json.gz -q 1:10167-10321 -o test.json",
+      "commandLineArgs": "  -i momGen.json.gz -q 22 -o test.json",
       "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }

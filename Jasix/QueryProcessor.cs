@@ -98,6 +98,7 @@ namespace Jasix
 		    foreach (var queryString in queryStrings)
             {
                 var query = Utilities.ParseQuery(queryString);
+                if (!_jasixIndex.ContainsChr(query.Item1)) continue;
                 var needComma = PrintLargeVariantsExtendingIntoQuery(query);
                 PrintAllVariantsFromQueryBegin(query, needComma);
             }
@@ -167,6 +168,8 @@ namespace Jasix
 				//The array of positions entry end with "]," Going past it will cause the json parser to crash
 			{
 				line = line.TrimEnd(',');
+                if (string.IsNullOrEmpty(line)) continue;
+			    
 				JsonSchema jsonEntry;
 				try
 				{
@@ -177,7 +180,7 @@ namespace Jasix
 					Console.WriteLine($"Error in line:\n{line}");
 					throw;
 				}
-
+                
 				if (jsonEntry.chromosome != query.Item1) break;
 
 				if (jsonEntry.Start > query.Item3) break;
