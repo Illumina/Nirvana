@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 
@@ -18,43 +15,7 @@ namespace Jasix
         private int _lastPosition;
         private string _lastChromName;
 
-        #region IDisposable
-        bool _disposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.
-                _jasixIndex.Write(_indexStream);
-                _indexStream.Flush();
-                _indexStream.Dispose();
-            }
-
-            // Free any unmanaged objects here.
-            //
-            _disposed = true;
-            // Free any other managed objects here.
-
-        }
-        #endregion
-
+        
         public OnTheFlyIndexCreator(Stream indexStream)
         {
             _indexStream = indexStream;
@@ -90,5 +51,11 @@ namespace Jasix
             _jasixIndex.Add(position.Chromosome.EnsemblName, start, end.Value, fileLocation);
         }
 
+        public void Dispose()
+        {
+            _jasixIndex.Write(_indexStream);
+            _indexStream.Flush();
+            _indexStream.Dispose();
+        }
     }
 }

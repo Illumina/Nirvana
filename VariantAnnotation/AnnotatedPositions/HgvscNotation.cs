@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace VariantAnnotation.AnnotatedPositions
+﻿namespace VariantAnnotation.AnnotatedPositions
 {
 	public sealed class PositionOffset
 	{

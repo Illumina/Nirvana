@@ -16,43 +16,7 @@ namespace Compression.FileHandling
         public long Position => _bgzipStream.Position + _bufferIndex;
 
 
-        #region IDisposable
-        bool _disposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.
-                //Console.WriteLine($"disposing bgzipTextWriter, total bytes written:{_totalBytesWritten}");
-                Flush();
-                _bgzipStream.Dispose();
-            }
-
-            // Free any unmanaged objects here.
-            //
-            _disposed = true;
-            // Free any other managed objects here.
-
-        }
-        #endregion
-
+        
         public BgzipTextWriter(string path) : this(new BlockGZipStream(FileUtilities.GetCreateStream(path), CompressionMode.Compress))
         {
         }
@@ -110,5 +74,10 @@ namespace Compression.FileHandling
             }
         }
 
+        public void Dispose()
+        {
+            Flush();
+            _bgzipStream.Dispose();
+        }
     }
 }
