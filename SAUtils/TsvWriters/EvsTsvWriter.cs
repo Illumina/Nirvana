@@ -52,7 +52,7 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		public EvsTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider) :this(new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.EvsTag, InterimSaCommon.EvsVcfTag, true, sequenceProvider))
+				SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.EvsTag, InterimSaCommon.EvsVcfTag, true, sequenceProvider))
 		{
 			Console.WriteLine(version.ToString());
 		}
@@ -75,7 +75,7 @@ namespace SAUtils.TsvWriters
 				evsItems.Add(evsItem);
 			}
 
-		    SupplementaryDataItem.RemoveConflictedAlleles(evsItems);
+		    SupplementaryDataItem.RemoveConflictingAlleles(evsItems);
 
             foreach (var evsItem in evsItems)
 			{

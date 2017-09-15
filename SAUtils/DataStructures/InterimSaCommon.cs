@@ -11,7 +11,8 @@ namespace SAUtils.DataStructures
 		public const string EvsTag                = "evs";
 		public const string EvsVcfTag             = "EVS";
 		public const string ExacTag               = "exac";
-		public const string ClinvarTag            = "clinvar";
+	    public const string GnomadTag             = "gnomAD";
+        public const string ClinvarTag            = "clinvar";
 		public const string ClinvarVcfTag         = "clinvar";
 		public const string CosmicTag             = "cosmic";
 		public const string CosmicVcfTag          = "cosmic";

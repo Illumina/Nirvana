@@ -1,8 +1,8 @@
 ﻿namespace SAUtils
 {
-    public static class SaTSVCommon
+    public static class SaTsvCommon
     {
-
+        public const int SchemaVersion = 1;
         public const int DbSnpSchemaVersion = 1;
         public const int OneKgenSchemaVersion = 1;
         public const int CosmicSchemaVersion = 1;

@@ -63,10 +63,10 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_dbsnpWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true,sequenceProvider);
+				SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true,sequenceProvider);
 
 			_globalAlleleWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, sequenceProvider);
+				SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, sequenceProvider);
 
 		}
 

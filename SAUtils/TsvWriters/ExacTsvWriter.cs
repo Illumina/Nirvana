@@ -56,7 +56,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_writer= new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.ExacTag, null, true, sequenceProvider);
+				SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.ExacTag, null, true, sequenceProvider);
 
 		}
 
@@ -73,7 +73,7 @@ namespace SAUtils.TsvWriters
 				exacItems.Add(exacItem);
 			}
 
-		    SupplementaryDataItem.RemoveConflictedAlleles(exacItems);
+		    SupplementaryDataItem.RemoveConflictingAlleles(exacItems);
 
 
             foreach (var exacItem in exacItems)

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
 using ExtractMiniXml;
+using SAUtils.CreateGnomadTsv;
 using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimTsv;
 using SAUtils.ExtractMiniSa;
@@ -21,6 +22,7 @@ namespace SAUtils
                 ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"] = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
+                ["createGnomadTsv"] = new TopLevelOption("create gnomAD tsv file", CreateGnomadTsvMain.Run)
             };
 
 

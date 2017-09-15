@@ -86,7 +86,7 @@ namespace SAUtils.TsvWriters
             var releaseDate = new DateTime(dataSourceVersion.ReleaseDateTicks, DateTimeKind.Utc);
             sb.Append($"#releaseDate={releaseDate:yyyy-MM-dd}\n");
             sb.Append($"#dataVersion={schemaVersion}\n");
-            sb.Append($"#schemaVersion={SaTSVCommon.SupplementarySchemaVersion}\n");
+            sb.Append($"#schemaVersion={SaTsvCommon.SupplementarySchemaVersion}\n");
             sb.Append($"#matchByAllele={matchByAllele}\n");
             sb.Append($"#isArray={isArray}\n");
             sb.Append($"#jsonKey={jsonKey}\n");

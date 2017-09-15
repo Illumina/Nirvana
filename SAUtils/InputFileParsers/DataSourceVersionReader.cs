@@ -39,6 +39,7 @@ namespace SAUtils.InputFileParsers
 
         public static DataSourceVersion GetSourceVersion(string versionFileName)
         {
+            if (!versionFileName.EndsWith(".version")) versionFileName += ".version";
             if (!File.Exists(versionFileName))
             {
                 throw new FileNotFoundException(versionFileName);
