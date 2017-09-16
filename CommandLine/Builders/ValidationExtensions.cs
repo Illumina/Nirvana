@@ -104,6 +104,17 @@ namespace CommandLine.Builders
             return validator;
         }
 
+        public static IConsoleAppValidator CheckInputDirectoryExists(this IConsoleAppValidator validator,
+            string directory, string description, string commandLineOption)
+        {
+            if (validator.SkipValidation) return validator;
+
+            if (! Directory.Exists(directory))
+                validator.Data.AddError($"The {description} directory ({directory} specified by {commandLineOption}) does not exist.", ExitCodes.FileNotFound);
+            
+            return validator;
+        }
+
         /// <summary>
         /// checks if the required parameter has been set
         /// </summary>

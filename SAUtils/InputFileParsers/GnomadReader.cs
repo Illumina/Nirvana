@@ -9,22 +9,22 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers
 {
-	public sealed class GnomadReader : IEnumerable<ExacItem>
+	public sealed class GnomadReader : IEnumerable<GnomadItem>
 	{
 	    private readonly StreamReader _reader;
         private readonly IDictionary<string,IChromosome> _refChromDict;
 
-        private int[] _acAdj;
+        private int[] _acAll;
 		private int[] _acAfr;
 		private int[] _acAmr;
 		private int[] _acEas;
 		private int[] _acFin;
 		private int[] _acNfe;
 		private int[] _acOth;
-		private int[] _acSas;
+		private int[] _acAsj;
 
-		private int _anAdj;
-		private int _anAfr;
+	    private int _anAll;
+        private int _anAfr;
 		private int _anAmr;
 		private int _anEas;
 		private int _anFin;
@@ -43,9 +43,9 @@ namespace SAUtils.InputFileParsers
 
         
 
-		public IEnumerator<ExacItem> GetEnumerator()
+		public IEnumerator<GnomadItem> GetEnumerator()
 		{
-			return GetExacItems().GetEnumerator();
+			return GetGnomadItems().GetEnumerator();
 		}
 
 		IEnumerator IEnumerable.GetEnumerator()
@@ -55,16 +55,15 @@ namespace SAUtils.InputFileParsers
 
 		private void Clear()
 		{
-			_acAdj = null;
+			_acAll = null;
 			_acAfr = null;
 			_acAmr = null;
 			_acEas = null;
 			_acFin = null;
 			_acNfe = null;
 			_acOth = null;
-			_acSas = null;
+			_acAsj = null;
 
-			_anAdj = 0;
 			_anAfr = 0;
 			_anAmr = 0;
 			_anEas = 0;
@@ -81,7 +80,7 @@ namespace SAUtils.InputFileParsers
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<ExacItem> GetExacItems()
+		private IEnumerable<GnomadItem> GetGnomadItems()
 		{
 			using (_reader)
 			{
@@ -92,11 +91,11 @@ namespace SAUtils.InputFileParsers
 					if (string.IsNullOrWhiteSpace(line)) continue;
 					// Skip comments.
 					if (line.StartsWith("#")) continue;
-					var exacItemsList = ExtractItems(line);
-					if (exacItemsList == null) continue;
-					foreach (var exacItem in exacItemsList)
+					var gnomadItemsList = ExtractItems(line);
+					if (gnomadItemsList == null) continue;
+					foreach (var gnomadItem in gnomadItemsList)
 					{
-						yield return exacItem;
+						yield return gnomadItem;
 					}
 
 				}
@@ -104,11 +103,11 @@ namespace SAUtils.InputFileParsers
 		}
 
 	    /// <summary>
-		/// Extracts a exac item(s) from the specified VCF line.
+		/// Extracts a gnomad item(s) from the specified VCF line.
 		/// </summary>
 		/// <param name="vcfline"></param>
 		/// <returns></returns>
-		public List<ExacItem> ExtractItems(string vcfline)
+	    private List<GnomadItem> ExtractItems(string vcfline)
 		{
 			if (vcfline == null) return null;
 			var splitLine = vcfline.Split( '\t');// we don't care about the many fields after info field
@@ -129,25 +128,25 @@ namespace SAUtils.InputFileParsers
 			// parses the info fields and extract frequencies, coverage, num samples.
 			ParseInfoField(infoFields);
 
-			if (_anAdj == 0) return null;
+		    if (_anAll == 0) return null;
 
-			var exacItemsList = new List<ExacItem>();
+            var gnomadItemsList = new List<GnomadItem>();
 
 			
 			for (int i = 0; i < altAlleles.Length; i++)
 			{
-				exacItemsList.Add(new ExacItem(
+				gnomadItemsList.Add(new GnomadItem(
 					chrom,
 					position,
 					refAllele,
 					altAlleles[i],
-					(int) Math.Round(_totalDepth*1.0/ (_anAdj/2.0), MidpointRounding.AwayFromZero),//to be consistant with evs, we use integer values for coverage
-					_anAdj, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
-					GetAlleleCount(_acAdj, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
-					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acSas, i))
+                    _totalDepth,
+					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
+					GetAlleleCount(_acAll, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
+					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i))
 					);
 			}
-			return exacItemsList;
+			return gnomadItemsList;
 		}
 
 		private static int? GetAlleleCount(int[] alleleCounts, int i)
@@ -188,8 +187,8 @@ namespace SAUtils.InputFileParsers
 		{
 			switch (vcfId)
 			{
-				case "AC_Adj":
-					_acAdj = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+				case "AC":
+					_acAll = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_AFR":
@@ -216,13 +215,13 @@ namespace SAUtils.InputFileParsers
 					_acOth = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_SAS":
-					_acSas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+				case "AC_ASJ":
+					_acAsj = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AN_Adj":
-					_anAdj = Convert.ToInt32(value);
-					break;
+			    case "AN":
+			        _anAll = Convert.ToInt32(value);
+			        break;
 
 				case "AN_AFR":
 					_anAfr = Convert.ToInt32(value);
@@ -248,7 +247,7 @@ namespace SAUtils.InputFileParsers
 					_anOth = Convert.ToInt32(value);
 					break;
 
-				case "AN_SAS":
+				case "AN_ASJ":
 					_anSas = Convert.ToInt32(value);
 					break;
 

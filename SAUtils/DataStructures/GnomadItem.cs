@@ -15,7 +15,7 @@ namespace SAUtils.DataStructures
         private int? FinAlleleCount { get; set; }
         private int? NfeAlleleCount { get; set; }
         private int? OthAlleleCount { get; set; }
-        private int? SasAlleleCount { get; set; }
+        private int? AsjAlleleCount { get; set; }
         public int? AllAlleleNumber { get; private set; }
         private int? AfrAlleleNumber { get; set; }
         private int? AmrAlleleNumber { get; set; }
@@ -23,7 +23,7 @@ namespace SAUtils.DataStructures
         private int? FinAlleleNumber { get; set; }
         private int? NfeAlleleNumber { get; set; }
         private int? OthAlleleNumber { get; set; }
-        private int? SasAlleleNumber { get; set; }
+        private int? AsjAlleleNumber { get; set; }
 
         public int Coverage { get; }
 
@@ -35,9 +35,9 @@ namespace SAUtils.DataStructures
             string alternateAllele,
             int coverage,
             int? allAlleleNumber, int? afrAlleleNumber, int? amrAlleleNumber, int? easAlleleNumber,
-            int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? sasAlleleNumber, int? allAlleleCount,
+            int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? asjAlleleNumber, int? allAlleleCount,
             int? afrAlleleCount, int? amrAlleleCount, int? easAlleleCount, int? finAlleleCount, int? nfeAlleleCount,
-            int? othAlleleCount, int? sasAlleleCount)
+            int? othAlleleCount, int? asjAlleleCount)
         {
             Chromosome = chromosome;
             Start = position;
@@ -46,7 +46,6 @@ namespace SAUtils.DataStructures
 
             Coverage = coverage;
 
-
             AllAlleleNumber = allAlleleNumber;
             AfrAlleleNumber = afrAlleleNumber;
             AmrAlleleNumber = amrAlleleNumber;
@@ -54,7 +53,7 @@ namespace SAUtils.DataStructures
             FinAlleleNumber = finAlleleNumber;
             NfeAlleleNumber = nfeAlleleNumber;
             OthAlleleNumber = othAlleleNumber;
-            SasAlleleNumber = sasAlleleNumber;
+            AsjAlleleNumber = asjAlleleNumber;
 
             AllAlleleCount = allAlleleCount;
             AfrAlleleCount = afrAlleleCount;
@@ -63,7 +62,7 @@ namespace SAUtils.DataStructures
             FinAlleleCount = finAlleleCount;
             NfeAlleleCount = nfeAlleleCount;
             OthAlleleCount = othAlleleCount;
-            SasAlleleCount = sasAlleleCount;
+            AsjAlleleCount = asjAlleleCount;
 
             RemoveAlleleNumberZero();
         }
@@ -112,10 +111,10 @@ namespace SAUtils.DataStructures
                 OthAlleleCount = null;
             }
 
-            if (SasAlleleNumber == null || SasAlleleNumber.Value == 0)
+            if (AsjAlleleNumber == null || AsjAlleleNumber.Value == 0)
             {
-                SasAlleleNumber = null;
-                SasAlleleCount = null;
+                AsjAlleleNumber = null;
+                AsjAlleleCount = null;
             }
         }
 
@@ -125,14 +124,10 @@ namespace SAUtils.DataStructures
         // note that for an GnomadItem, the chromosome, position and alt allele should uniquely identify it. If not, there is an error in the data source.
         public override bool Equals(object other)
         {
-            // If parameter is null return false.
-
-            // if other cannot be cast into OneKGenItem, return false
-            var otherItem = other as GnomadItem;
-            if (otherItem == null) return false;
+            if (!(other is GnomadItem otherItem)) return false;
 
             // Return true if the fields match:
-            return string.Equals(Chromosome, otherItem.Chromosome)
+            return Equals(Chromosome, otherItem.Chromosome)
                 && Start == otherItem.Start
                 && AlternateAllele.Equals(otherItem.AlternateAllele)
                 ;
@@ -167,7 +162,7 @@ namespace SAUtils.DataStructures
 			jsonObject.AddStringValue("easAf", ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
 			jsonObject.AddStringValue("finAf", ComputeFrequency(FinAlleleNumber, FinAlleleCount), false);
 			jsonObject.AddStringValue("nfeAf", ComputeFrequency(NfeAlleleNumber, NfeAlleleCount), false);
-			jsonObject.AddStringValue("sasAf", ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
+			jsonObject.AddStringValue("asjAf", ComputeFrequency(AsjAlleleNumber, AsjAlleleCount), false);
 			jsonObject.AddStringValue("othAf", ComputeFrequency(OthAlleleNumber, OthAlleleCount), false);
 
 			if (AllAlleleNumber != null) jsonObject.AddIntValue("allAn", AllAlleleNumber.Value);
@@ -176,7 +171,7 @@ namespace SAUtils.DataStructures
 			if (EasAlleleNumber != null) jsonObject.AddIntValue("easAn", EasAlleleNumber.Value);
 			if (FinAlleleNumber != null) jsonObject.AddIntValue("finAn", FinAlleleNumber.Value);
 			if (NfeAlleleNumber != null) jsonObject.AddIntValue("nfeAn", NfeAlleleNumber.Value);
-			if (SasAlleleNumber != null) jsonObject.AddIntValue("sasAn", SasAlleleNumber.Value);
+			if (AsjAlleleNumber != null) jsonObject.AddIntValue("asjAn", AsjAlleleNumber.Value);
 			if (OthAlleleNumber != null) jsonObject.AddIntValue("othAn", OthAlleleNumber.Value);
 
 			if (AllAlleleCount != null) jsonObject.AddIntValue("allAc", AllAlleleCount.Value);
@@ -185,7 +180,7 @@ namespace SAUtils.DataStructures
 			if (EasAlleleCount != null) jsonObject.AddIntValue("easAc", EasAlleleCount.Value);
 			if (FinAlleleCount != null) jsonObject.AddIntValue("finAc", FinAlleleCount.Value);
 			if (NfeAlleleCount != null) jsonObject.AddIntValue("nfeAc", NfeAlleleCount.Value);
-			if (SasAlleleCount != null) jsonObject.AddIntValue("sasAc", SasAlleleCount.Value);
+			if (AsjAlleleCount != null) jsonObject.AddIntValue("asjAc", AsjAlleleCount.Value);
 			if (OthAlleleCount != null) jsonObject.AddIntValue("othAc", OthAlleleCount.Value);
 
 			return sb.ToString();

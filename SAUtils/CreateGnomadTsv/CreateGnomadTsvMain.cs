@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -26,6 +27,8 @@ namespace SAUtils.CreateGnomadTsv
             if (versionFiles.Length != 1)
                 throw new InvalidDataException("more than one .version file found in input directory");
 
+            Console.WriteLine($"Creating gnomAD TSV file from {inputStreamReaders.Length} input files");
+
             var version = DataSourceVersionReader.GetSourceVersion(versionFiles[0]);
             var gnomadTsvCreator = new GnomadTsvCreator(inputStreamReaders, referenceProvider, version, ConfigurationSettings.OutputDirectory);
 
@@ -46,7 +49,7 @@ namespace SAUtils.CreateGnomadTsv
                 {
                     "in|i=",
                     "input directory containing VCF (and .version) files",
-                    v => ConfigurationSettings.OutputDirectory = v
+                    v => ConfigurationSettings.InputDirectory = v
                 },
                 {
                     "out|o=",
@@ -58,9 +61,10 @@ namespace SAUtils.CreateGnomadTsv
             var commandLineExample = $"{command} [options]";
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
-                .Parse()
+            .Parse()
             .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "Compressed reference sequence file name", "--ref")
-            .HasRequiredParameter(ConfigurationSettings.InputDirectory, "output Supplementary directory", "--out")
+            .HasRequiredParameter(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
+            .CheckInputDirectoryExists(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
             .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")
             .CheckAndCreateDirectory(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")
             .ShowBanner(Constants.Authors)

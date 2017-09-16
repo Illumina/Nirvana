@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CommandLine.Utilities;
 using SAUtils.InputFileParsers;
 using SAUtils.TsvWriters;
@@ -25,14 +26,16 @@ namespace SAUtils.CreateGnomadTsv
         {
             var benchMark = new Benchmark();
 
-            foreach (var fileStreamReader in _streamReaders)
+            using (var writer = new GnomadTsvWriter(_version, _outputDirectory, _refProvider.GenomeAssembly, _refProvider))
             {
-                using (var writer = new GnomadTsvWriter(_version, _outputDirectory, _refProvider.GenomeAssembly, _refProvider))
+                var count = 0;
+                foreach (var fileStreamReader in _streamReaders)
                 {
                     var exacReader = new GnomadReader(fileStreamReader, _refProvider.GetChromosomeDictionary());
                     TsvWriterUtilities.WriteSortedItems(exacReader.GetEnumerator(), writer);
+                    Console.WriteLine($"ingested {count++} file in " + benchMark.GetElapsedTime());
                 }
-
+                
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());

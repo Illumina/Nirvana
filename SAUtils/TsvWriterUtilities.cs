@@ -56,7 +56,7 @@ namespace SAUtils
                     if (currentRefIndex != Int32.MaxValue)
                     {
                         //flushing out the remaining items in buffer
-                        TsvWriterUtilities.WriteToPosition(writer, itemsMinHeap, int.MaxValue);
+                        WriteToPosition(writer, itemsMinHeap, int.MaxValue);
                         //Console.WriteLine($"Wrote out chr{currentRefIndex} items in {benchmark.GetElapsedTime()}");
                         benchmark.Reset();
                     }
