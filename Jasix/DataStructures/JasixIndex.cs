@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using VariantAnnotation.IO;
 
 namespace Jasix.DataStructures
@@ -97,5 +98,10 @@ namespace Jasix.DataStructures
 		{
 			return _chrIndices.Keys;
 		}
+
+	    public bool ContainsChr(string chr)
+	    {
+	        return _chrIndices.Keys.Contains(chr);
+	    }
 	}
 }
