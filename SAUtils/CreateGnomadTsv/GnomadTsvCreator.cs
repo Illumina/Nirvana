@@ -39,7 +39,7 @@ namespace SAUtils.CreateGnomadTsv
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            TsvWriterUtilities.WriteCompleteInfo("EXaC", _version.Version, timeSpan);
+            TsvWriterUtilities.WriteCompleteInfo("gnomAD", _version.Version, timeSpan);
         }
     }
 }
