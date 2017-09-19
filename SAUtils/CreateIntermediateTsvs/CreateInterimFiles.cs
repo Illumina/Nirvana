@@ -16,6 +16,7 @@ using SAUtils.InputFileParsers.DbSnp;
 using SAUtils.InputFileParsers.DGV;
 using SAUtils.InputFileParsers.EVS;
 using SAUtils.InputFileParsers.ExAc;
+using SAUtils.InputFileParsers.MitoMAP;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.SA;
@@ -40,6 +41,8 @@ namespace SAUtils.CreateIntermediateTsvs
 		private readonly string _dgvFile;
 		private readonly string _evsFile;
 		private readonly string _exacFile;
+	    private readonly List<string> _mitoMapMutationFileNames;
+	    private readonly List<string> _mitoMapSvFileNames;
 		private readonly string _outputDirectory;
 		#endregion
 
@@ -50,7 +53,7 @@ namespace SAUtils.CreateIntermediateTsvs
 	    private readonly string _compressedReferencePath;
 
         #endregion
-        public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles )
+        public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> mitoMapMutationFileNames, List<string> mitoMapSvFileNames, List<string> customAnnotationFiles, List<string> customIntervalFiles )
 		{
 			_outputDirectory         = outputDirectory;
 			_dbSnpFileName           = dbSnpFileName;
@@ -64,6 +67,8 @@ namespace SAUtils.CreateIntermediateTsvs
 			_dgvFile                 = dgvFile;
 			_onekGSvFileName         = onekGSvFileName;
 			_clinGenFileName         = clinGenFileName;
+		    _mitoMapMutationFileNames = mitoMapMutationFileNames;
+		    _mitoMapSvFileNames = mitoMapSvFileNames;
 			_customIntervalFiles = customIntervalFiles;
 
 		    _compressedReferencePath = compressedReferencePath;
@@ -100,6 +105,8 @@ namespace SAUtils.CreateIntermediateTsvs
 				Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.DgvTag, _dgvFile)),
 				Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.ClinGenTag, _clinGenFileName)),
 				Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName)),
+                Task.Factory.StartNew(() => CreateMitoMapMutationTsv(_mitoMapMutationFileNames)),
+                Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
 			};
 
 			tasks.AddRange(_customAnnotationFiles.Select(customAnnotationFile => Task.Factory.StartNew(() => CreateCutomAnnoTsv(customAnnotationFile))));
@@ -120,7 +127,41 @@ namespace SAUtils.CreateIntermediateTsvs
 			}
 		}
 
-		private void CreateSvTsv(string sourceName, string fileName)
+	    private void CreateMitoMapMutationTsv(List<string> mitoMapFileNames)
+	    {
+	        if (mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
+            var benchMark = new Benchmark();
+	        var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
+	        var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), InterimSaCommon.MitoMap));
+	        using (var writer = new MitoMapMutationTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
+	        {
+	            foreach (var mitoMapFileName in mitoMapFileNames)
+	            {
+	                var evsReader = new MitoMapMutationReader(new FileInfo(mitoMapFileName), _refNamesDictionary);
+	                WriteSortedItems(evsReader.GetEnumerator(), writer);
+                }
+	        }
+	        var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
+	        WriteCompleteInfo(InterimSaCommon.MitoMap, version.Version, timeSpan);
+	    }
+
+	    private void CreateMitoMapSvTsv(List<string> mitoMapFileNames)
+	    {
+	        if (mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
+	        var benchMark = new Benchmark();
+	        var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
+	        var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), InterimSaCommon.MitoMap));
+	        using (var writer = new MitoMapSvTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
+	        {
+	            var evsReader = new MitoMapSvReader(new FileInfo(mitoMapFileName), _refNamesDictionary);
+	            WriteSortedItems(evsReader.GetEnumerator(), writer);
+	        }
+	        var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
+	        WriteCompleteInfo(InterimSaCommon.MitoMap, version.Version, timeSpan);
+	    }
+
+
+        private void CreateSvTsv(string sourceName, string fileName)
 		{
 			if (string.IsNullOrEmpty(fileName)) return;
 

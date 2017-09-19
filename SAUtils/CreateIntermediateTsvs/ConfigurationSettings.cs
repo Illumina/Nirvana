@@ -19,11 +19,14 @@ namespace SAUtils.CreateIntermediateTsvs
 	    public static string InputDgvFile;
 	    public static string Input1000GSvFileName;
 	    public static string InputClinGenFileName;
+        public static readonly List<string> InputMitoMapMutationFileNames = new List<string>();
+        public static readonly List<string> InputMitoMapSvFileNames = new List<string>();
         public static string OutputSupplementaryDirectory;
 	    public static readonly List<string> CustomAnnotationFiles= new List<string>();
 		public static readonly List<string> CustomIntervalFiles = new List<string>();
 
-		#endregion
+
+        #endregion
 
 		public static int NumberOfProvidedInputFiles()
         {

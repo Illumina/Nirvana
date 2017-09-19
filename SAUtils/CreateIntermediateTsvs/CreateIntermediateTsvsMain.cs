@@ -25,6 +25,8 @@ namespace SAUtils.CreateIntermediateTsvs
 					ConfigurationSettings.InputDgvFile,
 					ConfigurationSettings.Input1000GSvFileName,
 					ConfigurationSettings.InputClinGenFileName,
+                    ConfigurationSettings.InputMitoMapMutationFileNames,
+                    ConfigurationSettings.InputMitoMapSvFileNames,
 					ConfigurationSettings.CustomAnnotationFiles,
 					ConfigurationSettings.CustomIntervalFiles
 					);
@@ -110,7 +112,17 @@ namespace SAUtils.CreateIntermediateTsvs
 					"input ClinGen file",
 					v => ConfigurationSettings.InputClinGenFileName = v
 				},
-				{
+			    {
+			        "mitoMut",
+			        "input MitoMAP mutation HTML file",
+			        v => ConfigurationSettings.InputMitoMapMutationFileNames.Add(v)
+			    },
+			    {
+			        "mitoSv",
+			        "input MitoMAP SV HTML file",
+			        v => ConfigurationSettings.InputMitoMapSvFileNames.Add(v)
+			    },
+                {
 					"out|o=",
 					"output Nirvana Supplementary directory",
 					v => ConfigurationSettings.OutputSupplementaryDirectory = v
@@ -133,6 +145,8 @@ namespace SAUtils.CreateIntermediateTsvs
 		    .CheckInputFilenameExists(ConfigurationSettings.InputExacFile, "input Exac file", "--exac", false)
 		    .CheckInputFilenameExists(ConfigurationSettings.InputDgvFile, "input DGV file", "--dgv", false)
 		    .CheckInputFilenameExists(ConfigurationSettings.Input1000GSvFileName, "input DGV file", "--onekSv", false)
+            .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapMutationFileNames, "input MitoMap mutation file names", "--mitoMut", false)
+		    .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapSvFileNames, "input MitoMap SV file names", "--mitoSv", false)
             .CheckEachFilenameExists(ConfigurationSettings.CustomAnnotationFiles, "Custom Annotation file name", "--cust", false)
             .CheckEachFilenameExists(ConfigurationSettings.CustomIntervalFiles, "Custom interval file name", "--bed", false)
             .CheckNonZero(ConfigurationSettings.NumberOfProvidedInputFiles(), "supplementary data source") 
