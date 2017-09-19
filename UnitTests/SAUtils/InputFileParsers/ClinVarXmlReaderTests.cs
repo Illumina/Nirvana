@@ -776,14 +776,6 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2029")]
         public void MissingClinvarInsertion2()
         {
-            //var mockCompressedSequence = new Mock<ICompressedSequence>();
-            //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-            //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh38);
-
-            //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(true);
-            //mockCompressedSequence.Setup(x => x.Substring(132903739, It.IsAny<int>())).Returns("AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
-            //mockCompressedSequence.Setup(x => x.Substring(It.IsNotIn(132903739), It.IsAny<int>())).Returns("N");
-
             var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr9", "9", 1), 132903739, "AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
             var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000342164.xml")), sequenceProvider);
 
