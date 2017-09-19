@@ -19,7 +19,7 @@ namespace Compression.DataStructures
         public long FileOffset { get; private set; }
         public int Offset { get; internal set; }
 
-        internal const int DefaultSize = 16777216;
+        internal const int DefaultSize = 16777216/16;
         private readonly int _size;
         private readonly int _compressedBlockSize;
 

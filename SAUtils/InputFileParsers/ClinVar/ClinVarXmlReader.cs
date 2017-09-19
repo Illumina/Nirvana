@@ -247,9 +247,9 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 				ClinvarVariant shiftedVariant= variant;
 				//some entries do not have ref allele in the xml file. For those, we extract them from our ref sequence
-				if (variant.ReferenceAllele == null && variant.VariantType=="Deletion")
+				if (string.IsNullOrEmpty(variant.ReferenceAllele) && variant.VariantType=="Deletion" )
 					shiftedVariant = GenerateRefAllele(variant, _sequenceProvider.Sequence);
-				if (variant.AltAllele == null && variant.VariantType == "Duplication")
+				if (string.IsNullOrEmpty(variant.AltAllele) && variant.VariantType == "Duplication")
 					shiftedVariant = GenerateAltAllele(variant, _sequenceProvider.Sequence);
 
 				
@@ -257,7 +257,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 				//left align the variant
 				shiftedVariant = LeftShift(shiftedVariant);
                 
-                if (variant.ReferenceAllele == null && variant.VariantType == "Indel" && variant.AltAllele != null)
+                if (string.IsNullOrEmpty(variant.ReferenceAllele) && variant.VariantType == "Indel" && !string.IsNullOrEmpty(variant.AltAllele))
 					shiftedVariant = GenerateRefAllele(variant, _sequenceProvider.Sequence);
 
 				_pubMedIds.Sort();
