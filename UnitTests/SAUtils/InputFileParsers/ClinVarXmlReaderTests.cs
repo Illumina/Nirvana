@@ -669,7 +669,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
         [Fact]
         [Trait("jira", "NIR-2372")]
-        public void SameClinvarButDifferentVariant()
+        public void AllelicOmimIdsForDeletions()
         {
             var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 1), 111335402, "CTC");
 
@@ -677,147 +677,118 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.ToList();
             Assert.Equal(1, clinvarItems.Count);
+
+            var clinvarItem = clinvarItems[0];
+            Assert.Equal(1, clinvarItem.OmimIDs.Count());
+            Assert.Equal("612800.0002", clinvarItem.OmimIDs.First());
         }
 
-        //[Fact(Skip = "need refactoring")]
-        //[Trait("jira", "NIR-2372")]
-        //public void AllelicOmimIdsForDeletions()
-        //{
-        //    //var mockCompressedSequence = new Mock<ICompressedSequence>();
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-        //    //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh37);
+        [Fact]
+        [Trait("jira", "NIR-2372")]
+        public void ExcludeAllelicOmimIdsFromTraits()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr8", "8", 1), 100887650, "ATG");
 
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), "G"))
-        //    //    .Returns(false);
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsNotIn("G")))
-        //    //    .Returns(true);
-        //    //mockCompressedSequence.Setup(x => x.Substring(It.IsAny<int>(), It.IsAny<int>())).Returns("N");
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000050055.xml")), sequenceProvider);
 
-        //    var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000170338.xml")), sequenceProvider);
+            var clinvarItems = reader.ToList();
+            Assert.Equal(1, clinvarItems.Count);
 
-        //    var clinvarItems = reader.ToList();
-        //    Assert.Equal(2, clinvarItems.Count);
+            var clinvarItem = clinvarItems[0];
+            Assert.Equal(1, clinvarItem.OmimIDs.Count());
+            Assert.Equal("216550", clinvarItem.OmimIDs.First());
+        }
 
-        //    var clinvarItem = clinvarItems[0];
-        //    Assert.Equal(1, clinvarItem.OmimIDs.Count());
-        //    Assert.Equal("612800.0002", clinvarItem.OmimIDs.First());
-        //}
+        [Fact]
+        [Trait("jira", "NIR-2372")]
+        public void AllelicOmimIdsFromAttributeSetChrX()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 1), 595469, "C");
 
-        //[Fact(Skip = "need refactoring")]
-        //[Trait("jira", "NIR-2372")]
-        //public void ExcludeAllelicOmimIdsFromTraits()
-        //{
-        //    //var mockCompressedSequence = new Mock<ICompressedSequence>();
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-        //    //    .Returns(true);
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-        //    //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh37);
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000010551.xml")), sequenceProvider);
 
-        //    //mockCompressedSequence.Setup(x => x.Substring(It.IsAny<int>(), It.IsAny<int>())).Returns("N");
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
+            var clinvarItems = reader.ToList();
 
-        //    var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000050055.xml")), sequenceProvider);
+            Assert.Equal(1, clinvarItems.Count);
 
-        //    var clinvarItems = reader.ToList();
-        //    Assert.Equal(1, clinvarItems.Count);
+            foreach (var clinVarItem in clinvarItems)
+            {
+                Assert.Equal(2, clinVarItem.OmimIDs.Count());
+            }
+        }
 
-        //    var clinvarItem = clinvarItems[0];
-        //    Assert.Equal(1, clinvarItem.OmimIDs.Count());
-        //    Assert.Equal("216550", clinvarItem.OmimIDs.First());
-        //}
+        [Fact]
+        [Trait("jira", "NIR-2372")]
+        public void AllelicOmimIdsFromAttributeSetChrY()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrY", "Y", 1), 545469, "C");
 
-        //[Fact(Skip = "need refactoring")]
-        //[Trait("jira", "NIR-2372")]
-        //public void AllelicOmimIdsFromAttributeSet()
-        //{
-        //    //var mockCompressedSequence = new Mock<ICompressedSequence>();
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-        //    //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh37);
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000010551.xml")), sequenceProvider);
 
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>()))
-        //    //    .Returns(true);
-        //    //mockCompressedSequence.Setup(x => x.Substring(It.IsAny<int>(), It.IsAny<int>())).Returns("N");
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
+            var clinvarItems = reader.ToList();
 
-        //    var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000010551.xml")), sequenceProvider);
+            Assert.Equal(1, clinvarItems.Count);
 
-        //    var clinvarItems = reader.ToList();
+            foreach (var clinVarItem in clinvarItems)
+            {
+                Assert.Equal(2, clinVarItem.OmimIDs.Count());
+            }
+        }
 
-        //    Assert.Equal(2, clinvarItems.Count);
+        [Fact]
+        [Trait("jira", "NIR-2372")]
+        public void MultipleEntryRecordVariant1()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 8045031, "G");
 
-        //    foreach (var clinVarItem in clinvarItems)
-        //    {
-        //        switch (clinVarItem.Chromosome.EnsemblName)
-        //        {
-        //            case "X":
-        //                Assert.Equal(2, clinVarItem.OmimIDs.Count());
-        //                break;
-        //            case "Y":
-        //                Assert.Equal(2, clinVarItem.OmimIDs.Count());
-        //                break;
-        //        }
-        //    }
-        //}
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000007484.xml")), sequenceProvider);
 
-        //[Fact(Skip = "need refactoring")]
-        //[Trait("jira", "NIR-2372")]
-        //public void MultipleEntryRecord()
-        //{
-        //    //var mockCompressedSequence = new Mock<ICompressedSequence>();
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-        //    //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh37);
+            var clinvarItems = reader.ToList();
 
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(true);
+            Assert.Equal(1, clinvarItems.Count);
+        }
 
-        //    //mockCompressedSequence.Setup(x => x.Substring(It.IsAny<int>(), It.IsAny<int>())).Returns("N");
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
+        [Fact]
+        [Trait("jira", "NIR-2372")]
+        public void MultipleEntryRecordVariant2()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 8021910, "ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT");
 
-        //    var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000007484.xml")), sequenceProvider);
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000007484.xml")), sequenceProvider);
 
-        //    var clinvarItems = reader.ToList();
+            var clinvarItems = reader.ToList();
 
-        //    Assert.Equal(2, clinvarItems.Count);
-        //}
+            Assert.Equal(1, clinvarItems.Count);
+        }
 
-        ////RCV000001054
-        //[Fact(Skip = "need refactoring")]
-        //[Trait("jira", "NIR-2372")]
-        //public void SkipMicrosatellitesWithoutAltAllele()
-        //{
-        //    //var mockCompressedSequence = new Mock<ICompressedSequence>();
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-        //    //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh37);
+        [Fact]
+        [Trait("jira", "NIR-2372")]
+        public void SkipMicrosatellitesWithoutAltAllele()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr22", "22", 1), 46191240, "ATTCT");
 
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(true);
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000001054.xml")), sequenceProvider);
 
-        //    //mockCompressedSequence.Setup(x => x.Substring(It.IsAny<int>(), It.IsAny<int>())).Returns("N");
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
+            Assert.False(reader.Any());
+        }
 
-        //    var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000001054.xml")), sequenceProvider);
+        [Fact]
+        [Trait("jira", "NIR-2029")]
+        public void MissingClinvarInsertion2()
+        {
+            //var mockCompressedSequence = new Mock<ICompressedSequence>();
+            //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
+            //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh38);
 
-        //    var clinvarItems = reader.ToList();
+            //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(true);
+            //mockCompressedSequence.Setup(x => x.Substring(132903739, It.IsAny<int>())).Returns("AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
+            //mockCompressedSequence.Setup(x => x.Substring(It.IsNotIn(132903739), It.IsAny<int>())).Returns("N");
 
-        //    Assert.Equal(0, clinvarItems.Count);
-        //}
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr9", "9", 1), 132903739, "AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000342164.xml")), sequenceProvider);
 
-        ////RCV000342164
-        //[Fact(Skip = "need refactoring")]
-        //[Trait("jira", "NIR-2029")]
-        //public void MissingClinvarInsertion2()
-        //{
-        //    //var mockCompressedSequence = new Mock<ICompressedSequence>();
-        //    //mockCompressedSequence.SetupProperty(x => x.Renamer, _sequence.Renamer);
-        //    //mockCompressedSequence.SetupProperty(x => x.GenomeAssembly, GenomeAssembly.GRCh38);
-
-        //    //mockCompressedSequence.Setup(x => x.Validate(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>())).Returns(true);
-        //    //mockCompressedSequence.Setup(x => x.Substring(132903739, It.IsAny<int>())).Returns("AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
-        //    //mockCompressedSequence.Setup(x => x.Substring(It.IsNotIn(132903739), It.IsAny<int>())).Returns("N");
-
-        //    var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000342164.xml")), sequenceProvider);
-
-        //    var clinvarItems = reader.ToList();
-        //    Assert.Equal(1, clinvarItems.Count);
-        //}
+            var clinvarItems = reader.ToList();
+            Assert.Equal(1, clinvarItems.Count);
+        }
     }
 }
