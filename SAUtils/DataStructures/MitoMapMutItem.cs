@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;
@@ -43,8 +44,12 @@ namespace SAUtils.DataStructures
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
             if (!string.IsNullOrEmpty(_clinicalSignificance)) jsonObject.AddStringValue("clinicalSignificance", _clinicalSignificance);
             if(!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile);
-
             return sb.ToString();
+        }
+
+        public void Trim()
+        {
+            (Start, ReferenceAllele, AlternateAllele) = BiDirectionalTrimmer.Trim(Start, ReferenceAllele, AlternateAllele);
         }
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()

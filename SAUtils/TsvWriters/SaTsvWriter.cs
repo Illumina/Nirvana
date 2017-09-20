@@ -80,7 +80,7 @@ namespace SAUtils.TsvWriters
             var sb = new StringBuilder();
 
             sb.Append($"#name={dataSourceVersion.Name}\n");
-            sb.Append($"#assembly={assembly}\n");
+            if (!string.IsNullOrEmpty(assembly)) sb.Append($"#assembly={assembly}\n");
             sb.Append($"#version={dataSourceVersion.Version}\n");
             sb.Append($"#description={dataSourceVersion.Description}\n");
             var releaseDate = new DateTime(dataSourceVersion.ReleaseDateTicks, DateTimeKind.Utc);

@@ -12,16 +12,16 @@ using VariantAnnotation.Interface.Positions;
 
 namespace SAUtils.InputFileParsers.MitoMAP
 {
-    public class MitoMapReader
+    public sealed class MitoMapMutationReader
     {
-        private FileInfo _mitoMapFileInfo;
+        private readonly FileInfo _mitoMapFileInfo;
 
-        private readonly HashSet<string> _mitoMapMutationDataTypes = new HashSet<string>()
+        private readonly Dictionary<string, int[]> _mitoMapMutationDataTypes = new Dictionary<string, int[]>()
         {
-            "MutationsCodingControl",
-            "MutationsRNA",
-            "PolymorphismsCoding",
-            "PolymorphismsControl"
+            {"MutationsCodingControl", new[] {0, 2, 3, 6, 7, 8, -1}},
+            {"MutationsRNA", new[] {0, 2, 3, 5, 6, 7, 8}},
+            {"PolymorphismsCoding",  new[] {0, -1, 2, -1, -1, -1, -1}},
+            {"PolymorphismsControl",  new[] {0, -1, 2, -1, -1, -1, -1}}
         };
 
         private readonly Dictionary<(string, int), string> _clininalSigfincances = new Dictionary<(string, int), string>()
@@ -39,15 +39,15 @@ namespace SAUtils.InputFileParsers.MitoMAP
             {"-", false}
         };
 
-        public MitoMapReader(FileInfo mitoMapFileInfo)
+        public MitoMapMutationReader(FileInfo mitoMapFileInfo)
         {
             _mitoMapFileInfo = mitoMapFileInfo;
         }
 
-        private string getDataType()
+        private string GetDataType()
         {
             var dataType = _mitoMapFileInfo.Name.Replace(".HTML", null);
-            if (!_mitoMapMutationDataTypes.Contains(dataType)) throw new InvalidFileFormatException($"Unexpected data file: {_mitoMapFileInfo.Name}");
+            if (!_mitoMapMutationDataTypes.ContainsKey(dataType)) throw new InvalidFileFormatException($"Unexpected data file: {_mitoMapFileInfo.Name}");
             return dataType;
         }
 
@@ -58,7 +58,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private IEnumerable<MitoMapMutItem> GetMitoMapItems()
         {
-            var dataType = getDataType();
+            var dataType = GetDataType();
             bool isDataLine = false;
             using (var reader = new StreamReader(_mitoMapFileInfo.FullName))
             {
@@ -88,41 +88,27 @@ namespace SAUtils.InputFileParsers.MitoMAP
             ["583","<a href='/MITOMAP/GenomeLoci#MTTF'>MT-TF</a>","MELAS / MM & EXIT","G583A","tRNA Phe","-","+","Cfrm","<span style='display:inline-block;white-space:nowrap;'><a href='/cgi-bin/mitotip?pos=583&alt=A&quart=0'><u>93.10%</u></a> <i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i></span>","0","<a href='/cgi-bin/print_ref_list?refs=2066,90532,91590&title=RNA+Mutation+G583A' target='_blank'>3</a>"],
             */
             var info = line.Split(",").Select(x => x.Trim('"')).ToList();
-            int posi;
-            string disease;
-            string refAllele;
-            string altAllele;
-            bool homoplasmy;
-            bool heteroplasmy;
-            string status;
-            string clinicalSignificance;
-            string scorePercentile;
-            switch (dataType)
-            {
-                case "MutationsCodingControl":
+            return ExtracMapMutItem(info, _mitoMapMutationDataTypes[dataType]);
+        }
 
-                    break;
-                case "MutationsRNA":
-                    posi = int.Parse(info[0]);
-                    disease = getDiseaseInfo(info[2]);
-                    (refAllele, altAllele) = getRefAltAlleles(info[3]);
-                    if (_symbolToBools.ContainsKey(info[5])) homoplasmy =_symbolToBools[info[5]];
-                    if (_symbolToBools.ContainsKey(info[6])) heteroplasmy = _symbolToBools[info[6]];
-                    status = info[7];
-                    (clinicalSignificance, scorePercentile) = getFunctionalInfo(info[8]);
-                    return new MitoMapMutItem(posi, refAllele, altAllele, disease, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile);
-                    break;
-                case "PolymorphismsCoding":
-                    //TODO
-                    break;
-                case "PolymorphismsControl":
-                    break;
-            }
+        private MitoMapMutItem ExtracMapMutItem(List<string> info, int[] fields)
+        {
+            int posi = int.Parse(info[fields[0]]);
+            string disease = GetDiseaseInfo(info, fields[1]);
+            var (refAllele, altAllele) = GetRefAltAlleles(info[fields[2]]);
+            bool? homoplasmy = null;
+            if (fields[3] != -1 && _symbolToBools.ContainsKey(info[fields[3]])) homoplasmy = _symbolToBools[info[fields[3]]];
+            bool? heteroplasmy = null;
+            if (fields[4] != -1 && _symbolToBools.ContainsKey(info[fields[4]])) heteroplasmy = _symbolToBools[info[fields[4]]];
+            string status = fields[5] == -1 ? null : info[fields[5]];
+            var (clinicalSignificance, scorePercentile) = GetFunctionalInfo(info, fields[6]);
             return new MitoMapMutItem(posi, refAllele, altAllele, disease, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile);
         }
 
-        private string getDiseaseInfo(string diseaseString)
+        private static string GetDiseaseInfo(List<string> info, int fieldIndex)
         {
+            if (fieldIndex == -1) return null;
+            string diseaseString = info[fieldIndex];
             if (String.IsNullOrEmpty(diseaseString)) return diseaseString;
             var regexPattern = new Regex(@"<a href=.+>(?<disease>\S+)</a>$");
             var match = regexPattern.Match(diseaseString);
@@ -131,16 +117,18 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return match.Groups["disease"].Value;
         }
 
-        private (string, string) getFunctionalInfo(string functionInfoString)
+        private (string, string) GetFunctionalInfo(List<string> info, int fieldIndex)
         {
+            if (fieldIndex == -1) return (null, null);
+            string functionInfoString = info[fieldIndex];
             // <u>93.10%</u></a> <i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i></span>
             var regexPattern = new Regex(@"<u>(?<scoreString>[0-9.]+)%</u></a> (?<significanceString>.+)</span>$");
             var match = regexPattern.Match(functionInfoString);
-            var clineSignificance = getClinicalSignificance(match.Groups["significanceString"].Value);
+            var clineSignificance = GetClinicalSignificance(match.Groups["significanceString"].Value);
             return (match.Groups["scoreString"].Value, clineSignificance);
         }
 
-        private string getClinicalSignificance(string significanceString)
+        private string GetClinicalSignificance(string significanceString)
         {
             // < i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i>
             // filter out the symbol for frequency alert
@@ -150,20 +138,12 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return _clininalSigfincances[(arrowType, nArrows)];
         }
 
-        private Tuple<string, string> getRefAltAlleles(string refPosiAltString)
+        private (string, string) GetRefAltAlleles(string refPosiAltString)
         {
-            var regexPattern = new Regex(@"(?<ref>^[A-Za-z]+)(?<posi>\d+)(?<alt>[A-Za-z]+$)");
+            var regexPattern = new Regex(@"(?<ref>^[A-Za-z]+)(?<posi>(\d+|-))(?<alt>[A-Za-z]+$)");
             var match = regexPattern.Match(refPosiAltString);
             if (match.Groups.Count == 0) throw new FormatException($"No reference and alternative alleles could be extracted: {refPosiAltString}");
-            return new Tuple<string, string>(match.Groups["ref"].Value, match.Groups["alt"].Value);
+            return (match.Groups["ref"].Value, match.Groups["alt"].Value);
         }
-
-        public static string TrimEnd(string sourceString, string toTrime)
-        {
-            if (!sourceString.EndsWith(toTrime)) return sourceString;
-            return sourceString.Remove(sourceString.LastIndexOf(toTrime, StringComparison.Ordinal));
-        }
-
-
     }
 }
