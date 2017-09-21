@@ -16,6 +16,9 @@ namespace UnitTests.TestDataStructures
 
         public string Substring(int offset, int length)
         {
+            if (offset - _zeroBasedStartOffset + length > _sequence.Length
+                || offset < _zeroBasedStartOffset)
+                return "";
             return _sequence.Substring(offset - _zeroBasedStartOffset, length);
         }
     }
