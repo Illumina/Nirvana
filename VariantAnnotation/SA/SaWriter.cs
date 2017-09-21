@@ -23,6 +23,8 @@ namespace VariantAnnotation.SA
         private readonly List<Interval<long>> _intervals;
         private readonly List<Tuple<int, string>> _globalMajorAllleInRefMinors;
         private readonly bool _leaveOpen;
+        private int _blockCount;
+        private int _blockPositionCount;
 
         public int RefMinorCount => _globalMajorAllleInRefMinors.Count;
 
@@ -72,6 +74,7 @@ namespace VariantAnnotation.SA
         {
             Flush();
             WriteIndex();
+            //Console.WriteLine($"positions/block={_blockPositionCount*1.0/_blockCount}");
             if(!_leaveOpen) _stream.Dispose();
             _writer.Dispose();
             
@@ -97,6 +100,9 @@ namespace VariantAnnotation.SA
         private void Flush()
         {
             if (_block.BlockOffset == 0) return;
+
+            _blockCount++;
+            _blockPositionCount += _block.PositionCount;
 
             var fileOffset = _stream.Position;
             var positions = _block.Write(_stream);

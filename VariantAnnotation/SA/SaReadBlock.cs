@@ -7,14 +7,14 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
-    public class SaReadBlock : SaBlock
+    public sealed class SaReadBlock : SaBlock
     {
         private ISaIndexOffset[] _blockOffsets;
 
         /// <summary>
         /// constructor
         /// </summary>
-        public SaReadBlock(ICompressionAlgorithm compressionAlgorithm, int size = 524288)
+        public SaReadBlock(ICompressionAlgorithm compressionAlgorithm, int size = SaWriteBlock.DefaultBlockSize)
             : base(compressionAlgorithm, size)
         { }
 
