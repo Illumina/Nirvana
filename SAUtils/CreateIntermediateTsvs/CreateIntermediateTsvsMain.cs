@@ -113,12 +113,12 @@ namespace SAUtils.CreateIntermediateTsvs
 					v => ConfigurationSettings.InputClinGenFileName = v
 				},
 			    {
-			        "mitoMut",
+			        "mitoMut=",
 			        "input MitoMAP mutation HTML file",
 			        v => ConfigurationSettings.InputMitoMapMutationFileNames.Add(v)
 			    },
 			    {
-			        "mitoSv",
+			        "mitoSv=",
 			        "input MitoMAP SV HTML file",
 			        v => ConfigurationSettings.InputMitoMapSvFileNames.Add(v)
 			    },

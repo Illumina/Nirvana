@@ -106,7 +106,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.ClinGenTag, _clinGenFileName)),
                 Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName)),
                 Task.Factory.StartNew(() => CreateMitoMapMutationTsv(_mitoMapMutationFileNames)),
-                Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
+                //Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
             };
 
             tasks.AddRange(_customAnnotationFiles.Select(customAnnotationFile => Task.Factory.StartNew(() => CreateCutomAnnoTsv(customAnnotationFile))));
@@ -133,12 +133,13 @@ namespace SAUtils.CreateIntermediateTsvs
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
             var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), InterimSaCommon.MitoMap));
-
             foreach (var mitoMapFileName in mitoMapFileNames)
             {
-                var mitoMapMutationReaderReader = new MitoMapMutationReader(new FileInfo(mitoMapFileName));
-                using (var writer = new MitoMapMutationTsvWriter(version, _outputDirectory))
-                    WriteSortedItems(mitoMapMutationReaderReader.GetEnumerator(), writer);
+                var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
+                var mitoMapMutationReader = new MitoMapMutationReader(new FileInfo(mitoMapFileName), sequenceProvider);
+                var outputFilePrefix = InterimSaCommon.MitoMap + "_" + mitoMapMutationReader._dataType;
+                using (var writer = new MitoMapMutationTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
+                    WriteSortedItems(mitoMapMutationReader.GetEnumerator(), writer);
             }
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
             WriteCompleteInfo(InterimSaCommon.MitoMap, version.Version, timeSpan);

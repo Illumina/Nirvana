@@ -232,7 +232,7 @@ namespace SAUtils.MergeInterimTsvs
                 if (assembly == GenomeAssembly.Unknown)//there were no interim SA headers with known assembly
                     assembly = knownIntervalAssemblies[0];
 
-                for (int i = 1; i < knownIntervalAssemblies.Count; i++)
+                for (int i = 0; i < knownIntervalAssemblies.Count; i++)
                     if (knownIntervalAssemblies[i] != assembly)
                         throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {knownIntervalAssemblies[i]} and {assembly}");
             }

@@ -14,6 +14,11 @@
       "commandName": "Project",
       "commandLineArgs": "createTSV --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cvr C:\\Development\\TestDatasets\\OneMillion.xml -o TestSa",
       "workingDirectory": "C:\\Development\\TestDatasets"
+    },
+    "MitoMap_SK": {
+      "commandName": "Project",
+      "commandLineArgs": "createTSV --mitoMut E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-15\\MutationsRNA.html --mitoMut E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-15\\MutationsCodingControl.html --mitoMut E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-15\\PolymorphismsCoding.html --mitoMut E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-15\\PolymorphismsControl.html  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out .",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_MitoMap"
     }
   }
 }

@@ -37,8 +37,6 @@ namespace SAUtils.DataStructures
                    && GenomeAssembly == other.GenomeAssembly
                    && Version.Equals(other.Version)
                    && ReleaseDate.Equals(other.ReleaseDate);
-
-
         }
 
 

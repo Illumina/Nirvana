@@ -42,6 +42,8 @@ namespace SAUtils.CreateIntermediateTsvs
 	        if (Input1000GSvFileName != null) count++;
 	        if (InputClinGenFileName != null) count++;
 
+            count += InputMitoMapMutationFileNames.Count;
+            count += InputMitoMapSvFileNames.Count;
             count += CustomAnnotationFiles.Count;
 			count += CustomIntervalFiles.Count;
 

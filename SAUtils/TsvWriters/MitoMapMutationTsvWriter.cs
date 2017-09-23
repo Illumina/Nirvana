@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using SAUtils.DataStructures;
+using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.Sequence;
+using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
@@ -9,6 +14,7 @@ namespace SAUtils.TsvWriters
 
         #region members
         private readonly SaTsvWriter _mitoMapMutWriter;
+        
         #endregion
 
         #region IDisposable
@@ -22,12 +28,6 @@ namespace SAUtils.TsvWriters
             Dispose(true);
             GC.SuppressFinalize(this);
         }
-
-        public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
-        {
-            throw new NotImplementedException();
-        }
-
 
         /// <summary>
         /// protected implementation of Dispose pattern. 
@@ -51,6 +51,30 @@ namespace SAUtils.TsvWriters
         }
         #endregion
 
+        public MitoMapMutationTsvWriter(DataSourceVersion version, string outputDirectory, string mitoMapDataType, ISequenceProvider sequenceProvider)
+        {
+            Console.WriteLine(version.ToString());
+            _mitoMapMutWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.Unknown.ToString(), SaTSVCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, false);
+        }
 
+
+        public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
+        {
+            if (saItems == null) return;
+            foreach (var saItem in saItems)
+            {
+                var mitoMapMutItem = saItem as MitoMapMutItem;
+                if (mitoMapMutItem != null)
+                {
+                    _mitoMapMutWriter.AddEntry(
+                        mitoMapMutItem.Chromosome.EnsemblName,
+                        mitoMapMutItem.Start,
+                        mitoMapMutItem.ReferenceAllele,
+                        mitoMapMutItem.AlternateAllele, 
+                        null,
+                        new List<string> { mitoMapMutItem.GetJsonString() });
+                }
+            }
+        }
     }
 }
