@@ -1,9 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using SAUtils.InputFileParsers.Cosmic;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
+using Vcf;
 using Xunit;
 
 namespace UnitTests.SaUtilsTests.InputFileParsers
@@ -21,14 +24,17 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             _refChromDict = new Dictionary<string, IChromosome>
             {
                 {"1",new Chromosome("chr1", "1",0) },
-                {"3",new Chromosome("chr3", "3", 2) }
+                {"3",new Chromosome("chr3", "3", 2) },
+                {"17",new Chromosome("chr17", "17", 16) }
             };
         }
 
         [Fact]
         public void TwoStudyCosmicCoding()
         {
-            var cosmicReader = new MergedCosmicReader(Resources.TopPath("cosm5428243.vcf"), Resources.TopPath("cosm5428243.tsv"), _refChromDict);
+            var vcfReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("cosm5428243.vcf"));
+            var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("cosm5428243.tsv"));
+            var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
 
             var enumerator = cosmicReader.GetEnumerator();
             enumerator.MoveNext();
@@ -53,44 +59,40 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             enumerator.Dispose();
         }
 
-        [Fact(Skip = "new SA")]
+        [Fact]
         public void IndelWithNoLeadingBase()
         {
-            //var cosmicReader = new MergedCosmicReader();
+            var tsvReader = new StreamReader(new MemoryStream());
+            var vcfReader = new StreamReader(new MemoryStream());
+            var cosmicReader = new MergedCosmicReader(vcfReader,tsvReader,_refChromDict);
 
-            //const string vcfLine1 = "3	10188320	COSM14426	GGTACTGAC	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.?;CNT=2";
-            //const string vcfLine2 = "3	10188320	COSM18152	G	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.V155M;CNT=7";
+            const string vcfLine1 = "3	10188320	COSM14426	GGTACTGAC	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.?;CNT=2";
+            const string vcfLine2 = "3	10188320	COSM18152	G	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.V155M;CNT=7";
 
-            //var sa = new SupplementaryAnnotationPosition(10188320);
-            //var saCreator = new SupplementaryPositionCreator(sa);
+            var items = cosmicReader.ExtractCosmicItems(vcfLine1);
+            Assert.Equal("GGTACTGAC", items[0].ReferenceAllele);
+            Assert.Equal("A", items[0].AlternateAllele);
+            Assert.Equal(10188320, items[0].Start);
 
-            //foreach (var cosmicItem in cosmicReader.ExtractCosmicItems(vcfLine1))
-            //{
-            //    cosmicItem.SetSupplementaryAnnotations(saCreator);
-            //}
-
-            //Assert.Equal("9A", sa.CosmicItems[0].SaAltAllele);
-
-            //foreach (var cosmicItem in cosmicReader.ExtractCosmicItems(vcfLine2))
-            //{
-            //    cosmicItem.SetSupplementaryAnnotations(saCreator);
-            //}
-
-            //Assert.Equal("A", sa.CosmicItems[1].SaAltAllele);
+            var items2 = cosmicReader.ExtractCosmicItems(vcfLine2);
+            Assert.Equal("G", items2[0].ReferenceAllele);
+            Assert.Equal("A", items2[0].AlternateAllele);
+            Assert.Equal(10188320, items2[0].Start);
         }
 
         /// <summary>
         /// testing if cosmic alternate allele is correctly output
         /// </summary>
-        [Fact(Skip="currently trim occurs in writeTSV")]
+        [Fact]
         public void CosmicAltAllele()
         {
-            var cosmicReader = new MergedCosmicReader(Resources.TopPath("COSM983708.vcf"),
-                Resources.TopPath("COSM983708.tsv"), _refChromDict);
+            var vcfReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM983708.vcf"));
+            var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM983708.tsv"));
+            var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
             var items = cosmicReader.ToList();
 
             Assert.Equal(1,items.Count);
-            Assert.Contains("\"refAllele\":\"-\"",items[0].GetJsonString());
+            Assert.Contains("\"refAllele\":\"C\"",items[0].GetJsonString());
 
         }
 
@@ -98,8 +100,9 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
         public void CosmicAlleleSpecificIndel()
         {
 
-            var cosmicReader = new MergedCosmicReader(Resources.TopPath("COSM18152.vcf"),
-                Resources.TopPath("COSM18152.tsv"), _refChromDict);
+            var vcfReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM18152.vcf"));
+            var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM18152.tsv"));
+            var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
             var items = cosmicReader.ToList();
 
             Assert.Equal(3, items.Count);
