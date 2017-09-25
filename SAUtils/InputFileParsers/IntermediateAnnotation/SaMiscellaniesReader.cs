@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using Compression.Utilities;
 using SAUtils.DataStructures;
 
@@ -11,23 +13,26 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
     public class SaMiscellaniesReader:IEnumerable<SaMiscellanies>
     {
 
-        private readonly FileInfo _inputFileInfo;
+
+        private readonly StreamReader _inputFileStreamReader;
+
         private readonly Dictionary<string, long> _refNameOffsets;
 
 
 
-        public SaMiscellaniesReader(FileInfo inputFileInfo)
+        public SaMiscellaniesReader(StreamReader inputFileStreamReader,Stream indexFileStream)
         {
-            _inputFileInfo = inputFileInfo;
 
-            using (var tsvIndex = new TsvIndex(new BinaryReader(File.Open(inputFileInfo.FullName + ".tvi", FileMode.Open, FileAccess.Read, FileShare.Read))))
+            _inputFileStreamReader = inputFileStreamReader;
+
+            using (var tsvIndex = new TsvIndex(new BinaryReader(indexFileStream)))
             {
                 _refNameOffsets = tsvIndex.TagPositions;
             }
 
 
             //set the header information
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
+            using (var reader =_inputFileStreamReader)
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -65,7 +70,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
             var offset = _refNameOffsets[refName];
 
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
+            using (var reader = _inputFileStreamReader)
             {
                 reader.BaseStream.Position = offset;
                 string line;

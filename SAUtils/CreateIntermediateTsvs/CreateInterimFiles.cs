@@ -224,7 +224,10 @@ namespace SAUtils.CreateIntermediateTsvs
             var version = GetDataSourceVersion(vcfFile);
 			using (var writer = new CosmicTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
-				var cosmicReader = new MergedCosmicReader(vcfFile,tsvFile,_refNamesDictionary);
+			    var tsvReader = GZipUtilities.GetAppropriateStreamReader(tsvFile);
+                var vcfReader = GZipUtilities.GetAppropriateStreamReader(vcfFile);
+
+                var cosmicReader = new MergedCosmicReader(vcfReader,tsvReader,_refNamesDictionary);
 				WriteSortedItems(cosmicReader.GetEnumerator(), writer);
 			}
 
@@ -240,7 +243,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var version = GetDataSourceVersion(fileName);
 			using (var writer = new EvsTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
-				var evsReader = new EvsReader(new FileInfo(fileName), _refNamesDictionary);
+				var evsReader = new EvsReader(GZipUtilities.GetAppropriateStreamReader(fileName), _refNamesDictionary);
 				WriteSortedItems(evsReader.GetEnumerator(), writer);
 			}
 		    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -290,11 +293,16 @@ namespace SAUtils.CreateIntermediateTsvs
 
             var version = GetDataSourceVersion(fileName);
 
-			using (var tsvWriter = new DbsnpGaTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
-			{
-				var dbSnpReader = new DbSnpReader( GZipUtilities.GetAppropriateReadStream(fileName) , _refNamesDictionary);
-				WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
-			}
+		    var dbsnpWriter = new SaTsvWriter(_outputDirectory, version, _genomeAssembly.ToString(),
+		        SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
+
+		    var globalAlleleWriter = new SaTsvWriter(_outputDirectory, version, _genomeAssembly.ToString(),
+		        SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
+            using (var tsvWriter = new DbsnpGaTsvWriter(dbsnpWriter,globalAlleleWriter))
+            {
+                var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(fileName), _refNamesDictionary);
+                WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
+            }
 
 		    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
 		    WriteCompleteInfo("DbSNP", version.Version, timeSpan);
