@@ -6,15 +6,14 @@ using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
 using SAUtils.DataStructures;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Algorithms;
 
 namespace SAUtils.InputFileParsers.MitoMAP
 {
     public sealed class MitoMapMutationReader
     {
         private readonly FileInfo _mitoMapFileInfo;
-        private const string _delSymbol = "-";
-        public readonly string _dataType;
+        private const string DelSymbol = "-";
+        public readonly string DataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
 
         private readonly Dictionary<string, int[]> _mitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
@@ -46,7 +45,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         public MitoMapMutationReader(FileInfo mitoMapFileInfo, ReferenceSequenceProvider sequenceProvider)
         {
             _mitoMapFileInfo = mitoMapFileInfo;
-            _dataType = GetDataType();
+            DataType = GetDataType();
             _sequenceProvider = sequenceProvider;
         }
 
@@ -83,7 +82,8 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     foreach (var mitoMapMutItem in ParseLine(line, dataType))
                     {
                         if (!string.IsNullOrEmpty(mitoMapMutItem.ReferenceAllele) &&
-                            !string.IsNullOrEmpty(mitoMapMutItem.AlternateAllele)) yield return mitoMapMutItem;
+                            !string.IsNullOrEmpty(mitoMapMutItem.AlternateAllele))
+                            yield return mitoMapMutItem;
                     }
                 }
             }
@@ -111,7 +111,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");
             if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele))
                 Console.WriteLine($"No reference and alternative alleles could be extracted: {posi}; allele {info[fields[2]]}");
-            if (_mitoMapDelSymbolSet.Contains(altAllele)) altAllele = _delSymbol;
+            if (_mitoMapDelSymbolSet.Contains(altAllele)) altAllele = DelSymbol;
             bool? homoplasmy = null;
             if (fields[3] != -1 && _symbolToBools.ContainsKey(info[fields[3]])) homoplasmy = _symbolToBools[info[fields[3]]];
             bool? heteroplasmy = null;
@@ -119,17 +119,21 @@ namespace SAUtils.InputFileParsers.MitoMAP
             string status = fields[5] == -1 ? null : info[fields[5]];
             var (scorePercentile, clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
             List<MitoMapMutItem> mitoMapMutItems = new List<MitoMapMutItem>();
-            if (!string.IsNullOrEmpty(altAllele)) {
-                if (DegenerateBases.HasDegenerateBase(altAllele))
+            if (!string.IsNullOrEmpty(altAllele))
+            {
+                /* disable degenerate base expanding for now
+                if (DegenerateBaseUtilities.HasDegenerateBase(altAllele))
                 {
                     Console.WriteLine($"Expand Alternative Allele Sequence {altAllele} at {posi}");
-                    foreach (var possibleAltAllele in DegenerateBases.GetAllPossibleSequences(altAllele))
+                    foreach (var possibleAltAllele in DegenerateBaseUtilities.GetAllPossibleSequences(altAllele))
                     {
                         mitoMapMutItems.Add(new MitoMapMutItem(posi, refAllele, possibleAltAllele, disease, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile));
                     }
+                    return mitoMapMutItems;
                 }
-                else if (altAllele.Contains(";"))
+                else if (altAllele.Contains(";")) */
+                if (altAllele.Contains(";"))
                 {
                     Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
                     foreach (var possibleAltAllele in altAllele.Split(";"))
@@ -137,12 +141,11 @@ namespace SAUtils.InputFileParsers.MitoMAP
                         mitoMapMutItems.Add(new MitoMapMutItem(posi, refAllele, possibleAltAllele, disease, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile));
                     }
+                    return mitoMapMutItems;
                 }
             }
-            else
-            {
-                mitoMapMutItems.Add(new MitoMapMutItem(posi, refAllele, altAllele, disease, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile));
-            }
+            mitoMapMutItems.Add(new MitoMapMutItem(posi, refAllele, altAllele, disease, homoplasmy,
+                    heteroplasmy, status, clinicalSignificance, scorePercentile));
             return mitoMapMutItems;
         }
 
@@ -182,6 +185,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private (string, string, int?) GetRefAltAlleles(string alleleString)
         {
+            // C123T, A-del or A123del
             var regexPattern1 = new Regex(@"(?<ref>^[ACGTacgtNn]+)(?<posi>(\d+|-))(?<alt>([ACGTBDHKMRSVWYNacgtbdhkmrsvwyn]+|:|del[ACGTacgtNn]*|d)$)");
             var match1 = regexPattern1.Match(alleleString);
             if (match1.Success)
@@ -190,14 +194,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 if (match1.Groups["posi"].Value != "-") extractedPosi = int.Parse(match1.Groups["posi"].Value);
                 return (match1.Groups["ref"].Value, match1.Groups["alt"].Value, extractedPosi);
             }
-            // A-del or A123del
-            /*var regexPattern5 = new Regex(@"(?<ref>^[ACGTacgtNn]+)(?<posi>(\d+|-))del$");
-            var match5 = regexPattern5.Match(alleleString);
-            if (match5.Success)
-            {
-                return (match1.Groups["ref"].Value, "-", posi);
-            }*/
-
+            
             // 16021_16022del
             var regexPattern2 = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)del");
             var match2 = regexPattern2.Match(alleleString);
@@ -213,8 +210,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (match3.Success)
             {
                 var extractedPosi = int.Parse(match3.Groups["posi"].Value);
-                Console.WriteLine(GetRefAllelesFromReferece(_sequenceProvider, extractedPosi,
-                    int.Parse(match3.Groups["length"].Value)));
                 return (GetRefAllelesFromReferece(_sequenceProvider, extractedPosi,
                     int.Parse(match3.Groups["length"].Value)), "-", extractedPosi);
             }
@@ -236,9 +231,8 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 var start = int.Parse(match5.Groups["start"].Value);
                 var end = int.Parse(match5.Groups["end"].Value);
                 var refSequence = GetRefAllelesFromReferece(_sequenceProvider, start, end - start + 1);
-                //if (refSequence != match5.Groups["seq"].Value) throw new Exception($"Inconsistent sequences: reference {refSequence}, annotation {match5.Groups["seq"].Value}"); 
-                //return (refSequence, ReverseSequence(refSequence), start);
-                return (refSequence, refSequence, start);
+                if (refSequence != match5.Groups["seq"].Value) throw new Exception($"Inconsistent sequences: reference {refSequence}, annotation {match5.Groups["seq"].Value}"); 
+                return (refSequence, ReverseSequence(refSequence), start);
             }
             //A-Cor CC
             var regexPattern6 = new Regex(@"(?<ref>[ACGTacgtNn]+)[_|-](?<alt1>[ACGTacgtNn]+) ?or ?(?<alt2>[ACGTacgtNn]+)");
@@ -256,13 +250,12 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 var altBase = char.Parse(match7.Groups["alt"].Value);
                 int minRepeat = int.Parse(match7.Groups["min"].Value);
                 int maxRepeat = int.Parse(match7.Groups["max"].Value);
-                var altAlleleSequences = "";
+                var altAlleleSequences = new List<string>();
                 for (int i = minRepeat; i <= maxRepeat; i++)
                 {
-                    altAlleleSequences += new String(altBase, i);
+                    altAlleleSequences.Add(new String(altBase, i));
                 }
-                var altAllele = match7.Groups["alt1"].Value + ";" + match6.Groups["alt2"].Value;
-                return (match7.Groups["ref"].Value, altAllele, null);
+                return (match7.Groups["ref"].Value, string.Join(";", altAlleleSequences), null);
             }
 
             return (null, null, null);
@@ -283,6 +276,13 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 i--;
             }
             return new string(reversedNucleotide);
+        }
+
+        public static IEnumerator<MitoMapMutItem> MergeAndSort(List<MitoMapMutationReader> mitoMapMutationReaders)
+        {
+            var allItems = mitoMapMutationReaders.SelectMany(x => x.GetMitoMapItems()).ToList();
+            allItems.ForEach(x => x.Trim());
+            return allItems.OrderBy(x => x.Start).GetEnumerator();
         }
     }
 }

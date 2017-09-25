@@ -22,6 +22,7 @@ using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateIntermediateTsvs
@@ -132,17 +133,22 @@ namespace SAUtils.CreateIntermediateTsvs
             if (mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
-            var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), InterimSaCommon.MitoMap));
+            var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
+            var sequenceProvider =
+                new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
+            sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
+            var mitoMapMutationReaders = new List<MitoMapMutationReader>();
             foreach (var mitoMapFileName in mitoMapFileNames)
             {
-                var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
-                var mitoMapMutationReader = new MitoMapMutationReader(new FileInfo(mitoMapFileName), sequenceProvider);
-                var outputFilePrefix = InterimSaCommon.MitoMap + "_" + mitoMapMutationReader._dataType;
-                using (var writer = new MitoMapMutationTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
-                    WriteSortedItems(mitoMapMutationReader.GetEnumerator(), writer);
+                mitoMapMutationReaders.Add(new MitoMapMutationReader(new FileInfo(mitoMapFileName), sequenceProvider));
             }
+            var mergedMitoMapMutItems = MitoMapMutationReader.MergeAndSort(mitoMapMutationReaders);
+            var outputFilePrefix = InterimSaCommon.MitoMapMutTag;
+                using (var writer = new MitoMapMutationTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
+                    WriteSortedItems(mergedMitoMapMutItems, writer);
+            
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo(InterimSaCommon.MitoMap, version.Version, timeSpan);
+            WriteCompleteInfo(InterimSaCommon.MitoMapMutTag, version.Version, timeSpan);
         }
 
         /*

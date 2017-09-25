@@ -23,7 +23,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private string GetDataType()
         {
-            var dataType = _mitoMapFileInfo.Name.Replace(".HTML", null);
+            var dataType = _mitoMapFileInfo.Name.Replace(".html", null);
             if (!_mitoMapSvDataTypes.ContainsKey(dataType)) throw new InvalidFileFormatException($"Unexpected data file: {_mitoMapFileInfo.Name}");
             return dataType;
         }

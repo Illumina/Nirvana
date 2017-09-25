@@ -18,6 +18,7 @@ namespace SAUtils.DataStructures
 		public const string OnekSvTag             = "oneKg";
 		public const string DgvTag                = "dgv";
 		public const string ClinGenTag            = "clingen";
-	    public const string MitoMap = "mitoMap";
-	}
+	    public const string MitoMapMutTag = "mitoMap_Mutation";
+	    public const string MitoMapSVTag = "mitoMap_SV";
+    }
 }
