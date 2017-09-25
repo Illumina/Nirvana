@@ -454,6 +454,17 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
+        [Trait("jira", "NIR-2748")]
+        public void Discard_entries_with_unknown_variant_type()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 0), 66765160, "CAG");
+
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.TopPath("RCV000485802.xml")), sequenceProvider);
+
+            Assert.False(reader.Any());
+        }
+
+        [Fact]
         [Trait("jira", "NIR-2035")]
         public void EmptyRefAndAlt()
         {
