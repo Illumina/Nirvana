@@ -5,7 +5,7 @@ using VariantAnnotation.Interface;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public class MergeIntermediateTsvsMain
+    public sealed class MergeIntermediateTsvsMain
     {
         private ExitCodes ProgramExecution()
         {

@@ -9,7 +9,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class IntervalTsvWriter:IDisposable
+	public sealed class IntervalTsvWriter:IDisposable
 	{
 		#region members
 

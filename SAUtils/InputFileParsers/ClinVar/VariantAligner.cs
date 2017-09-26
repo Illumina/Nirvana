@@ -5,7 +5,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-    public class VariantAligner
+    public sealed class VariantAligner
     {
         private readonly ISequence _compressedSequence;
         private const int MaxRotationRange = 500;

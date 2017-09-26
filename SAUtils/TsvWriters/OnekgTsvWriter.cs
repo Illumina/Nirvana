@@ -58,7 +58,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_onekgWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.OneKgenTag, "AF1000G",true, sequenceProvider);
+				SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.OneKgenTag, "AF1000G",true, sequenceProvider);
 
             _refMinorWriter = new SaMiscTsvWriter(outputDirectory,version,genomeAssembly.ToString(),InterimSaCommon.RefMinorTag, sequenceProvider);
 

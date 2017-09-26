@@ -7,7 +7,7 @@ using VariantAnnotation.Caches.DataStructures;
 
 namespace Jasix.DataStructures
 {
-    public class JasixChrIndex
+    public sealed class JasixChrIndex
     {
         public readonly string ReferenceSequence;
         private readonly List<JasixNode> _nodes;
@@ -144,9 +144,7 @@ namespace Jasix.DataStructures
 
 	    public long[] FindLargeVariants(int begin, int end)
         {
-            
-            if (_intervalArray == null) return null;
-            var positions = _intervalArray.GetAllOverlappingValues(begin, end);
+            var positions = _intervalArray?.GetAllOverlappingValues(begin, end);
 
             if (positions == null || positions.Length == 0) return null;
             return positions;

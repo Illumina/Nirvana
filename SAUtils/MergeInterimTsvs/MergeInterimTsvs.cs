@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
@@ -20,7 +19,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public class MergeInterimTsvs
+    public sealed class MergeInterimTsvs
     {
         private List<SaTsvReader> _tsvReaders;
         private List<IntervalTsvReader> _intervalReaders;
@@ -331,8 +330,7 @@ namespace SAUtils.MergeInterimTsvs
                 refMinorCount = blockSaWriter.RefMinorCount;
             }
 
-            double lookupsPerSecond;
-            Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out lookupsPerSecond)}");
+            Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out double lookupsPerSecond)}");
         }
 
         private static List<ISupplementaryInterval> GetSpecificIntervals(ReportFor reportFor, IEnumerable<ISupplementaryInterval> intervals)

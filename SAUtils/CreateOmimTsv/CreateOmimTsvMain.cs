@@ -6,7 +6,7 @@ using VariantAnnotation.Interface;
 
 namespace SAUtils.CreateOmimTsv
 {
-    class CreateOmimTsvMain
+    public sealed class CreateOmimTsvMain
     {
         private ExitCodes ProgramExecution()
         {

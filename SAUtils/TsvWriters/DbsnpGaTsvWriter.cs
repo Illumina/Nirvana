@@ -5,14 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class DbsnpGaTsvWriter:ISaItemTsvWriter
+	public sealed class DbsnpGaTsvWriter:ISaItemTsvWriter
 	{
 
 		#region members

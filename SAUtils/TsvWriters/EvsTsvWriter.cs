@@ -8,7 +8,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class EvsTsvWriter : ISaItemTsvWriter
+	public sealed class EvsTsvWriter : ISaItemTsvWriter
 	{
 		#region members
 
@@ -52,7 +52,7 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		public EvsTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider) :this(new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.EvsTag, InterimSaCommon.EvsVcfTag, true, sequenceProvider))
+				SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.EvsTag, InterimSaCommon.EvsVcfTag, true, sequenceProvider))
 		{
 			Console.WriteLine(version.ToString());
 		}

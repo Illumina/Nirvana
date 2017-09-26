@@ -1,6 +1,6 @@
 ﻿namespace SAUtils
 {
-    public static class SaTSVCommon
+    public static class SaTsvCommon
     {
 
         public const int DbSnpSchemaVersion = 1;

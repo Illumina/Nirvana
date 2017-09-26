@@ -10,14 +10,14 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.CreateOmimTsv
 {
-    public class OmimTsvCreator
+    public sealed class OmimTsvCreator
     {
-        private const string _jsonKeyName = "omim";
-        private FileInfo _geneMap2File;
-        private FileInfo _mim2Genefile;
-        private GeneSymbolUpdater _geneSymbolUpdater;
-        private SortedList<string, List<OmimEntry>> _gene2Mims;
-        private string _outputDirectory;
+        private const string JsonKeyName = "omim";
+        private readonly FileInfo _geneMap2File;
+        private readonly FileInfo _mim2Genefile;
+        private readonly GeneSymbolUpdater _geneSymbolUpdater;
+        private readonly SortedList<string, List<OmimEntry>> _gene2Mims;
+        private readonly string _outputDirectory;
 
         public OmimTsvCreator(FileInfo geneMap2File, FileInfo mim2Genefile,  GeneSymbolUpdater geneSymbolUpdater, string outputDirectory)
         {
@@ -26,7 +26,7 @@ namespace SAUtils.CreateOmimTsv
 
             _geneSymbolUpdater = geneSymbolUpdater;
             _outputDirectory = outputDirectory;
-            _gene2Mims = new SortedList<string, List<OmimEntry>> { };
+            _gene2Mims = new SortedList<string, List<OmimEntry>>();
         }
 
         public void Create()
@@ -61,7 +61,7 @@ namespace SAUtils.CreateOmimTsv
 
             var dataSourceVersion = GetSourceVersion(_geneMap2File.FullName);
 
-            using (var omimWriter = new GeneAnnotationTsvWriter(_outputDirectory, dataSourceVersion, null, 0, _jsonKeyName, true))
+            using (var omimWriter = new GeneAnnotationTsvWriter(_outputDirectory, dataSourceVersion, null, 0, JsonKeyName, true))
             {
                 foreach (var kvp in _gene2Mims)
                 {           

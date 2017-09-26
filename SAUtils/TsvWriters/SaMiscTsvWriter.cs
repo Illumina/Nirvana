@@ -8,7 +8,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-    public class SaMiscTsvWriter:IDisposable
+    public sealed class SaMiscTsvWriter:IDisposable
     {
 
         private const int ReferenceWindow = 10;

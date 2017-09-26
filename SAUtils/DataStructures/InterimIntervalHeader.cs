@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.DataStructures
 {
-    public class InterimIntervalHeader : InterimHeader, IEquatable<InterimIntervalHeader>
+    public sealed class InterimIntervalHeader : InterimHeader, IEquatable<InterimIntervalHeader>
     {
         private readonly ReportFor _reportingFor;
 
