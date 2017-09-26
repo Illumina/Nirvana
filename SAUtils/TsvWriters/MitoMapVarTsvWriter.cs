@@ -9,7 +9,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-    public class MitoMapMutationTsvWriter : ISaItemTsvWriter
+    public class MitoMapVarTsvWriter : ISaItemTsvWriter
     {
 
         #region members
@@ -51,7 +51,7 @@ namespace SAUtils.TsvWriters
         }
         #endregion
 
-        public MitoMapMutationTsvWriter(DataSourceVersion version, string outputDirectory, string mitoMapDataType, ISequenceProvider sequenceProvider)
+        public MitoMapVarTsvWriter(DataSourceVersion version, string outputDirectory, string mitoMapDataType, ISequenceProvider sequenceProvider)
         {
             Console.WriteLine(version.ToString());
             _mitoMapMutWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.Unknown.ToString(), SaTSVCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, true);
@@ -61,7 +61,7 @@ namespace SAUtils.TsvWriters
         public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
         {
             if (saItems == null) return;
-            var mitoMapMutItems = saItems.Select(x => x as MitoMapMutItem).ToList();
+            var mitoMapMutItems = saItems.Select(x => x as MitoMapItem).ToList();
             var uniqueMutations = GetUniqueMutations(mitoMapMutItems);
             foreach (var mutation in uniqueMutations)
             {
@@ -71,20 +71,20 @@ namespace SAUtils.TsvWriters
                            mutation.Key.Item1,
                            mutation.Key.Item2,
                            null,
-                           mutation.Value.Select(x => x.GetJsonString()).Distinct().ToList());
+                           mutation.Value.Select(x => x.GetVariantJsonString()).Distinct().ToList());
             }
         }
 
-        private Dictionary<(string, string), List<MitoMapMutItem>> GetUniqueMutations(List<MitoMapMutItem> mitoMapMutItems)
+        private Dictionary<(string, string), List<MitoMapItem>> GetUniqueMutations(List<MitoMapItem> mitoMapMutItems)
         {
-            var uniqueMutations = new Dictionary<(string, string), List<MitoMapMutItem>>();
+            var uniqueMutations = new Dictionary<(string, string), List<MitoMapItem>>();
 
             foreach (var mitoMapMutItem in mitoMapMutItems)
             {
                 var mutation = (mitoMapMutItem.ReferenceAllele, mitoMapMutItem.AlternateAllele);
                 if (uniqueMutations.ContainsKey(mutation))
                     uniqueMutations[mutation].Add(mitoMapMutItem);
-                else uniqueMutations[mutation] = new List<MitoMapMutItem> { mitoMapMutItem };
+                else uniqueMutations[mutation] = new List<MitoMapItem> { mitoMapMutItem };
             }
             return uniqueMutations;
         }

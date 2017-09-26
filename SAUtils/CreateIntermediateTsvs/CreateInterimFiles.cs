@@ -42,7 +42,7 @@ namespace SAUtils.CreateIntermediateTsvs
         private readonly string _dgvFile;
         private readonly string _evsFile;
         private readonly string _exacFile;
-        private readonly List<string> _mitoMapMutationFileNames;
+        private readonly List<string> _mitoMapVarFileNames;
         private readonly List<string> _mitoMapSvFileNames;
         private readonly string _outputDirectory;
         #endregion
@@ -54,7 +54,7 @@ namespace SAUtils.CreateIntermediateTsvs
         private readonly string _compressedReferencePath;
 
         #endregion
-        public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> mitoMapMutationFileNames, List<string> mitoMapSvFileNames, List<string> customAnnotationFiles, List<string> customIntervalFiles)
+        public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames, List<string> customAnnotationFiles, List<string> customIntervalFiles)
         {
             _outputDirectory = outputDirectory;
             _dbSnpFileName = dbSnpFileName;
@@ -68,16 +68,12 @@ namespace SAUtils.CreateIntermediateTsvs
             _dgvFile = dgvFile;
             _onekGSvFileName = onekGSvFileName;
             _clinGenFileName = clinGenFileName;
-            _mitoMapMutationFileNames = mitoMapMutationFileNames;
+            _mitoMapVarFileNames = mitoMapVarFileNames;
             _mitoMapSvFileNames = mitoMapSvFileNames;
             _customIntervalFiles = customIntervalFiles;
-
             _compressedReferencePath = compressedReferencePath;
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
-
-
             _refNamesDictionary = sequenceProvider.GetChromosomeDictionary();
-
             _genomeAssembly = sequenceProvider.GenomeAssembly;
 
         }
@@ -106,8 +102,8 @@ namespace SAUtils.CreateIntermediateTsvs
                 Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.DgvTag, _dgvFile)),
                 Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.ClinGenTag, _clinGenFileName)),
                 Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName)),
-                Task.Factory.StartNew(() => CreateMitoMapMutationTsv(_mitoMapMutationFileNames)),
-                //Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
+                Task.Factory.StartNew(() => CreateMitoMapVarTsv(_mitoMapVarFileNames)),
+                Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
             };
 
             tasks.AddRange(_customAnnotationFiles.Select(customAnnotationFile => Task.Factory.StartNew(() => CreateCutomAnnoTsv(customAnnotationFile))));
@@ -128,45 +124,52 @@ namespace SAUtils.CreateIntermediateTsvs
             }
         }
 
-        private void CreateMitoMapMutationTsv(List<string> mitoMapFileNames)
+        private void CreateMitoMapSvTsv(List<string> mitoMapSvFileNames)
         {
-            if (mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
+            if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(String.IsNullOrEmpty)) return;
+            var benchMark = new Benchmark();
+            var rootDirectory = new FileInfo(mitoMapSvFileNames[0]).Directory;
+            var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
+            var sequenceProvider =
+                new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
+            sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
+            var mitoMapSvReaders = new List<MitoMapSvReader>();
+            foreach (var mitoMapFileName in mitoMapSvFileNames)
+            {
+                mitoMapSvReaders.Add(new MitoMapSvReader(new FileInfo(mitoMapFileName), sequenceProvider));
+            }
+
+            var mergedMitoMapItems = MitoMapSvReader.MergeAndSort(mitoMapSvReaders);
+
+            using (var writer = new IntervalTsvWriter(_outputDirectory, version,
+                _genomeAssembly.ToString(), SaTSVCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapSvTag,
+                ReportFor.StructuralVariants))
+                CreateSvTsv(mergedMitoMapItems, writer);
+            var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
+            WriteCompleteInfo(InterimSaCommon.MitoMapSvTag, version.Version, timeSpan);
+        }
+
+        private void CreateMitoMapVarTsv(List<string> mitoMapFileNames)
+        {
+            if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
             var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
             var sequenceProvider =
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
-            var mitoMapMutationReaders = new List<MitoMapMutationReader>();
+            var mitoMapVarReaders = new List<MitoMapVariantReader>();
             foreach (var mitoMapFileName in mitoMapFileNames)
             {
-                mitoMapMutationReaders.Add(new MitoMapMutationReader(new FileInfo(mitoMapFileName), sequenceProvider));
+                mitoMapVarReaders.Add(new MitoMapVariantReader(new FileInfo(mitoMapFileName), sequenceProvider));
             }
-            var mergedMitoMapMutItems = MitoMapMutationReader.MergeAndSort(mitoMapMutationReaders);
-            var outputFilePrefix = InterimSaCommon.MitoMapMutTag;
-                using (var writer = new MitoMapMutationTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
-                    WriteSortedItems(mergedMitoMapMutItems, writer);
-            
+            var mergedMitoMapVarItems = MitoMapVariantReader.MergeAndSort(mitoMapVarReaders);
+            var outputFilePrefix = InterimSaCommon.MitoMapVarTag;
+                using (var writer = new MitoMapVarTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
+                    WriteSortedItems(mergedMitoMapVarItems, writer);         
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo(InterimSaCommon.MitoMapMutTag, version.Version, timeSpan);
+            WriteCompleteInfo(InterimSaCommon.MitoMapVarTag, version.Version, timeSpan);
         }
-
-        /*
-	    private void CreateMitoMapSvTsv(List<string> mitoMapFileNames)
-	    {
-	        if (mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
-	        var benchMark = new Benchmark();
-	        var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
-	        var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), InterimSaCommon.MitoMap));
-	        using (var writer = new MitoMapSvTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
-	        {
-	            var evsReader = new MitoMapSvReader(new FileInfo(mitoMapFileName), _refNamesDictionary);
-	            WriteSortedItems(evsReader.GetEnumerator(), writer);
-	        }
-	        var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-	        WriteCompleteInfo(InterimSaCommon.MitoMap, version.Version, timeSpan);
-	    }*/
-
 
         private void CreateSvTsv(string sourceName, string fileName)
         {
@@ -206,6 +209,7 @@ namespace SAUtils.CreateIntermediateTsvs
                     }
 
                     break;
+
                 default:
                     Console.WriteLine("invalid source name");
                     break;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using CommonUtilities;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;
@@ -18,7 +19,13 @@ namespace SAUtils.DataStructures
         public const string MitoMapInsertionsSimple = "InsertionsSimple";
     }
 
-    public sealed class MitoMapMutItem : SupplementaryDataItem
+    public static class MitoDLoop
+    {
+        public const int Start = 16024;
+        public const int End = 576;
+    }
+
+    public sealed class MitoMapItem : SupplementaryDataItem
     {
         private readonly string _disease;
         private bool? _homoplasmy;
@@ -26,23 +33,29 @@ namespace SAUtils.DataStructures
         private readonly string _status;
         private readonly string _clinicalSignificance;
         private readonly string _scorePercentile;
+        private readonly int? _intervalEnd;
+        private readonly VariantType? _variantType;
+        private static readonly Chromosome ChromM= new Chromosome("chrM", "MT", 24);
 
-        public MitoMapMutItem(int posi, string refAllele, string altAllele, string disease, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile)
+
+        public MitoMapItem(int posi, string refAllele, string altAllele, string disease, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType)
         {
-            Chromosome = new Chromosome("chrM", "MT", 24);
+            Chromosome = ChromM;
             Start = posi;
             ReferenceAllele = refAllele;
             AlternateAllele = altAllele;
-            IsInterval = false;
+            IsInterval = isInterval;
             _disease = disease;
             _homoplasmy = homoplasmy;
             _heteroplasmy = heteroplasmy;
             _status = status;
             _clinicalSignificance = clinicalSignificance;
             _scorePercentile = scorePercentile;
+            _intervalEnd = intervalEnd;
+            _variantType = variantType;
         }
 
-        public string GetJsonString()
+        public string GetVariantJsonString()
         {
             var sb = new StringBuilder();
             var jsonObject = new JsonObject(sb);
@@ -64,41 +77,32 @@ namespace SAUtils.DataStructures
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()
         {
-            throw new System.NotImplementedException();
+            if (!IsInterval || !_intervalEnd.HasValue || !_variantType.HasValue) return null;
+
+            var intValues = new Dictionary<string, int>();
+            var doubleValues = new Dictionary<string, double>();
+            var freqValues = new Dictionary<string, double>();
+            var stringValues = new Dictionary<string, string>();
+            var boolValues = new List<string>();
+
+            var suppInterval = new SupplementaryIntervalItem(Chromosome, Start, _intervalEnd.Value, null, _variantType.Value,
+                InterimSaCommon.MitoMapSvTag, intValues, doubleValues, freqValues, stringValues, boolValues);
+            return suppInterval;
         }
 
 
-        public Dictionary<(string, string), List<MitoMapMutItem>> GroupByAltAllele(List<MitoMapMutItem> mitoMapMutItems)
+        public Dictionary<(string, string), List<MitoMapItem>> GroupByAltAllele(List<MitoMapItem> mitoMapMutItems)
         {
-            var groups = new Dictionary<(string, string), List<MitoMapMutItem>>();
+            var groups = new Dictionary<(string, string), List<MitoMapItem>>();
 
             foreach (var mitoMapMutItem in mitoMapMutItems)
             {
                 var alleleTuple = (mitoMapMutItem.ReferenceAllele, mitoMapMutItem.AlternateAllele);
                 if (groups.ContainsKey(alleleTuple))
                     groups[alleleTuple].Add(mitoMapMutItem);
-                else groups[alleleTuple] = new List<MitoMapMutItem> { mitoMapMutItem };
+                else groups[alleleTuple] = new List<MitoMapItem> { mitoMapMutItem };
             }
-
             return groups;
         }
-
-        /*
-        private List<MitoMapMutItem> CombineFiles(List<MitoMapMutItem> mitoMapMutItems)
-        {
-            var mitoMapMutcDict = new Dictionary<string, MitoMapMutItem>();
-
-            foreach (var mitoMapItem in mitoMapMutItems)
-            {
-                if (mitoMapMutcDict.ContainsKey(cosmicItem.ID))
-                {
-                    cosmicDict[cosmicItem.ID].MergeStudies(cosmicItem);
-                }
-                else cosmicDict[cosmicItem.ID] = cosmicItem;
-            }
-
-            return cosmicDict.Values.ToList();
-        }
-        */
     }
 }

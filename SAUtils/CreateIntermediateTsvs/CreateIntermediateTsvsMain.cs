@@ -25,7 +25,7 @@ namespace SAUtils.CreateIntermediateTsvs
 					ConfigurationSettings.InputDgvFile,
 					ConfigurationSettings.Input1000GSvFileName,
 					ConfigurationSettings.InputClinGenFileName,
-                    ConfigurationSettings.InputMitoMapMutationFileNames,
+                    ConfigurationSettings.InputMitoMapVarFileNames,
                     ConfigurationSettings.InputMitoMapSvFileNames,
 					ConfigurationSettings.CustomAnnotationFiles,
 					ConfigurationSettings.CustomIntervalFiles
@@ -113,9 +113,9 @@ namespace SAUtils.CreateIntermediateTsvs
 					v => ConfigurationSettings.InputClinGenFileName = v
 				},
 			    {
-			        "mitoMut=",
-			        "input MitoMAP mutation HTML file",
-			        v => ConfigurationSettings.InputMitoMapMutationFileNames.Add(v)
+			        "mitoVar=",
+			        "input MitoMAP variant HTML file",
+			        v => ConfigurationSettings.InputMitoMapVarFileNames.Add(v)
 			    },
 			    {
 			        "mitoSv=",
@@ -145,7 +145,7 @@ namespace SAUtils.CreateIntermediateTsvs
 		    .CheckInputFilenameExists(ConfigurationSettings.InputExacFile, "input Exac file", "--exac", false)
 		    .CheckInputFilenameExists(ConfigurationSettings.InputDgvFile, "input DGV file", "--dgv", false)
 		    .CheckInputFilenameExists(ConfigurationSettings.Input1000GSvFileName, "input DGV file", "--onekSv", false)
-            .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapMutationFileNames, "input MitoMap mutation file names", "--mitoMut", false)
+            .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapVarFileNames, "input MitoMap variant file names", "--mitoVar", false)
 		    .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapSvFileNames, "input MitoMap SV file names", "--mitoSv", false)
             .CheckEachFilenameExists(ConfigurationSettings.CustomAnnotationFiles, "Custom Annotation file name", "--cust", false)
             .CheckEachFilenameExists(ConfigurationSettings.CustomIntervalFiles, "Custom interval file name", "--bed", false)
