@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Vcf
 {
@@ -39,6 +40,8 @@ namespace Vcf
                 return null;
             }
         }
+
+        
 
     }
 }

@@ -4,6 +4,7 @@ using System.IO;
 using VariantAnnotation.GeneAnnotation;
 using System.Linq;
 using Compression.Utilities;
+using ErrorHandling;
 using SAUtils.TsvWriters;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
@@ -29,7 +30,7 @@ namespace SAUtils.CreateOmimTsv
             _gene2Mims = new SortedList<string, List<OmimEntry>> { };
         }
 
-        public void Create()
+        public ExitCodes Create()
         {
             var geneMap2Reader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_geneMap2File.FullName), _geneSymbolUpdater);
             var mimToGeneReader = _mim2Genefile != null? new OmimReader(GZipUtilities.GetAppropriateReadStream(_mim2Genefile.FullName), _geneSymbolUpdater):null;
@@ -57,9 +58,10 @@ namespace SAUtils.CreateOmimTsv
                 }
 
             }
-            
 
-            var dataSourceVersion = GetSourceVersion(_geneMap2File.FullName);
+
+            var dataSourceVersion = DataSourceVersionReader.GetSourceVersion(_geneMap2File.FullName + ".version");
+            Console.WriteLine(dataSourceVersion.ToString());
 
             using (var omimWriter = new GeneAnnotationTsvWriter(_outputDirectory, dataSourceVersion, null, 0, _jsonKeyName, true))
             {
@@ -69,22 +71,8 @@ namespace SAUtils.CreateOmimTsv
                 }
             }
 
+            return ExitCodes.Success;
         }
-
-
-        private static DataSourceVersion GetSourceVersion(string dataFileName)
-        {
-            var versionFileName = dataFileName + ".version";
-
-            if (!File.Exists(versionFileName))
-            {
-                throw new FileNotFoundException(versionFileName);
-            }
-
-            var versionReader = new DataSourceVersionReader(versionFileName);
-            var version = versionReader.GetVersion();
-            Console.WriteLine(version.ToString());
-            return version;
-        }
+        
     }
 }
