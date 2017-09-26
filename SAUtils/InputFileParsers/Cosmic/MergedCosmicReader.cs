@@ -13,8 +13,10 @@ namespace SAUtils.InputFileParsers.Cosmic
     {
         #region members
 
-        private readonly string _vcfFileName;
-        private readonly string _tsvFileName;
+        //private readonly string _vcfFileName;
+        //private readonly string _tsvFileName;
+        private readonly StreamReader _vcfFileReader;
+        private readonly StreamReader _tsvFileReader;
         private string _geneName;
         private int? _sampleCount;
 
@@ -34,10 +36,10 @@ namespace SAUtils.InputFileParsers.Cosmic
         #endregion
 
         // constructor
-        public MergedCosmicReader(string vcfFileName, string tsvFileName, IDictionary<string, IChromosome> refChromDict)
+        public MergedCosmicReader(StreamReader vcfFileReader, StreamReader tsvFileReader, IDictionary<string, IChromosome> refChromDict)
         {
-            _vcfFileName = vcfFileName;
-            _tsvFileName = tsvFileName;
+            _vcfFileReader = vcfFileReader;
+            _tsvFileReader = tsvFileReader;
             _refChromDict     = refChromDict;
             _studies     = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
         }
@@ -50,10 +52,10 @@ namespace SAUtils.InputFileParsers.Cosmic
         private IEnumerator<CosmicItem> GetCosmicItems()
         {
             //taking up all studies in to the dictionary
-            using (var tsvReader = GZipUtilities.GetAppropriateStreamReader(_tsvFileName))
+            using (_tsvFileReader)
             {
                 string line;
-                while ((line = tsvReader.ReadLine()) != null)
+                while ((line = _tsvFileReader.ReadLine()) != null)
                 {
                     if (IsHeaderLine(line))
                         GetColumnIndexes(line);//the first line is supposed to be a the header line
@@ -61,10 +63,10 @@ namespace SAUtils.InputFileParsers.Cosmic
                 }
             }
 
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_vcfFileName))
+            using (_vcfFileReader)
             {
                 string line;
-                while ((line = reader.ReadLine()) != null)
+                while ((line = _vcfFileReader.ReadLine()) != null)
                 {
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
@@ -143,7 +145,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 throw new InvalidDataException("Column for primary histology could not be detected");
         }
 
-        private List<CosmicItem> ExtractCosmicItems(string vcfLine)
+        internal List<CosmicItem> ExtractCosmicItems(string vcfLine)
         {
             var splitLine = vcfLine.Split(new[] { '\t' }, 8);
 

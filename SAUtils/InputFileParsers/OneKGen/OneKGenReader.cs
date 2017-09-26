@@ -49,7 +49,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 #pragma warning restore 414
 
         // empty constructor for onekg reader for unit tests.
-        private OneKGenReader(IDictionary<string,IChromosome> refNameDict)
+        internal OneKGenReader(IDictionary<string,IChromosome> refNameDict)
         {
             _refNameDictionary = refNameDict;
         }
@@ -122,7 +122,7 @@ namespace SAUtils.InputFileParsers.OneKGen
         /// </summary>
         /// <param name="vcfline"></param>
         /// <returns></returns>
-        private List<OneKGenItem> ExtractItems(string vcfline)
+        internal List<OneKGenItem> ExtractItems(string vcfline)
         {
             var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;

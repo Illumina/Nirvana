@@ -75,6 +75,7 @@ namespace SAUtils.TsvWriters
             _tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName + ".tvi"));
         }
 
+
         private string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
         {
             var sb = new StringBuilder();

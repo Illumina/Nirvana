@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -208,7 +210,9 @@ namespace SAUtils.MergeInterimTsvs
         {
             if (string.IsNullOrEmpty(miscFile)) return;
 
-            _miscReader = new SaMiscellaniesReader(new FileInfo(miscFile));
+            var miscFileReader = GZipUtilities.GetAppropriateStreamReader(miscFile);
+            var indexFileStream = new FileStream(miscFile+".tvi",FileMode.Open);
+            _miscReader = new SaMiscellaniesReader(miscFileReader,indexFileStream);
             _allRefNames.AddRange(_miscReader.GetAllRefNames());
 
 

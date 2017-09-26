@@ -47,7 +47,8 @@ namespace Vcf.Sample
                     RepeatNumber = sampleCols[formatIndices.CN.Value];
                     CopyNumber = null;
                 }
-                else CopyNumber = int.Parse(sampleCols[formatIndices.CN.Value]);
+                else if (sampleCols[formatIndices.CN.Value] != ".")
+                    CopyNumber = int.Parse(sampleCols[formatIndices.CN.Value]);
             }
             if (formatIndices.CI != null)
             {
