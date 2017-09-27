@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
   <ClinVarSet ID="17458387">
@@ -211,7 +211,7 @@
           <XRef DB="OMIM" ID="216550" Type="MIM" />
         </Trait>
       </TraitSet>
-      <Comment>FinDis database variant: This variant was not found or characterized by our laboratory, data were collected from public sources: see reference</Comment>
+      <Comment>FinDis database variant: This variant was not found or characterized by our laboratory, data were collected from public sourceStrings: see reference</Comment>
     </ClinVarAssertion>
   </ClinVarSet>
 

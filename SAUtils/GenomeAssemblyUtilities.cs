@@ -1,4 +1,5 @@
-﻿using ErrorHandling.Exceptions;
+﻿using System;
+using ErrorHandling.Exceptions;
 using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils
@@ -9,7 +10,7 @@ namespace SAUtils
         {
             GenomeAssembly ret;
 
-            switch (genomeAssembly.ToLower())
+            switch (String.IsNullOrEmpty(genomeAssembly) ? String.Empty : genomeAssembly.ToLower())
             {
                 case "grch37":
                     ret = GenomeAssembly.GRCh37;
@@ -19,6 +20,9 @@ namespace SAUtils
                     break;
                 case "hg19":
                     ret = GenomeAssembly.hg19;
+                    break;
+                case "":
+                    ret = GenomeAssembly.Unknown;
                     break;
                 default:
                     throw new UserErrorException($"Unknown genome assembly was specified: {genomeAssembly}");
