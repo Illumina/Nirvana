@@ -75,12 +75,13 @@ namespace SAUtils.TsvWriters
             _tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName + ".tvi"));
         }
 
+
         private string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
         {
             var sb = new StringBuilder();
 
             sb.Append($"#name={dataSourceVersion.Name}\n");
-            sb.Append($"#assembly={assembly}\n");
+            if (!string.IsNullOrEmpty(assembly)) sb.Append($"#assembly={assembly}\n");
             sb.Append($"#version={dataSourceVersion.Version}\n");
             sb.Append($"#description={dataSourceVersion.Description}\n");
             var releaseDate = new DateTime(dataSourceVersion.ReleaseDateTicks, DateTimeKind.Utc);

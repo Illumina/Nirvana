@@ -12,5 +12,6 @@
         public const int CustomItemSchemaVersion = 1;
         public const int CustIntervalSchemaVersion = 1;
         public const int SupplementarySchemaVersion = 1;
+        public const int MitoMapSchemaVersion = 1;
     }
 }
