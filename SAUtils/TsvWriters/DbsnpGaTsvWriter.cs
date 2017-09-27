@@ -57,21 +57,15 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		
-		public DbsnpGaTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider)
-		{
 
-			Console.WriteLine(version.ToString());
+	    public DbsnpGaTsvWriter(SaTsvWriter dbsnpWriter, SaTsvWriter globalAlleleWriter)
+	    {
+	        _dbsnpWriter = dbsnpWriter;
+	        _globalAlleleWriter = globalAlleleWriter;
+	    }
 
-			_dbsnpWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true,sequenceProvider);
 
-			_globalAlleleWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, sequenceProvider);
-
-		}
-
-		
-		public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
+        public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
 		{
 			var itemsByAllele = GetItemsByAllele(saItems);
 			WriteDbsnpTsv(itemsByAllele);
@@ -113,7 +107,7 @@ namespace SAUtils.TsvWriters
 			_globalAlleleWriter.AddEntry(chromosome.EnsemblName, position, refAllele, "N", vcfString, new List<string> { sb.ToString() });
 		}
 
-		private static string GetMostFrequentAllele(Dictionary<string, double> alleleFreqDict, string refAllele, bool isRefPreferred = true)
+		internal static string GetMostFrequentAllele(Dictionary<string, double> alleleFreqDict, string refAllele, bool isRefPreferred = true)
 		{
 			if (alleleFreqDict.Count == 0) return null;
 

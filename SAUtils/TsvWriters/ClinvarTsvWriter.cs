@@ -96,7 +96,7 @@ namespace SAUtils.TsvWriters
 			//{
 			//	var uniqueItems = groupedItem.GroupBy(p => p.ID).Select(x => x.First()).ToList();
 			//	var vcfString = string.Join(",", uniqueItems.Select(x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
-			//	var jsonStrings = uniqueItems.Select(x => x.GetJsonString()).ToList();
+			//	var jsonStrings = uniqueItems.Select(x => x.GetVariantJsonString()).ToList();
 
 			//	// since the reference allele for different items in the group may be different, we only use the first base as it is supposed to be the common padding base.
 			//	_writer.AddEntry(groupedItem.First().Chromosome,

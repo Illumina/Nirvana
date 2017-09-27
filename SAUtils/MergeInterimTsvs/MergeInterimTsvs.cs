@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -208,7 +210,9 @@ namespace SAUtils.MergeInterimTsvs
         {
             if (string.IsNullOrEmpty(miscFile)) return;
 
-            _miscReader = new SaMiscellaniesReader(new FileInfo(miscFile));
+            var miscFileReader = GZipUtilities.GetAppropriateStreamReader(miscFile);
+            var indexFileStream = new FileStream(miscFile+".tvi",FileMode.Open);
+            _miscReader = new SaMiscellaniesReader(miscFileReader,indexFileStream);
             _allRefNames.AddRange(_miscReader.GetAllRefNames());
 
 
@@ -217,23 +221,24 @@ namespace SAUtils.MergeInterimTsvs
         private void CheckAssemblyConsistancy()
         {
             var assembly = GenomeAssembly.Unknown;
-            if (_interimSaHeaders != null && _interimSaHeaders.Count > 0)
+            var knownSaAssemblies = _interimSaHeaders.Select(x => x.GenomeAssembly).Where(x => !x.Equals(GenomeAssembly.Unknown)).ToList();
+            var knownIntervalAssemblies = _intervalHeaders.Select(x => x.GenomeAssembly).Where(x => !x.Equals(GenomeAssembly.Unknown)).ToList();
+            if (knownSaAssemblies.Count > 0)
             {
-                assembly = _interimSaHeaders[0].GenomeAssembly;
-
-                for (int i = 1; i < _interimSaHeaders.Count; i++)
-                    if (_interimSaHeaders[i].GenomeAssembly != assembly)
-                        throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {_interimSaHeaders[i].GenomeAssembly} and {_interimSaHeaders[i + 1].GenomeAssembly} and {assembly}");
+                assembly = knownSaAssemblies[0];
+                for (int i = 1; i < knownSaAssemblies.Count; i++)
+                    if (knownSaAssemblies[i] != assembly)
+                        throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {knownSaAssemblies[i]} and {assembly}");
             }
 
-            if (_intervalHeaders != null && _intervalHeaders.Count > 0)
+            if (knownIntervalAssemblies.Count > 0)
             {
-                if (assembly == GenomeAssembly.Unknown)//there were no interim SA headers
-                    assembly = _intervalHeaders[0].GenomeAssembly;
+                if (assembly == GenomeAssembly.Unknown)//there were no interim SA headers with known assembly
+                    assembly = knownIntervalAssemblies[0];
 
-                for (int i = 0; i < _intervalHeaders.Count; i++)
-                    if (_intervalHeaders[i].GenomeAssembly != assembly)
-                        throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {_intervalHeaders[i].GenomeAssembly} and {_intervalHeaders[i + 1].GenomeAssembly} and {assembly}");
+                for (int i = 0; i < knownIntervalAssemblies.Count; i++)
+                    if (knownIntervalAssemblies[i] != assembly)
+                        throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {knownIntervalAssemblies[i]} and {assembly}");
             }
 
         }

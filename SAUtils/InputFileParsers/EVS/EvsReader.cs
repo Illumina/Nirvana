@@ -13,7 +13,7 @@ namespace SAUtils.InputFileParsers.EVS
 {
     public sealed class EvsReader : IEnumerable<EvsItem>
     {
-        private readonly FileInfo _evsFileInfo;
+        private readonly StreamReader _evsFileReader;
 		private double[] _allFrequencies;
 	    private double[] _europeanFrequencies;
 		private double[] _africanFrequencies;
@@ -21,9 +21,9 @@ namespace SAUtils.InputFileParsers.EVS
 	    private string _numSamples;
         private readonly IDictionary<string,IChromosome> _refChromDict;
 
-        public EvsReader(FileInfo evsInfo, IDictionary<string,IChromosome> refChromDicr) 
+        public EvsReader(StreamReader evsStream, IDictionary<string,IChromosome> refChromDicr) 
         {
-            _evsFileInfo = evsInfo;
+            _evsFileReader = evsStream;
             _refChromDict = refChromDicr;
         }
 
@@ -56,10 +56,10 @@ namespace SAUtils.InputFileParsers.EVS
         /// <returns></returns>
         private IEnumerable<EvsItem> GetEvsItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_evsFileInfo.FullName))
+            using (_evsFileReader)
             {
                 string line;
-                while ((line = reader.ReadLine()) != null)
+                while ((line = _evsFileReader.ReadLine()) != null)
                 {
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
@@ -81,7 +81,7 @@ namespace SAUtils.InputFileParsers.EVS
         /// </summary>
         /// <param name="vcfline"></param>
         /// <returns></returns>
-        private List<EvsItem> ExtractItems(string vcfline)
+        internal List<EvsItem> ExtractItems(string vcfline)
         {
             var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;

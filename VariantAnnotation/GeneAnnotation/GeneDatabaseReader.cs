@@ -37,9 +37,7 @@ namespace VariantAnnotation.GeneAnnotation
                 throw new FormatException("Unrecognized header in this database");
 
             var dataVersion = _reader.ReadUInt16();
-            if (dataVersion != SaDataBaseCommon.DataVersion)
-                throw new UserErrorException(
-                    $"Gene database data version mismatch. Expected {SaDataBaseCommon.DataVersion}, observed {dataVersion}");
+            
 
             var schema = _reader.ReadUInt16();
             if (schema != SaDataBaseCommon.SchemaVersion)
