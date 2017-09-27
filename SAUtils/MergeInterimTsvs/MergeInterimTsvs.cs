@@ -266,7 +266,7 @@ namespace SAUtils.MergeInterimTsvs
         private void MergeGene()
         {
             var geneAnnotationList = GetGeneAnnotationEnumerator();
-            var geneMinheap = new MinHeap<IAnnotatedGene>();
+
             List<IAnnotatedGene> geneAnnotations = null;
             var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
@@ -282,6 +282,9 @@ namespace SAUtils.MergeInterimTsvs
         private IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
         {
             if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
+
+            if (geneAnnotations[0].GeneName=="AGRN")
+                Console.WriteLine("bug");
             var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
 
             return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);

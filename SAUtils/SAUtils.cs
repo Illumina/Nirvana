@@ -4,12 +4,13 @@ using ExtractMiniXml;
 using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimTsv;
 using SAUtils.ExtractMiniSa;
+using SAUtils.GeneScoresTsv;
 using SAUtils.MergeInterimTsvs;
 using VariantAnnotation.Interface;
 
 namespace SAUtils
 {
-    public class SaUtils 
+    public sealed class SaUtils 
     {
 
         public static int Main(string[] args)
@@ -19,6 +20,7 @@ namespace SAUtils
                 ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvsMain.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
                 ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
+                ["geneScoresTsv"] = new TopLevelOption("create gene scores tsv file", GeneScoresMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"] = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
             };
@@ -31,12 +33,6 @@ namespace SAUtils
                 .ShowErrors().Execute();
             return (int) exitCode;
         }
-
-
-
-
-
-
 
     }
 }

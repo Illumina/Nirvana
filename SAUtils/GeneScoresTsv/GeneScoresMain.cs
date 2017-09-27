@@ -1,16 +1,23 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.Utilities;
 using ErrorHandling;
+using SAUtils.InputFileParsers;
+using SAUtils.TsvWriters;
 using VariantAnnotation.Interface;
 
 namespace SAUtils.GeneScoresTsv
 {
     public class GeneScoresMain
     {
+        private const string JsonKeyName = "exacScores";
         private ExitCodes ProgramExecution()
         {
+            var geneScoreCreator= new GeneScoreTsvCreator(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputPath), 
+                new GeneAnnotationTsvWriter(ConfigurationSettings.OutputDirectory, 
+                DataSourceVersionReader.GetSourceVersion(ConfigurationSettings.InputPath+".version"), null, 0, JsonKeyName, false));
 
-            return ExitCodes.Success;
+            return geneScoreCreator.Create();
         }
 
         public static ExitCodes Run(string command, string[] commandArgs)
