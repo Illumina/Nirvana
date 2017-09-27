@@ -19,11 +19,14 @@ namespace SAUtils.CreateIntermediateTsvs
 	    public static string InputDgvFile;
 	    public static string Input1000GSvFileName;
 	    public static string InputClinGenFileName;
+        public static readonly List<string> InputMitoMapVarFileNames = new List<string>();
+        public static readonly List<string> InputMitoMapSvFileNames = new List<string>();
         public static string OutputSupplementaryDirectory;
 	    public static readonly List<string> CustomAnnotationFiles= new List<string>();
 		public static readonly List<string> CustomIntervalFiles = new List<string>();
 
-		#endregion
+
+        #endregion
 
 		public static int NumberOfProvidedInputFiles()
         {
@@ -39,6 +42,8 @@ namespace SAUtils.CreateIntermediateTsvs
 	        if (Input1000GSvFileName != null) count++;
 	        if (InputClinGenFileName != null) count++;
 
+            count += InputMitoMapVarFileNames.Count;
+            count += InputMitoMapSvFileNames.Count;
             count += CustomAnnotationFiles.Count;
 			count += CustomIntervalFiles.Count;
 
