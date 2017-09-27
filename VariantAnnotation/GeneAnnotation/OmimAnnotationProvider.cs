@@ -33,9 +33,9 @@ namespace VariantAnnotation.GeneAnnotation
             foreach (var omimAnnotation in omimDatabaseReader.Read())
             {
                 if (!_omimGeneDict.ContainsKey(omimAnnotation.GeneName))
-                {
+                
                     _omimGeneDict[omimAnnotation.GeneName] = omimAnnotation;
-                }
+                
             }
 
         }

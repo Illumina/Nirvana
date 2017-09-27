@@ -10,7 +10,7 @@ namespace SAUtils.GeneScoresTsv
 {
     public class GeneScoresMain
     {
-        private const string JsonKeyName = "exacScores";
+        private const string JsonKeyName = "exac";
         private ExitCodes ProgramExecution()
         {
             var geneScoreCreator= new GeneScoreTsvCreator(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputPath), 
