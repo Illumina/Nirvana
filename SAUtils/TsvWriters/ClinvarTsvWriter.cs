@@ -50,7 +50,7 @@ namespace SAUtils.TsvWriters
 		}
 		#endregion
 
-		public ClinvarTsvWriter(SaTsvWriter saTsvWriter)
+	    private ClinvarTsvWriter(SaTsvWriter saTsvWriter)
 		{
 			_writer = saTsvWriter;
 		}
