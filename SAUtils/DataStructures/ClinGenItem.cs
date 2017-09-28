@@ -19,17 +19,17 @@ namespace SAUtils.DataStructures
 
     public sealed class ClinGenItem : SupplementaryDataItem
     {
-        public string Id { get; }
-        public int End { get; }
+        private string Id { get; }
+        private int End { get; }
         private VariantType VariantType { get; }
-        public ClinicalInterpretation ClinicalInterpretation { get; private set; }
-        public IEnumerable<string> Phenotypes => _phenotypes;
+        private ClinicalInterpretation ClinicalInterpretation { get; set; }
+        private IEnumerable<string> Phenotypes => _phenotypes;
 	    private readonly HashSet<string> _phenotypes;
-        public IEnumerable<string> PhenotypeIds => _phenotypeIds;
+        private IEnumerable<string> PhenotypeIds => _phenotypeIds;
 	    private readonly HashSet<string> _phenotypeIds;
-        public int ObservedGains { get; private set; }
-        public int ObservedLosses { get; private set; }
-        public bool Validated { get; private set; }
+        private int ObservedGains { get; set; }
+        private int ObservedLosses { get; set; }
+        private bool Validated { get; set; }
 
         public ClinGenItem(string id, IChromosome chromosome, int start, int end, VariantType variantType, int observedGains, int observedLosses,
             ClinicalInterpretation clinicalInterpretation, bool validated, HashSet<string> phenotypes = null, HashSet<string> phenotypeIds = null)

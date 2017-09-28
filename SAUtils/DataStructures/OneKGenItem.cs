@@ -137,7 +137,7 @@ namespace SAUtils.DataStructures
         {
             if (!IsInterval) return null;
 
-            var seqAltType = SAParseUtilities.GetSequenceAlteration(SvType, ObservedGains, ObservedLosses);
+            var seqAltType = SaParseUtilities.GetSequenceAlteration(SvType, ObservedGains, ObservedLosses);
 
             var intValues    = new Dictionary<string, int>();
             var doubleValues = new Dictionary<string, double>();

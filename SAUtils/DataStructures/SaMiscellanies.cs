@@ -2,7 +2,7 @@
 
 namespace SAUtils.DataStructures
 {
-    public class SaMiscellanies :IInterimSaItem
+    public sealed class SaMiscellanies :IInterimSaItem
     {
         public string KeyName { get; }
         public string Chromosome { get; }

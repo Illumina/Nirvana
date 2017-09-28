@@ -8,7 +8,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class ExacTsvWriter:ISaItemTsvWriter
+	public sealed class ExacTsvWriter:ISaItemTsvWriter
 	{
 		#region members
 		private readonly SaTsvWriter _writer;
@@ -56,7 +56,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_writer= new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.ExacTag, null, true, sequenceProvider);
+				SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.ExacTag, null, true, sequenceProvider);
 
 		}
 

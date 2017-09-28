@@ -2,7 +2,7 @@
 using VariantAnnotation.Interface.IO;
 
 namespace Jasix.DataStructures { 
-	public class JasixNode : IComparable<JasixNode>
+	public sealed class JasixNode : IComparable<JasixNode>
 	{
 		private readonly int _start;
 		private int _end;

@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -13,8 +12,6 @@ namespace SAUtils.InputFileParsers.Cosmic
     {
         #region members
 
-        //private readonly string _vcfFileName;
-        //private readonly string _tsvFileName;
         private readonly StreamReader _vcfFileReader;
         private readonly StreamReader _tsvFileReader;
         private string _geneName;
@@ -95,8 +92,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             if (string.IsNullOrEmpty(mutationId)) return;
 
             var study = new CosmicItem.CosmicStudy(studyId, histology, primarySite);
-			HashSet<CosmicItem.CosmicStudy> studySet;
-			if (_studies.TryGetValue(mutationId, out studySet))
+            if (_studies.TryGetValue(mutationId, out var studySet))
                 studySet.Add(study);
             else _studies[mutationId] = new HashSet<CosmicItem.CosmicStudy> { study };
         }
@@ -171,7 +167,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 if (_studies.ContainsKey(cosmicId))
                     foreach (var study in _studies[cosmicId])
                     {
-                        cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy(study.ID, study.Histology, study.PrimarySite) }, _sampleCount));
+                        cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy(study.Id, study.Histology, study.PrimarySite) }, _sampleCount));
                     }
                 else cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, null, _sampleCount));
             }

@@ -2,7 +2,7 @@
 
 namespace SAUtils.CreateOmimTsv
 {
-    public class GeneSymbolSynonyms
+    public sealed class GeneSymbolSynonyms
     {
         public string GeneSymbol;
         public List<string> Synonyms = new List<string>();

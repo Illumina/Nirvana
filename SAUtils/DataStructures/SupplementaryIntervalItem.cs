@@ -8,7 +8,7 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
-    public class SupplementaryIntervalItem:IChromosomeInterval
+    public sealed class SupplementaryIntervalItem:IChromosomeInterval
     {
         public int Start { get; }
         public int End { get; }

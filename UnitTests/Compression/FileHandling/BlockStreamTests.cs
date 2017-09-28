@@ -67,8 +67,7 @@ namespace UnitTests.Compression.FileHandling
                 CheckWriteException(blockStream);
 
                 // grab the header
-                DemoCustomHeader customHeader;
-                var header = GetHeader(blockStream, out customHeader);
+                var header = GetHeader(blockStream, out var customHeader);
                 Assert.Equal(ExpectedGenomeAssembly, header.GenomeAssembly);
 
                 // sequential string check
@@ -83,7 +82,7 @@ namespace UnitTests.Compression.FileHandling
         }
 
         // ReSharper disable once UnusedParameter.Local
-        private static void CheckString(ExtendedBinaryReader reader, string expectedString)
+        private static void CheckString(IExtendedBinaryReader reader, string expectedString)
         {
             string s = reader.ReadAsciiString();           
             Assert.NotNull(s);

@@ -11,7 +11,7 @@ namespace SAUtils.DataStructures
     {
         #region members
 
-        public string ID { get; }
+        public string Id { get; }
         private string Gene { get; }
         private int? SampleCount { get; }
 
@@ -34,7 +34,7 @@ namespace SAUtils.DataStructures
         {
             Chromosome = chromosome;
             Start = start;
-            ID = id;
+            Id = id;
             ReferenceAllele = refAllele;
             AlternateAllele = altAllele;
             Gene = gene;
@@ -48,7 +48,7 @@ namespace SAUtils.DataStructures
         {
             #region members
 
-            public string ID { get; }
+            public string Id { get; }
             public string Histology { get; }
             public string PrimarySite { get; }
 
@@ -56,21 +56,21 @@ namespace SAUtils.DataStructures
 
             public CosmicStudy(string studyId, string histology, string primarySite)
             {
-                ID = studyId;
+                Id = studyId;
                 Histology = histology;
                 PrimarySite = primarySite;
             }
 
             public bool Equals(CosmicStudy other)
             {
-                return ID.Equals(other?.ID) &&
+                return Id.Equals(other?.Id) &&
                        Histology.Equals(other?.Histology) &&
                        PrimarySite.Equals(other?.PrimarySite);
             }
 
             public override int GetHashCode()
             {
-                var hashCode = ID?.GetHashCode() ?? 0;
+                var hashCode = Id?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ (Histology?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (PrimarySite?.GetHashCode() ?? 0);
                 return hashCode;
@@ -82,7 +82,7 @@ namespace SAUtils.DataStructures
                 var jsonObject = new JsonObject(sb);
 
                 sb.Append(JsonObject.OpenBrace);
-                if (!string.IsNullOrEmpty(ID)) jsonObject.AddStringValue("id", ID, false);
+                if (!string.IsNullOrEmpty(Id)) jsonObject.AddStringValue("id", Id, false);
                 jsonObject.AddStringValue("histology", Histology?.Replace('_', ' '));
                 jsonObject.AddStringValue("primarySite", PrimarySite?.Replace('_', ' '));
                 sb.Append(JsonObject.CloseBrace);
@@ -105,7 +105,7 @@ namespace SAUtils.DataStructures
             // Return true if the fields match:
             return string.Equals(Chromosome, otherItem.Chromosome) &&
                    Start == otherItem.Start &&
-                   string.Equals(ID, otherItem.ID) &&
+                   string.Equals(Id, otherItem.Id) &&
                    string.Equals(ReferenceAllele, otherItem.ReferenceAllele) &&
                    string.Equals(AlternateAllele, otherItem.AlternateAllele) &&
                    string.Equals(Gene, otherItem.Gene);
@@ -117,7 +117,7 @@ namespace SAUtils.DataStructures
             {
                 var hashCode = Chromosome?.GetHashCode() ?? 0;
                 hashCode = (hashCode * 397) ^ Start;
-                hashCode = (hashCode * 397) ^ (ID?.GetHashCode() ?? 0);
+                hashCode = (hashCode * 397) ^ (Id?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (ReferenceAllele?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (AlternateAllele?.GetHashCode() ?? 0);
                 hashCode = (hashCode * 397) ^ (Gene?.GetHashCode() ?? 0);
@@ -135,7 +135,7 @@ namespace SAUtils.DataStructures
 
             var jsonObject = new JsonObject(sb);
 
-            jsonObject.AddStringValue("id", ID);
+            jsonObject.AddStringValue("id", Id);
             jsonObject.AddStringValue("isAlleleSpecific", IsAlleleSpecific, false);
             jsonObject.AddStringValue("refAllele", string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele);
             jsonObject.AddStringValue("altAllele",

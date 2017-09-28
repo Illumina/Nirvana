@@ -34,8 +34,7 @@ namespace CommandLine.Builders
             var lowerDict = new Dictionary<string, TopLevelOption>();
             foreach (var kvp in _data.Ops) lowerDict[kvp.Key.ToLower()] = kvp.Value;
 
-            TopLevelOption topLevelOption;
-            if (lowerDict.TryGetValue(command, out topLevelOption)) return topLevelOption.CommandMethod;
+            if (lowerDict.TryGetValue(command, out var topLevelOption)) return topLevelOption.CommandMethod;
 
             _data.AddError($"An unrecognized command '{_data.Command}' was specified.", ExitCodes.UnknownCommandLineOption);
             return null;

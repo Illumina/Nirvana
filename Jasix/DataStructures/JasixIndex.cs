@@ -5,7 +5,7 @@ using VariantAnnotation.IO;
 
 namespace Jasix.DataStructures
 {
-	public class JasixIndex
+	public sealed class JasixIndex
 	{
 		private readonly Dictionary<string, JasixChrIndex> _chrIndices;
 		public string HeaderLine;
