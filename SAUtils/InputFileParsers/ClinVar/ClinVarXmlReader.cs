@@ -236,7 +236,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 if(variant.Chromosome == null) continue;
 
-                if (variant.VariantType == "Microsatellite" 
+                if ((variant.VariantType == "Microsatellite" || variant.VariantType=="Variation")
                     && string.IsNullOrEmpty(variant.AltAllele)) continue;
 
                 _sequenceProvider.LoadChromosome(variant.Chromosome);
