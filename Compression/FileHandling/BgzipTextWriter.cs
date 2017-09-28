@@ -21,7 +21,7 @@ namespace Compression.FileHandling
         {
         }
         // the stream writer needs to have a stream but we cannot provide it with 
-        public BgzipTextWriter(BlockGZipStream bgzipStream):base(Console.OpenStandardError())
+        private BgzipTextWriter(BlockGZipStream bgzipStream):base(Console.OpenStandardError())
         {
             _buffer = new byte[BufferSize];//4kb blocks
             _bgzipStream = bgzipStream;

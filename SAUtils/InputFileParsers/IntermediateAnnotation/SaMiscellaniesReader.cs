@@ -3,14 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Runtime.CompilerServices;
-using Compression.Utilities;
 using SAUtils.DataStructures;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public class SaMiscellaniesReader:IEnumerable<SaMiscellanies>
+    public sealed class SaMiscellaniesReader:IEnumerable<SaMiscellanies>
     {
 
 

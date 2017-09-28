@@ -70,8 +70,7 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void BlockWrongSize()
         {
-            int copyLength;
-            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out copyLength);
+            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out var _);
             ms.Seek(0, SeekOrigin.Begin);
 
             var readBlock = new Block(Qlz);
@@ -100,8 +99,7 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void BlockTruncation()
         {
-            int copyLength;
-            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out copyLength);
+            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out var _);
             ms.Seek(0, SeekOrigin.Begin);
 
             var readBlock = new Block(Qlz);
@@ -121,8 +119,7 @@ namespace UnitTests.Compression.DataStructures
             const int bufferSize = 10000;
             var buffer = BlockStreamTests.GetRandomBytes(bufferSize);
 
-            int copyLength;
-            var ms = GetBlockStream(Qlz, buffer, bufferSize, out copyLength);
+            var ms = GetBlockStream(Qlz, buffer, bufferSize, out _);
             ms.Seek(0, SeekOrigin.Begin);
 
             var readBlock = new Block(Qlz);

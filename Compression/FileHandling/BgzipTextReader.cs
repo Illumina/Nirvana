@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Compression.FileHandling
 {
-    public class BgzipTextReader : IDisposable
+    public sealed class BgzipTextReader : IDisposable
     {
         readonly Stream _stream;
         private readonly char _newLineChar;

@@ -51,9 +51,9 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader)
             {
-                Assert.Equal("RCV000077146.3", clinVarItem.ID);
+                Assert.Equal("RCV000077146.3", clinVarItem.Id);
 
-                switch (clinVarItem.ID)
+                switch (clinVarItem.Id)
                 {
                     case "RCV000077146.3":
                         Assert.Equal("17", clinVarItem.Chromosome.EnsemblName);
@@ -398,9 +398,9 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader)
             {
-                Assert.Equal("RCV000032548.5", clinVarItem.ID);
+                Assert.Equal("RCV000032548.5", clinVarItem.Id);
 
-                switch (clinVarItem.ID)
+                switch (clinVarItem.Id)
                 {
                     case "RCV000032548.5":
                         Assert.Equal("4", clinVarItem.Chromosome.EnsemblName);

@@ -54,7 +54,7 @@ namespace SAUtils.TsvWriters
         public MitoMapVarTsvWriter(DataSourceVersion version, string outputDirectory, string mitoMapDataType, ISequenceProvider sequenceProvider)
         {
             Console.WriteLine(version.ToString());
-            _mitoMapMutWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.Unknown.ToString(), SaTSVCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, true);
+            _mitoMapMutWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.Unknown.ToString(), SaTsvCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, true);
         }
 
 

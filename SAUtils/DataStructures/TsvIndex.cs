@@ -4,7 +4,7 @@ using System.IO;
 
 namespace SAUtils.DataStructures
 {
-    public class TsvIndex : IDisposable
+    public sealed class TsvIndex : IDisposable
     {
 
         #region members

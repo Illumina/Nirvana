@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Moq;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.EVS;
 using VariantAnnotation.Interface.Sequence;

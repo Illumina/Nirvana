@@ -2,7 +2,7 @@
 
 namespace SAUtils.CreateOmimTsv
 {
-    public class SymbolDataSource
+    public sealed class SymbolDataSource
     {
         private readonly Dictionary<string, UniqueString> _synonymToSymbol;
 
@@ -18,8 +18,7 @@ namespace SAUtils.CreateOmimTsv
         {
             newSymbol = currentSymbol;
 
-            UniqueString symbol;
-            if (!_synonymToSymbol.TryGetValue(currentSymbol, out symbol)) return false;
+            if (!_synonymToSymbol.TryGetValue(currentSymbol, out var symbol)) return false;
 
             if (symbol.HasConflict) return false;
 

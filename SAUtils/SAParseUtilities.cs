@@ -2,7 +2,7 @@
 
 namespace SAUtils
 {
-    public static class SAParseUtilities
+    public static class SaParseUtilities
     {
         public static VariantType GetSequenceAlterationType(string dgvType, string dgvSubType)
         {

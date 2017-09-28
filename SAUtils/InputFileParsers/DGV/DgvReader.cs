@@ -59,7 +59,7 @@ namespace SAUtils.InputFileParsers.DGV
 			var observedGains = cols[15] == "" ? 0:int.Parse(cols[15]);
 			var observedLosses = cols[16] == "" ? 0 : int.Parse(cols[16]);
 
-			var seqAltType = SAParseUtilities.GetSequenceAlterationType(variantType,variantSubType);
+			var seqAltType = SaParseUtilities.GetSequenceAlterationType(variantType,variantSubType);
 
 			return new DgvItem(id, chromosome,start,end,sampleSize,observedGains,observedLosses, seqAltType);
 		}

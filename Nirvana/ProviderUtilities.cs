@@ -26,8 +26,7 @@ namespace Nirvana
 		public static IAnnotationProvider GetConservationProvider(IEnumerable<string> dirPaths)
 		{
 			if (dirPaths==null) return null;
-		    if (dirPaths.All(x => Directory.GetFiles(x, "*.npd").Length == 0)) return null;
-			return new ConservationScoreProvider(dirPaths);
+		    return dirPaths.All(x => Directory.GetFiles(x, "*.npd").Length == 0) ? null : new ConservationScoreProvider(dirPaths);
 		}
 
 	    public static IAnnotationProvider GetSaProvider(List<string> supplementaryAnnotationDirectories)

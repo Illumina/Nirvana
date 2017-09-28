@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Xml;
-using VariantAnnotation.Utilities;
 using Compression.Utilities;
+using VariantAnnotation.Utilities;
 
-namespace ExtractMiniXml
+namespace SAUtils.ExtractMiniXml
 {
 	public sealed class XmlExtractor
 	{

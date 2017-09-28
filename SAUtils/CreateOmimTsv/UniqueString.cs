@@ -1,6 +1,6 @@
 ﻿namespace SAUtils.CreateOmimTsv
 {
-    public class UniqueString
+    public sealed class UniqueString
     {
         public string Value;
         public bool HasConflict;

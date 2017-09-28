@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace SAUtils.DataStructures
 {
-    public class MinHeap<T> where T : IComparable<T>
+    public sealed class MinHeap<T> where T : IComparable<T>
     {
         private readonly List<T> _itemArray;
 
