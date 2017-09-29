@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;

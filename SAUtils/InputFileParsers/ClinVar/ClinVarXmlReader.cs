@@ -44,8 +44,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 	    public override bool Equals(object obj)
 	    {
-	        var other = obj as ClinvarVariant;
-	        if (other == null) return false;
+	        if (!(obj is ClinvarVariant other)) return false;
 
 	        return Chromosome.Equals(other.Chromosome)
 	               && Start == other.Start
@@ -53,13 +52,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 	               && ReferenceAllele.Equals(other.ReferenceAllele)
 	               && AltAllele.Equals(other.AltAllele);
 	    }
-
-	    
 	}
 
-	/// <summary>
-	/// Parser for ClinVar file
-	/// </summary>
 	public sealed class ClinVarXmlReader : IEnumerable<ClinVarItem>
     {
         #region members
@@ -74,7 +68,6 @@ namespace SAUtils.InputFileParsers.ClinVar
         #region xmlTags
 
         const string ClinVarSetTag = "ClinVarSet";
-        const string RecordStatusTag = "RecordStatus";
 
         #endregion
 
@@ -99,9 +92,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 		#endregion
 
 		private string _dbSnp;
-		private string _recordStatus;
-		
-		private void ClearClinvarFields()
+
+        private void ClearClinvarFields()
 		{
 			_variantList.Clear();
 			_reviewStatus      = null;
@@ -142,26 +134,6 @@ namespace SAUtils.InputFileParsers.ClinVar
             _refChromDict = sequenceProvider.GetChromosomeDictionary();
         }
 
-		public sealed class LitexElement
-		{
-			public readonly string Name;
-			public readonly Dictionary<string, string> Attributes = new Dictionary<string, string>();
-			public readonly List<LitexElement> Children = new List<LitexElement>();
-			public readonly List<string> StringValues= new List<string>();
-
-			public LitexElement(string name)
-			{
-				Name = name;
-			}
-
-			public bool IsEmpty()
-			{
-				return Attributes.Count == 0 
-					&& Children.Count == 0 
-					&& StringValues.Count == 0;
-			}
-		}
-
 		/// <summary>
 		/// Parses a ClinVar file and return an enumeration object containing all the ClinVar objects
 		/// that have been extracted
@@ -171,7 +143,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_clinVarXmlFileInfo.FullName))
 			using (var xmlReader = XmlReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true }))
 			{
-				//skipping the top level element to go down to its children
+				//skipping the top level element to go down to its elementren
 			    xmlReader.ReadToDescendant(ClinVarSetTag);
 
 				do
@@ -193,7 +165,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
         private const string RefAssertionTag = "ReferenceClinVarAssertion";
-        private const string AssertionTag = "ClinVarAssertion";
+        private const string ClinVarAssertionTag = "ClinVarAssertion";
         private List<ClinVarItem> ExtractClinVarItems(XElement xElement)
 		{
             ClearClinvarFields();
@@ -203,7 +175,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			foreach (var element in xElement.Elements(RefAssertionTag))
 			    ParseRefClinVarAssertion(element);
 
-		    foreach (var element in xElement.Elements())
+		    foreach (var element in xElement.Elements(ClinVarAssertionTag))
                 ParseClinvarAssertion(element);
 		    
 
@@ -318,46 +290,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    return new ClinvarVariant(variant.Chromosome, alignedVariant.Item1, variant.Stop, alignedVariant.Item2,alignedVariant.Item3, variant.AllelicOmimIds);
 		}
 
-		private static LitexElement ParsexElement(XmlReader xmlReader)
-		{
-			var xElement = new LitexElement(xmlReader.Name);
-
-			var isEmptyElement = xmlReader.IsEmptyElement;
-			if (xmlReader.HasAttributes)
-			{
-				while (xmlReader.MoveToNextAttribute())
-					xElement.Attributes[xmlReader.Name] = xmlReader.Value;
-			}
-
-			if (isEmptyElement)
-				return xElement.IsEmpty()? null: xElement;
-
-			while (xmlReader.Read())
-			{
-				//we will read till an end tag is observed
-				switch (xmlReader.NodeType)
-				{
-					case XmlNodeType.Element: // The node is an element.
-						var child = ParsexElement(xmlReader);
-						if (child != null ) xElement.Children.Add(child);
-						break;
-					case XmlNodeType.Text:
-						if (! string.IsNullOrEmpty(xmlReader.Value))
-							xElement.StringValues.Add(xmlReader.Value);
-						break;
-					case XmlNodeType.EndElement: //Display the end of the element.
-						if (xmlReader.Name == xElement.Name)
-						{
-							return xElement.IsEmpty()? null: xElement;
-						}
-						Console.WriteLine("WARNING!! encountered unexpected endElement tag:"+xmlReader.Name);
-						break;
-				}
-			}
-			return null;
-		}
-
-        internal static long ParseDate(string s)
+		internal static long ParseDate(string s)
 		{
 			if (string.IsNullOrEmpty(s) || s == "-") return long.MinValue;
 			//Jun 29, 2010
@@ -365,159 +298,120 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
         private const string UpdateDateTag= "DateLastUpdated";
-
+        private const string AccessionTag = "Acc";
+        private const string VersionTag = "Version";
+        private const string ClinVarAccessionTag = "ClinVarAccession";
+        private const string ClinicalSignificanceTag = "ClinicalSignificance";
+        private const string MeasureSetTag = "MeasureSet";
+        private const string TraitSetTag = "TraitSet";
+        
         private void ParseRefClinVarAssertion(XElement xElement)
 		{
 			if (xElement==null || xElement.IsEmpty) return;
 			//<ReferenceClinVarAssertion DateCreated="2013-10-28" DateLastUpdated="2016-04-20" ID="182406">
 		    _lastUpdatedDate = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
-			
-            foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "RecordStatus":
-						_recordStatus = child.StringValues[0];
-						break;
-					case "ClinVarAccession":
-						_id = child.Attributes["Acc"] + "." + child.Attributes["Version"];
-						break;
-					case "ClinicalSignificance":
-						GetClinicalSignificance(child);
-						break;
-					case "MeasureSet":
-						//get variant info like position ref and alt, etc
-						ParseMeasureSet(child);
-						break;
-					case "TraitSet":
-						// contains cross ref, phenotype
-						ParseTraitSet(child);
-						break;
+		    _id              = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag) + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag);
 
-				}
-			}
-		}
-		
-		
-		private void ParseClinvarAssertion(LitexElement xElement)
-		{
-			//the  information we want from SCVs is pubmed ids and allele origins
-			if (xElement.Children == null) return;
-
-			foreach (var child in xElement.Children)
-			{
-				if (child.Name== "Citation")
-					ParseCitation(child);
-				if(child.Name== "Origin")
-					_alleleOrigins.Add(child.StringValues[0]);
-
-				ParseClinvarAssertion(child);//keep going deeper
-			}
+            GetClinicalSignificance(xElement.Element(ClinicalSignificanceTag));
+		    ParseMeasureSet(xElement.Element(MeasureSetTag));
+		    ParseTraitSet(xElement.Element(TraitSetTag));
 		}
 
+        private const string CitationTag = "Citation";
+        private const string OriginTag = "Origin";
 
-		private void ParseTraitSet(LitexElement xElement)
+        private void ParseClinvarAssertion(XElement xElement)
 		{
-			if (xElement.Children == null) return;
+		    if (xElement == null || xElement.IsEmpty) return;
 
-			foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "Trait":
-						// this element contains xref and phenotype name
-						ParseTrait(child);
-						break;
-				}
-			}
+            foreach (var element in xElement.Elements(CitationTag))
+				ParseCitation(element);
+
+		    foreach (var element in xElement.Elements(OriginTag))
+		        _alleleOrigins.Add(element.Value);
+
+		    //ParseClinvarAssertion(element);//keep going deeper
+        }
+
+        private const string TraitTag = "Trait";
+
+        private void ParseTraitSet(XElement xElement)
+		{
+			if (xElement == null || xElement.IsEmpty) return;
+
+			foreach (var element in xElement.Elements(TraitTag))
+			    ParseTrait(element);
 		}
 
-		private void ParseTrait(LitexElement xElement)
+        private const string NameTag = "Name";
+		private void ParseTrait(XElement xElement)
 		{
-			if (xElement.Children == null) return;
+			if (xElement == null || xElement.IsEmpty) return;
 
-			foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "XRef":
-						// this contains MedGen, Orphanet, Omim ids
-						ParseXref(child);
-						break;
-					case "Name":
-						ParsePnenotype(child);
-						break;
-				}
-			}
-		}
-		/// <summary>
-		/// Contains phenotype information for the trait
-		/// </summary>
-		/// <param name="xElement"></param>
-		private void ParsePnenotype(LitexElement xElement)
-		{
-			if (xElement.Children == null) return;
+		    foreach (var element in xElement.Elements(XrefTag))
+		        ParseXref(element);
 
-			foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "ElementValue":
-						// contains phenotype
-						// <ElementValue Type="Preferred">Breast-ovarian cancer, familial 1</ElementValue>
-						ParsePhenotypeElementValue(child);
-						if (!IsPreferredPhenotype(child))
-							return;//we do not want to parse XRef for alternates
-						break;
-					case "XRef":
-						ParseXref(child);
-						break;
-				}
-			}
+		    ParsePnenotype(xElement.Element(NameTag));
 		}
 
-		private static bool IsPreferredPhenotype(LitexElement xElement)
+        private const string ElementValueTag = "ElementValue";
+        private const string XrefTag = "XRef";
+        private void ParsePnenotype(XElement xElement)
 		{
-			if (!xElement.Attributes.ContainsKey("Type")) return false;
+			if (xElement == null || xElement.IsEmpty) return;
 
-			return xElement.Attributes["Type"] == "Preferred";
-				
+		    var isPreferred = ParsePhenotypeElementValue(xElement.Element(ElementValueTag));
+		    if (!isPreferred)
+		        return;//we do not want to parse XRef for alternates
+
+		    foreach (var element in xElement.Elements(XrefTag))
+                ParseXref(element);
 		}
 
-		private void ParsePhenotypeElementValue(LitexElement xElement)
+        private const string TypeTag = "Type";
+
+        private bool ParsePhenotypeElementValue(XElement xElement)
 		{
-			if (!xElement.Attributes.ContainsKey("Type")) return;
-			if (xElement.Attributes["Type"] == "Preferred") 
-				_prefPhenotypes.Add(xElement.StringValues[0]);
-			if (xElement.Attributes["Type"] == "Alternate")
-				_altPhenotypes.Add(xElement.StringValues[0]);
-			
+		    var phenotype = xElement.Attribute(TypeTag);
+		    if (phenotype == null) return false;
+
+			if (phenotype.Value == "Preferred") 
+				_prefPhenotypes.Add(xElement.Value);
+			if (phenotype.Value == "Alternate")
+				_altPhenotypes.Add(xElement.Value);
+
+		    return phenotype.Value == "Preferred";
 		}
 
-        
 
-        private void ParseXref(LitexElement xElement)
-		{
-			if (! xElement.Attributes.ContainsKey("DB")) return;
+        private const string DbTag = "DB";
+        private const string IdTag = "ID";
+        private void ParseXref(XElement xElement)
+        {
+            var db = xElement.Attribute(DbTag);
 
-			var idAttributes = xElement.Attributes["ID"].Trim(' ');
-			switch (xElement.Attributes["DB"])
+            if (db == null) return;
+
+			var id = xElement.Attribute(IdTag)?.Value;//.Trim(' ');
+
+			switch (db.Value)
 			{
 				case "MedGen":
-					_medGenIDs.Add(idAttributes);
+					_medGenIDs.Add(id);
 					break;
 				case "Orphanet":
-					_orphanetIDs.Add(idAttributes);
+					_orphanetIDs.Add(id);
 					break;
 				case "OMIM":
-					if (xElement.Attributes.ContainsKey("Type"))
-					    if (xElement.Attributes["Type"] == "Allelic variant" )
-                            _allilicOmimIDs.Add(TrimOmimId(idAttributes));
+				    var type = xElement.Attribute(TypeTag);
+					if (type !=null)
+					    if (type.Value == "Allelic variant" )
+                            _allilicOmimIDs.Add(TrimOmimId(id));
                         else
-                            _omimIDs.Add(TrimOmimId(idAttributes));
+                            _omimIDs.Add(TrimOmimId(id));
 					break;
 				case "dbSNP":
-					_dbSnp = string.IsNullOrEmpty(_dbSnp) ? idAttributes : _dbSnp + "," + idAttributes;
+					_dbSnp = string.IsNullOrEmpty(_dbSnp) ? id : _dbSnp + "," + id;
 					break;
 			}
 		}
@@ -528,109 +422,87 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    return id.TrimStart('P','S');
 	    }
 
-		private void ParseCitation(LitexElement xElement)
+        private const string SourceTag = "Source";
+        private const string PubmedIdTag = "PubMed";
+
+        private void ParseCitation(XElement xElement)
 		{
-			if (xElement.Children == null) return;
+			if (xElement == null || xElement.IsEmpty) return;
 
 			
-			foreach (var child in xElement.Children)
+			foreach (var element in xElement.Elements(IdTag))
 			{
-				switch (child.Name)
-				{
-					case "ID":
-						if (child.Attributes.ContainsKey("Source") )
-						{
-							switch (child.Attributes["Source"])
-							{
-								case "PubMed":
-									var value = child.StringValues[0].TrimEnd('.');
-								    {
-                                        if (long.TryParse(value, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
-                                            _pubMedIds.Add(l);
-                                        else Console.WriteLine($"WARNING:unexpected pubmedID {value}.");
-								    }
-								    break;
-							}
-						}
-						break;
-				}
+			    var source = element.Attribute(SourceTag);
+			    if (source == null) continue;
+
+			    if (source.Value != PubmedIdTag) continue;
+
+			    var pubmedId = source.Value.TrimEnd('.');
+			    if (long.TryParse(pubmedId, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
+			        _pubMedIds.Add(l);
+			    else Console.WriteLine($"WARNING:unexpected pubmedID {pubmedId}.");
+
+
+    //            switch (element.Name.LocalName)
+				//{
+				//	case IdTag:
+				//		if (element.Attributes.ContainsKey("Source") )
+				//		{
+				//			switch (element.Attributes["Source"])
+				//			{
+				//				case "PubMed":
+				//					var value = element.Value.TrimEnd('.');
+				//				    {
+    //                                    if (long.TryParse(value, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
+    //                                        _pubMedIds.Add(l);
+    //                                    else Console.WriteLine($"WARNING:unexpected pubmedID {value}.");
+				//				    }
+				//				    break;
+				//			}
+				//		}
+				//		break;
+				//}
 			}
 		}
 
-		private void ParseMeasureSet(LitexElement xElement)
+        private const string MeasureTag = "Measure";
+
+        private void ParseMeasureSet(XElement xElement)
 		{
-			if (xElement.Children == null) return;
+			if (xElement == null || xElement.IsEmpty) return;
 
-			foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "Measure":
-						// this element contains the sequence location info
-						ParseMeasure(child);
-						break;
-				}
-
-			}
-
+            ParseMeasure(xElement.Element(MeasureTag));
 		}
-/*
-        private void ParseAttributeSet(LitexElement xElement)
-        {
-            if (xElement.Children == null) return;
 
-            foreach (var child in xElement.Children)
-            {
-                switch (child.Name)
-                {
-                    case "XRef":
-                        ParseXref(child);
-                        break;
-                }
-            }
-        }
-*/
-        private void ParseMeasure(LitexElement xElement)
+
+        private const string SeqLocationTag = "SequenceLocation";
+        private void ParseMeasure(XElement xElement)
 		{
-			if (xElement.Children == null) return;
+			if (xElement == null || xElement.IsEmpty) return;
 
 			_dbSnp = null;
             _allilicOmimIDs.Clear();
 
 			//the variant type is available in the attributes
-			string varType = null;
-			foreach (var attribute in xElement.Attributes)
-			{
-				if (attribute.Key == "Type")
-					varType = attribute.Value;
-			}
-            var variantList = new List<ClinvarVariant>();
-			foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "SequenceLocation":
-						var variant = GetClinvarVariant(child,  _sequenceProvider.GenomeAssembly,_refChromDict);
-				        
-				        if (variant != null)
-						{
-							variant.VariantType = varType;
-							if (variant.AltAllele !=null && variant.AltAllele.Length == 1 && _iupacBases.ContainsKey(variant.AltAllele[0]))
-								AddIupacVariants(variant, variantList);
-							else
-                                variantList.Add(variant);
-                        }
-						break;
-					case "XRef":
-						ParseXref(child);
-						break;
-            //        case "AttributeSet":
-				        //ParseAttributeSet(child);
-				        //break;
+            string varType = xElement.Attribute(TypeTag)?.Value;
 
+			var variantList = new List<ClinvarVariant>();
 
-				}
-			}
+            ParseXref(xElement.Element(XrefTag));
+
+		    foreach (var element in xElement.Elements(SeqLocationTag))
+            {
+		        var variant = GetClinvarVariant(element, _sequenceProvider.GenomeAssembly, _refChromDict);
+
+		        if (variant == null) continue;
+
+		        variant.VariantType = varType;
+		        if (variant.AltAllele != null && variant.AltAllele.Length == 1 && _iupacBases.ContainsKey(variant.AltAllele[0]))
+		            AddIupacVariants(variant, variantList);
+		        else
+		            variantList.Add(variant);
+		    }
+
             if (_dbSnp == null)
             {
                 _variantList.Clear();
@@ -650,7 +522,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 			{
 				variant.DbSnp = _dbSnp;
 			}
-            
 		    
 		}
 
@@ -677,39 +548,26 @@ namespace SAUtils.InputFileParsers.ClinVar
 			['V'] = new[] { 'A', 'C', 'G' }
 		};
 
-		private static ClinvarVariant GetClinvarVariant(LitexElement xElement, GenomeAssembly genomeAssembly,IDictionary<string,IChromosome> refChromDict)
+        private const string ChrTag       = "Chr";
+        private const string StopTag      = "display_stop";
+        private const string StartTag     = "display_start";
+        private const string AssemblyTag  = "Assembly";
+        private const string RefAlleleTag = "referenceAllele";
+        private const string AltAlleleTag = "alternateAllele";
+
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly,IDictionary<string,IChromosome> refChromDict)
 		{
-			if (xElement.Children == null) return null;
+		    if (xElement == null || xElement.IsEmpty) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
 
-			string  referenceAllele = null, altAllele = null;
-		    IChromosome chromosome = null;
-			int start=0, stop=0;
-			foreach (var attribute in xElement.Attributes)
-			{
-				switch (attribute.Key)
-				{
-					case "Assembly":
-                        if (attribute.Value != genomeAssembly.ToString()
-                            && genomeAssembly != GenomeAssembly.Unknown) return null;
-                        break;
-					case "Chr":                       
-						chromosome = refChromDict.ContainsKey(attribute.Value)?refChromDict[attribute.Value]:null ;
-						break;
-					case "display_start":
-						start = Convert.ToInt32(attribute.Value);
-						break;
-					case "display_stop":
-						stop = Convert.ToInt32(attribute.Value);
-						break;
-					case "referenceAllele":
-						referenceAllele = attribute.Value;
-						break;
-					case "alternateAllele":
-						altAllele= attribute.Value;
-						break;
-				}
-			}
+			if (genomeAssembly.ToString()!= xElement.Attribute(AssemblyTag)?.Value
+                && genomeAssembly != GenomeAssembly.Unknown) return null;
+
+            var chromosome      = refChromDict.ContainsKey(xElement.Attribute(ChrTag)?.Value) ? refChromDict[xElement.Attribute(ChrTag)?.Value] : null;
+            var start           = Convert.ToInt32(xElement.Attribute(StartTag)?.Value);
+		    var stop            = Convert.ToInt32(xElement.Attribute(StopTag)?.Value);
+		    var referenceAllele = xElement.Attribute(RefAlleleTag)?.Value;
+		    var altAllele       = xElement.Attribute(AltAlleleTag)?.Value;
 
             AdjustVariant(ref start,ref stop, ref referenceAllele, ref altAllele);
 		    
@@ -728,23 +586,15 @@ namespace SAUtils.InputFileParsers.ClinVar
 				altAllele = "";
 		}
 
+        private const string ReviewStatusTag = "ReviewStatus";
+        private const string DescriptionTag = "Description";
 
-		private void GetClinicalSignificance(LitexElement xElement)
+        private void GetClinicalSignificance(XElement xElement)
 		{
-			if (xElement.Children == null) return;
+			if (xElement == null || xElement.IsEmpty) return;
 
-			foreach (var child in xElement.Children)
-			{
-				switch (child.Name)
-				{
-					case "ReviewStatus":
-						_reviewStatus = child.StringValues[0];
-						break;
-					case "Description":
-						_significance = child.StringValues[0].ToLower();
-						break;
-				}
-			}
+		    _reviewStatus = xElement.Element(ReviewStatusTag)?.Value;
+		    _significance = xElement.Element(DescriptionTag)?.Value;
 		}
     }
 }
