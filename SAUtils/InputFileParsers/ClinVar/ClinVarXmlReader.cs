@@ -310,7 +310,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			if (xElement==null || xElement.IsEmpty) return;
 			//<ReferenceClinVarAssertion DateCreated="2013-10-28" DateLastUpdated="2016-04-20" ID="182406">
 		    _lastUpdatedDate = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
-		    _id              = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag) + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag);
+		    _id              = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag)?.Value;
 
             GetClinicalSignificance(xElement.Element(ClinicalSignificanceTag));
 		    ParseMeasureSet(xElement.Element(MeasureSetTag));
@@ -471,7 +471,11 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
-            ParseMeasure(xElement.Element(MeasureTag));
+		    foreach (var element in xElement.Elements(MeasureTag))
+		    {
+		        ParseMeasure(element);
+            }
+            
 		}
 
 
@@ -488,7 +492,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 			var variantList = new List<ClinvarVariant>();
 
-            ParseXref(xElement.Element(XrefTag));
+		    foreach (var element in xElement.Elements(XrefTag))
+                ParseXref(element);
 
 		    foreach (var element in xElement.Elements(SeqLocationTag))
             {
