@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using CommandLine.Utilities;
 using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -19,7 +20,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 		public readonly int Stop;
 		public readonly string ReferenceAllele;
 		public readonly string AltAllele;
-		public string DbSnp;
 		public string VariantType;
 	    public readonly List<string> AllelicOmimIds;
 
@@ -91,7 +91,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		#endregion
 
-		private string _dbSnp;
+		private bool _hasDbSnpId;
 
         private void ClearClinvarFields()
 		{
@@ -108,6 +108,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             _orphanetIDs       = new List<string>();
 			_pubMedIds         = new List<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
 			_lastUpdatedDate   = long.MinValue;
+		    _hasDbSnpId = false;
 
 		}
 
@@ -141,11 +142,13 @@ namespace SAUtils.InputFileParsers.ClinVar
 		private IEnumerable<ClinVarItem> GetItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_clinVarXmlFileInfo.FullName))
-			using (var xmlReader = XmlReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true }))
+			using (var xmlReader = XmlReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true}))
 			{
 				//skipping the top level element to go down to its elementren
 			    xmlReader.ReadToDescendant(ClinVarSetTag);
 
+			    var benchmark = new Benchmark();
+			    var itemCount = 0;
 				do
 				{
 					var subTreeReader = xmlReader.ReadSubtree();
@@ -153,12 +156,16 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                     var clinVarItems = ExtractClinVarItems(xElement);
 
-					if (clinVarItems == null) continue;
+					if (clinVarItems == null || clinVarItems.Count==0) continue;
 
 					foreach (var clinVarItem in clinVarItems)
 					{
+					    itemCount++;
 						yield return clinVarItem;
 					}
+
+                    if (itemCount%10_000==0)
+                        Console.WriteLine($"processed {itemCount} clinvar entries in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 				} while (xmlReader.ReadToNextSibling(ClinVarSetTag));
 			}
 			
@@ -180,12 +187,9 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    
 
 			var clinvarList = new List<ClinVarItem>();
-            var clinvarSet = new HashSet<ClinvarVariant>();
+            var variants = new HashSet<ClinvarVariant>();
 			foreach (var variant in _variantList)
 			{
-                // in order to match the VCF, we leave out the ones that do not have dbsnp id
-				if (variant.DbSnp == null) continue;
-
                 if(variant.Chromosome == null) continue;
 
                 if ((variant.VariantType == "Microsatellite" || variant.VariantType=="Variation")
@@ -217,11 +221,11 @@ namespace SAUtils.InputFileParsers.ClinVar
 				if(string.IsNullOrEmpty(shiftedVariant.ReferenceAllele) && string.IsNullOrEmpty(shiftedVariant.AltAllele)) continue;
 
                 //getting the unique ones
-			    clinvarSet.Add(shiftedVariant);
+			    variants.Add(shiftedVariant);
                 
 			}
 
-		    foreach (var clinvarVariant in clinvarSet)
+		    foreach (var clinvarVariant in variants)
 		    {
 		        var extendedOmimIds = new List<string>();
 		        extendedOmimIds.AddRange(_omimIDs);
@@ -304,7 +308,9 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string ClinicalSignificanceTag = "ClinicalSignificance";
         private const string MeasureSetTag = "MeasureSet";
         private const string TraitSetTag = "TraitSet";
-        
+        private const string ObservedInTag = "ObservedIn";
+        private const string SampleTag = "Sample";
+
         private void ParseRefClinVarAssertion(XElement xElement)
 		{
 			if (xElement==null || xElement.IsEmpty) return;
@@ -324,13 +330,24 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 		    if (xElement == null || xElement.IsEmpty) return;
 
-            foreach (var element in xElement.Elements(CitationTag))
+            foreach (var element in xElement.Descendants(CitationTag))
 				ParseCitation(element);
 
-		    foreach (var element in xElement.Elements(OriginTag))
-		        _alleleOrigins.Add(element.Value);
+		    foreach (var element in xElement.Elements(ObservedInTag))
+                ParseObservedIn(element);
 
-		    //ParseClinvarAssertion(element);//keep going deeper
+        }
+
+        private void ParseObservedIn(XElement xElement)
+        {
+            var samples = xElement?.Elements(SampleTag);
+            if (samples == null) return;
+
+            foreach (var sample in samples)
+            {
+                foreach (var origin in sample.Elements(OriginTag))
+                    _alleleOrigins.Add(origin.Value);
+            }
         }
 
         private const string TraitTag = "Trait";
@@ -411,7 +428,7 @@ namespace SAUtils.InputFileParsers.ClinVar
                             _omimIDs.Add(TrimOmimId(id));
 					break;
 				case "dbSNP":
-					_dbSnp = string.IsNullOrEmpty(_dbSnp) ? id : _dbSnp + "," + id;
+				    _hasDbSnpId = true;
 					break;
 			}
 		}
@@ -437,32 +454,12 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 			    if (source.Value != PubmedIdTag) continue;
 
-			    var pubmedId = source.Value.TrimEnd('.');
+			    var pubmedId = element.Value.TrimEnd('.');
 			    if (long.TryParse(pubmedId, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
 			        _pubMedIds.Add(l);
 			    else Console.WriteLine($"WARNING:unexpected pubmedID {pubmedId}.");
-
-
-    //            switch (element.Name.LocalName)
-				//{
-				//	case IdTag:
-				//		if (element.Attributes.ContainsKey("Source") )
-				//		{
-				//			switch (element.Attributes["Source"])
-				//			{
-				//				case "PubMed":
-				//					var value = element.Value.TrimEnd('.');
-				//				    {
-    //                                    if (long.TryParse(value, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
-    //                                        _pubMedIds.Add(l);
-    //                                    else Console.WriteLine($"WARNING:unexpected pubmedID {value}.");
-				//				    }
-				//				    break;
-				//			}
-				//		}
-				//		break;
-				//}
-			}
+                
+    		}
 		}
 
         private const string MeasureTag = "Measure";
@@ -484,7 +481,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
-			_dbSnp = null;
+			_hasDbSnpId = false;
             _allilicOmimIDs.Clear();
 
 			//the variant type is available in the attributes
@@ -508,7 +505,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		            variantList.Add(variant);
 		    }
 
-            if (_dbSnp == null)
+            if (! _hasDbSnpId)
             {
                 _variantList.Clear();
                 return;
@@ -522,11 +519,6 @@ namespace SAUtils.InputFileParsers.ClinVar
                 }
             }
             _variantList.AddRange(variantList);
-            //if we don't have a dbSNP for this variant, we will skip it
-            foreach (var variant in _variantList)
-			{
-				variant.DbSnp = _dbSnp;
-			}
 		    
 		}
 
@@ -562,7 +554,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly,IDictionary<string,IChromosome> refChromDict)
 		{
-		    if (xElement == null || xElement.IsEmpty) return null;
+		    if (xElement == null ) return null;//|| xElement.IsEmpty) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
 
 			if (genomeAssembly.ToString()!= xElement.Attribute(AssemblyTag)?.Value
