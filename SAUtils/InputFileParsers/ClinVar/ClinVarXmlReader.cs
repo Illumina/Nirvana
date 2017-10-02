@@ -74,19 +74,19 @@ namespace SAUtils.InputFileParsers.ClinVar
         #region clinVarItem fields
 
         private readonly List<ClinvarVariant> _variantList= new List<ClinvarVariant>();
-		private List<string> _alleleOrigins;
+		private HashSet<string> _alleleOrigins;
 		private string _reviewStatus;
 		private string _id;
-		private List<string> _prefPhenotypes;
-		private List<string> _altPhenotypes;
+		private HashSet<string> _prefPhenotypes;
+		private HashSet<string> _altPhenotypes;
 		private string _significance;
 
-		private List<string> _medGenIDs;
-		private List<string> _omimIDs;
+		private HashSet<string> _medGenIDs;
+		private HashSet<string> _omimIDs;
         private HashSet<string> _allilicOmimIDs;
-		private List<string> _orphanetIDs;
+		private HashSet<string> _orphanetIDs;
 
-		List<long> _pubMedIds= new List<long>();
+		HashSet<long> _pubMedIds= new HashSet<long>();
 		private long _lastUpdatedDate;
 
 		#endregion
@@ -97,16 +97,16 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			_variantList.Clear();
 			_reviewStatus      = null;
-			_alleleOrigins     = new List<string>();
+			_alleleOrigins     = new HashSet<string>();
 			_significance      = null;
-			_prefPhenotypes    = new List<string>();
-			_altPhenotypes     = new List<string>();
+			_prefPhenotypes    = new HashSet<string>();
+			_altPhenotypes     = new HashSet<string>();
 			_id                = null;
-			_medGenIDs         = new List<string>();
-			_omimIDs           = new List<string>();
+			_medGenIDs         = new HashSet<string>();
+			_omimIDs           = new HashSet<string>();
             _allilicOmimIDs    = new HashSet<string>();
-            _orphanetIDs       = new List<string>();
-			_pubMedIds         = new List<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
+            _orphanetIDs       = new HashSet<string>();
+			_pubMedIds         = new HashSet<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
 			_lastUpdatedDate   = long.MinValue;
 		    _hasDbSnpId = false;
 
@@ -216,8 +216,6 @@ namespace SAUtils.InputFileParsers.ClinVar
                 if (string.IsNullOrEmpty(variant.ReferenceAllele) && variant.VariantType == "Indel" && !string.IsNullOrEmpty(variant.AltAllele))
 					shiftedVariant = GenerateRefAllele(variant, _sequenceProvider.Sequence);
 
-				_pubMedIds.Sort();
-				
 				if(string.IsNullOrEmpty(shiftedVariant.ReferenceAllele) && string.IsNullOrEmpty(shiftedVariant.AltAllele)) continue;
 
                 //getting the unique ones
@@ -227,26 +225,27 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		    foreach (var clinvarVariant in variants)
 		    {
-		        var extendedOmimIds = new List<string>();
-		        extendedOmimIds.AddRange(_omimIDs);
-		        if (clinvarVariant.AllelicOmimIds.Count != 0)
-		            extendedOmimIds.AddRange(clinvarVariant.AllelicOmimIds);
+		        var extendedOmimIds = new HashSet<string>(_omimIDs);
 
+		        foreach (var omimId in clinvarVariant.AllelicOmimIds)
+		        {
+		            extendedOmimIds.Add(omimId);
+                }
 
 		        clinvarList.Add(
 		            new ClinVarItem(clinvarVariant.Chromosome,
 		                clinvarVariant.Start,
-		                _alleleOrigins.Distinct().ToList(),
+		                _alleleOrigins.ToList(),
 		                clinvarVariant.AltAllele ,
 		                _id,
 		                _reviewStatus,
-		                _medGenIDs.Distinct().ToList(),
-		                extendedOmimIds.Distinct().ToList(),
-		                _orphanetIDs.Distinct().ToList(),
-		                _prefPhenotypes.Count > 0 ? _prefPhenotypes.Distinct().ToList() : _altPhenotypes.Distinct().ToList(),
+		                _medGenIDs.ToList(),
+		                extendedOmimIds.ToList(),
+		                _orphanetIDs.ToList(),
+		                _prefPhenotypes.Count > 0 ? _prefPhenotypes.ToList() : _altPhenotypes.ToList(),
 		                clinvarVariant.ReferenceAllele ,
 		                _significance,
-		                _pubMedIds.Distinct().ToList(),
+		                _pubMedIds.OrderBy(x=>x).ToList(),
 		                _lastUpdatedDate));
             }
 
