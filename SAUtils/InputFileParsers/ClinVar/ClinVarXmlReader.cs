@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using CommandLine.Utilities;
 using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -140,14 +138,10 @@ namespace SAUtils.InputFileParsers.ClinVar
 				    var extractedItems = ExtractClinVarItems(xElement);
 				    if (extractedItems == null) continue;
                     clinVarItems.AddRange(extractedItems);
-
-					
-                    //if (clinVarItems.Count % 10_000==0)
-                    //    Console.WriteLine($"processed {clinVarItems.Count} clinvar entries in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
+                    
 				} while (xmlReader.ReadToNextSibling(ClinVarSetTag));
 			}
-
-            clinVarItems.Sort();
+		    clinVarItems.Sort();
 
 		    var validItems = GetValidVariants(clinVarItems);
 
@@ -168,9 +162,6 @@ namespace SAUtils.InputFileParsers.ClinVar
             {
                 _sequenceProvider.LoadChromosome(item.Chromosome);
 
-                if (item.Id == "RCV000489770.1")
-                    Console.WriteLine("shifting bug!!");
-
                 if (!ValidateRefAllele(item)) continue;
 
                 string refAllele= item.ReferenceAllele, altAllele= item.AlternateAllele;
@@ -185,7 +176,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele)) continue;
 
-                var start = 0;
+                int start;
                 (start, refAllele, altAllele) = LeftShift(item.Start, refAllele, altAllele);
                 shiftedItems.Add(new ClinVarItem(item.Chromosome,
                     start,
@@ -279,23 +270,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 	    }
 
-	    private static ClinvarVariant GenerateAltAllele(ClinvarVariant variant, ISequence compressedSequence)
-		{
-			if (variant == null) return null;
-			var extractedAlt = compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
-
-            return new ClinvarVariant(variant.Chromosome, variant.Start, variant.Stop, variant.ReferenceAllele , extractedAlt, variant.AllelicOmimIds);
-		}
-
-		private static ClinvarVariant GenerateRefAllele(ClinvarVariant variant, ISequence compressedSequence)
-		{
-			if (variant == null) return null;
-			var extractedRef = compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
-
-            return new ClinvarVariant(variant.Chromosome, variant.Start, variant.Stop, extractedRef, variant.AltAllele, variant.AllelicOmimIds);
-
-		}
-
         private static string GetReferenceAllele(ClinVarItem variant, ISequence compressedSequence)
         {
             return variant == null ? null : compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
@@ -338,9 +312,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (xElement==null || xElement.IsEmpty) return;
 			//<ReferenceClinVarAssertion DateCreated="2013-10-28" DateLastUpdated="2016-04-20" ID="182406">
-            if (xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value== "RCV000170338")
-                Console.WriteLine("Missing RCV000170338 bug");
-		    _lastUpdatedDate = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
+            _lastUpdatedDate = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
 		    _id              = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag)?.Value;
 
             GetClinicalSignificance(xElement.Element(ClinicalSignificanceTag));
@@ -494,7 +466,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private void ParseGenotypeSet(XElement xElement)
         {
             if (xElement == null || xElement.IsEmpty) return;
-
+            
             foreach (var measureSet in xElement.Elements(MeasureSetTag))
             {
                 ParseMeasureSet(measureSet);
