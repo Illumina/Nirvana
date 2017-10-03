@@ -131,7 +131,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 				//skipping the top level element to go down to its elementren
 			    xmlReader.ReadToDescendant(ClinVarSetTag);
 
-			    var benchmark = new Benchmark();
+			    //var benchmark = new Benchmark();
                 do
 				{
 					var subTreeReader = xmlReader.ReadSubtree();
@@ -142,8 +142,8 @@ namespace SAUtils.InputFileParsers.ClinVar
                     clinVarItems.AddRange(extractedItems);
 
 					
-                    if (clinVarItems.Count % 10_000==0)
-                        Console.WriteLine($"processed {clinVarItems.Count} clinvar entries in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
+                    //if (clinVarItems.Count % 10_000==0)
+                    //    Console.WriteLine($"processed {clinVarItems.Count} clinvar entries in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 				} while (xmlReader.ReadToNextSibling(ClinVarSetTag));
 			}
 
@@ -151,10 +151,13 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		    var validItems = GetValidVariants(clinVarItems);
 
+		    var count = 0;
 		    foreach (var clinVarItem in validItems.Distinct())
 		    {
+		        count++;
 		        yield return clinVarItem;
 		    }
+		    Console.WriteLine("Total number of clinvar items written:"+count);
 
         }
 
@@ -164,6 +167,9 @@ namespace SAUtils.InputFileParsers.ClinVar
             foreach (var item in clinVarItems)
             {
                 _sequenceProvider.LoadChromosome(item.Chromosome);
+
+                if (item.Id == "RCV000489770.1")
+                    Console.WriteLine("shifting bug!!");
 
                 if (!ValidateRefAllele(item)) continue;
 
@@ -179,7 +185,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele)) continue;
 
-                var start = LeftShift(item);
+                var start = 0;
+                (start, refAllele, altAllele) = LeftShift(item.Start, refAllele, altAllele);
                 shiftedItems.Add(new ClinVarItem(item.Chromosome,
                     start,
                     item.Stop,
@@ -299,13 +306,14 @@ namespace SAUtils.InputFileParsers.ClinVar
             return variant == null ? null : compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
         }
 
-        private int LeftShift(ClinVarItem variant)
+        private (int start, string refAllele, string altAllele) LeftShift(int start, string refAllele, string altAllele)
 		{
-			if (variant.ReferenceAllele == null || variant.AlternateAllele == null) return variant.Start;
+			if (refAllele == null || altAllele == null) return (start, refAllele, altAllele);
 
-			var alignedVariant = _aligner.LeftAlign(variant.Start, variant.ReferenceAllele, variant.AlternateAllele);
+			var alignedVariant = _aligner.LeftAlign(start, refAllele, altAllele);
 
-            return alignedVariant?.Item1 ?? variant.Start;
+            return alignedVariant==null? (start, refAllele, altAllele)
+                : (alignedVariant.Item1, alignedVariant.Item2, alignedVariant.Item3);
             
 		}
 
@@ -330,10 +338,13 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (xElement==null || xElement.IsEmpty) return;
 			//<ReferenceClinVarAssertion DateCreated="2013-10-28" DateLastUpdated="2016-04-20" ID="182406">
+            if (xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value== "RCV000170338")
+                Console.WriteLine("Missing RCV000170338 bug");
 		    _lastUpdatedDate = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
 		    _id              = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag)?.Value;
 
             GetClinicalSignificance(xElement.Element(ClinicalSignificanceTag));
+            ParseGenotypeSet(xElement.Element(GenotypeSetTag));
 		    ParseMeasureSet(xElement.Element(MeasureSetTag));
 		    ParseTraitSet(xElement.Element(TraitSetTag));
 		}
@@ -478,6 +489,17 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
         private const string MeasureTag = "Measure";
+        private const string GenotypeSetTag = "GenotypeSet";
+
+        private void ParseGenotypeSet(XElement xElement)
+        {
+            if (xElement == null || xElement.IsEmpty) return;
+
+            foreach (var measureSet in xElement.Elements(MeasureSetTag))
+            {
+                ParseMeasureSet(measureSet);
+            }
+        }
 
         private void ParseMeasureSet(XElement xElement)
 		{
@@ -607,7 +629,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			if (xElement == null || xElement.IsEmpty) return;
 
 		    _reviewStatus = xElement.Element(ReviewStatusTag)?.Value;
-		    _significance = xElement.Element(DescriptionTag)?.Value;
+		    _significance = xElement.Element(DescriptionTag)?.Value.ToLower();
 		}
     }
 }

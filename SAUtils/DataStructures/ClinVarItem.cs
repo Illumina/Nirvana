@@ -85,11 +85,12 @@ namespace SAUtils.DataStructures
         {
             var item = obj as ClinVarItem;
             if (item == null) return false;
-            return Chromosome==item.Chromosome
-                && Start == item.Start
-                && Id.Equals(item.Id)
-                && ReferenceAllele.Equals(item.ReferenceAllele)
-                && AlternateAllele.Equals(item.AlternateAllele);
+            return Chromosome == item.Chromosome
+                   && Start == item.Start
+                   && Id.Equals(item.Id)
+                   && ReferenceAllele.Equals(item.ReferenceAllele)
+                   && AlternateAllele.Equals(item.AlternateAllele);
+            //&& (Significance?.Equals(item.Significance) ?? true);
         }
 
         #endregion

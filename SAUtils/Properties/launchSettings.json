@@ -2,7 +2,7 @@
   "profiles": {
     "SAUtils": {
       "commandName": "Project",
-      "commandLineArgs": "createSA --ref e:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat  -d E:\\Data\\Nirvana\\IntermediateTSV\\39.3\\GRCh37 -o  E:\\Data\\Nirvana\\SupplementaryDatabase\\40.1\\GRCh37",
+      "commandLineArgs": "createTSV --cvr c:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz --out c:\\Development\\IntermediateTsvs\\GRCh37 --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
       "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
     },
     "OMIM_SK": {
@@ -12,7 +12,7 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": "createTSV --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cvr C:\\Development\\TestDatasets\\OneMillion.xml -o TestSa",
+      "commandLineArgs": "createTSV --cvr c:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz --out c:\\Development\\IntermediateTsvs\\GRCh37 --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
       "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
