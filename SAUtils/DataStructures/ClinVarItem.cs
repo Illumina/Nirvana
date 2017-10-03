@@ -69,16 +69,27 @@ namespace SAUtils.DataStructures
             var hashCode = Start.GetHashCode();
             if (Chromosome      != null) hashCode ^= Chromosome.GetHashCode();
             if (Id              != null) hashCode ^= Id.GetHashCode();
-            if (AlleleOrigins   != null) hashCode ^= AlleleOrigins.GetHashCode();
+            //if (AlleleOrigins   != null) hashCode ^= AlleleOrigins.GetHashCode();
             if (AlternateAllele != null) hashCode ^= AlternateAllele.GetHashCode();
-            if (MedGenIDs       != null) hashCode ^= MedGenIDs.GetHashCode();
-            if (OmimIDs         != null) hashCode ^= OmimIDs.GetHashCode();
-            if (OrphanetIDs     != null) hashCode ^= OrphanetIDs.GetHashCode();
-            if (Phenotypes      != null) hashCode ^= Phenotypes.GetHashCode();
+            //if (MedGenIDs       != null) hashCode ^= MedGenIDs.GetHashCode();
+            //if (OmimIDs         != null) hashCode ^= OmimIDs.GetHashCode();
+            //if (OrphanetIDs     != null) hashCode ^= OrphanetIDs.GetHashCode();
+            //if (Phenotypes      != null) hashCode ^= Phenotypes.GetHashCode();
             if (ReferenceAllele != null) hashCode ^= ReferenceAllele.GetHashCode();
-            if (Significance    != null) hashCode ^= Significance.GetHashCode();
+            //if (Significance    != null) hashCode ^= Significance.GetHashCode();
             // ReSharper restore NonReadonlyMemberInGetHashCode
             return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            var item = obj as ClinVarItem;
+            if (item == null) return false;
+            return Chromosome==item.Chromosome
+                && Start == item.Start
+                && Id.Equals(item.Id)
+                && ReferenceAllele.Equals(item.ReferenceAllele)
+                && AlternateAllele.Equals(item.AlternateAllele);
         }
 
         #endregion

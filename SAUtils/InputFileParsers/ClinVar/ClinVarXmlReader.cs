@@ -34,25 +34,6 @@ namespace SAUtils.InputFileParsers.ClinVar
             AllelicOmimIds  = allilicOmimIds ?? new List<string>();
 		}
 
-	    public override int GetHashCode()
-	    {
-	        return Chromosome.GetHashCode()
-	               ^ ReferenceAllele.GetHashCode()
-	               ^ AltAllele.GetHashCode()
-	               ^ Start
-	               ^ Stop;
-	    }
-
-	    public override bool Equals(object obj)
-	    {
-	        if (!(obj is ClinvarVariant other)) return false;
-
-	        return Chromosome.Equals(other.Chromosome)
-	               && Start == other.Start
-	               && Stop == other.Stop
-	               && ReferenceAllele.Equals(other.ReferenceAllele)
-	               && AltAllele.Equals(other.AltAllele);
-	    }
 	}
 
 	public sealed class ClinVarXmlReader : IEnumerable<ClinVarItem>
@@ -74,7 +55,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         #region clinVarItem fields
 
-        private readonly HashSet<ClinvarVariant> _variantList= new HashSet<ClinvarVariant>();
+        private readonly List<ClinvarVariant> _variantList= new List<ClinvarVariant>();
 		private HashSet<string> _alleleOrigins;
 		private string _reviewStatus;
 		private string _id;
@@ -170,7 +151,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		    var validItems = GetValidVariants(clinVarItems);
 
-		    foreach (var clinVarItem in validItems)
+		    foreach (var clinVarItem in validItems.Distinct())
 		    {
 		        yield return clinVarItem;
 		    }
@@ -553,7 +534,7 @@ namespace SAUtils.InputFileParsers.ClinVar
                 }
             }
 
-            _variantList.UnionWith(variantList);
+            _variantList.AddRange(variantList);
 		    
 		}
 
