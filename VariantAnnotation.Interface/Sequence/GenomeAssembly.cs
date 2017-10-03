@@ -6,7 +6,8 @@
 		Unknown,
 		GRCh37,
 		GRCh38,
-		hg19
-	}
+		hg19,
+        rCRS // Revised Cambridge Reference Sequence (rCRS) of the Human Mitochondrial DNA 
+    }
 	// ReSharper restore InconsistentNaming
 }

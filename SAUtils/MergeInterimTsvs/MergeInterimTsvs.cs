@@ -32,6 +32,7 @@ namespace SAUtils.MergeInterimTsvs
         private readonly GenomeAssembly _genomeAssembly;
         private readonly IDictionary<string, IChromosome> _refChromDict;
         private List<string> _allRefNames;
+        private readonly HashSet<GenomeAssembly> _assembliesIgnoredInConsistancyCheck = new HashSet<GenomeAssembly>() { GenomeAssembly.Unknown, GenomeAssembly.rCRS };
 
         /// <summary>
         /// constructor
@@ -126,11 +127,11 @@ namespace SAUtils.MergeInterimTsvs
 
         private List<Tuple<int, string>> GetGlobalMajorAlleleForRefMinors(string refName)
         {
-            var globalAlleles = new List<Tuple<int,string>>();
+            var globalAlleles = new List<Tuple<int, string>>();
             if (_miscReader == null) return globalAlleles;
             foreach (var saMiscellaniese in _miscReader.GetAnnotationItems(refName))
             {
-               globalAlleles.Add( Tuple.Create(saMiscellaniese.Position, saMiscellaniese.GlobalMajorAllele));
+                globalAlleles.Add(Tuple.Create(saMiscellaniese.Position, saMiscellaniese.GlobalMajorAllele));
             }
             return globalAlleles;
         }
@@ -210,8 +211,8 @@ namespace SAUtils.MergeInterimTsvs
             if (string.IsNullOrEmpty(miscFile)) return;
 
             var miscFileReader = GZipUtilities.GetAppropriateStreamReader(miscFile);
-            var indexFileStream = new FileStream(miscFile+".tvi",FileMode.Open);
-            _miscReader = new SaMiscellaniesReader(miscFileReader,indexFileStream);
+            var indexFileStream = new FileStream(miscFile + ".tvi", FileMode.Open);
+            _miscReader = new SaMiscellaniesReader(miscFileReader, indexFileStream);
             _allRefNames.AddRange(_miscReader.GetAllRefNames());
 
 
@@ -219,27 +220,14 @@ namespace SAUtils.MergeInterimTsvs
 
         private void CheckAssemblyConsistancy()
         {
-            var assembly = GenomeAssembly.Unknown;
-            var knownSaAssemblies = _interimSaHeaders.Select(x => x.GenomeAssembly).Where(x => !x.Equals(GenomeAssembly.Unknown)).ToList();
-            var knownIntervalAssemblies = _intervalHeaders.Select(x => x.GenomeAssembly).Where(x => !x.Equals(GenomeAssembly.Unknown)).ToList();
-            if (knownSaAssemblies.Count > 0)
-            {
-                assembly = knownSaAssemblies[0];
-                for (int i = 1; i < knownSaAssemblies.Count; i++)
-                    if (knownSaAssemblies[i] != assembly)
-                        throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {knownSaAssemblies[i]} and {assembly}");
-            }
+            var uniqueAssemblies = _interimSaHeaders.Select(x => x.GenomeAssembly)
+                .Concat(_intervalHeaders.Select(x => x.GenomeAssembly))
+                .Where(x => !_assembliesIgnoredInConsistancyCheck.Contains(x))
+                .Distinct()
+                .ToList();
 
-            if (knownIntervalAssemblies.Count > 0)
-            {
-                if (assembly == GenomeAssembly.Unknown)//there were no interim SA headers with known assembly
-                    assembly = knownIntervalAssemblies[0];
-
-                for (int i = 0; i < knownIntervalAssemblies.Count; i++)
-                    if (knownIntervalAssemblies[i] != assembly)
-                        throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {knownIntervalAssemblies[i]} and {assembly}");
-            }
-
+            if (uniqueAssemblies.Count > 1)
+                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {string.Join(", ", uniqueAssemblies.ToArray())}");
         }
 
         public void Merge()
@@ -318,7 +306,7 @@ namespace SAUtils.MergeInterimTsvs
 
             using (var stream = FileUtilities.GetCreateStream(saPath))
             using (var idxStream = FileUtilities.GetCreateStream(saPath + ".idx"))
-            using (var blockSaWriter = new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantsIntervals,globalMajorAlleleInRefMinors))
+            using (var blockSaWriter = new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantsIntervals, globalMajorAlleleInRefMinors))
             {
                 InterimSaPosition currPosition;
                 while ((currPosition = GetNextInterimPosition(iInterimSaItemsList)) != null)
