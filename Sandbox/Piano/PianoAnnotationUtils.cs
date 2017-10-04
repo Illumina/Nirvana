@@ -8,9 +8,8 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace Piano
 {
-    public class PianoAnnotationUtils
+    public static class PianoAnnotationUtils
     {
-        internal const int FlankingLength = 5000;
         private static readonly AminoAcids AminoAcidsProvider = new AminoAcids(false);
         private static readonly AminoAcids MitoAminoAcidsProvider = new AminoAcids(true);
 
@@ -19,7 +18,7 @@ namespace Piano
         {
             foreach (var transcript in transcriptCandidates)
             {
-                if (NeedAnnotate(variant, transcript, variant.Behavior, transcript.Gene))
+                if (transcript.Overlaps(variant) && !variant.Behavior.ReducedTranscriptAnnotation)
                 {
                     var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript);
                     if (annotatedTranscript != null) annotatedTranscripts.Add(annotatedTranscript);
@@ -36,20 +35,12 @@ namespace Piano
             var acidsProvider = variant.Chromosome.UcscName == "chrM"
                         ? MitoAminoAcidsProvider
                         : AminoAcidsProvider;
-            IAnnotatedTranscript annotatedTranscript =
+            var annotatedTranscript =
                 PianoTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, compressedSequence,acidsProvider);
 
             return annotatedTranscript;
         }
 
-        internal static bool NeedAnnotate(IInterval variant, IInterval transcript,
-            AnnotationBehavior behavior, IInterval gene)
-        {
-
-            if (transcript.Overlaps(variant) && !behavior.ReducedTranscriptAnnotation) return true;
-
-            return false;
-        }
 
        
     }

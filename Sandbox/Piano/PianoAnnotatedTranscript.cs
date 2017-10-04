@@ -32,15 +32,12 @@ namespace Piano
         public string UpstreamAminoAcids { get; }
         public string DownStreamAminoAcids { get; }
 
-        public PianoAnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
-            string referenceCodons, string alternateCodons, IMappedPositions mappedPositions, string upstreamAminoAcids,
+        public PianoAnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids, IMappedPositions mappedPositions, string upstreamAminoAcids,
             string downStreamAminoAcids,IEnumerable<ConsequenceTag> consequences)
         {
             Transcript           = transcript;
             ReferenceAminoAcids  = referenceAminoAcids;
             AlternateAminoAcids  = alternateAminoAcids;
-            ReferenceCodons      = referenceCodons;
-            AlternateCodons      = alternateCodons;
             MappedPositions      = mappedPositions;
             UpstreamAminoAcids   = upstreamAminoAcids;
             DownStreamAminoAcids = downStreamAminoAcids;
