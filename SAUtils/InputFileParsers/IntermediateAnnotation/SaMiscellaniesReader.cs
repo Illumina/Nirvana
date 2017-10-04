@@ -28,20 +28,30 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             }
 
 
-            //set the header information
-            using (var reader =_inputFileStreamReader)
+            string line;
+            while ((line = _inputFileStreamReader.ReadLine()) != null)
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
+                // Skip empty lines.
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    if (!line.StartsWith("#")) break;
+                if (!line.StartsWith("#")) break;
 
-                    ParseHeaderLine(line);
-                }
+                ParseHeaderLine(line);
             }
+            //set the header information
+            //using (var reader =_inputFileStreamReader)
+            //{
+            //    string line;
+            //    while ((line = reader.ReadLine()) != null)
+            //    {
+            //        // Skip empty lines.
+            //        if (string.IsNullOrWhiteSpace(line)) continue;
+
+            //        if (!line.StartsWith("#")) break;
+
+            //        ParseHeaderLine(line);
+            //    }
+            //}
         }
 
         private void ParseHeaderLine(string line)
