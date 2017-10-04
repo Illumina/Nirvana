@@ -43,14 +43,12 @@ namespace SAUtils.InputFileParsers.ClinVar
         private readonly ISequenceProvider _sequenceProvider;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
-        #endregion
-
-        #region xmlTags
-
-        const string ClinVarSetTag = "ClinVarSet";
+        private string _lastClinvarAccession;
 
         #endregion
 
+        
+        
         #region clinVarItem fields
 
         private readonly List<ClinvarVariant> _variantList= new List<ClinvarVariant>();
@@ -115,11 +113,13 @@ namespace SAUtils.InputFileParsers.ClinVar
             _refChromDict = sequenceProvider.GetChromosomeDictionary();
         }
 
-		/// <summary>
-		/// Parses a ClinVar file and return an enumeration object containing all the ClinVar objects
-		/// that have been extracted
-		/// </summary>
-		private IEnumerable<ClinVarItem> GetItems()
+        private const string ClinVarSetTag = "ClinVarSet";
+
+        /// <summary>
+        /// Parses a ClinVar file and return an enumeration object containing all the ClinVar objects
+        /// that have been extracted
+        /// </summary>
+        private IEnumerable<ClinVarItem> GetItems()
 		{
 		    var clinVarItems = new List<ClinVarItem>();
 
@@ -134,12 +134,21 @@ namespace SAUtils.InputFileParsers.ClinVar
 				{
 					var subTreeReader = xmlReader.ReadSubtree();
 				    var xElement = XElement.Load(subTreeReader);
-
-				    var extractedItems = ExtractClinVarItems(xElement);
+				    List<ClinVarItem> extractedItems;
+				    try
+				    {
+				        extractedItems = ExtractClinVarItems(xElement);
+                    }
+                    catch (Exception )
+				    {
+				        Console.WriteLine($"Last clinVar accession observed {_lastClinvarAccession}");
+				        throw;
+				    }
 				    if (extractedItems == null) continue;
-                    clinVarItems.AddRange(extractedItems);
-                    
-				} while (xmlReader.ReadToNextSibling(ClinVarSetTag));
+				    clinVarItems.AddRange(extractedItems);
+
+
+                } while (xmlReader.ReadToNextSibling(ClinVarSetTag));
 			}
 		    clinVarItems.Sort();
 
@@ -312,8 +321,9 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (xElement==null || xElement.IsEmpty) return;
 			//<ReferenceClinVarAssertion DateCreated="2013-10-28" DateLastUpdated="2016-04-20" ID="182406">
-            _lastUpdatedDate = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
-		    _id              = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag)?.Value;
+            _lastUpdatedDate      = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
+		    _lastClinvarAccession = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value;
+            _id                   =  _lastClinvarAccession + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag)?.Value;
 
             GetClinicalSignificance(xElement.Element(ClinicalSignificanceTag));
             ParseGenotypeSet(xElement.Element(GenotypeSetTag));
