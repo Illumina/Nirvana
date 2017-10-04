@@ -50,7 +50,7 @@ namespace SAUtils.TsvWriters
 		}
 		#endregion
 
-		public ClinvarTsvWriter(SaTsvWriter saTsvWriter)
+	    private ClinvarTsvWriter(SaTsvWriter saTsvWriter)
 		{
 			_writer = saTsvWriter;
 		}
@@ -81,8 +81,8 @@ namespace SAUtils.TsvWriters
                 var altAllele = kvp.Key.Item2;
 
                 var groupedItems = kvp.Value;
-                var vcfString = string.Join(",", Enumerable.Select(groupedItems.OrderBy(x => x.ID), x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
-                var jsonStrings = groupedItems.OrderBy(x => x.ID).Select(x => x.GetJsonString()).ToList();
+                var vcfString = string.Join(",", Enumerable.Select(groupedItems.OrderBy(x => x.Id), x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
+                var jsonStrings = groupedItems.OrderBy(x => x.Id).Select(x => x.GetJsonString()).ToList();
 
                 var firstItem = groupedItems[0];
                 _writer.AddEntry(firstItem.Chromosome.EnsemblName,

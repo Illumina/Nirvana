@@ -8,7 +8,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class ExacTsvWriter:ISaItemTsvWriter
+	public sealed class ExacTsvWriter:ISaItemTsvWriter
 	{
 		#region members
 		private readonly SaTsvWriter _writer;

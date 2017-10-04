@@ -10,7 +10,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public class GeneDatabaseWriter : IDisposable
+    public sealed class GeneDatabaseWriter : IDisposable
     {
         private readonly Stream _stream;
         private readonly ExtendedBinaryWriter _writer;

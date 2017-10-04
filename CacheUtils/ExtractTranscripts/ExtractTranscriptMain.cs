@@ -3,7 +3,7 @@ using ErrorHandling;
 
 namespace CacheUtils.ExtractTranscripts
 {
-    public class ExtractTranscriptMain
+    public static class ExtractTranscriptMain
     {
         public static ExitCodes Run(string command, string[] args)
         {

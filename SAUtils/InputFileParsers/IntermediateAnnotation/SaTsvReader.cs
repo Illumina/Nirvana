@@ -8,7 +8,7 @@ using SAUtils.DataStructures;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public class SaTsvReader:IEnumerable<InterimSaItem>
+    public sealed class SaTsvReader:IEnumerable<InterimSaItem>
 	{
 		private readonly FileInfo _inputFileInfo;
 		private readonly Dictionary<string, long> _refNameOffsets;

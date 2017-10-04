@@ -8,7 +8,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-    class GeneAnnotationTsvWriter : IDisposable
+    public sealed class GeneAnnotationTsvWriter : IDisposable
     {
         #region members
         private readonly BgzipTextWriter _bgzipTextWriter;

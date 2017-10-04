@@ -142,7 +142,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var mergedMitoMapItems = MitoMapSvReader.MergeAndSort(mitoMapSvReaders);
 
             using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                _genomeAssembly.ToString(), SaTsvCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapSvTag,
+                GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapSvTag,
                 ReportFor.StructuralVariants))
                 CreateSvTsv(mergedMitoMapItems, writer);
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());

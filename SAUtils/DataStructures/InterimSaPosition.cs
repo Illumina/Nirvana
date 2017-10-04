@@ -6,12 +6,12 @@ using VariantAnnotation.SA;
 namespace SAUtils.DataStructures
 {
 
-    public class InterimSaPosition
+    public sealed class InterimSaPosition
     {
         private readonly List<IInterimSaItem> _intermediateSaItems;
         public int Position { get; private set; }
         private string GlobalMajorAllele { get; set; }
-        public bool IsReferenceMinor { get; private set; }
+        private bool IsReferenceMinor { get; set; }
 
         /// <summary>
         /// constructor

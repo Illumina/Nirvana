@@ -8,7 +8,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.CreateOmimTsv
 {
-	public class OmimReader : IEnumerable<OmimEntry>
+	public sealed class OmimReader : IEnumerable<OmimEntry>
 	{
 		#region members
 
@@ -113,9 +113,7 @@ namespace SAUtils.CreateOmimTsv
 			var phenotypeRegex = new Regex(@"^(.+?)(?:,\s(\d{6}))?\s\((\d)\)(?:,\s)?(.*)?$");
 			var match = phenotypeRegex.Match(info);
 			var phenotypeGroup = match.Groups[1].ToString();
-			string phenotype;
-		    OmimEntry.Comments comments;
-			ParsePhenotypeMapping(phenotypeGroup, out phenotype, out comments);
+		    ParsePhenotypeMapping(phenotypeGroup, out var phenotype, out var comments);
 
 			var mimNumber = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
 			var mapping = (OmimEntry.Mapping) Convert.ToInt16(match.Groups[3].Value);

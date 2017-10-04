@@ -6,7 +6,7 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
-    public class CustomInterval : IComparable<CustomInterval>
+    public sealed class CustomInterval : IComparable<CustomInterval>
     {
         public IChromosome Chromosome { get; }
         public int Start { get; }

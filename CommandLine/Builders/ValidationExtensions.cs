@@ -25,27 +25,6 @@ namespace CommandLine.Builders
         }
 
         /// <summary>
-        /// check if directory exist,if not, create the directory
-        /// </summary>
-        public static IConsoleAppValidator CheckAndCreateDirectory(this IConsoleAppValidator validator,
-            string directoryPath, string description, string commandLineOption, bool isReuired = true)
-        {
-            if (string.IsNullOrEmpty(directoryPath))
-            {
-                if (isReuired)
-                    validator.Data.AddError(
-                        $"The {description} file was not specified. Please use the {commandLineOption} parameter.",
-                        ExitCodes.MissingCommandLineOption);
-            }
-            else if (!Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
-
-            return validator;
-        }
-
-        /// <summary>
         /// check if each file exists
         /// </summary>
 
@@ -104,7 +83,7 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        public static IConsoleAppValidator CheckInputDirectoryExists(this IConsoleAppValidator validator,
+        public static IConsoleAppValidator CheckDirectoryExists(this IConsoleAppValidator validator,
             string directory, string description, string commandLineOption)
         {
             if (validator.SkipValidation) return validator;

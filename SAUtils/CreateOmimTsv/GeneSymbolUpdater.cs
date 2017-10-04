@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SAUtils.CreateOmimTsv
 {
-    public class GeneSymbolUpdater
+    public sealed class GeneSymbolUpdater
     {
         private readonly SymbolDataSource _geneInfoSource;
         private readonly SymbolDataSource _hgncSource;
@@ -24,8 +24,7 @@ namespace SAUtils.CreateOmimTsv
 
         public string UpdateGeneSymbol(string currentSymbol)
         {
-            string newSymbol;
-            if (_hgncSource.TryUpdateSymbol(currentSymbol, out newSymbol))
+            if (_hgncSource.TryUpdateSymbol(currentSymbol, out var newSymbol))
             {
                 if (newSymbol == currentSymbol) _numGenesAlreadyCurrent++;
                 else _numGenesUpdated++;
@@ -125,8 +124,7 @@ namespace SAUtils.CreateOmimTsv
 
         private static void AddIdToUniqueString(Dictionary<string, UniqueString> idToUniqueString, string id, string newValue)
         {
-            UniqueString oldValue;
-            if (idToUniqueString.TryGetValue(id, out oldValue))
+            if (idToUniqueString.TryGetValue(id, out var oldValue))
             {
                 if (oldValue.Value != newValue) oldValue.HasConflict = true;
             }

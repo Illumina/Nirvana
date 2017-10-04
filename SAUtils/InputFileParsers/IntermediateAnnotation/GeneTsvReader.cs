@@ -11,7 +11,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public class GeneTsvReader : IEnumerable<IAnnotatedGene>
+    public sealed class GeneTsvReader : IEnumerable<IAnnotatedGene>
     {
         private readonly FileInfo _inputFileInfo;
         private string _name;

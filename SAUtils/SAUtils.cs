@@ -10,7 +10,7 @@ using VariantAnnotation.Interface;
 
 namespace SAUtils
 {
-    public class SaUtils 
+    public static class SaUtils 
     {
 
         public static int Main(string[] args)

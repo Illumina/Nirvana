@@ -9,7 +9,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-	public class CosmicTsvWriter:ISaItemTsvWriter
+	public sealed class CosmicTsvWriter:ISaItemTsvWriter
 	{
 		#region members
 		private readonly SaTsvWriter _writer;
@@ -81,8 +81,8 @@ namespace SAUtils.TsvWriters
 				var altAllele = kvp.Key.Item2;
 
 				var groupedItems = kvp.Value;
-				var vcfString = string.Join(",", groupedItems.OrderBy(x=>x.ID).Select(x => x.ID));
-				var jsonStrings = groupedItems.OrderBy(x => x.ID).Select(x => x.GetJsonString()).ToList();
+				var vcfString = string.Join(",", groupedItems.OrderBy(x=>x.Id).Select(x => x.Id));
+				var jsonStrings = groupedItems.OrderBy(x => x.Id).Select(x => x.GetJsonString()).ToList();
 
 				var firstItem = groupedItems[0];
 				_writer.AddEntry(firstItem.Chromosome.EnsemblName,
@@ -114,11 +114,11 @@ namespace SAUtils.TsvWriters
 
 			foreach (var cosmicItem in cosmicItems)
 			{
-				if (cosmicDict.ContainsKey(cosmicItem.ID))
+				if (cosmicDict.ContainsKey(cosmicItem.Id))
 				{
-					cosmicDict[cosmicItem.ID].MergeStudies(cosmicItem);
+					cosmicDict[cosmicItem.Id].MergeStudies(cosmicItem);
 				}
-				else cosmicDict[cosmicItem.ID] = cosmicItem;
+				else cosmicDict[cosmicItem.Id] = cosmicItem;
 			}
 
 			return cosmicDict.Values.ToList();

@@ -11,7 +11,7 @@ namespace SAUtils.DataStructures
     {
         #region members
 
-        public string ID { get; }
+        public string Id { get; }
 	    private readonly List<string> _alleleOrigins;
 		private readonly List<string> _phenotypes;
 		private readonly List<string> _medgenIds;
@@ -73,7 +73,7 @@ namespace SAUtils.DataStructures
 		    // ReSharper disable NonReadonlyMemberInGetHashCode
             var hashCode = Start.GetHashCode();
             if (Chromosome      != null) hashCode ^= Chromosome.GetHashCode();
-            if (ID              != null) hashCode ^= ID.GetHashCode();
+            if (Id              != null) hashCode ^= Id.GetHashCode();
             if (AlleleOrigins   != null) hashCode ^= AlleleOrigins.GetHashCode();
             if (AlternateAllele != null) hashCode ^= AlternateAllele.GetHashCode();
             if (MedGenIDs       != null) hashCode ^= MedGenIDs.GetHashCode();
@@ -108,7 +108,7 @@ namespace SAUtils.DataStructures
 			Start              = position;
 			_alleleOrigins     = alleleOrigins?.Count==0? null: alleleOrigins;
 			AlternateAllele          = altAllele;
-		    ID                 = id;
+		    Id                 = id;
 		    _medgenIds         = medGenIds?.Count == 0 ? null : medGenIds ;
 			_omimIds           = omimIds?.Count == 0 ? null : omimIds;
 			_orphanetIds       = orphanetIds?.Count == 0 ? null : orphanetIds;
@@ -119,9 +119,9 @@ namespace SAUtils.DataStructures
 			LastUpdatedDate    = lastUpdatedDate;
 			IsAlleleSpecific   = null;
 
-			if (reviewStatusString != null)
-				if (ReviewStatusNameMapping.ContainsKey(reviewStatusString))
-					ReviewStatus = ReviewStatusNameMapping[reviewStatusString];
+		    if (reviewStatusString == null) return;
+		    if (ReviewStatusNameMapping.ContainsKey(reviewStatusString))
+		        ReviewStatus = ReviewStatusNameMapping[reviewStatusString];
 		}
 
 		public string GetJsonString()
@@ -136,7 +136,7 @@ namespace SAUtils.DataStructures
 			//the reduced alt allele should never be output
 			altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(altAllele);
 
-			jsonObject.AddStringValue("id", ID);
+			jsonObject.AddStringValue("id", Id);
 			jsonObject.AddStringValue("reviewStatus", ReviewStatusStrings[ReviewStatus]);
 			jsonObject.AddStringValue("isAlleleSpecific", IsAlleleSpecific, false);
 			jsonObject.AddStringValues("alleleOrigins", _alleleOrigins);

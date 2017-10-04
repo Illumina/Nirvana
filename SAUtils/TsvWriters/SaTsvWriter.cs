@@ -9,7 +9,7 @@ using Compression.FileHandling;
 
 namespace SAUtils.TsvWriters
 {
-    public class SaTsvWriter : IDisposable
+    public sealed class SaTsvWriter : IDisposable
     {
         #region members
 
