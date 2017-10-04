@@ -4,20 +4,13 @@ using System.Reflection;
 
 namespace CommandLine.Utilities
 {
-    public static class CommandLineUtilities {
-
-        #region members
-
+    public static class CommandLineUtilities
+    {
         private static readonly string Copyright;
         public static readonly string Title;
         public static readonly string InformationalVersion;
         public static readonly string Version;
 
-        #endregion
-
-        /// <summary>
-        /// constructor
-        /// </summary>
         static CommandLineUtilities()
         {
             var assembly = Assembly.GetEntryAssembly();
@@ -72,7 +65,8 @@ namespace CommandLine.Utilities
             int fillerLength  = lineLength - Title.Length - Copyright.Length;
             int fillerLength2 = lineLength - author.Length - InformationalVersion.Length;
 
-            if (fillerLength < 1) {
+            if (fillerLength < 1)
+            {
                 throw new InvalidOperationException("Unable to display the program banner, the program name is too long.");
             }
 
