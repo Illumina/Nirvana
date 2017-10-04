@@ -11,7 +11,7 @@ namespace Nirvana
         private readonly Benchmark _cacheBenchmark;
         private readonly Benchmark _annotationBenchmark;
 
-        public bool DisableOutput = false;
+        private readonly bool _disableOutput = false;
 
         private string _referenceName;
         private string _referenceTime;
@@ -60,8 +60,8 @@ namespace Nirvana
         public void StopReference()
         {
             _referenceTime = Benchmark.ToHumanReadable(_referenceBenchmark.GetElapsedTime());
-            if (!DisableOutput) ShowReferenceTime();
-            if (!DisableOutput) Console.WriteLine("cache & sa: {0}", Benchmark.ToHumanReadable(_cacheBenchmark.GetElapsedTime()));
+            if (!_disableOutput) ShowReferenceTime();
+            if (!_disableOutput) Console.WriteLine("cache & sa: {0}", Benchmark.ToHumanReadable(_cacheBenchmark.GetElapsedTime()));
            
         }
 
@@ -73,7 +73,7 @@ namespace Nirvana
             if (!_hasStartedAnnotation) return;
 
             double dummy;
-            if (!DisableOutput) Console.WriteLine("annotation: {0}", _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
+            if (!_disableOutput) Console.WriteLine("annotation: {0}", _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
             _numVariantsInReference = 0;
         }
 

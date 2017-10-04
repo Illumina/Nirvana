@@ -12,7 +12,7 @@ using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public class IntervalTsvReader : IEnumerable<ISupplementaryInterval>
+    public sealed class IntervalTsvReader : IEnumerable<ISupplementaryInterval>
     {
         private readonly FileInfo _inputFileInfo;
         private string _name;

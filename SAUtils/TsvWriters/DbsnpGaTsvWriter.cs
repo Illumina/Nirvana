@@ -9,7 +9,7 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.TsvWriters
 {
-	public class DbsnpGaTsvWriter:ISaItemTsvWriter
+	public sealed class DbsnpGaTsvWriter:ISaItemTsvWriter
 	{
 
 		#region members

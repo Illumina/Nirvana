@@ -43,7 +43,7 @@ namespace SAUtils.GeneScoresTsv
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(ConfigurationSettings.InputPath, "gene scores file", "--in")
-                .CheckAndCreateDirectory(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
+                .CheckDirectoryExists(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()

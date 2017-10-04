@@ -142,7 +142,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var mergedMitoMapItems = MitoMapSvReader.MergeAndSort(mitoMapSvReaders);
 
             using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                _genomeAssembly.ToString(), SaTSVCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapSvTag,
+                GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapSvTag,
                 ReportFor.StructuralVariants))
                 CreateSvTsv(mergedMitoMapItems, writer);
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -178,13 +178,13 @@ namespace SAUtils.CreateIntermediateTsvs
             var benchMark = new Benchmark();
             //Console.WriteLine($"Creating TSV from {fileName}");
             var dataSource = "";
-            DataSourceVersion version = GetDataSourceVersion(fileName); ;
+            var version = GetDataSourceVersion(fileName); 
             switch (sourceName)
             {
                 case InterimSaCommon.DgvTag:
                     dataSource = "DGV";
                     using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                        _genomeAssembly.ToString(), SaTSVCommon.DgvSchemaVersion, InterimSaCommon.DgvTag, ReportFor.StructuralVariants))
+						_genomeAssembly.ToString(), SaTsvCommon.DgvSchemaVersion, InterimSaCommon.DgvTag, ReportFor.StructuralVariants))
                     {
                         CreateSvTsv(new DgvReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
                     }
@@ -192,7 +192,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 case InterimSaCommon.ClinGenTag:
                     dataSource = "ClinGen";
                     using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                        _genomeAssembly.ToString(), SaTSVCommon.ClinGenSchemaVersion, InterimSaCommon.ClinGenTag,
+						_genomeAssembly.ToString(), SaTsvCommon.ClinGenSchemaVersion, InterimSaCommon.ClinGenTag,
                         ReportFor.StructuralVariants))
                     {
                         CreateSvTsv(new ClinGenReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
@@ -202,7 +202,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 case InterimSaCommon.OnekSvTag:
                     dataSource = "OnekSv";
                     using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                        _genomeAssembly.ToString(), SaTSVCommon.OneKgenSchemaVersion, InterimSaCommon.OnekSvTag,
+						_genomeAssembly.ToString(), SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.OnekSvTag,
                         ReportFor.StructuralVariants))
                     {
                         CreateSvTsv(new OneKGenSvReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
@@ -237,7 +237,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var version = GetDataSourceVersion(fileName);
             var reader = new CustomIntervalParser(new FileInfo(fileName), _refNamesDictionary);
             using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                _genomeAssembly.ToString(), SaTSVCommon.CustIntervalSchemaVersion, reader.KeyName,
+				_genomeAssembly.ToString(), SaTsvCommon.CustIntervalSchemaVersion, reader.KeyName,
                 ReportFor.AllVariants))
             {
                 foreach (var custInterval in reader)
@@ -345,10 +345,10 @@ namespace SAUtils.CreateIntermediateTsvs
             var version = GetDataSourceVersion(fileName);
 
 		    var dbsnpWriter = new SaTsvWriter(_outputDirectory, version, _genomeAssembly.ToString(),
-		        SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
+		        SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
 
 		    var globalAlleleWriter = new SaTsvWriter(_outputDirectory, version, _genomeAssembly.ToString(),
-		        SaTSVCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
+		        SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
             using (var tsvWriter = new DbsnpGaTsvWriter(dbsnpWriter,globalAlleleWriter))
             {
                 var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(fileName), _refNamesDictionary);

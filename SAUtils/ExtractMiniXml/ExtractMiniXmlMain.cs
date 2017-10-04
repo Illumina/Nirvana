@@ -1,7 +1,7 @@
-﻿using System;
-using CommandLine.Builders;
+﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
+using SAUtils.ExtractMiniXml;
 using VariantAnnotation.Interface;
 
 namespace ExtractMiniXml

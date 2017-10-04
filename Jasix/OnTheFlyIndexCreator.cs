@@ -8,7 +8,7 @@ using VariantAnnotation.Interface.Positions;
 
 namespace Jasix
 {
-    public class OnTheFlyIndexCreator : IDisposable
+    public sealed class OnTheFlyIndexCreator : IDisposable
     {
         private readonly Stream _indexStream;
         private readonly JasixIndex _jasixIndex;

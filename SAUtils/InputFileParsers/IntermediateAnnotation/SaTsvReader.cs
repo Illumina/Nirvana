@@ -8,7 +8,7 @@ using SAUtils.DataStructures;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public class SaTsvReader:IEnumerable<InterimSaItem>
+    public sealed class SaTsvReader:IEnumerable<InterimSaItem>
 	{
 		private readonly FileInfo _inputFileInfo;
 		private readonly Dictionary<string, long> _refNameOffsets;
@@ -186,8 +186,8 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 					break;
 				case "#schemaVersion":
 					var schemaVersion = int.Parse(value);
-					if (schemaVersion != SaTSVCommon.SupplementarySchemaVersion)
-						throw new InvalidDataException($"Expected Schema version:{SaTSVCommon.SupplementarySchemaVersion}, oberved: {value}");
+					if (schemaVersion != SaTsvCommon.SupplementarySchemaVersion)
+						throw new InvalidDataException($"Expected Schema version:{SaTsvCommon.SupplementarySchemaVersion}, oberved: {value}");
 					break;
 			}
 		}

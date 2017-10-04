@@ -35,7 +35,7 @@ namespace SAUtils.TsvWriters
             var releaseDate = new DateTime(dataSourceVersion.ReleaseDateTicks, DateTimeKind.Utc);
             sb.Append($"#releaseDate={releaseDate:yyyy-MM-dd}\n");
             sb.Append($"#dataVersion={dataVersion}\n");
-            sb.Append($"#schemaVersion={SaTSVCommon.SupplementarySchemaVersion}\n");
+            sb.Append($"#schemaVersion={SaTsvCommon.SupplementarySchemaVersion}\n");
             sb.Append($"#isArray={isArray}\n");
             sb.Append($"#keyName={keyName}\n");
             sb.Append("#GENESYMBOL\tJSON\n");

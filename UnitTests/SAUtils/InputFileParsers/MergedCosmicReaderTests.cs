@@ -6,7 +6,6 @@ using SAUtils.InputFileParsers.Cosmic;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
-using Vcf;
 using Xunit;
 
 namespace UnitTests.SaUtilsTests.InputFileParsers
@@ -42,7 +41,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
 
             foreach (var study in cosmicItem.Studies)
             {
-                Assert.Equal("544", study.ID);
+                Assert.Equal("544", study.Id);
                 Assert.Equal("haematopoietic_and_lymphoid_tissue", study.PrimarySite);
                 Assert.Equal("haematopoietic_neoplasm", study.Histology);
             }
@@ -51,7 +50,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             cosmicItem = enumerator.Current;
             foreach (var study in cosmicItem.Studies)
             {
-                Assert.Equal("544", study.ID);
+                Assert.Equal("544", study.Id);
                 Assert.Equal("haematopoietic;lymphoid_tissue", study.PrimarySite);
                 Assert.Equal("haematopoietic_neoplasm", study.Histology);
             }
