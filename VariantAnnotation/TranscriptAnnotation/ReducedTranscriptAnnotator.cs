@@ -64,8 +64,9 @@ namespace VariantAnnotation.TranscriptAnnotation
         /// <param name="candidateForPos2"></param>
         /// <param name="transcriptForPos1"></param>
         /// <param name="breakendToAnnotate"></param>
+        /// <param name="pos1Hgvs"></param>
+        /// <param name="isPos1TranscriptSuffix"></param>
         /// <returns></returns>
-
         private static IGeneFusion GetFusion(ITranscript candidateForPos2, ITranscript transcriptForPos1, IBreakEnd breakendToAnnotate,string pos1Hgvs,bool isPos1TranscriptSuffix)
         {
             if (transcriptForPos1.Source != candidateForPos2.Source

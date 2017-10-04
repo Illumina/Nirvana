@@ -1,7 +1,4 @@
-﻿using System;
-using System.Text;
-
-namespace VariantAnnotation.AnnotatedPositions
+﻿namespace VariantAnnotation.AnnotatedPositions
 {
 	public sealed class PositionOffset
 	{
@@ -82,46 +79,9 @@ namespace VariantAnnotation.AnnotatedPositions
 
 		public override string ToString()
 		{
-			var sb = new StringBuilder();
-			// all start with transcript name & numbering type
-			sb.Append(_transcriptId + ':' + _transcriptType + '.');
+		    return HgvsUtilities.FormatDnaNotation(_start.Value, _end.Value, _transcriptId, _referenceBases,
+		        _alternateBases, _type, _transcriptType);
 
-			// handle single and multiple positions
-			var coordinates = _start.Value == _end.Value
-				? _start.Value
-				: _start.Value + '_' + _end.Value;
-
-			// format rest of string according to type
-			// note: inversion and multiple are never assigned as genomic changes
-		switch (_type)
-			{
-				case GenomicChange.Deletion:
-					sb.Append(coordinates + "del" + _referenceBases);
-					break;
-				case GenomicChange.Inversion:
-					sb.Append(coordinates + "inv" + _referenceBases);
-					break;
-				case GenomicChange.Duplication:
-					sb.Append(coordinates + "dup" + _referenceBases);
-					break;
-				case GenomicChange.Substitution:
-					sb.Append(_start.Value + _referenceBases + '>' + _alternateBases);
-					break;
-				case GenomicChange.DelIns:
-					sb.Append(coordinates + "del" + _referenceBases + "ins" + _alternateBases);
-					//sb.Append(coordinates + "delins" + _alternateBases);
-					break;
-				case GenomicChange.Insertion:
-					sb.Append(coordinates + "ins" + _alternateBases);
-					break;
-				//case GenomicChange.Multiple:
-				//	sb.Append(coordinates + '[' + _alleleMultiple + ']' + _referenceBases);
-				//	break;
-				default:
-					throw new InvalidOperationException("Unhandled genomic change found: " + _type);
-			}
-
-			return sb.ToString();
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace VariantAnnotation.GeneAnnotation
 
         public readonly string Hgnc;
         private readonly string _description;
-        private readonly int _mimNumber;
+        public readonly int MimNumber;
         private readonly List<Phenotype> _phenotypes;
 
         #endregion
@@ -22,7 +22,7 @@ namespace VariantAnnotation.GeneAnnotation
         {
             Hgnc = hgnc;
             _description = description;
-            _mimNumber = mimNumber;
+            MimNumber = mimNumber;
             _phenotypes = phenotypes;
         }
 
@@ -50,7 +50,7 @@ namespace VariantAnnotation.GeneAnnotation
 
             sb.Append(JsonObject.OpenBrace);
 
-            jsonObject.AddIntValue("mimNumber", _mimNumber);
+            jsonObject.AddIntValue("mimNumber", MimNumber);
             jsonObject.AddStringValue("description", _description);
             if (_phenotypes.Count > 0) jsonObject.AddObjectValues("phenotypes", _phenotypes);
             sb.Append(JsonObject.CloseBrace.ToString());
@@ -62,7 +62,7 @@ namespace VariantAnnotation.GeneAnnotation
         {
             writer.WriteOptAscii(Hgnc);
             writer.WriteOptAscii(_description);
-            writer.WriteOpt(_mimNumber);
+            writer.WriteOpt(MimNumber);
             writer.WriteOpt(_phenotypes.Count);
             foreach (var phenotype in _phenotypes) phenotype.Write(writer);
         }

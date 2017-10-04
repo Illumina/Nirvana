@@ -34,8 +34,13 @@ namespace VariantAnnotation.AnnotatedPositions
 
             jsonObject.AddStringValue("chromosome",  originalChromName);
             jsonObject.AddIntValue("position",       Position.Start);
-	        jsonObject.AddStringValue("repeatUnit",  Position.InfoData.RepeatUnit);
-	        jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
+
+            if (IsShortTandemRepeat())
+            {
+                jsonObject.AddStringValue("repeatUnit",  Position.InfoData.RepeatUnit);
+                jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
+            }
+            
 			jsonObject.AddIntValue("svEnd",          Position.InfoData.End);
             jsonObject.AddStringValue("refAllele",   Position.RefAllele);
             jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
@@ -57,18 +62,23 @@ namespace VariantAnnotation.AnnotatedPositions
 	        
 			jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
 
-			//if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()).ToArray(), false);
-
 			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
 
 			if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
                 AddSuppIntervalToJsonObject(jsonObject);
 
-			//jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)).ToArray(), false);
 			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
 
 			sb.Append(JsonObject.CloseBrace);
             return sb.ToString();
+        }
+
+        private bool IsShortTandemRepeat()
+        {
+            return Position.Variants.Any(x => 
+                x.Type == VariantType.short_tandem_repeat_variant
+                || x.Type == VariantType.short_tandem_repeat_contraction
+                || x.Type == VariantType.short_tandem_repeat_expansion);
         }
 
         private void AddSuppIntervalToJsonObject(JsonObject jsonObject)

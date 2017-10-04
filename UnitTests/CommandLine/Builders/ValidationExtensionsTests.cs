@@ -132,7 +132,7 @@ namespace UnitTests.CommandLine.Builders
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--if", "-" }, ops)
                 .Parse()
-                .CheckInputFilenameExists("-", "test", "--if", "-"));
+                .CheckInputFilenameExists("-", "test", "--if",true, "-"));
 
             Assert.Equal(ExitCodes.Success, exitCode);
         }

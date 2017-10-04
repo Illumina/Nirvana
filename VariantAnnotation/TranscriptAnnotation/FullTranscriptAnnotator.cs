@@ -15,7 +15,7 @@ namespace VariantAnnotation.TranscriptAnnotation
     public static class FullTranscriptAnnotator
     {
         public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant variant,ISequence refSequence,
-            IPredictionCache siftCache, IPredictionCache polyphenCache)
+            IPredictionCache siftCache, IPredictionCache polyphenCache,AminoAcids aminoAcidsProvider)
         {
 
             #region duplicate
@@ -25,7 +25,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var transcriptRefAllele = HgvsUtilities.GetTranscriptAllele(variant.RefAllele, transcript.Gene.OnReverseStrand);
             var transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, transcript.Gene.OnReverseStrand);
 
-            var codonsAndAminoAcids = GetCodonsAndAminoAcids(transcript, refSequence, transcriptRefAllele, transcriptAltAllele, variant, mappedPositions);
+            var codonsAndAminoAcids = GetCodonsAndAminoAcids(transcript, refSequence, transcriptRefAllele, transcriptAltAllele, variant, mappedPositions,aminoAcidsProvider);
 
             var referenceCodons = codonsAndAminoAcids.Item1;
             var alternateCodons = codonsAndAminoAcids.Item2;
@@ -45,14 +45,14 @@ namespace VariantAnnotation.TranscriptAnnotation
             var consequences = GetConsequences(transcript, variant, variantEffect);
 
             bool shiftToEnd;
-            var rightShiftedVariant = VariantRotator.Right(variant, transcript, refSequence, out shiftToEnd);
+            var rightShiftedVariant = VariantRotator.Right(variant, transcript, refSequence, transcript.Gene.OnReverseStrand, out shiftToEnd);
             var hgvsCoding = shiftToEnd
                 ? null
                 : HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant ?? variant, refSequence);
             var hgvsProtein = ReferenceEquals(rightShiftedVariant, variant)
                 ? GetHgvspLeftAlignPath(transcript, variant, variantEffect, transcriptAltAllele, refSequence,
                     referenceAminoAcids, alternateAminoAcids, mappedPositions, hgvsCoding)
-                : GetHgvspForRightAlignPath(transcript, rightShiftedVariant, refSequence, hgvsCoding);
+                : GetHgvspForRightAlignPath(transcript, rightShiftedVariant, refSequence, hgvsCoding,aminoAcidsProvider);
 
 
             PredictionScore siftScore = null, polyphenScore = null;
@@ -83,7 +83,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         private static Tuple<string, string, string, string> GetCodonsAndAminoAcids(ITranscript transcript,ISequence refSequence,
             string transcriptRefAllele, string transcriptAltAllele, ISimpleVariant variant,
-            IMappedPositions mappedPositions)
+            IMappedPositions mappedPositions,AminoAcids aminoAcidsProvider)
         {
             var codingSequence = transcript.Translation == null
                 ? null
@@ -93,7 +93,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             // compute codons and amino acids
             AssignCodonsAndAminoAcids(transcriptRefAllele, transcriptAltAllele, mappedPositions,
-                codingSequence, variant.Chromosome.UcscName == "chrM", out string referenceCodons,
+                codingSequence, aminoAcidsProvider, out string referenceCodons,
                 out string alternateCodons, out string referenceAminoAcids, out string alternateAminoAcids);
 
             return Tuple.Create(referenceCodons ?? "", alternateCodons ?? "", referenceAminoAcids ?? "",
@@ -101,14 +101,14 @@ namespace VariantAnnotation.TranscriptAnnotation
         }
 
         private static void AssignCodonsAndAminoAcids(string transcriptRefAllele, string transcriptAltAllele,
-            IMappedPositions mappedPositions, ISequence codingSequence, bool isMitochondrial, out string refCodons,
+            IMappedPositions mappedPositions, ISequence codingSequence,AminoAcids aminoAcidProvier ,out string refCodons,
             out string altCodons, out string refAminoAcids, out string altAminoAcids)
         {
             Codons.Assign(transcriptRefAllele, transcriptAltAllele, mappedPositions.CdsInterval,
                 mappedPositions.ProteinInterval, codingSequence, out refCodons, out altCodons);
 
-            var aminoAcid = new AminoAcids(isMitochondrial);
-            aminoAcid.Assign(refCodons, altCodons, out refAminoAcids, out altAminoAcids);
+
+            aminoAcidProvier.Assign(refCodons, altCodons, out refAminoAcids, out altAminoAcids);
         }
 
         private static List<ConsequenceTag> GetConsequences(ITranscript transcript,IVariant variant, VariantEffect variantEffect)
@@ -143,7 +143,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 variant.Chromosome.UcscName == "chrM");
         }   
 
-        private static string GetHgvspForRightAlignPath(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,string hgvsCoding)
+        private static string GetHgvspForRightAlignPath(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,string hgvsCoding,AminoAcids aminoAcidsProvider)
         {
             #region duplicate
             //todo: refactor to reduce duplicate code (see above)
@@ -152,7 +152,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var transcriptRefAllele = HgvsUtilities.GetTranscriptAllele(variant.RefAllele, transcript.Gene.OnReverseStrand);
             var transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, transcript.Gene.OnReverseStrand);
 
-            var codonsAndAminoAcids = GetCodonsAndAminoAcids(transcript, refSequence, transcriptRefAllele, transcriptAltAllele, variant, mappedPositions);
+            var codonsAndAminoAcids = GetCodonsAndAminoAcids(transcript, refSequence, transcriptRefAllele, transcriptAltAllele, variant, mappedPositions,aminoAcidsProvider);
 
             var refCodons = codonsAndAminoAcids.Item1;
             var altCodons = codonsAndAminoAcids.Item2;

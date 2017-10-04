@@ -19,7 +19,7 @@ namespace UnitTests.TestUtilities
 
 		static Resources()
 		{
-			var solutionDir = GetParentDirectory(AppContext.BaseDirectory, 3);
+			var solutionDir = GetParentDirectory(AppContext.BaseDirectory, 4);
 			Top = Path.Combine(solutionDir, "UnitTests", "Resources");
 		}
 

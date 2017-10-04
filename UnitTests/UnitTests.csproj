@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -14,7 +14,9 @@
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\Jasix\Jasix.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
+    <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />

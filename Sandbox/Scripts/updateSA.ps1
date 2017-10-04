@@ -12,7 +12,7 @@ $NirvanaSourceDir="D:\Projects\Nirvana"
 $ExternalDataRootDir="\\ussd-prd-isi04\Nirvana\Development\IntermediateTsvs"
 
 $RefVersion=5.2
-$currentSAversion=39.1
+$currentSAversion=40.1
 
 $GRCh37="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh37.Nirvana.dat"
 $GRCh38="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh38.Nirvana.dat"
@@ -21,8 +21,8 @@ $GRCh38="$NirvanaRootDir\References\$RefVersion\Homo_sapiens.GRCh38.Nirvana.dat"
 $miniSAGRCh37="$NirvanaSourceDir\UnitTests\Resources\MiniSuppAnnot"
 $miniSAGRCh38="$NirvanaSourceDir\UnitTests\Resources\MiniSuppAnnot\hg38"
 
-$SAOutGRCh37="$NirvanaRootDir\SupplementaryAnnotation\$currentSAversion\GRCh37"
-$SAOutGRCh38="$NirvanaRootDir\SupplementaryAnnotation\$currentSAversion\GRCh38"
+$SAOutGRCh37="$NirvanaRootDir\SupplementaryDatabase\$currentSAversion\GRCh37"
+$SAOutGRCh38="$NirvanaRootDir\SupplementaryDatabase\$currentSAversion\GRCh38"
 
 
 $CreateSupplementaryDatabase="dotnet $NirvanaSourceDir\bin\Release\netcoreapp1.1\SAUtils.dll createSA"
@@ -30,7 +30,7 @@ $ExtractMiniSAdb="dotnet $NirvanaSourceDir\bin\Release\netcoreapp1.1\SAUtils.dll
 
 $SAisilonPath="\\ussd-prd-isi04\Nirvana\Development\SupplementaryDatabase\$currentSAversion"
 $PhylopFolder="\\ussd-prd-isi04\Nirvana\SupplementaryDatabase\PhyloP\latest"
-$OmimDatabase="\\ussd-prd-isi04\Nirvana\Development\OmimDatabase\3\genePhenotypeMap.mim"
+#$OmimDatabase="\\ussd-prd-isi04\Nirvana\Development\OmimDatabase\3\genePhenotypeMap.mim"
 # ================
 # update files
 # ================

@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using UnitTests.TestDataStructures;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Sequence;
 using VariantAnnotation.TranscriptAnnotation;
@@ -18,7 +19,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 			var refSequence = new SimpleSequence(HgvsProteinNomenclatureTests.ENST00000343938_genomicSequence, 1260147 - 1);
 			var transcript = HgvsProteinNomenclatureTests.GetMockedTranscriptOnForwardStrand();
 
-			var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null); 
+			var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null,new AminoAcids(false)); 
             var sb = new StringBuilder();
             annotatedTranscript.SerializeJson(sb);
 		    var jsonString = sb.ToString();

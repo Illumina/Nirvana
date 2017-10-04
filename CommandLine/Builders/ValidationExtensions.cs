@@ -13,21 +13,47 @@ namespace CommandLine.Builders
             return validator;
         }
 
+        public static IConsoleAppValidator CheckNonZero(this IConsoleAppValidator validator, int num, string description)
+        {
+            if (num == 0)
+            {
+                validator.Data.AddError(
+                    $"At least one {description} should be provided.",
+                    ExitCodes.MissingCommandLineOption);
+            }
+            return validator;
+        }
+
+        /// <summary>
+        /// check if each file exists
+        /// </summary>
+
+        /// <returns></returns>
+        public static IConsoleAppValidator CheckEachFilenameExists(this IConsoleAppValidator validator,
+            List<string> filePaths, string description, string commandLineOption, bool isRequired = true)
+        {
+            foreach (var filePath in filePaths)
+            {
+                validator.CheckInputFilenameExists(filePath, description, commandLineOption, isRequired);
+            }
+            return validator;
+        }
+
         /// <summary>
         /// checks if an input file exists
         /// </summary>
         public static IConsoleAppValidator CheckInputFilenameExists(this IConsoleAppValidator validator,
-            string filePath, string description, string commandLineOption, string ignoreValue = null)
+            string filePath, string description, string commandLineOption, bool isRequired = true, string ignoreValue = null)
         {
             if (validator.SkipValidation) return validator;
 
-            if (string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath) && isRequired)
             {
                 validator.Data.AddError(
                     $"The {description} file was not specified. Please use the {commandLineOption} parameter.",
                     ExitCodes.MissingCommandLineOption);
             }
-            else if (ignoreValue != null && filePath == ignoreValue) { }
+            else if (!isRequired || ignoreValue != null && filePath == ignoreValue) { }
             else if (!File.Exists(filePath))
             {
                 validator.Data.AddError($"The {description} file ({filePath}) does not exist.", ExitCodes.FileNotFound);
