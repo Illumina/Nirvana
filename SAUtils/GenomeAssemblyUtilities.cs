@@ -21,6 +21,9 @@ namespace SAUtils
                 case "hg19":
                     ret = GenomeAssembly.hg19;
                     break;
+                case "rcrs":
+                    ret = GenomeAssembly.rCRS;
+                    break;
                 case "":
                     ret = GenomeAssembly.Unknown;
                     break;
