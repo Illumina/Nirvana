@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -11,6 +12,8 @@ namespace Vcf
 {
     public static class VcfReaderUtils
     {
+        private static readonly HashSet<string> NonInformativeAltAllele = new HashSet<string> { "<*>", "*", "<M>" };
+
         internal static IPosition ParseVcfLine(string vcfLine, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
         {
             var vcfFields = vcfLine.Split('\t');
@@ -21,7 +24,8 @@ namespace Vcf
             int start = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]);
             string refAllele = vcfFields[VcfCommon.RefIndex];
             int end = ExtractEnd(infoData, start, refAllele.Length);
-            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',');
+            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',').Where(x => !NonInformativeAltAllele.Contains(x)).ToArray();
+            if (altAlleles.Length == 0) return null;
             double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
             string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
             var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();

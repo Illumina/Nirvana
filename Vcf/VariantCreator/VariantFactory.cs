@@ -15,6 +15,7 @@ namespace Vcf.VariantCreator
 	    private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 	    private const string StrPrefix = "<STR";
 	    private const string CnvPrefix = "<CN";
+        private const string NonRefAltAllele = "<NON_REF>";
 		private bool _enableVerboseTranscript;
 
 
@@ -42,13 +43,13 @@ namespace Vcf.VariantCreator
 
         private static bool IsSymbolicAllele(string altAllele)
         {
-            return altAllele.StartsWith("<") && altAllele.EndsWith(">");
+            return altAllele != NonRefAltAllele && altAllele.StartsWith("<") && altAllele.EndsWith(">");
         }
 		
 	    public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber)
 		{
 		    var variants         = new IVariant[altAlleles.Length];
-		    var isReference      = altAlleles.Length == 1 && altAlleles[0] == ".";
+		    var isReference      = altAlleles.Length == 1 && ( altAlleles[0] == "." || altAlleles[0] == NonRefAltAllele);
 		    var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
 			var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele);
 
