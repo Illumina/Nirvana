@@ -6,10 +6,9 @@ using SAUtils.TsvWriters;
 
 namespace SAUtils
 {
-    public class TsvWriterUtilities
+    public static class TsvWriterUtilities
     {
-
-        public static void WriteToPosition(ISaItemTsvWriter writer, MinHeap<SupplementaryDataItem> itemsHeap, int position)
+        private static void WriteToPosition(ISaItemTsvWriter writer, MinHeap<SupplementaryDataItem> itemsHeap, int position)
         {
             if (itemsHeap.Count() == 0) return;
             var bufferMin = itemsHeap.GetMin();

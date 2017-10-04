@@ -10,7 +10,7 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
-    public class SaWriter : IDisposable
+    public sealed class SaWriter : IDisposable
     {
         private readonly Stream _stream;
         private readonly Stream _idxStream;
@@ -23,9 +23,7 @@ namespace VariantAnnotation.SA
         private readonly List<Interval<long>> _intervals;
         private readonly List<Tuple<int, string>> _globalMajorAllleInRefMinors;
         private readonly bool _leaveOpen;
-        private int _blockCount;
-        private int _blockPositionCount;
-
+        
         public int RefMinorCount => _globalMajorAllleInRefMinors.Count;
 
         public SaWriter(Stream stream, Stream idxStream, ISupplementaryAnnotationHeader header,
@@ -101,9 +99,6 @@ namespace VariantAnnotation.SA
         {
             if (_block.BlockOffset == 0) return;
 
-            _blockCount++;
-            _blockPositionCount += _block.PositionCount;
-
             var fileOffset = _stream.Position;
             var positions = _block.Write(_stream);
             _intervals.Add(new Interval<long>(positions.Item1, positions.Item2, fileOffset));
@@ -114,8 +109,7 @@ namespace VariantAnnotation.SA
             _memoryStream.Position = 0;
             position.Write(_msWriter);
 
-            ArraySegment<byte> buff;
-            if (!_memoryStream.TryGetBuffer(out buff)) throw new InvalidDataException("Unable to get the MemoryStream buffer.");
+            if (!_memoryStream.TryGetBuffer(out var buff)) throw new InvalidDataException("Unable to get the MemoryStream buffer.");
 
             var result = new byte[_memoryStream.Position];
             Buffer.BlockCopy(buff.Array, 0, result, 0, (int)_memoryStream.Position);

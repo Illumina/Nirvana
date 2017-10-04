@@ -5,10 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
@@ -21,61 +18,21 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		#region IDisposable
-		bool _disposed;
-
-		/// <summary>
-		/// public implementation of Dispose pattern callable by consumers. 
-		/// </summary>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		
-		/// <summary>
-		/// protected implementation of Dispose pattern. 
-		/// </summary>
-		private void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-
-			if (disposing)
-			{
-				// Free any other managed objects here.
-				_dbsnpWriter.Dispose();
-				_globalAlleleWriter.Dispose();
-			}
-
-			// Free any unmanaged objects here.
-			//
-			_disposed = true;
-			// Free any other managed objects here.
-
-		}
+        public void Dispose()
+	    {
+	        _dbsnpWriter.Dispose();
+	        _globalAlleleWriter.Dispose();
+	    }
         #endregion
 
-	    public DbsnpGaTsvWriter(SaTsvWriter dbsnpWriter, SaTsvWriter globalAlleleWriter)
+        public DbsnpGaTsvWriter(SaTsvWriter dbsnpWriter, SaTsvWriter globalAlleleWriter)
 	    {
 	        _dbsnpWriter = dbsnpWriter;
 	        _globalAlleleWriter = globalAlleleWriter;
 	    }
-        public DbsnpGaTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider)
-		{
 
-			Console.WriteLine(version.ToString());
 
-			_dbsnpWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true,sequenceProvider);
-
-			_globalAlleleWriter = new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.GlobalAlleleTag, "GMAF", false, sequenceProvider);
-
-		}
-
-		
-		public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
+	    public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
 		{
 			var itemsByAllele = GetItemsByAllele(saItems);
 			WriteDbsnpTsv(itemsByAllele);
@@ -185,8 +142,7 @@ namespace SAUtils.TsvWriters
 			var itemsForPosition = new List<DbSnpItem>();
 			foreach (var item in saItems)
 			{
-				var dbSnpItem = item as DbSnpItem;
-				if (dbSnpItem==null) 
+			    if (!(item is DbSnpItem dbSnpItem)) 
 					throw new InvalidDataException("Expecting enumerable of DbSnpItems!!");
 				itemsForPosition.Add(dbSnpItem);
 			}
@@ -202,5 +158,7 @@ namespace SAUtils.TsvWriters
 			}
 			return itemsByAllele;
 		}
+
+	    
 	}
 }

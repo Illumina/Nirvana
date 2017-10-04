@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
+// ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace SAUtils.DataStructures
 {
@@ -8,7 +9,7 @@ namespace SAUtils.DataStructures
     {
         #region members
 
-        public int? AllAlleleCount { get; private set; }
+        private int? AllAlleleCount { get; set; }
         private int? AfrAlleleCount { get; set; }
         private int? AmrAlleleCount { get; set; }
         private int? EasAlleleCount { get; set; }
@@ -16,7 +17,7 @@ namespace SAUtils.DataStructures
         private int? NfeAlleleCount { get; set; }
         private int? OthAlleleCount { get; set; }
         private int? AsjAlleleCount { get; set; }
-        public int? AllAlleleNumber { get; private set; }
+        private int? AllAlleleNumber { get; set; }
         private int? AfrAlleleNumber { get; set; }
         private int? AmrAlleleNumber { get; set; }
         private int? EasAlleleNumber { get; set; }
@@ -25,7 +26,7 @@ namespace SAUtils.DataStructures
         private int? OthAlleleNumber { get; set; }
         private int? AsjAlleleNumber { get; set; }
 
-        public int Coverage { get; }
+        private int Coverage { get; }
 
         #endregion
 

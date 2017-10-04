@@ -178,7 +178,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var benchMark = new Benchmark();
             //Console.WriteLine($"Creating TSV from {fileName}");
             var dataSource = "";
-		    DataSourceVersion version = DataSourceVersionReader.GetSourceVersion(fileName); ;
+		    var version = DataSourceVersionReader.GetSourceVersion(fileName);
             switch (sourceName)
             {
                 case InterimSaCommon.DgvTag:
