@@ -9,13 +9,10 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
     public sealed class SaMiscellaniesReader:IEnumerable<SaMiscellanies>
     {
-
-
         private readonly StreamReader _inputFileStreamReader;
 
         private readonly Dictionary<string, long> _refNameOffsets;
-
-
+        
 
         public SaMiscellaniesReader(StreamReader inputFileStreamReader,Stream indexFileStream)
         {
@@ -38,20 +35,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
                 ParseHeaderLine(line);
             }
-            //set the header information
-            //using (var reader =_inputFileStreamReader)
-            //{
-            //    string line;
-            //    while ((line = reader.ReadLine()) != null)
-            //    {
-            //        // Skip empty lines.
-            //        if (string.IsNullOrWhiteSpace(line)) continue;
-
-            //        if (!line.StartsWith("#")) break;
-
-            //        ParseHeaderLine(line);
-            //    }
-            //}
+            
         }
 
         private void ParseHeaderLine(string line)
