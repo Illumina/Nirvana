@@ -1,9 +1,7 @@
 {
   "profiles": {
     "Nirvana": {
-      "commandName": "Project",
-      "commandLineArgs": "-i E:\\Data\\Nirvana\\bugfixes\\test_input2_GRCh37.vcf -c E:\\Data\\Nirvana\\Cache\\24\\GRCh37\\Both84 -r E:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat -o test_mother_new --sd \\\\ussd-prd-isi04\\Nirvana\\Development\\SupplementaryDatabase\\40\\GRCh37",
-      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+      "commandName": "Project"
     },
     "YJ_Nirvana": {
       "commandName": "Project",
@@ -12,7 +10,7 @@
     },
     "RR_Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar_otf",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in  Mother_chr22.genome.vcf.gz --out momGen22 --sd C:\\Development\\SupplementaryDatabase\\41\\GRCh37",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "MS_ClinVar": {
