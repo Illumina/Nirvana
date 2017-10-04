@@ -73,7 +73,7 @@ namespace SAUtils.TsvWriters
 				exacItems.Add(exacItem);
 			}
 
-		    SupplementaryDataItem.RemoveConflictedAlleles(exacItems);
+		    SupplementaryDataItem.RemoveConflictingAlleles(exacItems);
 
 
             foreach (var exacItem in exacItems)

@@ -75,7 +75,7 @@ namespace SAUtils.TsvWriters
 				evsItems.Add(evsItem);
 			}
 
-		    SupplementaryDataItem.RemoveConflictedAlleles(evsItems);
+		    SupplementaryDataItem.RemoveConflictingAlleles(evsItems);
 
             foreach (var evsItem in evsItems)
 			{

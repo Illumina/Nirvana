@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
 using ExtractMiniXml;
+using SAUtils.CreateGnomadTsv;
 using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimTsv;
 using SAUtils.ExtractMiniSa;
@@ -23,6 +24,7 @@ namespace SAUtils
                 ["geneScoresTsv"] = new TopLevelOption("create gene scores tsv file", GeneScoresMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"] = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
+                ["createGnomadTsv"] = new TopLevelOption("create gnomAD tsv file", CreateGnomadTsvMain.Run)
             };
 
 
@@ -33,6 +35,5 @@ namespace SAUtils
                 .ShowErrors().Execute();
             return (int) exitCode;
         }
-
     }
 }
