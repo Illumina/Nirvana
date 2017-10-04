@@ -11,12 +11,10 @@ namespace VariantAnnotation.SA
         protected readonly byte[] CompressedBlock;
         public readonly byte[] UncompressedBlock;
 
-        private const int DefaultBufferSize = 524288;
-
         /// <summary>
         /// constructor
         /// </summary>
-        protected SaBlock(ICompressionAlgorithm compressionAlgorithm, int size = DefaultBufferSize)
+        protected SaBlock(ICompressionAlgorithm compressionAlgorithm, int size)
         {
             CompressionAlgorithm = compressionAlgorithm;
             UncompressedBlock = new byte[size];

@@ -2,8 +2,6 @@
 {
 	public interface IVersionProvider
 	{
-		string GetProgramVersion();
-
-		string GetDataVersion();
+	    string DataVersion { get; }
 	}
 }

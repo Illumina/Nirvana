@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -9,11 +8,11 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-    public class MitoMapVarTsvWriter : ISaItemTsvWriter
+    public sealed class MitoMapVarTsvWriter : ISaItemTsvWriter
     {
 
         #region members
-        private readonly SaTsvWriter _mitoMapMutWriter;
+        private readonly SaTsvWriter _mitoMapVarWriter;
 
         #endregion
 
@@ -40,7 +39,7 @@ namespace SAUtils.TsvWriters
             if (disposing)
             {
                 // Free any other managed objects here.
-                _mitoMapMutWriter.Dispose();
+                _mitoMapVarWriter.Dispose();
             }
 
             // Free any unmanaged objects here.
@@ -54,7 +53,7 @@ namespace SAUtils.TsvWriters
         public MitoMapVarTsvWriter(DataSourceVersion version, string outputDirectory, string mitoMapDataType, ISequenceProvider sequenceProvider)
         {
             Console.WriteLine(version.ToString());
-            _mitoMapMutWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.Unknown.ToString(), SaTsvCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, true);
+            _mitoMapVarWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, true);
         }
 
 
@@ -65,7 +64,7 @@ namespace SAUtils.TsvWriters
             var uniqueMutations = GetUniqueMutations(mitoMapMutItems);
             foreach (var mutation in uniqueMutations)
             {
-                _mitoMapMutWriter.AddEntry(
+                _mitoMapVarWriter.AddEntry(
                            mutation.Value[0].Chromosome.EnsemblName,
                            mutation.Value[0].Start,
                            mutation.Key.Item1,
