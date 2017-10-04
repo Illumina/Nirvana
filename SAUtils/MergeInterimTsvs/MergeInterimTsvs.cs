@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
-using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -210,14 +209,9 @@ namespace SAUtils.MergeInterimTsvs
         {
             if (string.IsNullOrEmpty(miscFile)) return;
 
-            var miscFileReader = GZipUtilities.GetAppropriateStreamReader(miscFile);
-            var indexFileStream = new FileStream(miscFile + ".tvi", FileMode.Open);
-            _miscReader = new SaMiscellaniesReader(miscFileReader, indexFileStream);
+            _miscReader = new SaMiscellaniesReader(new FileInfo(miscFile));
             _allRefNames.AddRange(_miscReader.GetAllRefNames());
-
-
         }
-
         private void CheckAssemblyConsistancy()
         {
             var uniqueAssemblies = _interimSaHeaders.Select(x => x.GenomeAssembly)
@@ -258,8 +252,7 @@ namespace SAUtils.MergeInterimTsvs
         private void MergeGene()
         {
             var geneAnnotationList = GetGeneAnnotationEnumerator();
-            var geneMinheap = new MinHeap<IAnnotatedGene>();
-            List<IAnnotatedGene> geneAnnotations = null;
+            List<IAnnotatedGene> geneAnnotations;
             var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
@@ -319,7 +312,7 @@ namespace SAUtils.MergeInterimTsvs
                 refMinorCount = blockSaWriter.RefMinorCount;
             }
 
-            Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out double lookupsPerSecond)}");
+            Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out double _)}");
         }
 
         private static List<ISupplementaryInterval> GetSpecificIntervals(ReportFor reportFor, IEnumerable<ISupplementaryInterval> intervals)

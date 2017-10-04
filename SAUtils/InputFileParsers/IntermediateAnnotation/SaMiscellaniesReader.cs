@@ -3,39 +3,43 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class SaMiscellaniesReader:IEnumerable<SaMiscellanies>
+    public sealed class SaMiscellaniesReader 
     {
-        private readonly StreamReader _inputFileStreamReader;
 
+        private readonly FileInfo _inputFileInfo;
         private readonly Dictionary<string, long> _refNameOffsets;
-        
 
-        public SaMiscellaniesReader(StreamReader inputFileStreamReader,Stream indexFileStream)
+
+
+        public SaMiscellaniesReader(FileInfo inputFileInfo)
         {
+            _inputFileInfo = inputFileInfo;
 
-            _inputFileStreamReader = inputFileStreamReader;
-
-            using (var tsvIndex = new TsvIndex(new BinaryReader(indexFileStream)))
+            using (var tsvIndex = new TsvIndex(new BinaryReader(File.Open(inputFileInfo.FullName + ".tvi", FileMode.Open, FileAccess.Read, FileShare.Read))))
             {
                 _refNameOffsets = tsvIndex.TagPositions;
             }
 
 
-            string line;
-            while ((line = _inputFileStreamReader.ReadLine()) != null)
+            //set the header information
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
             {
-                // Skip empty lines.
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    // Skip empty lines.
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
-                if (!line.StartsWith("#")) break;
+                    if (!line.StartsWith("#")) break;
 
-                ParseHeaderLine(line);
+                    ParseHeaderLine(line);
+                }
             }
-            
         }
 
         private void ParseHeaderLine(string line)
@@ -43,25 +47,13 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         }
 
-        public IEnumerator<SaMiscellanies> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-
-
         public IEnumerable<SaMiscellanies> GetAnnotationItems(string refName)
         {
             if (!_refNameOffsets.ContainsKey(refName)) yield break;
 
             var offset = _refNameOffsets[refName];
 
-            using (var reader = _inputFileStreamReader)
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
             {
                 reader.BaseStream.Position = offset;
                 string line;
