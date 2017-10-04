@@ -12,7 +12,7 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createGnomadTsv --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  -i C:\\Development\\ExternalDataSources\\Gnomad\\2.0.1 --out C:\\Development\\IntermediateTsvs\\GRCh37",
+      "commandLineArgs": "createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --out c:\\Development\\SupplementaryDatabase\\40.4\\GRCh37 --gene c:\\Development\\IntermediateTsvs\\GRCh37\\omim_20170905.gene.tsv.gz --gene c:\\Development\\IntermediateTsvs\\GRCh37\\geneScores_0.3.1.gene.tsv.gz",
       "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
