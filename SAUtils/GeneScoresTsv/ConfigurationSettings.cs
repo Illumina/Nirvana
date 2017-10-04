@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SAUtils.GeneScoresTsv
+﻿namespace SAUtils.GeneScoresTsv
 {
     public static class ConfigurationSettings
     {

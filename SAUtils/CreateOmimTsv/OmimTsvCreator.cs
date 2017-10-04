@@ -7,7 +7,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using SAUtils.TsvWriters;
 using SAUtils.InputFileParsers;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.CreateOmimTsv
 {

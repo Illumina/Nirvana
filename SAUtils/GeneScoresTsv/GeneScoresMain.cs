@@ -8,7 +8,7 @@ using VariantAnnotation.Interface;
 
 namespace SAUtils.GeneScoresTsv
 {
-    public class GeneScoresMain
+    public sealed class GeneScoresMain
     {
         private const string JsonKeyName = "exac";
         private ExitCodes ProgramExecution()
