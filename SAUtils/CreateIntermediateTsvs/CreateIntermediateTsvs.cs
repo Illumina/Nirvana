@@ -327,8 +327,7 @@ namespace SAUtils.CreateIntermediateTsvs
             using (var writer = new ClinvarTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var clinvarReader = new ClinVarXmlReader(new FileInfo(fileName), new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
-                WriteSortedItems(clinvarReader.GetEnumerator(), writer);
-				TsvWriterUtilities.WriteSortedItems(clinvarList.GetEnumerator(), writer);
+                TsvWriterUtilities.WriteSortedItems(clinvarReader.GetEnumerator(), writer);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());

@@ -256,6 +256,8 @@ namespace SAUtils.MergeInterimTsvs
             var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
+
+            List<IAnnotatedGene> geneAnnotations;
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))
                 while ((geneAnnotations = GetMinItems(geneAnnotationList)) != null)
                 {
@@ -268,8 +270,6 @@ namespace SAUtils.MergeInterimTsvs
         {
             if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
 
-            if (geneAnnotations[0].GeneName=="AGRN")
-                Console.WriteLine("bug");
             var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
 
             return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);

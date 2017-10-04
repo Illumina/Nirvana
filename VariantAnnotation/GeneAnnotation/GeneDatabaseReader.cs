@@ -18,7 +18,6 @@ namespace VariantAnnotation.GeneAnnotation
         public GenomeAssembly GenomeAssembly;
         private long _creationTime;
         public List<IDataSourceVersion> DataSourceVersions;
-        private bool _isDisposed;
 
 
         public GeneDatabaseReader(string geneDatabaseFile)
