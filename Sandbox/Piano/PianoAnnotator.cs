@@ -1,164 +1,86 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using CommandLine.Handlers;
-using CommandLine.NDesk.Options;
-using CommandLine.VersionProvider;
+using System.Linq;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.DataStructures;
-using VariantAnnotation.DataStructures.CompressedSequence;
-using VariantAnnotation.DataStructures.Variants;
-using VariantAnnotation.FileHandling;
-using VariantAnnotation.FileHandling.Compression;
-using VariantAnnotation.FileHandling.TranscriptCache;
-using VariantAnnotation.FileHandling.VCF;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Utilities;
+using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.Sequence;
 
 namespace Piano
 {
-    sealed class PianoAnnotator : AbstractCommandLineHandler
+    public class PianoAnnotator:IAnnotator
     {
-        #region members
 
-        private const string OutHeader =
-            "#Chrom\tPos\tRefAllele\tAltAllele\tGeneSymbol\tGeneId\tTranscriptID\tProteinID\tProteinPos\tUpstream\tAAchange\tDownstream\tConsequences";
+        private readonly IAnnotationProvider _taProvider;
+        private readonly ISequenceProvider _sequenceProvider;
+        private bool _annotateMito;
+        public GenomeAssembly GenomeAssembly { get; }
 
-        #endregion
-
-        private PianoAnnotator(string programDescription, OptionSet ops, string commandLineExample, string programAuthors,
-            IVersionProvider versionProvider = null)
-            : base(programDescription, ops, commandLineExample, programAuthors, versionProvider)
+        public PianoAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider)
         {
+            _taProvider = taProvider;
+            _sequenceProvider = sequenceProvider;
+
+            GenomeAssembly = GetGenomeAssembly();
+
         }
 
-        static void Main(string[] args)
+        private GenomeAssembly GetGenomeAssembly()
         {
-            var ops = new OptionSet
+            var assemblies = new Dictionary<GenomeAssembly, string>();
+            if (_taProvider != null) assemblies[_taProvider.GenomeAssembly] = _taProvider.Name;
+            if (_sequenceProvider != null) assemblies[_sequenceProvider.GenomeAssembly] = _sequenceProvider.Name;
+
+            if (assemblies.Count == 0) return GenomeAssembly.Unknown;
+            if (assemblies.Count == 1) return assemblies.First().Key;
+            foreach (var assembly in assemblies)
             {
-                {
-                    "cache|c=",
-                    "input cache {prefix}",
-                    v => ConfigurationSettings.InputCachePrefix = v
-                },
-                {
-                    "in|i=",
-                    "input VCF {path}",
-                    v => ConfigurationSettings.VcfPath = v
-                },
-                {
-                    "out|o=",
-                    "output {file path} ",
-                    v => ConfigurationSettings.OutputFileName = v
-                },
-                {
-                    "ref|r=",
-                    "input compressed reference sequence {path}",
-                    v => ConfigurationSettings.CompressedReferencePath = v
-                },
-                {
-                    "force-mt",
-                    "forces to annotate mitochondria variants",
-                    v => ConfigurationSettings.ForceMitochondrialAnnotation = v != null
-                }
-            };
-
-            var commandLineExample = "-i <vcf path> -d <cache dir> -r <ref path> -o <base output filename>";
-
-            var piano = new PianoAnnotator("Annotates a set of variants", ops, commandLineExample, Constants.Authors);
-            piano.Execute(args);
-        }
-
-        protected override void ValidateCommandLine()
-        {
-            CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in");
-            CheckInputFilenameExists(ConfigurationSettings.CompressedReferencePath, "compressed reference sequence", "--ref");
-            HasRequiredParameter(ConfigurationSettings.InputCachePrefix, "cache prefix", "--cache");
-            HasRequiredParameter(ConfigurationSettings.OutputFileName, "output file stub", "--out");
-        }
-
-        protected override void ProgramExecution()
-        {
-            var processedReferences = new HashSet<string>();
-            string previousReference = null;
-
-            Console.WriteLine("Running Nirvana on {0}:", Path.GetFileName(ConfigurationSettings.VcfPath));
-
-            var outputFilePath = ConfigurationSettings.OutputFileName + ".txt.gz";
-            var annotationCreationTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            var reader = new LiteVcfReader(ConfigurationSettings.VcfPath);
-
-            var compressedSequence = new CompressedSequence();
-            var compressedSequenceReader = new CompressedSequenceReader(FileUtilities.GetReadStream(ConfigurationSettings.CompressedReferencePath), compressedSequence);
-            var transcriptCacheStream = new FileStream(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix),
-                FileMode.Open, FileAccess.Read, FileShare.Read);
-
-            var annotator = new PianoAnnotationSource(transcriptCacheStream, compressedSequenceReader);
-
-            if (ConfigurationSettings.ForceMitochondrialAnnotation || reader.IsRcrsMitochondrion)
-                annotator.EnableMitochondrialAnnotation();
-
-            // sanity check: make sure we have annotations
-            if (annotator == null)
-            {
-                throw new GeneralException("Unable to perform annotation because no annotation sources could be created");
+                Console.WriteLine($"{assembly.Value} has genome assembly {assembly.Key}");
             }
-
-            using (var writer = GZipUtilities.GetStreamWriter(outputFilePath))
-            {
-
-                WriteHeader(writer, annotationCreationTime);
-                string vcfLine = null;
-
-                try
-                {
-                    while ((vcfLine = reader.ReadLine()) != null)
-
-                    {
-                        var vcfVariant = CreateVcfVariant(vcfLine, reader.IsGatkGenomeVcf);
-
-                        // check if the vcf is sorted
-                        if (vcfVariant == null) continue;
-
-                        var currentReference = vcfVariant.ReferenceName;
-                        if (currentReference != previousReference && processedReferences.Contains(currentReference))
-                        {
-                            throw new FileNotSortedException(
-                                "The current input vcf file is not sorted. Please sort the vcf file before running variant annotation using a tool like vcf-sort in vcftools.");
-                        }
-                        if (!processedReferences.Contains(currentReference))
-                        {
-                            processedReferences.Add(currentReference);
-                        }
-                        previousReference = currentReference;
-
-                        var annotatedVariant = annotator.Annotate(vcfVariant);
-
-                        writer.Write(annotatedVariant.ToString());
-                    }
-
-
-                }
-                catch (Exception e)
-                {
-                    // embed the vcf line
-                    e.Data["VcfLine"] = vcfLine;
-                    throw;
-                }
-            }
+            throw new InconsistantGenomeAssemblyException();
         }
 
-        private static void WriteHeader(StreamWriter writer, string annotationTime)
+       
+        public IAnnotatedPosition Annotate(IPosition position)
         {
-            writer.WriteLine("##Source=Piano");
-            writer.WriteLine($"##CreationTime={annotationTime}");
-            writer.WriteLine(OutHeader);
+            if (position == null) return null;
+
+            var annotatedVariants = GetAnnotatedVariants(position.Variants);
+            var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+
+            if (annotatedPosition.AnnotatedVariants == null
+                || annotatedPosition.AnnotatedVariants.Length == 0
+                || position.Chromosome.UcscName == "chrM" && !_annotateMito
+            ) return annotatedPosition;
+
+            _sequenceProvider?.Annotate(annotatedPosition);
+
+            _taProvider.Annotate(annotatedPosition);
+
+            return annotatedPosition;
+        }
+        private static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
+        {
+            if (variants?[0].Behavior == null) return null;
+
+            var numVariants = variants.Length;
+            var annotatedVariants = new IAnnotatedVariant[numVariants];
+            for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(variants[i]);
+
+            return annotatedVariants;
+        }
+        public IList<IAnnotatedGene> GetAnnotatedGenes()
+        {
+            return null;
         }
 
-        private static IVariant CreateVcfVariant(string vcfLine, bool isGatkGenomeVcf)
+        public void EnableMitochondrialAnnotation()
         {
-            var fields = vcfLine.Split('\t');
-            return fields.Length < VcfCommon.MinNumColumns ? null : new VcfVariant(fields, vcfLine, isGatkGenomeVcf);
+            _annotateMito = true;
         }
     }
 }
