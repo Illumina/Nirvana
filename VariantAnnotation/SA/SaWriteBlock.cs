@@ -15,7 +15,7 @@ namespace VariantAnnotation.SA
         internal int BlockOffset;
         public int PositionCount => _blockPositions.Count;
 
-        public const int DefaultBlockSize = 524288 * 16;
+        public const int DefaultBlockSize = 524288 * 8;
         /// <summary>
         /// constructor
         /// </summary>
