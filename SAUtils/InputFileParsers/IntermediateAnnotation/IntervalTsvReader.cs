@@ -12,7 +12,7 @@ using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class IntervalTsvReader : IEnumerable<ISupplementaryInterval>
+    public sealed class IntervalTsvReader 
     {
         private readonly FileInfo _inputFileInfo;
         private string _name;
@@ -58,7 +58,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         }
 
 
-        private IEnumerable<ISupplementaryInterval> GetAnnotationItems(string refName)
+        public IEnumerable<ISupplementaryInterval> GetAnnotationItems(string refName)
         {
             if (!_refNameOffsets.ContainsKey(refName)) yield break;
 
@@ -176,21 +176,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             return ReportFor.AllVariants;
         }
 
-        public IEnumerator<ISupplementaryInterval> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<ISupplementaryInterval> GetEnumerator(string refName)
-        {
-            return GetAnnotationItems(refName).GetEnumerator();
-        }
-
+        
         public List<string> GetAllRefNames()
         {
             return _refNameOffsets.Keys.ToList();

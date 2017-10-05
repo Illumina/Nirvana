@@ -8,7 +8,7 @@ using SAUtils.DataStructures;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class SaTsvReader:IEnumerable<InterimSaItem>
+    public sealed class SaTsvReader
 	{
 		private readonly FileInfo _inputFileInfo;
 		private readonly Dictionary<string, long> _refNameOffsets;
@@ -60,7 +60,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 		}
 
 
-		private IEnumerable<InterimSaItem> GetAnnotationItems(string refName)
+		public IEnumerable<InterimSaItem> GetAnnotationItems(string refName)
 		{
 			if (!_refNameOffsets.ContainsKey(refName)) yield break;
 
@@ -190,22 +190,6 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 						throw new InvalidDataException($"Expected Schema version:{SaTsvCommon.SupplementarySchemaVersion}, oberved: {value}");
 					break;
 			}
-		}
-
-		public IEnumerator<InterimSaItem> GetEnumerator()
-		{
-			throw new NotImplementedException();
-		}
-
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		public IEnumerator<InterimSaItem> GetEnumerator(string refName)
-		{
-			return GetAnnotationItems(refName).GetEnumerator();
 		}
 
 		public List<string> GetAllRefNames()

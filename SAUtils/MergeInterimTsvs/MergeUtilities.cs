@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using SAUtils.DataStructures;
+using VariantAnnotation.Interface.Providers;
 
 namespace SAUtils.MergeInterimTsvs
 {
     public static class MergeUtilities
     {
-        public static List<T> GetMinItems<T>(List<IEnumerator<T>> interimSaItemsList) where T : IComparable<T>
+        public static List<T> GetMinItems<T>(List<IEnumerator<T>> iSaEnumerators) where T : IComparable<T>
         {
-            if (interimSaItemsList.Count == 0) return null;
+            if (iSaEnumerators.Count == 0) return null;
 
-            //var minItem = GetMinItem(interimSaItemsList);
-            var firstItems = interimSaItemsList.Select(x => x.Current);
+            var firstItems = iSaEnumerators.Select(x => x.Current);
             var minItem = firstItems.Min();
 
             var minItems = new List<T>();
             List<IEnumerator<T>> emptyEnumerators=null;
 
-            foreach (var saEnumerator in interimSaItemsList)
+            foreach (var saEnumerator in iSaEnumerators)
             {
                 if (minItem.CompareTo(saEnumerator.Current) < 0) continue;
 
@@ -32,21 +34,28 @@ namespace SAUtils.MergeInterimTsvs
                 }
             }
 
-            RemoveEmptyEnumerators(emptyEnumerators, interimSaItemsList);
+            RemoveEmptyEnumerators(emptyEnumerators, iSaEnumerators);
             return minItems.Count == 0 ? null : minItems;
         }
 
+        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(List<InterimSaHeader> interimSaHeaders,
+            List<InterimIntervalHeader> intervalHeaders)
+        {
+            return interimSaHeaders.Select(header => header.GetDataSourceVersion()).Concat(intervalHeaders.Select(header => header.GetDataSourceVersion()));
+        }
 
-        //private static T GetMinItem<T>(List<IEnumerator<T>> interimSaItemsList) where T : IComparable<T>
-        //{
-        //    var minItem = interimSaItemsList[0].Current;
-        //    foreach (var saEnumerator in interimSaItemsList)
-        //    {
-        //        if (minItem.CompareTo(saEnumerator.Current) > 0)
-        //            minItem = saEnumerator.Current;
-        //    }
-        //    return minItem;
-        //}
+        public static void CheckAssemblyConsistancy(IEnumerable<InterimSaHeader> iSaHeaders, IEnumerable<InterimIntervalHeader> iIntervalHeaders)
+        {
+            var uniqueAssemblies = iSaHeaders.Select(x => x.GenomeAssembly)
+                .Concat(iIntervalHeaders.Select(x => x.GenomeAssembly))
+                .Where(x => !MergeInterimTsvs.AssembliesIgnoredInConsistancyCheck.Contains(x))
+                .Distinct()
+                .ToList();
+
+            if (uniqueAssemblies.Count > 1)
+                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {string.Join(", ", uniqueAssemblies.ToArray())}");
+        }
+
 
         private static void RemoveEmptyEnumerators<T>(List<IEnumerator<T>> emptyEnumerators, List<IEnumerator<T>> enumerators)
         {
