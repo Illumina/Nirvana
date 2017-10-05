@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Piano": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache E:\\Data\\Nirvana\\Cache\\24\\GRCh37\\Both84 --in E:\\Data\\Nirvana\\Data\\Mother\\Mother.genome.vcf.gz -r E:\\Data\\Nirvana\\References\\5.2\\Homo_sapiens.GRCh37.Nirvana.dat --out testPiano",
+      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+    }
+  }
+}

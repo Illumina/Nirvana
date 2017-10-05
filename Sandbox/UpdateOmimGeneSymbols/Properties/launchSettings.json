@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "UpdateOmimGeneSymbols": {
-      "commandName": "Project",
-      "commandLineArgs": "-i External_data_sources\\OMIM\\2017-03-08\\genemap2.txt -o testGeneMap2.txt --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2017-02-17 --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2016-10-17 --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2016-09-24 --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2016-04-29 --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2015-09-01 --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2014-12-12 --gi E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\gene_info_2011-08-28 --hgnc E:\\Sync\\Nirvana\\CacheDump\\GeneSymbols\\gene_info\\hgnc_complete_set_2017-02-17.txt",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    }
-  }
-}
