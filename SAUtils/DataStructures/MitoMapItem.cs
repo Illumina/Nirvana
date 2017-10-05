@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
-using CommonUtilities;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;
 

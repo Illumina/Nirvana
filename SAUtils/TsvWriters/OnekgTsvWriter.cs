@@ -78,7 +78,7 @@ namespace SAUtils.TsvWriters
 				onekGenItems.Add(onekGenItem);
 			}
 			
-			SupplementaryDataItem.RemoveConflictedAlleles(onekGenItems);
+			SupplementaryDataItem.RemoveConflictingAlleles(onekGenItems);
 
 		    var totalAltAlleleFreq = 0.0;
             var alleleFrequencies = new Dictionary<string,double>();

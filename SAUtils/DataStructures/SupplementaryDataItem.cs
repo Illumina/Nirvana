@@ -42,7 +42,7 @@ namespace SAUtils.DataStructures
 			
 		}
 
-        public static  void RemoveConflictedAlleles<T>(List<T> saItems) where T : SupplementaryDataItem
+        public static  void RemoveConflictingAlleles<T>(List<T> saItems) where T : SupplementaryDataItem
         {
             var allelesSet = new HashSet<Tuple<string, string>>();
             var conflictSet = new HashSet<Tuple<string, string>>();

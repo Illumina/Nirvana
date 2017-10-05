@@ -112,7 +112,6 @@ namespace Jasix
 
             var jasix = new Jasix();
             var exitCode = new ConsoleAppBuilder(args, ops)
-                .UseVersionProvider(new JasixVersionProvider())
                 .Parse()
                 .CheckInputFilenameExists(ConfigurationSettings.InputJson, "input Json file", "[in.json.gz]")
                 .DisableOutput(!ConfigurationSettings.CreateIndex && ConfigurationSettings.OutputFile == null)

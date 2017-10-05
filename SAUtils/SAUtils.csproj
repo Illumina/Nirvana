@@ -7,6 +7,7 @@
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
+    <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
   </ItemGroup>

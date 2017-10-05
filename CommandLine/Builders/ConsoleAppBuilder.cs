@@ -84,7 +84,7 @@ namespace CommandLine.Builders
 
         public IConsoleAppBanner ShowBanner(string authors)
         {
-            if (Data.ShowVersion) Console.WriteLine("{0} {1}", Data.VersionProvider.GetProgramVersion(), Data.VersionProvider.GetDataVersion());
+            if (Data.ShowVersion) Console.WriteLine($"{CommandLineUtilities.Title} {CommandLineUtilities.InformationalVersion} {Data.VersionProvider.DataVersion}");
             else if (!Data.DisableOutput) CommandLineUtilities.DisplayBanner(authors);
             return new ConsoleAppBanner(Data);
         }
@@ -101,7 +101,7 @@ namespace CommandLine.Builders
             if (_data.ShowHelpMenu || _data.Errors.Count > 0)
             {
                 Help.Show(_data.Ops, commandLineExample, description);
-                Console.WriteLine($"\n{_data.VersionProvider.GetDataVersion()}\n");
+                Console.WriteLine($"\n{_data.VersionProvider.DataVersion}\n");
             }
 
             return new ConsoleAppHelpMenu(_data);

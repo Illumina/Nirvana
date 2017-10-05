@@ -12,8 +12,8 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createSA --ref  E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir \\\\ussd-prd-isi04\\Nirvana\\Development\\IntermediateTsvs\\2017-09\\GRCh37 --out E:\\Nirvana_resources\\test_runs\\rCRS",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\rCRS"
+      "commandLineArgs": "createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --out c:\\Development\\SupplementaryDatabase\\40.4\\GRCh37 --gene c:\\Development\\IntermediateTsvs\\GRCh37\\omim_20170905.gene.tsv.gz --gene c:\\Development\\IntermediateTsvs\\GRCh37\\geneScores_0.3.1.gene.tsv.gz",
+      "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
 }

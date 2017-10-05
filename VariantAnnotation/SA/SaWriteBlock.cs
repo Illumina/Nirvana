@@ -9,15 +9,17 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
-    public class SaWriteBlock : SaBlock
+    public sealed class SaWriteBlock : SaBlock
     {
         private readonly List<ISaIndexOffset> _blockPositions;
         internal int BlockOffset;
+        public int PositionCount => _blockPositions.Count;
 
+        public const int DefaultBlockSize = 524288 * 8;
         /// <summary>
         /// constructor
         /// </summary>
-        public SaWriteBlock(ICompressionAlgorithm compressionAlgorithm, int size = 524288)
+        public SaWriteBlock(ICompressionAlgorithm compressionAlgorithm, int size = DefaultBlockSize)
             : base(compressionAlgorithm, size)
         {
             _blockPositions = new List<ISaIndexOffset>();
