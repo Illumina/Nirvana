@@ -13,7 +13,6 @@ namespace Vcf
     public static class VcfReaderUtils
     {
         private static readonly HashSet<string> NonInformativeAltAllele = new HashSet<string> { "<*>", "*", "<M>" };
-        internal const string NonRefAltAllele = "<NON_REF>";
 
         internal static IPosition ParseVcfLine(string vcfLine, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
         {
@@ -28,7 +27,7 @@ namespace Vcf
             string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',').Where(x => !NonInformativeAltAllele.Contains(x)).ToArray();
             if (altAlleles.Length == 0) return null;
             // only filter out "<NON_REF>" allele when there are more than one alternative alleles
-            if (altAlleles.Length > 1) altAlleles = altAlleles.Where(x => x != NonRefAltAllele).ToArray();
+            if (altAlleles.Length > 1) altAlleles = altAlleles.Where(x => x != VcfCommon.GatkNonRefAllele).ToArray();
             double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(Double.TryParse);
             string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
             var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();

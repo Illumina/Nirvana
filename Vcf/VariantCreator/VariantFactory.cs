@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
@@ -48,7 +49,7 @@ namespace Vcf.VariantCreator
 	    public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber)
 		{
 		    var variants         = new IVariant[altAlleles.Length];
-		    var isReference      = altAlleles.Length == 1 && ( altAlleles[0] == "." || altAlleles[0] == VcfReaderUtils.NonRefAltAllele);
+		    var isReference      = altAlleles.Length == 1 && ( altAlleles[0] == "." || altAlleles[0] == VcfCommon.GatkNonRefAllele);
 		    var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
 			var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele);
 
