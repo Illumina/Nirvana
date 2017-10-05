@@ -15,7 +15,7 @@ namespace SAUtils.MergeInterimTsvs
             var minItem = firstItems.Min();
 
             var minItems = new List<T>();
-            var emptyEnumerators = new List<IEnumerator<T>>();
+            List<IEnumerator<T>> emptyEnumerators=null;
 
             foreach (var saEnumerator in interimSaItemsList)
             {
@@ -25,6 +25,8 @@ namespace SAUtils.MergeInterimTsvs
                 {
                     minItems.Add(saEnumerator.Current);
                     if (saEnumerator.MoveNext()) continue;
+                    if (emptyEnumerators == null)
+                        emptyEnumerators = new List<IEnumerator<T>>();
                     emptyEnumerators.Add(saEnumerator);
                     break;
                 }
@@ -48,7 +50,7 @@ namespace SAUtils.MergeInterimTsvs
 
         private static void RemoveEmptyEnumerators<T>(List<IEnumerator<T>> emptyEnumerators, List<IEnumerator<T>> enumerators)
         {
-            if (emptyEnumerators.Count == 0) return;
+            if (emptyEnumerators == null || emptyEnumerators.Count == 0) return;
 
             foreach (var enumerator in emptyEnumerators)
             {
@@ -56,15 +58,6 @@ namespace SAUtils.MergeInterimTsvs
             }
         }
 
-        public static void RemoveEmptyEnumerators<T>(List<IEnumerator<T>> enumerators)
-        {
-            var emptyEnumerators = enumerators.Where(x => x.MoveNext() == false);
-            
-            foreach (var enumerator in emptyEnumerators)
-            {
-                enumerators.Remove(enumerator);
-            }
-        }
-
+        
     }
 }
