@@ -26,7 +26,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             var customReader = new CustomIntervalParser(customFile,_refChromDict);
 
             // all items from this file should be of type cosmic.
-            foreach (var customInterval in customReader)
+            foreach (var customInterval in customReader.GetCustomIntervals())
             {
                 Assert.Equal("IcslIntervals", customInterval.Type);
             }
@@ -41,7 +41,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
 
             // all items from this file should be of type cosmic.
             var i = 0;
-            foreach (var customInterval in customReader)
+            foreach (var customInterval in customReader.GetCustomIntervals())
             {
                 switch (i)
                 {
