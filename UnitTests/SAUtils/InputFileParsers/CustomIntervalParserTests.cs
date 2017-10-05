@@ -5,7 +5,7 @@ using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Sequence;
 using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class CustomIntervalParserTests
     {
