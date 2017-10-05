@@ -143,7 +143,7 @@ namespace SAUtils.MergeInterimTsvs
 
             foreach (var geneReader in _geneReaders)
             {
-                var dataEnumerator = geneReader.GetEnumerator();
+                var dataEnumerator = geneReader.GetAnnotationItems().GetEnumerator();
                 if (!dataEnumerator.MoveNext()) continue;
                 geneAnnotationList.Add(dataEnumerator);
             }
@@ -259,7 +259,7 @@ namespace SAUtils.MergeInterimTsvs
 
             List<IAnnotatedGene> geneAnnotations;
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))
-                while ((geneAnnotations = GetMinItems(geneAnnotationList)) != null)
+                while ((geneAnnotations = MergeUtilities.GetMinItems(geneAnnotationList)) != null)
                 {
                     var mergedGeneAnnotation = MergeGeneAnnotations(geneAnnotations);
                     writer.Write(mergedGeneAnnotation);
@@ -364,7 +364,7 @@ namespace SAUtils.MergeInterimTsvs
 
         private InterimSaPosition GetNextInterimPosition(List<IEnumerator<IInterimSaItem>> interimSaItemsList)
         {
-            var minItems = GetMinItems(interimSaItemsList);
+            var minItems = MergeUtilities.GetMinItems(interimSaItemsList);
             if (minItems == null) return null;
 
             var interimSaPosition = new InterimSaPosition();
@@ -373,50 +373,6 @@ namespace SAUtils.MergeInterimTsvs
             return interimSaPosition;
         }
 
-        private List<T> GetMinItems<T>(List<IEnumerator<T>> interimSaItemsList) where T : IComparable<T>
-        {
-            if (interimSaItemsList.Count == 0) return null;
-
-            var minItem = GetMinItem(interimSaItemsList);
-            var minItems = new List<T>();
-            var removeList = new List<IEnumerator<T>>();
-
-            foreach (var saEnumerator in interimSaItemsList)
-            {
-                if (minItem.CompareTo(saEnumerator.Current) < 0) continue;
-
-                while (minItem.CompareTo(saEnumerator.Current) == 0)
-                {
-                    minItems.Add(saEnumerator.Current);
-                    if (saEnumerator.MoveNext()) continue;
-                    removeList.Add(saEnumerator);
-                    break;
-                }
-            }
-
-            RemoveEnumerators(removeList, interimSaItemsList);
-            return minItems.Count == 0 ? null : minItems;
-        }
-
-        private T GetMinItem<T>(List<IEnumerator<T>> interimSaItemsList) where T : IComparable<T>
-        {
-            var minItem = interimSaItemsList[0].Current;
-            foreach (var saEnumerator in interimSaItemsList)
-            {
-                if (minItem.CompareTo(saEnumerator.Current) > 0)
-                    minItem = saEnumerator.Current;
-            }
-            return minItem;
-        }
-
-        private void RemoveEnumerators<T>(List<IEnumerator<T>> removeList, List<IEnumerator<T>> interimSaItemsList)
-        {
-            if (removeList.Count == 0) return;
-
-            foreach (var enumerator in removeList)
-            {
-                interimSaItemsList.Remove(enumerator);
-            }
-        }
+       
     }
 }
