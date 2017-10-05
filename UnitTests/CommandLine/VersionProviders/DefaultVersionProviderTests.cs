@@ -8,8 +8,8 @@ namespace UnitTests.CommandLine.VersionProviders
         [Fact]
         public void GetProgramVersion()
         {
-            var programVersionCols = new DefaultVersionProvider().GetProgramVersion().Split(' ');
-            Assert.Equal(2, programVersionCols.Length);
+            var versionProvider = new DefaultVersionProvider();
+            Assert.Equal(string.Empty, versionProvider.DataVersion);
         }
     }
 }

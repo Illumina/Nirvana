@@ -27,7 +27,7 @@ using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
-    internal sealed class CreateInterimFiles
+    internal sealed class CreateIntermediateTsvs
     {
         #region fileNames
         private readonly List<string> _customAnnotationFiles;
@@ -54,7 +54,7 @@ namespace SAUtils.CreateIntermediateTsvs
         private readonly string _compressedReferencePath;
 
         #endregion
-        public CreateInterimFiles(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames, List<string> customAnnotationFiles, List<string> customIntervalFiles)
+        public CreateIntermediateTsvs(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames )
         {
             _outputDirectory = outputDirectory;
             _dbSnpFileName = dbSnpFileName;
@@ -129,7 +129,7 @@ namespace SAUtils.CreateIntermediateTsvs
             if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(String.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapSvFileNames[0]).Directory;
-            var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
+            var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
             var sequenceProvider =
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
@@ -146,7 +146,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 ReportFor.StructuralVariants))
                 CreateSvTsv(mergedMitoMapItems, writer);
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo(InterimSaCommon.MitoMapSvTag, version.Version, timeSpan);
+            TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapSvTag, version.Version, timeSpan);
         }
 
         private void CreateMitoMapVarTsv(List<string> mitoMapFileNames)
@@ -154,7 +154,7 @@ namespace SAUtils.CreateIntermediateTsvs
             if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
-            var version = GetDataSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
+            var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
             var sequenceProvider =
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
@@ -166,9 +166,9 @@ namespace SAUtils.CreateIntermediateTsvs
             var mergedMitoMapVarItems = MitoMapVariantReader.MergeAndSort(mitoMapVarReaders);
             var outputFilePrefix = InterimSaCommon.MitoMapVarTag;
                 using (var writer = new MitoMapVarTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
-                    WriteSortedItems(mergedMitoMapVarItems, writer);         
+                    TsvWriterUtilities.WriteSortedItems(mergedMitoMapVarItems, writer);         
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo(InterimSaCommon.MitoMapVarTag, version.Version, timeSpan);
+            TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapVarTag, version.Version, timeSpan);
         }
 
         private void CreateSvTsv(string sourceName, string fileName)
@@ -178,7 +178,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var benchMark = new Benchmark();
             //Console.WriteLine($"Creating TSV from {fileName}");
             var dataSource = "";
-            var version = GetDataSourceVersion(fileName); 
+		    var version = DataSourceVersionReader.GetSourceVersion(fileName);
             switch (sourceName)
             {
                 case InterimSaCommon.DgvTag:
@@ -216,7 +216,7 @@ namespace SAUtils.CreateIntermediateTsvs
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo(dataSource, version.Version, timeSpan);
+            TsvWriterUtilities.WriteCompleteInfo(dataSource,version.Version,timeSpan);
         }
 
         private void CreateSvTsv(IEnumerator<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
@@ -234,7 +234,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(fileName);
+			var version = DataSourceVersionReader.GetSourceVersion(fileName);
             var reader = new CustomIntervalParser(new FileInfo(fileName), _refNamesDictionary);
             using (var writer = new IntervalTsvWriter(_outputDirectory, version,
 				_genomeAssembly.ToString(), SaTsvCommon.CustIntervalSchemaVersion, reader.KeyName,
@@ -247,7 +247,7 @@ namespace SAUtils.CreateIntermediateTsvs
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo("customInterval", fileName, timeSpan);
+		    TsvWriterUtilities.WriteCompleteInfo("customInterval", fileName, timeSpan);
         }
 
         private void CreateCutomAnnoTsv(string fileName)
@@ -255,12 +255,12 @@ namespace SAUtils.CreateIntermediateTsvs
             if (string.IsNullOrEmpty(fileName)) return;
 
             Console.WriteLine($"Creating TSV from {fileName}");
-            var version = GetDataSourceVersion(fileName);
+			var version = DataSourceVersionReader.GetSourceVersion(fileName);
 
             var customReader = new CustomAnnotationReader(new FileInfo(fileName), _refNamesDictionary);
             using (var writer = new CustomAnnoTsvWriter(version, _outputDirectory, _genomeAssembly, customReader.IsPositional, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
-                WriteSortedItems(customReader.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(customReader.GetEnumerator(), writer);
             }
 
             Console.WriteLine($"Finished {fileName}");
@@ -273,32 +273,33 @@ namespace SAUtils.CreateIntermediateTsvs
 
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(vcfFile);
+            var version = DataSourceVersionReader.GetSourceVersion(vcfFile);
 			using (var writer = new CosmicTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 			    var tsvReader = GZipUtilities.GetAppropriateStreamReader(tsvFile);
                 var vcfReader = GZipUtilities.GetAppropriateStreamReader(vcfFile);
-
                 var cosmicReader = new MergedCosmicReader(vcfReader,tsvReader,_refNamesDictionary);
-				WriteSortedItems(cosmicReader.GetEnumerator(), writer);
-			}
 
-		    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-		    WriteCompleteInfo("COSMIC", version.Version, timeSpan);
+			    TsvWriterUtilities.WriteSortedItems(cosmicReader.GetEnumerator(), writer);
+
+            }
+
+            var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
+		    TsvWriterUtilities.WriteCompleteInfo("COSMIC", version.Version, timeSpan);
 		}
         private void CreateEvsTsv(string fileName)
         {
             if (string.IsNullOrEmpty(fileName)) return;
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(fileName);
+            var version = DataSourceVersionReader.GetSourceVersion(fileName);
 			using (var writer = new EvsTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var evsReader = new EvsReader(GZipUtilities.GetAppropriateStreamReader(fileName), _refNamesDictionary);
-				WriteSortedItems(evsReader.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(evsReader.GetEnumerator(), writer);
 			}
 		    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-		    WriteCompleteInfo("EVS", version.Version, timeSpan);
+		    TsvWriterUtilities.WriteCompleteInfo("EVS", version.Version, timeSpan);
         }
 
         private void CreateExacTsv(string fileName)
@@ -306,15 +307,15 @@ namespace SAUtils.CreateIntermediateTsvs
             if (string.IsNullOrEmpty(fileName)) return;
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(fileName);
+            var version = DataSourceVersionReader.GetSourceVersion(fileName);
             using (var writer = new ExacTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var exacReader = new ExacReader(new FileInfo(fileName), _refNamesDictionary);
-                WriteSortedItems(exacReader.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(exacReader.GetEnumerator(), writer);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo("EXaC", version.Version, timeSpan);
+		    TsvWriterUtilities.WriteCompleteInfo("EXaC", version.Version, timeSpan);
         }
 
         private void CreateClinvarTsv(string fileName)
@@ -322,18 +323,18 @@ namespace SAUtils.CreateIntermediateTsvs
             if (fileName == null) return;
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(fileName);
+            var version = DataSourceVersionReader.GetSourceVersion(fileName);
             //clinvar items do not come in sorted order, hence we need to store them in an array, sort them and then flush them out
             using (var writer = new ClinvarTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var clinvarReader = new ClinVarXmlReader(new FileInfo(fileName), new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
                 var clinvarList = clinvarReader.ToList();
                 clinvarList.Sort();
-                WriteSortedItems(clinvarList.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(clinvarList.GetEnumerator(), writer);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo("ClinVar", version.Version, timeSpan);
+		    TsvWriterUtilities.WriteCompleteInfo("ClinVar", version.Version, timeSpan);
         }
 
         private void CreateDbsnpGaTsv(string fileName)
@@ -342,7 +343,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(fileName);
+            var version = DataSourceVersionReader.GetSourceVersion(fileName);
 
 		    var dbsnpWriter = new SaTsvWriter(_outputDirectory, version, _genomeAssembly.ToString(),
 		        SaTsvCommon.DbSnpSchemaVersion, InterimSaCommon.DbsnpTag, null, true, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
@@ -352,11 +353,11 @@ namespace SAUtils.CreateIntermediateTsvs
             using (var tsvWriter = new DbsnpGaTsvWriter(dbsnpWriter,globalAlleleWriter))
             {
                 var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(fileName), _refNamesDictionary);
-                WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
+				TsvWriterUtilities.WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo("DbSNP", version.Version, timeSpan);
+		    TsvWriterUtilities.WriteCompleteInfo("DbSNP", version.Version, timeSpan);
 
         }
 
@@ -365,95 +366,15 @@ namespace SAUtils.CreateIntermediateTsvs
             if (fileName == null) return;
             var benchMark = new Benchmark();
 
-            var version = GetDataSourceVersion(fileName);
+            var version = DataSourceVersionReader.GetSourceVersion(fileName);
 
             using (var tsvWriter = new OnekgTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var onekgReader = new OneKGenReader(new FileInfo(fileName), _refNamesDictionary);
-                WriteSortedItems(onekgReader.GetEnumerator(), tsvWriter);
+				TsvWriterUtilities.WriteSortedItems(onekgReader.GetEnumerator(), tsvWriter);
             }
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            WriteCompleteInfo("OneKg", version.Version, timeSpan);
-        }
-
-        private static DataSourceVersion GetDataSourceVersion(string dataFileName)
-        {
-            var versionFileName = dataFileName + ".version";
-
-            var version = DataSourceVersionReader.GetSourceVersion(versionFileName);
-            return version;
-        }
-
-        private void WriteSortedItems(IEnumerator<SupplementaryDataItem> saItems, ISaItemTsvWriter writer)
-        {
-            var itemsMinHeap = new MinHeap<SupplementaryDataItem>();
-            var currentRefIndex = Int32.MaxValue;
-
-            var benchmark = new Benchmark();
-            while (saItems.MoveNext())
-            {
-                var saItem = saItems.Current;
-                //if (!SupplementaryAnnotationUtilities.IsRefAlleleValid(_compressedSequence, saItem.Start, saItem.ReferenceAllele))
-                //	continue;
-                if (currentRefIndex != saItem.Chromosome.Index)
-                {
-                    if (currentRefIndex != Int32.MaxValue)
-                    {
-                        //flushing out the remaining items in buffer
-                        WriteToPosition(writer, itemsMinHeap, int.MaxValue);
-                        //Console.WriteLine($"Wrote out chr{currentRefIndex} items in {benchmark.GetElapsedTime()}");
-                        benchmark.Reset();
-                    }
-                    currentRefIndex = saItem.Chromosome.Index;
-                    //Console.WriteLine("Writing items from chromosome:" + currentRefIndex);
-                }
-
-                //the items come in sorted order of the pre-trimmed position. 
-                //So when writing out, we have to make sure that we do not write past this position. 
-                //Once a position has been seen in the stream, we can safely write all positions before that.
-                var writeToPos = saItem.Start;
-
-                saItem.Trim();
-                itemsMinHeap.Add(saItem);
-
-                WriteToPosition(writer, itemsMinHeap, writeToPos);
-            }
-
-            //flushing out the remaining items in buffer
-            WriteToPosition(writer, itemsMinHeap, int.MaxValue);
-        }
-
-
-        private static void WriteToPosition(ISaItemTsvWriter writer, MinHeap<SupplementaryDataItem> itemsHeap, int position)
-        {
-            if (itemsHeap.Count() == 0) return;
-            var bufferMin = itemsHeap.GetMin();
-
-            while (bufferMin.Start < position)
-            {
-                var itemsAtMinPosition = new List<SupplementaryDataItem>();
-
-                while (itemsHeap.Count() > 0 && bufferMin.CompareTo(itemsHeap.GetMin()) == 0)
-                    itemsAtMinPosition.Add(itemsHeap.ExtractMin());
-
-                writer.WritePosition(itemsAtMinPosition);
-
-                if (itemsHeap.Count() == 0) break;
-
-                bufferMin = itemsHeap.GetMin();
-            }
-
-        }
-
-        private static void WriteCompleteInfo(string dataSourceDescription, string version, string timeSpan)
-        {
-
-            Console.Write($"{dataSourceDescription,-20}    {version,-20}");
-            Console.ForegroundColor = ConsoleColor.Yellow;
-
-            Console.WriteLine($"{timeSpan,-20}");
-            Console.ResetColor();
-
+		    TsvWriterUtilities.WriteCompleteInfo("OneKg", version.Version, timeSpan);
         }
 
     }

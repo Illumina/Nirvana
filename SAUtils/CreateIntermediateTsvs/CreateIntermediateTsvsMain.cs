@@ -12,7 +12,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			// load the reference sequence
 			
 			var interimTsvCreator =
-				new CreateInterimFiles(
+				new CreateIntermediateTsvs(
 					ConfigurationSettings.CompressedReference,
 					ConfigurationSettings.OutputSupplementaryDirectory,
 					ConfigurationSettings.InputDbSnpFileName,
