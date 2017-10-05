@@ -73,7 +73,7 @@ namespace VariantAnnotation
             if (!_hasStartedAnnotation) return;
 
             double dummy;
-            if (!_disableOutput) Console.WriteLine((string) "annotation: {0}", (object) _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
+            if (!_disableOutput) Console.WriteLine("annotation: {0}", _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
             _numVariantsInReference = 0;
         }
 
@@ -102,10 +102,10 @@ namespace VariantAnnotation
             var filler = new string(' ', fillerLength);
 
             // display the reference time
-            Console.WriteLine((string) _divider);
+            Console.WriteLine(_divider);
             Console.Write("reference:  {0}{1}", _referenceTime, filler);
             Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine((string) _referenceName);
+            Console.WriteLine(_referenceName);
             Console.ResetColor();
         }
     }
