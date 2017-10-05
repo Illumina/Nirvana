@@ -35,27 +35,33 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("cosm5428243.tsv"));
             var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
 
-            var enumerator = cosmicReader.GetEnumerator();
-            enumerator.MoveNext();
-            var cosmicItem = enumerator.Current;
-
-            foreach (var study in cosmicItem.Studies)
+            var cosmicItems = cosmicReader.GetCosmicItems();
+            var count = 0;
+            foreach (var cosmicItem in cosmicItems)
             {
-                Assert.Equal("544", study.Id);
-                Assert.Equal("haematopoietic_and_lymphoid_tissue", study.PrimarySite);
-                Assert.Equal("haematopoietic_neoplasm", study.Histology);
+                switch (count)
+                {
+                    case 0:
+                        foreach (var study in cosmicItem.Studies)
+                        {
+                            Assert.Equal("544", study.Id);
+                            Assert.Equal("haematopoietic_and_lymphoid_tissue", study.PrimarySite);
+                            Assert.Equal("haematopoietic_neoplasm", study.Histology);
+                        }
+                        break;
+                    case 1:
+                        foreach (var study in cosmicItem.Studies)
+                        {
+                            Assert.Equal("544", study.Id);
+                            Assert.Equal("haematopoietic;lymphoid_tissue", study.PrimarySite);
+                            Assert.Equal("haematopoietic_neoplasm", study.Histology);
+                        }
+                        break;
+                }
+
+                count++;
             }
 
-            enumerator.MoveNext();
-            cosmicItem = enumerator.Current;
-            foreach (var study in cosmicItem.Studies)
-            {
-                Assert.Equal("544", study.Id);
-                Assert.Equal("haematopoietic;lymphoid_tissue", study.PrimarySite);
-                Assert.Equal("haematopoietic_neoplasm", study.Histology);
-            }
-
-            enumerator.Dispose();
         }
 
         [Fact]
@@ -88,7 +94,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             var vcfReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM983708.vcf"));
             var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM983708.tsv"));
             var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
-            var items = cosmicReader.ToList();
+            var items = cosmicReader.GetCosmicItems().ToList();
 
             Assert.Equal(1,items.Count);
             Assert.Contains("\"refAllele\":\"C\"",items[0].GetJsonString());
@@ -102,7 +108,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             var vcfReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM18152.vcf"));
             var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM18152.tsv"));
             var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
-            var items = cosmicReader.ToList();
+            var items = cosmicReader.GetCosmicItems().ToList();
 
             Assert.Equal(3, items.Count);
 

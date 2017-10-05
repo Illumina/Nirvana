@@ -11,10 +11,10 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.InputFileParsers.MitoMAP
 {
-    public class MitoMapSvReader
+    public sealed class MitoMapSvReader
     {
         private readonly FileInfo _mitoMapFileInfo;
-        public readonly string DataType;
+        private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly CircularGenomeModel _mitoGenomeModel;
         private readonly VariantAligner _variantAligner;
@@ -29,7 +29,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         public MitoMapSvReader(FileInfo mitoMapFileInfo, ReferenceSequenceProvider sequenceProvider)
         {
             _mitoMapFileInfo = mitoMapFileInfo;
-            DataType = GetDataType();
+            _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
             _mitoGenomeModel = new CircularGenomeModel(sequenceProvider);
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
@@ -60,7 +60,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     // last item
                     if (line.StartsWith("[") && line.EndsWith("]],")) isDataLine = false;
 
-                    foreach (var supplementaryIntervalItem in ParseLine(line, DataType))
+                    foreach (var supplementaryIntervalItem in ParseLine(line, _dataType))
                     {
                         yield return supplementaryIntervalItem;
                     }
@@ -115,6 +115,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
             }
             return svItems;
         }
-        public static IEnumerator<MitoMapItem> MergeAndSort(List<MitoMapSvReader> mitoMapSvReaders) => mitoMapSvReaders.SelectMany(x => x.GetMitoMapItems()).OrderBy(x => x.Start).GetEnumerator();
+        public static IEnumerable<MitoMapItem> MergeAndSort(List<MitoMapSvReader> mitoMapSvReaders) => mitoMapSvReaders.SelectMany(x => x.GetMitoMapItems()).OrderBy(x => x.Start);
     }
 }

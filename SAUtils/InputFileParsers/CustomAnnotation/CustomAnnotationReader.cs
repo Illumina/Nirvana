@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.CustomAnnotation
 {
-	public sealed class CustomAnnotationReader: IEnumerable<CustomItem>
+	public sealed class CustomAnnotationReader
 	{
 		private readonly FileInfo _customFileInfo;
 		private readonly Dictionary<string, string> _desiredStringFields;
@@ -73,17 +72,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 			_customItemList.Clear();
 		}
 	
-		public IEnumerator<CustomItem> GetEnumerator()
-		{
-			return GetCustomItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		private IEnumerable<CustomItem> GetCustomItems()
+		public IEnumerable<CustomItem> GetCustomItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_customFileInfo.FullName))
 			{

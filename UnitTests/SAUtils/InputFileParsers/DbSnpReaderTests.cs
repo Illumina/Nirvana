@@ -47,7 +47,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void TestDbSnpReader()
         {
             var dbSnpReader = new DbSnpReader(TestDbSnpStream, _refChromDict);
-            Assert.True(dbSnpReader.SequenceEqual(CreateTruthDbSnpItemSequence()));
+            Assert.True(dbSnpReader.GetDbSnpItems().SequenceEqual(CreateTruthDbSnpItemSequence()));
         }
 
         [Fact]

@@ -31,8 +31,8 @@ namespace SAUtils.CreateGnomadTsv
                 var count = 0;
                 foreach (var fileStreamReader in _streamReaders)
                 {
-                    var exacReader = new GnomadReader(fileStreamReader, _refProvider.GetChromosomeDictionary());
-                    TsvWriterUtilities.WriteSortedItems(exacReader.GetEnumerator(), writer);
+                    var reader = new GnomadReader(fileStreamReader, _refProvider.GetChromosomeDictionary());
+                    TsvWriterUtilities.WriteSortedItems(reader.GetGnomadItems(), writer);
                     Console.WriteLine($"ingested {count++} file in " + benchMark.GetElapsedTime());
                 }
                 

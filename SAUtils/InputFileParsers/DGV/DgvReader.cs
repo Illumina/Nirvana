@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
 using SAUtils.DataStructures;
@@ -7,7 +6,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.DGV
 {
-	public sealed class DgvReader:IEnumerable<DgvItem>
+	public sealed class DgvReader
 	{
 		#region members
 
@@ -16,21 +15,7 @@ namespace SAUtils.InputFileParsers.DGV
 
         #endregion
 
-        #region IEnumerable implementation
-
-        public IEnumerator<DgvItem> GetEnumerator()
-		{
-			return GetDgvItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		#endregion
-
-		// constructor
+        // constructor
 		public DgvReader(FileInfo dgvFileInfo, IDictionary<string, IChromosome> refChromDict)
 		{
 			_dgvFileInfo = dgvFileInfo;
@@ -66,11 +51,7 @@ namespace SAUtils.InputFileParsers.DGV
 
 
 
-		/// <summary>
-		/// Parses a ClinVar file and return an enumeration object containing all the ClinVar objects
-		/// that have been extracted
-		/// </summary>
-		private IEnumerable<DgvItem> GetDgvItems()
+		public IEnumerable<DgvItem> GetDgvItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_dgvFileInfo.FullName))
 			{

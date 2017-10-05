@@ -313,11 +313,11 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return new string(reversedNucleotide);
         }
 
-        public static IEnumerator<MitoMapItem> MergeAndSort(List<MitoMapVariantReader> mitoMapMutationReaders)
+        public static IEnumerable<MitoMapItem> MergeAndSort(List<MitoMapVariantReader> mitoMapMutationReaders)
         {
             var allItems = mitoMapMutationReaders.SelectMany(x => x.GetMitoMapItems()).ToList();
             allItems.ForEach(x => x.Trim());
-            return allItems.OrderBy(x => x.Start).GetEnumerator();
+            return allItems.OrderBy(x => x.Start);
         }
     }
 }
