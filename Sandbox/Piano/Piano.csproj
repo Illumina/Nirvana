@@ -8,6 +8,7 @@
     <ProjectReference Include="..\..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\..\VariantAnnotation\VariantAnnotation.csproj" />
+    <ProjectReference Include="..\..\Vcf\Vcf.csproj" />
   </ItemGroup>
   <Import Project="..\..\VariantAnnotation\CommonAssemblyInfo.props" />
 </Project>

@@ -9,6 +9,7 @@ using Compression.FileHandling;
 using ErrorHandling;
 using Jasix;
 using Jasix.DataStructures;
+using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Positions;

@@ -43,7 +43,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// <summary>
         /// returns the codon string consisting of the prefix and suffix bases flanking the allele bases
         /// </summary>
-        internal static string GetCodon(string allele, string prefix, string suffix)
+        public static string GetCodon(string allele, string prefix, string suffix)
         {
             if (prefix.Length == 0 && suffix.Length == 0) return allele;
             return $"{prefix}{allele}{suffix}";
@@ -53,5 +53,10 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// returns true if the length is a multiple of three, false otherwise
         /// </summary>
         public static bool IsTriplet(int len) => Math.Abs(len) % 3 == 0;
+
+
+       
     }
+
+    
 };
