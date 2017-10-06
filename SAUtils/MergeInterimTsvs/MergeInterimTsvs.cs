@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
-using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -210,14 +209,9 @@ namespace SAUtils.MergeInterimTsvs
         {
             if (string.IsNullOrEmpty(miscFile)) return;
 
-            var miscFileReader = GZipUtilities.GetAppropriateStreamReader(miscFile);
-            var indexFileStream = new FileStream(miscFile + ".tvi", FileMode.Open);
-            _miscReader = new SaMiscellaniesReader(miscFileReader, indexFileStream);
+            _miscReader = new SaMiscellaniesReader(new FileInfo(miscFile));
             _allRefNames.AddRange(_miscReader.GetAllRefNames());
-
-
         }
-
         private void CheckAssemblyConsistancy()
         {
             var uniqueAssemblies = _interimSaHeaders.Select(x => x.GenomeAssembly)
@@ -259,10 +253,11 @@ namespace SAUtils.MergeInterimTsvs
         {
             var geneAnnotationList = GetGeneAnnotationEnumerator();
 
-            List<IAnnotatedGene> geneAnnotations = null;
             var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
+
+            List<IAnnotatedGene> geneAnnotations;
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))
                 while ((geneAnnotations = GetMinItems(geneAnnotationList)) != null)
                 {
@@ -275,8 +270,6 @@ namespace SAUtils.MergeInterimTsvs
         {
             if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
 
-            if (geneAnnotations[0].GeneName=="AGRN")
-                Console.WriteLine("bug");
             var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
 
             return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);
@@ -322,7 +315,7 @@ namespace SAUtils.MergeInterimTsvs
                 refMinorCount = blockSaWriter.RefMinorCount;
             }
 
-            Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out double lookupsPerSecond)}");
+            Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out double _)}");
         }
 
         private static List<ISupplementaryInterval> GetSpecificIntervals(ReportFor reportFor, IEnumerable<ISupplementaryInterval> intervals)

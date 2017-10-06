@@ -35,7 +35,10 @@ namespace UnitTests.SAUtils.InputFileParsers
         private static ISequenceProvider GetSequenceProvider(GenomeAssembly assembly, IChromosome chromosome, int start, string refSequence)
         {
             var seqProvider = new Mock<ISequenceProvider>();
-            seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() {{chromosome.EnsemblName, chromosome}});
+            if (chromosome.EnsemblName=="X" || chromosome.EnsemblName == "Y")
+                seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() { { "X", new Chromosome("chrX", "X", 1)},{"Y", new Chromosome("chrY", "Y", 2)} });
+            else
+                seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() {{chromosome.EnsemblName, chromosome}});
             seqProvider.Setup(x => x.GenomeAssembly).Returns(assembly);
             seqProvider.Setup(x => x.Sequence).Returns(new SimpleSequence(refSequence, start - 1));
             return seqProvider.Object;

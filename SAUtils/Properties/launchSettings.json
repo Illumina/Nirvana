@@ -2,7 +2,7 @@
   "profiles": {
     "SAUtils": {
       "commandName": "Project",
-      "commandLineArgs": "dotnet D:\\Projects\\Nirvana\\bin\\Release\\netcoreapp2.0\\SAUtils.dll  createSA --ref  E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir \\\\ussd-prd-isi04\\Nirvana\\Development\\IntermediateTsvs\\2017-09\\GRCh37 --out E:\\Nirvana_resources\\test_runs\\rCRS",
+      "commandLineArgs": "createTSV --cvr c:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz --out c:\\Development\\IntermediateTsvs\\GRCh37 --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\rCRS"
     },
     "OMIM_SK": {
