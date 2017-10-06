@@ -15,7 +15,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private const string DelSymbol = "-";
         public readonly string DataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
-        private readonly CircularGenomeModel _mitoGenomeModel;
 
 
         private readonly Dictionary<string, int[]> _mitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
@@ -50,7 +49,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
             _mitoMapFileInfo = mitoMapFileInfo;
             DataType = GetDataType();
             _sequenceProvider = sequenceProvider;
-            _mitoGenomeModel = new CircularGenomeModel(sequenceProvider);
         }
 
         private string GetDataType()
@@ -114,6 +112,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var altAlleleInfo = info[2];
             var dLoopPattern = new Regex(@"(?<start>^\d+)-(?<end>(\d+)) D-Loop region");
             var dLoopMatch = dLoopPattern.Match(altAlleleInfo);
+            var diseases = new List<string>();
             // not a small variant
             if (dLoopMatch.Success)
             {
@@ -134,13 +133,13 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
             if (!firstNumberMatch.Success) throw new Exception($"Failed to extract variant position from {info[3]}");
             var posi = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
-            return new List<MitoMapItem>(){new MitoMapItem(posi, "-", altAllele, "", null, null, "", "", "", false, null, null)};
+            return new List<MitoMapItem>(){new MitoMapItem(posi, "-", altAllele, diseases, null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
         {
             int posi = int.Parse(info[fields[0]]);
-            string disease = GetDiseaseInfo(info, fields[1]);
+            var diseases = MitoMapDiseases.ParseDiseaseInfo(GetDiseaseInfo(info, fields[1]));
             var (refAllele, altAllele, extractedPosi) = GetRefAltAlleles(info[fields[2]]);
             if (extractedPosi.HasValue && posi != extractedPosi)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");
@@ -173,13 +172,13 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
                     foreach (var possibleAltAllele in altAllele.Split(";"))
                     {
-                        mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, disease, homoplasmy,
+                        mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, diseases, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
                     }
                     return mitoMapMutItems;
                 }
             }
-            mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, altAllele, disease, homoplasmy,
+            mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, altAllele, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
             return mitoMapMutItems;
         }
@@ -189,9 +188,9 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (fieldIndex == -1) return null;
             string diseaseString = info[fieldIndex];
             if (String.IsNullOrEmpty(diseaseString)) return diseaseString;
-            var regexPattern = new Regex(@"<a href=.+>(?<disease>\S+)</a>$");
+            var regexPattern = new Regex(@"<a href=.+>(?<disease>.+)</a>$");
             var match = regexPattern.Match(diseaseString);
-            if (match.Groups.Count == 0)
+            if (!match.Success)
                 return diseaseString;
             return match.Groups["disease"].Value;
         }

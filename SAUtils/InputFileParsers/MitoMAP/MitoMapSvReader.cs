@@ -92,7 +92,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
             var newStart = _variantAligner.LeftAlign(start, refSequence, "").Item1;
             if (start != newStart) Console.WriteLine($"Deletion of {calculatedSize} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, "", "", "", null, null, "", "", "", true, newStart + size - 1, VariantType.deletion);
+            var mitoMapItem = new MitoMapItem(newStart, "", "", new List<string>(), null, null, "", "", "", true, newStart + size - 1, VariantType.deletion);
             return new List<MitoMapItem> { mitoMapItem };
 
         }
@@ -110,7 +110,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var genomeEnd = MitoDLoop.Start + int.Parse(dLoopMatch.Groups["end"].Value) - 1;
             foreach (var interval in _mitoGenomeModel.GetLinearIntervals(genomeStart, genomeEnd))
             {
-                var mitoMapItem = new MitoMapItem(interval.Item1, "", "", "", null, null, "", "", "", true, interval.Item2, VariantType.duplication);
+                var mitoMapItem = new MitoMapItem(interval.Item1, "", "", new List<string>(), null, null, "", "", "", true, interval.Item2, VariantType.duplication);
                 svItems.Add(mitoMapItem);
             }
             return svItems;
