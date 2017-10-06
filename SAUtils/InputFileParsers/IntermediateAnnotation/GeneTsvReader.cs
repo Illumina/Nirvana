@@ -11,7 +11,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class GeneTsvReader : IEnumerable<IAnnotatedGene>
+    public sealed class GeneTsvReader
     {
         private readonly FileInfo _inputFileInfo;
         private string _name;
@@ -21,9 +21,9 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private string _description;
         private string _keyName;
         private bool _isArray;
-        private const int _geneIndex = 0;
-        private const int _jsonStringIndex = 1;
-        private const int _minNoOfColumns = 2;
+        private const int GeneIndex = 0;
+        private const int JsonStringIndex = 1;
+        private const int MinNoOfColumns = 2;
 
 
         public GeneTsvReader(FileInfo inputFileInfo)
@@ -45,7 +45,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         }
 
 
-        private IEnumerable<IAnnotatedGene> GetAnnotationItems()
+        public IEnumerable<IAnnotatedGene> GetAnnotationItems()
         {
             using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
             {
@@ -66,11 +66,11 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private IAnnotatedGene ExtractItem(string line)
         {
             var columns = line.Split('\t');
-            if (columns.Length < _minNoOfColumns)
+            if (columns.Length < MinNoOfColumns)
                 throw new InvalidDataException("Line contains too few columns:\n" + line);
 
-            var geneSymbol = columns[_geneIndex];
-            var jsonStrings = columns.Skip(_jsonStringIndex).ToArray();
+            var geneSymbol = columns[GeneIndex];
+            var jsonStrings = columns.Skip(JsonStringIndex).ToArray();
             return new AnnotatedGene(geneSymbol, new[] { new GeneAnnotation(_keyName, jsonStrings, _isArray) });
         }
 
@@ -131,19 +131,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
                     break;
             }
         }
-
-
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public IEnumerator<IAnnotatedGene> GetEnumerator()
-        {
-            return GetAnnotationItems().GetEnumerator();
-        }
-
+        
 
     }
 }

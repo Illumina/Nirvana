@@ -18,15 +18,13 @@ namespace Vcf
         private readonly VariantFactory _variantFactory;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 
-        private bool _isGatkGenomeVcf;
-
         public bool IsRcrsMitochondrion { get; private set; }
 
         private string[] _sampleNames;
 
         private List<string> _headerLines;
 
-        private const string CopyNumberTag = "CN";
+	    //private const string CopyNumberTag = "CN";
 
         private readonly HashSet<string> _nirvanaInfoTags = new HashSet<string>
         {
@@ -81,7 +79,7 @@ namespace Vcf
                 if (duplicateTag) continue;
 
                 // check if this is a GATK genome vcf
-                if (line.StartsWith(VcfCommon.GatkNonRefAltTag)) _isGatkGenomeVcf = true;
+                //if (line.StartsWith(VcfCommon.GatkNonRefAltTag)) _isGatkGenomeVcf = true;
 
                 if (line.StartsWith("##contig=<ID") && line.Contains("M") && line.Contains("length=16569>")) IsRcrsMitochondrion = true;
 

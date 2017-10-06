@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
@@ -7,7 +6,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.CustomInterval
 {
-	public sealed class CustomIntervalParser : IEnumerable<DataStructures.CustomInterval>
+	public sealed class CustomIntervalParser
 	{
 		#region member
 		private readonly FileInfo _customFileInfo;
@@ -62,7 +61,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			}
 		}
 
-		private IEnumerable<DataStructures.CustomInterval> GetCustomIntervals()
+		public IEnumerable<DataStructures.CustomInterval> GetCustomIntervals()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_customFileInfo.FullName))
 			{
@@ -229,14 +228,6 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			}
 
 		}
-		public IEnumerator<DataStructures.CustomInterval> GetEnumerator()
-		{
-			return GetCustomIntervals().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+		
 	}
 }

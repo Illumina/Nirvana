@@ -34,7 +34,7 @@ namespace SAUtils.CreateOmimTsv
             var geneMap2Reader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_geneMap2File.FullName), _geneSymbolUpdater);
             var mimToGeneReader = _mim2Genefile != null? new OmimReader(GZipUtilities.GetAppropriateReadStream(_mim2Genefile.FullName), _geneSymbolUpdater):null;
 
-            foreach(var entry in geneMap2Reader)
+            foreach(var entry in geneMap2Reader.GetOmimItems())
             {
                 if (!_gene2Mims.ContainsKey(entry.Hgnc))
                     _gene2Mims[entry.Hgnc] = new List<OmimEntry>();
@@ -44,7 +44,7 @@ namespace SAUtils.CreateOmimTsv
 
             if (mimToGeneReader != null)
             {
-                foreach (var entry in mimToGeneReader)
+                foreach (var entry in mimToGeneReader.GetOmimItems())
                 {
                     if (!_gene2Mims.ContainsKey(entry.Hgnc))
                     {
