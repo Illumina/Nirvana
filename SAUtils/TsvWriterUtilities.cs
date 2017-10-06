@@ -39,17 +39,15 @@ namespace SAUtils
             Console.ResetColor();
 
         }
-        public static void WriteSortedItems(IEnumerator<SupplementaryDataItem> saItems, ISaItemTsvWriter writer)
+        public static void WriteSortedItems(IEnumerable<SupplementaryDataItem> saItems, ISaItemTsvWriter writer)
         {
             var itemsMinHeap = new MinHeap<SupplementaryDataItem>();
             var currentRefIndex = Int32.MaxValue;
 
             var benchmark = new Benchmark();
-            while (saItems.MoveNext())
+
+            foreach (var saItem in saItems)        
             {
-                var saItem = saItems.Current;
-                //if (!SupplementaryAnnotationUtilities.IsRefAlleleValid(_compressedSequence, saItem.Start, saItem.ReferenceAllele))
-                //	continue;
                 if (currentRefIndex != saItem.Chromosome.Index)
                 {
                     if (currentRefIndex != Int32.MaxValue)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ExAc
 {
-	public sealed class ExacReader : IEnumerable<ExacItem>
+	public sealed class ExacReader 
 	{
 	    private readonly FileInfo _exacFileInfo;
         private readonly IDictionary<string,IChromosome> _refChromDict;
@@ -44,16 +43,6 @@ namespace SAUtils.InputFileParsers.ExAc
 
         
 
-		public IEnumerator<ExacItem> GetEnumerator()
-		{
-			return GetExacItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		private void Clear()
 		{
 			_acAdj = null;
@@ -77,12 +66,7 @@ namespace SAUtils.InputFileParsers.ExAc
 			_totalDepth = 0;
 		}
 
-		/// <summary>
-		/// Parses a source file and return an enumeration object containing 
-		/// all the data objects that have been extracted.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<ExacItem> GetExacItems()
+		public IEnumerable<ExacItem> GetExacItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_exacFileInfo.FullName))
 			{

@@ -28,7 +28,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
             var customReader = new CustomAnnotationReader(customFile, _refChromDict);
 
             // all items from this file should be of type cosmic.
-            foreach (var customItem in customReader)
+            foreach (var customItem in customReader.GetCustomItems())
             {
                 Assert.Equal("cosmic", customItem.AnnotationType);
             }
@@ -43,7 +43,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
 
             // all items from this file should be of type cosmic.
             var i = 0;
-            foreach (var customItem in customReader)
+            foreach (var customItem in customReader.GetCustomItems())
             {
                 switch (i)
                 {

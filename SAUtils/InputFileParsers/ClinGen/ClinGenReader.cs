@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
 using SAUtils.DataStructures;
@@ -8,7 +7,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinGen
 {
-    public sealed class ClinGenReader : IEnumerable<ClinGenItem>
+    public sealed class ClinGenReader 
     {
         #region members
 
@@ -17,20 +16,7 @@ namespace SAUtils.InputFileParsers.ClinGen
 
         #endregion
 
-        #region IEnumerable implementation
-
-        public IEnumerator<ClinGenItem> GetEnumerator()
-        {
-            return GetClinGenItems().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
-
+        
         // constructor
         public ClinGenReader(FileInfo clinGenFileInfo, IDictionary<string, IChromosome> refNameDict)
         {
@@ -38,7 +24,7 @@ namespace SAUtils.InputFileParsers.ClinGen
             _refNameDict = refNameDict;
         }
 
-        private IEnumerable<ClinGenItem> GetClinGenItems()
+        public IEnumerable<ClinGenItem> GetClinGenItems()
         {
             using (var reader = GZipUtilities.GetAppropriateStreamReader(_clinGenFileInfo.FullName))
             {

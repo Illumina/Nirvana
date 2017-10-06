@@ -56,25 +56,25 @@ namespace SAUtils.CreateIntermediateTsvs
         #endregion
         public CreateIntermediateTsvs(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames )
         {
-            _outputDirectory = outputDirectory;
-            _dbSnpFileName = dbSnpFileName;
-            _cosmicVcfFileName = cosmicVcfFileName;
-            _cosmicTsvFileName = cosmicTsvFileName;
-            _clinVarFileName = clinVarFileName;
-            _onekGFileName = onekGFileName;
-            _evsFile = evsFile;
-            _exacFile = exacFile;
-            _customAnnotationFiles = customAnnotationFiles;
-            _dgvFile = dgvFile;
-            _onekGSvFileName = onekGSvFileName;
-            _clinGenFileName = clinGenFileName;
-            _mitoMapVarFileNames = mitoMapVarFileNames;
-            _mitoMapSvFileNames = mitoMapSvFileNames;
-            _customIntervalFiles = customIntervalFiles;
+            _outputDirectory         = outputDirectory;
+            _dbSnpFileName           = dbSnpFileName;
+            _cosmicVcfFileName       = cosmicVcfFileName;
+            _cosmicTsvFileName       = cosmicTsvFileName;
+            _clinVarFileName         = clinVarFileName;
+            _onekGFileName           = onekGFileName;
+            _evsFile                 = evsFile;
+            _exacFile                = exacFile;
+            _customAnnotationFiles   = customAnnotationFiles;
+            _dgvFile                 = dgvFile;
+            _onekGSvFileName         = onekGSvFileName;
+            _clinGenFileName         = clinGenFileName;
+            _mitoMapVarFileNames     = mitoMapVarFileNames;
+            _mitoMapSvFileNames      = mitoMapSvFileNames;
+            _customIntervalFiles     = customIntervalFiles;
             _compressedReferencePath = compressedReferencePath;
-            var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
-            _refNamesDictionary = sequenceProvider.GetChromosomeDictionary();
-            _genomeAssembly = sequenceProvider.GenomeAssembly;
+            var sequenceProvider     = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
+            _refNamesDictionary      = sequenceProvider.GetChromosomeDictionary();
+            _genomeAssembly          = sequenceProvider.GenomeAssembly;
 
         }
 
@@ -186,7 +186,8 @@ namespace SAUtils.CreateIntermediateTsvs
                     using (var writer = new IntervalTsvWriter(_outputDirectory, version,
 						_genomeAssembly.ToString(), SaTsvCommon.DgvSchemaVersion, InterimSaCommon.DgvTag, ReportFor.StructuralVariants))
                     {
-                        CreateSvTsv(new DgvReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
+                        var reader = new DgvReader(new FileInfo(fileName), _refNamesDictionary);
+                        CreateSvTsv(reader.GetDgvItems(), writer);
                     }
                     break;
                 case InterimSaCommon.ClinGenTag:
@@ -195,7 +196,8 @@ namespace SAUtils.CreateIntermediateTsvs
 						_genomeAssembly.ToString(), SaTsvCommon.ClinGenSchemaVersion, InterimSaCommon.ClinGenTag,
                         ReportFor.StructuralVariants))
                     {
-                        CreateSvTsv(new ClinGenReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
+                        var reader = new ClinGenReader(new FileInfo(fileName), _refNamesDictionary);
+                        CreateSvTsv(reader.GetClinGenItems(), writer);
                     }
 
                     break;
@@ -205,7 +207,8 @@ namespace SAUtils.CreateIntermediateTsvs
 						_genomeAssembly.ToString(), SaTsvCommon.OneKgenSchemaVersion, InterimSaCommon.OnekSvTag,
                         ReportFor.StructuralVariants))
                     {
-                        CreateSvTsv(new OneKGenSvReader(new FileInfo(fileName), _refNamesDictionary).GetEnumerator(), writer);
+                        var reader = new OneKGenSvReader(new FileInfo(fileName), _refNamesDictionary);
+                        CreateSvTsv(reader.GetOneKGenSvItems(), writer);
                     }
 
                     break;
@@ -219,12 +222,12 @@ namespace SAUtils.CreateIntermediateTsvs
             TsvWriterUtilities.WriteCompleteInfo(dataSource,version.Version,timeSpan);
         }
 
-        private void CreateSvTsv(IEnumerator<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
+        private void CreateSvTsv(IEnumerable<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
         {
-            while (siItems.MoveNext())
+            foreach (var siItem in siItems)       
             {
-                var siItem = siItems.Current.GetSupplementaryInterval();
-                writer.AddEntry(siItem.Chromosome.EnsemblName, siItem.Start, siItem.End, siItem.GetJsonString());
+                var interval = siItem.GetSupplementaryInterval();
+                writer.AddEntry(interval.Chromosome.EnsemblName, interval.Start, interval.End, interval.GetJsonString());
             }
         }
 
@@ -240,7 +243,7 @@ namespace SAUtils.CreateIntermediateTsvs
 				_genomeAssembly.ToString(), SaTsvCommon.CustIntervalSchemaVersion, reader.KeyName,
                 ReportFor.AllVariants))
             {
-                foreach (var custInterval in reader)
+                foreach (var custInterval in reader.GetCustomIntervals())
                 {
                     writer.AddEntry(custInterval.Chromosome.EnsemblName, custInterval.Start, custInterval.End, custInterval.GetJsonString());
                 }
@@ -260,7 +263,7 @@ namespace SAUtils.CreateIntermediateTsvs
             var customReader = new CustomAnnotationReader(new FileInfo(fileName), _refNamesDictionary);
             using (var writer = new CustomAnnoTsvWriter(version, _outputDirectory, _genomeAssembly, customReader.IsPositional, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
-				TsvWriterUtilities.WriteSortedItems(customReader.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(customReader.GetCustomItems(), writer);
             }
 
             Console.WriteLine($"Finished {fileName}");
@@ -278,9 +281,9 @@ namespace SAUtils.CreateIntermediateTsvs
 			{
 			    var tsvReader = GZipUtilities.GetAppropriateStreamReader(tsvFile);
                 var vcfReader = GZipUtilities.GetAppropriateStreamReader(vcfFile);
-                var cosmicReader = new MergedCosmicReader(vcfReader,tsvReader,_refNamesDictionary);
+                var reader = new MergedCosmicReader(vcfReader,tsvReader,_refNamesDictionary);
 
-			    TsvWriterUtilities.WriteSortedItems(cosmicReader.GetEnumerator(), writer);
+			    TsvWriterUtilities.WriteSortedItems(reader.GetCosmicItems(), writer);
 
             }
 
@@ -296,7 +299,7 @@ namespace SAUtils.CreateIntermediateTsvs
 			using (var writer = new EvsTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
 			{
 				var evsReader = new EvsReader(GZipUtilities.GetAppropriateStreamReader(fileName), _refNamesDictionary);
-				TsvWriterUtilities.WriteSortedItems(evsReader.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(evsReader.GetEvsItems(), writer);
 			}
 		    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
 		    TsvWriterUtilities.WriteCompleteInfo("EVS", version.Version, timeSpan);
@@ -311,7 +314,7 @@ namespace SAUtils.CreateIntermediateTsvs
             using (var writer = new ExacTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var exacReader = new ExacReader(new FileInfo(fileName), _refNamesDictionary);
-				TsvWriterUtilities.WriteSortedItems(exacReader.GetEnumerator(), writer);
+				TsvWriterUtilities.WriteSortedItems(exacReader.GetExacItems(), writer);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -328,7 +331,7 @@ namespace SAUtils.CreateIntermediateTsvs
             using (var writer = new ClinvarTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var clinvarReader = new ClinVarXmlReader(new FileInfo(fileName), new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath)));
-                TsvWriterUtilities.WriteSortedItems(clinvarReader.GetEnumerator(), writer);
+                TsvWriterUtilities.WriteSortedItems(clinvarReader.GetItems(), writer);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -351,7 +354,7 @@ namespace SAUtils.CreateIntermediateTsvs
             using (var tsvWriter = new DbsnpGaTsvWriter(dbsnpWriter,globalAlleleWriter))
             {
                 var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(fileName), _refNamesDictionary);
-				TsvWriterUtilities.WriteSortedItems(dbSnpReader.GetEnumerator(), tsvWriter);
+				TsvWriterUtilities.WriteSortedItems(dbSnpReader.GetDbSnpItems(), tsvWriter);
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -369,7 +372,7 @@ namespace SAUtils.CreateIntermediateTsvs
             using (var tsvWriter = new OnekgTsvWriter(version, _outputDirectory, _genomeAssembly, new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath))))
             {
                 var onekgReader = new OneKGenReader(new FileInfo(fileName), _refNamesDictionary);
-				TsvWriterUtilities.WriteSortedItems(onekgReader.GetEnumerator(), tsvWriter);
+				TsvWriterUtilities.WriteSortedItems(onekgReader.GetOneKGenItems(), tsvWriter);
             }
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
 		    TsvWriterUtilities.WriteCompleteInfo("OneKg", version.Version, timeSpan);

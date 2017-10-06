@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -34,7 +33,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 	}
 
-	public sealed class ClinVarXmlReader : IEnumerable<ClinVarItem>
+	public sealed class ClinVarXmlReader 
     {
         #region members
 
@@ -90,21 +89,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		}
 
-		#region IEnumerable implementation
-
-		public IEnumerator<ClinVarItem> GetEnumerator()
-        {
-            return GetItems().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        #endregion
-
-        // constructor
+		// constructor
         public ClinVarXmlReader(FileInfo clinVarXmlFileInfo, ISequenceProvider sequenceProvider)
         {
             _sequenceProvider = sequenceProvider;
@@ -119,7 +104,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         /// Parses a ClinVar file and return an enumeration object containing all the ClinVar objects
         /// that have been extracted
         /// </summary>
-        private IEnumerable<ClinVarItem> GetItems()
+        public IEnumerable<ClinVarItem> GetItems()
 		{
 		    var clinVarItems = new List<ClinVarItem>();
 
