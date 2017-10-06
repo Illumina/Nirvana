@@ -136,8 +136,8 @@ namespace SAUtils.InputFileParsers
                     _totalDepth,
 					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
 					GetAlleleCount(_acAll, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
-					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i)),
-                    _hasFailedFilters
+					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i),
+                    _hasFailedFilters)
 					);
 			}
 			return gnomadItemsList;
