@@ -15,18 +15,18 @@ namespace Vcf
         #region members
 
         private readonly StreamReader _reader;
-	    private readonly VariantFactory _variantFactory;
+        private readonly VariantFactory _variantFactory;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 
         public bool IsRcrsMitochondrion { get; private set; }
 
-	    private string[] _sampleNames;
+        private string[] _sampleNames;
 
         private List<string> _headerLines;
 
 	    //private const string CopyNumberTag = "CN";
 
-		private readonly HashSet<string> _nirvanaInfoTags = new HashSet<string>
+        private readonly HashSet<string> _nirvanaInfoTags = new HashSet<string>
         {
             "##INFO=<ID=CSQT",
             "##INFO=<ID=CSQR",
@@ -54,10 +54,10 @@ namespace Vcf
         public string[] GetSampleNames() => _sampleNames;
 
         public VcfReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider,bool enableVerboseTranscript)
+            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript)
         {
-            _reader              = new StreamReader(stream);
-			_variantFactory      = new VariantFactory(refNameToChromosome, refMinorProvider,enableVerboseTranscript);
+            _reader = new StreamReader(stream);
+            _variantFactory = new VariantFactory(refNameToChromosome, refMinorProvider, enableVerboseTranscript);
             _refNameToChromosome = refNameToChromosome;
 
             ParseHeader();
@@ -114,12 +114,12 @@ namespace Vcf
         public IPosition GetNextPosition()
         {
             VcfLine = _reader.ReadLine();
-            return String.IsNullOrEmpty(VcfLine) ? null :VcfReaderUtils.ParseVcfLine(VcfLine,_variantFactory, _refNameToChromosome);
+            return String.IsNullOrEmpty(VcfLine) ? null : VcfReaderUtils.ParseVcfLine(VcfLine, _variantFactory, _refNameToChromosome);
         }
 
         public string VcfLine { get; private set; }
 
-       
+
 
         public void Dispose() => _reader?.Dispose();
     }
