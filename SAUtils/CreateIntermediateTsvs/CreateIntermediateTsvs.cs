@@ -54,7 +54,7 @@ namespace SAUtils.CreateIntermediateTsvs
         private readonly string _compressedReferencePath;
 
         #endregion
-        public CreateIntermediateTsvs(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> customAnnotationFiles, List<string> customIntervalFiles, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames )
+        public CreateIntermediateTsvs(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames, List<string> customAnnotationFiles, List<string> customIntervalFiles)
         {
             _outputDirectory         = outputDirectory;
             _dbSnpFileName           = dbSnpFileName;
