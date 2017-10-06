@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CommandLine.Utilities;
 using Compression.Utilities;
 using SAUtils.DataStructures;
@@ -81,7 +82,7 @@ namespace SAUtils.CreateIntermediateTsvs
         {
             //CreateDbsnpGaTsv(_dbSnpFileName);
             //CreateOnekgTsv(_onekGFileName);
-            CreateClinvarTsv(_clinVarFileName);
+            //CreateClinvarTsv(_clinVarFileName);
             //CreateExacTsv(_exacFile);
             //CreateEvsTsv(_evsFile);
             //CreateCosmicTsv(_cosmicVcfFileName, _cosmicTsvFileName);
@@ -90,37 +91,37 @@ namespace SAUtils.CreateIntermediateTsvs
             //CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName);
             //ThreadPool.SetMaxThreads(Environment.ProcessorCount, Environment.ProcessorCount);
 
-            //var tasks = new List<Task>
-            //{
-            //    Task.Factory.StartNew(() => CreateDbsnpGaTsv(_dbSnpFileName)),
-            //    Task.Factory.StartNew(() => CreateOnekgTsv(_onekGFileName)),
-            //    Task.Factory.StartNew(() => CreateClinvarTsv(_clinVarFileName)),
-            //    Task.Factory.StartNew(() => CreateExacTsv(_exacFile)),
-            //    Task.Factory.StartNew(() => CreateEvsTsv(_evsFile)),
-            //    Task.Factory.StartNew(() => CreateCosmicTsv(_cosmicVcfFileName, _cosmicTsvFileName)),
-            //    Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.DgvTag, _dgvFile)),
-            //    Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.ClinGenTag, _clinGenFileName)),
-            //    Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName)),
-            //    Task.Factory.StartNew(() => CreateMitoMapVarTsv(_mitoMapVarFileNames)),
-            //    Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
-            //};
+            var tasks = new List<Task>
+            {
+                Task.Factory.StartNew(() => CreateDbsnpGaTsv(_dbSnpFileName)),
+                Task.Factory.StartNew(() => CreateOnekgTsv(_onekGFileName)),
+                Task.Factory.StartNew(() => CreateClinvarTsv(_clinVarFileName)),
+                Task.Factory.StartNew(() => CreateExacTsv(_exacFile)),
+                Task.Factory.StartNew(() => CreateEvsTsv(_evsFile)),
+                Task.Factory.StartNew(() => CreateCosmicTsv(_cosmicVcfFileName, _cosmicTsvFileName)),
+                Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.DgvTag, _dgvFile)),
+                Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.ClinGenTag, _clinGenFileName)),
+                Task.Factory.StartNew(() => CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName)),
+                Task.Factory.StartNew(() => CreateMitoMapVarTsv(_mitoMapVarFileNames)),
+                Task.Factory.StartNew(() => CreateMitoMapSvTsv(_mitoMapSvFileNames))
+            };
 
-            //tasks.AddRange(_customAnnotationFiles.Select(customAnnotationFile => Task.Factory.StartNew(() => CreateCutomAnnoTsv(customAnnotationFile))));
-            //tasks.AddRange(_customIntervalFiles.Select(customIntervalFile => Task.Factory.StartNew(() => CreateCustIntervalTsv(customIntervalFile))));
+            tasks.AddRange(_customAnnotationFiles.Select(customAnnotationFile => Task.Factory.StartNew(() => CreateCutomAnnoTsv(customAnnotationFile))));
+            tasks.AddRange(_customIntervalFiles.Select(customIntervalFile => Task.Factory.StartNew(() => CreateCustIntervalTsv(customIntervalFile))));
 
-            //try
-            //{
-            //    Task.WaitAll(tasks.ToArray());
-            //}
-            //catch (AggregateException ae)
-            //{
-            //    ae.Handle((x) =>
-            //    {
-            //        Console.WriteLine(x);
-            //        return true;
-            //    });
-            //    throw;
-            //}
+            try
+            {
+                Task.WaitAll(tasks.ToArray());
+            }
+            catch (AggregateException ae)
+            {
+                ae.Handle((x) =>
+                {
+                    Console.WriteLine(x);
+                    return true;
+                });
+                throw;
+            }
         }
 
         private void CreateMitoMapSvTsv(List<string> mitoMapSvFileNames)
