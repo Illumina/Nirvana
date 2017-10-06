@@ -3,7 +3,7 @@
     "SAUtils": {
       "commandName": "Project",
       "commandLineArgs": "createTSV --cvr c:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz --out c:\\Development\\IntermediateTsvs\\GRCh37 --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
-      "workingDirectory": "E:\\Data\\Nirvana\\bugfixes"
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\rCRS"
     },
     "OMIM_SK": {
       "commandName": "Project",
