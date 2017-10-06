@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers
 {
-	public sealed class GnomadReader : IEnumerable<GnomadItem>
+	public sealed class GnomadReader 
 	{
 	    private readonly StreamReader _reader;
         private readonly IDictionary<string,IChromosome> _refChromDict;
@@ -43,16 +42,6 @@ namespace SAUtils.InputFileParsers
 
         
 
-		public IEnumerator<GnomadItem> GetEnumerator()
-		{
-			return GetGnomadItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		private void Clear()
 		{
 			_acAll = null;
@@ -80,7 +69,7 @@ namespace SAUtils.InputFileParsers
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<GnomadItem> GetGnomadItems()
+		public IEnumerable<GnomadItem> GetGnomadItems()
 		{
 			using (_reader)
 			{

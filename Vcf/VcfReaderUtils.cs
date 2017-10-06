@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -11,6 +12,8 @@ namespace Vcf
 {
     public static class VcfReaderUtils
     {
+        private static readonly HashSet<string> NonInformativeAltAllele = new HashSet<string> { "<*>", "*", "<M>" };
+
         internal static IPosition ParseVcfLine(string vcfLine, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
         {
             var vcfFields = vcfLine.Split('\t');
@@ -21,8 +24,11 @@ namespace Vcf
             int start = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]);
             string refAllele = vcfFields[VcfCommon.RefIndex];
             int end = ExtractEnd(infoData, start, refAllele.Length);
-            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',');
-            double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',').Where(x => !NonInformativeAltAllele.Contains(x)).ToArray();
+            if (altAlleles.Length == 0) return null;
+            // only filter out "<NON_REF>" allele when there are more than one alternative alleles
+            if (altAlleles.Length > 1) altAlleles = altAlleles.Where(x => x != VcfCommon.GatkNonRefAllele).ToArray();
+            double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(Double.TryParse);
             string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
             var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,10 +8,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.DbSnp
 {
-    /// <summary>
-    /// Parser for dbSNP Wiggle file
-    /// </summary>
-    public sealed class DbSnpReader : IEnumerable<DbSnpItem>
+    public sealed class DbSnpReader 
     {
         // Key in VCF info field of the allele frequencies subfield.
 	    private readonly Stream _stream;
@@ -27,12 +23,7 @@ namespace SAUtils.InputFileParsers.DbSnp
         }
 
 	    
-	    /// <summary>
-        /// Parses a dbSNP file and return an enumeration object containing 
-        /// all the dbSNP objects that have been extracted.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<DbSnpItem> GetDbSnpItems()
+	    public IEnumerable<DbSnpItem> GetDbSnpItems()
         {
             using (var reader = new StreamReader(_stream))
             {
@@ -119,15 +110,6 @@ namespace SAUtils.InputFileParsers.DbSnp
 	    {
 		    return alleleFrequency == "." || alleleFrequency == "0" ? double.MinValue : Convert.ToDouble(alleleFrequency);
 	    }
-
-	    public IEnumerator<DbSnpItem> GetEnumerator()
-        {
-            return GetDbSnpItems().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        
     }
 }

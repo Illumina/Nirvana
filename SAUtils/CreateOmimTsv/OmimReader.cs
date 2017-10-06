@@ -8,7 +8,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.CreateOmimTsv
 {
-	public sealed class OmimReader : IEnumerable<OmimEntry>
+	public sealed class OmimReader 
 	{
 		#region members
 
@@ -27,17 +27,8 @@ namespace SAUtils.CreateOmimTsv
             _omimFileStream = omimFileStream;
             _geneSymbolUpdater = geneSymbolUpdater;
 	    }
-		public IEnumerator<OmimEntry> GetEnumerator()
-		{
-			return GetOmimItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-		private IEnumerable<OmimEntry> GetOmimItems()
+		
+		public IEnumerable<OmimEntry> GetOmimItems()
 		{
 			using (var reader = new StreamReader(_omimFileStream))
 			{

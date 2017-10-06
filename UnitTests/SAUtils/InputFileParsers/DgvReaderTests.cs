@@ -43,7 +43,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
         public void TestDbSnpReader()
         {
             var dgvReader = new DgvReader(TestDgvFile, _refChromDict);
-            Assert.True(dgvReader.SequenceEqual(CreateTruthDgvItemSequence()));
+            Assert.True(dgvReader.GetDgvItems().SequenceEqual(CreateTruthDgvItemSequence()));
         }
     }
 }

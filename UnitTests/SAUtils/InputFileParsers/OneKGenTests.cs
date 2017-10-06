@@ -10,7 +10,7 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
 using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class OneKGenTests
     {
@@ -18,16 +18,16 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
 
         private const string VcfLine2 = "1	15274	rs62636497	A	G,T	100	PASS	AC=1739,3210;AF=0.347244,0.640974;AN=5008;NS=2504;DP=23255;EAS_AF=0.4812,0.5188;AMR_AF=0.2752,0.7205;AFR_AF=0.323,0.6369;EUR_AF=0.2922,0.7078;SAS_AF=0.3497,0.6472;AA=g|||;VT=SNP;MULTI_ALLELIC;EAS_AN=1008;EAS_AC=485,523;EUR_AN=1006;EUR_AC=294,712;AFR_AN=1322;AFR_AC=427,842;AMR_AN=694;AMR_AC=191,500;SAS_AN=978;SAS_AC=342,633";
 
-        private const string VcfLine3 = "1	10616	rs376342519	CCGCCGTTGCAAAGGCGCGCCG	C	100	PASS	AC=4973;AF=0.993011;AN=5008;NS=2504;DP=2365;EAS_AF=0.9911; AMR_AF=0.9957;AFR_AF=0.9894;EUR_AF=0.994;SAS_AF=0.9969;VT=INDEL;EAS_AN=1008;EAS_AC=999;EUR_AN=1006;EUR_AC=1000;AFR_AN=1322;AFR_AC = 1308; AMR_AN=694;AMR_AC=691;SAS_AN=978;SAS_AC=975";
+        //private const string VcfLine3 = "1	10616	rs376342519	CCGCCGTTGCAAAGGCGCGCCG	C	100	PASS	AC=4973;AF=0.993011;AN=5008;NS=2504;DP=2365;EAS_AF=0.9911; AMR_AF=0.9957;AFR_AF=0.9894;EUR_AF=0.994;SAS_AF=0.9969;VT=INDEL;EAS_AN=1008;EAS_AC=999;EUR_AN=1006;EUR_AC=1000;AFR_AN=1322;AFR_AC = 1308; AMR_AN=694;AMR_AC=691;SAS_AN=978;SAS_AC=975";
 
-        // have been modified to make the first alt allele very freq
-        private const string VcfLine4 = "1	806324	.	G	GATA,T	100	PASS	AC=4912,2;AF=0.9808,0.000399361;AN=5008";
+        //// have been modified to make the first alt allele very freq
+        //private const string VcfLine4 = "1	806324	.	G	GATA,T	100	PASS	AC=4912,2;AF=0.9808,0.000399361;AN=5008";
 
-        // frequency have been modified
-        private const string VcfLine5 = "1	985465	rs200384052;rs566813074	G	A,GT	100	PASS	AC=200,11;AF=0.0399361,0.00219649;AN=5008;NS=2504;DP=7139;EAS_AF=0,0;AMR_AF=0,0;AFR_AF=0,0;EUR_AF=0.002,0.002;SAS_AF=0,0.0092;VT=SNP,INDEL;MULTI_ALLELIC;EX_TARGET;EAS_AN=1008;EAS_AC=0,0;EUR_AN=1006;EUR_AC=2,2;AFR_AN=1322;AFR_AC=0,0;AMR_AN=694;AMR_AC=0,0;SAS_AN=978;SAS_AC=0,9";
+        //// frequency have been modified
+        //private const string VcfLine5 = "1	985465	rs200384052;rs566813074	G	A,GT	100	PASS	AC=200,11;AF=0.0399361,0.00219649;AN=5008;NS=2504;DP=7139;EAS_AF=0,0;AMR_AF=0,0;AFR_AF=0,0;EUR_AF=0.002,0.002;SAS_AF=0,0.0092;VT=SNP,INDEL;MULTI_ALLELIC;EX_TARGET;EAS_AN=1008;EAS_AC=0,0;EUR_AN=1006;EUR_AC=2,2;AFR_AN=1322;AFR_AC=0,0;AMR_AN=694;AMR_AC=0,0;SAS_AN=978;SAS_AC=0,9";
 
-        // VcfLine6 is an artificial entry for testing only
-        private const string VcfLine6 = "1	985465	.	G	C	100	PASS	AC=4688;AF=0.9361;AN=5008;NS=2504;DP=7139;EAS_AF=0;AMR_AF=0;AFR_AF=0;EUR_AF=0.002;SAS_AF=0";
+        //// VcfLine6 is an artificial entry for testing only
+        //private const string VcfLine6 = "1	985465	.	G	C	100	PASS	AC=4688;AF=0.9361;AN=5008;NS=2504;DP=7139;EAS_AF=0;AMR_AF=0;AFR_AF=0;EUR_AF=0.002;SAS_AF=0";
 
         private readonly OneKGenReader _oneKGenReader;
         private readonly IDictionary<string, IChromosome> _refChromDict;
@@ -483,7 +483,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
 
             var svReader = new OneKGenSvReader(inputFileInfo,_refChromDict);
 
-            var svItemList = svReader.ToList();
+            var svItemList = svReader.GetOneKGenSvItems().ToList();
 
             var si = svItemList[0].GetSupplementaryInterval();
 
