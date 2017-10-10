@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Compression.Utilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO.VcfWriter
@@ -21,7 +19,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 "##INFO=<ID=CSQR,Number=.,Type=String,Description=\"Predicted regulatory consequence type. Format: GenotypeIndex|RegulatoryID|Consequence\">"
             ;
 
-        private readonly List<string> InfoHeaderLines = new List<string>
+        private readonly List<string> _infoHeaderLines = new List<string>
         {
             "##INFO=<ID=AF1000G,Number=A,Type=Float,Description=\"The allele frequency from all populations of 1000 genomes data\">",
             "##INFO=<ID=AA,Number=A,Type=String,Description=\"The inferred allele ancestral (if determined) to the chimpanzee/human lineage.\">",
@@ -50,12 +48,11 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var dataSourceVersions = new IDataSourceVersion[]
             {
                 new DataSourceVersion("VEP", "84", DateTime.Parse("2017/7/21").Ticks, "RefSeq"),
-                new DataSourceVersion("1000 Genomes Project", "v5", DateTime.Parse("2017/7/21").Ticks, null),
-                new DataSourceVersion("dbSNP", "72", DateTime.Parse("2017/8/15").Ticks, null),
-                new DataSourceVersion("dummy", "2", DateTime.Parse("2017/9/15").Ticks, null)
+                new DataSourceVersion("1000 Genomes Project", "v5", DateTime.Parse("2017/7/21").Ticks),
+                new DataSourceVersion("dbSNP", "72", DateTime.Parse("2017/8/15").Ticks),
+                new DataSourceVersion("dummy", "2", DateTime.Parse("2017/9/15").Ticks)
             };
-            var vcfLine =
-                "1       10167   .       C       A       4       LowGQXHetSNP    SNVSB=0.0;SNVHPOL=3;CSQT=1|DDX11L1|ENST00000456328.2|upstream_gene_variant,1|WASH7P|ENST00000438504.2|downstream_gene_variant,1|DDX11L1|NR_046018.2|upstream_gene_variant,1|WASH7P|NR_024540.1|downstream_gene_variant;CSQR=1|ENSR00001576074|regulatory_region_variant,1|ENSR00001576074|regulatory_region_variant     GT:GQ:GQX:DP:DPF:AD     0/1:34:8:3:0:2,1";
+            const string vcfLine = "1       10167   .       C       A       4       LowGQXHetSNP    SNVSB=0.0;SNVHPOL=3;CSQT=1|DDX11L1|ENST00000456328.2|upstream_gene_variant,1|WASH7P|ENST00000438504.2|downstream_gene_variant,1|DDX11L1|NR_046018.2|upstream_gene_variant,1|WASH7P|NR_024540.1|downstream_gene_variant;CSQR=1|ENSR00001576074|regulatory_region_variant,1|ENSR00001576074|regulatory_region_variant     GT:GQ:GQX:DP:DPF:AD     0/1:34:8:3:0:2,1";
             using (var vcfWriter = new LiteVcfWriter(writer,currentHeaderLines, "Illumina Annotation Engine 2.0.1", "84.21.41",dataSourceVersions))
             {
                 vcfWriter.Write(vcfLine);
@@ -74,7 +71,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 
                
             };
-            expectedLines.AddRange(InfoHeaderLines);
+            expectedLines.AddRange(_infoHeaderLines);
             expectedLines.Add(CsqtHeaderLine);
             expectedLines.Add(CsqrHeaderLine);
             expectedLines.Add("#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  Mother");

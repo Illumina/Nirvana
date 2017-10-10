@@ -25,7 +25,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 false, false, "", null, null);
             var position = new Position(chrom,101,101,"A",new []{"T"},100,null,null,null, inforData, vcfFields);
             var variant = new Variant(chrom,101,101,"A","T",VariantType.SNV,null,false,false,null,null,new AnnotationBehavior(true,false,false,true,false,false));
-            var annotatedVariant = new AnnotatedVariant(variant){};
+            var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = {annotatedVariant};
             var annotatedPosition = new AnnotatedPosition(position,annotatedVariants);
 
@@ -44,7 +44,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields);
             var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
-            var annotatedVariant = new AnnotatedVariant(variant) { };
+            var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 
@@ -63,7 +63,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields);
             var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
-            var annotatedVariant = new AnnotatedVariant(variant) { };
+            var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 
