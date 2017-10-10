@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VariantAnnotation.IO.VcfWriter
 {
-    public class VcfField
+    public sealed class VcfField
     {
         #region members
 
