@@ -76,45 +76,46 @@ namespace UnitTests.SAUtils.TsvWriters
             var dbsnpWriter = new SaTsvWriter(randomDbsnpPath, dataVersion, "GRCh37",10,"dbsnp","dbsnp",true,sequenceProvider.Object);
             var globalAlleleWriter = new SaTsvWriter(randomDbsnpPath, dataVersion, "GRCh37", 10, "globalAllele", "GMAF", true, sequenceProvider.Object);
 
-            var dbsnpGaTsvWriter = new DbsnpGaTsvWriter(dbsnpWriter,globalAlleleWriter);
-            
+            using (var dbsnpGaTsvWriter = new DbsnpGaTsvWriter(dbsnpWriter, globalAlleleWriter))
+            {
+                var dbSnpItemsPos100 = new List<SupplementaryDataItem>
+                {
+                    new DbSnpItem(chromosome,100,123456,"A",0.2,"G",0.4),
+                    new DbSnpItem(chromosome,100,123458,"A",0.2,"T",0.4),
+                };
+                var dbSnpItemsPos103 = new List<SupplementaryDataItem>
+                {
+                    new DbSnpItem(chromosome,103,134567,"C",0.5,"A",0.5)
+                };
 
-            var dbSnpItemsPos100 = new List<SupplementaryDataItem>
-            {
-                new DbSnpItem(chromosome,100,123456,"A",0.2,"G",0.4),
-                new DbSnpItem(chromosome,100,123458,"A",0.2,"T",0.4),
-            };
-            var dbSnpItemsPos103 = new List<SupplementaryDataItem>
-            {
-                new DbSnpItem(chromosome,103,134567,"C",0.5,"A",0.5)
-            };
+                var dbSnpItemsPos104 = new List<SupplementaryDataItem>
+                {
+                    new DbSnpItem(chromosome,104,134590,"G",double.MinValue,"A",0.75)
+                };
+                var dbSnpItemsPos106 = new List<SupplementaryDataItem>
+                {
+                    new DbSnpItem(chromosome,106,134257,"T",0.3,"G",0.45),
+                    new DbSnpItem(chromosome,106,126753,"T",0.3,"A",0.25)
+                };
 
-            var dbSnpItemsPos104 = new List<SupplementaryDataItem>
-            {
-                new DbSnpItem(chromosome,104,134590,"G",double.MinValue,"A",0.75)
-            };
-            var dbSnpItemsPos106 = new List<SupplementaryDataItem>
-            {
-                new DbSnpItem(chromosome,106,134257,"T",0.3,"G",0.45),
-                new DbSnpItem(chromosome,106,126753,"T",0.3,"A",0.25)
-            };
+                dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos100);
+                dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos103);
+                dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos104);
+                dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos106);
 
-            dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos100);
-            dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos103);
-            dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos104);
-            dbsnpGaTsvWriter.WritePosition(dbSnpItemsPos106);
-            dbsnpGaTsvWriter.Dispose();
+            }
 
             var dbsnpFile = Path.Combine(randomDbsnpPath, "dbsnp_77.tsv.gz");
             var globalAlleleFile = Path.Combine(randomDbsnpPath, "globalAllele_77.tsv.gz");
             var tsvReader = new SaTsvReader(new FileInfo(dbsnpFile));
 
-            var tsvEnumerator = tsvReader.GetAnnotationItems("1").GetEnumerator();
-            Assert.True(tsvEnumerator.MoveNext());
-            Assert.Equal("\"ids\":[\"rs123456\"]", tsvEnumerator.Current.JsonStrings[0]);
-            Assert.True(tsvEnumerator.MoveNext());
-            Assert.Equal("\"ids\":[\"rs123458\"]", tsvEnumerator.Current.JsonStrings[0]);
-            tsvEnumerator.Dispose();
+            using (var tsvEnumerator = tsvReader.GetAnnotationItems("1").GetEnumerator())
+            {
+                Assert.True(tsvEnumerator.MoveNext());
+                Assert.Equal("\"ids\":[\"rs123456\"]", tsvEnumerator.Current.JsonStrings[0]);
+                Assert.True(tsvEnumerator.MoveNext());
+                Assert.Equal("\"ids\":[\"rs123458\"]", tsvEnumerator.Current.JsonStrings[0]);
+            }
 
             var globalAlleleReader = new SaTsvReader(new FileInfo(globalAlleleFile));
             var globalAlleleEnumerator = globalAlleleReader.GetAnnotationItems("1").GetEnumerator();
@@ -128,12 +129,10 @@ namespace UnitTests.SAUtils.TsvWriters
             Assert.True(globalAlleleEnumerator.MoveNext());
             Assert.Equal(104, globalAlleleEnumerator.Current.Position);
             Assert.Equal("", globalAlleleEnumerator.Current.JsonStrings[0]);
-            tsvEnumerator.Dispose();
 
             Assert.True(globalAlleleEnumerator.MoveNext());
             Assert.Equal(106, globalAlleleEnumerator.Current.Position);
             Assert.Equal("\"globalMinorAllele\":\"T\",\"globalMinorAlleleFrequency\":0.3", globalAlleleEnumerator.Current.JsonStrings[0]);
-            tsvEnumerator.Dispose();
 
             globalAlleleEnumerator.Dispose();
             File.Delete(dbsnpFile);

@@ -17,11 +17,11 @@ namespace SAUtils.CreateGnomadTsv
     {
         private ExitCodes ProgramExecution()
         {
-            var inputStreamReaders = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.vcf.gz").Select(fileName => GZipUtilities.GetAppropriateStreamReader(Path.Combine(ConfigurationSettings.InputDirectory, fileName))).ToArray();
+            var inputStreamReaders = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.vcf.bgz").Select(fileName => GZipUtilities.GetAppropriateStreamReader(Path.Combine(ConfigurationSettings.InputDirectory, fileName))).ToArray();
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(ConfigurationSettings.CompressedReference));
 
             if (inputStreamReaders.Length == 0)
-                throw new UserErrorException("input directory does not conatin any .vcf.gz files");
+                throw new UserErrorException("input directory does not conatin any .vcf.bgz files");
 
             var versionFiles = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.version");
             if (versionFiles.Length != 1)

@@ -27,6 +27,7 @@ namespace SAUtils.DataStructures
         private int? AsjAlleleNumber { get; set; }
 
         private int Coverage { get; }
+        private bool HasFailedFilters { get; }
 
         #endregion
 
@@ -38,7 +39,8 @@ namespace SAUtils.DataStructures
             int? allAlleleNumber, int? afrAlleleNumber, int? amrAlleleNumber, int? easAlleleNumber,
             int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? asjAlleleNumber, int? allAlleleCount,
             int? afrAlleleCount, int? amrAlleleCount, int? easAlleleCount, int? finAlleleCount, int? nfeAlleleCount,
-            int? othAlleleCount, int? asjAlleleCount)
+            int? othAlleleCount, int? asjAlleleCount,
+            bool hasFailedFilters)
         {
             Chromosome = chromosome;
             Start = position;
@@ -64,6 +66,8 @@ namespace SAUtils.DataStructures
             NfeAlleleCount = nfeAlleleCount;
             OthAlleleCount = othAlleleCount;
             AsjAlleleCount = asjAlleleCount;
+
+            HasFailedFilters = hasFailedFilters;
 
             RemoveAlleleNumberZero();
         }
@@ -183,6 +187,8 @@ namespace SAUtils.DataStructures
 			if (NfeAlleleCount != null) jsonObject.AddIntValue("nfeAc", NfeAlleleCount.Value);
 			if (AsjAlleleCount != null) jsonObject.AddIntValue("asjAc", AsjAlleleCount.Value);
 			if (OthAlleleCount != null) jsonObject.AddIntValue("othAc", OthAlleleCount.Value);
+
+            if (HasFailedFilters) jsonObject.AddBoolValue("hasFailedFilters", true);
 
 			return sb.ToString();
 		}
