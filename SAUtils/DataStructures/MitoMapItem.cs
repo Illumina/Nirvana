@@ -106,10 +106,10 @@ namespace SAUtils.DataStructures
 
         private void Update(MitoMapItem newMitoMapItem)
         {
-            if (hasConflict(Chromosome, newMitoMapItem.Chromosome) || hasConflict(Start, newMitoMapItem.Start) ||
-                hasConflict(ReferenceAllele, newMitoMapItem.ReferenceAllele) || hasConflict(AlternateAllele, newMitoMapItem.AlternateAllele) || hasConflict(_homoplasmy, newMitoMapItem._homoplasmy) || hasConflict(_heteroplasmy, newMitoMapItem._heteroplasmy) || hasConflict(_diseases, newMitoMapItem._diseases) || hasConflict(_status, newMitoMapItem._status) || hasConflict(_clinicalSignificance, newMitoMapItem._clinicalSignificance) || hasConflict(_scorePercentile, newMitoMapItem._scorePercentile) || hasConflict(_intervalEnd, newMitoMapItem._intervalEnd) || hasConflict(_variantType, newMitoMapItem._variantType))
+            if (HasConflict(Chromosome, newMitoMapItem.Chromosome) || HasConflict(Start, newMitoMapItem.Start) ||
+                HasConflict(ReferenceAllele, newMitoMapItem.ReferenceAllele) || HasConflict(AlternateAllele, newMitoMapItem.AlternateAllele) || HasConflict(_homoplasmy, newMitoMapItem._homoplasmy) || HasConflict(_heteroplasmy, newMitoMapItem._heteroplasmy) || HasConflict(_diseases.ToString(), newMitoMapItem._diseases.ToString()) || HasConflict(_status, newMitoMapItem._status) || HasConflict(_clinicalSignificance, newMitoMapItem._clinicalSignificance) || HasConflict(_scorePercentile, newMitoMapItem._scorePercentile) || HasConflict(_intervalEnd, newMitoMapItem._intervalEnd) || HasConflict(_variantType, newMitoMapItem._variantType))
             {
-                throw new InvalidDataException($"Conflict found when updating MITOMAP record: original record: {GetVariantJsonString()}; new record: {newMitoMapItem.GetVariantJsonString()} ");
+                throw new InvalidDataException($"Conflict found at {Start} when updating MITOMAP record: original record: {GetVariantJsonString()}; new record: {newMitoMapItem.GetVariantJsonString()} ");
             }
             _homoplasmy = _homoplasmy ?? newMitoMapItem._homoplasmy;
             _heteroplasmy = _heteroplasmy ?? newMitoMapItem._heteroplasmy;
@@ -121,7 +121,7 @@ namespace SAUtils.DataStructures
             _variantType = _variantType ?? newMitoMapItem._variantType;
         }
 
-        private bool hasConflict<T>(T originalValue, T newValue)
+        private bool HasConflict<T>(T originalValue, T newValue)
         {
             return !IsNullOrEmpty(originalValue) && !IsNullOrEmpty(newValue) && !originalValue.Equals(newValue);
         }

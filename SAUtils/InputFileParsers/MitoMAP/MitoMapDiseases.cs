@@ -8,14 +8,11 @@ namespace SAUtils.InputFileParsers.MitoMAP
         public static Dictionary<string, string> MitoMapDiseaseAbbreviations = new Dictionary<string, string>
         {
             {"AD", "Alzeimer's Disease"},
-            {"LIMM", "Lethal Infantile Mitochondrial Myopathy"},
             {"ADPD", "Alzeimer's Disease and Parkinsons's Disease"},
             {"MMC", "Maternal Myopathy and Cardiomyopathy"},
-            {"FICP", "Fatal Infantile Cardiomyopathy Plus, a MELAS-associated cardiomyopathy"},
             {"CPEO", "Chronic Progressive External Ophthalmoplegia"},
             {"DM", "Diabetes Mellitus"},
             {"DMDF", "Diabetes Mellitus + Deafness"},
-            {"CIPO", "Chronic Intestinal Pseudoobstruction with myopathy and Ophthalmoplegia"},
             {"DEAF", "Maternally inherited Deafness or aminoglycoside-induced Deafness"},
             {"PEM", "Progressive encephalopathy"},
             {"EXIT", "Exercise Intolerance"},
@@ -67,8 +64,9 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         public static List<string> ParseDiseaseInfo(string diseaseInfo)
         {
-            throw new System.NotImplementedException();
-            diseaseInfo.Split(' ').Select(x => x.TrimEnd(',')).Select(x => MitoMapDiseaseAbbreviations.ContainsKey(x) ? ";" + x + ";" : " " + x + " ");
+            return new List<string>() { diseaseInfo };
+            // throw new System.NotImplementedException();
+            //diseaseInfo.Split(' ').Select(x => x.TrimEnd(',')).Select(x => MitoMapDiseaseAbbreviations.ContainsKey(x) ? ";" + x + ";" : " " + x + " ");
         }
     }
 }

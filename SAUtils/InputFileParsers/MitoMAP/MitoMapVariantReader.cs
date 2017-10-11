@@ -190,9 +190,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (String.IsNullOrEmpty(diseaseString)) return diseaseString;
             var regexPattern = new Regex(@"<a href=.+>(?<disease>.+)</a>$");
             var match = regexPattern.Match(diseaseString);
-            if (!match.Success)
-                return diseaseString;
-            return match.Groups["disease"].Value;
+            return match.Success ? match.Groups["disease"].Value : diseaseString;
         }
 
         private (string, string) GetFunctionalInfo(List<string> info, int fieldIndex)
