@@ -13,20 +13,22 @@ namespace SAUtils.CreateGnomadTsv
         private readonly ReferenceSequenceProvider _refProvider;
         private readonly DataSourceVersion _version;
         private readonly string _outputDirectory;
+        private readonly string _sequencingDataType;
 
-        public GnomadTsvCreator(StreamReader[] streamReaders, ReferenceSequenceProvider refProvider, DataSourceVersion version, string outputDirectory)
+        public GnomadTsvCreator(StreamReader[] streamReaders, ReferenceSequenceProvider refProvider, DataSourceVersion version, string outputDirectory, string sequencingDataType)
         {
             _version          = version;
             _refProvider      = refProvider;
             _outputDirectory  = outputDirectory;
             _streamReaders    = streamReaders;
+            _sequencingDataType = sequencingDataType;
         }
 
         public void CreateTsvs()
         {
             var benchMark = new Benchmark();
 
-            using (var writer = new GnomadTsvWriter(_version, _outputDirectory, _refProvider.GenomeAssembly, _refProvider))
+            using (var writer = new GnomadTsvWriter(_version, _outputDirectory, _refProvider.GenomeAssembly, _refProvider, _sequencingDataType))
             {
                 var count = 0;
                 foreach (var fileStreamReader in _streamReaders)

@@ -83,7 +83,7 @@ namespace SAUtils.DataStructures
             var boolValues = new List<string>();
 
             var suppInterval = new SupplementaryIntervalItem(Chromosome, Start, _intervalEnd.Value, null, _variantType.Value,
-                InterimSaCommon.MitoMapSvTag, intValues, doubleValues, freqValues, stringValues, boolValues);
+                InterimSaCommon.MitoMapTag, intValues, doubleValues, freqValues, stringValues, boolValues);
             return suppInterval;
         }
 

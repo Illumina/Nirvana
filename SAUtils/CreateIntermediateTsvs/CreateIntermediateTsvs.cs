@@ -142,11 +142,11 @@ namespace SAUtils.CreateIntermediateTsvs
             var mergedMitoMapItems = MitoMapSvReader.MergeAndSort(mitoMapSvReaders);
 
             using (var writer = new IntervalTsvWriter(_outputDirectory, version,
-                GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapSvTag,
+                GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, InterimSaCommon.MitoMapTag,
                 ReportFor.StructuralVariants))
                 CreateSvTsv(mergedMitoMapItems, writer);
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapSvTag, version.Version, timeSpan);
+            TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapTag, version.Version, timeSpan);
         }
 
         private void CreateMitoMapVarTsv(List<string> mitoMapFileNames)
@@ -164,11 +164,11 @@ namespace SAUtils.CreateIntermediateTsvs
                 mitoMapVarReaders.Add(new MitoMapVariantReader(new FileInfo(mitoMapFileName), sequenceProvider));
             }
             var mergedMitoMapVarItems = MitoMapVariantReader.MergeAndSort(mitoMapVarReaders);
-            var outputFilePrefix = InterimSaCommon.MitoMapVarTag;
+            var outputFilePrefix = InterimSaCommon.MitoMapTag;
                 using (var writer = new MitoMapVarTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
                     TsvWriterUtilities.WriteSortedItems(mergedMitoMapVarItems, writer);         
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapVarTag, version.Version, timeSpan);
+            TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapTag, version.Version, timeSpan);
         }
 
         private void CreateSvTsv(string sourceName, string fileName)
