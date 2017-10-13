@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -21,6 +21,7 @@ namespace SAUtils.InputFileParsers
 		private int[] _acNfe;
 		private int[] _acOth;
 		private int[] _acAsj;
+	    private int[] _acSas;
 
 	    private int _anAll;
         private int _anAfr;
@@ -29,7 +30,8 @@ namespace SAUtils.InputFileParsers
 		private int _anFin;
 		private int _anNfe;
 		private int _anOth;
-		private int _anSas;
+		private int _anAsj;
+	    private int _anSas;
 
 		private int _totalDepth;
 	    private bool _hasFailedFilters;
@@ -53,6 +55,7 @@ namespace SAUtils.InputFileParsers
 			_acNfe = null;
 			_acOth = null;
 			_acAsj = null;
+		    _acSas = null;
 
 			_anAfr = 0;
 			_anAmr = 0;
@@ -60,7 +63,8 @@ namespace SAUtils.InputFileParsers
 			_anFin = 0;
 			_anNfe = 0;
 			_anOth = 0;
-			_anSas = 0;
+			_anAsj = 0;
+		    _anSas = 0;
 
 			_totalDepth = 0;
 		    _hasFailedFilters = false;
@@ -134,10 +138,10 @@ namespace SAUtils.InputFileParsers
 					refAllele,
 					altAlleles[i],
                     _totalDepth,
-					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
+					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth, _anAsj, _anSas,
 					GetAlleleCount(_acAll, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
 					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i),
-                    _hasFailedFilters)
+			        GetAlleleCount(_acSas, i), _hasFailedFilters)
 					);
 			}
 			return gnomadItemsList;
@@ -213,7 +217,11 @@ namespace SAUtils.InputFileParsers
 					_acAsj = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-			    case "AN":
+			    case "AC_SAS":
+			        _acSas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+			        break;
+
+                case "AN":
 			        _anAll = Convert.ToInt32(value);
 			        break;
 
@@ -242,10 +250,14 @@ namespace SAUtils.InputFileParsers
 					break;
 
 				case "AN_ASJ":
-					_anSas = Convert.ToInt32(value);
+					_anAsj = Convert.ToInt32(value);
 					break;
 
-				case "DP":
+			    case "AN_SAS":
+			        _anSas = Convert.ToInt32(value);
+			        break;
+
+                case "DP":
 					_totalDepth = Convert.ToInt32(value);
 					break;
 

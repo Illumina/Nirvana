@@ -10,7 +10,8 @@ namespace SAUtils.DataStructures
         public const string EvsTag          = "evs";
         public const string EvsVcfTag       = "EVS";
         public const string ExacTag         = "exac";
-	    public const string GnomadTag       = "gnomAD";
+	    public const string GnomadTag       = "gnomad";
+        public const string GnomadExomeTag  = "gnomadExome";
         public const string ClinvarTag      = "clinvar";
         public const string ClinvarVcfTag   = "clinvar";
         public const string CosmicTag       = "cosmic";
@@ -18,7 +19,6 @@ namespace SAUtils.DataStructures
         public const string OnekSvTag       = "oneKg";
         public const string DgvTag          = "dgv";
         public const string ClinGenTag      = "clingen";
-        public const string MitoMapVarTag   = "mitoMapVar";
-        public const string MitoMapSvTag    = "mitoMapSv";
+        public const string MitoMapTag   = "mitomap";
     }
 }
