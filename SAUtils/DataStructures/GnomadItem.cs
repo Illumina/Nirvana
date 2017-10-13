@@ -35,7 +35,7 @@ namespace SAUtils.DataStructures
             int position,
             string refAllele,
             string alternateAllele,
-            int coverage,
+            int depth,
             int? allAlleleNumber, int? afrAlleleNumber, int? amrAlleleNumber, int? easAlleleNumber,
             int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? asjAlleleNumber, int? allAlleleCount,
             int? afrAlleleCount, int? amrAlleleCount, int? easAlleleCount, int? finAlleleCount, int? nfeAlleleCount,
@@ -47,7 +47,7 @@ namespace SAUtils.DataStructures
             ReferenceAllele = refAllele;
             AlternateAllele = alternateAllele;
 
-            Coverage = coverage;
+            Coverage = depth/allAlleleNumber.Value;
 
             AllAlleleNumber = allAlleleNumber;
             AfrAlleleNumber = afrAlleleNumber;
