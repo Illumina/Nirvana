@@ -32,6 +32,7 @@ namespace SAUtils.InputFileParsers
 		private int _anSas;
 
 		private int _totalDepth;
+	    private bool _hasFailedFilters;
 
 
 		public GnomadReader(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict) 
@@ -62,6 +63,7 @@ namespace SAUtils.InputFileParsers
 			_anSas = 0;
 
 			_totalDepth = 0;
+		    _hasFailedFilters = false;
 		}
 
 		/// <summary>
@@ -112,8 +114,10 @@ namespace SAUtils.InputFileParsers
 			var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
 			var refAllele  = splitLine[VcfCommon.RefIndex];
 			var altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
+		    var filters = splitLine[VcfCommon.FilterIndex];
 			var infoFields = splitLine[VcfCommon.InfoIndex];
 
+		    _hasFailedFilters = !(filters.Equals("PASS") || filters.Equals("."));
 			// parses the info fields and extract frequencies, coverage, num samples.
 			ParseInfoField(infoFields);
 
@@ -132,7 +136,8 @@ namespace SAUtils.InputFileParsers
                     _totalDepth,
 					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
 					GetAlleleCount(_acAll, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
-					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i))
+					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i),
+                    _hasFailedFilters)
 					);
 			}
 			return gnomadItemsList;

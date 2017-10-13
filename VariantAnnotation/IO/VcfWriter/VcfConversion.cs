@@ -8,7 +8,7 @@ using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.IO.VcfWriter
 {
-    public  class VcfConversion
+    public sealed class VcfConversion
     {
         private const string DbSnpKeyName = "dbsnp";
         private const string OneKgKeyName = "oneKg";
