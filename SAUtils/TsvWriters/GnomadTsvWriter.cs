@@ -12,7 +12,7 @@ namespace SAUtils.TsvWriters
 	{
 		#region members
 		private readonly SaTsvWriter _writer;
-        private readonly Dictionary<string, string> jsonKeyDictionary = new Dictionary<string, string>
+        private readonly Dictionary<string, string> _jsonKeyDictionary = new Dictionary<string, string>
         {
             {"genome", InterimSaCommon.GnomadTag },
             {"exome", InterimSaCommon.GnomadExomeTag }
@@ -25,7 +25,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 
 			_writer= new SaTsvWriter(outputDirectory, version, genomeAssembly.ToString(),
-				SaTsvCommon.SchemaVersion, jsonKeyDictionary[sequencingDataType], null, true, sequenceProvider);
+				SaTsvCommon.SchemaVersion, _jsonKeyDictionary[sequencingDataType], null, true, sequenceProvider);
 
 		}
 

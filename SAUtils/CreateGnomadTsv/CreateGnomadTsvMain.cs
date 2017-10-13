@@ -16,11 +16,11 @@ namespace SAUtils.CreateGnomadTsv
 {
     public sealed class CreateGnomadTsvMain
     {
-        private HashSet<string> supportedSequencingDataType = new HashSet<string> {"genome", "exome"};
+        private readonly HashSet<string> _supportedSequencingDataType = new HashSet<string> {"genome", "exome"};
         private ExitCodes ProgramExecution()
         {
-            if (!supportedSequencingDataType.Contains(ConfigurationSettings.SequencingDataType)) 
-                throw new ArgumentException($"Only the following sequencing data types are supported: {string.Join(supportedSequencingDataType.ToString(), ", ")}");
+            if (!_supportedSequencingDataType.Contains(ConfigurationSettings.SequencingDataType)) 
+                throw new ArgumentException($"Only the following sequencing data types are supported: {string.Join(_supportedSequencingDataType.ToString(), ", ")}");
 
             var inputStreamReaders = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.vcf.bgz").Select(fileName => GZipUtilities.GetAppropriateStreamReader(Path.Combine(ConfigurationSettings.InputDirectory, fileName))).ToArray();
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(ConfigurationSettings.CompressedReference));
