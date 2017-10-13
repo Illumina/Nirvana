@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using SAUtils.InputFileParsers.CustomAnnotation;
 using UnitTests.TestUtilities;
