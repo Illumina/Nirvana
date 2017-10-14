@@ -22,7 +22,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private readonly HashSet<string> _mitoMapSvDataTypes = new HashSet<string>()
         {
-            MitoMapDataTypes.MitoMapDeletionsSingle, 
+            MitoMapDataTypes.MitoMapDeletionsSingle,
             MitoMapDataTypes.MitoMapInsertionsSimple
         };
 
@@ -88,11 +88,12 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (end < start) Console.WriteLine($"Deletions with end position smaller than start position: start: {start}, end: {end}");
             var calculatedSize = end - start + 1;
             var size = int.Parse(info[1].Substring(1));
+            if (size <= VariantSize.LargeDeletionCutoff) return new List<MitoMapItem>();
             if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}");
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
             var newStart = _variantAligner.LeftAlign(start, refSequence, "").Item1;
             if (start != newStart) Console.WriteLine($"Deletion of {calculatedSize} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, "", "", new List<string>(), null, null, "", "", "", true, newStart + size - 1, VariantType.deletion);
+            var mitoMapItem = new MitoMapItem(newStart, "", "", "", new List<string>(), null, null, "", "", "", true, newStart + size - 1, VariantType.deletion);
             return new List<MitoMapItem> { mitoMapItem };
 
         }
