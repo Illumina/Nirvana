@@ -15,6 +15,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private const string DelSymbol = "-";
         public readonly string DataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
+        private readonly MitoMapDisease _mitoMapDisease;
 
 
         private readonly Dictionary<string, int[]> _mitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
@@ -49,6 +50,9 @@ namespace SAUtils.InputFileParsers.MitoMAP
             _mitoMapFileInfo = mitoMapFileInfo;
             DataType = GetDataType();
             _sequenceProvider = sequenceProvider;
+            _mitoMapDisease = new MitoMapDisease(
+                              new FileInfo(
+                              Path.Combine(mitoMapFileInfo.DirectoryName,   MitomapParsingParameters.MitomapDiseaseAnnotationFile)));
         }
 
         private string GetDataType()
@@ -133,13 +137,14 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
             if (!firstNumberMatch.Success) throw new Exception($"Failed to extract variant position from {info[3]}");
             var posi = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
-            return new List<MitoMapItem>(){new MitoMapItem(posi, "-", altAllele, diseases, null, null, "", "", "", false, null, null)};
+            return new List<MitoMapItem>(){new MitoMapItem(posi, "-", altAllele, "", diseases, null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
         {
             int posi = int.Parse(info[fields[0]]);
-            var diseases = MitoMapDiseases.ParseDiseaseInfo(GetDiseaseInfo(info, fields[1]));
+            var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
+            var diseases = _mitoMapDisease.GetDisease(mitomapDiseaseString);
             var (refAllele, altAllele, extractedPosi) = GetRefAltAlleles(info[fields[2]]);
             if (extractedPosi.HasValue && posi != extractedPosi)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");
@@ -172,13 +177,13 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
                     foreach (var possibleAltAllele in altAllele.Split(";"))
                     {
-                        mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, diseases, homoplasmy,
+                        mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, mitomapDiseaseString, diseases, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
                     }
                     return mitoMapMutItems;
                 }
             }
-            mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, altAllele, diseases, homoplasmy,
+            mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, altAllele, mitomapDiseaseString, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
             return mitoMapMutItems;
         }

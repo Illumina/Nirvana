@@ -26,9 +26,10 @@ namespace SAUtils.DataStructures
         public const int End = 576;
     }
 
-    public static class VariantSize
+    public static class MitomapParsingParameters
     {
         public const int LargeDeletionCutoff = 100;
+        public const string MitomapDiseaseAnnotationFile = "MitomapDisease";
     }
 
     public sealed class MitoMapItem : SupplementaryDataItem
