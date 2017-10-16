@@ -16,7 +16,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
     {
         private readonly FileInfo _mitoMapFileInfo;
         private const string DelSymbol = "-";
-        public readonly string DataType;
+        private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly MitoMapDisease _mitoMapDisease;
         private readonly VariantAligner _variantAligner;
@@ -53,7 +53,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         public MitoMapVariantReader(FileInfo mitoMapFileInfo, ReferenceSequenceProvider sequenceProvider)
         {
             _mitoMapFileInfo = mitoMapFileInfo;
-            DataType = GetDataType();
+            _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
             _mitoMapDisease = new MitoMapDisease(
                               new FileInfo(
@@ -75,7 +75,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private IEnumerable<MitoMapItem> GetMitoMapItems()
         {
-            Console.WriteLine($"Processing {DataType} file");
+            Console.WriteLine($"Processing {_dataType} file");
             bool isDataLine = false;
             using (var reader = new StreamReader(_mitoMapFileInfo.FullName))
             {
@@ -91,7 +91,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     // last item
                     if (line.StartsWith("[") && line.EndsWith("]],")) isDataLine = false;
 
-                    foreach (var mitoMapMutItem in ParseLine(line, DataType))
+                    foreach (var mitoMapMutItem in ParseLine(line, _dataType))
                     {
                         if (!string.IsNullOrEmpty(mitoMapMutItem.ReferenceAllele) &&
                             !string.IsNullOrEmpty(mitoMapMutItem.AlternateAllele))
@@ -137,7 +137,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var newStart = leftAlgnResults.Item1;
             var newRefAllele = leftAlgnResults.Item2;
             if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, newRefAllele, "-", "", null, null, null, "", "", "", false, null, null);
+            var mitoMapItem = new MitoMapItem(newStart, newRefAllele, "-", null, null, null, "", "", "", false, null, null);
             return new List<MitoMapItem> { mitoMapItem };
         }
 
@@ -171,7 +171,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var newPosi = leftAlgnResults.Item1;
             var newAltAllele = leftAlgnResults.Item3;
             if (posi != newPosi) Console.WriteLine($"Insertion of {altAllele}. Original start position: {posi}; new position after left-alignment {newPosi}; new altAllele {newAltAllele}");
-            return new List<MitoMapItem>{new MitoMapItem(newPosi, "-", newAltAllele, "", null, null, null, "", "", "", false, null, null)};
+            return new List<MitoMapItem>{new MitoMapItem(newPosi, "-", newAltAllele, null, null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
@@ -212,13 +212,13 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
                     foreach (var possibleAltAllele in altAllele.Split(";"))
                     {
-                        mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, mitomapDiseaseString, diseases, homoplasmy,
+                        mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, diseases, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
                     }
                     return mitoMapVarItems;
                 }
             }
-            mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, altAllele, mitomapDiseaseString, diseases, homoplasmy,
+            mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, altAllele, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
             return mitoMapVarItems;
         }
@@ -230,7 +230,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var altNotationMatch = altNotationPattern1.Match(mitomapDiseaseString);
             if (altNotationMatch.Success)
             {
-                Console.WriteLine($"Altnate natation found: {mitomapDiseaseString}. This record is skipped");
+                Console.WriteLine($"Altnate natation found: {mitomapDiseaseString}. This record is skipped.");
                 return true;
             }
             return false;
@@ -351,7 +351,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return sequenceProvider.Sequence.Substring(start - 1, length);
         }
 
-        public static string ReverseSequence(string sequence)
+        private static string ReverseSequence(string sequence)
         {
             var reversedNucleotide = new char[sequence.Length];
             var i = sequence.Length - 1;

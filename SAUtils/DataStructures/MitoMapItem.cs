@@ -36,7 +36,6 @@ namespace SAUtils.DataStructures
     public sealed class MitoMapItem : SupplementaryDataItem
     {
         private List<string> _diseases;
-        private string _mitomapDiseaseString;
         private bool? _homoplasmy;
         private bool? _heteroplasmy;
         private string _status;
@@ -46,14 +45,13 @@ namespace SAUtils.DataStructures
         private VariantType? _variantType;
         private static readonly Chromosome ChromM = new Chromosome("chrM", "MT", 24);
 
-        public MitoMapItem(int posi, string refAllele, string altAllele, string mitomapDiseaseString, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType)
+        public MitoMapItem(int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType)
         {
             Chromosome = ChromM;
             Start = posi;
             ReferenceAllele = refAllele;
             AlternateAllele = altAllele;
             IsInterval = isInterval;
-            _mitomapDiseaseString = mitomapDiseaseString;
             _diseases = diseases;
             _homoplasmy = homoplasmy;
             _heteroplasmy = heteroplasmy;
@@ -75,8 +73,7 @@ namespace SAUtils.DataStructures
 
             jsonObject.AddStringValue("refAllele", refAllele);
             jsonObject.AddStringValue("altAllele", altAllele);
-            if (!string.IsNullOrEmpty(_mitomapDiseaseString)) jsonObject.AddStringValue("mitomapDiseaseAnnotation", _mitomapDiseaseString);
-            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValue("disease", string.Join(";", _diseases));
+            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("disease", _diseases.Distinct().ToList());
             if (_homoplasmy.HasValue) jsonObject.AddStringValue("hasHomoplasmy", _homoplasmy.ToString());
             if (_heteroplasmy.HasValue) jsonObject.AddStringValue("hasHeteroplasmy", _heteroplasmy.ToString());
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
@@ -123,16 +120,14 @@ namespace SAUtils.DataStructures
             }
             _homoplasmy = _homoplasmy ?? newMitoMapItem._homoplasmy;
             _heteroplasmy = _heteroplasmy ?? newMitoMapItem._heteroplasmy;
-            if (HasConflict(_mitomapDiseaseString, newMitoMapItem._mitomapDiseaseString))
+            if (_diseases != null && newMitoMapItem._diseases != null)
             {
-                Console.WriteLine();
-                _mitomapDiseaseString = string.Join(";(additional MITOMAP disease description)", _mitomapDiseaseString,
-                    newMitoMapItem._mitomapDiseaseString);
+                Console.WriteLine($"Merge diseases at {Start}, {ReferenceAllele}-{AlternateAllele}: {string.Join(",", _diseases)} and {string.Join(",",newMitoMapItem._diseases)}");
                 _diseases.AddRange(newMitoMapItem._diseases);
+                _diseases = _diseases.Distinct().ToList();
             }
             else
             {
-                _mitomapDiseaseString = !IsNullOrEmpty(_mitomapDiseaseString) ? _mitomapDiseaseString : newMitoMapItem._mitomapDiseaseString;
                 _diseases = (_diseases != null && _diseases.Count > 0) ? _diseases : newMitoMapItem._diseases;
             }
             _status = _status ?? newMitoMapItem._status;

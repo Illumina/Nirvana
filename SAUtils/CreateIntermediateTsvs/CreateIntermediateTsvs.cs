@@ -129,7 +129,7 @@ namespace SAUtils.CreateIntermediateTsvs
             if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(String.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapSvFileNames[0]).Directory;
-            var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
+            var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapSV"));
             var sequenceProvider =
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
@@ -154,7 +154,7 @@ namespace SAUtils.CreateIntermediateTsvs
             if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
-            var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMap"));
+            var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapVar"));
             var sequenceProvider =
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
