@@ -28,11 +28,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         public List<string> GetDisease(string mitomapDiseaseString)
         {
             if (!_mitomapDiseaseAnnotation.ContainsKey(mitomapDiseaseString))
-                //throw new Exception($"MITOMAP disease description hasn't been curated: {mitomapDiseaseString}");
-            {
-                Console.WriteLine($"MITOMAP disease description hasn't been curated: {mitomapDiseaseString}");
-                return null;
-            }
+                throw new Exception($"MITOMAP disease description hasn't been curated: {mitomapDiseaseString}");
             return _mitomapDiseaseAnnotation[mitomapDiseaseString];
         }
     }
