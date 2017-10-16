@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
 using SAUtils.DataStructures;
@@ -175,8 +176,10 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
         {
+            List<MitoMapItem> mitoMapVarItems = new List<MitoMapItem>();
             int posi = int.Parse(info[fields[0]]);
             var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
+            if (DescribedAsDuplicatedRecord(mitomapDiseaseString)) return mitoMapVarItems;
             var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : _mitoMapDisease.GetDisease(mitomapDiseaseString);
             var (refAllele, altAllele, extractedPosi) = GetRefAltAlleles(info[fields[2]]);
             if (extractedPosi.HasValue && posi != extractedPosi)
@@ -190,7 +193,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (fields[4] != -1 && _symbolToBools.ContainsKey(info[fields[4]])) heteroplasmy = _symbolToBools[info[fields[4]]];
             string status = fields[5] == -1 ? null : info[fields[5]];
             var (scorePercentile, clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
-            List<MitoMapItem> mitoMapVarItems = new List<MitoMapItem>();
             if (!string.IsNullOrEmpty(altAllele))
             {
                 /* disable degenerate base expanding for now
@@ -219,6 +221,19 @@ namespace SAUtils.InputFileParsers.MitoMAP
             mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, altAllele, mitomapDiseaseString, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
             return mitoMapVarItems;
+        }
+
+        private bool DescribedAsDuplicatedRecord(string mitomapDiseaseString)
+        {
+            if (String.IsNullOrEmpty(mitomapDiseaseString)) return false;
+            var altNotationPattern1 = new Regex("alternate notation$");
+            var altNotationMatch = altNotationPattern1.Match(mitomapDiseaseString);
+            if (altNotationMatch.Success)
+            {
+                Console.WriteLine($"Altnate natation found: {mitomapDiseaseString}. This record is skipped");
+                return true;
+            }
+            return false;
         }
 
         private static string GetDiseaseInfo(List<string> info, int fieldIndex)
