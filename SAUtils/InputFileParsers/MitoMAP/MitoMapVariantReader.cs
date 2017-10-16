@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
 using SAUtils.DataStructures;
+using SAUtils.InputFileParsers.ClinVar;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.InputFileParsers.MitoMAP
@@ -16,6 +18,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         public readonly string DataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly MitoMapDisease _mitoMapDisease;
+        private readonly VariantAligner _variantAligner;
 
 
         private readonly Dictionary<string, int[]> _mitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
@@ -24,7 +27,8 @@ namespace SAUtils.InputFileParsers.MitoMAP
             {MitoMapDataTypes.MitoMapMutationsRNA, new[] {0, 2, 3, 5, 6, 7, 8}},
             {MitoMapDataTypes.MitoMapPolymorphismsCoding,  new[] {0, -1, 2, -1, -1, -1, -1}},
             {MitoMapDataTypes.MitoMapPolymorphismsControl,  new[] {0, -1, 2, -1, -1, -1, -1}},
-            {MitoMapDataTypes.MitoMapInsertionsSimple,  new int[0]}
+            {MitoMapDataTypes.MitoMapInsertionsSimple,  new int[0]},
+            {MitoMapDataTypes.MitoMapDeletionsSingle,  new int[0]}
         };
 
         private readonly Dictionary<(string, int), string> _clininalSigfincances = new Dictionary<(string, int), string>
@@ -53,6 +57,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             _mitoMapDisease = new MitoMapDisease(
                               new FileInfo(
                               Path.Combine(mitoMapFileInfo.DirectoryName,   MitomapParsingParameters.MitomapDiseaseAnnotationFile)));
+            _variantAligner = new VariantAligner(sequenceProvider.Sequence);
         }
 
         private string GetDataType()
@@ -105,18 +110,42 @@ namespace SAUtils.InputFileParsers.MitoMAP
             ["583","<a href='/MITOMAP/GenomeLoci#MTTF'>MT-TF</a>","MELAS / MM & EXIT","G583A","tRNA Phe","-","+","Cfrm","<span style='display:inline-block;white-space:nowrap;'><a href='/cgi-bin/mitotip?pos=583&alt=A&quart=0'><u>93.10%</u></a> <i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i></span>","0","<a href='/cgi-bin/print_ref_list?refs=2066,90532,91590&title=RNA+Mutation+G583A' target='_blank'>3</a>"],
             */
             var info = line.TrimEnd(',').TrimEnd(']').Trim('[', ']').Split("\",\"").Select(x => x.Trim('"')).ToList();
-            if (dataType == MitoMapDataTypes.MitoMapInsertionsSimple)
-                return ExtractVariantItemFromSimpleInsertions(info);
+            switch (dataType)
+            {
+                case MitoMapDataTypes.MitoMapInsertionsSimple:
+                    return ExtractVariantItemFromInsertionsSimple(info);
+                case MitoMapDataTypes.MitoMapDeletionsSingle:
+                    return ExtractVariantItemFromDeletionsSingle(info);
+            }
             return ExtracVariantItem(info, _mitoMapMutationColumnDefinitions[dataType]);
         }
 
+        private List<MitoMapItem> ExtractVariantItemFromDeletionsSingle(List<string> info)
+        {
+            var junctions = info[0].Split(':').Select(int.Parse).ToList();
+            var start = junctions[0] + 1;
+            var end = junctions[1] - 1;
+            if (end < start)
+                throw new ArgumentOutOfRangeException($"Deletions with end position smaller than start position: start: {start}, end: {end}");
+            var calculatedSize = end - start + 1;
+            var size = int.Parse(info[1].Substring(1));
+            if (size > MitomapParsingParameters.LargeDeletionCutoff) return new List<MitoMapItem>();
+            if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}. Provided size is used.");
+            var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
+            var leftAlgnResults = _variantAligner.LeftAlign(start, refSequence, "");
+            var newStart = leftAlgnResults.Item1;
+            var newRefAllele = leftAlgnResults.Item2;
+            if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
+            var mitoMapItem = new MitoMapItem(newStart, newRefAllele, "-", "", new List<string>(), null, null, "", "", "", false, null, null);
+            return new List<MitoMapItem> { mitoMapItem };
+        }
+
         // extract small variant from this file
-        private List<MitoMapItem> ExtractVariantItemFromSimpleInsertions(List<string> info)
+        private List<MitoMapItem> ExtractVariantItemFromInsertionsSimple(List<string> info)
         {
             var altAlleleInfo = info[2];
             var dLoopPattern = new Regex(@"(?<start>^\d+)-(?<end>(\d+)) D-Loop region");
             var dLoopMatch = dLoopPattern.Match(altAlleleInfo);
-            var diseases = new List<string>();
             // not a small variant
             if (dLoopMatch.Success)
             {
@@ -125,8 +154,8 @@ namespace SAUtils.InputFileParsers.MitoMAP
             string altAllele;
             var additionalRepeatPattern = new Regex(@"additional \[(?<repeat>[ACTGN]+)\] ");
             var additionalRepeatMatch = additionalRepeatPattern.Match(altAlleleInfo);
-
-            if (additionalRepeatMatch.Success) altAllele = additionalRepeatMatch.Groups["repeat"].Value;
+            if (additionalRepeatMatch.Success)
+                altAllele = additionalRepeatMatch.Groups["repeat"].Value;
             // expect a string of allele sequence then
             else
             {
@@ -137,7 +166,11 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
             if (!firstNumberMatch.Success) throw new Exception($"Failed to extract variant position from {info[3]}");
             var posi = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
-            return new List<MitoMapItem>(){new MitoMapItem(posi, "-", altAllele, "", diseases, null, null, "", "", "", false, null, null)};
+            var leftAlgnResults = _variantAligner.LeftAlign(posi, "", altAllele); // insertion
+            var newPosi = leftAlgnResults.Item1;
+            var newAltAllele = leftAlgnResults.Item3;
+            if (posi != newPosi) Console.WriteLine($"Insertion of {altAllele}. Original start position: {posi}; new position after left-alignment {newPosi}; new altAllele {newAltAllele}");
+            return new List<MitoMapItem>{new MitoMapItem(newPosi, "-", newAltAllele, "", new List<string>(), null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
@@ -157,7 +190,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (fields[4] != -1 && _symbolToBools.ContainsKey(info[fields[4]])) heteroplasmy = _symbolToBools[info[fields[4]]];
             string status = fields[5] == -1 ? null : info[fields[5]];
             var (scorePercentile, clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
-            List<MitoMapItem> mitoMapMutItems = new List<MitoMapItem>();
+            List<MitoMapItem> mitoMapVarItems = new List<MitoMapItem>();
             if (!string.IsNullOrEmpty(altAllele))
             {
                 /* disable degenerate base expanding for now
@@ -177,15 +210,15 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
                     foreach (var possibleAltAllele in altAllele.Split(";"))
                     {
-                        mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, mitomapDiseaseString, diseases, homoplasmy,
+                        mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, mitomapDiseaseString, diseases, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
                     }
-                    return mitoMapMutItems;
+                    return mitoMapVarItems;
                 }
             }
-            mitoMapMutItems.Add(new MitoMapItem(posi, refAllele, altAllele, mitomapDiseaseString, diseases, homoplasmy,
+            mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, altAllele, mitomapDiseaseString, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
-            return mitoMapMutItems;
+            return mitoMapVarItems;
         }
 
         private static string GetDiseaseInfo(List<string> info, int fieldIndex)

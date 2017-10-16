@@ -83,17 +83,17 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private List<MitoMapItem> ExtractSvItemFromDeletionsSingle(List<string> info)
         {
             var junctions = info[0].Split(':').Select(int.Parse).ToList();
-            var start = junctions[0] + 1;
+            var start = junctions[0] + 1; 
             var end = junctions[1] - 1;
             if (end < start)
                 throw new ArgumentOutOfRangeException($"Deletions with end position smaller than start position: start: {start}, end: {end}");
             var calculatedSize = end - start + 1;
             var size = int.Parse(info[1].Substring(1));
-            if (size <= VariantSize.LargeDeletionCutoff) return new List<MitoMapItem>();
-            if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}");
+            if (size <= MitomapParsingParameters.LargeDeletionCutoff) return new List<MitoMapItem>();
+            if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}. Provided size is used.");
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
             var newStart = _variantAligner.LeftAlign(start, refSequence, "").Item1;
-            if (start != newStart) Console.WriteLine($"Deletion of {calculatedSize} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
+            if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
             var mitoMapItem = new MitoMapItem(newStart, "", "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.deletion);
             return new List<MitoMapItem> { mitoMapItem };
 
