@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using VariantAnnotation.Interface.Positions;
@@ -35,7 +36,7 @@ namespace SAUtils.DataStructures
     public sealed class MitoMapItem : SupplementaryDataItem
     {
         private List<string> _diseases;
-        private readonly string _mitomapDiseaseString;
+        private string _mitomapDiseaseString;
         private bool? _homoplasmy;
         private bool? _heteroplasmy;
         private string _status;
@@ -75,7 +76,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddStringValue("refAllele", refAllele);
             jsonObject.AddStringValue("altAllele", altAllele);
             if (!string.IsNullOrEmpty(_mitomapDiseaseString)) jsonObject.AddStringValue("mitomapDiseaseAnnotation", _mitomapDiseaseString);
-            if (_diseases.Count > 0) jsonObject.AddStringValue("disease", string.Join(";", _diseases));
+            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValue("disease", string.Join(";", _diseases));
             if (_homoplasmy.HasValue) jsonObject.AddStringValue("hasHomoplasmy", _homoplasmy.ToString());
             if (_heteroplasmy.HasValue) jsonObject.AddStringValue("hasHeteroplasmy", _heteroplasmy.ToString());
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
@@ -116,13 +117,24 @@ namespace SAUtils.DataStructures
         private void Update(MitoMapItem newMitoMapItem)
         {
             if (HasConflict(Chromosome, newMitoMapItem.Chromosome) || HasConflict(Start, newMitoMapItem.Start) ||
-                HasConflict(ReferenceAllele, newMitoMapItem.ReferenceAllele) || HasConflict(AlternateAllele, newMitoMapItem.AlternateAllele) || HasConflict(_homoplasmy, newMitoMapItem._homoplasmy) || HasConflict(_heteroplasmy, newMitoMapItem._heteroplasmy) || HasConflict(_diseases.ToString(), newMitoMapItem._diseases.ToString()) || HasConflict(_status, newMitoMapItem._status) || HasConflict(_clinicalSignificance, newMitoMapItem._clinicalSignificance) || HasConflict(_scorePercentile, newMitoMapItem._scorePercentile) || HasConflict(_intervalEnd, newMitoMapItem._intervalEnd) || HasConflict(_variantType, newMitoMapItem._variantType))
+                HasConflict(ReferenceAllele, newMitoMapItem.ReferenceAllele) || HasConflict(AlternateAllele, newMitoMapItem.AlternateAllele) || HasConflict(_homoplasmy, newMitoMapItem._homoplasmy) || HasConflict(_heteroplasmy, newMitoMapItem._heteroplasmy) || HasConflict(_status, newMitoMapItem._status) || HasConflict(_clinicalSignificance, newMitoMapItem._clinicalSignificance) || HasConflict(_scorePercentile, newMitoMapItem._scorePercentile) || HasConflict(_intervalEnd, newMitoMapItem._intervalEnd) || HasConflict(_variantType, newMitoMapItem._variantType))
             {
                 throw new InvalidDataException($"Conflict found at {Start} when updating MITOMAP record: original record: {GetVariantJsonString()}; new record: {newMitoMapItem.GetVariantJsonString()} ");
             }
             _homoplasmy = _homoplasmy ?? newMitoMapItem._homoplasmy;
             _heteroplasmy = _heteroplasmy ?? newMitoMapItem._heteroplasmy;
-            _diseases = _diseases ?? newMitoMapItem._diseases;
+            if (HasConflict(_mitomapDiseaseString, newMitoMapItem._mitomapDiseaseString))
+            {
+                Console.WriteLine();
+                _mitomapDiseaseString = string.Join(";(additional MITOMAP disease description)", _mitomapDiseaseString,
+                    newMitoMapItem._mitomapDiseaseString);
+                _diseases.AddRange(newMitoMapItem._diseases);
+            }
+            else
+            {
+                _mitomapDiseaseString = !IsNullOrEmpty(_mitomapDiseaseString) ? _mitomapDiseaseString : newMitoMapItem._mitomapDiseaseString;
+                _diseases = (_diseases != null && _diseases.Count > 0) ? _diseases : newMitoMapItem._diseases;
+            }
             _status = _status ?? newMitoMapItem._status;
             _clinicalSignificance = _clinicalSignificance ?? newMitoMapItem._clinicalSignificance;
             _scorePercentile = _scorePercentile ?? newMitoMapItem._scorePercentile;

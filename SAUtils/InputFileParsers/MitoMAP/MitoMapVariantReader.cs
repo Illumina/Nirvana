@@ -136,7 +136,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var newStart = leftAlgnResults.Item1;
             var newRefAllele = leftAlgnResults.Item2;
             if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, newRefAllele, "-", "", new List<string>(), null, null, "", "", "", false, null, null);
+            var mitoMapItem = new MitoMapItem(newStart, newRefAllele, "-", "", null, null, null, "", "", "", false, null, null);
             return new List<MitoMapItem> { mitoMapItem };
         }
 
@@ -170,14 +170,14 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var newPosi = leftAlgnResults.Item1;
             var newAltAllele = leftAlgnResults.Item3;
             if (posi != newPosi) Console.WriteLine($"Insertion of {altAllele}. Original start position: {posi}; new position after left-alignment {newPosi}; new altAllele {newAltAllele}");
-            return new List<MitoMapItem>{new MitoMapItem(newPosi, "-", newAltAllele, "", new List<string>(), null, null, "", "", "", false, null, null)};
+            return new List<MitoMapItem>{new MitoMapItem(newPosi, "-", newAltAllele, "", null, null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
         {
             int posi = int.Parse(info[fields[0]]);
             var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
-            var diseases = _mitoMapDisease.GetDisease(mitomapDiseaseString);
+            var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : _mitoMapDisease.GetDisease(mitomapDiseaseString);
             var (refAllele, altAllele, extractedPosi) = GetRefAltAlleles(info[fields[2]]);
             if (extractedPosi.HasValue && posi != extractedPosi)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");

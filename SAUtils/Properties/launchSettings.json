@@ -17,7 +17,7 @@
     },
     "MITOMAP": {
       "commandName": "Project",
-      "commandLineArgs": "createTSV --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\MutationsRNA --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\MutationsCodingControl --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\PolymorphismsCoding --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\PolymorphismsControl  --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\InsertionsSimple  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
+      "commandLineArgs": "createTSV --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\MutationsRNA --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\MutationsCodingControl --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\PolymorphismsCoding --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\PolymorphismsControl  --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\InsertionsSimple --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\DeletionsSingle  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_MitoMap\\"
     }
   }
