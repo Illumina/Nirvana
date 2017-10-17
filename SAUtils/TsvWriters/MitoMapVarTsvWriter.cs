@@ -53,7 +53,7 @@ namespace SAUtils.TsvWriters
         public MitoMapVarTsvWriter(DataSourceVersion version, string outputDirectory, string mitoMapDataType, ISequenceProvider sequenceProvider)
         {
             Console.WriteLine(version.ToString());
-            _mitoMapVarWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider, true);
+            _mitoMapVarWriter = new SaTsvWriter(outputDirectory, version, GenomeAssembly.rCRS.ToString(), SaTsvCommon.MitoMapSchemaVersion, mitoMapDataType, null, false, sequenceProvider);
         }
 
 
@@ -61,31 +61,17 @@ namespace SAUtils.TsvWriters
         {
             if (saItems == null) return;
             var mitoMapMutItems = saItems.Select(x => x as MitoMapItem).ToList();
-            var uniqueMutations = GetUniqueMutations(mitoMapMutItems);
+            var uniqueMutations = MitoMapItem.AggregatedMutationsSomePosition(mitoMapMutItems);
             foreach (var mutation in uniqueMutations)
             {
                 _mitoMapVarWriter.AddEntry(
-                           mutation.Value[0].Chromosome.EnsemblName,
-                           mutation.Value[0].Start,
+                           mutation.Value.Chromosome.EnsemblName,
+                           mutation.Value.Start,
                            mutation.Key.Item1,
                            mutation.Key.Item2,
                            null,
-                           mutation.Value.Select(x => x.GetVariantJsonString()).Distinct().ToList());
+                           new List<string> {mutation.Value.GetVariantJsonString()});
             }
-        }
-
-        private Dictionary<(string, string), List<MitoMapItem>> GetUniqueMutations(List<MitoMapItem> mitoMapMutItems)
-        {
-            var uniqueMutations = new Dictionary<(string, string), List<MitoMapItem>>();
-
-            foreach (var mitoMapMutItem in mitoMapMutItems)
-            {
-                var mutation = (mitoMapMutItem.ReferenceAllele, mitoMapMutItem.AlternateAllele);
-                if (uniqueMutations.ContainsKey(mutation))
-                    uniqueMutations[mutation].Add(mitoMapMutItem);
-                else uniqueMutations[mutation] = new List<MitoMapItem> { mitoMapMutItem };
-            }
-            return uniqueMutations;
         }
     }
 }

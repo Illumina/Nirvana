@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
@@ -19,30 +23,36 @@ namespace SAUtils.DataStructures
     public static class MitoDLoop
     {
         public const int Start = 16024;
+        // ReSharper disable once UnusedMember.Global
         public const int End = 576;
+    }
+
+    public static class MitomapParsingParameters
+    {
+        public const int LargeDeletionCutoff = 100;
+        public const string MitomapDiseaseAnnotationFile = "MitomapDisease";
     }
 
     public sealed class MitoMapItem : SupplementaryDataItem
     {
-        private readonly string _disease;
+        private List<string> _diseases;
         private bool? _homoplasmy;
         private bool? _heteroplasmy;
-        private readonly string _status;
-        private readonly string _clinicalSignificance;
-        private readonly string _scorePercentile;
-        private readonly int? _intervalEnd;
-        private readonly VariantType? _variantType;
-        private static readonly Chromosome ChromM= new Chromosome("chrM", "MT", 24);
+        private string _status;
+        private string _clinicalSignificance;
+        private string _scorePercentile;
+        private int? _intervalEnd;
+        private VariantType? _variantType;
+        private static readonly Chromosome ChromM = new Chromosome("chrM", "MT", 24);
 
-
-        public MitoMapItem(int posi, string refAllele, string altAllele, string disease, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType)
+        public MitoMapItem(int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType)
         {
             Chromosome = ChromM;
             Start = posi;
             ReferenceAllele = refAllele;
             AlternateAllele = altAllele;
             IsInterval = isInterval;
-            _disease = disease;
+            _diseases = diseases;
             _homoplasmy = homoplasmy;
             _heteroplasmy = heteroplasmy;
             _status = status;
@@ -60,10 +70,10 @@ namespace SAUtils.DataStructures
             //converting empty alleles to '-'
             var refAllele = string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele;
             var altAllele = string.IsNullOrEmpty(AlternateAllele) ? "-" : AlternateAllele;
- 
+
             jsonObject.AddStringValue("refAllele", refAllele);
             jsonObject.AddStringValue("altAllele", altAllele);
-            if (!string.IsNullOrEmpty(_disease)) jsonObject.AddStringValue("disease", _disease);
+            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("disease", _diseases.Distinct().ToList());
             if (_homoplasmy.HasValue) jsonObject.AddStringValue("hasHomoplasmy", _homoplasmy.ToString());
             if (_heteroplasmy.HasValue) jsonObject.AddStringValue("hasHeteroplasmy", _heteroplasmy.ToString());
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
@@ -87,19 +97,56 @@ namespace SAUtils.DataStructures
             return suppInterval;
         }
 
-
-        public Dictionary<(string, string), List<MitoMapItem>> GroupByAltAllele(List<MitoMapItem> mitoMapMutItems)
+        public static Dictionary<(string, string), MitoMapItem> AggregatedMutationsSomePosition(List<MitoMapItem> mitoMapMutItems)
         {
-            var groups = new Dictionary<(string, string), List<MitoMapItem>>();
+            var aggregatedMutations = new Dictionary<(string, string), MitoMapItem>();
 
             foreach (var mitoMapMutItem in mitoMapMutItems)
             {
-                var alleleTuple = (mitoMapMutItem.ReferenceAllele, mitoMapMutItem.AlternateAllele);
-                if (groups.ContainsKey(alleleTuple))
-                    groups[alleleTuple].Add(mitoMapMutItem);
-                else groups[alleleTuple] = new List<MitoMapItem> { mitoMapMutItem };
+                var mutation = (mitoMapMutItem.ReferenceAllele, mitoMapMutItem.AlternateAllele);
+                if (aggregatedMutations.ContainsKey(mutation))
+                    aggregatedMutations[mutation].Update(mitoMapMutItem);
+                else aggregatedMutations[mutation] = mitoMapMutItem;
             }
-            return groups;
+            return aggregatedMutations;
+        }
+
+        private void Update(MitoMapItem newMitoMapItem)
+        {
+            if (HasConflict(Chromosome, newMitoMapItem.Chromosome) || HasConflict(Start, newMitoMapItem.Start) ||
+                HasConflict(ReferenceAllele, newMitoMapItem.ReferenceAllele) || HasConflict(AlternateAllele, newMitoMapItem.AlternateAllele) || HasConflict(_homoplasmy, newMitoMapItem._homoplasmy) || HasConflict(_heteroplasmy, newMitoMapItem._heteroplasmy) || HasConflict(_status, newMitoMapItem._status) || HasConflict(_clinicalSignificance, newMitoMapItem._clinicalSignificance) || HasConflict(_scorePercentile, newMitoMapItem._scorePercentile) || HasConflict(_intervalEnd, newMitoMapItem._intervalEnd) || HasConflict(_variantType, newMitoMapItem._variantType))
+            {
+                throw new InvalidDataException($"Conflict found at {Start} when updating MITOMAP record: original record: {GetVariantJsonString()}; new record: {newMitoMapItem.GetVariantJsonString()} ");
+            }
+            _homoplasmy = _homoplasmy ?? newMitoMapItem._homoplasmy;
+            _heteroplasmy = _heteroplasmy ?? newMitoMapItem._heteroplasmy;
+            if (_diseases != null && newMitoMapItem._diseases != null)
+            {
+                Console.WriteLine($"Merge diseases at {Start}, {ReferenceAllele}-{AlternateAllele}: {string.Join(",", _diseases)} and {string.Join(",",newMitoMapItem._diseases)}");
+                _diseases.AddRange(newMitoMapItem._diseases);
+                _diseases = _diseases.Distinct().ToList();
+            }
+            else
+            {
+                _diseases = (_diseases != null && _diseases.Count > 0) ? _diseases : newMitoMapItem._diseases;
+            }
+            _status = _status ?? newMitoMapItem._status;
+            _clinicalSignificance = _clinicalSignificance ?? newMitoMapItem._clinicalSignificance;
+            _scorePercentile = _scorePercentile ?? newMitoMapItem._scorePercentile;
+            _intervalEnd = _intervalEnd ?? newMitoMapItem._intervalEnd;
+            _variantType = _variantType ?? newMitoMapItem._variantType;
+        }
+
+        private bool HasConflict<T>(T originalValue, T newValue)
+        {
+            return !IsNullOrEmpty(originalValue) && !IsNullOrEmpty(newValue) && !originalValue.Equals(newValue);
+        }
+
+        private static bool IsNullOrEmpty<T>(T value)
+        {
+            if (typeof(T) == typeof(string))
+                return string.IsNullOrEmpty(value as string);
+            return value == null || value.Equals(default(T));
         }
     }
 }

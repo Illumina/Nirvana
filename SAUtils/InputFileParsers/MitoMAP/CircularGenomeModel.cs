@@ -15,10 +15,10 @@ namespace SAUtils.InputFileParsers.MitoMAP
         }
 
         // translate the genomic coordinate that may be bigger than the genome length due to mathmatical operations 
-        public int GetRealPosition(int posi) => (posi - 1 % GenomeLength) + 1;
+        private int GetRealPosition(int posi) => ((posi - 1) % GenomeLength) + 1;
 
         // translate the genomic interval that may overlap with the origin of the genome into interval(s) on linear sequence
-        public List<(int, int)> GetLinearIntervals(int start, int end)
+        private List<(int, int)> GetLinearIntervals(int start, int end)
         {
             var realStart = GetRealPosition(start);
             var realEnd = GetRealPosition(end);
