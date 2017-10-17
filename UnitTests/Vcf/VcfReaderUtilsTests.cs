@@ -125,7 +125,7 @@ namespace UnitTests.Vcf
             Assert.Equal("<NON_REF>", position.Variants[0].AltAllele);
 
             // Variants
-            Assert.Equal(new[] { "<NON_REF>" }, annotatedVariants.Select(x => x.Variant.AltAllele).ToArray());
+            Assert.Null(annotatedVariants);
         }
     }
 }
