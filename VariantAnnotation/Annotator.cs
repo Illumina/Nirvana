@@ -7,7 +7,6 @@ using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
