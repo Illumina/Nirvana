@@ -16,7 +16,7 @@ namespace Vcf.VariantCreator
 	    private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 	    private const string StrPrefix = "<STR";
 	    private const string CnvPrefix = "<CN";
-		private bool _enableVerboseTranscript;
+		private readonly bool _enableVerboseTranscript;
 
 
 		public VariantFactory(IDictionary<string, IChromosome> refNameToChromosome, IRefMinorProvider refMinorProvider,bool enableVerboseTranscript)
@@ -43,7 +43,7 @@ namespace Vcf.VariantCreator
 
         private static bool IsSymbolicAllele(string altAllele)
         {
-            return altAllele.StartsWith("<") && altAllele.EndsWith(">");
+            return altAllele.StartsWith("<") && altAllele.EndsWith(">") && !VcfCommon.NonInformativeAltAllele.Contains(altAllele) && altAllele != VcfCommon.GatkNonRefAllele;
         }
 		
 	    public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber)
