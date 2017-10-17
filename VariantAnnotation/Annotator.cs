@@ -108,15 +108,12 @@ namespace VariantAnnotation
 
         }
 
-        internal static IAnnotatedVariant[] GetAnnotatedVariants(IEnumerable<IVariant> variants)
+        internal static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
         {
-            var filteredVariants = variants?.Where(x => !VcfCommon.NonInformativeAltAllele.Contains(x.AltAllele)).ToArray();
-            if (filteredVariants == null || filteredVariants.Length == 0 || filteredVariants[0].Behavior == null) return null;
-            // only filter out "<NON_REF>" allele when there are more than one alternative alleles
-            if (filteredVariants.Length > 1) filteredVariants = filteredVariants.Where(x => x.AltAllele != VcfCommon.GatkNonRefAllele).ToArray();
-            var numVariants = filteredVariants.Length;
+            if (variants?[0].Behavior == null) return null;
+            var numVariants = variants.Length;
             var annotatedVariants = new IAnnotatedVariant[numVariants];
-            for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(filteredVariants[i]);
+            for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(variants[i]);
             return annotatedVariants;
         }
 

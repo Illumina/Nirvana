@@ -51,7 +51,7 @@ namespace UnitTests.Vcf
             var vcfLine1 = "chr1	13133	.	T	<*>,G	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
             var vcfLine2 = "chr1	13133	.	T	*,C	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
             var vcfLine3 = "chr1	13133	.	T	<M>,A	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
-            var vcfLine4 = "chr1	13133	.	T	<NON_REF>,A	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
+            var vcfLine4 = "chr1	13133	.	T	A,<NON_REF>	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
 
             var chromosome = new Chromosome("chr1", "1", 0);
             var refMinorProvider = new Mock<IRefMinorProvider>();
@@ -73,10 +73,10 @@ namespace UnitTests.Vcf
             Assert.Equal(new[] { "<*>", "G" }, position1.AltAlleles);
             Assert.Equal(new[] { "*", "C" }, position2.AltAlleles);
             Assert.Equal(new[] { "<M>", "A" }, position3.AltAlleles);
-            Assert.Equal(new[] { "<NON_REF>", "A" }, position4.AltAlleles);
+            Assert.Equal(new[] { "A", "<NON_REF>" }, position4.AltAlleles);
 
             // Variants
-            Assert.Equal(new [] {"G"}, annotatedVariants1.Select(x => x.Variant.AltAllele).ToArray());
+            Assert.Equal(new[] { "G" }, annotatedVariants1.Select(x => x.Variant.AltAllele).ToArray());
             Assert.Equal(new[] { "C" }, annotatedVariants2.Select(x => x.Variant.AltAllele).ToArray());
             Assert.Equal(new[] { "A" }, annotatedVariants3.Select(x => x.Variant.AltAllele).ToArray());
             Assert.Equal(new[] { "A" }, annotatedVariants4.Select(x => x.Variant.AltAllele).ToArray());
