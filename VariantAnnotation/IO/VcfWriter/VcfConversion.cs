@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -133,8 +134,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
             var suppAnnotationSources = new Dictionary<string, VcfInfoKeyValue>();
             var isSaArrayInfo = new Dictionary<string, bool>();
-
-            int numAltAlleles = annotatedPosition.AnnotatedVariants.Count(x => !x.Variant.IsRecomposed);
+            var numInputAltAlleles = annotatedPosition.Position.AltAlleles.Length;
 
             foreach (var alternateAllele in annotatedPosition.AnnotatedVariants)
             {
@@ -151,20 +151,22 @@ namespace VariantAnnotation.IO.VcfWriter
             foreach (var kvp in suppAnnotationSources)
             {
                 if (isSaArrayInfo[kvp.Key]) continue;
-                for (var i = 0; i < numAltAlleles; i++) kvp.Value.Add(null);
+                for (var i = 0; i < numInputAltAlleles; i++) kvp.Value.Add(null);
             }
 
-            for (var i = 0; i < numAltAlleles; i++)
+            for (var i = 0; i < numInputAltAlleles; i++)
             {
                 alleleFreq1000G.Add(null);
                 ancestralAllele.Add(null);
             }
 
+            var inputGenotypeIndex = GetInputGenotypeIndex(annotatedPosition.Position.AltAlleles, annotatedPosition.AnnotatedVariants);
+
             // understand the number of annotation contains in the whole vcf line
             for(int i=0;i<annotatedPosition.AnnotatedVariants.Length;i++)
             {
                 var jsonVariant = annotatedPosition.AnnotatedVariants[i];
-                var genotypeIndex = i + 1;
+                var genotypeIndex = inputGenotypeIndex[i] + 1;
                 if (jsonVariant.Variant.IsRefMinor) infoEntries.Add("RefMinor");
 
                 phyloP.Add(jsonVariant.PhylopScore?.ToString(CultureInfo.InvariantCulture));
@@ -208,6 +210,25 @@ namespace VariantAnnotation.IO.VcfWriter
             infoEntries.Add(ancestralAllele.GetString());
             infoEntries.Add(alleleFreq1000G.GetString());
             infoEntries.Add(phyloP.GetString());
+        }
+
+        private static int[] GetInputGenotypeIndex(string[] positionAltAlleles, IAnnotatedVariant[] annotatedPositionAnnotatedVariants)
+        {
+            var inputGenotypeIndex = new int[annotatedPositionAnnotatedVariants.Length];
+            int numAnnotatedVar = annotatedPositionAnnotatedVariants.Length;
+            int annotatedVarIndex = 0;
+            for (int inputIndex = 0; inputIndex < positionAltAlleles.Length && annotatedVarIndex < numAnnotatedVar; inputIndex++)
+            {
+                if (positionAltAlleles[inputIndex] ==
+                    annotatedPositionAnnotatedVariants[annotatedVarIndex].Variant.AltAllele)
+                {
+                    inputGenotypeIndex[annotatedVarIndex] = inputIndex;
+                    annotatedVarIndex++;
+                }
+            }
+            if (annotatedVarIndex < numAnnotatedVar)
+                throw new Exception($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
+            return inputGenotypeIndex;
         }
 
         /// <summary>

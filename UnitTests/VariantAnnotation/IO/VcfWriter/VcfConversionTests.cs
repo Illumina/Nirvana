@@ -275,5 +275,62 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             Assert.Equal("Test=abc;CSQR=1|ENSR12345|regulatory_region_variant", observedVcf);
         }
 
+        [Fact]
+
+        public void genotypeIndex_is_correct_w_nonInformative_altAlleles()
+        {
+            var vcfFields1 = "chr1	101	sa123	A	<*>,T	.	.	.".Split("\t");
+            var vcfFields2 = "chr1	101	sa123	A	M,T	.	.	.".Split("\t");
+            var vcfFields3 = "chr1	101	sa123	A	*,T	.	.	.".Split("\t");
+            var vcfFields4 = "chr1	101	sa123	A	<NON_REF>,T	.	.	.".Split("\t");
+            var vcfFields5 = "chr1	101	sa123	A	T,<*>	.	.	.".Split("\t");
+            var vcfFields6 = "chr1	101	sa123	A	T,M	.	.	.".Split("\t");
+            var vcfFields7 = "chr1	101	sa123	A	T,*	.	.	.".Split("\t");
+            var vcfFields8 = "chr1	101	sa123	A	T,<NON_REF>	.	.	.".Split("\t");
+
+            var chrom = new Chromosome("chr1", "1", 0);
+            var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
+                false, false, "", null, null);
+            var position1 = new Position(chrom, 101, 101, "A", new[] { "<*>", "T" }, 100, null, null, null, inforData, vcfFields1);
+            var position2 = new Position(chrom, 101, 101, "A", new[] { "M", "T" }, 100, null, null, null, inforData, vcfFields2);
+            var position3 = new Position(chrom, 101, 101, "A", new[] { "*", "T" }, 100, null, null, null, inforData, vcfFields3);
+            var position4 = new Position(chrom, 101, 101, "A", new[] { "<NON_REF>", "T" }, 100, null, null, null, inforData, vcfFields4);
+            var position5 = new Position(chrom, 101, 101, "A", new[] { "T", "<*>" }, 100, null, null, null, inforData, vcfFields5);
+            var position6 = new Position(chrom, 101, 101, "A", new[] { "T", "M" }, 100, null, null, null, inforData, vcfFields6);
+            var position7 = new Position(chrom, 101, 101, "A", new[] { "T", "*" }, 100, null, null, null, inforData, vcfFields7);
+            var position8 = new Position(chrom, 101, 101, "A", new[] { "T", "<NON_REF>" }, 100, null, null, null, inforData, vcfFields8);
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var annotatedVariant = new AnnotatedVariant(variant);
+
+            annotatedVariant.SupplementaryAnnotations.Add(new AnnotatedSaDataSource(new SaDataSource("testSource", "Test", "T", false, true, "pathogenic", null), "T"));
+            IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
+            var annotatedPosition1 = new AnnotatedPosition(position1, annotatedVariants);
+            var annotatedPosition2 = new AnnotatedPosition(position2, annotatedVariants);
+            var annotatedPosition3 = new AnnotatedPosition(position3, annotatedVariants);
+            var annotatedPosition4 = new AnnotatedPosition(position4, annotatedVariants);
+            var annotatedPosition5 = new AnnotatedPosition(position5, annotatedVariants);
+            var annotatedPosition6 = new AnnotatedPosition(position6, annotatedVariants);
+            var annotatedPosition7 = new AnnotatedPosition(position7, annotatedVariants);
+            var annotatedPosition8 = new AnnotatedPosition(position8, annotatedVariants);
+
+            var converter = new VcfConversion();
+            var observedVcf1 = converter.Convert(annotatedPosition1).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf2 = converter.Convert(annotatedPosition2).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf3 = converter.Convert(annotatedPosition3).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf4 = converter.Convert(annotatedPosition4).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf5 = converter.Convert(annotatedPosition5).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf6 = converter.Convert(annotatedPosition6).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf7 = converter.Convert(annotatedPosition7).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf8 = converter.Convert(annotatedPosition8).Split("\t")[VcfCommon.InfoIndex];
+
+            Assert.Equal("Test=2|pathogenic", observedVcf1);
+            Assert.Equal("Test=2|pathogenic", observedVcf2);
+            Assert.Equal("Test=2|pathogenic", observedVcf3);
+            Assert.Equal("Test=2|pathogenic", observedVcf4);
+            Assert.Equal("Test=1|pathogenic", observedVcf5);
+            Assert.Equal("Test=1|pathogenic", observedVcf6);
+            Assert.Equal("Test=1|pathogenic", observedVcf7);
+            Assert.Equal("Test=1|pathogenic", observedVcf8);
+        }
     }
 }
