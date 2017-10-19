@@ -74,7 +74,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             if (isCircularGenome)
             {
                 var circularGenome = new CircularGenomeModel(_compressedSequence);
-                var interval = (position, position + length - 1);
+                var interval = (position - length, position -1);
                 return circularGenome.ExtractIntervalSequence(interval);
             }
             var adjustedLength = length < position ? length : position - 1;
