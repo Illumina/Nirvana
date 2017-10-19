@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using CommonUtilities;
+using SAUtils.InputFileParsers.MitoMAP;
 using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar
@@ -22,7 +23,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         /// Left aligns the variant using base rotation
         /// </summary>
         /// <returns>Tuple of new position, ref and alt allele</returns>
-        public Tuple<int, string, string> LeftAlign(int refPosition, string refAllele, string altAllele)
+        public Tuple<int, string, string> LeftAlign(int refPosition, string refAllele, string altAllele, bool isCircularGenome = false)
         {
             var trimmedAllele = BiDirectionalTrimmer.Trim(refPosition, refAllele, altAllele);
             var trimmedPos = trimmedAllele.Item1;
@@ -32,7 +33,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             // alignment only makes sense for insertion and deletion
             if (!(trimmedAltAllele.Length == 0 || trimmedRefAllele.Length == 0)) return null;
 
-            var upstreamSeq = GetUpstreamSeq(trimmedPos, MaxRotationRange);
+            var upstreamSeq = GetUpstreamSeq(trimmedPos, MaxRotationRange, isCircularGenome);
             if (upstreamSeq == null)
                 throw new InvalidDataException("Reference sequence not set, please check that it is loaded");
 
@@ -68,8 +69,14 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         }
 
-        private string GetUpstreamSeq(int position, int length)
+        private string GetUpstreamSeq(int position, int length, bool isCircularGenome)
         {
+            if (isCircularGenome)
+            {
+                var circularGenome = new CircularGenomeModel(_compressedSequence);
+                var interval = (position, position + length - 1);
+                return circularGenome.ExtractIntervalSequence(interval);
+            }
             var adjustedLength = length < position ? length : position - 1;
             return _compressedSequence.Substring(position - 1 - adjustedLength, adjustedLength);
         }
