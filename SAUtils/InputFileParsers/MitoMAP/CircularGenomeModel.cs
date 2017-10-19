@@ -1,29 +1,26 @@
 ﻿using System.Collections.Generic;
-using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils.InputFileParsers.MitoMAP
 {
-    public class CircularGenomeModel
+    public sealed class CircularGenomeModel
     {
-        public readonly int GenomeLength;
+        private readonly int _genomeLength;
         private readonly ISequence _compressedSequence;
 
         public CircularGenomeModel(ISequence compressedSequence)
         {
             _compressedSequence = compressedSequence;
-            GenomeLength = compressedSequence.Length;
+            _genomeLength = compressedSequence.Length;
         }
 
         // convert an interval on the circular genome position into that on a linear pseudogenome, where the end point may be bigger than the genome length 
-        private (int, int) CircularToPseudo((int, int) interval) => ( interval.Item1, (interval.Item2 >= interval.Item1) ? interval.Item2 : interval.Item2 + GenomeLength);
+        private (int, int) CircularToPseudo((int, int) interval) => ( interval.Item1, (interval.Item2 >= interval.Item1) ? interval.Item2 : interval.Item2 + _genomeLength);
 
         // convert linear pseudogenome position back to the circular genome position 
         private (int, int) PseudoToCircular((int, int) interval) =>  (GetCircularPosition(interval.Item1), GetCircularPosition(interval.Item2));
 
-        private int GetCircularPosition(int posi) => (posi - 1) % GenomeLength + 1;
+        private int GetCircularPosition(int posi) => (posi - 1) % _genomeLength + 1;
 
         // translate the genomic interval that may overlap with the origin of the genome, no matter on circular genome or linear pseudo genome,  into interval(s) not crossing the origin
         private List<(int, int)> SplitInterval((int, int) interval)
@@ -34,7 +31,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 intervalList.Add((circularStart, circularEnd));
             else
             {
-                intervalList.Add((circularStart, GenomeLength));
+                intervalList.Add((circularStart, _genomeLength));
                 intervalList.Add((1, circularEnd));
             }
             return intervalList;
