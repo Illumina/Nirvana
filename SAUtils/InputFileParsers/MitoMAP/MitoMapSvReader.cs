@@ -31,7 +31,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             _mitoMapFileInfo = mitoMapFileInfo;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
-            _mitoGenomeModel = new CircularGenomeModel(sequenceProvider);
+            _mitoGenomeModel = new CircularGenomeModel(sequenceProvider.Sequence);
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
         }
 
