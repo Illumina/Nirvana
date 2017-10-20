@@ -276,8 +276,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         }
 
         [Fact]
-
-        public void genotypeIndex_is_correct_w_nonInformative_altAlleles()
+        public void GenotypeIndex_is_correct_w_nonInformative_altAlleles_filtered()
         {
             var vcfFields1 = "chr1	101	sa123	A	<*>,T	.	.	.".Split("\t");
             var vcfFields2 = "chr1	101	sa123	A	M,T	.	.	.".Split("\t");
@@ -331,6 +330,32 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             Assert.Equal("Test=1|pathogenic", observedVcf6);
             Assert.Equal("Test=1|pathogenic", observedVcf7);
             Assert.Equal("Test=1|pathogenic", observedVcf8);
+        }
+
+        [Fact]
+        public void GenotypeIndex_is_correct_w_refMinor_allele()
+        {
+            var vcfFields1 =
+                "1	10628385	.	C	<NON_REF>	.	LowGQX;HighDPFRatio	END=10628385;BLOCKAVG_min30p3a	GT:GQX:DP:DPF	0/0:24:9:18".Split('\t');
+            var vcfFields2 =
+                "1	10628385	.	C	<NON_REF>	.	LowGQX;HighDPFRatio	END=10628385;BLOCKAVG_min30p3a	GT:GQX:DP:DPF	0/0:24:9:18".Split('\t');
+            var chromosome = new Chromosome("chr1", "1", 0);
+            var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
+                false, false, "", null, null);
+            var position1 = new Position(chromosome, 10628385, 10628385, "C", new[] { "." }, 100, null, null, null, inforData, vcfFields1);
+            var position2 = new Position(chromosome, 10628385, 10628385, "C", new[] { "." }, 100, null, null, null, inforData, vcfFields2);
+            var variant = new Variant(chromosome, 10628385, 10628385, "C", "<NON_REF>", VariantType.reference, null, true, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var annotatedVariant = new AnnotatedVariant(variant);
+            annotatedVariant.SupplementaryAnnotations.Add(new AnnotatedSaDataSource(new SaDataSource("testSource", "Test", "C", false, true, "pathogenic", null), "C"));
+
+            var annotatedPosition1 = new AnnotatedPosition(position1, new IAnnotatedVariant[]{annotatedVariant});
+            var annotatedPosition2 = new AnnotatedPosition(position2, new IAnnotatedVariant[] { annotatedVariant });
+            var converter = new VcfConversion();
+            var observedVcf1 = converter.Convert(annotatedPosition1).Split("\t")[VcfCommon.InfoIndex];
+            var observedVcf2 = converter.Convert(annotatedPosition2).Split("\t")[VcfCommon.InfoIndex];
+
+            Assert.Equal("RefMinor;Test=1|pathogenic", observedVcf1);
+            Assert.Equal("RefMinor;Test=1|pathogenic", observedVcf2);
         }
     }
 }

@@ -214,17 +214,20 @@ namespace VariantAnnotation.IO.VcfWriter
 
         private static int[] GetInputGenotypeIndex(string[] positionAltAlleles, IAnnotatedVariant[] annotatedPositionAnnotatedVariants)
         {
-            var inputGenotypeIndex = new int[annotatedPositionAnnotatedVariants.Length];
+
             int numAnnotatedVar = annotatedPositionAnnotatedVariants.Length;
-            int annotatedVarIndex = 0;
-            for (int inputIndex = 0; inputIndex < positionAltAlleles.Length && annotatedVarIndex < numAnnotatedVar; inputIndex++)
+            // alt allele is <NON_REF> or . , and this is a refMinor site
+            if (positionAltAlleles.Length == 1 && (positionAltAlleles[0] == "." || positionAltAlleles[0] == VcfCommon.GatkNonRefAllele) && numAnnotatedVar == 1)
+                return new []{0};
+
+            var inputGenotypeIndex = new int[numAnnotatedVar];
+            var annotatedVarIndex = 0;
+            for (var inputIndex = 0; inputIndex < positionAltAlleles.Length && annotatedVarIndex < numAnnotatedVar; inputIndex++)
             {
-                if (positionAltAlleles[inputIndex] ==
-                    annotatedPositionAnnotatedVariants[annotatedVarIndex].Variant.AltAllele)
-                {
-                    inputGenotypeIndex[annotatedVarIndex] = inputIndex;
-                    annotatedVarIndex++;
-                }
+                if (positionAltAlleles[inputIndex] !=
+                    annotatedPositionAnnotatedVariants[annotatedVarIndex].Variant.AltAllele) continue;
+                inputGenotypeIndex[annotatedVarIndex] = inputIndex;
+                annotatedVarIndex++;
             }
             if (annotatedVarIndex < numAnnotatedVar)
                 throw new Exception($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
