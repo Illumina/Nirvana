@@ -10,7 +10,7 @@
     },
     "RR_Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in  Mother_chr22.genome.vcf.gz --out momGen22 --sd C:\\Development\\SupplementaryDatabase\\41\\GRCh37",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in - --out C:\\Development\\TestDatasets\\momGen < C:\\Development\\TestDatasets\\Mother.genome.vcf.gz",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "MS_ClinVar": {

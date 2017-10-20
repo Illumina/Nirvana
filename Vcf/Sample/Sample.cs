@@ -12,7 +12,7 @@ namespace Vcf.Sample
         public bool FailedFilter { get; }
         public int? CopyNumber { get; }
         public bool IsLossOfHeterozygosity { get; }
-        public int? DeNovoQuality { get; }
+        public float? DeNovoQuality { get; }
         public bool IsEmpty { get; }
         public int[] SplitReadCounts { get; }
         public int[] PairEndReadCounts { get; }
@@ -20,7 +20,7 @@ namespace Vcf.Sample
 	    public string RepeatNumberSpans { get; }
 
 	    public Sample(string genotype, int? genotypeQuality, double? variantFreq, int? totalDepth, int[] alleleDepths,
-            bool failedFilter, int? copyNumber, bool isLossOfHeterozygosity, int? deNovoQuality, int[] splitReadCounts,
+            bool failedFilter, int? copyNumber, bool isLossOfHeterozygosity, float? deNovoQuality, int[] splitReadCounts,
             int[] pairEndReadCounts, string repeatNumbers, string repeatNumberSpan)
         {
             Genotype = genotype;
