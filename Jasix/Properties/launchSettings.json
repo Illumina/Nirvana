@@ -2,7 +2,7 @@
   "profiles": {
     "Jasix": {
       "commandName": "Project",
-      "commandLineArgs": "  -i momGen.json.gz -q 22 -o test.json",
+      "commandLineArgs": " -i LP2100674-DNA_A01_LP2100673-DNA_A01_G1_P1.somatic.SV.json.gz -q chr9:835025-39582453",
       "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
