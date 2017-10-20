@@ -224,8 +224,8 @@ namespace VariantAnnotation.IO.VcfWriter
             var annotatedVarIndex = 0;
             for (var inputIndex = 0; inputIndex < positionAltAlleles.Length && annotatedVarIndex < numAnnotatedVar; inputIndex++)
             {
-                if (positionAltAlleles[inputIndex] !=
-                    annotatedPositionAnnotatedVariants[annotatedVarIndex].Variant.AltAllele) continue;
+                if (VcfCommon.NonInformativeAltAllele.Contains(positionAltAlleles[inputIndex]) ||
+                    positionAltAlleles[inputIndex] == VcfCommon.GatkNonRefAllele) continue;
                 inputGenotypeIndex[annotatedVarIndex] = inputIndex;
                 annotatedVarIndex++;
             }
