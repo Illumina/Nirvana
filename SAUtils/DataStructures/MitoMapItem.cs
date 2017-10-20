@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
@@ -35,12 +34,12 @@ namespace SAUtils.DataStructures
 
     public sealed class MitoMapItem : SupplementaryDataItem
     {
-        private List<string> _diseases;
+        private readonly List<string> _diseases;
         private bool? _homoplasmy;
         private bool? _heteroplasmy;
-        private string _status;
-        private string _clinicalSignificance;
-        private string _scorePercentile;
+        private readonly string _status;
+        private readonly string _clinicalSignificance;
+        private readonly string _scorePercentile;
         private int? _intervalEnd;
         private VariantType? _variantType;
         private static readonly Chromosome ChromM = new Chromosome("chrM", "MT", 24);
@@ -105,39 +104,43 @@ namespace SAUtils.DataStructures
             {
                 var mutation = (mitoMapMutItem.ReferenceAllele, mitoMapMutItem.AlternateAllele);
                 if (aggregatedMutations.ContainsKey(mutation))
-                    aggregatedMutations[mutation].Update(mitoMapMutItem);
+                    aggregatedMutations[mutation] =  Merge(aggregatedMutations[mutation], mitoMapMutItem);
                 else aggregatedMutations[mutation] = mitoMapMutItem;
             }
             return aggregatedMutations;
         }
 
-        private void Update(MitoMapItem newMitoMapItem)
+        private static MitoMapItem Merge(MitoMapItem mitoMapItem1, MitoMapItem mitoMapItem2)
         {
-            if (HasConflict(Chromosome, newMitoMapItem.Chromosome) || HasConflict(Start, newMitoMapItem.Start) ||
-                HasConflict(ReferenceAllele, newMitoMapItem.ReferenceAllele) || HasConflict(AlternateAllele, newMitoMapItem.AlternateAllele) || HasConflict(_homoplasmy, newMitoMapItem._homoplasmy) || HasConflict(_heteroplasmy, newMitoMapItem._heteroplasmy) || HasConflict(_status, newMitoMapItem._status) || HasConflict(_clinicalSignificance, newMitoMapItem._clinicalSignificance) || HasConflict(_scorePercentile, newMitoMapItem._scorePercentile) || HasConflict(_intervalEnd, newMitoMapItem._intervalEnd) || HasConflict(_variantType, newMitoMapItem._variantType))
+            if (HasConflict(mitoMapItem1.Chromosome, mitoMapItem2.Chromosome) || HasConflict(mitoMapItem1.Start, mitoMapItem2.Start) ||
+                HasConflict(mitoMapItem1.ReferenceAllele, mitoMapItem2.ReferenceAllele) || HasConflict(mitoMapItem1.AlternateAllele, mitoMapItem2.AlternateAllele) || HasConflict(mitoMapItem1._homoplasmy, mitoMapItem2._homoplasmy) || HasConflict(mitoMapItem1._heteroplasmy, mitoMapItem2._heteroplasmy) || HasConflict(mitoMapItem1._status, mitoMapItem2._status) || HasConflict(mitoMapItem1._clinicalSignificance, mitoMapItem2._clinicalSignificance) || HasConflict(mitoMapItem1._scorePercentile, mitoMapItem2._scorePercentile) || HasConflict(mitoMapItem1.IsInterval, mitoMapItem2.IsInterval) || HasConflict(mitoMapItem1._intervalEnd, mitoMapItem2._intervalEnd) || HasConflict(mitoMapItem1._variantType, mitoMapItem2._variantType))
             {
-                throw new InvalidDataException($"Conflict found at {Start} when updating MITOMAP record: original record: {GetVariantJsonString()}; new record: {newMitoMapItem.GetVariantJsonString()} ");
+                throw new InvalidDataException($"Conflict found at {mitoMapItem1.Start} when updating MITOMAP record: first record: {mitoMapItem1.GetVariantJsonString()}; second record: {mitoMapItem2.GetVariantJsonString()} ");
             }
-            _homoplasmy = _homoplasmy ?? newMitoMapItem._homoplasmy;
-            _heteroplasmy = _heteroplasmy ?? newMitoMapItem._heteroplasmy;
-            if (_diseases != null && newMitoMapItem._diseases != null)
+            var homoplasmy = mitoMapItem1._homoplasmy ?? mitoMapItem2._homoplasmy;
+            var heteroplasmy = mitoMapItem1._heteroplasmy ?? mitoMapItem2._heteroplasmy;
+            List<string> diseases;
+            if (mitoMapItem1._diseases != null && mitoMapItem2._diseases != null)
             {
-                Console.WriteLine($"Merge diseases at {Start}, {ReferenceAllele}-{AlternateAllele}: {string.Join(",", _diseases)} and {string.Join(",",newMitoMapItem._diseases)}");
-                _diseases.AddRange(newMitoMapItem._diseases);
-                _diseases = _diseases.Distinct().ToList();
+                Console.WriteLine($"Merge diseases at {mitoMapItem1.Start}, {mitoMapItem1.ReferenceAllele}-{mitoMapItem1.AlternateAllele}: {string.Join(",", mitoMapItem1._diseases)} and {string.Join(",",mitoMapItem2._diseases)}");
+                diseases = mitoMapItem1._diseases.Concat(mitoMapItem2._diseases).Distinct().ToList();
             }
             else
             {
-                _diseases = (_diseases != null && _diseases.Count > 0) ? _diseases : newMitoMapItem._diseases;
+                diseases = (mitoMapItem1._diseases?.Count > 0) ? mitoMapItem1._diseases : mitoMapItem2._diseases;
             }
-            _status = _status ?? newMitoMapItem._status;
-            _clinicalSignificance = _clinicalSignificance ?? newMitoMapItem._clinicalSignificance;
-            _scorePercentile = _scorePercentile ?? newMitoMapItem._scorePercentile;
-            _intervalEnd = _intervalEnd ?? newMitoMapItem._intervalEnd;
-            _variantType = _variantType ?? newMitoMapItem._variantType;
+            var status = mitoMapItem1._status ?? mitoMapItem2._status;
+            var clinicalSignificance = mitoMapItem1._clinicalSignificance ?? mitoMapItem2._clinicalSignificance;
+            var scorePercentile = mitoMapItem1._scorePercentile ?? mitoMapItem2._scorePercentile;
+            var isInterval = mitoMapItem1.IsInterval;
+            var intervalEnd = mitoMapItem1._intervalEnd ?? mitoMapItem2._intervalEnd;
+            var variantType = mitoMapItem1._variantType ?? mitoMapItem2._variantType;
+            return new MitoMapItem(mitoMapItem1.Start, mitoMapItem1.ReferenceAllele, mitoMapItem1.AlternateAllele,
+                diseases, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile, isInterval,
+                intervalEnd, variantType);
         }
 
-        private bool HasConflict<T>(T originalValue, T newValue)
+        private static bool HasConflict<T>(T originalValue, T newValue)
         {
             return !IsNullOrEmpty(originalValue) && !IsNullOrEmpty(newValue) && !originalValue.Equals(newValue);
         }
