@@ -26,7 +26,7 @@ namespace VariantAnnotation.IO
             jsonObject.AddIntValues("splitReadCounts", sample.SplitReadCounts);
             jsonObject.AddIntValues("pairedEndReadCounts", sample.PairEndReadCounts);
             jsonObject.AddBoolValue("lossOfHeterozygosity", sample.IsLossOfHeterozygosity);
-            jsonObject.AddIntValue("deNovoQuality", sample.DeNovoQuality);
+            jsonObject.AddDoubleValue("deNovoQuality", sample.DeNovoQuality, "0.#");
 
             sb.Append(JsonObject.CloseBrace);
             return sb.ToString();
