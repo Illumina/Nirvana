@@ -279,11 +279,11 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void GenotypeIndex_is_correct_w_nonInformative_altAlleles_filtered()
         {
             var vcfFields1 = "chr1	101	sa123	A	<*>,T	.	.	.".Split("\t");
-            var vcfFields2 = "chr1	101	sa123	A	M,T	.	.	.".Split("\t");
+            var vcfFields2 = "chr1	101	sa123	A	<M>,T	.	.	.".Split("\t");
             var vcfFields3 = "chr1	101	sa123	A	*,T	.	.	.".Split("\t");
             var vcfFields4 = "chr1	101	sa123	A	<NON_REF>,T	.	.	.".Split("\t");
             var vcfFields5 = "chr1	101	sa123	A	T,<*>	.	.	.".Split("\t");
-            var vcfFields6 = "chr1	101	sa123	A	T,M	.	.	.".Split("\t");
+            var vcfFields6 = "chr1	101	sa123	A	T,<M>	.	.	.".Split("\t");
             var vcfFields7 = "chr1	101	sa123	A	T,*	.	.	.".Split("\t");
             var vcfFields8 = "chr1	101	sa123	A	T,<NON_REF>	.	.	.".Split("\t");
 
@@ -291,11 +291,11 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position1 = new Position(chrom, 101, 101, "A", new[] { "<*>", "T" }, 100, null, null, null, inforData, vcfFields1);
-            var position2 = new Position(chrom, 101, 101, "A", new[] { "M", "T" }, 100, null, null, null, inforData, vcfFields2);
+            var position2 = new Position(chrom, 101, 101, "A", new[] { "<M>", "T" }, 100, null, null, null, inforData, vcfFields2);
             var position3 = new Position(chrom, 101, 101, "A", new[] { "*", "T" }, 100, null, null, null, inforData, vcfFields3);
             var position4 = new Position(chrom, 101, 101, "A", new[] { "<NON_REF>", "T" }, 100, null, null, null, inforData, vcfFields4);
             var position5 = new Position(chrom, 101, 101, "A", new[] { "T", "<*>" }, 100, null, null, null, inforData, vcfFields5);
-            var position6 = new Position(chrom, 101, 101, "A", new[] { "T", "M" }, 100, null, null, null, inforData, vcfFields6);
+            var position6 = new Position(chrom, 101, 101, "A", new[] { "T", "<M>" }, 100, null, null, null, inforData, vcfFields6);
             var position7 = new Position(chrom, 101, 101, "A", new[] { "T", "*" }, 100, null, null, null, inforData, vcfFields7);
             var position8 = new Position(chrom, 101, 101, "A", new[] { "T", "<NON_REF>" }, 100, null, null, null, inforData, vcfFields8);
             var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));

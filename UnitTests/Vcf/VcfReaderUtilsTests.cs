@@ -82,6 +82,29 @@ namespace UnitTests.Vcf
             Assert.Equal(new[] { "A" }, annotatedVariants4.Select(x => x.Variant.AltAllele).ToArray());
         }
 
+
+        [Fact]
+        public void Test_crash_caused_by_variant_trimming ()
+        {
+            var vcfLine1 = "chr1	8021910	rs373653682	GGTGCTGGACGGTGTCCCT	G	.	.	.";
+
+            var chromosome = new Chromosome("chr1", "1", 0);
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            refMinorProvider.Setup(x => x.IsReferenceMinor(chromosome, 8021910)).Returns(false);
+            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
+            var variantFactory = new VariantFactory(refNameToChromosome, refMinorProvider.Object, false);
+            var position1 = VcfReaderUtils.ParseVcfLine(vcfLine1, variantFactory, refNameToChromosome);
+
+            var annotatedVariants1 = Annotator.GetAnnotatedVariants(position1.Variants);
+
+            // Positions
+            Assert.Equal(new[] { "G"}, position1.AltAlleles);
+
+            // Variants
+            Assert.Equal(new[] { "" }, annotatedVariants1.Select(x => x.Variant.AltAllele).ToArray());
+        }
+
+
         [Fact]
         public void ParseVcfLine_line_with_only_NonRef_is_refMinor()
         {
