@@ -25,7 +25,7 @@ namespace Vcf.Sample
         public string[] AltAlleles { get; }
         public string RepeatNumber { get; }
         public string RepeatNumberSpan { get; }
-        public int? DenovoQuality { get; }
+        public float? DenovoQuality { get; }
 
         // constructor
         public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols, bool fixGatkGenomeVcf = false)
@@ -74,10 +74,9 @@ namespace Vcf.Sample
             GetPlatypusCounts();
         }
 
-        private static int? GetDenovoQuality(string sampleDqCol)
+        private static float? GetDenovoQuality(string sampleDqCol)
         {
-            int denovoQuality;
-            var parse = int.TryParse(sampleDqCol, out denovoQuality);
+            var parse = float.TryParse(sampleDqCol, out var denovoQuality);
 
             if (!parse) return null;
 

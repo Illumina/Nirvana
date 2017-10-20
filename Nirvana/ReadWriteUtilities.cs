@@ -19,11 +19,18 @@ namespace Nirvana
 		        : new BgzipTextWriter(outputPath + ".json.gz");
 		}
 
-	    internal static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary,IRefMinorProvider refMinorProvider,bool verboseTranscript)
-		{
-			return new VcfReader(GZipUtilities.GetAppropriateReadStream(vcfPath), chromosomeDictionary, refMinorProvider,verboseTranscript);
-		}
+	    internal static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary, IRefMinorProvider refMinorProvider, bool verboseTranscript)
+	    {
+	        var useStdInput = ConfigurationSettings.VcfPath == "-";
 
+	        var peekStream =
+	            new PeekStream(useStdInput
+	                ? Console.OpenStandardInput()
+	                : GZipUtilities.GetAppropriateReadStream(vcfPath));
+
+	        return new VcfReader(peekStream, chromosomeDictionary, refMinorProvider, verboseTranscript);
+        }
+        
 	    public static StreamWriter GetVcfOutputWriter(string outputPath)
 	    {
 	        return ConfigurationSettings.OutputFileName == "-"

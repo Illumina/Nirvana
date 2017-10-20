@@ -1,44 +1,47 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Providers;
+using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.MitoMAP
 {
-    public class CircularGenomeModel
+    public sealed class CircularGenomeModel
     {
-        public readonly int GenomeLength;
-        private readonly ReferenceSequenceProvider _sequenceProvider;
+        private readonly int _genomeLength;
+        private readonly ISequence _compressedSequence;
 
-        public CircularGenomeModel(ReferenceSequenceProvider sequenceProvider)
+        public CircularGenomeModel(ISequence compressedSequence)
         {
-            _sequenceProvider = sequenceProvider;
-            GenomeLength = _sequenceProvider.Sequence.Length;
+            _compressedSequence = compressedSequence;
+            _genomeLength = compressedSequence.Length;
         }
 
-        // translate the genomic coordinate that may be bigger than the genome length due to mathmatical operations 
-        private int GetRealPosition(int posi) => ((posi - 1) % GenomeLength) + 1;
+        // convert an interval on the circular genome position into that on a linear pseudogenome, where the end point may be bigger than the genome length 
+        private (int, int) CircularToPseudo((int, int) interval) => ( interval.Item1, (interval.Item2 >= interval.Item1) ? interval.Item2 : interval.Item2 + _genomeLength);
 
-        // translate the genomic interval that may overlap with the origin of the genome into interval(s) on linear sequence
-        private List<(int, int)> GetLinearIntervals(int start, int end)
+        // convert linear pseudogenome position back to the circular genome position 
+        private (int, int) PseudoToCircular((int, int) interval) =>  (GetCircularPosition(interval.Item1), GetCircularPosition(interval.Item2));
+
+        private int GetCircularPosition(int posi) => (posi - 1) % _genomeLength + 1;
+
+        // translate the genomic interval that may overlap with the origin of the genome, no matter on circular genome or linear pseudo genome,  into interval(s) not crossing the origin
+        private List<(int, int)> SplitInterval((int, int) interval)
         {
-            var realStart = GetRealPosition(start);
-            var realEnd = GetRealPosition(end);
+            var (circularStart, circularEnd) = PseudoToCircular(interval);
             var intervalList = new List<(int, int)>();
-            if (realEnd >= realStart)
-                intervalList.Add((realStart, realEnd));
+            if (circularEnd >= circularStart)
+                intervalList.Add((circularStart, circularEnd));
             else
             {
-                intervalList.Add((realStart, GenomeLength));
-                intervalList.Add((1, realEnd));
+                intervalList.Add((circularStart, _genomeLength));
+                intervalList.Add((1, circularEnd));
             }
             return intervalList;
         }
 
-        public string ExtractIntervalSequence(int start, int end)
+        public string ExtractIntervalSequence((int, int) interval)
         {
             var subSequence = "";
-            GetLinearIntervals(start, end).ForEach(x => subSequence += _sequenceProvider.Sequence.Substring(x.Item1 - 1, x.Item2 - x.Item1 + 1));
+            SplitInterval(interval).ForEach(x => subSequence += _compressedSequence.Substring(x.Item1 - 1, x.Item2 - x.Item1 + 1));
             return subSequence;
         }
-
     }
 }
