@@ -54,14 +54,13 @@ namespace Vcf.VariantCreator
 			var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele);
 
             if (isReference)
-                return new IVariant[1]{ GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber) };
+                return new []{ GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber) };
             var variants = new List<IVariant>();
 
-		    // ReSharper disable once LoopCanBeConvertedToQuery
-            for (var i=0; i < altAlleles.Length; i++)
+            foreach (string altAllele in altAlleles)
             {
-                if (VcfCommon.NonInformativeAltAllele.Contains(altAlleles[i]) || altAlleles[i] == VcfCommon.GatkNonRefAllele) continue;
-                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAlleles[i], infoData, variantCategory, sampleCopyNumber));
+                if (VcfCommon.NonInformativeAltAllele.Contains(altAllele) || altAllele == VcfCommon.GatkNonRefAllele) continue;
+                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAllele, infoData, variantCategory, sampleCopyNumber));
             }
             return variants.Count==0? null:variants.ToArray();
         }
@@ -71,7 +70,7 @@ namespace Vcf.VariantCreator
 		    switch (category)
 		    {
 				case VariantCategory.Reference:
-					var refMinorGlobalMajorAllele = _refMinorProvider?.GetGlobalMajorAlleleForRefMinor(chromosome, start) ?? null;
+					var refMinorGlobalMajorAllele = _refMinorProvider?.GetGlobalMajorAlleleForRefMinor(chromosome, start);
 				    return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, refMinorGlobalMajorAllele);
 			    case VariantCategory.SmallVariant:
 				    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele);
