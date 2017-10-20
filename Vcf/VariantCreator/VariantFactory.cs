@@ -52,27 +52,18 @@ namespace Vcf.VariantCreator
 		    var isReference      = altAlleles.Length == 1 && ( altAlleles[0] == "." || altAlleles[0] == VcfCommon.GatkNonRefAllele);
 		    var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
 			var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele);
-		    var filteredAltAlleleIndexes = filterNonInformativeAlleles(altAlleles);
-		    if (filteredAltAlleleIndexes.Length == 0) return null;
-            var variants = new IVariant[filteredAltAlleleIndexes.Length];
-		    for (var i=0; i < filteredAltAlleleIndexes.Length; i++)
-            {
-				variants[i] = GetVariant(chromosome, id, start, end, refAllele, altAlleles[filteredAltAlleleIndexes[i]], infoData, variantCategory, sampleCopyNumber);
-            }
-            return variants;
-        }
 
-        private int[] filterNonInformativeAlleles(string[] altAlleles)
-        {
-            // <NON_REF> only
-            if (altAlleles.Length == 1 && altAlleles[0] == VcfCommon.GatkNonRefAllele) return new []{0};
-            var filteredAlleleIndexs = new List<int>();
-            for (var i = 0; i < altAlleles.Length; i++)
+            if (isReference)
+                return new IVariant[1]{ GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber) };
+            var variants = new List<IVariant>();
+
+		    // ReSharper disable once LoopCanBeConvertedToQuery
+            for (var i=0; i < altAlleles.Length; i++)
             {
                 if (VcfCommon.NonInformativeAltAllele.Contains(altAlleles[i]) || altAlleles[i] == VcfCommon.GatkNonRefAllele) continue;
-                filteredAlleleIndexs.Add(i);
+                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAlleles[i], infoData, variantCategory, sampleCopyNumber));
             }
-            return filteredAlleleIndexs.ToArray();
+            return variants.Count==0? null:variants.ToArray();
         }
 
         private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, int? sampleCopyNumber)
