@@ -12,14 +12,14 @@ namespace Compression.FileHandling
         private int _bufferLength;
         private int _bufferIndex;
         private long _streamPosition;
-        private const int BufferSize = 4 * 1024;
+        private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
 
         public long Position => _streamPosition + _bufferIndex;
 
         
         public BgzipTextReader(Stream stream, char newLineChar = '\n')
         {
-            _buffer = new byte[BufferSize];//4kb blocks
+            _buffer = new byte[BufferSize];
             _stream = stream;
             _newLineChar = newLineChar;
 
