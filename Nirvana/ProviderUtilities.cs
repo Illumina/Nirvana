@@ -51,7 +51,7 @@ namespace Nirvana
 
 	        var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories);
 	        if (reader == null) return null;
-            var geneAnnotationProvider = new OmimAnnotationProvider(reader);
+            var geneAnnotationProvider = new GeneAnnotationProvider(reader);
 	        return geneAnnotationProvider;
 
 	    }
