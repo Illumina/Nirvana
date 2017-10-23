@@ -132,7 +132,7 @@ namespace UnitTests.VariantAnnotation
             var geneAnnotationProvider = new Mock<IGeneAnnotationProvider>();
 		    geneAnnotationProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
 
-			var annotator = new Annotator(taProvider.Object, null, null, null,new []{geneAnnotationProvider.Object});
+			var annotator = new Annotator(taProvider.Object, null, null, null,geneAnnotationProvider.Object);
             var annotatedPosition = new Mock<IAnnotatedPosition>();
             var annotatedVariant = new Mock<IAnnotatedVariant>();
             var ensembleTranscript = new Mock<IAnnotatedTranscript>();
@@ -173,8 +173,7 @@ namespace UnitTests.VariantAnnotation
 			var omimProvider = new Mock<IGeneAnnotationProvider>();
 			omimProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
 
-			var geneAnnotationProviders = new [] { omimProvider.Object };
-			var annotator = new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, geneAnnotationProviders);
+			var annotator = new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object);
 			
 			Assert.NotNull(annotator);
 
@@ -195,9 +194,8 @@ namespace UnitTests.VariantAnnotation
 			var omimProvider = new Mock<IGeneAnnotationProvider>();
 			omimProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
 
-			var geneAnnotationProviders = new[] { omimProvider.Object };
 
-			Assert.Throws<InconsistantGenomeAssemblyException>( ()=> new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, geneAnnotationProviders));
+			Assert.Throws<InconsistantGenomeAssemblyException>( ()=> new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object));
 
 		}
 

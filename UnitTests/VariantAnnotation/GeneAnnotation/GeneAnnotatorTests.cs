@@ -11,10 +11,9 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         public void Annoate_noAnnotation()
         {
             var annotationProvider = new Mock<IGeneAnnotationProvider>();
-            var providers = new[] {annotationProvider.Object};
             annotationProvider.Setup(x => x.Annotate(It.IsAny<string>())).Returns((IAnnotatedGene)null);
 
-            var observedResult = GeneAnnotator.Annotate(new[] {"gene1", "gene2"},providers);
+            var observedResult = GeneAnnotator.Annotate(new[] {"gene1", "gene2"}, annotationProvider.Object);
 
             Assert.Equal(0,observedResult.Count);
         }
@@ -23,13 +22,12 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         public void Annoate()
         {
             var annotationProvider = new Mock<IGeneAnnotationProvider>();
-            var providers = new[] { annotationProvider.Object };
             annotationProvider.Setup(x => x.Annotate("gene2")).Returns((IAnnotatedGene)null);
             var geneAnnotation = new Mock<IAnnotatedGene>();
             annotationProvider.Setup(x => x.Annotate("gene1")).Returns(geneAnnotation.Object);
 
 
-            var observedResult = GeneAnnotator.Annotate(new[] { "gene1", "gene2" }, providers);
+            var observedResult = GeneAnnotator.Annotate(new[] { "gene1", "gene2" }, annotationProvider.Object);
 
             Assert.Equal(1, observedResult.Count);
             Assert.Equal(geneAnnotation.Object,observedResult[0]);

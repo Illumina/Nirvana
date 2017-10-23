@@ -20,17 +20,17 @@ namespace VariantAnnotation
         private readonly ISequenceProvider _sequenceProvider;
         private readonly IAnnotationProvider _conservationProvider;
         private readonly HashSet<string> _affectedGenes;
-        private readonly IGeneAnnotationProvider[] _geneAnnotationProviders;
+        private readonly IGeneAnnotationProvider _geneAnnotationProvider;
         private bool _annotateMito;
         public GenomeAssembly GenomeAssembly { get; }
 
-        public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider, IGeneAnnotationProvider[] geneAnnotationProviders)
+        public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider, IGeneAnnotationProvider geneAnnotationProvider)
         {
             _saProviders = saProviders;
             _taProvider = taProvider;
             _sequenceProvider = sequenceProvider;
             _conservationProvider = conservationProvider;
-            _geneAnnotationProviders = geneAnnotationProviders;
+            _geneAnnotationProvider = geneAnnotationProvider;
 
             GenomeAssembly = GetGenomeAssembly();
 
@@ -80,7 +80,7 @@ namespace VariantAnnotation
 
         internal void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
         {
-            if (_geneAnnotationProviders == null || _geneAnnotationProviders.Length == 0) return;
+            if (_geneAnnotationProvider == null) return;
             foreach (var variant in annotatedPosition.AnnotatedVariants)
             {
                 if (variant.OverlappingGenes != null)
@@ -116,7 +116,7 @@ namespace VariantAnnotation
             return annotatedVariants;
         }
 
-        public IList<IAnnotatedGene> GetAnnotatedGenes() => GeneAnnotator.Annotate(_affectedGenes, _geneAnnotationProviders);
+        public IList<IAnnotatedGene> GetAnnotatedGenes() => GeneAnnotator.Annotate(_affectedGenes, _geneAnnotationProvider);
         public void EnableMitochondrialAnnotation()
         {
             _annotateMito = true;
