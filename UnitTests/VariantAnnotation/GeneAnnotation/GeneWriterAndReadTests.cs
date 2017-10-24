@@ -12,8 +12,11 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         {
             var geneAnnotation = new global::VariantAnnotation.GeneAnnotation.GeneAnnotation("omim", new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true);
             var ms = new MemoryStream();
-            var writer = new ExtendedBinaryWriter(ms, Encoding.Default,true);
-            geneAnnotation.Write(writer);
+            using (var writer = new ExtendedBinaryWriter(ms, Encoding.Default, true))
+            {
+                geneAnnotation.Write(writer);
+            }
+               
 
             ms.Position = 0;
             var reader = new ExtendedBinaryReader(ms);
