@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public class GeneAnnotation:IGeneAnnotation
+    public sealed class GeneAnnotation:IGeneAnnotation
     {
         public string DataSource { get; }
         public string[] JsonStrings { get; }

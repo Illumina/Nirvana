@@ -5,7 +5,7 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public class AnnotatedGene:IAnnotatedGene
+    public sealed class AnnotatedGene:IAnnotatedGene
     {
         private const string NullGene = "nullGene";
         public string GeneName { get; }

@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
@@ -26,7 +27,7 @@ namespace VariantAnnotation
             foreach (var omimDatabaseDir in omimDirs)
             {
                 var omimFile = Path.Combine(omimDatabaseDir, SaDataBaseCommon.OmimDatabaseFileName);
-                if (File.Exists(omimFile)) return new GeneDatabaseReader(omimFile);
+                if (File.Exists(omimFile)) return new GeneDatabaseReader(FileUtilities.GetReadStream(omimFile));
             }
 
             return null;

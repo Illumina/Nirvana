@@ -1,6 +1,7 @@
 ﻿using ErrorHandling.Exceptions;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
@@ -13,18 +14,16 @@ namespace VariantAnnotation.GeneAnnotation
 {
     public sealed class GeneDatabaseReader
     {
-        private readonly string _geneDatabaseFile;
+
         private readonly ExtendedBinaryReader _reader;
         public GenomeAssembly GenomeAssembly;
         private long _creationTime;
         public List<IDataSourceVersion> DataSourceVersions;
 
 
-        public GeneDatabaseReader(string geneDatabaseFile)
+        public GeneDatabaseReader(Stream geneDatabaseFileStream)
         {
-            // open the database file
-            _geneDatabaseFile = geneDatabaseFile;
-            _reader = new ExtendedBinaryReader(FileUtilities.GetReadStream(geneDatabaseFile));
+            _reader = new ExtendedBinaryReader(geneDatabaseFileStream);
             DataSourceVersions = new List<IDataSourceVersion>();
             ReadHeader();
         }
