@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -37,15 +36,15 @@ namespace Nirvana
             var saProvider                   = ProviderUtilities.GetSaProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
             var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var geneAnnotationProviders      = ProviderUtilities.GetGeneAnnotationProviders(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProviders);
+            var geneAnnotationProvider      = ProviderUtilities.GetGeneAnnotationProviders(ConfigurationSettings.SupplementaryAnnotationDirectories);
+            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider);
 
             var dataSourceVersions = new List<IDataSourceVersion>();
             dataSourceVersions.AddRange(transcriptAnnotationProvider.DataSourceVersions);
             if (saProvider != null) dataSourceVersions.AddRange(saProvider.DataSourceVersions);
-            if (geneAnnotationProviders != null && geneAnnotationProviders.Length > 0)
+            if (geneAnnotationProvider != null )
             {
-                dataSourceVersions.AddRange(geneAnnotationProviders.SelectMany(x => x.DataSourceVersions));
+                dataSourceVersions.AddRange(geneAnnotationProvider.DataSourceVersions);
             }
 
             if (conservationProvider != null) dataSourceVersions.AddRange(conservationProvider.DataSourceVersions);

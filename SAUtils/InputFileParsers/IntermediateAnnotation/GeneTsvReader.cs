@@ -70,7 +70,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
             var geneSymbol = columns[GeneIndex];
             var jsonStrings = columns.Skip(JsonStringIndex).ToArray();
-            return new AnnotatedGene(geneSymbol, new[] { new GeneAnnotation(_keyName, jsonStrings, _isArray) });
+            return new AnnotatedGene(geneSymbol, new[] { new GeneAnnotationSource(_keyName, jsonStrings, _isArray) });
         }
 
         public InterimHeader GetHeader()

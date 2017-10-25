@@ -13,7 +13,7 @@ namespace Nirvana
 {
 	public static class ProviderUtilities
 	{
-		public static IAnnotator GetAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,IGeneAnnotationProvider[] geneAnnotationProviders)
+		public static IAnnotator GetAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,IGeneAnnotationProvider geneAnnotationProviders)
 		{
 			return new Annotator(taProvider, sequenceProvider, saProviders, conservationProvider,geneAnnotationProviders);
 		}
@@ -46,14 +46,13 @@ namespace Nirvana
 	        return supplementaryAnnotationDirectories==null || supplementaryAnnotationDirectories.Count==0? null: new RefMinorProvider(supplementaryAnnotationDirectories);
 	    }
 
-	    public static IGeneAnnotationProvider[] GetGeneAnnotationProviders(List<string> supplementaryAnnotationDirectories)
+	    public static IGeneAnnotationProvider GetGeneAnnotationProviders(List<string> supplementaryAnnotationDirectories)
 	    {
 
 	        var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories);
 	        if (reader == null) return null;
-            var geneAnnotationProviders = new IGeneAnnotationProvider[1];
-	        geneAnnotationProviders[0] = new OmimAnnotationProvider(reader);
-	        return geneAnnotationProviders;
+            var geneAnnotationProvider = new GeneAnnotationProvider(reader);
+	        return geneAnnotationProvider;
 
 	    }
 	}

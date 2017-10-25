@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.InputFileParsers.MitoMAP

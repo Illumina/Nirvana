@@ -6,7 +6,7 @@ namespace VariantAnnotation.Interface.GeneAnnotation
 	public interface IAnnotatedGene:IJsonSerializer,IComparable<IAnnotatedGene>
 	{
         string GeneName { get; }
-        IGeneAnnotation[] Annotations { get; }
+        IGeneAnnotationSource[] Annotations { get; }
         void Write(IExtendedBinaryWriter writer);
 	}
 
