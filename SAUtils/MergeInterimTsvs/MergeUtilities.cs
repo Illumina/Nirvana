@@ -38,13 +38,13 @@ namespace SAUtils.MergeInterimTsvs
             return minItems.Count == 0 ? null : minItems;
         }
 
-        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(List<InterimSaHeader> interimSaHeaders,
-            List<InterimIntervalHeader> intervalHeaders)
+        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(List<SmallAnnotationsHeader> interimSaHeaders,
+            List<IntervalAnnotationHeader> intervalHeaders)
         {
             return interimSaHeaders.Select(header => header.GetDataSourceVersion()).Concat(intervalHeaders.Select(header => header.GetDataSourceVersion()));
         }
 
-        public static void CheckAssemblyConsistancy(IEnumerable<InterimSaHeader> iSaHeaders, IEnumerable<InterimIntervalHeader> iIntervalHeaders)
+        public static void CheckAssemblyConsistancy(IEnumerable<SmallAnnotationsHeader> iSaHeaders, IEnumerable<IntervalAnnotationHeader> iIntervalHeaders)
         {
             var uniqueAssemblies = iSaHeaders.Select(x => x.GenomeAssembly)
                 .Concat(iIntervalHeaders.Select(x => x.GenomeAssembly))

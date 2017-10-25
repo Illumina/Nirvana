@@ -2,18 +2,21 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using SAUtils.DataStructures;
+using SAUtils.Interface;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class IntervalTsvReader 
+    public sealed class IntervalTsvReader:ITsvReader
     {
-        private readonly FileInfo _inputFileInfo;
+        public SaHeader SaHeader => _header;
+        public IEnumerable<string> RefNames => _refNameOffsets.Keys;
+
+        private readonly StreamReader _reader;
+        private readonly IntervalAnnotationHeader _header;
         private string _name;
         private string _genomeAssembly;
         private string _version;
@@ -31,31 +34,39 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private const int MinNoOfColumns = 4;
 
-        public IntervalTsvReader(FileInfo inputFileInfo)
+        public IntervalTsvReader(StreamReader reader, Stream indexFileStream)
         {
-            _inputFileInfo = inputFileInfo;
-
-            using (var tsvIndex = new TsvIndex(new BinaryReader(FileUtilities.GetReadStream(inputFileInfo.FullName + ".tvi"))))
+            using (var tsvIndex = new TsvIndex(new BinaryReader(indexFileStream)))
             {
                 _refNameOffsets = tsvIndex.TagPositions;
             }
-
-
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    if (!line.StartsWith("#")) break;
-
-                    ParseHeaderLine(line);
-                }
-
-            }
+            _reader = reader;
+            _header = ReadHeader(_reader);
         }
 
+        private IntervalAnnotationHeader ReadHeader(StreamReader reader)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                // Skip empty lines.
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (!line.StartsWith("#")) break;
+
+                ParseHeaderLine(line);
+            }
+
+            if (!string.IsNullOrEmpty(_name) 
+             && !string.IsNullOrEmpty(_version) 
+             && !string.IsNullOrEmpty(_releaseDate) 
+             && !string.IsNullOrEmpty(_keyName)
+             && _reportFor != ReportFor.None
+             )
+                return new IntervalAnnotationHeader(_name, _genomeAssembly, _version, _releaseDate, _description, _reportFor);
+
+            Console.WriteLine($"Insufficient version information for {_name}");
+            return null;
+        }
 
         public IEnumerable<ISupplementaryInterval> GetAnnotationItems(string refName)
         {
@@ -63,30 +74,28 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
             var offset = _refNameOffsets[refName];
 
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
+            _reader.BaseStream.Position = offset;
+            string line;
+            //getting to the chromosome
+            while ((line = _reader.ReadLine()) != null)
             {
-                reader.BaseStream.Position = offset;
-                string line;
-                //getting to the chromosome
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
-                    // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
-                    if (line.StartsWith(refName + "\t")) break;
-                }
-                if (line == null) yield break;
-                do
-                {
-                    //next chromosome
-                    if (!line.StartsWith(refName + "\t")) yield break;
-
-                    var annotationItem = ExtractItem(line);
-                    if (annotationItem == null) continue;
-
-                    yield return annotationItem;
-
-                } while ((line = reader.ReadLine()) != null);
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
+                if (line.StartsWith(refName + "\t")) break;
             }
+            if (line == null) yield break;
+            do
+            {
+                //next chromosome
+                if (!line.StartsWith(refName + "\t")) yield break;
+
+                var annotationItem = ExtractItem(line);
+                if (annotationItem == null) continue;
+
+                yield return annotationItem;
+
+            } while ((line = _reader.ReadLine()) != null);
+            
         }
 
 
@@ -102,21 +111,6 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             var jsonString = columns[JsonStringIndex];
 
             return new SupplementaryInterval(_keyName, chromosome, start, end, jsonString, _reportFor);
-        }
-
-        public InterimIntervalHeader GetHeader()
-        {
-            if (string.IsNullOrEmpty(_name)           ||
-                string.IsNullOrEmpty(_version)        ||
-                string.IsNullOrEmpty(_releaseDate)    ||
-                string.IsNullOrEmpty(_keyName)
-                )
-            {
-                Console.WriteLine($"Insufficient version information for {_name}");
-                return null;
-            }
-
-            return new InterimIntervalHeader(_name, _genomeAssembly, _version, _releaseDate, _description, _reportFor);
         }
 
         private void ParseHeaderLine(string line)
@@ -180,5 +174,11 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         {
             return _refNameOffsets.Keys.ToList();
         }
+
+        public void Dispose()
+        {
+            _reader.Dispose();
+        }
+        
     }
 }

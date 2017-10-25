@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -23,9 +24,9 @@ namespace SAUtils.MergeInterimTsvs
         private List<IntervalTsvReader> _intervalReaders;
         private List<GeneTsvReader> _geneReaders;
         private SaMiscellaniesReader _miscReader;
-        private readonly List<InterimSaHeader> _interimSaHeaders;
-        private readonly List<InterimIntervalHeader> _intervalHeaders;
-        private readonly List<InterimHeader> _geneHeaders;
+        private readonly List<SmallAnnotationsHeader> _interimSaHeaders;
+        private readonly List<IntervalAnnotationHeader> _intervalHeaders;
+        private readonly List<SaHeader> _geneHeaders;
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
         private readonly IDictionary<string, IChromosome> _refChromDict;
@@ -42,13 +43,20 @@ namespace SAUtils.MergeInterimTsvs
             var refSequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReference));
             _genomeAssembly = refSequenceProvider.GenomeAssembly;
             _refChromDict = refSequenceProvider.GetChromosomeDictionary();
-            _interimSaHeaders = new List<InterimSaHeader>();
-            _intervalHeaders = new List<InterimIntervalHeader>();
-            _geneHeaders = new List<InterimHeader>();
+            _interimSaHeaders = new List<SmallAnnotationsHeader>();
+            _intervalHeaders = new List<IntervalAnnotationHeader>();
+            _geneHeaders = new List<SaHeader>();
             _allRefNames = new List<string>();
-            var headers = new List<InterimHeader>();
-            SetSaTsvReaders(annotationFiles, headers);
-            SetIntervalReaders(intervalFiles, headers);
+            var headers = new List<SaHeader>();
+
+            _tsvReaders = GetSaTsvReaders(annotationFiles);
+            headers.AddRange(GetTsvHeaders(_tsvReaders));
+            _allRefNames.AddRange(GetRefNames(_tsvReaders));
+
+            _intervalReaders = GetIntervalReaders(intervalFiles, headers);
+            headers.AddRange(GetTsvHeaders(_intervalReaders));
+            _allRefNames.AddRange(GetRefNames(_intervalReaders));
+
             SetGeneReaders(geneFiles, headers);
             SetMiscTsvReader(miscFile);
             DisplayDataSources(headers);
@@ -56,7 +64,24 @@ namespace SAUtils.MergeInterimTsvs
             MergeUtilities.CheckAssemblyConsistancy(_interimSaHeaders, _intervalHeaders);
         }
 
-        private void SetGeneReaders(List<string> geneFiles, List<InterimHeader> headers)
+        private IEnumerable<string> GetRefNames(IEnumerable<ITsvReader> tsvReaders)
+        {
+            return tsvReaders.SelectMany(tsvReader => tsvReader.RefNames);
+        }
+
+        private IEnumerable<SaHeader> GetTsvHeaders(IEnumerable<ITsvReader> tsvReaders)
+        {
+            foreach (var tsvReader in tsvReaders)
+            {
+                var header = tsvReader.SaHeader;
+                if (header == null) throw new InvalidDataException("Data file lacks version information!!");
+                yield return header;
+            }
+            
+            //_allRefNames.AddRange(tsvReader.GetAllRefNames());
+        }
+
+        private void SetGeneReaders(List<string> geneFiles, List<SaHeader> headers)
         {
             if (geneFiles == null) return;
 
@@ -72,7 +97,7 @@ namespace SAUtils.MergeInterimTsvs
             }
         }
 
-        private void DisplayDataSources(List<InterimHeader> headers)
+        private void DisplayDataSources(List<SaHeader> headers)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Data sources:\n");
@@ -138,44 +163,35 @@ namespace SAUtils.MergeInterimTsvs
             return saItemsList;
         }
 
-        private void SetIntervalReaders(List<string> intervalFiles, List<InterimHeader> headers)
+        private List<IntervalTsvReader> GetIntervalReaders(List<string> intervalFiles, List<SaHeader> headers)
         {
-            if (intervalFiles == null) return;
+            if (intervalFiles == null) return null;
 
+            var readers = new List<IntervalTsvReader>();
             _intervalReaders = new List<IntervalTsvReader>(intervalFiles.Count);
             foreach (var fileName in intervalFiles)
             {
-                var intervalReader = new IntervalTsvReader(new FileInfo(fileName));
-
-                var header = intervalReader.GetHeader();
-                if (header == null) throw new InvalidDataException("Data file lacks version information!!");
-                headers.Add(header);
-                _intervalHeaders.Add(header);
-
-                _allRefNames.AddRange(intervalReader.GetAllRefNames());
-                _intervalReaders.Add(intervalReader);
+                var tsvStreamReader = GZipUtilities.GetAppropriateStreamReader(fileName);
+                var indexFileStream = FileUtilities.GetReadStream(fileName + TsvIndex.FileExtension);
+                readers.Add(new IntervalTsvReader(tsvStreamReader, indexFileStream));
             }
+
+            return readers;
         }
 
-        private void SetSaTsvReaders(List<string> annotationFiles, List<InterimHeader> headers)
+        private List<SaTsvReader> GetSaTsvReaders(List<string> saTsvFiles)
         {
-            if (annotationFiles == null) return;
-            _tsvReaders = new List<SaTsvReader>(annotationFiles.Count);
+            if (saTsvFiles == null) return null;
+            var readers = new List<SaTsvReader>(saTsvFiles.Count);
 
-            foreach (var fileName in annotationFiles)
+            foreach (var fileName in saTsvFiles)
             {
-                var tsvReader = new SaTsvReader(new FileInfo(fileName));
-
-                var header = tsvReader.GetHeader();
-                if (header == null) throw new InvalidDataException("Data file lacks version information!!");
-                headers.Add(header);
-                _interimSaHeaders.Add(header);
-
-                _allRefNames.AddRange(tsvReader.GetAllRefNames());
-                _tsvReaders.Add(tsvReader);
+                var tsvStreamReader = GZipUtilities.GetAppropriateStreamReader(fileName);
+                var indexFileStream = FileUtilities.GetReadStream(fileName + TsvIndex.FileExtension);
+                readers.Add(new SaTsvReader(tsvStreamReader, indexFileStream));
             }
-
-            _allRefNames = _allRefNames.Distinct().ToList();
+            
+            return readers;
         }
 
         private void SetMiscTsvReader(string miscFile)
