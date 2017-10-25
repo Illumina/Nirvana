@@ -2,6 +2,7 @@
 using System.Text;
 using VariantAnnotation.IO;
 using Xunit;
+using VariantAnnotation.GeneAnnotation;
 
 namespace UnitTests.VariantAnnotation.GeneAnnotation
 {
@@ -10,7 +11,7 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         [Fact]
         public void Write_and_read_return_the_same_info()
         {
-            var geneAnnotation = new global::VariantAnnotation.GeneAnnotation.GeneAnnotation("omim", new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true);
+            var geneAnnotation = new GeneAnnotationSource("omim", new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true);
             var ms = new MemoryStream();
             using (var writer = new ExtendedBinaryWriter(ms, Encoding.Default, true))
             {
@@ -20,7 +21,7 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
 
             ms.Position = 0;
             var reader = new ExtendedBinaryReader(ms);
-            var observedAnnotation = global::VariantAnnotation.GeneAnnotation.GeneAnnotation.Read(reader);
+            var observedAnnotation = global::VariantAnnotation.GeneAnnotation.GeneAnnotationSource.Read(reader);
 
             Assert.Equal(geneAnnotation.DataSource ,observedAnnotation.DataSource);
             Assert.Equal(geneAnnotation.JsonStrings.Length,observedAnnotation.JsonStrings.Length);

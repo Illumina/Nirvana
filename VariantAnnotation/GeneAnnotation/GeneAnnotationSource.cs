@@ -3,14 +3,14 @@ using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public sealed class GeneAnnotation:IGeneAnnotation
+    public sealed class GeneAnnotationSource:IGeneAnnotation
     {
         public string DataSource { get; }
         public string[] JsonStrings { get; }
         public bool IsArray { get; }
 
 
-        public GeneAnnotation(string dataSource, string[] jsonStrings, bool isArray)
+        public GeneAnnotationSource(string dataSource, string[] jsonStrings, bool isArray)
         {
             DataSource = dataSource;
             JsonStrings = jsonStrings;
@@ -37,7 +37,7 @@ namespace VariantAnnotation.GeneAnnotation
                 jsonStrings[i] = reader.ReadString();
             }
 
-            return new GeneAnnotation(dataSource, jsonStrings, isArray);
+            return new GeneAnnotationSource(dataSource, jsonStrings, isArray);
         }
     }
 }

@@ -8,7 +8,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.GeneAnnotation
 {
@@ -16,9 +15,9 @@ namespace VariantAnnotation.GeneAnnotation
     {
 
         private readonly ExtendedBinaryReader _reader;
-        public GenomeAssembly GenomeAssembly;
+        private GenomeAssembly GenomeAssembly;
         private long _creationTime;
-        public List<IDataSourceVersion> DataSourceVersions;
+        public readonly List<IDataSourceVersion> DataSourceVersions;
 
 
         public GeneDatabaseReader(Stream geneDatabaseFileStream)

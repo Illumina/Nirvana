@@ -53,7 +53,7 @@ namespace VariantAnnotation.GeneAnnotation
             var annotations = new IGeneAnnotation[annotationLength];
             for (int i = 0; i < annotationLength; i++)
             {
-                annotations[i] = GeneAnnotation.Read(reader);
+                annotations[i] = GeneAnnotationSource.Read(reader);
             }
 
             if (geneName == NullGene) return null;

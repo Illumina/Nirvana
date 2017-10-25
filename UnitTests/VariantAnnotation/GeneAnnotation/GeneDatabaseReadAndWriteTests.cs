@@ -7,7 +7,6 @@ using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.GeneAnnotation
@@ -18,7 +17,7 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         public void Read_and_write_return_the_same_info()
         {
             var annotatedGene = new AnnotatedGene("A2M",
-                new IGeneAnnotation[] {new global::VariantAnnotation.GeneAnnotation.GeneAnnotation("omim",  new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true)});
+                new IGeneAnnotation[] {new global::VariantAnnotation.GeneAnnotation.GeneAnnotationSource("omim",  new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true)});
 
             var ms = new MemoryStream();
             var header = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, 1, new IDataSourceVersion[]{}, GenomeAssembly.Unknown);

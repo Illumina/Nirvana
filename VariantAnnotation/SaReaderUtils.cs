@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
