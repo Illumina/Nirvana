@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.Interface.GeneAnnotation
 {
-    public interface IGeneAnnotation 
+    public interface IGeneAnnotationSource 
     {
         string DataSource { get; }
         string[] JsonStrings { get; }

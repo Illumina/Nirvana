@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public sealed class GeneAnnotationSource:IGeneAnnotation
+    public sealed class GeneAnnotationSource:IGeneAnnotationSource
     {
         public string DataSource { get; }
         public string[] JsonStrings { get; }
@@ -26,7 +26,7 @@ namespace VariantAnnotation.GeneAnnotation
                 writer.Write(jsonString);
         }
 
-        public static IGeneAnnotation Read(IExtendedBinaryReader reader)
+        public static IGeneAnnotationSource Read(IExtendedBinaryReader reader)
         {
             var dataSource = reader.ReadAsciiString();
             var isArray = reader.ReadBoolean();

@@ -11,8 +11,8 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         [Fact]
         public void SerializeJson()
         {
-            var geneAnnotation1 = new Mock<IGeneAnnotation>();
-            var geneAnnotation2 = new Mock<IGeneAnnotation>();
+            var geneAnnotation1 = new Mock<IGeneAnnotationSource>();
+            var geneAnnotation2 = new Mock<IGeneAnnotationSource>();
             var geneAnnotations = new [] {geneAnnotation1.Object, geneAnnotation2.Object};
 
             geneAnnotation1.SetupGet(x => x.DataSource).Returns("annotation1");
