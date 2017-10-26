@@ -18,7 +18,7 @@ namespace SAUtils
         {
             var ops = new Dictionary<string, TopLevelOption>
             {
-                ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvsMain.Run),
+                ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvs.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
                 ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
                 ["geneScoresTsv"] = new TopLevelOption("create gene scores tsv file", GeneScoresMain.Run),

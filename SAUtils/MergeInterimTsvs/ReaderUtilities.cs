@@ -14,6 +14,7 @@ namespace SAUtils.MergeInterimTsvs
     {
         public static List<SaHeader> GetTsvHeaders(IEnumerable<ITsvReader> tsvReaders)
         {
+            if (tsvReaders == null) return null;
             var headers = new List<SaHeader>();
             foreach (var tsvReader in tsvReaders)
             {
@@ -26,7 +27,7 @@ namespace SAUtils.MergeInterimTsvs
 
         public static IEnumerable<string> GetRefNames(IEnumerable<ITsvReader> tsvReaders)
         {
-            return tsvReaders.SelectMany(tsvReader => tsvReader.RefNames);
+            return tsvReaders?.SelectMany(tsvReader => tsvReader.RefNames);
         }
 
         public static List<GeneTsvReader> GetGeneReaders(IEnumerable<string> geneFiles)

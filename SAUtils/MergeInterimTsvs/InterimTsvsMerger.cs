@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
-using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -14,11 +13,10 @@ using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public sealed class MergeInterimTsvs
+    public sealed class InterimTsvsMerger:IDisposable
     {
         private readonly List<SaTsvReader> _tsvReaders;
         private readonly List<IntervalTsvReader> _intervalReaders;
@@ -37,7 +35,7 @@ namespace SAUtils.MergeInterimTsvs
         /// <summary>
         /// constructor
         /// </summary>
-        public MergeInterimTsvs(List<string> annotationFiles, List<string> intervalFiles, string miscFile, List<string> geneFiles, string compressedReference, string outputDirectory)
+        public InterimTsvsMerger(IEnumerable<string> annotationFiles, IEnumerable<string> intervalFiles, string miscFile, IEnumerable<string> geneFiles, string compressedReference, string outputDirectory)
         {
             _outputDirectory = outputDirectory;
 
@@ -56,7 +54,7 @@ namespace SAUtils.MergeInterimTsvs
             _allRefNames.UnionWith(ReaderUtilities.GetRefNames(_intervalReaders));
 
             _geneReaders = ReaderUtilities.GetGeneReaders(geneFiles);
-            _geneHeaders = ReaderUtilities.GetTsvHeaders(_geneReaders).ToList();
+            _geneHeaders = ReaderUtilities.GetTsvHeaders(_geneReaders)?.ToList();
             _saHeaders.AddRange(_geneHeaders);
 
             _miscReader = ReaderUtilities.GetMiscTsvReader(miscFile);
@@ -86,12 +84,6 @@ namespace SAUtils.MergeInterimTsvs
 
             Console.WriteLine();
         }
-
-        private IEnumerable<IEnumerable<ISupplementaryInterval>> GetIntervalEnumerables(string refName)
-        {
-            return _intervalReaders?.Select(intervalReader => intervalReader.GetAnnotationItems(refName)).ToList();
-        }
-
 
         private List<Tuple<int, string>> GetGlobalMajorAlleleForRefMinors(string refName)
         {
@@ -181,7 +173,7 @@ namespace SAUtils.MergeInterimTsvs
             var currentChrAnnotationCount = 0;
             int refMinorCount;
 
-            var iSaEnumerators = GetSaEnumerators(refName);
+            var saEnumerators = GetSaEnumerators(refName);
 
             var globalMajorAlleleInRefMinors = GetGlobalMajorAlleleForRefMinors(refName);
 
@@ -191,12 +183,12 @@ namespace SAUtils.MergeInterimTsvs
             var header = new SupplementaryAnnotationHeader(ucscRefName, DateTime.Now.Ticks,
                 SaDataBaseCommon.DataVersion, dataSourceVersions, _genomeAssembly);
 
-            var intervalEnumerables = GetIntervalEnumerables(refName);
-            var intervals = GetIntervals(intervalEnumerables).OrderBy(x => x.Start).ThenBy(x => x.End).ToList();
+            //we need a list because we will enumerate over it multiple times
+            var intervals = MergeUtilities.GetIntervals(_intervalReaders,refName).OrderBy(x => x.Start).ThenBy(x => x.End).ToList();
 
-            var smallVariantIntervals = GetSpecificIntervals(ReportFor.SmallVariants, intervals);
-            var svIntervals = GetSpecificIntervals(ReportFor.StructuralVariants, intervals);
-            var allVariantsIntervals = GetSpecificIntervals(ReportFor.AllVariants, intervals);
+            var svIntervals           = MergeUtilities.GetSpecificIntervals(ReportFor.StructuralVariants, intervals);
+            var allVariantsIntervals  = MergeUtilities.GetSpecificIntervals(ReportFor.AllVariants, intervals);
+            var smallVariantIntervals = MergeUtilities.GetSpecificIntervals(ReportFor.SmallVariants, intervals);
 
             var saPath = Path.Combine(_outputDirectory, $"{ucscRefName}.nsa");
 
@@ -205,7 +197,7 @@ namespace SAUtils.MergeInterimTsvs
             using (var blockSaWriter = new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantsIntervals, globalMajorAlleleInRefMinors))
             {
                 InterimSaPosition currPosition;
-                while ((currPosition = GetNextInterimPosition(iSaEnumerators)) != null)
+                while ((currPosition = GetNextInterimPosition(saEnumerators)) != null)
                 {
                     var saPosition = currPosition.Convert();
                     blockSaWriter.Write(saPosition, currPosition.Position);
@@ -218,25 +210,7 @@ namespace SAUtils.MergeInterimTsvs
             Console.WriteLine($"{ucscRefName,-23}  {currentChrAnnotationCount,10:n0}   {intervals.Count,6:n0}    {refMinorCount,6:n0}   {creationBench.GetElapsedIterationTime(currentChrAnnotationCount, "variants", out double _)}");
         }
 
-        private static List<ISupplementaryInterval> GetSpecificIntervals(ReportFor reportFor, IEnumerable<ISupplementaryInterval> intervals)
-        {
-            return intervals.Where(interval => interval.ReportingFor == reportFor).ToList();
-        }
-
-        private List<ISupplementaryInterval> GetIntervals(IEnumerable<IEnumerable<ISupplementaryInterval>> interimIntervalEnumerators)
-        {
-            var intervals = new List<ISupplementaryInterval>();
-            if (interimIntervalEnumerators == null ) return intervals;
-
-            foreach (var intervalEnumerator in interimIntervalEnumerators)
-            {
-                intervals.AddRange(intervalEnumerator);
-            }
-
-            return intervals;
-        }
-
-        private InterimSaPosition GetNextInterimPosition(List<IEnumerator<IInterimSaItem>> iSaEnumerators)
+        private static InterimSaPosition GetNextInterimPosition(List<IEnumerator<IInterimSaItem>> iSaEnumerators)
         {
             var minItems = MergeUtilities.GetMinItems(iSaEnumerators);
             if (minItems == null) return null;
@@ -246,5 +220,30 @@ namespace SAUtils.MergeInterimTsvs
 
             return interimSaPosition;
         }
+
+        public void Dispose()
+        {
+            _miscReader?.Dispose();
+
+            if (_tsvReaders != null)
+                foreach (var tsvReader in _tsvReaders)
+                {
+                    tsvReader.Dispose();
+                }
+
+            if (_intervalReaders != null)
+                foreach (var intervalReader in _intervalReaders)
+                {
+                    intervalReader.Dispose();
+                }
+
+            if (_geneReaders != null)
+                foreach (var geneReader in _geneReaders)
+                {
+                    geneReader.Dispose();
+                }
+
+        }
+        
     }
 }

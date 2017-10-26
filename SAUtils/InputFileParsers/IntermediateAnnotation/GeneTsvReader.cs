@@ -37,17 +37,14 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private SaHeader ReadHeader(StreamReader reader)
         {
-            using (reader)
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                while (reader.Peek() != '#' && (line = reader.ReadLine()) != null)
-                {
-                    // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    //if (!line.StartsWith("#")) break;
+                // Skip empty lines.
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (reader.Peek() != '#') break;
 
-                    ParseHeaderLine(line);
-                }
+                ParseHeaderLine(line);
             }
 
             //just to make it work this one time
