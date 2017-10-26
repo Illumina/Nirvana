@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
+    // making this class a disposable is not recommneded for the following reasons
+    // multiple threads access different parts of a iTSV file simultaneously. So having one stream doesn't work.
+    // instead, each thread is handed an enumerator which has its own stream that it disposes upon use
     public sealed class IntervalTsvReader:ITsvReader
     {
-        public SaHeader SaHeader => _header;
+        public SaHeader SaHeader => GetHeader();
         public IEnumerable<string> RefNames => _refNameOffsets.Keys;
 
-        private readonly StreamReader _reader;
-        private readonly IntervalAnnotationHeader _header;
+        private readonly string _fileName;
         private string _name;
         private string _genomeAssembly;
         private string _version;
@@ -33,16 +37,25 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private const int MinNoOfColumns = 4;
 
-        public IntervalTsvReader(StreamReader reader, Stream indexFileStream)
+        public IntervalTsvReader(string fileName)
         {
-            using (var tsvIndex = new TsvIndex(new BinaryReader(indexFileStream)))
+            _fileName = fileName;
+            using (var tsvIndex = new TsvIndex(new BinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
             {
                 _refNameOffsets = tsvIndex.TagPositions;
             }
-            _reader = reader;
-            _header = ReadHeader(_reader);
         }
 
+        private SaHeader GetHeader()
+        {
+            SaHeader header;
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
+            {
+                header = ReadHeader(reader);
+            }
+
+            return header;
+        }
         private IntervalAnnotationHeader ReadHeader(StreamReader reader)
         {
             string line;
@@ -73,28 +86,30 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
             var offset = _refNameOffsets[refName];
 
-            _reader.BaseStream.Position = offset;
-            string line;
-            //getting to the chromosome
-            while ((line = _reader.ReadLine()) != null)
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
             {
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
-                // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
-                if (line.StartsWith(refName + "\t")) break;
+                reader.BaseStream.Position = offset;
+                string line;
+                //getting to the chromosome
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                    // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
+                    if (line.StartsWith(refName + "\t")) break;
+                }
+                if (line == null) yield break;
+                do
+                {
+                    //next chromosome
+                    if (!line.StartsWith(refName + "\t")) yield break;
+
+                    var annotationItem = ExtractItem(line);
+                    if (annotationItem == null) continue;
+
+                    yield return annotationItem;
+
+                } while ((line = reader.ReadLine()) != null);
             }
-            if (line == null) yield break;
-            do
-            {
-                //next chromosome
-                if (!line.StartsWith(refName + "\t")) yield break;
-
-                var annotationItem = ExtractItem(line);
-                if (annotationItem == null) continue;
-
-                yield return annotationItem;
-
-            } while ((line = _reader.ReadLine()) != null);
-            
         }
 
 
@@ -166,12 +181,6 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             }
 
             return ReportFor.AllVariants;
-        }
-
-
-        public void Dispose()
-        {
-            _reader.Dispose();
         }
         
     }

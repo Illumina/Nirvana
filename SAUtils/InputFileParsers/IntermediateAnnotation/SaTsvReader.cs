@@ -1,20 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
+    // making this class a disposable is not recommneded for the following reasons
+    // multiple threads access different parts of a iTSV file simultaneously. So having one stream doesn't work.
+    // instead, each thread is handed an enumerator which has its own stream that it disposes upon use
     public sealed class SaTsvReader:ITsvReader
     {
-        public SaHeader SaHeader => _header;
+        public SaHeader SaHeader => GetHeader();
         public IEnumerable<string> RefNames => _refNameOffsets.Keys;
 
-        private readonly StreamReader _tsvReader;
 		private readonly Dictionary<string, long> _refNameOffsets;
-
-        private readonly SmallAnnotationHeader _header;
+        private readonly string _fileName;
+        
         private string _name;
 		private string _genomeAssembly;
 		private string _version;
@@ -34,17 +38,27 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
 	    private const int MinNoOfColumns  = 5;
 
-	    public SaTsvReader(StreamReader reader, Stream indexFileStream)
+	    public SaTsvReader(string fileName)
 	    {
-            using (var tsvIndex = new TsvIndex(new BinaryReader(indexFileStream)))
-            {
-                _refNameOffsets = tsvIndex.TagPositions;
-            }
-	        _tsvReader = reader;
-	        _header = ReadHeader(_tsvReader);
-	    }
+	        _fileName = fileName;
+	        using (var tsvIndex = new TsvIndex(new BinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
+	        {
+	            _refNameOffsets = tsvIndex.TagPositions;
+	        }
+        }
 
-	    private SmallAnnotationHeader ReadHeader(StreamReader reader)
+        private SaHeader GetHeader()
+        {
+            SaHeader header;
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
+            {
+                header = ReadHeader(reader);
+            }
+
+            return header;
+        }
+
+        private SmallAnnotationHeader ReadHeader(StreamReader reader)
 	    {
 	        string line;
 	        while ((line = reader.ReadLine()) != null)
@@ -67,47 +81,50 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 	        return null;
 	    }
 
-	   public IEnumerable<InterimSaItem> GetAnnotationItems(string refName)
-		{
-			if (!_refNameOffsets.ContainsKey(refName)) yield break;
+        public IEnumerable<InterimSaItem> GetAnnotationItems(string refName)
+        {
+            if (!_refNameOffsets.ContainsKey(refName)) yield break;
 
-			var offset = _refNameOffsets[refName];
+            var offset = _refNameOffsets[refName];
 
-		    _tsvReader.BaseStream.Position = offset;
-		    string line;
-		    while ((line = _tsvReader.ReadLine()) != null)
-		    {
-		        if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
-		        // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
-		        if (line.StartsWith(refName + "\t")) break;
-		    }
-		    if (line == null) yield break;
-		    string lastLine = line;
-		    do
-		    {
-		        //next chromosome
-		        if (!line.StartsWith(refName + "\t")) yield break;
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
+            {
+                reader.BaseStream.Position = offset;
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                    // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
+                    if (line.StartsWith(refName + "\t")) break;
+                }
+                if (line == null) yield break;
+                string lastLine = line;
+                do
+                {
+                    //next chromosome
+                    if (!line.StartsWith(refName + "\t")) yield break;
 
-		        var annotationItem = ExtractItem(line);
-		        if (annotationItem == null) continue;
+                    var annotationItem = ExtractItem(line);
+                    if (annotationItem == null) continue;
 
-		        yield return annotationItem;
-		        try
-		        {
-		            line = _tsvReader.ReadLine();
-		        }
-		        catch (Exception)
-		        {
-		            Console.WriteLine("error while reading line in while loop. Last line read:");
-		            Console.WriteLine(lastLine);
-		            throw;
-		        }
-		        lastLine = line;
-		    } while (line != null);
+                    yield return annotationItem;
+                    try
+                    {
+                        line = reader.ReadLine();
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine("error while reading line in while loop. Last line read:");
+                        Console.WriteLine(lastLine);
+                        throw;
+                    }
+                    lastLine = line;
+                } while (line != null);
+            }
         }
 
 
-		private InterimSaItem ExtractItem(string line)
+        private InterimSaItem ExtractItem(string line)
 		{
 			var columns = line.Split('\t');
 			if ( columns.Length < MinNoOfColumns)
@@ -176,11 +193,6 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 			}
 		}
 
-        public void Dispose()
-	    {
-	        _tsvReader.Dispose();
-	    }
-
-	    
+        
 	}
 }

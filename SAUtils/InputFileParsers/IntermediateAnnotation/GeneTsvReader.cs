@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
 using VariantAnnotation.IO;
@@ -29,9 +30,9 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private const int MinNoOfColumns = 2;
 
 
-        public GeneTsvReader(StreamReader reader)
+        public GeneTsvReader(string fileName)
         {
-            _reader = reader;
+            _reader = GZipUtilities.GetAppropriateStreamReader(fileName); 
             SaHeader = ReadHeader(_reader);
         }
 

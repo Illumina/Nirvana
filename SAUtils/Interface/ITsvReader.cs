@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using SAUtils.DataStructures;
 
 namespace SAUtils.Interface
 {
-    public interface ITsvReader : IDisposable
+    public interface ITsvReader
     {
         SaHeader SaHeader { get; }
         IEnumerable<string> RefNames{ get; }

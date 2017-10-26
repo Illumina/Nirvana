@@ -16,7 +16,7 @@ using VariantAnnotation.Interface.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public sealed class InterimTsvsMerger:IDisposable
+    public sealed class InterimTsvsMerger
     {
         private readonly List<SaTsvReader> _tsvReaders;
         private readonly List<IntervalTsvReader> _intervalReaders;
@@ -29,7 +29,7 @@ namespace SAUtils.MergeInterimTsvs
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
         private readonly IDictionary<string, IChromosome> _refChromDict;
-        private readonly HashSet<string> _allRefNames;
+        private readonly HashSet<string> _refNames;
         public static readonly HashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck = new HashSet<GenomeAssembly>() { GenomeAssembly.Unknown, GenomeAssembly.rCRS };
 
         /// <summary>
@@ -42,23 +42,23 @@ namespace SAUtils.MergeInterimTsvs
             var refSequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReference));
             _genomeAssembly = refSequenceProvider.GenomeAssembly;
             _refChromDict = refSequenceProvider.GetChromosomeDictionary();
-            _allRefNames = new HashSet<string>();
-            _saHeaders= new List<SaHeader>();
-
-            _tsvReaders = ReaderUtilities.GetSaTsvReaders(annotationFiles);
-            _saHeaders.AddRange(ReaderUtilities.GetTsvHeaders(_tsvReaders));
-            _allRefNames.UnionWith(ReaderUtilities.GetRefNames(_tsvReaders));
-
+            
+            _tsvReaders      = ReaderUtilities.GetSaTsvReaders(annotationFiles);
+            _miscReader      = ReaderUtilities.GetMiscTsvReader(miscFile);
+            _geneReaders     = ReaderUtilities.GetGeneReaders(geneFiles);
             _intervalReaders = ReaderUtilities.GetIntervalReaders(intervalFiles);
-            _saHeaders.AddRange(ReaderUtilities.GetTsvHeaders(_intervalReaders));
-            _allRefNames.UnionWith(ReaderUtilities.GetRefNames(_intervalReaders));
 
-            _geneReaders = ReaderUtilities.GetGeneReaders(geneFiles);
+            _saHeaders = new List<SaHeader>();
+            _saHeaders.AddRange(ReaderUtilities.GetTsvHeaders(_tsvReaders));
+            _saHeaders.AddRange(ReaderUtilities.GetTsvHeaders(_intervalReaders));
             _geneHeaders = ReaderUtilities.GetTsvHeaders(_geneReaders)?.ToList();
             _saHeaders.AddRange(_geneHeaders);
 
-            _miscReader = ReaderUtilities.GetMiscTsvReader(miscFile);
-            _allRefNames.UnionWith(_miscReader.RefNames);
+
+            _refNames = new HashSet<string>();
+            _refNames.UnionWith(ReaderUtilities.GetRefNames(_tsvReaders));
+            _refNames.UnionWith(ReaderUtilities.GetRefNames(_intervalReaders));
+            _refNames.UnionWith(_miscReader.RefNames);
 
             DisplayDataSources(_saHeaders);
 
@@ -140,12 +140,13 @@ namespace SAUtils.MergeInterimTsvs
 
             MergeGene();
 
-            Parallel.ForEach(_allRefNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
+            Parallel.ForEach(_refNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
 
 
-            //foreach (var refName in _allRefNames)
+            //foreach (var refName in _refNames)
             //{
-            //     if (refName !="1") continue;
+            //    if (refName.Length < 2) continue;
+            //    Console.WriteLine("Merging chrom:"+ refName);
             //    MergeChrom(refName);
             //}
         }
@@ -175,6 +176,7 @@ namespace SAUtils.MergeInterimTsvs
 
             var saEnumerators = GetSaEnumerators(refName);
 
+            //return;
             var globalMajorAlleleInRefMinors = GetGlobalMajorAlleleForRefMinors(refName);
 
             var ucscRefName = _refChromDict[refName].UcscName;
@@ -221,29 +223,6 @@ namespace SAUtils.MergeInterimTsvs
             return interimSaPosition;
         }
 
-        public void Dispose()
-        {
-            _miscReader?.Dispose();
-
-            if (_tsvReaders != null)
-                foreach (var tsvReader in _tsvReaders)
-                {
-                    tsvReader.Dispose();
-                }
-
-            if (_intervalReaders != null)
-                foreach (var intervalReader in _intervalReaders)
-                {
-                    intervalReader.Dispose();
-                }
-
-            if (_geneReaders != null)
-                foreach (var geneReader in _geneReaders)
-                {
-                    geneReader.Dispose();
-                }
-
-        }
         
     }
 }

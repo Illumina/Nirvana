@@ -9,15 +9,14 @@ namespace SAUtils.MergeInterimTsvs
     {
         private static ExitCodes ProgramExecution()
         {
-            using (var intermediateSaMerger = new InterimTsvsMerger(ConfigurationSettings.IntermediateFiles,
+            var intermediateSaMerger = new InterimTsvsMerger(ConfigurationSettings.IntermediateFiles,
                 ConfigurationSettings.IntervalFiles, ConfigurationSettings.MiscFile,
                 ConfigurationSettings.GeneTsvFiles,
                 ConfigurationSettings.CompressedReference,
-                ConfigurationSettings.OutputDirectory))
-            {
-                intermediateSaMerger.Merge();
-            }
+                ConfigurationSettings.OutputDirectory);
 
+            intermediateSaMerger.Merge();
+            
             return ExitCodes.Success;
 
         }

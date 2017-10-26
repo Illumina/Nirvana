@@ -109,9 +109,7 @@ namespace UnitTests.SAUtils.TsvWriters
 
             var dbsnpFile = Path.Combine(randomDbsnpPath, "dbsnp_77.tsv.gz");
             var globalAlleleFile = Path.Combine(randomDbsnpPath, "globalAllele_77.tsv.gz");
-            var dbsnpReader = GZipUtilities.GetAppropriateStreamReader(dbsnpFile);
-            var dbsnpIndexStream = FileUtilities.GetReadStream(dbsnpFile + TsvIndex.FileExtension);
-            var tsvReader = new SaTsvReader(dbsnpReader, dbsnpIndexStream);
+            var tsvReader = new SaTsvReader(dbsnpFile);
 
             using (var tsvEnumerator = tsvReader.GetAnnotationItems("1").GetEnumerator())
             {
@@ -121,10 +119,7 @@ namespace UnitTests.SAUtils.TsvWriters
                 Assert.Equal("\"ids\":[\"rs123458\"]", tsvEnumerator.Current.JsonStrings[0]);
             }
 
-            var gaReader = GZipUtilities.GetAppropriateStreamReader(globalAlleleFile);
-            var gaiStream = FileUtilities.GetReadStream(globalAlleleFile + TsvIndex.FileExtension);
-
-            var globalAlleleReader = new SaTsvReader(gaReader, gaiStream);
+            var globalAlleleReader = new SaTsvReader(globalAlleleFile);
             var globalAlleleEnumerator = globalAlleleReader.GetAnnotationItems("1").GetEnumerator();
             Assert.True(globalAlleleEnumerator.MoveNext());
             Assert.Equal(100,globalAlleleEnumerator.Current.Position);
