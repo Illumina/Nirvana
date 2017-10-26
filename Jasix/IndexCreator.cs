@@ -104,12 +104,12 @@ namespace Jasix
                 line = line.TrimEnd(',');
                 var chrPos = GetChromPosition(line);
 
-                CheckFileSorted(chrPos, previousChr, previousPos);
+                CheckFileSorted(chrPos.chr, chrPos.position, previousChr, previousPos);
 
-                index.Add(chrPos.Item1, chrPos.Item2, chrPos.Item3, fileLoc);
+                index.Add(chrPos.chr, chrPos.position, chrPos.end, fileLoc);
                 fileLoc = _reader.Position;
-                previousChr = chrPos.Item1;
-                previousPos = chrPos.Item2;
+                previousChr = chrPos.chr;
+                previousPos = chrPos.position;
 
             }
 
@@ -142,10 +142,8 @@ namespace Jasix
         }
 
         // ReSharper disable once UnusedParameter.Local
-        private void CheckFileSorted(Tuple<string, int, int> chrPos, string previousChr, int previousPos)
+        private void CheckFileSorted(string chr, int pos, string previousChr, int previousPos)
         {
-            var chr = chrPos.Item1;
-            var pos = chrPos.Item2;
             if (chr != previousChr && _processedChromosome.Contains(chr))
             {
                 throw new UserErrorException($"the Json file is not sorted at {chr}: {pos}");
@@ -165,7 +163,7 @@ namespace Jasix
 
         }
 
-        internal static Tuple<string, int, int> GetChromPosition(string line)
+        internal static (string chr, int position, int end) GetChromPosition(string line)
         {
             JsonSchema jsonEntry;
             try
@@ -180,7 +178,7 @@ namespace Jasix
 
 			var end = Utilities.GetJsonEntryEnd(jsonEntry);
 
-            return new Tuple<string, int, int>(jsonEntry.chromosome, jsonEntry.position, end);
+            return (jsonEntry.chromosome, jsonEntry.position, end);
         }
     }
 }
