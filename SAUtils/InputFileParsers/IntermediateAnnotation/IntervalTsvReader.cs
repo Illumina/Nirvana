@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
 using VariantAnnotation.Interface.SA;
@@ -169,11 +168,6 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             return ReportFor.AllVariants;
         }
 
-        
-        public List<string> GetAllRefNames()
-        {
-            return _refNameOffsets.Keys.ToList();
-        }
 
         public void Dispose()
         {

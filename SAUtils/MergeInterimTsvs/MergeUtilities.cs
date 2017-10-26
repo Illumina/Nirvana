@@ -44,10 +44,9 @@ namespace SAUtils.MergeInterimTsvs
             return interimSaHeaders.Select(header => header.GetDataSourceVersion()).Concat(intervalHeaders.Select(header => header.GetDataSourceVersion()));
         }
 
-        public static void CheckAssemblyConsistancy(IEnumerable<SmallAnnotationsHeader> iSaHeaders, IEnumerable<IntervalAnnotationHeader> iIntervalHeaders)
+        public static void CheckAssemblyConsistancy(IEnumerable<SaHeader> saHeaders)
         {
-            var uniqueAssemblies = iSaHeaders.Select(x => x.GenomeAssembly)
-                .Concat(iIntervalHeaders.Select(x => x.GenomeAssembly))
+            var uniqueAssemblies = saHeaders.Select(x => x.GenomeAssembly)
                 .Where(x => !MergeInterimTsvs.AssembliesIgnoredInConsistancyCheck.Contains(x))
                 .Distinct()
                 .ToList();

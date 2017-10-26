@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
 
@@ -177,13 +176,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 			}
 		}
 
-		public List<string> GetAllRefNames()
-		{
-			return _refNameOffsets.Keys.ToList();
-		}
-
-
-	    public void Dispose()
+        public void Dispose()
 	    {
 	        _tsvReader.Dispose();
 	    }
