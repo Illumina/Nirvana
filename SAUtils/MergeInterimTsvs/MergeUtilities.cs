@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SAUtils.DataStructures;
+using VariantAnnotation.GeneAnnotation;
+using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 
 namespace SAUtils.MergeInterimTsvs
@@ -38,10 +40,9 @@ namespace SAUtils.MergeInterimTsvs
             return minItems.Count == 0 ? null : minItems;
         }
 
-        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(List<SmallAnnotationsHeader> interimSaHeaders,
-            List<IntervalAnnotationHeader> intervalHeaders)
+        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(IEnumerable<SaHeader> saHeaders)
         {
-            return interimSaHeaders.Select(header => header.GetDataSourceVersion()).Concat(intervalHeaders.Select(header => header.GetDataSourceVersion()));
+            return saHeaders.Select(header => header.GetDataSourceVersion());
         }
 
         public static void CheckAssemblyConsistancy(IEnumerable<SaHeader> saHeaders)
@@ -66,6 +67,14 @@ namespace SAUtils.MergeInterimTsvs
             }
         }
 
-        
+        public static IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
+        {
+            if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
+
+            var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
+
+            return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);
+        }
+
     }
 }

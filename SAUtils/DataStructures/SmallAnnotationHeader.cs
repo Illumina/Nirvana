@@ -2,17 +2,17 @@
 
 namespace SAUtils.DataStructures
 {
-    public sealed class SmallAnnotationsHeader : SaHeader, IEquatable<SmallAnnotationsHeader>
+    public sealed class SmallAnnotationHeader : SaHeader, IEquatable<SmallAnnotationHeader>
     {
         private bool MatchByAllele { get; }
 
-        public SmallAnnotationsHeader(string name, string assembly, string version, string releaseDate, string description,
+        public SmallAnnotationHeader(string name, string assembly, string version, string releaseDate, string description,
             bool matchByAllele) : base(name, assembly, version, releaseDate, description)
         {
             MatchByAllele = matchByAllele;
         }
 
-        public bool Equals(SmallAnnotationsHeader other)
+        public bool Equals(SmallAnnotationHeader other)
         {
             if (other == null) return false;
             return Name.Equals(other.Name)

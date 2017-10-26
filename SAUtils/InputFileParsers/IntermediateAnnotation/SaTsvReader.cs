@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private readonly StreamReader _tsvReader;
 		private readonly Dictionary<string, long> _refNameOffsets;
 
-        private readonly SmallAnnotationsHeader _header;
+        private readonly SmallAnnotationHeader _header;
         private string _name;
 		private string _genomeAssembly;
 		private string _version;
@@ -44,7 +44,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 	        _header = ReadHeader(_tsvReader);
 	    }
 
-	    private SmallAnnotationsHeader ReadHeader(StreamReader reader)
+	    private SmallAnnotationHeader ReadHeader(StreamReader reader)
 	    {
 	        string line;
 	        while ((line = reader.ReadLine()) != null)
@@ -61,7 +61,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
                 && !string.IsNullOrEmpty(_version) 
                 && !string.IsNullOrEmpty(_releaseDate) 
                 && !string.IsNullOrEmpty(_jsonKey))
-	            return new SmallAnnotationsHeader(_name, _genomeAssembly, _version, _releaseDate, _description, _matchByAllele);
+	            return new SmallAnnotationHeader(_name, _genomeAssembly, _version, _releaseDate, _description, _matchByAllele);
 
             Console.WriteLine($"Insufficient version information for {_name}");
 	        return null;
