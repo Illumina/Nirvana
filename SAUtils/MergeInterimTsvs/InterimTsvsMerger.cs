@@ -62,7 +62,6 @@ namespace SAUtils.MergeInterimTsvs
 
             MergeUtilities.CheckAssemblyConsistancy(_saHeaders);
         }
-
         
         private static void DisplayDataSources(IEnumerable<SaHeader> headers)
         {
