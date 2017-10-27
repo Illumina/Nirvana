@@ -10,29 +10,29 @@ namespace SAUtils.MergeInterimTsvs
 {
     public static class ReaderUtilities
     {
-        public static List<SaHeader> GetTsvHeaders(IEnumerable<ITsvReader> tsvReaders)
+        public static List<SaHeader> GetTsvHeaders(IEnumerable<IParallelTsvReader> tsvReaders)
         {
             return tsvReaders?.Select(tsvReader => tsvReader.SaHeader).ToList();
         }
 
-        public static IEnumerable<string> GetRefNames(IEnumerable<ITsvReader> tsvReaders)
+        public static IEnumerable<string> GetRefNames(IEnumerable<IParallelTsvReader> tsvReaders)
         {
             return tsvReaders?.SelectMany(tsvReader => tsvReader.RefNames);
         }
 
-        public static List<GeneTsvReader> GetGeneReaders(IEnumerable<string> geneFiles)
+        public static List<ParallelGeneTsvReader> GetGeneReaders(IEnumerable<string> geneFiles)
         {
-            return geneFiles?.Select(fileName => new GeneTsvReader(fileName)).ToList();
+            return geneFiles?.Select(fileName => new ParallelGeneTsvReader(fileName)).ToList();
         }
 
-        public static List<IntervalTsvReader> GetIntervalReaders(IEnumerable<string> intervalFiles)
+        public static List<ParallelIntervalTsvReader> GetIntervalReaders(IEnumerable<string> intervalFiles)
         {
-            return intervalFiles?.Select(fileName => new IntervalTsvReader(fileName)).ToList();
+            return intervalFiles?.Select(fileName => new ParallelIntervalTsvReader(fileName)).ToList();
         }
 
-        public static List<SaTsvReader> GetSaTsvReaders(IEnumerable<string> saTsvFiles)
+        public static List<ParallelSaTsvReader> GetSaTsvReaders(IEnumerable<string> saTsvFiles)
         {
-            return saTsvFiles?.Select(fileName => new SaTsvReader(fileName)).ToList();
+            return saTsvFiles?.Select(fileName => new ParallelSaTsvReader(fileName)).ToList();
         }
 
         public static SaMiscellaniesReader GetMiscTsvReader(string miscFile)

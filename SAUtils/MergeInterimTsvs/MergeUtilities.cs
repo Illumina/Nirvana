@@ -78,14 +78,14 @@ namespace SAUtils.MergeInterimTsvs
             return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);
         }
 
-        public static List<ISupplementaryInterval> GetIntervals(IEnumerable<IntervalTsvReader> intervalReaders, string refName)
+        public static List<ISupplementaryInterval> GetIntervals(IEnumerable<ParallelIntervalTsvReader> intervalReaders, string refName)
         {
             var intervals = new List<ISupplementaryInterval>();
             if (intervalReaders == null) return intervals;
 
             foreach (var intervalReader in intervalReaders)
             {
-                intervals.AddRange(intervalReader.GetAnnotationItems(refName));
+                intervals.AddRange(intervalReader.GetItems(refName));
             }
 
             return intervals;

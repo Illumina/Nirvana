@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
     // making this class a disposable is not recommneded for the following reasons
     // multiple threads access different parts of a iTSV file simultaneously. So having one stream doesn't work.
     // instead, each thread is handed an enumerator which has its own stream that it disposes upon use
-    public sealed class IntervalTsvReader:ITsvReader
+    public sealed class ParallelIntervalTsvReader:IParallelTsvReader
     {
         public SaHeader SaHeader => GetHeader();
         public IEnumerable<string> RefNames => _refNameOffsets.Keys;
@@ -37,7 +37,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private const int MinNoOfColumns = 4;
 
-        public IntervalTsvReader(string fileName)
+        public ParallelIntervalTsvReader(string fileName)
         {
             _fileName = fileName;
             using (var tsvIndex = new TsvIndex(new BinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
@@ -80,7 +80,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             return null;
         }
 
-        public IEnumerable<ISupplementaryInterval> GetAnnotationItems(string refName)
+        public IEnumerable<ISupplementaryInterval> GetItems(string refName)
         {
             if (!_refNameOffsets.ContainsKey(refName)) yield break;
 

@@ -18,13 +18,11 @@ namespace SAUtils.MergeInterimTsvs
 {
     public sealed class InterimTsvsMerger
     {
-        private readonly List<SaTsvReader> _tsvReaders;
-        private readonly List<IntervalTsvReader> _intervalReaders;
-        private readonly List<GeneTsvReader> _geneReaders;
+        private readonly List<ParallelSaTsvReader> _tsvReaders;
+        private readonly List<ParallelIntervalTsvReader> _intervalReaders;
+        private readonly List<ParallelGeneTsvReader> _geneReaders;
         private readonly SaMiscellaniesReader _miscReader;
         private readonly List<SaHeader> _saHeaders;
-        //private readonly List<SaHeader> _smallAnnotationHeaders;
-        //private readonly List<SaHeader> _intervalHeaders;
         private readonly List<SaHeader> _geneHeaders;
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
@@ -89,7 +87,7 @@ namespace SAUtils.MergeInterimTsvs
         {
             var globalAlleles = new List<Tuple<int, string>>();
             if (_miscReader == null) return globalAlleles;
-            foreach (var saMiscellaniese in _miscReader.GetAnnotationItems(refName))
+            foreach (var saMiscellaniese in _miscReader.GetItems(refName))
             {
                 globalAlleles.Add(Tuple.Create(saMiscellaniese.Position, saMiscellaniese.GlobalMajorAllele));
             }
@@ -104,7 +102,7 @@ namespace SAUtils.MergeInterimTsvs
 
             foreach (var geneReader in _geneReaders)
             {
-                var dataEnumerator = geneReader.GetAnnotationItems().GetEnumerator();
+                var dataEnumerator = geneReader.GetItems().GetEnumerator();
                 if (!dataEnumerator.MoveNext()) continue;
                 geneAnnotationList.Add(dataEnumerator);
             }
@@ -117,7 +115,7 @@ namespace SAUtils.MergeInterimTsvs
             if (_tsvReaders == null) return saItemsList;
             foreach (var tsvReader in _tsvReaders)
             {
-                var dataEnumerator = tsvReader.GetAnnotationItems(refName).GetEnumerator();
+                var dataEnumerator = tsvReader.GetItems(refName).GetEnumerator();
                 if (!dataEnumerator.MoveNext()) continue;
 
                 saItemsList.Add(dataEnumerator);

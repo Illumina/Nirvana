@@ -11,7 +11,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class GeneTsvReader:ITsvReader
+    public sealed class ParallelGeneTsvReader:IParallelTsvReader
     {
         private readonly StreamReader _reader;
 
@@ -30,7 +30,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private const int MinNoOfColumns = 2;
 
 
-        public GeneTsvReader(string fileName)
+        public ParallelGeneTsvReader(string fileName)
         {
             _reader = GZipUtilities.GetAppropriateStreamReader(fileName); 
             SaHeader = ReadHeader(_reader);
@@ -61,7 +61,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         }
 
 
-        public IEnumerable<IAnnotatedGene> GetAnnotationItems()
+        public IEnumerable<IAnnotatedGene> GetItems()
         {
             string line;
             //getting to the chromosome
