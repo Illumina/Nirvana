@@ -274,15 +274,11 @@ namespace SAUtils.InputFileParsers.ClinVar
             return variant == null ? null : compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
         }
 
-        private (int start, string refAllele, string altAllele) LeftShift(int start, string refAllele, string altAllele)
+        private (int Start, string RefAllele, string AltAllele) LeftShift(int start, string refAllele, string altAllele)
 		{
 			if (refAllele == null || altAllele == null) return (start, refAllele, altAllele);
 
-			var alignedVariant = _aligner.LeftAlign(start, refAllele, altAllele);
-
-            return alignedVariant==null? (start, refAllele, altAllele)
-                : (alignedVariant.Item1, alignedVariant.Item2, alignedVariant.Item3);
-            
+			return _aligner.LeftAlign(start, refAllele, altAllele);
 		}
 
 		internal static long ParseDate(string s)

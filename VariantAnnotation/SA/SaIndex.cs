@@ -13,14 +13,14 @@ namespace VariantAnnotation.SA
     public class SaIndex : ISaIndex
     {
         private readonly IIntervalSearch<long> _fileOffsetIntervals;
-        public Tuple<int,string>[] GlobalMajorAlleleForRefMinor { get; }
+        public (int Position, string GlobalMajorAllele)[] GlobalMajorAlleleForRefMinor { get; }
 
         private Interval<long> _cachedInterval = IntervalArray<long>.EmptyInterval;
 
         /// <summary>
         /// constructor
         /// </summary>
-        private SaIndex(IIntervalSearch<long> fileOffsetIntervals, Tuple<int, string>[] globalMajorAlleleForRefMinor)
+        private SaIndex(IIntervalSearch<long> fileOffsetIntervals, (int, string)[] globalMajorAlleleForRefMinor)
         {
             _fileOffsetIntervals = fileOffsetIntervals;
             GlobalMajorAlleleForRefMinor = globalMajorAlleleForRefMinor;
@@ -45,7 +45,7 @@ namespace VariantAnnotation.SA
         public static ISaIndex Read(Stream stream)
         {
             IntervalArray<long> intervalArray;
-            Tuple<int, string>[] globalMajorAlleleForRefMinors;
+            (int, string)[] globalMajorAlleleForRefMinors;
 
             using (var reader = new ExtendedBinaryReader(stream))
             {
@@ -69,10 +69,10 @@ namespace VariantAnnotation.SA
             return new SaIndex(intervalArray, globalMajorAlleleForRefMinors);
         }
 
-        private static Tuple<int,string>[] GetGlobalMajorAlleleInRefMinor(ExtendedBinaryReader reader)
+        private static (int Position, string GlobalMajorAllele)[] GetGlobalMajorAlleleInRefMinor(ExtendedBinaryReader reader)
         {
             var numPositions = reader.ReadOptInt32();
-            var globalMajorAlleleForRefMinors = new Tuple<int,string>[numPositions];
+            var globalMajorAlleleForRefMinors = new(int, string)[numPositions];
             int oldPosition = 0;
 
             for (int i = 0; i < numPositions; i++)
@@ -81,7 +81,7 @@ namespace VariantAnnotation.SA
                 var refMinorPosition = oldPosition + deltaPosition;
                 oldPosition = refMinorPosition;
                 var globalMajorAllele = reader.ReadAsciiString();
-                globalMajorAlleleForRefMinors[i] = Tuple.Create(refMinorPosition,globalMajorAllele);
+                globalMajorAlleleForRefMinors[i] = (refMinorPosition, globalMajorAllele);
 
             }
 
@@ -89,7 +89,7 @@ namespace VariantAnnotation.SA
         }
 
         public static void Write(IExtendedBinaryWriter writer, List<Interval<long>> intervals,
-            List<Tuple<int,string>> refMinorPositions)
+            List<(int, string)> refMinorPositions)
         {
             writer.WriteOpt(intervals.Count);
 
@@ -103,19 +103,19 @@ namespace VariantAnnotation.SA
             WriteRefMinor(writer, refMinorPositions);
         }
 
-        private static void WriteRefMinor(IExtendedBinaryWriter writer, List<Tuple<int, string>> refMinorPositions)
+        private static void WriteRefMinor(IExtendedBinaryWriter writer, List<(int Position, string GlobalMajorAllele)> refMinorPositions)
         {
             writer.WriteOpt(refMinorPositions.Count);
 
             int oldPosition = 0;
 
-            foreach (var globalMajorAllele in refMinorPositions.OrderBy(x => x.Item1))
+            foreach (var globalMajorAllele in refMinorPositions.OrderBy(x => x.Position))
             {
-                var position = globalMajorAllele.Item1;
+                var position = globalMajorAllele.Position;
                 int deltaPosition = position - oldPosition;
                 writer.WriteOpt(deltaPosition);
                 oldPosition = position;
-                writer.WriteOptAscii(globalMajorAllele.Item2);
+                writer.WriteOptAscii(globalMajorAllele.GlobalMajorAllele);
             }
         }
     }

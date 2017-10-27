@@ -93,13 +93,13 @@ namespace SAUtils.TsvWriters
 
 		}
 
-		private Dictionary<Tuple<string, string>, List<CosmicItem>> GroupByAltAllele(List<CosmicItem> cosmicItems)
+		private Dictionary<(string ReferenceAllele, string AlternateAllele), List<CosmicItem>> GroupByAltAllele(List<CosmicItem> cosmicItems)
 		{
-			var groups = new Dictionary<Tuple<string, string>, List<CosmicItem>>();
+			var groups = new Dictionary<(string, string), List<CosmicItem>>();
 
 			foreach (var cosmicItem in cosmicItems)
 			{
-			    var alleleTuple = Tuple.Create(cosmicItem.ReferenceAllele, cosmicItem.AlternateAllele);
+			    var alleleTuple = (cosmicItem.ReferenceAllele, cosmicItem.AlternateAllele);
 				if (groups.ContainsKey(alleleTuple))
 					groups[alleleTuple].Add(cosmicItem);
 				else groups[alleleTuple] = new List<CosmicItem> { cosmicItem };

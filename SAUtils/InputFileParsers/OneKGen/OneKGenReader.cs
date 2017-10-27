@@ -210,19 +210,18 @@ namespace SAUtils.InputFileParsers.OneKGen
 						_svEnd = Convert.ToInt32(value);
 					break;
 				case "CIEND":
-					if (hasSymbolicAllele)
+					/*if (hasSymbolicAllele)
 					{
 						var endBoundaries = value.Split(',');
 						Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
 					}
-					break;
+					break;*/
 				case "CIPOS":
-					if (hasSymbolicAllele)
+					/*if (hasSymbolicAllele)
 					{
 						var beginBoundaries = value.Split(',');
 						Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
-
-					}
+					}*/
 					break;
 				case "AN":
 					_allAlleleNumber = Convert.ToInt32(value);

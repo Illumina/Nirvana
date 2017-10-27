@@ -31,7 +31,7 @@ namespace VariantAnnotation.SA
         public IEnumerable<Interval<ISupplementaryInterval>> SvIntervals { get; }
         public IEnumerable<Interval<ISupplementaryInterval>> AllVariantIntervals { get; }
         public ISupplementaryAnnotationHeader Header { get; }
-        public IEnumerable<Tuple<int, string>> GlobalMajorAlleleInRefMinors { get; }
+        public IEnumerable<(int, string)> GlobalMajorAlleleInRefMinors { get; }
 
         /// <summary>
         /// constructor
