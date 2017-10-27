@@ -1,5 +1,4 @@
-﻿using System;
-using VariantAnnotation.Interface.Intervals;
+﻿using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Sequence

@@ -30,17 +30,6 @@ namespace SAUtils.DataStructures
                 Description);
         }
 
-        public bool Equals(SaHeader other)
-        {
-            if (other == null) return false;
-            return Name.Equals(other.Name)
-                   && GenomeAssembly == other.GenomeAssembly
-                   && Version.Equals(other.Version)
-                   && ReleaseDate.Equals(other.ReleaseDate);
-        }
-
-
-
         public override string ToString()
         {
             return $"{Name,-20}   {Version,-14}   {ReleaseDate,-10}";

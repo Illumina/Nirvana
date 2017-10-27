@@ -11,7 +11,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class ParallelGeneTsvReader:IParallelTsvReader
+    public sealed class GeneTsvReader:ITsvReader
     {
         private readonly StreamReader _reader;
 
@@ -30,7 +30,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private const int MinNoOfColumns = 2;
 
 
-        public ParallelGeneTsvReader(string fileName)
+        public GeneTsvReader(string fileName)
         {
             _reader = GZipUtilities.GetAppropriateStreamReader(fileName); 
             SaHeader = ReadHeader(_reader);
@@ -84,7 +84,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
             var geneSymbol = columns[GeneIndex];
             var jsonStrings = columns.Skip(JsonStringIndex).ToArray();
-            return new AnnotatedGene(geneSymbol, new[] { new GeneAnnotationSource(_keyName, jsonStrings, _isArray) });
+            return new AnnotatedGene(geneSymbol, new IGeneAnnotationSource[] { new GeneAnnotationSource(_keyName, jsonStrings, _isArray) });
         }
 
         private void ParseHeaderLine(string line)

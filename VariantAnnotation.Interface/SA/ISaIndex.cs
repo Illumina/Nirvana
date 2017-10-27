@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VariantAnnotation.Interface.SA
+﻿namespace VariantAnnotation.Interface.SA
 {
     public interface ISaIndex
     {

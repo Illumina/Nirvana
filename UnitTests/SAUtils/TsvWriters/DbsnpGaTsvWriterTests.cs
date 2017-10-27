@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Compression.FileHandling;
-using Compression.Utilities;
 using Moq;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;

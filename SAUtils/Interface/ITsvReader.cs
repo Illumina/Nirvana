@@ -3,7 +3,7 @@ using SAUtils.DataStructures;
 
 namespace SAUtils.Interface
 {
-    public interface IParallelTsvReader
+    public interface ITsvReader
     {
         SaHeader SaHeader { get; }
         IEnumerable<string> RefNames{ get; }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace CommonUtilities
+﻿namespace CommonUtilities
 {
     public static class BiDirectionalTrimmer
     {

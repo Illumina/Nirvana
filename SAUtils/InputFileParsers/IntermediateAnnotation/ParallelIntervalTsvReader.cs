@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
     // making this class a disposable is not recommneded for the following reasons
     // multiple threads access different parts of a iTSV file simultaneously. So having one stream doesn't work.
     // instead, each thread is handed an enumerator which has its own stream that it disposes upon use
-    public sealed class ParallelIntervalTsvReader:IParallelTsvReader
+    public sealed class ParallelIntervalTsvReader:ITsvReader
     {
         public SaHeader SaHeader => GetHeader();
         public IEnumerable<string> RefNames => _refNameOffsets.Keys;

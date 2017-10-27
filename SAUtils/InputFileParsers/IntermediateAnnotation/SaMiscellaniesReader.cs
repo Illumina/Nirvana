@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
@@ -12,7 +11,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
     // making this class a disposable is not recommneded for the following reasons
     // multiple threads access different parts of a iTSV file simultaneously. So having one stream doesn't work.
     // instead, each thread is handed an enumerator which has its own stream that it disposes upon use
-    public sealed class SaMiscellaniesReader : IParallelTsvReader
+    public sealed class SaMiscellaniesReader : ITsvReader
     {
         public SaHeader SaHeader => null;
         public IEnumerable<string> RefNames => _refNameOffsets.Keys;

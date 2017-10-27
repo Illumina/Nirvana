@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
@@ -10,19 +8,19 @@ namespace SAUtils.MergeInterimTsvs
 {
     public static class ReaderUtilities
     {
-        public static List<SaHeader> GetTsvHeaders(IEnumerable<IParallelTsvReader> tsvReaders)
+        public static List<SaHeader> GetTsvHeaders(IEnumerable<ITsvReader> tsvReaders)
         {
             return tsvReaders?.Select(tsvReader => tsvReader.SaHeader).ToList();
         }
 
-        public static IEnumerable<string> GetRefNames(IEnumerable<IParallelTsvReader> tsvReaders)
+        public static IEnumerable<string> GetRefNames(IEnumerable<ITsvReader> tsvReaders)
         {
             return tsvReaders?.SelectMany(tsvReader => tsvReader.RefNames);
         }
 
-        public static List<ParallelGeneTsvReader> GetGeneReaders(IEnumerable<string> geneFiles)
+        public static List<GeneTsvReader> GetGeneReaders(IEnumerable<string> geneFiles)
         {
-            return geneFiles?.Select(fileName => new ParallelGeneTsvReader(fileName)).ToList();
+            return geneFiles?.Select(fileName => new GeneTsvReader(fileName)).ToList();
         }
 
         public static List<ParallelIntervalTsvReader> GetIntervalReaders(IEnumerable<string> intervalFiles)

@@ -20,7 +20,7 @@ namespace SAUtils.MergeInterimTsvs
     {
         private readonly List<ParallelSaTsvReader> _tsvReaders;
         private readonly List<ParallelIntervalTsvReader> _intervalReaders;
-        private readonly List<ParallelGeneTsvReader> _geneReaders;
+        private readonly List<GeneTsvReader> _geneReaders;
         private readonly SaMiscellaniesReader _miscReader;
         private readonly List<SaHeader> _saHeaders;
         private readonly List<SaHeader> _geneHeaders;
@@ -164,6 +164,11 @@ namespace SAUtils.MergeInterimTsvs
                     var mergedGeneAnnotation = MergeUtilities.MergeGeneAnnotations(geneAnnotations);
                     writer.Write(mergedGeneAnnotation);
                 }
+            //dispose the gene annotators
+            foreach (var geneReader in _geneReaders)
+            {
+                geneReader.Dispose();
+            }
         }
 
         private void MergeChrom(string refName)
