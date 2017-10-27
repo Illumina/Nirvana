@@ -93,14 +93,14 @@ namespace VariantAnnotation.AnnotatedPositions
 
 	    private void AddSAstoJsonObject(JsonObject jsonObject)
         {
-            var saDict = new Dictionary<string, Tuple<bool, List<string>>>();
+            var saDict = new Dictionary<string, (bool, List<string>)>();
             foreach (var annotatedSa in SupplementaryAnnotations)
             {
                 var sa = annotatedSa.SaDataSource;
 
                 if (!saDict.ContainsKey(sa.KeyName))
                 {
-                    saDict[sa.KeyName] = new Tuple<bool, List<string>>(sa.IsArray, new List<string>());
+                    saDict[sa.KeyName] = (sa.IsArray, new List<string>());
                 }
 
                 var jsonStrings = annotatedSa.GetJsonStrings();

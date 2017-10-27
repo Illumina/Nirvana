@@ -4,10 +4,10 @@ namespace CommonUtilities
 {
     public static class BiDirectionalTrimmer
     {
-        public static Tuple<int, string, string> Trim(int start, string refAllele, string altAllele)
+        public static (int Start, string RefAllele, string AltAllele) Trim(int start, string refAllele, string altAllele)
         {
             // do not trim if ref and alt are same
-            if (refAllele == altAllele) return new Tuple<int, string, string>(start, refAllele, altAllele);
+            if (refAllele == altAllele) return (start, refAllele, altAllele);
 
             if (refAllele == null) refAllele = "";
             if (altAllele == null) altAllele = "";
@@ -28,11 +28,11 @@ namespace CommonUtilities
             while (j < refAllele.Length && j < altAllele.Length &&
                    refAllele[refAllele.Length - j - 1] == altAllele[altAllele.Length - j - 1]) j++;
 
-            if (j <= 0) return Tuple.Create(start, refAllele, altAllele);
+            if (j <= 0) return (start, refAllele, altAllele);
 
             altAllele = altAllele.Substring(0, altAllele.Length - j);
             refAllele = refAllele.Substring(0, refAllele.Length - j);
-            return Tuple.Create(start, refAllele, altAllele);
+            return (start, refAllele, altAllele);
         }
     }
 }

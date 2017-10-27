@@ -4,7 +4,7 @@ namespace VariantAnnotation.Interface.SA
 {
     public interface ISaIndex
     {
-        Tuple<int, string>[] GlobalMajorAlleleForRefMinor { get; }
+        (int Position, string GlobalMajorAllele)[] GlobalMajorAlleleForRefMinor { get; }
         long GetOffset(int position);
     }
 }

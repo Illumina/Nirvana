@@ -12,22 +12,22 @@ namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class ReducedTranscriptAnnotator
     {
-        public static IAnnotatedTranscript GetAnnotatedTranscript( ITranscript transcript,IVariant variant,IEnumerable<ITranscript> geneFusionCandidates)
+        public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant variant, IEnumerable<ITranscript> geneFusionCandidates)
         {
-            var exonsAndIntrons =  MappedPositionsUtils.ComputeExonAndIntron(variant.Start,variant.End,transcript.CdnaMaps,transcript.Introns,transcript.Gene.OnReverseStrand);
+            var exonsAndIntrons = MappedPositionsUtils.ComputeExonAndIntron(variant.Start, variant.End, transcript.CdnaMaps, transcript.Introns, transcript.Gene.OnReverseStrand);
 
-            var nullInterval = new NullableInterval(null,null);
-            var mappedPosition = new MappedPositions(nullInterval,null,nullInterval,null,nullInterval,exonsAndIntrons.Item1,exonsAndIntrons.Item2 );
+            var nullInterval = new NullableInterval(null, null);
+            var mappedPosition = new MappedPositions(nullInterval, null, nullInterval, null, nullInterval, exonsAndIntrons.Item1, exonsAndIntrons.Item2);
 
-            var geneFusionAnnotation = ComputeGeneFusions(variant.BreakEnds,transcript,geneFusionCandidates);
-            
-            var featureEffect = new FeatureVariantEffects(transcript,variant.Type,variant.Start,variant.End,true);
+            var geneFusionAnnotation = ComputeGeneFusions(variant.BreakEnds, transcript, geneFusionCandidates);
 
-            var consequence = new Consequences(null,featureEffect);
-            consequence.DetermineStructuralVariantEffect(geneFusionAnnotation!=null, variant.Type);
+            var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant.Start, variant.End, true);
+
+            var consequence = new Consequences(null, featureEffect);
+            consequence.DetermineStructuralVariantEffect(geneFusionAnnotation != null, variant.Type);
 
 
-            return new AnnotatedTranscript(transcript,null,null,null,null,mappedPosition,null,null,null,null,consequence.GetConsequences(),geneFusionAnnotation);
+            return new AnnotatedTranscript(transcript, null, null, null, null, mappedPosition, null, null, null, null, consequence.GetConsequences(), geneFusionAnnotation);
         }
 
         internal static IGeneFusionAnnotation ComputeGeneFusions(IBreakEnd[] breakEnds, ITranscript transcript,
@@ -44,7 +44,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var geneFusions = new List<IGeneFusion>();
             foreach (var candidate in geneFusionCandidates)
             {
-                var geneFusion = GetFusion(candidate, transcript, breakendToAnnotate,position1Info.Item3,position1Info.Item4);
+                var geneFusion = GetFusion(candidate, transcript, breakendToAnnotate, position1Info.Item3, position1Info.Item4);
                 if (geneFusion != null) geneFusions.Add(geneFusion);
             }
 
@@ -67,7 +67,7 @@ namespace VariantAnnotation.TranscriptAnnotation
         /// <param name="pos1Hgvs"></param>
         /// <param name="isPos1TranscriptSuffix"></param>
         /// <returns></returns>
-        private static IGeneFusion GetFusion(ITranscript candidateForPos2, ITranscript transcriptForPos1, IBreakEnd breakendToAnnotate,string pos1Hgvs,bool isPos1TranscriptSuffix)
+        private static IGeneFusion GetFusion(ITranscript candidateForPos2, ITranscript transcriptForPos1, IBreakEnd breakendToAnnotate, string pos1Hgvs, bool isPos1TranscriptSuffix)
         {
             if (transcriptForPos1.Source != candidateForPos2.Source
                 || candidateForPos2.Translation == null ||
@@ -83,20 +83,20 @@ namespace VariantAnnotation.TranscriptAnnotation
             if (pos2Info.Item4 == isPos1TranscriptSuffix) return null;
             var hgvsString = isPos1TranscriptSuffix ? pos2Info.Item3 + "_" + pos1Hgvs : pos1Hgvs + "_" + pos2Info.Item3;
 
-            return new GeneFusion(pos2Info.Item1,pos2Info.Item2,hgvsString);
+            return new GeneFusion(pos2Info.Item1, pos2Info.Item2, hgvsString);
         }
 
-        private static Tuple<int?, int?,string, bool> ComputeBreakendTranscriptRelation(ITranscript transcript, int position, bool isGenomicSuffix)
+        private static (int? Exon, int? Intron, string Hgvs, bool IsTranscriptSuffix) ComputeBreakendTranscriptRelation(ITranscript transcript, int position, bool isGenomicSuffix)
         {
-            var positionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, position,true);
+            var positionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, position, true);
             var exon = GetIntervalIndex(transcript.CdnaMaps, position, transcript.Gene.OnReverseStrand);
             var intron = GetIntervalIndex(transcript.Introns, position, transcript.Gene.OnReverseStrand);
             var isTranscriptSuffix = isGenomicSuffix != transcript.Gene.OnReverseStrand;
             var transcriptCdnaLength = transcript.Translation.CodingRegion.CdnaEnd - transcript.Translation.CodingRegion.CdnaStart + 1;
-            var hgvsPosString = isTranscriptSuffix ?positionOffset.Value+"_"+ transcriptCdnaLength : 1+"_"+ positionOffset.Value;
+            var hgvsPosString = isTranscriptSuffix ? positionOffset.Value + "_" + transcriptCdnaLength : 1 + "_" + positionOffset.Value;
 
             var hgvs = transcript.Gene.Symbol + "{" + transcript.GetVersionedId() + "}" + ":c." + hgvsPosString;
-            return Tuple.Create(exon, intron, hgvs,isTranscriptSuffix);
+            return (exon, intron, hgvs, isTranscriptSuffix);
         }
 
         private static int? GetIntervalIndex(IInterval[] intervals, int position, bool onReverseStrand)

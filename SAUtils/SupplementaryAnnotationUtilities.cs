@@ -47,35 +47,35 @@ namespace SAUtils
             return refAllele.StartsWith(refBases);
         }
 
-        public static Tuple<int, string, string> GetReducedAlleles(int start, string refAllele, string altAllele)
+        public static (int Start, string RefAllele, string AltAllele) GetReducedAlleles(int start, string refAllele, string altAllele)
         {
             // we have a deletion
             if (refAllele == "-") refAllele = "";
             if (altAllele == "-") altAllele = "";
             if (!NeedsReduction(refAllele, altAllele))
-                return Tuple.Create(start, refAllele, altAllele);
+                return (start, refAllele, altAllele);
 
             var trimmedTuple = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
 
-            start = trimmedTuple.Item1;
-            refAllele = trimmedTuple.Item2;
-            altAllele = trimmedTuple.Item3;
+            start = trimmedTuple.Start;
+            refAllele = trimmedTuple.RefAllele;
+            altAllele = trimmedTuple.AltAllele;
 
             // we have detected a deletion after trimming
             if (string.IsNullOrEmpty(altAllele))
-                return Tuple.Create(start, refAllele, refAllele.Length.ToString(CultureInfo.InvariantCulture));
+                return (start, refAllele, refAllele.Length.ToString(CultureInfo.InvariantCulture));
 
             // we have an insertion and we indicate that with an i at the beginning
             if (string.IsNullOrEmpty(refAllele))
-                return Tuple.Create(start, refAllele, 'i' + altAllele);
+                return (start, refAllele, 'i' + altAllele);
 
             if (refAllele.Length == altAllele.Length) //SNV or CNV
-                return Tuple.Create(start, refAllele, altAllele);
+                return (start, refAllele, altAllele);
 
             // its a delins 
             altAllele = refAllele.Length.ToString(CultureInfo.InvariantCulture) + altAllele;
 
-            return Tuple.Create(start, refAllele, altAllele);
+            return (start, refAllele, altAllele);
         }
 
         private static bool NeedsReduction(string refAllele, string altAllele)

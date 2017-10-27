@@ -8,19 +8,19 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Providers
 {
-    public sealed class RefMinorProvider:IRefMinorProvider
+    public sealed class RefMinorProvider : IRefMinorProvider
     {
-        private readonly Dictionary<string,Dictionary<int,string>> _positionDict = new Dictionary<string, Dictionary<int, string>>();
+        private readonly Dictionary<string, Dictionary<int, string>> _positionDict = new Dictionary<string, Dictionary<int, string>>();
 
         public RefMinorProvider(List<string> supplementaryAnnotationDirectories)
         {
             foreach (var directory in supplementaryAnnotationDirectories)
             {
-                foreach (var file in Directory.GetFiles(directory,"*.idx"))
+                foreach (var file in Directory.GetFiles(directory, "*.idx"))
                 {
                     var chromeName = Path.GetFileNameWithoutExtension(file).Split('.')[0];
                     var refMinorPostions = SaIndex.Read(FileUtilities.GetReadStream(file)).GlobalMajorAlleleForRefMinor;
-                    if(refMinorPostions.Length>0) _positionDict[chromeName] = refMinorPostions.ToDictionary(x=>x.Item1,x=>x.Item2);
+                    if (refMinorPostions.Length > 0) _positionDict[chromeName] = refMinorPostions.ToDictionary(x => x.Position, x => x.GlobalMajorAllele);
 
                 }
             }
@@ -33,7 +33,7 @@ namespace VariantAnnotation.Providers
 
         public string GetGlobalMajorAlleleForRefMinor(IChromosome chromosome, int pos)
         {
-            return !IsReferenceMinor(chromosome,pos) ? null : _positionDict[chromosome.UcscName][pos];
+            return !IsReferenceMinor(chromosome, pos) ? null : _positionDict[chromosome.UcscName][pos];
         }
     }
 }

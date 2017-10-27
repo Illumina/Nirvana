@@ -97,13 +97,13 @@ namespace SAUtils.MergeInterimTsvs
         }
 
 
-        private List<Tuple<int, string>> GetGlobalMajorAlleleForRefMinors(string refName)
+        private List<(int, string)> GetGlobalMajorAlleleForRefMinors(string refName)
         {
-            var globalAlleles = new List<Tuple<int, string>>();
+            var globalAlleles = new List<(int, string)>();
             if (_miscReader == null) return globalAlleles;
             foreach (var saMiscellaniese in _miscReader.GetAnnotationItems(refName))
             {
-                globalAlleles.Add(Tuple.Create(saMiscellaniese.Position, saMiscellaniese.GlobalMajorAllele));
+                globalAlleles.Add((saMiscellaniese.Position, saMiscellaniese.GlobalMajorAllele));
             }
             return globalAlleles;
         }

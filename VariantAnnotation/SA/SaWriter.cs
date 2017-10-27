@@ -21,14 +21,14 @@ namespace VariantAnnotation.SA
         private readonly ExtendedBinaryWriter _msWriter;
 
         private readonly List<Interval<long>> _intervals;
-        private readonly List<Tuple<int, string>> _globalMajorAllleInRefMinors;
+        private readonly List<(int, string)> _globalMajorAllleInRefMinors;
         private readonly bool _leaveOpen;
         
         public int RefMinorCount => _globalMajorAllleInRefMinors.Count;
 
         public SaWriter(Stream stream, Stream idxStream, ISupplementaryAnnotationHeader header,
             List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
-            List<ISupplementaryInterval> allVariantIntervals,List<Tuple<int,string>> globalMajorAllelesInRefMinors,bool leaveOpen=false)
+            List<ISupplementaryInterval> allVariantIntervals,List<(int,string)> globalMajorAllelesInRefMinors,bool leaveOpen=false)
         {
             _leaveOpen = leaveOpen;
             _stream = stream;
@@ -101,7 +101,7 @@ namespace VariantAnnotation.SA
 
             var fileOffset = _stream.Position;
             var positions = _block.Write(_stream);
-            _intervals.Add(new Interval<long>(positions.Item1, positions.Item2, fileOffset));
+            _intervals.Add(new Interval<long>(positions.FirstPosition, positions.LastPosition, fileOffset));
         }
 
         private byte[] GetUncompressedBytes(ISaPosition position)

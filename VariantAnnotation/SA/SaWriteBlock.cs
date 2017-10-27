@@ -35,7 +35,7 @@ namespace VariantAnnotation.SA
             BlockOffset += source.Length;
         }
 
-        public Tuple<int, int> Write(Stream stream)
+        public (int FirstPosition, int LastPosition) Write(Stream stream)
         {
             WriteHeader(stream);
 
@@ -53,7 +53,7 @@ namespace VariantAnnotation.SA
             var lastPosition = _blockPositions[_blockPositions.Count - 1].Position;
             _blockPositions.Clear();
 
-            return new Tuple<int, int>(firstPosition, lastPosition);
+            return (firstPosition, lastPosition);
         }
 
         private void WriteBlockOffsets(ExtendedBinaryWriter writer)
