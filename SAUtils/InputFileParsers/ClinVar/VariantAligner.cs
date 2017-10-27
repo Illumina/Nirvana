@@ -30,7 +30,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             var trimmedAltAllele = trimmedAllele.AltAllele;
 
             // alignment only makes sense for insertion and deletion
-            if (!(trimmedAltAllele.Length == 0 || trimmedRefAllele.Length == 0)) return trimmedAllele;
+            if (!(trimmedAltAllele.Length == 0 || trimmedRefAllele.Length == 0)) return (refPosition, refAllele, altAllele);
 
             var upstreamSeq = GetUpstreamSeq(trimmedPos, MaxRotationRange, isCircularGenome);
             if (upstreamSeq == null)
