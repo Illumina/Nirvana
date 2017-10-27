@@ -94,10 +94,10 @@ namespace Vcf.VariantCreator
 	    {
 		    var breakendInfo = ParseBreakendAltAllele(refAllele, altAllele);
 
-			var chromosome2 = breakendInfo.Item1;
-		    var position2   = breakendInfo.Item2;
-		    var isSuffix1   = breakendInfo.Item3;
-		    var isSuffix2   = breakendInfo.Item4;
+			var chromosome2 = breakendInfo.Chromosome2;
+		    var position2   = breakendInfo.Position2;
+		    var isSuffix1   = breakendInfo.IsSuffix1;
+		    var isSuffix2   = breakendInfo.IsSuffix2;
 
 			return new IBreakEnd[]{ new BreakEnd(chromosome1, chromosome2, position1, position2, isSuffix1, isSuffix2)};
 	    }
@@ -155,7 +155,7 @@ namespace Vcf.VariantCreator
         /// <summary>
 		/// parses the alternate allele
 		/// </summary>
-		private Tuple<IChromosome, int, bool , bool> ParseBreakendAltAllele(string refAllele, string altAllele)
+		private (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(string refAllele, string altAllele)
 		{
 			string referenceName2;
 			int position2;
@@ -176,7 +176,7 @@ namespace Vcf.VariantCreator
 				position2      = Convert.ToInt32(match.Groups[3].Value);
 				referenceName2 = match.Groups[2].Value;
 
-				return new Tuple<IChromosome, int, bool, bool>(GetChromosome(referenceName2), position2, false, isSuffix2);
+				return (GetChromosome(referenceName2), position2, false, isSuffix2);
 			}
 			else
 			{
@@ -191,7 +191,7 @@ namespace Vcf.VariantCreator
 				position2      = Convert.ToInt32(match.Groups[3].Value);
 				referenceName2 = match.Groups[2].Value;
 
-				return new Tuple<IChromosome, int, bool, bool>(GetChromosome(referenceName2), position2, true, isSuffix2);
+				return (GetChromosome(referenceName2), position2, true, isSuffix2);
 			}
 		}
 

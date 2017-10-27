@@ -10,7 +10,7 @@ namespace VariantAnnotation.Interface.SA
         IEnumerable<Interval<ISupplementaryInterval>> SvIntervals { get; }
         IEnumerable<Interval<ISupplementaryInterval>> AllVariantIntervals { get; }
         ISupplementaryAnnotationHeader Header { get; }
-        IEnumerable<Tuple<int,string>> GlobalMajorAlleleInRefMinors { get; }
+        IEnumerable<(int, string)> GlobalMajorAlleleInRefMinors { get; }
         ISaPosition GetAnnotation(int position);
     }
 }

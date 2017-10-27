@@ -19,7 +19,7 @@ namespace UnitTests.VariantAnnotation.Utilities
         public void SplitVersion_ReturnNull_WithNullInput()
         {
             var splitVersion = FormatUtilities.SplitVersion(null);
-            Assert.Null(splitVersion);
+            Assert.Null(splitVersion.Id);
         }
 
         [Theory]
@@ -28,8 +28,8 @@ namespace UnitTests.VariantAnnotation.Utilities
         public void SplitVersion(string combinedId, string expectedId, byte expectedVersion)
         {
             var splitVersion = FormatUtilities.SplitVersion(combinedId);
-            Assert.Equal(expectedId, splitVersion.Item1);
-            Assert.Equal(expectedVersion, splitVersion.Item2);
+            Assert.Equal(expectedId, splitVersion.Id);
+            Assert.Equal(expectedVersion, splitVersion.Version);
         }
     }
 }

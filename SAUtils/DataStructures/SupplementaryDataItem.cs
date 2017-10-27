@@ -44,11 +44,11 @@ namespace SAUtils.DataStructures
 
         public static  void RemoveConflictingAlleles<T>(List<T> saItems) where T : SupplementaryDataItem
         {
-            var allelesSet = new HashSet<Tuple<string, string>>();
-            var conflictSet = new HashSet<Tuple<string, string>>();
+            var allelesSet = new HashSet<(string, string)>();
+            var conflictSet = new HashSet<(string, string)>();
             foreach (var saItem in saItems)
             {
-                var alleleTuple = Tuple.Create(saItem.ReferenceAllele, saItem.AlternateAllele);
+                var alleleTuple = (saItem.ReferenceAllele, saItem.AlternateAllele);
 
                 if (allelesSet.Contains(alleleTuple))
                     conflictSet.Add(alleleTuple);
@@ -56,7 +56,7 @@ namespace SAUtils.DataStructures
                 allelesSet.Add(alleleTuple);
             }
 
-            saItems.RemoveAll(x => conflictSet.Contains(Tuple.Create(x.ReferenceAllele, x.AlternateAllele)));
+            saItems.RemoveAll(x => conflictSet.Contains((x.ReferenceAllele, x.AlternateAllele)));
 
         }
 

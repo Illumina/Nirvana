@@ -39,7 +39,7 @@ namespace SAUtils.TsvWriters
             WriteGlobalAlleleTsv(itemsByAllele);
         }
 
-        private void WriteGlobalAlleleTsv(Dictionary<Tuple<string, string>, List<DbSnpItem>> itemsByAllele)
+        private void WriteGlobalAlleleTsv(Dictionary<(string, string), List<DbSnpItem>> itemsByAllele)
         {
             var alleleFreqDict = GetAlleleFrequencies(itemsByAllele);
             if (alleleFreqDict.Count == 0) return;
@@ -98,14 +98,14 @@ namespace SAUtils.TsvWriters
             return maxFreqAlleles[0];
 
         }
-        private static Dictionary<string, double> GetAlleleFrequencies(Dictionary<Tuple<string, string>, List<DbSnpItem>> itemsByAllele)
+        private static Dictionary<string, double> GetAlleleFrequencies(Dictionary<(string ReferenceAllele, string AlternateAllele), List<DbSnpItem>> itemsByAllele)
         {
             var alleleFreqDict = new Dictionary<string, double>();
 
             foreach (var kvp in itemsByAllele)
             {
-                var refAllele = kvp.Key.Item1;
-                var altAllele = kvp.Key.Item2;
+                var refAllele = kvp.Key.ReferenceAllele;
+                var altAllele = kvp.Key.AlternateAllele;
 
                 foreach (var dbSnpItem in kvp.Value)
                 {
@@ -118,12 +118,12 @@ namespace SAUtils.TsvWriters
             return alleleFreqDict;
         }
 
-        private void WriteDbsnpTsv(Dictionary<Tuple<string, string>, List<DbSnpItem>> itemsByAllele)
+        private void WriteDbsnpTsv(Dictionary<(string RefAllele, string AltAllele), List<DbSnpItem>> itemsByAllele)
         {
             foreach (var kvp in itemsByAllele)
             {
-                var refAllele = kvp.Key.Item1;
-                var altAllele = kvp.Key.Item2;
+                var refAllele = kvp.Key.RefAllele;
+                var altAllele = kvp.Key.AltAllele;
                 var itemsGroup = kvp.Value;
 
                 var uniqueIds = new HashSet<long>(itemsGroup.Select(x => x.RsId).ToList());
@@ -137,7 +137,7 @@ namespace SAUtils.TsvWriters
             }
         }
 
-        private static Dictionary<Tuple<string, string>, List<DbSnpItem>> GetItemsByAllele(IEnumerable<SupplementaryDataItem> saItems)
+        private static Dictionary<(string ReferenceAllele, string AlternateAllele), List<DbSnpItem>> GetItemsByAllele(IEnumerable<SupplementaryDataItem> saItems)
         {
             var itemsForPosition = new List<DbSnpItem>();
             foreach (var item in saItems)
@@ -147,10 +147,10 @@ namespace SAUtils.TsvWriters
                 itemsForPosition.Add(dbSnpItem);
             }
 
-            var itemsByAllele = new Dictionary<Tuple<string, string>, List<DbSnpItem>>();
+            var itemsByAllele = new Dictionary<(string, string), List<DbSnpItem>>();
             foreach (var item in itemsForPosition)
             {
-                var alleleTuple = Tuple.Create(item.ReferenceAllele, item.AlternateAllele);
+                var alleleTuple = (item.ReferenceAllele, item.AlternateAllele);
 
                 if (itemsByAllele.ContainsKey(alleleTuple))
                     itemsByAllele[alleleTuple].Add(item);

@@ -77,8 +77,8 @@ namespace SAUtils.TsvWriters
             var alleleGroupDict = GroupByAltAllele(clinvarItems);
             foreach (var kvp in alleleGroupDict)
             {
-                var refAllele = kvp.Key.Item1;
-                var altAllele = kvp.Key.Item2;
+                var refAllele = kvp.Key.ReferenceAllele;
+                var altAllele = kvp.Key.AlternateAllele;
 
                 var groupedItems = kvp.Value;
                 var vcfString = string.Join(",", Enumerable.Select(groupedItems.OrderBy(x => x.Id), x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
@@ -108,13 +108,13 @@ namespace SAUtils.TsvWriters
 
 		}
 
-        private Dictionary<Tuple<string, string>, List<ClinVarItem>> GroupByAltAllele(List<ClinVarItem> clinVarItems)
+        private Dictionary<(string ReferenceAllele, string AlternateAllele), List<ClinVarItem>> GroupByAltAllele(List<ClinVarItem> clinVarItems)
         {
-            var groups = new Dictionary<Tuple<string, string>, List<ClinVarItem>>();
+            var groups = new Dictionary<(string, string), List<ClinVarItem>>();
 
             foreach (var clinVarItem in clinVarItems)
             {
-                var alleleTuple = Tuple.Create(clinVarItem.ReferenceAllele, clinVarItem.AlternateAllele);
+                var alleleTuple = (clinVarItem.ReferenceAllele, clinVarItem.AlternateAllele);
                 if (groups.ContainsKey(alleleTuple))
                     groups[alleleTuple].Add(clinVarItem);
                 else groups[alleleTuple] = new List<ClinVarItem> { clinVarItem };

@@ -81,7 +81,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         }
 
-        private static Tuple<string, string, string, string> GetCodonsAndAminoAcids(ITranscript transcript,ISequence refSequence,
+        private static (string ReferenceCodons, string AlternateCodons, string ReferenceAminoAcids, string AlternateAminoAcids) GetCodonsAndAminoAcids(ITranscript transcript,ISequence refSequence,
             string transcriptRefAllele, string transcriptAltAllele, ISimpleVariant variant,
             IMappedPositions mappedPositions,AminoAcids aminoAcidsProvider)
         {
@@ -96,7 +96,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 codingSequence, aminoAcidsProvider, out string referenceCodons,
                 out string alternateCodons, out string referenceAminoAcids, out string alternateAminoAcids);
 
-            return Tuple.Create(referenceCodons ?? "", alternateCodons ?? "", referenceAminoAcids ?? "",
+            return (referenceCodons ?? "", alternateCodons ?? "", referenceAminoAcids ?? "",
                 alternateAminoAcids ?? "");
         }
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using CommonUtilities;
 using SAUtils.InputFileParsers.MitoMAP;
 using VariantAnnotation.Interface.Sequence;
@@ -23,15 +22,15 @@ namespace SAUtils.InputFileParsers.ClinVar
         /// Left aligns the variant using base rotation
         /// </summary>
         /// <returns>Tuple of new position, ref and alt allele</returns>
-        public Tuple<int, string, string> LeftAlign(int refPosition, string refAllele, string altAllele, bool isCircularGenome = false)
+        public (int RefPosition, string RefAllele, string AltAllele) LeftAlign(int refPosition, string refAllele, string altAllele, bool isCircularGenome = false)
         {
             var trimmedAllele = BiDirectionalTrimmer.Trim(refPosition, refAllele, altAllele);
-            var trimmedPos = trimmedAllele.Item1;
-            var trimmedRefAllele = trimmedAllele.Item2;
-            var trimmedAltAllele = trimmedAllele.Item3;
+            var trimmedPos = trimmedAllele.Start;
+            var trimmedRefAllele = trimmedAllele.RefAllele;
+            var trimmedAltAllele = trimmedAllele.AltAllele;
 
             // alignment only makes sense for insertion and deletion
-            if (!(trimmedAltAllele.Length == 0 || trimmedRefAllele.Length == 0)) return null;
+            if (!(trimmedAltAllele.Length == 0 || trimmedRefAllele.Length == 0)) return trimmedAllele;
 
             var upstreamSeq = GetUpstreamSeq(trimmedPos, MaxRotationRange, isCircularGenome);
             if (upstreamSeq == null)
@@ -51,7 +50,7 @@ namespace SAUtils.InputFileParsers.ClinVar
                     if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
                 }
                 var newRefAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
-                return Tuple.Create(trimmedPos, newRefAllele, ""); //alt is empty for deletion
+                return (trimmedPos, newRefAllele, ""); //alt is empty for deletion
             }
             else
             {
@@ -64,7 +63,7 @@ namespace SAUtils.InputFileParsers.ClinVar
                     if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
                 }
                 var newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
-                return Tuple.Create(trimmedPos, "", newAltAllele);
+                return (trimmedPos, "", newAltAllele);
             }
 
         }
