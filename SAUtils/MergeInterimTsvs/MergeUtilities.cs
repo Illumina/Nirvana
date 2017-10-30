@@ -3,7 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using SAUtils.DataStructures;
+using SAUtils.InputFileParsers.IntermediateAnnotation;
+using VariantAnnotation.GeneAnnotation;
+using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.MergeInterimTsvs
 {
@@ -38,22 +42,20 @@ namespace SAUtils.MergeInterimTsvs
             return minItems.Count == 0 ? null : minItems;
         }
 
-        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(List<InterimSaHeader> interimSaHeaders,
-            List<InterimIntervalHeader> intervalHeaders)
+        public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(IEnumerable<SaHeader> saHeaders)
         {
-            return interimSaHeaders.Select(header => header.GetDataSourceVersion()).Concat(intervalHeaders.Select(header => header.GetDataSourceVersion()));
+            return saHeaders.Select(header => header.GetDataSourceVersion());
         }
 
-        public static void CheckAssemblyConsistancy(IEnumerable<InterimSaHeader> iSaHeaders, IEnumerable<InterimIntervalHeader> iIntervalHeaders)
+        public static void CheckAssemblyConsistancy(IEnumerable<SaHeader> saHeaders)
         {
-            var uniqueAssemblies = iSaHeaders.Select(x => x.GenomeAssembly)
-                .Concat(iIntervalHeaders.Select(x => x.GenomeAssembly))
-                .Where(x => !MergeInterimTsvs.AssembliesIgnoredInConsistancyCheck.Contains(x))
+            var uniqueAssemblies = saHeaders.Select(x => x.GenomeAssembly)
+                .Where(x => !InterimTsvsMerger.AssembliesIgnoredInConsistancyCheck.Contains(x))
                 .Distinct()
                 .ToList();
 
             if (uniqueAssemblies.Count > 1)
-                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {string.Join(", ", uniqueAssemblies.ToArray())}");
+                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {String.Join(", ", uniqueAssemblies.ToArray())}");
         }
 
 
@@ -67,6 +69,31 @@ namespace SAUtils.MergeInterimTsvs
             }
         }
 
-        
+        public static IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
+        {
+            if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
+
+            var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
+
+            return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);
+        }
+
+        public static List<ISupplementaryInterval> GetIntervals(IEnumerable<ParallelIntervalTsvReader> intervalReaders, string refName)
+        {
+            var intervals = new List<ISupplementaryInterval>();
+            if (intervalReaders == null) return intervals;
+
+            foreach (var intervalReader in intervalReaders)
+            {
+                intervals.AddRange(intervalReader.GetItems(refName));
+            }
+
+            return intervals;
+        }
+
+        public static List<ISupplementaryInterval> GetSpecificIntervals(ReportFor reportFor, IEnumerable<ISupplementaryInterval> intervals)
+        {
+            return intervals.Where(interval => interval.ReportingFor == reportFor).ToList();
+        }
     }
 }

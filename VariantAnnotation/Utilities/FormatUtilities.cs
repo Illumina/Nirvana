@@ -1,5 +1,4 @@
-﻿using System;
-using VariantAnnotation.Interface.AnnotatedPositions;
+﻿using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.Utilities
 {

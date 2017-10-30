@@ -3,17 +3,17 @@ using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class InterimIntervalHeader : InterimHeader, IEquatable<InterimIntervalHeader>
+    public sealed class IntervalAnnotationHeader : SaHeader, IEquatable<IntervalAnnotationHeader>
     {
         private readonly ReportFor _reportingFor;
 
-        public InterimIntervalHeader(string name, string assembly, string version, string releaseDate, string description,
+        public IntervalAnnotationHeader(string name, string assembly, string version, string releaseDate, string description,
             ReportFor reportingFor) : base(name, assembly, version, releaseDate, description)
         {
             _reportingFor = reportingFor;
         }
 
-        public bool Equals(InterimIntervalHeader other)
+        public bool Equals(IntervalAnnotationHeader other)
         {
             if (other == null) return false;
             return Name.Equals(other.Name)

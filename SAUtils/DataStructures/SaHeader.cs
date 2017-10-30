@@ -4,7 +4,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.DataStructures
 {
-    public class InterimHeader
+    public class SaHeader
     {
         protected string Name { get; }
         public GenomeAssembly GenomeAssembly { get; }
@@ -13,7 +13,7 @@ namespace SAUtils.DataStructures
         private string Description { get; }
 
 
-        public InterimHeader(string name, string assembly, string version, string releaseDate, string description)
+        public SaHeader(string name, string assembly, string version, string releaseDate, string description)
         {
             Name = name;
             GenomeAssembly = GenomeAssemblyUtilities.Convert(assembly);
@@ -29,17 +29,6 @@ namespace SAUtils.DataStructures
                 Name, Version, DateTime.Parse(ReleaseDate).Ticks,
                 Description);
         }
-
-        public bool Equals(InterimHeader other)
-        {
-            if (other == null) return false;
-            return Name.Equals(other.Name)
-                   && GenomeAssembly == other.GenomeAssembly
-                   && Version.Equals(other.Version)
-                   && ReleaseDate.Equals(other.ReleaseDate);
-        }
-
-
 
         public override string ToString()
         {

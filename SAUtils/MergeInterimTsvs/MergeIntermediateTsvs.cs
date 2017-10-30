@@ -5,17 +5,18 @@ using VariantAnnotation.Interface;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public sealed class MergeIntermediateTsvsMain
+    public sealed class MergeIntermediateTsvs
     {
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
-            var intermediateSaMerger = new MergeInterimTsvs(ConfigurationSettings.IntermediateFiles,
+            var intermediateSaMerger = new InterimTsvsMerger(ConfigurationSettings.IntermediateFiles,
                 ConfigurationSettings.IntervalFiles, ConfigurationSettings.MiscFile,
                 ConfigurationSettings.GeneTsvFiles,
                 ConfigurationSettings.CompressedReference,
                 ConfigurationSettings.OutputDirectory);
-            intermediateSaMerger.Merge();
 
+            intermediateSaMerger.Merge();
+            
             return ExitCodes.Success;
 
         }
@@ -61,7 +62,6 @@ namespace SAUtils.MergeInterimTsvs
                  }
             };
 
-            var merger = new MergeIntermediateTsvsMain();
             var commandLineExample = $"{command} [options]";
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
@@ -80,15 +80,10 @@ namespace SAUtils.MergeInterimTsvs
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Reads provided intermediate TSV files and creates supplementary database", commandLineExample)
                 .ShowErrors()
-                .Execute(merger.ProgramExecution);
-
+                .Execute(ProgramExecution);
 
             return exitCode;
 
-
-
         }
-
-
     }
 }

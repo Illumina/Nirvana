@@ -107,9 +107,9 @@ namespace UnitTests.SAUtils.TsvWriters
 
             var dbsnpFile = Path.Combine(randomDbsnpPath, "dbsnp_77.tsv.gz");
             var globalAlleleFile = Path.Combine(randomDbsnpPath, "globalAllele_77.tsv.gz");
-            var tsvReader = new SaTsvReader(new FileInfo(dbsnpFile));
+            var tsvReader = new ParallelSaTsvReader(dbsnpFile);
 
-            using (var tsvEnumerator = tsvReader.GetAnnotationItems("1").GetEnumerator())
+            using (var tsvEnumerator = tsvReader.GetItems("1").GetEnumerator())
             {
                 Assert.True(tsvEnumerator.MoveNext());
                 Assert.Equal("\"ids\":[\"rs123456\"]", tsvEnumerator.Current.JsonStrings[0]);
@@ -117,8 +117,8 @@ namespace UnitTests.SAUtils.TsvWriters
                 Assert.Equal("\"ids\":[\"rs123458\"]", tsvEnumerator.Current.JsonStrings[0]);
             }
 
-            var globalAlleleReader = new SaTsvReader(new FileInfo(globalAlleleFile));
-            var globalAlleleEnumerator = globalAlleleReader.GetAnnotationItems("1").GetEnumerator();
+            var globalAlleleReader = new ParallelSaTsvReader(globalAlleleFile);
+            var globalAlleleEnumerator = globalAlleleReader.GetItems("1").GetEnumerator();
             Assert.True(globalAlleleEnumerator.MoveNext());
             Assert.Equal(100,globalAlleleEnumerator.Current.Position);
             Assert.Equal("\"globalMinorAllele\":\"T\",\"globalMinorAlleleFrequency\":0.4", globalAlleleEnumerator.Current.JsonStrings[0]);
