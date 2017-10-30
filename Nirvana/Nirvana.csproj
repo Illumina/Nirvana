@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
