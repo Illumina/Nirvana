@@ -12,7 +12,7 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\GRCh37 --out c:\\Development\\SupplementaryDatabase\\41.4\\GRCh37",
+      "commandLineArgs": " createTSV --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --out C:\\Development\\IntermediateTsvs\\test --cvr C:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "MITOMAP": {
