@@ -398,7 +398,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
             if (db == null) return;
 
-			var id = xElement.Attribute(IdTag)?.Value;//.Trim(' ');
+			var id = xElement.Attribute(IdTag)?.Value.Trim(' '); // Trimming is necessary here, don't turn it off.
 
 			switch (db.Value)
 			{
@@ -423,7 +423,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
         
-        private String TrimOmimId(string id)
+        private static string TrimOmimId(string id)
 	    {
 		    return id.TrimStart('P','S');
 	    }
