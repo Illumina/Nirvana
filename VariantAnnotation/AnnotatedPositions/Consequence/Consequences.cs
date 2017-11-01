@@ -60,7 +60,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 	    {
 		    switch (variantType)
 		    {
-				case VariantType.short_tandem_repeat_variant:
+				case VariantType.short_tandem_repeat_variantion:
 				    _consequences.Add(ConsequenceTag.short_tandem_repeat_change);
 				    break;
 			    case VariantType.short_tandem_repeat_contraction:

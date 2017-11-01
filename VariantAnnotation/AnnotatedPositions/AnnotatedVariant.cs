@@ -81,10 +81,10 @@ namespace VariantAnnotation.AnnotatedPositions
 				case VariantType.copy_number_loss:
 				case VariantType.copy_number_variation:
 					return VariantType.copy_number_variation;
-			    case VariantType.short_tandem_repeat_variant:
+			    case VariantType.short_tandem_repeat_variantion:
 			    case VariantType.short_tandem_repeat_contraction:
 			    case VariantType.short_tandem_repeat_expansion:
-				    return VariantType.short_tandem_repeat_variant;
+				    return VariantType.short_tandem_repeat_variantion;
 				default:
 					return variantType;
 			}

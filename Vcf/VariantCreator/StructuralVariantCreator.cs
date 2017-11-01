@@ -73,7 +73,7 @@ namespace Vcf.VariantCreator
 				case VariantType.mobile_element_insertion:
 					return $"{ensemblName}:{start}:{end}:MEI";
 
-				//case VariantType.short_tandem_repeat_variant:
+				//case VariantType.short_tandem_repeat_variantion:
 				//	return $"{ensemblName}:{start}:{end}:{repeatUnit}:{repeatCount}";
 				default:
 					return $"{ensemblName}:{start}:{end}";

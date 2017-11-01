@@ -120,7 +120,7 @@ namespace Vcf.Info
 				case "CNV":
 					return VariantType.copy_number_variation;
 				case "STR":
-					return VariantType.short_tandem_repeat_variant;
+					return VariantType.short_tandem_repeat_variantion;
 				case "ALU":
 					return VariantType.mobile_element_insertion;
 				case "LINE1":
