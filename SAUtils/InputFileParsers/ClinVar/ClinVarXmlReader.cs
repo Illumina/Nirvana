@@ -259,10 +259,14 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    var refAllele = clinvarVariant.ReferenceAllele;
 		    if (string.IsNullOrEmpty(refAllele)) return true;
 
-	        var stop = clinvarVariant.Start + refAllele.Length - 1;
-		    return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
+	        var refLength = clinvarVariant.Stop - clinvarVariant.Start + 1;
+	        if (refLength != refAllele.Length) return false;
 
-	    }
+	        return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
+            //var stop = clinvarVariant.Start + refAllele.Length - 1;
+            //return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
+
+        }
 
         private static string GetReferenceAllele(ClinVarItem variant, ISequence compressedSequence)
         {

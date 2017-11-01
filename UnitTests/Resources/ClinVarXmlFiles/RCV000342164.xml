@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-  <ClinVarSet ID="17828906">
+  <ClinVarSet ID="22637006">
     <RecordStatus>current</RecordStatus>
     <Title>NM_000368.4(TSC1):c.2075_2120dup46 (p.Phe707Leufs) AND not provided</Title>
-    <ReferenceClinVarAssertion DateCreated="2016-12-05" DateLastUpdated="2017-02-26" ID="880915">
-      <ClinVarAccession Acc="RCV000342164" Version="1" Type="RCV" DateUpdated="2017-02-26" />
+    <ReferenceClinVarAssertion DateCreated="2016-12-05" DateLastUpdated="2017-08-21" ID="880915">
+      <ClinVarAccession Acc="RCV000342164" Version="1" Type="RCV" DateUpdated="2017-08-21" />
       <RecordStatus>current</RecordStatus>
       <ClinicalSignificance DateLastEvaluated="2016-09-20">
         <ReviewStatus>criteria provided, single submitter</ReviewStatus>
@@ -21,7 +21,7 @@
         <Method>
           <MethodType>clinical testing</MethodType>
         </Method>
-        <ObservedData ID="17046881">
+        <ObservedData ID="21540799">
           <Attribute Type="Description">not provided</Attribute>
         </ObservedData>
       </ObservedIn>
@@ -64,11 +64,11 @@
             <XRef ID="NM_000368.4:c.2075_2120dup46" DB="RefSeq" />
           </AttributeSet>
           <CytogeneticLocation>9q34.13</CytogeneticLocation>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="9" Accession="NC_000009.12" start="132903739" stop="132903784" display_start="132903739" display_stop="132903784" variantLength="46" />
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="9" Accession="NC_000009.11" start="135779126" stop="135779126" display_start="135779126" display_stop="135779126" variantLength="1" referenceAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" alternateAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCAT" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="9" Accession="NC_000009.12" start="132903739" stop="132903784" display_start="132903739" display_stop="132903784" variantLength="46" positionVCF="132903738" referenceAlleleVCF="A" alternateAlleleVCF="AAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="9" Accession="NC_000009.11" start="135779126" stop="135779126" display_start="135779126" display_stop="135779126" variantLength="1" referenceAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" alternateAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCAT" positionVCF="135779125" referenceAlleleVCF="A" alternateAlleleVCF="AAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" />
           <MeasureRelationship Type="within single gene">
             <Name>
-              <ElementValue Type="Preferred">tuberous sclerosis 1</ElementValue>
+              <ElementValue Type="Preferred">TSC complex subunit 1</ElementValue>
             </Name>
             <Symbol>
               <ElementValue Type="Preferred">TSC1</ElementValue>
@@ -91,6 +91,7 @@
             <XRef Type="MIM" ID="605284" DB="OMIM" />
             <XRef ID="HGNC:12362" DB="HGNC" />
             <Comment DataSource="NCBI curation" Type="public">This gene is cited in the ACMG recommendations of 2013 (PubMed 23788249) for reporting incidental findings in exons.</Comment>
+            <Comment DataSource="NCBI curation" Type="public">This gene is cited in the ACMG recommendations of 2016 (PubMed 27854360) for reporting incidental findings in exons.</Comment>
           </MeasureRelationship>
           <XRef Type="rs" ID="886042012" DB="dbSNP" />
         </Measure>
@@ -111,8 +112,8 @@
       </TraitSet>
     </ReferenceClinVarAssertion>
     <ClinVarAssertion ID="644191">
-      <ClinVarSubmissionID localKey="GDX:1281897|Not Provided" submittedAssembly="GRCh37" submitter="GeneDx" submitterDate="2016-11-08" />
-      <ClinVarAccession Acc="SCV000330841" Version="1" Type="SCV" OrgID="26957" DateUpdated="2017-01-23" />
+      <ClinVarSubmissionID localKey="GDX:1281897|Not Provided" submittedAssembly="GRCh37" submitter="GeneDx" submitterDate="2017-07-13" />
+      <ClinVarAccession Acc="SCV000330841" Version="2" Type="SCV" OrgID="26957" DateUpdated="2017-08-21" />
       <RecordStatus>current</RecordStatus>
       <ClinicalSignificance DateLastEvaluated="2016-09-20">
         <ReviewStatus>criteria provided, single submitter</ReviewStatus>
@@ -145,7 +146,6 @@
           <AttributeSet>
             <Attribute Type="HGVS">NM_000368.4:c.2075_2120dupGAGACCAGTTGCTTTTACTGCACAACCAGTTACTCTATGAGCGTTT</Attribute>
           </AttributeSet>
-          <SequenceLocation Assembly="GRCh37" Chr="9" alternateAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" referenceAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" start="135779126" stop="135779126" variantLength="1" />
           <MeasureRelationship Type="variant in gene">
             <Symbol>
               <ElementValue Type="Preferred">TSC1</ElementValue>
