@@ -567,7 +567,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private bool IsShortTandemRepeatVariant()
         {
-            return _variant.Type == VariantType.short_tandem_repeat_variantion
+            return _variant.Type == VariantType.short_tandem_repeat_variation
                    || _variant.Type == VariantType.short_tandem_repeat_expansion
                    || _variant.Type == VariantType.short_tandem_repeat_contraction;
         }

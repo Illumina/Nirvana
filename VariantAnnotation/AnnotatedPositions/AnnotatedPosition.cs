@@ -76,7 +76,7 @@ namespace VariantAnnotation.AnnotatedPositions
         private bool IsShortTandemRepeat()
         {
             return Position.Variants.Any(x => 
-                x.Type == VariantType.short_tandem_repeat_variantion
+                x.Type == VariantType.short_tandem_repeat_variation
                 || x.Type == VariantType.short_tandem_repeat_contraction
                 || x.Type == VariantType.short_tandem_repeat_expansion);
         }
