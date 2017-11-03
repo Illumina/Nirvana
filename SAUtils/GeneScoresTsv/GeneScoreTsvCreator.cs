@@ -34,7 +34,7 @@ namespace SAUtils.GeneScoresTsv
         {
             bool isFirstLine = true;
 
-            var genes = new List<(string gene, string pLi, string pRec, string pNull)>();
+            var genes = new List<(string gene, double pLi, double pRec, double pNull)>();
             using (_reader)
             using (_writer)
             {
@@ -83,27 +83,27 @@ namespace SAUtils.GeneScoresTsv
             return ExitCodes.Success;
         }
 
-        private void WriteScores(string gene, string pLi, string pRec, string pNull)
+        private void WriteScores(string gene, double pLi, double pRec, double pNull)
         {
             var sb = new StringBuilder();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddStringValue("pLi", pLi, false);
-            jsonObject.AddStringValue("pRec", pRec, false);
-            jsonObject.AddStringValue("pNull", pNull, false);
+            jsonObject.AddDoubleValue("pLi", pLi, "0.00e0");
+            jsonObject.AddDoubleValue("pRec", pRec, "0.00e0");
+            jsonObject.AddDoubleValue("pNull", pNull, "0.00e0");
             sb.Append(JsonObject.CloseBrace);
 
             _writer.AddEntry(gene, new List<string>(){sb.ToString()});
         }
 
-        private (string gene, string pLi, string pRec, string pNull) GetGeneAndScores(string line)
+        private (string gene, double pLi, double pRec, double pNull) GetGeneAndScores(string line)
         {
             var cols  = line.Split('\t');
             var gene  = cols[_geneIndex];
-            var pLi   = cols[_pliIndex];
-            var pRec  = cols[_precIndex];
-            var pNull = cols[_pnullIndex];
+            var pLi   = double.Parse(cols[_pliIndex]);
+            var pRec  = double.Parse(cols[_precIndex]);
+            var pNull = double.Parse(cols[_pnullIndex]);
 
             return (gene, pLi, pRec, pNull);
         }
