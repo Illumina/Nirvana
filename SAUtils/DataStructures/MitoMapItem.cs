@@ -72,7 +72,7 @@ namespace SAUtils.DataStructures
 
             jsonObject.AddStringValue("refAllele", refAllele);
             jsonObject.AddStringValue("altAllele", altAllele);
-            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("disease", _diseases.Distinct().ToList());
+            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("diseases", _diseases.Distinct().ToList());
             if (_homoplasmy.HasValue) jsonObject.AddStringValue("hasHomoplasmy", _homoplasmy.ToString());
             if (_heteroplasmy.HasValue) jsonObject.AddStringValue("hasHeteroplasmy", _heteroplasmy.ToString());
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
