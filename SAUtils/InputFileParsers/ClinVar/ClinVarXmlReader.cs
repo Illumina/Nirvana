@@ -259,10 +259,14 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    var refAllele = clinvarVariant.ReferenceAllele;
 		    if (string.IsNullOrEmpty(refAllele)) return true;
 
-	        var stop = clinvarVariant.Start + refAllele.Length - 1;
-		    return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
+	        var refLength = clinvarVariant.Stop - clinvarVariant.Start + 1;
+	        if (refLength != refAllele.Length) return false;
 
-	    }
+	        return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
+            //var stop = clinvarVariant.Start + refAllele.Length - 1;
+            //return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
+
+        }
 
         private static string GetReferenceAllele(ClinVarItem variant, ISequence compressedSequence)
         {
@@ -398,7 +402,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
             if (db == null) return;
 
-			var id = xElement.Attribute(IdTag)?.Value;//.Trim(' ');
+			var id = xElement.Attribute(IdTag)?.Value.Trim(' '); // Trimming is necessary here, don't turn it off.
 
 			switch (db.Value)
 			{
@@ -423,7 +427,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
         
-        private String TrimOmimId(string id)
+        private static string TrimOmimId(string id)
 	    {
 		    return id.TrimStart('P','S');
 	    }

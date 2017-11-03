@@ -22,7 +22,7 @@
         mobile_element_insertion        = 16,
         mobile_element_deletion         = 17,
         novel_sequence_insertion        = 18,
-        short_tandem_repeat_variant     = 19,
+        short_tandem_repeat_variation   = 19,
         short_tandem_repeat_expansion   = 20,
         short_tandem_repeat_contraction = 21,
 

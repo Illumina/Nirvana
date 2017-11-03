@@ -16,7 +16,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private const string DelSymbol = "-";
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
-        private readonly MitoMapDisease _mitoMapDisease;
         private readonly VariantAligner _variantAligner;
 
 
@@ -53,9 +52,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
             _mitoMapFileInfo = mitoMapFileInfo;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
-            _mitoMapDisease = new MitoMapDisease(
-                              new FileInfo(
-                              Path.Combine(mitoMapFileInfo.DirectoryName,   MitomapParsingParameters.MitomapDiseaseAnnotationFile)));
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
         }
 
@@ -178,7 +174,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             int posi = int.Parse(info[fields[0]]);
             var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
             if (DescribedAsDuplicatedRecord(mitomapDiseaseString)) return mitoMapVarItems;
-            var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : _mitoMapDisease.GetDisease(mitomapDiseaseString);
+            var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : new List<string> {mitomapDiseaseString};
             var (refAllele, altAllele, extractedPosi) = GetRefAltAlleles(info[fields[2]]);
             if (extractedPosi.HasValue && posi != extractedPosi)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");

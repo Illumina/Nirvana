@@ -12,7 +12,7 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\GRCh37 --out c:\\Development\\SupplementaryDatabase\\41.4\\GRCh37",
+      "commandLineArgs": "geneScoresTsv --in C:\\Development\\ExternalDataSources\\ExAC\\exac_r03_march16_z_pli_rec_null_data.tsv.gz --out c:\\Development\\IntermediateTsvs\\GRCh37",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "MITOMAP": {
