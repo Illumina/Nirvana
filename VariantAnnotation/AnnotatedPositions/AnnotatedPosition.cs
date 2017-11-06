@@ -53,7 +53,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddIntValues("ciEnd",   Position.InfoData.CiEnd);
             jsonObject.AddIntValue("svLength", Position.InfoData.SvLength);
 
-            jsonObject.AddDoubleValue("strandBias",             Position.InfoData.StrandBias,"0.#######");
+            jsonObject.AddDoubleValue("strandBias",             Position.InfoData.StrandBias,JsonCommon.FrequencyRoundingFormat);
             jsonObject.AddIntValue("jointSomaticNormalQuality", Position.InfoData.JointSomaticNormalQuality);
             jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData.RecalibratedQuality);
             jsonObject.AddIntValue("copyNumber",                Position.InfoData.CopyNumber);
