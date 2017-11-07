@@ -50,20 +50,18 @@ namespace SAUtils.MergeInterimTsvs
             _saHeaders.AddRange(ReaderUtilities.GetTsvHeaders(_tsvReaders));
             _saHeaders.AddRange(ReaderUtilities.GetTsvHeaders(_intervalReaders));
             _geneHeaders = ReaderUtilities.GetTsvHeaders(_geneReaders)?.ToList();
-            _saHeaders.AddRange(_geneHeaders);
-
-
+            
             _refNames = new HashSet<string>();
             _refNames.UnionWith(ReaderUtilities.GetRefNames(_tsvReaders));
             _refNames.UnionWith(ReaderUtilities.GetRefNames(_intervalReaders));
             _refNames.UnionWith(_miscReader.RefNames);
 
-            DisplayDataSources(_saHeaders);
+            DisplayDataSources(_saHeaders, _geneHeaders);
 
             MergeUtilities.CheckAssemblyConsistancy(_saHeaders);
         }
         
-        private static void DisplayDataSources(IEnumerable<SaHeader> headers)
+        private static void DisplayDataSources(IEnumerable<SaHeader> saHeaders, IEnumerable<SaHeader> geneHeaders)
         {
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Data sources:\n");
@@ -74,7 +72,12 @@ namespace SAUtils.MergeInterimTsvs
             Console.WriteLine("=======================================================================");
             Console.ResetColor();
 
-            foreach (var header in headers.OrderBy(h => h.GetDataSourceVersion().Name))
+            foreach (var header in saHeaders.OrderBy(h => h.GetDataSourceVersion().Name))
+            {
+                Console.WriteLine(header);
+            }
+
+            foreach (var header in geneHeaders.OrderBy(h => h.GetDataSourceVersion().Name))
             {
                 Console.WriteLine(header);
             }
