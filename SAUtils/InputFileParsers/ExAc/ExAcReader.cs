@@ -126,7 +126,8 @@ namespace SAUtils.InputFileParsers.ExAc
 					position,
 					refAllele,
 					altAlleles[i],
-					(int) Math.Round(_totalDepth*1.0/ (_anAdj/2.0), MidpointRounding.AwayFromZero),//to be consistant with evs, we use integer values for coverage
+					ComputingUtilities.GetCoverage(_totalDepth, _anAdj / 2),
+                    //(int) Math.Round(_totalDepth*1.0/ (_anAdj/2.0), MidpointRounding.AwayFromZero),//to be consistant with evs, we use integer values for coverage
 					_anAdj, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
 					GetAlleleCount(_acAdj, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
 					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acSas, i))
