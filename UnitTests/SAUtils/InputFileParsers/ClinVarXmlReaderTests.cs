@@ -584,6 +584,22 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
+        [Trait("jira", "NIR-2072")]
+        public void TrimSpaceFromOmimIds()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 1), 129283520, "A");
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000373191.xml")), sequenceProvider);
+
+            Assert.True(reader.GetItems().Any());
+
+            foreach (var clinVarItem in reader.GetItems())
+            {
+                Assert.Equal(1, clinVarItem.OmimIDs.Count());
+                Assert.Equal("609060", clinVarItem.OmimIDs.FirstOrDefault());
+            }
+        }
+
+        [Fact]
         [Trait("jira", "NIR-2099")]
         public void ClinvarInsertion()
         {
