@@ -48,11 +48,10 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
                 ParseHeaderLine(line);
             }
 
-            //just to make it work this one time
-            if (string.IsNullOrEmpty(_genomeAssembly)) _genomeAssembly = "GRCh37";
+            if (string.IsNullOrEmpty(_genomeAssembly))
+                _genomeAssembly = "";
 
             if (!string.IsNullOrEmpty(_name) 
-             && !string.IsNullOrEmpty(_genomeAssembly) 
              && !string.IsNullOrEmpty(_version) && !string.IsNullOrEmpty(_releaseDate) 
              && !string.IsNullOrEmpty(_keyName))
                 return new SaHeader(_name, _genomeAssembly, _version, _releaseDate, _description);
