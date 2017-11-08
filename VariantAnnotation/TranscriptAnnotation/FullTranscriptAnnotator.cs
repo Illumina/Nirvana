@@ -61,7 +61,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                  polyphenScore = GetPredictionScore(mappedPositions.ProteinInterval.Start.Value, alternateAminoAcids, polyphenCache, transcript.PolyPhenIndex);
             }
 
-            return new AnnotatedTranscript(transcript,referenceAminoAcids,alternateAminoAcids,referenceCodons,alternateCodons,mappedPositions,hgvsCoding,hgvsProtein,siftScore,polyphenScore,consequences,null);
+            return new AnnotatedTranscript(transcript,referenceAminoAcids,alternateAminoAcids,referenceCodons,alternateCodons,mappedPositions,hgvsCoding,hgvsProtein,siftScore,polyphenScore,consequences,null, null);
         }
 
         private static PredictionScore GetPredictionScore(int proteinPosition, string alternateAminoAcids, IPredictionCache predictionCache,int predictionIndex)

@@ -24,12 +24,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         public IEnumerable<ConsequenceTag> Consequences { get;  }
         public IGeneFusionAnnotation GeneFusionAnnotation { get; }
+        public IList<IPluginData> PluginData { get; }
 
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPositions mappedPositions, string hgvsCoding,
             string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
-            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation)
+            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation, IList<IPluginData> pluginData)
         {
             Transcript           = transcript;
             ReferenceAminoAcids  = referenceAminoAcids;
@@ -43,6 +44,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             PolyPhen             = polyphen;
             Consequences         = consequences;
             GeneFusionAnnotation = geneFusionAnnotation;
+            PluginData = pluginData;
         }
 
 
