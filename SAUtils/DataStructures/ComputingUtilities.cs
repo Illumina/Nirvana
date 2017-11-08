@@ -12,9 +12,9 @@ namespace SAUtils.DataStructures
                 : null;
         }
 
-        public static int GetCoverage(int depth, int allAlleleNumber)
+        public static int GetCoverage(double depth, double allAlleleNumber)
         {
-            return (int) Math.Round(depth * 1.0 / allAlleleNumber, 0, MidpointRounding.AwayFromZero);
+            return (int) Math.Round(depth / allAlleleNumber, 0, MidpointRounding.AwayFromZero);
         }
     }
 }
