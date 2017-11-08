@@ -201,7 +201,7 @@ namespace SAUtils.DataStructures
 
 		public string GetVcfString()
 		{
-			var freq = ComputeFrequency(AllAlleleNumber, AllAlleleCount) ?? "";
+			var freq = ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount) ?? "";
 			var ancestralAlleleString = AncestralAllele ?? "";
 			return freq + ";" + ancestralAlleleString;
 		}
@@ -211,12 +211,12 @@ namespace SAUtils.DataStructures
 			var sb = new StringBuilder();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddStringValue("ancestralAllele", AncestralAllele);
-			jsonObject.AddStringValue("allAf", ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
-			jsonObject.AddStringValue("afrAf", ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
-			jsonObject.AddStringValue("amrAf", ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
-			jsonObject.AddStringValue("easAf", ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
-			jsonObject.AddStringValue("eurAf", ComputeFrequency(EurAlleleNumber, EurAlleleCount), false);
-			jsonObject.AddStringValue("sasAf", ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
+			jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
+			jsonObject.AddStringValue("afrAf", ComputingUtilities.ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
+			jsonObject.AddStringValue("amrAf", ComputingUtilities.ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
+			jsonObject.AddStringValue("easAf", ComputingUtilities.ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
+			jsonObject.AddStringValue("eurAf", ComputingUtilities.ComputeFrequency(EurAlleleNumber, EurAlleleCount), false);
+			jsonObject.AddStringValue("sasAf", ComputingUtilities.ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
 
 			if (AllAlleleNumber != null) jsonObject.AddIntValue("allAn", AllAlleleNumber.Value);
 			if (AfrAlleleNumber != null) jsonObject.AddIntValue("afrAn", AfrAlleleNumber.Value);
@@ -234,13 +234,6 @@ namespace SAUtils.DataStructures
 
 			return sb.ToString();
 
-		}
-
-		private static string ComputeFrequency(int? alleleNumber, int? alleleCount)
-		{
-			return alleleNumber != null && alleleNumber.Value > 0 && alleleCount != null
-				? ((double)alleleCount / alleleNumber.Value).ToString(JsonCommon.FrequencyRoundingFormat)
-				: null;
 		}
 
 	}

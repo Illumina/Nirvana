@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -60,7 +61,7 @@ namespace SAUtils.DataStructures
             ReferenceAllele = refAllele;
             AlternateAllele = alternateAllele;
 
-            Coverage = depth/allAlleleNumber.Value;
+            Coverage = ComputingUtilities.GetCoverage(depth, allAlleleNumber.Value);
 
             AllAlleleNumber = allAlleleNumber;
             AfrAlleleNumber = afrAlleleNumber;
@@ -189,13 +190,6 @@ namespace SAUtils.DataStructures
             }
         }
 
-		private static string ComputeFrequency(int? alleleNumber, int? alleleCount)
-		{
-			return alleleNumber != null && alleleNumber.Value > 0 && alleleCount != null
-				? ((double)alleleCount / alleleNumber.Value).ToString(JsonCommon.FrequencyRoundingFormat)
-				: null;
-		}
-
 		public string GetJsonString()
 		{
 			var sb = new StringBuilder();
@@ -203,47 +197,47 @@ namespace SAUtils.DataStructures
 			jsonObject.AddIntValue("coverage", Coverage);
 		    if (HasFailedFilters) jsonObject.AddBoolValue("hasFailedFilters", true);
 
-            jsonObject.AddStringValue("allAf", ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
+            jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
 		    if (AllAlleleNumber != null) jsonObject.AddIntValue("allAn", AllAlleleNumber.Value);
 		    if (AllAlleleCount != null) jsonObject.AddIntValue("allAc", AllAlleleCount.Value);
 		    if (AllHomCount != null) jsonObject.AddIntValue("allHc", AllHomCount.Value);
             
-            jsonObject.AddStringValue("afrAf", ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
+            jsonObject.AddStringValue("afrAf", ComputingUtilities.ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
 		    if (AfrAlleleNumber != null) jsonObject.AddIntValue("afrAn", AfrAlleleNumber.Value);
 		    if (AfrAlleleCount != null) jsonObject.AddIntValue("afrAc", AfrAlleleCount.Value);
 		    if (AfrHomCount != null) jsonObject.AddIntValue("afrHc", AfrHomCount.Value);
             
-            jsonObject.AddStringValue("amrAf", ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
+            jsonObject.AddStringValue("amrAf", ComputingUtilities.ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
 		    if (AmrAlleleNumber != null) jsonObject.AddIntValue("amrAn", AmrAlleleNumber.Value);
 		    if (AmrAlleleCount != null) jsonObject.AddIntValue("amrAc", AmrAlleleCount.Value);
 		    if (AmrHomCount != null) jsonObject.AddIntValue("amrHc", AmrHomCount.Value);
 
-            jsonObject.AddStringValue("easAf", ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
+            jsonObject.AddStringValue("easAf", ComputingUtilities.ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
 		    if (EasAlleleNumber != null) jsonObject.AddIntValue("easAn", EasAlleleNumber.Value);
 		    if (EasAlleleCount != null) jsonObject.AddIntValue("easAc", EasAlleleCount.Value);
 		    if (EasHomCount != null) jsonObject.AddIntValue("easHc", EasHomCount.Value);
 
-            jsonObject.AddStringValue("finAf", ComputeFrequency(FinAlleleNumber, FinAlleleCount), false);
+            jsonObject.AddStringValue("finAf", ComputingUtilities.ComputeFrequency(FinAlleleNumber, FinAlleleCount), false);
 		    if (FinAlleleNumber != null) jsonObject.AddIntValue("finAn", FinAlleleNumber.Value);
 		    if (FinAlleleCount != null) jsonObject.AddIntValue("finAc", FinAlleleCount.Value);
 		    if (FinHomCount != null) jsonObject.AddIntValue("finHc", FinHomCount.Value);
 
-            jsonObject.AddStringValue("nfeAf", ComputeFrequency(NfeAlleleNumber, NfeAlleleCount), false);
+            jsonObject.AddStringValue("nfeAf", ComputingUtilities.ComputeFrequency(NfeAlleleNumber, NfeAlleleCount), false);
 			if (NfeAlleleNumber != null) jsonObject.AddIntValue("nfeAn", NfeAlleleNumber.Value);
 		    if (NfeAlleleCount != null) jsonObject.AddIntValue("nfeAc", NfeAlleleCount.Value);
 		    if (NfeHomCount != null) jsonObject.AddIntValue("nfeHc", NfeHomCount.Value);
 
-            jsonObject.AddStringValue("asjAf", ComputeFrequency(AsjAlleleNumber, AsjAlleleCount), false);
+            jsonObject.AddStringValue("asjAf", ComputingUtilities.ComputeFrequency(AsjAlleleNumber, AsjAlleleCount), false);
 		    if (AsjAlleleNumber != null) jsonObject.AddIntValue("asjAn", AsjAlleleNumber.Value);
 		    if (AsjAlleleCount != null) jsonObject.AddIntValue("asjAc", AsjAlleleCount.Value);
 		    if (AsjHomCount != null) jsonObject.AddIntValue("asjHc", AsjHomCount.Value);
 
-            jsonObject.AddStringValue("sasAf", ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
+            jsonObject.AddStringValue("sasAf", ComputingUtilities.ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
 		    if (SasAlleleNumber != null) jsonObject.AddIntValue("sasAn", SasAlleleNumber.Value);
 		    if (SasAlleleCount != null) jsonObject.AddIntValue("sasAc", SasAlleleCount.Value);
 		    if (SasHomCount != null) jsonObject.AddIntValue("sasHc", SasHomCount.Value);
 
-            jsonObject.AddStringValue("othAf", ComputeFrequency(OthAlleleNumber, OthAlleleCount), false);
+            jsonObject.AddStringValue("othAf", ComputingUtilities.ComputeFrequency(OthAlleleNumber, OthAlleleCount), false);
             if (OthAlleleNumber != null) jsonObject.AddIntValue("othAn", OthAlleleNumber.Value);
             if (OthAlleleCount != null) jsonObject.AddIntValue("othAc", OthAlleleCount.Value);
 		    if (OthHomCount != null) jsonObject.AddIntValue("othHc", OthHomCount.Value);
