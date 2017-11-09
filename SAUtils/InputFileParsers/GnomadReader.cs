@@ -43,7 +43,7 @@ namespace SAUtils.InputFileParsers
 	    private int[] _hcAsj;
 	    private int[] _hcSas;
 
-        private int _totalDepth;
+        private int? _totalDepth;
 	    private bool _hasFailedFilters;
 
 
@@ -85,7 +85,7 @@ namespace SAUtils.InputFileParsers
 		    _hcAsj = null;
 		    _hcSas = null;
 
-            _totalDepth = 0;
+            _totalDepth = null;
 		    _hasFailedFilters = false;
 		}
 
