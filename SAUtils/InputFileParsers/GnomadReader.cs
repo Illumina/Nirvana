@@ -67,6 +67,7 @@ namespace SAUtils.InputFileParsers
 			_acAsj = null;
 		    _acSas = null;
 
+		    _anAll = 0;
 			_anAfr = 0;
 			_anAmr = 0;
 			_anEas = 0;
@@ -76,6 +77,7 @@ namespace SAUtils.InputFileParsers
 			_anAsj = 0;
 		    _anSas = 0;
 
+		    _hcAll = null;
 		    _hcAfr = null;
 		    _hcAmr = null;
 		    _hcEas = null;
