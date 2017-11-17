@@ -54,7 +54,7 @@ namespace SAUtils.MergeInterimTsvs
             _refNames = new HashSet<string>();
             _refNames.UnionWith(ReaderUtilities.GetRefNames(_tsvReaders));
             _refNames.UnionWith(ReaderUtilities.GetRefNames(_intervalReaders));
-            _refNames.UnionWith(_miscReader.RefNames);
+            if (_miscReader != null) _refNames.UnionWith(_miscReader.RefNames);
 
             DisplayDataSources(_saHeaders, _geneHeaders);
 
