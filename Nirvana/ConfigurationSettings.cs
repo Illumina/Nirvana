@@ -10,6 +10,8 @@ namespace Nirvana
 		public static string RefSequencePath;
 		public static string OutputFileName;
 
+	    public static string PluginDirectory;
+
 		public static bool Vcf;
 		public static bool Gvcf;
 		public static bool ForceMitochondrialAnnotation;
