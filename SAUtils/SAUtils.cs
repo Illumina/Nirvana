@@ -20,7 +20,7 @@ namespace SAUtils
             {
                 ["createSA"] = new TopLevelOption("create Nirvana supplementary annotation database", MergeIntermediateTsvs.Run),
                 ["createTSV"] = new TopLevelOption("create intermediate tsv file for supplementary annotation", CreateIntermediateTsvsMain.Run),
-                ["createOMIMTSV"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
+                ["createOmimTsv"] = new TopLevelOption("create omim tsv file", CreateOmimTsvMain.Run),
                 ["geneScoresTsv"] = new TopLevelOption("create gene scores tsv file", GeneScoresMain.Run),
                 ["extractMiniSA"] = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"] = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
