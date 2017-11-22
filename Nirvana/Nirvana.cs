@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -50,6 +51,14 @@ namespace Nirvana
             }
 
             if (conservationProvider != null) dataSourceVersions.AddRange(conservationProvider.DataSourceVersions);
+
+            if (pluglins != null)
+            {
+                foreach (var pluglin in pluglins)
+                {
+                    dataSourceVersions.AddRange(pluglin.GetDataSourceVersions());
+                }
+            }
 
             var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
             var jasixFileName  = ConfigurationSettings.OutputFileName + ".json.gz" + JasixCommons.FileExt;
