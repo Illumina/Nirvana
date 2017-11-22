@@ -90,6 +90,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
             jsonObject.AddStringValue("siftPrediction", Sift?.Prediction);
+
+            foreach (var pluginData in PluginData)
+            {
+                jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
+            }
+            
             sb.Append(JsonObject.CloseBrace);
         }
 
