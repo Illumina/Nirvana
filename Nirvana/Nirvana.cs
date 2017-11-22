@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -37,7 +38,9 @@ namespace Nirvana
             var conservationProvider         = ProviderUtilities.GetConservationProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
             var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
             var geneAnnotationProvider      = ProviderUtilities.GetGeneAnnotationProviders(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider);
+
+            var pluglins = PluginUtilities.LoadPlugins(ConfigurationSettings.PluginDirectory);
+            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider,pluglins);
 
             var dataSourceVersions = new List<IDataSourceVersion>();
             dataSourceVersions.AddRange(transcriptAnnotationProvider.DataSourceVersions);
@@ -48,6 +51,14 @@ namespace Nirvana
             }
 
             if (conservationProvider != null) dataSourceVersions.AddRange(conservationProvider.DataSourceVersions);
+
+            if (pluglins != null)
+            {
+                foreach (var pluglin in pluglins)
+                {
+                    dataSourceVersions.AddRange(pluglin.GetDataSourceVersions());
+                }
+            }
 
             var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
             var jasixFileName  = ConfigurationSettings.OutputFileName + ".json.gz" + JasixCommons.FileExt;
@@ -155,9 +166,9 @@ namespace Nirvana
                     v => ConfigurationSettings.VcfPath = v
                 },
                 {
-                    "loftee",
-                    "enables loftee",
-                    v => ConfigurationSettings.EnableLoftee = v != null
+                    "plugin|p=",
+                    "plugin {directory}",
+                    v => ConfigurationSettings.PluginDirectory = v
                 },
                 {
                     "gvcf",

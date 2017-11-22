@@ -7,6 +7,7 @@ using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
@@ -23,18 +24,18 @@ namespace VariantAnnotation
         private readonly IGeneAnnotationProvider _geneAnnotationProvider;
         private bool _annotateMito;
         public GenomeAssembly GenomeAssembly { get; }
+        private readonly IEnumerable<IPlugin> _plugins;
 
-        public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider, IGeneAnnotationProvider geneAnnotationProvider)
+        public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider, IGeneAnnotationProvider geneAnnotationProvider, IEnumerable<IPlugin> plugins = null)
         {
             _saProviders = saProviders;
             _taProvider = taProvider;
             _sequenceProvider = sequenceProvider;
             _conservationProvider = conservationProvider;
             _geneAnnotationProvider = geneAnnotationProvider;
-
-            GenomeAssembly = GetGenomeAssembly();
-
             _affectedGenes = new HashSet<string>();
+            _plugins = plugins;
+            GenomeAssembly = GetGenomeAssembly();            
         }
 
         private GenomeAssembly GetGenomeAssembly()
@@ -44,14 +45,35 @@ namespace VariantAnnotation
             if (_saProviders != null) assemblies[_saProviders.GenomeAssembly] = _saProviders.Name;
             if (_sequenceProvider != null) assemblies[_sequenceProvider.GenomeAssembly] = _sequenceProvider.Name;
             if (_conservationProvider != null) assemblies[_conservationProvider.GenomeAssembly] = _conservationProvider.Name;
+            
 
             if (assemblies.Count == 0) return GenomeAssembly.Unknown;
-            if (assemblies.Count == 1) return assemblies.First().Key;
+            if (assemblies.Count == 1)
+            {
+                CheckPluginAssemblyConsistent(assemblies.First().Key);
+                return assemblies.First().Key;
+            }
             foreach (var assembly in assemblies)
             {
                 Console.WriteLine($"{assembly.Value} has genome assembly {assembly.Key}");
             }
             throw new InconsistantGenomeAssemblyException();
+
+        }
+
+        private void CheckPluginAssemblyConsistent(GenomeAssembly assembly)
+        {
+            if (_plugins == null || !_plugins.Any()) return ;
+            foreach (var plugin in _plugins)
+            {
+                var pluginAssembly = plugin.GetGenomeAssembly();
+                if (pluginAssembly != null && pluginAssembly != assembly)
+                {
+                    Console.WriteLine($"plugins have inconsistent genome assembly {pluginAssembly}");
+                    throw new InconsistantGenomeAssemblyException();
+                }
+  
+            }
         }
 
         public IAnnotatedPosition Annotate(IPosition position)
@@ -74,9 +96,19 @@ namespace VariantAnnotation
 
             _taProvider.Annotate(annotatedPosition);
 
+            if (_plugins != null)
+            {
+                foreach (var plugin in _plugins)
+                {
+                    if (_sequenceProvider != null) plugin.Annotate(annotatedPosition, _sequenceProvider.Sequence);
+                }
+            }
             TrackAffectedGenes(annotatedPosition);
             return annotatedPosition;
         }
+
+
+
 
         internal void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
         {
