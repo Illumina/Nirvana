@@ -33,22 +33,20 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             {
                 new CdnaCoordinateMap(1260147,1260482,1,336),
                 new CdnaCoordinateMap(1262216,1262412,337,533),
-                new CdnaCoordinateMap(1262621,1264277,534,2160),
+                new CdnaCoordinateMap(1262621,1264277,534,2160)
             };
 
             var translation = new Mock<ITranslation>();
             translation.SetupGet(x => x.CodingRegion).Returns(new CdnaCoordinateMap(1262291, 1263143, 412, 1056));
-            translation.SetupGet(x => x.ProteinId).Returns(CompactId.Convert("ENST00000343938"));
-            translation.SetupGet(x => x.ProteinVersion).Returns(4);
+            translation.SetupGet(x => x.ProteinId).Returns(CompactId.Convert("ENST00000343938", 4));
             translation.SetupGet(x => x.PeptideSeq).Returns("MDDSETGFNLKVVLVSFKQCLDEKEEVLLDPYIASWKGLVRFLNSLGTIFSFISKDVVSKLRIMERLRGGPQSEHYRSLQAMVAHELSNRLVDLERRSHHPESGCRTVLRLHRALHWLQLFLEGLRTSPEDARTSALCADSYNASLAAYHPWVVRRAVTVAFCTLPTREVFLEAMNVGPPEQAVQMLGEALPFIQRVYNVSQKLYAEHSLLDLP");
 
             var gene = new Mock<IGene>();
             gene.SetupGet(x => x.OnReverseStrand).Returns(false);
             gene.SetupGet(x => x.EnsemblId).Returns(CompactId.Convert("ENSG00000224051 "));
 
-            mockedTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938"));
+            mockedTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938", 4));
             mockedTranscript.SetupGet(x => x.Source).Returns(Source.Ensembl);
-            mockedTranscript.SetupGet(x => x.Version).Returns(4);
             mockedTranscript.SetupGet(x => x.Chromosome).Returns(chromosome);
             mockedTranscript.SetupGet(x => x.Start).Returns(start);
             mockedTranscript.SetupGet(x => x.End).Returns(end);
@@ -59,7 +57,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             mockedTranscript.SetupGet(x => x.TotalExonLength).Returns(2190);
 
             return mockedTranscript.Object;
-
         }
 
         [Fact]

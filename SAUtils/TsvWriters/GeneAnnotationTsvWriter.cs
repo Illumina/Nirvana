@@ -43,7 +43,7 @@ namespace SAUtils.TsvWriters
         public void AddEntry(string geneSymbol, List<string> jsonStrings)
         {
             if (jsonStrings == null || jsonStrings.Count == 0) return;
-            _writer.Write($"{geneSymbol}\t{String.Join("\t",jsonStrings)}\n");
+            _writer.Write($"{geneSymbol}\t{string.Join("\t",jsonStrings)}\n");
         }
 
         public void Dispose()

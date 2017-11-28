@@ -33,7 +33,7 @@ namespace SAUtils.ExtractMiniSa
             _end    = end;
             _saPath = saPath;
 
-            var refChromDict       = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).GetChromosomeDictionary();
+            var refChromDict = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
 
             var referenceName = GetReferenceName(saPath, refChromDict);
             _miniSaPath       = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);

@@ -42,6 +42,7 @@ namespace Vcf.Info
                 var key = kvp.Key;
                 var value = kvp.Value;
 
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (key)
                 {
                     case "SB":

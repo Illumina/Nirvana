@@ -11,36 +11,24 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ReferenceSequenceProvider : ISequenceProvider
     {
-	    public string Name { get; }
-	    public GenomeAssembly GenomeAssembly { get; }
-        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
-        public ushort NumRefSeqs { get; }
+        public IDictionary<string, IChromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
+        public IDictionary<ushort, IChromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
+        public ushort NumRefSeqs                                     => _sequenceReader.NumRefSeqs;
+        public GenomeAssembly GenomeAssembly                         => _sequenceReader.Assembly;
+        public ISequence Sequence                                    => _sequenceReader.Sequence;
 
-        public ISequence Sequence { get; }
-
-        private readonly IDictionary<string, IChromosome> _chromosomeDictionary;
-        private readonly IDictionary<ushort, IChromosome> _chromosomeIndexDictionary;
-        public IDictionary<string, IChromosome> GetChromosomeDictionary() => _chromosomeDictionary;
-        public IDictionary<ushort, IChromosome> GetChromosomeIndexDictionary() => _chromosomeIndexDictionary;
+        public string Name { get; } = "Reference sequence provider";
+        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = null;
 
         private readonly CytogeneticBands _cytogeneticBands;
-        private int _currentReferenceIndex;
+        private IChromosome _currentChromosome;
         private readonly CompressedSequenceReader _sequenceReader;
 
         public ReferenceSequenceProvider(Stream stream)
         {
-	        Name = "Reference sequence provider";
-            _sequenceReader            = new CompressedSequenceReader(stream);
-            Sequence                   = _sequenceReader.Sequence;
-            NumRefSeqs                 = _sequenceReader.NumRefSeqs;
-            _cytogeneticBands          = new CytogeneticBands(_sequenceReader.CytogeneticBands);
-            _chromosomeDictionary      = new Dictionary<string, IChromosome>();
-            _chromosomeIndexDictionary = new Dictionary<ushort, IChromosome>();
-            GenomeAssembly             = _sequenceReader.Assembly;
-            DataSourceVersions         = null;
-            _currentReferenceIndex     = -1;
-
-            AddReferenceMetadata(_sequenceReader.Metadata);
+            _currentChromosome = new EmptyChromosome(string.Empty);
+            _sequenceReader    = new CompressedSequenceReader(stream);
+            _cytogeneticBands  = new CytogeneticBands(_sequenceReader.CytogeneticBands);
         }
 
         /// <summary>
@@ -64,45 +52,9 @@ namespace VariantAnnotation.Providers
 
         public void LoadChromosome(IChromosome chromosome)
         {
-            var refIndex = chromosome.Index;
-            if (refIndex == _currentReferenceIndex) return;
-
+            if (chromosome.Index == _currentChromosome.Index) return;
             _sequenceReader.GetCompressedSequence(chromosome);
-            _currentReferenceIndex = refIndex;
-        }
-
-        private void AddReferenceMetadata(ReferenceMetadata[] refMetadataList)
-        {
-            ushort index = 0;
-
-            _chromosomeDictionary.Clear();
-
-            foreach (var refMetadata in refMetadataList)
-            {
-                AddReferenceName(refMetadata.EnsemblName, refMetadata.UcscName, index);
-                index++;
-            }
-        }
-
-        /// <summary>
-        /// adds a Ensembl/UCSC reference name pair to the current dictionary
-        /// </summary>
-        private void AddReferenceName(string ensemblReferenceName, string ucscReferenceName, ushort refIndex)
-        {
-            var isUcscEmpty    = string.IsNullOrEmpty(ucscReferenceName);
-            var isEnsemblEmpty = string.IsNullOrEmpty(ensemblReferenceName);
-
-            // sanity check: make sure we have at least one reference name
-            if (isUcscEmpty && isEnsemblEmpty) return;
-
-            if (isUcscEmpty)    ucscReferenceName    = ensemblReferenceName;
-            if (isEnsemblEmpty) ensemblReferenceName = ucscReferenceName;
-
-            var chromosome = new Chromosome(ucscReferenceName, ensemblReferenceName, refIndex);
-
-            _chromosomeDictionary[ucscReferenceName]    = chromosome;
-            _chromosomeDictionary[ensemblReferenceName] = chromosome;
-            _chromosomeIndexDictionary[refIndex]        = chromosome;
+            _currentChromosome = chromosome;
         }
     }
 }

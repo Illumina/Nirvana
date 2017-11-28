@@ -32,7 +32,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             {
                 new CdnaCoordinateMap(1260147,1260482,1,336),
                 new CdnaCoordinateMap(1262216,1262412,337,533),
-                new CdnaCoordinateMap(1262621,1264277,534,2160),
+                new CdnaCoordinateMap(1262621,1264277,534,2160)
             };
 
             var translation = new Mock<ITranslation>();
@@ -41,8 +41,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var gene = new Mock<IGene>();
             gene.SetupGet(x => x.OnReverseStrand).Returns(false);
 
-            _forwardTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938"));
-            _forwardTranscript.SetupGet(x => x.Version).Returns(4);
+            _forwardTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938", 4));
             _forwardTranscript.SetupGet(x => x.Chromosome).Returns(chromosome);
             _forwardTranscript.SetupGet(x => x.Start).Returns(start);
             _forwardTranscript.SetupGet(x => x.End).Returns(end);
@@ -54,8 +53,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
 
             //set up reverse transcript
-            _reverseTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000423372"));
-            _reverseTranscript.SetupGet(x => x.Version).Returns(3);
+            _reverseTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000423372", 3));
             _reverseTranscript.SetupGet(x => x.Chromosome).Returns(chromosome);
             _reverseTranscript.SetupGet(x => x.Start).Returns(134901);
             _reverseTranscript.SetupGet(x => x.End).Returns(139379);

@@ -17,14 +17,18 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void Transcript_EndToEnd()
         {
-            IChromosome expectedChromosome        = new Chromosome("chrBob", "Bob", 1);
-            int expectedStart                     = int.MaxValue;
-            int expectedEnd                       = int.MinValue;
-            var expectedId                        = "ENST00000540021";
-            byte expectedVersion                  = 7;
-            var expectedBioType                   = BioType.IG_J_pseudogene;
-            bool expectedCanonical                = true;
-            var expectedSource                    = Source.BothRefSeqAndEnsembl;
+            IChromosome expectedChromosome = new Chromosome("chrBob", "Bob", 1);
+            int expectedStart              = int.MaxValue;
+            int expectedEnd                = int.MinValue;
+            var expectedId                 = "ENST00000540021";
+            byte expectedVersion           = 7;
+            var expectedBioType            = BioType.IG_J_pseudogene;
+            bool expectedCanonical         = true;
+            var expectedSource             = Source.BothRefSeqAndEnsembl;
+            bool expectedCdsStartNotFound  = true;
+            bool expectedCdsEndNotFound    = true;
+
+            var expectedIdAndVersion = expectedId + "." + expectedVersion;
 
             IInterval[] expectedIntrons           = GetIntrons();
             ICdnaCoordinateMap[] expectedCdnaMaps = GetCdnaMaps();
@@ -36,10 +40,10 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             IInterval[] expectedMicroRnas         = GetMicroRnas();
 
             ITranslation expectedTranslation =
-                new Translation(expectedCdnaMaps[0], CompactId.Convert("ENSP00000446475"), 17, "VEIDSD");
+                new Translation(expectedCdnaMaps[0], CompactId.Convert("ENSP00000446475", 17), "VEIDSD");
 
             IGene expectedGene = new Gene(expectedChromosome, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
-                CompactId.Convert("ENSG00000141510"), 500);
+                CompactId.Convert("ENSG00000141510"));
 
             var genes = new IGene[1];
             genes[0] = expectedGene;
@@ -59,9 +63,10 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             var transcript = new Transcript(expectedChromosome, expectedStart, expectedEnd,
-                CompactId.Convert(expectedId), expectedVersion, expectedTranslation, expectedBioType, expectedGene,
+                CompactId.Convert(expectedId, expectedVersion), expectedTranslation, expectedBioType, expectedGene,
                 expectedTotalExonLength, expectedStartExonPhase, expectedCanonical, expectedIntrons, expectedMicroRnas,
-                expectedCdnaMaps, expectedSiftIndex, expectedPolyPhenIndex, expectedSource);
+                expectedCdnaMaps, expectedSiftIndex, expectedPolyPhenIndex, expectedSource, expectedCdsStartNotFound,
+                expectedCdsEndNotFound, null, null);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             ITranscript observedTranscript;
@@ -84,8 +89,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.NotNull(observedTranscript);
             Assert.Equal(expectedStart,           observedTranscript.Start);
             Assert.Equal(expectedEnd,             observedTranscript.End);
-            Assert.Equal(expectedId,              observedTranscript.Id.ToString());
-            Assert.Equal(expectedVersion,         observedTranscript.Version);
+            Assert.Equal(expectedIdAndVersion,    observedTranscript.Id.WithVersion);
             Assert.Equal(expectedBioType,         observedTranscript.BioType);
             Assert.Equal(expectedCanonical,       observedTranscript.IsCanonical);
             Assert.Equal(expectedSource,          observedTranscript.Source);

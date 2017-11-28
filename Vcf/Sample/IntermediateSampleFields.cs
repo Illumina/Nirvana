@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using VariantAnnotation.Interface.IO;
 
 namespace Vcf.Sample
@@ -27,8 +28,7 @@ namespace Vcf.Sample
         public string RepeatNumberSpan { get; }
         public float? DenovoQuality { get; }
 
-        // constructor
-        public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols, bool fixGatkGenomeVcf = false)
+        public IntermediateSampleFields(IReadOnlyList<string> vcfColumns, FormatIndices formatIndices, string[] sampleCols, bool fixGatkGenomeVcf = false)
         {
             VcfRefAllele = vcfColumns[VcfCommon.RefIndex];
             FormatIndices = formatIndices;
@@ -151,8 +151,7 @@ namespace Vcf.Sample
             var countString = SampleColumns[index].Split(',')[0];
             if (countString == ".") return null;
 
-            int count;
-            if (!int.TryParse(countString, out count)) return null;
+            if (!int.TryParse(countString, out var count)) return null;
             return count;
         }
     }

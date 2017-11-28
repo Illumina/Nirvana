@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -12,12 +11,14 @@ using Jasix.DataStructures;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.IO.VcfWriter;
+using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
@@ -26,50 +27,46 @@ namespace Nirvana
 {
     public sealed class Nirvana
     {
-        private static readonly string AnnotatorVersionTag      = "Illumina Annotation Engine " + CommandLineUtilities.Version;
-        private readonly PerformanceMetrics _performanceMetrics = PerformanceMetrics.Instance;
-        private readonly VcfConversion _conversion              = new VcfConversion();
+        private static string _inputCachePrefix;
+        private static readonly List<string> SupplementaryAnnotationDirectories = new List<string>();
+        private static string _vcfPath;
+        private static string _refSequencePath;
+        private static string _outputFileName;
+        private static string _pluginDirectory;
+
+        private static bool _vcf;
+        private static bool _gvcf;
+        private static bool _forceMitochondrialAnnotation;
+        private static bool _reportAllSvOverlappingTranscripts;
+
+        private readonly string _annotatorVersionTag = "Illumina Annotation Engine " + CommandLineUtilities.Version;
+        private readonly VcfConversion _conversion   = new VcfConversion();
 
         private ExitCodes ProgramExecution()
         {
-            var sequenceProvider             = ProviderUtilities.GetSequenceProvider(ConfigurationSettings.RefSequencePath);
-            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(ConfigurationSettings.InputCachePrefix, sequenceProvider);
-            var saProvider                   = ProviderUtilities.GetSaProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var conservationProvider         = ProviderUtilities.GetConservationProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var geneAnnotationProvider      = ProviderUtilities.GetGeneAnnotationProviders(ConfigurationSettings.SupplementaryAnnotationDirectories);
+            var sequenceProvider             = ProviderUtilities.GetSequenceProvider(_refSequencePath);
+            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(_inputCachePrefix, sequenceProvider);
+            var saProvider                   = ProviderUtilities.GetSaProvider(SupplementaryAnnotationDirectories);
+            var conservationProvider         = ProviderUtilities.GetConservationProvider(SupplementaryAnnotationDirectories);
+            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(SupplementaryAnnotationDirectories);
+            var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
+            var plugins                      = PluginUtilities.LoadPlugins(_pluginDirectory);
+            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
 
-            var pluglins = PluginUtilities.LoadPlugins(ConfigurationSettings.PluginDirectory);
-            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider,pluglins);
+            var logger  = _outputFileName == "" ? (ILogger)new NullLogger() : new ConsoleLogger();
+            var metrics = new PerformanceMetrics(logger);
 
-            var dataSourceVersions = new List<IDataSourceVersion>();
-            dataSourceVersions.AddRange(transcriptAnnotationProvider.DataSourceVersions);
-            if (saProvider != null) dataSourceVersions.AddRange(saProvider.DataSourceVersions);
-            if (geneAnnotationProvider != null )
-            {
-                dataSourceVersions.AddRange(geneAnnotationProvider.DataSourceVersions);
-            }
-
-            if (conservationProvider != null) dataSourceVersions.AddRange(conservationProvider.DataSourceVersions);
-
-            if (pluglins != null)
-            {
-                foreach (var pluglin in pluglins)
-                {
-                    var pluginDataSourceVersions = pluglin.GetDataSourceVersions();
-                    if (pluginDataSourceVersions != null)
-                        dataSourceVersions.AddRange(pluginDataSourceVersions);
-                }
-            }
-
+            var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
+                geneAnnotationProvider, conservationProvider);
+ 
             var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
-            var jasixFileName  = ConfigurationSettings.OutputFileName + ".json.gz" + JasixCommons.FileExt;
+            var jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
-            using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(ConfigurationSettings.OutputFileName))
-            using (var vcfReader         = ReadWriteUtilities.GetVcfReader(ConfigurationSettings.VcfPath, sequenceProvider.GetChromosomeDictionary(), refMinorProvider, ConfigurationSettings.ReportAllSvOverlappingTranscripts))
-            using (var jsonWriter        = new JsonWriter(outputWriter, AnnotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
-            using (var vcfWriter         = ConfigurationSettings.Vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(ConfigurationSettings.OutputFileName), vcfReader.GetHeaderLines(), AnnotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
-            using (var gvcfWriter        = ConfigurationSettings.Gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(ConfigurationSettings.OutputFileName), vcfReader.GetHeaderLines(), AnnotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
+            using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
+            using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts))
+            using (var jsonWriter        = new JsonWriter(outputWriter, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
+            using (var vcfWriter         = _vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
+            using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var jasixIndexCreator = new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)))
             {
                 var bgzipTextWriter = outputWriter as BgzipTextWriter;
@@ -80,18 +77,17 @@ namespace Nirvana
 
                     if (vcfReader.IsRcrsMitochondrion && annotator.GenomeAssembly == GenomeAssembly.GRCh37
                         || annotator.GenomeAssembly == GenomeAssembly.GRCh38
-                        || ConfigurationSettings.ForceMitochondrialAnnotation)
+                        || _forceMitochondrialAnnotation)
                         annotator.EnableMitochondrialAnnotation();
 
                     int previousChromIndex = -1;
                     IPosition position;
                     var sortedVcfChecker = new SortedVcfChecker();
 
-
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
                         sortedVcfChecker.CheckVcfOrder(position.Chromosome.UcscName);
-                        previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome);
+                        previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
 
                         var annotatedPosition = annotator.Annotate(position);
 
@@ -104,19 +100,13 @@ namespace Nirvana
                         jsonWriter.WriteJsonEntry(jsonOutput);
 
                         if (annotatedPosition.AnnotatedVariants?.Length > 0) vcfWriter?.Write(_conversion.Convert(annotatedPosition));
-                        if (annotatedPosition.AnnotatedVariants?.Length > 0)
-                        {
-                            gvcfWriter?.Write(_conversion.Convert(annotatedPosition));
-                        }
-                        else
-                        {
-                            gvcfWriter?.Write(string.Join("\t", position.VcfFields));
-                        }
 
-                        _performanceMetrics.Increment();
+                        gvcfWriter?.Write(annotatedPosition.AnnotatedVariants?.Length > 0
+                            ? _conversion.Convert(annotatedPosition)
+                            : string.Join("\t", position.VcfFields));
+
+                        metrics.Increment();
                     }
-
-                    if (previousChromIndex != -1) _performanceMetrics.StopReference();
 
                     WriteGeneAnnotations(annotator.GetAnnotatedGenes(), jsonWriter);
                 }
@@ -127,10 +117,21 @@ namespace Nirvana
                 }
             }
 
+            metrics.ShowAnnotationTime();
+
             return ExitCodes.Success;
         }
 
-        private static void WriteGeneAnnotations(IList<IAnnotatedGene> annotatedGenes, JsonWriter writer)
+        private static List<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
+            params IProvider[] providers)
+        {
+            var dataSourceVersions = new List<IDataSourceVersion>();
+            if (plugins != null) foreach (var provider in plugins) if (provider.DataSourceVersions != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
+            foreach (var provider in providers) if (provider != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
+            return dataSourceVersions;
+        }
+
+        private static void WriteGeneAnnotations(ICollection<IAnnotatedGene> annotatedGenes, JsonWriter writer)
         {
             if (annotatedGenes.Count == 0) return;
             var sb = new StringBuilder();
@@ -139,13 +140,12 @@ namespace Nirvana
             writer.WriteAnnotatedGenes(sb.ToString());
         }
 
-        private int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome)
+        private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome, PerformanceMetrics metrics)
         {
+            // ReSharper disable once InvertIf
             if (chromosome.Index != previousChromIndex)
             {
-                if (previousChromIndex != -1) _performanceMetrics.StopReference();
-                _performanceMetrics.StartReference(chromosome.UcscName);
-
+                metrics.StartAnnotatingReference(chromosome);
                 previousChromIndex = chromosome.Index;
             }
 
@@ -160,71 +160,71 @@ namespace Nirvana
                 {
                     "cache|c=",
                     "input cache {prefix}",
-                    v => ConfigurationSettings.InputCachePrefix = v
+                    v => _inputCachePrefix = v
                 },
                 {
                     "in|i=",
                     "input VCF {path}",
-                    v => ConfigurationSettings.VcfPath = v
+                    v => _vcfPath = v
                 },
                 {
                     "plugin|p=",
                     "plugin {directory}",
-                    v => ConfigurationSettings.PluginDirectory = v
+                    v => _pluginDirectory = v
                 },
                 {
                     "gvcf",
                     "enables genome vcf output",
-                    v => ConfigurationSettings.Gvcf = v != null
+                    v => _gvcf = v != null
                 },
                 {
                     "vcf",
                     "enables vcf output",
-                    v => ConfigurationSettings.Vcf = v != null
+                    v => _vcf = v != null
                 },
                 {
                     "out|o=",
                     "output {file path}",
-                    v => ConfigurationSettings.OutputFileName = v
+                    v => _outputFileName = v
                 },
                 {
                     "ref|r=",
                     "input compressed reference sequence {path}",
-                    v => ConfigurationSettings.RefSequencePath = v
+                    v => _refSequencePath = v
                 },
                 {
                     "sd=",
                     "input supplementary annotation {directory}",
-                    v => ConfigurationSettings.SupplementaryAnnotationDirectories.Add(v)
+                    v => SupplementaryAnnotationDirectories.Add(v)
                 },
                 {
                     "force-mt",
                     "forces to annotate mitochondrial variants",
-                    v => ConfigurationSettings.ForceMitochondrialAnnotation = v != null
+                    v => _forceMitochondrialAnnotation = v != null
                 },
                 {
                     "verbose-transcripts",
                     "reports all overlapping transcripts for structural variants",
-                    v => ConfigurationSettings.ReportAllSvOverlappingTranscripts = v != null
+                    v => _reportAllSvOverlappingTranscripts = v != null
                 }
             };
 
             var exitCode = new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
-                .CheckInputFilenameExists(ConfigurationSettings.VcfPath, "vcf", "--in", true, "-")
-                .CheckInputFilenameExists(ConfigurationSettings.RefSequencePath, "reference sequence", "--ref")
-                .CheckInputFilenameExists(CacheConstants.TranscriptPath(ConfigurationSettings.InputCachePrefix), "transcript cache", "--cache")
-                .CheckInputFilenameExists(CacheConstants.SiftPath(ConfigurationSettings.InputCachePrefix), "SIFT cache", "--cache")
-                .CheckInputFilenameExists(CacheConstants.PolyPhenPath(ConfigurationSettings.InputCachePrefix), "PolyPhen cache", "--cache")
-                .CheckEachDirectoryContainsFiles(ConfigurationSettings.SupplementaryAnnotationDirectories, "supplementary annotation", "--sd", "*.nsa")
-                .HasRequiredParameter(ConfigurationSettings.OutputFileName, "output file stub", "--out")
-                .Enable(ConfigurationSettings.OutputFileName == "-", () =>
+                .CheckInputFilenameExists(_vcfPath, "vcf", "--in", true, "-")
+                .CheckInputFilenameExists(_refSequencePath, "reference sequence", "--ref")
+                .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
+                .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
+                .CheckInputFilenameExists(CacheConstants.PolyPhenPath(_inputCachePrefix), "PolyPhen cache", "--cache")
+                .CheckEachDirectoryContainsFiles(SupplementaryAnnotationDirectories, "supplementary annotation", "--sd", "*.nsa")
+                .HasRequiredParameter(_outputFileName, "output file stub", "--out")
+                .Enable(_outputFileName == "-", () =>
                 {
-                    ConfigurationSettings.Vcf = false;
-                    ConfigurationSettings.Gvcf = false;
+                    _vcf  = false;
+                    _gvcf = false;
                 })
-                .DisableOutput(ConfigurationSettings.OutputFileName == "-")
+                .DisableOutput(_outputFileName == "-")
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Annotates a set of variants", "-i <vcf path> -c <cache prefix> --sd <sa dir> -r <ref path> -o <base output filename>")
                 .ShowErrors()

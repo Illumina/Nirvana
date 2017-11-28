@@ -16,28 +16,20 @@ namespace VariantAnnotation.Caches.DataStructures
         public ICompactId EntrezGeneId { get; }
         public ICompactId EnsemblId { get; }
         public int HgncId { get; }
-        public int MimNumber { get; }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        internal Gene(IChromosome chromosome, int start, int end, bool onReverseStrand, string symbol, int hgncId,
-            CompactId entrezGeneId, CompactId ensemblId, int mimNumber)
+        public Gene(IChromosome chromosome, int start, int end, bool onReverseStrand, string symbol, int hgncId,
+            CompactId entrezGeneId, CompactId ensemblId)
         {
             OnReverseStrand = onReverseStrand;
             Symbol          = symbol;
             HgncId          = hgncId;
             EntrezGeneId    = entrezGeneId;
             EnsemblId       = ensemblId;
-            MimNumber       = mimNumber;
             Start           = start;
             End             = end;
 	        Chromosome		= chromosome;
         }
 
-        /// <summary>
-        /// reads the gene data from the binary reader
-        /// </summary>
         public static IGene Read(IExtendedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
         {
             ushort referenceIndex = reader.ReadUInt16();
@@ -48,14 +40,10 @@ namespace VariantAnnotation.Caches.DataStructures
             int hgncId            = reader.ReadOptInt32();
             var entrezId          = CompactId.Read(reader);
             var ensemblId         = CompactId.Read(reader);
-            int mimNumber         = reader.ReadOptInt32();
 
-            return new Gene(indexToChromosome[referenceIndex], start, end, onReverseStrand, symbol, hgncId, entrezId, ensemblId, mimNumber);
+            return new Gene(indexToChromosome[referenceIndex], start, end, onReverseStrand, symbol, hgncId, entrezId, ensemblId);
         }
 
-        /// <summary>
-        /// writes the gene data to the binary writer
-        /// </summary>
         public void Write(IExtendedBinaryWriter writer)
         {
             writer.Write(Chromosome.Index);
@@ -67,8 +55,6 @@ namespace VariantAnnotation.Caches.DataStructures
             // ReSharper disable ImpureMethodCallOnReadonlyValueField
             EntrezGeneId.Write(writer);
             EnsemblId.Write(writer);
-            // ReSharper restore ImpureMethodCallOnReadonlyValueField
-            writer.WriteOpt(MimNumber);
         }
     }
 }

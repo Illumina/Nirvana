@@ -1,0 +1,12 @@
+{  
+   "GRCh37":{  
+      "ReferencePath":"E:\\Data\\Nirvana\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
+      "EnsemblCachePath":"E:\\Data\\Nirvana\\IntermediateCache\\Ensembl90_GRCh37.transcripts.gz",
+      "RefSeqCachePath":"E:\\Data\\Nirvana\\IntermediateCache\\RefSeq90_GRCh37.transcripts.gz"
+   },
+  "GRCh38": {
+    "ReferencePath": "E:\\Data\\Nirvana\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat",
+    "EnsemblCachePath": "E:\\Data\\Nirvana\\IntermediateCache\\Ensembl90_GRCh38.transcripts.gz",
+    "RefSeqCachePath": "E:\\Data\\Nirvana\\IntermediateCache\\RefSeq90_GRCh38.transcripts.gz"
+  }
+}

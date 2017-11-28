@@ -9,8 +9,8 @@ namespace VariantAnnotation.IO.Caches
     public sealed class CacheHeader : IFileHeader
     {
         private readonly string _identifier;
-        private readonly ushort _schemaVersion;
-        private readonly ushort _dataVersion;
+        public readonly ushort SchemaVersion;
+        public readonly ushort DataVersion;
         public readonly Source TranscriptSource;
         public readonly long CreationTimeTicks;
         public readonly GenomeAssembly GenomeAssembly;
@@ -20,8 +20,8 @@ namespace VariantAnnotation.IO.Caches
             long creationTimeTicks, GenomeAssembly genomeAssembly, ICustomCacheHeader customHeader)
         {
             _identifier       = identifier;
-            _schemaVersion    = schemaVersion;
-            _dataVersion      = dataVersion;
+            SchemaVersion     = schemaVersion;
+            DataVersion       = dataVersion;
             TranscriptSource  = transcriptSource;
             CreationTimeTicks = creationTimeTicks;
             GenomeAssembly    = genomeAssembly;
@@ -31,8 +31,8 @@ namespace VariantAnnotation.IO.Caches
         public void Write(BinaryWriter writer)
         {
             writer.Write(_identifier);
-            writer.Write(_schemaVersion);
-            writer.Write(_dataVersion);
+            writer.Write(SchemaVersion);
+            writer.Write(DataVersion);
             writer.Write((byte)TranscriptSource);
             writer.Write(CreationTimeTicks);
             writer.Write((byte)GenomeAssembly);

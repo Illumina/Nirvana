@@ -5,11 +5,11 @@ using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.DGV;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
-using Xunit;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
+using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class DgvReaderTests
     {

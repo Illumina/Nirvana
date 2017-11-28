@@ -14,14 +14,15 @@ namespace Nirvana
 	{
 		public static StreamWriter GetOutputWriter(string outputPath)
 		{
-		    return ConfigurationSettings.OutputFileName == "-"
+		    return outputPath == "-"
 		        ? new StreamWriter(Console.OpenStandardOutput())
 		        : new BgzipTextWriter(outputPath + ".json.gz");
 		}
 
-	    internal static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary, IRefMinorProvider refMinorProvider, bool verboseTranscript)
+	    internal static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary,
+	        IRefMinorProvider refMinorProvider, bool verboseTranscript)
 	    {
-	        var useStdInput = ConfigurationSettings.VcfPath == "-";
+	        var useStdInput = vcfPath == "-";
 
 	        var peekStream =
 	            new PeekStream(useStdInput
@@ -33,14 +34,14 @@ namespace Nirvana
         
 	    public static StreamWriter GetVcfOutputWriter(string outputPath)
 	    {
-	        return ConfigurationSettings.OutputFileName == "-"
+	        return outputPath == "-"
 	            ? new StreamWriter(Console.OpenStandardOutput())
 	            : GZipUtilities.GetStreamWriter(outputPath + ".vcf.gz");
 
 	    }
 	    public static StreamWriter GetGvcfOutputWriter(string outputPath)
 	    {
-	        return ConfigurationSettings.OutputFileName == "-"
+	        return outputPath == "-"
 	            ? new StreamWriter(Console.OpenStandardOutput())
 	            : GZipUtilities.GetStreamWriter(outputPath + ".genome.vcf.gz");
 	    }

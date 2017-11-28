@@ -95,7 +95,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             _sequenceProvider = sequenceProvider;
             _aligner = new VariantAligner(_sequenceProvider.Sequence);
             _clinVarXmlFileInfo = clinVarXmlFileInfo;
-            _refChromDict = sequenceProvider.GetChromosomeDictionary();
+            _refChromDict = sequenceProvider.RefNameToChromosome;
         }
 
         private const string ClinVarSetTag = "ClinVarSet";

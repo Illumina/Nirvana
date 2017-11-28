@@ -29,6 +29,5 @@ namespace VariantAnnotation.Algorithms
 
 			return new IntervalForest<T>(refIntervalArrays);
 		}
-
 	}
 }

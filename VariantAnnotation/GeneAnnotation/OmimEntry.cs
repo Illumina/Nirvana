@@ -7,7 +7,7 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public class OmimEntry:IEquatable<OmimEntry>
+    public sealed class OmimEntry : IEquatable<OmimEntry>
     {
         #region members
 

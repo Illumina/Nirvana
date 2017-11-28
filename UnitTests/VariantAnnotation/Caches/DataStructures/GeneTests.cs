@@ -24,7 +24,6 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             var expectedEntrezGeneId       = "7157";
             var expectedEnsemblId          = "ENSG00000141510";
             int expectedHgncId             = int.MaxValue;
-            int expectedMimNumber          = int.MinValue;
 
             var indexToChromosome = new Dictionary<ushort, IChromosome>
             {
@@ -34,7 +33,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             var gene = new Gene(expectedChromosome, expectedStart, expectedEnd, expectedReverseStrand,
                 expectedSymbol, expectedHgncId, CompactId.Convert(expectedEntrezGeneId),
-                CompactId.Convert(expectedEnsemblId), expectedMimNumber);
+                CompactId.Convert(expectedEnsemblId));
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             IGene observedGene;
@@ -63,7 +62,6 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.Equal(expectedEntrezGeneId,     observedGene.EntrezGeneId.ToString());
             Assert.Equal(expectedEnsemblId,        observedGene.EnsemblId.ToString());
             Assert.Equal(expectedHgncId,           observedGene.HgncId);
-            Assert.Equal(expectedMimNumber,        observedGene.MimNumber);
         }
     }
 }

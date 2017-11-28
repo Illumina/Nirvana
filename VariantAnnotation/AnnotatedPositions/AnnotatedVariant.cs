@@ -66,7 +66,7 @@ namespace VariantAnnotation.AnnotatedPositions
             if(OverlappingTranscripts.Count>0) jsonObject.AddObjectValues("overlappingTranscripts",OverlappingTranscripts);
             if (EnsemblTranscripts?.Count > 0 || RefSeqTranscripts?.Count > 0)
             {
-                jsonObject.AddGroupedObjectValues("transcripts", TranscriptLabels, RefSeqTranscripts,EnsemblTranscripts);
+                jsonObject.AddGroupedObjectValues("transcripts", TranscriptLabels, RefSeqTranscripts, EnsemblTranscripts);
             }
 
             sb.Append(JsonObject.CloseBrace);

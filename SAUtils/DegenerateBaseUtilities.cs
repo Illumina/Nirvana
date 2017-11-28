@@ -16,10 +16,10 @@ namespace SAUtils
             {'S', new List<char>{'C','G'}},
             {'V', new List<char>{'A','C','G'}},
             {'W', new List<char>{'A','T'}},
-            {'Y', new List<char>{'C','T'}},
+            {'Y', new List<char>{'C','T'}}
         };
 
-        public static readonly HashSet<char> BasicBases = new HashSet<char>(){'A','C','G','T','N'};
+        public static readonly HashSet<char> BasicBases = new HashSet<char> {'A','C','G','T','N'};
 
         public static bool HasDegenerateBase(string sequence) =>
             sequence.ToUpper().Any(x => DegenerateBaseNotation.ContainsKey(x)) && 
@@ -44,6 +44,6 @@ namespace SAUtils
 
         }
 
-        private static List<char> MapBase(char inputBase) => DegenerateBaseNotation.ContainsKey(inputBase) ? DegenerateBaseNotation[inputBase] : new List<char>() {inputBase};
+        private static List<char> MapBase(char inputBase) => DegenerateBaseNotation.ContainsKey(inputBase) ? DegenerateBaseNotation[inputBase] : new List<char> {inputBase};
     }
 }

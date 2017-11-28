@@ -55,7 +55,7 @@ namespace SAUtils.MergeInterimTsvs
                 .ToList();
 
             if (uniqueAssemblies.Count > 1)
-                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {String.Join(", ", uniqueAssemblies.ToArray())}");
+                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {string.Join(", ", uniqueAssemblies.ToArray())}");
         }
 
 

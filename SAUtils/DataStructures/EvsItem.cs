@@ -61,7 +61,7 @@ namespace SAUtils.DataStructures
 			if (otherItem == null) return false;
 
 			// Return true if the fields match:
-			return string.Equals(Chromosome, otherItem.Chromosome)
+			return Equals(Chromosome, otherItem.Chromosome)
 				&& Start == otherItem.Start
 				&& AlternateAllele.Equals(otherItem.AlternateAllele)
 				;

@@ -30,10 +30,10 @@ namespace VariantAnnotation.AnnotatedPositions
 
         internal static (int Start, string RefAminoAcids, string AltAminoAcids) Rotate3Prime(string refAminoAcids, string altAminoAcids, int start, string peptides)
         {
-            if (!(String.IsNullOrEmpty(refAminoAcids) || String.IsNullOrEmpty(altAminoAcids)))
+            if (!(string.IsNullOrEmpty(refAminoAcids) || string.IsNullOrEmpty(altAminoAcids)))
                 return (start, refAminoAcids, altAminoAcids);
 
-            var isInsertion = !String.IsNullOrEmpty(altAminoAcids);
+            var isInsertion = !string.IsNullOrEmpty(altAminoAcids);
 
             // ReSharper disable once PossibleNullReferenceException
             var end = start + refAminoAcids.Length - 1;

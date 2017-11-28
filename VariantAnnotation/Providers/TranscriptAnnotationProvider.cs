@@ -18,14 +18,6 @@ namespace VariantAnnotation.Providers
     {
         private const int MaxSvLengthForRegulatoryRegionAnnotation = 50000;
 
-        private static readonly string[] SiftDescriptions =
-        {
-            "tolerated", "deleterious", "tolerated - low confidence",
-            "deleterious - low confidence"
-        };
-
-        private static readonly string[] PolyphenDescriptions =
-            {"probably damaging", "possibly damaging", "benign", "unknown"};
         private readonly ITranscriptCache _transcriptCache;
         private readonly ISequence _sequence;
 
@@ -41,21 +33,21 @@ namespace VariantAnnotation.Providers
 
         public TranscriptAnnotationProvider(string pathPrefix,  ISequenceProvider sequenceProvider)
         {
-	        Name = "Transcript annotation provider";
+            Name               = "Transcript annotation provider";
             _sequence          = sequenceProvider.Sequence;
-            _transcriptCache   = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)), sequenceProvider.GetChromosomeIndexDictionary(), sequenceProvider.GenomeAssembly, sequenceProvider.NumRefSeqs);
+            _transcriptCache   = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)), sequenceProvider.RefIndexToChromosome, sequenceProvider.NumRefSeqs);
             GenomeAssembly     = _transcriptCache.GenomeAssembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
-	        _siftReader     = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(pathPrefix)),SiftDescriptions);
-            _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)),PolyphenDescriptions);
+            _siftReader     = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(pathPrefix)),     PredictionCacheReader.SiftDescriptions);
+            _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)), PredictionCacheReader.PolyphenDescriptions);
         }
 
-        private static TranscriptCache InitiateCache(Stream stream,
-            IDictionary<ushort, IChromosome> chromosomeIndexDictionary, GenomeAssembly genomeAssembly, ushort numRefSeq)
+        private static TranscriptCache InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome, ushort numRefSequences)
         {
             TranscriptCache cache;
-            using (var reader = new TranscriptCacheReader(stream, genomeAssembly, numRefSeq)) cache = reader.Read(chromosomeIndexDictionary);
+            using (var reader = new TranscriptCacheReader(stream))
+                cache = reader.Read(refIndexToChromosome).GetCache();
             return cache;
         }
 
@@ -69,9 +61,6 @@ namespace VariantAnnotation.Providers
             AddRegulatoryRegions(annotatedPosition);
             AddTranscripts(annotatedPosition);
         }
-
-
-
 
         private void LoadPredictionCaches(ushort refIndex)
         {
@@ -95,7 +84,7 @@ namespace VariantAnnotation.Providers
 
         private void AddTranscripts(IAnnotatedPosition annotatedPosition)
         {
-            var overlappingTranscripts = _transcriptCache.GetOverlappingFlankingTranscripts(annotatedPosition.Position);
+            var overlappingTranscripts = _transcriptCache.GetOverlappingTranscripts(annotatedPosition.Position);
 
             if (overlappingTranscripts == null)
             {

@@ -8,13 +8,10 @@ namespace VariantAnnotation.Caches.DataStructures
 		private readonly IntervalArray<T>[] _intervalArrays;
 		private readonly ushort _maxIndex;
 
-		/// <summary>
-		/// constructor
-		/// </summary>
 		public IntervalForest(IntervalArray<T>[] intervalArrays)
 		{
 			_intervalArrays = intervalArrays;
-			_maxIndex = (ushort)(intervalArrays.Length - 1);
+			_maxIndex       = (ushort)(intervalArrays.Length - 1);
 		}
 
 		/// <summary>
@@ -32,13 +29,9 @@ namespace VariantAnnotation.Caches.DataStructures
 		/// </summary>
 		public T[] GetAllOverlappingValues(ushort refIndex, int begin, int end)
 		{
-			if (refIndex > _maxIndex)
-			{
-				return null;
-			}
-
+			if (refIndex > _maxIndex) return null;
 			var intervalArray = _intervalArrays[refIndex];
-			return intervalArray.GetAllOverlappingValues(begin, end);
+		    return intervalArray?.GetAllOverlappingValues(begin, end);
 		}
 	}
 }

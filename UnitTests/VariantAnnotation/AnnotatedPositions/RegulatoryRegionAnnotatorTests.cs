@@ -39,7 +39,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private IRegulatoryRegion GetRegulatoryRegion()
         {
             return new RegulatoryRegion(_chromosome, 948000, 950401, CompactId.Convert("ENSR00001037666"),
-                RegulatoryElementType.promoter);
+                RegulatoryRegionType.promoter);
         }
 
         private static IVariant GetVariant()

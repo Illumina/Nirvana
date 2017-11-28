@@ -73,7 +73,7 @@ namespace SAUtils.CreateIntermediateTsvs
             _customIntervalFiles = customIntervalFiles;
             _compressedReferencePath = compressedReferencePath;
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
-            _refNamesDictionary = sequenceProvider.GetChromosomeDictionary();
+            _refNamesDictionary = sequenceProvider.RefNameToChromosome;
             _genomeAssembly = sequenceProvider.GenomeAssembly;
 
         }
@@ -115,7 +115,7 @@ namespace SAUtils.CreateIntermediateTsvs
             }
             catch (AggregateException ae)
             {
-                ae.Handle((x) =>
+                ae.Handle(x =>
                 {
                     Console.WriteLine(x);
                     return true;
@@ -126,7 +126,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
         private void CreateMitoMapSvTsv(List<string> mitoMapSvFileNames)
         {
-            if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(String.IsNullOrEmpty)) return;
+            if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(string.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapSvFileNames[0]).Directory;
             var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapSV"));
@@ -151,7 +151,7 @@ namespace SAUtils.CreateIntermediateTsvs
 
         private void CreateMitoMapVarTsv(List<string> mitoMapFileNames)
         {
-            if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
+            if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(string.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
             var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapVar"));

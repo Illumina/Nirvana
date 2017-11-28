@@ -222,11 +222,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			{
 				throw new Exception("duplicate index:\n" + line);
 			}
-			else
-			{
-				_fieldIndex[index.Value] = json;
-			}
-
+		    _fieldIndex[index.Value] = json;
 		}
 		
 	}

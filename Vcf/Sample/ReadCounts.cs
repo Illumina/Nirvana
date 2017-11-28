@@ -14,8 +14,7 @@ namespace Vcf.Sample
 		    var pairEndReadCounts = new int[readCounts.Length];
 		    for (int i = 0; i < pairEndReadCounts.Length; i++)
 		    {
-		        int num;
-		        if (!int.TryParse(readCounts[i], out num)) return null;
+		        if (!int.TryParse(readCounts[i], out var num)) return null;
 		        pairEndReadCounts[i] = num;
 		    }
 
@@ -30,8 +29,7 @@ namespace Vcf.Sample
 		    var splitReads = new int[splitReadCounts.Length];
 		    for (int i = 0; i < splitReads.Length; i++)
 		    {
-		        int num;
-		        if (!int.TryParse(splitReadCounts[i], out num)) return null;
+		        if (!int.TryParse(splitReadCounts[i], out var num)) return null;
 		        splitReads[i] = num;
 		    }
 

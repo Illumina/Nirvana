@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
-using CacheUtils.IO.Caches;
+using CacheUtils.TranscriptCache;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -18,78 +19,140 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 {
     public sealed class TranscriptCacheReaderTests
     {
-        private readonly IChromosomeInterval _transcriptSearchInterval;
-        private readonly IChromosomeInterval _regulatoryRegionSearchInterval;
-
         private readonly Dictionary<ushort, IChromosome> _refIndexToChromosome;
+        private readonly TranscriptCacheData _expectedCacheData;
         private readonly CacheHeader _expectedHeader;
-
-        private readonly ITranscript[]       _expectedTranscripts;
-        private readonly IRegulatoryRegion[] _expectedRegulatoryRegions;
-        private readonly IGene[]             _expectedGenes;
-        private readonly IInterval[]         _expectedIntrons;
-        private readonly IInterval[]         _expectedMirnas;
-        private readonly string[]            _expectedPeptideSeqs;
 
         public TranscriptCacheReaderTests()
         {
-            var chr3              = new Chromosome("chr3", "3", 2);
-            _refIndexToChromosome = new Dictionary<ushort, IChromosome> { [chr3.Index] = chr3 };
+            var chr1 = new Chromosome("chr1", "1", 0);
+            var chr2 = new Chromosome("chr2", "2", 1);
+            var chr3 = new Chromosome("chr3", "3", 2);
 
-            _transcriptSearchInterval       = new ChromosomeSearchInterval(chr3, 100, 200);
-            _regulatoryRegionSearchInterval = new ChromosomeSearchInterval(chr3, 1000, 2000);
+            _refIndexToChromosome = new Dictionary<ushort, IChromosome>
+            {
+                [chr1.Index] = chr1,
+                [chr2.Index] = chr2,
+                [chr3.Index] = chr3
+            };
 
-            var expectedCustomHeader = new TranscriptCacheCustomHeader(1, 2);
-            _expectedHeader          = new CacheHeader("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, GenomeAssembly.GRCh38, expectedCustomHeader);
+            var genomeAssembly = GenomeAssembly.GRCh38;
 
-            _expectedIntrons    = new IInterval[1];
-            _expectedIntrons[0] = new Interval(100, 200);
+            var customHeader = new TranscriptCacheCustomHeader(1, 2);
+            _expectedHeader  = new CacheHeader("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly, customHeader);
 
-            _expectedMirnas    = new IInterval[2];
-            _expectedMirnas[0] = _expectedIntrons[0];
-            _expectedMirnas[1] = new Interval(300, 400);
+            var introns = new IInterval[1];
+            introns[0]  = new Interval(100, 200);
 
-            _expectedPeptideSeqs = new[] {"MASE*"};
+            var mirnas = new IInterval[2];
+            mirnas[0]  = introns[0];
+            mirnas[1]  = new Interval(300, 400);
 
-            _expectedGenes = new IGene[1];
-            _expectedGenes[0] = new Gene(chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
-                CompactId.Convert("ENSG00000141510"), 500);
+            var peptideSeqs = new[] { "MASE*" };
 
-            _expectedRegulatoryRegions = new IRegulatoryRegion[2];
-            _expectedRegulatoryRegions[0] = new RegulatoryRegion(chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryElementType.enhancer);
-            _expectedRegulatoryRegions[1] = new RegulatoryRegion(chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryElementType.enhancer);
+            var genes = new IGene[1];
+            genes[0]  = new Gene(chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
+                CompactId.Convert("ENSG00000141510"));
 
-            _expectedTranscripts = GetTranscripts(chr3);
+            var regulatoryRegions = new IRegulatoryRegion[2];
+            regulatoryRegions[0]  = new RegulatoryRegion(chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[1]  = new RegulatoryRegion(chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
+            var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(3);
+
+            var transcripts = GetTranscripts(chr3, genes, introns, mirnas);
+            var transcriptIntervalArrays = transcripts.ToIntervalArrays(3);
+
+            _expectedCacheData = new TranscriptCacheData(_expectedHeader, genes, introns, mirnas, peptideSeqs,
+                transcriptIntervalArrays, regulatoryRegionIntervalArrays);
         }
 
         [Fact]
         public void TranscriptCacheReader_EndToEnd()
         {
-            TranscriptCache observedCache;
+            TranscriptCacheData observedCache;
 
             using (var ms = new MemoryStream())
             {
                 using (var writer = new TranscriptCacheWriter(ms, _expectedHeader, true))
                 {
-                    writer.Write(_expectedTranscripts, _expectedRegulatoryRegions, _expectedGenes, _expectedIntrons,
-                        _expectedMirnas, _expectedPeptideSeqs);
+                    writer.Write(_expectedCacheData);
                 }
 
                 ms.Position = 0;
 
-                using (var reader = new TranscriptCacheReader(ms, GenomeAssembly.GRCh38, 25))
+                using (var reader = new TranscriptCacheReader(ms))
                 {
                     observedCache = reader.Read(_refIndexToChromosome);
                 }
             }
 
             Assert.NotNull(observedCache);
+            Assert.Equal(_expectedCacheData.PeptideSeqs, observedCache.PeptideSeqs);
+            CheckChromosomeIntervals(_expectedCacheData.Genes, observedCache.Genes);
+            CheckIntervalArrays(_expectedCacheData.RegulatoryRegionIntervalArrays, observedCache.RegulatoryRegionIntervalArrays);
+            CheckIntervalArrays(_expectedCacheData.TranscriptIntervalArrays, observedCache.TranscriptIntervalArrays);
+            CheckIntervals(_expectedCacheData.Introns, observedCache.Introns);
+            CheckIntervals(_expectedCacheData.Mirnas, observedCache.Mirnas);
+        }
 
-            var overlappingTranscripts = observedCache.GetOverlappingFlankingTranscripts(_transcriptSearchInterval);
-            Assert.Equal(1, overlappingTranscripts.Length);
+        private static void CheckIntervalArrays<T>(IntervalArray<T>[] expected, IntervalArray<T>[] observed)
+            where T : IInterval
+        {
+            Assert.Equal(expected.Length, observed.Length);
 
-            var overlappingRegulatoryRegions = observedCache.GetOverlappingRegulatoryRegions(_regulatoryRegionSearchInterval);
-            Assert.Equal(2, overlappingRegulatoryRegions.Length);
+            for (int refIndex = 0; refIndex < expected.Length; refIndex++)
+            {
+                var expectedIntervalArray = expected[refIndex];
+                var observedIntervalArray = observed[refIndex];
+
+                if (expectedIntervalArray == null && observedIntervalArray == null) continue;
+
+                Assert.NotNull(expectedIntervalArray);
+                Assert.NotNull(observedIntervalArray);
+                Assert.Equal(expectedIntervalArray.Array.Length, observedIntervalArray.Array.Length);
+
+                for (int i = 0; i < expectedIntervalArray.Array.Length; i++)
+                {
+                    var expectedInterval = expectedIntervalArray.Array[i];
+                    var observedInterval = observedIntervalArray.Array[i];
+                    Assert.Equal(expectedInterval.Begin, observedInterval.Begin);
+                    Assert.Equal(expectedInterval.End, observedInterval.End);
+                }
+            }
+        }
+
+        private static void CheckChromosomeIntervals(IEnumerable<IChromosomeInterval> expected,
+            IEnumerable<IChromosomeInterval> observed)
+        {
+            var expectedList = expected.ToList();
+            var observedList = observed.ToList();
+
+            Assert.Equal(expectedList.Count, observedList.Count);
+
+            for (int i = 0; i < expectedList.Count; i++)
+            {
+                var expectedEntry = expectedList[i];
+                var observedEntry = observedList[i];
+                Assert.Equal(expectedEntry.Chromosome.EnsemblName, observedEntry.Chromosome.EnsemblName);
+                Assert.Equal(expectedEntry.Start,                  observedEntry.Start);
+                Assert.Equal(expectedEntry.End,                    observedEntry.End);
+            }
+        }
+
+        private static void CheckIntervals(IEnumerable<IInterval> expected, IEnumerable<IInterval> observed)
+        {
+            var expectedList = expected.ToList();
+            var observedList = observed.ToList();
+
+            Assert.Equal(expectedList.Count, observedList.Count);
+
+            for (int i = 0; i < expectedList.Count; i++)
+            {
+                var expectedEntry = expectedList[i];
+                var observedEntry = observedList[i];
+                Assert.Equal(expectedEntry.Start, observedEntry.Start);
+                Assert.Equal(expectedEntry.End, observedEntry.End);
+            }
         }
 
         [Fact]
@@ -133,30 +196,14 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             });
         }
 
-        private sealed class ChromosomeSearchInterval : IChromosomeInterval
-        {
-            public int Start { get; }
-            public int End { get; }
-            public IChromosome Chromosome { get; }
-
-            public ChromosomeSearchInterval(IChromosome chromosome, int start, int end)
-            {
-                Chromosome = chromosome;
-                Start      = start;
-                End        = end;
-            }
-        }
-
-        private ITranscript[] GetTranscripts(IChromosome chromosome)
+        private static ITranscript[] GetTranscripts(IChromosome chromosome, IGene[] genes, IInterval[] introns, IInterval[] mirnas)
         {
             var cdnaMaps = new ICdnaCoordinateMap[1];
             cdnaMaps[0]  = new CdnaCoordinateMap(100, 199, 300, 399);
 
             var transcripts = new ITranscript[1];
-            transcripts[0] = new Transcript(chromosome, 120, 180,
-                CompactId.Convert("789"), 0, null, BioType.IG_D_gene, _expectedGenes[0],
-                0, 0, false, _expectedIntrons, _expectedMirnas,
-                cdnaMaps, -1, -1, Source.None);
+            transcripts[0]  = new Transcript(chromosome, 120, 180, CompactId.Convert("789"), null, BioType.IG_D_gene,
+                genes[0], 0, 0, false, introns, mirnas, cdnaMaps, -1, -1, Source.None, false, false, null, null);
 
             return transcripts;
         }

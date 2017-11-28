@@ -8,20 +8,11 @@ namespace VariantAnnotation.Providers
 {
 	public sealed class DataSourceVersion : IDataSourceVersion, IEquatable<DataSourceVersion>, ISerializable
 	{
-		#region members
-
 		public string Name { get; }
 		public string Description { get; }
 		public string Version { get; }
 		public long ReleaseDateTicks { get; }
 
-		private readonly int _hashCode;
-
-		#endregion
-
-		/// <summary>
-		/// constructor
-		/// </summary>
 		public DataSourceVersion(string name, string version, long releaseDateTicks, string description = null)
 		{
 			Name             = name;
@@ -29,8 +20,6 @@ namespace VariantAnnotation.Providers
 			Version          = version;
 			Description      = description;
 			ReleaseDateTicks = releaseDateTicks;
-
-			_hashCode = Name.GetHashCode() ^ Version.GetHashCode() ^ ReleaseDateTicks.GetHashCode();
 		}
 
 	    public static IDataSourceVersion Read(ExtendedBinaryReader reader)
@@ -50,56 +39,6 @@ namespace VariantAnnotation.Providers
 			writer.WriteOptAscii(Description);
 		}
 		
-		#region Equality Overrides
-
-		public override int GetHashCode()
-		{
-			return _hashCode;
-		}
-
-		public override bool Equals(object obj)
-		{
-			// If parameter cannot be cast to DataSourceVersion return false:
-			var other = obj as DataSourceVersion;
-			if ((object)other == null) return false;
-
-			// Return true if the fields match:
-			return this == other;
-		}
-
-		bool IEquatable<DataSourceVersion>.Equals(DataSourceVersion other)
-		{
-			return Equals(other);
-		}
-
-		/// <summary>
-		/// Indicates whether the current object is equal to another object of the same type.
-		/// </summary>
-		private bool Equals(DataSourceVersion other)
-		{
-			return this == other;
-		}
-
-		public static bool operator ==(DataSourceVersion a, DataSourceVersion b)
-		{
-			// If both are null, or both are same instance, return true.
-			if (ReferenceEquals(a, b)) return true;
-
-			// If one is null, but not both, return false.
-			if ((object)a == null || (object)b == null) return false;
-
-			return a.Name == b.Name &&
-			       a.Version == b.Version &&
-			       a.ReleaseDateTicks == b.ReleaseDateTicks;
-		}
-
-		public static bool operator !=(DataSourceVersion a, DataSourceVersion b)
-		{
-			return !(a == b);
-		}
-
-		#endregion
-
 		/// <summary>
 		/// returns the release date
 		/// </summary>
@@ -129,6 +68,24 @@ namespace VariantAnnotation.Providers
 			sb.Append(JsonObject.CloseBrace);
 		}
 
-		
+	    public bool Equals(DataSourceVersion other)
+	    {
+	        if (ReferenceEquals(null, other)) return false;
+	        if (ReferenceEquals(this, other)) return true;
+	        return string.Equals(Name, other.Name) && string.Equals(Description, other.Description) &&
+	               string.Equals(Version, other.Version) && ReleaseDateTicks == other.ReleaseDateTicks;
+	    }
+
+	    public override int GetHashCode()
+	    {
+	        unchecked
+	        {
+	            var hashCode = (Name != null ? Name.GetHashCode() : 0);
+	            hashCode = (hashCode * 397) ^ (Description != null ? Description.GetHashCode() : 0);
+	            hashCode = (hashCode * 397) ^ (Version != null ? Version.GetHashCode() : 0);
+	            hashCode = (hashCode * 397) ^ ReleaseDateTicks.GetHashCode();
+	            return hashCode;
+	        }
+	    }
 	}
 }

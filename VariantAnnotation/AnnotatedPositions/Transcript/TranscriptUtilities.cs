@@ -73,7 +73,5 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
 		    return compareRegion == variant.AltAllele;
 	    }
-
-        public static string GetVersionedId(this ITranscript transcript) => transcript.Id +"."+ transcript.Version;
     }
 }

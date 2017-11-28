@@ -101,16 +101,19 @@ namespace VariantAnnotation.Providers
 			if (_hasAllVariantIntervals) AddIntervals(annotatedPosition, _allVariantIntervalArray, begin, end);
 		}
 
-		private static void AddIntervals(IAnnotatedPosition annotatedPosition, IIntervalSearch<ISupplementaryInterval> intervalArray,
-			int begin,
-			int end)
-		{
+	    private static void AddIntervals(IAnnotatedPosition annotatedPosition,
+	        IIntervalSearch<ISupplementaryInterval> intervalArray, int begin, int end)
+	    {
 			var intervals = intervalArray.GetAllOverlappingValues(begin, end);
 		    if (intervals == null) return;
+
 			foreach (var overlappingInterval in intervals)
 			{
-				var reciprocalOverlap = annotatedPosition.Position.Start>=annotatedPosition.Position.End? null: overlappingInterval.GetReciprocalOverlap(annotatedPosition.AnnotatedVariants[0].Variant);
-				annotatedPosition.SupplementaryIntervals.Add(
+			    var reciprocalOverlap = annotatedPosition.Position.Start >= annotatedPosition.Position.End
+			        ? null
+			        : overlappingInterval.GetReciprocalOverlap(annotatedPosition.AnnotatedVariants[0].Variant);
+
+                annotatedPosition.SupplementaryIntervals.Add(
 					new AnnotatedSupplementaryInterval(overlappingInterval, reciprocalOverlap));
 			}
 		}

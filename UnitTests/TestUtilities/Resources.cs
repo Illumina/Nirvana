@@ -8,25 +8,28 @@ namespace UnitTests.TestUtilities
 		// ReSharper disable once MemberCanBePrivate.Global
 		public static readonly string Top;
 		public static string TopPath(string path) => Path.Combine(Top, path);
-		public static string CacheGRCh37(string path) => Path.Combine(Top, "Caches", "GRCh37", path);
-		public static string CacheGRCh38(string path) => Path.Combine(Top, "Caches", "GRCh38", path);
-		public static string CustomAnnotations(string path) => Path.Combine(Top, "SA", "CustomAnnotation", path);
-		public static string CustomIntervals(string path) => Path.Combine(Top, "SA", "CustomIntervals", path);
+		public static string EndToEnd37(string path) => Path.Combine(Top, "EndToEnd", "GRCh37", path);
 		public static string InputFiles(string path) => Path.Combine(Top, "InputFiles", path);
 	    public static string ClinvarXmlFiles(string path) => Path.Combine(Top, "ClinVarXmlFiles", path);
-        public static string SaGRCh37(string path) => Path.Combine(Top, "SA", "GRCh37", path);
-		public static string SaGRCh38(string path) => Path.Combine(Top, "SA", "GRCh37", path);
-      
+		public static string SaGRCh37(string path) => Path.Combine(Top, "SA", "GRCh37", path);
 
 		static Resources()
 		{
-			var solutionDir = GetParentDirectory(AppContext.BaseDirectory, 4);
+            var solutionDir = GetParentDirectory(AppContext.BaseDirectory);
 			Top = Path.Combine(solutionDir, "UnitTests", "Resources");
 		}
 
-		private static string GetParentDirectory(string directory, int numLevels)
+		private static string GetParentDirectory(string directory)
 		{
-			for (int i = 0; i < numLevels; i++) directory = Path.GetDirectoryName(directory);
+		    while (true)
+		    {
+		        directory = Path.GetDirectoryName(directory);
+		        if (directory == null) return string.Empty;
+
+		        var unitTestDir = Path.Combine(directory, "UnitTests");
+		        if (Directory.Exists(unitTestDir)) break;
+		    }
+
 			return directory;
 		}
 	}

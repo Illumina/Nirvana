@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 // ReSharper disable NonReadonlyMemberInGetHashCode

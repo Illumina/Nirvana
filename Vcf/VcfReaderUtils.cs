@@ -15,17 +15,17 @@ namespace Vcf
         internal static IPosition ParseVcfLine(string vcfLine, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
         {
             var vcfFields = vcfLine.Split('\t');
-            var infoData = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            var infoData  = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
 
-            var id = vcfFields[VcfCommon.IdIndex];
-            var chromosome = GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
-            int start = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]);
-            string refAllele = vcfFields[VcfCommon.RefIndex];
-            int end = ExtractEnd(infoData, start, refAllele.Length);
+            var id              = vcfFields[VcfCommon.IdIndex];
+            var chromosome      = GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
+            int start           = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]);
+            string refAllele    = vcfFields[VcfCommon.RefIndex];
+            int end             = ExtractEnd(infoData, start, refAllele.Length);
             string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',').ToArray();
-            double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(Double.TryParse);
-            string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
-            var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
+            double? quality     = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            string[] filters    = vcfFields[VcfCommon.FilterIndex].Split(';');
+            var samples         = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 
             var sampleCopyNumber = GetSampleCopyNumbers(samples);
 

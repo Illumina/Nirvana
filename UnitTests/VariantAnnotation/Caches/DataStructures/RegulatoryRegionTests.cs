@@ -21,7 +21,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             int expectedStart              = int.MaxValue;
             int expectedEnd                = int.MinValue;
             var expectedId                 = "ENST00000540021";
-            var expectedType               = RegulatoryElementType.open_chromatin_region;
+            var expectedType               = RegulatoryRegionType.open_chromatin_region;
 
             var indexToChromosome = new Dictionary<ushort, IChromosome>
             {
@@ -53,7 +53,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.NotNull(observedRegulatoryRegion);
             Assert.Equal(expectedStart,            observedRegulatoryRegion.Start);
             Assert.Equal(expectedEnd,              observedRegulatoryRegion.End);
-            Assert.Equal(expectedId,               observedRegulatoryRegion.Id.ToString());
+            Assert.Equal(expectedId,               observedRegulatoryRegion.Id.WithoutVersion);
             Assert.Equal(expectedType,             observedRegulatoryRegion.Type);
             Assert.Equal(expectedChromosome.Index, observedRegulatoryRegion.Chromosome.Index);
         }

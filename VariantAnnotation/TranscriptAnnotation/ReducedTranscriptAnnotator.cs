@@ -68,13 +68,13 @@ namespace VariantAnnotation.TranscriptAnnotation
         /// <returns></returns>
         private static IGeneFusion GetFusion(ITranscript candidateForPos2, ITranscript transcriptForPos1, IBreakEnd breakendToAnnotate, string pos1Hgvs, bool isPos1TranscriptSuffix)
         {
-            if (transcriptForPos1.Source != candidateForPos2.Source
-                || candidateForPos2.Translation == null ||
+            if (transcriptForPos1.Source != candidateForPos2.Source ||
+                candidateForPos2.Translation == null ||
                 candidateForPos2.Gene.Symbol == transcriptForPos1.Gene.Symbol ||
                 candidateForPos2.Chromosome.Index == transcriptForPos1.Chromosome.Index &&
                 candidateForPos2.Translation.CodingRegion.Overlaps(transcriptForPos1.Translation.CodingRegion) ||
-                candidateForPos2.Chromosome.Index != breakendToAnnotate.Chromosome2.Index
-                || !candidateForPos2.Translation.CodingRegion.Overlaps(breakendToAnnotate.Position2,
+                candidateForPos2.Chromosome.Index != breakendToAnnotate.Chromosome2.Index ||
+                !candidateForPos2.Translation.CodingRegion.Overlaps(breakendToAnnotate.Position2,
                     breakendToAnnotate.Position2)) return null;
 
             var pos2Info = ComputeBreakendTranscriptRelation(candidateForPos2, breakendToAnnotate.Position2,
@@ -87,14 +87,14 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         private static (int? Exon, int? Intron, string Hgvs, bool IsTranscriptSuffix) ComputeBreakendTranscriptRelation(ITranscript transcript, int position, bool isGenomicSuffix)
         {
-            var positionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, position, true);
-            var exon = GetIntervalIndex(transcript.CdnaMaps, position, transcript.Gene.OnReverseStrand);
-            var intron = GetIntervalIndex(transcript.Introns, position, transcript.Gene.OnReverseStrand);
-            var isTranscriptSuffix = isGenomicSuffix != transcript.Gene.OnReverseStrand;
+            var positionOffset       = HgvsUtilities.GetCdnaPositionOffset(transcript, position, true);
+            var exon                 = GetIntervalIndex(transcript.CdnaMaps, position, transcript.Gene.OnReverseStrand);
+            var intron               = GetIntervalIndex(transcript.Introns, position, transcript.Gene.OnReverseStrand);
+            var isTranscriptSuffix   = isGenomicSuffix != transcript.Gene.OnReverseStrand;
             var transcriptCdnaLength = transcript.Translation.CodingRegion.CdnaEnd - transcript.Translation.CodingRegion.CdnaStart + 1;
-            var hgvsPosString = isTranscriptSuffix ? positionOffset.Value + "_" + transcriptCdnaLength : 1 + "_" + positionOffset.Value;
+            var hgvsPosString        = isTranscriptSuffix ? positionOffset.Value + "_" + transcriptCdnaLength : 1 + "_" + positionOffset.Value;
 
-            var hgvs = transcript.Gene.Symbol + "{" + transcript.GetVersionedId() + "}" + ":c." + hgvsPosString;
+            var hgvs = transcript.Gene.Symbol + "{" + transcript.Id.WithVersion + "}" + ":c." + hgvsPosString;
             return (exon, intron, hgvs, isTranscriptSuffix);
         }
 

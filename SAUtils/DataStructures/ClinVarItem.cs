@@ -55,7 +55,7 @@ namespace SAUtils.DataStructures
 			[ReviewStatusEnum.practice_guideline]              = "practice guideline",
 			[ReviewStatusEnum.multiple_submitters]             = "classified by multiple submitters",
 			[ReviewStatusEnum.conflicting_interpretations]     = "criteria provided, conflicting interpretations",
-			[ReviewStatusEnum.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts",
+			[ReviewStatusEnum.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts"
 			
 		};
 

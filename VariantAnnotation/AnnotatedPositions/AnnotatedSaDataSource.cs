@@ -37,7 +37,7 @@ namespace VariantAnnotation.AnnotatedPositions
             return outStrings;
         }
 
-        public IList<string> GetVcfStrings()
+        public IEnumerable<string> GetVcfStrings()
         {
             return SaDataSource.VcfString.Split(',');
         }

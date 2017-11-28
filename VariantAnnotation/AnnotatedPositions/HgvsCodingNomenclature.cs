@@ -6,7 +6,6 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
-	// TODO: why do we need a class here? shouldn't this just be a utility function?
 	public static class HgvsCodingNomenclature
 	{
 		/// <summary>
@@ -54,11 +53,8 @@ namespace VariantAnnotation.AnnotatedPositions
 			//_hgvs notation past the transcript
 			if (startPositionOffset.Position > transcriptLen || endPositionOffset.Position > transcriptLen) return null;
 
-			var hgvsNotation = new HgvscNotation(refAllele, altAllele,
-				FormatUtilities.CombineIdAndVersion(transcript.Id, transcript.Version), genomicChange,
-				startPositionOffset,
-				endPositionOffset,
-				transcript.Translation != null);
+		    var hgvsNotation = new HgvscNotation(refAllele, altAllele, transcript.Id.WithVersion, genomicChange,
+		        startPositionOffset, endPositionOffset, transcript.Translation != null);
 
 			// generic formatting
 			return hgvsNotation.ToString();

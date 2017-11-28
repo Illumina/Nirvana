@@ -130,10 +130,10 @@ namespace SAUtils.TsvWriters
         {
             if (_sequenceProvider == null) return true;
 
-            var refDictionary = _sequenceProvider.GetChromosomeDictionary();
+            var refDictionary = _sequenceProvider.RefNameToChromosome;
             if (!refDictionary.ContainsKey(chromosome)) return false;
 
-            var chrom = _sequenceProvider.GetChromosomeDictionary()[chromosome];
+            var chrom = refDictionary[chromosome];
 
             _sequenceProvider.LoadChromosome(chrom);
             var refSequence = _sequenceProvider.Sequence.Substring(position - 1, ReferenceWindow);

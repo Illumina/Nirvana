@@ -10,17 +10,17 @@
         // Windows-specific
         // ================
 
-        Success = 0,
-        InvalidFunction = 1,
-        FileNotFound = 2,
-        PathNotFound = 3,
-        AccessDenied = 5,
-        BadFormat = 11,
-        InvalidData = 13,
-        OutofMemory = 14,
-        SharingViolation = 32,
+        Success            = 0,
+        InvalidFunction    = 1,
+        FileNotFound       = 2,
+        PathNotFound       = 3,
+        AccessDenied       = 5,
+        BadFormat          = 11,
+        InvalidData        = 13,
+        OutofMemory        = 14,
+        SharingViolation   = 32,
         CallNotImplemented = 120,
-        BadArguments = 160,
+        BadArguments       = 160,
 
         // =================
         // Illumina-specific
@@ -34,9 +34,9 @@
         UserError = 210,
 
         // file (220 - 239)
-        InvalidFileFormat = 220,
-        FileNotSorted = 221,
-        MissingFilenameSuffix = 222,
+        InvalidFileFormat         = 220,
+        FileNotSorted             = 221,
+        MissingFilenameSuffix     = 222,
         MissingCompressionLibrary = 223,
 
         // functionality (240 - 259)

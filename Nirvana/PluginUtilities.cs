@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Composition;
+﻿using System.Collections.Generic;
 using System.Composition.Hosting;
 using System.IO;
 using System.Linq;
@@ -12,7 +10,7 @@ namespace Nirvana
 {
     public static class PluginUtilities
     {
-        public static IEnumerable<IPlugin> LoadPlugins(string pluginDirectory)
+        public static IPlugin[] LoadPlugins(string pluginDirectory)
         {
             IEnumerable<IPlugin> plugins;
             var executableLocation = Assembly.GetEntryAssembly().Location;
@@ -24,14 +22,15 @@ namespace Nirvana
                 .GetFiles(path, "*.dll", SearchOption.AllDirectories)
                 .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
                 .ToList();
-            var configuration = new ContainerConfiguration()
-                .WithAssemblies(assemblies);
+
+            var configuration = new ContainerConfiguration().WithAssemblies(assemblies);
+
             using (var container = configuration.CreateContainer())
             {
                 plugins = container.GetExports<IPlugin>();
             }
 
-            return plugins;
+            return plugins.ToArray();
         }
     }
 }

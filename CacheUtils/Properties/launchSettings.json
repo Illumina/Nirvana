@@ -1,0 +1,44 @@
+{
+  "profiles": {
+    "CacheUtils": {
+      "commandName": "Project",
+      "commandLineArgs": "create -g VEP90_genes_2017-10-26.tsv.gz -i IntermediateCache\\Ensembl90_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o test",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Create": {
+      "commandName": "Project",
+      "commandLineArgs": "create -g VEP90_genes_2017-11-17.tsv.gz -i IntermediateCache\\Ensembl90_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o Cache\\25\\GRCh37\\Ensembl90",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Gene": {
+      "commandName": "Project",
+      "commandLineArgs": "gene -o VEP90_genes_2017-10-27.tsv.gz",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Parse": {
+      "commandName": "Project",
+      "commandLineArgs": "parse --date 2017-09-04 -s refseq --ga GRCh37 --vep 90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i VepCache\\90\\homo_sapiens_refseq\\90_GRCh37 -o IntermediateCache\\RefSeq90_GRCh37 --genbank RefSeq_Genbank_Transcripts_1_43.gz",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Genbank": {
+      "commandName": "Project",
+      "commandLineArgs": "genbank -o test",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Parse Ensembl": {
+      "commandName": "Project",
+      "commandLineArgs": "parse --date 2017-09-04 -s ensembl --ga GRCh37 --vep 90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i VepCache\\90\\homo_sapiens\\90_GRCh37 -o IntermediateCache\\Ensembl90_GRCh37",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Combine": {
+      "commandName": "Project",
+      "commandLineArgs": "combine -1 Cache\\25\\GRCh38\\Ensembl90 -2 Cache\\25\\GRCh38\\RefSeq90 -r References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o Cache\\25\\GRCh38\\Both90",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS_Extract": {
+      "commandName": "Project",
+      "commandLineArgs": "extract -i Cache\\25\\GRCh37\\Both90 -o e:\\Data\\Nirvana -n chr12 -p 7018490 --endpos 7086889 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    }
+  }
+}

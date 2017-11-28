@@ -5,8 +5,6 @@ namespace VariantAnnotation.PhyloP
 {
 	public sealed class PhylopInterval : IEquatable<PhylopInterval>, IComparable<PhylopInterval>
 	{
-		#region member
-
 		public int Begin { get; private set; }
 
 		public int Length;
@@ -14,7 +12,6 @@ namespace VariantAnnotation.PhyloP
 	    private short StepSize { get; set; }
 		//file location of the compressed phylop scores for this interval
 		public long FilePosition;
-		#endregion
 
 		public PhylopInterval(int begin, int length, short stepSize)
 		{

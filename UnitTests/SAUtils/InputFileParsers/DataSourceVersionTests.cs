@@ -5,7 +5,7 @@ using UnitTests.TestUtilities;
 using VariantAnnotation.Providers;
 using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
 	public class DataSourceVersionTests
 	{

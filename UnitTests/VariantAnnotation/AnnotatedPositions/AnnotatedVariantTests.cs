@@ -61,7 +61,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private void AddRegulatoryRegion(IAnnotatedVariant annotatedVariant)
         {
             var regulatoryRegion = new RegulatoryRegion(_chromosome, 103, 104, CompactId.Convert("7157"),
-                RegulatoryElementType.TF_binding_site);
+                RegulatoryRegionType.TF_binding_site);
             var consequences = new List<ConsequenceTag> { ConsequenceTag.regulatory_region_amplification };
 
             annotatedVariant.RegulatoryRegions.Add(new AnnotatedRegulatoryRegion(regulatoryRegion, consequences));

@@ -26,20 +26,17 @@ namespace SAUtils.MergeInterimTsvs
         private readonly List<SaHeader> _geneHeaders;
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly HashSet<string> _refNames;
         public static readonly HashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck = new HashSet<GenomeAssembly>() { GenomeAssembly.Unknown, GenomeAssembly.rCRS };
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public InterimTsvsMerger(IEnumerable<string> annotationFiles, IEnumerable<string> intervalFiles, string miscFile, IEnumerable<string> geneFiles, string compressedReference, string outputDirectory)
         {
             _outputDirectory = outputDirectory;
 
             var refSequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReference));
-            _genomeAssembly = refSequenceProvider.GenomeAssembly;
-            _refChromDict = refSequenceProvider.GetChromosomeDictionary();
+            _genomeAssembly         = refSequenceProvider.GenomeAssembly;
+            _refNameToChromosome    = refSequenceProvider.RefNameToChromosome;
             
             _tsvReaders      = ReaderUtilities.GetSaTsvReaders(annotationFiles);
             _miscReader      = ReaderUtilities.GetMiscTsvReader(miscFile);
@@ -184,7 +181,7 @@ namespace SAUtils.MergeInterimTsvs
             //return;
             var globalMajorAlleleInRefMinors = GetGlobalMajorAlleleForRefMinors(refName);
 
-            var ucscRefName = _refChromDict[refName].UcscName;
+            var ucscRefName = _refNameToChromosome[refName].UcscName;
             var dataSourceVersions = MergeUtilities.GetDataSourceVersions(_saHeaders);
 
             var header = new SupplementaryAnnotationHeader(ucscRefName, DateTime.Now.Ticks,
@@ -227,7 +224,5 @@ namespace SAUtils.MergeInterimTsvs
 
             return interimSaPosition;
         }
-
-        
     }
 }

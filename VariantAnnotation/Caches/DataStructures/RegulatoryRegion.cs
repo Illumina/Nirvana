@@ -13,12 +13,9 @@ namespace VariantAnnotation.Caches.DataStructures
         public int End { get; }
         public IChromosome Chromosome { get; }
         public ICompactId Id { get; }
-        public RegulatoryElementType Type { get; }
+        public RegulatoryRegionType Type { get; }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        internal RegulatoryRegion(IChromosome chromosome, int start, int end, CompactId id, RegulatoryElementType type)
+        public RegulatoryRegion(IChromosome chromosome, int start, int end, CompactId id, RegulatoryRegionType type)
         {
             Id         = id;
             Type       = type;
@@ -35,12 +32,11 @@ namespace VariantAnnotation.Caches.DataStructures
             var refIndex = reader.ReadUInt16();
             int start    = reader.ReadOptInt32();
             int end      = reader.ReadOptInt32();
-            var type     = (RegulatoryElementType)reader.ReadByte();
+            var type     = (RegulatoryRegionType)reader.ReadByte();
             var id       = CompactId.Read(reader);
 
             return new RegulatoryRegion(chromosomeIndexDictionary[refIndex], start, end, id, type);
         }
-
 
         /// <summary>
         /// writes the regulatory element data to the binary writer

@@ -94,7 +94,7 @@ namespace SAUtils.GeneScoresTsv
             jsonObject.AddDoubleValue("pNull", pNull, "0.00e0");
             sb.Append(JsonObject.CloseBrace);
 
-            _writer.AddEntry(gene, new List<string>(){sb.ToString()});
+            _writer.AddEntry(gene, new List<string> {sb.ToString()});
         }
 
         private (string gene, double pLi, double pRec, double pNull) GetGeneAndScores(string line)

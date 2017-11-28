@@ -41,9 +41,7 @@ namespace VariantAnnotation.AnnotatedPositions
 	        var refAbbreviation = AminoAcids.GetAbbreviations(refAminoAcids);
 	        var altAbbreviation = AminoAcids.GetAbbreviations(altAminoAcids);
 
-
-			var proteinId = FormatUtilities.CombineIdAndVersion(transcript.Translation.ProteinId, transcript.Translation.ProteinVersion);
-
+			var proteinId     = transcript.Translation.ProteinId.WithVersion;
 			var proteinChange = GetProteinChange(start, refAminoAcids, altAminoAcids, peptideSeq, variantEffect);
 
 

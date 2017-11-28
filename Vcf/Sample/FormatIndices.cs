@@ -27,7 +27,6 @@
         internal int? DQ;
         internal int? PR;
         internal int? SR;
-        internal int? RGT;
         // ReSharper restore InconsistentNaming
 
         #endregion
@@ -45,6 +44,7 @@
 
             for (var index = 0; index < formatCols.Length; index++)
             {
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (formatCols[index])
                 {
                     case "AU":
@@ -112,9 +112,6 @@
                         break;
                     case "SR":
                         formatIndices.SR = index;
-                        break;
-                    case "RGT":
-                        formatIndices.RGT = index;
                         break;
                 }
             }

@@ -6,13 +6,17 @@ namespace VariantAnnotation.Utilities
 	{
 		public static string CombineIdAndVersion(ICompactId id, byte version) => id + "." + version;
 
-		public static (string Id, byte Version) SplitVersion(string id)
+		public static (string Id, byte Version) SplitVersion(string s)
 		{
-			if (id == null) return (null, 0);
-			int lastPeriod = id.LastIndexOf('.');
-			return lastPeriod == -1
-			    ? (id, (byte) 0)
-			    : (id.Substring(0, lastPeriod), byte.Parse(id.Substring(lastPeriod + 1)));
-		}
-	}
+		    if (s == null) return (null, 0);
+
+			int lastPeriodPos = s.LastIndexOf('.');
+		    if (lastPeriodPos == -1) return (s, 0);
+
+            string id        = s.Substring(0, lastPeriodPos);
+            string remaining = s.Substring(lastPeriodPos + 1);
+
+            return !byte.TryParse(remaining, out byte version) ? (s, (byte)1) : (id, version);
+        }
+    }
 }

@@ -11,7 +11,7 @@ namespace UnitTests.VariantAnnotation.Sequence
         [Fact]
         public void Serialization()
         {
-            var expectedMetadata = new ReferenceMetadata("chr1", "1", true);
+            var expectedMetadata = new ReferenceMetadata("chr1", "1");
             ReferenceMetadata observedMetadata;
 
             using (var ms = new MemoryStream())
@@ -31,7 +31,6 @@ namespace UnitTests.VariantAnnotation.Sequence
 
             Assert.Equal(expectedMetadata.EnsemblName, observedMetadata.EnsemblName);
             Assert.Equal(expectedMetadata.UcscName, observedMetadata.UcscName);
-            Assert.Equal(expectedMetadata.InVep, observedMetadata.InVep);
         }
     }
 }

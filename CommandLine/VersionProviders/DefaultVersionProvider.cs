@@ -1,4 +1,4 @@
-using VariantAnnotation.Interface.Providers;
+﻿using VariantAnnotation.Interface.Providers;
 
 namespace CommandLine.VersionProviders
 {

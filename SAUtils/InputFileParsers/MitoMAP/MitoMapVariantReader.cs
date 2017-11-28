@@ -44,7 +44,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             {"-", false}
         };
 
-        private readonly HashSet<string> _mitoMapDelSymbolSet = new HashSet<string>() { ":", "del", "d" };
+        private readonly HashSet<string> _mitoMapDelSymbolSet = new HashSet<string> { ":", "del", "d" };
 
 
         public MitoMapVariantReader(FileInfo mitoMapFileInfo, ReferenceSequenceProvider sequenceProvider)
@@ -219,7 +219,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
         private bool DescribedAsDuplicatedRecord(string mitomapDiseaseString)
         {
-            if (String.IsNullOrEmpty(mitomapDiseaseString)) return false;
+            if (string.IsNullOrEmpty(mitomapDiseaseString)) return false;
             var altNotationPattern1 = new Regex("alternate notation$");
             var altNotationMatch = altNotationPattern1.Match(mitomapDiseaseString);
             if (altNotationMatch.Success)
@@ -234,7 +234,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         {
             if (fieldIndex == -1) return null;
             string diseaseString = info[fieldIndex];
-            if (String.IsNullOrEmpty(diseaseString)) return diseaseString;
+            if (string.IsNullOrEmpty(diseaseString)) return diseaseString;
             var regexPattern = new Regex(@"<a href=.+>(?<disease>.+)</a>$");
             var match = regexPattern.Match(diseaseString);
             return match.Success ? match.Groups["disease"].Value : diseaseString;
@@ -332,7 +332,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 var altAlleleSequences = new List<string>();
                 for (int i = minRepeat; i <= maxRepeat; i++)
                 {
-                    altAlleleSequences.Add(new String(altBase, i));
+                    altAlleleSequences.Add(new string(altBase, i));
                 }
                 return (match7.Groups["ref"].Value, string.Join(";", altAlleleSequences), null);
             }

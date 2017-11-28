@@ -55,7 +55,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddStringValue("transcript", Transcript.GetVersionedId());
+            jsonObject.AddStringValue("transcript", Transcript.Id.WithVersion);
             jsonObject.AddStringValue("bioType", GetBioType( Transcript.BioType));
             jsonObject.AddStringValue("codons", GetAlleleString(ReferenceCodons, AlternateCodons));
             jsonObject.AddStringValue("aminoAcids", GetAlleleString(ReferenceAminoAcids, AlternateAminoAcids));
@@ -85,7 +85,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("polyPhenScore", PolyPhen?.Score);
 
             jsonObject.AddStringValue("polyPhenPrediction", PolyPhen?.Prediction);
-            if(Transcript.Translation !=null) jsonObject.AddStringValue("proteinId", CombineIdAndVersion(Transcript.Translation.ProteinId,Transcript.Translation.ProteinVersion));
+            if (Transcript.Translation != null) jsonObject.AddStringValue("proteinId", Transcript.Translation.ProteinId.WithVersion);
 
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
@@ -100,11 +100,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             sb.Append(JsonObject.CloseBrace);
         }
 
-        private string GetBioType(BioType bioType)
-        {
-            if (bioType == BioType.three_prime_overlapping_ncrna) return "3prime_overlapping_ncrna";
-            return bioType.ToString();
-        }
+        public static string GetBioType(BioType bioType) => bioType == BioType.three_prime_overlapping_ncrna
+            ? "3prime_overlapping_ncrna"
+            : bioType.ToString();
 
         /// <summary>
         /// returns an allele string representation of two alleles

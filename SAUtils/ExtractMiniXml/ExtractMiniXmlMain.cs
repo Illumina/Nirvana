@@ -1,14 +1,13 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using SAUtils.ExtractMiniXml;
+using ExtractMiniXml;
 using VariantAnnotation.Interface;
 
-namespace ExtractMiniXml
+namespace SAUtils.ExtractMiniXml
 {
-    public sealed class ExtractMiniXmlMain
+    public static class ExtractMiniXmlMain
 	{
-
 	    private static ExitCodes ProgramExecution()
         {
 	        var extractor = new XmlExtractor(ConfigurationSettings.InputXmlFile, ConfigurationSettings.RcvId, ConfigurationSettings.OutputDir);
@@ -18,7 +17,7 @@ namespace ExtractMiniXml
         }
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-			var ops = new OptionSet()
+			var ops = new OptionSet
 			{
 				{
 					"i|in=",
@@ -49,7 +48,6 @@ namespace ExtractMiniXml
 	            .Execute(ProgramExecution);
 	        
 	        return exitCode;
-		}
-		
+		}		
 	}
 }

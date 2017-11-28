@@ -18,8 +18,9 @@ namespace UnitTests.VariantAnnotation.Utilities
         [Fact]
         public void SplitVersion_ReturnNull_WithNullInput()
         {
-            var splitVersion = FormatUtilities.SplitVersion(null);
-            Assert.Null(splitVersion.Id);
+            var result = FormatUtilities.SplitVersion(null);
+            Assert.Null(result.Id);
+            Assert.Equal(0, result.Version);
         }
 
         [Theory]
@@ -27,9 +28,9 @@ namespace UnitTests.VariantAnnotation.Utilities
         [InlineData("ENSG00000141510", "ENSG00000141510", 0)]
         public void SplitVersion(string combinedId, string expectedId, byte expectedVersion)
         {
-            var splitVersion = FormatUtilities.SplitVersion(combinedId);
-            Assert.Equal(expectedId, splitVersion.Id);
-            Assert.Equal(expectedVersion, splitVersion.Version);
+            var result = FormatUtilities.SplitVersion(combinedId);
+            Assert.Equal(expectedId, result.Id);
+            Assert.Equal(expectedVersion, result.Version);
         }
     }
 }

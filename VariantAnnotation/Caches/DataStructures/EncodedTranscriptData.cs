@@ -1,70 +1,96 @@
 ﻿using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.IO;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
-	public sealed class EncodedTranscriptData
-	{
-		private readonly ushort _info;
-		private readonly byte _contents;
+    public sealed class EncodedTranscriptData
+    {
+        private readonly ushort _info;
+        private readonly byte _contents;
 
-		private const int BioTypeMask          = 0xff;
-		private const int VersionMask          = 0x1f;
-		private const int TranscriptSourceMask = 0x3;
-		private const int CanonicalMask        = 0x8000;
-		private const int SiftMask             = 1;
-		private const int PolyPhenMask         = 2;
-		private const int MirnasMask           = 4;
-		private const int IntronsMask          = 8;
-		private const int CdnaMapsMask         = 16;
-		private const int TranslationMask      = 32;
-		private const int StartExonMask        = 3;
+        // contents
+        // +====+====+====+====+====+====+====+====+
+        // |Tran|Cdna|Intr|Mirn|Poly|Sift|StrExonPh|
+        // +====+====+====+====+====+====+====+====+
+        private const int StartExonMask   = 3;
+        private const int SiftMask        = 4;
+        private const int PolyPhenMask    = 8;
+        private const int MirnasMask      = 16;
+        private const int IntronsMask     = 32;
+        private const int CdnaMapsMask    = 64;
+        private const int TranslationMask = 128;
 
-		private const int VersionShift          = 8;
-		private const int TranscriptSourceShift = 13;
-		private const int StartExonShift        = 6;
+        public byte StartExonPhase     => (byte)(_contents & StartExonMask);
+        public bool HasSift            => (_contents & SiftMask)        != 0;
+        public bool HasPolyPhen        => (_contents & PolyPhenMask)    != 0;
+        public bool HasMirnas          => (_contents & MirnasMask)      != 0;
+        public bool HasRnaEdits        => (_info & RnaEditsMask)        != 0;
+        public bool HasSelenocysteines => (_info & SelenocysteinesMask) != 0;
+        public bool HasIntrons         => (_contents & IntronsMask)     != 0;
+        public bool HasCdnaMaps        => (_contents & CdnaMapsMask)    != 0;
+        public bool HasTranslation     => (_contents & TranslationMask) != 0;
 
-		public BioType BioType         => (BioType)(_info & BioTypeMask);
-		public byte Version            => (byte)((_info >> VersionShift) & VersionMask);
-		public Source TranscriptSource => (Source)((_info >> TranscriptSourceShift) & TranscriptSourceMask);
-		public bool IsCanonical        => (_info & CanonicalMask) != 0;
+        // info
+        // +====+====+====+====+====+====+====+====+====+====+====+====+====+====+====+====+
+        // |Cano|  Source |\\\\|Sele|RnaE|CSNF|CENF|                BioType                |
+        // +====+====+====+====+====+====+====+====+====+====+====+====+====+====+====+====+
+        private const int BioTypeMask           = 0xff;
+        private const int CdsStartNotFoundMask  = 0x100;
+        private const int CdsEndNotFoundMask    = 0x200;
+        private const int TranscriptSourceMask  = 0x3;
+        private const int CanonicalMask         = 0x8000;
+        private const int TranscriptSourceShift = 13;
+        private const int RnaEditsMask          = 1024;
+        private const int SelenocysteinesMask   = 2048;
 
-		public bool HasSift        => (_contents & SiftMask) != 0;
-		public bool HasPolyPhen    => (_contents & PolyPhenMask) != 0;
-		public bool HasMirnas      => (_contents & MirnasMask) != 0;
-		public bool HasIntrons     => (_contents & IntronsMask) != 0;
-		public bool HasCdnaMaps    => (_contents & CdnaMapsMask) != 0;
-		public bool HasTranslation => (_contents & TranslationMask) != 0;
-		public byte StartExonPhase => (byte)((_contents >> StartExonShift) & StartExonMask);
+        public BioType BioType         => (BioType)(_info & BioTypeMask);
+        public bool CdsStartNotFound   => (_info & CdsStartNotFoundMask) != 0;
+        public bool CdsEndNotFound     => (_info & CdsEndNotFoundMask) != 0;
+        public Source TranscriptSource => (Source)((_info >> TranscriptSourceShift) & TranscriptSourceMask);
+        public bool IsCanonical        => (_info & CanonicalMask) != 0;
 
-		public EncodedTranscriptData(ushort info, byte contents)
-		{
-			_info     = info;
-			_contents = contents;
-		}
+        public EncodedTranscriptData(ushort info, byte contents)
+        {
+            _info     = info;
+            _contents = contents;
+        }
 
-	    public EncodedTranscriptData(BioType bioType, byte version, Source transcriptSource, bool isCanonical,
-	        bool hasSift, bool hasPolyPhen, bool hasMicroRnas, bool hasIntrons, bool hasCdnaMaps, bool hasTranslation,
-	        byte startExonPhase)
-	    {
-	        _info = (ushort)bioType;
-	        _info |= (ushort)(version << VersionShift);
-	        _info |= (ushort)((ushort)transcriptSource << TranscriptSourceShift);
-	        if (isCanonical) _info |= CanonicalMask;
+        public static EncodedTranscriptData GetEncodedTranscriptData(BioType bioType, bool cdsStartNotFound,
+            bool cdsEndNotFound, Source source, bool isCanonical, bool hasSift, bool hasPolyPhen, bool hasMicroRnas,
+            bool hasRnaEdits, bool hasSelenocysteines, bool hasIntrons, bool hasCdnaMaps, bool hasTranslation,
+            byte startExonPhase)
+        {
+            ushort info = (ushort)bioType;
+            if (cdsStartNotFound)   info |= CdsStartNotFoundMask;
+            if (cdsEndNotFound)     info |= CdsEndNotFoundMask;
+            if (isCanonical)        info |= CanonicalMask;
+            if (hasRnaEdits)        info |= RnaEditsMask;
+            if (hasSelenocysteines) info |= SelenocysteinesMask;
+            info |= (ushort)((ushort)source << TranscriptSourceShift);
 
-	        _contents = (byte)(startExonPhase << StartExonShift);
-	        if (hasSift)        _contents |= SiftMask;
-	        if (hasPolyPhen)    _contents |= PolyPhenMask;
-	        if (hasMicroRnas)   _contents |= MirnasMask;
-	        if (hasIntrons)     _contents |= IntronsMask;
-	        if (hasCdnaMaps)    _contents |= CdnaMapsMask;
-	        if (hasTranslation) _contents |= TranslationMask;
-	    }
+            byte contents = startExonPhase;
+            if (hasSift)        contents |= SiftMask;
+            if (hasPolyPhen)    contents |= PolyPhenMask;
+            if (hasMicroRnas)   contents |= MirnasMask;
+            if (hasIntrons)     contents |= IntronsMask;
+            if (hasCdnaMaps)    contents |= CdnaMapsMask;
+            if (hasTranslation) contents |= TranslationMask;
+
+            return new EncodedTranscriptData(info, contents);
+        }
+
+        public static EncodedTranscriptData Read(ExtendedBinaryReader reader)
+        {
+            var info     = reader.ReadUInt16();
+            var contents = reader.ReadByte();
+            return new EncodedTranscriptData(info, contents);
+        }
 
         internal void Write(IExtendedBinaryWriter writer)
-		{
-			writer.Write(_info);
-			writer.Write(_contents);
-		}
-	}
+        {
+            writer.Write(_info);
+            writer.Write(_contents);
+        }
+    }
 }

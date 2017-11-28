@@ -77,7 +77,7 @@ namespace SAUtils.CreateOmimTsv
                 return new GeneSymbolSynonyms
                 {
                     GeneSymbol = geneSymbol,
-                    Synonyms   = synonyms,
+                    Synonyms   = synonyms
                 };
             }
             catch (Exception)

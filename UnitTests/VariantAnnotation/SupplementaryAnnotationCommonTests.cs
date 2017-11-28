@@ -27,7 +27,7 @@ namespace UnitTests.VariantAnnotation
 	    public void GetGenomeAssembly_grch37()
 	    {
 		    var grch37SaDir = Resources.SaGRCh37("");
-		    var genomeAssembly = SaReaderUtils.GetGenomeAssembly(new List<string>() {grch37SaDir});
+		    var genomeAssembly = SaReaderUtils.GetGenomeAssembly(new List<string> {grch37SaDir});
 
 			Assert.Equal(GenomeAssembly.GRCh37, genomeAssembly);
 	    }
@@ -37,7 +37,7 @@ namespace UnitTests.VariantAnnotation
 	    {
 		 
 			var grch37SaDir = Resources.SaGRCh37("");
-			var dataSourceVersions = SaReaderUtils.GetDataSourceVersions(new List<string>() { grch37SaDir });
+			var dataSourceVersions = SaReaderUtils.GetDataSourceVersions(new List<string> { grch37SaDir });
 
 			Assert.True(dataSourceVersions.Any());
 

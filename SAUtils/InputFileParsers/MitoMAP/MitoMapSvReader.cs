@@ -20,7 +20,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private readonly VariantAligner _variantAligner;
 
 
-        private readonly HashSet<string> _mitoMapSvDataTypes = new HashSet<string>()
+        private readonly HashSet<string> _mitoMapSvDataTypes = new HashSet<string>
         {
             MitoMapDataTypes.MitoMapDeletionsSingle,
             MitoMapDataTypes.MitoMapInsertionsSimple

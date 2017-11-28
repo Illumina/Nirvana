@@ -72,11 +72,11 @@ namespace UnitTests.Jasix
 
             index.Flush();
 
-	        var chrPos = global::Jasix.DataStructures.Utilities.ParseQuery("chr1");
+	        var chrPos = Utilities.ParseQuery("chr1");
 				
 			Assert.Equal(100000, index.GetFirstVariantPosition(chrPos.Item1, chrPos.Item2, chrPos.Item3));
 
-            chrPos = global::Jasix.DataStructures.Utilities.ParseQuery("chr2");
+            chrPos = Utilities.ParseQuery("chr2");
 			Assert.Equal(100150, index.GetFirstVariantPosition(chrPos.Item1, chrPos.Item2, chrPos.Item3));
         }
 

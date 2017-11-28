@@ -12,22 +12,26 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void EncodedTranscriptData_EndToEnd()
         {
-            var expectedBiotype          = BioType.non_stop_decay;
-            byte expectedVersion         = 31;
-            var expectedTranscriptSource = Source.BothRefSeqAndEnsembl;
-            bool expectedCanonical       = true;
-            bool expectedSift            = true;
-            bool expectedPolyPhen        = true;
-            bool expectedMirnas          = true;
-            bool expectedIntrons         = true;
-            bool expectedCdnaMaps        = true;
-            bool expectedTranslation     = true;
-            byte expectedStartExonPhase  = 3;
+            var expectedBiotype           = BioType.non_stop_decay;
+            bool expectedCdsStartNotFound = true;
+            bool expectedCdsEndNotFound   = true;
+            var expectedSource            = Source.BothRefSeqAndEnsembl;
+            bool expectedCanonical        = true;
+            bool expectedSift             = true;
+            bool expectedPolyPhen         = true;
+            bool expectedMirnas           = true;
+            bool expectedRnaEdits         = true;
+            bool expectedSelenocysteines  = true;
+            bool expectedIntrons          = true;
+            bool expectedCdnaMaps         = true;
+            bool expectedTranslation      = true;
+            byte expectedStartExonPhase   = 3;
 
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            var encodedData = new EncodedTranscriptData(expectedBiotype, expectedVersion, expectedTranscriptSource,                
-                expectedCanonical, expectedSift, expectedPolyPhen, expectedMirnas, expectedIntrons,                
-                expectedCdnaMaps, expectedTranslation, expectedStartExonPhase);
+            var encodedData = EncodedTranscriptData.GetEncodedTranscriptData(expectedBiotype, expectedCdsStartNotFound,
+                expectedCdsEndNotFound, expectedSource, expectedCanonical, expectedSift, expectedPolyPhen,
+                expectedMirnas, expectedRnaEdits, expectedSelenocysteines, expectedIntrons, expectedCdnaMaps,
+                expectedTranslation, expectedStartExonPhase);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             EncodedTranscriptData observedEncodedTranscriptData;
@@ -51,8 +55,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
             Assert.NotNull(observedEncodedTranscriptData);
             Assert.Equal(expectedBiotype,          observedEncodedTranscriptData.BioType);
-            Assert.Equal(expectedVersion,          observedEncodedTranscriptData.Version);
-            Assert.Equal(expectedTranscriptSource, observedEncodedTranscriptData.TranscriptSource);
+            Assert.Equal(expectedSource, observedEncodedTranscriptData.TranscriptSource);
             Assert.Equal(expectedCanonical,        observedEncodedTranscriptData.IsCanonical);
             Assert.Equal(expectedSift,             observedEncodedTranscriptData.HasSift);
             Assert.Equal(expectedPolyPhen,         observedEncodedTranscriptData.HasPolyPhen);

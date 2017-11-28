@@ -14,14 +14,13 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         public void Translation_EndToEnd()
         {
             ICdnaCoordinateMap expectedCodingRegion = new CdnaCoordinateMap(100, 200, 300, 400);
-            string expectedProteinId                = "ENSP00000446475";
-            byte expectedProteinVersion             = 7;
+            string expectedProteinId                = "ENSP00000446475.7";
             string expectedPeptideSeq               = "VEIDSD";
 
             string[] peptideSeqs = { expectedPeptideSeq };
 
             ITranslation expectedTranslation =
-                new Translation(expectedCodingRegion, CompactId.Convert(expectedProteinId), expectedProteinVersion,
+                new Translation(expectedCodingRegion, CompactId.Convert(expectedProteinId, 7),
                     expectedPeptideSeq);
 
             ITranslation observedTranslation;
@@ -43,8 +42,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
             Assert.NotNull(observedTranslation);
             Assert.Equal(expectedCodingRegion.CdnaStart, observedTranslation.CodingRegion.CdnaStart);
-            Assert.Equal(expectedProteinId,              observedTranslation.ProteinId.ToString());
-            Assert.Equal(expectedProteinVersion,         observedTranslation.ProteinVersion);
+            Assert.Equal(expectedProteinId,              observedTranslation.ProteinId.WithVersion);
             Assert.Equal(expectedPeptideSeq,             observedTranslation.PeptideSeq);
         }
     }

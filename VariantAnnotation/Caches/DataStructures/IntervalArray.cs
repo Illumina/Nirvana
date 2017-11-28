@@ -4,20 +4,13 @@ using VariantAnnotation.Interface.Intervals;
 namespace VariantAnnotation.Caches.DataStructures
 {
 	public sealed class IntervalArray<T> : IIntervalSearch<T>
-	{
-		#region members
-
-		private readonly Interval<T>[] _array;
+    {
+		public readonly Interval<T>[] Array;
 		public static readonly Interval<T> EmptyInterval = new Interval<T>(-1, -1, default(T));
 
-		#endregion
-
-		/// <summary>
-		/// constructor
-		/// </summary>
 		public IntervalArray(Interval<T>[] array)
 		{
-			_array = array;
+			Array = array;
 			SetMaxIntervals();
 		}
 
@@ -38,7 +31,7 @@ namespace VariantAnnotation.Caches.DataStructures
 				return false;
 			}
 
-			interval = _array[firstIndex];
+			interval = Array[firstIndex];
 			return true;
 		}
 
@@ -59,9 +52,9 @@ namespace VariantAnnotation.Caches.DataStructures
 		private T[] AddOverlappingValues(int firstIndex, int begin, int end)
 		{
 			var values = new List<T>();
-			for (var index = firstIndex; index < _array.Length; index++)
+			for (var index = firstIndex; index < Array.Length; index++)
 			{
-				var interval = _array[index];
+				var interval = Array[index];
 				if (interval.Begin > end) break;
 				if (interval.Overlaps(begin, end)) values.Add(interval.Value);
 			}
@@ -74,7 +67,7 @@ namespace VariantAnnotation.Caches.DataStructures
 		private int GetFirstIndex(int intervalBegin, int intervalEnd)
 		{
 			var begin = 0;
-			var end = _array.Length - 1;
+			var end = Array.Length - 1;
 
 			var lastOverlapIndex = -1;
 
@@ -82,8 +75,8 @@ namespace VariantAnnotation.Caches.DataStructures
 			{
 				var index = begin + (end - begin >> 1);
 
-				if (_array[index].Overlaps(intervalBegin, intervalEnd)) lastOverlapIndex = index;
-				var ret = _array[index].CompareMax(intervalBegin);
+				if (Array[index].Overlaps(intervalBegin, intervalEnd)) lastOverlapIndex = index;
+				var ret = Array[index].CompareMax(intervalBegin);
 
 				if (ret <= 0) end = index - 1;
 				else begin = index + 1;
@@ -98,14 +91,14 @@ namespace VariantAnnotation.Caches.DataStructures
 		private int GetFirstIndexAny(int intervalBegin, int intervalEnd)
 		{
 			var begin = 0;
-			var end = _array.Length - 1;
+			var end = Array.Length - 1;
 
 			while (begin <= end)
 			{
 				var index = begin + (end - begin >> 1);
 
-				if (_array[index].Overlaps(intervalBegin, intervalEnd)) return index;
-				var ret = _array[index].CompareMax(intervalBegin);
+				if (Array[index].Overlaps(intervalBegin, intervalEnd)) return index;
+				var ret = Array[index].CompareMax(intervalBegin);
 
 				if (ret <= 0) end = index - 1;
 				else begin = index + 1;
@@ -121,11 +114,11 @@ namespace VariantAnnotation.Caches.DataStructures
 		{
 			var currentMax = int.MinValue;
 
-			for (var i = 0; i < _array.Length; i++)
+			for (var i = 0; i < Array.Length; i++)
 			{
-				if (_array[i].End > currentMax) currentMax = _array[i].End;
-				_array[i].Max = currentMax;
+				if (Array[i].End > currentMax) currentMax = Array[i].End;
+				Array[i].Max = currentMax;
 			}
 		}
-	}
+    }
 }

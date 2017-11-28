@@ -16,29 +16,26 @@ namespace UnitTests.SAUtils.InputFileParsers
     [Collection("ChromosomeRenamer")]
     public sealed class ClinVarXmlReaderTests
     {
-        private readonly Dictionary<string, IChromosome> _refNameDict;
-        /// <summary>
-        /// constructor
-        /// </summary>
+        private readonly Dictionary<string, IChromosome> _refNameToChromosome;
+
         public ClinVarXmlReaderTests()
         {
-            _refNameDict = new Dictionary<string, IChromosome>
+            _refNameToChromosome = new Dictionary<string, IChromosome>
             {
                 {"17", new Chromosome("chr17", "17", 16)},
                 {"1", new Chromosome("chr1", "1", 0)},
                 {"2", new Chromosome("chr2", "2", 1)},
                 {"22", new Chromosome("chr22", "2", 21)}
-            };
-            
+            };            
         }
 
         private static ISequenceProvider GetSequenceProvider(GenomeAssembly assembly, IChromosome chromosome, int start, string refSequence)
         {
             var seqProvider = new Mock<ISequenceProvider>();
             if (chromosome.EnsemblName=="X" || chromosome.EnsemblName == "Y")
-                seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() { { "X", new Chromosome("chrX", "X", 1)},{"Y", new Chromosome("chrY", "Y", 2)} });
+                seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome>() { { "X", new Chromosome("chrX", "X", 1)},{"Y", new Chromosome("chrY", "Y", 2)} });
             else
-                seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() {{chromosome.EnsemblName, chromosome}});
+                seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome>() {{chromosome.EnsemblName, chromosome}});
             seqProvider.Setup(x => x.GenomeAssembly).Returns(assembly);
             seqProvider.Setup(x => x.Sequence).Returns(new SimpleSequence(refSequence, start - 1));
             return seqProvider.Object;
@@ -94,7 +91,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         //public void MultiEntryXmlParsing()
         //{
         //    var mockProvider = new Mock<ISequenceProvider>();
-        //    mockProvider.Setup(x => x.GetChromosomeDictionary()).Returns(_refNameDict);
+        //    mockProvider.Setup(x => x.GetChromosomeDictionary()).Returns(_refNameToChromosome);
 
         //    var sequenceProvider = mockProvider.Object;
 
@@ -307,7 +304,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void NoClinVarItem()
         {
             var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.Setup(x => x.GetChromosomeDictionary()).Returns(_refNameDict);
+            mockProvider.Setup(x => x.RefNameToChromosome).Returns(_refNameToChromosome);
 
             var sequenceProvider = mockProvider.Object;
 

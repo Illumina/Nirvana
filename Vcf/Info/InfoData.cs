@@ -8,7 +8,7 @@ namespace Vcf.Info
         public double? StrandBias { get; }
         public double? RecalibratedQuality { get; }
         public int? JointSomaticNormalQuality { get; }
-        public int? CopyNumber { get; private set; }
+        public int? CopyNumber { get; }
         public int? Depth { get; }
         public bool ColocalizedWithCnv { get; }
 		public bool IsInv3 { get; }
@@ -16,7 +16,7 @@ namespace Vcf.Info
 		public int[] CiPos { get; }
         public int[] CiEnd { get; }
         public int? SvLength { get; }
-	    public VariantType SvType { get; private set; }
+	    public VariantType SvType { get; }
 
 		public int? RefRepeatCount { get; }
 		public string RepeatUnit { get; }
@@ -43,11 +43,5 @@ namespace Vcf.Info
 	        RefRepeatCount            = refRepeatCount;
             UpdatedInfoField          = updatedInfoField;
         }
-
-	    public void UpdateCnvData(VariantType svType, int? copyNumber)
-	    {
-		    SvType = svType;
-		    CopyNumber = copyNumber;
-	    }
     }
 }

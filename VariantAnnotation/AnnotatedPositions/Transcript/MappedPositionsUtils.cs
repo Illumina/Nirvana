@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
@@ -7,8 +8,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public static class MappedPositionsUtils
     {
-
-        
         public static IMappedPositions ComputeMappedPositions(int start, int end, ITranscript transcript)
         {
             var exonIntron = ComputeExonAndIntron(start, end, transcript.CdnaMaps, transcript.Introns,
@@ -17,7 +16,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var coords = MapCdnaInterval(start, end, transcript);
 
             var first = coords[0];
-            var last = coords[coords.Count - 1];
+            var last  = coords[coords.Count - 1];
 
             var cdnaInterval = new NullableInterval(first.IsGap ? (int?)null : first.Start,
                 last.IsGap ? (int?)null : last.End);
@@ -34,16 +33,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return new MappedPositions(cdnaInterval, impactedCdnaInterval, cdsIntervals.CdsInterval, cdsIntervals.ImpactedCdsInterval, proteinInterval,exonIntron.AffectedExons,exonIntron.AffectedIntrons);
         }
 
-
-
-
         public static (IInterval AffectedExons, IInterval AffectedIntrons) ComputeExonAndIntron(int start, int end,
             ICdnaCoordinateMap[] cdnaCoordinateMaps, IInterval[] introns, bool onReverseStrand)
         {
-            var numExons = cdnaCoordinateMaps.Length;
-            var overlappedExonIndices = new List<int>();
+            var numExons                = cdnaCoordinateMaps.Length;
+            var overlappedExonIndices   = new List<int>();
             var overlappedIntronIndices = new List<int>();
-            var variantInterval = new Interval(start, end);
+            var variantInterval         = new Interval(start, end);
 
             for (var i = 0; i < numExons; i++)
             {
@@ -91,19 +87,21 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (affectedExons, affectedIntrons);
         }
 
-
         private static NullableInterval UpdateProteinPosition(NullableInterval cdsInterval)
         {
             const int shift = 0;
+
             var start = cdsInterval.Start == null
                 ? null
                 : (cdsInterval.Start + shift + 2) / 3;
+
             var end = cdsInterval.End == null
                 ? null
                 : (cdsInterval.End + shift + 2) / 3;
 
             return new NullableInterval(start, end);
         }
+
         private static List<MappedPositions.Coordinate> MapCdnaInterval(int start, int end, ITranscript transcript)
         {
             var isInsertion = start > end;
@@ -114,7 +112,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             var coords = results;
             if (isInsertion) coords = SetInsertionCdna(results, transcript.TotalExonLength);
-
 
             return coords;
         }
@@ -200,12 +197,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (onReverseStrand)
             {
                 cdnaStart = map.CdnaStart - end + map.End;
-                cdnaEnd = map.CdnaStart - start + map.End;
+                cdnaEnd   = map.CdnaStart - start + map.End;
             }
             else
             {
                 cdnaStart = start - map.Start + map.CdnaStart;
-                cdnaEnd = end - map.End + map.CdnaEnd;
+                cdnaEnd   = end - map.End + map.CdnaEnd;
             }
 
             return new MappedPositions.Coordinate(cdnaStart, cdnaEnd, false);
@@ -225,7 +222,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             // insertion on the boundary of gap
             var first = coords[0];
-            var last = coords[coords.Count - 1];
+            var last  = coords[coords.Count - 1];
 
             if (!first.IsGap)
             {
@@ -276,6 +273,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var cdsStart = impactedCdsStart < 1 || invalidCdnaStart
                 ? (int?)null
                 : impactedCdsStart;
+
             var cdsEnd =
                 impactedCdsEnd > translation.CodingRegion.CdnaEnd + beginOffset ||
                 invalidCdnaEnd

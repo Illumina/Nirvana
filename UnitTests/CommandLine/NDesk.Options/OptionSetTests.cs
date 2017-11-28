@@ -330,7 +330,7 @@ namespace UnitTests.CommandLine.NDesk.Options
             var optionSet = new OptionSet
             {
                 { "a", "", v => {} },
-                { "b", "", v => {} },
+                { "b", "", v => {} }
             };
 
             var e = optionSet.Parse(new[] { "-a", "-b", "--", "-a", "-b" });
@@ -372,7 +372,7 @@ namespace UnitTests.CommandLine.NDesk.Options
                 new ContextCheckerOption ("a=", "a desc", "/a",   "a-val", 1),
                 new ContextCheckerOption ("b",  "b desc", "--b+", "--b+",  2),
                 new ContextCheckerOption ("c=", "c desc", "--c",  "C",     3),
-                new ContextCheckerOption ("d",  "d desc", "/d-",  null,    4),
+                new ContextCheckerOption ("d",  "d desc", "/d-",  null,    4)
             };
             Assert.Equal(optionSet.Count, 4);
             optionSet.Parse(new[] { "/a", "a-val", "--b+", "--c=C", "/d-" });
@@ -384,7 +384,7 @@ namespace UnitTests.CommandLine.NDesk.Options
             var extra = new List<string>();
             var optionSet = new OptionSet
             {
-                { "<>", "", v => extra.Add (v) },
+                { "<>", "", v => extra.Add (v) }
             };
             var e = optionSet.Parse(new[] { "-a", "b", "--c=D", "E" });
             Assert.Equal(e.Count, 0);
@@ -401,7 +401,7 @@ namespace UnitTests.CommandLine.NDesk.Options
             var tests = new List<string>();
             var optionSet = new OptionSet
             {
-                { "t|<>=", "", v => tests.Add (v) },
+                { "t|<>=", "", v => tests.Add (v) }
             };
             var e = optionSet.Parse(new[] { "-tA", "-t:B", "-t=C", "D", "--E=F" });
             Assert.Equal(e.Count, 0);
@@ -430,7 +430,7 @@ namespace UnitTests.CommandLine.NDesk.Options
                             formats.Add (format, f);
                         }
                         f.Add (v);
-                    } },
+                    } }
             };
 
             var e = optionSet.Parse(new[] { "a", "b", "-fbar", "c", "d", "--format=baz", "e", "f" });

@@ -206,24 +206,21 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         {
             var mockedTranscript1 = new Mock<IAnnotatedTranscript>();
             mockedTranscript1.Setup(x => x.Transcript.IsCanonical).Returns(true);
-            mockedTranscript1.Setup(x => x.Transcript.Id).Returns(CompactId.Convert("ENST12345"));
-            mockedTranscript1.Setup(x => x.Transcript.Version).Returns(1);
+            mockedTranscript1.Setup(x => x.Transcript.Id).Returns(CompactId.Convert("ENST12345", 1));
             mockedTranscript1.Setup(x => x.Transcript.Gene.Symbol).Returns("testGene1");
             mockedTranscript1.SetupGet(x => x.Consequences)
                 .Returns(new List<ConsequenceTag> {ConsequenceTag.five_prime_UTR_variant});
 
             var mockedTranscript2 = new Mock<IAnnotatedTranscript>();
             mockedTranscript2.Setup(x => x.Transcript.IsCanonical).Returns(false);
-            mockedTranscript2.Setup(x => x.Transcript.Id).Returns(CompactId.Convert("ENST23456"));
-            mockedTranscript2.Setup(x => x.Transcript.Version).Returns(2);
+            mockedTranscript2.Setup(x => x.Transcript.Id).Returns(CompactId.Convert("ENST23456", 2));
             mockedTranscript2.Setup(x => x.Transcript.Gene.Symbol).Returns("testGene2");
             mockedTranscript2.SetupGet(x => x.Consequences)
                 .Returns(new List<ConsequenceTag> { ConsequenceTag.missense_variant });
 
             var mockedTranscript3 = new Mock<IAnnotatedTranscript>();
             mockedTranscript3.Setup(x => x.Transcript.IsCanonical).Returns(true);
-            mockedTranscript3.Setup(x => x.Transcript.Id).Returns(CompactId.Convert("NM1234.3"));
-            mockedTranscript3.Setup(x => x.Transcript.Version).Returns(3);
+            mockedTranscript3.Setup(x => x.Transcript.Id).Returns(CompactId.Convert("NM_1234", 3));
             mockedTranscript3.Setup(x => x.Transcript.Gene.Symbol).Returns("testGene3");
             mockedTranscript3.SetupGet(x => x.Consequences)
                 .Returns(new List<ConsequenceTag> { ConsequenceTag.missense_variant,ConsequenceTag.splice_region_variant });
@@ -246,8 +243,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var converter = new VcfConversion();
             var observedVcf = converter.Convert(annotatedPosition).Split("\t")[VcfCommon.InfoIndex];
 
-            Assert.Equal("CSQT=1|testGene1|ENST12345.1|5_prime_UTR_variant,1|testGene3|.3|missense_variant&splice_region_variant", observedVcf);
-
+            Assert.Equal("CSQT=1|testGene1|ENST12345.1|5_prime_UTR_variant,1|testGene3|NM_1234.3|missense_variant&splice_region_variant", observedVcf);
         }
 
         [Fact]

@@ -8,7 +8,7 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
 using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     [Collection("ChromosomeRenamer")]
     public sealed class MergedCosmicReaderTests

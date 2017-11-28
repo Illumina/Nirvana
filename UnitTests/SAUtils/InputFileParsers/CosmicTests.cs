@@ -3,7 +3,7 @@ using SAUtils.DataStructures;
 using VariantAnnotation.Sequence;
 using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
 	public class CosmicTests
 	{

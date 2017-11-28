@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.Positions;
+﻿using System.Collections.Generic;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf.VariantCreator
@@ -16,11 +17,9 @@ namespace Vcf.VariantCreator
 			if (svType == VariantType.duplication && altAllele == TandemDuplicationAltAllele)
 				svType = VariantType.tandem_duplication;
 
-			var copyNumber = infoData?.CopyNumber;
-
 		    if (svType != VariantType.translocation_breakend) start++;
 		    var end = infoData?.End ?? start;
-            var vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds, copyNumber);
+            var vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
 			var svAltAllele = GetSvAltAllele(altAllele, svType);
 			
 			return new Variant(chromosome, start, end, refAllele, svAltAllele, svType, vid, false, false, null, breakEnds, enableVerboseTranscript?VerbosedStructuralVariantBehavior : StructuralVariantBehavior);
@@ -28,6 +27,7 @@ namespace Vcf.VariantCreator
 
 		private static string GetSvAltAllele(string altAllele, VariantType svType)
 		{
+		    // ReSharper disable once SwitchStatementMissingSomeCases
 			switch (svType)
 			{
 				case VariantType.deletion:
@@ -48,8 +48,9 @@ namespace Vcf.VariantCreator
 			}
 		}
 
-		private static string GetVid(string ensemblName, int start, int end, VariantType variantType, IBreakEnd[] breakEnds, int? copyNumber)
+		private static string GetVid(string ensemblName, int start, int end, VariantType variantType, IReadOnlyList<IBreakEnd> breakEnds)
 		{
+		    // ReSharper disable once SwitchStatementMissingSomeCases
 			switch (variantType)
 			{
 				case VariantType.insertion:
@@ -79,6 +80,5 @@ namespace Vcf.VariantCreator
 					return $"{ensemblName}:{start}:{end}";
 			}
 		}
-
 	}
 }

@@ -10,17 +10,16 @@ namespace VariantAnnotation.Caches
     public sealed class PredictionCache : IPredictionCache
     {
         private readonly Prediction[] _predictions;
-	    public string Name { get; }
+	    public string Name { get; } = string.Empty;
 	    public GenomeAssembly GenomeAssembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = new List<IDataSourceVersion>();
         private readonly string[] _descriptions;
 
-        public PredictionCache(GenomeAssembly genomeAssembly, Prediction[] predictions,string[] descriptions)
+        public PredictionCache(GenomeAssembly genomeAssembly, Prediction[] predictions, string[] descriptions)
         {
-	        Name = "Protein function predictor";
             GenomeAssembly = genomeAssembly;
             _predictions   = predictions;
-            _descriptions = descriptions;
+            _descriptions  = descriptions;
         }
 
         public PredictionScore GetProteinFunctionPrediction(int predictionIndex, char newAminoAcid,

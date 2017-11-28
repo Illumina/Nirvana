@@ -26,10 +26,12 @@ namespace Vcf.VariantCreator
 		}
 		private static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
 		{
-			var referenceName = ensemblName;
-			switch (type)
-			{
-				case VariantType.SNV:
+            var referenceName = ensemblName;
+
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (type)
+            {
+                case VariantType.SNV:
 					return $"{referenceName}:{start}:{altAllele}";
 				case VariantType.insertion:
 					return $"{referenceName}:{start}:{end}:{GetInsertedAltAllele(altAllele)}";

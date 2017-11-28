@@ -13,7 +13,7 @@ namespace VariantAnnotation.Caches.DataStructures
 
 		public bool IsNull => Start == -1 && End == -1 && CdnaStart == -1 && CdnaEnd == -1;
 
-		internal CdnaCoordinateMap(int start, int end, int cdnaStart, int cdnaEnd)
+		public CdnaCoordinateMap(int start, int end, int cdnaStart, int cdnaEnd)
 		{
 			Start     = start;
 			End       = end;
@@ -26,7 +26,7 @@ namespace VariantAnnotation.Caches.DataStructures
 		/// <summary>
 		/// reads the cDNA coordinate map from the binary reader
 		/// </summary>
-		public static CdnaCoordinateMap Read(ExtendedBinaryReader reader)
+		public static ICdnaCoordinateMap Read(ExtendedBinaryReader reader)
 		{
 			// read the genomic interval
 			int genomicStart = reader.ReadOptInt32();

@@ -27,8 +27,6 @@ namespace CommandLine.Builders
         /// <summary>
         /// check if each file exists
         /// </summary>
-
-        /// <returns></returns>
         public static IConsoleAppValidator CheckEachFilenameExists(this IConsoleAppValidator validator,
             List<string> filePaths, string description, string commandLineOption, bool isRequired = true)
         {
@@ -63,6 +61,69 @@ namespace CommandLine.Builders
         }
 
         /// <summary>
+        /// checks if an input file exists
+        /// </summary>
+        public static IConsoleAppValidator CheckInputFilenamesExist(this IConsoleAppValidator validator,
+            List<string> filePaths, string description, string commandLineOption)
+        {
+            if (validator.SkipValidation) return validator;
+
+            if (filePaths == null || filePaths.Count == 0)
+            {
+                validator.Data.AddError(
+                    $"A {description} file was not specified. Please use the {commandLineOption} parameter.",
+                    ExitCodes.MissingCommandLineOption);
+            }
+            else
+            {
+                foreach (var filePath in filePaths)
+                    validator.CheckInputFilenameExists(filePath, description, commandLineOption);
+            }
+
+            return validator;
+        }
+
+        /// <summary>
+        /// checks if an input file exists and has the appropriate filename suffix
+        /// </summary>
+        public static IConsoleAppValidator CheckOutputFilenameSuffix(this IConsoleAppValidator validator,
+            string filePath, string fileSuffix, string description, string commandLineOption)
+        {
+            if (validator.SkipValidation) return validator;
+
+            validator.CheckInputFilenameExists(filePath, description, commandLineOption);
+
+            if (!filePath.EndsWith(fileSuffix))
+            {
+                validator.Data.AddError($"The {description} file ({filePath}) does not end with a {fileSuffix}.", ExitCodes.BadArguments);
+            }
+
+            return validator;
+        }
+
+        /// <summary>
+        /// checks if an input directory exists
+        /// </summary>
+        public static IConsoleAppValidator CheckDirectoryExists(this IConsoleAppValidator validator, string dirPath,
+            string description, string commandLineOption)
+        {
+            if (validator.SkipValidation) return validator;
+
+            if (string.IsNullOrEmpty(dirPath))
+            {
+                validator.Data.AddError(
+                    $"The {description} directory was not specified. Please use the {commandLineOption} parameter.",
+                    ExitCodes.MissingCommandLineOption);
+            }
+            else if (!Directory.Exists(dirPath))
+            {
+                validator.Data.AddError($"The {description} directory ({dirPath}) does not exist.", ExitCodes.PathNotFound);
+            }
+
+            return validator;
+        }
+
+        /// <summary>
         /// checks if an input directory exists
         /// </summary>
         public static IConsoleAppValidator CheckEachDirectoryContainsFiles(this IConsoleAppValidator validator,
@@ -83,17 +144,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        public static IConsoleAppValidator CheckDirectoryExists(this IConsoleAppValidator validator,
-            string directory, string description, string commandLineOption)
-        {
-            if (validator.SkipValidation) return validator;
-
-            if (! Directory.Exists(directory))
-                validator.Data.AddError($"The {description} directory ({directory} specified by {commandLineOption}) does not exist.", ExitCodes.FileNotFound);
-            
-            return validator;
-        }
-
         /// <summary>
         /// checks if the required parameter has been set
         /// </summary>
@@ -106,6 +156,25 @@ namespace CommandLine.Builders
             {
                 validator.Data.AddError($"The {description} was not specified. Please use the {commandLineOption} parameter.",
                     ExitCodes.MissingCommandLineOption);
+            }
+
+            return validator;
+        }
+
+        /// <summary>
+        /// checks if the required date has been set and is parseable
+        /// </summary>
+        public static IConsoleAppValidator HasRequiredDate(this IConsoleAppValidator validator, string date,
+            string description, string commandLineOption)
+        {
+            if (validator.SkipValidation) return validator;
+
+            validator.HasRequiredParameter(date, description, commandLineOption);
+            if (string.IsNullOrEmpty(date)) return validator;
+
+            if (!DateTime.TryParse(date, out var _))
+            {
+                validator.Data.AddError($"The {description} was not specified as a date (YYYY-MM-dd). Please use the {commandLineOption} parameter.", ExitCodes.BadArguments);
             }
 
             return validator;
