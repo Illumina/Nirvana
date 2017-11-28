@@ -69,7 +69,7 @@ namespace VariantAnnotation
 
             foreach (var plugin in _plugins)
             {
-                if (plugin.GenomeAssembly == systemGenomeAssembly) continue;
+                if (plugin.GenomeAssembly == systemGenomeAssembly || plugin.GenomeAssembly == GenomeAssembly.Unknown) continue;
                 throw new InvalidDataException($"At least one plugin does not have the same genome assembly ({plugin.GenomeAssembly}) as the system genome assembly ({systemGenomeAssembly})");
             }
         }
