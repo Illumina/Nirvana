@@ -26,7 +26,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             consequence.DetermineStructuralVariantEffect(geneFusionAnnotation != null, variant.Type);
 
 
-            return new AnnotatedTranscript(transcript, null, null, null, null, mappedPosition, null, null, null, null, consequence.GetConsequences(), geneFusionAnnotation, null);
+            return new AnnotatedTranscript(transcript, null, null, null, null, mappedPosition, null, null, null, null, consequence.GetConsequences(), geneFusionAnnotation);
         }
 
         internal static IGeneFusionAnnotation ComputeGeneFusions(IBreakEnd[] breakEnds, ITranscript transcript,

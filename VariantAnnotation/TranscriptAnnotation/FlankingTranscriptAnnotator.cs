@@ -14,7 +14,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             consequence.DetermineFlankingVariantEffects(isDownStream);
 
-            return new AnnotatedTranscript(Transcript,null,null,null,null,null,null,null,null,null, consequence.GetConsequences(), null, null);
+            return new AnnotatedTranscript(Transcript,null,null,null,null,null,null,null,null,null, consequence.GetConsequences(), null);
         }
     }
 }
