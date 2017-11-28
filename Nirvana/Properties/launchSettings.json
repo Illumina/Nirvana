@@ -10,7 +10,7 @@
     },
     "RR_Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in Platypus-Platypus-unknown-short-hg19.vcf.gz --out platypus --sd C:\\Development\\SupplementaryDatabase\\41.5\\GRCh37",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\24\\GRCh37\\Ensembl84 --sd C:\\Development\\SupplementaryDatabase\\41.5\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in C:\\Development\\TestDatasets\\Mother.genome.vcf.gz --out C:\\Development\\TestDatasets\\momGen --plugin c:\\Development\\Loftee\\loftee\\bin\\Debug\\netcoreapp2.0\\",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "MS_ClinVar": {

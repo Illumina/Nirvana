@@ -56,7 +56,9 @@ namespace Nirvana
             {
                 foreach (var pluglin in pluglins)
                 {
-                    dataSourceVersions.AddRange(pluglin.GetDataSourceVersions());
+                    var pluginDataSourceVersions = pluglin.GetDataSourceVersions();
+                    if (pluginDataSourceVersions != null)
+                        dataSourceVersions.AddRange(pluginDataSourceVersions);
                 }
             }
 

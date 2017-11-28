@@ -30,7 +30,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPositions mappedPositions, string hgvsCoding,
             string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
-            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation, IList<IPluginData> pluginData)
+            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation)
         {
             Transcript           = transcript;
             ReferenceAminoAcids  = referenceAminoAcids;
@@ -44,7 +44,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             PolyPhen             = polyphen;
             Consequences         = consequences;
             GeneFusionAnnotation = geneFusionAnnotation;
-            PluginData = pluginData;
+            PluginData           = new List<IPluginData>();
         }
 
 
@@ -90,6 +90,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
             jsonObject.AddStringValue("siftPrediction", Sift?.Prediction);
+
+            if (PluginData != null)
+                foreach (var pluginData in PluginData)
+                {
+                    jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
+                }
+            
             sb.Append(JsonObject.CloseBrace);
         }
 
