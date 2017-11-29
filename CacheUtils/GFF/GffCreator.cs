@@ -34,17 +34,19 @@ namespace CacheUtils.GFF
         {
             using (var writer = GZipUtilities.GetStreamWriter(outputPath))
             {
+                var cachePath    = CacheConstants.TranscriptPath(_cachePrefix);
                 var sequenceData = SequenceHelper.GetDictionaries(_referencePath);
 
-                Console.Write("- reading {0}... ", Path.GetFileName(_cachePrefix));
-                var cache = TranscriptCacheHelper.GetCache(CacheConstants.TranscriptPath(_cachePrefix), sequenceData.refIndexToChromosome);
-                Console.WriteLine("found {0:N0} transcripts.", cache.TranscriptIntervalArrays.Length);
+                Console.Write("- reading {0}... ", Path.GetFileName(cachePath));
+                var cache = TranscriptCacheHelper.GetCache(cachePath, sequenceData.refIndexToChromosome);
+                Console.WriteLine("found {0:N0} reference sequences.", cache.TranscriptIntervalArrays.Length);
 
                 AddGenesToDictionary(cache.Genes);
 
                 Console.Write("- writing GFF entries... ");
                 foreach (var transcriptArray in cache.TranscriptIntervalArrays)
                 {
+                    if (transcriptArray == null) continue;
                     foreach (var interval in transcriptArray.Array) Write(writer, interval.Value);                    
                 }
                 Console.WriteLine("finished.");
