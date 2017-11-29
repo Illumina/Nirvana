@@ -69,10 +69,10 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 
         public UgaGene ToUgaGene(bool isGrch37)
         {
-            var (ensemblGeneId, entrezGeneId) = GeneId.StartsWith("ENSG") ? (GeneId, null as string) : (null, GeneId);
+            var (ensemblGeneId, entrezGeneId) = GeneId.StartsWith("ENSG") ? (GeneId, null as string) : (null as string, GeneId);
 
             IInterval interval = new Interval(Start, End);
-            var (grch37, grch38) = isGrch37 ? (interval, null as IInterval) : (null, interval);
+            var (grch37, grch38) = isGrch37 ? (interval, null as IInterval) : (null as IInterval, interval);
 
             return new UgaGene(Chromosome, grch37, grch38, OnReverseStrand, entrezGeneId, ensemblGeneId, Symbol,
                 HgncId);

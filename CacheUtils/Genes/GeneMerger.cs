@@ -105,7 +105,7 @@ namespace CacheUtils.Genes
             if (ensemblGene.OnReverseStrand  != refSeqGene.OnReverseStrand)  throw new InvalidDataException($"Both genes do not have the same orientation: {geneA.GeneId} & {geneB.GeneId}");
 
             IInterval interval = GetMergedInterval(ensemblGene, refSeqGene);
-            var (grch37, grch38) = isGrch37 ? (interval, null as IInterval) : (null, interval);
+            var (grch37, grch38) = isGrch37 ? (interval, null as IInterval) : (null as IInterval, interval);
 
             return new UgaGene(ensemblGene.Chromosome, grch37, grch38, ensemblGene.OnReverseStrand, refSeqGene.GeneId,
                 ensemblGene.GeneId, ensemblGene.Symbol, ensemblGene.HgncId);
