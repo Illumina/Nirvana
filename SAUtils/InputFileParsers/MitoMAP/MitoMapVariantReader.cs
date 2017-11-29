@@ -13,7 +13,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
     public sealed class MitoMapVariantReader
     {
         private readonly FileInfo _mitoMapFileInfo;
-        private const string DelSymbol = "-";
+        private const string DelSymbol = "";
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly VariantAligner _variantAligner;
@@ -87,7 +87,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
 
                     foreach (var mitoMapMutItem in ParseLine(line, _dataType))
                     {
-                        if (!string.IsNullOrEmpty(mitoMapMutItem.ReferenceAllele) &&
+                        if (!string.IsNullOrEmpty(mitoMapMutItem.ReferenceAllele) ||
                             !string.IsNullOrEmpty(mitoMapMutItem.AlternateAllele))
                             yield return mitoMapMutItem;
                     }
@@ -127,11 +127,8 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (size > MitomapParsingParameters.LargeDeletionCutoff) return new List<MitoMapItem>();
             if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}. Provided size is used.");
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
-            var leftAlgnResults = _variantAligner.LeftAlign(start, refSequence, "");
-            var newStart = leftAlgnResults.Item1;
-            var newRefAllele = leftAlgnResults.Item2;
-            if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, newRefAllele, "-", null, null, null, "", "", "", false, null, null);
+            var leftAlignResults = GetLeftAlignedVariant(start, refSequence, "");
+            var mitoMapItem = new MitoMapItem(leftAlignResults.RefPosition, leftAlignResults.RefAllele, "-", null, null, null, "", "", "", false, null, null);
             return new List<MitoMapItem> { mitoMapItem };
         }
 
@@ -161,11 +158,8 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
             if (!firstNumberMatch.Success) throw new Exception($"Failed to extract variant position from {info[3]}");
             var posi = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
-            var leftAlgnResults = _variantAligner.LeftAlign(posi, "", altAllele); // insertion
-            var newPosi = leftAlgnResults.Item1;
-            var newAltAllele = leftAlgnResults.Item3;
-            if (posi != newPosi) Console.WriteLine($"Insertion of {altAllele}. Original start position: {posi}; new position after left-alignment {newPosi}; new altAllele {newAltAllele}");
-            return new List<MitoMapItem>{new MitoMapItem(newPosi, "-", newAltAllele, null, null, null, "", "", "", false, null, null)};
+            var leftAlgnResults = GetLeftAlignedVariant(posi, "", altAllele); // insertion
+            return new List<MitoMapItem>{new MitoMapItem(leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
@@ -179,7 +173,10 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (extractedPosi.HasValue && posi != extractedPosi)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");
             if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele))
+            {
                 Console.WriteLine($"No reference and alternative alleles could be extracted: {posi}; allele {info[fields[2]]}");
+                return mitoMapVarItems;
+            }
             if (_mitoMapDelSymbolSet.Contains(altAllele)) altAllele = DelSymbol;
             bool? homoplasmy = null;
             if (fields[3] != -1 && _symbolToBools.ContainsKey(info[fields[3]])) homoplasmy = _symbolToBools[info[fields[3]]];
@@ -206,13 +203,15 @@ namespace SAUtils.InputFileParsers.MitoMAP
                     Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
                     foreach (var possibleAltAllele in altAllele.Split(";"))
                     {
-                        mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, possibleAltAllele, diseases, homoplasmy,
+                        var thisLeftAlignResults = GetLeftAlignedVariant(posi, refAllele, possibleAltAllele);
+                        mitoMapVarItems.Add(new MitoMapItem(thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,
                             heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
                     }
                     return mitoMapVarItems;
                 }
             }
-            mitoMapVarItems.Add(new MitoMapItem(posi, refAllele, altAllele, diseases, homoplasmy,
+            var leftAlignResults = GetLeftAlignedVariant(posi, refAllele, altAllele);
+            mitoMapVarItems.Add(new MitoMapItem(leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
             return mitoMapVarItems;
         }
@@ -362,6 +361,26 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var allItems = mitoMapMutationReaders.SelectMany(x => x.GetMitoMapItems()).ToList();
             allItems.ForEach(x => x.Trim());
             return allItems.OrderBy(x => x.Start);
+        }
+
+        private (int RefPosition, string RefAllele, string AltAllele) GetLeftAlignedVariant(int posi, string refAllele, string altAllele)
+        {
+            if (refAllele == null || altAllele == null) return (posi, refAllele, altAllele);
+            var leftAlgnResults = _variantAligner.LeftAlign(posi, refAllele, altAllele); 
+            var newPosi = leftAlgnResults.RefPosition;
+            var newRefAllele = leftAlgnResults.RefAllele;
+            var newAltAllele = leftAlgnResults.AltAllele;
+            if (posi == newPosi) return leftAlgnResults;
+            if (newRefAllele == "") // insertion
+                Console.WriteLine(
+                    $"Insertion of {altAllele}. Original start position: {posi}; new position after left-alignment {newPosi}; new altAllele {newAltAllele}");
+            else if (newAltAllele == "") // deletion
+                Console.WriteLine($"Deletion of {newRefAllele.Length} bps. Original start start position: {posi}; new position after left-alignment {newPosi}.");
+            else
+            {
+                throw new Exception($"{posi}:{refAllele}:{altAllele} becomes {newPosi}:{newRefAllele}:{newAltAllele} after left alignment. Left-alignment should be only performed for deletions and insertions");
+            }
+            return leftAlgnResults;
         }
     }
 }
