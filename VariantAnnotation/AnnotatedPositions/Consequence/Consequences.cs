@@ -139,8 +139,8 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
             // StopLost
             if (_variantEffect.IsStopLost()) _consequences.Add(ConsequenceTag.stop_lost);
-
             if (_variantEffect.IsStartLost()) _consequences.Add(ConsequenceTag.start_lost);
+
             // InframeInsertion
             if (_variantEffect.IsInframeInsertion()) _consequences.Add(ConsequenceTag.inframe_insertion);
 
