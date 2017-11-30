@@ -20,7 +20,7 @@
     },
     "MS_Mother": {
       "commandName": "Project",
-      "commandLineArgs": "-c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother",
+      "commandLineArgs": "-c Cache\\25\\GRCh37\\Ensembl90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother --sd SupplementaryDatabase\\41\\GRCh37",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
     "Nirvana_sk": {

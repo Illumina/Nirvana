@@ -7,7 +7,7 @@
     },
     "MS_Create": {
       "commandName": "Project",
-      "commandLineArgs": "create -g VEP90_genes_2017-11-17.tsv.gz -i IntermediateCache\\Ensembl90_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o Cache\\25\\GRCh37\\Ensembl90",
+      "commandLineArgs": "create -g IntermediateCache\\VEP90_UGA_2017-11-27.tsv.gz -i IntermediateCache\\Ensembl90_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o temp_ensembl90",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
     "MS_Gene": {
