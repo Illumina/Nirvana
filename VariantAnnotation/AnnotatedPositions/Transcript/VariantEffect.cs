@@ -11,8 +11,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
     /// </summary>
     public sealed class VariantEffect:IVariantEffect
     {
-        #region members
-
         private readonly TranscriptPositionalEffect _preCache;
 
         private readonly ITranscript _transcript;
@@ -37,11 +35,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private readonly int _proteinBegin;
 
-        #endregion
-
-        /// <summary>
-        /// constructor
-        /// </summary>
         public VariantEffect(TranscriptPositionalEffect transcriptEffect, ISimpleVariant variant, ITranscript transcript,
             string referenAminoAcids, string alternateAminoAcids, string referenceCodons, string alternateCodons,
             int? proteinBegin,VariantEffectCache cache = null)
@@ -340,7 +333,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.non_coding_transcript_exon_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _preCache.HasExonOverlap && IsNonCodingTranscriptVariant();
+            bool result = _preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
 
             _cache.Add(ct, result);
             return result;
@@ -522,7 +515,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             // TODO: Isn't IsWithinTranscript always true? and not within mature miRNA is always true
             // For Ensembl transcript, miRNA may be a valid attribute. We have their location and we would like to check if the variant overlaps with the miRNA
-            var result = _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
+            var result = !_preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
 
             _cache.Add(ct, result);
             return result;

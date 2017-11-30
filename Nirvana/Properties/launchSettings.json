@@ -15,7 +15,7 @@
     },
     "MS_ClinVar": {
       "commandName": "Project",
-      "commandLineArgs": " -c Cache\\24\\GRCh37\\Ensembl84 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\ClinVar\\clinvar_20170130.vcf.gz -o clinvar",
+      "commandLineArgs": " -c Cache\\25\\GRCh37\\Ensembl90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\ClinVar\\ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz -o clinvar",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
     "MS_Mother": {
