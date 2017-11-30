@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches;
@@ -35,7 +37,7 @@ namespace VariantAnnotation.Providers
         {
             Name               = "Transcript annotation provider";
             _sequence          = sequenceProvider.Sequence;
-            _transcriptCache   = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)), sequenceProvider.RefIndexToChromosome, sequenceProvider.NumRefSeqs);
+            _transcriptCache   = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)), sequenceProvider.RefIndexToChromosome);
             GenomeAssembly     = _transcriptCache.GenomeAssembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
@@ -43,12 +45,29 @@ namespace VariantAnnotation.Providers
             _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)), PredictionCacheReader.PolyphenDescriptions);
         }
 
-        private static TranscriptCache InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome, ushort numRefSequences)
+        private static TranscriptCache InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             TranscriptCache cache;
             using (var reader = new TranscriptCacheReader(stream))
+            {
+                CheckHeaderVersion(reader.Header);
                 cache = reader.Read(refIndexToChromosome).GetCache();
+            }
+                
             return cache;
+        }
+
+        private static void CheckHeaderVersion(CacheHeader header)
+        {
+            if(!(header.CustomHeader is TranscriptCacheCustomHeader customHeader)) throw new InvalidCastException("Unable to cast the custom header to a transcript cache custom header.");
+
+            if (customHeader.VepVersion != CacheConstants.VepVersion)
+                throw new UserErrorException(
+                    $"Expected the VEP cache version ({CacheConstants.VepVersion}) to be identical to the VEP version in the cache header ({customHeader.VepVersion})");
+
+            if (header.SchemaVersion != CacheConstants.SchemaVersion)
+                throw new UserErrorException(
+                    $"Expected the cache schema version ({CacheConstants.SchemaVersion}) to be identical to the schema version in the cache header ({header.SchemaVersion})");
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
