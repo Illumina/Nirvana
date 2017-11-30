@@ -8,7 +8,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
 using SAUtils.InputFileParsers;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Utilities;
 
@@ -71,17 +70,17 @@ namespace SAUtils.CreateGnomadTsv
             var commandLineExample = $"{command} [options]";
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
-            .Parse()
-            .HasRequiredParameter(ConfigurationSettings.SequencingDataType, "type of input sequencing data (", "--type")
-            .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "compressed reference sequence file name", "--ref")
-            .HasRequiredParameter(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
-            .CheckDirectoryExists(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
-            .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")
-            .CheckDirectoryExists(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")
-            .ShowBanner(Constants.Authors)
-            .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
-            .ShowErrors()
-            .Execute(creator.ProgramExecution);
+                .Parse()
+                .HasRequiredParameter(ConfigurationSettings.SequencingDataType, "type of input sequencing data (", "--type")
+                .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "compressed reference sequence file name", "--ref")
+                .HasRequiredParameter(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
+                .CheckDirectoryExists(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
+                .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")
+                .CheckDirectoryExists(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")
+                .SkipBanner()
+                .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
+                .ShowErrors()
+                .Execute(creator.ProgramExecution);
 
             return exitCode;
         }
