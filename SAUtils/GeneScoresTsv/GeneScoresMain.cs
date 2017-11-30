@@ -4,7 +4,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using SAUtils.InputFileParsers;
 using SAUtils.TsvWriters;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.GeneScoresTsv
 {
@@ -44,7 +43,7 @@ namespace SAUtils.GeneScoresTsv
                 .Parse()
                 .CheckInputFilenameExists(ConfigurationSettings.InputPath, "gene scores file", "--in")
                 .CheckDirectoryExists(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
-                .ShowBanner(Constants.Authors)
+                .SkipBanner()
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()
                 .Execute(creator.ProgramExecution);

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace VariantAnnotation.Interface.AnnotatedPositions
+﻿namespace VariantAnnotation.Interface.AnnotatedPositions
 {
     public interface IPluginData
     {

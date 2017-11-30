@@ -2,7 +2,6 @@
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 using System.IO;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.CreateOmimTsv
 {
@@ -53,14 +52,14 @@ namespace SAUtils.CreateOmimTsv
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-            .CheckInputFilenameExists(ConfigurationSettings.InputGeneMap2Path, "genemap2", "--in")
-            .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
-            .CheckInputFilenameExists(ConfigurationSettings.HgncPath, "HGNC", "--hgnc")
-            .CheckEachFilenameExists(ConfigurationSettings.GeneInfoPaths, "geneinfo files", "--gi")
-            .ShowBanner(Constants.Authors)
-            .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
-            .ShowErrors()
-            .Execute(creator.ProgramExecution);
+                .CheckInputFilenameExists(ConfigurationSettings.InputGeneMap2Path, "genemap2", "--in")
+                .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
+                .CheckInputFilenameExists(ConfigurationSettings.HgncPath, "HGNC", "--hgnc")
+                .CheckEachFilenameExists(ConfigurationSettings.GeneInfoPaths, "geneinfo files", "--gi")
+                .SkipBanner()
+                .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
+                .ShowErrors()
+                .Execute(creator.ProgramExecution);
 
             return exitCode;
         }

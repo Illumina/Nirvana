@@ -2,7 +2,6 @@
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 using ExtractMiniXml;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.ExtractMiniXml
 {
@@ -42,8 +41,8 @@ namespace SAUtils.ExtractMiniXml
 	            .Parse()
 	            .CheckInputFilenameExists(ConfigurationSettings.InputXmlFile, "input XML file", "--in")
 	            .HasRequiredParameter(ConfigurationSettings.OutputDir, "output directory", "--out")
-	            .ShowBanner(Constants.Authors)
-	            .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
+			    .SkipBanner()
+                .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
 	            .ShowErrors()
 	            .Execute(ProgramExecution);
 	        

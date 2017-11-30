@@ -1,7 +1,6 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
@@ -142,12 +141,12 @@ namespace SAUtils.CreateIntermediateTsvs
                 .CheckInputFilenameExists(ConfigurationSettings.InputExacFile, "input Exac file", "--exac", false)
                 .CheckInputFilenameExists(ConfigurationSettings.InputDgvFile, "input DGV file", "--dgv", false)
                 .CheckInputFilenameExists(ConfigurationSettings.Input1000GSvFileName, "input DGV file", "--onekSv", false)
-            .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapVarFileNames, "input MitoMap variant file names", "--mitoVar", false)
-		    .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapSvFileNames, "input MitoMap SV file names", "--mitoSv", false)
+                .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapVarFileNames, "input MitoMap variant file names", "--mitoVar", false)
+                .CheckEachFilenameExists(ConfigurationSettings.InputMitoMapSvFileNames, "input MitoMap SV file names", "--mitoSv", false)
                 .CheckEachFilenameExists(ConfigurationSettings.CustomAnnotationFiles, "Custom Annotation file name", "--cust", false)
                 .CheckEachFilenameExists(ConfigurationSettings.CustomIntervalFiles, "Custom interval file name", "--bed", false)
                 .CheckNonZero(ConfigurationSettings.NumberOfProvidedInputFiles(), "supplementary data source")
-                .ShowBanner(Constants.Authors)
+                .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
                 .Execute(creator.ProgramExecution);

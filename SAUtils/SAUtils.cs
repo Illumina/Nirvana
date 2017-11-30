@@ -30,7 +30,9 @@ namespace SAUtils
                 .Parse()
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Utilities focused on supplementary annotation")
-                .ShowErrors().Execute();
+                .ShowErrors()
+                .Execute();
+
             return (int)exitCode;
         }
     }

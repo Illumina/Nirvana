@@ -2,7 +2,6 @@
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.ExtractMiniSa
 {
@@ -63,21 +62,17 @@ namespace SAUtils.ExtractMiniSa
 
 			var commandLineExample = $"{command} --in <Supplementary Annotations path> --out <Supplementary Annotations Directory> --begin <position> --end <position> --name <dataSource>";
 
-	        var exitCode = new ConsoleAppBuilder(commandArgs, ops)
-	            .Parse()
-	            .CheckInputFilenameExists(ConfigurationSettings.InputSuppAnnotPath, "Nirvana supplementary annotations",
-	                "--in")
-	            .CheckInputFilenameExists(ConfigurationSettings.CompressedReference,
-	                "Compressed reference sequence file name", "--ref")
-	            .HasRequiredParameter(ConfigurationSettings.MiniSaDirectory, "output directory", "--out")
-	            .ShowBanner(Constants.Authors)
-	            .ShowHelpMenu(
-	                "Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.",
-	                commandLineExample)
-	            .ShowErrors()
-	            .Execute(extractor.ProgramExecution);
-	        
-	        return exitCode;
+            var exitCode = new ConsoleAppBuilder(commandArgs, ops)
+                .Parse()
+                .CheckInputFilenameExists(ConfigurationSettings.InputSuppAnnotPath, "Nirvana supplementary annotations", "--in")
+                .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "Compressed reference sequence file name", "--ref")
+                .HasRequiredParameter(ConfigurationSettings.MiniSaDirectory, "output directory", "--out")
+                .SkipBanner()
+                .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
+                .ShowErrors()
+                .Execute(extractor.ProgramExecution);
+
+            return exitCode;
 	    }
 	}
 }
