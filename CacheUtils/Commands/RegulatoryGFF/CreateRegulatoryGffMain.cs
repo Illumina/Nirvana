@@ -27,10 +27,14 @@ namespace CacheUtils.Commands.RegulatoryGFF
                 // load the cache
                 Console.Write("- reading {0}... ", Path.GetFileName(cachePath));
                 var cache = TranscriptCacheHelper.GetCache(cachePath, sequenceData.refIndexToChromosome);
-                Console.WriteLine("found {0:N0} regulatory regions. ", cache.RegulatoryRegionIntervalArrays.Length);
+                Console.WriteLine("found {0:N0} reference sequences. ", cache.RegulatoryRegionIntervalArrays.Length);
 
                 Console.Write("- writing GFF entries... ");
-                foreach (var intervalArray in cache.RegulatoryRegionIntervalArrays) foreach (var interval in intervalArray.Array) WriteRegulatoryFeature(writer, interval.Value);                
+                foreach (var intervalArray in cache.RegulatoryRegionIntervalArrays)
+                {
+                    if (intervalArray == null) continue;
+                    foreach (var interval in intervalArray.Array) WriteRegulatoryFeature(writer, interval.Value);
+                }                
                 Console.WriteLine("finished.");
             }
 
@@ -64,7 +68,7 @@ namespace CacheUtils.Commands.RegulatoryGFF
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .HasRequiredParameter(_inputPrefix, "input cache prefix", "--in")
-                .CheckOutputFilenameSuffix(_outputFileName, ".gz", "GFF", "--out")
+                .CheckOutputFilenameSuffix(_outputFileName, ".gz", "GFF")
                 .SkipBanner()
                 .ShowHelpMenu("Outputs regulatory regions in a database.", commandLineExample)
                 .ShowErrors()

@@ -61,37 +61,12 @@ namespace CommandLine.Builders
         }
 
         /// <summary>
-        /// checks if an input file exists
-        /// </summary>
-        public static IConsoleAppValidator CheckInputFilenamesExist(this IConsoleAppValidator validator,
-            List<string> filePaths, string description, string commandLineOption)
-        {
-            if (validator.SkipValidation) return validator;
-
-            if (filePaths == null || filePaths.Count == 0)
-            {
-                validator.Data.AddError(
-                    $"A {description} file was not specified. Please use the {commandLineOption} parameter.",
-                    ExitCodes.MissingCommandLineOption);
-            }
-            else
-            {
-                foreach (var filePath in filePaths)
-                    validator.CheckInputFilenameExists(filePath, description, commandLineOption);
-            }
-
-            return validator;
-        }
-
-        /// <summary>
         /// checks if an input file exists and has the appropriate filename suffix
         /// </summary>
         public static IConsoleAppValidator CheckOutputFilenameSuffix(this IConsoleAppValidator validator,
-            string filePath, string fileSuffix, string description, string commandLineOption)
+            string filePath, string fileSuffix, string description)
         {
             if (validator.SkipValidation) return validator;
-
-            validator.CheckInputFilenameExists(filePath, description, commandLineOption);
 
             if (!filePath.EndsWith(fileSuffix))
             {

@@ -39,6 +39,11 @@
       "commandName": "Project",
       "commandLineArgs": "extract -i Cache\\25\\GRCh37\\Both90 -o e:\\Data\\Nirvana -n chr12 -p 7018490 --endpos 7086889 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
       "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS GFF": {
+      "commandName": "Project",
+      "commandLineArgs": "gff -i Cache\\25\\GRCh37\\RefSeq90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o Cache\\25\\GRCh37\\GRCh37_RefSeq_25.gff.gz",
+      "workingDirectory": "E:\\Data\\Nirvana"
     }
   }
 }

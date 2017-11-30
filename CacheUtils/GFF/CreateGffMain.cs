@@ -46,7 +46,7 @@ namespace CacheUtils.GFF
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .HasRequiredParameter(_inputPrefix, "input cache prefix", "--in")
-                .CheckOutputFilenameSuffix(_outputFileName, ".gz", "GFF", "--out")
+                .CheckOutputFilenameSuffix(_outputFileName, ".gz", "GFF")
                 .SkipBanner()
                 .ShowHelpMenu("Outputs exon coordinates for all transcripts in a database.", commandLineExample)
                 .ShowErrors()
