@@ -10,6 +10,7 @@ namespace Nirvana
 {
     public static class PluginUtilities
     {
+        public const string ConfigExtension = ".dll.config";
         public static IPlugin[] LoadPlugins(string pluginDirectory)
         {
             IEnumerable<IPlugin> plugins;
@@ -29,8 +30,17 @@ namespace Nirvana
             {
                 plugins = container.GetExports<IPlugin>();
             }
+            var pluginArray = plugins.ToArray();
+            //check for config files
 
-            return plugins.ToArray();
+            foreach (var plugin in pluginArray)
+            {
+                var configFilePath = Path.Combine(path, plugin.Name + ConfigExtension);
+                if (! File.Exists(configFilePath))
+                    throw new FileNotFoundException($"Missing expected config file: {configFilePath}!!");
+            }
+            return pluginArray;
         }
+        
     }
 }

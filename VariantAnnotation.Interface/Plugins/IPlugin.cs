@@ -8,4 +8,5 @@ namespace VariantAnnotation.Interface.Plugins
     {
         void Annotate(IAnnotatedPosition annotatedPosition, ISequence referenceSequence);
     }
+    
 }
