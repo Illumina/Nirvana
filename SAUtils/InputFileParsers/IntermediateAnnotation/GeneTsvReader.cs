@@ -1,19 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using SAUtils.DataStructures;
+using SAUtils.Interface;
 using VariantAnnotation.IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class GeneTsvReader : IEnumerable<IAnnotatedGene>
+    public sealed class GeneTsvReader:ITsvReader
     {
-        private readonly FileInfo _inputFileInfo;
+        private readonly StreamReader _reader;
+
+        public SaHeader SaHeader { get; }
+        public IEnumerable<string> RefNames => null;
+
         private string _name;
         private string _genomeAssembly;
         private string _version;
@@ -21,44 +25,52 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private string _description;
         private string _keyName;
         private bool _isArray;
-        private const int _geneIndex = 0;
-        private const int _jsonStringIndex = 1;
-        private const int _minNoOfColumns = 2;
+        private const int GeneIndex = 0;
+        private const int JsonStringIndex = 1;
+        private const int MinNoOfColumns = 2;
 
 
-        public GeneTsvReader(FileInfo inputFileInfo)
+        public GeneTsvReader(string fileName)
         {
-            _inputFileInfo = inputFileInfo;
+            _reader = GZipUtilities.GetAppropriateStreamReader(fileName); 
+            SaHeader = ReadHeader(_reader);
+        }
 
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
+        private SaHeader ReadHeader(StreamReader reader)
+        {
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
-                    if (!line.StartsWith("#")) break;
+                // Skip empty lines.
+                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (reader.Peek() != '#') break;
 
-                    ParseHeaderLine(line);
-                }
+                ParseHeaderLine(line);
             }
+
+            if (string.IsNullOrEmpty(_genomeAssembly))
+                _genomeAssembly = "";
+
+            if (!string.IsNullOrEmpty(_name) 
+             && !string.IsNullOrEmpty(_version) && !string.IsNullOrEmpty(_releaseDate) 
+             && !string.IsNullOrEmpty(_keyName))
+                return new SaHeader(_name, _genomeAssembly, _version, _releaseDate, _description);
+            Console.WriteLine($"Insufficient version information for {_name}");
+            return null;
         }
 
 
-        private IEnumerable<IAnnotatedGene> GetAnnotationItems()
+        public IEnumerable<IAnnotatedGene> GetItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileInfo.FullName))
+            string line;
+            //getting to the chromosome
+            while ((line = _reader.ReadLine()) != null)
             {
-                string line;
-                //getting to the chromosome
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
-              
-                    var annotationItem = ExtractItem(line);
-                    if (annotationItem == null) continue;
-                    yield return annotationItem;
-                } 
+                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+
+                var annotationItem = ExtractItem(line);
+                if (annotationItem == null) continue;
+                yield return annotationItem;
             }
         }
 
@@ -66,31 +78,12 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         private IAnnotatedGene ExtractItem(string line)
         {
             var columns = line.Split('\t');
-            if (columns.Length < _minNoOfColumns)
+            if (columns.Length < MinNoOfColumns)
                 throw new InvalidDataException("Line contains too few columns:\n" + line);
 
-            var geneSymbol = columns[_geneIndex];
-            var jsonStrings = columns.Skip(_jsonStringIndex).ToArray();
-            return new AnnotatedGene(geneSymbol, new[] { new GeneAnnotation(_keyName, jsonStrings, _isArray) });
-        }
-
-        public InterimHeader GetHeader()
-        {
-            //just to make it work this one time
-            if (string.IsNullOrEmpty(_genomeAssembly)) _genomeAssembly = "GRCh37";
-
-            if (string.IsNullOrEmpty(_name) ||
-                string.IsNullOrEmpty(_genomeAssembly) ||
-                string.IsNullOrEmpty(_version) ||
-                string.IsNullOrEmpty(_releaseDate) ||
-                string.IsNullOrEmpty(_keyName)
-                )
-            {
-                Console.WriteLine($"Insufficient version information for {_name}");
-                return null;
-            }
-
-            return new InterimHeader(_name, _genomeAssembly, _version, _releaseDate, _description);
+            var geneSymbol = columns[GeneIndex];
+            var jsonStrings = columns.Skip(JsonStringIndex).ToArray();
+            return new AnnotatedGene(geneSymbol, new IGeneAnnotationSource[] { new GeneAnnotationSource(_keyName, jsonStrings, _isArray) });
         }
 
         private void ParseHeaderLine(string line)
@@ -133,18 +126,11 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         }
 
 
-
-        IEnumerator IEnumerable.GetEnumerator()
+        public void Dispose()
         {
-            return GetEnumerator();
+            _reader.Dispose();
         }
-
-        public IEnumerator<IAnnotatedGene> GetEnumerator()
-        {
-            return GetAnnotationItems().GetEnumerator();
-        }
-
-
+        
     }
 }
 

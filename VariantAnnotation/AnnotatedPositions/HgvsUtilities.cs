@@ -17,21 +17,21 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             var trimmedAlleles = BiDirectionalTrimmer.Trim(start, refAminoAcids, altAminoAcids);
 
-            start         = trimmedAlleles.Item1;
-            refAminoAcids = trimmedAlleles.Item2;
-            altAminoAcids = trimmedAlleles.Item3;
+            start         = trimmedAlleles.Start;
+            refAminoAcids = trimmedAlleles.RefAllele;
+            altAminoAcids = trimmedAlleles.AltAllele;
 
             var rotatedAlleles = Rotate3Prime(refAminoAcids, altAminoAcids, start, peptideSeq);
 
-            start         = rotatedAlleles.Item1;
-            refAminoAcids = rotatedAlleles.Item2;
-            altAminoAcids = rotatedAlleles.Item3;
+            start         = rotatedAlleles.Start;
+            refAminoAcids = rotatedAlleles.RefAminoAcids;
+            altAminoAcids = rotatedAlleles.AltAminoAcids;
         }
 
-        internal static Tuple<int, string, string> Rotate3Prime(string refAminoAcids, string altAminoAcids, int start, string peptides)
+        internal static (int Start, string RefAminoAcids, string AltAminoAcids) Rotate3Prime(string refAminoAcids, string altAminoAcids, int start, string peptides)
         {
             if (!(String.IsNullOrEmpty(refAminoAcids) || String.IsNullOrEmpty(altAminoAcids)))
-                return Tuple.Create(start, refAminoAcids, altAminoAcids);
+                return (start, refAminoAcids, altAminoAcids);
 
             var isInsertion = !String.IsNullOrEmpty(altAminoAcids);
 
@@ -60,7 +60,7 @@ namespace VariantAnnotation.AnnotatedPositions
             if (isInsertion) altAminoAcids = rotatingPeptides;
             else refAminoAcids = rotatingPeptides;
 
-            return Tuple.Create(start, refAminoAcids, altAminoAcids);
+            return (start, refAminoAcids, altAminoAcids);
         }
 
         /// <summary>
@@ -99,14 +99,14 @@ namespace VariantAnnotation.AnnotatedPositions
             return numExtraAminoAcids > 0 ? numExtraAminoAcids : -1;
         }
 
-        public static Tuple<int, char, char> GetChangesAfterFrameshift(int start, string peptideSeq, string altPeptideSeq)
+        public static (int Start, char RefAminoAcid, char AltAminoAcid) GetChangesAfterFrameshift(int start, string peptideSeq, string altPeptideSeq)
         {
 	        start = Math.Min(start, peptideSeq.Length);
 
 			// for deletions at the end of peptide sequence
 	        if (start > altPeptideSeq.Length)
 	        {
-		        return Tuple.Create(start, peptideSeq[start - 1], '?');
+		        return (start, peptideSeq[start - 1], '?');
 	        }
 	        var refPeptideSeq = peptideSeq + "*";
             char refAminoAcid = refPeptideSeq[start - 1];
@@ -122,7 +122,7 @@ namespace VariantAnnotation.AnnotatedPositions
                 start++;
             }
 
-            return Tuple.Create(start, refAminoAcid, altAminoAcid);
+            return (start, refAminoAcid, altAminoAcid);
         }
 
         /// <summary>

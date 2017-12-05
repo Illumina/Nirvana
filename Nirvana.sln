@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.10
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation.Interface", "VariantAnnotation.Interface\VariantAnnotation.Interface.csproj", "{248C8736-3A76-4F45-A131-A776BD3257C9}"
 EndProject
@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheUtils", "CacheUtils\Ca
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAUtils", "SAUtils\SAUtils.csproj", "{F1F05D39-1BE0-4CFD-AD60-F27FB31D925A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jasix", "Jasix\Jasix.csproj", "{ECC7869C-1B21-42C1-B8BD-4190F15B3B6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jasix", "Jasix\Jasix.csproj", "{ECC7869C-1B21-42C1-B8BD-4190F15B3B6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

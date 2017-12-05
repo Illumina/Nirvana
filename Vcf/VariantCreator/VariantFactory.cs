@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
@@ -15,7 +16,7 @@ namespace Vcf.VariantCreator
 	    private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 	    private const string StrPrefix = "<STR";
 	    private const string CnvPrefix = "<CN";
-		private bool _enableVerboseTranscript;
+		private readonly bool _enableVerboseTranscript;
 
 
 		public VariantFactory(IDictionary<string, IChromosome> refNameToChromosome, IRefMinorProvider refMinorProvider,bool enableVerboseTranscript)
@@ -42,29 +43,34 @@ namespace Vcf.VariantCreator
 
         private static bool IsSymbolicAllele(string altAllele)
         {
-            return altAllele.StartsWith("<") && altAllele.EndsWith(">");
+            return altAllele.StartsWith("<") && altAllele.EndsWith(">") && !VcfCommon.NonInformativeAltAllele.Contains(altAllele) && altAllele != VcfCommon.GatkNonRefAllele;
         }
 		
 	    public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber)
 		{
-		    var variants         = new IVariant[altAlleles.Length];
-		    var isReference      = altAlleles.Length == 1 && altAlleles[0] == ".";
+		    
+		    var isReference      = altAlleles.Length == 1 && ( altAlleles[0] == "." || altAlleles[0] == VcfCommon.GatkNonRefAllele);
 		    var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
 			var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele);
 
-			for (var i = 0; i < altAlleles.Length; i++)
+            if (isReference)
+                return new []{ GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber) };
+            var variants = new List<IVariant>();
+
+            foreach (string altAllele in altAlleles)
             {
-				variants[i] = GetVariant(chromosome, id, start, end, refAllele, altAlleles[i], infoData, variantCategory, sampleCopyNumber);
+                if (VcfCommon.NonInformativeAltAllele.Contains(altAllele) || altAllele == VcfCommon.GatkNonRefAllele) continue;
+                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAllele, infoData, variantCategory, sampleCopyNumber));
             }
-            return variants;
+            return variants.Count==0? null:variants.ToArray();
         }
 
-	    private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, int? sampleCopyNumber)
+        private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, int? sampleCopyNumber)
 	    {
 		    switch (category)
 		    {
 				case VariantCategory.Reference:
-					var refMinorGlobalMajorAllele = _refMinorProvider?.GetGlobalMajorAlleleForRefMinor(chromosome, start) ?? null;
+					var refMinorGlobalMajorAllele = _refMinorProvider?.GetGlobalMajorAlleleForRefMinor(chromosome, start);
 				    return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, refMinorGlobalMajorAllele);
 			    case VariantCategory.SmallVariant:
 				    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele);
@@ -88,10 +94,10 @@ namespace Vcf.VariantCreator
 	    {
 		    var breakendInfo = ParseBreakendAltAllele(refAllele, altAllele);
 
-			var chromosome2 = breakendInfo.Item1;
-		    var position2   = breakendInfo.Item2;
-		    var isSuffix1   = breakendInfo.Item3;
-		    var isSuffix2   = breakendInfo.Item4;
+			var chromosome2 = breakendInfo.Chromosome2;
+		    var position2   = breakendInfo.Position2;
+		    var isSuffix1   = breakendInfo.IsSuffix1;
+		    var isSuffix2   = breakendInfo.IsSuffix2;
 
 			return new IBreakEnd[]{ new BreakEnd(chromosome1, chromosome2, position1, position2, isSuffix1, isSuffix2)};
 	    }
@@ -145,10 +151,11 @@ namespace Vcf.VariantCreator
 	    }
 
 		private const string ForwardBreakEnd = "[";
-		/// <summary>
+
+        /// <summary>
 		/// parses the alternate allele
 		/// </summary>
-		private Tuple<IChromosome, int, bool , bool> ParseBreakendAltAllele(string refAllele, string altAllele)
+		private (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(string refAllele, string altAllele)
 		{
 			string referenceName2;
 			int position2;
@@ -169,7 +176,7 @@ namespace Vcf.VariantCreator
 				position2      = Convert.ToInt32(match.Groups[3].Value);
 				referenceName2 = match.Groups[2].Value;
 
-				return new Tuple<IChromosome, int, bool, bool>(GetChromosome(referenceName2), position2, false, isSuffix2);
+				return (GetChromosome(referenceName2), position2, false, isSuffix2);
 			}
 			else
 			{
@@ -184,7 +191,7 @@ namespace Vcf.VariantCreator
 				position2      = Convert.ToInt32(match.Groups[3].Value);
 				referenceName2 = match.Groups[2].Value;
 
-				return new Tuple<IChromosome, int, bool, bool>(GetChromosome(referenceName2), position2, true, isSuffix2);
+				return (GetChromosome(referenceName2), position2, true, isSuffix2);
 			}
 		}
 

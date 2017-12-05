@@ -53,7 +53,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddIntValues("ciEnd",   Position.InfoData.CiEnd);
             jsonObject.AddIntValue("svLength", Position.InfoData.SvLength);
 
-            jsonObject.AddDoubleValue("strandBias",             Position.InfoData.StrandBias,"0.#######");
+            jsonObject.AddDoubleValue("strandBias",             Position.InfoData.StrandBias,JsonCommon.FrequencyRoundingFormat);
             jsonObject.AddIntValue("jointSomaticNormalQuality", Position.InfoData.JointSomaticNormalQuality);
             jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData.RecalibratedQuality);
             jsonObject.AddIntValue("copyNumber",                Position.InfoData.CopyNumber);
@@ -76,7 +76,7 @@ namespace VariantAnnotation.AnnotatedPositions
         private bool IsShortTandemRepeat()
         {
             return Position.Variants.Any(x => 
-                x.Type == VariantType.short_tandem_repeat_variant
+                x.Type == VariantType.short_tandem_repeat_variation
                 || x.Type == VariantType.short_tandem_repeat_contraction
                 || x.Type == VariantType.short_tandem_repeat_expansion);
         }

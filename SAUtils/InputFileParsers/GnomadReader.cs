@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers
 {
-	public sealed class GnomadReader : IEnumerable<GnomadItem>
+	public sealed class GnomadReader 
 	{
 	    private readonly StreamReader _reader;
         private readonly IDictionary<string,IChromosome> _refChromDict;
@@ -22,6 +21,7 @@ namespace SAUtils.InputFileParsers
 		private int[] _acNfe;
 		private int[] _acOth;
 		private int[] _acAsj;
+	    private int[] _acSas;
 
 	    private int _anAll;
         private int _anAfr;
@@ -30,9 +30,21 @@ namespace SAUtils.InputFileParsers
 		private int _anFin;
 		private int _anNfe;
 		private int _anOth;
-		private int _anSas;
+		private int _anAsj;
+	    private int _anSas;
 
-		private int _totalDepth;
+	    private int[] _hcAll;
+	    private int[] _hcAfr;
+	    private int[] _hcAmr;
+	    private int[] _hcEas;
+	    private int[] _hcFin;
+	    private int[] _hcNfe;
+	    private int[] _hcOth;
+	    private int[] _hcAsj;
+	    private int[] _hcSas;
+
+        private int? _totalDepth;
+	    private bool _hasFailedFilters;
 
 
 		public GnomadReader(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict) 
@@ -42,16 +54,6 @@ namespace SAUtils.InputFileParsers
 		}
 
         
-
-		public IEnumerator<GnomadItem> GetEnumerator()
-		{
-			return GetGnomadItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
 
 		private void Clear()
 		{
@@ -63,16 +65,30 @@ namespace SAUtils.InputFileParsers
 			_acNfe = null;
 			_acOth = null;
 			_acAsj = null;
+		    _acSas = null;
 
+		    _anAll = 0;
 			_anAfr = 0;
 			_anAmr = 0;
 			_anEas = 0;
 			_anFin = 0;
 			_anNfe = 0;
 			_anOth = 0;
-			_anSas = 0;
+			_anAsj = 0;
+		    _anSas = 0;
 
-			_totalDepth = 0;
+		    _hcAll = null;
+		    _hcAfr = null;
+		    _hcAmr = null;
+		    _hcEas = null;
+		    _hcFin = null;
+		    _hcNfe = null;
+		    _hcOth = null;
+		    _hcAsj = null;
+		    _hcSas = null;
+
+            _totalDepth = null;
+		    _hasFailedFilters = false;
 		}
 
 		/// <summary>
@@ -80,7 +96,7 @@ namespace SAUtils.InputFileParsers
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-		private IEnumerable<GnomadItem> GetGnomadItems()
+		public IEnumerable<GnomadItem> GetGnomadItems()
 		{
 			using (_reader)
 			{
@@ -119,14 +135,26 @@ namespace SAUtils.InputFileParsers
 			var chromosome = splitLine[VcfCommon.ChromIndex];
 			if (!_refChromDict.ContainsKey(chromosome)) return null;
 
-		    var chrom = _refChromDict[chromosome];
+		    var chrom      = _refChromDict[chromosome];
 			var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
 			var refAllele  = splitLine[VcfCommon.RefIndex];
 			var altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
+		    var filters    = splitLine[VcfCommon.FilterIndex];
 			var infoFields = splitLine[VcfCommon.InfoIndex];
 
-			// parses the info fields and extract frequencies, coverage, num samples.
-			ParseInfoField(infoFields);
+		    _hasFailedFilters = !(filters.Equals("PASS") || filters.Equals("."));
+            // parses the info fields and extract frequencies, coverage, num samples.
+		    try
+		    {
+		        ParseInfoField(infoFields);
+            }
+		    catch (Exception e)
+		    {
+		        Console.WriteLine(vcfline);
+		        Console.WriteLine(e);
+		        throw;
+		    }
+            
 
 		    if (_anAll == 0) return null;
 
@@ -141,19 +169,23 @@ namespace SAUtils.InputFileParsers
 					refAllele,
 					altAlleles[i],
                     _totalDepth,
-					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
-					GetAlleleCount(_acAll, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
-					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acAsj, i))
+					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth, _anAsj, _anSas,
+					GetCount(_acAll, i), GetCount(_acAfr, i), GetCount(_acAmr, i), GetCount(_acEas, i), 
+					GetCount(_acFin, i), GetCount(_acNfe, i), GetCount(_acOth, i), GetCount(_acAsj, i),
+			        GetCount(_acSas, i),
+					GetCount(_hcAll, i), GetCount(_hcAfr, i), GetCount(_hcAmr, i), GetCount(_hcEas, i), GetCount(_hcFin, i),
+					GetCount(_hcNfe, i), GetCount(_hcOth, i), GetCount(_hcAsj, i), GetCount(_hcSas, i),
+                    _hasFailedFilters)
 					);
 			}
 			return gnomadItemsList;
 		}
 
-		private static int? GetAlleleCount(int[] alleleCounts, int i)
+		private static int? GetCount(int[] counts, int i)
 		{
-			if (alleleCounts == null) return null;
-			if (i >= alleleCounts.Length) return null;
-			return alleleCounts[i];
+			if (counts == null) return null;
+			if (i >= counts.Length) return null;
+			return counts[i];
 		}
 
 		/// <summary>
@@ -219,7 +251,11 @@ namespace SAUtils.InputFileParsers
 					_acAsj = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-			    case "AN":
+			    case "AC_SAS":
+			        _acSas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+			        break;
+
+                case "AN":
 			        _anAll = Convert.ToInt32(value);
 			        break;
 
@@ -248,10 +284,50 @@ namespace SAUtils.InputFileParsers
 					break;
 
 				case "AN_ASJ":
-					_anSas = Convert.ToInt32(value);
+					_anAsj = Convert.ToInt32(value);
 					break;
 
-				case "DP":
+			    case "AN_SAS":
+			        _anSas = Convert.ToInt32(value);
+			        break;
+
+			    case "Hom":
+			        _hcAll = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_AFR":
+			        _hcAfr = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_AMR":
+			        _hcAmr = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_EAS":
+			        _hcEas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_FIN":
+			        _hcFin = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_NFE":
+			        _hcNfe = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_OTH":
+			        _hcOth = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_ASJ":
+			        _hcAsj = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+			    case "Hom_SAS":
+			        _hcSas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+                case "DP":
 					_totalDepth = Convert.ToInt32(value);
 					break;
 

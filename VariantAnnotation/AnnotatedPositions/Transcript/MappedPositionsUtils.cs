@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
@@ -25,20 +24,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             var impactedCdnaInterval = AssignBackupCdnaPositions(coords);
 
-            var cdsIntervals = Tuple.Create<NullableInterval, IInterval>(new NullableInterval(null, null), null); 
+            (NullableInterval CdsInterval, IInterval ImpactedCdsInterval) cdsIntervals = (new NullableInterval(null, null), null); 
             if (transcript.Translation != null)
                  cdsIntervals = UpdateCdsPosition(transcript.Translation, transcript.StartExonPhase, impactedCdnaInterval.Start,
                      impactedCdnaInterval.End, first.IsGap,last.IsGap);
 
-            var proteinInterval = UpdateProteinPosition(cdsIntervals.Item1);
+            var proteinInterval = UpdateProteinPosition(cdsIntervals.CdsInterval);
 
-            return new MappedPositions(cdnaInterval, impactedCdnaInterval, cdsIntervals.Item1,cdsIntervals.Item2,proteinInterval,exonIntron.Item1,exonIntron.Item2);
+            return new MappedPositions(cdnaInterval, impactedCdnaInterval, cdsIntervals.CdsInterval, cdsIntervals.ImpactedCdsInterval, proteinInterval,exonIntron.AffectedExons,exonIntron.AffectedIntrons);
         }
 
 
 
 
-        public static Tuple<IInterval,IInterval> ComputeExonAndIntron(int start, int end,
+        public static (IInterval AffectedExons, IInterval AffectedIntrons) ComputeExonAndIntron(int start, int end,
             ICdnaCoordinateMap[] cdnaCoordinateMaps, IInterval[] introns, bool onReverseStrand)
         {
             var numExons = cdnaCoordinateMaps.Length;
@@ -89,7 +88,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 }
             }
 
-            return Tuple.Create(affectedExons, affectedIntrons);
+            return (affectedExons, affectedIntrons);
         }
 
 
@@ -259,7 +258,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return new Interval(nonGaps[0].Start, nonGaps[nonGaps.Count - 1].End);
         }
 
-        private static Tuple<NullableInterval, IInterval> UpdateCdsPosition(ITranslation translation,
+        private static (NullableInterval CdsInterval, IInterval ImpactedCdsInterval) UpdateCdsPosition(ITranslation translation,
             byte startExonPhase, int impactedCdnaStart, int impactedCdnaEnd,bool invalidCdnaStart, bool invalidCdnaEnd)
         {
             var beginOffset = startExonPhase - translation.CodingRegion.CdnaStart + 1;
@@ -267,7 +266,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (impactedCdnaEnd < translation.CodingRegion.CdnaStart ||
                 impactedCdnaStart > translation.CodingRegion.CdnaEnd ||
                 impactedCdnaStart == -1 && impactedCdnaEnd == -1)
-                return Tuple.Create<NullableInterval,IInterval>(new NullableInterval(null,null), null);
+                return (new NullableInterval(null,null), null);
 
             var impactedCdsStart = impactedCdnaStart + beginOffset;
             var impactedCdsEnd = impactedCdnaEnd + beginOffset;
@@ -285,7 +284,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             var cdsInterval = new NullableInterval(cdsStart, cdsEnd);
 
-            return Tuple.Create(cdsInterval, impactedCdsInterval);
+            return (cdsInterval, impactedCdsInterval);
         }
     }
 }

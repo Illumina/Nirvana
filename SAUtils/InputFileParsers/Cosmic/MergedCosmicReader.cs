@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using SAUtils.DataStructures;
@@ -8,7 +7,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.Cosmic
 {
-    public sealed class MergedCosmicReader : IEnumerable<CosmicItem>
+    public sealed class MergedCosmicReader 
     {
         #region members
 
@@ -41,12 +40,8 @@ namespace SAUtils.InputFileParsers.Cosmic
             _studies     = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
         }
 
-        public IEnumerator<CosmicItem> GetEnumerator()
-        {
-            return GetCosmicItems();
-        }
-
-        private IEnumerator<CosmicItem> GetCosmicItems()
+        
+        public IEnumerable<CosmicItem> GetCosmicItems()
         {
             //taking up all studies in to the dictionary
             using (_tsvFileReader)
@@ -214,9 +209,6 @@ namespace SAUtils.InputFileParsers.Cosmic
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        
     }
 }

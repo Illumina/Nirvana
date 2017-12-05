@@ -11,27 +11,22 @@ namespace SAUtils.DataStructures
     {
         #region members
 
+        public int Stop { get; }
+        public string VariantType { get; }
         public string Id { get; }
-	    private readonly List<string> _alleleOrigins;
-		private readonly List<string> _phenotypes;
-		private readonly List<string> _medgenIds;
-		private readonly List<string> _omimIds;
-		private readonly List<string> _orphanetIds;
-		private readonly List<long> _pubmedIds;
-
-		public IEnumerable<string> AlleleOrigins => _alleleOrigins;
-		public IEnumerable<string> Phenotypes => _phenotypes;
-		public string Significance { get;  }
-	    private ReviewStatusEnum ReviewStatus { get;}
+        public IEnumerable<string> AlleleOrigins { get; }
+        public IEnumerable<string> Phenotypes { get; }
+        public string Significance { get;  }
+	    public ReviewStatusEnum ReviewStatus { get;}
 	    private string IsAlleleSpecific { get; }
-		public IEnumerable<string> MedGenIDs => _medgenIds;
-		public IEnumerable<string> OmimIDs => _omimIds;
-		public IEnumerable<string> OrphanetIDs => _orphanetIds;
+		public IEnumerable<string> MedGenIDs { get; }
+        public IEnumerable<string> OmimIDs { get; }
+        public IEnumerable<string> OrphanetIDs { get; }
 
-		public IEnumerable<long> PubmedIds => _pubmedIds;
-		public long LastUpdatedDate { get; }
+        public IEnumerable<long> PubmedIds { get; }
+        public long LastUpdatedDate { get; }
 		
-		private static readonly Dictionary<string, ReviewStatusEnum> ReviewStatusNameMapping = new Dictionary<string, ReviewStatusEnum>
+		public static readonly Dictionary<string, ReviewStatusEnum> ReviewStatusNameMapping = new Dictionary<string, ReviewStatusEnum>
 		{
 			["no_assertion"]                                         = ReviewStatusEnum.no_assertion,
 			["no_criteria"]                                          = ReviewStatusEnum.no_criteria,
@@ -74,54 +69,60 @@ namespace SAUtils.DataStructures
             var hashCode = Start.GetHashCode();
             if (Chromosome      != null) hashCode ^= Chromosome.GetHashCode();
             if (Id              != null) hashCode ^= Id.GetHashCode();
-            if (AlleleOrigins   != null) hashCode ^= AlleleOrigins.GetHashCode();
             if (AlternateAllele != null) hashCode ^= AlternateAllele.GetHashCode();
-            if (MedGenIDs       != null) hashCode ^= MedGenIDs.GetHashCode();
-            if (OmimIDs         != null) hashCode ^= OmimIDs.GetHashCode();
-            if (OrphanetIDs     != null) hashCode ^= OrphanetIDs.GetHashCode();
-            if (Phenotypes      != null) hashCode ^= Phenotypes.GetHashCode();
             if (ReferenceAllele != null) hashCode ^= ReferenceAllele.GetHashCode();
-            if (Significance    != null) hashCode ^= Significance.GetHashCode();
             // ReSharper restore NonReadonlyMemberInGetHashCode
             return hashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (!(obj is ClinVarItem item)) return false;
+            return Chromosome == item.Chromosome
+                   && Start == item.Start
+                   && Id.Equals(item.Id)
+                   && ReferenceAllele.Equals(item.ReferenceAllele)
+                   && AlternateAllele.Equals(item.AlternateAllele);
         }
 
         #endregion
 
 		public ClinVarItem(IChromosome chromosome,
 			int position,
-			List<string> alleleOrigins,
+            int stop,
+			IEnumerable<string> alleleOrigins,
 			string altAllele,
+            string variantType,
 			string id,
-			string reviewStatusString,
-			List<string> medGenIds,
-			List<string> omimIds,
-			List<string> orphanetIds,
-			List<string> phenotypes,
+			ReviewStatusEnum reviewStatus,
+		    IEnumerable<string> medGenIds,
+		    IEnumerable<string> omimIds,
+		    IEnumerable<string> orphanetIds,
+		    IEnumerable<string> phenotypes,
 			string referenceAllele,
 			string significance,
-			List<long> pubmedIds = null,
+		    IEnumerable<long> pubmedIds = null,
 			long lastUpdatedDate = long.MinValue
 			)
 		{
 			Chromosome         = chromosome;
 			Start              = position;
-			_alleleOrigins     = alleleOrigins?.Count==0? null: alleleOrigins;
-			AlternateAllele          = altAllele;
+		    Stop               = stop;
+			AlleleOrigins      = alleleOrigins;
+			AlternateAllele    = altAllele;
+		    VariantType        = variantType;
 		    Id                 = id;
-		    _medgenIds         = medGenIds?.Count == 0 ? null : medGenIds ;
-			_omimIds           = omimIds?.Count == 0 ? null : omimIds;
-			_orphanetIds       = orphanetIds?.Count == 0 ? null : orphanetIds;
-			_phenotypes        = phenotypes?.Count == 0 ? null : phenotypes; 
+		    MedGenIDs          = medGenIds ;
+			OmimIDs            = omimIds;
+			OrphanetIDs        = orphanetIds;
+			Phenotypes         = phenotypes; 
 			ReferenceAllele    = referenceAllele;
 			Significance       = significance;
-			_pubmedIds         = pubmedIds?.Count == 0 ? null : pubmedIds;
+			PubmedIds          = pubmedIds;
 			LastUpdatedDate    = lastUpdatedDate;
 			IsAlleleSpecific   = null;
+		    ReviewStatus = reviewStatus;
 
-		    if (reviewStatusString == null) return;
-		    if (ReviewStatusNameMapping.ContainsKey(reviewStatusString))
-		        ReviewStatus = ReviewStatusNameMapping[reviewStatusString];
 		}
 
 		public string GetJsonString()
@@ -139,11 +140,11 @@ namespace SAUtils.DataStructures
 			jsonObject.AddStringValue("id", Id);
 			jsonObject.AddStringValue("reviewStatus", ReviewStatusStrings[ReviewStatus]);
 			jsonObject.AddStringValue("isAlleleSpecific", IsAlleleSpecific, false);
-			jsonObject.AddStringValues("alleleOrigins", _alleleOrigins);
+			jsonObject.AddStringValues("alleleOrigins", AlleleOrigins);
 			jsonObject.AddStringValue("refAllele", "N" == refAllele ? null : refAllele);
 			jsonObject.AddStringValue("altAllele", "N" == altAllele ? null : altAllele);
 			jsonObject.AddStringValues("phenotypes", Phenotypes);
-			jsonObject.AddStringValues("medGenIds", _medgenIds);
+			jsonObject.AddStringValues("medGenIds", MedGenIDs);
 			jsonObject.AddStringValues("omimIds", OmimIDs);
 			jsonObject.AddStringValues("orphanetIds", OrphanetIDs);
 			jsonObject.AddStringValue("significance", Significance);

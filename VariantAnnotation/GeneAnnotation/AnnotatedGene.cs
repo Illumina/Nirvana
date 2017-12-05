@@ -5,13 +5,13 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public class AnnotatedGene:IAnnotatedGene
+    public sealed class AnnotatedGene:IAnnotatedGene
     {
         private const string NullGene = "nullGene";
         public string GeneName { get; }
-        public IGeneAnnotation[] Annotations { get; }
+        public IGeneAnnotationSource[] Annotations { get; }
 
-        public AnnotatedGene(string geneName, IGeneAnnotation[] annotations)
+        public AnnotatedGene(string geneName, IGeneAnnotationSource[] annotations)
         {
             GeneName = geneName;
             Annotations = annotations;
@@ -50,10 +50,10 @@ namespace VariantAnnotation.GeneAnnotation
         {
             var geneName = reader.ReadAsciiString();
             var annotationLength = reader.ReadOptInt32();
-            var annotations = new IGeneAnnotation[annotationLength];
+            var annotations = new IGeneAnnotationSource[annotationLength];
             for (int i = 0; i < annotationLength; i++)
             {
-                annotations[i] = GeneAnnotation.Read(reader);
+                annotations[i] = GeneAnnotationSource.Read(reader);
             }
 
             if (geneName == NullGene) return null;
@@ -67,7 +67,7 @@ namespace VariantAnnotation.GeneAnnotation
 
         public static IAnnotatedGene CreateEmptyGene()
         {
-            return new AnnotatedGene(NullGene, new IGeneAnnotation[0]);
+            return new AnnotatedGene(NullGene, new IGeneAnnotationSource[0]);
         }
     }
 }

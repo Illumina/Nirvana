@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
 using SAUtils.DataStructures;
@@ -7,7 +6,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
-	public sealed class OneKGenSvReader: IEnumerable<OneKGenItem>
+	public sealed class OneKGenSvReader
 	{
 		#region members
 
@@ -21,12 +20,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 		    _refNameDict = refNameDict;
 		}
 
-		public IEnumerator<OneKGenItem> GetEnumerator()
-		{
-			return GetOneKGenSvItems().GetEnumerator();
-		}
-
-		private IEnumerable<OneKGenItem> GetOneKGenSvItems()
+		public IEnumerable<OneKGenItem> GetOneKGenSvItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_oneKGenSvFile.FullName))
 			{
@@ -82,10 +76,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 				allAlleleNumber, afrAlleleNumber, amrAlleleNumber, eurAlleleNumber, easAlleleNumber, sasAlleleNumber,
 				variantType, end, observedGains, observedLosses);
 		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
+        
 	}
 }

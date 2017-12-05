@@ -9,6 +9,7 @@ namespace SAUtils.DataStructures
 
         #region members
 
+        public const string FileExtension = ".tvi";
         private readonly BinaryWriter _writer;
         public Dictionary<string, long> TagPositions { get; }
 

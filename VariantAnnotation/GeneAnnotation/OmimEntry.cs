@@ -51,7 +51,7 @@ namespace VariantAnnotation.GeneAnnotation
             sb.Append(JsonObject.OpenBrace);
 
             jsonObject.AddIntValue("mimNumber", MimNumber);
-            jsonObject.AddStringValue("description", _description);
+            jsonObject.AddStringValue("description", _description?.Replace(@"\'", @"'"));
             if (_phenotypes.Count > 0) jsonObject.AddObjectValues("phenotypes", _phenotypes);
             sb.Append(JsonObject.CloseBrace.ToString());
 

@@ -67,7 +67,7 @@ namespace SAUtils.ExtractMiniSa
 
         private SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
             List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
-            List<ISupplementaryInterval> allVariantIntervals,List<Tuple<int,string>> globalMajorAlleleInRefMinors)
+            List<ISupplementaryInterval> allVariantIntervals,List<(int,string)> globalMajorAlleleInRefMinors)
         {
             var stream    = FileUtilities.GetCreateStream(saPath);
             var idxStream = FileUtilities.GetCreateStream(saPath + ".idx");
@@ -109,12 +109,12 @@ namespace SAUtils.ExtractMiniSa
             return count;
         }
 
-        private List<Tuple<int,string>> GetGlobaleMajorAlleleAndRefMinors(IEnumerable<Tuple<int, string>> readerGlobalMajorAlleleInRefMinors)
+        private List<(int,string)> GetGlobaleMajorAlleleAndRefMinors(IEnumerable<(int Position, string)> readerGlobalMajorAlleleInRefMinors)
         {
-            var overlappedRefMinors = new List<Tuple<int,string>>();
+            var overlappedRefMinors = new List<(int,string)>();
             foreach (var refMinor in readerGlobalMajorAlleleInRefMinors)
             {
-                if(refMinor.Item1>=_begin && refMinor.Item1<=_end)
+                if(refMinor.Position>=_begin && refMinor.Position<=_end)
                     overlappedRefMinors.Add(refMinor);
             }
             return overlappedRefMinors;

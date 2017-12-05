@@ -24,6 +24,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         public IEnumerable<ConsequenceTag> Consequences { get;  }
         public IGeneFusionAnnotation GeneFusionAnnotation { get; }
+        public IList<IPluginData> PluginData { get; }
 
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
@@ -43,6 +44,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             PolyPhen             = polyphen;
             Consequences         = consequences;
             GeneFusionAnnotation = geneFusionAnnotation;
+            PluginData           = new List<IPluginData>();
         }
 
 
@@ -88,6 +90,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
             jsonObject.AddStringValue("siftPrediction", Sift?.Prediction);
+
+            if (PluginData != null)
+                foreach (var pluginData in PluginData)
+                {
+                    jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
+                }
+            
             sb.Append(JsonObject.CloseBrace);
         }
 

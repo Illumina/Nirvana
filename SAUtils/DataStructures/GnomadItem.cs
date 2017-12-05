@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -17,6 +18,7 @@ namespace SAUtils.DataStructures
         private int? NfeAlleleCount { get; set; }
         private int? OthAlleleCount { get; set; }
         private int? AsjAlleleCount { get; set; }
+        private int? SasAlleleCount { get; set; }
         private int? AllAlleleNumber { get; set; }
         private int? AfrAlleleNumber { get; set; }
         private int? AmrAlleleNumber { get; set; }
@@ -25,8 +27,20 @@ namespace SAUtils.DataStructures
         private int? NfeAlleleNumber { get; set; }
         private int? OthAlleleNumber { get; set; }
         private int? AsjAlleleNumber { get; set; }
+        private int? SasAlleleNumber { get; set; }
 
-        private int Coverage { get; }
+        private int? AllHomCount { get; set; }
+        private int? AfrHomCount { get; set; }
+        private int? AmrHomCount { get; set; }
+        private int? EasHomCount { get; set; }
+        private int? FinHomCount { get; set; }
+        private int? NfeHomCount { get; set; }
+        private int? OthHomCount { get; set; }
+        private int? AsjHomCount { get; set; }
+        private int? SasHomCount { get; set; }
+
+        private int? Coverage { get; }
+        private bool HasFailedFilters { get; }
 
         #endregion
 
@@ -34,18 +48,21 @@ namespace SAUtils.DataStructures
             int position,
             string refAllele,
             string alternateAllele,
-            int coverage,
+            int? depth,
             int? allAlleleNumber, int? afrAlleleNumber, int? amrAlleleNumber, int? easAlleleNumber,
-            int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? asjAlleleNumber, int? allAlleleCount,
-            int? afrAlleleCount, int? amrAlleleCount, int? easAlleleCount, int? finAlleleCount, int? nfeAlleleCount,
-            int? othAlleleCount, int? asjAlleleCount)
+            int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? asjAlleleNumber, int? sasAlleleNumber, 
+            int? allAlleleCount, int? afrAlleleCount, int? amrAlleleCount, int? easAlleleCount, int? finAlleleCount, int? nfeAlleleCount, int? othAlleleCount, int? asjAlleleCount, int? sasAlleleCount,
+            int? allHomCount, int? afrHomCount, int? amrHomCount, int? easHomCount,
+            int? finHomCount, int? nfeHomCount, int? othHomCount, int? asjHomCount, int? sasHomCount,
+            bool hasFailedFilters)
         {
             Chromosome = chromosome;
             Start = position;
             ReferenceAllele = refAllele;
             AlternateAllele = alternateAllele;
 
-            Coverage = coverage;
+            if (depth!=null && allAlleleNumber!=null)
+                Coverage = ComputingUtilities.GetCoverage(depth.Value, allAlleleNumber.Value);
 
             AllAlleleNumber = allAlleleNumber;
             AfrAlleleNumber = afrAlleleNumber;
@@ -55,6 +72,7 @@ namespace SAUtils.DataStructures
             NfeAlleleNumber = nfeAlleleNumber;
             OthAlleleNumber = othAlleleNumber;
             AsjAlleleNumber = asjAlleleNumber;
+            SasAlleleNumber = sasAlleleNumber;
 
             AllAlleleCount = allAlleleCount;
             AfrAlleleCount = afrAlleleCount;
@@ -64,6 +82,19 @@ namespace SAUtils.DataStructures
             NfeAlleleCount = nfeAlleleCount;
             OthAlleleCount = othAlleleCount;
             AsjAlleleCount = asjAlleleCount;
+            SasAlleleCount = sasAlleleCount;
+
+            AllHomCount = allHomCount;
+            AfrHomCount = afrHomCount;
+            AmrHomCount = amrHomCount;
+            EasHomCount = easHomCount;
+            FinHomCount = finHomCount;
+            NfeHomCount = nfeHomCount;
+            OthHomCount = othHomCount;
+            AsjHomCount = asjHomCount;
+            SasHomCount = sasHomCount;
+
+            HasFailedFilters = hasFailedFilters;
 
             RemoveAlleleNumberZero();
         }
@@ -74,48 +105,63 @@ namespace SAUtils.DataStructures
             {
                 AllAlleleNumber = null;
                 AllAlleleCount = null;
+                AllHomCount = null;
             }
 
             if (AfrAlleleNumber == null || AfrAlleleNumber.Value == 0)
             {
                 AfrAlleleNumber = null;
                 AfrAlleleCount = null;
+                AfrHomCount = null;
             }
 
             if (AmrAlleleNumber == null || AmrAlleleNumber.Value == 0)
             {
                 AmrAlleleNumber = null;
                 AmrAlleleCount = null;
+                AmrHomCount = null;
             }
 
             if (EasAlleleNumber == null || EasAlleleNumber.Value == 0)
             {
                 EasAlleleNumber = null;
                 EasAlleleCount = null;
+                EasHomCount = null;
             }
 
             if (FinAlleleNumber == null || FinAlleleNumber.Value == 0)
             {
                 FinAlleleNumber = null;
                 FinAlleleCount = null;
+                FinHomCount = null;
             }
 
             if (NfeAlleleNumber == null || NfeAlleleNumber.Value == 0)
             {
                 NfeAlleleNumber = null;
                 NfeAlleleCount = null;
+                NfeHomCount = null;
             }
 
             if (OthAlleleNumber == null || OthAlleleNumber.Value == 0)
             {
                 OthAlleleNumber = null;
                 OthAlleleCount = null;
+                OthHomCount = null;
             }
 
             if (AsjAlleleNumber == null || AsjAlleleNumber.Value == 0)
             {
                 AsjAlleleNumber = null;
                 AsjAlleleCount = null;
+                AsjHomCount = null;
+            }
+
+            if (SasAlleleNumber == null || SasAlleleNumber.Value == 0)
+            {
+                SasAlleleNumber = null;
+                SasAlleleCount = null;
+                SasHomCount = null;
             }
         }
 
@@ -145,46 +191,59 @@ namespace SAUtils.DataStructures
             }
         }
 
-		private static string ComputeFrequency(int? alleleNumber, int? alleleCount)
-		{
-			return alleleNumber != null && alleleNumber.Value > 0 && alleleCount != null
-				? ((double)alleleCount / alleleNumber.Value).ToString(JsonCommon.FrequencyRoundingFormat)
-				: null;
-		}
-
 		public string GetJsonString()
 		{
 			var sb = new StringBuilder();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddIntValue("coverage", Coverage);
-			jsonObject.AddStringValue("allAf", ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
-			jsonObject.AddStringValue("afrAf", ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
-			jsonObject.AddStringValue("amrAf", ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
-			jsonObject.AddStringValue("easAf", ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
-			jsonObject.AddStringValue("finAf", ComputeFrequency(FinAlleleNumber, FinAlleleCount), false);
-			jsonObject.AddStringValue("nfeAf", ComputeFrequency(NfeAlleleNumber, NfeAlleleCount), false);
-			jsonObject.AddStringValue("asjAf", ComputeFrequency(AsjAlleleNumber, AsjAlleleCount), false);
-			jsonObject.AddStringValue("othAf", ComputeFrequency(OthAlleleNumber, OthAlleleCount), false);
+		    if (HasFailedFilters) jsonObject.AddBoolValue("hasFailedFilters", true);
 
-			if (AllAlleleNumber != null) jsonObject.AddIntValue("allAn", AllAlleleNumber.Value);
-			if (AfrAlleleNumber != null) jsonObject.AddIntValue("afrAn", AfrAlleleNumber.Value);
-			if (AmrAlleleNumber != null) jsonObject.AddIntValue("amrAn", AmrAlleleNumber.Value);
-			if (EasAlleleNumber != null) jsonObject.AddIntValue("easAn", EasAlleleNumber.Value);
-			if (FinAlleleNumber != null) jsonObject.AddIntValue("finAn", FinAlleleNumber.Value);
-			if (NfeAlleleNumber != null) jsonObject.AddIntValue("nfeAn", NfeAlleleNumber.Value);
-			if (AsjAlleleNumber != null) jsonObject.AddIntValue("asjAn", AsjAlleleNumber.Value);
-			if (OthAlleleNumber != null) jsonObject.AddIntValue("othAn", OthAlleleNumber.Value);
+            jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
+		    jsonObject.AddIntValue("allAn", AllAlleleNumber);
+		    jsonObject.AddIntValue("allAc", AllAlleleCount);
+		    jsonObject.AddIntValue("allHc", AllHomCount);
+            
+            jsonObject.AddStringValue("afrAf", ComputingUtilities.ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
+		    jsonObject.AddIntValue("afrAn", AfrAlleleNumber);
+		    jsonObject.AddIntValue("afrAc", AfrAlleleCount);
+		    jsonObject.AddIntValue("afrHc", AfrHomCount);
+            
+            jsonObject.AddStringValue("amrAf", ComputingUtilities.ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
+		    jsonObject.AddIntValue("amrAn", AmrAlleleNumber);
+		    jsonObject.AddIntValue("amrAc", AmrAlleleCount);
+		    jsonObject.AddIntValue("amrHc", AmrHomCount);
 
-			if (AllAlleleCount != null) jsonObject.AddIntValue("allAc", AllAlleleCount.Value);
-			if (AfrAlleleCount != null) jsonObject.AddIntValue("afrAc", AfrAlleleCount.Value);
-			if (AmrAlleleCount != null) jsonObject.AddIntValue("amrAc", AmrAlleleCount.Value);
-			if (EasAlleleCount != null) jsonObject.AddIntValue("easAc", EasAlleleCount.Value);
-			if (FinAlleleCount != null) jsonObject.AddIntValue("finAc", FinAlleleCount.Value);
-			if (NfeAlleleCount != null) jsonObject.AddIntValue("nfeAc", NfeAlleleCount.Value);
-			if (AsjAlleleCount != null) jsonObject.AddIntValue("asjAc", AsjAlleleCount.Value);
-			if (OthAlleleCount != null) jsonObject.AddIntValue("othAc", OthAlleleCount.Value);
+            jsonObject.AddStringValue("easAf", ComputingUtilities.ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
+		    jsonObject.AddIntValue("easAn", EasAlleleNumber);
+		    jsonObject.AddIntValue("easAc", EasAlleleCount);
+		    jsonObject.AddIntValue("easHc", EasHomCount);
 
-			return sb.ToString();
+            jsonObject.AddStringValue("finAf", ComputingUtilities.ComputeFrequency(FinAlleleNumber, FinAlleleCount), false);
+		    jsonObject.AddIntValue("finAn", FinAlleleNumber);
+		    jsonObject.AddIntValue("finAc", FinAlleleCount);
+		    jsonObject.AddIntValue("finHc", FinHomCount);
+
+            jsonObject.AddStringValue("nfeAf", ComputingUtilities.ComputeFrequency(NfeAlleleNumber, NfeAlleleCount), false);
+			jsonObject.AddIntValue("nfeAn", NfeAlleleNumber);
+		    jsonObject.AddIntValue("nfeAc", NfeAlleleCount);
+		    jsonObject.AddIntValue("nfeHc", NfeHomCount);
+
+            jsonObject.AddStringValue("asjAf", ComputingUtilities.ComputeFrequency(AsjAlleleNumber, AsjAlleleCount), false);
+		    jsonObject.AddIntValue("asjAn", AsjAlleleNumber);
+		    jsonObject.AddIntValue("asjAc", AsjAlleleCount);
+		    jsonObject.AddIntValue("asjHc", AsjHomCount);
+
+            jsonObject.AddStringValue("sasAf", ComputingUtilities.ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
+		    jsonObject.AddIntValue("sasAn", SasAlleleNumber);
+		    jsonObject.AddIntValue("sasAc", SasAlleleCount);
+		    jsonObject.AddIntValue("sasHc", SasHomCount);
+
+            jsonObject.AddStringValue("othAf", ComputingUtilities.ComputeFrequency(OthAlleleNumber, OthAlleleCount), false);
+            jsonObject.AddIntValue("othAn", OthAlleleNumber);
+            jsonObject.AddIntValue("othAc", OthAlleleCount);
+		    jsonObject.AddIntValue("othHc", OthHomCount);
+
+            return sb.ToString();
 		}
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()

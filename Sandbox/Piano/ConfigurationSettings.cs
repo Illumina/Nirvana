@@ -5,7 +5,7 @@
 		// filenames
 		public static string InputCachePrefix;
 		public static string VcfPath;
-		public static string CompressedReferencePath;
+		public static string RefSequencePath;
 		public static string OutputFileName;
 
         // parameters

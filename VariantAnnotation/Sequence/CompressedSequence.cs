@@ -1,5 +1,4 @@
-﻿using System;
-using VariantAnnotation.Interface.Intervals;
+﻿using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Sequence
@@ -29,13 +28,13 @@ namespace VariantAnnotation.Sequence
 		/// <summary>
 		/// returns a tuple containing the base index and shift given a reference position
 		/// </summary>
-		private static Tuple<int, int> GetBaseIndexAndShift(int referencePosition)
+		private static (int BaseIndex, int Shift) GetBaseIndexAndShift(int referencePosition)
 		{
 			int refPos = referencePosition + 1;
 			// ReSharper disable once SuggestUseVarKeywordEvident
 			int baseIndex = (int)(refPos / 4.0);
 			int shift = (3 - refPos % 4) * 2;
-			return new Tuple<int, int>(baseIndex, shift);
+			return (baseIndex, shift);
 		}
 
 		/// <summary>
@@ -77,8 +76,8 @@ namespace VariantAnnotation.Sequence
 			// set the initial state of the buffer
 			var indexAndShiftTuple = GetBaseIndexAndShift(offset - 1);
 
-			int bufferIndex = indexAndShiftTuple.Item1;
-			int bufferShift = indexAndShiftTuple.Item2;
+			int bufferIndex = indexAndShiftTuple.BaseIndex;
+			int bufferShift = indexAndShiftTuple.Shift;
 			byte currentBufferSeed = _buffer[bufferIndex];
 
 			// get the overlapping masked interval
@@ -102,8 +101,8 @@ namespace VariantAnnotation.Sequence
 
 					indexAndShiftTuple = GetBaseIndexAndShift(offset + baseIndex);
 
-					bufferIndex = indexAndShiftTuple.Item1;
-					bufferShift = indexAndShiftTuple.Item2;
+					bufferIndex = indexAndShiftTuple.BaseIndex;
+					bufferShift = indexAndShiftTuple.Shift;
 					currentBufferSeed = _buffer[bufferIndex];
 
 					currentOffset++;

@@ -108,7 +108,7 @@ namespace Jasix
 
 		}
 
-		private void PrintAllVariantsFromQueryBegin(Tuple<string, int, int> query, bool needComma)
+		private void PrintAllVariantsFromQueryBegin((string, int, int) query, bool needComma)
 		{
 			foreach (var line in ReadOverlappingJsonLines(query))
 			{
@@ -117,7 +117,7 @@ namespace Jasix
 			}
 
 		}
-		private bool PrintLargeVariantsExtendingIntoQuery(Tuple<string, int, int> query)
+		private bool PrintLargeVariantsExtendingIntoQuery((string, int, int) query)
 		{
 			var needComma = false;
 			foreach (var line in ReadJsonLinesExtendingInto(query))
@@ -129,10 +129,10 @@ namespace Jasix
 			return needComma;
 		}
 
-		internal IEnumerable<string> ReadJsonLinesExtendingInto(Tuple<string, int, int> query)
+		internal IEnumerable<string> ReadJsonLinesExtendingInto((string Chr, int Start, int End) query)
 		{
 			// query for large variants like chr1:100-99 returns all overlapping large variants that start before 100
-			var locations = _jasixIndex.LargeVariantPositions(query.Item1, query.Item2, query.Item2 - 1);
+			var locations = _jasixIndex.LargeVariantPositions(query.Chr, query.Start, query.Start - 1);
 
 			if (locations == null || locations.Length == 0) yield break;
 
@@ -155,9 +155,9 @@ namespace Jasix
 			_jsonReader.BaseStream.Position = location;
 		}
 
-		internal IEnumerable<string> ReadOverlappingJsonLines(Tuple<string, int, int> query)
+		internal IEnumerable<string> ReadOverlappingJsonLines((string Chr, int Start, int End) query)
 		{
-			var position = _jasixIndex.GetFirstVariantPosition(query.Item1, query.Item2, query.Item3);
+			var position = _jasixIndex.GetFirstVariantPosition(query.Chr, query.Start, query.End);
 
 			if (position == -1) yield break;
 

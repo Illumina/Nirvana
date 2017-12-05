@@ -9,6 +9,7 @@ using Compression.FileHandling;
 using ErrorHandling;
 using Jasix;
 using Jasix.DataStructures;
+using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Positions;
@@ -36,18 +37,30 @@ namespace Nirvana
             var saProvider                   = ProviderUtilities.GetSaProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
             var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var geneAnnotationProviders      = ProviderUtilities.GetGeneAnnotationProviders(ConfigurationSettings.SupplementaryAnnotationDirectories);
-            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProviders);
+            var geneAnnotationProvider      = ProviderUtilities.GetGeneAnnotationProviders(ConfigurationSettings.SupplementaryAnnotationDirectories);
+
+            var pluglins = PluginUtilities.LoadPlugins(ConfigurationSettings.PluginDirectory);
+            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider,pluglins);
 
             var dataSourceVersions = new List<IDataSourceVersion>();
             dataSourceVersions.AddRange(transcriptAnnotationProvider.DataSourceVersions);
             if (saProvider != null) dataSourceVersions.AddRange(saProvider.DataSourceVersions);
-            if (geneAnnotationProviders != null && geneAnnotationProviders.Length > 0)
+            if (geneAnnotationProvider != null )
             {
-                dataSourceVersions.AddRange(geneAnnotationProviders.SelectMany(x => x.DataSourceVersions));
+                dataSourceVersions.AddRange(geneAnnotationProvider.DataSourceVersions);
             }
 
             if (conservationProvider != null) dataSourceVersions.AddRange(conservationProvider.DataSourceVersions);
+
+            if (pluglins != null)
+            {
+                foreach (var pluglin in pluglins)
+                {
+                    var pluginDataSourceVersions = pluglin.GetDataSourceVersions();
+                    if (pluginDataSourceVersions != null)
+                        dataSourceVersions.AddRange(pluginDataSourceVersions);
+                }
+            }
 
             var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
             var jasixFileName  = ConfigurationSettings.OutputFileName + ".json.gz" + JasixCommons.FileExt;
@@ -155,9 +168,9 @@ namespace Nirvana
                     v => ConfigurationSettings.VcfPath = v
                 },
                 {
-                    "loftee",
-                    "enables loftee",
-                    v => ConfigurationSettings.EnableLoftee = v != null
+                    "plugin|p=",
+                    "plugin {directory}",
+                    v => ConfigurationSettings.PluginDirectory = v
                 },
                 {
                     "gvcf",

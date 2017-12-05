@@ -11,12 +11,12 @@ namespace VariantAnnotation.IO
         private readonly StringBuilder _sb;
         private bool _needsComma;
 
-        public const char Comma          = ',';
-        private const char DoubleQuote   = '\"';
-        private const char OpenBracket   = '[';
-        private const char CloseBracket  = ']';
-        public const char OpenBrace      = '{';
-        public const char CloseBrace     = '}';
+        public const char Comma = ',';
+        private const char DoubleQuote = '\"';
+        private const char OpenBracket = '[';
+        private const char CloseBracket = ']';
+        public const char OpenBrace = '{';
+        public const char CloseBrace = '}';
         private const string ColonString = "\":";
 
         public JsonObject(StringBuilder sb)
@@ -34,14 +34,14 @@ namespace VariantAnnotation.IO
         /// <summary>
         /// adds the boolean KVP to the string builder
         /// </summary>
-        public void AddBoolValue(string description, bool b)
+        public void AddBoolValue(string description, bool b, bool outputFalse = false)
         {
-            if (b == false) return;//we do not want to print out false flags.
+            if (!b && !outputFalse) return;//we do not want to print out false flags by default.
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
 
-            _sb.Append("true");
+            _sb.Append(b ? "true" : "false");
             _needsComma = true;
         }
 
@@ -99,44 +99,44 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote=true)
+        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote = true)
         {
-	        if (values == null) return;
-		    var index = 0;
+            if (values == null) return;
+            var index = 0;
 
-		    foreach (var value in values)
-		    {
-			    if (value == ".") continue;
+            foreach (var value in values)
+            {
+                if (value == ".") continue;
 
-			    if (index == 0)
-			    {
-				    if (_needsComma) _sb.Append(Comma);
-				    AddKey(description);
-				    _sb.Append(OpenBracket);
+                if (index == 0)
+                {
+                    if (_needsComma) _sb.Append(Comma);
+                    AddKey(description);
+                    _sb.Append(OpenBracket);
 
-				    if (useQuote) _sb.Append(DoubleQuote);
-				    _sb.Append(value);
-				    if (useQuote) _sb.Append(DoubleQuote);
-			    }
-			    else
-			    {
-				    _sb.Append(Comma);
-				    if (useQuote) _sb.Append(DoubleQuote);
-				    _sb.Append(value);
-				    if (useQuote) _sb.Append(DoubleQuote);
-				}
-			    index++;
-		    }
+                    if (useQuote) _sb.Append(DoubleQuote);
+                    _sb.Append(value);
+                    if (useQuote) _sb.Append(DoubleQuote);
+                }
+                else
+                {
+                    _sb.Append(Comma);
+                    if (useQuote) _sb.Append(DoubleQuote);
+                    _sb.Append(value);
+                    if (useQuote) _sb.Append(DoubleQuote);
+                }
+                index++;
+            }
 
-			if (index > 0)
-				_sb.Append(CloseBracket);
-		    _needsComma = true;
-		}
+            if (index > 0)
+                _sb.Append(CloseBracket);
+            _needsComma = true;
+        }
 
-	    /// <summary>
+        /// <summary>
         /// adds the object values to this current JSON object
         /// </summary>
-        public void AddObjectValues<T>(string description, IEnumerable<T> values,bool seperatedByNewLine = false) where T : IJsonSerializer
+        public void AddObjectValues<T>(string description, IEnumerable<T> values, bool seperatedByNewLine = false) where T : IJsonSerializer
         {
             if (values == null) return;
 

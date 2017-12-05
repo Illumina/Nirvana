@@ -12,7 +12,7 @@ namespace Jasix.DataStructures
         private const char OpenBracket  = '[';
         private const char CloseBracket = ']';
 
-        public static Tuple<string, int, int> ParseQuery(string position)
+        public static (string Chromosome, int Start, int End) ParseQuery(string position)
         {
             //chr1:100-101
             //chr1:100
@@ -25,13 +25,13 @@ namespace Jasix.DataStructures
             if (!match.Success)
                 throw new UserErrorException($"region {trimmedPos} is not valid, please specify a valid region, e.g., chr1, 1, 1:1234 or 1:1234-4567");
             var chromosome = match.Groups[1].ToString();
-            if (!match.Groups[2].Success && !match.Groups[3].Success) return Tuple.Create(chromosome, 1, Int32.MaxValue);
+            if (!match.Groups[2].Success && !match.Groups[3].Success) return (chromosome, 1, Int32.MaxValue);
 
             var start = Convert.ToInt32(match.Groups[2].ToString());
 
             int end = match.Groups[3].Success ? Convert.ToInt32(match.Groups[3].ToString()) : start;
 
-            return Tuple.Create(chromosome, start, end);
+            return (chromosome, start, end);
         }
 
 	    public static void PrintQuerySectionOpening(string sectionName, StreamWriter writer)

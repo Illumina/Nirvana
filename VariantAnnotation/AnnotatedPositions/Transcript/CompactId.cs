@@ -53,21 +53,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 			if (s.StartsWith("XM_")) return GetCompactId(s, 3, IdType.RefSeqPredictedMessengerRNA);
 			if (s.StartsWith("XP_")) return GetCompactId(s, 3, IdType.RefSeqPredictedProtein);
 
-			int i;
-			if (int.TryParse(s, out i))
-			{
-				return new CompactId(IdType.OnlyNumbers, ToInfo(i, s.Length));
-			}
+            if (int.TryParse(s, out int i))
+            {
+                return new CompactId(IdType.OnlyNumbers, ToInfo(i, s.Length));
+            }
 
-			Console.WriteLine("Unknown ID: [{0}] ({1})", s, s.Length);
+            Console.WriteLine("Unknown ID: [{0}] ({1})", s, s.Length);
 			return Empty;
 		}
 
 		private static CompactId GetCompactId(string s, int prefixLen, IdType idType)
 		{
 			var tuple = FormatUtilities.SplitVersion(s);
-			var num = int.Parse(tuple.Item1.Substring(prefixLen));
-			return new CompactId(idType, ToInfo(num, tuple.Item1.Length - prefixLen));
+			var num = int.Parse(tuple.Id.Substring(prefixLen));
+			return new CompactId(idType, ToInfo(num, tuple.Id.Length - prefixLen));
 		}
 
 		/// <summary>

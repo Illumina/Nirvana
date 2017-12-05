@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -10,7 +9,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.EVS
 {
-    public sealed class EvsReader : IEnumerable<EvsItem>
+    public sealed class EvsReader
     {
         private readonly StreamReader _evsFileReader;
 		private double[] _allFrequencies;
@@ -27,17 +26,7 @@ namespace SAUtils.InputFileParsers.EVS
         }
 
 
-		public IEnumerator<EvsItem> GetEnumerator()
-		{
-			return GetEvsItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
-	    private void Clear()
+		private void Clear()
 	    {
 		    _europeanFrequencies = null;
 		    _africanFrequencies  = null;
@@ -48,12 +37,7 @@ namespace SAUtils.InputFileParsers.EVS
 		    _numSamples          = null;
 	    }
 
-	    /// <summary>
-        /// Parses a OneKGen file and return an enumeration object containing 
-        /// all the OneKGen objects that have been extracted.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<EvsItem> GetEvsItems()
+	    public IEnumerable<EvsItem> GetEvsItems()
         {
             using (_evsFileReader)
             {
@@ -75,11 +59,6 @@ namespace SAUtils.InputFileParsers.EVS
             }
         }
 
-        /// <summary>
-        /// Extracts a OneKGen item from the specified VCF line.
-        /// </summary>
-        /// <param name="vcfline"></param>
-        /// <returns></returns>
         internal List<EvsItem> ExtractItems(string vcfline)
         {
             var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field

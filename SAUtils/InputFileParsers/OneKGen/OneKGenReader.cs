@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
-    public sealed class OneKGenReader : IEnumerable<OneKGenItem>
+    public sealed class OneKGenReader 
     {
         private readonly FileInfo _oneKGenFile;
         private readonly IDictionary<string,IChromosome> _refNameDictionary;
@@ -90,12 +89,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 
 	    }
 
-	    /// <summary>
-        /// Parses a OneKGen file and return an enumeration object containing 
-        /// all the OneKGen objects that have been extracted.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<OneKGenItem> GetOneKGenItems()
+	    public IEnumerable<OneKGenItem> GetOneKGenItems()
         {
             using (var reader = GZipUtilities.GetAppropriateStreamReader(_oneKGenFile.FullName))
             {
@@ -117,11 +111,6 @@ namespace SAUtils.InputFileParsers.OneKGen
             }
         }
 
-        /// <summary>
-        /// Extracts a OneKGen item from the specified VCF line.
-        /// </summary>
-        /// <param name="vcfline"></param>
-        /// <returns></returns>
         internal List<OneKGenItem> ExtractItems(string vcfline)
         {
             var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
@@ -221,19 +210,18 @@ namespace SAUtils.InputFileParsers.OneKGen
 						_svEnd = Convert.ToInt32(value);
 					break;
 				case "CIEND":
-					if (hasSymbolicAllele)
+					/*if (hasSymbolicAllele)
 					{
 						var endBoundaries = value.Split(',');
 						Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
 					}
-					break;
+					break;*/
 				case "CIPOS":
-					if (hasSymbolicAllele)
+					/*if (hasSymbolicAllele)
 					{
 						var beginBoundaries = value.Split(',');
 						Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
-
-					}
+					}*/
 					break;
 				case "AN":
 					_allAlleleNumber = Convert.ToInt32(value);
@@ -289,14 +277,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 			c = Char.ToUpper(c);
 			return c == 'A' || c == 'C' || c == 'G' || c == 'T' || c == 'N';
 		}
-		public IEnumerator<OneKGenItem> GetEnumerator()
-        {
-            return GetOneKGenItems().GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+		
     }
 }

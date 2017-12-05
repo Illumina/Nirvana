@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommandLine.Builders;
@@ -15,13 +16,17 @@ namespace SAUtils.CreateGnomadTsv
 {
     public sealed class CreateGnomadTsvMain
     {
+        private readonly HashSet<string> _supportedSequencingDataType = new HashSet<string> {"genome", "exome"};
         private ExitCodes ProgramExecution()
         {
-            var inputStreamReaders = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.vcf.gz").Select(fileName => GZipUtilities.GetAppropriateStreamReader(Path.Combine(ConfigurationSettings.InputDirectory, fileName))).ToArray();
+            if (!_supportedSequencingDataType.Contains(ConfigurationSettings.SequencingDataType)) 
+                throw new ArgumentException($"Only the following sequencing data types are supported: {string.Join(_supportedSequencingDataType.ToString(), ", ")}");
+
+            var inputStreamReaders = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.vcf.bgz").Select(fileName => GZipUtilities.GetAppropriateStreamReader(Path.Combine(ConfigurationSettings.InputDirectory, fileName))).ToArray();
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(ConfigurationSettings.CompressedReference));
 
             if (inputStreamReaders.Length == 0)
-                throw new UserErrorException("input directory does not conatin any .vcf.gz files");
+                throw new UserErrorException("input directory does not conatin any .vcf.bgz files");
 
             var versionFiles = Directory.GetFiles(ConfigurationSettings.InputDirectory, "*.version");
             if (versionFiles.Length != 1)
@@ -30,7 +35,7 @@ namespace SAUtils.CreateGnomadTsv
             Console.WriteLine($"Creating gnomAD TSV file from {inputStreamReaders.Length} input files");
 
             var version = DataSourceVersionReader.GetSourceVersion(versionFiles[0]);
-            var gnomadTsvCreator = new GnomadTsvCreator(inputStreamReaders, referenceProvider, version, ConfigurationSettings.OutputDirectory);
+            var gnomadTsvCreator = new GnomadTsvCreator(inputStreamReaders, referenceProvider, version, ConfigurationSettings.OutputDirectory, ConfigurationSettings.SequencingDataType);
 
             gnomadTsvCreator.CreateTsvs();
             return ExitCodes.Success;
@@ -41,6 +46,11 @@ namespace SAUtils.CreateGnomadTsv
             var creator = new CreateGnomadTsvMain();
             var ops = new OptionSet
             {
+                {
+                    "type|t=",
+                    "sequencing data type: genome or exome",
+                    v => ConfigurationSettings.SequencingDataType = v
+                },
                 {
                      "ref|r=",
                      "compressed reference sequence file",
@@ -62,7 +72,8 @@ namespace SAUtils.CreateGnomadTsv
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
             .Parse()
-            .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "Compressed reference sequence file name", "--ref")
+            .HasRequiredParameter(ConfigurationSettings.SequencingDataType, "type of input sequencing data (", "--type")
+            .CheckInputFilenameExists(ConfigurationSettings.CompressedReference, "compressed reference sequence file name", "--ref")
             .HasRequiredParameter(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
             .CheckDirectoryExists(ConfigurationSettings.InputDirectory, "input directory containing gnomAD vcf files", "--in")
             .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "output Supplementary directory", "--out")

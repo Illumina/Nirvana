@@ -5,6 +5,7 @@ using VariantAnnotation;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Utilities;
@@ -13,9 +14,9 @@ namespace Nirvana
 {
 	public static class ProviderUtilities
 	{
-		public static IAnnotator GetAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,IGeneAnnotationProvider[] geneAnnotationProviders)
+		public static IAnnotator GetAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,IGeneAnnotationProvider geneAnnotationProviders,IEnumerable<IPlugin> plugins =null)
 		{
-			return new Annotator(taProvider, sequenceProvider, saProviders, conservationProvider,geneAnnotationProviders);
+			return new Annotator(taProvider, sequenceProvider, saProviders, conservationProvider,geneAnnotationProviders,plugins);
 		}
 
 		public static ISequenceProvider GetSequenceProvider(string compressedReferencePath)
@@ -46,14 +47,13 @@ namespace Nirvana
 	        return supplementaryAnnotationDirectories==null || supplementaryAnnotationDirectories.Count==0? null: new RefMinorProvider(supplementaryAnnotationDirectories);
 	    }
 
-	    public static IGeneAnnotationProvider[] GetGeneAnnotationProviders(List<string> supplementaryAnnotationDirectories)
+	    public static IGeneAnnotationProvider GetGeneAnnotationProviders(List<string> supplementaryAnnotationDirectories)
 	    {
 
 	        var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories);
 	        if (reader == null) return null;
-            var geneAnnotationProviders = new IGeneAnnotationProvider[1];
-	        geneAnnotationProviders[0] = new OmimAnnotationProvider(reader);
-	        return geneAnnotationProviders;
+            var geneAnnotationProvider = new GeneAnnotationProvider(reader);
+	        return geneAnnotationProvider;
 
 	    }
 	}

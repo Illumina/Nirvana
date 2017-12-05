@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,7 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ExAc
 {
-	public sealed class ExacReader : IEnumerable<ExacItem>
+	public sealed class ExacReader 
 	{
 	    private readonly FileInfo _exacFileInfo;
         private readonly IDictionary<string,IChromosome> _refChromDict;
@@ -44,16 +43,6 @@ namespace SAUtils.InputFileParsers.ExAc
 
         
 
-		public IEnumerator<ExacItem> GetEnumerator()
-		{
-			return GetExacItems().GetEnumerator();
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return GetEnumerator();
-		}
-
 		private void Clear()
 		{
 			_acAdj = null;
@@ -77,12 +66,7 @@ namespace SAUtils.InputFileParsers.ExAc
 			_totalDepth = 0;
 		}
 
-		/// <summary>
-		/// Parses a source file and return an enumeration object containing 
-		/// all the data objects that have been extracted.
-		/// </summary>
-		/// <returns></returns>
-		private IEnumerable<ExacItem> GetExacItems()
+		public IEnumerable<ExacItem> GetExacItems()
 		{
 			using (var reader = GZipUtilities.GetAppropriateStreamReader(_exacFileInfo.FullName))
 			{
@@ -142,7 +126,8 @@ namespace SAUtils.InputFileParsers.ExAc
 					position,
 					refAllele,
 					altAlleles[i],
-					(int) Math.Round(_totalDepth*1.0/ (_anAdj/2.0), MidpointRounding.AwayFromZero),//to be consistant with evs, we use integer values for coverage
+					ComputingUtilities.GetCoverage(_totalDepth, _anAdj / 2.0),
+                    //(int) Math.Round(_totalDepth*1.0/ (_anAdj/2.0), MidpointRounding.AwayFromZero),//to be consistant with evs, we use integer values for coverage
 					_anAdj, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth,_anSas,
 					GetAlleleCount(_acAdj, i), GetAlleleCount(_acAfr, i), GetAlleleCount(_acAmr, i), GetAlleleCount(_acEas, i), 
 					GetAlleleCount(_acFin, i), GetAlleleCount(_acNfe, i), GetAlleleCount(_acOth, i), GetAlleleCount(_acSas, i))

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Nirvana;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -28,8 +27,8 @@ namespace UnitTests.TestUtilities
 	        var refMinorProvider = ProviderUtilities.GetRefMinorProvider(saPaths);
 	        var annotatorAndRef = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
 
-	        var annotator = annotatorAndRef.Item1;
-            var refNames = annotatorAndRef.Item2;
+	        var annotator = annotatorAndRef.Annotator;
+            var refNames = annotatorAndRef.RefNames;
             var variantFactory = new VariantFactory(refNames,refMinorProvider,enableVerboseTranscripts);
 
 	        var position = VcfReaderUtils.ParseVcfLine(vcfLine,variantFactory,refNames);
@@ -39,7 +38,7 @@ namespace UnitTests.TestUtilities
 	        return annotatedPosition;
 	    }
 
-        private static Tuple<Annotator,IDictionary<string,IChromosome>> GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
+        private static (Annotator Annotator, IDictionary<string,IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
         {
             var sequenceFilePath = cacheFilePrefix + ".bases";
             var sequenceProvider = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
@@ -51,7 +50,7 @@ namespace UnitTests.TestUtilities
                 ProviderUtilities.GetConservationProvider(saPaths);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);
-            return Tuple.Create(annotator,refNames);
+            return (annotator,refNames);
         }
     }
 }

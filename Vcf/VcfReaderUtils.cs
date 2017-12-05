@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -21,8 +22,8 @@ namespace Vcf
             int start = Convert.ToInt32(vcfFields[VcfCommon.PosIndex]);
             string refAllele = vcfFields[VcfCommon.RefIndex];
             int end = ExtractEnd(infoData, start, refAllele.Length);
-            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',');
-            double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',').ToArray();
+            double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(Double.TryParse);
             string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
             var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 

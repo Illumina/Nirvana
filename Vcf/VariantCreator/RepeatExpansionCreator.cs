@@ -13,7 +13,7 @@ namespace Vcf.VariantCreator
 			altAllele = altAllele.Trim('<', '>');
 			var repeatCount = int.Parse(altAllele.Substring(3));
 
-			var svType = repeatCount == infoData.RefRepeatCount ? VariantType.short_tandem_repeat_variant: 
+			var svType = repeatCount == infoData.RefRepeatCount ? VariantType.short_tandem_repeat_variation: 
 				repeatCount > infoData.RefRepeatCount
 					? VariantType.short_tandem_repeat_expansion
 					: VariantType.short_tandem_repeat_contraction;

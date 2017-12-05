@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
@@ -82,10 +81,10 @@ namespace VariantAnnotation.AnnotatedPositions
 				case VariantType.copy_number_loss:
 				case VariantType.copy_number_variation:
 					return VariantType.copy_number_variation;
-			    case VariantType.short_tandem_repeat_variant:
+			    case VariantType.short_tandem_repeat_variation:
 			    case VariantType.short_tandem_repeat_contraction:
 			    case VariantType.short_tandem_repeat_expansion:
-				    return VariantType.short_tandem_repeat_variant;
+				    return VariantType.short_tandem_repeat_variation;
 				default:
 					return variantType;
 			}
@@ -93,14 +92,14 @@ namespace VariantAnnotation.AnnotatedPositions
 
 	    private void AddSAstoJsonObject(JsonObject jsonObject)
         {
-            var saDict = new Dictionary<string, Tuple<bool, List<string>>>();
+            var saDict = new Dictionary<string, (bool, List<string>)>();
             foreach (var annotatedSa in SupplementaryAnnotations)
             {
                 var sa = annotatedSa.SaDataSource;
 
                 if (!saDict.ContainsKey(sa.KeyName))
                 {
-                    saDict[sa.KeyName] = new Tuple<bool, List<string>>(sa.IsArray, new List<string>());
+                    saDict[sa.KeyName] = (sa.IsArray, new List<string>());
                 }
 
                 var jsonStrings = annotatedSa.GetJsonStrings();

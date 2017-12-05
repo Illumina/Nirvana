@@ -13,7 +13,8 @@ namespace UnitTests.TestUtilities
 		public static string CustomAnnotations(string path) => Path.Combine(Top, "SA", "CustomAnnotation", path);
 		public static string CustomIntervals(string path) => Path.Combine(Top, "SA", "CustomIntervals", path);
 		public static string InputFiles(string path) => Path.Combine(Top, "InputFiles", path);
-		public static string SaGRCh37(string path) => Path.Combine(Top, "SA", "GRCh37", path);
+	    public static string ClinvarXmlFiles(string path) => Path.Combine(Top, "ClinVarXmlFiles", path);
+        public static string SaGRCh37(string path) => Path.Combine(Top, "SA", "GRCh37", path);
 		public static string SaGRCh38(string path) => Path.Combine(Top, "SA", "GRCh37", path);
       
 
