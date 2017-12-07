@@ -19,7 +19,7 @@ namespace SAUtils.TsvWriters
 
         #region IDisposable
 
-        bool _disposed;
+        private bool _disposed;
 
         /// <summary>
         /// public implementation of Dispose pattern callable by consumers. 
@@ -65,7 +65,7 @@ namespace SAUtils.TsvWriters
 
         }
 
-        private string GetHeader(DataSourceVersion dataSourceVersion, string assembly)
+        private static string GetHeader(DataSourceVersion dataSourceVersion, string assembly)
         {
             var sb = new StringBuilder();
 

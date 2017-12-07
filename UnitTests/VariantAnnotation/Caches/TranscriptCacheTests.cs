@@ -21,7 +21,7 @@ namespace UnitTests.VariantAnnotation.Caches
     {
         private readonly ITranscriptCache _cache;
         private readonly IEnumerable<IDataSourceVersion> _expectedDataSourceVersions;
-        private readonly GenomeAssembly _expectedGenomeAssembly = GenomeAssembly.hg19;
+        private const GenomeAssembly ExpectedGenomeAssembly = GenomeAssembly.hg19;
 
         private readonly IChromosome _chr1  = new Chromosome("chr1", "1", 0);
         private readonly IChromosome _chr11 = new Chromosome("chr11", "11", 10);
@@ -32,7 +32,7 @@ namespace UnitTests.VariantAnnotation.Caches
             var transcriptIntervalArrays       = GetTranscripts().ToIntervalArrays(11);
             var regulatoryRegionIntervalArrays = GetRegulatoryRegions().ToIntervalArrays(11);
 
-            _cache = new TranscriptCache(_expectedDataSourceVersions, _expectedGenomeAssembly, transcriptIntervalArrays,
+            _cache = new TranscriptCache(_expectedDataSourceVersions, ExpectedGenomeAssembly, transcriptIntervalArrays,
                 regulatoryRegionIntervalArrays);
         }
 
@@ -94,7 +94,7 @@ namespace UnitTests.VariantAnnotation.Caches
         public void GenomeAssembly_Get()
         {
             var observedGenomeAssembly = _cache.GenomeAssembly;
-            Assert.Equal(_expectedGenomeAssembly, observedGenomeAssembly);
+            Assert.Equal(ExpectedGenomeAssembly, observedGenomeAssembly);
         }
 
         [Fact]

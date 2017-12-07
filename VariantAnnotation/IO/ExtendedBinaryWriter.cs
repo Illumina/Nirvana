@@ -7,14 +7,8 @@ namespace VariantAnnotation.IO
 {
     public sealed class ExtendedBinaryWriter : BinaryWriter, IExtendedBinaryWriter
     {
-        /// <summary>
-        /// constructor
-        /// </summary>
         public ExtendedBinaryWriter(Stream output) : this(output, new UTF8Encoding(false, true)) { }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public ExtendedBinaryWriter(Stream output, Encoding encoding, bool leaveOpen = false)
             : base(output, encoding, leaveOpen)
         {

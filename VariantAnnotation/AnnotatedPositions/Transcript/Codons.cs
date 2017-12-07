@@ -53,10 +53,5 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// returns true if the length is a multiple of three, false otherwise
         /// </summary>
         public static bool IsTriplet(int len) => Math.Abs(len) % 3 == 0;
-
-
-       
     }
-
-    
-};
+}

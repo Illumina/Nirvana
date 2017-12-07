@@ -34,8 +34,7 @@ namespace SAUtils.DataStructures
 
         public override bool Equals(object other)
 		{
-			var otherItem = other as CustomItem;
-			if (otherItem == null) return false;
+		    if (!(other is CustomItem otherItem)) return false;
 
 			return Chromosome.Equals(otherItem.Chromosome)
 				   && Start.Equals(otherItem.Start)

@@ -68,8 +68,7 @@ namespace SAUtils.DataStructures
         {
             // If parameter is null return false.
 
-            var otherItem = other as DgvItem;
-            if (otherItem == null) return false;
+            if (!(other is DgvItem otherItem)) return false;
 
             // Return true if the fields match:
             return Equals(Chromosome, otherItem.Chromosome)

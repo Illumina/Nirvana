@@ -9,15 +9,15 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 		[Fact]
 		public void AddUnknownAminoAcid_identity_seq()
 		{
-			var aminoAcids = "*";
-			Assert.Equal(aminoAcids, AminoAcids.AddUnknownAminoAcid(aminoAcids));
+		    const string aminoAcids = "*";
+		    Assert.Equal(aminoAcids, AminoAcids.AddUnknownAminoAcid(aminoAcids));
 		}
 
 		[Fact]
 		public void AddUnknownAminoAcid_incomplete_peptideSeq()
 		{
-			var aminoAcids = "MACGYIL";
-			Assert.Equal(aminoAcids+'X', AminoAcids.AddUnknownAminoAcid(aminoAcids));
+		    const string aminoAcids = "MACGYIL";
+		    Assert.Equal(aminoAcids+'X', AminoAcids.AddUnknownAminoAcid(aminoAcids));
 		}
 
 	    [Fact]

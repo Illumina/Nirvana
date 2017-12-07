@@ -17,25 +17,25 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void Transcript_EndToEnd()
         {
-            IChromosome expectedChromosome = new Chromosome("chrBob", "Bob", 1);
-            int expectedStart              = int.MaxValue;
-            int expectedEnd                = int.MinValue;
-            var expectedId                 = "ENST00000540021";
-            byte expectedVersion           = 7;
-            var expectedBioType            = BioType.IG_J_pseudogene;
-            bool expectedCanonical         = true;
-            var expectedSource             = Source.BothRefSeqAndEnsembl;
-            bool expectedCdsStartNotFound  = true;
-            bool expectedCdsEndNotFound    = true;
+            IChromosome expectedChromosome      = new Chromosome("chrBob", "Bob", 1);
+            const int expectedStart             = int.MaxValue;
+            const int expectedEnd               = int.MinValue;
+            const string expectedId             = "ENST00000540021";
+            const byte expectedVersion          = 7;
+            const BioType expectedBioType       = BioType.IG_J_pseudogene;
+            const bool expectedCanonical        = true;
+            const Source expectedSource         = Source.BothRefSeqAndEnsembl;
+            const bool expectedCdsStartNotFound = true;
+            const bool expectedCdsEndNotFound   = true;
 
             var expectedIdAndVersion = expectedId + "." + expectedVersion;
 
             IInterval[] expectedIntrons           = GetIntrons();
             ICdnaCoordinateMap[] expectedCdnaMaps = GetCdnaMaps();
-            int expectedTotalExonLength           = 300;
-            byte expectedStartExonPhase           = 3;
-            int expectedSiftIndex                 = 11;
-            int expectedPolyPhenIndex             = 13;
+            const int expectedTotalExonLength     = 300;
+            const byte expectedStartExonPhase     = 3;
+            const int expectedSiftIndex           = 11;
+            const int expectedPolyPhenIndex       = 13;
 
             IInterval[] expectedMicroRnas         = GetMicroRnas();
 
@@ -106,7 +106,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.Equal(expectedMicroRnas.Length,       observedTranscript.MicroRnas.Length);
         }
 
-        private Dictionary<T, int> CreateIndices<T>(T[] objects)
+        private static Dictionary<T, int> CreateIndices<T>(T[] objects)
         {
             var indexDict = new Dictionary<T, int>();
             for (int i = 0; i < objects.Length; i++) indexDict[objects[i]] = i;

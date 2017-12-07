@@ -14,7 +14,7 @@ namespace UnitTests.VariantAnnotation
 {
     public sealed class AnnotatorTest
     {
-        private IVariant[] GetVariants()
+        private static IVariant[] GetVariants()
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false, false);
             var variant = new Mock<IVariant>();
@@ -28,7 +28,7 @@ namespace UnitTests.VariantAnnotation
             return new[] { variant.Object };
         }
 
-        private IVariant[] GetMitoVariants()
+        private static IVariant[] GetMitoVariants()
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false, false);
             var variant = new Mock<IVariant>();

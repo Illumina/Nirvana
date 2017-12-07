@@ -1,7 +1,6 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using ExtractMiniXml;
 
 namespace SAUtils.ExtractMiniXml
 {

@@ -42,7 +42,7 @@ namespace VariantAnnotation.IO.Caches
             return new TranscriptCacheData(Header, genes, introns, mirnas, peptideSeqs, transcripts, regulatoryRegions);
         }
 
-        private static IntervalArray<T>[] ReadIntervals<T>(ExtendedBinaryReader reader, Func<T> readMethod) where T : IInterval
+        private static IntervalArray<T>[] ReadIntervals<T>(IExtendedBinaryReader reader, Func<T> readMethod) where T : IInterval
         {
             var numRefSeqs     = reader.ReadOptInt32();
             var intervalArrays = new IntervalArray<T>[numRefSeqs];

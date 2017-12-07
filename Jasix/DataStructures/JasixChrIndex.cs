@@ -39,7 +39,7 @@ namespace Jasix.DataStructures
             _intervalArray = new IntervalArray<long>(_largeVariants.ToArray());
         }
 
-        private Interval<long> ReadInterval(IExtendedBinaryReader reader)
+        private static Interval<long> ReadInterval(IExtendedBinaryReader reader)
         {
             var begin    = reader.ReadOptInt32();
             var end      = reader.ReadOptInt32();
@@ -69,7 +69,7 @@ namespace Jasix.DataStructures
 	        }
 		}
 
-        private void WriteInterval(Interval<long> interval, IExtendedBinaryWriter writer)
+        private static void WriteInterval(Interval<long> interval, IExtendedBinaryWriter writer)
         {
             writer.WriteOpt(interval.Begin);
             writer.WriteOpt(interval.End);

@@ -159,7 +159,7 @@ namespace VariantAnnotation.Caches.DataStructures
             foreach (var item in items) writeAction(item, writer);
         }
 
-        private static T[] ReadIndices<T>(ExtendedBinaryReader reader, T[] cachedItems)
+        private static T[] ReadIndices<T>(IExtendedBinaryReader reader, T[] cachedItems)
         {
             int numItems = reader.ReadOptInt32();
             var items = new T[numItems];

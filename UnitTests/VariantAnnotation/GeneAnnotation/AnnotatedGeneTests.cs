@@ -30,8 +30,7 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
 
             var annotatedGene = new AnnotatedGene("Gene1", geneAnnotations);
 
-            var expectedLine =
-                "{\"name\":\"Gene1\",\"annotation1\":[{\"mimNumber\":603024,\"description\":\"AT rich interactive domain 1A, SWI-like\",\"phenotypes\":[{\"mimNumber\":614607,\"phenotype\":\"Coffin-Siris syndrome 2\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"]}]},{\"mimNumber\":300531,\"description\":\"Sprouty, Drosophila, homolog of, 3\"}],\"annotation2\":0.154}";
+            const string expectedLine = "{\"name\":\"Gene1\",\"annotation1\":[{\"mimNumber\":603024,\"description\":\"AT rich interactive domain 1A, SWI-like\",\"phenotypes\":[{\"mimNumber\":614607,\"phenotype\":\"Coffin-Siris syndrome 2\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"]}]},{\"mimNumber\":300531,\"description\":\"Sprouty, Drosophila, homolog of, 3\"}],\"annotation2\":0.154}";
 
             var sb = new StringBuilder();
             annotatedGene.SerializeJson(sb);

@@ -415,17 +415,18 @@ namespace CommandLine.NDesk.Options
 
             flag = name = sep = value = null;
             var m = _valueOption.Match(argument);
-            if (!m.Success)
-            {
-                return false;
-            }
+            if (!m.Success) return false;
+
             flag = m.Groups["flag"].Value;
             name = m.Groups["name"].Value;
+
+            // ReSharper disable once InvertIf
             if (m.Groups["sep"].Success && m.Groups["value"].Success)
             {
-                sep = m.Groups["sep"].Value;
+                sep   = m.Groups["sep"].Value;
                 value = m.Groups["value"].Value;
             }
+
             return true;
         }
 
@@ -437,31 +438,27 @@ namespace CommandLine.NDesk.Options
                 return true;
             }
 
-            string f, n, s, v;
-            if (!GetOptionParts(argument, out f, out n, out s, out v))
+            if (!GetOptionParts(argument, out var f, out var n, out var s, out var v))
                 return false;
 
-            if (Contains(n))
-            {
-                var p = this[n];
-                c.OptionName = f + n;
-                c.Option = p;
-                switch (p.OptionValueType)
-                {
-                    case OptionValueType.None:
-                        c.OptionValues.Add(n);
-                        c.Option.Invoke(c);
-                        break;
-                    case OptionValueType.Optional:
-                    case OptionValueType.Required:
-                        ParseValue(v, c);
-                        break;
-                }
-                return true;
-            }
+            if (!Contains(n)) return ParseBool(argument, n, c) || ParseBundledValue(f, n + s + v, c);
 
-            // no match; is it a bool option?
-            return ParseBool(argument, n, c) || ParseBundledValue(f, n + s + v, c);
+            var p = this[n];
+            c.OptionName = f + n;
+            c.Option = p;
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (p.OptionValueType)
+            {
+                case OptionValueType.None:
+                    c.OptionValues.Add(n);
+                    c.Option.Invoke(c);
+                    break;
+                case OptionValueType.Optional:
+                case OptionValueType.Required:
+                    ParseValue(v, c);
+                    break;
+            }
+            return true;
         }
 
         private static void ParseValue(string option, OptionContext c)
@@ -485,18 +482,16 @@ namespace CommandLine.NDesk.Options
         private bool ParseBool(string option, string n, OptionContext c)
         {
             string rn;
-            if (n.Length >= 1 && (n[n.Length - 1] == '+' || n[n.Length - 1] == '-') &&
-                Contains(rn = n.Substring(0, n.Length - 1)))
-            {
-                var p = this[rn];
-                string v = n[n.Length - 1] == '+' ? option : null;
-                c.OptionName = option;
-                c.Option = p;
-                c.OptionValues.Add(v);
-                p.Invoke(c);
-                return true;
-            }
-            return false;
+            if (n.Length < 1 || n[n.Length - 1] != '+' && n[n.Length - 1] != '-' ||
+                !Contains(rn = n.Substring(0, n.Length - 1))) return false;
+
+            var p = this[rn];
+            string v = n[n.Length - 1] == '+' ? option : null;
+            c.OptionName = option;
+            c.Option = p;
+            c.OptionValues.Add(v);
+            p.Invoke(c);
+            return true;
         }
 
         private bool ParseBundledValue(string f, string n, OptionContext c)
@@ -624,9 +619,9 @@ namespace CommandLine.NDesk.Options
             return true;
         }
 
-        private static int GetNextOptionIndex(string[] names, int i)
+        private static int GetNextOptionIndex(IReadOnlyList<string> names, int i)
         {
-            while (i < names.Length && names[i] == "<>")
+            while (i < names.Count && names[i] == "<>")
             {
                 ++i;
             }

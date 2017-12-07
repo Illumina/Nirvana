@@ -95,6 +95,7 @@ namespace Compression.FileHandling
 
 		#endregion
 
+		/// <inheritdoc />
 		/// <summary>
 		/// constructor
 		/// </summary>

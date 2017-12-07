@@ -35,6 +35,7 @@ namespace CommandLine.Utilities
                 return $"{megaBytes:0.0} MB";
             }
 
+            // ReSharper disable once InvertIf
             if (numBytes > NumBytesInKB)
             {
                 var kiloBytes = numBytes / (double)NumBytesInKB;

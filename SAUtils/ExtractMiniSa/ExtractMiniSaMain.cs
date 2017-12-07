@@ -5,14 +5,14 @@ using ErrorHandling;
 
 namespace SAUtils.ExtractMiniSa
 {
-    sealed class ExtractMiniSaMain 
+    internal sealed class ExtractMiniSaMain 
 	{
 	
 
 		/// <summary>
 		/// executes the program
 		/// </summary>
-		private ExitCodes ProgramExecution()
+		private static ExitCodes ProgramExecution()
 		{
 			var extractor = new MiniSaExtractor(ConfigurationSettings.CompressedReference, ConfigurationSettings.InputSuppAnnotPath, ConfigurationSettings.Begin, ConfigurationSettings.End, ConfigurationSettings.DataSourceName, ConfigurationSettings.MiniSaDirectory);
 			var count = extractor.Extract();
@@ -70,7 +70,7 @@ namespace SAUtils.ExtractMiniSa
                 .SkipBanner()
                 .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
                 .ShowErrors()
-                .Execute(extractor.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
 	    }

@@ -29,8 +29,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            bool shiftToEnd;
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence,transcript.Object.Gene.OnReverseStrand,out shiftToEnd);
+            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence,transcript.Object.Gene.OnReverseStrand,out var shiftToEnd);
 
             Assert.NotNull(rotatedVariant);
             Assert.False(ReferenceEquals(variant.Object, rotatedVariant));
@@ -49,8 +48,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            bool shiftToEnd;
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out shiftToEnd);
+            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out var shiftToEnd);
 
             Assert.NotNull(rotatedVariant);
             Assert.False(ReferenceEquals(variant.Object, rotatedVariant));

@@ -20,7 +20,7 @@ namespace SAUtils.TsvWriters
 
 		#region IDisposable
 
-		bool _disposed ;
+	    private bool _disposed ;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 
@@ -64,7 +64,7 @@ namespace SAUtils.TsvWriters
 			_tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName) + ".tvi");
 		}
 
-		private string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, ReportFor reportingFor)
+		private static string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, ReportFor reportingFor)
 		{
 			var sb = new StringBuilder();
 			

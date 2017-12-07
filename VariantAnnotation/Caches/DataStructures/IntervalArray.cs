@@ -41,9 +41,7 @@ namespace VariantAnnotation.Caches.DataStructures
 		public T[] GetAllOverlappingValues(int begin, int end)
 		{
 			var firstIndex = GetFirstIndex(begin, end);
-			if (firstIndex == -1) return null;
-
-			return AddOverlappingValues(firstIndex, begin, end);
+			return firstIndex == -1 ? null : AddOverlappingValues(firstIndex, begin, end);
 		}
 
 		/// <summary>

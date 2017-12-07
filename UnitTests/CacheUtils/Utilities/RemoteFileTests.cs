@@ -18,7 +18,7 @@ namespace UnitTests.CacheUtils.Utilities
         [Fact]
         public void GetFilename_WithoutDate()
         {
-            string expectedResult = "CCDS2Sequence.20160908.txt";
+            const string expectedResult = "CCDS2Sequence.20160908.txt";
             var observedResult = RemoteFile.GetFilename("ftp://ftp.ncbi.nlm.nih.gov/pub/CCDS/current_human/CCDS2Sequence.20160908.txt", false);
             Assert.Equal(expectedResult, observedResult);
         }

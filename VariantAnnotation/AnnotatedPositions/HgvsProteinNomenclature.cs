@@ -63,8 +63,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
 				case ProteinChange.Frameshift:
 					return GetHgvsFrameshiftNotation(refSequence, cdsStart,
-						cdsEnd, transcriptAltAllele, transcript, isMitochondrial, proteinId, start, end,
-						hgvscNotation, variantEffect.IsStopRetained());
+						cdsEnd, transcriptAltAllele, transcript, isMitochondrial, proteinId, start, end);
 
 				case ProteinChange.None:
 					return HgvspNotation.GetSilentNotation(hgvscNotation, start, refAbbreviation, variantEffect.IsStopRetained());
@@ -91,8 +90,10 @@ namespace VariantAnnotation.AnnotatedPositions
 			return null;
 		}
 
-	    private static string GetHgvsFrameshiftNotation(ISequence refSequence, int cdsBegin, int cdsEnd, string transcriptAltAllele, ITranscript transcript, bool isMitochondrial, string proteinId, int start, int end, string hgvscNotation, bool isStopRetained)
-		{
+        private static string GetHgvsFrameshiftNotation(ISequence refSequence, int cdsBegin, int cdsEnd,
+            string transcriptAltAllele, ITranscript transcript, bool isMitochondrial, string proteinId, int start,
+            int end)
+        {
 		    var peptideSeq = transcript.Translation.PeptideSeq;
 		    var altPeptideSeq = HgvsUtilities.GetAltPeptideSequence(refSequence, cdsBegin, cdsEnd, transcriptAltAllele, transcript, isMitochondrial);
 
@@ -105,9 +106,6 @@ namespace VariantAnnotation.AnnotatedPositions
 		    var altAminoAcid = frameshiftedParameters.Item3;
 
 		    var refAbbreviation = AminoAcids.ConvertAminoAcidToAbbreviation(refAminoAcid);
-
-			//if (refAminoAcid == altAminoAcid)
-			//	return HgvspNotation.GetSilentNotation(hgvscNotation, start, refAbbreviation, isStopRetained);
 
 			if (altAminoAcid == AminoAcids.StopCodonChar)
 			    return HgvspNotation.GetSubstitutionNotation(proteinId, start, refAbbreviation, "Ter");
@@ -126,9 +124,10 @@ namespace VariantAnnotation.AnnotatedPositions
 		           || mappedPositions.CdsInterval.Start == null 
 		           || mappedPositions.CdsInterval.End == null;
 	    }
-		
-	    internal static ProteinChange GetProteinChange(int start, string refAminoAcids, string altAminoAcids, string peptideSeq, IVariantEffect variantEffect)
-	    {
+
+        internal static ProteinChange GetProteinChange(int start, string refAminoAcids, string altAminoAcids,
+            string peptideSeq, IVariantEffect variantEffect)
+        {
 		    if (refAminoAcids == altAminoAcids
 				|| variantEffect.IsStopRetained()) return ProteinChange.None;
 

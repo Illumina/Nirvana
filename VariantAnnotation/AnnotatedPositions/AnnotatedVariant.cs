@@ -73,7 +73,7 @@ namespace VariantAnnotation.AnnotatedPositions
             return sb.ToString();
         }
 
-	    private VariantType GetVariantType(VariantType variantType)
+	    private static VariantType GetVariantType(VariantType variantType)
 	    {
 		    switch (variantType)
 		    {

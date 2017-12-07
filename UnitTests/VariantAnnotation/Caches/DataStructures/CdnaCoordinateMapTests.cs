@@ -12,10 +12,10 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void CdnaCoordinateMap_EndToEnd()
         {
-            int expectedStart     = 100;
-            int expectedEnd       = 200;
-            int expectedCdnaStart = 300;
-            int expectedCdnaEnd   = 400;
+            const int expectedStart     = 100;
+            const int expectedEnd       = 200;
+            const int expectedCdnaStart = 300;
+            const int expectedCdnaEnd   = 400;
 
             ICdnaCoordinateMap expectedCdnaCoordinateMap =
                 new CdnaCoordinateMap(expectedStart, expectedEnd, expectedCdnaStart, expectedCdnaEnd);

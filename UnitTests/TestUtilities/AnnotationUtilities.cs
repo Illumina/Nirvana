@@ -10,16 +10,6 @@ namespace UnitTests.TestUtilities
 {
     public static class AnnotationUtilities
 	{
-	    internal static IAnnotatedVariant GetVariant(string cacheFilePrefix, List<string> saPaths,
-	        string vcfLine,
-	        int variantIndex = 0, bool enableVerboseTranscripts = false)
-	    {
-	        var annotatedPosition = GetAnnotatedPosition(cacheFilePrefix, saPaths, vcfLine,
-	            enableVerboseTranscripts);
-
-	        return annotatedPosition.AnnotatedVariants[variantIndex];
-	    }
-
 	    internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
             string vcfLine, bool enableVerboseTranscripts)
 	    {

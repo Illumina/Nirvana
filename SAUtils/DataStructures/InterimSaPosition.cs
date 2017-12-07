@@ -36,8 +36,7 @@ namespace SAUtils.DataStructures
                 if (intermediateSaItem.KeyName == InterimSaCommon.RefMinorTag)
                 {
                     IsReferenceMinor = true;
-                    var miscItem = intermediateSaItem as SaMiscellanies;
-                    if (miscItem != null) GlobalMajorAllele = miscItem.GlobalMajorAllele;
+                    if (intermediateSaItem is SaMiscellanies miscItem) GlobalMajorAllele = miscItem.GlobalMajorAllele;
                 }
                 else
                 {

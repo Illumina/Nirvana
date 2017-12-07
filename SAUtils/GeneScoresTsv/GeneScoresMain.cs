@@ -10,7 +10,7 @@ namespace SAUtils.GeneScoresTsv
     public sealed class GeneScoresMain
     {
         private const string JsonKeyName = "exac";
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             var geneScoreCreator= new GeneScoreTsvCreator(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputPath), 
                 new GeneAnnotationTsvWriter(ConfigurationSettings.OutputDirectory, 
@@ -46,7 +46,7 @@ namespace SAUtils.GeneScoresTsv
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }

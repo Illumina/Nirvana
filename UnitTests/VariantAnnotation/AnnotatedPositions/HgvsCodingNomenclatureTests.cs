@@ -13,14 +13,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 {
     public sealed class HgvsCodingNomenclatureTests
     {
-        private Mock<ITranscript> _forwardTranscript = new Mock<ITranscript>(); //get info from ENST00000343938.4 
-        private Mock<ITranscript> _reverseTranscript = new Mock<ITranscript>(); //get info from "ENST00000423372.3
+        private readonly Mock<ITranscript> _forwardTranscript = new Mock<ITranscript>(); //get info from ENST00000343938.4 
+        private readonly Mock<ITranscript> _reverseTranscript = new Mock<ITranscript>(); //get info from "ENST00000423372.3
 
         public HgvsCodingNomenclatureTests()
         {
             var chromosome = new Chromosome("chr1", "1", 0);
-            var start = 1260147;
-            var end = 1264277;
+            const int start = 1260147;
+            const int end = 1264277;
 
             var introns = new IInterval[]
             {
@@ -71,7 +71,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.SNV);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000343938.4:c.-311A>G";
+            const string expHgvs = "ENST00000343938.4:c.-311A>G";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -84,7 +84,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.SNV);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000343938.4:c.-75-6C>G";
+            const string expHgvs = "ENST00000343938.4:c.-75-6C>G";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -99,7 +99,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.insertion);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000343938.4:c.130_131insG";
+            const string expHgvs = "ENST00000343938.4:c.130_131insG";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -113,7 +113,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.insertion);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000343938.4:c.*15_*16insG";
+            const string expHgvs = "ENST00000343938.4:c.*15_*16insG";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -126,7 +126,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.insertion);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000343938.4:c.129_130dupTA";
+            const string expHgvs = "ENST00000343938.4:c.129_130dupTA";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -153,7 +153,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
 
-            var expHgvs = "ENST00000343938.4:c.120_122+2delATGTCinsTG";
+            const string expHgvs = "ENST00000343938.4:c.120_122+2delATGTCinsTG";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -167,7 +167,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript.Object, variant, sequence.Object);
 
-            var expHgvs = "ENST00000343938.4:c.120_122+2invATGTC";
+            const string expHgvs = "ENST00000343938.4:c.120_122+2invATGTC";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -204,7 +204,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.SNV);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000423372.3:c.*910-198T>C";
+            const string expHgvs = "ENST00000423372.3:c.*910-198T>C";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -217,7 +217,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.SNV);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000423372.3:c.*1T>C";
+            const string expHgvs = "ENST00000423372.3:c.*1T>C";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }
@@ -230,7 +230,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
                 VariantType.deletion);
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript.Object, variant, sequence.Object);
-            var expHgvs = "ENST00000423372.3:c.*909+2_*910delACAACCCACGAT";
+            const string expHgvs = "ENST00000423372.3:c.*909+2_*910delACAACCCACGAT";
 
             Assert.Equal(expHgvs, observedHgvsc);
         }

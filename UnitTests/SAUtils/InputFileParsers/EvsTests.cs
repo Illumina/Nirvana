@@ -35,8 +35,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var evs = evsReader.ExtractItems(vcfLine)[0];
 
             Assert.NotNull(evs);
-            var expectedRes =
-                "\"sampleCount\":5335,\"coverage\":110,\"allAf\":0.030647,\"afrAf\":0.003663,\"eurAf\":0.045707";
+            const string expectedRes = "\"sampleCount\":5335,\"coverage\":110,\"allAf\":0.030647,\"afrAf\":0.003663,\"eurAf\":0.045707";
             Assert.Equal(expectedRes, evs.GetJsonString());
             
         }
@@ -52,8 +51,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var evs = evsReader.ExtractItems(vcfLine)[0];
 
             Assert.NotNull(evs);
-            var expectedRes =
-                "\"sampleCount\":5335,\"coverage\":110,\"allAf\":0.030647,\"afrAf\":0.003663,\"eurAf\":0.045707";
+            const string expectedRes = "\"sampleCount\":5335,\"coverage\":110,\"allAf\":0.030647,\"afrAf\":0.003663,\"eurAf\":0.045707";
             Assert.Equal(expectedRes, evs.GetJsonString());
         }
 
@@ -69,13 +67,11 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             Assert.NotNull(evs);
             Assert.Equal(2,evs.Count);
-            var expectedRes1 =
-                "\"sampleCount\":5648,\"coverage\":10,\"allAf\":0.004072,\"afrAf\":0.012380,\"eurAf\":0.000258";
+            const string expectedRes1 = "\"sampleCount\":5648,\"coverage\":10,\"allAf\":0.004072,\"afrAf\":0.012380,\"eurAf\":0.000258";
             Assert.Equal(expectedRes1, evs[0].GetJsonString());
             Assert.Equal("TGG",evs[0].AlternateAllele);
 
-            var expectedRes2 =
-                "\"sampleCount\":5648,\"coverage\":10,\"allAf\":0.293732,\"afrAf\":0.078503,\"eurAf\":0.392534";
+            const string expectedRes2 = "\"sampleCount\":5648,\"coverage\":10,\"allAf\":0.293732,\"afrAf\":0.078503,\"eurAf\":0.392534";
             Assert.Equal(expectedRes2, evs[1].GetJsonString());
             Assert.Equal("T", evs[1].AlternateAllele);
 

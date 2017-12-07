@@ -103,6 +103,7 @@ namespace Compression.FileHandling
 
         #endregion
 
+        /// <inheritdoc />
         /// <summary>
         /// private constructor
         /// </summary>
@@ -115,6 +116,7 @@ namespace Compression.FileHandling
             _compressedBlock   = new byte[_bgzf.GetCompressedBufferBounds(BlockGZipFormatCommon.MaxBlockSize)];            
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// stream constructor
         /// </summary>
@@ -148,6 +150,7 @@ namespace Compression.FileHandling
         /// <summary>
         /// returns true if this GZip block has a valid header
         /// </summary>
+        // ReSharper disable once SuggestBaseTypeForParameter
         private static bool HasValidHeader(int numHeaderBytes, byte[] header)
         {
             if (numHeaderBytes != BlockGZipFormatCommon.BlockHeaderLength) return false;
@@ -209,6 +212,7 @@ namespace Compression.FileHandling
             _blockLength  = count;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// reads from the disk into the byte array
         /// </summary>
@@ -240,6 +244,7 @@ namespace Compression.FileHandling
                 numBytesRead += copyLength;
             }
 
+            // ReSharper disable once InvertIf
             if (_blockOffset == _blockLength)
             {
                 _blockAddress = _stream.CanSeek ? _stream.Position : 0;
@@ -249,6 +254,7 @@ namespace Compression.FileHandling
             return numBytesRead;
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// writes the byte array to disk. Returns the number of bytes written
         /// </summary>

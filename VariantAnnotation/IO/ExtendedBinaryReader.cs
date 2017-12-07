@@ -7,19 +7,10 @@ namespace VariantAnnotation.IO
 {
 	public sealed class ExtendedBinaryReader : BinaryReader, IExtendedBinaryReader
 	{
-		#region members
-
-		private readonly Stream _stream;
-
-		#endregion
-
 		public ExtendedBinaryReader(Stream s) : this(s, new UTF8Encoding()) { }
 
 		public ExtendedBinaryReader(Stream input, Encoding encoding, bool leaveOpen = false)
-			: base(input, encoding, leaveOpen)
-		{
-			_stream = input;
-		}
+			: base(input, encoding, leaveOpen) {}
 
 		/// <summary>
 		/// returns an integer from the binary reader

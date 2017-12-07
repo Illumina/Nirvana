@@ -124,7 +124,7 @@ namespace SAUtils.CreateIntermediateTsvs
             }
         }
 
-        private void CreateMitoMapSvTsv(List<string> mitoMapSvFileNames)
+        private void CreateMitoMapSvTsv(IReadOnlyList<string> mitoMapSvFileNames)
         {
             if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(string.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
@@ -134,6 +134,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
             var mitoMapSvReaders = new List<MitoMapSvReader>();
+
             foreach (var mitoMapFileName in mitoMapSvFileNames)
             {
                 mitoMapSvReaders.Add(new MitoMapSvReader(new FileInfo(mitoMapFileName), sequenceProvider));
@@ -149,7 +150,7 @@ namespace SAUtils.CreateIntermediateTsvs
             TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapTag, version.Version, timeSpan);
         }
 
-        private void CreateMitoMapVarTsv(List<string> mitoMapFileNames)
+        private void CreateMitoMapVarTsv(IReadOnlyList<string> mitoMapFileNames)
         {
             if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(string.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
@@ -164,7 +165,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 mitoMapVarReaders.Add(new MitoMapVariantReader(new FileInfo(mitoMapFileName), sequenceProvider));
             }
             var mergedMitoMapVarItems = MitoMapVariantReader.MergeAndSort(mitoMapVarReaders);
-            var outputFilePrefix = InterimSaCommon.MitoMapTag;
+            const string outputFilePrefix = InterimSaCommon.MitoMapTag;
             using (var writer = new MitoMapVarTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
                 TsvWriterUtilities.WriteSortedItems(mergedMitoMapVarItems, writer);
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -222,7 +223,7 @@ namespace SAUtils.CreateIntermediateTsvs
             TsvWriterUtilities.WriteCompleteInfo(dataSource, version.Version, timeSpan);
         }
 
-        private void CreateSvTsv(IEnumerable<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
+        private static void CreateSvTsv(IEnumerable<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
         {
             foreach (var siItem in siItems)
             {

@@ -8,7 +8,7 @@ namespace Compression.FileHandling
 {
     public sealed class BgzipTextWriter : StreamWriter, IDisposable
     {
-        readonly BlockGZipStream _bgzipStream;
+        private readonly BlockGZipStream _bgzipStream;
         private readonly byte[] _buffer;
         private int _bufferIndex;
         private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
@@ -56,11 +56,11 @@ namespace Compression.FileHandling
             }
             else
             {
-                //fill up the buffer
+                // fill up the buffer
                 Array.Copy(lineBytes, 0, _buffer, _bufferIndex, BufferSize - _bufferIndex);
                 var lineIndex = BufferSize - _bufferIndex;
 
-                //write it out to the stream
+                // write it out to the stream
                 _bgzipStream.Write(_buffer, 0, BufferSize);
                 _bufferIndex = 0;
 
@@ -69,13 +69,11 @@ namespace Compression.FileHandling
                     _bgzipStream.Write(lineBytes, lineIndex, BufferSize);
                     lineIndex += BufferSize;
                 }
-                //the leftover bytes should be saved in buffer
-                if (lineIndex < lineBytes.Length)
-                {
-                    Array.Copy(lineBytes, lineIndex, _buffer, 0, lineBytes.Length - lineIndex);
-                    _bufferIndex = lineBytes.Length - lineIndex;
-                }
 
+                // the leftover bytes should be saved in buffer
+                if (lineIndex >= lineBytes.Length) return;
+                Array.Copy(lineBytes, lineIndex, _buffer, 0, lineBytes.Length - lineIndex);
+                _bufferIndex = lineBytes.Length - lineIndex;
             }
         }
 

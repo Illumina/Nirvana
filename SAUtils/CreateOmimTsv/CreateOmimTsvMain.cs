@@ -7,7 +7,7 @@ namespace SAUtils.CreateOmimTsv
 {
     public sealed class CreateOmimTsvMain
     {
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             var geneSymbolUpdater = new GeneSymbolUpdater(ConfigurationSettings.GeneInfoPaths, ConfigurationSettings.HgncPath);
             var omimTsvCreator = new OmimTsvCreator(new FileInfo(ConfigurationSettings.InputGeneMap2Path), ConfigurationSettings.Mim2GenePath ==null? null: new FileInfo (ConfigurationSettings.Mim2GenePath), geneSymbolUpdater,ConfigurationSettings.OutputDirectory);
@@ -59,7 +59,7 @@ namespace SAUtils.CreateOmimTsv
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }

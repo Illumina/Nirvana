@@ -39,11 +39,9 @@ namespace SAUtils
             if (refAllele == ".") return true; //ref base is unknown
             if (refBases.All(x => x == 'N')) return true;
 
-            if (refAllele.Length < refBases.Length)
-                return refBases.StartsWith(refAllele);
+            return refAllele.Length < refBases.Length ? refBases.StartsWith(refAllele) : refAllele.StartsWith(refBases);
 
             // in rare cases the refAllele will be too large for our refBases string that is limited in length
-            return refAllele.StartsWith(refBases);
         }
 
         public static (int Start, string RefAllele, string AltAllele) GetReducedAlleles(int start, string refAllele, string altAllele)

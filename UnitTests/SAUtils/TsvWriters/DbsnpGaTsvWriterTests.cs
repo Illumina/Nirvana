@@ -81,7 +81,7 @@ namespace UnitTests.SAUtils.TsvWriters
                 var dbSnpItemsPos100 = new List<SupplementaryDataItem>
                 {
                     new DbSnpItem(chromosome,100,123456,"A",0.2,"G",0.4),
-                    new DbSnpItem(chromosome,100,123458,"A",0.2,"T",0.4),
+                    new DbSnpItem(chromosome,100,123458,"A",0.2,"T",0.4)
                 };
                 var dbSnpItemsPos103 = new List<SupplementaryDataItem>
                 {

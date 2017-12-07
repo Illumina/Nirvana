@@ -8,12 +8,12 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class SupplementaryIntervalItem:IChromosomeInterval
+    public sealed class SupplementaryIntervalItem : IChromosomeInterval
     {
         public int Start { get; }
         public int End { get; }
         public IChromosome Chromosome { get; }
-        public string AlternateAllele { get; }
+        private string AlternateAllele { get; }
         public VariantType VariantType { get; }
         public string Source { get; }
         private readonly Dictionary<string, string> _stringValues;
@@ -21,13 +21,13 @@ namespace SAUtils.DataStructures
         private readonly Dictionary<string, int> _intValues;
         public IReadOnlyDictionary<string, int> IntValues => _intValues;
         private readonly List<string> _boolList;
-        public IEnumerable<string> BoolValues => _boolList;
+        private IEnumerable<string> BoolValues => _boolList;
         private readonly Dictionary<string, double> _doubleValues;
-        public IReadOnlyDictionary<string, double> DoubleValues => _doubleValues;
+        private IReadOnlyDictionary<string, double> DoubleValues => _doubleValues;
         private readonly Dictionary<string, double> _freqValues;
         public IReadOnlyDictionary<string, double> PopulationFrequencies => _freqValues;
         private readonly Dictionary<string, IEnumerable<string>> _stringLists;
-        public IReadOnlyDictionary<string, IEnumerable<string>> StringLists => _stringLists;
+        private IReadOnlyDictionary<string, IEnumerable<string>> StringLists => _stringLists;
 
 
         public SupplementaryIntervalItem(IChromosome chromsome, int start, int end,  string altAllele, VariantType variantType,

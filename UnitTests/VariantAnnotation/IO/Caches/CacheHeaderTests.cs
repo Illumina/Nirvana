@@ -13,10 +13,10 @@ namespace UnitTests.VariantAnnotation.IO.Caches
         [Fact]
         public void CacheHeader_EndToEnd()
         {
-            var expectedTranscriptSource   = Source.BothRefSeqAndEnsembl;
-            long expectedCreationTimeTicks = long.MaxValue;
-            var expectedGenomeAssembly     = GenomeAssembly.hg19;
-            ushort expectedVepVersion      = ushort.MaxValue;
+            const Source expectedTranscriptSource       = Source.BothRefSeqAndEnsembl;
+            const long expectedCreationTimeTicks        = long.MaxValue;
+            const GenomeAssembly expectedGenomeAssembly = GenomeAssembly.hg19;
+            const ushort expectedVepVersion             = ushort.MaxValue;
 
             var expectedCustomHeader = new TranscriptCacheCustomHeader(expectedVepVersion, 0);
             var expectedHeader = new CacheHeader("VEP", 1, 2, expectedTranscriptSource, expectedCreationTimeTicks,

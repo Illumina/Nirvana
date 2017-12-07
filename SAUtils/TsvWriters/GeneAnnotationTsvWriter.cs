@@ -22,7 +22,7 @@ namespace SAUtils.TsvWriters
             _writer.Write(GetHeader(dataSourceVersion, dataVersion, assembly, keyName, isArray));
         }
 
-        private string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
+        private static string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
         {
             var sb = new StringBuilder();
 

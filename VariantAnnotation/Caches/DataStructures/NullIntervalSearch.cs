@@ -20,11 +20,6 @@ namespace VariantAnnotation.Caches.DataStructures
 
 		#region IIntervalSearch
 
-		public bool OverlapsAny(int begin, int end)
-		{
-			return false;
-		}
-
 		public T[] GetAllOverlappingValues(int begin, int end)
 		{
 			return null;

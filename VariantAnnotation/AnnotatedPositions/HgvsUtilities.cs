@@ -253,7 +253,7 @@ namespace VariantAnnotation.AnnotatedPositions
 	    /// <summary>
 	    /// get the shorted intron offset from the nearest exon
 	    /// </summary>
-	    public static void GetIntronOffset(ICdnaCoordinateMap prevExon, ICdnaCoordinateMap exon, int? position, PositionOffset po, bool onReverseStrand)
+	    private static void GetIntronOffset(ICdnaCoordinateMap prevExon, ICdnaCoordinateMap exon, int? position, PositionOffset po, bool onReverseStrand)
 	    {
 		    int? upDist = position - prevExon.End;
 		    int? downDist = exon.Start - position;

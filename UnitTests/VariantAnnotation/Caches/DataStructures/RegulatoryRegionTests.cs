@@ -17,11 +17,11 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void RegulatoryRegion_EndToEnd()
         {
-            IChromosome expectedChromosome = new Chromosome("chrBob", "Bob", 1);
-            int expectedStart              = int.MaxValue;
-            int expectedEnd                = int.MinValue;
-            var expectedId                 = "ENST00000540021";
-            var expectedType               = RegulatoryRegionType.open_chromatin_region;
+            IChromosome expectedChromosome          = new Chromosome("chrBob", "Bob", 1);
+            const int expectedStart                 = int.MaxValue;
+            const int expectedEnd                   = int.MinValue;
+            const string expectedId                 = "ENST00000540021";
+            const RegulatoryRegionType expectedType = RegulatoryRegionType.open_chromatin_region;
 
             var indexToChromosome = new Dictionary<ushort, IChromosome>
             {

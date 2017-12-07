@@ -103,8 +103,7 @@ namespace VariantAnnotation.Sequence
         /// </summary>
         private SequenceIndexEntry GetIndexEntry(string ensemblReferenceName)
         {
-            if (!_nameToIndex.TryGetValue(ensemblReferenceName, out var refIndex)) return null;
-            return _refSeqIndex[refIndex];
+            return !_nameToIndex.TryGetValue(ensemblReferenceName, out var refIndex) ? null : _refSeqIndex[refIndex];
         }
 
         /// <summary>

@@ -249,9 +249,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var nonGaps = new List<MappedPositions.Coordinate>();
             foreach (var coord in coords) if (!coord.IsGap) nonGaps.Add(coord);
 
-            if (nonGaps.Count == 0) return new Interval(-1, -1);
-
-            return new Interval(nonGaps[0].Start, nonGaps[nonGaps.Count - 1].End);
+            return nonGaps.Count == 0 ? new Interval(-1, -1) : new Interval(nonGaps[0].Start, nonGaps[nonGaps.Count - 1].End);
         }
 
         private static (NullableInterval CdsInterval, IInterval ImpactedCdsInterval) UpdateCdsPosition(ITranslation translation,

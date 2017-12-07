@@ -9,7 +9,7 @@ namespace UnitTests.VariantAnnotation.Sequence
 {
     public sealed class CytogeneticBandTests
     {
-		private CytogeneticBands GetCytogeneticBands()
+		private static CytogeneticBands GetCytogeneticBands()
         {
             var bands = new Band[25][];
 

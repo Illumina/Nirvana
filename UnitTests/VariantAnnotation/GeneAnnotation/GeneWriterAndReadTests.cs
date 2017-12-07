@@ -21,7 +21,7 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
 
             ms.Position = 0;
             var reader = new ExtendedBinaryReader(ms);
-            var observedAnnotation = global::VariantAnnotation.GeneAnnotation.GeneAnnotationSource.Read(reader);
+            var observedAnnotation = GeneAnnotationSource.Read(reader);
 
             Assert.Equal(geneAnnotation.DataSource ,observedAnnotation.DataSource);
             Assert.Equal(geneAnnotation.JsonStrings.Length,observedAnnotation.JsonStrings.Length);

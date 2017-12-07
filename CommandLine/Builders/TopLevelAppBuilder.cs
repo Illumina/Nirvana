@@ -62,6 +62,7 @@ namespace CommandLine.Builders
 
         public ITopLevelAppHelpMenu ShowHelpMenu(string description)
         {
+            // ReSharper disable once InvertIf
             if (_data.ShowHelpMenu || _data.Errors.Count > 0)
             {
                 Console.WriteLine(description);
@@ -80,7 +81,7 @@ namespace CommandLine.Builders
 
         private static void DisplayCommands(Dictionary<string, TopLevelOption> ops)
         {
-            string label  = "COMMAND: ";
+            const string label = "COMMAND: ";
             string filler = new string(' ', label.Length);
 
             int commandColumnLen = GetMaxCommandLen(ops.Keys) + 3;
@@ -114,6 +115,7 @@ namespace CommandLine.Builders
 
         public ITopLevelAppErrors ShowErrors()
         {
+            // ReSharper disable once InvertIf
             if (_data.Errors.Count > 0)
             {
                 Console.WriteLine("\nSome problems were encountered when parsing the command line options:");

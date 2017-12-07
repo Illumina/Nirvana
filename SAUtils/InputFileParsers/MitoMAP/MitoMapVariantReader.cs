@@ -62,11 +62,6 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return dataType;
         }
 
-        public IEnumerator<MitoMapItem> GetEnumerator()
-        {
-            return GetMitoMapItems().GetEnumerator();
-        }
-
         private IEnumerable<MitoMapItem> GetMitoMapItems()
         {
             Console.WriteLine($"Processing {_dataType} file");
@@ -216,7 +211,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return mitoMapVarItems;
         }
 
-        private bool DescribedAsDuplicatedRecord(string mitomapDiseaseString)
+        private static bool DescribedAsDuplicatedRecord(string mitomapDiseaseString)
         {
             if (string.IsNullOrEmpty(mitomapDiseaseString)) return false;
             var altNotationPattern1 = new Regex("alternate notation$");
@@ -339,7 +334,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return (null, null, null);
         }
 
-        private string GetRefAllelesFromReferece(ReferenceSequenceProvider sequenceProvider, int start, int length)
+        private static string GetRefAllelesFromReferece(ReferenceSequenceProvider sequenceProvider, int start, int length)
         {
             return sequenceProvider.Sequence.Substring(start - 1, length);
         }

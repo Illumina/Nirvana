@@ -29,7 +29,6 @@ namespace SAUtils.DataStructures
     public static class MitomapParsingParameters
     {
         public const int LargeDeletionCutoff = 100;
-        public const string MitomapDiseaseAnnotationFile = "MitomapDisease";
     }
 
     public sealed class MitoMapItem : SupplementaryDataItem
@@ -127,7 +126,7 @@ namespace SAUtils.DataStructures
             }
             else
             {
-                diseases = (mitoMapItem1._diseases?.Count > 0) ? mitoMapItem1._diseases : mitoMapItem2._diseases;
+                diseases = mitoMapItem1._diseases?.Count > 0 ? mitoMapItem1._diseases : mitoMapItem2._diseases;
             }
             var status = mitoMapItem1._status ?? mitoMapItem2._status;
             var clinicalSignificance = mitoMapItem1._clinicalSignificance ?? mitoMapItem2._clinicalSignificance;

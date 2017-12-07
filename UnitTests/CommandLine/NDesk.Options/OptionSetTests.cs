@@ -424,8 +424,7 @@ namespace UnitTests.CommandLine.NDesk.Options
                 { "f|format=", "", v => format = v },
                 { "<>",
                     "", v => {
-                        List<string> f;
-                        if (!formats.TryGetValue (format, out f)) {
+                        if (!formats.TryGetValue (format, out var f)) {
                             f = new List<string> ();
                             formats.Add (format, f);
                         }

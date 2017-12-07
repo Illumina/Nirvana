@@ -129,8 +129,5 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var range= interval.Start == interval.End ? interval.Start.ToString(CultureInfo.InvariantCulture) : interval.Start + "-" + interval.End;
             return range + "/" + totalNumber;
         }
-
-        private static string CombineIdAndVersion(ICompactId id, byte version) => id + "." + version;
-
     }
 }

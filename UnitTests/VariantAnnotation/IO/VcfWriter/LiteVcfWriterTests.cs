@@ -67,7 +67,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 "##annotatorDataVersion=84.21.41",
                 "##annotatorTranscriptSource=RefSeq",
                 "##dataSource=1000 Genomes Project,version:v5,release date:2017-07-21",
-                "##dataSource=dbSNP,version:72,release date:2017-08-15",
+                "##dataSource=dbSNP,version:72,release date:2017-08-15"
                 
                
             };

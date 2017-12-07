@@ -36,7 +36,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
                 [chr3.Index] = chr3
             };
 
-            var genomeAssembly = GenomeAssembly.GRCh38;
+            const GenomeAssembly genomeAssembly = GenomeAssembly.GRCh38;
 
             var customHeader = new TranscriptCacheCustomHeader(1, 2);
             _expectedHeader  = new CacheHeader("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly, customHeader);

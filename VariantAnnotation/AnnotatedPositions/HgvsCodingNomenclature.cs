@@ -111,7 +111,6 @@ namespace VariantAnnotation.AnnotatedPositions
 		DelIns,
 		Insertion,
 		Inversion,
-		Multiple,
 		Substitution
 	}
 }

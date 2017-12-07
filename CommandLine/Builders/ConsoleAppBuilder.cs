@@ -100,6 +100,7 @@ namespace CommandLine.Builders
 
         public IConsoleAppHelpMenu ShowHelpMenu(string description, string commandLineExample)
         {
+            // ReSharper disable once InvertIf
             if (_data.ShowHelpMenu || _data.Errors.Count > 0)
             {
                 Help.Show(_data.Ops, commandLineExample, description);
@@ -118,6 +119,7 @@ namespace CommandLine.Builders
 
         public IConsoleAppErrors ShowErrors()
         {
+            // ReSharper disable once InvertIf
             if (_data.Errors.Count > 0)
             {
                 Console.WriteLine("\nSome problems were encountered when parsing the command line options:");

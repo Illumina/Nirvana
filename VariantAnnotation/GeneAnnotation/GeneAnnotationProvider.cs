@@ -12,11 +12,10 @@ namespace VariantAnnotation.GeneAnnotation
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
         private readonly Dictionary<string, IAnnotatedGene> _geneAnnotationDict;
+
         public IAnnotatedGene Annotate(string geneName)
         {
-            if (!_geneAnnotationDict.ContainsKey(geneName)) return null;
-            return _geneAnnotationDict[geneName];
-
+            return !_geneAnnotationDict.ContainsKey(geneName) ? null : _geneAnnotationDict[geneName];
         }
 
         public GeneAnnotationProvider(GeneDatabaseReader geneDatabaseReader)
@@ -29,7 +28,6 @@ namespace VariantAnnotation.GeneAnnotation
 
         private void CreateGeneMapDict(GeneDatabaseReader geneDatabaseReader)
         {
-
             foreach (var geneAnnotation in geneDatabaseReader.Read())
             {
                 if (!_geneAnnotationDict.ContainsKey(geneAnnotation.GeneName))
@@ -37,7 +35,6 @@ namespace VariantAnnotation.GeneAnnotation
                     _geneAnnotationDict[geneAnnotation.GeneName] = geneAnnotation;
                 
             }
-
         }
     }
 }

@@ -74,12 +74,11 @@ namespace SAUtils.CreateOmimTsv
                 }
             }
 
-            if (_symbolIndex == -1 || _synonymsIndex == -1)
-            {
-                Console.WriteLine("_symbolIndex:   {0}", _symbolIndex);
-                Console.WriteLine("_synonymsIndex: {0}", _synonymsIndex);
-                throw new UserErrorException("Not all of the indices were set.");
-            }
+            if (_symbolIndex != -1 && _synonymsIndex != -1) return;
+
+            Console.WriteLine("_symbolIndex:   {0}", _symbolIndex);
+            Console.WriteLine("_synonymsIndex: {0}", _synonymsIndex);
+            throw new UserErrorException("Not all of the indices were set.");
         }
 
         /// <summary>

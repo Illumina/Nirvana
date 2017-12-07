@@ -54,6 +54,7 @@ namespace VariantAnnotation.TranscriptAnnotation
         {
             IAnnotatedTranscript annotatedTranscript = null;
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (annotationStatus)
             {
                 case Status.FlankingAnnotation:

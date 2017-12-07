@@ -8,15 +8,14 @@ namespace UnitTests.Compression.FileHandling
 {
     public sealed class PeekStreamTests
     {
-        private readonly MemoryStream _memoryStream;
         private readonly PeekStream _peekStream;
 
         public PeekStreamTests()
         {
-            _memoryStream = new MemoryStream();
-            using (var writer = new StreamWriter(_memoryStream, Encoding.UTF8, 1024, true)) writer.WriteLine("testing");
-            _memoryStream.Position = 0;
-            _peekStream = new PeekStream(_memoryStream);
+            var memoryStream = new MemoryStream();
+            using (var writer = new StreamWriter(memoryStream, Encoding.UTF8, 1024, true)) writer.WriteLine("testing");
+            memoryStream.Position = 0;
+            _peekStream = new PeekStream(memoryStream);
         }
 
         [Fact]

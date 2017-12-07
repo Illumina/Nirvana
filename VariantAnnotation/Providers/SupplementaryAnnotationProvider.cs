@@ -66,7 +66,7 @@ namespace VariantAnnotation.Providers
 			}
 		}
 
-		private void AddSaPositon(ISaPosition saPosition, IAnnotatedVariant annotatedVariant)
+		private static void AddSaPositon(ISaPosition saPosition, IAnnotatedVariant annotatedVariant)
 		{
 			foreach (var dataSource in saPosition.DataSources)
 			{
@@ -155,7 +155,7 @@ namespace VariantAnnotation.Providers
 			_allVariantIntervalArray = CreateIntervalArray(allVariantIntervals);
 		}
 
-		private IIntervalSearch<ISupplementaryInterval> CreateIntervalArray(List<Interval<ISupplementaryInterval>> intervals)
+		private static IIntervalSearch<ISupplementaryInterval> CreateIntervalArray(List<Interval<ISupplementaryInterval>> intervals)
 		{
 			if (intervals.Count == 0) return new NullIntervalSearch<ISupplementaryInterval>();
 			return new IntervalArray<ISupplementaryInterval>(intervals.ToArray());

@@ -23,9 +23,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 
         public TranscriptPositionalEffectTests()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var start      = 874655;
-            var end        = 879639;
+            var chromosome  = new Chromosome("chr1", "1", 0);
+            const int start = 874655;
+            const int end   = 879639;
 
             var introns = new IInterval[]
             {
@@ -160,22 +160,19 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void DetermineExonicEffect_HasExonOverlap()
         {
-            var variantStart = 876686;
-            var variantEnd = 876686;
-            var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
+            const int variantStart = 876686;
+            const int variantEnd   = 876686;
+            var mappedPosition     = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
             var positionalEffect = new TranscriptPositionalEffect();
             positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
             Assert.True(positionalEffect.HasExonOverlap);
-
         }
-
-
 
         [Fact]
         public void DetermineExonicEffect_AfterCoding()
         {
-            var variantStart = 879600;
-            var variantEnd = 879600;
+            const int variantStart = 879600;
+            const int variantEnd   = 879600;
             var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
             var positionalEffect = new TranscriptPositionalEffect();
             positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
@@ -185,8 +182,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void DetermineExonicEffect_WithinCdna()
         {
-            var variantStart = 879600;
-            var variantEnd = 879600;
+            const int variantStart = 879600;
+            const int variantEnd   = 879600;
             var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
             var positionalEffect = new TranscriptPositionalEffect();
             positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
@@ -195,8 +192,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void DetermineExonicEffect_WithinCds()
         {
-            var variantStart = 876543;
-            var variantEnd = 876543;
+            const int variantStart = 876543;
+            const int variantEnd   = 876543;
             var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
             var positionalEffect = new TranscriptPositionalEffect();
             positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
@@ -206,8 +203,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void DetermineExonicEffect_OverlapWithMicroRna()
         {
-            var variantStart = 3477284;
-            var variantEnd = 3477284;
+            const int variantStart = 3477284;
+            const int variantEnd   = 3477284;
             var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _reverseTranscript.Object);
             var positionalEffect = new TranscriptPositionalEffect();
             positionalEffect.DetermineExonicEffect(_reverseTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);

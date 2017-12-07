@@ -6,17 +6,17 @@ namespace VariantAnnotation.IO.Caches
     public sealed class TranscriptCacheCustomHeader : ICustomCacheHeader
     {
         public readonly ushort VepVersion;
-        public readonly long VepReleaseTicks;
+        private readonly long _vepReleaseTicks;
 
         public TranscriptCacheCustomHeader(ushort vepVersion, long vepReleaseTicks)
         {
             VepVersion       = vepVersion;
-            VepReleaseTicks = vepReleaseTicks;
+            _vepReleaseTicks = vepReleaseTicks;
         }
 
         public void Write(BinaryWriter writer)
         {
-            writer.Write(VepReleaseTicks);
+            writer.Write(_vepReleaseTicks);
             writer.Write(VepVersion);
         }
 

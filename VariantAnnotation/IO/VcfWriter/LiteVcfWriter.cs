@@ -22,8 +22,6 @@ namespace VariantAnnotation.IO.VcfWriter
         private const string CsqTInfoTag = "##INFO=<ID=CSQT,";
         private const string InfoTag = "##INFO=";
 
-        private readonly VcfConversion _conversion = new VcfConversion();
-
         private const string CsqtHeaderLine = "##INFO=<ID=CSQT,Number=.,Type=String,Description=\"Consequence type as predicted by Nirvana. Format: GenotypeIndex|HGNC|TranscriptID|Consequence\">";
         private const string CsqrHeaderLine = "##INFO=<ID=CSQR,Number=.,Type=String,Description=\"Predicted regulatory consequence type. Format: GenotypeIndex|RegulatoryID|Consequence\">";
 

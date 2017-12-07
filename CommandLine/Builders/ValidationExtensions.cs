@@ -28,7 +28,7 @@ namespace CommandLine.Builders
         /// check if each file exists
         /// </summary>
         public static IConsoleAppValidator CheckEachFilenameExists(this IConsoleAppValidator validator,
-            List<string> filePaths, string description, string commandLineOption, bool isRequired = true)
+            IEnumerable<string> filePaths, string description, string commandLineOption, bool isRequired = true)
         {
             foreach (var filePath in filePaths)
             {

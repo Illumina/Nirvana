@@ -53,7 +53,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         #endregion
 
-        public enum CodonConversion : byte
+        private enum CodonConversion : byte
         {
             HumanChromosome,
             HumanMitochondrion
@@ -179,9 +179,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// </summary>
         public static string ConvertAminoAcidToAbbreviation(char aminoAcid)
         {
-            string abbreviation;
-
-            if (!SingleToThreeAminoAcids.TryGetValue(aminoAcid, out abbreviation))
+            if (!SingleToThreeAminoAcids.TryGetValue(aminoAcid, out var abbreviation))
             {
                 throw new NotSupportedException($"Unable to convert the following string to an amino acid abbreviation: {aminoAcid}");
             }
@@ -195,24 +193,16 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// </summary>
         internal char ConvertTripletToAminoAcid(string triplet)
         {
-            var aminoAcid = 'X';
-            var foundAminoAcid = false;
             var upperTriplet = triplet.ToUpper();
 
             // check our exceptions first
             if (_codonConversionScheme == CodonConversion.HumanMitochondrion &&
-                _mitoDifferences.TryGetValue(upperTriplet, out aminoAcid))
-            {
-                foundAminoAcid = true;
-            }
+                _mitoDifferences.TryGetValue(upperTriplet, out var mitoAminoAcid)) return mitoAminoAcid;
 
             // the default case
-            if (!foundAminoAcid && _aminoAcidLookupTable.TryGetValue(upperTriplet, out aminoAcid))
-            {
-                foundAminoAcid = true;
-            }
+            if (_aminoAcidLookupTable.TryGetValue(upperTriplet, out var aminoAcid)) return aminoAcid;
 
-            return foundAminoAcid ? aminoAcid : 'X';
+            return 'X';
         }
 
 

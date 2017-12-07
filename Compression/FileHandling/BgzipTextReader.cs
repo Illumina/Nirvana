@@ -6,7 +6,7 @@ namespace Compression.FileHandling
 {
     public sealed class BgzipTextReader : IDisposable
     {
-        readonly Stream _stream;
+        private readonly Stream _stream;
         private readonly char _newLineChar;
         private readonly byte[] _buffer;
         private int _bufferLength;

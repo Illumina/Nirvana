@@ -67,10 +67,7 @@ namespace Jasix.DataStructures
 
         public static bool IsNucleotideAllele(string altAllele)
         {
-            if (string.IsNullOrEmpty(altAllele)) return true;
-            return altAllele.ToCharArray().All(x => x == 'A' || x == 'T' || x == 'C' || x == 'G');
+            return string.IsNullOrEmpty(altAllele) || altAllele.ToCharArray().All(x => x == 'A' || x == 'T' || x == 'C' || x == 'G');
         }
-
-
     }
 }

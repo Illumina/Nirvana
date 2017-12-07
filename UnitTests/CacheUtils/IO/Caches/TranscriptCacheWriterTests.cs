@@ -18,7 +18,7 @@ namespace UnitTests.CacheUtils.IO.Caches
         [Fact]
         public void CreateIndex_EmptyDictionary_WhenInputNull()
         {
-            var dict = TranscriptCacheWriter.CreateIndex<string>(null, EqualityComparer<string>.Default);
+            var dict = TranscriptCacheWriter.CreateIndex(null, EqualityComparer<string>.Default);
             Assert.NotNull(dict);
             Assert.Equal(0, dict.Count);
         }

@@ -75,9 +75,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
             if (!(line.StartsWith("[") && line.EndsWith("],")))
                 throw new InvalidFileFormatException($"Data line doesn't start with \"[\" or end with \"],\": {line}");
             var info = line.TrimEnd(',').TrimEnd(']').Trim('[', ']').Split("\",\"").Select(x => x.Trim('"')).ToList();
-            if (dataType == MitoMapDataTypes.MitoMapInsertionsSimple)
-                return ExtractSvItemFromSimpleInsertions(info);
-            return ExtractSvItemFromDeletionsSingle(info);
+            return dataType == MitoMapDataTypes.MitoMapInsertionsSimple ? ExtractSvItemFromSimpleInsertions(info) : ExtractSvItemFromDeletionsSingle(info);
         }
 
         private List<MitoMapItem> ExtractSvItemFromDeletionsSingle(List<string> info)

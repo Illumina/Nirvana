@@ -169,11 +169,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetAltPeptideSequence_Genomic()
         {
-            var refSequence            = GetGenomicRefSequence();
-            var transcript             = GetGenomicTranscript();
-            int cdsBegin               = 112;
-            int cdsEnd                 = 121;
-            string transcriptAltAllele = "";
+            var refSequence                  = GetGenomicRefSequence();
+            var transcript                   = GetGenomicTranscript();
+            const int cdsBegin               = 112;
+            const int cdsEnd                 = 121;
+            const string transcriptAltAllele = "";
 
             const string expectedResult = "RHRNRNTQTETNTETQRHRNTQKHRNKHRDTETHRNTETNTETQKHTETQKQTQRHRNTQKHTDRNKHRNTETQKYRNTQKHRNKHRDTETQKHSDAETQQHKHRNTETHRNRNTETNTETQTHRHRETQKHTETLKHSGRCPGCRGSIA";
             var observedResult =

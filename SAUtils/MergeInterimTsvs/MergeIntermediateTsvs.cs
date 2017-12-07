@@ -4,7 +4,7 @@ using ErrorHandling;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public sealed class MergeIntermediateTsvs
+    public static class MergeIntermediateTsvs
     {
         private static ExitCodes ProgramExecution()
         {

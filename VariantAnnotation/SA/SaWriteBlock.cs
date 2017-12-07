@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Compression.Algorithms;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 
@@ -13,12 +14,9 @@ namespace VariantAnnotation.SA
     {
         private readonly List<ISaIndexOffset> _blockPositions;
         internal int BlockOffset;
-        public int PositionCount => _blockPositions.Count;
 
         public const int DefaultBlockSize = 524288 * 8;
-        /// <summary>
-        /// constructor
-        /// </summary>
+
         public SaWriteBlock(ICompressionAlgorithm compressionAlgorithm, int size = DefaultBlockSize)
             : base(compressionAlgorithm, size)
         {
@@ -56,7 +54,7 @@ namespace VariantAnnotation.SA
             return (firstPosition, lastPosition);
         }
 
-        private void WriteBlockOffsets(ExtendedBinaryWriter writer)
+        private void WriteBlockOffsets(IExtendedBinaryWriter writer)
         {
             writer.WriteOpt(_blockPositions.Count);
 

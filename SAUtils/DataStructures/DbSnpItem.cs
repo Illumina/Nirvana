@@ -37,8 +37,7 @@ namespace SAUtils.DataStructures
 		{
 			// If parameter is null return false.
 
-			var otherItem = other as DbSnpItem;
-			if (otherItem == null) return false;
+		    if (!(other is DbSnpItem otherItem)) return false;
 
 			// Return true if the fields match:
 			return Equals(Chromosome, otherItem.Chromosome)

@@ -23,7 +23,7 @@ namespace SAUtils.TsvWriters
 
         #region IDisposable
 
-        bool _disposed;
+        private bool _disposed;
 
         /// <summary>
         /// public implementation of Dispose pattern callable by consumers. 
@@ -76,7 +76,7 @@ namespace SAUtils.TsvWriters
         }
 
 
-        private string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
+        private static string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
         {
             var sb = new StringBuilder();
 

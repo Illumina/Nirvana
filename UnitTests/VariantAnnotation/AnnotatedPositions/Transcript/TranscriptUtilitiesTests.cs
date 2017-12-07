@@ -12,13 +12,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
     public sealed class TranscriptUtilitiesTests
     {
         private static readonly IChromosome Chromosome = new Chromosome("chr21", "short", 21);
-        private readonly ISequence refSequence = new SimpleSequence("ACTTCGGGC",12340);
+        private readonly ISequence _refSequence = new SimpleSequence("ACTTCGGGC",12340);
 
         [Fact]
         public void IsDuplicateWithinInterval_not_intertion()
         {
             var simpleVar = GenSimpleDeletionMock();
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(refSequence, simpleVar.Object, new Interval(1, 3), false));
+            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(1, 3), false));
         }
 
         [Fact]
@@ -26,9 +26,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         {
             var simpleVar = GenSimpleInsertionMock();
             //forward strand
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(refSequence, simpleVar.Object, new Interval(12344,12370), false));
+            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(12344,12370), false));
             //reverse strand
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(refSequence, simpleVar.Object, new Interval(12340, 12347), true));
+            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(12340, 12347), true));
         }
 
         [Fact]

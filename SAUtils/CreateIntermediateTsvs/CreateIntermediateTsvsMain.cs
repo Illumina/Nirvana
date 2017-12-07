@@ -6,7 +6,7 @@ namespace SAUtils.CreateIntermediateTsvs
 {
     public sealed class CreateIntermediateTsvsMain
     {
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             var interimTsvCreator =
 				new CreateIntermediateTsvs(
@@ -149,7 +149,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return  exitCode;
 		}

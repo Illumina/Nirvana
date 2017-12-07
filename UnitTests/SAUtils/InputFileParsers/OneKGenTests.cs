@@ -49,9 +49,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         private static string GetAlleleFrequency(string jsonString,string description)
         {
             var regexMatch = Regex.Match(jsonString, $"\"{description}\":([0|1]\\.?\\d+)?");
-            if (regexMatch.Success) return regexMatch.Groups[1].ToString();
-
-            return null;
+            return regexMatch.Success ? regexMatch.Groups[1].ToString() : null;
         }
 
         [Fact(Skip = "new SA")]

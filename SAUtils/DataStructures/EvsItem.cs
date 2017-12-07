@@ -57,8 +57,7 @@ namespace SAUtils.DataStructures
 			// If parameter is null return false.
 
 			// if other cannot be cast into OneKGenItem, return false
-			var otherItem = other as EvsItem;
-			if (otherItem == null) return false;
+		    if (!(other is EvsItem otherItem)) return false;
 
 			// Return true if the fields match:
 			return Equals(Chromosome, otherItem.Chromosome)
@@ -81,9 +80,7 @@ namespace SAUtils.DataStructures
 
 		public string GetVcfString()
 		{
-			if (string.IsNullOrEmpty(AllFreq)) return null;
-
-			return $"{AllFreq}|{Coverage}|{NumSamples}";
+		    return string.IsNullOrEmpty(AllFreq) ? null : $"{AllFreq}|{Coverage}|{NumSamples}";
 		}
 		public string GetJsonString()
 		{
