@@ -38,12 +38,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Contains($"\"chromosome\":\"{originalChromosomeName}\"", observedResult);
         }
 
-        private static ISample[] GetSamples()
-        {
-            var samples = new ISample[1];
-            samples[0] = new Sample(null, null, null, null, null, false, null, false, null, null, null, null, null);
-            return samples;
-        }
+        private static ISample[] GetSamples() => new ISample[] { Sample.EmptySample };
 
         [Fact]
         public void GetJsonString_NullAnnotatedVariants()

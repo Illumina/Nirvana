@@ -221,14 +221,15 @@ namespace VariantAnnotation.IO.VcfWriter
                 return new []{0};
 
             var inputGenotypeIndex = new int[numAnnotatedVar];
-            var annotatedVarIndex = 0;
+            var annotatedVarIndex  = 0;
+
             for (var inputIndex = 0; inputIndex < positionAltAlleles.Length && annotatedVarIndex < numAnnotatedVar; inputIndex++)
             {
-                if (VcfCommon.NonInformativeAltAllele.Contains(positionAltAlleles[inputIndex]) ||
-                    positionAltAlleles[inputIndex] == VcfCommon.GatkNonRefAllele) continue;
+                if (VcfCommon.NonInformativeAltAllele.Contains(positionAltAlleles[inputIndex])) continue;
                 inputGenotypeIndex[annotatedVarIndex] = inputIndex;
                 annotatedVarIndex++;
             }
+
             if (annotatedVarIndex < numAnnotatedVar)
                 throw new Exception($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
             return inputGenotypeIndex;

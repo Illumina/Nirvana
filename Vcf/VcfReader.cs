@@ -78,9 +78,6 @@ namespace Vcf
                 var duplicateTag = _nirvanaInfoTags.Any(infoTag => line.StartsWith(infoTag));
                 if (duplicateTag) continue;
 
-                // check if this is a GATK genome vcf
-                //if (line.StartsWith(VcfCommon.GatkNonRefAltTag)) _isGatkGenomeVcf = true;
-
                 if (line.StartsWith("##contig=<ID") && line.Contains("M") && line.Contains("length=16569>")) IsRcrsMitochondrion = true;
 
                 _headerLines.Add(line);

@@ -23,8 +23,7 @@ namespace VariantAnnotation.Interface.IO
         public const string NonVariant = ".";
         public const string StructuralVariantTag = "SVTYPE";
         public const string GatkNonRefAllele = "<NON_REF>";
-        public const string GatkNonRefAltTag = "##ALT=<ID=NON_REF";
-        public static readonly HashSet<string> NonInformativeAltAllele = new HashSet<string> { "<*>", "*", "<M>" };
+        public static readonly HashSet<string> NonInformativeAltAllele = new HashSet<string> { "<*>", "*", "<M>", GatkNonRefAllele };
         public static string StrTag = "STR";
     }
 }

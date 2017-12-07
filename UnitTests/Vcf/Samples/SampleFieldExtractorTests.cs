@@ -8,7 +8,7 @@ namespace UnitTests.Vcf.Samples
         [Fact]
         public void FormatIndicesTest()
         {
-            const string formatColumn = "AU:GU:TAR:FT:GQ:DP:VF:CU:TU:TIR:GT:GQX:BOB:DPI:NV:NR";
+            const string formatColumn = "AU:GU:TAR:FT:GQ:DP:VF:CU:TU:TIR:GT:GQX:BOB:DPI:NV:NR:CHC:DST:PCH:DCS:DID:PLG:PCN:MAD:SCH";
             var formatIndicies = FormatIndices.Extract(formatColumn);
 
             Assert.Equal(0, formatIndicies.AU);
@@ -26,6 +26,15 @@ namespace UnitTests.Vcf.Samples
             Assert.Equal(6, formatIndicies.VF);
             Assert.Equal(13, formatIndicies.DPI);
             Assert.Equal(14, formatIndicies.NV);
+            Assert.Equal(16, formatIndicies.CHC);
+            Assert.Equal(17, formatIndicies.DST);
+            Assert.Equal(18, formatIndicies.PCH);
+            Assert.Equal(19, formatIndicies.DCS);
+            Assert.Equal(20, formatIndicies.DID);
+            Assert.Equal(21, formatIndicies.PLG);
+            Assert.Equal(22, formatIndicies.PCN);
+            Assert.Equal(23, formatIndicies.MAD);
+            Assert.Equal(24, formatIndicies.SCH);
 
             Assert.Null(FormatIndices.Extract(null));
 
@@ -55,6 +64,27 @@ namespace UnitTests.Vcf.Samples
             var sample = samples[0];
             var observedAlleleDepths = sample?.AlleleDepths;
             Assert.Equal(expectedAlleleDepths, observedAlleleDepths);
+        }
+
+        [Fact]
+        public void Smn1()
+        {
+            const string vcfLine = "5\t70247773\t.\tC\tT\t366\tPASS\tSNVHPOL=4;MQ=60\tGT:DST:DID:DCS:SCH:PCN:PLG:MAD:GQ:GQX:DP:DPF:AD:ADF:ADR:SB:FT:PL\t0/1:-:70:Orphanet:-:3,3:6606,6607:41,49:368:364:81:11:39,42:21,20:18,22:-41.0:PASS:370,0,365";
+            var vcfColumns = vcfLine.Split('\t');
+
+            var extractor = new SampleFieldExtractor(vcfColumns);
+            var samples   = extractor.ExtractSamples();
+
+            Assert.Equal(1, samples.Length);
+
+            var sample = samples[0];
+            Assert.Equal("-", sample?.DiseaseAffectedStatus);
+            Assert.Equal(new[] { "70" }, sample?.DiseaseIds);
+            Assert.Equal(new[] { "Orphanet" }, sample?.DiseaseClassificationSources);
+            Assert.Equal("-", sample?.SilentCarrierHaplotype);
+            Assert.Equal(new[] { 3, 3 }, sample?.ParalogousGeneCopyNumbers);
+            Assert.Equal(new[] { 6606, 6607 }, sample?.ParalogousEntrezGeneIds);
+            Assert.Equal(new[] { 41, 49 }, sample?.MpileupAlleleDepths);
         }
 
         [Theory]
@@ -229,7 +259,6 @@ namespace UnitTests.Vcf.Samples
                 var observedVariantFrequency = sample.VariantFrequency.Value.ToString("0.####");
                 Assert.Equal(expectedVariantFrequency, observedVariantFrequency);
             }
-
         }
 
         [Theory]
@@ -351,10 +380,7 @@ namespace UnitTests.Vcf.Samples
         [Fact]
         public void EmptySample()
         {
-
-            var vcfLine =
-                "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	.";
-
+            var vcfLine = "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	.";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
@@ -362,7 +388,6 @@ namespace UnitTests.Vcf.Samples
             Assert.Equal(1, samples.Length);
             var sample = samples[0];
             Assert.True(sample.IsEmpty);
-
         }
 
         [Fact]

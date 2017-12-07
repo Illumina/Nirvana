@@ -5,24 +5,20 @@ namespace Vcf.Sample
 {
     public sealed class SampleFieldExtractor
     {
-        #region members
-
         private readonly string[] _vcfColumns;
         private FormatIndices _formatIndices;
         private readonly int? _infoDepth;
-        #endregion
 
-        // constructor
         internal SampleFieldExtractor(string[] vcfColumns, int? depth = null)
         {
             _vcfColumns = vcfColumns;
-            _infoDepth = depth;
+            _infoDepth  = depth;
         }
 
         /// <summary>
         /// extracts the genotype fields from the VCF file and returns a list of JSON samples
         /// </summary>
-        internal ISample[] ExtractSamples(bool fixGatkGenomeVcf = false)
+        internal ISample[] ExtractSamples()
         {
             // sanity check: make sure we have enough columns
             if (_vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
@@ -36,7 +32,7 @@ namespace Vcf.Sample
             // add each sample
             for (var index = VcfCommon.GenotypeIndex; index < _vcfColumns.Length; index++)
             {
-                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(_vcfColumns[index], fixGatkGenomeVcf);
+                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(_vcfColumns[index]);
             }
 
             return samples;
@@ -46,18 +42,17 @@ namespace Vcf.Sample
         /// returns a JsonSample object given the data contained within the sample genotype
         /// field.
         /// </summary>
-        private ISample ExtractSample(string sampleColumn, bool fixGatkGenomeVcf = false)
+        private ISample ExtractSample(string sampleColumn)
         {
             // sanity check: make sure we have a format column
-            if (_formatIndices == null || string.IsNullOrEmpty(sampleColumn)) return EmptySample();
+            if (_formatIndices == null || string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;
 
             var sampleColumns = sampleColumn.Split(':');
 
             // handle missing sample columns
-            if (sampleColumns.Length == 1 && sampleColumns[0] == ".") return EmptySample();
+            if (sampleColumns.Length == 1 && sampleColumns[0] == ".") return Sample.EmptySample;
 
-            var sampleFields = new IntermediateSampleFields(_vcfColumns, _formatIndices, sampleColumns, fixGatkGenomeVcf);
-
+            var sampleFields = new IntermediateSampleFields(_vcfColumns, _formatIndices, sampleColumns);
 
             var alleleDepths      = AlleleDepths.GetAlleleDepths(sampleFields);
             var failedFilter      = FailedFilter.GetFailedFilter(sampleFields);
@@ -69,25 +64,17 @@ namespace Vcf.Sample
 			var splitReadCounts   = ReadCounts.GetSplitReadCounts(sampleFields);
 	        var pairEndReadCounts = ReadCounts.GetPairEndReadCounts(sampleFields);
 
-			var copyNumber = sampleFields.CopyNumber;
             var isLossOfHeterozygosity = sampleFields.MajorChromosomeCount != null && sampleFields.CopyNumber != null &&
-                                     sampleFields.MajorChromosomeCount.Value == sampleFields.CopyNumber.Value && sampleFields.CopyNumber.Value > 1;
-            var deNovoQuality = sampleFields.DenovoQuality;
-	        var repeatNumber = sampleFields.RepeatNumber;
-	        var repeatSpan = sampleFields.RepeatNumberSpan;
-            
-            var sample = new Sample(genotype, genotypeQuality, variantFrequency, totalDepth, alleleDepths,
-                failedFilter, copyNumber, isLossOfHeterozygosity, deNovoQuality, splitReadCounts, pairEndReadCounts, repeatNumber, repeatSpan);
+                                         sampleFields.MajorChromosomeCount.Value == sampleFields.CopyNumber.Value &&
+                                         sampleFields.CopyNumber.Value > 1;
+
+            var sample = new Sample(genotype, genotypeQuality, variantFrequency, totalDepth, alleleDepths, failedFilter,
+                sampleFields.CopyNumber, isLossOfHeterozygosity, sampleFields.DenovoQuality, splitReadCounts,
+                pairEndReadCounts, sampleFields.RepeatNumber, sampleFields.RepeatNumberSpan, sampleFields.MAD,
+                sampleFields.SCH, sampleFields.PLG, sampleFields.PCN, sampleFields.DCS, sampleFields.DID,
+                sampleFields.DST, sampleFields.PCH, sampleFields.CHC);
 
             return sample;
-        }
-
-        /// <summary>
-        /// returns a sample where the empty flag is enabled
-        /// </summary>
-        private static ISample EmptySample()
-        {
-            return new Sample();
         }
     }
 }

@@ -27,7 +27,17 @@
         internal int? DQ;
         internal int? PR;
         internal int? SR;
-        internal int? RGT;
+
+        // SMN1
+        internal int? MAD;
+        internal int? SCH;
+        internal int? PLG;
+        internal int? PCN;
+        internal int? DCS;
+        internal int? DID;
+        internal int? DST;
+        internal int? PCH;
+        internal int? CHC;
         // ReSharper restore InconsistentNaming
 
         #endregion
@@ -41,7 +51,7 @@
             if (formatColumn == null) return null;
 
             var formatIndices = new FormatIndices();
-            var formatCols = formatColumn.Split(':');
+            var formatCols    = formatColumn.Split(':');
 
             for (var index = 0; index < formatCols.Length; index++)
             {
@@ -113,8 +123,32 @@
                     case "SR":
                         formatIndices.SR = index;
                         break;
-                    case "RGT":
-                        formatIndices.RGT = index;
+                    case "MAD":
+                        formatIndices.MAD = index;
+                        break;
+                    case "SCH":
+                        formatIndices.SCH = index;
+                        break;
+                    case "PLG":
+                        formatIndices.PLG = index;
+                        break;
+                    case "PCN":
+                        formatIndices.PCN = index;
+                        break;
+                    case "DCS":
+                        formatIndices.DCS = index;
+                        break;
+                    case "DID":
+                        formatIndices.DID = index;
+                        break;
+                    case "DST":
+                        formatIndices.DST = index;
+                        break;
+                    case "PCH":
+                        formatIndices.PCH = index;
+                        break;
+                    case "CHC":
+                        formatIndices.CHC = index;
                         break;
                 }
             }

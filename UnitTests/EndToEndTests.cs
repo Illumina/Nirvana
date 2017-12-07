@@ -14,8 +14,6 @@ namespace UnitTests
         private string _cacheFilePrefix = Resources.TopPath(Path.Combine("GRCh37_chr12_7018490_7086889", "chr12_7018490_7086889_BothRefSeqAndEnsembl84_pos"));
         private  string _saDirectory = Resources.TopPath(Path.Combine("GRCh37_chr12_7018490_7086889",  "SA"));
 
-
-
         [Fact]
         public void Annotation_RefMinor_not_annotated_when_no_SA()
         {
@@ -25,9 +23,7 @@ namespace UnitTests
 
             var output = annotatedPosition.GetJsonString();
             Assert.Null(output);
-
         }
-
 
         [Theory]
         [InlineData("chr12	7045879	.	C	<STR14>,<STR22>	.	PASS	SVTYPE=STR;END=7045936;REF=19;RL=57;RU=CAG;REPID=DRPLA	GT:SO:CN:CI:AD_SP:AD_FL:AD_IR	1/2:SPANNING/SPANNING:14/22:9/4:19/20:0/0", "{\"chromosome\":\"chr12\",\"position\":7045879,\"repeatUnit\":\"CAG\",\"refRepeatCount\":19,\"svEnd\":7045936,\"refAllele\":\"C\",\"altAlleles\":[\"<STR14>\",\"<STR22>\"],\"filters\":[\"PASS\"],\"cytogeneticBand\":\"12p13.31\",\"samples\":[{\"genotype\":\"1/2\",\"repeatNumbers\":\"14/22\",\"repeatNumberSpans\":\"9/4\"}],\"variants\":[{\"vid\":\"12:7045880:7045936:CAG:14\",\"chromosome\":\"chr12\",\"begin\":7045880,\"end\":7045936,\"refAllele\":\"C\",\"altAllele\":\"STR14\",\"variantType\":\"short_tandem_repeat_variation\",\"transcripts\":{\"refSeq\":[{\"transcript\":\"NM_001007026.1\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_contraction\"],\"isCanonical\":true,\"proteinId\":\"NP_001007027.1\"},{\"transcript\":\"XM_005253672.1\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_contraction\"],\"proteinId\":\"XP_005253729.1\"},{\"transcript\":\"NM_001940.3\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_contraction\"],\"proteinId\":\"NP_001931.2\"}],\"ensembl\":[{\"transcript\":\"ENST00000356654.4\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_contraction\"],\"isCanonical\":true,\"proteinId\":\"ENSP00000349076.3\"},{\"transcript\":\"ENST00000396684.2\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_contraction\"],\"proteinId\":\"ENSP00000379915.2\"}]}},{\"vid\":\"12:7045880:7045936:CAG:22\",\"chromosome\":\"chr12\",\"begin\":7045880,\"end\":7045936,\"refAllele\":\"C\",\"altAllele\":\"STR22\",\"variantType\":\"short_tandem_repeat_variation\",\"transcripts\":{\"refSeq\":[{\"transcript\":\"NM_001007026.1\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_expansion\"],\"isCanonical\":true,\"proteinId\":\"NP_001007027.1\"},{\"transcript\":\"XM_005253672.1\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_expansion\"],\"proteinId\":\"XP_005253729.1\"},{\"transcript\":\"NM_001940.3\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_expansion\"],\"proteinId\":\"NP_001931.2\"}],\"ensembl\":[{\"transcript\":\"ENST00000356654.4\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_expansion\"],\"isCanonical\":true,\"proteinId\":\"ENSP00000349076.3\"},{\"transcript\":\"ENST00000396684.2\",\"bioType\":\"protein_coding\",\"exons\":\"5/10\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"short_tandem_repeat_expansion\"],\"proteinId\":\"ENSP00000379915.2\"}]}}]}")]
@@ -53,16 +49,5 @@ namespace UnitTests
             var output = annotatedPosition.GetJsonString();
             Assert.Equal(expectedOutPut, output);
         }
-
-
-
-
-
-
-
-
-
-
-
     }
 }

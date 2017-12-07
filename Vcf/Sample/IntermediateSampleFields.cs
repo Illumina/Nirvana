@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using VariantAnnotation.Interface.IO;
+﻿using VariantAnnotation.Interface.IO;
 
 namespace Vcf.Sample
 {
@@ -7,153 +6,131 @@ namespace Vcf.Sample
     {
         public FormatIndices FormatIndices { get; }
         public string[] SampleColumns { get; }
-
-        public int? Tir { get; private set; }
-        public int? Tar { get; private set; }
-        public int? TotalAlleleCount { get; private set; }
-        public string VcfRefAllele { get; }
-        // ReSharper disable InconsistentNaming
-        public int? ACount { get; private set; }
-        public int? CCount { get; private set; }
-        public int? GCount { get; private set; }
-        public int? TCount { get; private set; }
-        public int? NR { get; private set; }
-        public int? NV { get; private set; }
-        // ReSharper restore InconsistentNaming
-        public int? MajorChromosomeCount { get; }
-        public int? CopyNumber { get; }
         public string[] AltAlleles { get; }
+
+        public int? TotalAlleleCount { get; }
+        public string VcfRefAllele { get; }
+        public int? MajorChromosomeCount { get; }
+        public int? CopyNumber { get; }        
         public string RepeatNumber { get; }
         public string RepeatNumberSpan { get; }
         public float? DenovoQuality { get; }
 
-        // constructor
-        public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols, bool fixGatkGenomeVcf = false)
+        // ReSharper disable InconsistentNaming
+        public int? TIR { get; }
+        public int? TAR { get; }
+        public int? ACount { get; }
+        public int? CCount { get; }
+        public int? GCount { get; }
+        public int? TCount { get; }
+        public int? NR { get; }
+        public int? NV { get; }
+        public int[] MAD { get; }
+        public string SCH { get; }
+        public int[] PLG { get; }
+        public int[] PCN { get; }
+        public string[] DCS { get; }
+        public string[] DID { get; }
+        public string DST { get; }
+        public int[] PCH { get; }
+        public bool CHC { get; }
+        // ReSharper restore InconsistentNaming
+
+        public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols)
         {
-            VcfRefAllele = vcfColumns[VcfCommon.RefIndex];
+            VcfRefAllele  = vcfColumns[VcfCommon.RefIndex];
+            AltAlleles    = vcfColumns[VcfCommon.AltIndex].Split(',');
             FormatIndices = formatIndices;
             SampleColumns = sampleCols;
 
-            if (formatIndices.MCC != null)
-            {
-                if (sampleCols[formatIndices.MCC.Value] != ".")
-                    MajorChromosomeCount = int.Parse(sampleCols[formatIndices.MCC.Value]);
-            }
+            (TAR, TIR)           = GetLinkedIntegers(GetFirstValue(GetString(formatIndices.TAR, sampleCols)), GetFirstValue(GetString(formatIndices.TIR, sampleCols)));
+            (NR, NV)             = GetLinkedIntegers(GetString(formatIndices.NR, sampleCols), GetString(formatIndices.NV, sampleCols));
+            RepeatNumberSpan     = GetString(formatIndices.CI, sampleCols);
+            MajorChromosomeCount = GetInteger(GetString(formatIndices.MCC, sampleCols));
+            DenovoQuality        = GetFloat(GetString(formatIndices.DQ, sampleCols));
+            MAD                  = GetIntegers(GetString(formatIndices.MAD, sampleCols));
+            SCH                  = GetString(formatIndices.SCH, sampleCols);
+            PLG                  = GetIntegers(GetString(formatIndices.PLG, sampleCols));
+            PCN                  = GetIntegers(GetString(formatIndices.PCN, sampleCols));
+            DCS                  = GetStrings(GetString(formatIndices.DCS, sampleCols));
+            DID                  = GetStrings(GetString(formatIndices.DID, sampleCols));
+            DST                  = GetString(formatIndices.DST, sampleCols);
+            PCH                  = GetIntegers(GetString(formatIndices.PCH, sampleCols));
+            CHC                  = GetBool(GetString(formatIndices.CHC, sampleCols), "+");
 
-            if (formatIndices.CN != null)
-            {
-                if (vcfColumns[VcfCommon.AltIndex].Contains("STR"))
-                {
-                    RepeatNumber = sampleCols[formatIndices.CN.Value];
-                    CopyNumber = null;
-                }
-                else if (sampleCols[formatIndices.CN.Value] != ".")
-                    CopyNumber = int.Parse(sampleCols[formatIndices.CN.Value]);
-            }
-            if (formatIndices.CI != null)
-            {
-                if (sampleCols[formatIndices.CI.Value] != ".")
-                {
-                    RepeatNumberSpan = sampleCols[formatIndices.CI.Value];
-                }
-            }
+            (CopyNumber, RepeatNumber) = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
 
-            if (fixGatkGenomeVcf && formatIndices.AD != null)
-            {
-                sampleCols[formatIndices.AD.Value] = CorrectAdInGatkGenomeVcf(sampleCols[formatIndices.AD.Value]);
-            }
-            if (formatIndices.DQ != null)
-            {
-                DenovoQuality = GetDenovoQuality(sampleCols[formatIndices.DQ.Value]);
-            }
-
-            AltAlleles = vcfColumns[VcfCommon.AltIndex].Split(',');
-
-            CalculateTirTar();
-            CalculateRawAlleleCounts();
-            GetPlatypusCounts();
+            (ACount, CCount, GCount, TCount, TotalAlleleCount) = GetAlleleCounts(
+                GetString(formatIndices.AU, sampleCols), GetString(formatIndices.CU, sampleCols),
+                GetString(formatIndices.GU, sampleCols), GetString(formatIndices.TU, sampleCols));
         }
 
-        private static float? GetDenovoQuality(string sampleDqCol)
+        private static string GetString(int? index, string[] cols)
         {
-            var parse = float.TryParse(sampleDqCol, out var denovoQuality);
-
-            if (!parse) return null;
-
-            return denovoQuality;
+            if (index == null) return null;
+            var s = cols[index.Value];
+            return s == "." ? null : s;
         }
 
-        private static string CorrectAdInGatkGenomeVcf(string adString)
+        internal static bool GetBool(string s, string trueString)
         {
-            var ads = adString.Split(',');
-            if (ads.Length < 3) return adString;
-
-            ads = ads.Take(ads.Length - 1).ToArray();
-            return string.Join(",", ads);
+            if (s == null) return false;
+            return s == trueString;
         }
 
-        /// <summary>
-        /// calculates TIR and TAR tier 1 values
-        /// </summary>
-        private void CalculateTirTar()
+        internal static float? GetFloat(string s)
         {
-            if (FormatIndices.TAR == null || FormatIndices.TIR == null) return;
-
-            var tarString = SampleColumns[FormatIndices.TAR.Value];
-            var tirString = SampleColumns[FormatIndices.TIR.Value];
-
-            if (tarString == "." || tirString == ".") return;
-
-            Tar = int.Parse(tarString.Split(',')[0]);
-            Tir = int.Parse(tirString.Split(',')[0]);
+            if (s == null) return null;
+            if (float.TryParse(s, out var ret)) return ret;
+            return null;
         }
 
-        /// <summary>
-        /// calculates allele counts from tier 1
-        /// </summary>
-        private void CalculateRawAlleleCounts()
+        internal static int? GetInteger(string s)
         {
-            if (FormatIndices.AU == null || FormatIndices.CU == null || FormatIndices.GU == null ||
-                FormatIndices.TU == null)
-                return;
-
-            ACount = GetTier1RawCount(FormatIndices.AU.Value);
-            CCount = GetTier1RawCount(FormatIndices.CU.Value);
-            GCount = GetTier1RawCount(FormatIndices.GU.Value);
-            TCount = GetTier1RawCount(FormatIndices.TU.Value);
-
-            if (ACount == null || CCount == null || GCount == null || TCount == null) return;
-
-            TotalAlleleCount = ACount + CCount + GCount + TCount;
+            if (s == null) return null;
+            if (int.TryParse(s, out var ret)) return ret;
+            return null;
         }
 
-        /// <summary>
-        /// grabs the Platypus NR & NV values
-        /// </summary>
-        private void GetPlatypusCounts()
+        private static int[] GetIntegers(string s)
         {
-            if (FormatIndices.NR == null || FormatIndices.NV == null) return;
+            var cols = GetStrings(s);
+            if (cols == null) return null;
 
-            var nrString = SampleColumns[FormatIndices.NR.Value];
-            var nvString = SampleColumns[FormatIndices.NV.Value];
-
-            if (nrString == "." || nvString == ".") return;
-
-            NR = int.Parse(nrString);
-            NV = int.Parse(nvString);
+            var result = new int[cols.Length];
+            for (int i = 0; i < cols.Length; i++) result[i] = int.Parse(cols[i]);
+            return result;
         }
 
-        /// <summary>
-        /// returns a raw count given a genotype field index
-        /// </summary>
-        private int? GetTier1RawCount(int index)
+        private static (int?, int?) GetLinkedIntegers(string s, string s2)
         {
-            var countString = SampleColumns[index].Split(',')[0];
-            if (countString == ".") return null;
-
-            int count;
-            if (!int.TryParse(countString, out count)) return null;
-            return count;
+            var num = GetInteger(s);
+            var num2 = GetInteger(s2);
+            if (num == null || num2 == null) return (null, null);
+            return (num, num2);
         }
+
+        private static string[] GetStrings(string s) => s?.Split(',');
+
+        private static (int? CopyNumber, string RepeatNumber) GetCopyNumber(string s, bool containsStr)
+        {
+            if (s == null) return (null, null);
+            if (containsStr) return (null, s);
+            return (GetInteger(s), null);
+        }
+
+        private static (int?, int?, int?, int?, int?) GetAlleleCounts(string au, string cu, string gu, string tu)
+        {
+            if (au == null || cu == null || gu == null || tu == null) return (null, null, null, null, null);
+
+            var a = GetInteger(GetFirstValue(au));
+            var c = GetInteger(GetFirstValue(cu));
+            var g = GetInteger(GetFirstValue(gu));
+            var t = GetInteger(GetFirstValue(tu));
+            var total = a == null || c == null || g == null || t == null ? null : a + c + g + t;
+            return (a, c, g, t, total);
+        }
+
+        private static string GetFirstValue(string s) => GetStrings(s)?[0];
     }
 }
