@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using CommonUtilities;
-using SAUtils.InputFileParsers.MitoMAP;
+using SAUtils.InputFileParsers.MitoMap;
 using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar

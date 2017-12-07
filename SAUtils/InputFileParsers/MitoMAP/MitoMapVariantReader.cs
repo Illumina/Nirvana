@@ -8,7 +8,7 @@ using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Providers;
 
-namespace SAUtils.InputFileParsers.MitoMAP
+namespace SAUtils.InputFileParsers.MitoMap
 {
     public sealed class MitoMapVariantReader
     {
@@ -152,64 +152,52 @@ namespace SAUtils.InputFileParsers.MitoMAP
             var firstNumberPattern = new Regex(@"(?<firstNumber>^\d+)");
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
             if (!firstNumberMatch.Success) throw new Exception($"Failed to extract variant position from {info[3]}");
-            var posi = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
-            var leftAlgnResults = GetLeftAlignedVariant(posi, "", altAllele); // insertion
+            var position = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
+            var leftAlgnResults = GetLeftAlignedVariant(position, "", altAllele); // insertion
             return new List<MitoMapItem>{new MitoMapItem(leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null)};
         }
 
         private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
         {
             List<MitoMapItem> mitoMapVarItems = new List<MitoMapItem>();
-            int posi = int.Parse(info[fields[0]]);
+            int position = int.Parse(info[fields[0]]);
             var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
             if (DescribedAsDuplicatedRecord(mitomapDiseaseString)) return mitoMapVarItems;
             var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : new List<string> {mitomapDiseaseString};
-            var (refAllele, altAllele, extractedPosi) = GetRefAltAlleles(info[fields[2]]);
-            if (extractedPosi.HasValue && posi != extractedPosi)
-                Console.WriteLine($"Inconsistant positions found: annotated position: {posi}; allele {info[fields[2]]}");
-            if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele))
+            var (refAllele, rawAltAllele, extractedPosition) = GetRefAltAlleles(info[fields[2]]);
+            if (extractedPosition.HasValue && position != extractedPosition)
+                Console.WriteLine($"Inconsistant positions found: annotated position: {position}; allele {info[fields[2]]}");
+            if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(rawAltAllele))
             {
-                Console.WriteLine($"No reference and alternative alleles could be extracted: {posi}; allele {info[fields[2]]}");
+                Console.WriteLine($"No reference and alternative alleles could be extracted: {position}; allele {info[fields[2]]}");
                 return mitoMapVarItems;
             }
-            if (_mitoMapDelSymbolSet.Contains(altAllele)) altAllele = DelSymbol;
+            if (_mitoMapDelSymbolSet.Contains(rawAltAllele)) rawAltAllele = DelSymbol;
             bool? homoplasmy = null;
             if (fields[3] != -1 && _symbolToBools.ContainsKey(info[fields[3]])) homoplasmy = _symbolToBools[info[fields[3]]];
             bool? heteroplasmy = null;
             if (fields[4] != -1 && _symbolToBools.ContainsKey(info[fields[4]])) heteroplasmy = _symbolToBools[info[fields[4]]];
             string status = fields[5] == -1 ? null : info[fields[5]];
             var (scorePercentile, clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
-            if (!string.IsNullOrEmpty(altAllele))
+            if (!string.IsNullOrEmpty(rawAltAllele))
             {
-                /* disable degenerate base expanding for now
-                if (DegenerateBaseUtilities.HasDegenerateBase(altAllele))
+                foreach (var altAllele in GetAltAlleles(rawAltAllele))
                 {
-                    Console.WriteLine($"Expand Alternative Allele Sequence {altAllele} at {posi}");
-                    foreach (var possibleAltAllele in DegenerateBaseUtilities.GetAllPossibleSequences(altAllele))
-                    {
-                        mitoMapMutItems.Add(new MitoMapMutItem(posi, refAllele, possibleAltAllele, disease, homoplasmy,
-                            heteroplasmy, status, clinicalSignificance, scorePercentile));
-                    }
-                    return mitoMapMutItems;
+                    var thisLeftAlignResults = GetLeftAlignedVariant(position, refAllele, altAllele);
+                    mitoMapVarItems.Add(new MitoMapItem(thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
                 }
-                else if (altAllele.Contains(";")) */
-                if (altAllele.Contains(";"))
-                {
-                    Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {posi}");
-                    foreach (var possibleAltAllele in altAllele.Split(";"))
-                    {
-                        var thisLeftAlignResults = GetLeftAlignedVariant(posi, refAllele, possibleAltAllele);
-                        mitoMapVarItems.Add(new MitoMapItem(thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,
-                            heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
-                    }
-                    return mitoMapVarItems;
-                }
+                if (mitoMapVarItems.Count > 1) Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {position}");
+                return mitoMapVarItems;         
             }
-            var leftAlignResults = GetLeftAlignedVariant(posi, refAllele, altAllele);
+            var leftAlignResults = GetLeftAlignedVariant(position, refAllele, rawAltAllele);
             mitoMapVarItems.Add(new MitoMapItem(leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null));
             return mitoMapVarItems;
         }
+
+        // there may be multiple alt alleles concatenated by ";"
+        internal static IEnumerable<string> GetAltAlleles(string rawAltAllele) => rawAltAllele.Split(";").Select(DegenerateBaseUtilities.GetAllPossibleSequences).SelectMany(x => x);
+
 
         private static bool DescribedAsDuplicatedRecord(string mitomapDiseaseString)
         {
@@ -259,13 +247,13 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private (string, string, int?) GetRefAltAlleles(string alleleString)
         {
             // C123T, A-del or A123del
-            var regexPattern1 = new Regex(@"(?<ref>^[ACGTacgtNn]+)(?<posi>(\d+|-))(?<alt>([ACGTBDHKMRSVWYNacgtbdhkmrsvwyn]+|:|del[ACGTacgtNn]*|d)$)");
+            var regexPattern1 = new Regex(@"(?<ref>^[ACGTacgtNn]+)(?<position>(\d+|-))(?<alt>([ACGTBDHKMRSVWYNacgtbdhkmrsvwyn]+|:|del[ACGTacgtNn]*|d)$)");
             var match1 = regexPattern1.Match(alleleString);
             if (match1.Success)
             {
-                int? extractedPosi = null;
-                if (match1.Groups["posi"].Value != "-") extractedPosi = int.Parse(match1.Groups["posi"].Value);
-                return (match1.Groups["ref"].Value, match1.Groups["alt"].Value, extractedPosi);
+                int? extractedPosition = null;
+                if (match1.Groups["position"].Value != "-") extractedPosition = int.Parse(match1.Groups["position"].Value);
+                return (match1.Groups["ref"].Value, match1.Groups["alt"].Value, extractedPosition);
             }
 
             // 16021_16022del
@@ -278,23 +266,23 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 return (GetRefAllelesFromReferece(_sequenceProvider, start, end - start + 1), "-", start);
             }
             // 8042del2
-            var regexPattern3 = new Regex(@"(?<posi>^\d+)del(?<length>\d+)");
+            var regexPattern3 = new Regex(@"(?<position>^\d+)del(?<length>\d+)");
             var match3 = regexPattern3.Match(alleleString);
             if (match3.Success)
             {
-                var extractedPosi = int.Parse(match3.Groups["posi"].Value);
-                return (GetRefAllelesFromReferece(_sequenceProvider, extractedPosi,
-                    int.Parse(match3.Groups["length"].Value)), "-", extractedPosi);
+                var extractedPosition = int.Parse(match3.Groups["position"].Value);
+                return (GetRefAllelesFromReferece(_sequenceProvider, extractedPosition,
+                    int.Parse(match3.Groups["length"].Value)), "-", extractedPosition);
             }
             // C9537insC
-            var regexPattern4 = new Regex(@"(?<ref>[ACGTacgtNn])(?<posi>\d+)ins(?<extra>[ACGTacgtNn]+)");
+            var regexPattern4 = new Regex(@"(?<ref>[ACGTacgtNn])(?<position>\d+)ins(?<extra>[ACGTacgtNn]+)");
             var match4 = regexPattern4.Match(alleleString);
             if (match4.Success)
             {
-                var extractedPosi = int.Parse(match4.Groups["posi"].Value);
+                var extractedPosition = int.Parse(match4.Groups["position"].Value);
                 var refAllele = match4.Groups["ref"].Value;
                 var altAllele = refAllele + match4.Groups["extra"].Value;
-                return (refAllele, altAllele, extractedPosi);
+                return (refAllele, altAllele, extractedPosition);
             }
             // 3902_3908invACCTTGC
             var regexPattern5 = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)inv(?<seq>[ACGTacgtNn]+)");
@@ -358,22 +346,22 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return allItems.OrderBy(x => x.Start);
         }
 
-        private (int RefPosition, string RefAllele, string AltAllele) GetLeftAlignedVariant(int posi, string refAllele, string altAllele)
+        private (int RefPosition, string RefAllele, string AltAllele) GetLeftAlignedVariant(int position, string refAllele, string altAllele)
         {
-            if (refAllele == null || altAllele == null) return (posi, refAllele, altAllele);
-            var leftAlgnResults = _variantAligner.LeftAlign(posi, refAllele, altAllele); 
-            var newPosi = leftAlgnResults.RefPosition;
+            if (refAllele == null || altAllele == null) return (position, refAllele, altAllele);
+            var leftAlgnResults = _variantAligner.LeftAlign(position, refAllele, altAllele); 
+            var newPosition = leftAlgnResults.RefPosition;
             var newRefAllele = leftAlgnResults.RefAllele;
             var newAltAllele = leftAlgnResults.AltAllele;
-            if (posi == newPosi) return leftAlgnResults;
+            if (position == newPosition) return leftAlgnResults;
             if (newRefAllele == "") // insertion
                 Console.WriteLine(
-                    $"Insertion of {altAllele}. Original start position: {posi}; new position after left-alignment {newPosi}; new altAllele {newAltAllele}");
+                    $"Insertion of {altAllele}. Original start position: {position}; new position after left-alignment {newPosition}; new altAllele {newAltAllele}");
             else if (newAltAllele == "") // deletion
-                Console.WriteLine($"Deletion of {newRefAllele.Length} bps. Original start start position: {posi}; new position after left-alignment {newPosi}.");
+                Console.WriteLine($"Deletion of {newRefAllele.Length} bps. Original start start position: {position}; new position after left-alignment {newPosition}.");
             else
             {
-                throw new Exception($"{posi}:{refAllele}:{altAllele} becomes {newPosi}:{newRefAllele}:{newAltAllele} after left alignment. Left-alignment should be only performed for deletions and insertions");
+                throw new Exception($"{position}:{refAllele}:{altAllele} becomes {newPosition}:{newRefAllele}:{newAltAllele} after left alignment. Left-alignment should be only performed for deletions and insertions");
             }
             return leftAlgnResults;
         }

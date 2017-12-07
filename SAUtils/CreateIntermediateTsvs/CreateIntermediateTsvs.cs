@@ -16,7 +16,7 @@ using SAUtils.InputFileParsers.DbSnp;
 using SAUtils.InputFileParsers.DGV;
 using SAUtils.InputFileParsers.EVS;
 using SAUtils.InputFileParsers.ExAc;
-using SAUtils.InputFileParsers.MitoMAP;
+using SAUtils.InputFileParsers.MitoMap;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.SA;

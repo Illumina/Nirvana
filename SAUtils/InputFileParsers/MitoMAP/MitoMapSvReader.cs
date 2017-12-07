@@ -9,7 +9,7 @@ using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Providers;
 
-namespace SAUtils.InputFileParsers.MitoMAP
+namespace SAUtils.InputFileParsers.MitoMap
 {
     public sealed class MitoMapSvReader
     {

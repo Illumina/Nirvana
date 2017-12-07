@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using VariantAnnotation.Interface.Sequence;
 
-namespace SAUtils.InputFileParsers.MitoMAP
+namespace SAUtils.InputFileParsers.MitoMap
 {
     public sealed class CircularGenomeModel
     {
