@@ -31,10 +31,14 @@ namespace VariantAnnotation.IO.Caches
 
 	        if (genomeAssembly != _header?.GenomeAssembly)
 	        {
-		        Console.WriteLine($"Sequence provider has {genomeAssembly}, but cache has {_header?.GenomeAssembly}.");
-		        throw new InconsistantGenomeAssemblyException();
-	        }
-		}
+	            throw new UserErrorException("Found more than one genome assembly represented in the selected data sources.");
+            }
+
+            if (_header.SchemaVersion != CacheConstants.SchemaVersion)
+            {
+                throw new UserErrorException($"The selected cache file has a different version (Schema: {_header.SchemaVersion}, Data: {_header.DataVersion}) than expected (Schema: {CacheConstants.SchemaVersion}, Data: {CacheConstants.DataVersion})");
+            }
+        }
 
         public void Dispose() => _reader.Dispose();
 
@@ -81,6 +85,7 @@ namespace VariantAnnotation.IO.Caches
         {
             var vepVersion = ((TranscriptCacheCustomHeader)header.CustomHeader).VepVersion;
             var dataSourceVersion = new DataSourceVersion("VEP", vepVersion.ToString(), header.CreationTimeTicks, header.TranscriptSource.ToString());
+
             return new List<IDataSourceVersion> { dataSourceVersion };
         }
     }

@@ -178,27 +178,5 @@ namespace UnitTests.VariantAnnotation
 			Assert.NotNull(annotator);
 
 		}
-
-		[Fact]
-		public void CheckGenomeAssemblyConsistancy_inconsistant()
-		{
-			var taProvider = new Mock<IAnnotationProvider>();
-			taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
-
-			var saProvider = new Mock<IAnnotationProvider>();
-			saProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
-
-			var csProvider = new Mock<IAnnotationProvider>();
-			csProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh38);
-
-			var omimProvider = new Mock<IGeneAnnotationProvider>();
-			omimProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
-
-
-			Assert.Throws<InconsistantGenomeAssemblyException>( ()=> new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object));
-
-		}
-
-
 	}
 }

@@ -57,7 +57,7 @@ namespace VariantAnnotation
             {
                 Console.WriteLine($"{assembly.Value} has genome assembly {assembly.Key}");
             }
-            throw new InconsistantGenomeAssemblyException();
+            throw new UserErrorException("Found more than one genome assembly represented in the selected data sources.");
 
         }
 
@@ -69,10 +69,8 @@ namespace VariantAnnotation
                 var pluginAssembly = plugin.GetGenomeAssembly();
                 if (pluginAssembly != null && pluginAssembly != assembly)
                 {
-                    Console.WriteLine($"plugins have inconsistent genome assembly {pluginAssembly}");
-                    throw new InconsistantGenomeAssemblyException();
-                }
-  
+                    throw new UserErrorException("Found more than one genome assembly represented in the selected data sources.");
+                }  
             }
         }
 
