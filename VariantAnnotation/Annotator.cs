@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
+using ErrorHandling.Exceptions;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
@@ -43,23 +43,31 @@ namespace VariantAnnotation
 
         private GenomeAssembly GetGenomeAssembly()
         {
-            var assemblies = new Dictionary<GenomeAssembly, string>();
-            if (_taProvider           != null) assemblies[_taProvider.GenomeAssembly]           = _taProvider.Name;
-            if (_saProviders          != null) assemblies[_saProviders.GenomeAssembly]          = _saProviders.Name;
-            if (_sequenceProvider     != null) assemblies[_sequenceProvider.GenomeAssembly]     = _sequenceProvider.Name;
-            if (_conservationProvider != null) assemblies[_conservationProvider.GenomeAssembly] = _conservationProvider.Name;
+            var assemblies = new Dictionary<GenomeAssembly, List<string>>();
+            AddGenomeAssembly(assemblies, _taProvider);
+            AddGenomeAssembly(assemblies, _saProviders);
+            AddGenomeAssembly(assemblies, _sequenceProvider);
+            AddGenomeAssembly(assemblies, _conservationProvider);
 
             if (assemblies.Count == 0) return GenomeAssembly.Unknown;
-            if (assemblies.Count != 1) throw new InvalidDataException(GetGenomeAssemblyErrorMessage(assemblies));
+            if (assemblies.Count != 1) throw new UserErrorException(GetGenomeAssemblyErrorMessage(assemblies));
 
             CheckPluginGenomeAssemblyConsistency(assemblies.First().Key);
             return assemblies.First().Key;
         }
 
-        private static string GetGenomeAssemblyErrorMessage(Dictionary<GenomeAssembly, string> assemblies)
+        private static void AddGenomeAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
+        {
+            if (provider == null) return;
+            if (assemblies.TryGetValue(provider.GenomeAssembly, out var assemblyList)) assemblyList.Add(provider.Name);
+            else assemblies[provider.GenomeAssembly] = new List<string> { provider.Name };
+        }
+
+        private static string GetGenomeAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
         {
             var sb = new StringBuilder();
-            foreach (var assembly in assemblies) sb.AppendLine($"{assembly.Value} has genome assembly {assembly.Key}");
+            sb.AppendLine("Not all of the data sources have the same genome assembly:");
+            foreach (var assembly in assemblies) sb.AppendLine($"- Using {assembly.Key}: {string.Join(", ", assembly.Value)}");
             return sb.ToString();
         }
 
@@ -70,7 +78,7 @@ namespace VariantAnnotation
             foreach (var plugin in _plugins)
             {
                 if (plugin.GenomeAssembly == systemGenomeAssembly || plugin.GenomeAssembly == GenomeAssembly.Unknown) continue;
-                throw new InvalidDataException($"At least one plugin does not have the same genome assembly ({plugin.GenomeAssembly}) as the system genome assembly ({systemGenomeAssembly})");
+                throw new UserErrorException($"At least one plugin does not have the same genome assembly ({plugin.GenomeAssembly}) as the system genome assembly ({systemGenomeAssembly})");
             }
         }
 

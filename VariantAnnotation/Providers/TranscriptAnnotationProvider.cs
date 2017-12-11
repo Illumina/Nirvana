@@ -59,7 +59,7 @@ namespace VariantAnnotation.Providers
 
         private static void CheckHeaderVersion(CacheHeader header)
         {
-            if(!(header.CustomHeader is TranscriptCacheCustomHeader customHeader)) throw new InvalidCastException("Unable to cast the custom header to a transcript cache custom header.");
+            if (!(header.CustomHeader is TranscriptCacheCustomHeader customHeader)) throw new InvalidCastException("Unable to cast the custom header to a transcript cache custom header.");
 
             if (customHeader.VepVersion != CacheConstants.VepVersion)
                 throw new UserErrorException(

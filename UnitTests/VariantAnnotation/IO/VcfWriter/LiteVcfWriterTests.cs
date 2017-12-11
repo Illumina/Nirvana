@@ -37,6 +37,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         {
             var ms = new MemoryStream();
             var writer = new StreamWriter(ms, Encoding.Default, 1024, true);
+
             var currentHeaderLines = new List<string>
             {
                 "##fileformat=VCFv4.1",
@@ -45,6 +46,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 "#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  Mother"
 
             };
+
             var dataSourceVersions = new IDataSourceVersion[]
             {
                 new DataSourceVersion("VEP", "84", DateTime.Parse("2017/7/21").Ticks, "RefSeq"),
@@ -52,8 +54,9 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 new DataSourceVersion("dbSNP", "72", DateTime.Parse("2017/8/15").Ticks),
                 new DataSourceVersion("dummy", "2", DateTime.Parse("2017/9/15").Ticks) //should not showing in output
             };
+
             const string vcfLine = "1       10167   .       C       A       4       LowGQXHetSNP    SNVSB=0.0;SNVHPOL=3;CSQT=1|DDX11L1|ENST00000456328.2|upstream_gene_variant,1|WASH7P|ENST00000438504.2|downstream_gene_variant,1|DDX11L1|NR_046018.2|upstream_gene_variant,1|WASH7P|NR_024540.1|downstream_gene_variant;CSQR=1|ENSR00001576074|regulatory_region_variant,1|ENSR00001576074|regulatory_region_variant     GT:GQ:GQX:DP:DPF:AD     0/1:34:8:3:0:2,1";
-            using (var vcfWriter = new LiteVcfWriter(writer,currentHeaderLines, "Illumina Annotation Engine 2.0.2", "84.21.41",dataSourceVersions))
+            using (var vcfWriter = new LiteVcfWriter(writer,currentHeaderLines, "Illumina Annotation Engine 2.0.4", "84.21.41",dataSourceVersions))
             {
                 vcfWriter.Write(vcfLine);
             }
@@ -63,14 +66,13 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 "##fileformat=VCFv4.1",
                 "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
                 "##source=IsaacVariantCaller",
-                "##annotator=Illumina Annotation Engine 2.0.2",
+                "##annotator=Illumina Annotation Engine 2.0.4",
                 "##annotatorDataVersion=84.21.41",
                 "##annotatorTranscriptSource=RefSeq",
                 "##dataSource=1000 Genomes Project,version:v5,release date:2017-07-21",
                 "##dataSource=dbSNP,version:72,release date:2017-08-15"
-                
-               
             };
+
             expectedLines.AddRange(_infoHeaderLines);
             expectedLines.Add(CsqtHeaderLine);
             expectedLines.Add(CsqrHeaderLine);

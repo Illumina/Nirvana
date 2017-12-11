@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SAUtils.InputFileParsers.MitoMap;
+﻿using SAUtils.InputFileParsers.MitoMap;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
