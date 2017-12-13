@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using ErrorHandling.Exceptions;
 using Moq;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -191,7 +192,7 @@ namespace UnitTests.VariantAnnotation
             var omimProvider = new Mock<IGeneAnnotationProvider>();
             omimProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
 
-            Assert.Throws<InvalidDataException>(() => new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object));
+            Assert.Throws<UserErrorException>(() => new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object));
         }
     }
 }
