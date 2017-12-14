@@ -76,7 +76,7 @@ namespace SAUtils.DataStructures
             if (_heteroplasmy.HasValue) jsonObject.AddBoolValue("hasHeteroplasmy", _heteroplasmy.Value, true);  
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
             if (!string.IsNullOrEmpty(_clinicalSignificance)) jsonObject.AddStringValue("clinicalSignificance", _clinicalSignificance);
-            if (!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile);
+            if (!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile, false);
             return sb.ToString();
         }
 
