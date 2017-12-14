@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
@@ -35,9 +36,12 @@ namespace VariantAnnotation.Providers
 
         public TranscriptAnnotationProvider(string pathPrefix,  ISequenceProvider sequenceProvider)
         {
-            Name               = "Transcript annotation provider";
-            _sequence          = sequenceProvider.Sequence;
-            _transcriptCache   = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)), sequenceProvider.RefIndexToChromosome);
+            Name      = "Transcript annotation provider";
+            _sequence = sequenceProvider.Sequence;
+
+            _transcriptCache = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)),
+                sequenceProvider.RefIndexToChromosome, sequenceProvider.GenomeAssembly);
+
             GenomeAssembly     = _transcriptCache.GenomeAssembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
@@ -45,20 +49,23 @@ namespace VariantAnnotation.Providers
             _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)), PredictionCacheReader.PolyphenDescriptions);
         }
 
-        private static TranscriptCache InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
+        private static TranscriptCache InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refGenomeAssembly)
         {
             TranscriptCache cache;
             using (var reader = new TranscriptCacheReader(stream))
             {
-                CheckHeaderVersion(reader.Header);
+                CheckHeaderVersion(reader.Header, refGenomeAssembly);
                 cache = reader.Read(refIndexToChromosome).GetCache();
             }
                 
             return cache;
         }
 
-        private static void CheckHeaderVersion(CacheHeader header)
+        private static void CheckHeaderVersion(CacheHeader header, GenomeAssembly refGenomeAssembly)
         {
+            if (header.GenomeAssembly != refGenomeAssembly)
+                throw new UserErrorException(GetGenomeAssemblyErrorMessage(header.GenomeAssembly, refGenomeAssembly));
+
             if (!(header.CustomHeader is TranscriptCacheCustomHeader customHeader)) throw new InvalidCastException("Unable to cast the custom header to a transcript cache custom header.");
 
             if (customHeader.VepVersion != CacheConstants.VepVersion)
@@ -68,6 +75,15 @@ namespace VariantAnnotation.Providers
             if (header.SchemaVersion != CacheConstants.SchemaVersion)
                 throw new UserErrorException(
                     $"Expected the cache schema version ({CacheConstants.SchemaVersion}) to be identical to the schema version in the cache header ({header.SchemaVersion})");
+        }
+
+        private static string GetGenomeAssemblyErrorMessage(GenomeAssembly cacheGenomeAssembly, GenomeAssembly refGenomeAssembly)
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("Not all of the data sources have the same genome assembly:");
+            sb.AppendLine($"- Using {refGenomeAssembly}: Reference sequence provider");
+            sb.AppendLine($"- Using {cacheGenomeAssembly}: Transcript annotation provider");
+            return sb.ToString();
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
