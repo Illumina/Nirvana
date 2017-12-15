@@ -4,13 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
+using ErrorHandling.Exceptions;
 using VariantAnnotation.Interface.Plugins;
 
 namespace Nirvana
 {
     public static class PluginUtilities
     {
-        public const string ConfigExtension = ".dll.config";
+        private const string ConfigExtension = ".config";
         public static IPlugin[] LoadPlugins(string pluginDirectory)
         {
             IEnumerable<IPlugin> plugins;
@@ -19,10 +20,8 @@ namespace Nirvana
 
             if (!Directory.Exists(path)) return null;
 
-            var assemblies = Directory
-                .GetFiles(path, "*.dll", SearchOption.AllDirectories)
-                .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
-                .ToList();
+            var pluginFileNames = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
+            var assemblies = pluginFileNames.Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToArray();
 
             var configuration = new ContainerConfiguration().WithAssemblies(assemblies);
 
@@ -31,11 +30,13 @@ namespace Nirvana
                 plugins = container.GetExports<IPlugin>();
             }
             var pluginArray = plugins.ToArray();
-            //check for config files
 
-            foreach (var plugin in pluginArray)
+            if (pluginFileNames.Length != pluginArray.Length)
+                throw new UserErrorException("Some dlls are not plugins !!");
+
+            foreach (var pluginFileName in pluginFileNames)
             {
-                var configFilePath = Path.Combine(path, plugin.Name + ConfigExtension);
+                var configFilePath = Path.Combine(path, pluginFileName + ConfigExtension);
                 if (! File.Exists(configFilePath))
                     throw new FileNotFoundException($"Missing expected config file: {configFilePath}!!");
             }
