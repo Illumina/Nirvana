@@ -20,11 +20,14 @@ namespace VariantAnnotation.AnnotatedPositions
 
         private static readonly string[] TranscriptLabels = { "refSeq", "ensembl" };
 
+        public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
+
         public AnnotatedVariant(IVariant variant)
         {
             Variant = variant;
         }
 
+        
         public string GetJsonString(string originalChromName)
         {
             var sb = new StringBuilder();
@@ -61,6 +64,10 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
             if (SupplementaryAnnotations.Count > 0) AddSAstoJsonObject(jsonObject);
+            foreach (var pluginData in PluginDataSet)
+            {
+                jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
+            }
 
             if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes);
             if(OverlappingTranscripts.Count>0) jsonObject.AddObjectValues("overlappingTranscripts",OverlappingTranscripts);
