@@ -11,10 +11,10 @@ namespace Nirvana
 {
     public static class PluginUtilities
     {
+        private const string DllExtension = ".dll";
         private const string ConfigExtension = ".config";
         public static IPlugin[] LoadPlugins(string pluginDirectory)
         {
-            IEnumerable<IPlugin> plugins;
             var executableLocation = Assembly.GetEntryAssembly().Location;
             var path = pluginDirectory ?? Path.Combine(Path.GetDirectoryName(executableLocation), "Plugins");
 
@@ -25,23 +25,20 @@ namespace Nirvana
 
             var configuration = new ContainerConfiguration().WithAssemblies(assemblies);
 
+            IPlugin[] plugins;
             using (var container = configuration.CreateContainer())
             {
-                plugins = container.GetExports<IPlugin>();
+                plugins = container.GetExports<IPlugin>().ToArray();
             }
-            var pluginArray = plugins.ToArray();
 
-            if (pluginFileNames.Length != pluginArray.Length)
-                throw new UserErrorException("Some dlls are not plugins !!");
-
-            foreach (var pluginFileName in pluginFileNames)
+            foreach (var plugin in plugins)
             {
-                var configFilePath = Path.Combine(path, pluginFileName + ConfigExtension);
-                if (! File.Exists(configFilePath))
+                var configFilePath = Path.Combine(path, plugin.Name + DllExtension + ConfigExtension);
+                if (!File.Exists(configFilePath))
                     throw new FileNotFoundException($"Missing expected config file: {configFilePath}!!");
             }
-            return pluginArray;
+            return plugins;
         }
-        
+
     }
 }
