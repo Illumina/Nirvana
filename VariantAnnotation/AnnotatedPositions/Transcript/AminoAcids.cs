@@ -11,6 +11,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public const string StopCodon = "*";
 	    public const char StopCodonChar = '*';
 
+        public const string StartCodon = "M";
 
 		private readonly CodonConversion _codonConversionScheme = CodonConversion.HumanChromosome;
 

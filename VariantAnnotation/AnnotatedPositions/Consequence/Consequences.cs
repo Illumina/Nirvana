@@ -159,6 +159,9 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             // IncompleteTerminalCodonVariant
             if (_variantEffect.IsIncompleteTerminalCodonVariant()) _consequences.Add(ConsequenceTag.incomplete_terminal_codon_variant);
 
+            // StartRetainedVariant
+            if (_variantEffect.IsStartRetained()) _consequences.Add(ConsequenceTag.start_retained_variant);
+
             // StopRetainedVariant
             if (_variantEffect.IsStopRetained()) _consequences.Add(ConsequenceTag.stop_retained_variant);
 

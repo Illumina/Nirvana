@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Nirvana": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\25\\GRCh37\\Ensembl90 --sd C:\\Development\\SupplementaryDatabase\\42\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in C:\\Development\\TestDatasets\\NewExpansionHunter_NA12877-ExpansionHunter-Germline-short-hg19.vcf.gz --out c:\\Development\\TestDatasets\\expHunt"
     },
     "YJ_Nirvana": {
       "commandName": "Project",
@@ -10,7 +11,7 @@
     },
     "RR_Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\25\\GRCh37\\Ensembl90 --sd C:\\Development\\SupplementaryDatabase\\41\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in c:\\Development\\TestDatasets\\NewExpansionHunter_NA12877-ExpansionHunter-Germline-short-hg19.vcf.gz --out c:\\Development\\TestDatasets\\expHunt --plugin C:\\Development\\ExpansionHunterPlugin\\ExpansionHunterPlugin\\bin\\Debug\\netcoreapp2.0",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\25\\GRCh37\\Ensembl90 --sd C:\\Development\\SupplementaryDatabase\\42\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz --out badVariant",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "MS_ClinVar": {

@@ -15,6 +15,7 @@
         inframe_deletion,
         inframe_insertion,
         start_lost,
+        start_retained_variant,
         intron_variant,
         missense_variant,
         mature_miRNA_variant,

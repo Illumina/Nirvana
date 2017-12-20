@@ -456,6 +456,25 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return result;
         }
 
+        /// <summary>
+        /// returns true if the variant is a stop retained variant [VariationEffect.pm:701 stop_lost]
+        /// </summary>
+        public bool IsStartRetained()
+        {
+            const ConsequenceTag ct = ConsequenceTag.start_retained_variant;
+            if (_cache.Contains(ct)) return _cache.Get(ct);
+
+            var alternateAminoAcids = TrimPeptides(_alternateAminoAcids);
+
+            bool result = _proteinBegin == 1 &&
+                          !string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
+                          _referenceAminoAcids.StartsWith(AminoAcids.StartCodon) &&
+                          alternateAminoAcids.Contains(AminoAcids.StartCodon);
+
+            _cache.Add(ct, result);
+            return result;
+        }
+
         private static string TrimPeptides(string alternateAminoAcids)
         {
             if (string.IsNullOrEmpty(alternateAminoAcids)) return null;
