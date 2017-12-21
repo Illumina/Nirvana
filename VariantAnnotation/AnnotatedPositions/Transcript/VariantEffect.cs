@@ -69,7 +69,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.splice_acceptor_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _transcript.Gene.OnReverseStrand ? _preCache.IsStartSpliceSite : _preCache.IsEndSpliceSite;
+            var result = _transcript.Gene.OnReverseStrand ? _preCache.IsStartSpliceSite : _preCache.IsEndSpliceSite;
 
             _cache.Add(ct, result);
             return result;
@@ -83,7 +83,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.splice_donor_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _transcript.Gene.OnReverseStrand ? _preCache.IsEndSpliceSite : _preCache.IsStartSpliceSite;
+            var result = _transcript.Gene.OnReverseStrand ? _preCache.IsEndSpliceSite : _preCache.IsStartSpliceSite;
 
             _cache.Add(ct, result);
             return result;
@@ -97,7 +97,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.five_prime_UTR_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = false;
+            var result = false;
 
             if (_transcript.Translation != null)
             {
@@ -134,7 +134,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            bool result = _preCache.HasFrameShift && !IsStopRetained() && !IsTruncatedByStop();
+            var result = _preCache.HasFrameShift && !IsStopRetained() && !IsTruncatedByStop();
 
             _cache.Add(ct, result);
             return result;
@@ -154,14 +154,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            int cdsLength = CodingSequence.GetCodingSequenceLength(_transcript.CdnaMaps,
+            var cdsLength = CodingSequence.GetCodingSequenceLength(_transcript.CdnaMaps,
                 _transcript.Translation.CodingRegion.Start, _transcript.Translation.CodingRegion.End,
                 _transcript.StartExonPhase);
 
-            int codonCdsStart = _proteinBegin * 3 - 2;
-            int lastCodonLength = cdsLength - (codonCdsStart - 1);
+            var codonCdsStart = _proteinBegin * 3 - 2;
+            var lastCodonLength = cdsLength - (codonCdsStart - 1);
 
-            bool result = lastCodonLength < 3 && lastCodonLength > 0;
+            var result = lastCodonLength < 3 && lastCodonLength > 0;
 
             _cache.Add(ct, result);
             return result;
@@ -205,7 +205,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var commonPrefixLength = _referenceCodons.CommonPrefixLength(_alternateCodons);
             var commonSuffixLength = _referenceCodons.CommonSuffixLength(_alternateCodons);
 
-            bool result = _alternateCodonsLen - commonPrefixLength - commonSuffixLength == 0;
+            var result = _alternateCodonsLen - commonPrefixLength - commonSuffixLength == 0;
 
             _cache.Add(ct, result);
             return result;
@@ -236,7 +236,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            bool result = !IsTruncatedByStop();
+            var result = !IsTruncatedByStop();
 
             _cache.Add(ct, result);
             return result;
@@ -285,7 +285,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            bool result = _alternateAminoAcidsLen == 0 || _alternateAminoAcids[0] != _referenceAminoAcids[0];
+            var result = _alternateAminoAcidsLen == 0 || _alternateAminoAcids[0] != _referenceAminoAcids[0];
 
             _cache.Add(ct, result);
             return result;
@@ -318,7 +318,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            bool result = _referenceAminoAcids != _alternateAminoAcids &&
+            var result = _referenceAminoAcids != _alternateAminoAcids &&
                 _referenceAminoAcidsLen == _alternateAminoAcidsLen;
 
             _cache.Add(ct, result);
@@ -333,7 +333,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.non_coding_transcript_exon_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
+            var result = _preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
 
             _cache.Add(ct, result);
             return result;
@@ -387,7 +387,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.splice_region_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = false;
+            var result = false;
 
             if (IsSpliceDonorVariant() || IsSpliceAcceptorVariant())
             {
@@ -410,7 +410,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.stop_gained;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = !IsStopRetained() &&
+            var result = !IsStopRetained() &&
                      (string.IsNullOrEmpty(_referenceAminoAcids) || !_referenceAminoAcids.Contains(AminoAcids.StopCodon)) &&
                           !string.IsNullOrEmpty(_alternateAminoAcids) && _alternateAminoAcids.Contains(AminoAcids.StopCodon);
 
@@ -426,7 +426,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.stop_lost;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = false;
+            var result = false;
             if (!string.IsNullOrEmpty(_referenceAminoAcids) && _alternateAminoAcids != null)
                 result = _referenceAminoAcids.Contains(AminoAcids.StopCodon) &&
                          !_alternateAminoAcids.Contains(AminoAcids.StopCodon);
@@ -445,7 +445,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             var alternateAminoAcids = TrimPeptides(_alternateAminoAcids);
 
-            bool result = !string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
+            var result = !string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
                      _referenceAminoAcids == alternateAminoAcids &&
                      _referenceAminoAcids.Contains(AminoAcids.StopCodon) ||
                      string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
@@ -464,12 +464,17 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.start_retained_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
+            if (_proteinBegin != 1 || string.IsNullOrEmpty(_referenceAminoAcids))
+            {
+                _cache.Add(ct, false);
+                return false;
+            }
+
+            var startProtein =  _referenceAminoAcids[0].ToString();
             var alternateAminoAcids = TrimPeptides(_alternateAminoAcids);
 
-            bool result = _proteinBegin == 1 &&
-                          !string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
-                          _referenceAminoAcids.StartsWith(AminoAcids.StartCodon) &&
-                          alternateAminoAcids.Contains(AminoAcids.StartCodon);
+            var result = alternateAminoAcids != null 
+                          && alternateAminoAcids.Contains(startProtein);
 
             _cache.Add(ct, result);
             return result;
@@ -491,7 +496,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.synonymous_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = !string.IsNullOrEmpty(_referenceAminoAcids)  &&
+            var result = !string.IsNullOrEmpty(_referenceAminoAcids)  &&
                      (_variant.Type == VariantType.SNV ||
                       _variant.Type == VariantType.MNV) &&
                      _referenceAminoAcids == _alternateAminoAcids && !_referenceAminoAcids.Contains("X") &&
@@ -509,7 +514,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.three_prime_UTR_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = false;
+            var result = false;
 
             if (_transcript.Translation != null)
             {
@@ -548,7 +553,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.coding_sequence_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _preCache.WithinCds &&
+            var result = _preCache.WithinCds &&
                      (string.IsNullOrEmpty(_transcript.Translation.PeptideSeq) ||
                       string.IsNullOrEmpty(_alternateAminoAcids) || _alternateAminoAcids.Contains("X"))
                      && !(IsFrameshiftVariant() || IsInframeDeletion() || IsIncompleteTerminalCodonVariant() ||
@@ -571,7 +576,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.mature_miRNA_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _preCache.OverlapWithMicroRna;
+            var result = _preCache.OverlapWithMicroRna;
 
             _cache.Add(ct, result);
             return result;

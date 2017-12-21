@@ -67,6 +67,24 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 
         }
 
+        [Theory]
+        [InlineData(1, "M", "KM", "", "TCT", true)]
+        [InlineData(2, "M", "Mk", "", "TCT", false)]
+        [InlineData(1, "K", "MK", "", "ATG", true)]
+        public void IsStartRetainedVariant(int proteinBegin, string refAminoAcids, string altAminoAcids, string refAllele, string altAllele, bool isStartRetained)
+        {
+            var variant = new Mock<ISimpleVariant>();
+            var transcript = new Mock<ITranscript>();
+
+            variant.SetupGet(x => x.AltAllele).Returns(refAllele);
+            variant.SetupGet(x => x.RefAllele).Returns(altAllele);
+
+            var variantEffect = new VariantEffect(null, variant.Object, transcript.Object, refAminoAcids, altAminoAcids , "", "",
+                proteinBegin);
+
+            if (isStartRetained) Assert.True(variantEffect.IsStartRetained());
+            else Assert.False(variantEffect.IsStartRetained());
+        }
 
         [Theory]
         [InlineData(false, true, false, false, false)]
