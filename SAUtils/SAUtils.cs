@@ -3,6 +3,8 @@ using CommandLine.Builders;
 using SAUtils.CreateGnomadTsv;
 using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimTsv;
+using SAUtils.CreateTopMedTsv;
+using SAUtils.DbSnpRemapper;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GeneScoresTsv;
@@ -23,7 +25,9 @@ namespace SAUtils
                 ["geneScoresTsv"]   = new TopLevelOption("create gene scores tsv file", GeneScoresMain.Run),
                 ["extractMiniSA"]   = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"]  = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
-                ["createGnomadTsv"] = new TopLevelOption("create gnomAD tsv file", CreateGnomadTsvMain.Run)
+                ["createGnomadTsv"] = new TopLevelOption("create gnomAD tsv file", CreateGnomadTsvMain.Run),
+                ["createTopMedTsv"] = new TopLevelOption("create TOPMed tsv file", CreateTopMedTsvMain.Run),
+                ["remapWithDbsnp"] = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)

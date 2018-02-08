@@ -56,23 +56,23 @@ namespace SAUtils.TsvWriters
         }
         #endregion
 
-        public SaTsvWriter(string outputPath, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion, string jsonKey, string vcfKeys,
-            bool isAlleleSpecific, ISequenceProvider sequenceProvider, bool isArray = false) : this(outputPath, dataSourceVersion, assembly, schemaVersion, jsonKey, vcfKeys, isAlleleSpecific, isArray)
+        public SaTsvWriter(string outputDir, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion, string jsonKey, string vcfKeys,
+            bool isAlleleSpecific, ISequenceProvider sequenceProvider, bool isArray = false) : this(outputDir, dataSourceVersion, assembly, schemaVersion, jsonKey, vcfKeys, isAlleleSpecific, isArray)
         {
             _sequenceProvider = sequenceProvider;
         }
 
-        private SaTsvWriter(string outputPath, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion,
+        private SaTsvWriter(string outputDir, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion,
             string jsonKey, string vcfKeys,
             bool isAlleleSpecific, bool isArray = false)
         {
             var fileName = jsonKey + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".tsv.gz";
 
-            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputPath, fileName));
+            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputDir, fileName));
 
             _bgzipTextWriter.Write(GetHeader(dataSourceVersion, schemaVersion, assembly, jsonKey, vcfKeys, isAlleleSpecific, isArray));
 
-            _tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName + ".tvi"));
+            _tsvIndex = new TsvIndex(Path.Combine(outputDir, fileName + ".tvi"));
         }
 
 

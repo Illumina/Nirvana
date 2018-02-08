@@ -12,8 +12,8 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\GRCh37 --out c:\\Development\\SupplementaryDatabase\\test",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": " remapWithDbsnp --src topMed.dbsnp.GRCh38.vcf.gz --des C:\\Development\\ExternalDataSources\\dbSNP\\150\\GRCh37\\All_20170403.vcf.gz",
+      "workingDirectory": "C:\\Development\\ExternalDataSources\\TOPMed\\freeze5"
     },
     "MITOMAP": {
       "commandName": "Project",
