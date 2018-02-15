@@ -18,13 +18,16 @@ namespace CacheUtils.TranscriptCache
         private readonly GenomeAssembly _genomeAssembly;
         private readonly Source _source;
         private readonly long _vepReleaseTicks;
+        private readonly ushort _vepVersion;
 
-        public TranscriptCacheBuilder(ILogger logger, GenomeAssembly genomeAssembly, Source source, long vepReleaseTicks)
+        public TranscriptCacheBuilder(ILogger logger, GenomeAssembly genomeAssembly, Source source,
+            long vepReleaseTicks, ushort vepVersion)
         {
             _logger          = logger;
             _genomeAssembly  = genomeAssembly;
             _source          = source;
             _vepReleaseTicks = vepReleaseTicks;
+            _vepVersion      = vepVersion;
         }
 
         public TranscriptCacheStaging CreateTranscriptCache(MutableTranscript[] mutableTranscripts,
@@ -37,7 +40,7 @@ namespace CacheUtils.TranscriptCache
             var transcriptIntervalArrays       = mutableTranscripts.ToTranscripts().ToIntervalArrays(numRefSeqs);
             var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(numRefSeqs);
 
-            var customHeader = new TranscriptCacheCustomHeader(CacheConstants.VepVersion, _vepReleaseTicks);
+            var customHeader = new TranscriptCacheCustomHeader(_vepVersion, _vepReleaseTicks);
             var header = new CacheHeader(CacheConstants.Identifier, CacheConstants.SchemaVersion,
                 CacheConstants.DataVersion, _source, DateTime.Now.Ticks, _genomeAssembly, customHeader);
 

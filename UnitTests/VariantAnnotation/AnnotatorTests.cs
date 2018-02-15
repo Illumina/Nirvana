@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using ErrorHandling.Exceptions;
 using Moq;
 using VariantAnnotation;

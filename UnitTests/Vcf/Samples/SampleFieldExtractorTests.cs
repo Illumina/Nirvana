@@ -50,7 +50,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedAlleleDepths = sample?.AlleleDepths;
@@ -69,7 +69,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedAlleleDepths = sample?.AlleleDepths;
@@ -89,7 +89,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedFailedFilter = sample?.FailedFilter;
@@ -110,7 +110,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedGenotype = sample?.Genotype;
@@ -132,7 +132,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedGenotypeQuality = sample?.GenotypeQuality;
@@ -157,7 +157,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedTotalDepth = sample?.TotalDepth;
@@ -174,7 +174,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedTotalDepth = sample?.TotalDepth;
@@ -216,7 +216,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             if (expectedVariantFrequency == null)
@@ -242,7 +242,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
 
@@ -266,7 +266,7 @@ namespace UnitTests.Vcf.Samples
             var sample = samples[1];
 
             var observedMcc = sample?.IsLossOfHeterozygosity;
-            Assert.Equal(false, observedMcc);
+            Assert.False(observedMcc);
         }
 
         [Fact]
@@ -309,7 +309,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             if (expectedVariantFrequency == null)
@@ -354,7 +354,7 @@ namespace UnitTests.Vcf.Samples
 
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
             var sample = samples[0];
             Assert.True(sample.IsEmpty);
 
@@ -369,7 +369,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             Assert.Equal(20,sample.DeNovoQuality);

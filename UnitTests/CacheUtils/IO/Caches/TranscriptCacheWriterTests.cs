@@ -20,7 +20,7 @@ namespace UnitTests.CacheUtils.IO.Caches
         {
             var dict = TranscriptCacheWriter.CreateIndex(null, EqualityComparer<string>.Default);
             Assert.NotNull(dict);
-            Assert.Equal(0, dict.Count);
+            Assert.Empty(dict);
         }
     }
 }

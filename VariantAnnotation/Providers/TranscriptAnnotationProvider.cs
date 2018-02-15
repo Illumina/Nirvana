@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using System.Linq;
+using CommonUtilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
@@ -17,7 +17,7 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Providers
 {
-    public sealed class TranscriptAnnotationProvider : IAnnotationProvider
+    public sealed class TranscriptAnnotationProvider : ITranscriptAnnotationProvider
     {
         private const int MaxSvLengthForRegulatoryRegionAnnotation = 50000;
 
@@ -27,6 +27,7 @@ namespace VariantAnnotation.Providers
 	    public string Name { get; }
 	    public GenomeAssembly GenomeAssembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
+        public ushort VepVersion { get; }
 
         private readonly PredictionCacheReader _siftReader;
         private readonly PredictionCacheReader _polyphenReader;
@@ -39,7 +40,7 @@ namespace VariantAnnotation.Providers
             Name      = "Transcript annotation provider";
             _sequence = sequenceProvider.Sequence;
 
-            _transcriptCache = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)),
+            (_transcriptCache, VepVersion) = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)),
                 sequenceProvider.RefIndexToChromosome, sequenceProvider.GenomeAssembly);
 
             GenomeAssembly     = _transcriptCache.GenomeAssembly;
@@ -49,28 +50,27 @@ namespace VariantAnnotation.Providers
             _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)), PredictionCacheReader.PolyphenDescriptions);
         }
 
-        private static TranscriptCache InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refGenomeAssembly)
+        private static (TranscriptCache cache, ushort vepVersion) InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refGenomeAssembly)
         {
             TranscriptCache cache;
+            ushort vepVersion;
+
             using (var reader = new TranscriptCacheReader(stream))
             {
+                var customHeader = reader.Header.CustomHeader as TranscriptCacheCustomHeader;
+                vepVersion = customHeader?.VepVersion ?? 0;
+
                 CheckHeaderVersion(reader.Header, refGenomeAssembly);
                 cache = reader.Read(refIndexToChromosome).GetCache();
             }
                 
-            return cache;
+            return (cache, vepVersion);
         }
 
         private static void CheckHeaderVersion(CacheHeader header, GenomeAssembly refGenomeAssembly)
         {
             if (header.GenomeAssembly != refGenomeAssembly)
                 throw new UserErrorException(GetGenomeAssemblyErrorMessage(header.GenomeAssembly, refGenomeAssembly));
-
-            if (!(header.CustomHeader is TranscriptCacheCustomHeader customHeader)) throw new InvalidCastException("Unable to cast the custom header to a transcript cache custom header.");
-
-            if (customHeader.VepVersion != CacheConstants.VepVersion)
-                throw new UserErrorException(
-                    $"Expected the VEP cache version ({CacheConstants.VepVersion}) to be identical to the VEP version in the cache header ({customHeader.VepVersion})");
 
             if (header.SchemaVersion != CacheConstants.SchemaVersion)
                 throw new UserErrorException(
@@ -79,11 +79,11 @@ namespace VariantAnnotation.Providers
 
         private static string GetGenomeAssemblyErrorMessage(GenomeAssembly cacheGenomeAssembly, GenomeAssembly refGenomeAssembly)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
             sb.AppendLine($"- Using {refGenomeAssembly}: Reference sequence provider");
             sb.AppendLine($"- Using {cacheGenomeAssembly}: Transcript annotation provider");
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
@@ -121,11 +121,7 @@ namespace VariantAnnotation.Providers
         {
             var overlappingTranscripts = _transcriptCache.GetOverlappingTranscripts(annotatedPosition.Position);
 
-            if (overlappingTranscripts == null)
-            {
-                // todo: handle intergenic variants
-                return;
-            }
+            if (overlappingTranscripts == null) return;
 
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
@@ -147,23 +143,20 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        private IEnumerable<ITranscript> GetGeneFusionCandiates(IBreakEnd[] breakEnds)
+        private ITranscript[] GetGeneFusionCandiates(IBreakEnd[] breakEnds)
         {
             if (breakEnds == null || breakEnds.Length == 0) return null;
 
             var geneFusionCandidates = new HashSet<ITranscript>();
             foreach (var breakEnd in breakEnds)
             {
-                var candiates = _transcriptCache.GetOverlappingTranscripts(breakEnd.Chromosome2,
-                    breakEnd.Position2, breakEnd.Position2);
+                var candiates = _transcriptCache.GetOverlappingTranscripts(breakEnd.Piece2.Chromosome,
+                    breakEnd.Piece2.Position, breakEnd.Piece2.Position);
                 if (candiates == null) continue;
-                foreach (var candiate in candiates)
-                {
-                    geneFusionCandidates.Add(candiate);
-                }
+                foreach (var candiate in candiates) geneFusionCandidates.Add(candiate);
             }
 
-            return geneFusionCandidates;
+            return geneFusionCandidates.ToArray();
         }
 
         private void AddRegulatoryRegions(IAnnotatedPosition annotatedPosition)

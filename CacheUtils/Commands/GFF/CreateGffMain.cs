@@ -1,9 +1,13 @@
-﻿using CommandLine.Builders;
+﻿using CacheUtils.GFF;
+using CacheUtils.Helpers;
+using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.Utilities;
 using ErrorHandling;
+using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 
-namespace CacheUtils.GFF
+namespace CacheUtils.Commands.GFF
 {
     public static class CreateGffMain
     {
@@ -13,8 +17,16 @@ namespace CacheUtils.GFF
 
         private static ExitCodes ProgramExecution()
         {
-            var creator = new GffCreator(_inputPrefix, _compressedReferencePath);
-            creator.Create(_outputFileName);
+            var cachePath                    = CacheConstants.TranscriptPath(_inputPrefix);
+            var (refIndexToChromosome, _, _) = SequenceHelper.GetDictionaries(_compressedReferencePath);
+            var cache                        = TranscriptCacheHelper.GetCache(cachePath, refIndexToChromosome);
+            var geneToInternalId             = InternalGenes.CreateDictionary(cache.Genes);
+
+            using (var writer = new GffWriter(GZipUtilities.GetStreamWriter(_outputFileName)))
+            {
+                var creator = new GffCreator(writer, geneToInternalId);
+                creator.Create(cache.TranscriptIntervalArrays);
+            }
 
             return ExitCodes.Success;
         }

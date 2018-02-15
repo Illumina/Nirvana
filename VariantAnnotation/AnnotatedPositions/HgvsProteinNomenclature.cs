@@ -14,19 +14,14 @@ namespace VariantAnnotation.AnnotatedPositions
 			string refAminoAcids,
 			string altAminoAcids,
 			string transcriptAltAllele,
-			IMappedPositions mappedPositions, 
+            IMappedPosition position,
 			VariantEffect variantEffect, 
 			ISimpleVariant variant, 
 			ISequence refSequence, 
 			string hgvscNotation,
 			bool isMitochondrial)
         {
-	        if (IsHgvspNull(transcriptAltAllele, mappedPositions, variant, hgvscNotation)) return null;
-
-	        var start    = mappedPositions.ProteinInterval.Start.Value;
-	        var cdsStart = mappedPositions.CdsInterval.Start.Value;
-			var cdsEnd   = mappedPositions.CdsInterval.End.Value;
-
+	        if (IsHgvspNull(transcriptAltAllele, position.CdsStart, position.CdsEnd, variant, hgvscNotation)) return null;
 
 			var peptideSeq = transcript.Translation.PeptideSeq;
 
@@ -35,56 +30,57 @@ namespace VariantAnnotation.AnnotatedPositions
 		        ? refAminoAcids.Split(AminoAcids.StopCodon[0])[0]+AminoAcids.StopCodon
 		        : refAminoAcids;
 
-			HgvsUtilities.ShiftAndRotateAlleles( ref start, ref refAminoAcids, ref altAminoAcids, peptideSeq);
+            int proteinStart = position.ProteinStart;
+			HgvsUtilities.ShiftAndRotateAlleles(ref proteinStart, ref refAminoAcids, ref altAminoAcids, peptideSeq);
 
-	        var end             = start + refAminoAcids.Length - 1;
+	        var end             = proteinStart + refAminoAcids.Length - 1;
 	        var refAbbreviation = AminoAcids.GetAbbreviations(refAminoAcids);
 	        var altAbbreviation = AminoAcids.GetAbbreviations(altAminoAcids);
 
 			var proteinId     = transcript.Translation.ProteinId.WithVersion;
-			var proteinChange = GetProteinChange(start, refAminoAcids, altAminoAcids, peptideSeq, variantEffect);
+			var proteinChange = GetProteinChange(proteinStart, refAminoAcids, altAminoAcids, peptideSeq, variantEffect);
 
 
 			switch (proteinChange)
 			{
 				case ProteinChange.Substitution:
-					return HgvspNotation.GetSubstitutionNotation(proteinId, start, refAbbreviation, altAbbreviation);
+					return HgvspNotation.GetSubstitutionNotation(proteinId, proteinStart, refAbbreviation, altAbbreviation);
 
 				case ProteinChange.Unknown:
 					//todo:not defined in hgvs standards
-					return HgvspNotation.GetUnknownNotation(proteinId, start, end, refAbbreviation, altAbbreviation);
+					return HgvspNotation.GetUnknownNotation(proteinId, proteinStart, end, refAbbreviation, altAbbreviation);
 
 				case ProteinChange.Deletion:
-					return HgvspNotation.GetDeletionNotation(proteinId, start, end, refAbbreviation, variantEffect.IsStopGained());
+					return HgvspNotation.GetDeletionNotation(proteinId, proteinStart, end, refAbbreviation, variantEffect.IsStopGained());
 
 				case ProteinChange.Duplication:
-					start -= altAminoAcids.Length;
-					return HgvspNotation.GetDuplicationNotation(proteinId, start, end, altAbbreviation);
+				    proteinStart -= altAminoAcids.Length;
+					return HgvspNotation.GetDuplicationNotation(proteinId, proteinStart, end, altAbbreviation);
 
 				case ProteinChange.Frameshift:
-					return GetHgvsFrameshiftNotation(refSequence, cdsStart,
-						cdsEnd, transcriptAltAllele, transcript, isMitochondrial, proteinId, start, end);
+				    return GetHgvsFrameshiftNotation(refSequence, position.CdsStart, position.CdsEnd, transcriptAltAllele,
+				        transcript, isMitochondrial, proteinId, proteinStart, end);
 
 				case ProteinChange.None:
-					return HgvspNotation.GetSilentNotation(hgvscNotation, start, refAbbreviation, variantEffect.IsStopRetained());
+					return HgvspNotation.GetSilentNotation(hgvscNotation, proteinStart, refAbbreviation, variantEffect.IsStopRetained());
 
 				case ProteinChange.DelIns:
-					return HgvspNotation.GetDelInsNotation(proteinId, start, end, refAbbreviation, altAbbreviation);
+					return HgvspNotation.GetDelInsNotation(proteinId, proteinStart, end, refAbbreviation, altAbbreviation);
 
 				case ProteinChange.Insertion:
-					Swap.Int(ref start, ref end);
-					return HgvspNotation.GetInsertionNotation(proteinId, start, end, altAbbreviation, peptideSeq);
+					Swap.Int(ref proteinStart, ref end);
+					return HgvspNotation.GetInsertionNotation(proteinId, proteinStart, end, altAbbreviation, peptideSeq);
 				
 				case ProteinChange.Extension:
-					var altPeptideSequence = HgvsUtilities.GetAltPeptideSequence(refSequence, cdsStart,
-						cdsEnd, transcriptAltAllele, transcript, isMitochondrial);
-					altAbbreviation = start <= altPeptideSequence.Length ? AminoAcids.ConvertAminoAcidToAbbreviation(altPeptideSequence[start - 1]): "Ter";
-					var countToStop = HgvsUtilities.GetNumAminoAcidsUntilStopCodon(altPeptideSequence, peptideSeq, start - 1, false);
+				    var altPeptideSequence = HgvsUtilities.GetAltPeptideSequence(refSequence, position.CdsStart, position.CdsEnd,
+				        transcriptAltAllele, transcript, isMitochondrial);
+					altAbbreviation = proteinStart <= altPeptideSequence.Length ? AminoAcids.ConvertAminoAcidToAbbreviation(altPeptideSequence[proteinStart - 1]): "Ter";
+					var countToStop = HgvsUtilities.GetNumAminoAcidsUntilStopCodon(altPeptideSequence, peptideSeq, proteinStart - 1, false);
 
-					return HgvspNotation.GetExtensionNotation(proteinId, start, refAbbreviation, altAbbreviation,countToStop);
+					return HgvspNotation.GetExtensionNotation(proteinId, proteinStart, refAbbreviation, altAbbreviation,countToStop);
 
 				case ProteinChange.StartLost:
-					return HgvspNotation.GetStartLostNotation(proteinId, start, end, refAbbreviation);
+					return HgvspNotation.GetStartLostNotation(proteinId, proteinStart, end, refAbbreviation);
 			}
 
 			return null;
@@ -116,14 +112,15 @@ namespace VariantAnnotation.AnnotatedPositions
 		    return HgvspNotation.GetFrameshiftNotation(proteinId, start, refAbbreviation, altAbbreviation, countToStop);
 	    }
 
-	    private static bool IsHgvspNull(string transcriptAltAllele, IMappedPositions mappedPositions, ISimpleVariant variant, string hgvscNotation)
-	    {
-		    return string.IsNullOrEmpty(hgvscNotation)
-		           || variant.Type == VariantType.reference 
-		           || SequenceUtilities.HasNonCanonicalBase(transcriptAltAllele)
-		           || mappedPositions.CdsInterval.Start == null 
-		           || mappedPositions.CdsInterval.End == null;
-	    }
+        private static bool IsHgvspNull(string transcriptAltAllele, int cdsStart, int cdsEnd, ISimpleVariant variant,
+            string hgvscNotation)
+        {
+            return string.IsNullOrEmpty(hgvscNotation)                        ||
+                   variant.Type == VariantType.reference                      ||
+                   SequenceUtilities.HasNonCanonicalBase(transcriptAltAllele) ||
+                   cdsStart == -1                                             || 
+                   cdsEnd == -1;
+        }
 
         internal static ProteinChange GetProteinChange(int start, string refAminoAcids, string altAminoAcids,
             string peptideSeq, IVariantEffect variantEffect)
@@ -154,7 +151,6 @@ namespace VariantAnnotation.AnnotatedPositions
 		    
 		    // the only remaining possibility is deletions/insertions
 		    return ProteinChange.DelIns;
-
 		}
     }
 

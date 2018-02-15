@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
-using VariantAnnotation.Interface.AnnotatedPositions;
+using CacheUtils.DataDumperImport.DataStructures.Mutable;
 
 namespace CacheUtils.DataDumperImport.Import
 {
@@ -20,9 +20,9 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// parses the relevant data from each pair genomic object
         /// </summary>
-        public static ICdnaCoordinateMap[] Parse(ObjectValueNode objectValue)
+        public static MutableTranscriptRegion[] Parse(ObjectValueNode objectValue)
         {
-            ICdnaCoordinateMap[] cdnaMaps = null;
+            MutableTranscriptRegion[] cdnaMaps = null;
 
             foreach (var node in objectValue.Values)
             {

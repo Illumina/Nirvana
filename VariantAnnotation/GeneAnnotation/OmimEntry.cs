@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 
@@ -45,7 +46,7 @@ namespace VariantAnnotation.GeneAnnotation
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -55,7 +56,7 @@ namespace VariantAnnotation.GeneAnnotation
             if (_phenotypes.Count > 0) jsonObject.AddObjectValues("phenotypes", _phenotypes);
             sb.Append(JsonObject.CloseBrace.ToString());
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public void Write(ExtendedBinaryWriter writer)

@@ -33,13 +33,13 @@ namespace VariantAnnotation.IO.Caches
         public TranscriptCacheData Read(IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             var genes             = ReadItems(_reader,     () => Gene.Read(_reader, refIndexToChromosome));
-            var introns           = ReadItems(_reader,     () => Interval.Read(_reader));
+            var transcriptRegions = ReadItems(_reader,     () => TranscriptRegion.Read(_reader));
             var mirnas            = ReadItems(_reader,     () => Interval.Read(_reader));
             var peptideSeqs       = ReadItems(_reader,     () => _reader.ReadAsciiString());
             var regulatoryRegions = ReadIntervals(_reader, () => RegulatoryRegion.Read(_reader, refIndexToChromosome));
-            var transcripts       = ReadIntervals(_reader, () => Transcript.Read(_reader, refIndexToChromosome, genes, introns, mirnas, peptideSeqs));
+            var transcripts       = ReadIntervals(_reader, () => Transcript.Read(_reader, refIndexToChromosome, genes, transcriptRegions, mirnas, peptideSeqs));
 
-            return new TranscriptCacheData(Header, genes, introns, mirnas, peptideSeqs, transcripts, regulatoryRegions);
+            return new TranscriptCacheData(Header, genes, transcriptRegions, mirnas, peptideSeqs, transcripts, regulatoryRegions);
         }
 
         private static IntervalArray<T>[] ReadIntervals<T>(IExtendedBinaryReader reader, Func<T> readMethod) where T : IInterval

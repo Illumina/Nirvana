@@ -11,25 +11,23 @@ namespace VariantAnnotation.Caches.DataStructures
 
         // contents
         // +====+====+====+====+====+====+====+====+
-        // |Tran|Cdna|Intr|Mirn|Poly|Sift|StrExonPh|
+        // |Tran|TReg|////|Mirn|Poly|Sift|StrExonPh|
         // +====+====+====+====+====+====+====+====+
-        private const int StartExonMask   = 3;
-        private const int SiftMask        = 4;
-        private const int PolyPhenMask    = 8;
-        private const int MirnasMask      = 16;
-        private const int IntronsMask     = 32;
-        private const int CdnaMapsMask    = 64;
-        private const int TranslationMask = 128;
+        private const int StartExonMask         = 3;
+        private const int SiftMask              = 4;
+        private const int PolyPhenMask          = 8;
+        private const int MirnasMask            = 16;
+        private const int TranscriptRegionsMask = 64;
+        private const int TranslationMask       = 128;
 
-        public byte StartExonPhase     => (byte)(_contents & StartExonMask);
-        public bool HasSift            => (_contents & SiftMask)        != 0;
-        public bool HasPolyPhen        => (_contents & PolyPhenMask)    != 0;
-        public bool HasMirnas          => (_contents & MirnasMask)      != 0;
-        public bool HasRnaEdits        => (_info & RnaEditsMask)        != 0;
-        public bool HasSelenocysteines => (_info & SelenocysteinesMask) != 0;
-        public bool HasIntrons         => (_contents & IntronsMask)     != 0;
-        public bool HasCdnaMaps        => (_contents & CdnaMapsMask)    != 0;
-        public bool HasTranslation     => (_contents & TranslationMask) != 0;
+        public byte StartExonPhase       => (byte)(_contents & StartExonMask);
+        public bool HasSift              => (_contents & SiftMask)              != 0;
+        public bool HasPolyPhen          => (_contents & PolyPhenMask)          != 0;
+        public bool HasMirnas            => (_contents & MirnasMask)            != 0;
+        public bool HasRnaEdits          => (_info & RnaEditsMask)              != 0;
+        public bool HasSelenocysteines   => (_info & SelenocysteinesMask)       != 0;
+        public bool HasTranscriptRegions => (_contents & TranscriptRegionsMask) != 0;
+        public bool HasTranslation       => (_contents & TranslationMask)       != 0;
 
         // info
         // +====+====+====+====+====+====+====+====+====+====+====+====+====+====+====+====+
@@ -50,7 +48,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public Source TranscriptSource => (Source)((_info >> TranscriptSourceShift) & TranscriptSourceMask);
         public bool IsCanonical        => (_info & CanonicalMask) != 0;
 
-        public EncodedTranscriptData(ushort info, byte contents)
+        private EncodedTranscriptData(ushort info, byte contents)
         {
             _info     = info;
             _contents = contents;
@@ -58,7 +56,7 @@ namespace VariantAnnotation.Caches.DataStructures
 
         public static EncodedTranscriptData GetEncodedTranscriptData(BioType bioType, bool cdsStartNotFound,
             bool cdsEndNotFound, Source source, bool isCanonical, bool hasSift, bool hasPolyPhen, bool hasMicroRnas,
-            bool hasRnaEdits, bool hasSelenocysteines, bool hasIntrons, bool hasCdnaMaps, bool hasTranslation,
+            bool hasRnaEdits, bool hasSelenocysteines, bool hasTranscriptRegions, bool hasTranslation,
             byte startExonPhase)
         {
             ushort info = (ushort)bioType;
@@ -70,12 +68,11 @@ namespace VariantAnnotation.Caches.DataStructures
             info |= (ushort)((ushort)source << TranscriptSourceShift);
 
             byte contents = startExonPhase;
-            if (hasSift)        contents |= SiftMask;
-            if (hasPolyPhen)    contents |= PolyPhenMask;
-            if (hasMicroRnas)   contents |= MirnasMask;
-            if (hasIntrons)     contents |= IntronsMask;
-            if (hasCdnaMaps)    contents |= CdnaMapsMask;
-            if (hasTranslation) contents |= TranslationMask;
+            if (hasSift)              contents |= SiftMask;
+            if (hasPolyPhen)          contents |= PolyPhenMask;
+            if (hasMicroRnas)         contents |= MirnasMask;
+            if (hasTranscriptRegions) contents |= TranscriptRegionsMask;
+            if (hasTranslation)       contents |= TranslationMask;
 
             return new EncodedTranscriptData(info, contents);
         }

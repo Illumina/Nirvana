@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -55,7 +55,7 @@ namespace SAUtils.DataStructures
 
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
 			jsonObject.AddStringValue("start", Start.ToString(), false);
@@ -77,7 +77,7 @@ namespace SAUtils.DataStructures
 				}
 			}
 
-			return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 	}
 }

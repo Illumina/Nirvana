@@ -20,7 +20,7 @@ namespace UnitTests.CacheUtils.Genes
 
             var flatGenes = GeneFlattener.FlattenWithSameId(genes);
 
-            Assert.Equal(1, flatGenes.Count);
+            Assert.Single(flatGenes);
 
             var flatGene = flatGenes[0];
             Assert.Equal(100, flatGene.Start);
@@ -37,7 +37,7 @@ namespace UnitTests.CacheUtils.Genes
 
             var flatGenes = GeneFlattener.FlattenWithSameId(genes);
 
-            Assert.Equal(1, flatGenes.Count);
+            Assert.Single(flatGenes);
             Assert.Equal(genes[0].Start, flatGenes[0].Start);
             Assert.Equal(genes[0].End, flatGenes[0].End);
         }

@@ -31,22 +31,23 @@ namespace CacheUtils.TranscriptCache
         {
             var uniqueData = GetUniqueData(transcriptIntervalArrays);
 
-            var cacheData = new TranscriptCacheData(header, uniqueData.Genes, uniqueData.Introns, uniqueData.Mirnas,
+            var cacheData = new TranscriptCacheData(header, uniqueData.Genes, uniqueData.TranscriptRegions, uniqueData.Mirnas,
                 uniqueData.PeptideSeqs, transcriptIntervalArrays, regulatoryRegionIntervalArrays);
 
             return new TranscriptCacheStaging(cacheData);
         }
 
-        private static (IGene[] Genes, IInterval[] Introns, IInterval[] Mirnas, string[] PeptideSeqs) GetUniqueData(
+        private static (IGene[] Genes, ITranscriptRegion[] TranscriptRegions, IInterval[] Mirnas, string[] PeptideSeqs) GetUniqueData(
             IEnumerable<IntervalArray<ITranscript>> intervalArrays)
         {
-            var intervalComparer = new IntervalComparer();
-            var geneComparer     = new GeneComparer();
+            var intervalComparer         = new IntervalComparer();
+            var transcriptRegionComparer = new TranscriptRegionComparer();
+            var geneComparer             = new GeneComparer();
 
-            var geneSet    = new HashSet<IGene>(geneComparer);
-            var intronSet  = new HashSet<IInterval>(intervalComparer);
-            var mirnaSet   = new HashSet<IInterval>(intervalComparer);
-            var peptideSet = new HashSet<string>();
+            var geneSet             = new HashSet<IGene>(geneComparer);
+            var transcriptRegionSet = new HashSet<ITranscriptRegion>(transcriptRegionComparer);
+            var mirnaSet            = new HashSet<IInterval>(intervalComparer);
+            var peptideSet          = new HashSet<string>();
 
             foreach (var intervalArray in intervalArrays)
             {
@@ -57,18 +58,18 @@ namespace CacheUtils.TranscriptCache
                     var transcript = interval.Value;
                     geneSet.Add(transcript.Gene);
                     if (transcript.Translation?.PeptideSeq != null) peptideSet.Add(transcript.Translation.PeptideSeq);
-                    if (transcript.Introns                 != null) foreach (var intron in transcript.Introns) intronSet.Add(intron);
+                    if (transcript.TranscriptRegions       != null) foreach (var region in transcript.TranscriptRegions) transcriptRegionSet.Add(region);
                     // ReSharper disable once InvertIf
                     if (transcript.MicroRnas               != null) foreach (var mirna in transcript.MicroRnas) mirnaSet.Add(mirna);
                 }
             }
 
-            var genes       = geneSet.Count    > 0 ? geneSet.Sort().ToArray()             : null;
-            var introns     = intronSet.Count  > 0 ? intronSet.SortInterval().ToArray()   : null;
-            var mirnas      = mirnaSet.Count   > 0 ? mirnaSet.SortInterval().ToArray()    : null;
-            var peptideSeqs = peptideSet.Count > 0 ? peptideSet.OrderBy(x => x).ToArray() : null;
+            var genes             = geneSet.Count             > 0 ? geneSet.Sort().ToArray()                     : null;
+            var transcriptRegions = transcriptRegionSet.Count > 0 ? transcriptRegionSet.SortInterval().ToArray() : null;
+            var mirnas            = mirnaSet.Count            > 0 ? mirnaSet.SortInterval().ToArray()            : null;
+            var peptideSeqs       = peptideSet.Count          > 0 ? peptideSet.OrderBy(x => x).ToArray()         : null;
 
-            return (genes, introns, mirnas, peptideSeqs);
+            return (genes, transcriptRegions, mirnas, peptideSeqs);
         }
     }
 }

@@ -1,10 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Composition.Hosting;
+﻿using System.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Loader;
-using ErrorHandling.Exceptions;
 using VariantAnnotation.Interface.Plugins;
 
 namespace Nirvana

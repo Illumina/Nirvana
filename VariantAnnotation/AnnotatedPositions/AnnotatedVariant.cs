@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
@@ -30,14 +30,13 @@ namespace VariantAnnotation.AnnotatedPositions
         
         public string GetJsonString(string originalChromName)
         {
-            var sb = new StringBuilder();
+            var sb         = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             // data section
             sb.Append(JsonObject.OpenBrace);
 
             jsonObject.AddStringValue("vid", Variant.VariantId);
-            //jsonObject.AddStringValue(AncestralAlleleTag, AncestralAllele);
             jsonObject.AddStringValue("chromosome", originalChromName);
             jsonObject.AddIntValue("begin", Variant.Start);
             jsonObject.AddIntValue("end", Variant.End);
@@ -71,13 +70,14 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes);
             if(OverlappingTranscripts.Count>0) jsonObject.AddObjectValues("overlappingTranscripts",OverlappingTranscripts);
+
             if (EnsemblTranscripts?.Count > 0 || RefSeqTranscripts?.Count > 0)
             {
                 jsonObject.AddGroupedObjectValues("transcripts", TranscriptLabels, RefSeqTranscripts, EnsemblTranscripts);
             }
 
             sb.Append(JsonObject.CloseBrace);
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
 	    private static VariantType GetVariantType(VariantType variantType)

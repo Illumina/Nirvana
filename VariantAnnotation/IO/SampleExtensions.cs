@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CommonUtilities;
 using VariantAnnotation.Interface.Positions;
 
 namespace VariantAnnotation.IO
@@ -7,7 +7,7 @@ namespace VariantAnnotation.IO
     {
         public static string GetJsonString(this ISample sample)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             // data section
@@ -29,7 +29,7 @@ namespace VariantAnnotation.IO
             jsonObject.AddDoubleValue("deNovoQuality", sample.DeNovoQuality, "0.#");
 
             sb.Append(JsonObject.CloseBrace);
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
     }
 }

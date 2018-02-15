@@ -1,8 +1,8 @@
 ﻿using Moq;
 using UnitTests.TestDataStructures;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 using Xunit;
-using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
@@ -12,34 +12,38 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
     public sealed class TranscriptUtilitiesTests
     {
         private static readonly IChromosome Chromosome = new Chromosome("chr21", "short", 21);
-        private readonly ISequence _refSequence = new SimpleSequence("ACTTCGGGC",12340);
+        private readonly ISequence _refSequence = new SimpleSequence("ACTTCGGGC", 12340);
 
         [Fact]
         public void IsDuplicateWithinInterval_not_intertion()
         {
             var simpleVar = GenSimpleDeletionMock();
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(1, 3), false));
+            Assert.False(HgvsUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(1, 3), false));
         }
 
         [Fact]
         public void IsDuplicateWithinInterval_outside_interval()
         {
             var simpleVar = GenSimpleInsertionMock();
-            //forward strand
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(12344,12370), false));
-            //reverse strand
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(12340, 12347), true));
+
+            // forward strand
+            Assert.False(HgvsUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(12344, 12370), false));
+
+            // reverse strand
+            Assert.False(HgvsUtilities.IsDuplicateWithinInterval(_refSequence, simpleVar.Object, new Interval(12340, 12347), true));
         }
 
         [Fact]
         public void IsDuplicateWithinInterval_insertion_not_dup()
         {
             var simpleVar = GenSimpleInsertionMock();
-            //forward strand
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACTTCGGGC", 12340), 
+
+            // forward strand
+            Assert.False(HgvsUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACTTCGGGC", 12340),
                 simpleVar.Object, new Interval(12300, 12400), false));
-            //reverse strand
-            Assert.False(TranscriptUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACTTCGGGC", 12340),
+
+            // reverse strand
+            Assert.False(HgvsUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACTTCGGGC", 12340),
                 simpleVar.Object, new Interval(12300, 12400), true));
         }
 
@@ -47,11 +51,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void IsDuplicateWithinInterval_insertion_is_dup()
         {
             var simpleVar = GenSimpleInsertionMock();
-            //forward strand
-            Assert.True(TranscriptUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACCTGGGGC", 12340),
+
+            // forward strand
+            Assert.True(HgvsUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACCTGGGGC", 12340),
                 simpleVar.Object, new Interval(12300, 12400), false));
-            //reverse strand
-            Assert.True(TranscriptUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACTTCCTGC", 12340),
+
+            // reverse strand
+            Assert.True(HgvsUtilities.IsDuplicateWithinInterval(new SimpleSequence("ACTTCCTGC", 12340),
                 simpleVar.Object, new Interval(12300, 12400), true));
         }
 
@@ -78,6 +84,5 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             simpleVar.SetupGet(x => x.Type).Returns(VariantType.insertion);
             return simpleVar;
         }
-
     }
 }

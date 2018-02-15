@@ -8,13 +8,10 @@ using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
-    public class DgvTests
+    public sealed class DgvTests
     {
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public DgvTests()
         {
             _refChromDict = new Dictionary<string, IChromosome>
@@ -96,8 +93,8 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var dgvHash = new HashSet<DgvItem> { dgvItem };
 
-            Assert.Equal(1, dgvHash.Count);
-            Assert.True(dgvHash.Contains(dgvItem));
+            Assert.Single(dgvHash);
+            Assert.Contains(dgvItem, dgvHash);
         }
     }
 }

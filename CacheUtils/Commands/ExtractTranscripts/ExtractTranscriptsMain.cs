@@ -92,7 +92,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
         }
 
         private static string GetOutputStub(IChromosome chromosome, Source source) => Path.Combine(_outputDirectory,
-            $"{chromosome.UcscName}_{_referencePosition}_{_referenceEndPosition}_{GetSource(source)}{CacheConstants.VepVersion}");
+            $"{chromosome.UcscName}_{_referencePosition}_{_referenceEndPosition}_{GetSource(source)}");
 
         private static string GetSource(Source source) =>
             source != Source.BothRefSeqAndEnsembl ? source.ToString() : "Both";

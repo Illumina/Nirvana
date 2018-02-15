@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using CommonUtilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
@@ -78,7 +78,7 @@ namespace SAUtils.TsvWriters
 
         private static string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             sb.Append($"#name={dataSourceVersion.Name}\n");
             if (!string.IsNullOrEmpty(assembly)) sb.Append($"#assembly={assembly}\n");
@@ -93,7 +93,7 @@ namespace SAUtils.TsvWriters
             sb.Append($"#jsonKey={jsonKey}\n");
             sb.Append($"#vcfKeys={vcfKeys}\n");
             sb.Append("#CHROM\tPOS\tREF\tALT\tVCF\tJSON\n");
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public void AddEntry(string chromosome, int position, string refAllele, string altAllele, string vcfString, List<string> jsonStrings)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using CacheUtils.Commands.Download;
 using CacheUtils.Commands.UniversalGeneArchive;
 using CacheUtils.Helpers;
 using VariantAnnotation.Interface;
@@ -25,10 +26,14 @@ namespace CacheUtils.Genes.DataStores
 
         public static AssemblyDataStore Create(string description, ILogger logger,
             FilePaths.AssemblySpecificPaths paths, IDictionary<string, IChromosome> refNameToChromosome,
-            IDictionary<string, IChromosome> accessionToChromosome)
+            IDictionary<string, IChromosome> accessionToChromosome, bool useGrch37)
         {
-            var ensemblGtf = EnsemblGtf.Create(paths.EnsemblGtfPath, refNameToChromosome);
-            var refSeqGff  = RefSeqGff.Create(paths.RefSeqGffPath, paths.RefSeqGenomeGffPath, accessionToChromosome);
+            var ensemblGtfPath      = useGrch37 ? ExternalFiles.EnsemblGtfFile37.FilePath      : ExternalFiles.EnsemblGtfFile38.FilePath;
+            var refseqGffPath       = useGrch37 ? ExternalFiles.RefSeqGffFile37.FilePath       : ExternalFiles.RefSeqGffFile38.FilePath;
+            var refseqGenomeGffPath = useGrch37 ? ExternalFiles.RefSeqGenomeGffFile37.FilePath : ExternalFiles.RefSeqGenomeGffFile38.FilePath;
+
+            var ensemblGtf = EnsemblGtf.Create(ensemblGtfPath, refNameToChromosome);
+            var refSeqGff  = RefSeqGff.Create(refseqGffPath, refseqGenomeGffPath, accessionToChromosome);
 
             var (refIndexToChromosome, _, _) = SequenceHelper.GetDictionaries(paths.ReferencePath);
             var globalCache = GlobalCache.Create(paths.RefSeqCachePath, paths.EnsemblCachePath, refIndexToChromosome, refNameToChromosome);

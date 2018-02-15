@@ -11,21 +11,21 @@ namespace VariantAnnotation.Caches
     public sealed class TranscriptCacheData
     {
         public readonly CacheHeader Header;
-
+        
         public readonly IGene[] Genes;
-        public readonly IInterval[] Introns;
+        public readonly ITranscriptRegion[] TranscriptRegions;
         public readonly IInterval[] Mirnas;
         public readonly string[] PeptideSeqs;
         public readonly IntervalArray<ITranscript>[] TranscriptIntervalArrays;
         public readonly IntervalArray<IRegulatoryRegion>[] RegulatoryRegionIntervalArrays;
 
-        public TranscriptCacheData(CacheHeader header, IGene[] genes, IInterval[] introns, IInterval[] mirnas,
-            string[] peptideSeqs, IntervalArray<ITranscript>[] transcriptIntervalArrays,
+        public TranscriptCacheData(CacheHeader header, IGene[] genes, ITranscriptRegion[] transcriptRegions,
+            IInterval[] mirnas, string[] peptideSeqs, IntervalArray<ITranscript>[] transcriptIntervalArrays,
             IntervalArray<IRegulatoryRegion>[] regulatoryRegionIntervalArrays)
         {
             Header                         = header;
             Genes                          = genes;
-            Introns                        = introns;
+            TranscriptRegions              = transcriptRegions;
             Mirnas                         = mirnas;
             PeptideSeqs                    = peptideSeqs;
             TranscriptIntervalArrays       = transcriptIntervalArrays;

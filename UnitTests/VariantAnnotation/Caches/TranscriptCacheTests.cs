@@ -74,7 +74,7 @@ namespace UnitTests.VariantAnnotation.Caches
             var overlappingRegulatoryRegions = _cache.GetOverlappingRegulatoryRegions(interval.Object);
 
             Assert.NotNull(overlappingRegulatoryRegions);
-            Assert.Equal(1, overlappingRegulatoryRegions.Length);
+            Assert.Single(overlappingRegulatoryRegions);
         }
 
         [Fact]
@@ -101,7 +101,7 @@ namespace UnitTests.VariantAnnotation.Caches
         public void DataSourceVersions_Get()
         {
             var observedDataSourceVersions = _cache.DataSourceVersions.ToArray();
-            Assert.Equal(1, observedDataSourceVersions.Length);
+            Assert.Single(observedDataSourceVersions);
 
             var expectedDataSourceVersion = _expectedDataSourceVersions.ToArray()[0];
             var observedDataSourceVersion = observedDataSourceVersions[0];
@@ -135,18 +135,15 @@ namespace UnitTests.VariantAnnotation.Caches
 
         private ITranscript[] GetTranscripts()
         {
-            var transcripts = new ITranscript[3];
-
-            transcripts[0] = new Transcript(_chr11, 11000, 12000, CompactId.Empty, null, BioType.Unknown, null, 0, 0,
-                false, null, null, null, 0, 0, Source.None, false, false, null, null);
-
-            transcripts[1] = new Transcript(_chr1, 120, 180, CompactId.Empty, null, BioType.Unknown, null, 0, 0,
-                false, null, null, null, 0, 0, Source.None, false, false, null, null);
-
-            transcripts[2] = new Transcript(_chr1, 300, 320, CompactId.Empty, null, BioType.Unknown, null, 0, 0,
-                false, null, null, null, 0, 0, Source.None, false, false, null, null);
-
-            return transcripts;
+            return new ITranscript[]
+            {
+                new Transcript(_chr11, 11000, 12000, CompactId.Empty, null, BioType.other, null, 0, 0,
+                    false, null, 0, null, 0, 0, Source.None, false, false, null, null),
+                new Transcript(_chr1, 120, 180, CompactId.Empty, null, BioType.other, null, 0, 0,
+                    false, null, 0, null, 0, 0, Source.None, false, false, null, null),
+                new Transcript(_chr1, 300, 320, CompactId.Empty, null, BioType.other, null, 0, 0,
+                    false, null, 0, null, 0, 0, Source.None, false, false, null, null)
+            };
         }
     }
 }

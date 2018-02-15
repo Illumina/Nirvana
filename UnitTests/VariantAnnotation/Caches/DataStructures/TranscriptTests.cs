@@ -30,17 +30,17 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
             var expectedIdAndVersion = expectedId + "." + expectedVersion;
 
-            IInterval[] expectedIntrons           = GetIntrons();
-            ICdnaCoordinateMap[] expectedCdnaMaps = GetCdnaMaps();
-            const int expectedTotalExonLength     = 300;
-            const byte expectedStartExonPhase     = 3;
-            const int expectedSiftIndex           = 11;
-            const int expectedPolyPhenIndex       = 13;
+            ITranscriptRegion[] expectedTranscriptRegions = GetTranscriptRegions();
+            const byte expectedNumExons = 3;
 
-            IInterval[] expectedMicroRnas         = GetMicroRnas();
+            const int expectedTotalExonLength             = 300;
+            const byte expectedStartExonPhase             = 3;
+            const int expectedSiftIndex                   = 11;
+            const int expectedPolyPhenIndex               = 13;
 
-            ITranslation expectedTranslation =
-                new Translation(expectedCdnaMaps[0], CompactId.Convert("ENSP00000446475", 17), "VEIDSD");
+            IInterval[] expectedMicroRnas = GetMicroRnas();
+
+            ITranslation expectedTranslation = new Translation(expectedTranscriptRegions[0], CompactId.Convert("ENSP00000446475", 17), "VEIDSD");
 
             IGene expectedGene = new Gene(expectedChromosome, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
                 CompactId.Convert("ENSG00000141510"));
@@ -51,10 +51,10 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             var peptideSeqs = new string[1];
             peptideSeqs[0] = expectedTranslation.PeptideSeq;
 
-            var geneIndices     = CreateIndices(genes);
-            var intronIndices   = CreateIndices(expectedIntrons);
-            var microRnaIndices = CreateIndices(expectedMicroRnas);
-            var peptideIndices  = CreateIndices(peptideSeqs);
+            var geneIndices             = CreateIndices(genes);
+            var transcriptRegionIndices = CreateIndices(expectedTranscriptRegions);
+            var microRnaIndices         = CreateIndices(expectedMicroRnas);
+            var peptideIndices          = CreateIndices(peptideSeqs);
 
             var indexToChromosome = new Dictionary<ushort, IChromosome>
             {
@@ -64,9 +64,9 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             var transcript = new Transcript(expectedChromosome, expectedStart, expectedEnd,
                 CompactId.Convert(expectedId, expectedVersion), expectedTranslation, expectedBioType, expectedGene,
-                expectedTotalExonLength, expectedStartExonPhase, expectedCanonical, expectedIntrons, expectedMicroRnas,
-                expectedCdnaMaps, expectedSiftIndex, expectedPolyPhenIndex, expectedSource, expectedCdsStartNotFound,
-                expectedCdsEndNotFound, null, null);
+                expectedTotalExonLength, expectedStartExonPhase, expectedCanonical, expectedTranscriptRegions,
+                expectedNumExons, expectedMicroRnas, expectedSiftIndex, expectedPolyPhenIndex,
+                expectedSource, expectedCdsStartNotFound, expectedCdsEndNotFound, null, null);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             ITranscript observedTranscript;
@@ -75,14 +75,14 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             {
                 using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true))
                 {
-                    transcript.Write(writer, geneIndices, intronIndices, microRnaIndices, peptideIndices);
+                    transcript.Write(writer, geneIndices, transcriptRegionIndices, microRnaIndices, peptideIndices);
                 }
 
                 ms.Position = 0;
 
                 using (var reader = new ExtendedBinaryReader(ms))
                 {
-                    observedTranscript = Transcript.Read(reader, indexToChromosome, genes, expectedIntrons, expectedMicroRnas, peptideSeqs);
+                    observedTranscript = Transcript.Read(reader, indexToChromosome, genes, expectedTranscriptRegions, expectedMicroRnas, peptideSeqs);
                 }
             }
 
@@ -98,12 +98,11 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.Equal(expectedSiftIndex,       observedTranscript.SiftIndex);
             Assert.Equal(expectedPolyPhenIndex,   observedTranscript.PolyPhenIndex);
 
-            Assert.Equal(expectedChromosome.Index,       observedTranscript.Chromosome.Index);
-            Assert.Equal(expectedGene.Symbol,            observedTranscript.Gene.Symbol);
-            Assert.Equal(expectedTranslation.PeptideSeq, observedTranscript.Translation.PeptideSeq);
-            Assert.Equal(expectedIntrons.Length,         observedTranscript.Introns.Length);
-            Assert.Equal(expectedCdnaMaps.Length,        observedTranscript.CdnaMaps.Length);
-            Assert.Equal(expectedMicroRnas.Length,       observedTranscript.MicroRnas.Length);
+            Assert.Equal(expectedChromosome.Index,         observedTranscript.Chromosome.Index);
+            Assert.Equal(expectedGene.Symbol,              observedTranscript.Gene.Symbol);
+            Assert.Equal(expectedTranslation.PeptideSeq,   observedTranscript.Translation.PeptideSeq);
+            Assert.Equal(expectedTranscriptRegions.Length, observedTranscript.TranscriptRegions.Length);
+            Assert.Equal(expectedMicroRnas.Length,         observedTranscript.MicroRnas.Length);
         }
 
         private static Dictionary<T, int> CreateIndices<T>(T[] objects)
@@ -113,21 +112,15 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             return indexDict;
         }
 
-        private static ICdnaCoordinateMap[] GetCdnaMaps()
+        private static ITranscriptRegion[] GetTranscriptRegions()
         {
-            var cdnaMaps = new ICdnaCoordinateMap[3];
-            cdnaMaps[0] = new CdnaCoordinateMap(100, 199, 300, 399);
-            cdnaMaps[1] = cdnaMaps[0];
-            cdnaMaps[2] = cdnaMaps[0];
-            return cdnaMaps;
-        }
-
-        private static IInterval[] GetIntrons()
-        {
-            var introns = new IInterval[2];
-            introns[0] = new Interval(100, 200);
-            introns[1] = introns[0];
-            return introns;
+            var regions = new ITranscriptRegion[5];
+            regions[0] = new TranscriptRegion(TranscriptRegionType.Exon, 1, 100, 199, 300, 399);
+            regions[1] = new TranscriptRegion(TranscriptRegionType.Intron, 1, 200, 299, 400, 499);
+            regions[2] = new TranscriptRegion(TranscriptRegionType.Exon, 2, 300, 399, 500, 599);
+            regions[3] = new TranscriptRegion(TranscriptRegionType.Intron, 2, 400, 499, 600, 699);
+            regions[4] = new TranscriptRegion(TranscriptRegionType.Exon, 3, 500, 599, 700, 799);
+            return regions;
         }
 
         private static IInterval[] GetMicroRnas()

@@ -32,7 +32,7 @@ namespace VariantAnnotation.Caches.DataStructures
 
         public static IGene Read(IExtendedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
         {
-            ushort referenceIndex = reader.ReadUInt16();
+            ushort referenceIndex = reader.ReadOptUInt16();
             int start             = reader.ReadOptInt32();
             int end               = reader.ReadOptInt32();
             bool onReverseStrand  = reader.ReadBoolean();
@@ -46,7 +46,7 @@ namespace VariantAnnotation.Caches.DataStructures
 
         public void Write(IExtendedBinaryWriter writer)
         {
-            writer.Write(Chromosome.Index);
+            writer.WriteOpt(Chromosome.Index);
             writer.WriteOpt(Start);
             writer.WriteOpt(End);
             writer.Write(OnReverseStrand);

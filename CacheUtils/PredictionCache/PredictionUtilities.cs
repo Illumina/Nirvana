@@ -31,8 +31,9 @@ namespace CacheUtils.PredictionCache
         internal static ITranscript UpdatePredictions(this ITranscript t, int siftIndex, int polyphenIndex)
         {
             return new Transcript(t.Chromosome, t.Start, t.End, t.Id, t.Translation, t.BioType, t.Gene,
-                t.TotalExonLength, t.StartExonPhase, t.IsCanonical, t.Introns, t.MicroRnas, t.CdnaMaps, siftIndex,
-                polyphenIndex, t.Source, t.CdsStartNotFound, t.CdsEndNotFound, t.Selenocysteines, t.RnaEdits);
+                t.TotalExonLength, t.StartExonPhase, t.IsCanonical, t.TranscriptRegions, t.NumExons,
+                t.MicroRnas, siftIndex, polyphenIndex, t.Source, t.CdsStartNotFound, t.CdsEndNotFound,
+                t.Selenocysteines, t.RnaEdits);
         }
 
         private static int GetNewIndex(IReadOnlyList<Prediction> oldPredictions, int index,

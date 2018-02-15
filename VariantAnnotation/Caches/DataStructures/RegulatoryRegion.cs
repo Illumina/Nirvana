@@ -29,7 +29,7 @@ namespace VariantAnnotation.Caches.DataStructures
         /// </summary>
         public static IRegulatoryRegion Read(IExtendedBinaryReader reader, IDictionary<ushort, IChromosome> chromosomeIndexDictionary)
         {
-            var refIndex = reader.ReadUInt16();
+            var refIndex = reader.ReadOptUInt16();
             int start    = reader.ReadOptInt32();
             int end      = reader.ReadOptInt32();
             var type     = (RegulatoryRegionType)reader.ReadByte();
@@ -43,7 +43,7 @@ namespace VariantAnnotation.Caches.DataStructures
         /// </summary>
         public void Write(IExtendedBinaryWriter writer)
         {
-            writer.Write(Chromosome.Index);
+            writer.WriteOpt(Chromosome.Index);
             writer.WriteOpt(Start);
             writer.WriteOpt(End);
             writer.Write((byte)Type);

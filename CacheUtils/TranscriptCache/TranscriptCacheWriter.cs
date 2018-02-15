@@ -43,21 +43,22 @@ namespace CacheUtils.TranscriptCache
         {
             _blockStream.WriteHeader(_header.Write);
 
-            WriteItems(_writer, cacheData.Genes,       x => x.Write(_writer));
-            WriteItems(_writer, cacheData.Introns,     x => ((ISerializable)x).Write(_writer));
-            WriteItems(_writer, cacheData.Mirnas,      x => ((ISerializable)x).Write(_writer));
-            WriteItems(_writer, cacheData.PeptideSeqs, x => _writer.WriteOptAscii(x));
+            WriteItems(_writer, cacheData.Genes,             x => x.Write(_writer));
+            WriteItems(_writer, cacheData.TranscriptRegions, x => x.Write(_writer));
+            WriteItems(_writer, cacheData.Mirnas,            x => ((ISerializable)x).Write(_writer));
+            WriteItems(_writer, cacheData.PeptideSeqs,       x => _writer.WriteOptAscii(x));
 
-            var geneComparer     = new GeneComparer();
-            var intervalComparer = new IntervalComparer();
+            var geneComparer             = new GeneComparer();
+            var transcriptRegionComparer = new TranscriptRegionComparer();
+            var intervalComparer         = new IntervalComparer();
 
-            var geneIndices     = CreateIndex(cacheData.Genes, geneComparer);
-            var intronIndices   = CreateIndex(cacheData.Introns, intervalComparer);
-            var microRnaIndices = CreateIndex(cacheData.Mirnas, intervalComparer);
-            var peptideIndices  = CreateIndex(cacheData.PeptideSeqs, EqualityComparer<string>.Default);
+            var geneIndices             = CreateIndex(cacheData.Genes, geneComparer);
+            var transcriptRegionIndices = CreateIndex(cacheData.TranscriptRegions, transcriptRegionComparer);
+            var microRnaIndices         = CreateIndex(cacheData.Mirnas, intervalComparer);
+            var peptideIndices          = CreateIndex(cacheData.PeptideSeqs, EqualityComparer<string>.Default);
 
             WriteIntervals(_writer, cacheData.RegulatoryRegionIntervalArrays, x => x.Write(_writer));
-            WriteIntervals(_writer, cacheData.TranscriptIntervalArrays,       x => x.Write(_writer, geneIndices, intronIndices, microRnaIndices, peptideIndices));
+            WriteIntervals(_writer, cacheData.TranscriptIntervalArrays,       x => x.Write(_writer, geneIndices, transcriptRegionIndices, microRnaIndices, peptideIndices));
         }
 
         private static void WriteIntervals<T>(IExtendedBinaryWriter writer, IReadOnlyCollection<IntervalArray<T>> intervalArrays,

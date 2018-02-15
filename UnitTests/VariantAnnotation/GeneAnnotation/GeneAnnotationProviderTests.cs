@@ -25,7 +25,6 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
                 writer.Write(annotatedGene);
             }
 
-
             ms.Position = 0;
             var reader = new GeneDatabaseReader(ms);
 
@@ -36,9 +35,8 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
 
             Assert.NotNull(observedAnnotation);
             Assert.Null(observedAnnotation2);
-            Assert.Equal(1,observedAnnotation.Annotations.Length);
-            Assert.Equal("omim",observedAnnotation.Annotations[0].DataSource);
-
+            Assert.Single(observedAnnotation.Annotations);
+            Assert.Equal("omim", observedAnnotation.Annotations[0].DataSource);
         }
     }
 }

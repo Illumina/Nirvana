@@ -1,14 +1,15 @@
 ﻿using System;
+using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 {
-    public sealed class MutableExon : IEquatable<MutableExon>
+    public sealed class MutableExon : IEquatable<MutableExon>, IInterval
     {
         private readonly IChromosome _chromosome;
-        public readonly int Start;
-        public readonly int End;
         public readonly int Phase;
+        public int Start { get; }
+        public int End { get; }
 
         public MutableExon(IChromosome chromosome, int start, int end, int phase)
         {

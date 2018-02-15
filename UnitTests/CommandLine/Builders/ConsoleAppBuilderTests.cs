@@ -17,8 +17,8 @@ namespace UnitTests.CommandLine.Builders
                 .Parse()
                 .Data;
 
-            Assert.Equal(data.Errors.Count, 1);
-            Assert.Equal(data.UnsupportedOps.Count, 2);
+            Assert.Single(data.Errors);
+            Assert.Equal(2, data.UnsupportedOps.Count);
         }
 
         [Fact]

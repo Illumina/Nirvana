@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using ErrorHandling;
 using SAUtils.TsvWriters;
 using VariantAnnotation.IO;
@@ -85,7 +85,7 @@ namespace SAUtils.GeneScoresTsv
 
         private void WriteScores(string gene, double pLi, double pRec, double pNull)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -94,7 +94,7 @@ namespace SAUtils.GeneScoresTsv
             jsonObject.AddDoubleValue("pNull", pNull, "0.00e0");
             sb.Append(JsonObject.CloseBrace);
 
-            _writer.AddEntry(gene, new List<string> {sb.ToString()});
+            _writer.AddEntry(gene, new List<string> { StringBuilderCache.GetStringAndRelease(sb) });
         }
 
         private (string gene, double pLi, double pRec, double pNull) GetGeneAndScores(string line)

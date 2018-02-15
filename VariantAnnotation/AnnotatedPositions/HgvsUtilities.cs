@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using CommonUtilities;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions.Transcript;
@@ -101,14 +100,12 @@ namespace VariantAnnotation.AnnotatedPositions
 
         public static (int Start, char RefAminoAcid, char AltAminoAcid) GetChangesAfterFrameshift(int start, string peptideSeq, string altPeptideSeq)
         {
-	        start = Math.Min(start, peptideSeq.Length);
+            start = Math.Min(start, peptideSeq.Length);
 
-			// for deletions at the end of peptide sequence
-	        if (start > altPeptideSeq.Length)
-	        {
-		        return (start, peptideSeq[start - 1], '?');
-	        }
-	        var refPeptideSeq = peptideSeq + "*";
+            // for deletions at the end of peptide sequence
+            if (start > altPeptideSeq.Length) return (start, peptideSeq[start - 1], '?');
+
+            var refPeptideSeq = peptideSeq + "*";
             char refAminoAcid = refPeptideSeq[start - 1];
             char altAminoAcid = altPeptideSeq[start - 1];
 
@@ -132,170 +129,103 @@ namespace VariantAnnotation.AnnotatedPositions
             string trancriptAltAllele, ITranscript transcript, bool isMitochondrial)
         {
             string altCds = TranscriptUtilities.GetAlternateCds(refSequence, cdsBegin,
-                cdsEnd, trancriptAltAllele, transcript.CdnaMaps,
+                cdsEnd, trancriptAltAllele, transcript.TranscriptRegions,
                 transcript.Gene.OnReverseStrand, transcript.StartExonPhase,
                 transcript.Translation.CodingRegion.CdnaStart);
 
             var aminoAcids = new AminoAcids(isMitochondrial);
-	        return aminoAcids.TranslateBases(altCds, true);
+            return aminoAcids.TranslateBases(altCds, true);
         }
 
-	    /// <summary>
-	    /// Return the coordinates of the variant reletive to the interval
-	    /// </summary>
-	    /// <param name="variant"></param>
-	    /// <param name="interval"></param>
-	    /// <param name="onReverseStrand"></param>
-	    /// <returns>interval reflecting the relative coordinates</returns>
-	    public static IInterval GetReletiveCoordinates(ISimpleVariant variant, IInterval interval, bool onReverseStrand)
-	    {
-		    // calculate the HGVS position: use HGVS coordinates not variation feature coordinates due to duplications
-		    int refEnd, refStart;
-		    if (onReverseStrand)
-		    {
-			    refStart = interval.End - variant.End + 1;
-			    refEnd = interval.End - variant.Start + 1;
-		    }
-		    else
-		    {
-			    refStart = variant.Start - interval.Start + 1;
-			    refEnd = variant.End - interval.Start + 1;
-		    }
-
-		    return new Interval(refStart, refEnd);
-	    }
-
-	    /// <summary>
-	    /// gets the variant position (with intron offset) in the transcript [TranscriptVariationAllele.pm:1805 _get_cDNA_position]
-	    /// </summary>
-	    public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int position,bool isGenomicPosition = false)
-	    {
-            // start and stop coordinate relative to transcript. Take into account which
-            // strand we're working on
-	        if (!isGenomicPosition)
-	            position = transcript.Gene.OnReverseStrand
-	                ? transcript.End - position + 1
-	                : transcript.Start + position - 1;
-
-		    if (!transcript.Overlaps(position, position)) return null;
-
-		    var po = new PositionOffset(position);
-
-		    var exons = transcript.CdnaMaps;
-
-		    for (int exonIndex = 0; exonIndex < exons.Length; exonIndex++)
-		    {
-			    var exon = exons[exonIndex];
-			    if (position > exon.End) continue;
-
-			    // EXONIC: if the start coordinate is within this exon
-			    if (position >= exon.Start)
-			    {
-				    // get the cDNA start coordinate of the exon and add the number of nucleotides
-				    // from the exon boundary to the variation. If the transcript is in the opposite
-				    // direction, count from the end instead
-				    po.Position = exon.CdnaStart + (transcript.Gene.OnReverseStrand
-					                  ? exon.End - position
-					                  : position - exon.Start);
-
-				    break;
-			    }
-
-			    // INTRONIC: the start coordinate is between this exon and the previous one, determine which one is closest and get coordinates relative to that one
-
-			    // sanity check: make sure we have at least passed one exon
-			    if (exonIndex < 1)
-			    {
-				    //po.Position = null;
-				    return null;
-			    }
-
-			    var prevExon = exons[exonIndex - 1];
-			    GetIntronOffset(prevExon, exon, position, po, transcript.Gene.OnReverseStrand);
-			    break;
-		    }
-
-		    // start by correcting for the stop codon
-		    int startCodon = transcript.Translation?.CodingRegion.CdnaStart ?? -1;
-		    int stopCodon = transcript.Translation?.CodingRegion.CdnaEnd ?? -1;
-
-		    string cdnaCoord = po.Position.ToString();
-		    po.HasStopCodonNotation = false;
-		    bool hasNoPosition = false;
-
-		    if (stopCodon != -1)
-		    {
-			    if (po.Position > stopCodon)
-			    {
-				    cdnaCoord = '*' + (po.Position - stopCodon).ToString();
-				    po.HasStopCodonNotation = true;
-			    }
-			    else if (po.Offset != null && po.Position == stopCodon)
-			    {
-				    cdnaCoord = "*";
-				    po.HasStopCodonNotation = true;
-				    hasNoPosition = true;
-			    }
-		    }
-
-		    if (!po.HasStopCodonNotation && startCodon != -1)
-		    {
-			    cdnaCoord = (po.Position + (po.Position >= startCodon ? 1 : 0) - startCodon).ToString();
-		    }
-
-		    // re-assemble the cDNA position  [ return exon num & offset & direction for intron eg. 142+363]
-		    if (hasNoPosition) po.Value = "*" + po.Offset;
-		    else po.Value = cdnaCoord + (po.Offset == null ? "" : ((int)po.Offset).ToString("+0;-0;+0"));
-
-		    return po;
-	    }
-
-	    /// <summary>
-	    /// get the shorted intron offset from the nearest exon
-	    /// </summary>
-	    private static void GetIntronOffset(ICdnaCoordinateMap prevExon, ICdnaCoordinateMap exon, int? position, PositionOffset po, bool onReverseStrand)
-	    {
-		    int? upDist = position - prevExon.End;
-		    int? downDist = exon.Start - position;
-
-		    if (upDist < downDist || upDist == downDist && !onReverseStrand)
-		    {
-			    // distance to upstream exon is the shortest (or equal and in the positive orientation)
-			    if (onReverseStrand)
-			    {
-				    po.Position = prevExon.CdnaStart;
-				    po.Offset = -upDist;
-			    }
-			    else
-			    {
-				    po.Position = prevExon.CdnaEnd;
-				    po.Offset = upDist;
-			    }
-		    }
-		    else
-		    {
-			    // distance to downstream exon is the shortest
-			    if (onReverseStrand)
-			    {
-				    po.Position = exon.CdnaEnd;
-				    po.Offset = downDist;
-			    }
-			    else
-			    {
-				    po.Position = exon.CdnaStart;
-				    po.Offset = -downDist;
-			    }
-		    }
-	    }
-
-	    public static string GetTranscriptAllele(string variantAllele, bool onReverseStrand)
-	    {
-		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(variantAllele) : variantAllele;
-	    }
-
-        public static string FormatDnaNotation(string start, string end, string referenceId, string referenceBases, string alternateBases, GenomicChange type,char notationType)
+        public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int position, int regionIndex)
         {
-            var sb = new StringBuilder();
+            if (!transcript.Overlaps(position, position)) return null;
+
+            var region            = transcript.TranscriptRegions[regionIndex];
+            int codingRegionStart = transcript.Translation?.CodingRegion.CdnaStart ?? -1;
+            int codingRegionEnd   = transcript.Translation?.CodingRegion.CdnaEnd ?? -1;
+
+            var po = GetPositionAndOffset(position, region, transcript.Gene.OnReverseStrand);
+            if (po.Position == -1) return null;
+
+            var cdnaCoord = GetCdnaCoord(po.Position, po.Offset, codingRegionStart, codingRegionEnd);
+            var value     = cdnaCoord.HasNoPosition ? "*" + po.Offset : cdnaCoord.CdnaCoord + (po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0"));
+
+            return new PositionOffset(po.Position, po.Offset, value, cdnaCoord.HasStopCodonNotation);
+        }
+
+        private static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region,
+            bool onReverseStrand)
+        {
+            if (region.Type == TranscriptRegionType.Exon)
+            {
+                return (region.CdnaStart + (onReverseStrand ? region.End - position : position - region.Start), 0);
+            }
+
+            if (region.Type != TranscriptRegionType.Intron) return (-1, -1);
+
+            // intron
+            int leftDist  = position - region.Start + 1;
+            int rightDist = region.End - position + 1;
+
+            int offset = Math.Min(leftDist, rightDist);
+            if (!onReverseStrand && rightDist < leftDist || onReverseStrand && rightDist > leftDist) offset = -offset;
+
+            // cDNA position truth table
+            //
+            //          forward     reverse
+            //       -------------------------
+            // L < R | CdnaStart | CdnaEnd   |
+            // L = R | CdnaStart | CdnaStart |
+            // L > R | CdnaEnd   | CdnaStart |
+            //       -------------------------
+
+            int cdnaPosition = leftDist < rightDist && onReverseStrand || leftDist > rightDist && !onReverseStrand
+                ? region.CdnaEnd
+                : region.CdnaStart;
+
+            return (cdnaPosition, offset);
+        }
+
+        private static (string CdnaCoord, bool HasStopCodonNotation, bool HasNoPosition) GetCdnaCoord(int position,
+            int offset, int codingRegionStart, int codingRegionEnd)
+        {
+            string cdnaCoord          = null;
+            bool hasStopCodonNotation = false;
+            bool hasNoPosition        = false;
+
+            if (codingRegionEnd != -1)
+            {
+                if (position > codingRegionEnd)
+                {
+                    cdnaCoord = "*" + (position - codingRegionEnd);
+                    hasStopCodonNotation = true;
+                }
+                else if (offset != 0 && position == codingRegionEnd)
+                {
+                    cdnaCoord = "*";
+                    hasStopCodonNotation = true;
+                    hasNoPosition = true;
+                }
+            }
+
+            if (!hasStopCodonNotation && codingRegionStart != -1)
+            {
+                cdnaCoord = (position + (position >= codingRegionStart ? 1 : 0) - codingRegionStart).ToString();
+            }
+
+            if (cdnaCoord == null) cdnaCoord = position.ToString();
+            return (cdnaCoord, hasStopCodonNotation, hasNoPosition);
+        }
+
+        public static string GetTranscriptAllele(string variantAllele, bool onReverseStrand) =>
+            onReverseStrand ? SequenceUtilities.GetReverseComplement(variantAllele) : variantAllele;
+
+        public static string FormatDnaNotation(string start, string end, string referenceId, string referenceBases,
+            string alternateBases, GenomicChange type, char notationType)
+        {
+            var sb = StringBuilderCache.Acquire();
+
             // all start with transcript name & numbering type
             sb.Append(referenceId + ':' + notationType + '.');
 
@@ -332,8 +262,29 @@ namespace VariantAnnotation.AnnotatedPositions
                     throw new InvalidOperationException("Unhandled genomic change found: " + type);
             }
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
+        public static bool IsDuplicateWithinInterval(ISequence refSequence, ISimpleVariant variant, IInterval interval, bool onReverseStrand)
+        {
+            if (variant.Type != VariantType.insertion) return false;
+
+            int altAlleleLen = variant.AltAllele.Length;
+            string compareRegion;
+
+            if (onReverseStrand)
+            {
+                if (variant.End + altAlleleLen > interval.End) return false;
+                compareRegion = refSequence.Substring(variant.Start - 1, altAlleleLen);
+            }
+            else
+            {
+                if (variant.Start - altAlleleLen < interval.Start) return false;
+                compareRegion = refSequence.Substring(variant.End - altAlleleLen, altAlleleLen);
+
+            }
+
+            return compareRegion == variant.AltAllele;
+        }
     }
 }

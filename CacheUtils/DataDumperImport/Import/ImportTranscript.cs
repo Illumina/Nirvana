@@ -98,22 +98,23 @@ namespace CacheUtils.DataDumperImport.Import
             string siftData     = null;
             string polyphenData = null;
 
-            var bioType                   = BioType.Unknown;
-            IInterval[] microRnas         = null;
-            ICdnaCoordinateMap[] cdnaMaps = null;
-            IInterval[] introns           = null;
-            string peptideSequence        = null;
-            string translateableSequence  = null;
-            bool isCanonical              = false;
-            int compDnaCodingStart        = -1;
-            int compDnaCodingEnd          = -1;
-            int start                     = -1;
-            int end                       = -1;
-            MutableExon[] exons           = null;
-            bool cdsStartNotFound         = false;
-            bool cdsEndNotFound           = false;
-            int[] selenocysteinePositions = null;
-            IRnaEdit[] rnaEdits           = null;
+            var bioType                        = BioType.other;
+            IInterval[] microRnas              = null;
+            MutableTranscriptRegion[] cdnaMaps = null;
+            IInterval[] introns                = null;
+            string peptideSequence             = null;
+            string translateableSequence       = null;
+            bool isCanonical                   = false;
+            int compDnaCodingStart             = -1;
+            int compDnaCodingEnd               = -1;
+            int start                          = -1;
+            int end                            = -1;
+            MutableExon[] exons                = null;
+            bool cdsStartNotFound              = false;
+            bool cdsEndNotFound                = false;
+            int[] selenocysteinePositions      = null;
+            IRnaEdit[] rnaEdits                = null;
+            string bamEditStatus          = null;
 
             foreach (var node in objectValue.Values)
             {
@@ -126,7 +127,6 @@ namespace CacheUtils.DataDumperImport.Import
                 // handle each key
                 switch (node.Key)
                 {
-                    case ImportKeys.BamEditStatus:
                     case ImportKeys.CodingRegionEnd:
                     case ImportKeys.CodingRegionStart:
                     case ImportKeys.CreatedDate:
@@ -149,6 +149,9 @@ namespace CacheUtils.DataDumperImport.Import
                     case ImportKeys.UniParc:
                     case ImportKeys.VepLazyLoaded:
                         // not used
+                        break;
+                    case ImportKeys.BamEditStatus:
+                        bamEditStatus = node.GetString();
                         break;
                     case ImportKeys.Attributes:
                         if (node is ListObjectKeyValueNode attributesList) (microRnas, rnaEdits, cdsStartNotFound, cdsEndNotFound) = Attribute.ParseList(attributesList.Values);
@@ -230,7 +233,7 @@ namespace CacheUtils.DataDumperImport.Import
             var gene = new MutableGene(chromosome, geneStart, geneEnd, geneOnReverseStrand, geneSymbol,
                 geneSymbolSource, geneId, hgncId);
 
-            var codingRegion = new CdnaCoordinateMap(
+            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0,
                 GetCodingRegionStart(geneOnReverseStrand, translationStartExon, translationEndExon, translationStart, translationEnd),
                 GetCodingRegionEnd(geneOnReverseStrand, translationStartExon, translationEndExon, translationStart, translationEnd), 
                 compDnaCodingStart, compDnaCodingEnd);
@@ -242,7 +245,7 @@ namespace CacheUtils.DataDumperImport.Import
                 refSeqId, bioType, isCanonical, codingRegion, fixedProtein.Id, fixedProtein.Version,
                 peptideSequence, source, gene, exons, startExonPhase, totalExonLength, introns, cdnaMaps,
                 siftData, polyphenData, translateableSequence, microRnas, cdsStartNotFound, cdsEndNotFound,
-                selenocysteinePositions, rnaEdits);
+                selenocysteinePositions, rnaEdits, bamEditStatus);
         }
 
         /// <summary>

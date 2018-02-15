@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
-using VariantAnnotation.Interface.AnnotatedPositions;
+using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.DataDumperImport.Import
@@ -33,16 +33,16 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// parses the relevant data from each variant effect feature cache
         /// </summary>
-        public static (ICdnaCoordinateMap[] CdnaMaps, IInterval[] Introns, string PeptideSequence, string
+        public static (MutableTranscriptRegion[] CdnaMaps, IInterval[] Introns, string PeptideSequence, string
             TranslateableSequence, string SiftData, string PolyPhenData, int[] SelenocysteinePositions) Parse(ObjectValueNode objectValue)
         {
-            ICdnaCoordinateMap[] cdnaMaps = null;
-            IInterval[] introns           = null;
-            string peptideSequence        = null;
-            string translateableSequence  = null;
-            string siftData               = null;
-            string polyphenData           = null;
-            int[] selenocysteinePositions = null;
+            MutableTranscriptRegion[] cdnaMaps = null;
+            IInterval[] introns                = null;
+            string peptideSequence             = null;
+            string translateableSequence       = null;
+            string siftData                    = null;
+            string polyphenData                = null;
+            int[] selenocysteinePositions      = null;
 
             foreach (var node in objectValue.Values)
             {

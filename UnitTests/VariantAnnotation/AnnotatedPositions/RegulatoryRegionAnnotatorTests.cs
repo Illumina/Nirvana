@@ -32,7 +32,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var consequences = annotatedRegulatoryRegion.Consequences.ToList();
 
             Assert.NotNull(annotatedRegulatoryRegion);
-            Assert.Equal(1, consequences.Count);
+            Assert.Single(consequences);
             Assert.Equal(expectedConsequence, consequences[0]);
         }
 

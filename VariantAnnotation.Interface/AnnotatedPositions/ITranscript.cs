@@ -12,8 +12,8 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         Source Source { get; }
 
         IGene Gene { get; }
-        IInterval[] Introns { get; }
-        ICdnaCoordinateMap[] CdnaMaps { get; }
+        ITranscriptRegion[] TranscriptRegions { get; }
+        ushort NumExons { get; }
         int TotalExonLength { get; }
         byte StartExonPhase { get; }
         int SiftIndex { get; }
@@ -28,7 +28,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         bool CdsEndNotFound { get; }
 
         void Write(IExtendedBinaryWriter writer, Dictionary<IGene, int> geneIndices,
-            Dictionary<IInterval, int> intronIndices, Dictionary<IInterval, int> microRnaIndices,
+            Dictionary<ITranscriptRegion, int> transcriptRegionIndices, Dictionary<IInterval, int> microRnaIndices,
             Dictionary<string, int> peptideIndices);
     }
 

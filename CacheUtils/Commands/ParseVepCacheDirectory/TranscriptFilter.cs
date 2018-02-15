@@ -9,7 +9,6 @@ using CacheUtils.Genbank;
 using CacheUtils.Genes.Utilities;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
 {
@@ -34,6 +33,18 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                     filteredTranscripts = transcripts.Where(transcript => transcript.CdnaMaps[9].Start == 25419007).ToList();
                     logMessage = $"Filtered on exon 9 start: {transcriptId}";
                     break;
+                case "NM_001278597":
+                    filteredTranscripts = transcripts.Where(transcript => transcript.CdnaMaps.Length == 26).ToList();
+                    logMessage = $"Filtered on exon count (26): {transcriptId}";
+                    break;
+                case "NM_001278596":
+                    filteredTranscripts = transcripts.Where(transcript => transcript.CdnaMaps.Length == 26).ToList();
+                    logMessage = $"Filtered on exon count (26): {transcriptId}";
+                    break;
+                case "NM_016152":
+                    filteredTranscripts = transcripts.Where(transcript => transcript.Exons[0].Phase == 0).ToList();
+                    logMessage = $"Filtered on exon phase (0): {transcriptId}";
+                    break;
                 default:
                     return transcripts;
             }
@@ -44,15 +55,66 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return filteredTranscripts.Unique();
         }
 
+        public static List<MutableTranscript> InvestigateInconsistentCdnaMaps(this List<MutableTranscript> transcripts,
+            ILogger logger, string transcriptId)
+        {
+            int index = 0;
+            foreach (var transcript in transcripts)
+            {
+                var onReverseStrand = transcript.Gene.OnReverseStrand ? "R" : "F";
+
+                if (transcript.Exons.Length != transcript.CdnaMaps.Length)
+                {
+                    logger.Log(transcriptId, $"Found different exon & cDNA maps counts ({transcript.Exons.Length} vs {transcript.CdnaMaps.Length}) (index: {index}, {onReverseStrand})");
+                }
+
+                if (transcript.Exons.Length == transcript.CdnaMaps.Length &&
+                    DiffExonsAndCdnaMaps(transcript.Exons, transcript.CdnaMaps))
+                {
+                    logger.Log(transcriptId, $"Found different start/end coordinates between exons & cDNA maps. (index: {index}, {onReverseStrand})");
+                }
+
+                index++;
+            }
+
+            return transcripts;
+        }
+
+        private static bool DiffExonsAndCdnaMaps(MutableExon[] exons, MutableTranscriptRegion[] cdnaMaps)
+        {
+            int numExons = exons.Length;
+
+            for (int i = 0; i < numExons; i++)
+            {
+                var exon    = exons[i];
+                var cdnaMap = cdnaMaps[i];
+                if (exon.Start != cdnaMap.Start || exon.End != cdnaMap.End) return false;
+            }
+
+            return false;
+        }
+
         public static List<MutableTranscript> ChooseEditedTranscripts(
             this List<MutableTranscript> transcripts, ILogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
-            var filteredTranscripts = transcripts.Where(transcript => transcript.RnaEdits != null).ToList();
+            var filteredTranscripts = transcripts.Where(transcript => transcript.RnaEdits != null || transcript.BamEditStatus == "ok").ToList();
             if (filteredTranscripts.Count == 0) return transcripts;
 
-            logger.Log(transcripts[0].Id, "Filtered transcripts without RNA edits");
+            logger.Log(transcripts[0].Id, "Filtered transcripts without RNA edits or BAM edit status");
+            return filteredTranscripts.Unique();
+        }
+
+        public static List<MutableTranscript> RemoveFailedTranscripts(
+            this List<MutableTranscript> transcripts, ILogger logger)
+        {
+            if (transcripts.Count == 1) return transcripts;
+
+            var filteredTranscripts = transcripts.Where(transcript => transcript.BamEditStatus != "failed").ToList();
+            if (filteredTranscripts.Count == 0) return transcripts;
+
+            logger.Log(transcripts[0].Id, "Filtered transcripts with failed BAM status.");
             return filteredTranscripts.Unique();
         }
 
@@ -70,30 +132,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             logger.Log(transcripts[0].Id, "Filtered transcripts with lower versions");
             return transcripts.Unique();
         }
-
-        public static List<MutableTranscript> RemoveTranscriptsWithDifferentExons(
-            this List<MutableTranscript> transcripts, ILogger logger,
-            IReadOnlyDictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
-        {
-            if (transcripts.Count == 1 || idToGenbankEntry == null || !idToGenbankEntry.TryGetValue(transcriptId, out var genbankEntry)) return transcripts;
-
-            var filteredTranscripts = transcripts.Where(transcript => CdnaMapsMatch(transcript.CdnaMaps, genbankEntry.Exons)).ToList();
-            if (filteredTranscripts.Count == 0) return transcripts;
-
-            logger.Log(transcripts[0].Id, "Removed transcripts with different exons");
-            return filteredTranscripts.Unique();
-        }
-
-        private static bool CdnaMapsMatch(IReadOnlyList<ICdnaCoordinateMap> cdnaMaps, IReadOnlyList<IInterval> exons)
-        {
-            if (cdnaMaps.Count != exons.Count) return false;
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            for (int i = 0; i < cdnaMaps.Count; i++) if (!CdnaMapMatches(cdnaMaps[i], exons[i])) return false;
-            return true;
-        }
-
-        private static bool CdnaMapMatches(ICdnaCoordinateMap cdnaMap, IInterval exon) =>
-            cdnaMap.CdnaStart == exon.Start && cdnaMap.CdnaEnd == exon.End;
 
         public static List<MutableTranscript> Unique(this IEnumerable<MutableTranscript> transcripts)
         {
@@ -132,22 +170,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return filteredTranscripts.Unique();
         }
 
-        public static List<MutableTranscript> FixCdnaMapExonInconsistency(this List<MutableTranscript> transcripts,
-            ILogger logger)
-        {
-            if (transcripts.Count == 1) return transcripts;
-
-            var cdnaMapLengths = transcripts.GetSet(x => x.CdnaMaps.Length);
-            var exonLengths    = transcripts.GetSet(x => x.Exons.Length);
-            if (cdnaMapLengths.Count == 1 && exonLengths.Count == 1) return transcripts;
-
-            var filteredTranscripts = transcripts.Where(transcript => transcript.CdnaMaps.Length == transcript.Exons.Length).ToList();
-            if (filteredTranscripts.Count == 0) return transcripts;
-
-            logger.Log(transcripts[0].Id, "Filtered transcripts with inconsistent # of exons and cDNA maps");
-            return filteredTranscripts.Unique();
-        }
-
         public static List<MutableTranscript> FixGeneSymbolSource(this List<MutableTranscript> transcripts,
             ILogger logger)
         {
@@ -173,7 +195,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             if (biotypes.Count != 2) return transcripts;
 
             var biotype = GetDesiredBioType(biotypes);
-            if (biotype == BioType.Unknown) return transcripts;
+            if (biotype == BioType.other) return transcripts;
 
             foreach (var transcript in transcripts) transcript.BioType = biotype;
             logger.Log(transcripts[0].Id, "Normalized biotype");
@@ -204,7 +226,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             if (biotypes.Contains(BioType.mRNA) && biotypes.Contains(BioType.protein_coding))
                 return BioType.protein_coding;
 
-            return BioType.Unknown;
+            return BioType.other;
         }
 
         public static List<MutableTranscript> FixGeneId(this List<MutableTranscript> transcripts, ILogger logger,

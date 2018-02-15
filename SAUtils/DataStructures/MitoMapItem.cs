@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;
@@ -62,7 +62,7 @@ namespace SAUtils.DataStructures
 
         public string GetVariantJsonString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             //converting empty alleles to '-'
@@ -77,7 +77,7 @@ namespace SAUtils.DataStructures
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
             if (!string.IsNullOrEmpty(_clinicalSignificance)) jsonObject.AddStringValue("clinicalSignificance", _clinicalSignificance);
             if (!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile, false);
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()

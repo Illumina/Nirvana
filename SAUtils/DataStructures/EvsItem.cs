@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -84,7 +84,7 @@ namespace SAUtils.DataStructures
 		}
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
 			jsonObject.AddStringValue("sampleCount", NumSamples, false);
@@ -93,7 +93,7 @@ namespace SAUtils.DataStructures
 			jsonObject.AddStringValue("afrAf", AfrFreq, false);
 			jsonObject.AddStringValue("eurAf", EurFreq, false);
 
-			return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 	}
 }

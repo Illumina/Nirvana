@@ -5,6 +5,7 @@
     <DebugType>Full</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
   </ItemGroup>

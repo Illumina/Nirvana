@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
@@ -131,7 +132,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             var jsonObject = new JsonObject(sb);
 
@@ -144,7 +145,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddIntValue("sampleCount", SampleCount);
             jsonObject.AddObjectValues("studies", Studies);
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public void MergeStudies(CosmicItem otherItem)

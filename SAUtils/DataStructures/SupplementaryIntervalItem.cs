@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -82,7 +82,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             // data section
@@ -126,12 +126,7 @@ namespace SAUtils.DataStructures
                 jsonObject.AddStringValues(kvp.Key, kvp.Value.ToArray());
             }
 
-
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
-
-
     }
-
-
 }

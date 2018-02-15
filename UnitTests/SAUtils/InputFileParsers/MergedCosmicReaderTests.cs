@@ -61,7 +61,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 
                 count++;
             }
-
         }
 
         [Fact]
@@ -69,7 +68,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var tsvReader = new StreamReader(new MemoryStream());
             var vcfReader = new StreamReader(new MemoryStream());
-            var cosmicReader = new MergedCosmicReader(vcfReader,tsvReader,_refChromDict);
+            var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
 
             const string vcfLine1 = "3	10188320	COSM14426	GGTACTGAC	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.?;CNT=2";
             const string vcfLine2 = "3	10188320	COSM18152	G	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.V155M;CNT=7";
@@ -96,9 +95,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
             var items = cosmicReader.GetCosmicItems().ToList();
 
-            Assert.Equal(1,items.Count);
-            Assert.Contains("\"refAllele\":\"C\"",items[0].GetJsonString());
-
+            Assert.Single(items);
+            Assert.Contains("\"refAllele\":\"C\"", items[0].GetJsonString());
         }
 
         [Fact]
@@ -111,9 +109,6 @@ namespace UnitTests.SAUtils.InputFileParsers
             var items = cosmicReader.GetCosmicItems().ToList();
 
             Assert.Equal(3, items.Count);
-
-
         }
-
     }
 }

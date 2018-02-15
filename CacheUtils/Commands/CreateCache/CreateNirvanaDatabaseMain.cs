@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CacheUtils.Commands.Download;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
@@ -8,7 +9,6 @@ using CacheUtils.Helpers;
 using CacheUtils.IntermediateIO;
 using CacheUtils.PredictionCache;
 using CacheUtils.TranscriptCache;
-using CacheUtils.Utilities;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -28,7 +28,6 @@ namespace CacheUtils.Commands.CreateCache
     {
         private static string _inputPrefix;
         private static string _inputReferencePath;
-        private static string _inputUgaPath;
 
         private static string _outputCacheFilePrefix;
 
@@ -46,11 +45,12 @@ namespace CacheUtils.Commands.CreateCache
             using (var regulatoryReader = new RegulatoryRegionReader(GZipUtilities.GetAppropriateReadStream(regulatoryPath), refIndexToChromosome))
             using (var siftReader       = new PredictionReader(GZipUtilities.GetAppropriateReadStream(siftPath), refIndexToChromosome, IntermediateIoCommon.FileType.Sift))
             using (var polyphenReader   = new PredictionReader(GZipUtilities.GetAppropriateReadStream(polyphenPath), refIndexToChromosome, IntermediateIoCommon.FileType.Polyphen))
-            using (var geneReader       = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(_inputUgaPath), refNameToChromosome))
+            using (var geneReader       = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.UniversalGeneFilePath), refNameToChromosome))
             {
                 var genomeAssembly  = transcriptReader.Header.GenomeAssembly;
                 var source          = transcriptReader.Header.Source;
                 var vepReleaseTicks = transcriptReader.Header.VepReleaseTicks;
+                var vepVersion      = transcriptReader.Header.VepVersion;
 
                 logger.Write("- loading universal gene archive file... ");
                 var genes      = geneReader.GetGenes();
@@ -79,7 +79,7 @@ namespace CacheUtils.Commands.CreateCache
                 predictionCaches.PolyPhen.Write(FileUtilities.GetCreateStream(CacheConstants.PolyPhenPath(_outputCacheFilePrefix)));
                 logger.WriteLine("finished.");
 
-                var transcriptBuilder = new TranscriptCacheBuilder(logger, genomeAssembly, source, vepReleaseTicks);
+                var transcriptBuilder = new TranscriptCacheBuilder(logger, genomeAssembly, source, vepReleaseTicks, vepVersion);
                 var transcriptStaging = transcriptBuilder.CreateTranscriptCache(transcripts, regulatoryRegions, geneForest, numRefSeqs);
 
                 logger.Write("- writing transcript cache... ");
@@ -115,17 +115,8 @@ namespace CacheUtils.Commands.CreateCache
 
         private static void MarkCanonicalTranscripts(ILogger logger, MutableTranscript[] transcripts)
         {
-            var fileList = new List<RemoteFile>();
-            var ccdsFile = new RemoteFile("CCDS file (2016-09-08)", "ftp://ftp.ncbi.nlm.nih.gov/pub/CCDS/current_human/CCDS2Sequence.20160908.txt", false);
-            var lrgFile  = new RemoteFile("latest LRG file", "http://ftp.ebi.ac.uk/pub/databases/lrgex/list_LRGs_transcripts_xrefs.txt");
-
-            fileList.Add(ccdsFile);
-            fileList.Add(lrgFile);
-
-            fileList.Execute(logger, "downloads", file => file.Download(logger));
-
-            var ccdsIdToEnsemblId = CcdsReader.GetCcdsIdToEnsemblId(ccdsFile.FilePath);
-            var lrgTranscriptIds  = LrgReader.GetTranscriptIds(lrgFile.FilePath, ccdsIdToEnsemblId);
+            var ccdsIdToEnsemblId = CcdsReader.GetCcdsIdToEnsemblId(ExternalFiles.CcdsFile.FilePath);
+            var lrgTranscriptIds  = LrgReader.GetTranscriptIds(ExternalFiles.LrgFile.FilePath, ccdsIdToEnsemblId);
 
             logger.Write("- marking canonical transcripts... ");
             var canonical = new CanonicalTranscriptMarker(lrgTranscriptIds);
@@ -137,11 +128,6 @@ namespace CacheUtils.Commands.CreateCache
         {
             var ops = new OptionSet
             {
-                {
-                    "genes|g=",
-                    "universal genes archive {filename}",
-                    v => _inputUgaPath = v
-                },
                 {
                     "in|i=",
                     "input filename {prefix}",
@@ -159,14 +145,13 @@ namespace CacheUtils.Commands.CreateCache
                 }
             };
 
-            var commandLineExample = $"{command} --in <prefix> --out <prefix> --genes <path> --ref <path> --lrg <path>";
+            var commandLineExample = $"{command} --in <prefix> --out <prefix> --ref <path>";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .HasRequiredParameter(_inputPrefix, "intermediate cache", "--in")
                 .CheckInputFilenameExists(_inputReferencePath, "compressed reference", "--ref")
-                .CheckInputFilenameExists(_inputUgaPath, "UGA genes", "--genes")
                 .HasRequiredParameter(_outputCacheFilePrefix, "Nirvana", "--out")
                 .SkipBanner()
                 .ShowHelpMenu("Converts *deserialized* VEP cache files to Nirvana cache format.", commandLineExample)

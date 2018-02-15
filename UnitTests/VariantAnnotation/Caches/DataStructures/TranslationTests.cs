@@ -13,9 +13,9 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void Translation_EndToEnd()
         {
-            ICdnaCoordinateMap expectedCodingRegion = new CdnaCoordinateMap(100, 200, 300, 400);
-            const string expectedProteinId          = "ENSP00000446475.7";
-            const string expectedPeptideSeq         = "VEIDSD";
+            ITranscriptRegion expectedCodingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 100, 200, 300, 400);
+            const string expectedProteinId         = "ENSP00000446475.7";
+            const string expectedPeptideSeq        = "VEIDSD";
 
             string[] peptideSeqs = { expectedPeptideSeq };
 

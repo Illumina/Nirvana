@@ -12,10 +12,31 @@ namespace VariantAnnotation.IO
 		public ExtendedBinaryReader(Stream input, Encoding encoding, bool leaveOpen = false)
 			: base(input, encoding, leaveOpen) {}
 
-		/// <summary>
-		/// returns an integer from the binary reader
-		/// </summary>
-		public int ReadOptInt32()
+
+	    /// <summary>
+	    /// returns an unsigned short from the binary reader
+	    /// </summary>
+	    public ushort ReadOptUInt16()
+	    {
+	        ushort count = 0;
+	        int shift = 0;
+
+	        while (shift != 21)
+	        {
+	            byte b = ReadByte();
+	            count |= (ushort)((b & sbyte.MaxValue) << shift);
+	            shift += 7;
+
+	            if ((b & 128) == 0) return count;
+	        }
+
+	        throw new FormatException("Unable to read the 7-bit encoded unsigned short");
+	    }
+
+        /// <summary>
+        /// returns an integer from the binary reader
+        /// </summary>
+        public int ReadOptInt32()
 		{
 			int count = 0;
 			int shift = 0;

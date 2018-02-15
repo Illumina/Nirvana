@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.GeneAnnotation;
@@ -65,10 +65,10 @@ namespace VariantAnnotation
 
         private static string GetGenomeAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
             foreach (var assembly in assemblies) sb.AppendLine($"- Using {assembly.Key}: {string.Join(", ", assembly.Value)}");
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         private void CheckPluginGenomeAssemblyConsistency(GenomeAssembly systemGenomeAssembly)

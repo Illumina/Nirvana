@@ -15,6 +15,22 @@ namespace VariantAnnotation.IO
         }
 
         /// <summary>
+        /// writes an unsigned short to the binary writer
+        /// </summary>
+        public void WriteOpt(ushort value)
+        {
+            ushort num = value;
+
+            while (num >= 128U)
+            {
+                Write((byte)(num | 128U));
+                num >>= 7;
+            }
+
+            Write((byte)num);
+        }
+
+        /// <summary>
         /// writes an integer to the binary writer
         /// </summary>
         public void WriteOpt(int value)

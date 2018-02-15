@@ -6,7 +6,7 @@ using Compression.Utilities;
 using ErrorHandling;
 using System;
 using System.Collections.Generic;
-using System.IO;
+using CacheUtils.Commands.Download;
 using CacheUtils.Genbank;
 using CacheUtils.Logger;
 using VariantAnnotation.Interface;
@@ -23,7 +23,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
     {
         private static string _inputVepDirectory;
         private static string _inputReferencePath;
-        private static string _inputGenbankPath;
 
         private static string _outputStub;
 
@@ -104,12 +103,11 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         private static Dictionary<string, GenbankEntry> GetIdToGenbank(ILogger logger, GenomeAssembly assembly, Source source)
         {
             if (assembly != GenomeAssembly.GRCh37 || source != Source.RefSeq) return null;
-            if (string.IsNullOrEmpty(_inputGenbankPath)) throw new InvalidDataException("When parsing RefSeq GRCh37 data, data from the CacheUtils genbank tool is required (--genbank)");
 
             logger.Write("- loading the intermediate Genbank file... ");
 
             Dictionary<string, GenbankEntry> genbankDict;
-            using (var reader = new IntermediateIO.GenbankReader(GZipUtilities.GetAppropriateReadStream(_inputGenbankPath)))
+            using (var reader = new IntermediateIO.GenbankReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.GenbankFilePath)))
             {
                 genbankDict = reader.GetIdToGenbank();
             }
@@ -172,11 +170,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                     "ga=",
                     "genome assembly {version}",
                     v => _genomeAssembly = v
-                },
-                {
-                    "genbank=",
-                    "intermediate genbank {path}",
-                    v => _inputGenbankPath = v
                 },
                 {
                     "in|i=",

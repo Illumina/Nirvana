@@ -9,7 +9,7 @@ namespace VariantAnnotation.AnnotatedPositions
     {
         public static IAnnotatedRegulatoryRegion Annotate(IVariant variant, IRegulatoryRegion regulatoryRegion)
         {
-            var featureEffect = new FeatureVariantEffects(regulatoryRegion, variant.Type, variant.Start, variant.End,
+            var featureEffect = new FeatureVariantEffects(regulatoryRegion, variant.Type, variant,
                 variant.Behavior.StructuralVariantConsequence);
 
             var consequence = new Consequences(null, featureEffect);

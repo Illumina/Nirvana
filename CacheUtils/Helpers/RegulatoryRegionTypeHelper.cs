@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Interface.Caches;
 
 namespace CacheUtils.Helpers
@@ -23,11 +23,8 @@ namespace CacheUtils.Helpers
 
         public static RegulatoryRegionType GetRegulatoryRegionType(string s)
         {
-            if (!StringToRegulatoryRegionTypes.TryGetValue(s, out var ret))
-            {
-                throw new InvalidDataException($"Unable to convert [{s}] to a regulatory region");
-            }
-
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (!StringToRegulatoryRegionTypes.TryGetValue(s, out var ret)) throw new InvalidOperationException($"The specified regulatory region type ({s}) was not found in the RegulatoryRegionType enum.");
             return ret;
         }
     }

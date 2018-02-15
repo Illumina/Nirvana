@@ -12,9 +12,6 @@ namespace UnitTests.SAUtils.InputFileParsers
     {
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public EvsTests()
         {
             _refChromDict = new Dictionary<string, IChromosome>
@@ -30,14 +27,14 @@ namespace UnitTests.SAUtils.InputFileParsers
             const string vcfLine = "1	69428	rs140739101	T	G	.	PASS	BSNP=dbSNP_134;EA_AC=313,6535;AA_AC=14,3808;TAC=327,10343;MAF=4.5707,0.3663,3.0647;GTS=GG,GT,TT;EA_GTC=92,129,3203;AA_GTC=1,12,1898;GTC=93,141,5101;DP=110;GL=OR4F5;CP=1.0;CG=0.9;AA=T;CA=.;EXOME_CHIP=no;GWAS_PUBMED=.;FG=NM_001005484.1:missense;HGVS_CDNA_VAR=NM_001005484.1:c.338T>G;HGVS_PROTEIN_VAR=NM_001005484.1:p.(F113C);CDS_SIZES=NM_001005484.1:918;GS=205;PH=probably-damaging:0.999;EA_AGE=.;AA_AGE=.";
 
             var fileInfo = new StreamReader(new MemoryStream());
-            var evsReader = new EvsReader(fileInfo,_refChromDict);
+            var evsReader = new EvsReader(fileInfo, _refChromDict);
 
             var evs = evsReader.ExtractItems(vcfLine)[0];
 
             Assert.NotNull(evs);
             const string expectedRes = "\"sampleCount\":5335,\"coverage\":110,\"allAf\":0.030647,\"afrAf\":0.003663,\"eurAf\":0.045707";
             Assert.Equal(expectedRes, evs.GetJsonString());
-            
+
         }
 
         [Fact]
@@ -66,29 +63,25 @@ namespace UnitTests.SAUtils.InputFileParsers
             var evs = evsReader.ExtractItems(vcfLine);
 
             Assert.NotNull(evs);
-            Assert.Equal(2,evs.Count);
+            Assert.Equal(2, evs.Count);
             const string expectedRes1 = "\"sampleCount\":5648,\"coverage\":10,\"allAf\":0.004072,\"afrAf\":0.012380,\"eurAf\":0.000258";
             Assert.Equal(expectedRes1, evs[0].GetJsonString());
-            Assert.Equal("TGG",evs[0].AlternateAllele);
+            Assert.Equal("TGG", evs[0].AlternateAllele);
 
             const string expectedRes2 = "\"sampleCount\":5648,\"coverage\":10,\"allAf\":0.293732,\"afrAf\":0.078503,\"eurAf\":0.392534";
             Assert.Equal(expectedRes2, evs[1].GetJsonString());
             Assert.Equal("T", evs[1].AlternateAllele);
-
-
         }
-
-
 
         [Fact]
         public void EqualityAndHash()
         {
-            var evsItem = new EvsItem(new Chromosome(  "chr1","1",0), 100, "rs101", "A", "C", "0.1", "0.1", "0.1", "0.1", "100");
+            var evsItem = new EvsItem(new Chromosome("chr1", "1", 0), 100, "rs101", "A", "C", "0.1", "0.1", "0.1", "0.1", "100");
 
             var evsHash = new HashSet<EvsItem> { evsItem };
 
-            Assert.Equal(1, evsHash.Count);
-            Assert.True(evsHash.Contains(evsItem));
+            Assert.Single(evsHash);
+            Assert.Contains(evsItem, evsHash);
         }
     }
 }

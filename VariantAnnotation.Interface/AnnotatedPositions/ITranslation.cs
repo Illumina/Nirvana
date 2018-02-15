@@ -4,7 +4,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 {
     public interface ITranslation
     {
-	    ICdnaCoordinateMap CodingRegion { get; }
+        ITranscriptRegion CodingRegion { get; }
 		ICompactId ProteinId { get; }
 	    string PeptideSeq { get; }
         void Write(IExtendedBinaryWriter writer, int peptideIndex);

@@ -5,28 +5,28 @@ using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
-	public class CosmicTests
-	{
-		[Fact]
-		public void EqualityAndHash()
-		{
-			var cosmicItem = new CosmicItem(new Chromosome("chr1","1",0), 100, "rs101", "A", "C", "GENE0", new HashSet<CosmicItem.CosmicStudy> {new CosmicItem.CosmicStudy("100", "histology", "primarySite")},1);
+    public sealed class CosmicTests
+    {
+        [Fact]
+        public void EqualityAndHash()
+        {
+            var cosmicItem = new CosmicItem(new Chromosome("chr1", "1", 0), 100, "rs101", "A", "C", "GENE0", new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy("100", "histology", "primarySite") }, 1);
 
-			var customHash = new HashSet<CosmicItem> { cosmicItem };
+            var customHash = new HashSet<CosmicItem> { cosmicItem };
 
-			Assert.Equal(1, customHash.Count);
-			Assert.True(customHash.Contains(cosmicItem));
-		}
+            Assert.Single(customHash);
+            Assert.Contains(cosmicItem, customHash);
+        }
 
-		[Fact]
-		public void EqulityHashStudy()
-		{
-			var cosmicStudy = new CosmicItem.CosmicStudy("123", "histology1", "primarySite1");
+        [Fact]
+        public void EqulityHashStudy()
+        {
+            var cosmicStudy = new CosmicItem.CosmicStudy("123", "histology1", "primarySite1");
 
-			var studyHash = new HashSet<CosmicItem.CosmicStudy> {cosmicStudy};
+            var studyHash = new HashSet<CosmicItem.CosmicStudy> { cosmicStudy };
 
-			Assert.Equal(1, studyHash.Count);
-			Assert.True(studyHash.Contains(cosmicStudy));
-		}
-	}
+            Assert.Single(studyHash);
+            Assert.Contains(cosmicStudy, studyHash);
+        }
+    }
 }

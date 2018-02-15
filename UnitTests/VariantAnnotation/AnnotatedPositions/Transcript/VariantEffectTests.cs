@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 {
-    public class VariantEffectTests
+    public sealed class VariantEffectTests
     {
         [Theory]
         [InlineData(false,false,false,false)]
@@ -28,7 +28,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns("C");
 
             var variantEffect = new VariantEffect(positionalEffect, variant.Object, transcript.Object, "", "", "", "",
-                null);
+                null, null);
 
             var gene = new Mock<IGene>();
             transcript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -57,7 +57,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns("C");
 
             var variantEffect = new VariantEffect(positionalEffect, variant.Object, transcript.Object, "", "", "", "",
-                null);
+                null, null);
 
             var gene = new Mock<IGene>();
             transcript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -80,7 +80,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns(altAllele);
 
             var variantEffect = new VariantEffect(null, variant.Object, transcript.Object, refAminoAcids, altAminoAcids , "", "",
-                proteinBegin);
+                proteinBegin, null);
 
             if (isStartRetained) Assert.True(variantEffect.IsStartRetained());
             else Assert.False(variantEffect.IsStartRetained());
@@ -110,7 +110,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns("C");
 
             var variantEffect = new VariantEffect(positionalEffect, variant.Object, transcript.Object, "", "", "", "",
-                null);
+                null, null);
 
             var gene = new Mock<IGene>();
             transcript.SetupGet(x => x.Gene).Returns(gene.Object);

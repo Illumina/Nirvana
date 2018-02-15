@@ -51,6 +51,15 @@ namespace UnitTests.VariantAnnotation.IO
         }
 
         [Theory]
+        [InlineData(ushort.MaxValue)]
+        [InlineData(ushort.MinValue)]
+        public void ReadOptUInt16_HandleExtremeIntegers(ushort expectedInteger)
+        {
+            ushort observedInteger = GetObservedShort(expectedInteger);
+            Assert.Equal(expectedInteger, observedInteger);
+        }
+
+        [Theory]
         [InlineData(3)]
         [InlineData(0)]
         [InlineData(-2)]
@@ -186,6 +195,19 @@ namespace UnitTests.VariantAnnotation.IO
             Assert.Null(observedStrings);
         }
 
+        private static ushort GetObservedShort(ushort expectedShort)
+        {
+            ushort observedShort;
+
+            using (var memoryStream = GetMemoryStream(expectedShort))
+            using (var reader = new ExtendedBinaryReader(memoryStream))
+            {
+                observedShort = reader.ReadOptUInt16();
+            }
+
+            return observedShort;
+        }
+
         private static int GetObservedInteger(int expectedInteger)
         {
             int observedInteger;
@@ -210,6 +232,19 @@ namespace UnitTests.VariantAnnotation.IO
             }
 
             return observedLong;
+        }
+
+        private static Stream GetMemoryStream(ushort num)
+        {
+            var memoryStream = new MemoryStream();
+
+            using (var writer = new ExtendedBinaryWriter(memoryStream, Encoding.UTF8, true))
+            {
+                writer.WriteOpt(num);
+            }
+
+            memoryStream.Position = 0;
+            return memoryStream;
         }
 
         private static Stream GetMemoryStream(int num)

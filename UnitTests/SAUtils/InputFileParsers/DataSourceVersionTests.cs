@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using CommonUtilities;
 using SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Providers;
@@ -26,10 +26,10 @@ namespace UnitTests.SAUtils.InputFileParsers
 			Assert.True(string.IsNullOrEmpty(version.Description));
 			Assert.Contains("dataSource=dbSNP", version.ToString());//vcf output
 
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			version.SerializeJson(sb);
 			
-			Assert.Contains("name\":\"dbSNP", sb.ToString());//json output
+			Assert.Contains("name\":\"dbSNP", StringBuilderCache.GetStringAndRelease(sb));//json output
 		}
 
 		[Fact]

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using CacheUtils.DataDumperImport.DataStructures;
 
 namespace CacheUtils.Helpers
@@ -26,7 +27,8 @@ namespace CacheUtils.Helpers
         public static GeneSymbolSource GetGeneSymbolSource(string s)
         {
             if (s == null) return GeneSymbolSource.Unknown;
-            return !StringToGeneSymbolSources.TryGetValue(s, out var ret) ? GeneSymbolSource.Unknown : ret;
+            if (!StringToGeneSymbolSources.TryGetValue(s, out var ret)) throw new InvalidOperationException($"The specified gene symbol source ({s}) was not found in the GeneSymbolSource enum.");
+            return ret;
         }
     }
 }

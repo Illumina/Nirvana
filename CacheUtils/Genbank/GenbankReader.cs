@@ -50,7 +50,7 @@ namespace CacheUtils.Genbank
             while (true)
             {
                 var line = _reader.ReadLine();
-                if (line.StartsWith(TerminatorTag)) break;
+                if (line == null || line.StartsWith(TerminatorTag)) break;
 
                 if (line.StartsWith(FeaturesTag)) currentState = GenbankState.Features;
                 else if (line.StartsWith(OriginTag)) currentState = GenbankState.Origin;

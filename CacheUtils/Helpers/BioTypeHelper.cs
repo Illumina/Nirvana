@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.Helpers
@@ -11,11 +12,13 @@ namespace CacheUtils.Helpers
         {
             StringToBioTypes = new Dictionary<string, BioType>
             {
+                ["aligned_transcript"]                 = BioType.aligned_transcript,
                 ["ambiguous_orf"]                      = BioType.ambiguous_orf,
                 ["antisense"]                          = BioType.antisense,
                 ["antisense_RNA"]                      = BioType.antisense_RNA,
-                ["bidirectional_promoter_lncrna"]      = BioType.bidirectional_promoter_lncrna,
+                ["bidirectional_promoter_lncRNA"]      = BioType.bidirectional_promoter_lncRNA,
                 ["guide_RNA"]                          = BioType.guide_RNA,
+                ["IG_pseudogene"]                      = BioType.IG_pseudogene,
                 ["IG_C_gene"]                          = BioType.IG_C_gene,
                 ["IG_C_pseudogene"]                    = BioType.IG_C_pseudogene,
                 ["IG_D_gene"]                          = BioType.IG_D_gene,
@@ -34,6 +37,7 @@ namespace CacheUtils.Helpers
                 ["non_coding"]                         = BioType.non_coding,
                 ["nonsense_mediated_decay"]            = BioType.nonsense_mediated_decay,
                 ["non_stop_decay"]                     = BioType.non_stop_decay,
+                ["other"]                              = BioType.other,
                 ["polymorphic_pseudogene"]             = BioType.polymorphic_pseudogene,
                 ["processed_pseudogene"]               = BioType.processed_pseudogene,
                 ["processed_transcript"]               = BioType.processed_transcript,
@@ -54,7 +58,8 @@ namespace CacheUtils.Helpers
                 ["snRNA"]                              = BioType.snRNA,
                 ["snoRNA"]                             = BioType.snoRNA,
                 ["telomerase_RNA"]                     = BioType.telomerase_RNA,
-                ["three_prime_overlapping_ncrna"]      = BioType.three_prime_overlapping_ncrna,
+                ["3prime_overlapping_ncrna"]           = BioType.three_prime_overlapping_ncRNA,
+                ["3prime_overlapping_ncRNA"]           = BioType.three_prime_overlapping_ncRNA,
                 ["transcribed_processed_pseudogene"]   = BioType.transcribed_processed_pseudogene,
                 ["translated_unprocessed_pseudogene"]  = BioType.translated_unprocessed_pseudogene,
                 ["transcribed_unitary_pseudogene"]     = BioType.transcribed_unitary_pseudogene,
@@ -77,8 +82,9 @@ namespace CacheUtils.Helpers
 
         public static BioType GetBioType(string s)
         {
-            if (s == null) return BioType.Unknown;
-            return !StringToBioTypes.TryGetValue(s, out var ret) ? BioType.Unknown : ret;
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (!StringToBioTypes.TryGetValue(s, out var ret)) throw new InvalidOperationException($"The specified biotype ({s}) was not found in the BioType enum.");
+            return ret;
         }
     }
 }

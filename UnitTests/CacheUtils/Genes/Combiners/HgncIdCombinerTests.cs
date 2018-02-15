@@ -23,7 +23,7 @@ namespace UnitTests.CacheUtils.Genes.Combiners
             var observedResults = new List<UgaGene>();
             _combiner.Combine(observedResults, uga37, uga38);
 
-            Assert.Equal(1, observedResults.Count);
+            Assert.Single(observedResults);
 
             var observedGene = observedResults[0];
             Assert.Equal("102466751", observedGene.EntrezGeneId);
@@ -57,7 +57,7 @@ namespace UnitTests.CacheUtils.Genes.Combiners
             var observedResults = new List<UgaGene>();
             _combiner.Combine(observedResults, uga37, uga38);
 
-            Assert.Equal(1, observedResults.Count);
+            Assert.Single(observedResults);
 
             var observedGene = observedResults[0];
             Assert.Equal("102466751", observedGene.EntrezGeneId);

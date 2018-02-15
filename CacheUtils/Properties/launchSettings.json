@@ -1,48 +1,48 @@
 {
   "profiles": {
-    "CacheUtils": {
-      "commandName": "Project",
-      "commandLineArgs": "create -g VEP90_genes_2017-10-26.tsv.gz -i IntermediateCache\\Ensembl90_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o test",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    },
-    "MS_Create": {
-      "commandName": "Project",
-      "commandLineArgs": "create -g IntermediateCache\\VEP90_UGA_2017-11-27.tsv.gz -i IntermediateCache\\Ensembl90_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o temp_ensembl90",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    },
-    "MS_Gene": {
-      "commandName": "Project",
-      "commandLineArgs": "gene -o VEP90_genes_2017-10-27.tsv.gz",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    },
-    "MS_Parse": {
-      "commandName": "Project",
-      "commandLineArgs": "parse --date 2017-09-04 -s refseq --ga GRCh37 --vep 90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i VepCache\\90\\homo_sapiens_refseq\\90_GRCh37 -o IntermediateCache\\RefSeq90_GRCh37 --genbank RefSeq_Genbank_Transcripts_1_43.gz",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    },
-    "MS_Genbank": {
-      "commandName": "Project",
-      "commandLineArgs": "genbank -o test",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    },
-    "MS_Parse Ensembl": {
-      "commandName": "Project",
-      "commandLineArgs": "parse --date 2017-09-04 -s ensembl --ga GRCh37 --vep 90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i VepCache\\90\\homo_sapiens\\90_GRCh37 -o IntermediateCache\\Ensembl90_GRCh37",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    },
-    "MS_Combine": {
+    "MS Combine": {
       "commandName": "Project",
       "commandLineArgs": "combine -1 Cache\\25\\GRCh38\\Ensembl90 -2 Cache\\25\\GRCh38\\RefSeq90 -r References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o Cache\\25\\GRCh38\\Both90",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-    "MS_Extract": {
+    "MS Create RefSeq": {
+      "commandName": "Project",
+      "commandLineArgs": "create -i IntermediateCache\\91\\RefSeq_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o tempoutput",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS Create Ensembl": {
+      "commandName": "Project",
+      "commandLineArgs": "create -i IntermediateCache\\91\\Ensembl_GRCh37 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o tempoutput",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS Download": {
+      "commandName": "Project",
+      "commandLineArgs": "download",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS Extract": {
       "commandName": "Project",
       "commandLineArgs": "extract -i Cache\\25\\GRCh37\\Both90 -o e:\\Data\\Nirvana -n chr12 -p 7018490 --endpos 7086889 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
+    "MS Gene": {
+      "commandName": "Project",
+      "commandLineArgs": "gene -r e:\\Data\\Nirvana\\References\\5 -i e:\\Data\\Nirvana\\IntermediateCache\\90",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
     "MS GFF": {
       "commandName": "Project",
-      "commandLineArgs": "gff -i Cache\\25\\GRCh37\\RefSeq90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o Cache\\25\\GRCh37\\GRCh37_RefSeq_25.gff.gz",
+      "commandLineArgs": "gff -i Cache\\26\\GRCh37\\RefSeq -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o temp.gff.gz",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS Parse RefSeq": {
+      "commandName": "Project",
+      "commandLineArgs": "parse --date 2017-12-18 -s refseq --ga GRCh37 --vep 91 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i VepCache\\homo_sapiens_refseq\\91_GRCh37 -o IntermediateCache\\91\\RefSeq91_GRCh37",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "MS Parse Ensembl": {
+      "commandName": "Project",
+      "commandLineArgs": "parse --date 2017-09-04 -s ensembl --ga GRCh37 --vep 90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i VepCache\\90\\homo_sapiens\\90_GRCh37 -o IntermediateCache\\Ensembl90_GRCh37",
       "workingDirectory": "E:\\Data\\Nirvana"
     }
   }

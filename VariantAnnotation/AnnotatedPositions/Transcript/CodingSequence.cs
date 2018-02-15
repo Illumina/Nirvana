@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CommonUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Utilities;
@@ -7,53 +7,43 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class CodingSequence : ISequence
     {
-        #region members
-
-        private readonly int _start;
-        private readonly int _end;
-        private readonly ICdnaCoordinateMap[] _cdnaMaps;
+        private readonly ITranscriptRegion _codingRegion;
+        private readonly ITranscriptRegion[] _regions;
         private readonly bool _geneOnReverseStrand;
-        private readonly int _startExonPhase;
+        private readonly byte _startExonPhase;
         private readonly ISequence _compressedSequence;
         private string _sequence;
 
-        #endregion
-
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public CodingSequence(ISequence compressedSequence, int start, int end, ICdnaCoordinateMap[] cdnaMaps,
-            bool geneOnReverseStrand, byte? startExonPhase)
+        public CodingSequence(ISequence compressedSequence, ITranscriptRegion codingRegion, ITranscriptRegion[] regions,
+            bool geneOnReverseStrand, byte startExonPhase)
         {
-            _start               = start;
-            _end                 = end;
-            _cdnaMaps            = cdnaMaps;
+            _codingRegion        = codingRegion;
+            _regions             = regions;
             _geneOnReverseStrand = geneOnReverseStrand;
-            _startExonPhase      = startExonPhase ?? 0;
-            _compressedSequence = compressedSequence;
+            _startExonPhase      = startExonPhase;
+            _compressedSequence  = compressedSequence;
         }
 
-        /// <summary>
-        /// extracts the coding sequence corresponding to the listed exons
-        /// </summary>
         private string GetCodingSequence(ISequence genomicSequence)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire(Length);
 
             // account for the exon phase (forward orientation)
             if (_startExonPhase > 0 && !_geneOnReverseStrand) sb.Append('N', _startExonPhase);
 
-            foreach (var map in _cdnaMaps)
+            foreach (var region in _regions)
             {
-                // handle exons that are entirely in the UTR
-                if (map.End < _start || map.Start > _end) continue;
+                if (region.Type != TranscriptRegionType.Exon) continue;
 
-                int tempBegin = map.Start;
-                int tempEnd = map.End;
+                // handle exons that are entirely in the UTR
+                if (region.End < _codingRegion.Start || region.Start > _codingRegion.End) continue;
+
+                int tempBegin = region.Start;
+                int tempEnd   = region.End;
 
                 // trim the first and last exons
-                if (_start >= tempBegin && _start <= tempEnd) tempBegin = _start;
-                if (_end >= tempBegin && _end <= tempEnd) tempEnd = _end;
+                if (_codingRegion.Start >= tempBegin && _codingRegion.Start <= tempEnd) tempBegin = _codingRegion.Start;
+                if (_codingRegion.End   >= tempBegin && _codingRegion.End   <= tempEnd) tempEnd   = _codingRegion.End;
 
                 sb.Append(genomicSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
             }
@@ -61,43 +51,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             // account for the exon phase (reverse orientation)
             if (_startExonPhase > 0 && _geneOnReverseStrand) sb.Append('N', _startExonPhase);
 
-            return _geneOnReverseStrand ? SequenceUtilities.GetReverseComplement(sb.ToString()) : sb.ToString();
+            var s = StringBuilderCache.GetStringAndRelease(sb);
+            return _geneOnReverseStrand ? SequenceUtilities.GetReverseComplement(s) : s;
         }
 
-        public static int GetCodingSequenceLength(ICdnaCoordinateMap[] cdnaMaps, int start, int end, byte startExonPhase)
+        public static int GetCodingSequenceLength(ITranscriptRegion codingRegion, byte startExonPhase)
         {
-            int length = startExonPhase;
-
-            foreach (var map in cdnaMaps)
-            {
-                // handle exons that are entirely in the UTR
-                if (map.End < start || map.Start > end) continue;
-
-                int tempBegin = map.Start;
-                int tempEnd = map.End;
-
-                // trim the first and last exons
-                if (start >= tempBegin && start <= tempEnd) tempBegin = start;
-                if (end >= tempBegin && end <= tempEnd) tempEnd = end;
-
-                length += tempEnd - tempBegin + 1;
-            }
-
-            return length;
+            return codingRegion.CdnaEnd - codingRegion.CdnaStart + 1 + startExonPhase;
         }
 
-        public int Length
-        {
-            get
-            {
-                if (_sequence == null) _sequence = GetCodingSequence(_compressedSequence);
-                return _sequence.Length;
-            }
-        }
+        public int Length => GetCodingSequenceLength(_codingRegion, _startExonPhase);
+
         public string Substring(int offset, int length)
         {
-            if(_sequence ==null) _sequence = GetCodingSequence(_compressedSequence);
-
+            if (_sequence == null) _sequence = GetCodingSequence(_compressedSequence);
             return _sequence.Substring(offset, length);
         }
     }

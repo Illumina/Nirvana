@@ -23,7 +23,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public readonly int[] SelenocysteinePositions;
         public readonly int StartExonPhase;
         public readonly IRnaEdit[] RnaEdits;
-        public readonly ICdnaCoordinateMap CodingRegion;
+        public readonly ITranscriptRegion CodingRegion;
         public readonly string ProteinId;
         public readonly byte ProteinVersion;
         public readonly string PeptideSequence;
@@ -31,11 +31,12 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public readonly int TotalExonLength;
         public readonly IInterval[] Introns;
         public readonly string TranslateableSequence;
-        public readonly ICdnaCoordinateMap[] CdnaMaps;
+        public readonly MutableTranscriptRegion[] CdnaMaps;
+        public readonly string BamEditStatus;
 
         // mutable
         public BioType BioType;
-        public bool IsCanonical;        
+        public bool IsCanonical;
         public Gene UpdatedGene;
 
         public readonly string SiftData;
@@ -44,11 +45,12 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public int PolyPhenIndex = -1;
 
         public MutableTranscript(IChromosome chromosome, int start, int end, string id, byte version, string ccdsId,
-            string refSeqId, BioType bioType, bool isCanonical, CdnaCoordinateMap codingRegion, string proteinId,
+            string refSeqId, BioType bioType, bool isCanonical, ITranscriptRegion codingRegion, string proteinId,
             byte proteinVersion, string peptideSequence, Source source, MutableGene gene, MutableExon[] exons,
-            int startExonPhase, int totalExonLength, IInterval[] introns, ICdnaCoordinateMap[] cdnaMaps,
+            int startExonPhase, int totalExonLength, IInterval[] introns, MutableTranscriptRegion[] cdnaMaps,
             string siftData, string polyphenData, string translateableSequence, IInterval[] microRnas,
-            bool cdsStartNotFound, bool cdsEndNotFound, int[] selenocysteinePositions, IRnaEdit[] rnaEdits)
+            bool cdsStartNotFound, bool cdsEndNotFound, int[] selenocysteinePositions, IRnaEdit[] rnaEdits,
+            string bamEditStatus)
         {
             Chromosome              = chromosome;
             Start                   = start;
@@ -78,6 +80,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
             CdsEndNotFound          = cdsEndNotFound;
             SelenocysteinePositions = selenocysteinePositions;
             RnaEdits                = rnaEdits;
+            BamEditStatus           = bamEditStatus;
         }
 
         public bool Equals(MutableTranscript other)

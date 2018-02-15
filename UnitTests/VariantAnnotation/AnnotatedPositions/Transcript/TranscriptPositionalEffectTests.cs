@@ -1,4 +1,5 @@
 ﻿using Moq;
+using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -11,14 +12,10 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class TranscriptPositionalEffectTests
     {
-        private readonly IInterval[] _introns = {
-            new Interval(301, 400),
-            new Interval(700, 709)
-        };
-
-        private readonly Mock<ITranscript> _forwardTranscript; //use info from "ENST00000455979.1" with modification
-        private readonly Mock<ITranscript> _reverseTranscript; //use info from "ENST00000385042"
-        private readonly ICdnaCoordinateMap[] _cdnaMaps;
+        private readonly Mock<ITranscript> _forwardTranscript; // use info from "ENST00000455979.1" with modification
+        private readonly Mock<ITranscript> _reverseTranscript; // use info from "ENST00000385042"
+        private readonly ITranscriptRegion[] _forwardTranscriptRegions;
+        private readonly ITranscriptRegion[] _otherTranscriptRegions;
         private readonly ITranslation _translation;
 
         public TranscriptPositionalEffectTests()
@@ -27,29 +24,39 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             const int start = 874655;
             const int end   = 879639;
 
-            var introns = new IInterval[]
+            _otherTranscriptRegions = new ITranscriptRegion[]
             {
-                new Interval(874841,876523),
-                new Interval(876687,877515),
-                new Interval(877632,877789),
-                new Interval(877869,877938),
-                new Interval(878439,878632),
-                new Interval(878758,879077)
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 200, 300, 1, 186),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 301, 400, 186, 187),
+                new TranscriptRegion(TranscriptRegionType.Exon, 2, 401, 699, 187, 349),
+                new TranscriptRegion(TranscriptRegionType.Intron, 2, 700, 709, 359, 360),
+                new TranscriptRegion(TranscriptRegionType.Exon, 3, 710, 800, 350, 465)
             };
 
-            _cdnaMaps = new ICdnaCoordinateMap[]
+            _forwardTranscriptRegions = new ITranscriptRegion[]
             {
-                new CdnaCoordinateMap(874655,874840,1,186),
-                new CdnaCoordinateMap(876524,876686,187,349),
-                new CdnaCoordinateMap(877516,877631,350,465),
-                new CdnaCoordinateMap(877790,877868,466,544),
-                new CdnaCoordinateMap(877939,878438,545,1044),
-                new CdnaCoordinateMap(878633,878757,1045,1169),
-                new CdnaCoordinateMap(879078,879639,1170,1731)
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 874655, 874840, 1, 186),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 874841, 876523, 186, 187),
+                new TranscriptRegion(TranscriptRegionType.Exon, 2, 876524, 876686, 187, 349),
+                new TranscriptRegion(TranscriptRegionType.Intron, 2, 876687, 877515, 349, 350),
+                new TranscriptRegion(TranscriptRegionType.Exon, 3, 877516, 877631, 350, 465),
+                new TranscriptRegion(TranscriptRegionType.Intron, 3, 877632, 877789, 465, 466),
+                new TranscriptRegion(TranscriptRegionType.Exon, 4, 877790, 877868, 466, 544),
+                new TranscriptRegion(TranscriptRegionType.Intron, 4, 877869, 877938, 544, 545),
+                new TranscriptRegion(TranscriptRegionType.Exon, 5, 877939, 878438, 545, 1044),
+                new TranscriptRegion(TranscriptRegionType.Intron, 5, 878439, 878632, 1044, 1045),
+                new TranscriptRegion(TranscriptRegionType.Exon, 6, 878633, 878757, 1045, 1169),
+                new TranscriptRegion(TranscriptRegionType.Intron, 6, 878758, 879077, 1169, 1170),
+                new TranscriptRegion(TranscriptRegionType.Exon, 7, 879078, 879639, 1170, 1731)
+            };
+
+            var reverseTranscriptRegions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 3477259, 3477354, 1, 96)
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new CdnaCoordinateMap(874655, 879533, 1, 1625));
+            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 874655, 879533, 1, 1625));
             _translation = translation.Object;
 
             var gene = new Mock<IGene>();
@@ -60,8 +67,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             _forwardTranscript.SetupGet(x => x.Start).Returns(start);
             _forwardTranscript.SetupGet(x => x.End).Returns(end);
             _forwardTranscript.SetupGet(x => x.Gene).Returns(gene.Object);
-            _forwardTranscript.SetupGet(x => x.Introns).Returns(introns);
-            _forwardTranscript.SetupGet(x => x.CdnaMaps).Returns(_cdnaMaps);
+            _forwardTranscript.SetupGet(x => x.TranscriptRegions).Returns(_forwardTranscriptRegions);
             _forwardTranscript.SetupGet(x => x.Translation).Returns(translation.Object);
             _forwardTranscript.SetupGet(x => x.TotalExonLength).Returns(1731);
 
@@ -72,7 +78,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             _reverseTranscript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             _reverseTranscript.SetupGet(x => x.Translation).Returns((ITranslation)null);
             _reverseTranscript.SetupGet(x => x.BioType).Returns(BioType.miRNA);
-            _reverseTranscript.SetupGet(x => x.CdnaMaps).Returns(new ICdnaCoordinateMap[] { new CdnaCoordinateMap(3477259, 3477354, 1, 96) });
+            _reverseTranscript.SetupGet(x => x.TranscriptRegions).Returns(reverseTranscriptRegions);
             _reverseTranscript.SetupGet(x => x.MicroRnas).Returns(new IInterval[] { new Interval(61, 81) });
         }
 
@@ -99,15 +105,16 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void DetermineIntronicEffect_NotWithinFrameshiftIntron()
         {
-            var introns = new IInterval[1];
-            introns[0] = new Interval(201342340, 201342343);
+            var transcriptRegions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 201342300, 201342340, 1, 186),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 201342340, 201342343, 186, 187),
+                new TranscriptRegion(TranscriptRegionType.Exon, 2, 201342344, 201342400, 187, 349)
+            };
 
-            var variant = new Mock<IVariant>();
-            variant.SetupGet(x => x.Start).Returns(201342344);
-            variant.SetupGet(x => x.End).Returns(201342344);
-
+            IInterval variant    = new Interval(201342344, 201342344);
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(introns, variant.Object, VariantType.SNV);
+            positionalEffect.DetermineIntronicEffect(transcriptRegions, variant, VariantType.SNV);
 
             Assert.True(positionalEffect.IsWithinSpliceSiteRegion);
         }
@@ -116,7 +123,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void DetermineIntronicEffect_IsEndSpliceSite()
         {
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(_introns, new Interval(400, 400), VariantType.SNV);
+            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, new Interval(400, 400), VariantType.SNV);
             Assert.True(positionalEffect.IsEndSpliceSite);
         }
 
@@ -124,7 +131,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void DetermineIntronicEffect_IsStartSpliceSite()
         {
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(_introns, new Interval(300, 303), VariantType.deletion);
+            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, new Interval(300, 303), VariantType.deletion);
             Assert.True(positionalEffect.IsStartSpliceSite);
         }
 
@@ -132,93 +139,100 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void DetermineIntronicEffect_IsWithinFrameshiftIntron()
         {
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(_introns, new Interval(702, 705), VariantType.deletion);
+            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, new Interval(702, 705), VariantType.deletion);
             Assert.True(positionalEffect.IsWithinFrameshiftIntron);
         }
 
         [Fact]
         public void DetermineIntronicEffect_IsWithinIntron()
         {
+            IInterval variant    = new Interval(300, 302);
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(_introns, new Interval(300, 302), VariantType.deletion);
+            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, variant, VariantType.deletion);
             Assert.False(positionalEffect.IsWithinIntron);
 
+            IInterval variant2    = new Interval(303, 303);
             var positionalEffect2 = new TranscriptPositionalEffect();
-            positionalEffect2.DetermineIntronicEffect(_introns, new Interval(303, 303), VariantType.deletion);
+            positionalEffect2.DetermineIntronicEffect(_otherTranscriptRegions, variant2, VariantType.deletion);
             Assert.True(positionalEffect2.IsWithinIntron);
-
         }
 
         [Fact]
         public void DetermineIntronicEffect_IsWithinSpliceSiteRegion()
         {
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(_introns, new Interval(298, 302), VariantType.deletion);
+            IInterval variant    = new Interval(298, 302);
+
+            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, variant, VariantType.deletion);
             Assert.True(positionalEffect.IsWithinSpliceSiteRegion);
         }
 
         [Fact]
         public void DetermineExonicEffect_HasExonOverlap()
         {
-            const int variantStart = 876686;
-            const int variantEnd   = 876686;
-            var mappedPosition     = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
+            IInterval variant = new Interval(876686, 876686);
+            var position      = new MappedPosition(349, 349, 349, 349, 117, 117, 2, 2, -1, -1, 2, 2);
+
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
+            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, variant, position, 349, 349, 349, 349, "G", false);
+
             Assert.True(positionalEffect.HasExonOverlap);
         }
 
         [Fact]
         public void DetermineExonicEffect_AfterCoding()
         {
-            const int variantStart = 879600;
-            const int variantEnd   = 879600;
-            var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
+            IInterval variant = new Interval(879600, 879600);
+            var position      = new MappedPosition(1692, 1692, -1, -1, -1, -1, 7, 7, -1, -1, 12, 12);
+
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
+            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, variant, position, 1692, 1692, -1, -1, "G", false);
             Assert.True(positionalEffect.AfterCoding);
         }
 
         [Fact]
         public void DetermineExonicEffect_WithinCdna()
         {
-            const int variantStart = 879600;
-            const int variantEnd   = 879600;
-            var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
+            IInterval variant = new Interval(879600, 879600);
+            var position      = new MappedPosition(1692, 1692, -1, -1, -1, -1, 7, 7, -1, -1, 12, 12);
+
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
+            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, variant, position, 1692, 1692, -1, -1, "G", false);
             Assert.True(positionalEffect.WithinCdna);
         }
+
         [Fact]
         public void DetermineExonicEffect_WithinCds()
         {
-            const int variantStart = 876543;
-            const int variantEnd   = 876543;
-            var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _forwardTranscript.Object);
+            IInterval variant = new Interval(876543, 876543);
+            var position      = new MappedPosition(206, 206, 206, 206, 69, 69, 2, 2, -1, -1, 2, 2);
+
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
+            positionalEffect.DetermineExonicEffect(_forwardTranscript.Object, variant, position, 206, 206, 206, 206, "G", false);
             Assert.True(positionalEffect.WithinCdna);
         }
 
         [Fact]
         public void DetermineExonicEffect_OverlapWithMicroRna()
         {
-            const int variantStart = 3477284;
-            const int variantEnd   = 3477284;
-            var mappedPosition = MappedPositionsUtils.ComputeMappedPositions(variantStart, variantEnd, _reverseTranscript.Object);
+            IInterval variant = new Interval(3477284, 3477284);
+            var position      = new MappedPosition(71, 71, -1, -1, -1, -1, 1, 1, -1, -1, 0, 0);
+
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineExonicEffect(_reverseTranscript.Object, new Interval(variantStart, variantEnd), mappedPosition, "G", false);
+            positionalEffect.DetermineExonicEffect(_reverseTranscript.Object, variant, position, 71, 71, -1, -1, "G", false);
             Assert.True(positionalEffect.OverlapWithMicroRna);
         }
 
         [Fact]
         public void ExonOverlaps_NoOverlap()
         {
-            var cdnaMaps = new ICdnaCoordinateMap[1];
-            cdnaMaps[0]  = new CdnaCoordinateMap(100, 200, 300, 400);
+            var transcriptRegions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 100, 200, 300, 400)
+            };
 
-            var variantInterval = new Interval(201, 500);
-            var observedResult = TranscriptPositionalEffect.ExonOverlaps(cdnaMaps, variantInterval);
+            IInterval variant  = new Interval(201, 500);
+            var observedResult = transcriptRegions[0].Overlaps(variant);
 
             Assert.False(observedResult);
         }
@@ -226,28 +240,46 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void IsMatureMirnaVariant_NullMirnas()
         {
-            var mappedPositions = MappedPositionsUtils.ComputeMappedPositions(100, 200, _forwardTranscript.Object);
-            var observedResult  = TranscriptPositionalEffect.IsMatureMirnaVariant(mappedPositions, null, true);
-
+            var observedResult = TranscriptPositionalEffect.IsMatureMirnaVariant(-1, -1, null, true);
             Assert.False(observedResult);
         }
 
         [Fact]
-        public void IsWithinCds_NullTranslation()
+        public void IsWithinCds_ReturnFalse()
         {
             var positionalEffect = new TranscriptPositionalEffect();
-            var observedResult = positionalEffect.IsWithinCds(null, null, 0, 0);
-
+            var observedResult = positionalEffect.IsWithinCds(-1, -1, null, null);
             Assert.False(observedResult);
         }
 
         [Fact]
-        public void IsWithinCds_WithinFrameshiftIntron()
+        public void IsWithinCds_ReturnTrue()
         {
-            var positionalEffect = new TranscriptPositionalEffect { IsWithinFrameshiftIntron = true };
-            var observedResult = positionalEffect.IsWithinCds(_cdnaMaps, _translation, 877878, 877929);
-
+            var positionalEffect = new TranscriptPositionalEffect();
+            var observedResult = positionalEffect.IsWithinCds(180, 180, null, null);
             Assert.True(observedResult);
+        }
+
+        [Fact]
+        public void IsWithinCds_IsWithinFrameshiftIntron_OverlapCodingRegion_ReturnTrue()
+        {
+            var variant          = new Interval(100, 101);
+            var codingRegion     = new Interval(90, 120);
+            var positionalEffect = new TranscriptPositionalEffect { IsWithinFrameshiftIntron = true };
+
+            var observedResult = positionalEffect.IsWithinCds(-1, -1, codingRegion, variant);
+            Assert.True(observedResult);
+        }
+
+        [Fact]
+        public void IsWithinCds_IsWithinFrameshiftIntron_ReturnFalse()
+        {
+            var variant          = new Interval(100, 101);
+            var codingRegion     = new Interval(102, 120);
+            var positionalEffect = new TranscriptPositionalEffect { IsWithinFrameshiftIntron = true };
+
+            var observedResult = positionalEffect.IsWithinCds(-1, -1, codingRegion, variant);
+            Assert.False(observedResult);
         }
 
         [Fact]
@@ -269,8 +301,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [InlineData(500, 600, 300, false)]
         public void IsWithinCdna(int cdnaStart, int cdnaEnd, int totalExonLen, bool expectedResult)
         {
-            var impactedCdnaInterval = new Interval(cdnaStart, cdnaEnd);
-            var observedResult = TranscriptPositionalEffect.IsWithinCdna(impactedCdnaInterval, totalExonLen);
+            var observedResult = TranscriptPositionalEffect.IsWithinCdna(cdnaStart, cdnaEnd, totalExonLen);
             Assert.Equal(expectedResult, observedResult);
         }
     }

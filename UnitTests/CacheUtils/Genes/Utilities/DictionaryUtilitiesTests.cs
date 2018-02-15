@@ -17,7 +17,7 @@ namespace UnitTests.CacheUtils.Genes.Utilities
 
             var observedResult = genes.GetSingleValueDict(x => x.EnsemblId);
             Assert.NotNull(observedResult);
-            Assert.Equal(1, observedResult.Count);
+            Assert.Single(observedResult);
             Assert.True(observedResult.ContainsKey("ENSG00000278267"));
         }
 
@@ -45,7 +45,7 @@ namespace UnitTests.CacheUtils.Genes.Utilities
 
             var observedResult = genes.GetMultiValueDict(x => x.EnsemblId);
             Assert.NotNull(observedResult);
-            Assert.Equal(1, observedResult.Count);
+            Assert.Single(observedResult);
 
             var firstEntry = observedResult["ENSG00000278267"];
             Assert.NotNull(firstEntry);
@@ -62,10 +62,9 @@ namespace UnitTests.CacheUtils.Genes.Utilities
 
             var observedResult = genes.GetKeyValueDict(x => x.EnsemblId, x => x.HgncId);
             Assert.NotNull(observedResult);
-            Assert.Equal(1, observedResult.Count);
+            Assert.Single(observedResult);
 
             var hgncId = observedResult["ENSG00000278267"];
-            Assert.NotNull(hgncId);
             Assert.Equal(50039, hgncId);
         }
 

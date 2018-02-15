@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
 
@@ -84,7 +84,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
         private static string BuildVcfHeaderLines(string nirvanaVersion,string nirvanaDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             var nirvanaAnnotatorTag = "##annotator="+nirvanaVersion +'\n';
 
@@ -118,7 +118,7 @@ namespace VariantAnnotation.IO.VcfWriter
             sb.Append(CsqtHeaderLine + '\n');
             sb.Append(CsqrHeaderLine);
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         /// <summary>

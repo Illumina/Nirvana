@@ -33,7 +33,7 @@ namespace CacheUtils.DataDumperImport.Utilities
                    x.End   == y.End;
         }
 
-        private static bool CdnaMapEquals(ICdnaCoordinateMap x, ICdnaCoordinateMap y)
+        private static bool TranscriptRegionEquals(ITranscriptRegion x, ITranscriptRegion y)
         {
             return x.Start     == y.Start     &&
                    x.End       == y.End       &&
@@ -82,8 +82,8 @@ namespace CacheUtils.DataDumperImport.Utilities
                        ArrayEquals(x.Introns, y.Introns, IntervalEquals)                            &&
                        ArrayEquals(x.MicroRnas, y.MicroRnas, IntervalEquals)                        &&
                        ArrayEquals(x.SelenocysteinePositions, y.SelenocysteinePositions, IntEquals) &&
-                       ArrayEquals(x.CdnaMaps, y.CdnaMaps, CdnaMapEquals)                           &&
-                       CdnaMapEquals(x.CodingRegion, y.CodingRegion);
+                       ArrayEquals(x.CdnaMaps, y.CdnaMaps, TranscriptRegionEquals)                  &&
+                       TranscriptRegionEquals(x.CodingRegion, y.CodingRegion);
         }
 
         public override int GetHashCode(MutableTranscript x)

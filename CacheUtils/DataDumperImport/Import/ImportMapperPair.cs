@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
-using VariantAnnotation.Caches.DataStructures;
+using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.DataDumperImport.Import
@@ -23,7 +23,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// parses the relevant data from each mapper pairs object
         /// </summary>
-        private static ICdnaCoordinateMap Parse(ObjectValueNode objectValue)
+        private static MutableTranscriptRegion Parse(ObjectValueNode objectValue)
         {
             int fromStart = -1;
             int fromEnd   = -1;
@@ -72,19 +72,19 @@ namespace CacheUtils.DataDumperImport.Import
             return GetCdnaMap(fromStart, fromEnd, fromType, toStart, toEnd);
         }
 
-        private static ICdnaCoordinateMap GetCdnaMap(int fromStart, int fromEnd, MapperUnitType fromType, int toStart, int toEnd)
+        private static MutableTranscriptRegion GetCdnaMap(int fromStart, int fromEnd, MapperUnitType fromType, int toStart, int toEnd)
         {
             return fromType == MapperUnitType.Genomic
-                ? new CdnaCoordinateMap(fromStart, fromEnd, toStart, toEnd)
-                : new CdnaCoordinateMap(toStart, toEnd, fromStart, fromEnd);
+                ? new MutableTranscriptRegion(TranscriptRegionType.Exon, 0, fromStart, fromEnd, toStart, toEnd)
+                : new MutableTranscriptRegion(TranscriptRegionType.Exon, 0, toStart, toEnd, fromStart, fromEnd);
         }
 
         /// <summary>
         /// parses the relevant data from each mapper pairs object
         /// </summary>
-        public static ICdnaCoordinateMap[] ParseList(List<IListMember> listMembers)
+        public static MutableTranscriptRegion[] ParseList(List<IListMember> listMembers)
         {
-            var cdnaMaps = new List<ICdnaCoordinateMap>(listMembers.Count);
+            var cdnaMaps = new List<MutableTranscriptRegion>(listMembers.Count);
 
             foreach (var entry in listMembers)
             {

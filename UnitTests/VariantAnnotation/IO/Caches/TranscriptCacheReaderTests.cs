@@ -39,30 +39,34 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             const GenomeAssembly genomeAssembly = GenomeAssembly.GRCh38;
 
             var customHeader = new TranscriptCacheCustomHeader(1, 2);
-            _expectedHeader  = new CacheHeader("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly, customHeader);
+            _expectedHeader = new CacheHeader("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly, customHeader);
 
-            var introns = new IInterval[1];
-            introns[0]  = new Interval(100, 200);
+            var transcriptRegions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 100, 199, 300, 399),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 200, 299, 399, 400),
+                new TranscriptRegion(TranscriptRegionType.Exon, 2, 300, 399, 400, 499)
+            };
 
             var mirnas = new IInterval[2];
-            mirnas[0]  = introns[0];
-            mirnas[1]  = new Interval(300, 400);
+            mirnas[0] = new Interval(100, 200);
+            mirnas[1] = new Interval(300, 400);
 
             var peptideSeqs = new[] { "MASE*" };
 
             var genes = new IGene[1];
-            genes[0]  = new Gene(chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
+            genes[0] = new Gene(chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
                 CompactId.Convert("ENSG00000141510"));
 
             var regulatoryRegions = new IRegulatoryRegion[2];
-            regulatoryRegions[0]  = new RegulatoryRegion(chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
-            regulatoryRegions[1]  = new RegulatoryRegion(chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[0] = new RegulatoryRegion(chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[1] = new RegulatoryRegion(chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
             var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(3);
 
-            var transcripts = GetTranscripts(chr3, genes, introns, mirnas);
+            var transcripts = GetTranscripts(chr3, genes, transcriptRegions, mirnas);
             var transcriptIntervalArrays = transcripts.ToIntervalArrays(3);
 
-            _expectedCacheData = new TranscriptCacheData(_expectedHeader, genes, introns, mirnas, peptideSeqs,
+            _expectedCacheData = new TranscriptCacheData(_expectedHeader, genes, transcriptRegions, mirnas, peptideSeqs,
                 transcriptIntervalArrays, regulatoryRegionIntervalArrays);
         }
 
@@ -91,7 +95,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             CheckChromosomeIntervals(_expectedCacheData.Genes, observedCache.Genes);
             CheckIntervalArrays(_expectedCacheData.RegulatoryRegionIntervalArrays, observedCache.RegulatoryRegionIntervalArrays);
             CheckIntervalArrays(_expectedCacheData.TranscriptIntervalArrays, observedCache.TranscriptIntervalArrays);
-            CheckIntervals(_expectedCacheData.Introns, observedCache.Introns);
+            CheckIntervals(_expectedCacheData.TranscriptRegions, observedCache.TranscriptRegions);
             CheckIntervals(_expectedCacheData.Mirnas, observedCache.Mirnas);
         }
 
@@ -134,8 +138,8 @@ namespace UnitTests.VariantAnnotation.IO.Caches
                 var expectedEntry = expectedList[i];
                 var observedEntry = observedList[i];
                 Assert.Equal(expectedEntry.Chromosome.EnsemblName, observedEntry.Chromosome.EnsemblName);
-                Assert.Equal(expectedEntry.Start,                  observedEntry.Start);
-                Assert.Equal(expectedEntry.End,                    observedEntry.End);
+                Assert.Equal(expectedEntry.Start, observedEntry.Start);
+                Assert.Equal(expectedEntry.End, observedEntry.End);
             }
         }
 
@@ -196,16 +200,14 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             });
         }
 
-        private static ITranscript[] GetTranscripts(IChromosome chromosome, IGene[] genes, IInterval[] introns, IInterval[] mirnas)
+        private static ITranscript[] GetTranscripts(IChromosome chromosome, IGene[] genes, ITranscriptRegion[] regions,
+            IInterval[] mirnas)
         {
-            var cdnaMaps = new ICdnaCoordinateMap[1];
-            cdnaMaps[0]  = new CdnaCoordinateMap(100, 199, 300, 399);
-
-            var transcripts = new ITranscript[1];
-            transcripts[0]  = new Transcript(chromosome, 120, 180, CompactId.Convert("789"), null, BioType.IG_D_gene,
-                genes[0], 0, 0, false, introns, mirnas, cdnaMaps, -1, -1, Source.None, false, false, null, null);
-
-            return transcripts;
+            return new ITranscript[]
+            {
+                new Transcript(chromosome, 120, 180, CompactId.Convert("789"), null, BioType.IG_D_gene, genes[0], 0, 0,
+                    false, regions, 0, mirnas, -1, -1, Source.None, false, false, null, null)
+            };
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
-using CacheUtils.Helpers;
 using CommonUtilities;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -59,7 +59,7 @@ namespace CacheUtils.IntermediateIO
                 translation.Version, translation.PeptideSeq, transcriptInfo.Source, gene, exons,
                 transcriptInfo.StartExonPhase, transcriptInfo.TotalExonLength, introns, cdnaMaps, null, null,
                 transcriptInfo.TranslateableSequence, mirnas, transcriptInfo.CdsStartNotFound,
-                transcriptInfo.CdsEndNotFound, selenocysteines, rnaEdits);
+                transcriptInfo.CdsEndNotFound, selenocysteines, rnaEdits, transcriptInfo.BamEditStatus);
         }
 
         private int[] ReadSelenocysteines()
@@ -97,14 +97,14 @@ namespace CacheUtils.IntermediateIO
             return rnaEdits;
         }
 
-        private ICdnaCoordinateMap[] ReadCdnaMaps()
+        private MutableTranscriptRegion[] ReadCdnaMaps()
         {
             var cols = GetColumns("cDNA");
 
             int numCdnaMaps = int.Parse(cols[1]);
             if (numCdnaMaps == 0) return null;
 
-            var cdnaMaps = new ICdnaCoordinateMap[numCdnaMaps];
+            var cdnaMaps = new MutableTranscriptRegion[numCdnaMaps];
             int colIndex = 2;
 
             for (int i = 0; i < numCdnaMaps; i++)
@@ -113,7 +113,7 @@ namespace CacheUtils.IntermediateIO
                 int end       = int.Parse(cols[colIndex++]);
                 int cdnaStart = int.Parse(cols[colIndex++]);
                 int cdnaEnd   = int.Parse(cols[colIndex++]);
-                cdnaMaps[i]   = new CdnaCoordinateMap(start, end, cdnaStart, cdnaEnd);
+                cdnaMaps[i]   = new MutableTranscriptRegion(TranscriptRegionType.Exon, 0, start, end, cdnaStart, cdnaEnd);
             }
 
             return cdnaMaps;
@@ -160,7 +160,7 @@ namespace CacheUtils.IntermediateIO
             return exons;
         }
 
-        private (string Id, byte Version, CdnaCoordinateMap CodingRegion, string PeptideSeq) ReadTranslation()
+        private (string Id, byte Version, ITranscriptRegion CodingRegion, string PeptideSeq) ReadTranslation()
         {
             var cols = GetColumns("Translation");
 
@@ -172,7 +172,10 @@ namespace CacheUtils.IntermediateIO
             var cdnaEnd    = int.Parse(cols[6]);
             var peptideSeq = cols[7];
 
-            var codingRegion = new CdnaCoordinateMap(start, end, cdnaStart, cdnaEnd);
+            var codingRegion = start == -1 && end == -1
+                ? null
+                : new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, start, end, cdnaStart, cdnaEnd);
+
             return (id, version, codingRegion, peptideSeq);
         }
 
@@ -185,7 +188,7 @@ namespace CacheUtils.IntermediateIO
             var end             = int.Parse(cols[5]);
             var onReverseStrand = cols[6] == "R";
             var symbol          = cols[7];
-            var symbolSource    = GeneSymbolSourceHelper.GetGeneSymbolSource(cols[8]);
+            var symbolSource    = (GeneSymbolSource)int.Parse(cols[8]);
             var hgncId          = int.Parse(cols[9]);
 
             return new MutableGene(chromosome, start, end, onReverseStrand, symbol, symbolSource, id, hgncId);
@@ -193,7 +196,8 @@ namespace CacheUtils.IntermediateIO
 
         private (string Id, byte Version, IChromosome Chromosome, int Start, int End, BioType BioType, bool IsCanonical,
             int TotalExonLength, string CcdsId, string RefSeqId, Source Source, bool CdsStartNotFound, bool
-            CdsEndNotFound, string TranslateableSequence, int StartExonPhase) ReadTranscriptInfo(string line)
+            CdsEndNotFound, string TranslateableSequence, int StartExonPhase, string BamEditStatus) ReadTranscriptInfo(
+                string line)
         {
             var cols = GetColumns("Transcript", line);
 
@@ -211,21 +215,23 @@ namespace CacheUtils.IntermediateIO
             var cdsStartNotFound  = cols[14] == "Y";
             var cdsEndNotFound    = cols[15] == "Y";
             var startExonPhase    = int.Parse(cols[16]);
+            var bamEditStatus     = cols[17];
 
             var translateableSequence = _reader.ReadLine();
             var chromosome = ReferenceNameUtilities.GetChromosome(_refIndexToChromosome, referenceIndex);
 
             return (id, version, chromosome, start, end, biotype, isCanonical, totalExonLength, ccdsId, refSeqId, source
-                , cdsStartNotFound, cdsEndNotFound, translateableSequence, startExonPhase);
+                , cdsStartNotFound, cdsEndNotFound, translateableSequence, startExonPhase, bamEditStatus);
         }
 
         private string[] GetColumns(string keyword, string line = null)
         {
             if (line == null) line = _reader.ReadLine();
-            var cols = line.Split('\t');
+            var cols = line?.Split('\t');
+            if (cols == null) throw new InvalidDataException("Found an unexpected null when parsing the columns in the transcript reader.");
             if (cols[0] != keyword) throw new InvalidDataException($"Could not find the {keyword} keyword in the transcripts file.");
             return cols;
-        } 
+        }
 
         public void Dispose() => _reader.Dispose();
     }

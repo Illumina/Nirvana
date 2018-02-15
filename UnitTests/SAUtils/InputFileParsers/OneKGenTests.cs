@@ -46,7 +46,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             _oneKGenReader = new OneKGenReader(_refChromDict);
         }
 
-        private static string GetAlleleFrequency(string jsonString,string description)
+        private static string GetAlleleFrequency(string jsonString, string description)
         {
             var regexMatch = Regex.Match(jsonString, $"\"{description}\":([0|1]\\.?\\d+)?");
             return regexMatch.Success ? regexMatch.Groups[1].ToString() : null;
@@ -363,11 +363,10 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void MultiAltAlleleAncesterTest()
         {
             var oneKGenItems = _oneKGenReader.ExtractItems(VcfLine2);
-            
-            Assert.Equal(2,oneKGenItems.Count);
-            Assert.Contains("\"ancestralAllele\":\"g\"",oneKGenItems[0].GetJsonString());
-            Assert.Contains("\"ancestralAllele\":\"g\"", oneKGenItems[1].GetJsonString());
 
+            Assert.Equal(2, oneKGenItems.Count);
+            Assert.Contains("\"ancestralAllele\":\"g\"", oneKGenItems[0].GetJsonString());
+            Assert.Contains("\"ancestralAllele\":\"g\"", oneKGenItems[1].GetJsonString());
         }
 
         [Fact(Skip = "new SA")]
@@ -453,7 +452,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var oneKItems = _oneKGenReader.ExtractItems(vcfLine);
             Assert.False(oneKItems[0].IsInterval);
             var json1 = oneKItems[0].GetJsonString();
-            Assert.Equal("0.456424",GetAlleleFrequency(json1, "allAf"));
+            Assert.Equal("0.456424", GetAlleleFrequency(json1, "allAf"));
             Assert.Equal("0.836491", GetAlleleFrequency(json1, "afrAf"));
             Assert.Equal("0.343511", GetAlleleFrequency(json1, "amrAf"));
             Assert.Equal("0.117801", GetAlleleFrequency(json1, "easAf"));
@@ -466,12 +465,12 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void HashCode()
         {
             var chr1 = new Chromosome("chr1", "1", 0);
-            var onekItem = new OneKGenItem(chr1, 100, "rs1001", "A", "C", "a", null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null,null,null,null,null,100,0,0);
+            var onekItem = new OneKGenItem(chr1, 100, "rs1001", "A", "C", "a", null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, 100, 0, 0);
 
             var onekHash = new HashSet<OneKGenItem> { onekItem };
 
-            Assert.Equal(1, onekHash.Count);
-            Assert.True(onekHash.Contains(onekItem));
+            Assert.Single(onekHash);
+            Assert.Contains(onekItem, onekHash);
         }
 
         [Fact]
@@ -479,7 +478,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var inputFileInfo = new FileInfo(Resources.InputFiles("1000G_SVs.tsv"));
 
-            var svReader = new OneKGenSvReader(inputFileInfo,_refChromDict);
+            var svReader = new OneKGenSvReader(inputFileInfo, _refChromDict);
 
             var svItemList = svReader.GetOneKGenSvItems().ToList();
 

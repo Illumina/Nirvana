@@ -26,12 +26,18 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         private static MutableTranscript Merge(ILogger logger, IReadOnlyList<MutableTranscript> transcripts,
             Dictionary<string, GenbankEntry> idToGenbankEntry)
         {
-            if (transcripts.Count == 1) return transcripts[0];
-
             var transcriptId = transcripts[0].Id;
+
+            if (transcripts.Count == 1)
+            {
+                transcripts.Unique().InvestigateInconsistentCdnaMaps(logger, transcriptId);
+                return transcripts[0];
+            }
 
             var filteredTranscripts = transcripts
                 .Unique()
+                .InvestigateInconsistentCdnaMaps(logger, transcriptId)
+                .RemoveFailedTranscripts(logger)
                 .ChooseEditedTranscripts(logger)
                 .RemoveTranscriptsWithLowestVersion(logger)
                 .FixCodingRegionCdnaStart(logger, idToGenbankEntry, transcriptId)
@@ -43,14 +49,11 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                 .FixHgncId(logger)
                 .FixGeneStart(logger)
                 .FixGeneEnd(logger)
-                .FixCdnaMapExonInconsistency(logger)
                 .FixGeneSymbols(logger, idToGenbankEntry, transcriptId)
-                .RemoveTranscriptsWithDifferentExons(logger, idToGenbankEntry, transcriptId)
                 .UnsupervisedFixGeneId(logger)
                 .PickSpecificTranscript(logger, transcriptId);
 
             if (filteredTranscripts.Count == 1) return filteredTranscripts[0];
-
             throw new NotImplementedException($"Could not merge down to one transcript: {filteredTranscripts.Count} transcripts ({transcriptId})");
         }
     }

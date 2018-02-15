@@ -40,6 +40,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using CommonUtilities;
 
 namespace CommandLine.NDesk.Options
 {
@@ -660,7 +661,7 @@ namespace CommandLine.NDesk.Options
         {
             if (description == null)
                 return string.Empty;
-            StringBuilder sb = new StringBuilder(description.Length);
+            StringBuilder sb = StringBuilderCache.Acquire(description.Length);
             int start = -1;
             for (int i = 0; i < description.Length; ++i)
             {
@@ -700,7 +701,8 @@ namespace CommandLine.NDesk.Options
                         break;
                 }
             }
-            return sb.ToString();
+
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         private static IEnumerable<string> GetLines(string description)

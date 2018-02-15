@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Positions;
 
 namespace Vcf.Info
@@ -147,7 +147,7 @@ namespace Vcf.Info
             }
             var infoFields = infoField.Split(';');
 
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             foreach (var field in infoFields)
             {
@@ -167,7 +167,7 @@ namespace Vcf.Info
             {
                 sb.Remove(sb.Length - 1, 1); //removing the last semi-colon
 
-                updatedInfoField = sb.ToString();
+                updatedInfoField = StringBuilderCache.GetStringAndRelease(sb);
             }
             else updatedInfoField = "";
 

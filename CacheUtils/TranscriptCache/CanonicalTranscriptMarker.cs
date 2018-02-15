@@ -5,7 +5,6 @@ using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.TranscriptCache
 {
@@ -31,12 +30,14 @@ namespace CacheUtils.TranscriptCache
 
             foreach (var transcript in transcripts)
             {
-                string transcriptId  = RemoveVersionFromTranscriptId(transcript.Id);                
+                string idWithVersion = transcript.Id + '.' + transcript.Version;
+
                 int cdsLength        = GetCdsLength(transcript.CodingRegion);
                 int transcriptLength = transcript.End - transcript.Start + 1;
-                var isLrg            = _lrgTranscriptIds.Contains(transcriptId);
+                var isLrg            = _lrgTranscriptIds.Contains(transcript.Id);
+                int accession        = AccessionUtilities.GetAccessionNumber(transcript.Id);
 
-                var metadata = new TranscriptMetadata(transcriptId, transcriptLength, cdsLength, isLrg);
+                var metadata = new TranscriptMetadata(idWithVersion, accession, transcriptLength, cdsLength, isLrg);
                 int geneId   = ConvertGeneIdToInt(transcript.Gene.GeneId);
 
                 if (genes.TryGetValue(geneId, out var observedMetadata)) observedMetadata.Add(metadata);
@@ -44,12 +45,6 @@ namespace CacheUtils.TranscriptCache
             }
 
             return genes;
-        }
-
-        private static string RemoveVersionFromTranscriptId(string transcriptId)
-        {
-            var (id, _) = FormatUtilities.SplitVersion(transcriptId);
-            return id;
         }
 
         private static SortedDictionary<int, string> GetCanonicalTranscriptsByGeneId(SortedDictionary<int, HashSet<TranscriptMetadata>> genes)
@@ -71,7 +66,7 @@ namespace CacheUtils.TranscriptCache
             return canonicalTranscripts;
         }
 
-        private static int GetCdsLength(ICdnaCoordinateMap codingRegion)
+        private static int GetCdsLength(ITranscriptRegion codingRegion)
         {
             if (codingRegion == null) return 0;
             return codingRegion.CdnaEnd - codingRegion.CdnaStart + 1;
@@ -96,7 +91,8 @@ namespace CacheUtils.TranscriptCache
 
                 // no canonical transcript
                 if (!canonicalTranscriptsByGeneId.TryGetValue(geneId, out var canonicalTranscriptId)) continue;
-                if (transcript.Id != canonicalTranscriptId) continue;
+                string idWithVersion = transcript.Id + '.' + transcript.Version;
+                if (idWithVersion != canonicalTranscriptId) continue;
 
                 // mark the transcript canonical
                 transcript.IsCanonical = true;
@@ -132,13 +128,13 @@ namespace CacheUtils.TranscriptCache
             public readonly bool IsLrg;
             public readonly int Accession;
 
-            public TranscriptMetadata(string transcriptId, int transcriptLength, int cdsLength, bool isLrg)
+            public TranscriptMetadata(string transcriptId, int accession, int transcriptLength, int cdsLength, bool isLrg)
             {
                 TranscriptId     = transcriptId;
                 TranscriptLength = transcriptLength;
                 CdsLength        = cdsLength;
                 IsLrg            = isLrg;
-                Accession        = AccessionUtilities.GetAccessionNumber(transcriptId);
+                Accession        = accession;
             }
 
             public bool Equals(TranscriptMetadata other)

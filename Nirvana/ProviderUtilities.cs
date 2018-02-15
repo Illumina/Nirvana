@@ -38,7 +38,7 @@ namespace Nirvana
             return new SupplementaryAnnotationProvider(supplementaryAnnotationDirectories);
         }
 
-        public static IAnnotationProvider GetTranscriptAnnotationProvider(string path, ISequenceProvider sequenceProvider)
+        public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path, ISequenceProvider sequenceProvider)
         {
             return new TranscriptAnnotationProvider(path, sequenceProvider);
         }

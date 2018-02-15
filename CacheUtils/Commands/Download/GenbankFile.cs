@@ -5,28 +5,26 @@ using CacheUtils.Utilities;
 using Compression.Utilities;
 using VariantAnnotation.Interface;
 
-namespace CacheUtils.Commands.UniversalGeneArchive
+namespace CacheUtils.Commands.Download
 {
     public sealed class GenbankFile
     {
         private readonly ILogger _logger;
-        private readonly RemoteFile _remoteFile;
+        public readonly RemoteFile RemoteFile;
         public readonly Dictionary<string, GenbankEntry> GenbankDict;
 
         public GenbankFile(ILogger logger, int num)
         {
             _logger     = logger;
-            _remoteFile = new RemoteFile($"RefSeq Genbank {num}", $"ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.{num}.rna.gbff.gz", false);
+            RemoteFile  = new RemoteFile($"RefSeq Genbank {num} gbff", $"ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.{num}.rna.gbff.gz", false);
             GenbankDict = new Dictionary<string, GenbankEntry>();
         }
 
-        public void Download() => _remoteFile.Download(_logger);
-
         public void Parse()
         {
-            _logger.WriteLine($"- parsing {Path.GetFileName(_remoteFile.FilePath)}");
+            _logger.WriteLine($"- parsing {Path.GetFileName(RemoteFile.FilePath)}");
 
-            using (var reader = new GenbankReader(GZipUtilities.GetAppropriateStreamReader(_remoteFile.FilePath)))
+            using (var reader = new GenbankReader(GZipUtilities.GetAppropriateStreamReader(RemoteFile.FilePath)))
             {
                 while (true)
                 {

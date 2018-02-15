@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using CommonUtilities;
 
 namespace Compression.FileHandling
 {
@@ -35,7 +36,7 @@ namespace Compression.FileHandling
 
         public string ReadLine()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             //fill the buffer if empty
             if (_bufferIndex >= _bufferLength)
@@ -53,12 +54,14 @@ namespace Compression.FileHandling
                 startIndex = _bufferIndex;
                 if (_bufferLength == 0) break;
             }
-            //we do not want the last char (new line), therefore, the  length of subarray is _bufferIndex - startIndex -1
+
+            // we do not want the last char (new line), therefore, the  length of subarray is _bufferIndex - startIndex -1
             sb.Append(_buffer[_bufferIndex - 1] == _newLineChar
                 ? Encoding.UTF8.GetString(SubArray(_buffer, startIndex, _bufferIndex - startIndex - 1))
                 : Encoding.UTF8.GetString(SubArray(_buffer, startIndex, _bufferIndex - startIndex)));
 
-            return sb.Length==0 ? null : sb.ToString();
+            var result = StringBuilderCache.GetStringAndRelease(sb);
+            return result.Length == 0 ? null : result;
         }
 
         private static T[] SubArray<T>(T[] data, int index, int length)

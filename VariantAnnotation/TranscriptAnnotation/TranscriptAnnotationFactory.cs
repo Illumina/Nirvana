@@ -13,11 +13,12 @@ namespace VariantAnnotation.TranscriptAnnotation
     {
         private static readonly AminoAcids AminoAcidsProvider = new AminoAcids(false);
         private static readonly AminoAcids MitoAminoAcidsProvider = new AminoAcids(true);
+
         public static void GetAnnotatedTranscripts(IVariant variant, ITranscript[] transcriptCandidates,
             ISequence compressedSequence, IList<IAnnotatedTranscript> annotatedTranscripts,
             ISet<string> overlappingGenes, IList<IOverlappingTranscript> overlappingTranscripts,
             IPredictionCache siftCache, IPredictionCache polyphenCache,
-            IEnumerable<ITranscript> geneFusionCandidates = null)
+            ITranscript[] geneFusionCandidates = null)
         {
             foreach (var transcript in transcriptCandidates)
             {
@@ -29,13 +30,15 @@ namespace VariantAnnotation.TranscriptAnnotation
                 if (variant.Behavior.NeedVerboseTranscripts)
                     AddOverlappingTranscript(annotationStatus, transcript, variant, overlappingTranscripts);
 
-                var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript, annotationStatus, siftCache, polyphenCache, geneFusionCandidates);
+                var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript,
+                    annotationStatus, siftCache, polyphenCache, geneFusionCandidates);
 
                 if (annotatedTranscript != null) annotatedTranscripts.Add(annotatedTranscript);
             }
         }
 
-        private static void AddOverlappingTranscript(Status annotationStatus, ITranscript transcript, IInterval variant, IList<IOverlappingTranscript> overlappingTranscripts)
+        private static void AddOverlappingTranscript(Status annotationStatus, ITranscript transcript, IInterval variant,
+            IList<IOverlappingTranscript> overlappingTranscripts)
         {
             if (annotationStatus == Status.SvCompleteOverlapAnnotation)
             {
@@ -49,8 +52,9 @@ namespace VariantAnnotation.TranscriptAnnotation
             }
         }
 
-        private static IAnnotatedTranscript GetAnnotatedTranscript(IVariant variant, ISequence compressedSequence, ITranscript transcript, Status annotationStatus,
-            IPredictionCache siftCache, IPredictionCache polyphenCache, IEnumerable<ITranscript> geneFusionCandidates)
+        private static IAnnotatedTranscript GetAnnotatedTranscript(IVariant variant, ISequence compressedSequence,
+            ITranscript transcript, Status annotationStatus, IPredictionCache siftCache, IPredictionCache polyphenCache,
+            ITranscript[] geneFusionCandidates)
         {
             IAnnotatedTranscript annotatedTranscript = null;
 

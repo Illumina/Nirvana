@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
+using CommonUtilities;
 using Compression.FileHandling;
 using ErrorHandling;
 using Jasix;
@@ -39,7 +39,7 @@ namespace Nirvana
         private static bool _forceMitochondrialAnnotation;
         private static bool _reportAllSvOverlappingTranscripts;
 
-        private readonly string _annotatorVersionTag = "Illumina Annotation Engine " + CommandLineUtilities.Version;
+        private readonly string _annotatorVersionTag = "Nirvana " + CommandLineUtilities.Version;
         private readonly VcfConversion _conversion   = new VcfConversion();
 
         private ExitCodes ProgramExecution()
@@ -59,7 +59,7 @@ namespace Nirvana
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
                 geneAnnotationProvider, conservationProvider);
  
-            var vepDataVersion = CacheConstants.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
+            var vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
             var jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
@@ -134,10 +134,10 @@ namespace Nirvana
         private static void WriteGeneAnnotations(ICollection<IAnnotatedGene> annotatedGenes, JsonWriter writer)
         {
             if (annotatedGenes.Count == 0) return;
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
             jsonObject.AddObjectValues("genes", annotatedGenes, true);
-            writer.WriteAnnotatedGenes(sb.ToString());
+            writer.WriteAnnotatedGenes(StringBuilderCache.GetStringAndRelease(sb));
         }
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome, PerformanceMetrics metrics)

@@ -41,7 +41,8 @@ namespace CacheUtils.IntermediateIO
         private (IChromosome Chromosome, int NumPredictions) GetChromosomeHeader()
         {
             var line = _reader.ReadLine();
-            var cols = line.Split('\t');
+            var cols = line?.Split('\t');
+            if (cols == null) throw new InvalidDataException("Found an unexpected null line when parsing the chromosome header in the prediction reader.");
             if (cols.Length != 3) throw new InvalidDataException($"Expected 3 columns in the chromosome header, but found {cols.Length}");
 
             ushort referenceIndex = ushort.Parse(cols[1]);

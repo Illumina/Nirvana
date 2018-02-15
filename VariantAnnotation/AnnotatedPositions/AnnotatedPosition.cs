@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
@@ -25,7 +25,7 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             if (AnnotatedVariants == null || AnnotatedVariants.Length == 0) return null;
 
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -70,7 +70,7 @@ namespace VariantAnnotation.AnnotatedPositions
 			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
 
 			sb.Append(JsonObject.CloseBrace);
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         private bool IsShortTandemRepeat()

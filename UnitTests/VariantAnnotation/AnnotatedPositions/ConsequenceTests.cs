@@ -7,19 +7,19 @@ using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions
 {
-    public class ConsequenceTests
+    public sealed class ConsequenceTests
     {
 
         [Theory]
-        [InlineData(false,ConsequenceTag.upstream_gene_variant)]
-        [InlineData(true,ConsequenceTag.downstream_gene_variant)]
-        public void DetermineFlankingVariantEffects(bool isDownStreamVariant,ConsequenceTag expectedConsequence)
+        [InlineData(false, ConsequenceTag.upstream_gene_variant)]
+        [InlineData(true, ConsequenceTag.downstream_gene_variant)]
+        public void DetermineFlankingVariantEffects(bool isDownStreamVariant, ConsequenceTag expectedConsequence)
         {
             var consequence = new Consequences();
-           consequence.DetermineFlankingVariantEffects(isDownStreamVariant);
-            var observedConsequence = consequence.GetConsequences();
-            Assert.Equal(1,observedConsequence.Count);
-           Assert.Equal(expectedConsequence,observedConsequence[0]);
+            consequence.DetermineFlankingVariantEffects(isDownStreamVariant);
+            var observedConsequences = consequence.GetConsequences();
+            Assert.Single(observedConsequences);
+            Assert.Equal(expectedConsequence, observedConsequences[0]);
         }
 
         [Fact]
@@ -34,7 +34,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             consequence.DetermineSmallVariantEffects();
             var observedConsequences = consequence.GetConsequences();
             Assert.Equal(2, observedConsequences.Count);
-            Assert.Equal(ConsequenceTag.transcript_ablation,observedConsequences[0]);
+            Assert.Equal(ConsequenceTag.transcript_ablation, observedConsequences[0]);
             Assert.Equal(ConsequenceTag.transcript_amplification, observedConsequences[1]);
         }
 
@@ -50,7 +50,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var consequence = new Consequences(variantEffect.Object, featureEffect.Object);
             consequence.DetermineSmallVariantEffects();
             var observedConsequences = consequence.GetConsequences();
-            Assert.Equal(1, observedConsequences.Count);
+            Assert.Single(observedConsequences);
             Assert.Equal(ConsequenceTag.mature_miRNA_variant, observedConsequences[0]);
         }
 
@@ -62,14 +62,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             cache.Add(ConsequenceTag.mature_miRNA_variant, false);
 
             cache.Add(ConsequenceTag.splice_donor_variant, true);
-            cache.Add(ConsequenceTag.splice_acceptor_variant,true);
-            cache.Add(ConsequenceTag.stop_gained,true);
-            cache.Add(ConsequenceTag.frameshift_variant,true);
+            cache.Add(ConsequenceTag.splice_acceptor_variant, true);
+            cache.Add(ConsequenceTag.stop_gained, true);
+            cache.Add(ConsequenceTag.frameshift_variant, true);
             cache.Add(ConsequenceTag.stop_lost, true);
             cache.Add(ConsequenceTag.start_lost, true);
             cache.Add(ConsequenceTag.inframe_insertion, true);
             cache.Add(ConsequenceTag.inframe_deletion, true);
-            cache.Add(ConsequenceTag.missense_variant,true);
+            cache.Add(ConsequenceTag.missense_variant, true);
             cache.Add(ConsequenceTag.protein_altering_variant, true);
             cache.Add(ConsequenceTag.splice_region_variant, true);
             cache.Add(ConsequenceTag.incomplete_terminal_codon_variant, true);
@@ -80,7 +80,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             cache.Add(ConsequenceTag.three_prime_UTR_variant, true);
             cache.Add(ConsequenceTag.non_coding_transcript_exon_variant, true);
             cache.Add(ConsequenceTag.intron_variant, true);
-            cache.Add(ConsequenceTag.NMD_transcript_variant, true);           
+            cache.Add(ConsequenceTag.NMD_transcript_variant, true);
             cache.Add(ConsequenceTag.non_coding_transcript_variant, true);
 
 
@@ -92,7 +92,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             {
                 IsWithinIntron = true
             };
-            var variantEffect = new VariantEffect(positionalEffect,simpleVariant.Object,null,null,null,null,null,null,cache);
+            var variantEffect = new VariantEffect(positionalEffect, simpleVariant.Object, null, null, null, null, null, null, cache);
 
             var featureEffect = new Mock<IFeatureVariantEffects>();
             featureEffect.Setup(x => x.Ablation()).Returns(false);
@@ -100,7 +100,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             featureEffect.Setup(x => x.Truncation()).Returns(true);
             featureEffect.Setup(x => x.Elongation()).Returns(true);
 
-            var consequence = new Consequences(variantEffect,featureEffect.Object);
+            var consequence = new Consequences(variantEffect, featureEffect.Object);
 
             consequence.DetermineSmallVariantEffects();
             var observedConsequence = consequence.GetConsequences();
@@ -130,11 +130,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
 
         [Theory]
-        [InlineData(true,true)]
+        [InlineData(true, true)]
         [InlineData(true, false)]
         [InlineData(false, true)]
         [InlineData(false, false)]
-        public void DetermineRegularoryVariantEffects(bool isAmplification,bool isAblation)
+        public void DetermineRegularoryVariantEffects(bool isAmplification, bool isAblation)
         {
             var featureEffect = new Mock<IFeatureVariantEffects>();
             featureEffect.Setup(x => x.Ablation()).Returns(isAblation);
@@ -144,7 +144,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             consequence.DetermineRegulatoryVariantEffects();
             var observedConsequences = consequence.GetConsequences();
 
-            Assert.Contains(ConsequenceTag.regulatory_region_variant,observedConsequences);
+            Assert.Contains(ConsequenceTag.regulatory_region_variant, observedConsequences);
             if (isAblation)
             {
                 Assert.Contains(ConsequenceTag.regulatory_region_ablation, observedConsequences);
@@ -166,13 +166,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         }
 
         [Theory]
-        [InlineData(true,false,false,false,new[]{ConsequenceTag.transcript_ablation})]
+        [InlineData(true, false, false, false, new[] { ConsequenceTag.transcript_ablation })]
         [InlineData(false, true, false, false, new[] { ConsequenceTag.transcript_amplification })]
-        [InlineData(true, false, true, false, new[] { ConsequenceTag.transcript_ablation})]
+        [InlineData(true, false, true, false, new[] { ConsequenceTag.transcript_ablation })]
         [InlineData(false, false, true, false, new[] { ConsequenceTag.feature_elongation })]
         [InlineData(false, false, false, true, new[] { ConsequenceTag.transcript_truncation })]
         public void DetermineStructuralVariantEffect(bool isAblation, bool isAmplification, bool isElongation,
-            bool isTruncation,ConsequenceTag[] expectedConsequences)
+            bool isTruncation, ConsequenceTag[] expectedConsequences)
         {
 
             var featureEffect = new Mock<IFeatureVariantEffects>();
@@ -182,10 +182,10 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             featureEffect.Setup(x => x.Truncation()).Returns(isTruncation);
 
             var consequence = new Consequences(null, featureEffect.Object);
-            consequence.DetermineStructuralVariantEffect(false, VariantType.unknown);
+            consequence.DetermineStructuralVariantEffect(VariantType.unknown, false);
             var observedConsequences = consequence.GetConsequences().ToArray();
 
-            Assert.Equal(expectedConsequences,observedConsequences);
+            Assert.Equal(expectedConsequences, observedConsequences);
         }
     }
 }

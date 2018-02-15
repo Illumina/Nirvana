@@ -6,7 +6,7 @@ namespace CacheUtils.IntermediateIO
 {
     public sealed class IntermediateIoHeader
     {
-        private readonly ushort _vepVersion;
+        public readonly ushort VepVersion;
         public readonly long VepReleaseTicks;
         public readonly Source Source;
         public readonly GenomeAssembly GenomeAssembly;
@@ -15,23 +15,26 @@ namespace CacheUtils.IntermediateIO
         public IntermediateIoHeader(ushort vepVersion, long vepReleaseTicks, Source transcriptSource,
             GenomeAssembly genomeAssembly, int numRefSeqs)
         {
-            _vepVersion      = vepVersion;
+            VepVersion      = vepVersion;
             VepReleaseTicks = vepReleaseTicks;
             Source          = transcriptSource;
             GenomeAssembly  = genomeAssembly;
-            _numRefSeqs      = numRefSeqs;
+            _numRefSeqs     = numRefSeqs;
         }
 
         internal void Write(StreamWriter writer, IntermediateIoCommon.FileType fileType)
         {
             writer.WriteLine($"{IntermediateIoCommon.Header}\t{(byte)fileType}");
-            writer.WriteLine($"{_vepVersion}\t{VepReleaseTicks}\t{(byte)Source}\t{(byte)GenomeAssembly}\t{_numRefSeqs}");
+            writer.WriteLine($"{VepVersion}\t{VepReleaseTicks}\t{(byte)Source}\t{(byte)GenomeAssembly}\t{_numRefSeqs}");
         }
 
         internal static (string Id, IntermediateIoCommon.FileType Type, IntermediateIoHeader Header) Read(StreamReader reader)
         {
-            var cols  = reader.ReadLine().Split('\t');
-            var cols2 = reader.ReadLine().Split('\t');
+            var cols  = reader.ReadLine()?.Split('\t');
+            var cols2 = reader.ReadLine()?.Split('\t');
+
+            if (cols == null || cols2 == null)
+                throw new InvalidDataException("Found unexpected null lines when parsing the intermediate I/O file header");
 
             var id              = cols[0];
             var type            = (IntermediateIoCommon.FileType)byte.Parse(cols[1]);
