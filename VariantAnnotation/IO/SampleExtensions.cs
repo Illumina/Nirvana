@@ -28,6 +28,16 @@ namespace VariantAnnotation.IO
             jsonObject.AddBoolValue("lossOfHeterozygosity", sample.IsLossOfHeterozygosity);
             jsonObject.AddDoubleValue("deNovoQuality", sample.DeNovoQuality, "0.#");
 
+            jsonObject.AddIntValues("mpileupAlleleDepths",             sample.MpileupAlleleDepths);
+            jsonObject.AddStringValue("silentCarrierHaplotype",        sample.SilentCarrierHaplotype);
+            jsonObject.AddIntValues("paralogousEntrezGeneIds",         sample.ParalogousEntrezGeneIds);
+            jsonObject.AddIntValues("paralogousGeneCopyNumbers",       sample.ParalogousGeneCopyNumbers);
+            jsonObject.AddStringValues("diseaseClassificationSource",  sample.DiseaseClassificationSources);
+            jsonObject.AddStringValues("diseaseIds",                   sample.DiseaseIds);
+            jsonObject.AddStringValue("diseaseAffectedStatus",         sample.DiseaseAffectedStatus);
+            jsonObject.AddIntValues("proteinAlteringVariantPositions", sample.ProteinAlteringVariantPositions);
+            jsonObject.AddBoolValue("isCompoundHetCompatible",         sample.IsCompoundHetCompatible);
+
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);
         }

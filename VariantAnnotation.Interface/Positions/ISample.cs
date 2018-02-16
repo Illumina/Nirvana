@@ -11,10 +11,22 @@
         int? CopyNumber { get; }
         bool IsLossOfHeterozygosity { get; }
         float? DeNovoQuality { get; }
-        bool IsEmpty { get; }
         int[] SplitReadCounts { get; }
         int[] PairEndReadCounts { get; }
 		string RepeatNumbers { get; }
 		string RepeatNumberSpans { get; }
+
+        // SMN1
+        int[] MpileupAlleleDepths { get; }
+        string SilentCarrierHaplotype { get; }
+        int[] ParalogousEntrezGeneIds { get; }
+        int[] ParalogousGeneCopyNumbers { get; }
+        string[] DiseaseClassificationSources { get; }
+        string[] DiseaseIds { get; }
+        string DiseaseAffectedStatus { get; }
+        int[] ProteinAlteringVariantPositions { get; }
+        bool IsCompoundHetCompatible { get; }
+
+        bool IsEmpty { get; }
     }
 }

@@ -12,7 +12,7 @@ namespace Vcf.Sample
             int[] ad = null;
 
             // use TAR & TIR
-            if (intermediateSampleFields.Tar != null && intermediateSampleFields.Tir != null) ad = GetAlleleDepthsUsingTarTir(intermediateSampleFields);
+            if (intermediateSampleFields.TAR != null && intermediateSampleFields.TIR != null) ad = GetAlleleDepthsUsingTarTir(intermediateSampleFields);
 
             // use allele counts
             if (ad == null && intermediateSampleFields.TotalAlleleCount != null) ad = GetAlleleDepthsUsingAlleleCounts(intermediateSampleFields);
@@ -31,8 +31,8 @@ namespace Vcf.Sample
         /// </summary>
         private static int[] GetAlleleDepthsUsingTarTir(IntermediateSampleFields intermediateSampleFields)
         {
-            if (intermediateSampleFields.Tir == null || intermediateSampleFields.Tar == null || intermediateSampleFields.AltAlleles.Length > 1) return null;
-            return new[] { intermediateSampleFields.Tar.Value, intermediateSampleFields.Tir.Value };
+            if (intermediateSampleFields.TIR == null || intermediateSampleFields.TAR == null || intermediateSampleFields.AltAlleles.Length > 1) return null;
+            return new[] { intermediateSampleFields.TAR.Value, intermediateSampleFields.TIR.Value };
         }
 
         /// <summary>

@@ -8,7 +8,7 @@
         public static int? GetTotalDepth(int? infoDepth, IntermediateSampleFields intermediateSampleFields)
         {
             // use TAR & TIR
-            if (intermediateSampleFields.Tar != null && intermediateSampleFields.Tir != null) return GetTotalDepthUsingTarTir(intermediateSampleFields);
+            if (intermediateSampleFields.TAR != null && intermediateSampleFields.TIR != null) return GetTotalDepthUsingTarTir(intermediateSampleFields);
 
             // use base counts
             if (intermediateSampleFields.TotalAlleleCount != null) return GetTotalDepthUsingAlleleCounts(intermediateSampleFields);
@@ -31,7 +31,7 @@
         /// </summary>
         private static int? GetTotalDepthUsingTarTir(IntermediateSampleFields intermediateSampleFields)
         {
-            return intermediateSampleFields.Tar + intermediateSampleFields.Tir;
+            return intermediateSampleFields.TAR + intermediateSampleFields.TIR;
         }
 
         /// <summary>

@@ -10,7 +10,7 @@
             double? vf = null;
 
             // use TAR & TIR
-            if (intermediateSampleFields.Tar != null && intermediateSampleFields.Tir != null) vf = GetVariantFrequencyUsingTarTir(intermediateSampleFields);
+            if (intermediateSampleFields.TAR != null && intermediateSampleFields.TIR != null) vf = GetVariantFrequencyUsingTarTir(intermediateSampleFields);
 
             // use allele counts
             if (vf == null && intermediateSampleFields.TotalAlleleCount != null) vf = GetVariantFrequencyUsingAlleleCounts(intermediateSampleFields);
@@ -67,10 +67,10 @@
         /// </summary>
         private static  double? GetVariantFrequencyUsingTarTir(IntermediateSampleFields intermediateSampleFields)
         {
-            if (intermediateSampleFields.Tir == null || intermediateSampleFields.Tar == null) return null;
-	        if (intermediateSampleFields.Tir + intermediateSampleFields.Tar == 0) return 0;
-            var tir = (double)intermediateSampleFields.Tir;
-            var tar = (double)intermediateSampleFields.Tar;
+            if (intermediateSampleFields.TIR == null || intermediateSampleFields.TAR == null) return null;
+	        if (intermediateSampleFields.TIR + intermediateSampleFields.TAR == 0) return 0;
+            var tir = (double)intermediateSampleFields.TIR;
+            var tar = (double)intermediateSampleFields.TAR;
             return tir / (tar + tir);
         }
 

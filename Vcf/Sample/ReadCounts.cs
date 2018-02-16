@@ -3,9 +3,6 @@ namespace Vcf.Sample
 {
     internal static class ReadCounts
 	{
-		/// <summary>
-		/// returns the genotype flag
-		/// </summary>
 		public static int[] GetPairEndReadCounts(IntermediateSampleFields intermediateSampleFields)
 		{
 			if (intermediateSampleFields.FormatIndices.PR == null) return null;

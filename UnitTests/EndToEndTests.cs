@@ -5,7 +5,7 @@ using Xunit;
 namespace UnitTests
 {
     // NOTE: these tests do not include phyloP scores yet
-    // CACHE: v25 (VEP90)
+    // CACHE: v26 (VEP91)
     // SA: SA38 based on intermediate TSV from /illumina/development/Nirvana/Development/IntermediateTsvs/2017-05/GRCh37
     public sealed class EndToEndTests
     {

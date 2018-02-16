@@ -13,46 +13,65 @@ namespace Vcf.Sample
         public int? CopyNumber { get; }
         public bool IsLossOfHeterozygosity { get; }
         public float? DeNovoQuality { get; }
-        public bool IsEmpty { get; }
         public int[] SplitReadCounts { get; }
         public int[] PairEndReadCounts { get; }
 	    public string RepeatNumbers { get; }
 	    public string RepeatNumberSpans { get; }
 
-	    public Sample(string genotype, int? genotypeQuality, double? variantFreq, int? totalDepth, int[] alleleDepths,
-            bool failedFilter, int? copyNumber, bool isLossOfHeterozygosity, float? deNovoQuality, int[] splitReadCounts,
-            int[] pairEndReadCounts, string repeatNumbers, string repeatNumberSpan)
+        // SMN1
+        public int[] MpileupAlleleDepths { get; }
+        public string SilentCarrierHaplotype { get; }
+        public int[] ParalogousEntrezGeneIds { get; }
+        public int[] ParalogousGeneCopyNumbers { get; }
+        public string[] DiseaseClassificationSources { get; }
+        public string[] DiseaseIds { get; }
+        public string DiseaseAffectedStatus { get; }
+        public int[] ProteinAlteringVariantPositions { get; }
+        public bool IsCompoundHetCompatible { get; }
+
+        public bool IsEmpty { get; }
+
+        public static readonly Sample EmptySample = new Sample(null, null, null, null, null, false, null, false, null,
+            null, null, null, null, null, null, null, null, null, null, null, null, false);
+
+        public Sample(string genotype, int? genotypeQuality, double? variantFreq, int? totalDepth, int[] alleleDepths,
+            bool failedFilter, int? copyNumber, bool isLossOfHeterozygosity, float? deNovoQuality,
+            int[] splitReadCounts, int[] pairEndReadCounts, string repeatNumbers, string repeatNumberSpan,
+            int[] mpileupAlleleDepths, string silentCarrierHaplotype, int[] paralagousEntrezGeneIds,
+            int[] paralogousGeneCopyNumbers, string[] diseaseClassificationSources, string[] diseaseIds,
+            string diseaseAffectedStatus, int[] proteinAlteringVariantPositions, bool isCompoundHetCompatible)
         {
-            Genotype = genotype;
-            GenotypeQuality = genotypeQuality;
-            VariantFrequency = variantFreq;
-            TotalDepth = totalDepth;
-            AlleleDepths = alleleDepths;
-            FailedFilter = failedFilter;
-            CopyNumber = copyNumber;
-            IsLossOfHeterozygosity = isLossOfHeterozygosity;
-            DeNovoQuality = deNovoQuality;
-            SplitReadCounts = splitReadCounts;
-            PairEndReadCounts = pairEndReadCounts;
-	        RepeatNumbers = repeatNumbers;
-	        RepeatNumberSpans = repeatNumberSpan;
-            IsEmpty = IsNull();
+            Genotype                        = genotype;
+            GenotypeQuality                 = genotypeQuality;
+            VariantFrequency                = variantFreq;
+            TotalDepth                      = totalDepth;
+            AlleleDepths                    = alleleDepths;
+            FailedFilter                    = failedFilter;
+            CopyNumber                      = copyNumber;
+            IsLossOfHeterozygosity          = isLossOfHeterozygosity;
+            DeNovoQuality                   = deNovoQuality;
+            SplitReadCounts                 = splitReadCounts;
+            PairEndReadCounts               = pairEndReadCounts;
+            RepeatNumbers                   = repeatNumbers;
+            RepeatNumberSpans               = repeatNumberSpan;
+            MpileupAlleleDepths             = mpileupAlleleDepths;
+            SilentCarrierHaplotype          = silentCarrierHaplotype;
+            ParalogousEntrezGeneIds         = paralagousEntrezGeneIds;
+            ParalogousGeneCopyNumbers       = paralogousGeneCopyNumbers;
+            DiseaseClassificationSources    = diseaseClassificationSources;
+            DiseaseIds                      = diseaseIds;
+            DiseaseAffectedStatus           = diseaseAffectedStatus;
+            ProteinAlteringVariantPositions = proteinAlteringVariantPositions;
+            IsCompoundHetCompatible         = isCompoundHetCompatible;
+
+            IsEmpty = Genotype == null && GenotypeQuality == null && VariantFrequency == null && TotalDepth == null &&
+                      AlleleDepths == null && !FailedFilter && CopyNumber == null && !IsLossOfHeterozygosity &&
+                      DeNovoQuality == null && SplitReadCounts == null && PairEndReadCounts == null &&
+                      RepeatNumbers == null && RepeatNumberSpans == null && MpileupAlleleDepths == null &&
+                      SilentCarrierHaplotype == null && ParalogousEntrezGeneIds == null &&
+                      ParalogousGeneCopyNumbers == null && DiseaseClassificationSources == null && DiseaseIds == null &&
+                      DiseaseAffectedStatus == null && ProteinAlteringVariantPositions == null &&
+                      !IsCompoundHetCompatible;
         }
-
-        public Sample()
-        {
-            IsEmpty = true;
-        }
-
-        private bool IsNull()
-        {
-            return string.IsNullOrEmpty(Genotype) && GenotypeQuality == null && VariantFrequency == null &&
-                   TotalDepth == null && (AlleleDepths == null || AlleleDepths.Length == 0) && FailedFilter &&
-                   CopyNumber == null && IsLossOfHeterozygosity && DeNovoQuality == null &&
-                   (SplitReadCounts == null || SplitReadCounts.Length == 0) &&
-                   (PairEndReadCounts == null || PairEndReadCounts.Length == 0);
-        }
-
-
     }
 }
