@@ -32,7 +32,7 @@ namespace VariantAnnotation.Algorithms
             rotatingBases     = onReverseStrand ? SequenceUtilities.GetReverseComplement(rotatingBases) : rotatingBases;
 
             var basesToEnd       = onReverseStrand ? simpleVariant.Start - rotateRegion.Start : rotateRegion.End - simpleVariant.End;
-            var downStreamLength = Math.Min(basesToEnd, MaxDownstreamLength);
+            var downStreamLength = Math.Max(rotatingBases.Length, Math.Min(basesToEnd, MaxDownstreamLength));// for large rotatingBases, we need to factor in its length.
 
             var downStreamSeq = onReverseStrand
                 ? SequenceUtilities.GetReverseComplement(
@@ -47,7 +47,7 @@ namespace VariantAnnotation.Algorithms
             // TODO: probably a VEP bug, just use it for consistency
             var numBases = rotatingBases.Length;
 
-            for (shiftStart = 0, shiftEnd = numBases; shiftEnd <= combinedSequence.Length - numBases; shiftStart++, shiftEnd++)
+            for (shiftStart = 0, shiftEnd = numBases; shiftEnd <= combinedSequence.Length; shiftStart++, shiftEnd++)
             {
                 if (combinedSequence[shiftStart] != combinedSequence[shiftEnd]) break;
                 hasShifted = true;
