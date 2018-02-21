@@ -47,7 +47,7 @@ namespace VariantAnnotation.Algorithms
             // TODO: probably a VEP bug, just use it for consistency
             var numBases = rotatingBases.Length;
 
-            for (shiftStart = 0, shiftEnd = numBases; shiftEnd <= combinedSequence.Length; shiftStart++, shiftEnd++)
+            for (shiftStart = 0, shiftEnd = numBases; shiftEnd < combinedSequence.Length; shiftStart++, shiftEnd++)
             {
                 if (combinedSequence[shiftStart] != combinedSequence[shiftEnd]) break;
                 hasShifted = true;
