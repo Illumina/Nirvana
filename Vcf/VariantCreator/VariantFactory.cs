@@ -27,13 +27,13 @@ namespace Vcf.VariantCreator
             _enableVerboseTranscript = enableVerboseTranscript;
         }
 
-        private static VariantCategory GetVariantCategory(string[] altAlleles, bool isReference, bool isSymbolicAllele)
+        private static VariantCategory GetVariantCategory(string[] altAlleles, bool isReference, bool isSymbolicAllele, VariantType svType)
         {
             if (isReference)                                  return VariantCategory.Reference;
             if (IsBreakend(altAlleles))                       return VariantCategory.SV;
             if (!isSymbolicAllele)                            return VariantCategory.SmallVariant;
             if (altAlleles.Any(x => x.StartsWith(StrPrefix))) return VariantCategory.RepeatExpansion;
-            return altAlleles.Any(x => x.StartsWith(CnvPrefix)) ? VariantCategory.CNV : VariantCategory.SV;
+            return svType == VariantType.copy_number_variation ? VariantCategory.CNV : VariantCategory.SV;
         }
 
         private static bool IsBreakend(string[] altAlleles)
@@ -50,7 +50,7 @@ namespace Vcf.VariantCreator
         {
             var isReference      = altAlleles.Length == 1 && (altAlleles[0] == "." || altAlleles[0] == VcfCommon.GatkNonRefAllele);
             var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
-            var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele);
+            var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele, infoData.SvType);
 
             if (isReference) return new[] { GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber) };
 
@@ -81,7 +81,7 @@ namespace Vcf.VariantCreator
                         : GetSvBreakEnds(chromosome.EnsemblName, start, infoData.SvType, infoData.End, infoData.IsInv3, infoData.IsInv5);
                     return StructuralVariantCreator.Create(chromosome, start, refAllele, altAllele, svBreakEnds, infoData, _enableVerboseTranscript);
                 case VariantCategory.CNV:
-                    return CnvCreator.Create(chromosome, id, start, refAllele, infoData, sampleCopyNumber, _enableVerboseTranscript);
+                    return CnvCreator.Create(chromosome, id, start, refAllele, altAllele, infoData, sampleCopyNumber, _enableVerboseTranscript);
                 case VariantCategory.RepeatExpansion:
                     return RepeatExpansionCreator.Create(chromosome, start, refAllele, altAllele, infoData);
                 default:

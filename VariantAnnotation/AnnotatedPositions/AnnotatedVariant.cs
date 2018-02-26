@@ -84,11 +84,7 @@ namespace VariantAnnotation.AnnotatedPositions
 	    {
 		    switch (variantType)
 		    {
-				case VariantType.copy_number_gain:
-				case VariantType.copy_number_loss:
-				case VariantType.copy_number_variation:
-					return VariantType.copy_number_variation;
-			    case VariantType.short_tandem_repeat_variation:
+				case VariantType.short_tandem_repeat_variation:
 			    case VariantType.short_tandem_repeat_contraction:
 			    case VariantType.short_tandem_repeat_expansion:
 				    return VariantType.short_tandem_repeat_variation;
