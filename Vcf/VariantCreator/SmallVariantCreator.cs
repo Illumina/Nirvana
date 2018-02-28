@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Data;
+using System.Security.Cryptography;
 using System.Text;
 using CommonUtilities;
 using VariantAnnotation.Interface.Positions;
@@ -10,19 +11,19 @@ namespace Vcf.VariantCreator
     {
         private static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false, false);
 
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele)
+        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed)
         {
+            if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant cann't be both decomposed and recomposed");
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
             var end = start + refAllele.Length - 1;
 
             var variantType = GetVariantType(refAllele, altAllele);
             var vid         = GetVid(chromosome.EnsemblName, start, end, altAllele, variantType);
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, null, null, SmallVariantBehavior);
-        }
-
-        private static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
-        {
+			return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, null, null, SmallVariantBehavior);
+		}
+		private static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
+		{
             var referenceName = ensemblName;
 
             // ReSharper disable once SwitchStatementMissingSomeCases
@@ -56,7 +57,7 @@ namespace Vcf.VariantCreator
             return StringBuilderCache.GetStringAndRelease(md5Builder);
         }
 
-        private static VariantType GetVariantType(string refAllele, string altAllele)
+        public static VariantType GetVariantType(string refAllele, string altAllele)
         {
             var referenceAlleleLen = refAllele.Length;
             var alternateAlleleLen = altAllele.Length;

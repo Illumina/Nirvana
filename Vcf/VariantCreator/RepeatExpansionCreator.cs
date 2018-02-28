@@ -21,7 +21,7 @@ namespace Vcf.VariantCreator
 			var end = infoData.End ?? 0;
 			var vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
 
-			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, null, null, RepeatExpansionBehavior);
+			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, RepeatExpansionBehavior);
 		}
 
 		private static string GetVid(string ensemblName, int start, int end, string repeatUnit, int repeatCount)

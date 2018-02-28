@@ -95,14 +95,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private IVariant GetVariant()
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false, false);
-            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", false, true,
+            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", false, false, false,
                 new[] { "bob:100:102:TAT" }, null, behavior);
         }
 
         private IVariant GetRefMinorVariant()
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false, false);
-            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, true,
+            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
                 new[] { "bob:100:102:TAT" }, null, behavior);
         }
     }

@@ -68,6 +68,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static void CheckHeaderVersion(CacheHeader header, GenomeAssembly refGenomeAssembly)
+
         {
             if (header.GenomeAssembly != refGenomeAssembly)
                 throw new UserErrorException(GetGenomeAssemblyErrorMessage(header.GenomeAssembly, refGenomeAssembly));

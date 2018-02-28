@@ -215,7 +215,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
             int numAnnotatedVar = annotatedPositionAnnotatedVariants.Length;
             // alt allele is <NON_REF> or . , and this is a refMinor site
-            if (positionAltAlleles.Length == 1 && (positionAltAlleles[0] == "." || positionAltAlleles[0] == VcfCommon.GatkNonRefAllele) && numAnnotatedVar == 1)
+            if (positionAltAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(positionAltAlleles[0]) && numAnnotatedVar == 1)
                 return new []{0};
 
             var inputGenotypeIndex = new int[numAnnotatedVar];
@@ -223,8 +223,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
             for (var inputIndex = 0; inputIndex < positionAltAlleles.Length && annotatedVarIndex < numAnnotatedVar; inputIndex++)
             {
-                if (VcfCommon.NonInformativeAltAllele.Contains(positionAltAlleles[inputIndex]) ||
-                    positionAltAlleles[inputIndex] == VcfCommon.GatkNonRefAllele) continue;
+                if (VcfCommon.NonInformativeAltAllele.Contains(positionAltAlleles[inputIndex])) continue;
                 inputGenotypeIndex[annotatedVarIndex] = inputIndex;
                 annotatedVarIndex++;
             }

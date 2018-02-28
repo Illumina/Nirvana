@@ -206,7 +206,7 @@ namespace SAUtils.InputFileParsers.MitoMap
             var altNotationMatch = altNotationPattern1.Match(mitomapDiseaseString);
             if (altNotationMatch.Success)
             {
-                Console.WriteLine($"Altnate natation found: {mitomapDiseaseString}. This record is skipped.");
+                Console.WriteLine($"Alternate notation found: {mitomapDiseaseString}. This record is skipped.");
                 return true;
             }
             return false;
@@ -318,7 +318,20 @@ namespace SAUtils.InputFileParsers.MitoMap
                 }
                 return (match7.Groups["ref"].Value, string.Join(";", altAlleleSequences), null);
             }
-
+            // 8042delAT
+            var regexPattern8 = new Regex(@"(?<position>^\d+)del(?<del>[ACGTacgtNn]+)");
+            var match8 = regexPattern8.Match(alleleString);
+            if (match8.Success)
+            {
+                var extractedPosition = int.Parse(match8.Groups["position"].Value);
+                string deletedSeq = match8.Groups["del"].Value;
+                string deletedReferenceSeq = GetRefAllelesFromReferece(_sequenceProvider, extractedPosition,deletedSeq.Length);
+                if (deletedSeq != deletedReferenceSeq)
+                {
+                    throw new Exception($"Deleted sequence at {extractedPosition}: annoation is {deletedSeq}, reference sequence is {deletedReferenceSeq}");
+                }
+                return (deletedReferenceSeq, "-", extractedPosition);
+            }
             return (null, null, null);
         }
 

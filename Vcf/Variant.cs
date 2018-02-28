@@ -14,12 +14,13 @@ namespace Vcf
         public string VariantId { get; }
         public bool IsRefMinor { get; }
         public bool IsRecomposed { get; }
+        public bool IsDecomposed { get; }
         public string[] LinkedVids { get; }
 	    public IBreakEnd[] BreakEnds { get; }
 	    public AnnotationBehavior Behavior { get; }
 
         public Variant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
-            VariantType variantType, string variantId, bool isRefMinor, bool isRecomposed, string[] linkedVids, IBreakEnd[] breakEnds,
+            VariantType variantType, string variantId, bool isRefMinor, bool isDecomposed, bool isRecomposed, string[] linkedVids, IBreakEnd[] breakEnds,
             AnnotationBehavior behavior)
         {
             Chromosome   = chromosome;
@@ -31,6 +32,7 @@ namespace Vcf
             VariantId    = variantId;
             IsRefMinor   = isRefMinor;
             IsRecomposed = isRecomposed;
+            IsDecomposed = isDecomposed;
             LinkedVids   = linkedVids;
             Behavior     = behavior;
 	        BreakEnds = breakEnds;

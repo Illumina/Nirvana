@@ -18,7 +18,7 @@ namespace Vcf.VariantCreator
 		    {
 		        var dupEnd = infoData.End ?? start;
                 var dupVid = $"{chromosome.EnsemblName}:{start}:{dupEnd}:DUP";
-                return new Variant(chromosome, start, dupEnd, refAllele, altAllele, VariantType.copy_number_gain, dupVid, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
+                return new Variant(chromosome, start, dupEnd, refAllele, altAllele, VariantType.copy_number_gain, dupVid, false, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
             }
 
 		    var copyNumber = GetCopyNumber(altAllele, infoData, sampleCopyNumber);
@@ -27,7 +27,7 @@ namespace Vcf.VariantCreator
 			var end        = infoData.End??start;
 			var vid        = GetVid(chromosome.EnsemblName, start, end, copyNumber);
 
-			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
+			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
 		}
 
 	    private static int? GetCopyNumber(string altAllele, IInfoData infoData, int? sampleCopyNumber)

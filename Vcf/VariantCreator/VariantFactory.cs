@@ -43,30 +43,32 @@ namespace Vcf.VariantCreator
 
         private static bool IsSymbolicAllele(string altAllele)
         {
-            return altAllele.StartsWith("<") && altAllele.EndsWith(">") && !VcfCommon.NonInformativeAltAllele.Contains(altAllele) && altAllele != VcfCommon.GatkNonRefAllele;
+            return altAllele.StartsWith("<") && altAllele.EndsWith(">") && !VcfCommon.NonInformativeAltAllele.Contains(altAllele);
         }
 
-        public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber)
+        public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber, bool[] isDecomposed, bool isRecomposed)
         {
-            var isReference      = altAlleles.Length == 1 && (altAlleles[0] == "." || altAlleles[0] == VcfCommon.GatkNonRefAllele);
+            var isReference      = altAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(altAlleles[0]);
             var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
             var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele, infoData.SvType);
 
-            if (isReference) return new[] { GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber) };
+            if (isReference) return new[] { GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber, isDecomposed[0], isRecomposed) };
 
             var variants = new List<IVariant>();
 
             // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (string altAllele in altAlleles)
+            for (int i = 0; i < altAlleles.Length; i++)
             {
-                if (VcfCommon.NonInformativeAltAllele.Contains(altAllele) || altAllele == VcfCommon.GatkNonRefAllele) continue;
-                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAllele, infoData, variantCategory, sampleCopyNumber));
+                string altAllele = altAlleles[i];
+                bool isDecomposedVar = isDecomposed[i];
+                if (VcfCommon.NonInformativeAltAllele.Contains(altAllele)) continue;
+                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAllele, infoData, variantCategory, sampleCopyNumber, isDecomposedVar, isRecomposed));
             }
 
             return variants.Count == 0 ? null : variants.ToArray();
         }
 
-        private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, int? sampleCopyNumber)
+        private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, int? sampleCopyNumber, bool isDecomposedVar, bool isRecomposed)
         {
             switch (category)
             {
@@ -74,7 +76,7 @@ namespace Vcf.VariantCreator
                     var refMinorGlobalMajorAllele = _refMinorProvider?.GetGlobalMajorAlleleForRefMinor(chromosome, start);
                     return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, refMinorGlobalMajorAllele);
                 case VariantCategory.SmallVariant:
-                    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele);
+                    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele, isDecomposedVar, isRecomposed);
                 case VariantCategory.SV:
                     var svBreakEnds = infoData.SvType == VariantType.translocation_breakend ?
                         GetTranslocationBreakends(chromosome, refAllele, altAllele, start)

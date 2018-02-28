@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using ErrorHandling.Exceptions;
 
-namespace Nirvana
+namespace Vcf
 {
     public sealed class SortedVcfChecker
     {

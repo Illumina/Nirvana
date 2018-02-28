@@ -57,6 +57,8 @@ namespace VariantAnnotation.AnnotatedPositions
 
 	        var variantType = GetVariantType(Variant.Type);
 			jsonObject.AddStringValue("variantType", variantType.ToString());
+            jsonObject.AddBoolValue("isDecomposedVariant", Variant.IsDecomposed);
+            if (variantType.ToString() != "SNV") jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
             jsonObject.AddStringValue("hgvsg",HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);

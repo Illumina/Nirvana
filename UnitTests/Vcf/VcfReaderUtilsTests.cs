@@ -34,7 +34,7 @@ namespace UnitTests.Vcf
             var annotatedVariants2 = Annotator.GetAnnotatedVariants(position2.Variants);
             var annotatedVariants3 = Annotator.GetAnnotatedVariants(position3.Variants);
 
-            // Positions unchanged
+            // SimplePositions unchanged
             Assert.Equal("<*>", position1.AltAlleles[0]);
             Assert.Equal("*", position2.AltAlleles[0]);
             Assert.Equal("<M>", position3.AltAlleles[0]);
@@ -69,7 +69,7 @@ namespace UnitTests.Vcf
             var annotatedVariants3 = Annotator.GetAnnotatedVariants(position3.Variants);
             var annotatedVariants4 = Annotator.GetAnnotatedVariants(position4.Variants);
 
-            // Positions
+            // SimplePositions
             Assert.Equal(new[] { "<*>", "G" }, position1.AltAlleles);
             Assert.Equal(new[] { "*", "C" }, position2.AltAlleles);
             Assert.Equal(new[] { "<M>", "A" }, position3.AltAlleles);
@@ -97,7 +97,7 @@ namespace UnitTests.Vcf
 
             var annotatedVariants1 = Annotator.GetAnnotatedVariants(position1.Variants);
 
-            // Positions
+            // SimplePositions
             Assert.Equal(new[] { "G"}, position1.AltAlleles);
 
             // Variants

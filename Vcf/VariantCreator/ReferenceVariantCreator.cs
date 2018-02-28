@@ -36,8 +36,8 @@ namespace Vcf.VariantCreator
 
             return isRefMinor
                 ? new Variant(chromosome, start, end, refMinorGlobalMajorAllele, refallele, variantType, vid,
-                    true, false, null, null, RefVariantBehavior)
-                : new Variant(chromosome, start, end, refallele, altAllele, variantType, vid, false, false, null,
+                    true, false, false, null, null, RefVariantBehavior)
+                : new Variant(chromosome, start, end, refallele, altAllele, variantType, vid, false, false, false, null,
                     null, null);
         }
     }

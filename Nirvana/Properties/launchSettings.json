@@ -25,25 +25,31 @@
       "commandLineArgs": "-c Cache\\26\\GRCh37\\Ensembl -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-    "MS Platypus": {
+    "MS_ClinVar": {
       "commandName": "Project",
-      "commandLineArgs": "-c Cache\\26\\GRCh37\\Ensembl -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Platypus\\Platypus-Platypus-unknown-short-hg19.vcf.gz -o platypus",
+      "commandLineArgs": " -c Cache\\25\\GRCh37\\Ensembl90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\ClinVar\\ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz -o clinvar",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-    "MS Zodiac": {
+    "MS_Mother": {
       "commandName": "Project",
-      "commandLineArgs": "-c Cache\\26\\GRCh37\\Ensembl -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Zodiac\\Zodiac_all_observed-dummyInfo-dummyInfo-short-hg19.vcf.gz -o zodiac",
+      "commandLineArgs": "-c Cache\\25\\GRCh37\\Ensembl90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother --sd SupplementaryDatabase\\41\\GRCh37",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-    "RR Nirvana": {
-      "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  -i CanvasNS7-Canvas-Pedigree-WG-hg19.vcf.gz --out canvas7",
-      "workingDirectory": "C:\\Development\\TestDatasets"
-    },
+
     "SK Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "-i \\\\ussd-prd-isi04\\Nirvana\\Data\\Zodiac\\Zodiac_Eco.vcf -c \\\\ussd-prd-isi04\\Nirvana\\Cache\\latest\\GRCh37\\Both84 -r \\\\ussd-prd-isi04\\Nirvana\\References\\latest\\Homo_sapiens.GRCh37.Nirvana.dat -o test_out --sd E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15\\test\\createSA\\",
-      "workingDirectory": "E:\\temp"
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\MS_data\\NA12878_AH72T3CCXX-l2_S1.genome.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh38\\Both90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o NIR_NA12878 ",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+    },
+    "SK Pedigree": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf  -o Pedigree_NIR_Phan_out",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+    },
+    "SK bugfix": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree_bugfix.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf -o Pedigree_bugfix",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom"
     }
   }
 }

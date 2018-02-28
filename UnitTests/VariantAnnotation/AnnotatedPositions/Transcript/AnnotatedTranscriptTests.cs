@@ -15,7 +15,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void SerializeJson_NominalUsage()
         {
             var chromosome  = new Chromosome("chr1", "1", 0);
-            var variant     = new Variant(chromosome, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, null, null, new AnnotationBehavior(false, false, false, false, false, false));
+            var variant     = new Variant(chromosome, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false, false));
             var refSequence = new SimpleSequence(HgvsProteinNomenclatureTests.Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = HgvsProteinNomenclatureTests.GetMockedTranscriptOnForwardStrand();
 

@@ -8,6 +8,7 @@ using Compression.FileHandling;
 using ErrorHandling;
 using Jasix;
 using Jasix.DataStructures;
+using Phantom.Workers;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -22,6 +23,7 @@ using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
+using Vcf;
 
 namespace Nirvana
 {
@@ -38,6 +40,7 @@ namespace Nirvana
         private static bool _gvcf;
         private static bool _forceMitochondrialAnnotation;
         private static bool _reportAllSvOverlappingTranscripts;
+        private static bool _disableRecomposition;
 
         private readonly string _annotatorVersionTag = "Nirvana " + CommandLineUtilities.Version;
         private readonly VcfConversion _conversion   = new VcfConversion();
@@ -52,7 +55,7 @@ namespace Nirvana
             var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
             var plugins                      = PluginUtilities.LoadPlugins(_pluginDirectory);
             var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
-
+            var recomposer = _disableRecomposition ? new NullRecomposer() : Recomposer.Create(sequenceProvider, _inputCachePrefix);
             var logger  = _outputFileName == "" ? (ILogger)new NullLogger() : new ConsoleLogger();
             var metrics = new PerformanceMetrics(logger);
 
@@ -63,7 +66,7 @@ namespace Nirvana
             var jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
-            using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts))
+            using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))
             using (var jsonWriter        = new JsonWriter(outputWriter, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
             using (var vcfWriter         = _vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
@@ -206,6 +209,11 @@ namespace Nirvana
                     "verbose-transcripts",
                     "reports all overlapping transcripts for structural variants",
                     v => _reportAllSvOverlappingTranscripts = v != null
+                },
+                {
+                    "disable-recomposition",
+                    "don't recompose function relevant variants",
+                    v => _disableRecomposition = v != null
                 }
             };
 

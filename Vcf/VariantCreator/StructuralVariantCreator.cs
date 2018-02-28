@@ -27,7 +27,7 @@ namespace Vcf.VariantCreator
             var vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
             var svAltAllele = GetSvAltAllele(altAllele, svType);
 
-            return new Variant(chromosome, start, end, refAllele, svAltAllele, svType, vid, false, false, null,
+            return new Variant(chromosome, start, end, refAllele, svAltAllele, svType, vid, false, false, false, null,
                 breakEnds, enableVerboseTranscript ? VerbosedStructuralVariantBehavior : StructuralVariantBehavior);
         }
 
