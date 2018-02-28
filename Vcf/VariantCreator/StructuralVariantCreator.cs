@@ -25,35 +25,12 @@ namespace Vcf.VariantCreator
             if (svType != VariantType.translocation_breakend) start++;
             var end = infoData?.End ?? start;
             var vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
-            var svAltAllele = GetSvAltAllele(altAllele, svType);
-
-            return new Variant(chromosome, start, end, refAllele, svAltAllele, svType, vid, false, false, false, null,
+            
+            return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
                 breakEnds, enableVerboseTranscript ? VerbosedStructuralVariantBehavior : StructuralVariantBehavior);
         }
 
-        private static string GetSvAltAllele(string altAllele, VariantType svType)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (svType)
-            {
-                case VariantType.deletion:
-                    return "deletion";
-                case VariantType.duplication:
-                    return "duplication";
-                case VariantType.insertion:
-                    return "insertion";
-
-                case VariantType.inversion:
-                    return "inversion";
-
-                case VariantType.tandem_duplication:
-                    return "tandem_duplication";
-                default:
-                    return altAllele.Trim('<', '>');
-
-            }
-        }
-
+        
         private static string GetVid(string ensemblName, int start, int end, VariantType variantType,
             IReadOnlyList<IBreakEnd> breakEnds)
         {

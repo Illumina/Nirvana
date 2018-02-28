@@ -10,8 +10,8 @@ namespace Vcf.VariantCreator
 		{
 			start++;//for the padding base
 			if (infoData.RefRepeatCount == 0) return null;
-			altAllele = altAllele.Trim('<', '>');
-			var repeatCount = int.Parse(altAllele.Substring(3));
+			
+			var repeatCount = int.Parse(altAllele.Trim('<', '>').Substring(3));
 
 			var svType = repeatCount == infoData.RefRepeatCount ? VariantType.short_tandem_repeat_variation: 
 				repeatCount > infoData.RefRepeatCount

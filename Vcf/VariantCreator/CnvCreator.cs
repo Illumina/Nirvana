@@ -53,26 +53,11 @@ namespace Vcf.VariantCreator
 
 		private static VariantType EvaluateCopyNumberType(int? copyNumber, string id, string ucscName)
 		{
-			if (copyNumber == null) return VariantType.copy_number_variation;
+			if (copyNumber == null || copyNumber==1) return VariantType.copy_number_variation;
 
-			if (!string.IsNullOrEmpty(id) && id.StartsWith("Canvas:"))
-			{
-				var canvasInfo = id.Split(':');
-				if (canvasInfo[1].Equals("GAIN")) return VariantType.copy_number_gain;
-				if (canvasInfo[1].Equals("LOSS")) return VariantType.copy_number_loss;
-				if (canvasInfo[1].Equals("REF")) return VariantType.copy_number_variation;
-			}
-
-			var baseCopyNumber = ucscName == "chrY" ? 1 : 2;
-
-			if (copyNumber < baseCopyNumber)
-			{
-				return VariantType.copy_number_loss;
-			}
-
-			return copyNumber > baseCopyNumber
+			return copyNumber > 1
 				? VariantType.copy_number_gain
-				: VariantType.copy_number_variation;
+				: VariantType.copy_number_loss;
 		}
 
 	}
