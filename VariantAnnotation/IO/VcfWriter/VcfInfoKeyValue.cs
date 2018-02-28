@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace VariantAnnotation.IO.VcfWriter
 {
-    public class VcfInfoKeyValue
+    public sealed class VcfInfoKeyValue
     {
         #region members
 
@@ -63,6 +63,11 @@ namespace VariantAnnotation.IO.VcfWriter
         public string GetString()
         {
             if (!_containsNonEmptyEntries) return null;
+            if (_infoFieldName == "AA")
+            {
+                return _infoFieldName + "=" + _entries[0];
+            }
+
             return _infoFieldName + "=" + string.Join(",", _entries);
         }
     }

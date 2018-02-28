@@ -22,7 +22,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         private readonly List<string> _infoHeaderLines = new List<string>
         {
             "##INFO=<ID=AF1000G,Number=A,Type=Float,Description=\"The allele frequency from all populations of 1000 genomes data\">",
-            "##INFO=<ID=AA,Number=A,Type=String,Description=\"The inferred allele ancestral (if determined) to the chimpanzee/human lineage.\">",
+            "##INFO=<ID=AA,Number=1,Type=String,Description=\"The inferred allele ancestral (if determined) to the chimpanzee/human lineage.\">",
             "##INFO=<ID=GMAF,Number=A,Type=String,Description=\"Global minor allele frequency (GMAF); technically, the frequency of the second most frequent allele.  Format: GlobalMinorAllele|AlleleFreqGlobalMinor\">",
             "##INFO=<ID=cosmic,Number=.,Type=String,Description=\"The numeric identifier for the variant in the Catalogue of Somatic Mutations in Cancer (COSMIC) database. Format: GenotypeIndex|Significance\">",
             "##INFO=<ID=clinvar,Number=.,Type=String,Description=\"Clinical significance. Format: GenotypeIndex|Significance\">",

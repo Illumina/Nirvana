@@ -127,7 +127,7 @@ namespace VariantAnnotation.IO.VcfWriter
         private static void ExtractInfo(IAnnotatedPosition annotatedPosition, VcfField infoEntries)
         {
             var alleleFreq1000G = new VcfInfoKeyValue("AF1000G");
-            var ancestralAllele = new VcfInfoKeyValue("AA");
+            var ancestralAllele = new VcfPositionalInfo("AA");
             var phyloP          = new VcfInfoKeyValue("phyloP");
 
             var suppAnnotationSources = new Dictionary<string, VcfInfoKeyValue>();
@@ -155,7 +155,6 @@ namespace VariantAnnotation.IO.VcfWriter
             for (var i = 0; i < numInputAltAlleles; i++)
             {
                 alleleFreq1000G.Add(null);
-                ancestralAllele.Add(null);
             }
 
             var inputGenotypeIndex = GetInputGenotypeIndex(annotatedPosition.Position.AltAlleles, annotatedPosition.AnnotatedVariants);
@@ -163,13 +162,13 @@ namespace VariantAnnotation.IO.VcfWriter
             // understand the number of annotation contains in the whole vcf line
             for (int i = 0; i < annotatedPosition.AnnotatedVariants.Length; i++)
             {
-                var jsonVariant = annotatedPosition.AnnotatedVariants[i];
+                var annotatedVariant = annotatedPosition.AnnotatedVariants[i];
                 var genotypeIndex = inputGenotypeIndex[i] + 1;
-                if (jsonVariant.Variant.IsRefMinor) infoEntries.Add("RefMinor");
+                if (annotatedVariant.Variant.IsRefMinor) infoEntries.Add("RefMinor");
 
-                phyloP.Add(jsonVariant.PhylopScore?.ToString(CultureInfo.InvariantCulture));
+                phyloP.Add(annotatedVariant.PhylopScore?.ToString(CultureInfo.InvariantCulture));
 
-                foreach (var sa in jsonVariant.SupplementaryAnnotations)
+                foreach (var sa in annotatedVariant.SupplementaryAnnotations)
                 {
                     if (!sa.SaDataSource.MatchByAllele && !sa.IsAlleleSpecific && sa.SaDataSource.KeyName != GlobalAlleleKeyName) continue;
                     if (sa.SaDataSource.KeyName == DbSnpKeyName) continue;
@@ -186,7 +185,7 @@ namespace VariantAnnotation.IO.VcfWriter
                             var ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
 
                             alleleFreq1000G.Add(freq, genotypeIndex);
-                            ancestralAllele.Add(ancestryAllele, genotypeIndex);
+                            ancestralAllele.AddValue(ancestryAllele);
                             continue;
                         }
 
