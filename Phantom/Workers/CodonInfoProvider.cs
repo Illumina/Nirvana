@@ -31,7 +31,7 @@ namespace Phantom.Workers
         public int GetFunctionBlockRanges(IInterval interval)
         {
             //todo; don't really checked the codon info at this time
-            return interval.End + 2;
+            return interval.Start + 2;
         }
 
         private static IntervalArray<ICodonBlock>[] GetCodonBlockIntervalArrays(
