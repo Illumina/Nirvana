@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 
-namespace Phantom.Workers
+namespace Vcf
 {
     public sealed class NullRecomposer : IRecomposer
     {

@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using Phantom.DataStructures;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Utilities;
-using Vcf;
 using ReadWriteUtilities = Phantom.Utilities.ReadWriteUtilities;
 
 namespace Phantom.Workers
@@ -32,20 +30,6 @@ namespace Phantom.Workers
             var positionBuffer = new PositionBuffer(codonInfoProvider, geneIntervalForest);
             return new Recomposer(new PositionProcessor(positionBuffer, codonInfoProvider, variantGenerator), sequenceProvider);
         }
-
-        /*
-        public IEnumerable<IPosition> GetPositionEnumerator(StreamReader reader)
-        {
-            string vcfLine;
-            while ((vcfLine = reader.ReadLine()) != null)
-            {
-                var simplePosition = SimplePosition.GetSimplePosition(vcfLine, _sequenceProvider.RefNameToChromosome);
-                foreach (var vcfRecord in _positionProcessor.ProcessSimplePosition(simplePosition))
-                    yield return string.Join("\t", vcfRecord);
-            }
-            foreach (var vcfRecord in _positionProcessor.ProcessBufferedPositions())
-                yield return string.Join("\t", vcfRecord);
-        }*/
 
         public IEnumerable<ISimplePosition> ProcessSimplePosition(ISimplePosition simplePosition)
         {

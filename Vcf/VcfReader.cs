@@ -54,20 +54,25 @@ namespace Vcf
             _reader = new StreamReader(stream);
             _variantFactory = new VariantFactory(refNameToChromosome, refMinorProvider, enableVerboseTranscript);
             _refNameToChromosome = refNameToChromosome;
-            _recomposer = recomposer;
-            ParseHeader();
+            bool hasSampleColumn = ParseHeader();
+            _recomposer = hasSampleColumn ? recomposer : new NullRecomposer();
         }
 
-        private void ParseHeader()
+        private bool ParseHeader()
         {
             string line;
             _headerLines = new List<string>();
+            bool hasSampleColumn;
 
             while (true)
             {
                 // grab the next line - stop if we have reached the main header or read the entire file
                 line = _reader.ReadLine();
-                if (line == null || line.StartsWith(VcfCommon.ChromosomeHeader)) break;
+                if (line == null || line.StartsWith(VcfCommon.ChromosomeHeader))
+                {
+                    hasSampleColumn = HasSampleColumn(line);
+                    break;
+                }
 
                 // skip headers already produced by Nirvana
                 var duplicateTag = _nirvanaInfoTags.Any(infoTag => line.StartsWith(infoTag));
@@ -86,6 +91,14 @@ namespace Vcf
             _headerLines.Add(line);
 
             _sampleNames = ExtractSampleNames(line);
+
+            return hasSampleColumn;
+        }
+
+        private bool HasSampleColumn(string line)
+        {
+            string[] vcfHeaderFields = line?.Trim().Split("\t");
+            return vcfHeaderFields?.Length >= VcfCommon.MinNumColumnsSampleGenotypes;
         }
 
         private static string[] ExtractSampleNames(string line)

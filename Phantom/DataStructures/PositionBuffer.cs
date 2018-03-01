@@ -26,7 +26,7 @@ namespace Phantom.DataStructures
 
         public BufferedPositions AddPosition(ISimplePosition simplePosition)
         {
-            bool recomposable = !VcfCommon.ReferenceAltAllele.Contains(simplePosition.VcfFields[VcfCommon.AltIndex]);
+            bool recomposable = IsRecomposable(simplePosition);
             bool isPositionWithinRange = !simplePosition.Chromosome.IsEmpty() && PositionWithinRange(simplePosition);
             if (isPositionWithinRange)
             {
@@ -38,6 +38,12 @@ namespace Phantom.DataStructures
             var copyOfBuffer = BufferedPositions;
             ResetBuffer(simplePosition, recomposable);
             return copyOfBuffer;
+        }
+
+        internal static bool IsRecomposable(ISimplePosition simplePosition)
+        {
+            string formatCol = simplePosition.VcfFields[VcfCommon.FormatIndex];
+            return !VcfCommon.ReferenceAltAllele.Contains(simplePosition.VcfFields[VcfCommon.AltIndex]) && (formatCol.StartsWith("GT:") || formatCol.Equals("GT")) ;
         }
 
         private void ResetBuffer(ISimplePosition simplePosition, bool recomposable)

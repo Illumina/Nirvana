@@ -17,6 +17,16 @@ namespace UnitTests.Phantom.DataStructures
         private readonly Mock<ICodonInfoProvider> _codonInfoProviderMock = new Mock<ICodonInfoProvider>();
 
         [Fact]
+        public void IsRecomposable_NoCorrectGtTag_ReturnFalse()
+        {
+            Assert.False(PositionBuffer.IsRecomposable(GetMockedIPositionOnChr1(40, 40, "C", "AA")));
+            Assert.False(PositionBuffer.IsRecomposable(GetMockedIPositionOnChr1(40, 40, "C", "AA:BB")));
+            Assert.False(PositionBuffer.IsRecomposable(GetMockedIPositionOnChr1(40, 40, "C", "")));
+            Assert.False(PositionBuffer.IsRecomposable(GetMockedIPositionOnChr1(40, 40, "C", "GTO:BB")));
+            Assert.False(PositionBuffer.IsRecomposable(GetMockedIPositionOnChr1(40, 40, "C", "BB:GT")));
+        }
+
+        [Fact]
         public void InGeneRegion_NonOverlap_ReturnFalse()
         {
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 40, 40)).Returns(false);
@@ -155,7 +165,7 @@ namespace UnitTests.Phantom.DataStructures
         }
 
 
-        internal static IPosition GetMockedIPositionOnChr1(int start, int end, string altAllele="A")
+        internal static IPosition GetMockedIPositionOnChr1(int start, int end, string altAllele="A", string formatCol = "GT")
         {
             var positionMock = new Mock<IPosition>();
             var chromosome = new Chromosome("chr1", "1", 0);
@@ -164,6 +174,7 @@ namespace UnitTests.Phantom.DataStructures
             positionMock.SetupGet(x => x.End).Returns(end);
             var vcfFields = new string[VcfCommon.MinNumColumnsSampleGenotypes];
             vcfFields[VcfCommon.AltIndex] = altAllele;
+            vcfFields[VcfCommon.FormatIndex] = formatCol;
             positionMock.SetupGet(x => x.VcfFields).Returns(vcfFields);
             return positionMock.Object;
         }
