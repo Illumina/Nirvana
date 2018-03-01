@@ -1,61 +1,104 @@
-﻿using CommandLine.Builders;
+﻿using System;
+using System.Collections.Generic;
+using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using System.IO;
+using CacheUtils.Genes.DataStructures;
+using CacheUtils.Genes.IO;
+using CacheUtils.Helpers;
+using Compression.Utilities;
 
 namespace SAUtils.CreateOmimTsv
 {
-    public sealed class CreateOmimTsvMain
+    public static class CreateOmimTsvMain
     {
+        private static string _inputGeneMap2Path;
+        private static string _inputReferencePath;
+        private static string _outputTsvDirectory;
+        private static string _universalGeneArchivePath;
+        private static string _mim2GenePath;
+
         private static ExitCodes ProgramExecution()
         {
-            var geneSymbolUpdater = new GeneSymbolUpdater(ConfigurationSettings.GeneInfoPaths, ConfigurationSettings.HgncPath);
-            var omimTsvCreator = new OmimTsvCreator(new FileInfo(ConfigurationSettings.InputGeneMap2Path), ConfigurationSettings.Mim2GenePath ==null? null: new FileInfo (ConfigurationSettings.Mim2GenePath), geneSymbolUpdater,ConfigurationSettings.OutputDirectory);
+            var (ensemblGeneIdToSymbol, entrezGeneIdToSymbol) = ParseUniversalGeneArchive();
+            var geneSymbolUpdater = new GeneSymbolUpdater(ensemblGeneIdToSymbol, entrezGeneIdToSymbol);
+            var omimTsvCreator    = new OmimTsvCreator(_inputGeneMap2Path, _mim2GenePath, geneSymbolUpdater, _outputTsvDirectory);
 
             return omimTsvCreator.Create();
         }
 
+        private static (Dictionary<string, string> EntrezGeneIdToSymbol, Dictionary<string, string>
+            EnsemblIdToSymbol) ParseUniversalGeneArchive()
+        {
+            var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(_inputReferencePath);
+
+            UgaGene[] genes;
+
+            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(_universalGeneArchivePath),
+                refNameToChromosome))
+            {
+                genes = reader.GetGenes();
+            }
+
+            var entrezGeneIdToSymbol = genes.GetGeneIdToSymbol(x => x.EntrezGeneId);
+            var ensemblIdToSymbol    = genes.GetGeneIdToSymbol(x => x.EnsemblId);
+            return (entrezGeneIdToSymbol, ensemblIdToSymbol);
+        }
+
+        private static Dictionary<string, string> GetGeneIdToSymbol(this UgaGene[] genes,
+            Func<UgaGene, string> geneIdFunc)
+        {
+            var dict = new Dictionary<string, string>();
+            foreach (var gene in genes)
+            {
+                var key = geneIdFunc(gene);
+                var symbol = gene.Symbol;
+                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(symbol)) continue;
+                dict[key] = symbol;
+            }
+            return dict;
+        }
+
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-            var creator = new CreateOmimTsvMain();
-
             var ops = new OptionSet
             {
                 {
-                    "gi=",
-                    "gene_info {path} (newest first)",
-                    v => ConfigurationSettings.GeneInfoPaths.Add(v)
-                },
-                {
-                    "hgnc=",
-                    "HGNC {path}",
-                    v => ConfigurationSettings.HgncPath = v
-                },
-                {
-                    "mim=",
-                    "mim2gene {path}",
-                    v => ConfigurationSettings.Mim2GenePath = v
-                },
-                {
                     "in|i=",
                     "input genemap2 {path}",
-                    v => ConfigurationSettings.InputGeneMap2Path = v
+                    v => _inputGeneMap2Path = v
+                },
+                {
+                    "mim|m=",
+                    "mim2gene {path}",
+                    v => _mim2GenePath = v
                 },
                 {
                     "out|o=",
-                    "output genemap2 {path}",
-                    v => ConfigurationSettings.OutputDirectory = v
-                }
+                    "output TSV {directory}",
+                    v => _outputTsvDirectory = v
+                },
+                {
+                    "ref|r=",
+                    "input reference {filename}",
+                    v => _inputReferencePath = v
+                },
+                {
+                    "uga|u=",
+                    "universal gene archive {path}",
+                    v => _universalGeneArchivePath = v
+                },
             };
 
             var commandLineExample = $"{command} [options]";
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-                .CheckInputFilenameExists(ConfigurationSettings.InputGeneMap2Path, "genemap2", "--in")
-                .HasRequiredParameter(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
-                .CheckInputFilenameExists(ConfigurationSettings.HgncPath, "HGNC", "--hgnc")
-                .CheckEachFilenameExists(ConfigurationSettings.GeneInfoPaths, "geneinfo files", "--gi")
+                .CheckInputFilenameExists(_inputGeneMap2Path, "genemap2", "--in")
+                .CheckInputFilenameExists(_mim2GenePath, "mim2gene", "--mim")
+                .CheckInputFilenameExists(_universalGeneArchivePath, "universal gene archive", "--uga")
+                .CheckInputFilenameExists(_inputReferencePath, "compressed reference", "--ref")
+                .CheckDirectoryExists(_outputTsvDirectory, "output TSV", "--out")
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()

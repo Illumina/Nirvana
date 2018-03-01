@@ -7,131 +7,97 @@ namespace SAUtils.CreateOmimTsv
 {
     public sealed class GeneSymbolUpdater
     {
-        private readonly SymbolDataSource _geneInfoSource;
-        private readonly SymbolDataSource _hgncSource;
-        private int _numGenesUnableToUpdate;
-        private int _numGenesUpdated;
-        private int _numGenesAlreadyCurrent;
+        private readonly Dictionary<string, string> _entrezGeneIdToSymbol;
+        private readonly Dictionary<string, string> _ensemblGeneIdToSymbol;
+        private readonly HashSet<string> _geneSymbols;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public GeneSymbolUpdater(List<string> geneInfoPaths, string hgncPath)
+        private int _numGenesWhereBothIdsAreNull;
+        private int _numGeneSymbolsUpToDate;
+        private int _numGeneSymbolsUpdated;
+        private int _numGeneSymbolsNotInCache;
+        private int _numResolvedGeneSymbolConflicts;
+
+        public GeneSymbolUpdater(Dictionary<string, string> entrezGeneIdToSymbol,
+            Dictionary<string, string> ensemblGeneIdToSymbol)
         {
-            _geneInfoSource = ParseGeneInfoFiles(geneInfoPaths);
-            _hgncSource = ParseHgncFile(hgncPath);
+            _entrezGeneIdToSymbol  = entrezGeneIdToSymbol;
+            _ensemblGeneIdToSymbol = ensemblGeneIdToSymbol;
+            _geneSymbols           = new HashSet<string>();
         }
 
-        public string UpdateGeneSymbol(string currentSymbol)
+        public string UpdateGeneSymbol(string oldGeneSymbol, string ensemblGeneId, string entrezGeneId)
         {
-            if (_hgncSource.TryUpdateSymbol(currentSymbol, out var newSymbol))
+            if (ensemblGeneId == null && entrezGeneId == null)
             {
-                if (newSymbol == currentSymbol) _numGenesAlreadyCurrent++;
-                else _numGenesUpdated++;
-                return newSymbol;
+                _numGenesWhereBothIdsAreNull++;
+                return null;
             }
 
-            if (_geneInfoSource.TryUpdateSymbol(currentSymbol, out newSymbol))
+            var ensemblSymbol    = GetSymbol(ensemblGeneId, _ensemblGeneIdToSymbol);
+            var entrezGeneSymbol = GetSymbol(entrezGeneId, _entrezGeneIdToSymbol);
+
+            _geneSymbols.Clear();
+            if (ensemblSymbol    != null) _geneSymbols.Add(ensemblSymbol);
+            if (entrezGeneSymbol != null) _geneSymbols.Add(entrezGeneSymbol);
+
+            if (_geneSymbols.Count == 0)
             {
-                if (newSymbol == currentSymbol) _numGenesAlreadyCurrent++;
-                else _numGenesUpdated++;
-                return newSymbol;
+                _numGeneSymbolsNotInCache++;
+                return null;
             }
 
-            _numGenesUnableToUpdate++;
-            return currentSymbol;
+            var newGeneSymbol = _geneSymbols.First();
+
+            if (_geneSymbols.Count > 1)
+            {
+                newGeneSymbol = ResolveGeneSymbolConflict(oldGeneSymbol, ensemblSymbol, entrezGeneSymbol);
+                if (newGeneSymbol == null) throw new InvalidDataException($"Unable to resolve gene symbol conflict for {oldGeneSymbol}: Ensembl: [{ensemblGeneId}]: {ensemblSymbol}, Entrez Gene: [{entrezGeneId}]: {entrezGeneSymbol}");
+                _numResolvedGeneSymbolConflicts++;
+            }
+
+            if (newGeneSymbol == oldGeneSymbol) _numGeneSymbolsUpToDate++;
+            else _numGeneSymbolsUpdated++;
+
+            return _geneSymbols.First();
         }
 
-        private static SymbolDataSource ParseHgncFile(string hgncPath)
+        private static string ResolveGeneSymbolConflict(string oldGeneSymbol, string ensemblSymbol, string entrezGeneSymbol)
         {
-            Console.WriteLine();
-            Console.WriteLine("- loading HGNC file:");
+            var symbolCounts = new Dictionary<string, int>();
+            AddSymbol(symbolCounts, oldGeneSymbol);
+            AddSymbol(symbolCounts, ensemblSymbol);
+            AddSymbol(symbolCounts, entrezGeneSymbol);
 
-            var synonymToSymbol = new Dictionary<string, UniqueString>();
+            var mostFrequentSymbol = symbolCounts.OrderByDescending(x => x.Value).First();
+            if (mostFrequentSymbol.Value == 1) throw new InvalidDataException("Found unique gene symbols when trying to resolve the gene symbol conflict.");
 
-            int numEntries = 0;
-
-            using (var reader = new HgncReader(hgncPath))
-            {
-                while (true)
-                {
-                    var gs = reader.Next();
-                    if (gs == null) break;
-                    if (gs.IsEmpty) continue;
-
-                    numEntries++;
-
-                    AddIdToUniqueString(synonymToSymbol, gs.GeneSymbol, gs.GeneSymbol);
-                    if (gs.Synonyms.Count <= 0) continue;
-
-                    foreach (var synonym in gs.Synonyms)
-                    {
-                        AddIdToUniqueString(synonymToSymbol, synonym, gs.GeneSymbol);
-                    }
-                }
-            }
-
-            Console.WriteLine($"  - {numEntries} entries loaded.");
-
-            Console.WriteLine($"  - synonym -> symbol: {synonymToSymbol.Count} ({GetNonConflictCount(synonymToSymbol)})");
-
-            return new SymbolDataSource(synonymToSymbol);
+            return mostFrequentSymbol.Key;
         }
 
-        private static SymbolDataSource ParseGeneInfoFiles(List<string> geneInfoPaths)
+        private static void AddSymbol(IDictionary<string, int> symbolCounts, string geneSymbol)
         {
-            Console.WriteLine("- loading gene_info files:");
-
-            var synonymToSymbol = new Dictionary<string, UniqueString>();
-
-            foreach (var geneInfoPath in geneInfoPaths)
-            {
-                Console.Write("  - {0}... ", Path.GetFileName(geneInfoPath));
-                int numEntries = 0;
-
-                using (var reader = new GeneInfoReader(geneInfoPath))
-                {
-                    while (true)
-                    {
-                        var gs = reader.Next();
-                        if (gs == null) break;
-                        if (gs.IsEmpty) continue;
-
-                        numEntries++;
-
-                        AddIdToUniqueString(synonymToSymbol, gs.GeneSymbol, gs.GeneSymbol);
-                        if (gs.Synonyms.Count <= 0) continue;
-
-                        foreach (var synonym in gs.Synonyms)
-                        {
-                            AddIdToUniqueString(synonymToSymbol, synonym, gs.GeneSymbol);
-                        }
-                    }
-                }
-
-                Console.WriteLine($"{numEntries} entries loaded.");
-            }
-
-            Console.WriteLine($"  - synonym -> symbol: {synonymToSymbol.Count} ({GetNonConflictCount(synonymToSymbol)})");
-
-            return new SymbolDataSource(synonymToSymbol);
+            if (symbolCounts.TryGetValue(geneSymbol, out int counts)) symbolCounts[geneSymbol] = counts + 1;
+            else symbolCounts[geneSymbol] = 1;
         }
 
-        private static int GetNonConflictCount(Dictionary<string, UniqueString> dict)
+        private static string GetSymbol(string geneId, IReadOnlyDictionary<string, string> geneIdToSymbol)
         {
-            return dict.Values.Count(x => !x.HasConflict);
+            if (geneId == null) return null;
+            return geneIdToSymbol.TryGetValue(geneId, out var symbol) ? symbol : null;
         }
 
-        private static void AddIdToUniqueString(Dictionary<string, UniqueString> idToUniqueString, string id, string newValue)
+        public void DisplayStatistics()
         {
-            if (idToUniqueString.TryGetValue(id, out var oldValue))
-            {
-                if (oldValue.Value != newValue) oldValue.HasConflict = true;
-            }
-            else
-            {
-                idToUniqueString[id] = new UniqueString { Value = newValue };
-            }
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Gene Symbol Update Statistics");
+            Console.ResetColor();
+
+            Console.WriteLine("============================================");
+            Console.WriteLine($"# of gene symbols already up-to-date: {_numGeneSymbolsUpToDate:N0}");
+            Console.WriteLine($"# of gene symbols updated:            {_numGeneSymbolsUpdated:N0}");
+            Console.WriteLine($"# of genes where both IDs are null:   {_numGenesWhereBothIdsAreNull:N0}");
+            Console.WriteLine($"# of gene symbols not in cache:       {_numGeneSymbolsNotInCache:N0}");
+            Console.WriteLine($"# of resolved gene symbol conflicts:  {_numResolvedGeneSymbolConflicts:N0}");
         }
     }
 }

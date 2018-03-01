@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using VariantAnnotation.GeneAnnotation;
 using System.Linq;
 using Compression.Utilities;
@@ -13,65 +11,83 @@ namespace SAUtils.CreateOmimTsv
     public sealed class OmimTsvCreator
     {
         private const string JsonKeyName = "omim";
-        private readonly FileInfo _geneMap2File;
-        private readonly FileInfo _mim2Genefile;
+
+        private readonly string _geneMap2Path;
+        private readonly string _mim2GenePath;
         private readonly GeneSymbolUpdater _geneSymbolUpdater;
-        private readonly SortedList<string, List<OmimEntry>> _gene2Mims;
         private readonly string _outputDirectory;
 
-        public OmimTsvCreator(FileInfo geneMap2File, FileInfo mim2Genefile,  GeneSymbolUpdater geneSymbolUpdater, string outputDirectory)
+        public OmimTsvCreator(string geneMap2Path, string mim2GenePath, GeneSymbolUpdater geneSymbolUpdater,
+            string outputDirectory)
         {
-            _geneMap2File = geneMap2File;
-            _mim2Genefile = mim2Genefile;
-
+            _geneMap2Path      = geneMap2Path;
+            _mim2GenePath      = mim2GenePath;
             _geneSymbolUpdater = geneSymbolUpdater;
-            _outputDirectory = outputDirectory;
-            _gene2Mims = new SortedList<string, List<OmimEntry>>();
+            _outputDirectory   = outputDirectory;            
         }
 
         public ExitCodes Create()
         {
-            var geneMap2Reader = new OmimReader(GZipUtilities.GetAppropriateReadStream(_geneMap2File.FullName), _geneSymbolUpdater);
-            var mimToGeneReader = _mim2Genefile != null? new OmimReader(GZipUtilities.GetAppropriateReadStream(_mim2Genefile.FullName), _geneSymbolUpdater):null;
+            var mimIdToEntry = new Dictionary<int, OmimImportEntry>();
+            AddOmimEntries(mimIdToEntry, _geneMap2Path);
+            AddOmimEntries(mimIdToEntry, _mim2GenePath);
 
-            foreach(var entry in geneMap2Reader.GetOmimItems())
-            {
-                if (!_gene2Mims.ContainsKey(entry.Hgnc))
-                    _gene2Mims[entry.Hgnc] = new List<OmimEntry>();
+            UpdateGeneSymbols(mimIdToEntry);
 
-                _gene2Mims[entry.Hgnc].Add(entry);
-            }
-
-            if (mimToGeneReader != null)
-            {
-                foreach (var entry in mimToGeneReader.GetOmimItems())
-                {
-                    if (!_gene2Mims.ContainsKey(entry.Hgnc))
-                    {
-                        _gene2Mims[entry.Hgnc] = new List<OmimEntry> { entry };
-                        continue;
-                    }
-                    if (_gene2Mims[entry.Hgnc].Select(x => x.MimNumber).Contains(entry.MimNumber)) continue;
-
-                    throw new Exception($"{entry.Hgnc} exist in geneMap2.txt but {entry.MimNumber} not exist");
-                }
-
-            }
-
-
-            var dataSourceVersion = DataSourceVersionReader.GetSourceVersion(_geneMap2File.FullName + ".version");
-            Console.WriteLine(dataSourceVersion.ToString());
+            var geneToOmimEntries = GetGeneToOmimEntries(mimIdToEntry);
+            var dataSourceVersion = DataSourceVersionReader.GetSourceVersion(_geneMap2Path + ".version");
 
             using (var omimWriter = new GeneAnnotationTsvWriter(_outputDirectory, dataSourceVersion, null, 0, JsonKeyName, true))
             {
-                foreach (var kvp in _gene2Mims)
-                {           
-                    omimWriter.AddEntry(kvp.Key, kvp.Value.Select(x=>x.ToString()).ToList());
+                foreach (var kvp in geneToOmimEntries.OrderBy(x => x.Key))
+                {
+                    omimWriter.AddEntry(kvp.Key,
+                        kvp.Value.OrderBy(x => x.MimNumber).Select(x => x.ToString()).ToList());
                 }
             }
 
+            _geneSymbolUpdater.DisplayStatistics();
+
             return ExitCodes.Success;
         }
-        
+
+        private Dictionary<string, List<OmimEntry>> GetGeneToOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry)
+        {
+            var geneToOmimEntries = new Dictionary<string, List<OmimEntry>>();
+
+            foreach (var entry in mimIdToEntry.Values)
+            {
+                if (entry.GeneSymbol == null) continue;
+                var omimEntry = entry.ToOmimEntry();
+
+                if (geneToOmimEntries.TryGetValue(entry.GeneSymbol, out var mimList))
+                {
+                    mimList.Add(omimEntry);
+                }
+                else
+                {
+                    geneToOmimEntries[entry.GeneSymbol] = new List<OmimEntry> { omimEntry };
+                }
+            }
+
+            return geneToOmimEntries;
+        }
+
+        private void UpdateGeneSymbols(Dictionary<int, OmimImportEntry> mimIdToEntry)
+        {
+            foreach (var entry in mimIdToEntry.Values)
+            {
+                entry.GeneSymbol = _geneSymbolUpdater.UpdateGeneSymbol(entry.GeneSymbol, entry.EnsemblGeneId, entry.EntrezGeneId);
+            }
+        }
+
+        private void AddOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry, string omimPath)
+        {
+            using (var stream = GZipUtilities.GetAppropriateReadStream(omimPath))
+            using (var reader = new OmimReader(stream))
+            {
+                reader.AddOmimEntries(mimIdToEntry);
+            }
+        }
     }
 }
