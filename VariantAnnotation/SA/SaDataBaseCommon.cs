@@ -5,7 +5,7 @@
         public const uint GuardInt = 4041327495;
 
         public const string DataHeader = "NirvanaData";
-        public const ushort DataVersion = 42;
+        public const ushort DataVersion = 43;
         public const ushort SchemaVersion = 21;
 
         public const double RefMinorThreshold = 0.95;
