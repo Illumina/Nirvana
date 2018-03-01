@@ -72,68 +72,6 @@ namespace UnitTests.Vcf
         }
 
 	    [Fact]
-	    public void GetSampleCopyNumber_from_sample()
-	    {
-		    const string vcfLine =
-			    @"1	723707	.	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225	RC:BC:CN:MCC	.	129:3123:3:2";
-
-			var samples = new SampleFieldExtractor(vcfLine.Split('\t')).ExtractSamples();
-
-		    var sampleCopyNumber = Position.GetSampleCopyNumbers(samples);
-
-			Assert.Equal(3, sampleCopyNumber);
-	    }
-
-	    [Fact]
-	    public void CopyNumber_from_info_overrides_sample()
-	    {
-		    const string vcfLine =
-			    @"1	723707	.	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225;CN=4	RC:BC:CN:MCC	.	129:3123:3:2";
-
-		    var vcfColumns = vcfLine.Split('\t');
-
-			var infoData = VcfInfoParser.Parse(vcfColumns[VcfCommon.InfoIndex]);
-			var samples = new SampleFieldExtractor(vcfColumns).ExtractSamples();
-
-		    var sampleCopyNumber = Position.GetSampleCopyNumbers(samples);
-
-		    var chromosome1 = new Chromosome("chr1", "1", 0);
-		    var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, null, false);
-
-		    var variants = variantFactory.CreateVariants(chromosome1, null, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, sampleCopyNumber, new[]{false}, false);
-		    Assert.NotNull(variants);
-		    Assert.Null(variants[0].BreakEnds);
-
-		    Assert.Equal("1:723708:2581225:4", variants[0].VariantId);
-		    Assert.Equal(VariantType.copy_number_gain, variants[0].Type);
-
-	    }
-
-		[Fact]
-	    public void UpdateCnvInfo_regular_chrY()
-	    {
-		    const string vcfLine =
-			    @"Y	723707	.	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225	RC:BC:CN:MCC	.	129:3123:3:2";
-
-		    var vcfColumns = vcfLine.Split('\t');
-
-		    var infoData = VcfInfoParser.Parse(vcfColumns[VcfCommon.InfoIndex]);
-		    var samples = new SampleFieldExtractor(vcfColumns).ExtractSamples();
-
-		    var sampleCopyNumber = Position.GetSampleCopyNumbers(samples);
-		    var chromosome1 = new Chromosome("chr1", "1", 0);
-		    var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, null, false);
-
-			var variants = variantFactory.CreateVariants(chromosome1, null, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, sampleCopyNumber, new[]{ false}, false);
-
-		    Assert.NotNull(variants);
-		    Assert.Null(variants[0].BreakEnds);
-
-		    Assert.Equal("1:723708:2581225:3", variants[0].VariantId);
-		    Assert.Equal(VariantType.copy_number_gain, variants[0].Type);
-		}
-
-		[Fact]
         public void Sample_names_are_reported()
         {
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };

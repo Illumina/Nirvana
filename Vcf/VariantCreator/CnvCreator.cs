@@ -10,7 +10,7 @@ namespace Vcf.VariantCreator
 	    private const string CnvTag = "<CNV>";
 
 		private static readonly AnnotationBehavior VerbosedCnvBehavior = new AnnotationBehavior(false, true, true, false, true, true, true);
-		public static IVariant Create(IChromosome chromosome, string id, int start, string refAllele, string altAllele, IInfoData infoData, int? sampleCopyNumber, bool enableVerboseTranscript)
+		public static IVariant Create(IChromosome chromosome, string id, int start, string refAllele, string altAllele, IInfoData infoData, bool enableVerboseTranscript)
 		{
 			start++;
             // CNV caller's can use <DUP> to indicate a copy number increase where the exact copy number is unknown
@@ -21,22 +21,22 @@ namespace Vcf.VariantCreator
                 return new Variant(chromosome, start, dupEnd, refAllele, altAllele, VariantType.copy_number_gain, dupVid, false, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
             }
 
-		    var copyNumber = GetCopyNumber(altAllele, infoData, sampleCopyNumber);
+		    var copyNumber = GetCopyNumber(altAllele);
 
-		    var svType     = EvaluateCopyNumberType(copyNumber, id, chromosome.UcscName);
+		    var svType     = GetType(copyNumber);
 			var end        = infoData.End??start;
 			var vid        = GetVid(chromosome.EnsemblName, start, end, copyNumber);
 
 			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
 		}
 
-	    private static int? GetCopyNumber(string altAllele, IInfoData infoData, int? sampleCopyNumber)
+	    private static int? GetCopyNumber(string altAllele)
 	    {
 	        int? copyNumber;
 	        //if info copy number is null, check the sample copy number
 	        if (altAllele == CnvTag)
 	        {
-	            copyNumber = infoData.CopyNumber ?? sampleCopyNumber;
+	            copyNumber = null;
 	        }
 	        else
 	        {
@@ -47,11 +47,11 @@ namespace Vcf.VariantCreator
 	    }
 
 	    private static string GetVid(string ensemblName, int start, int end, int? copyNumber)
-		{
-			return $"{ensemblName}:{start}:{end}:{copyNumber}";
-		}
+	    {
+	        return copyNumber==null ? $"{ensemblName}:{start}:{end}:CNV" : $"{ensemblName}:{start}:{end}:{copyNumber}";
+	    }
 
-		private static VariantType EvaluateCopyNumberType(int? copyNumber, string id, string ucscName)
+		private static VariantType GetType(int? copyNumber)
 		{
 			if (copyNumber == null || copyNumber==1) return VariantType.copy_number_variation;
 

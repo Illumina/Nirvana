@@ -46,13 +46,13 @@ namespace Vcf.VariantCreator
             return altAllele.StartsWith("<") && altAllele.EndsWith(">") && !VcfCommon.NonInformativeAltAllele.Contains(altAllele);
         }
 
-        public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, int? sampleCopyNumber, bool[] isDecomposed, bool isRecomposed)
+        public IVariant[] CreateVariants(IChromosome chromosome, string id, int start, int end, string refAllele, string[] altAlleles, IInfoData infoData, bool[] isDecomposed, bool isRecomposed)
         {
             var isReference      = altAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(altAlleles[0]);
             var isSymbolicAllele = altAlleles.Any(IsSymbolicAllele);
             var variantCategory  = GetVariantCategory(altAlleles, isReference, isSymbolicAllele, infoData.SvType);
 
-            if (isReference) return new[] { GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, sampleCopyNumber, isDecomposed[0], isRecomposed) };
+            if (isReference) return new[] { GetVariant(chromosome, id, start, end, refAllele, altAlleles[0], infoData, variantCategory, isDecomposed[0], isRecomposed) };
 
             var variants = new List<IVariant>();
 
@@ -62,13 +62,13 @@ namespace Vcf.VariantCreator
                 string altAllele = altAlleles[i];
                 bool isDecomposedVar = isDecomposed[i];
                 if (VcfCommon.NonInformativeAltAllele.Contains(altAllele)) continue;
-                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAllele, infoData, variantCategory, sampleCopyNumber, isDecomposedVar, isRecomposed));
+                variants.Add(GetVariant(chromosome, id, start, end, refAllele, altAllele, infoData, variantCategory, isDecomposedVar, isRecomposed));
             }
 
             return variants.Count == 0 ? null : variants.ToArray();
         }
 
-        private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, int? sampleCopyNumber, bool isDecomposedVar, bool isRecomposed)
+        private IVariant GetVariant(IChromosome chromosome, string id, int start, int end, string refAllele, string altAllele, IInfoData infoData, VariantCategory category, bool isDecomposedVar, bool isRecomposed)
         {
             switch (category)
             {
@@ -83,7 +83,7 @@ namespace Vcf.VariantCreator
                         : GetSvBreakEnds(chromosome.EnsemblName, start, infoData.SvType, infoData.End, infoData.IsInv3, infoData.IsInv5);
                     return StructuralVariantCreator.Create(chromosome, start, refAllele, altAllele, svBreakEnds, infoData, _enableVerboseTranscript);
                 case VariantCategory.CNV:
-                    return CnvCreator.Create(chromosome, id, start, refAllele, altAllele, infoData, sampleCopyNumber, _enableVerboseTranscript);
+                    return CnvCreator.Create(chromosome, id, start, refAllele, altAllele, infoData, _enableVerboseTranscript);
                 case VariantCategory.RepeatExpansion:
                     return RepeatExpansionCreator.Create(chromosome, start, refAllele, altAllele, infoData);
                 default:

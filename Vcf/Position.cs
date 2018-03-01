@@ -56,9 +56,7 @@ namespace Vcf
             string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
             var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 
-            var sampleCopyNumber = GetSampleCopyNumbers(samples);
-
-            var variants = variantFactory.CreateVariants(simplePosition.Chromosome, id, simplePosition.Start, end, simplePosition.RefAllele, altAlleles, infoData, sampleCopyNumber, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
+            var variants = variantFactory.CreateVariants(simplePosition.Chromosome, id, simplePosition.Start, end, simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
 
             return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele, altAlleles, quality, filters, variants, samples,
                 infoData, vcfFields, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
@@ -70,17 +68,6 @@ namespace Vcf
             return start + refAlleleLength - 1;
         }
 
-        internal static int? GetSampleCopyNumbers(ISample[] samples)
-        {
-            if (samples == null) return null;
-            int? copyNumber = null;
-
-            foreach (var sample in samples)
-            {
-                if (sample.CopyNumber != null) copyNumber = sample.CopyNumber;
-            }
-
-            return copyNumber;
-        }
+        
     }
 }
