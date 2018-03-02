@@ -28,7 +28,8 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             "##INFO=<ID=clinvar,Number=.,Type=String,Description=\"Clinical significance. Format: GenotypeIndex|Significance\">",
             "##INFO=<ID=EVS,Number=A,Type=String,Description=\"Allele frequency, coverage and sample count taken from the Exome Variant Server (EVS). Format: AlleleFreqEVS|EVSCoverage|EVSSamples.\">",
             "##INFO=<ID=RefMinor,Number=0,Type=Flag,Description=\"Denotes positions where the reference base is a minor allele and is annotated as though it were a variant\">",
-            "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">"
+            "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">",
+            "##INFO=<ID=RECOMPOSED,Number=1,Type=String,Description=\"The position is recomposed\">"
         };
             
 
@@ -89,7 +90,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                     Assert.Equal(expectedLines[i],line);
                     i++;
                 }
-                Assert.Equal(20,i);
+                Assert.Equal(21,i);
             }
         }
     }
