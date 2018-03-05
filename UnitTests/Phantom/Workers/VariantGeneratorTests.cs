@@ -39,7 +39,7 @@ namespace UnitTests.Phantom.Workers
 
 
         [Fact]
-        public void VariantGenerator_Test()
+        public void VariantGenerator_AsExpected()
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
@@ -59,5 +59,68 @@ namespace UnitTests.Phantom.Workers
             Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT	.	.	1|2", string.Join("\t", recomposedPositions[0].VcfFields));
             Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT	.	1|2	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
+
+        [Fact]
+        public void VariantGenerator_NoMnvAfterTrimming_NotRecompose()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	1	.	C	A	.	PASS	.	GT:PS	1|0:1584593	1|1:.	0|1:.", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	2	.	A	C	.	PASS	.	GT:PS	0|1:1584593	0/0:.	0/0:.", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 3, 4};
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2 }, functionBlockRanges).ToList();
+
+            Assert.Empty(recomposedPositions);
+        }
+
+        [Fact]
+        public void VariantGenerator_OverlappingDeletionInTheMiddle_Ignored()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	0/0", sequenceProvider.RefNameToChromosome);
+
+            var functionBlockRanges = new List<int> { 4, 6, 6 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Single(recomposedPositions);
+            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT	1|2	.", string.Join("\t", recomposedPositions[0].VcfFields));
+        }
+
+        [Fact]
+        public void VariantGenerator_OverlappingDeletionAtTheEnd_Ignored()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 4, 6, 6 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Single(recomposedPositions);
+            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT	1|2	.", string.Join("\t", recomposedPositions[0].VcfFields));
+        }
+
     }
 }

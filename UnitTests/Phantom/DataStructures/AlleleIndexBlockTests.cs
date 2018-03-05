@@ -113,6 +113,7 @@ namespace UnitTests.Phantom.DataStructures
             var genotypes1 = new[] { "1|0", "0|1", "1|0", "0|1" };
             var genotypes2 = new[] { "1/1", "0|1", "1|0" };
             var genotypes3 = new[] { "0|0", "1|0", "0|1", "0|0" };
+            var genotypes4 = new[] { "0|1", "1|0", "1|0"};
             var starts = new[] { 100, 101, 102, 104 };
             var functionBlockRanges = starts.Select(x => x + 2).ToList();
 
@@ -121,7 +122,8 @@ namespace UnitTests.Phantom.DataStructures
                 {
                     {(string.Join(";", genotypes1), 0), new List<int> {0}},
                     {(string.Join(";", genotypes2), 1), new List<int> {1}},
-                    {(string.Join(";", genotypes3), 0), new List<int> {2}}
+                    {(string.Join(";", genotypes3), 0), new List<int> {2}},
+                    {(string.Join(";", genotypes4), 0), new List<int> {3}}
                 };
             var indexOfUnsupportedVars = Enumerable.Repeat(new HashSet<string>(), genotypes1.Length).ToArray();
 
@@ -131,6 +133,7 @@ namespace UnitTests.Phantom.DataStructures
             var expectedBlock2 = new AlleleIndexBlock(0, new List<int> { 0, 1, 0 });
             var expectedBlock3 = new AlleleIndexBlock(1, new List<int> { 1, 0 });
             var expectedBlock4 = new AlleleIndexBlock(1, new List<int> { 1, 1 });
+            var expectedBlock5 = new AlleleIndexBlock(1, new List<int> { 0, 0 });
 
             Assert.True(alleleIndexBlocksToSample.ContainsKey(expectedBlock1));
             Assert.True(alleleIndexBlocksToSample[expectedBlock1].SequenceEqual(new[] { new SampleAllele(0, 0) }));
@@ -139,7 +142,9 @@ namespace UnitTests.Phantom.DataStructures
             Assert.True(alleleIndexBlocksToSample.ContainsKey(expectedBlock3));
             Assert.True(alleleIndexBlocksToSample[expectedBlock3].SequenceEqual(new[] { new SampleAllele(1, 0) }));
             Assert.True(alleleIndexBlocksToSample.ContainsKey(expectedBlock4));
-            Assert.True(alleleIndexBlocksToSample[expectedBlock4].SequenceEqual(new[] { new SampleAllele(1, 1) }));
+            Assert.True(alleleIndexBlocksToSample[expectedBlock4].SequenceEqual(new[] { new SampleAllele(1, 1) , new SampleAllele(3, 0) }));
+            Assert.True(alleleIndexBlocksToSample.ContainsKey(expectedBlock5));
+            Assert.True(alleleIndexBlocksToSample[expectedBlock5].SequenceEqual(new[] { new SampleAllele(3, 1) }));
         }
     }
 }

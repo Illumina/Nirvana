@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Phantom.DataStructures;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.Positions;
@@ -28,9 +26,9 @@ namespace Phantom.Workers
             _sequenceProvider.LoadChromosome(alleleSet.Chromosome);
             int regionStart = alleleSet.Starts[0];
             string lastRefAllele = alleleSet.VariantArrays.Last()[0];
-            int regionEnd = alleleSet.Starts.Last() + lastRefAllele.Length - 1;
-            int totalSequenceEnd = regionEnd + 100; // make this sequence long enough
-            string totalRefSequence = totalSequenceEnd > _sequenceProvider.Sequence.Length ? _sequenceProvider.Sequence.Substring(regionStart - 1, _sequenceProvider.Sequence.Length - regionStart) : _sequenceProvider.Sequence.Substring(regionStart - 1, totalSequenceEnd - regionStart); // VCF positions are 1-based
+            int regionEnd = alleleSet.Starts.Last() + lastRefAllele.Length + 100; // make it long enough
+            if (regionEnd > _sequenceProvider.Sequence.Length) regionEnd = _sequenceProvider.Sequence.Length;
+            string totalRefSequence = _sequenceProvider.Sequence.Substring(regionStart - 1, regionEnd - regionStart); // VCF positions are 1-based
             var recomposedAlleleSet = new RecomposedAlleleSet(positionSet.ChrName, numSamples);
             var decomposedPosVarIndex = new HashSet<(int PosIndex, int VarIndex)>();
             foreach (var alleleIndexBlock in alleleIndexBlockToSampleIndex.Keys)
@@ -57,54 +55,28 @@ namespace Phantom.Workers
             string lastRefAllele = alleleSet.VariantArrays[lastPositionIndex][0];
             int blockRefLength = blockEnd - blockStart + lastRefAllele.Length;
             var refSequence = totalRefSequence.Substring(blockStart - regionStart, blockRefLength);
-            var altSequenceBuilder = new StringBuilder();
-            var refRegionBetweenVariants = (Start: int.MaxValue, Length: -1); // region of the ref sequence between alt alleles
+            int refSequenceStart = 0;
+            var altSequenceSegsegments = new LinkedList<string>();
             for (int positionIndex = firstPositionIndex; positionIndex <= lastPositionIndex; positionIndex++)
             {
-
-                refRegionBetweenVariants.Length = alleleSet.Starts[positionIndex] - refRegionBetweenVariants.Start;
-                if (refRegionBetweenVariants.Length > 0)
-                {
-                    string refSeqBetweenPositions = refSequence.Substring(refRegionBetweenVariants.Start - blockStart,
-                        refRegionBetweenVariants.Length);
-                    altSequenceBuilder.Append(refSeqBetweenPositions);
-                }
-                string refAllele = alleleSet.VariantArrays[positionIndex][0];
-                refRegionBetweenVariants.Start = alleleSet.Starts[positionIndex] + refAllele.Length;
                 int indexInBlock = positionIndex - firstPositionIndex;
                 int alleleIndex = alleleIndexBlock.AlleleIndexes[indexInBlock];
-                string altAllele = alleleSet.VariantArrays[positionIndex][alleleIndex];
-
-                // non-ref variant is preferred in case there are conflicting genotype information
-                bool ignoreThisPosition = false;
-                if (positionIndex != firstPositionIndex &&
-                    alleleSet.Starts[positionIndex] == alleleSet.Starts[positionIndex - 1] &&
-                    alleleIndexBlock.AlleleIndexes[indexInBlock - 1] != 0) // don't append alt sequence if previous allele is already non-ref
-                {
-                    ignoreThisPosition = true;
-                    if (alleleIndex != 0)  // if both variants are non-ref, use the first one, but a warning would be given.
-                    {
-                        Console.WriteLine($"Warning: Conflictual altnative alleles at {alleleSet.Chromosome.UcscName} position {alleleSet.Starts[positionIndex]}: {alleleSet.VariantArrays[positionIndex - 1][alleleIndexBlock.AlleleIndexes[indexInBlock - 1]]} and {altAllele}");
-                    }
-                }
+                if (alleleIndex == 0) continue;
 
                 //only mark positions with non-reference alleles being recomposed as "decomposed"
                 // alleleIndex is 1-based for altAlleles
-                if (alleleIndex != 0 && !ignoreThisPosition) decomposedPosVarIndex.Add((positionIndex, alleleIndex - 1));
-
-                //trim the reference sequence if it overlapps with next variant
-                if (positionIndex != lastPositionIndex && alleleSet.Starts[positionIndex + 1] < refRegionBetweenVariants.Start)
-                {
-                    refRegionBetweenVariants.Start = alleleSet.Starts[positionIndex + 1];
-                    if (alleleIndex == 0 && !ignoreThisPosition)
-                    {
-                        altAllele = altAllele.Substring(0, alleleSet.Starts[positionIndex + 1] - alleleSet.Starts[positionIndex]);
-                    }
-                }
-
-                if (!ignoreThisPosition) altSequenceBuilder.Append(altAllele);
+                decomposedPosVarIndex.Add((positionIndex, alleleIndex - 1));
+                string refAllele = alleleSet.VariantArrays[positionIndex][0];
+                string altAllele = alleleSet.VariantArrays[positionIndex][alleleIndex];
+                int positionOnRefSequence = alleleSet.Starts[positionIndex] - blockStart;
+                string refSequenceBefore =
+                    refSequence.Substring(refSequenceStart, positionOnRefSequence - refSequenceStart);
+                altSequenceSegsegments.AddLast(refSequenceBefore);
+                altSequenceSegsegments.AddLast(altAllele);
+                refSequenceStart = positionOnRefSequence + refAllele.Length;
             }
-            return (blockStart, blockStart + blockRefLength - 1, refSequence, altSequenceBuilder.ToString());
+            altSequenceSegsegments.AddLast(refSequence.Substring(refSequenceStart));
+            return (blockStart, blockStart + blockRefLength - 1, refSequence, string.Concat(altSequenceSegsegments));
         }
     }
 
@@ -143,7 +115,6 @@ namespace Phantom.Workers
         public List<string[]> GetRecomposedVcfRecords()
         {
             var vcfRecords = new List<string[]>();
-            // todo: warning: nested for loop 
             foreach (int start in _recomposedAlleles.Keys.OrderBy(x => x))
             {
                 foreach (var refAllele in _recomposedAlleles[start].Keys.OrderBy(x => x))

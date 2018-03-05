@@ -272,9 +272,9 @@ namespace Phantom.DataStructures
                     if (subBlockSize > 1)
                     {
                         subGenotypeBlocks.Add(GetSubBlock(subBlockStart, subBlockEnd));
-                        subBlockStart = i + 1;
-                        subBlockEnd = i + 1;
                     }
+                    subBlockStart = i + 1;
+                    subBlockEnd = i + 1;
                 }
             }
             if (subBlockEnd - subBlockStart >= 1) subGenotypeBlocks.Add(GetSubBlock(subBlockStart, subBlockEnd));
