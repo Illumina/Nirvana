@@ -47,8 +47,9 @@ namespace SAUtils.DataStructures
         {
             Chromosome = ChromM;
             Start = posi;
-            ReferenceAllele = refAllele;
-            AlternateAllele = altAllele;
+            //converting empty alleles to '-'
+            ReferenceAllele = string.IsNullOrEmpty(refAllele) ? "-" : refAllele;
+            AlternateAllele = string.IsNullOrEmpty(altAllele) ? "-" : altAllele;
             IsInterval = isInterval;
             _diseases = diseases;
             _homoplasmy = homoplasmy;
@@ -65,12 +66,8 @@ namespace SAUtils.DataStructures
             var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
-            //converting empty alleles to '-'
-            var refAllele = string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele;
-            var altAllele = string.IsNullOrEmpty(AlternateAllele) ? "-" : AlternateAllele;
-
-            jsonObject.AddStringValue("refAllele", refAllele);
-            jsonObject.AddStringValue("altAllele", altAllele);
+            jsonObject.AddStringValue("refAllele", ReferenceAllele);
+            jsonObject.AddStringValue("altAllele", AlternateAllele);
             if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("diseases", _diseases.Distinct().ToList());
             if (_homoplasmy.HasValue) jsonObject.AddBoolValue("hasHomoplasmy", _homoplasmy.Value, true); 
             if (_heteroplasmy.HasValue) jsonObject.AddBoolValue("hasHeteroplasmy", _heteroplasmy.Value, true);  
