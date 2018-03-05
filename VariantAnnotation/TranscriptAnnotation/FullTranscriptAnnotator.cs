@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;
@@ -20,6 +21,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var rightShifted = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
 
+            
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
             var rightAnnotation = ReferenceEquals(leftShiftedVariant, rightShifted.Variant)
@@ -28,9 +30,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
 
-            var hgvsCoding = rightShifted.ShiftToEnd
-                ? null
-                : HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShifted.Variant, refSequence,
+            var hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShifted.Variant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
 
             var hgvsProtein = HgvsProteinNomenclature.GetHgvsProteinAnnotation(transcript,

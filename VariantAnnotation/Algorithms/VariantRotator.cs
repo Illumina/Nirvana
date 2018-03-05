@@ -32,7 +32,7 @@ namespace VariantAnnotation.Algorithms
             rotatingBases     = onReverseStrand ? SequenceUtilities.GetReverseComplement(rotatingBases) : rotatingBases;
 
             var basesToEnd       = onReverseStrand ? simpleVariant.Start - rotateRegion.Start : rotateRegion.End - simpleVariant.End;
-            var downStreamLength = Math.Max(rotatingBases.Length, Math.Min(basesToEnd, MaxDownstreamLength));// for large rotatingBases, we need to factor in its length.
+            var downStreamLength = Math.Min(basesToEnd, Math.Max(rotatingBases.Length, MaxDownstreamLength));// for large rotatingBases, we need to factor in its length but still make sure that we do not go past the end of transcript
 
             var downStreamSeq = onReverseStrand
                 ? SequenceUtilities.GetReverseComplement(

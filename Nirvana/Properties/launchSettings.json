@@ -35,7 +35,6 @@
       "commandLineArgs": "-c Cache\\25\\GRCh37\\Ensembl90 -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother --sd SupplementaryDatabase\\41\\GRCh37",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-
     "SK Nirvana": {
       "commandName": "Project",
       "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\MS_data\\NA12878_AH72T3CCXX-l2_S1.genome.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh38\\Both90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o NIR_NA12878 ",
@@ -50,6 +49,21 @@
       "commandName": "Project",
       "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree_bugfix.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf -o Pedigree_bugfix",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom"
+    },
+    "RR_clinvar": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\43\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar --disable-recomposition",
+      "workingDirectory": "c:\\Development\\TestDatasets"
+    },
+    "RR_dq": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh38\\Both --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --disable-recomposition --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq22",
+      "workingDirectory": "c:\\Development\\TestDatasets"
+    },
+    "RR_platypus": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\43\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in Platypus-Platypus-unknown-short-hg19.vcf.gz --out platypus --disable-recomposition",
+      "workingDirectory": "c:\\Development\\TestDatasets"
     }
   }
 }
