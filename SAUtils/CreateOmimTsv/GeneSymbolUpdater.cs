@@ -65,7 +65,7 @@ namespace SAUtils.CreateOmimTsv
                 _numGeneSymbolsUpdated++;
             }
 
-            return _geneSymbols.First();
+            return newGeneSymbol;
         }
 
         private static string ResolveGeneSymbolConflict(string oldGeneSymbol, string ensemblSymbol, string entrezGeneSymbol)

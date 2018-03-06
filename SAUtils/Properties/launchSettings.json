@@ -19,6 +19,11 @@
       "commandName": "Project",
       "commandLineArgs": "createTSV --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsRNA --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsCodingControl --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsCoding --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsControl  --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\InsertionsSimple --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\DeletionsSingle  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_MitoMap\\"
+    },
+    "RR_omim": {
+      "commandName": "Project",
+      "commandLineArgs": " createomimtsv --in ExternalDataSources\\OMIM\\20180213\\genemap2.txt --mim ExternalDataSources\\OMIM\\20180213\\mim2gene.txt --uga Cache\\26\\UGA.tsv.gz --ref References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out SupplementaryDatabase\\test",
+      "workingDirectory": "c:\\Development"
     }
   }
 }
