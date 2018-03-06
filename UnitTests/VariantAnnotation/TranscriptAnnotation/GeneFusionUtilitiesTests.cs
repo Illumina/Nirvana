@@ -39,7 +39,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript.SetupGet(x => x.Chromosome).Returns(chromosome);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             transcript.SetupGet(x => x.Gene.Symbol).Returns("PDE4DIP");
-            transcript.SetupGet(x => x.Translation.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 144890975, 144904679, 1, 287));
+            transcript.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(144890975, 144904679, 1, 287, 287));
             transcript.SetupGet(x => x.Start).Returns(144890592);
             transcript.SetupGet(x => x.End).Returns(144904679);
             transcript.SetupGet(x => x.Source).Returns(Source.Ensembl);
@@ -50,7 +50,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript2.SetupGet(x => x.Chromosome).Returns(chromosome2);
             transcript2.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             transcript2.SetupGet(x => x.Gene.Symbol).Returns("PDE4DIP");
-            transcript2.SetupGet(x => x.Translation.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 144852458, 145039609, 394, 7116));
+            transcript2.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(144852458, 145039609, 394, 7116, 6723));
             transcript2.SetupGet(x => x.Start).Returns(144852458);
             transcript2.SetupGet(x => x.End).Returns(145039609);
             transcript2.SetupGet(x => x.Source).Returns(Source.Ensembl);
@@ -98,7 +98,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript.SetupGet(x => x.Chromosome).Returns(chromosome);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             transcript.SetupGet(x => x.Gene.Symbol).Returns("XCL2");
-            transcript.SetupGet(x => x.Translation.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 168510190, 168513202, 34, 378));
+            transcript.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(168510190, 168513202, 34, 378, 345));
             transcript.SetupGet(x => x.Start).Returns(168510003);
             transcript.SetupGet(x => x.End).Returns(168513235);
             transcript.SetupGet(x => x.Source).Returns(Source.Ensembl);
@@ -109,7 +109,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript2.SetupGet(x => x.Chromosome).Returns(chromosome);
             transcript2.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
             transcript2.SetupGet(x => x.Gene.Symbol).Returns("XCL1");
-            transcript2.SetupGet(x => x.Translation.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 168545876, 168550458, 166, 510));
+            transcript2.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(168545876, 168550458, 166, 510, 345));
             transcript2.SetupGet(x => x.Start).Returns(168545711);
             transcript2.SetupGet(x => x.End).Returns(168551315);
             transcript2.SetupGet(x => x.Source).Returns(Source.Ensembl);

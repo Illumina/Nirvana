@@ -87,7 +87,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         public static (int Start, int End) GetCoveredCdsPositions(int coveredCdnaStart, int coveredCdnaEnd,
-            byte startExonPhase, ITranscriptRegion codingRegion)
+            byte startExonPhase, ICodingRegion codingRegion)
         {
             if (codingRegion == null || 
                 coveredCdnaEnd < codingRegion.CdnaStart || 
@@ -107,7 +107,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdsPosition + 2) / 3;
         }
 
-        public static (int CdsStart, int CdsEnd) GetCdsPositions(ITranscriptRegion codingRegion, int cdnaStart,
+        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, int cdnaStart,
             int cdnaEnd, byte startExonPhase, bool isInsertion)
         {
             var cdsStart = GetCdsPosition(codingRegion, cdnaStart, startExonPhase);
@@ -123,7 +123,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdsStart, cdsEnd);
         }
 
-        private static int GetCdsPosition(ITranscriptRegion codingRegion, int cdnaPosition, byte startExonPhase)
+        private static int GetCdsPosition(ICodingRegion codingRegion, int cdnaPosition, byte startExonPhase)
         {
             if (codingRegion == null || cdnaPosition < codingRegion.CdnaStart ||
                 cdnaPosition > codingRegion.CdnaEnd) return -1;

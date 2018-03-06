@@ -35,7 +35,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 1262291, 1263143, 412, 1056));
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(1262291, 1263143, 412, 1056, 645));
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938", 4));
@@ -60,7 +60,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 138530, 139309, 71, 850));
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(138530, 139309, 71, 850, 780));
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000423372", 3));

@@ -23,7 +23,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public readonly int[] SelenocysteinePositions;
         public readonly int StartExonPhase;
         public readonly IRnaEdit[] RnaEdits;
-        public readonly ITranscriptRegion CodingRegion;
+        
         public readonly string ProteinId;
         public readonly byte ProteinVersion;
         public readonly string PeptideSequence;
@@ -39,13 +39,18 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public bool IsCanonical;
         public Gene UpdatedGene;
 
+        public int CdsLength;
+        public ITranscriptRegion[] TranscriptRegions;
+        public byte NewStartExonPhase;
+        public ICodingRegion CodingRegion;
+
         public readonly string SiftData;
         public readonly string PolyphenData;
         public int SiftIndex     = -1;
         public int PolyPhenIndex = -1;
 
         public MutableTranscript(IChromosome chromosome, int start, int end, string id, byte version, string ccdsId,
-            string refSeqId, BioType bioType, bool isCanonical, ITranscriptRegion codingRegion, string proteinId,
+            string refSeqId, BioType bioType, bool isCanonical, ICodingRegion codingRegion, string proteinId,
             byte proteinVersion, string peptideSequence, Source source, MutableGene gene, MutableExon[] exons,
             int startExonPhase, int totalExonLength, IInterval[] introns, MutableTranscriptRegion[] cdnaMaps,
             string siftData, string polyphenData, string translateableSequence, IInterval[] microRnas,

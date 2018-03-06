@@ -7,14 +7,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class CodingSequence : ISequence
     {
-        private readonly ITranscriptRegion _codingRegion;
+        private readonly ICodingRegion _codingRegion;
         private readonly ITranscriptRegion[] _regions;
         private readonly bool _geneOnReverseStrand;
         private readonly byte _startExonPhase;
         private readonly ISequence _compressedSequence;
         private string _sequence;
 
-        public CodingSequence(ISequence compressedSequence, ITranscriptRegion codingRegion, ITranscriptRegion[] regions,
+        public CodingSequence(ISequence compressedSequence, ICodingRegion codingRegion, ITranscriptRegion[] regions,
             bool geneOnReverseStrand, byte startExonPhase)
         {
             _codingRegion        = codingRegion;
@@ -24,7 +24,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             _compressedSequence  = compressedSequence;
         }
 
-        private string GetCodingSequence(ISequence genomicSequence)
+        public string GetCodingSequence()
         {
             var sb = StringBuilderCache.Acquire(Length);
 
@@ -45,7 +45,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 if (_codingRegion.Start >= tempBegin && _codingRegion.Start <= tempEnd) tempBegin = _codingRegion.Start;
                 if (_codingRegion.End   >= tempBegin && _codingRegion.End   <= tempEnd) tempEnd   = _codingRegion.End;
 
-                sb.Append(genomicSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
+                sb.Append(_compressedSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
             }
 
             // account for the exon phase (reverse orientation)
@@ -55,16 +55,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return _geneOnReverseStrand ? SequenceUtilities.GetReverseComplement(s) : s;
         }
 
-        public static int GetCodingSequenceLength(ITranscriptRegion codingRegion, byte startExonPhase)
-        {
-            return codingRegion.CdnaEnd - codingRegion.CdnaStart + 1 + startExonPhase;
-        }
-
-        public int Length => GetCodingSequenceLength(_codingRegion, _startExonPhase);
+        public int Length => _codingRegion.Length;
 
         public string Substring(int offset, int length)
         {
-            if (_sequence == null) _sequence = GetCodingSequence(_compressedSequence);
+            if (_sequence == null) _sequence = GetCodingSequence();
             return _sequence.Substring(offset, length);
         }
     }

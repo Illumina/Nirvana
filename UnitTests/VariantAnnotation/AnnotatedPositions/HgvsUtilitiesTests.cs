@@ -1,11 +1,9 @@
 ﻿using Moq;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions
@@ -207,7 +205,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 108813927, 108941437, 129, 1613));
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(108813927, 108941437, 129, 1613, 1485));
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Start).Returns(108810721);
@@ -249,7 +247,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 138530, 139309, 71, 850));
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(138530, 139309, 71, 850, 780));
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Start).Returns(134901);
@@ -341,7 +339,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 138530, 139309, 71, 850));
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(138530, 139309, 71, 850, 780));
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Start).Returns(134901);

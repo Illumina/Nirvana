@@ -154,10 +154,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            int cdsLength = CodingSequence.GetCodingSequenceLength(_transcript.Translation.CodingRegion,
-                    _transcript.StartExonPhase);
-
-            int codonCdsStart = _proteinBegin * 3 - 2;
+            int cdsLength       = _transcript.Translation.CodingRegion.Length;
+            int codonCdsStart   = _proteinBegin * 3 - 2;
             int lastCodonLength = cdsLength - (codonCdsStart - 1);
 
             bool result = lastCodonLength < 3 && lastCodonLength > 0;

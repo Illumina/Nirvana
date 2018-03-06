@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
+using CacheUtils.TranscriptCache;
 using CommonUtilities;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
@@ -16,6 +18,8 @@ namespace CacheUtils.IntermediateIO
         private readonly IDictionary<ushort, IChromosome> _refIndexToChromosome;
         private readonly StreamReader _reader;
         public readonly IntermediateIoHeader Header;
+
+        private readonly ISequence _sequence = new NSequence();
 
         internal MutableTranscriptReader(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
@@ -53,13 +57,35 @@ namespace CacheUtils.IntermediateIO
             var selenocysteines = ReadSelenocysteines();
             var rnaEdits        = ReadRnaEdits();
 
-            return new MutableTranscript(transcriptInfo.Chromosome, transcriptInfo.Start, transcriptInfo.End,
+            var transcript =  new MutableTranscript(transcriptInfo.Chromosome, transcriptInfo.Start, transcriptInfo.End,
                 transcriptInfo.Id, transcriptInfo.Version, transcriptInfo.CcdsId, transcriptInfo.RefSeqId,
                 transcriptInfo.BioType, transcriptInfo.IsCanonical, translation.CodingRegion, translation.Id,
                 translation.Version, translation.PeptideSeq, transcriptInfo.Source, gene, exons,
                 transcriptInfo.StartExonPhase, transcriptInfo.TotalExonLength, introns, cdnaMaps, null, null,
                 transcriptInfo.TranslateableSequence, mirnas, transcriptInfo.CdsStartNotFound,
                 transcriptInfo.CdsEndNotFound, selenocysteines, rnaEdits, transcriptInfo.BamEditStatus);
+
+            AddMutableContents(transcript);
+
+            return transcript;
+        }
+
+        private void AddMutableContents(MutableTranscript mt)
+        {
+            mt.TranscriptRegions = TranscriptRegionMerger.GetTranscriptRegions(mt.CdnaMaps, mt.Exons, mt.Introns, mt.Gene.OnReverseStrand);
+            TranscriptRegionValidater.Validate(mt.Id, mt.CdnaMaps, mt.Exons, mt.Introns, mt.TranscriptRegions);
+
+            mt.NewStartExonPhase = mt.StartExonPhase < 0 ? (byte)0 : (byte)mt.StartExonPhase;
+
+            if (mt.CodingRegion == null) return;
+
+            var codingSequence = new CodingSequence(_sequence, mt.CodingRegion, mt.TranscriptRegions,
+                mt.Gene.OnReverseStrand, mt.NewStartExonPhase);
+
+            mt.CdsLength = codingSequence.GetCodingSequence().Length;
+
+            mt.CodingRegion = new CodingRegion(mt.CodingRegion.Start, mt.CodingRegion.End,
+                mt.CodingRegion.CdnaStart, mt.CodingRegion.CdnaEnd, mt.CdsLength);
         }
 
         private int[] ReadSelenocysteines()
@@ -160,7 +186,7 @@ namespace CacheUtils.IntermediateIO
             return exons;
         }
 
-        private (string Id, byte Version, ITranscriptRegion CodingRegion, string PeptideSeq) ReadTranslation()
+        private (string Id, byte Version, ICodingRegion CodingRegion, string PeptideSeq) ReadTranslation()
         {
             var cols = GetColumns("Translation");
 
@@ -174,7 +200,7 @@ namespace CacheUtils.IntermediateIO
 
             var codingRegion = start == -1 && end == -1
                 ? null
-                : new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, start, end, cdnaStart, cdnaEnd);
+                : new CodingRegion(start, end, cdnaStart, cdnaEnd, 0);
 
             return (id, version, codingRegion, peptideSeq);
         }

@@ -8,7 +8,7 @@
 		// increment the schema version when the file structures are updated
 		// N.B. we only need to regenerate unit tests when the schema version is incremented
 		// e.g. adding a new feature like regulatory elements
-		public const ushort SchemaVersion = 20;
+		public const ushort SchemaVersion = 21;
 
 		// increment the data version when the contents are updated
 		// e.g. a bug is fixed in SIFT parsing or if transcripts are filtered differently

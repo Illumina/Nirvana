@@ -16,7 +16,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         private readonly Mock<ITranscript> _reverseTranscript; // use info from "ENST00000385042"
         private readonly ITranscriptRegion[] _forwardTranscriptRegions;
         private readonly ITranscriptRegion[] _otherTranscriptRegions;
-        private readonly ITranslation _translation;
 
         public TranscriptPositionalEffectTests()
         {
@@ -56,8 +55,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             };
 
             var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 874655, 879533, 1, 1625));
-            _translation = translation.Object;
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(874655, 879533, 1, 1625, 1625));
 
             var gene = new Mock<IGene>();
             gene.SetupGet(x => x.OnReverseStrand).Returns(false);

@@ -89,7 +89,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, ITranscriptRegion startRegion,
             int startIndex, ITranscriptRegion endRegion, int endIndex, IInterval variant, bool onReverseStrand,
-            ITranscriptRegion codingRegion, byte startExonPhase, bool isInsertion)
+            ICodingRegion codingRegion, byte startExonPhase, bool isInsertion)
         {
             var (cdnaStart, cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(startRegion, endRegion, variant, onReverseStrand, isInsertion);
             if (onReverseStrand) Swap.Int(ref cdnaStart, ref cdnaEnd);

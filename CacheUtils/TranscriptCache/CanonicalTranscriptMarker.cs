@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Utilities;
-using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.TranscriptCache
 {
@@ -32,7 +31,7 @@ namespace CacheUtils.TranscriptCache
             {
                 string idWithVersion = transcript.Id + '.' + transcript.Version;
 
-                int cdsLength        = GetCdsLength(transcript.CodingRegion);
+                int cdsLength        = transcript.CodingRegion?.Length ?? 0;
                 int transcriptLength = transcript.End - transcript.Start + 1;
                 var isLrg            = _lrgTranscriptIds.Contains(transcript.Id);
                 int accession        = AccessionUtilities.GetAccessionNumber(transcript.Id);
@@ -64,12 +63,6 @@ namespace CacheUtils.TranscriptCache
             }
 
             return canonicalTranscripts;
-        }
-
-        private static int GetCdsLength(ITranscriptRegion codingRegion)
-        {
-            if (codingRegion == null) return 0;
-            return codingRegion.CdnaEnd - codingRegion.CdnaStart + 1;
         }
 
         private static int ConvertGeneIdToInt(string geneId)

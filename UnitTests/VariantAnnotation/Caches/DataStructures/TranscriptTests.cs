@@ -30,6 +30,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
             var expectedIdAndVersion = expectedId + "." + expectedVersion;
 
+            ICodingRegion expectedCodingRegion = new CodingRegion(10001, 10200, 1, 200, 200);
             ITranscriptRegion[] expectedTranscriptRegions = GetTranscriptRegions();
             const byte expectedNumExons = 3;
 
@@ -40,7 +41,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
             IInterval[] expectedMicroRnas = GetMicroRnas();
 
-            ITranslation expectedTranslation = new Translation(expectedTranscriptRegions[0], CompactId.Convert("ENSP00000446475", 17), "VEIDSD");
+            ITranslation expectedTranslation = new Translation(expectedCodingRegion, CompactId.Convert("ENSP00000446475", 17), "VEIDSD");
 
             IGene expectedGene = new Gene(expectedChromosome, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
                 CompactId.Convert("ENSG00000141510"));

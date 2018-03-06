@@ -198,7 +198,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void GetCdsPosition_Forward_Insertion()
         {
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 78001559, 78024355, 262, 495);
+            var codingRegion = new CodingRegion(78001559, 78024355, 262, 495, 234);
             const byte startExonPhase = 0;
 
             var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 486, 485, startExonPhase, true);
@@ -210,7 +210,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void GetCdsPosition_Forward_Insertion_WithStartExonPhase()
         {
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 6413107, 6415837, 1, 953);
+            var codingRegion = new CodingRegion(6413107, 6415837, 1, 953, 953);
             const byte startExonPhase = 1;
 
             var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 29, 28, startExonPhase, true);
@@ -234,7 +234,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdsPosition_SilenceOutput_InsertionAfterCodingRegion_Forward()
         {
             // variant: [6647337, 6647336] insertion after coding region
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 6643999, 6647336, 667, 1674);
+            var codingRegion = new CodingRegion(6643999, 6647336, 667, 1674, 1008);
             const byte startExonPhase = 0;
 
             var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 1675, 1674, startExonPhase, true);
@@ -247,7 +247,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdsPosition_SilenceOutput_InsertionAfterCodingRegion_Reverse()
         {
             // variant: [103629803, 103629804] insertion after coding region
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 103113259, 103629803, 161, 10543);
+            var codingRegion = new CodingRegion(103113259, 103629803, 161, 10543, 10383);
             const byte startExonPhase = 0;
 
             var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 161, 160, startExonPhase, true);
@@ -260,7 +260,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdsPosition_SilenceOutput_InsertionBeforeCodingRegion_Reverse()
         {
             // variant: [37480320, 37480319] insertion after coding region
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 37480320, 37543667, 556, 3228);
+            var codingRegion = new CodingRegion(37480320, 37543667, 556, 3228, 2673);
             const byte startExonPhase = 0;
 
             var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 3229, 3228, startExonPhase, true);
@@ -273,7 +273,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdsPosition_DoNotSilenceOutput_Reverse()
         {
             // variant: [179315139, 179315692]
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0, 179308070, 179315170, 617, 942);
+            var codingRegion = new CodingRegion(179308070, 179315170, 617, 942, 326);
             const byte startExonPhase = 0;
 
             var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 95, 648, startExonPhase, false);

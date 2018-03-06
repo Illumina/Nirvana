@@ -84,7 +84,7 @@ namespace CacheUtils.IntermediateIO
             _writer.WriteLine();
         }
 
-        private void WriteTranslation(ITranscriptRegion codingRegion, string proteinId, byte proteinVersion, string peptideSequence) =>
+        private void WriteTranslation(ICodingRegion codingRegion, string proteinId, byte proteinVersion, string peptideSequence) =>
             _writer.WriteLine($"Translation\t{proteinId}\t{proteinVersion}\t{codingRegion.Start}\t{codingRegion.End}\t{codingRegion.CdnaStart}\t{codingRegion.CdnaEnd}\t{peptideSequence}");
 
         private static void WriteGene(TextWriter writer, MutableGene gene)

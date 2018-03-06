@@ -41,6 +41,15 @@ namespace CacheUtils.DataDumperImport.Utilities
                    x.CdnaEnd   == y.CdnaEnd;
         }
 
+        private static bool CodingRegionEquals(ICodingRegion x, ICodingRegion y)
+        {
+            return x.Start     == y.Start     &&
+                   x.End       == y.End       &&
+                   x.CdnaStart == y.CdnaStart &&
+                   x.CdnaEnd   == y.CdnaEnd   && 
+                   x.Length    == y.Length;
+        }
+
         // ReSharper disable SuggestBaseTypeForParameter
         private static bool ArrayEquals<T>(T[] x, T[] y, Func<T, T, bool> equals)
         // ReSharper restore SuggestBaseTypeForParameter
@@ -83,7 +92,7 @@ namespace CacheUtils.DataDumperImport.Utilities
                        ArrayEquals(x.MicroRnas, y.MicroRnas, IntervalEquals)                        &&
                        ArrayEquals(x.SelenocysteinePositions, y.SelenocysteinePositions, IntEquals) &&
                        ArrayEquals(x.CdnaMaps, y.CdnaMaps, TranscriptRegionEquals)                  &&
-                       TranscriptRegionEquals(x.CodingRegion, y.CodingRegion);
+                       CodingRegionEquals(x.CodingRegion, y.CodingRegion);
         }
 
         public override int GetHashCode(MutableTranscript x)

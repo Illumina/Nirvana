@@ -7,11 +7,11 @@ namespace VariantAnnotation.Caches.DataStructures
 {
     public sealed class Translation : ITranslation
     {
-        public ITranscriptRegion CodingRegion { get; }
+        public ICodingRegion CodingRegion { get; }
         public ICompactId ProteinId { get; }
         public string PeptideSeq { get; }
 
-        public Translation(ITranscriptRegion codingRegion, CompactId proteinId, string peptideSeq)
+        public Translation(ICodingRegion codingRegion, CompactId proteinId, string peptideSeq)
         {
             CodingRegion = codingRegion;
             ProteinId    = proteinId;
@@ -20,7 +20,7 @@ namespace VariantAnnotation.Caches.DataStructures
 
         public static ITranslation Read(ExtendedBinaryReader reader, string[] peptideSeqs)
         {
-            var codingRegion = TranscriptRegion.Read(reader);
+            var codingRegion = DataStructures.CodingRegion.Read(reader);
             var proteinId    = CompactId.Read(reader);
             var peptideIndex = reader.ReadOptInt32();
             var peptideSeq   = peptideIndex == -1 ? null : peptideSeqs[peptideIndex];

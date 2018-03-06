@@ -13,7 +13,6 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 
     public enum TranscriptRegionType : byte
     {
-        CodingRegion,
         Exon,
         Gap,
         Intron

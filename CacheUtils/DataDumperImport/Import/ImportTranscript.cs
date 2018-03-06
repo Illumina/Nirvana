@@ -233,10 +233,9 @@ namespace CacheUtils.DataDumperImport.Import
             var gene = new MutableGene(chromosome, geneStart, geneEnd, geneOnReverseStrand, geneSymbol,
                 geneSymbolSource, geneId, hgncId);
 
-            var codingRegion = new TranscriptRegion(TranscriptRegionType.CodingRegion, 0,
-                GetCodingRegionStart(geneOnReverseStrand, translationStartExon, translationEndExon, translationStart, translationEnd),
+            var codingRegion = new CodingRegion(GetCodingRegionStart(geneOnReverseStrand, translationStartExon, translationEndExon, translationStart, translationEnd),
                 GetCodingRegionEnd(geneOnReverseStrand, translationStartExon, translationEndExon, translationStart, translationEnd), 
-                compDnaCodingStart, compDnaCodingEnd);
+                compDnaCodingStart, compDnaCodingEnd, 0);
 
             var totalExonLength = GetTotalExonLength(exons);
             var startExonPhase  = translationStartExon?.Phase ?? int.MinValue;
