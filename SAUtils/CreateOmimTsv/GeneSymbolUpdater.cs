@@ -11,6 +11,8 @@ namespace SAUtils.CreateOmimTsv
         private readonly Dictionary<string, string> _ensemblGeneIdToSymbol;
         private readonly HashSet<string> _geneSymbols;
 
+        private readonly Dictionary<string, string> _updatedGeneSymbols;
+
         private int _numGenesWhereBothIdsAreNull;
         private int _numGeneSymbolsUpToDate;
         private int _numGeneSymbolsUpdated;
@@ -23,6 +25,7 @@ namespace SAUtils.CreateOmimTsv
             _entrezGeneIdToSymbol  = entrezGeneIdToSymbol;
             _ensemblGeneIdToSymbol = ensemblGeneIdToSymbol;
             _geneSymbols           = new HashSet<string>();
+            _updatedGeneSymbols    = new Dictionary<string, string>();
         }
 
         public string UpdateGeneSymbol(string oldGeneSymbol, string ensemblGeneId, string entrezGeneId)
@@ -56,7 +59,11 @@ namespace SAUtils.CreateOmimTsv
             }
 
             if (newGeneSymbol == oldGeneSymbol) _numGeneSymbolsUpToDate++;
-            else _numGeneSymbolsUpdated++;
+            else
+            {
+                _updatedGeneSymbols[oldGeneSymbol] = newGeneSymbol;
+                _numGeneSymbolsUpdated++;
+            }
 
             return _geneSymbols.First();
         }
@@ -98,6 +105,12 @@ namespace SAUtils.CreateOmimTsv
             Console.WriteLine($"# of genes where both IDs are null:   {_numGenesWhereBothIdsAreNull:N0}");
             Console.WriteLine($"# of gene symbols not in cache:       {_numGeneSymbolsNotInCache:N0}");
             Console.WriteLine($"# of resolved gene symbol conflicts:  {_numResolvedGeneSymbolConflicts:N0}");
+        }
+
+        public void WriteUpdatedGeneSymbols(StreamWriter writer)
+        {
+            writer.WriteLine("original\tupdated");
+            foreach (var kvp in _updatedGeneSymbols) writer.WriteLine($"{kvp.Key}\t{kvp.Value}");
         }
     }
 }

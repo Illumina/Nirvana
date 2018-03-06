@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using VariantAnnotation.GeneAnnotation;
 using System.Linq;
 using Compression.Utilities;
 using ErrorHandling;
 using SAUtils.TsvWriters;
 using SAUtils.InputFileParsers;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateOmimTsv
 {
@@ -48,7 +50,19 @@ namespace SAUtils.CreateOmimTsv
 
             _geneSymbolUpdater.DisplayStatistics();
 
+            WriteUpdatedGeneSymbols();
+
             return ExitCodes.Success;
+        }
+
+        private void WriteUpdatedGeneSymbols()
+        {
+            string updatedGeneSymbolsPath = Path.Combine(_outputDirectory, "updatedGeneSymbols.txt");
+
+            using (var writer = new StreamWriter(FileUtilities.GetCreateStream(updatedGeneSymbolsPath)))
+            {
+                _geneSymbolUpdater.WriteUpdatedGeneSymbols(writer);
+            }
         }
 
         private Dictionary<string, List<OmimEntry>> GetGeneToOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry)
