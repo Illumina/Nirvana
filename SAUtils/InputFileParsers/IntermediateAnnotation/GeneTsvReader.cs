@@ -60,8 +60,9 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         }
 
 
-        public IEnumerable<IAnnotatedGene> GetItems()
+        public IReadOnlyDictionary<string, IAnnotatedGene> GetAnnotationDicts()
         {
+            var geneAnnotationDict = new Dictionary<string, IAnnotatedGene>();
             string line;
             //getting to the chromosome
             while ((line = _reader.ReadLine()) != null)
@@ -70,8 +71,10 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
                 var annotationItem = ExtractItem(line);
                 if (annotationItem == null) continue;
-                yield return annotationItem;
+                geneAnnotationDict[annotationItem.GeneName] = annotationItem;
             }
+
+            return geneAnnotationDict.Count==0? null: geneAnnotationDict;
         }
 
 

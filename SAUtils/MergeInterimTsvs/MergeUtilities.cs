@@ -69,7 +69,7 @@ namespace SAUtils.MergeInterimTsvs
             }
         }
 
-        public static IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
+        public static IAnnotatedGene  MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
         {
             if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
 
