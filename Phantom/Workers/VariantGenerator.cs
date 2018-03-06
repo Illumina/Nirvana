@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using ErrorHandling.Exceptions;
 using Phantom.DataStructures;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.Positions;
@@ -69,8 +71,10 @@ namespace Phantom.Workers
                 string refAllele = alleleSet.VariantArrays[positionIndex][0];
                 string altAllele = alleleSet.VariantArrays[positionIndex][alleleIndex];
                 int positionOnRefSequence = alleleSet.Starts[positionIndex] - blockStart;
+                int refRegionBetweenTwoAltAlleles = positionOnRefSequence - refSequenceStart;
+                if (refRegionBetweenTwoAltAlleles < 0) throw new UserErrorException($"Conflicting alternative alleles identified at {alleleSet.Chromosome.UcscName}:{alleleSet.Starts[positionIndex]}.");
                 string refSequenceBefore =
-                    refSequence.Substring(refSequenceStart, positionOnRefSequence - refSequenceStart);
+                    refSequence.Substring(refSequenceStart, refRegionBetweenTwoAltAlleles);
                 altSequenceSegsegments.AddLast(refSequenceBefore);
                 altSequenceSegsegments.AddLast(altAllele);
                 refSequenceStart = positionOnRefSequence + refAllele.Length;

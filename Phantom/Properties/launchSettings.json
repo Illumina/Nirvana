@@ -15,7 +15,7 @@
     },
     "Small_Test": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\ALL.chr22.smoke.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh37\\Both90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o 1KG_test_out",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Unsorted_Chromosomes.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh37\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o small_test_out",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
     },
     "Test1K": {

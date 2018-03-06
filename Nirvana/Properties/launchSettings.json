@@ -47,7 +47,7 @@
     },
     "SK bugfix": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree_bugfix.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf -o Pedigree_bugfix",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Unsorted_Chromosomes.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf -o Pedigree_bugfix",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom"
     },
     "RR_clinvar": {
