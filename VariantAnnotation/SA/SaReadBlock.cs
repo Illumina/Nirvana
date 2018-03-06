@@ -2,6 +2,7 @@
 using System.Text;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 
@@ -32,7 +33,7 @@ namespace VariantAnnotation.SA
             else ReadCompressedBlock(inputStream);
         }
 
-        private void ReadBlockOffsets(ExtendedBinaryReader reader)
+        private void ReadBlockOffsets(IExtendedBinaryReader reader)
         {
             var numEntries = reader.ReadOptInt32();
             _blockOffsets = new ISaIndexOffset[numEntries];

@@ -31,8 +31,7 @@ namespace VariantAnnotation.SA
         {
             if (_cachedInterval.Contains(position)) return _cachedInterval.Value;
 
-            Interval<long> interval;
-            if (!_fileOffsetIntervals.GetFirstOverlappingInterval(position, position, out interval))
+            if (!_fileOffsetIntervals.GetFirstOverlappingInterval(position, position, out var interval))
             {
                 return -1;
             }
@@ -68,7 +67,7 @@ namespace VariantAnnotation.SA
             return new SaIndex(intervalArray, globalMajorAlleleForRefMinors);
         }
 
-        private static (int Position, string GlobalMajorAllele)[] GetGlobalMajorAlleleInRefMinor(ExtendedBinaryReader reader)
+        private static (int Position, string GlobalMajorAllele)[] GetGlobalMajorAlleleInRefMinor(IExtendedBinaryReader reader)
         {
             var numPositions = reader.ReadOptInt32();
             var globalMajorAlleleForRefMinors = new(int, string)[numPositions];

@@ -13,44 +13,45 @@ namespace SAUtils.TsvWriters
 	{
 		#region members
 		private readonly SaTsvWriter _writer;
-		#endregion
+        #endregion
 
-		#region IDisposable
-		bool _disposed;
+        #region IDisposable
 
-		/// <summary>
-		/// public implementation of Dispose pattern callable by consumers. 
-		/// </summary>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
+        private bool _disposed;
+
+        /// <summary>
+        /// public implementation of Dispose pattern callable by consumers. 
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
 
-		/// <summary>
-		/// protected implementation of Dispose pattern. 
-		/// </summary>
-		private void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
+        /// <summary>
+        /// protected implementation of Dispose pattern. 
+        /// </summary>
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+                return;
 
-			if (disposing)
-			{
-				// Free any other managed objects here.
-				_writer.Dispose();
-			}
+            if (disposing)
+            {
+                // Free any other managed objects here.
+                _writer.Dispose();
+            }
 
-			// Free any unmanaged objects here.
-			//
-			_disposed = true;
-			// Free any other managed objects here.
+            // Free any unmanaged objects here.
+            //
+            _disposed = true;
+            // Free any other managed objects here.
 
-		}
-		#endregion
+        }
+        #endregion
 
-	    private ClinvarTsvWriter(SaTsvWriter saTsvWriter)
+        private ClinvarTsvWriter(SaTsvWriter saTsvWriter)
 		{
 			_writer = saTsvWriter;
 		}
@@ -61,14 +62,14 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 			
 		}
+
 		public void WritePosition(IEnumerable<SupplementaryDataItem> saItems)
 		{
 			if (saItems == null ) return;
 			var clinvarItems = new List<ClinVarItem>();
 			foreach (var item in saItems)
 			{
-				var clinvarItem = item as ClinVarItem;
-				if (clinvarItem == null)
+			    if (!(item is ClinVarItem clinvarItem))
 					throw new InvalidDataException("Expected ClinvarItems list!!");
 				clinvarItems.Add(clinvarItem);
 			}
@@ -81,7 +82,7 @@ namespace SAUtils.TsvWriters
                 var altAllele = kvp.Key.AlternateAllele;
 
                 var groupedItems = kvp.Value;
-                var vcfString = string.Join(",", Enumerable.Select(groupedItems.OrderBy(x => x.Id), x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
+                var vcfString = string.Join(",", groupedItems.OrderBy(x => x.Id).Select(x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
                 var jsonStrings = groupedItems.OrderBy(x => x.Id).Select(x => x.GetJsonString()).ToList();
 
                 var firstItem = groupedItems[0];
@@ -108,7 +109,7 @@ namespace SAUtils.TsvWriters
 
 		}
 
-        private Dictionary<(string ReferenceAllele, string AlternateAllele), List<ClinVarItem>> GroupByAltAllele(List<ClinVarItem> clinVarItems)
+        private static Dictionary<(string ReferenceAllele, string AlternateAllele), List<ClinVarItem>> GroupByAltAllele(List<ClinVarItem> clinVarItems)
         {
             var groups = new Dictionary<(string, string), List<ClinVarItem>>();
 

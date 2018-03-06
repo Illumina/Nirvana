@@ -8,8 +8,8 @@ namespace VariantAnnotation.SA
     public sealed class SupplementaryAnnotationHeader : ISupplementaryAnnotationHeader
     {
         public string ReferenceSequenceName { get; }
-        public long CreationTimeTicks { get; }
-        public ushort DataVersion { get; }
+        private long CreationTimeTicks { get; }
+        private ushort DataVersion { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 	    public string Name { get; }
 	    public GenomeAssembly GenomeAssembly { get; }

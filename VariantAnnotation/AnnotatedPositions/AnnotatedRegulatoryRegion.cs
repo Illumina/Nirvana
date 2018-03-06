@@ -22,7 +22,7 @@ namespace VariantAnnotation.AnnotatedPositions
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddStringValue("id", RegulatoryRegion.Id.ToString());
+            jsonObject.AddStringValue("id", RegulatoryRegion.Id.WithoutVersion);
             jsonObject.AddStringValue("type", RegulatoryRegion.Type.ToString());
             jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
             sb.Append(JsonObject.CloseBrace);

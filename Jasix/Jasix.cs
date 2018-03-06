@@ -13,7 +13,7 @@ namespace Jasix
 {
     public sealed class Jasix 
     {
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             if (ConfigurationSettings.CreateIndex)
             {
@@ -118,7 +118,7 @@ namespace Jasix
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Indexes a Nirvana annotated JSON file", "-i in.json.gz [options]")
                 .ShowErrors()
-                .Execute(jasix.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return (int)exitCode;
         }

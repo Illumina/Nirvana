@@ -7,6 +7,7 @@ using CommandLine.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
+using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
@@ -26,20 +27,17 @@ namespace SAUtils.MergeInterimTsvs
         private readonly List<SaHeader> _geneHeaders;
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly HashSet<string> _refNames;
-        public static readonly HashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck = new HashSet<GenomeAssembly>() { GenomeAssembly.Unknown, GenomeAssembly.rCRS };
+        public static readonly HashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck = new HashSet<GenomeAssembly> { GenomeAssembly.Unknown, GenomeAssembly.rCRS };
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public InterimTsvsMerger(IEnumerable<string> annotationFiles, IEnumerable<string> intervalFiles, string miscFile, IEnumerable<string> geneFiles, string compressedReference, string outputDirectory)
         {
             _outputDirectory = outputDirectory;
 
             var refSequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReference));
-            _genomeAssembly = refSequenceProvider.GenomeAssembly;
-            _refChromDict = refSequenceProvider.GetChromosomeDictionary();
+            _genomeAssembly         = refSequenceProvider.GenomeAssembly;
+            _refNameToChromosome    = refSequenceProvider.RefNameToChromosome;
             
             _tsvReaders      = ReaderUtilities.GetSaTsvReaders(annotationFiles);
             _miscReader      = ReaderUtilities.GetMiscTsvReader(miscFile);
@@ -97,16 +95,17 @@ namespace SAUtils.MergeInterimTsvs
         }
 
 
-        private List<IEnumerator<IAnnotatedGene>> GetGeneEnumerators()
+        private List<IReadOnlyDictionary<string, IAnnotatedGene>> GetGeneAnnotationDicts()
         {
-            var geneAnnotationList = new List<IEnumerator<IAnnotatedGene>>();
-            if (_geneReaders == null) return geneAnnotationList;
+            if (_geneReaders == null) return null;
 
+            var geneAnnotationList = new List<IReadOnlyDictionary<string, IAnnotatedGene>>();
+            
             foreach (var geneReader in _geneReaders)
             {
-                var dataEnumerator = geneReader.GetItems().GetEnumerator();
-                if (!dataEnumerator.MoveNext()) continue;
-                geneAnnotationList.Add(dataEnumerator);
+                var annotationDict = geneReader.GetAnnotationDicts();
+                if (annotationDict==null) continue;
+                geneAnnotationList.Add(annotationDict);
             }
             return geneAnnotationList;
         }
@@ -141,36 +140,50 @@ namespace SAUtils.MergeInterimTsvs
             MergeGene();
 
             Parallel.ForEach(_refNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
-
-
-            //foreach (var refName in _refNames)
-            //{
-            //    if (refName.Length < 2) continue;
-            //    Console.WriteLine("Merging chrom:"+ refName);
-            //    MergeChrom(refName);
-            //}
+            
         }
 
         private void MergeGene()
         {
-            var geneEnumerators = GetGeneEnumerators();
+            var geneAnnotationDicts = GetGeneAnnotationDicts();
+
+            if (geneAnnotationDicts == null) return;
+
+            var geneList = GetGeneList(geneAnnotationDicts);
 
             var geneAnnotationDatabasePath = Path.Combine(_outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
             var geneAnnotationStream = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, _geneHeaders.Select(x => x.GetDataSourceVersion()), _genomeAssembly);
 
-            List<IAnnotatedGene> geneAnnotations;
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))
-                while ((geneAnnotations = MergeUtilities.GetMinItems(geneEnumerators)) != null)
+                foreach (var gene in geneList)
                 {
-                    var mergedGeneAnnotation = MergeUtilities.MergeGeneAnnotations(geneAnnotations);
-                    writer.Write(mergedGeneAnnotation);
+                    var annotations = new List<IGeneAnnotationSource>();
+                    foreach (var annotationDict in geneAnnotationDicts)
+                    {
+                        if (annotationDict.ContainsKey(gene))
+                            annotations.AddRange(annotationDict[gene].Annotations);
+                    }
+                    writer.Write(new AnnotatedGene(gene, annotations.ToArray()));
                 }
+                
             //dispose the gene annotators
             foreach (var geneReader in _geneReaders)
             {
                 geneReader.Dispose();
             }
+        }
+
+        private List<string> GetGeneList(List<IReadOnlyDictionary<string, IAnnotatedGene>> geneAnnotationDicts)
+        {
+            var geneList = new List<string>();
+
+            foreach (var geneAnnotationDict in geneAnnotationDicts)
+            {
+                geneList.AddRange(geneAnnotationDict.Keys);
+            }
+
+            return geneList;
         }
 
         private void MergeChrom(string refName)
@@ -184,7 +197,7 @@ namespace SAUtils.MergeInterimTsvs
             //return;
             var globalMajorAlleleInRefMinors = GetGlobalMajorAlleleForRefMinors(refName);
 
-            var ucscRefName = _refChromDict[refName].UcscName;
+            var ucscRefName = _refNameToChromosome[refName].UcscName;
             var dataSourceVersions = MergeUtilities.GetDataSourceVersions(_saHeaders);
 
             var header = new SupplementaryAnnotationHeader(ucscRefName, DateTime.Now.Ticks,
@@ -227,7 +240,5 @@ namespace SAUtils.MergeInterimTsvs
 
             return interimSaPosition;
         }
-
-        
     }
 }

@@ -59,7 +59,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedAlleleDepths = sample?.AlleleDepths;
@@ -75,7 +75,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples   = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             Assert.Equal("-", sample?.DiseaseAffectedStatus);
@@ -99,7 +99,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedAlleleDepths = sample?.AlleleDepths;
@@ -119,7 +119,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedFailedFilter = sample?.FailedFilter;
@@ -140,7 +140,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedGenotype = sample?.Genotype;
@@ -162,7 +162,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedGenotypeQuality = sample?.GenotypeQuality;
@@ -187,7 +187,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedTotalDepth = sample?.TotalDepth;
@@ -204,7 +204,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             var observedTotalDepth = sample?.TotalDepth;
@@ -246,7 +246,7 @@ namespace UnitTests.Vcf.Samples
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             if (expectedVariantFrequency == null)
@@ -265,13 +265,13 @@ namespace UnitTests.Vcf.Samples
         [InlineData("GT:NR:NV", "1/1:10:7", null)]
         public void VariantFrequencyMultiAllelic(string formatCol, string sampleCol, int? expectedVariantFrequency)
         {
-            string vcfLine = $"chr1\t5592503\t.\tC\tT,A\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
+            var vcfLine = $"chr1\t5592503\t.\tC\tT,A\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
 
@@ -284,8 +284,7 @@ namespace UnitTests.Vcf.Samples
         {
             // data from NIR-1095
             // for NIR-1218
-            var vcfLine =
-                "1	9314202	Canvas:GAIN:1:9314202:9404148	N	<CNV>	36	PASS	SVTYPE=CNV;END=9404148;ensembl_gene_id=ENSG00000049239,ENSG00000252841,ENSG00000171621	RC:BC:CN:MCC	.	151:108:6:4";
+            const string vcfLine = "1	9314202	Canvas:GAIN:1:9314202:9404148	N	<CNV>	36	PASS	SVTYPE=CNV;END=9404148;ensembl_gene_id=ENSG00000049239,ENSG00000252841,ENSG00000171621	RC:BC:CN:MCC	.	151:108:6:4";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
@@ -296,7 +295,7 @@ namespace UnitTests.Vcf.Samples
             var sample = samples[1];
 
             var observedMcc = sample?.IsLossOfHeterozygosity;
-            Assert.Equal(false, observedMcc);
+            Assert.False(observedMcc);
         }
 
         [Fact]
@@ -304,8 +303,7 @@ namespace UnitTests.Vcf.Samples
         {
 
             // for NIR-1306
-            var vcfLine =
-                "chrX	2735147	.	G	A	38.25	VQSRTrancheSNP99.90to100.00	AC=3;AF=0.500;AN=6;BaseQRankSum=-0.602;DP=56;Dels=0.00;FS=30.019;HaplotypeScore=7.7259;MLEAC=3;MLEAF=0.500;MQ=41.18;MQ0=0;MQRankSum=0.098;QD=1.06;ReadPosRankSum=0.266;SB=-8.681e-03;VQSLOD=-6.0901;culprit=QD	GT:AD:DP:GQ:PL	0:7,0:7:3:0,3,39	./.	0/1:14,3:17:35:35,0,35	1/1:9,10:19:3:41,3,0";
+            const string vcfLine = "chrX	2735147	.	G	A	38.25	VQSRTrancheSNP99.90to100.00	AC=3;AF=0.500;AN=6;BaseQRankSum=-0.602;DP=56;Dels=0.00;FS=30.019;HaplotypeScore=7.7259;MLEAC=3;MLEAF=0.500;MQ=41.18;MQ0=0;MQRankSum=0.098;QD=1.06;ReadPosRankSum=0.266;SB=-8.681e-03;VQSLOD=-6.0901;culprit=QD	GT:AD:DP:GQ:PL	0:7,0:7:3:0,3,39	./.	0/1:14,3:17:35:35,0,35	1/1:9,10:19:3:41,3,0";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
@@ -334,13 +332,13 @@ namespace UnitTests.Vcf.Samples
         public void VariantFrequencyNan(string formatCol, string sampleCol, string expectedVariantFrequency)
         {
             // NIR-1338
-            string vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
+            var vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             if (expectedVariantFrequency == null)
@@ -358,8 +356,7 @@ namespace UnitTests.Vcf.Samples
         [Fact]
         public void SplitReadCounts()
         {
-            var vcfLine =
-                "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	78,0:65,0	157,42:252,63";
+            const string vcfLine = "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	78,0:65,0	157,42:252,63";
 
             var vcfColumns = vcfLine.Split('\t');
 
@@ -380,26 +377,28 @@ namespace UnitTests.Vcf.Samples
         [Fact]
         public void EmptySample()
         {
-            var vcfLine = "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	.";
+            const string vcfLine = "chr7	127717248	MantaINV:267944:0:1:2:0:0	T	<INV>	.	PASS	END=140789466;SVTYPE=INV;SVLEN=13072218;INV5	PR:SR	.";
+
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
             var sample = samples[0];
             Assert.True(sample.IsEmpty);
+
         }
 
         [Fact]
         public void DeNovoQuality()
         {
-            string vcfLine = "chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\tGT:DQ\t0/1:20";
+            const string vcfLine = "chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\tGT:DQ\t0/1:20";
             var vcfColumns = vcfLine.Split('\t');
 
             var extractor = new SampleFieldExtractor(vcfColumns);
             var samples = extractor.ExtractSamples();
 
-            Assert.Equal(1, samples.Length);
+            Assert.Single(samples);
 
             var sample = samples[0];
             Assert.Equal(20,sample.DeNovoQuality);

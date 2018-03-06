@@ -38,6 +38,7 @@
             // get the reference count
             int? refCount = null;
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (intermediateSampleFields.VcfRefAllele)
             {
                 case "A":
@@ -96,8 +97,7 @@
             // one allele depth
             if (alleleDepths.Length == 1)
             {
-                int num;
-                if(int.TryParse(alleleDepths[0], out num) ) return 0;
+                if(int.TryParse(alleleDepths[0], out _) ) return 0;
                 return null;
             }
 
@@ -107,16 +107,13 @@
 
             foreach (var depthString in alleleDepths)
             {
-                int depth;
-                if (!int.TryParse(depthString, out depth)) return null;
+                if (!int.TryParse(depthString, out var depth)) return null;
 
                 totalDepth += depth;
+                if (hasRefDepth) continue;
 
-                if (!hasRefDepth)
-                {
-                    refDepth = depth;
-                    hasRefDepth = true;
-                }
+                refDepth    = depth;
+                hasRefDepth = true;
             }
 
             // sanity check: make sure we handle NaNs properly

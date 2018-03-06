@@ -16,7 +16,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         IList<IOverlappingTranscript>  OverlappingTranscripts { get; }
 		double? PhylopScore { get; set; }
 
-
-		string GetJsonString(string originalChromName);
+	    IList<IPluginData> PluginDataSet { get; }
+        string GetJsonString(string originalChromName);
     }	
 }

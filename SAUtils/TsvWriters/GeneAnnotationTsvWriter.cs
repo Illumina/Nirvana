@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using CommonUtilities;
 using Compression.Utilities;
 using VariantAnnotation.Providers;
 
@@ -22,9 +22,9 @@ namespace SAUtils.TsvWriters
             _writer.Write(GetHeader(dataSourceVersion, dataVersion, assembly, keyName, isArray));
         }
 
-        private string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
+        private static string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             sb.Append($"#name={dataSourceVersion.Name}\n");
             sb.Append($"#assembly={assembly}\n");
@@ -37,13 +37,13 @@ namespace SAUtils.TsvWriters
             sb.Append($"#isArray={isArray}\n");
             sb.Append($"#keyName={keyName}\n");
             sb.Append("#GENESYMBOL\tJSON\n");
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public void AddEntry(string geneSymbol, List<string> jsonStrings)
         {
             if (jsonStrings == null || jsonStrings.Count == 0) return;
-            _writer.Write($"{geneSymbol}\t{String.Join("\t",jsonStrings)}\n");
+            _writer.Write($"{geneSymbol}\t{string.Join("\t",jsonStrings)}\n");
         }
 
         public void Dispose()

@@ -16,7 +16,7 @@ using SAUtils.InputFileParsers.DbSnp;
 using SAUtils.InputFileParsers.DGV;
 using SAUtils.InputFileParsers.EVS;
 using SAUtils.InputFileParsers.ExAc;
-using SAUtils.InputFileParsers.MitoMAP;
+using SAUtils.InputFileParsers.MitoMap;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.SA;
@@ -73,7 +73,7 @@ namespace SAUtils.CreateIntermediateTsvs
             _customIntervalFiles = customIntervalFiles;
             _compressedReferencePath = compressedReferencePath;
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
-            _refNamesDictionary = sequenceProvider.GetChromosomeDictionary();
+            _refNamesDictionary = sequenceProvider.RefNameToChromosome;
             _genomeAssembly = sequenceProvider.GenomeAssembly;
 
         }
@@ -115,7 +115,7 @@ namespace SAUtils.CreateIntermediateTsvs
             }
             catch (AggregateException ae)
             {
-                ae.Handle((x) =>
+                ae.Handle(x =>
                 {
                     Console.WriteLine(x);
                     return true;
@@ -124,9 +124,9 @@ namespace SAUtils.CreateIntermediateTsvs
             }
         }
 
-        private void CreateMitoMapSvTsv(List<string> mitoMapSvFileNames)
+        private void CreateMitoMapSvTsv(IReadOnlyList<string> mitoMapSvFileNames)
         {
-            if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(String.IsNullOrEmpty)) return;
+            if (mitoMapSvFileNames.Count == 0 || mitoMapSvFileNames.Any(string.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapSvFileNames[0]).Directory;
             var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapSV"));
@@ -134,6 +134,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
             var mitoMapSvReaders = new List<MitoMapSvReader>();
+
             foreach (var mitoMapFileName in mitoMapSvFileNames)
             {
                 mitoMapSvReaders.Add(new MitoMapSvReader(new FileInfo(mitoMapFileName), sequenceProvider));
@@ -149,9 +150,9 @@ namespace SAUtils.CreateIntermediateTsvs
             TsvWriterUtilities.WriteCompleteInfo(InterimSaCommon.MitoMapTag, version.Version, timeSpan);
         }
 
-        private void CreateMitoMapVarTsv(List<string> mitoMapFileNames)
+        private void CreateMitoMapVarTsv(IReadOnlyList<string> mitoMapFileNames)
         {
-            if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(String.IsNullOrEmpty)) return;
+            if (mitoMapFileNames.Count == 0 || mitoMapFileNames.Any(string.IsNullOrEmpty)) return;
             var benchMark = new Benchmark();
             var rootDirectory = new FileInfo(mitoMapFileNames[0]).Directory;
             var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapVar"));
@@ -164,7 +165,7 @@ namespace SAUtils.CreateIntermediateTsvs
                 mitoMapVarReaders.Add(new MitoMapVariantReader(new FileInfo(mitoMapFileName), sequenceProvider));
             }
             var mergedMitoMapVarItems = MitoMapVariantReader.MergeAndSort(mitoMapVarReaders);
-            var outputFilePrefix = InterimSaCommon.MitoMapTag;
+            const string outputFilePrefix = InterimSaCommon.MitoMapTag;
             using (var writer = new MitoMapVarTsvWriter(version, _outputDirectory, outputFilePrefix, sequenceProvider))
                 TsvWriterUtilities.WriteSortedItems(mergedMitoMapVarItems, writer);
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
@@ -222,7 +223,7 @@ namespace SAUtils.CreateIntermediateTsvs
             TsvWriterUtilities.WriteCompleteInfo(dataSource, version.Version, timeSpan);
         }
 
-        private void CreateSvTsv(IEnumerable<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
+        private static void CreateSvTsv(IEnumerable<SupplementaryDataItem> siItems, IntervalTsvWriter writer)
         {
             foreach (var siItem in siItems)
             {

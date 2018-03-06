@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
@@ -26,18 +26,18 @@ namespace VariantAnnotation.AnnotatedPositions
 
             foreach (var jsonString in jsonStrings)
             {
-                var sb = new StringBuilder();
+                var sb = StringBuilderCache.Acquire();
                 sb.Append(JsonObject.OpenBrace);
                 sb.Append(jsonString);
                 if (IsAlleleSpecific) sb.Append(JsonObject.Comma + "\"isAlleleSpecific\":true");
                 sb.Append(JsonObject.CloseBrace);
-                outStrings.Add(sb.ToString());
+                outStrings.Add(StringBuilderCache.GetStringAndRelease(sb));
             }
 
             return outStrings;
         }
 
-        public IList<string> GetVcfStrings()
+        public IEnumerable<string> GetVcfStrings()
         {
             return SaDataSource.VcfString.Split(',');
         }

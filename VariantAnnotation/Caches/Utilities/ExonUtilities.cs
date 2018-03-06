@@ -4,18 +4,14 @@ namespace VariantAnnotation.Caches.Utilities
 {
     public static class ExonUtilities
     {
-        /// <summary>
-        /// returns the total exon length
-        /// </summary>
-        public static int GetTotalExonLength(ICdnaCoordinateMap[] maps)
+        public static int GetTotalExonLength(ITranscriptRegion[] regions)
         {
             int totalExonLength = 0;
 
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (int mapIndex = 0; mapIndex < maps.Length; mapIndex++)
+            foreach (var region in regions)
             {
-                var cdnaMap = maps[mapIndex];
-                totalExonLength += cdnaMap.End - cdnaMap.Start + 1;
+                if (region.Type != TranscriptRegionType.Exon) continue;
+                totalExonLength += region.End - region.Start + 1;
             }
 
             return totalExonLength;

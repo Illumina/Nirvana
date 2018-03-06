@@ -86,6 +86,7 @@ namespace Compression.FileHandling
         {
             try
             {
+                // ReSharper disable once InvertIf
                 if (disposing && _stream != null)
                 {
                     try
@@ -109,6 +110,7 @@ namespace Compression.FileHandling
 
         #endregion
 
+        /// <inheritdoc />
         /// <summary>
         /// constructor
         /// </summary>

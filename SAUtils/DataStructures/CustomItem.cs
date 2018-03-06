@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
@@ -34,8 +35,7 @@ namespace SAUtils.DataStructures
 
         public override bool Equals(object other)
 		{
-			var otherItem = other as CustomItem;
-			if (otherItem == null) return false;
+		    if (!(other is CustomItem otherItem)) return false;
 
 			return Chromosome.Equals(otherItem.Chromosome)
 				   && Start.Equals(otherItem.Start)
@@ -57,7 +57,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
 	    {
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
 			jsonObject.AddStringValue("id", Id);
@@ -81,7 +81,8 @@ namespace SAUtils.DataStructures
 				{
 					jsonObject.AddBoolValue(booleanField, true);
 				}
-			return sb.ToString();
+
+	        return StringBuilderCache.GetStringAndRelease(sb);
 	    }
 
 		public void SerializeJson(StringBuilder sb)

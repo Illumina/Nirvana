@@ -9,10 +9,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
     /// has been added to prevent unneeded calculations. The caching layer is reset when each new
     /// variant has been read.
     /// </summary>
-    public sealed class VariantEffect:IVariantEffect
+    public sealed class VariantEffect : IVariantEffect
     {
-        #region members
-
         private readonly TranscriptPositionalEffect _preCache;
 
         private readonly ITranscript _transcript;
@@ -37,17 +35,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private readonly int _proteinBegin;
 
-        #endregion
-
-        /// <summary>
-        /// constructor
-        /// </summary>
         public VariantEffect(TranscriptPositionalEffect transcriptEffect, ISimpleVariant variant, ITranscript transcript,
             string referenAminoAcids, string alternateAminoAcids, string referenceCodons, string alternateCodons,
-            int? proteinBegin,VariantEffectCache cache = null)
+            int? proteinBegin, VariantEffectCache cache = null)
         {
             _transcript = transcript;
-            _variant  = variant;
+            _variant    = variant;
 
             _preCache = transcriptEffect;
 
@@ -161,11 +154,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-            int cdsLength = CodingSequence.GetCodingSequenceLength(_transcript.CdnaMaps,
-                _transcript.Translation.CodingRegion.Start, _transcript.Translation.CodingRegion.End,
-                _transcript.StartExonPhase);
-
-            int codonCdsStart = _proteinBegin * 3 - 2;
+            int cdsLength       = _transcript.Translation.CodingRegion.Length;
+            int codonCdsStart   = _proteinBegin * 3 - 2;
             int lastCodonLength = cdsLength - (codonCdsStart - 1);
 
             bool result = lastCodonLength < 3 && lastCodonLength > 0;
@@ -277,15 +267,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return false;
             }
 
-
-
             if (_proteinBegin != 1 || _referenceAminoAcidsLen == 0)
             {
                 _cache.Add(ct, false);
                 return false;
             }
 
-            //insertion in start codon and do not change start codon
+            // insertion in start codon and do not change start codon
             if (_isInsertion && _proteinBegin == 1 && _alternateAminoAcids.EndsWith(_referenceAminoAcids))
             {
                 _cache.Add(ct, false);
@@ -340,7 +328,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.non_coding_transcript_exon_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            bool result = _preCache.HasExonOverlap && IsNonCodingTranscriptVariant();
+            bool result = _preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
 
             _cache.Add(ct, result);
             return result;
@@ -463,6 +451,27 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return result;
         }
 
+        public bool IsStartRetained()
+        {
+            const ConsequenceTag ct = ConsequenceTag.start_retained_variant;
+            if (_cache.Contains(ct)) return _cache.Get(ct);
+
+            if (_proteinBegin != 1 || string.IsNullOrEmpty(_referenceAminoAcids))
+            {
+                _cache.Add(ct, false);
+                return false;
+            }
+
+            var startProtein = _referenceAminoAcids[0].ToString();
+            var alternateAminoAcids = TrimPeptides(_alternateAminoAcids);
+
+            var result = alternateAminoAcids != null
+                          && alternateAminoAcids.Contains(startProtein);
+
+            _cache.Add(ct, result);
+            return result;
+        }
+
         private static string TrimPeptides(string alternateAminoAcids)
         {
             if (string.IsNullOrEmpty(alternateAminoAcids)) return null;
@@ -522,7 +531,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             // TODO: Isn't IsWithinTranscript always true? and not within mature miRNA is always true
             // For Ensembl transcript, miRNA may be a valid attribute. We have their location and we would like to check if the variant overlaps with the miRNA
-            var result = _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
+            var result = !_preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
 
             _cache.Add(ct, result);
             return result;
@@ -563,13 +572,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             _cache.Add(ct, result);
             return result;
-        }
-
-        private bool IsShortTandemRepeatVariant()
-        {
-            return _variant.Type == VariantType.short_tandem_repeat_variation
-                   || _variant.Type == VariantType.short_tandem_repeat_expansion
-                   || _variant.Type == VariantType.short_tandem_repeat_contraction;
         }
     }
 }

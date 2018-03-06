@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -31,16 +31,12 @@ namespace SAUtils.DataStructures
 
         public int CompareTo(CustomInterval other)
         {
-            if (Chromosome != other.Chromosome)
-                return Chromosome.Index.CompareTo(other.Chromosome.Index);
-
-            return Start.CompareTo(other.Start);
+            return Chromosome != other.Chromosome ? Chromosome.Index.CompareTo(other.Chromosome.Index) : Start.CompareTo(other.Start);
         }
 
         public override bool Equals(object other)
         {
-            var otherItem = other as CustomInterval;
-            if (otherItem == null) return false;
+            if (!(other is CustomInterval otherItem)) return false;
 
             return Chromosome.Equals(otherItem.Chromosome)
                    && Start.Equals(otherItem.Start)
@@ -59,7 +55,7 @@ namespace SAUtils.DataStructures
 
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
 			jsonObject.AddStringValue("start", Start.ToString(), false);
@@ -81,7 +77,7 @@ namespace SAUtils.DataStructures
 				}
 			}
 
-			return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 	}
 }

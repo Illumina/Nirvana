@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
 
@@ -22,20 +22,19 @@ namespace VariantAnnotation.IO.VcfWriter
         private const string CsqTInfoTag = "##INFO=<ID=CSQT,";
         private const string InfoTag = "##INFO=";
 
-        private readonly VcfConversion _conversion = new VcfConversion();
-
         private const string CsqtHeaderLine = "##INFO=<ID=CSQT,Number=.,Type=String,Description=\"Consequence type as predicted by Nirvana. Format: GenotypeIndex|HGNC|TranscriptID|Consequence\">";
         private const string CsqrHeaderLine = "##INFO=<ID=CSQR,Number=.,Type=String,Description=\"Predicted regulatory consequence type. Format: GenotypeIndex|RegulatoryID|Consequence\">";
 
         private const string InfoHeaderLines =
             "##INFO=<ID=AF1000G,Number=A,Type=Float,Description=\"The allele frequency from all populations of 1000 genomes data\">\n" +
-            "##INFO=<ID=AA,Number=A,Type=String,Description=\"The inferred allele ancestral (if determined) to the chimpanzee/human lineage.\">\n" +
+            "##INFO=<ID=AA,Number=1,Type=String,Description=\"The inferred allele ancestral (if determined) to the chimpanzee/human lineage.\">\n" +
             "##INFO=<ID=GMAF,Number=A,Type=String,Description=\"Global minor allele frequency (GMAF); technically, the frequency of the second most frequent allele.  Format: GlobalMinorAllele|AlleleFreqGlobalMinor\">\n" +
             "##INFO=<ID=cosmic,Number=.,Type=String,Description=\"The numeric identifier for the variant in the Catalogue of Somatic Mutations in Cancer (COSMIC) database. Format: GenotypeIndex|Significance\">\n" +
             "##INFO=<ID=clinvar,Number=.,Type=String,Description=\"Clinical significance. Format: GenotypeIndex|Significance\">\n" +
             "##INFO=<ID=EVS,Number=A,Type=String,Description=\"Allele frequency, coverage and sample count taken from the Exome Variant Server (EVS). Format: AlleleFreqEVS|EVSCoverage|EVSSamples.\">\n" +
             "##INFO=<ID=RefMinor,Number=0,Type=Flag,Description=\"Denotes positions where the reference base is a minor allele and is annotated as though it were a variant\">\n" +
-            "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">";
+            "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">\n" +
+            "##INFO=<ID=RECOMPOSED,Number=1,Type=String,Description=\"The position is recomposed\">";
 
         #endregion
 
@@ -86,7 +85,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
         private static string BuildVcfHeaderLines(string nirvanaVersion,string nirvanaDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             var nirvanaAnnotatorTag = "##annotator="+nirvanaVersion +'\n';
 
@@ -120,7 +119,7 @@ namespace VariantAnnotation.IO.VcfWriter
             sb.Append(CsqtHeaderLine + '\n');
             sb.Append(CsqrHeaderLine);
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         /// <summary>

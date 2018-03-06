@@ -3,45 +3,37 @@ using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf
 {
-    public sealed class BreakEnd:IBreakEnd
+    public sealed class BreakEnd : IBreakEnd
     {
-		#region members
+        public IBreakEndPiece Piece1 { get; }
+        public IBreakEndPiece Piece2 { get; }
 
-		public IChromosome Chromosome1 { get; }
-	    public IChromosome Chromosome2 { get; }
-	    public int Position1 { get; }
-	    public int Position2 { get; }
-	    public bool IsSuffix1 { get; }
-	    public bool IsSuffix2 { get; }
-	    public char Orientation1 { get; }
-	    public char Orientation2 { get; }
-		#endregion
-
-		/// <summary>
-		/// constructor
-		/// </summary>
-		public BreakEnd(IChromosome chromosome1, IChromosome chromosome2, int position1, int position2, bool isSuffix1,
+        public BreakEnd(IChromosome chromosome, IChromosome chromosome2, int position, int position2, bool isSuffix,
             bool isSuffix2)
         {
-	        Chromosome1 = chromosome1;
-	        Chromosome2 = chromosome2;
-
-	        Position1 = position1;
-            Position2 = position2;
-            IsSuffix1 = isSuffix1;
-            IsSuffix2 = isSuffix2;
-
-            Orientation1 = isSuffix1 ? '-' :'+' ;
-            Orientation2 = isSuffix2 ? '+' : '-';
+            var orientation1 = isSuffix ? '-' : '+';
+            var orientation2 = isSuffix2 ? '+' : '-';
+            Piece1 = new BreakEndPiece(chromosome, position, isSuffix, orientation1);
+            Piece2 = new BreakEndPiece(chromosome2, position2, isSuffix2, orientation2);
         }
 
-        /// <summary>
-        /// returns a string representation of this breakend
-        /// </summary>
-        public override string ToString()
+        public override string ToString() =>
+            $"{Piece1.Chromosome.EnsemblName}:{Piece1.Position}:{Piece1.Orientation}:{Piece2.Chromosome.EnsemblName}:{Piece2.Position}:{Piece2.Orientation}";
+    }
+
+    public sealed class BreakEndPiece : IBreakEndPiece
+    {
+        public IChromosome Chromosome { get; }
+        public int Position { get; }
+        public bool IsSuffix { get; }
+        public char Orientation { get; }
+
+        public BreakEndPiece(IChromosome chromosome, int position, bool isSuffix, char orientation)
         {
-	        return $"{Chromosome1.EnsemblName}:{Position1}:{Orientation1}:{Chromosome2.EnsemblName}:{Position2}:{Orientation2}";
+            Chromosome  = chromosome;
+            Position    = position;
+            IsSuffix    = isSuffix;
+            Orientation = orientation;
         }
-	    
     }
 }

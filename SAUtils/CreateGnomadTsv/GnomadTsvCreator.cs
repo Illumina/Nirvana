@@ -15,12 +15,13 @@ namespace SAUtils.CreateGnomadTsv
         private readonly string _outputDirectory;
         private readonly string _sequencingDataType;
 
-        public GnomadTsvCreator(StreamReader[] streamReaders, ReferenceSequenceProvider refProvider, DataSourceVersion version, string outputDirectory, string sequencingDataType)
+        public GnomadTsvCreator(StreamReader[] streamReaders, ReferenceSequenceProvider refProvider,
+            DataSourceVersion version, string outputDirectory, string sequencingDataType)
         {
-            _version          = version;
-            _refProvider      = refProvider;
-            _outputDirectory  = outputDirectory;
-            _streamReaders    = streamReaders;
+            _version            = version;
+            _refProvider        = refProvider;
+            _outputDirectory    = outputDirectory;
+            _streamReaders      = streamReaders;
             _sequencingDataType = sequencingDataType;
         }
 
@@ -31,13 +32,13 @@ namespace SAUtils.CreateGnomadTsv
             using (var writer = new GnomadTsvWriter(_version, _outputDirectory, _refProvider.GenomeAssembly, _refProvider, _sequencingDataType))
             {
                 var count = 0;
+
                 foreach (var fileStreamReader in _streamReaders)
                 {
-                    var reader = new GnomadReader(fileStreamReader, _refProvider.GetChromosomeDictionary());
+                    var reader = new GnomadReader(fileStreamReader, _refProvider.RefNameToChromosome);
                     TsvWriterUtilities.WriteSortedItems(reader.GetGnomadItems(), writer);
                     Console.WriteLine($"ingested {count++} file in " + benchMark.GetElapsedTime());
                 }
-                
             }
 
             var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());

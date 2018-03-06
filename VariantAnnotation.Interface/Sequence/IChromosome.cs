@@ -1,6 +1,8 @@
-﻿namespace VariantAnnotation.Interface.Sequence
+﻿using System;
+
+namespace VariantAnnotation.Interface.Sequence
 {
-    public interface IChromosome
+    public interface IChromosome : IEquatable<IChromosome>
     {
         string UcscName { get; }
         string EnsemblName { get; }
@@ -19,5 +21,9 @@
             EnsemblName = chromosomeName;
             Index       = ushort.MaxValue;
         }
+
+        public bool Equals(IChromosome other) => UcscName == other.UcscName;
+
+        public override int GetHashCode() => UcscName.GetHashCode();
     }
 }

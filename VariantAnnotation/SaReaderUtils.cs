@@ -8,6 +8,7 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
+using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using VariantAnnotation.Utilities;
 
@@ -143,17 +144,15 @@ namespace VariantAnnotation
             return header;
         }
 
-
         public static IEnumerable<IDataSourceVersion> GetDataSourceVersions(List<string> saDirs)
         {
-            var dataSourceVersions = new List<IDataSourceVersion>();
+            var dataSourceVersions = new HashSet<IDataSourceVersion>(new DataSourceVersionComparer());
             if (saDirs == null || saDirs.Count == 0) return dataSourceVersions;
 
             foreach (var saDir in saDirs)
             {
                 var header = GetSaHeader(saDir);
-                if (header != null)
-                    dataSourceVersions.AddRange(header.DataSourceVersions);
+                if (header != null) foreach (var version in header.DataSourceVersions) dataSourceVersions.Add(version);
             }
 
             return dataSourceVersions;

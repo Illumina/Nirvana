@@ -11,7 +11,6 @@ namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class TranscriptAnnotationFactory
     {
-        internal const int FlankingLength = 5000;
         private static readonly AminoAcids AminoAcidsProvider = new AminoAcids(false);
         private static readonly AminoAcids MitoAminoAcidsProvider = new AminoAcids(true);
 
@@ -19,7 +18,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             ISequence compressedSequence, IList<IAnnotatedTranscript> annotatedTranscripts,
             ISet<string> overlappingGenes, IList<IOverlappingTranscript> overlappingTranscripts,
             IPredictionCache siftCache, IPredictionCache polyphenCache,
-            IEnumerable<ITranscript> geneFusionCandidates = null)
+            ITranscript[] geneFusionCandidates = null)
         {
             foreach (var transcript in transcriptCandidates)
             {
@@ -29,31 +28,37 @@ namespace VariantAnnotation.TranscriptAnnotation
                     overlappingGenes.Add(transcript.Gene.Symbol);
 
                 if (variant.Behavior.NeedVerboseTranscripts)
-                    AddOverlappingTranscript(annotationStatus, transcript,variant,overlappingTranscripts );
+                    AddOverlappingTranscript(annotationStatus, transcript, variant, overlappingTranscripts);
 
-                var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript, annotationStatus, siftCache,polyphenCache,geneFusionCandidates);
+                var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript,
+                    annotationStatus, siftCache, polyphenCache, geneFusionCandidates);
 
                 if (annotatedTranscript != null) annotatedTranscripts.Add(annotatedTranscript);
             }
-
         }
 
-        private static void AddOverlappingTranscript(Status annotationStatus, ITranscript transcript,IInterval variant, IList<IOverlappingTranscript> overlappingTranscripts)
+        private static void AddOverlappingTranscript(Status annotationStatus, ITranscript transcript, IInterval variant,
+            IList<IOverlappingTranscript> overlappingTranscripts)
         {
-            if ( annotationStatus == Status.SvCompleteOverlapAnnotation)
-                overlappingTranscripts.Add(new OverlappingTranscript(transcript.Id,transcript.Gene.Symbol,transcript.Version,transcript.IsCanonical,false));
+            if (annotationStatus == Status.SvCompleteOverlapAnnotation)
+            {
+                overlappingTranscripts.Add(new OverlappingTranscript(transcript.Id, transcript.Gene.Symbol, transcript.IsCanonical, false));
+            }
+
             if (annotationStatus == Status.ReducedAnnotation)
             {
                 var partialOverlap = !variant.Contains(transcript);
-                overlappingTranscripts.Add(new OverlappingTranscript(transcript.Id, transcript.Gene.Symbol, transcript.Version, transcript.IsCanonical, partialOverlap));
+                overlappingTranscripts.Add(new OverlappingTranscript(transcript.Id, transcript.Gene.Symbol, transcript.IsCanonical, partialOverlap));
             }
-               
         }
 
-        private static IAnnotatedTranscript GetAnnotatedTranscript(IVariant variant, ISequence compressedSequence, ITranscript transcript, Status annotationStatus,
-            IPredictionCache siftCache, IPredictionCache polyphenCache, IEnumerable<ITranscript> geneFusionCandidates)
+        private static IAnnotatedTranscript GetAnnotatedTranscript(IVariant variant, ISequence compressedSequence,
+            ITranscript transcript, Status annotationStatus, IPredictionCache siftCache, IPredictionCache polyphenCache,
+            ITranscript[] geneFusionCandidates)
         {
             IAnnotatedTranscript annotatedTranscript = null;
+
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (annotationStatus)
             {
                 case Status.FlankingAnnotation:
@@ -61,7 +66,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                         FlankingTranscriptAnnotator.GetAnnotatedTranscript(variant.End, transcript);
                     break;
                 case Status.ReducedAnnotation:
-                    annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant,geneFusionCandidates);
+                    annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, geneFusionCandidates);
                     break;
                 case Status.FullAnnotation:
                     var acidsProvider = variant.Chromosome.UcscName == "chrM"
@@ -76,14 +81,13 @@ namespace VariantAnnotation.TranscriptAnnotation
         }
 
         internal static Status DecideAnnotationStatus(IInterval variant, IInterval transcript,
-            AnnotationBehavior behavior,IInterval gene)
+            AnnotationBehavior behavior, IInterval gene)
         {
-
-            if (variant.Contains(gene) && behavior.ReducedTranscriptAnnotation)  return Status.SvCompleteOverlapAnnotation;
+            if (variant.Contains(gene) && behavior.ReducedTranscriptAnnotation) return Status.SvCompleteOverlapAnnotation;
             if (variant.Contains(gene) && !behavior.ReducedTranscriptAnnotation) return Status.FullAnnotation;
-            if (!variant.Contains(gene)&& variant.Overlaps(transcript) && behavior.ReducedTranscriptAnnotation)  return Status.ReducedAnnotation;
+            if (!variant.Contains(gene) && variant.Overlaps(transcript) && behavior.ReducedTranscriptAnnotation) return Status.ReducedAnnotation;
             if (!variant.Contains(gene) && variant.Overlaps(transcript) && !behavior.ReducedTranscriptAnnotation) return Status.FullAnnotation;
-            if (!variant.Overlaps(transcript) && variant.Overlaps(transcript, FlankingLength) && behavior.NeedFlankingTranscript)
+            if (!variant.Overlaps(transcript) && variant.Overlaps(transcript, OverlapBehavior.FlankingLength) && behavior.NeedFlankingTranscript)
                 return Status.FlankingAnnotation;
 
             return Status.NoAnnotation;

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
@@ -20,21 +20,23 @@ namespace VariantAnnotation.AnnotatedPositions
 
         private static readonly string[] TranscriptLabels = { "refSeq", "ensembl" };
 
+        public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
+
         public AnnotatedVariant(IVariant variant)
         {
             Variant = variant;
         }
 
+        
         public string GetJsonString(string originalChromName)
         {
-            var sb = new StringBuilder();
+            var sb         = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             // data section
             sb.Append(JsonObject.OpenBrace);
 
             jsonObject.AddStringValue("vid", Variant.VariantId);
-            //jsonObject.AddStringValue(AncestralAlleleTag, AncestralAllele);
             jsonObject.AddStringValue("chromosome", originalChromName);
             jsonObject.AddIntValue("begin", Variant.Start);
             jsonObject.AddIntValue("end", Variant.End);
@@ -55,33 +57,36 @@ namespace VariantAnnotation.AnnotatedPositions
 
 	        var variantType = GetVariantType(Variant.Type);
 			jsonObject.AddStringValue("variantType", variantType.ToString());
+            jsonObject.AddBoolValue("isDecomposedVariant", Variant.IsDecomposed);
+            if (variantType.ToString() != "SNV") jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
             jsonObject.AddStringValue("hgvsg",HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
             if (SupplementaryAnnotations.Count > 0) AddSAstoJsonObject(jsonObject);
+            foreach (var pluginData in PluginDataSet)
+            {
+                jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
+            }
 
             if(OverlappingGenes.Count>0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes);
             if(OverlappingTranscripts.Count>0) jsonObject.AddObjectValues("overlappingTranscripts",OverlappingTranscripts);
+
             if (EnsemblTranscripts?.Count > 0 || RefSeqTranscripts?.Count > 0)
             {
-                jsonObject.AddGroupedObjectValues("transcripts", TranscriptLabels, RefSeqTranscripts,EnsemblTranscripts);
+                jsonObject.AddGroupedObjectValues("transcripts", TranscriptLabels, RefSeqTranscripts, EnsemblTranscripts);
             }
 
             sb.Append(JsonObject.CloseBrace);
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-	    private VariantType GetVariantType(VariantType variantType)
+	    private static VariantType GetVariantType(VariantType variantType)
 	    {
 		    switch (variantType)
 		    {
-				case VariantType.copy_number_gain:
-				case VariantType.copy_number_loss:
-				case VariantType.copy_number_variation:
-					return VariantType.copy_number_variation;
-			    case VariantType.short_tandem_repeat_variation:
+				case VariantType.short_tandem_repeat_variation:
 			    case VariantType.short_tandem_repeat_contraction:
 			    case VariantType.short_tandem_repeat_expansion:
 				    return VariantType.short_tandem_repeat_variation;

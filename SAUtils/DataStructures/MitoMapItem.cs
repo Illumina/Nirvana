@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;
 
@@ -29,7 +30,6 @@ namespace SAUtils.DataStructures
     public static class MitomapParsingParameters
     {
         public const int LargeDeletionCutoff = 100;
-        public const string MitomapDiseaseAnnotationFile = "MitomapDisease";
     }
 
     public sealed class MitoMapItem : SupplementaryDataItem
@@ -44,12 +44,19 @@ namespace SAUtils.DataStructures
         private VariantType? _variantType;
         private static readonly Chromosome ChromM = new Chromosome("chrM", "MT", 24);
 
-        public MitoMapItem(int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType)
+        public MitoMapItem(int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType, ISequenceProvider sequenceProvider)
         {
             Chromosome = ChromM;
             Start = posi;
-            ReferenceAllele = refAllele;
-            AlternateAllele = altAllele;
+            if (sequenceProvider == null)
+            {
+                ReferenceAllele = refAllele;
+                AlternateAllele = altAllele;
+            }
+            else
+            {
+                (Start, ReferenceAllele, AlternateAllele) = TryAddPaddingBase(refAllele, altAllele, Start, sequenceProvider);
+            }
             IsInterval = isInterval;
             _diseases = diseases;
             _homoplasmy = homoplasmy;
@@ -61,24 +68,40 @@ namespace SAUtils.DataStructures
             _variantType = variantType;
         }
 
+        private (int, string, string) TryAddPaddingBase(string refAllele, string altAllele, int position, ISequenceProvider sequenceProvider)
+        {
+            // insertion
+            if (IsEmptyOrDash(refAllele)) return AddPaddingBase(altAllele, true, position, sequenceProvider);
+            // deletion
+            if (IsEmptyOrDash(altAllele)) return AddPaddingBase(refAllele, false, position, sequenceProvider);
+            return (position, refAllele, altAllele);
+        }
+
+        private (int, string, string) AddPaddingBase(string allele, bool isInsertion, int position, ISequenceProvider sequenceProvider)
+        {
+            string paddingBase = sequenceProvider.Sequence.Substring(position - 2, 1);
+            return isInsertion ? (position - 1, paddingBase, paddingBase + allele) : (position - 1, paddingBase + allele, paddingBase);
+        }
+
+        private bool IsEmptyOrDash(string allele) => string.IsNullOrEmpty(allele) || allele == "-";
+
         public string GetVariantJsonString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
-            //converting empty alleles to '-'
-            var refAllele = string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele;
-            var altAllele = string.IsNullOrEmpty(AlternateAllele) ? "-" : AlternateAllele;
+            if (string.IsNullOrEmpty(ReferenceAllele)) ReferenceAllele = "-";
+            if (string.IsNullOrEmpty(AlternateAllele)) AlternateAllele = "-";
 
-            jsonObject.AddStringValue("refAllele", refAllele);
-            jsonObject.AddStringValue("altAllele", altAllele);
+            jsonObject.AddStringValue("refAllele", ReferenceAllele);
+            jsonObject.AddStringValue("altAllele", AlternateAllele);
             if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("diseases", _diseases.Distinct().ToList());
             if (_homoplasmy.HasValue) jsonObject.AddBoolValue("hasHomoplasmy", _homoplasmy.Value, true); 
             if (_heteroplasmy.HasValue) jsonObject.AddBoolValue("hasHeteroplasmy", _heteroplasmy.Value, true);  
             if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
             if (!string.IsNullOrEmpty(_clinicalSignificance)) jsonObject.AddStringValue("clinicalSignificance", _clinicalSignificance);
-            if (!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile);
-            return sb.ToString();
+            if (!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile, false);
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()
@@ -127,7 +150,7 @@ namespace SAUtils.DataStructures
             }
             else
             {
-                diseases = (mitoMapItem1._diseases?.Count > 0) ? mitoMapItem1._diseases : mitoMapItem2._diseases;
+                diseases = mitoMapItem1._diseases?.Count > 0 ? mitoMapItem1._diseases : mitoMapItem2._diseases;
             }
             var status = mitoMapItem1._status ?? mitoMapItem2._status;
             var clinicalSignificance = mitoMapItem1._clinicalSignificance ?? mitoMapItem2._clinicalSignificance;
@@ -137,7 +160,7 @@ namespace SAUtils.DataStructures
             var variantType = mitoMapItem1._variantType ?? mitoMapItem2._variantType;
             return new MitoMapItem(mitoMapItem1.Start, mitoMapItem1.ReferenceAllele, mitoMapItem1.AlternateAllele,
                 diseases, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile, isInterval,
-                intervalEnd, variantType);
+                intervalEnd, variantType, null);
         }
 
         private static bool HasConflict<T>(T originalValue, T newValue)

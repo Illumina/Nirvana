@@ -1,7 +1,6 @@
 ﻿using Moq;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 using Xunit;
 
@@ -12,67 +11,51 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void Assign_WhenIntervalsNull_ReturnNull()
         {
-            var cdsInterval = new NullableInterval(null, null);
-            var proteinInterval = new NullableInterval(null, null);
-            var codingSequence = new SimpleSequence("AAA");
+            var sequence = new SimpleSequence("AAA");
+            var codons = Codons.GetCodons("A", "G", -1, -1, -1, -1, sequence);
 
-            Codons.Assign("A", "G", cdsInterval, proteinInterval, codingSequence, out string refCodons,
-                out string altCodons);
-
-            Assert.Null(refCodons);
-            Assert.Null(altCodons);
+            Assert.Equal("", codons.Reference);
+            Assert.Equal("", codons.Alternate);
         }
 
         [Fact]
         public void Assign_SNV_SuffixLenTooBig()
         {
-            var cdsInterval = new NullableInterval(89, 89);
-            var proteinInterval = new NullableInterval(30, 30);
+            var sequence = new Mock<ISequence>();
+            sequence.SetupGet(x => x.Length).Returns(89);
+            sequence.Setup(x => x.Substring(87, 1)).Returns("t");
 
-            var codingSequence = new Mock<ISequence>();
-            codingSequence.SetupGet(x => x.Length).Returns(89);
-            codingSequence.Setup(x => x.Substring(87, 1)).Returns("t");
+            var codons = Codons.GetCodons("C", "T", 89, 89, 30, 30, sequence.Object);
 
-            Codons.Assign("C", "T", cdsInterval, proteinInterval, codingSequence.Object, out string refCodons,
-                out string altCodons);
-
-            Assert.Equal("tC", refCodons);
-            Assert.Equal("tT", altCodons);
+            Assert.Equal("tC", codons.Reference);
+            Assert.Equal("tT", codons.Alternate);
         }
 
         [Fact]
         public void Assign_SNV()
         {
-            var cdsInterval = new NullableInterval(24, 24);
-            var proteinInterval = new NullableInterval(8, 8);
+            var sequence = new Mock<ISequence>();
+            sequence.SetupGet(x => x.Length).Returns(100);
+            sequence.Setup(x => x.Substring(21, 2)).Returns("CA");
 
-            var codingSequence = new Mock<ISequence>();
-            codingSequence.SetupGet(x => x.Length).Returns(100);
-            codingSequence.Setup(x => x.Substring(21, 2)).Returns("CA");
+            var codons = Codons.GetCodons("A", "G", 24, 24, 8, 8, sequence.Object);
 
-            Codons.Assign("A", "G", cdsInterval, proteinInterval, codingSequence.Object, out string refCodons,
-                out string altCodons);
-
-            Assert.Equal("caA", refCodons);
-            Assert.Equal("caG", altCodons);
+            Assert.Equal("caA", codons.Reference);
+            Assert.Equal("caG", codons.Alternate);
         }
 
         [Fact]
         public void Assign_MNV()
         {
-            var cdsInterval = new NullableInterval(24, 28);
-            var proteinInterval = new NullableInterval(8, 10);
+            var sequence = new Mock<ISequence>();
+            sequence.SetupGet(x => x.Length).Returns(100);
+            sequence.Setup(x => x.Substring(21, 2)).Returns("CA");
+            sequence.Setup(x => x.Substring(28, 2)).Returns("GG");
 
-            var codingSequence = new Mock<ISequence>();
-            codingSequence.SetupGet(x => x.Length).Returns(100);
-            codingSequence.Setup(x => x.Substring(21, 2)).Returns("CA");
-            codingSequence.Setup(x => x.Substring(28, 2)).Returns("GG");
+            var codons = Codons.GetCodons("GTGCT", "ACCGA", 24, 28, 8, 10, sequence.Object);
 
-            Codons.Assign("GTGCT", "ACCGA", cdsInterval, proteinInterval, codingSequence.Object, out string refCodons,
-                out string altCodons);
-
-            Assert.Equal("caGTGCTgg", refCodons);
-            Assert.Equal("caACCGAgg", altCodons);
+            Assert.Equal("caGTGCTgg", codons.Reference);
+            Assert.Equal("caACCGAgg", codons.Alternate);
         }
 
         [Fact]

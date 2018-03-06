@@ -21,13 +21,6 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         }
 
         [Fact]
-        public void OverlapsAny_IIntervalSearch()
-        {
-            var intervalSearch = new NullIntervalSearch<string>();
-            Assert.False(intervalSearch.OverlapsAny(1, 2));
-        }
-
-        [Fact]
         public void GetAllOverlappingValues_IIntervalSearch()
         {
             var intervalSearch = new NullIntervalSearch<string>();

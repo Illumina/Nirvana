@@ -61,7 +61,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private void AddRegulatoryRegion(IAnnotatedVariant annotatedVariant)
         {
             var regulatoryRegion = new RegulatoryRegion(_chromosome, 103, 104, CompactId.Convert("7157"),
-                RegulatoryElementType.TF_binding_site);
+                RegulatoryRegionType.TF_binding_site);
             var consequences = new List<ConsequenceTag> { ConsequenceTag.regulatory_region_amplification };
 
             annotatedVariant.RegulatoryRegions.Add(new AnnotatedRegulatoryRegion(regulatoryRegion, consequences));
@@ -95,14 +95,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private IVariant GetVariant()
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false, false);
-            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", false, true,
+            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", false, false, false,
                 new[] { "bob:100:102:TAT" }, null, behavior);
         }
 
         private IVariant GetRefMinorVariant()
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false, false);
-            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, true,
+            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
                 new[] { "bob:100:102:TAT" }, null, behavior);
         }
     }

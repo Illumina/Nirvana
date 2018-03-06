@@ -6,15 +6,14 @@ namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class FlankingTranscriptAnnotator
     {
-        public static IAnnotatedTranscript GetAnnotatedTranscript(int variantEnd,ITranscript Transcript)
+        public static IAnnotatedTranscript GetAnnotatedTranscript(int variantEnd, ITranscript transcript)
         {
-            var isDownStream = variantEnd < Transcript.Start == Transcript.Gene.OnReverseStrand;
-
-            var consequence = new Consequences();
+            var isDownStream = variantEnd < transcript.Start == transcript.Gene.OnReverseStrand;
+            var consequence  = new Consequences();
 
             consequence.DetermineFlankingVariantEffects(isDownStream);
-
-            return new AnnotatedTranscript(Transcript,null,null,null,null,null,null,null,null,null, consequence.GetConsequences(), null);
+            return new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null,
+                consequence.GetConsequences(), null);
         }
     }
 }

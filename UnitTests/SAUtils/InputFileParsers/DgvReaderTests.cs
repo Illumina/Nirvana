@@ -5,16 +5,16 @@ using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.DGV;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
-using Xunit;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
+using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class DgvReaderTests
     {
         private static IChromosome chrom1 = new Chromosome("chr1", "1", 0);
-        private static readonly IDictionary<string, IChromosome> _refChromDict = new Dictionary<string, IChromosome>
+        private static readonly IDictionary<string, IChromosome> RefChromDict = new Dictionary<string, IChromosome>
         {
             {"chr1",chrom1 },
             {"1",chrom1}
@@ -42,7 +42,7 @@ namespace UnitTests.SaUtilsTests.InputFileParsers
         [Fact]
         public void TestDbSnpReader()
         {
-            var dgvReader = new DgvReader(TestDgvFile, _refChromDict);
+            var dgvReader = new DgvReader(TestDgvFile, RefChromDict);
             Assert.True(dgvReader.GetDgvItems().SequenceEqual(CreateTruthDgvItemSequence()));
         }
     }

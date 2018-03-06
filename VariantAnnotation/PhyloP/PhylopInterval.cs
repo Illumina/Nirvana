@@ -5,8 +5,6 @@ namespace VariantAnnotation.PhyloP
 {
 	public sealed class PhylopInterval : IEquatable<PhylopInterval>, IComparable<PhylopInterval>
 	{
-		#region member
-
 		public int Begin { get; private set; }
 
 		public int Length;
@@ -14,7 +12,6 @@ namespace VariantAnnotation.PhyloP
 	    private short StepSize { get; set; }
 		//file location of the compressed phylop scores for this interval
 		public long FilePosition;
-		#endregion
 
 		public PhylopInterval(int begin, int length, short stepSize)
 		{
@@ -31,17 +28,13 @@ namespace VariantAnnotation.PhyloP
 		
 		public int CompareTo(PhylopInterval otherInterval)
 		{
-			// A null value means that this object is greater. 
-			if (otherInterval == null)
-				return 1;
-
-			return Begin.CompareTo(otherInterval.Begin);
+		    // A null value means that this object is greater. 
+		    return otherInterval == null ? 1 : Begin.CompareTo(otherInterval.Begin);
 		}
 
 		public bool Equals(PhylopInterval other)
 		{
-			if (other == null) return false;
-			return Begin.Equals(other.Begin);
+		    return other != null && Begin.Equals(other.Begin);
 		}
 
 		public void Write(BinaryWriter binaryWriter)

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 
@@ -22,14 +21,14 @@ namespace SAUtils.DataStructures
         private string Id { get; }
         private int End { get; }
         private VariantType VariantType { get; }
-        private ClinicalInterpretation ClinicalInterpretation { get; set; }
+        private ClinicalInterpretation ClinicalInterpretation { get; }
         private IEnumerable<string> Phenotypes => _phenotypes;
 	    private readonly HashSet<string> _phenotypes;
         private IEnumerable<string> PhenotypeIds => _phenotypeIds;
 	    private readonly HashSet<string> _phenotypeIds;
-        private int ObservedGains { get; set; }
-        private int ObservedLosses { get; set; }
-        private bool Validated { get; set; }
+        private int ObservedGains { get; }
+        private int ObservedLosses { get; }
+        private bool Validated { get; }
 
         public ClinGenItem(string id, IChromosome chromosome, int start, int end, VariantType variantType, int observedGains, int observedLosses,
             ClinicalInterpretation clinicalInterpretation, bool validated, HashSet<string> phenotypes = null, HashSet<string> phenotypeIds = null)
@@ -109,46 +108,5 @@ namespace SAUtils.DataStructures
                 return hashCode;
             }
         }
-
-        public void MergeItem(ClinGenItem other)
-        {
-            //sanity check 
-            if (!Id.Equals(other.Id) || !Chromosome.Equals(other.Chromosome) || Start != other.Start || End != other.End)
-            {
-                throw new Exception($"different region with same parent ID {Id}\n");
-            }
-
-            //check if the validate status and clinical interpretation are consistent
-            if (Validated || other.Validated)
-            {
-                Validated = true;
-            }
-
-            if (!ClinicalInterpretation.Equals(other.ClinicalInterpretation))
-            {
-                if (ClinicalInterpretation < other.ClinicalInterpretation)
-                    ClinicalInterpretation = other.ClinicalInterpretation;
-            }
-
-            if (other.VariantType == VariantType.copy_number_gain)
-            {
-                ObservedGains++;
-            }
-            else if (other.VariantType == VariantType.copy_number_loss)
-            {
-                ObservedLosses++;
-            }
-            foreach (var phenotype in other.Phenotypes)
-            {
-                _phenotypes.Add(phenotype);
-            }
-
-            foreach (var phenotypeId in other.PhenotypeIds)
-            {
-                _phenotypeIds.Add(phenotypeId);
-            }
-        }
-
-
     }
 }

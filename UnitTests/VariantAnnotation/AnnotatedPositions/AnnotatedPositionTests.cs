@@ -75,7 +75,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var infoData = new InfoData(null, null, VariantType.unknown, null, null, null, null, null, false, null, null, false, false, null,null, null);
 
             return new Position(_chromosome, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
-                vcfFields);
+                vcfFields, new[] { false }, false);
         }
     }
 }

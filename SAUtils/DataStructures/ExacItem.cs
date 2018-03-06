@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -131,7 +131,7 @@ namespace SAUtils.DataStructures
             if (!(other is ExacItem otherItem)) return false;
 
             // Return true if the fields match:
-            return string.Equals(Chromosome, otherItem.Chromosome)
+            return Equals(Chromosome, otherItem.Chromosome)
                 && Start == otherItem.Start
                 && AlternateAllele.Equals(otherItem.AlternateAllele)
                 ;
@@ -150,7 +150,7 @@ namespace SAUtils.DataStructures
 
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddIntValue("coverage", Coverage);
 			jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
@@ -180,7 +180,7 @@ namespace SAUtils.DataStructures
 			if (SasAlleleCount != null) jsonObject.AddIntValue("sasAc", SasAlleleCount.Value);
 			if (OthAlleleCount != null) jsonObject.AddIntValue("othAc", OthAlleleCount.Value);
 
-			return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()

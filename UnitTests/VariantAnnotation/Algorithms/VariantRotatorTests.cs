@@ -29,14 +29,12 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            bool shiftToEnd;
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence,transcript.Object.Gene.OnReverseStrand,out shiftToEnd);
+            var rotated = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
 
-            Assert.NotNull(rotatedVariant);
-            Assert.False(ReferenceEquals(variant.Object, rotatedVariant));
-            Assert.Equal(966400, rotatedVariant.Start);
-            Assert.Equal("TG", rotatedVariant.RefAllele);
-            Assert.False(shiftToEnd);
+            Assert.False(ReferenceEquals(variant.Object, rotated.Variant));
+            Assert.Equal(966400, rotated.Variant.Start);
+            Assert.Equal("TG", rotated.Variant.RefAllele);
+            Assert.False(rotated.ShiftToEnd);
         }
 
         [Fact]
@@ -49,22 +47,20 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            bool shiftToEnd;
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out shiftToEnd);
+            var rotated = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
 
-            Assert.NotNull(rotatedVariant);
-            Assert.False(ReferenceEquals(variant.Object, rotatedVariant));
-            Assert.Equal(966403, rotatedVariant.Start);
-            Assert.Equal("TG", rotatedVariant.AltAllele);
-            Assert.False(shiftToEnd);
+            Assert.False(ReferenceEquals(variant.Object, rotated.Variant));
+            Assert.Equal(966403, rotated.Variant.Start);
+            Assert.Equal("TG", rotated.Variant.AltAllele);
+            Assert.False(rotated.ShiftToEnd);
         }
 
         [Fact]
         public void Right_Identity_WhenRefSequenceNull()
         {
             var originalVariant = GetDeletion();
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, null, false, out _);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, null, false);
+            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant.Variant));
         }
 
         [Fact]
@@ -72,8 +68,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
         {
             var originalVariant = GetDeletion();
             originalVariant.SetupGet(x => x.Type).Returns(VariantType.SNV);
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, _refSequence, false, out _);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotated = VariantRotator.Right(originalVariant.Object, null, _refSequence, false);
+            Assert.True(ReferenceEquals(originalVariant.Object, rotated.Variant));
         }
 
         [Fact]
@@ -85,8 +81,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.Start).Returns(966397);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out _);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant.Object, rotated.Variant));
         }
 
         [Fact]
@@ -98,8 +94,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966390);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out _);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant.Object, rotated.Variant));
         }
 
         [Fact]
@@ -111,8 +107,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966392);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand, out _);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant.Object, rotated.Variant));
         }
 
         [Fact]
@@ -129,8 +125,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, transcript.Object, refSequence, transcript.Object.Gene.OnReverseStrand, out _);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant.Object, rotated.Variant));
         }
 
         private static Mock<ISimpleVariant> GetDeletion()
@@ -146,7 +142,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         }
 
         private static Mock<ISimpleVariant> GetInsertion()
-        {            
+        {
             var variant = new Mock<ISimpleVariant>();
             variant.SetupGet(x => x.Chromosome).Returns(Chromosome);
             variant.SetupGet(x => x.Type).Returns(VariantType.insertion);

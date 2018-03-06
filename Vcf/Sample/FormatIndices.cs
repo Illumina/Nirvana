@@ -55,6 +55,7 @@
 
             for (var index = 0; index < formatCols.Length; index++)
             {
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (formatCols[index])
                 {
                     case "AU":

@@ -25,7 +25,7 @@ namespace Jasix.DataStructures
             if (!match.Success)
                 throw new UserErrorException($"region {trimmedPos} is not valid, please specify a valid region, e.g., chr1, 1, 1:1234 or 1:1234-4567");
             var chromosome = match.Groups[1].ToString();
-            if (!match.Groups[2].Success && !match.Groups[3].Success) return (chromosome, 1, Int32.MaxValue);
+            if (!match.Groups[2].Success && !match.Groups[3].Success) return (chromosome, 1, int.MaxValue);
 
             var start = Convert.ToInt32(match.Groups[2].ToString());
 
@@ -67,10 +67,7 @@ namespace Jasix.DataStructures
 
         public static bool IsNucleotideAllele(string altAllele)
         {
-            if (string.IsNullOrEmpty(altAllele)) return true;
-            return altAllele.ToCharArray().All(x => x == 'A' || x == 'T' || x == 'C' || x == 'G');
+            return string.IsNullOrEmpty(altAllele) || altAllele.ToCharArray().All(x => x == 'A' || x == 'T' || x == 'C' || x == 'G');
         }
-
-
     }
 }

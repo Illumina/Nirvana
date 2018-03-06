@@ -16,7 +16,8 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		#region IDisposable
-		bool _disposed;
+
+	    private bool _disposed;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 
@@ -65,8 +66,7 @@ namespace SAUtils.TsvWriters
 			var cosmicItems = new List<CosmicItem>();
 			foreach (var item in saItems)
 			{
-				var cosmicItem = item as CosmicItem;
-				if (cosmicItem == null)
+			    if (!(item is CosmicItem cosmicItem))
 					throw new InvalidDataException("Expected CosmicItem list!!");
 				cosmicItems.Add(cosmicItem);
 			}
@@ -93,7 +93,7 @@ namespace SAUtils.TsvWriters
 
 		}
 
-		private Dictionary<(string ReferenceAllele, string AlternateAllele), List<CosmicItem>> GroupByAltAllele(List<CosmicItem> cosmicItems)
+		private static Dictionary<(string ReferenceAllele, string AlternateAllele), List<CosmicItem>> GroupByAltAllele(List<CosmicItem> cosmicItems)
 		{
 			var groups = new Dictionary<(string, string), List<CosmicItem>>();
 
@@ -108,7 +108,7 @@ namespace SAUtils.TsvWriters
 			return groups;
 		}
 
-		private List<CosmicItem> CombineStudies(List<CosmicItem> cosmicItems)
+		private static List<CosmicItem> CombineStudies(List<CosmicItem> cosmicItems)
 		{
 			var cosmicDict = new Dictionary<string, CosmicItem>();
 

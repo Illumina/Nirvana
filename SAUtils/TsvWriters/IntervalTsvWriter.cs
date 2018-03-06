@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Text;
+using CommonUtilities;
 using Compression.FileHandling;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.SA;
@@ -20,7 +20,7 @@ namespace SAUtils.TsvWriters
 
 		#region IDisposable
 
-		bool _disposed ;
+	    private bool _disposed ;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 
@@ -64,9 +64,9 @@ namespace SAUtils.TsvWriters
 			_tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName) + ".tvi");
 		}
 
-		private string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, ReportFor reportingFor)
+		private static string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, ReportFor reportingFor)
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			
 			sb.Append($"#name={dataSourceVersion.Name}\n");
 			sb.Append($"#assembly={assembly}\n");
@@ -79,7 +79,7 @@ namespace SAUtils.TsvWriters
 			sb.Append($"#reportFor={reportingFor}\n");
 			sb.Append($"#keyName={keyName}\n");
 			sb.Append("#CHROM\tSTART\tEND\tJSON\n");
-			return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
 		public void AddEntry(string chromosome, int start, int end, string jsonString)

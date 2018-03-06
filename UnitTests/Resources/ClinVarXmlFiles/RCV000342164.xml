@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
   <ClinVarSet ID="22637006">
@@ -64,8 +64,8 @@
             <XRef ID="NM_000368.4:c.2075_2120dup46" DB="RefSeq" />
           </AttributeSet>
           <CytogeneticLocation>9q34.13</CytogeneticLocation>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="9" Accession="NC_000009.12" start="132903739" stop="132903784" display_start="132903739" display_stop="132903784" variantLength="46" positionVCF="132903738" referenceAlleleVCF="A" alternateAlleleVCF="AAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" />
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="9" Accession="NC_000009.11" start="135779126" stop="135779126" display_start="135779126" display_stop="135779126" variantLength="1" referenceAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" alternateAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCAT" positionVCF="135779125" referenceAlleleVCF="A" alternateAlleleVCF="AAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="9" Accession="NC_000009.12" start="132903739" stop="132903784" display_start="132903739" display_stop="132903784" variantLength="46" simplePositionVCF="132903738" referenceAlleleVCF="A" alternateAlleleVCF="AAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="9" Accession="NC_000009.11" start="135779126" stop="135779126" display_start="135779126" display_stop="135779126" variantLength="1" referenceAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" alternateAllele="AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCAT" simplePositionVCF="135779125" referenceAlleleVCF="A" alternateAlleleVCF="AAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC" />
           <MeasureRelationship Type="within single gene">
             <Name>
               <ElementValue Type="Preferred">TSC complex subunit 1</ElementValue>
@@ -118,7 +118,7 @@
       <ClinicalSignificance DateLastEvaluated="2016-09-20">
         <ReviewStatus>criteria provided, single submitter</ReviewStatus>
         <Description>Pathogenic</Description>
-        <Comment>The c.2075_2120dup46 pathogenic variant in the TSC1 gene causes a frameshift starting with codon Phenylalanine 707, changes this amino acid to a Leucine residue and creates a premature Stop codon at position 14 of the new reading frame, denoted p.Phe707LeufsX14. This pathogenic variant is predicted to cause loss of normal protein function either through protein truncation or nonsense-mediated mRNA decay. Furthermore, it was not observed in approximately 6,500 individuals of European and African American ancestry in the NHLBI Exome Sequencing Project, indicating it is not a common benign variant in these populations.</Comment>
+        <Comment>The c.2075_2120dup46 pathogenic variant in the TSC1 gene causes a frameshift starting with codon Phenylalanine 707, changes this amino acid to a Leucine residue and creates a premature Stop codon at simplePosition 14 of the new reading frame, denoted p.Phe707LeufsX14. This pathogenic variant is predicted to cause loss of normal protein function either through protein truncation or nonsense-mediated mRNA decay. Furthermore, it was not observed in approximately 6,500 individuals of European and African American ancestry in the NHLBI Exome Sequencing Project, indicating it is not a common benign variant in these populations.</Comment>
       </ClinicalSignificance>
       <Assertion Type="variation to disease" />
       <ExternalID DB="GeneDx" ID="GDX:1281897" />

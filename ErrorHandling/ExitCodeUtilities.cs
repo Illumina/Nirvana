@@ -69,6 +69,7 @@ namespace ErrorHandling
 
 			var exceptionType = e.GetType();
 
+		    // ReSharper disable once InvertIf
 			if (!UserFriendlyExceptions.Contains(exceptionType))
 			{
 				// print the stack trace
@@ -78,6 +79,7 @@ namespace ErrorHandling
 				Console.WriteLine(e.StackTrace);
 
 				// extract out the vcf line
+			    // ReSharper disable once InvertIf
 				if (e.Data.Contains(VcfLine))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;

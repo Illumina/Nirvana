@@ -3,8 +3,8 @@ namespace Jasix.DataStructures
 {
 	public  static class JasixCommons
 	{
-		public static int Version = 1;
-		public const string FileExt = ".jsi";
+	    public const int Version = 1;
+	    public const string FileExt = ".jsi";
 		public const string SectionToIndex = "positions";
 		private const int MaxVariantLength = 50;
 		public const int MinNodeWidth = MaxVariantLength;

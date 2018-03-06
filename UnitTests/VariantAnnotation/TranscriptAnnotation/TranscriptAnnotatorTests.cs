@@ -80,7 +80,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
-            var transcripts = new[] {transcript1.Object, transcript2.Object};
+            var transcripts = new[] { transcript1.Object, transcript2.Object };
 
             variant.SetupGet(x => x.Behavior).Returns(new AnnotationBehavior(true, false, false, true, false, false));
             variant.SetupGet(x => x.Start).Returns(123456);
@@ -99,11 +99,11 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript2.SetupGet(x => x.Gene.End).Returns(129489);
 
             var compressedSequence = new Mock<ISequence>();
-            var observedAnnotatedTranscripts =new List<IAnnotatedTranscript>();
+            var observedAnnotatedTranscripts = new List<IAnnotatedTranscript>();
 
-            TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts, compressedSequence.Object,observedAnnotatedTranscripts,null,null,null,null);
+            TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts, compressedSequence.Object, observedAnnotatedTranscripts, null, null, null, null);
 
-            Assert.Equal(0,observedAnnotatedTranscripts.Count);
+            Assert.Empty(observedAnnotatedTranscripts);
         }
     }
 }

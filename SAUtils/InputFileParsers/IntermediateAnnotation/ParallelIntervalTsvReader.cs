@@ -166,7 +166,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             }
         }
 
-        private ReportFor GetReportFor(string value)
+        private static ReportFor GetReportFor(string value)
         {
             switch (value)
             {

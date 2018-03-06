@@ -2,8 +2,7 @@
 {
 	public interface IIntervalSearch<T>
 	{
-		bool OverlapsAny(int begin, int end);
-		bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval);
+	    bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval);
 		T[] GetAllOverlappingValues(int begin, int end);
 	}
 

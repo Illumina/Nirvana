@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Composition;
-using System.Composition.Hosting;
+﻿using System.Composition.Hosting;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -12,26 +9,34 @@ namespace Nirvana
 {
     public static class PluginUtilities
     {
-        public static IEnumerable<IPlugin> LoadPlugins(string pluginDirectory)
+        private const string DllExtension = ".dll";
+        private const string ConfigExtension = ".config";
+        public static IPlugin[] LoadPlugins(string pluginDirectory)
         {
-            IEnumerable<IPlugin> plugins;
             var executableLocation = Assembly.GetEntryAssembly().Location;
             var path = pluginDirectory ?? Path.Combine(Path.GetDirectoryName(executableLocation), "Plugins");
 
             if (!Directory.Exists(path)) return null;
 
-            var assemblies = Directory
-                .GetFiles(path, "*.dll", SearchOption.AllDirectories)
-                .Select(AssemblyLoadContext.Default.LoadFromAssemblyPath)
-                .ToList();
-            var configuration = new ContainerConfiguration()
-                .WithAssemblies(assemblies);
+            var pluginFileNames = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
+            var assemblies = pluginFileNames.Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToArray();
+
+            var configuration = new ContainerConfiguration().WithAssemblies(assemblies);
+
+            IPlugin[] plugins;
             using (var container = configuration.CreateContainer())
             {
-                plugins = container.GetExports<IPlugin>();
+                plugins = container.GetExports<IPlugin>().ToArray();
             }
 
+            foreach (var plugin in plugins)
+            {
+                var configFilePath = Path.Combine(path, plugin.Name + DllExtension + ConfigExtension);
+                if (!File.Exists(configFilePath))
+                    throw new FileNotFoundException($"Missing expected config file: {configFilePath}!!");
+            }
             return plugins;
         }
+
     }
 }

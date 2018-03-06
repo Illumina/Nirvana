@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.IO;
 
@@ -66,12 +66,12 @@ namespace SAUtils.TsvWriters
                 vcfString = globalMinorAllele + '|' + globalMinorAlleleFrequency;
             }
 
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
             jsonObject.AddStringValue("globalMinorAllele", globalMinorAllele);
             jsonObject.AddStringValue("globalMinorAlleleFrequency", globalMinorAlleleFrequency, false);
 
-            _globalAlleleWriter.AddEntry(chromosome.EnsemblName, position, refAllele, "N", vcfString, new List<string> { sb.ToString() });
+            _globalAlleleWriter.AddEntry(chromosome.EnsemblName, position, refAllele, "N", vcfString, new List<string> { StringBuilderCache.GetStringAndRelease(sb) });
         }
 
         public static string GetMostFrequentAllele(Dictionary<string, double> alleleFreqDict, string refAllele, bool isRefPreferred = true)

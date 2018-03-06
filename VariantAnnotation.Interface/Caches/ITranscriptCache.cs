@@ -7,8 +7,8 @@ namespace VariantAnnotation.Interface.Caches
 {
     public interface ITranscriptCache : IProvider
     {
-        ITranscript[] GetOverlappingFlankingTranscripts(IChromosomeInterval interval);
-        ITranscript[] GetOverlappingTranscripts(IChromosome chromosome, int start, int end);
+        ITranscript[] GetOverlappingTranscripts(IChromosomeInterval interval);
+        ITranscript[] GetOverlappingTranscripts(IChromosome chromosome, int start, int end, int flankingLength = OverlapBehavior.FlankingLength);
         IRegulatoryRegion[] GetOverlappingRegulatoryRegions(IChromosomeInterval interval);
     }
 }

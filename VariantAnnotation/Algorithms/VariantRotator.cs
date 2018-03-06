@@ -11,31 +11,28 @@ namespace VariantAnnotation.Algorithms
     {
         internal const int MaxDownstreamLength = 500;
 
-        public static ISimpleVariant Right(ISimpleVariant simpleVariant, IInterval rotateRegion, ISequence refSequence, bool onReverseStrand,
-            out bool shiftToEnd)
-        {
-            shiftToEnd = false;
-            if (refSequence == null) return simpleVariant;
+        public static (ISimpleVariant Variant, bool ShiftToEnd) Right(ISimpleVariant simpleVariant, IInterval rotateRegion, ISequence refSequence, bool onReverseStrand)
+        {            
+            if (refSequence == null) return (simpleVariant, false);
 
             if (simpleVariant.Type != VariantType.deletion && simpleVariant.Type != VariantType.insertion)
-                return simpleVariant;
-
+                return (simpleVariant, false);
 
             // if variant is before the transcript start, do not perform 3 prime shift
-            if (onReverseStrand  && simpleVariant.End   > rotateRegion.End)   return simpleVariant;
-            if (!onReverseStrand && simpleVariant.Start < rotateRegion.Start) return simpleVariant;
+            if (onReverseStrand  && simpleVariant.End   > rotateRegion.End)   return (simpleVariant, false);
+            if (!onReverseStrand && simpleVariant.Start < rotateRegion.Start) return (simpleVariant, false);
 
             // consider insertion since insertion begin is larger than end
             // TODO: we shouldn't need special logic for insertions
-            if (!onReverseStrand && simpleVariant.Start >= rotateRegion.End)   return simpleVariant;
+            if (!onReverseStrand && simpleVariant.Start >= rotateRegion.End)   return (simpleVariant, false);
             // TODO: unable to find a situation where this is true
-            if (onReverseStrand  && simpleVariant.End   <= rotateRegion.Start) return simpleVariant;
+            if (onReverseStrand  && simpleVariant.End   <= rotateRegion.Start) return (simpleVariant, false);
 
             var rotatingBases = simpleVariant.Type == VariantType.insertion ? simpleVariant.AltAllele : simpleVariant.RefAllele;
             rotatingBases     = onReverseStrand ? SequenceUtilities.GetReverseComplement(rotatingBases) : rotatingBases;
 
             var basesToEnd       = onReverseStrand ? simpleVariant.Start - rotateRegion.Start : rotateRegion.End - simpleVariant.End;
-            var downStreamLength = Math.Min(basesToEnd, MaxDownstreamLength);
+            var downStreamLength = Math.Min(basesToEnd, Math.Max(rotatingBases.Length, MaxDownstreamLength));// for large rotatingBases, we need to factor in its length but still make sure that we do not go past the end of transcript
 
             var downStreamSeq = onReverseStrand
                 ? SequenceUtilities.GetReverseComplement(
@@ -50,15 +47,14 @@ namespace VariantAnnotation.Algorithms
             // TODO: probably a VEP bug, just use it for consistency
             var numBases = rotatingBases.Length;
 
-            for (shiftStart = 0, shiftEnd = numBases; shiftEnd <= combinedSequence.Length - numBases; shiftStart++, shiftEnd++)
+            for (shiftStart = 0, shiftEnd = numBases; shiftEnd < combinedSequence.Length; shiftStart++, shiftEnd++)
             {
                 if (combinedSequence[shiftStart] != combinedSequence[shiftEnd]) break;
                 hasShifted = true;
             }
 
-            if (shiftStart >= basesToEnd) shiftToEnd = true;
-
-            if (!hasShifted) return simpleVariant;
+            bool shiftToEnd = shiftStart >= basesToEnd;
+            if (!hasShifted) return (simpleVariant, shiftToEnd);
 
             // create a new alternative allele
             var rotatedSequence = combinedSequence.Substring(shiftStart, numBases);
@@ -78,8 +74,8 @@ namespace VariantAnnotation.Algorithms
                 ? simpleVariant.End - shiftStart
                 : simpleVariant.End + shiftStart;
 
-            return new SimpleVariant(simpleVariant.Chromosome, rotatedStart, rotatedEnd, rotatedRefAllele,
-                rotatedAltAllele, simpleVariant.Type);
+            return (new SimpleVariant(simpleVariant.Chromosome, rotatedStart, rotatedEnd, rotatedRefAllele,
+                rotatedAltAllele, simpleVariant.Type), shiftToEnd);
         }
     }
 }

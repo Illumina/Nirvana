@@ -53,9 +53,7 @@ namespace VariantAnnotation.Utilities
 		/// </summary>
 		public static bool HasNonCanonicalBase(string bases)
 		{
-			if (string.IsNullOrEmpty(bases)) return false;
-
-			return bases.Any(c => !CanonicalBases.Contains(c));
+		    return !string.IsNullOrEmpty(bases) && bases.Any(c => !CanonicalBases.Contains(c));
 		}
 
 		/// <summary>

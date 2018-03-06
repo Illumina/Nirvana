@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class AminoAcids
     {
-        #region members
+        public const string StopCodon   = "*";
+        public const char StopCodonChar = '*';
+        public const string StartCodon  = "M";
 
-        public const string StopCodon = "*";
-	    public const char StopCodonChar = '*';
-
-
-		private readonly CodonConversion _codonConversionScheme = CodonConversion.HumanChromosome;
+        private readonly CodonConversion _codonConversionScheme = CodonConversion.HumanChromosome;
 
         private readonly Dictionary<string, char> _aminoAcidLookupTable;
         private readonly Dictionary<string, char> _mitoDifferences;
@@ -48,12 +46,10 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             {'U', "Sec"},
             {'O', "Pyl"},
             {'J', "Xle"},
-			{'?', "_?_"} //deletion at the end of incomplete transcript results in unknown change
+            {'?', "_?_"} //deletion at the end of incomplete transcript results in unknown change
         };
 
-        #endregion
-
-        public enum CodonConversion : byte
+        private enum CodonConversion : byte
         {
             HumanChromosome,
             HumanMitochondrion
@@ -147,31 +143,17 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             };
         }
 
-	    
-	    /// <summary>
-        /// returns the peptide sequence until the first terminal amino acid
-        /// </summary>
-        internal static string AddUnknownAminoAcid(string aminoAcids)
+        internal static string AddUnknownAminoAcid(string aminoAcids) => aminoAcids == StopCodon ? aminoAcids : aminoAcids + 'X';
+
+        public (string Reference, string Alternate) Translate(string referenceCodons,
+            string alternateCodons)
         {
-            return aminoAcids == StopCodon ? aminoAcids : aminoAcids + 'X';
-        }
+            if (string.IsNullOrEmpty(referenceCodons) && string.IsNullOrEmpty(alternateCodons)) return ("", "");
+            if (referenceCodons != null && (referenceCodons.Contains("N") || alternateCodons.Contains("N"))) return ("", "");
 
-        /// <summary>O
-        /// sets the amino acids given the reference and variant codons
-        /// </summary>
-        public void Assign(string referenceCodons, string alternateCodons, out string referenceAminoAcids, out string alternateAminoAcids)
-        {
-            referenceAminoAcids = null;
-            alternateAminoAcids = null;
-
-            if (string.IsNullOrEmpty(referenceCodons) &&
-                string.IsNullOrEmpty(alternateCodons)) return;
-
-            // sanity check: return null if either codon contains Ns
-            if (referenceCodons != null && (referenceCodons.Contains("N") || alternateCodons.Contains("N"))) return;
-
-            referenceAminoAcids = TranslateBases(referenceCodons, false);
-            alternateAminoAcids = TranslateBases(alternateCodons, false);
+            var referenceAminoAcids = TranslateBases(referenceCodons, false);
+            var alternateAminoAcids = TranslateBases(alternateCodons, false);
+            return (referenceAminoAcids, alternateAminoAcids);
         }
 
         /// <summary>
@@ -179,9 +161,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// </summary>
         public static string ConvertAminoAcidToAbbreviation(char aminoAcid)
         {
-            string abbreviation;
-
-            if (!SingleToThreeAminoAcids.TryGetValue(aminoAcid, out abbreviation))
+            if (!SingleToThreeAminoAcids.TryGetValue(aminoAcid, out var abbreviation))
             {
                 throw new NotSupportedException($"Unable to convert the following string to an amino acid abbreviation: {aminoAcid}");
             }
@@ -195,24 +175,16 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// </summary>
         internal char ConvertTripletToAminoAcid(string triplet)
         {
-            var aminoAcid = 'X';
-            var foundAminoAcid = false;
             var upperTriplet = triplet.ToUpper();
 
             // check our exceptions first
             if (_codonConversionScheme == CodonConversion.HumanMitochondrion &&
-                _mitoDifferences.TryGetValue(upperTriplet, out aminoAcid))
-            {
-                foundAminoAcid = true;
-            }
+                _mitoDifferences.TryGetValue(upperTriplet, out var mitoAminoAcid)) return mitoAminoAcid;
 
             // the default case
-            if (!foundAminoAcid && _aminoAcidLookupTable.TryGetValue(upperTriplet, out aminoAcid))
-            {
-                foundAminoAcid = true;
-            }
+            if (_aminoAcidLookupTable.TryGetValue(upperTriplet, out var aminoAcid)) return aminoAcid;
 
-            return foundAminoAcid ? aminoAcid : 'X';
+            return 'X';
         }
 
 
@@ -224,14 +196,16 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public static string GetAbbreviations(string aminoAcids)
         {
             if (string.IsNullOrEmpty(aminoAcids)) return "";
-            var abbrevBuilder = new StringBuilder();
+            if (aminoAcids.Length == 1) return ConvertAminoAcidToAbbreviation(aminoAcids[0]);
+
+            var sb = StringBuilderCache.Acquire();
 
             foreach (var aminoAcid in aminoAcids)
             {
-                abbrevBuilder.Append(ConvertAminoAcidToAbbreviation(aminoAcid));
+                sb.Append(ConvertAminoAcidToAbbreviation(aminoAcid));
             }
 
-            return abbrevBuilder.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         /// <summary>

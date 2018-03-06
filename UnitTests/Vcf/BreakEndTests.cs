@@ -21,7 +21,7 @@ namespace UnitTests.Vcf
 
 			var breakEnds = variantFactory.GetTranslocationBreakends(chromosome1, refAllele, altAllele, position);
 			Assert.NotNull(breakEnds);
-			Assert.Equal(1, breakEnds.Length);
+			Assert.Single(breakEnds);
 			Assert.Equal(expectedVid, breakEnds[0].ToString());
 		}
 

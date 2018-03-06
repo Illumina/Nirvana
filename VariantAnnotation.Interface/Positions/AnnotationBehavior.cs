@@ -11,7 +11,8 @@
         public readonly bool NeedVerboseTranscripts;
 
         public AnnotationBehavior(bool needSaPosition, bool needSaInterval, bool reducedTranscriptAnnotation,
-            bool needFlankingTranscript, bool reportOverlappingGenes, bool structuralVariantConsequence,bool needVerboseTranscript=false)
+            bool needFlankingTranscript, bool reportOverlappingGenes, bool structuralVariantConsequence,
+            bool needVerboseTranscript = false)
         {
             NeedSaPosition               = needSaPosition;
             NeedSaInterval               = needSaInterval;
@@ -19,7 +20,7 @@
             NeedFlankingTranscript       = needFlankingTranscript;
             ReportOverlappingGenes       = reportOverlappingGenes;
             StructuralVariantConsequence = structuralVariantConsequence;
-            NeedVerboseTranscripts = needVerboseTranscript;
+            NeedVerboseTranscripts       = needVerboseTranscript;
         }
     }
 }

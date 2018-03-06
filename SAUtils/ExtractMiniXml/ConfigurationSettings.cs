@@ -1,4 +1,4 @@
-﻿namespace ExtractMiniXml
+﻿namespace SAUtils.ExtractMiniXml
 {
 	public static class ConfigurationSettings
 	{

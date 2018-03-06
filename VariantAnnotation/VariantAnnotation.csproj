@@ -5,17 +5,11 @@
     <DebugType>Full</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="Algorithms\IntervalExtensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PhyloP\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />

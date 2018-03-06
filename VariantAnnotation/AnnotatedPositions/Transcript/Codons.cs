@@ -1,25 +1,20 @@
 ﻿using System;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public static class Codons
     {
-        public static void Assign(string transcriptReferenceAllele, string transcriptAlternateAllele,
-            NullableInterval cdsInterval, NullableInterval proteinInterval, ISequence codingSequence, out string refCodons, out string altCodons)
+        public static (string Reference, string Alternate) GetCodons(string transcriptReferenceAllele, string transcriptAlternateAllele,
+            int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, ISequence codingSequence)
         {
-            refCodons = null;
-            altCodons = null;
+            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return ("", "");
 
-            if (cdsInterval.Start == null || cdsInterval.End == null || proteinInterval.Start == null ||
-                proteinInterval.End == null) return;
+            int aminoAcidStart = proteinBegin * 3 - 2;
+            int aminoAcidEnd   = proteinEnd * 3;
 
-            int aminoAcidStart = proteinInterval.Start.Value * 3 - 2;
-            int aminoAcidEnd   = proteinInterval.End.Value * 3;
-
-            int prefixLen = cdsInterval.Start.Value - aminoAcidStart;
-            int suffixLen = aminoAcidEnd - cdsInterval.End.Value;
+            int prefixLen = cdsStart - aminoAcidStart;
+            int suffixLen = aminoAcidEnd - cdsEnd;
 
             int start1 = aminoAcidStart - 1;
             int start2 = aminoAcidEnd - suffixLen;
@@ -36,8 +31,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 ? codingSequence.Substring(start2, suffixLen).ToLower()
                 : "";
 
-            refCodons = GetCodon(transcriptReferenceAllele, prefix, suffix);
-            altCodons = GetCodon(transcriptAlternateAllele, prefix, suffix);
+            var refCodons = GetCodon(transcriptReferenceAllele, prefix, suffix);
+            var altCodons = GetCodon(transcriptAlternateAllele, prefix, suffix);
+            return (refCodons, altCodons);
         }
 
         /// <summary>
@@ -53,10 +49,5 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         /// returns true if the length is a multiple of three, false otherwise
         /// </summary>
         public static bool IsTriplet(int len) => Math.Abs(len) % 3 == 0;
-
-
-       
     }
-
-    
-};
+}

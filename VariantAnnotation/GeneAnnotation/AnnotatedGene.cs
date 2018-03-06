@@ -56,8 +56,7 @@ namespace VariantAnnotation.GeneAnnotation
                 annotations[i] = GeneAnnotationSource.Read(reader);
             }
 
-            if (geneName == NullGene) return null;
-            return new AnnotatedGene(geneName, annotations);
+            return geneName == NullGene ? null : new AnnotatedGene(geneName, annotations);
         }
 
         public int CompareTo(IAnnotatedGene other)

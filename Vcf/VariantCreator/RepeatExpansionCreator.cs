@@ -10,8 +10,8 @@ namespace Vcf.VariantCreator
 		{
 			start++;//for the padding base
 			if (infoData.RefRepeatCount == 0) return null;
-			altAllele = altAllele.Trim('<', '>');
-			var repeatCount = int.Parse(altAllele.Substring(3));
+			
+			var repeatCount = int.Parse(altAllele.Trim('<', '>').Substring(3));
 
 			var svType = repeatCount == infoData.RefRepeatCount ? VariantType.short_tandem_repeat_variation: 
 				repeatCount > infoData.RefRepeatCount
@@ -21,7 +21,7 @@ namespace Vcf.VariantCreator
 			var end = infoData.End ?? 0;
 			var vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
 
-			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, null, null, RepeatExpansionBehavior);
+			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, RepeatExpansionBehavior);
 		}
 
 		private static string GetVid(string ensemblName, int start, int end, string repeatUnit, int repeatCount)

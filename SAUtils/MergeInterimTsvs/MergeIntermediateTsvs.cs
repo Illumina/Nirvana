@@ -1,11 +1,10 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.MergeInterimTsvs
 {
-    public sealed class MergeIntermediateTsvs
+    public static class MergeIntermediateTsvs
     {
         private static ExitCodes ProgramExecution()
         {
@@ -77,7 +76,7 @@ namespace SAUtils.MergeInterimTsvs
                 .CheckEachFilenameExists(ConfigurationSettings.IntervalFiles, "Intermediate interval file name", "--int", false)
                 .CheckInputFilenameExists(ConfigurationSettings.MiscFile, "Intermediate misc file name", "--misc", false)
                 .CheckEachFilenameExists(ConfigurationSettings.GeneTsvFiles, "Intermediate gene file name", "--gene", false)
-                .ShowBanner(Constants.Authors)
+                .SkipBanner()
                 .ShowHelpMenu("Reads provided intermediate TSV files and creates supplementary database", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ReleaseSet Dated="2016-08-30" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.36.xsd">
 
 <ClinVarSet ID="13196069">
@@ -295,7 +295,7 @@
     <ClinicalSignificance DateLastEvaluated="2012-06-05">
       <ReviewStatus>criteria provided, single submitter</ReviewStatus>
       <Description>Benign</Description>
-      <Comment>This variant is considered likely benign or benign based on one or more of the following criteria: it is a conservative change, it occurs at a poorly conserved position in the protein, it is predicted to be benign by multiple in silico algorithms, and/or has population frequency not consistent with disease.</Comment>
+      <Comment>This variant is considered likely benign or benign based on one or more of the following criteria: it is a conservative change, it occurs at a poorly conserved simplePosition in the protein, it is predicted to be benign by multiple in silico algorithms, and/or has population frequency not consistent with disease.</Comment>
     </ClinicalSignificance>
     <Assertion Type="variation to disease"/>
     <ExternalID DB="GeneDx" ID="GDX:11870"/>

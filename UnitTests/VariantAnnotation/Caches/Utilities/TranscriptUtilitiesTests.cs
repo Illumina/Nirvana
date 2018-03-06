@@ -7,28 +7,31 @@ namespace UnitTests.VariantAnnotation.Caches.Utilities
 {
     public sealed class TranscriptUtilitiesTests
     {
-        private readonly ICdnaCoordinateMap[] _cdnaMaps;
+        private readonly ITranscriptRegion[] _transcriptRegions;
 
         public TranscriptUtilitiesTests()
         {
-            _cdnaMaps = GetCdnaCoordinateMaps();
+            _transcriptRegions = GetTranscriptRegions();
         }
 
         [Fact]
         public void GetTotalExonLength_MultipleExons()
         {
             const int expectedLength = 300;
-            int observedLength = ExonUtilities.GetTotalExonLength(_cdnaMaps);
+            int observedLength = ExonUtilities.GetTotalExonLength(_transcriptRegions);
             Assert.Equal(expectedLength, observedLength);
         }
 
-        private static ICdnaCoordinateMap[] GetCdnaCoordinateMaps()
+        private static ITranscriptRegion[] GetTranscriptRegions()
         {
-            var cdnaMaps = new ICdnaCoordinateMap[3];
-            cdnaMaps[0] = new CdnaCoordinateMap(100, 199, 0, 99);
-            cdnaMaps[1] = new CdnaCoordinateMap(300, 399, 100, 199);
-            cdnaMaps[2] = new CdnaCoordinateMap(500, 599, 200, 299);
-            return cdnaMaps;
+            return new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 100, 199, 0, 99),
+                new TranscriptRegion(TranscriptRegionType.Gap, 0, 200, 299, 99, 100),
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 300, 399, 100, 199),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 400, 499, 199, 200),
+                new TranscriptRegion(TranscriptRegionType.Exon, 2, 500, 599, 200, 299)
+            };
         }
     }
 }

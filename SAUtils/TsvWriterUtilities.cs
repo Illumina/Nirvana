@@ -42,7 +42,7 @@ namespace SAUtils
         public static void WriteSortedItems(IEnumerable<SupplementaryDataItem> saItems, ISaItemTsvWriter writer)
         {
             var itemsMinHeap = new MinHeap<SupplementaryDataItem>();
-            var currentRefIndex = Int32.MaxValue;
+            var currentRefIndex = int.MaxValue;
 
             var benchmark = new Benchmark();
 
@@ -50,7 +50,7 @@ namespace SAUtils
             {
                 if (currentRefIndex != saItem.Chromosome.Index)
                 {
-                    if (currentRefIndex != Int32.MaxValue)
+                    if (currentRefIndex != int.MaxValue)
                     {
                         //flushing out the remaining items in buffer
                         WriteToPosition(writer, itemsMinHeap, int.MaxValue);

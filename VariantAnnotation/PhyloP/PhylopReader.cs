@@ -34,7 +34,7 @@ namespace VariantAnnotation.PhyloP
         private int _scoreCount;
         private byte[] _scoreBytes;
 
-        public bool IsInitialized { get; private set; }
+        private bool IsInitialized { get; set; }
 
         private string _currentReferenceName;
 
@@ -234,7 +234,7 @@ namespace VariantAnnotation.PhyloP
             _scoreCount = uncompressedLength / 2;
         }
 
-        private void BytesToScores(int uncompressedLength, byte[] uncompressedScores, short[] scores)
+        private static void BytesToScores(int uncompressedLength, byte[] uncompressedScores, short[] scores)
         {
             for (var i = 0; i < uncompressedLength / 2; i++)
             {
@@ -294,13 +294,6 @@ namespace VariantAnnotation.PhyloP
 
 	        return score * 0.001;
             //return (score * 0.001).ToString(CultureInfo.InvariantCulture);
-        }
-
-        public void Clear()
-        {
-            IsInitialized = false;
-            _currentIntervalIndex = -1;
-            _phylopIntervals.Clear();
         }
     }
 }

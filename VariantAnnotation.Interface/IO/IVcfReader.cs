@@ -7,7 +7,6 @@ namespace VariantAnnotation.Interface.IO
     public interface IVcfReader : IDisposable
     {
 		bool IsRcrsMitochondrion { get; }
-
 		IEnumerable<string> GetHeaderLines();
         IPosition GetNextPosition();
 	    string VcfLine { get; }

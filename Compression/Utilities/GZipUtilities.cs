@@ -36,6 +36,7 @@ namespace Compression.Utilities
         {
             Stream newStream;
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (compressionAlgorithm)
             {
                 case CompressionAlgorithm.BlockGZip:
@@ -117,6 +118,7 @@ namespace Compression.Utilities
             return header;
         }
 
+        // ReSharper disable once SuggestBaseTypeForParameter
         private static CompressionAlgorithm IdentifyCompressionAlgorithm(byte[] header)
         {
             var result = CompressionAlgorithm.Uncompressed;

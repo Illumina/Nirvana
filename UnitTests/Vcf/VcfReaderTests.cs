@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
+using Phantom.Workers;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -39,7 +40,7 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920" };
             AddLines(headers);
-            Assert.Throws<FormatException>(() => new VcfReader(_ms, null, null, false));
+            Assert.Throws<FormatException>(() => new VcfReader(_ms, null, null, false, null));
         }
 
         [Fact]
@@ -48,7 +49,7 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16" };
             AddLines(headers);
             IEnumerable<string> observedHeaders;
-            using (var vcfReader = new VcfReader(_ms, null, null, false))
+            using (var vcfReader = new VcfReader(_ms, null, null, false, new NullRecomposer()))
             {
                 observedHeaders = vcfReader.GetHeaderLines();
             }
@@ -62,7 +63,7 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "##dataSource=ClinVar,version:unknown,release date:2016-09-01", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
             IEnumerable<string> observedHeaders;
-            using (var vcfReader = new VcfReader(_ms, null, null, false))
+            using (var vcfReader = new VcfReader(_ms, null, null, false, new NullRecomposer()))
             {
                 observedHeaders = vcfReader.GetHeaderLines();
             }
@@ -71,74 +72,12 @@ namespace UnitTests.Vcf
         }
 
 	    [Fact]
-	    public void GetSampleCopyNumber_from_sample()
-	    {
-		    const string vcfLine =
-			    @"1	723707	.	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225	RC:BC:CN:MCC	.	129:3123:3:2";
-
-			var samples = new SampleFieldExtractor(vcfLine.Split('\t')).ExtractSamples();
-
-		    var sampleCopyNumber = VcfReaderUtils.GetSampleCopyNumbers(samples);
-
-			Assert.Equal(3, sampleCopyNumber);
-	    }
-
-	    [Fact]
-	    public void CopyNumber_from_info_overrides_sample()
-	    {
-		    const string vcfLine =
-			    @"1	723707	.	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225;CN=4	RC:BC:CN:MCC	.	129:3123:3:2";
-
-		    var vcfColumns = vcfLine.Split('\t');
-
-			var infoData = VcfInfoParser.Parse(vcfColumns[VcfCommon.InfoIndex]);
-			var samples = new SampleFieldExtractor(vcfColumns).ExtractSamples();
-
-		    var sampleCopyNumber = VcfReaderUtils.GetSampleCopyNumbers(samples);
-
-		    var chromosome1 = new Chromosome("chr1", "1", 0);
-		    var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, null, false);
-
-		    var variants = variantFactory.CreateVariants(chromosome1, null, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, sampleCopyNumber);
-		    Assert.NotNull(variants);
-		    Assert.Null(variants[0].BreakEnds);
-
-		    Assert.Equal("1:723708:2581225:4", variants[0].VariantId);
-		    Assert.Equal(VariantType.copy_number_gain, variants[0].Type);
-
-	    }
-
-		[Fact]
-	    public void UpdateCnvInfo_regular_chrY()
-	    {
-		    const string vcfLine =
-			    @"Y	723707	.	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225	RC:BC:CN:MCC	.	129:3123:3:2";
-
-		    var vcfColumns = vcfLine.Split('\t');
-
-		    var infoData = VcfInfoParser.Parse(vcfColumns[VcfCommon.InfoIndex]);
-		    var samples = new SampleFieldExtractor(vcfColumns).ExtractSamples();
-
-		    var sampleCopyNumber = VcfReaderUtils.GetSampleCopyNumbers(samples);
-		    var chromosome1 = new Chromosome("chr1", "1", 0);
-		    var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, null, false);
-
-			var variants = variantFactory.CreateVariants(chromosome1, null, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, sampleCopyNumber);
-
-		    Assert.NotNull(variants);
-		    Assert.Null(variants[0].BreakEnds);
-
-		    Assert.Equal("1:723708:2581225:3", variants[0].VariantId);
-		    Assert.Equal(VariantType.copy_number_gain, variants[0].Type);
-		}
-
-		[Fact]
         public void Sample_names_are_reported()
         {
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
             string[] samples;
-            using (var vcfReader = new VcfReader(_ms, null, null, false))
+            using (var vcfReader = new VcfReader(_ms, null, null, false, new NullRecomposer()))
             {
                 samples = vcfReader.GetSampleNames();
             }
@@ -149,7 +88,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void GetNextPosition()
         {
-            var vcfLine = "chr1	13133	.	T	C	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
+            const string vcfLine = "chr1	13133	.	T	C	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
             var lines = new[]
             {
                 "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920",
@@ -166,13 +105,13 @@ namespace UnitTests.Vcf
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
 
             IPosition observedResult;
-            using (var vcfReader = new VcfReader(_ms, refNameToChromosome, refMinorProvider.Object, false))
+            using (var vcfReader = new VcfReader(_ms, refNameToChromosome, refMinorProvider.Object, false, new NullRecomposer()))
             {
                 observedResult = vcfReader.GetNextPosition();
             }
 
             var expectedResult = new Position(chromosome, 13133, 13133, "T", new[] { "C" }, 36, new[] { "PASS" }, null,
-                null, null, vcfLine.Split('\t'));
+                null, null, vcfLine.Split('\t'), new[] { false }, false);
 
             Assert.NotNull(observedResult);
             Assert.Equal(expectedResult.End,        observedResult.End);
