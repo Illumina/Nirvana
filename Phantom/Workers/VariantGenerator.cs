@@ -52,11 +52,13 @@ namespace Phantom.Workers
             int numPositions = alleleIndexBlock.AlleleIndexes.Count;
             int firstPositionIndex = alleleIndexBlock.PositionIndex;
             int lastPositionIndex = alleleIndexBlock.PositionIndex + numPositions - 1;
+
             int blockStart = alleleSet.Starts[firstPositionIndex];
             int blockEnd = alleleSet.Starts[lastPositionIndex];
             string lastRefAllele = alleleSet.VariantArrays[lastPositionIndex][0];
             int blockRefLength = blockEnd - blockStart + lastRefAllele.Length;
             var refSequence = totalRefSequence.Substring(blockStart - regionStart, blockRefLength);
+
             int refSequenceStart = 0;
             var altSequenceSegsegments = new LinkedList<string>();
             for (int positionIndex = firstPositionIndex; positionIndex <= lastPositionIndex; positionIndex++)
@@ -72,7 +74,13 @@ namespace Phantom.Workers
                 string altAllele = alleleSet.VariantArrays[positionIndex][alleleIndex];
                 int positionOnRefSequence = alleleSet.Starts[positionIndex] - blockStart;
                 int refRegionBetweenTwoAltAlleles = positionOnRefSequence - refSequenceStart;
-                if (refRegionBetweenTwoAltAlleles < 0) throw new UserErrorException($"Conflicting alternative alleles identified at {alleleSet.Chromosome.UcscName}:{alleleSet.Starts[positionIndex]}.");
+
+                if (refRegionBetweenTwoAltAlleles < 0)
+                {
+                    string previousAltAllele = alleleSet.VariantArrays[positionIndex - 1][alleleIndex];
+                    throw new UserErrorException($"Conflicting alternative alleles identified at {alleleSet.Chromosome.UcscName}:{alleleSet.Starts[positionIndex]}: both \"{previousAltAllele}\" and \"{altAllele}\" are present.");
+                }
+
                 string refSequenceBefore =
                     refSequence.Substring(refSequenceStart, refRegionBetweenTwoAltAlleles);
                 altSequenceSegsegments.AddLast(refSequenceBefore);
