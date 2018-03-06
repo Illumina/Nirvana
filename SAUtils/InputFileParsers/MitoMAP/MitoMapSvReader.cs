@@ -92,7 +92,7 @@ namespace SAUtils.InputFileParsers.MitoMap
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
             var newStart = _variantAligner.LeftAlign(start, refSequence, "").Item1;
             if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.deletion);
+            var mitoMapItem = new MitoMapItem(newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.deletion, null);
             return new List<MitoMapItem> { mitoMapItem };
 
         }
@@ -115,7 +115,7 @@ namespace SAUtils.InputFileParsers.MitoMap
             var leftAlgnResults = _variantAligner.LeftAlign(genomeStart, refSequence, refSequence + refSequence); // duplication
             var newStart = leftAlgnResults.Item1;
             if (genomeStart != newStart) Console.WriteLine($"Duplication of {size} bps. Original start start position: {genomeStart}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.duplication);
+            var mitoMapItem = new MitoMapItem(newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.duplication, null);
             svItems.Add(mitoMapItem);
             return svItems;
         }
