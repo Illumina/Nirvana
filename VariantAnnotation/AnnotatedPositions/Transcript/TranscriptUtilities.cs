@@ -13,12 +13,15 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 	    public static string GetAlternateCds(ISequence refSequence, int cdsBegin, int cdsEnd, string alternateAllele,
 		    ITranscriptRegion[] regions, bool onReverseStrand, byte startExonPhase, int cdnaCodingStart)
 	    {
-		    var splicedSeq = GetSplicedSequence(refSequence, regions, onReverseStrand);
+		    var splicedSeq     = GetSplicedSequence(refSequence, regions, onReverseStrand);
 		    int numPaddedBases = startExonPhase;
 
-		    int shift = cdnaCodingStart - 1;
-		    string upstreamSeq = splicedSeq.Substring(shift, cdsBegin - numPaddedBases - 1);
-		    string downstreamSeq = splicedSeq.Substring(cdsEnd - numPaddedBases + shift);
+            int shift           = cdnaCodingStart - 1;
+            int upstreamLength  = GetUpstreamLength(shift, cdsBegin - numPaddedBases - 1, splicedSeq.Length);
+            int downstreamStart = cdsEnd - numPaddedBases + shift;
+
+            string upstreamSeq   = splicedSeq.Substring(shift, upstreamLength);
+	        string downstreamSeq = downstreamStart < splicedSeq.Length ? splicedSeq.Substring(downstreamStart) : "";
 
 		    if (alternateAllele == null) alternateAllele = string.Empty;
 		    var paddedBases = numPaddedBases > 0 ? new string('N', numPaddedBases) : "";
@@ -26,7 +29,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 		    return paddedBases + upstreamSeq + alternateAllele + downstreamSeq;
 	    }
 
-	    /// <summary>
+        private static int GetUpstreamLength(int start, int length, int seqLength)
+        {
+            int desiredLength = start + length;
+            int maxLength     = seqLength - start;
+            return desiredLength <= seqLength ? length : maxLength;
+        }
+
+        /// <summary>
 	    /// Retrieves all Exon sequences and concats them together. 
 	    /// This includes 5' UTR + cDNA + 3' UTR [Transcript.pm:862 spliced_seq]
 	    /// </summary>
