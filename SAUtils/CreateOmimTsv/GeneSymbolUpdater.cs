@@ -46,7 +46,7 @@ namespace SAUtils.CreateOmimTsv
             if (_geneSymbols.Count == 0)
             {
                 _numGeneSymbolsNotInCache++;
-                return null;
+                return oldGeneSymbol;
             }
 
             var newGeneSymbol = _geneSymbols.First();
