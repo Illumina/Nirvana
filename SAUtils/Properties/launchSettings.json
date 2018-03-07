@@ -2,7 +2,7 @@
   "profiles": {
     "SAUtils": {
       "commandName": "Project",
-      "commandLineArgs": "createTSV --cvr c:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz --out c:\\Development\\IntermediateTsvs\\GRCh37 --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
+      "commandLineArgs": "createTSV --dir c:\\Development\\IntermediateTsvs\\test --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\rCRS"
     },
     "OMIM_SK": {
@@ -12,8 +12,8 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createOMIMTSV --gi \\\\ussd-prd-isi04\\Nirvana\\Development\\GeneSymbols\\gene_info_2016-10-17 --gi \\\\ussd-prd-isi04\\Nirvana\\Development\\GeneSymbols\\gene_info_2011-08-28 --hgnc \\\\ussd-prd-isi04\\Nirvana\\Development\\GeneSymbols\\hgnc_complete_set_2016-10-17.txt --in \\\\ussd-prd-isi04\\Nirvana\\Development\\ExternalDataSources\\OMIM\\2018-02-13\\genemap2.txt --mim \\\\ussd-prd-isi04\\Nirvana\\Development\\ExternalDataSources\\OMIM\\2018-02-13\\mim2gene.txt --out .",
-      "workingDirectory": "C:\\Development\\ExternalDataSources\\Omim\\"
+      "commandLineArgs": "createSa --dir c:\\Development\\IntermediateTsvs\\test --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "C:\\Development\\"
     },
     "MITOMAP": {
       "commandName": "Project",

@@ -174,7 +174,7 @@ namespace SAUtils.MergeInterimTsvs
             }
         }
 
-        private List<string> GetGeneList(List<IReadOnlyDictionary<string, IAnnotatedGene>> geneAnnotationDicts)
+        private IEnumerable<string> GetGeneList(List<IReadOnlyDictionary<string, IAnnotatedGene>> geneAnnotationDicts)
         {
             var geneList = new List<string>();
 
@@ -183,7 +183,7 @@ namespace SAUtils.MergeInterimTsvs
                 geneList.AddRange(geneAnnotationDict.Keys);
             }
 
-            return geneList;
+            return geneList.Distinct();
         }
 
         private void MergeChrom(string refName)
