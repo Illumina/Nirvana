@@ -362,6 +362,8 @@ namespace SAUtils.InputFileParsers.MitoMap
         private (int RefPosition, string RefAllele, string AltAllele) GetLeftAlignedVariant(int position, string refAllele, string altAllele)
         {
             if (refAllele == null || altAllele == null) return (position, refAllele, altAllele);
+            if (refAllele == "-") refAllele = "";
+            if (altAllele == "-") altAllele = "";
             var leftAlgnResults = _variantAligner.LeftAlign(position, refAllele, altAllele); 
             var newPosition = leftAlgnResults.RefPosition;
             var newRefAllele = leftAlgnResults.RefAllele;
