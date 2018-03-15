@@ -16,6 +16,7 @@ namespace SAUtils.DataStructures
         public const string ClinvarVcfTag   = "clinvar";
         public const string CosmicTag       = "cosmic";
         public const string CosmicVcfTag    = "cosmic";
+        public const string CosmicCnvTag    = "cosmicCnv";
         public const string OnekSvTag       = "oneKg";
         public const string DgvTag          = "dgv";
         public const string ClinGenTag      = "clingen";

@@ -5,6 +5,7 @@ using SAUtils.CreateIntermediateTsvs;
 using SAUtils.CreateOmimTsv;
 using SAUtils.CreateTopMedTsv;
 using SAUtils.DbSnpRemapper;
+using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GeneScoresTsv;
@@ -27,7 +28,8 @@ namespace SAUtils
                 ["extractMiniXml"]  = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
                 ["createGnomadTsv"] = new TopLevelOption("create gnomAD tsv file", CreateGnomadTsvMain.Run),
                 ["createTopMedTsv"] = new TopLevelOption("create TOPMed tsv file", CreateTopMedTsvMain.Run),
-                ["remapWithDbsnp"] = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
+                ["createCosmicSvs"] = new TopLevelOption("create COSMIC SV tsv files", ExtractCosmicSvsMain.Run),
+                ["remapWithDbsnp"]  = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)
