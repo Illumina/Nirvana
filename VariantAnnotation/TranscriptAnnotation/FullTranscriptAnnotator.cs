@@ -18,24 +18,24 @@ namespace VariantAnnotation.TranscriptAnnotation
         public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant leftShiftedVariant,
             ISequence refSequence, IPredictionCache siftCache, IPredictionCache polyphenCache, AminoAcids aminoAcids)
         {
-            var rightShifted = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
+            var rightShiftedVariant = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
 
             
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
-            var rightAnnotation = ReferenceEquals(leftShiftedVariant, rightShifted.Variant)
+            var rightAnnotation = ReferenceEquals(leftShiftedVariant, rightShiftedVariant)
                 ? leftAnnotation
-                : AnnotateTranscript(transcript, rightShifted.Variant, aminoAcids, refSequence);
+                : AnnotateTranscript(transcript, rightShiftedVariant, aminoAcids, refSequence);
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
 
-            var hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShifted.Variant, refSequence,
+            var hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
 
             var hgvsProtein = HgvsProteinNomenclature.GetHgvsProteinAnnotation(transcript,
                 rightAnnotation.RefAminoAcids, rightAnnotation.AltAminoAcids, rightAnnotation.TranscriptAltAllele,
-                rightAnnotation.Position, rightAnnotation.VariantEffect, rightShifted.Variant, refSequence, hgvsCoding,
+                rightAnnotation.Position, rightAnnotation.VariantEffect, rightShiftedVariant, refSequence, hgvsCoding,
                 leftShiftedVariant.Chromosome.UcscName == "chrM");
 
             var predictionScores = GetPredictionScores(leftAnnotation.Position, leftAnnotation.RefAminoAcids,
