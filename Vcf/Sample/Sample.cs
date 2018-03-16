@@ -25,7 +25,7 @@ namespace Vcf.Sample
         public int[] ParalogousGeneCopyNumbers { get; }
         public string[] DiseaseClassificationSources { get; }
         public string[] DiseaseIds { get; }
-        public string DiseaseAffectedStatus { get; }
+        public string[] DiseaseAffectedStatus { get; }
         public int[] ProteinAlteringVariantPositions { get; }
         public bool IsCompoundHetCompatible { get; }
 
@@ -39,7 +39,7 @@ namespace Vcf.Sample
             int[] splitReadCounts, int[] pairEndReadCounts, string repeatNumbers, string repeatNumberSpan,
             int[] mpileupAlleleDepths, string silentCarrierHaplotype, int[] paralagousEntrezGeneIds,
             int[] paralogousGeneCopyNumbers, string[] diseaseClassificationSources, string[] diseaseIds,
-            string diseaseAffectedStatus, int[] proteinAlteringVariantPositions, bool isCompoundHetCompatible)
+            string[] diseaseAffectedStatus, int[] proteinAlteringVariantPositions, bool isCompoundHetCompatible)
         {
             Genotype                        = genotype;
             GenotypeQuality                 = genotypeQuality;

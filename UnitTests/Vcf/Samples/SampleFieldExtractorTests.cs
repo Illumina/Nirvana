@@ -78,7 +78,7 @@ namespace UnitTests.Vcf.Samples
             Assert.Single(samples);
 
             var sample = samples[0];
-            Assert.Equal("-", sample?.DiseaseAffectedStatus);
+            Assert.Equal(new[] { "-" }, sample?.DiseaseAffectedStatus);
             Assert.Equal(new[] { "70" }, sample?.DiseaseIds);
             Assert.Equal(new[] { "Orphanet" }, sample?.DiseaseClassificationSources);
             Assert.Equal("-", sample?.SilentCarrierHaplotype);

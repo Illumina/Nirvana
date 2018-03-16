@@ -23,7 +23,7 @@
         int[] ParalogousGeneCopyNumbers { get; }
         string[] DiseaseClassificationSources { get; }
         string[] DiseaseIds { get; }
-        string DiseaseAffectedStatus { get; }
+        string[] DiseaseAffectedStatus { get; }
         int[] ProteinAlteringVariantPositions { get; }
         bool IsCompoundHetCompatible { get; }
 

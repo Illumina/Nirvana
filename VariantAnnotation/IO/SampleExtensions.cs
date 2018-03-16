@@ -34,7 +34,7 @@ namespace VariantAnnotation.IO
             jsonObject.AddIntValues("paralogousGeneCopyNumbers",       sample.ParalogousGeneCopyNumbers);
             jsonObject.AddStringValues("diseaseClassificationSource",  sample.DiseaseClassificationSources);
             jsonObject.AddStringValues("diseaseIds",                   sample.DiseaseIds);
-            jsonObject.AddStringValue("diseaseAffectedStatus",         sample.DiseaseAffectedStatus);
+            jsonObject.AddStringValues("diseaseAffectedStatus",        sample.DiseaseAffectedStatus);
             jsonObject.AddIntValues("proteinAlteringVariantPositions", sample.ProteinAlteringVariantPositions);
             jsonObject.AddBoolValue("isCompoundHetCompatible",         sample.IsCompoundHetCompatible);
 

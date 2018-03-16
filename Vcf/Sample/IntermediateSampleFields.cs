@@ -31,7 +31,7 @@ namespace Vcf.Sample
         public int[] PCN { get; }
         public string[] DCS { get; }
         public string[] DID { get; }
-        public string DST { get; }
+        public string[] DST { get; }
         public int[] PCH { get; }
         public bool CHC { get; }
         // ReSharper restore InconsistentNaming
@@ -54,7 +54,7 @@ namespace Vcf.Sample
             PCN                  = GetIntegers(GetString(formatIndices.PCN, sampleCols));
             DCS                  = GetStrings(GetString(formatIndices.DCS, sampleCols));
             DID                  = GetStrings(GetString(formatIndices.DID, sampleCols));
-            DST                  = GetString(formatIndices.DST, sampleCols);
+            DST                  = GetStrings(GetString(formatIndices.DST, sampleCols));
             PCH                  = GetIntegers(GetString(formatIndices.PCH, sampleCols));
             CHC                  = GetBool(GetString(formatIndices.CHC, sampleCols), "+");
 

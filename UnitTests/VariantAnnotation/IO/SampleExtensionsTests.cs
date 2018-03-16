@@ -11,7 +11,7 @@ namespace UnitTests.VariantAnnotation.IO
         {
             var sample = new Sample("1/2", 98, 0.75, 34, new[] { 23, 34 }, true, 3, true, 97, new[] { 10, 15 },
                 new[] { 8, 14 }, null, null, new[] { 41, 49 }, "-", new[] { 6606, 6607 }, new[] { 3, 3 },
-                new[] { "Orphanet" }, new[] { "70" }, "-", new[] { 123, 456 }, true);
+                new[] { "Orphanet" }, new[] { "70" }, new [] { "-", "+" }, new[] { 123, 456 }, true);
 
             var observedResult = sample.GetJsonString();
 
@@ -33,7 +33,7 @@ namespace UnitTests.VariantAnnotation.IO
             Assert.Contains("\"paralogousGeneCopyNumbers\":[3,3]",            observedResult);
             Assert.Contains("\"diseaseClassificationSource\":[\"Orphanet\"]", observedResult);
             Assert.Contains("\"diseaseIds\":[\"70\"]",                        observedResult);
-            Assert.Contains("\"diseaseAffectedStatus\":\"-\"",                observedResult);
+            Assert.Contains("\"diseaseAffectedStatus\":[\"-\",\"+\"]",        observedResult);
             Assert.Contains("\"proteinAlteringVariantPositions\":[123,456]",  observedResult);
             Assert.Contains("\"isCompoundHetCompatible\":true",               observedResult);
         }
