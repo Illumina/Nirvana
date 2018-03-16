@@ -135,7 +135,7 @@ namespace SAUtils.MergeInterimTsvs
 
         private static void MergeGene(IReadOnlyList<GeneTsvReader> geneReaders, IEnumerable<SaHeader> geneHeaders, string outputDirectory, GenomeAssembly assembly)
         {
-            var geneAnnotationDatabasePath = Path.Combine(outputDirectory, SaDataBaseCommon.OmimDatabaseFileName);
+            var geneAnnotationDatabasePath = Path.Combine(outputDirectory, SaDataBaseCommon.GeneLevelAnnotationFileName);
             var geneAnnotationStream       = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader             = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, geneHeaders.Select(x => x.GetDataSourceVersion()), assembly);
 

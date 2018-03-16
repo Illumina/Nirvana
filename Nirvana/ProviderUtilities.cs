@@ -50,7 +50,7 @@ namespace Nirvana
 
         public static IGeneAnnotationProvider GetGeneAnnotationProvider(IEnumerable<string> supplementaryAnnotationDirectories)
         {
-            var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories);
+            var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories.ToList());
             if (reader == null) return null;
             var geneAnnotationProvider = new GeneAnnotationProvider(reader);
             return geneAnnotationProvider;
