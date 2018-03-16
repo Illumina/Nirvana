@@ -2,8 +2,6 @@
 {
     public sealed class FormatIndices
     {
-        #region members
-
         // ReSharper disable InconsistentNaming
         internal int? AU;
         internal int? CU;
@@ -40,7 +38,9 @@
         internal int? CHC;
         // ReSharper restore InconsistentNaming
 
-        #endregion
+        // PEPE
+        internal int? AQ;
+        internal int? LQ;
 
         /// <summary>
         /// extracts the index from each genotype format field
@@ -150,6 +150,12 @@
                         break;
                     case "CHC":
                         formatIndices.CHC = index;
+                        break;
+                    case "AQ":
+                        formatIndices.AQ = index;
+                        break;
+                    case "LQ":
+                        formatIndices.LQ = index;
                         break;
                 }
             }

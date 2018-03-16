@@ -17,7 +17,7 @@ namespace VariantAnnotation.IO
             jsonObject.AddStringValue("genotype", sample.Genotype);
 	        jsonObject.AddStringValue("repeatNumbers", sample.RepeatNumbers);
 	        jsonObject.AddStringValue("repeatNumberSpans", sample.RepeatNumberSpans);
-			jsonObject.AddDoubleValue("variantFreq", sample.VariantFrequency);
+			jsonObject.AddDoubleValues("variantFrequencies", sample.VariantFrequencies);
             jsonObject.AddIntValue("totalDepth", sample.TotalDepth);
             jsonObject.AddIntValue("genotypeQuality", sample.GenotypeQuality);
             jsonObject.AddIntValue("copyNumber", sample.CopyNumber);
@@ -37,6 +37,9 @@ namespace VariantAnnotation.IO
             jsonObject.AddStringValues("diseaseAffectedStatus",        sample.DiseaseAffectedStatus);
             jsonObject.AddIntValues("proteinAlteringVariantPositions", sample.ProteinAlteringVariantPositions);
             jsonObject.AddBoolValue("isCompoundHetCompatible",         sample.IsCompoundHetCompatible);
+
+            jsonObject.AddDoubleValue("artifactAdjustedQualityScore", sample.ArtifactAdjustedQualityScore, "0.#");
+            jsonObject.AddDoubleValue("likelihoodRatioQualityScore",  sample.LikelihoodRatioQualityScore, "0.#");
 
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);

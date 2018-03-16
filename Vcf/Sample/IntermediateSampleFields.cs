@@ -15,6 +15,9 @@ namespace Vcf.Sample
         public string RepeatNumber { get; }
         public string RepeatNumberSpan { get; }
         public float? DenovoQuality { get; }
+        public float? AQ { get; }
+        public float? LQ { get; }
+        public float? VF { get; }
 
         // ReSharper disable InconsistentNaming
         public int? TIR { get; }
@@ -57,6 +60,9 @@ namespace Vcf.Sample
             DST                  = GetStrings(GetString(formatIndices.DST, sampleCols));
             PCH                  = GetIntegers(GetString(formatIndices.PCH, sampleCols));
             CHC                  = GetBool(GetString(formatIndices.CHC, sampleCols), "+");
+            AQ                   = GetFloat(GetString(formatIndices.AQ, sampleCols));
+            LQ                   = GetFloat(GetString(formatIndices.LQ, sampleCols));
+            VF                   = GetFloat(GetString(formatIndices.VF, sampleCols));
 
             (CopyNumber, RepeatNumber) = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
 

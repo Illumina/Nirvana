@@ -58,21 +58,21 @@ namespace Vcf.Sample
             var failedFilter      = FailedFilter.GetFailedFilter(sampleFields);
             var genotype          = Genotype.GetGenotype(sampleFields);
 
-            var genotypeQuality   = GenotypeQuality.GetGenotypeQuality(sampleFields);
-            var totalDepth        = TotalDepth.GetTotalDepth(_infoDepth, sampleFields);
-            var variantFrequency  = VariantFrequency.GetVariantFrequency(sampleFields);
-			var splitReadCounts   = ReadCounts.GetSplitReadCounts(sampleFields);
-	        var pairEndReadCounts = ReadCounts.GetPairEndReadCounts(sampleFields);
+            var genotypeQuality    = GenotypeQuality.GetGenotypeQuality(sampleFields);
+            var totalDepth         = TotalDepth.GetTotalDepth(_infoDepth, sampleFields);
+            var variantFrequencies = VariantFrequency.GetVariantFrequencies(sampleFields);
+            var splitReadCounts    = ReadCounts.GetSplitReadCounts(sampleFields);
+            var pairEndReadCounts  = ReadCounts.GetPairEndReadCounts(sampleFields);
 
             var isLossOfHeterozygosity = sampleFields.MajorChromosomeCount != null && sampleFields.CopyNumber != null &&
                                          sampleFields.MajorChromosomeCount.Value == sampleFields.CopyNumber.Value &&
                                          sampleFields.CopyNumber.Value > 1;
 
-            var sample = new Sample(genotype, genotypeQuality, variantFrequency, totalDepth, alleleDepths, failedFilter,
+            var sample = new Sample(genotype, genotypeQuality, variantFrequencies, totalDepth, alleleDepths, failedFilter,
                 sampleFields.CopyNumber, isLossOfHeterozygosity, sampleFields.DenovoQuality, splitReadCounts,
                 pairEndReadCounts, sampleFields.RepeatNumber, sampleFields.RepeatNumberSpan, sampleFields.MAD,
                 sampleFields.SCH, sampleFields.PLG, sampleFields.PCN, sampleFields.DCS, sampleFields.DID,
-                sampleFields.DST, sampleFields.PCH, sampleFields.CHC);
+                sampleFields.DST, sampleFields.PCH, sampleFields.CHC, sampleFields.AQ, sampleFields.LQ);
 
             return sample;
         }
