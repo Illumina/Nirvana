@@ -195,7 +195,7 @@ namespace SAUtils.DataStructures
 			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddIntValue("coverage", Coverage);
-		    if (HasFailedFilters) jsonObject.AddBoolValue("hasFailedFilters", true);
+		    if (HasFailedFilters) jsonObject.AddBoolValue("failedFilters", true);
 
             jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
 		    jsonObject.AddIntValue("allAn", AllAlleleNumber);
