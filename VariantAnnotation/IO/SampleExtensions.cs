@@ -32,9 +32,9 @@ namespace VariantAnnotation.IO
             jsonObject.AddStringValue("silentCarrierHaplotype",        sample.SilentCarrierHaplotype);
             jsonObject.AddIntValues("paralogousEntrezGeneIds",         sample.ParalogousEntrezGeneIds);
             jsonObject.AddIntValues("paralogousGeneCopyNumbers",       sample.ParalogousGeneCopyNumbers);
-            jsonObject.AddStringValues("diseaseClassificationSource",  sample.DiseaseClassificationSources);
+            jsonObject.AddStringValues("diseaseClassificationSources", sample.DiseaseClassificationSources);
             jsonObject.AddStringValues("diseaseIds",                   sample.DiseaseIds);
-            jsonObject.AddStringValues("diseaseAffectedStatus",        sample.DiseaseAffectedStatus);
+            jsonObject.AddStringValues("diseaseAffectedStatuses",      sample.DiseaseAffectedStatus);
             jsonObject.AddIntValues("proteinAlteringVariantPositions", sample.ProteinAlteringVariantPositions);
             jsonObject.AddBoolValue("isCompoundHetCompatible",         sample.IsCompoundHetCompatible);
 

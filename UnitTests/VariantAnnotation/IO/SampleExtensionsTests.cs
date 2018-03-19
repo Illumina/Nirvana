@@ -27,17 +27,17 @@ namespace UnitTests.VariantAnnotation.IO
             Assert.Contains("\"lossOfHeterozygosity\":true",      observedResult);
             Assert.Contains("\"deNovoQuality\":97",               observedResult);
 
-            Assert.Contains("\"mpileupAlleleDepths\":[41,49]",                observedResult);
-            Assert.Contains("\"silentCarrierHaplotype\":\"-\"",               observedResult);
-            Assert.Contains("\"paralogousEntrezGeneIds\":[6606,6607]",        observedResult);
-            Assert.Contains("\"paralogousGeneCopyNumbers\":[3,3]",            observedResult);
-            Assert.Contains("\"diseaseClassificationSource\":[\"Orphanet\"]", observedResult);
-            Assert.Contains("\"diseaseIds\":[\"70\"]",                        observedResult);
-            Assert.Contains("\"diseaseAffectedStatus\":[\"-\",\"+\"]",        observedResult);
-            Assert.Contains("\"proteinAlteringVariantPositions\":[123,456]",  observedResult);
-            Assert.Contains("\"isCompoundHetCompatible\":true",               observedResult);
-            Assert.Contains("\"artifactAdjustedQualityScore\":12.3",          observedResult);
-            Assert.Contains("\"likelihoodRatioQualityScore\":56.7",           observedResult);
+            Assert.Contains("\"mpileupAlleleDepths\":[41,49]",                 observedResult);
+            Assert.Contains("\"silentCarrierHaplotype\":\"-\"",                observedResult);
+            Assert.Contains("\"paralogousEntrezGeneIds\":[6606,6607]",         observedResult);
+            Assert.Contains("\"paralogousGeneCopyNumbers\":[3,3]",             observedResult);
+            Assert.Contains("\"diseaseClassificationSources\":[\"Orphanet\"]", observedResult);
+            Assert.Contains("\"diseaseIds\":[\"70\"]",                         observedResult);
+            Assert.Contains("\"diseaseAffectedStatuses\":[\"-\",\"+\"]",       observedResult);
+            Assert.Contains("\"proteinAlteringVariantPositions\":[123,456]",   observedResult);
+            Assert.Contains("\"isCompoundHetCompatible\":true",                observedResult);
+            Assert.Contains("\"artifactAdjustedQualityScore\":12.3",           observedResult);
+            Assert.Contains("\"likelihoodRatioQualityScore\":56.7",            observedResult);
         }
     }
 }
