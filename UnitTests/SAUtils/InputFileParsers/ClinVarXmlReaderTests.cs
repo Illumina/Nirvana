@@ -816,5 +816,16 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             Assert.False(reader.GetItems().Any());
         }
+
+        [Fact]
+        public void Alternate_phenotypes()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr2", "2", 1), 204732740, "G");
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000537563.xml")), sequenceProvider);
+
+            var clinvarItems = reader.GetItems().ToList();
+
+            Assert.Equal(2, clinvarItems[0].Phenotypes.Count());
+        }
     }
 }

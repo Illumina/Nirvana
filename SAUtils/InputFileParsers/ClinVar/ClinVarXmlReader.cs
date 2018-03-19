@@ -360,7 +360,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    foreach (var element in xElement.Elements(XrefTag))
 		        ParseXref(element);
 
-		    ParsePnenotype(xElement.Element(NameTag));
+		    foreach (var element in xElement.Elements(NameTag))
+                ParsePnenotype(element);
 		}
 
         private const string ElementValueTag = "ElementValue";
