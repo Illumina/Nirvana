@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.IO;
@@ -8,23 +10,23 @@ namespace Phantom.DataStructures
 {
     public sealed class PositionSet : IPositionSet
     {
-        private List<ISimplePosition> SimplePositions { get; }
-        public List<int> FunctionBlockRanges { get;}
-        private static readonly HashSet<VariantType> SupportedVariantTypes = new HashSet<VariantType> {VariantType.SNV};
+        public List<ISimplePosition> SimplePositions { get; }
+        public List<int> FunctionBlockRanges { get; }
+        private static readonly HashSet<VariantType> SupportedVariantTypes = new HashSet<VariantType> { VariantType.SNV };
         public int NumSamples { get; private set; }
         public string ChrName { get; }
-        private readonly int _numColumns;
         private readonly int _numPositions;
         public AlleleSet AlleleSet { get; private set; }
         public Dictionary<AlleleIndexBlock, List<SampleAllele>> AlleleIndexBlockToSampleIndex { get; private set; }
         private HashSet<string>[] _allelesWithUnsupportedTypes;
+        private string[,][] _sampleInfo;
+        public string[][] GqInfo;
 
         internal PositionSet(List<ISimplePosition> simpleSimplePositions, List<int> functionBlockRanges)
         {
             SimplePositions = simpleSimplePositions;
             FunctionBlockRanges = functionBlockRanges;
-            _numColumns = SimplePositions[0].VcfFields.Length;
-            NumSamples = _numColumns - VcfCommon.GenotypeIndex;
+            NumSamples = SimplePositions[0].VcfFields.Length - VcfCommon.GenotypeIndex;
             ChrName = simpleSimplePositions[0].VcfFields[VcfCommon.ChromIndex];
             _numPositions = simpleSimplePositions.Count;
         }
@@ -34,9 +36,43 @@ namespace Phantom.DataStructures
             var positionSet = new PositionSet(simpleSimplePositions, functionBlockRanges);
             positionSet.AlleleSet = GenerateAlleleSet(positionSet);
             positionSet._allelesWithUnsupportedTypes = GetAllelesWithUnsupportedTypes(positionSet);
-            var genotypeToSampleIndex = GetGenotypeToSampleIndex(positionSet);
-            positionSet.AlleleIndexBlockToSampleIndex = AlleleIndexBlock.GetAlleleIndexBlockToSampleIndex(genotypeToSampleIndex,  positionSet._allelesWithUnsupportedTypes, positionSet.AlleleSet.Starts, positionSet.FunctionBlockRanges);
+            positionSet._sampleInfo = GetSampleInfo(positionSet);
+            var phaseSetAndGqIndexes = positionSet.GetSampleTagIndexes(new[] { "PS", "GQ" });
+            positionSet.GqInfo = GetGqInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[1]);
+            var genotypeToSampleIndex = GetGenotypeToSampleIndex(positionSet, phaseSetAndGqIndexes[0]);
+            positionSet.AlleleIndexBlockToSampleIndex = AlleleIndexBlock.GetAlleleIndexBlockToSampleIndex(genotypeToSampleIndex, positionSet._allelesWithUnsupportedTypes, positionSet.AlleleSet.Starts, positionSet.FunctionBlockRanges);
             return positionSet;
+        }
+
+        private static string[][] GetGqInfo(string[,][] positionSetSampleInfo, int[] gqIndexes)
+        {
+            int numPositions = positionSetSampleInfo.GetLength(0);
+            int numSamples = positionSetSampleInfo.GetLength(1);
+            if (numPositions != gqIndexes.Length) throw new InvalidDataException($"The inconsistent numbers of positions: {numPositions} in sample info array, {gqIndexes.Length} in GQ index array");
+            var gqInfo = new String[numSamples][];
+            for (int sampleIndex = 0; sampleIndex < numSamples; sampleIndex++)
+            {
+                gqInfo[sampleIndex] = new string[numPositions];
+                for (var i = 0; i < numPositions; i++)
+                {
+                    gqInfo[sampleIndex][i] = ExtractSampleGq(gqIndexes[i], positionSetSampleInfo[i, sampleIndex]);
+                }
+            }
+            return gqInfo;
+        }
+
+        private static string[,][] GetSampleInfo(PositionSet positionSet)
+        {
+            var sampleInfo = new String[positionSet._numPositions, positionSet.NumSamples][];
+            for (var i = 0; i < positionSet._numPositions; i++)
+            {
+                for (int sampleIndex = 0; sampleIndex < positionSet.NumSamples; sampleIndex++)
+                {
+                    int sampleColIndex = sampleIndex + VcfCommon.GenotypeIndex;
+                    sampleInfo[i, sampleIndex] = positionSet.SimplePositions[i].VcfFields[sampleColIndex].Split(":");
+                }
+            }
+            return sampleInfo;
         }
 
         private static AlleleSet GenerateAlleleSet(PositionSet positionSet)
@@ -53,21 +89,30 @@ namespace Phantom.DataStructures
             return new AlleleSet(positionSet.SimplePositions[0].Chromosome, starts, alleleArrays);
         }
 
-        internal int[] GetPhaseSetTagIndexes()
+        internal int[][] GetSampleTagIndexes(string[] tagsToExtract)
         {
-            var indexes = new int[_numPositions];
+            int numTagsToExtact = tagsToExtract.Length;
+            var indexes = new int[numTagsToExtact][];
+            var tagIndexDict = new Dictionary<string, int>();
+            for (int tagIndex = 0; tagIndex < numTagsToExtact; tagIndex++)
+            {
+                tagIndexDict[tagsToExtract[tagIndex]] = tagIndex;
+                indexes[tagIndex] = Enumerable.Repeat(-1, _numPositions).ToArray();
+            }
+
             for (int i = 0; i < _numPositions; i++)
-            {   
+            {
                 var tags = SimplePositions[i].VcfFields[VcfCommon.FormatIndex].Split(":");
-                bool tagFound = false;
+                int numTagsExtracted = 0;
                 for (int j = 0; j < tags.Length; j++)
                 {
-                    if (tags[j] != "PS") continue;
-                    indexes[i] = j;
-                    tagFound = true;
-                    break;
+                    if (tagIndexDict.TryGetValue(tags[j], out int tagIndex))
+                    {
+                        indexes[tagIndex][i] = j;
+                        numTagsExtracted++;
+                    }
+                    if (numTagsExtracted == numTagsToExtact) break;
                 }
-                if (!tagFound) indexes[i] = -1;
             }
             return indexes;
         }
@@ -79,23 +124,24 @@ namespace Phantom.DataStructures
             return phaseSet == "." ? 0 : int.Parse(phaseSet);
         }
 
-        private static Dictionary<(string Genotypes, int Start), List<int>> GetGenotypeToSampleIndex (PositionSet positionSet)
+        internal static string ExtractSampleGq(int gqTagIndex, string[] sampleInfo) => (gqTagIndex == -1) ? "." : sampleInfo[gqTagIndex];
+
+        private static Dictionary<(string Genotypes, int Start), List<int>> GetGenotypeToSampleIndex(PositionSet positionSet, int[] phaseSetTagIndexes)
         {
             var genotypeToSample = new Dictionary<(string, int), List<int>>();
-            var phaseSetTagIndexes = positionSet.GetPhaseSetTagIndexes();
-            for (int sampleColIndex = VcfCommon.GenotypeIndex; sampleColIndex < positionSet._numColumns; sampleColIndex++)
+            for (int sampleIndex = 0; sampleIndex < positionSet.NumSamples; sampleIndex++)
             {
-                var genotypesAndStartIndexes = GetGenotypesAndStarts(positionSet, sampleColIndex, phaseSetTagIndexes);
+                var genotypesAndStartIndexes = GetGenotypesAndStarts(positionSet, sampleIndex, phaseSetTagIndexes);
                 foreach (var genotypeAndSartIndex in genotypesAndStartIndexes)
                 {
-                    if (genotypeToSample.ContainsKey(genotypeAndSartIndex)) genotypeToSample[genotypeAndSartIndex].Add(sampleColIndex - VcfCommon.GenotypeIndex);
-                    else genotypeToSample[genotypeAndSartIndex] = new List<int> { sampleColIndex - VcfCommon.GenotypeIndex };
+                    if (genotypeToSample.ContainsKey(genotypeAndSartIndex)) genotypeToSample[genotypeAndSartIndex].Add(sampleIndex);
+                    else genotypeToSample[genotypeAndSartIndex] = new List<int> { sampleIndex };
                 }
             }
             return genotypeToSample;
         }
 
-        private static List<(string, int)> GetGenotypesAndStarts(PositionSet positionSet, int sampleColIndex, int[] phaseSetTagIndexes)
+        private static List<(string, int)> GetGenotypesAndStarts(PositionSet positionSet, int sampleIndex, int[] phaseSetTagIndexes)
         {
             var genotypesAndStartIndexes = new List<(string, int)>();
             var gtTags = new List<string>();
@@ -103,8 +149,8 @@ namespace Phantom.DataStructures
             int previousPhaseSetId = -1;
             for (var i = 0; i < positionSet._numPositions; i++)
             {
-                var sampleInfo = positionSet.SimplePositions[i].VcfFields[sampleColIndex].Split(":");
-                int currentPhaseSetId = ExtractSamplePhaseSet(phaseSetTagIndexes[i], sampleInfo);
+                var thisSampleInfo = positionSet._sampleInfo[i, sampleIndex];
+                int currentPhaseSetId = ExtractSamplePhaseSet(phaseSetTagIndexes[i], thisSampleInfo);
                 if (IsNewPhaseSet(currentPhaseSetId, previousPhaseSetId))
                 {
                     if (gtTags.Count > 1)
@@ -114,7 +160,7 @@ namespace Phantom.DataStructures
                     gtTags = new List<string>();
                     startIndexInBlock = i;
                 }
-                gtTags.Add(sampleInfo[0]);
+                gtTags.Add(thisSampleInfo[0]);
                 previousPhaseSetId = currentPhaseSetId;
             }
             if (gtTags.Count > 1)
@@ -124,7 +170,7 @@ namespace Phantom.DataStructures
             return genotypesAndStartIndexes;
         }
 
-        private static bool IsNewPhaseSet(int currentPhaseSetId, int previousPhaseSetId) => previousPhaseSetId != 0 && currentPhaseSetId !=0 && currentPhaseSetId != previousPhaseSetId;
+        private static bool IsNewPhaseSet(int currentPhaseSetId, int previousPhaseSetId) => previousPhaseSetId != 0 && currentPhaseSetId != 0 && currentPhaseSetId != previousPhaseSetId;
 
         private static HashSet<string>[] GetAllelesWithUnsupportedTypes(PositionSet positionSet)
         {
@@ -146,6 +192,6 @@ namespace Phantom.DataStructures
         {
             return !(altAllele.StartsWith("<") || altAllele == "*") && SupportedVariantTypes.Contains(Vcf.VariantCreator.SmallVariantCreator.GetVariantType(refAllele, altAllele));
         }
-        
+
     }
 }

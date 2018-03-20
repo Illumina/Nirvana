@@ -18,7 +18,7 @@ namespace UnitTests.Phantom.DataStructures
             position.SetupGet(x => x.VcfFields).Returns(vcfFields);
             var functionBlockRanges = new List<int> { 102 };
             var positionSet = new PositionSet(new List<ISimplePosition> { position.Object }, functionBlockRanges);
-            Assert.Equal(new[] { -1 }, positionSet.GetPhaseSetTagIndexes());
+            Assert.Equal(new[] { new []{-1} }, positionSet.GetSampleTagIndexes(new[] { "PS" }));
         }
 
         [Fact]
@@ -37,7 +37,7 @@ namespace UnitTests.Phantom.DataStructures
             vcfFields3[VcfCommon.FormatIndex] = "GT:AA:BB:PS";
             position3.SetupGet(x => x.VcfFields).Returns(vcfFields3);
             var positionSet = new PositionSet(new List<ISimplePosition> { position1.Object, position2.Object, position3.Object }, new List<int>());
-            Assert.Equal(new[] { 1, 2, 3 }, positionSet.GetPhaseSetTagIndexes());
+            Assert.Equal(new[] {new[] { 1, 2, 3 }}, positionSet.GetSampleTagIndexes(new[] { "PS" }));
         }
 
         [Fact]

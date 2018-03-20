@@ -4,6 +4,8 @@ using System.Linq;
 using ErrorHandling.Exceptions;
 using Phantom.DataStructures;
 using Phantom.Interfaces;
+using Phantom.Workers;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Vcf;
@@ -13,6 +15,7 @@ namespace Phantom.Workers
     public sealed class VariantGenerator : IVariantGenerator
     {
         private readonly ISequenceProvider _sequenceProvider;
+        private const string FailedFilterTag = "FilteredVariantsRecomposed";
 
         public VariantGenerator(ISequenceProvider sequenceProvider)
         {
@@ -33,11 +36,18 @@ namespace Phantom.Workers
             string totalRefSequence = _sequenceProvider.Sequence.Substring(regionStart - 1, regionEnd - regionStart); // VCF positions are 1-based
             var recomposedAlleleSet = new RecomposedAlleleSet(positionSet.ChrName, numSamples);
             var decomposedPosVarIndex = new HashSet<(int PosIndex, int VarIndex)>();
-            foreach (var alleleIndexBlock in alleleIndexBlockToSampleIndex.Keys)
+            foreach (var (alleleIndexBlock, sampleAlleles) in alleleIndexBlockToSampleIndex)
             {
-                var (start, end, refAllele, altAllele) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet, totalRefSequence, regionStart, decomposedPosVarIndex);
-                var sampleAlleles = alleleIndexBlockToSampleIndex[alleleIndexBlock];
-                recomposedAlleleSet.AddAllele(start, end, refAllele, altAllele, sampleAlleles);
+                var (start, _, refAllele, altAllele) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet, totalRefSequence, regionStart, decomposedPosVarIndex);
+                var variantSite = new VariantSite(start, refAllele);
+
+                if (!recomposedAlleleSet.RecomposedAlleles.TryGetValue(variantSite, out var variantInfo))
+                {
+                    variantInfo = GetVariantInfo(positionSet, alleleIndexBlock);
+
+                    recomposedAlleleSet.RecomposedAlleles[variantSite] = variantInfo;
+                }
+                variantInfo.AddAllele(altAllele, sampleAlleles);
             }
             // Set decomposed tag to positions used for recomposition
             foreach (var indexTuple in decomposedPosVarIndex)
@@ -45,6 +55,48 @@ namespace Phantom.Workers
                 recomposablePositions[indexTuple.PosIndex].IsDecomposed[indexTuple.VarIndex] = true;
             }
             return recomposedAlleleSet.GetRecomposedVcfRecords().Select(x => SimplePosition.GetSimplePosition(x, _sequenceProvider.RefNameToChromosome, true));
+        }
+
+        private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleIndexBlock alleleIndexBlock)
+        {
+            string filter = "PASS";
+            var positions = positionSet.SimplePositions;
+            var startIndex = alleleIndexBlock.PositionIndex;
+            var numPositions = alleleIndexBlock.AlleleIndexes.Count;
+            var numSamples = positionSet.NumSamples;
+
+            string[] quals = new string[numPositions];
+            for (int i = startIndex; i < startIndex + numPositions; i++)
+            {
+                quals[i - startIndex] = positions[i].VcfFields[VcfCommon.QualIndex];
+                string thisFilter = positions[i].VcfFields[VcfCommon.FilterIndex];
+                if (filter == "PASS" && thisFilter != "PASS" && thisFilter != ".")
+                    filter = FailedFilterTag;
+            }
+            string qual = GetStringWithMinValueOrDot(quals);
+
+            string[] gqValues = new string[numSamples];
+            for (int i = 0; i < numSamples; i++)
+                gqValues[i] = GetStringWithMinValueOrDot(new ArraySegment<string>(positionSet.GqInfo[i], startIndex, numPositions).ToArray());
+
+            return new VariantInfo(qual, filter, gqValues);
+        }
+
+        private static string GetStringWithMinValueOrDot(string[] strings)
+        {
+            string currentString = ".";
+            float currentValue = float.MaxValue;
+            foreach (string thisString in strings)
+            {
+                if (thisString != ".")
+                {
+                    var thisValue = float.Parse(thisString);
+                    if (thisValue >= currentValue) continue;
+                    currentString = thisString;
+                    currentValue = thisValue;
+                }
+            }
+            return currentString;
         }
 
         internal static (int Start, int End, string Ref, string Alt) GetPositionsAndRefAltAlleles(AlleleIndexBlock alleleIndexBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, HashSet<(int, int)> decomposedPosVarIndex)
@@ -92,115 +144,138 @@ namespace Phantom.Workers
         }
     }
 
-    internal sealed class RecomposedAlleleSet
+    public struct VariantSite : IComparable<VariantSite>
     {
-        private readonly Dictionary<int, Dictionary<string, Dictionary<string, List<SampleAllele>>>> _recomposedAlleles;
-        private readonly int _nSamples;
-        private readonly string _chrName;
-        private const string VariantId = ".";
-        private const string Qual = ".";
-        private const string Filter = "PASS";
-        private const string InfoTag = "RECOMPOSED";
-        private const string FormatTag = "GT";
+        public readonly int Start;
+        public readonly string RefAllele;
 
-
-        public RecomposedAlleleSet(string chrName, int nSamples)
+        public VariantSite(int start, string refAllele)
         {
-            _nSamples = nSamples;
-            _chrName = chrName;
-            _recomposedAlleles = new Dictionary<int, Dictionary<string, Dictionary<string, List<SampleAllele>>>>();
+            Start = start;
+            RefAllele = refAllele;
         }
 
-        public void AddAllele(int start, int end, string refAllele, string altAllele, List<SampleAllele> sampleAlleles)
+        public int CompareTo(VariantSite that) => Start != that.Start ? Start.CompareTo(that.Start) : string.Compare(RefAllele, that.RefAllele, StringComparison.Ordinal);
+    }
+
+    public sealed class VariantInfo
+    {
+        public readonly string Qual;
+        public readonly string Filter;
+        public readonly string[] SampleGqs;
+        public readonly Dictionary<string, List<SampleAllele>> AltAlleleToSample = new Dictionary<string, List<SampleAllele>>();
+
+        public VariantInfo(string qual, string filter, string[] sampleGqs)
         {
-            if (!_recomposedAlleles.ContainsKey(start))
-            {
-                _recomposedAlleles.Add(start, new Dictionary<string, Dictionary<string, List<SampleAllele>>>());
-            }
-            if (!_recomposedAlleles[start].ContainsKey(refAllele))
-            {
-                _recomposedAlleles[start].Add(refAllele, new Dictionary<string, List<SampleAllele>>());
-            }
-            _recomposedAlleles[start][refAllele].Add(altAllele, sampleAlleles);
+            Qual = qual;
+            Filter = filter;
+            SampleGqs = sampleGqs;
         }
 
-        public List<string[]> GetRecomposedVcfRecords()
+        public void AddAllele(string altAllele, List<SampleAllele> sampleAlleles)
         {
-            var vcfRecords = new List<string[]>();
-            foreach (int start in _recomposedAlleles.Keys.OrderBy(x => x))
+            AltAlleleToSample.Add(altAllele, sampleAlleles);
+        }
+    }
+
+}
+
+internal sealed class RecomposedAlleleSet
+{
+    public Dictionary<VariantSite, VariantInfo> RecomposedAlleles;
+    private readonly int _numSamples;
+    private readonly string _chrName;
+    private const string VariantId = ".";
+    private const string InfoTag = "RECOMPOSED";
+    private const string FormatTag = "GT:GQ";
+
+
+    public RecomposedAlleleSet(string chrName, int numSamples)
+    {
+        _numSamples = numSamples;
+        _chrName = chrName;
+        RecomposedAlleles = new Dictionary<VariantSite, VariantInfo>();
+    }
+
+    public List<string[]> GetRecomposedVcfRecords()
+    {
+        var vcfRecords = new List<string[]>();
+        foreach (var variantSite in RecomposedAlleles.Keys.OrderBy(x => x))
+        {
+            var varInfo = RecomposedAlleles[variantSite];
+            var altAlleleList = new List<string>();
+            int genotypeIndex = 1; // genotype index of alt allele
+            var sampleGenotypes = new List<int>[_numSamples];
+            for (int i = 0; i < _numSamples; i++) sampleGenotypes[i] = new List<int>();
+            foreach (var altAllele in varInfo.AltAlleleToSample.Keys.OrderBy(x => x))
             {
-                foreach (var refAllele in _recomposedAlleles[start].Keys.OrderBy(x => x))
+                var sampleAlleles = varInfo.AltAlleleToSample[altAllele];
+                int currentGenotypeIndex;
+                if (altAllele == variantSite.RefAllele)
                 {
-                    var altAlleles = _recomposedAlleles[start][refAllele];
-                    var altAlleleList = new List<string>();
-                    int genotypeIndex = 1; // genotype index of alt allele
-                    var sampleGenotypes = new List<int>[_nSamples];
-                    for (int i = 0; i < _nSamples; i++) sampleGenotypes[i] = new List<int>();
-                    foreach (var altAllele in altAlleles.Keys.OrderBy(x => x))
-                    {
-                        var sampleAlleles = altAlleles[altAllele];
-                        int currentGenotypeIndex;
-                        if (altAllele == refAllele)
-                        {
-                            currentGenotypeIndex = 0;
-                        }
-                        else
-                        {
-                            currentGenotypeIndex = genotypeIndex;
-                            genotypeIndex++;
-                            altAlleleList.Add(altAllele);
-                        }
-                        foreach (var sampleAllele in sampleAlleles)
-                        {
-                            SetGenotypeWithAlleleIndex(sampleGenotypes[sampleAllele.SampleIndex], sampleAllele.AlleleIndex,
-                                currentGenotypeIndex);
-                        }
-                    }
-                    var altAlleleColumn = string.Join(",", altAlleleList);
-                    vcfRecords.Add(GetVcfFields(start, refAllele, altAlleleColumn, sampleGenotypes));
+                    currentGenotypeIndex = 0;
+                }
+                else
+                {
+                    currentGenotypeIndex = genotypeIndex;
+                    genotypeIndex++;
+                    altAlleleList.Add(altAllele);
+                }
+                foreach (var sampleAllele in sampleAlleles)
+                {
+                    SetGenotypeWithAlleleIndex(sampleGenotypes[sampleAllele.SampleIndex], sampleAllele.AlleleIndex,
+                        currentGenotypeIndex);
                 }
             }
-            return vcfRecords;
+            var altAlleleColumn = string.Join(",", altAlleleList);
+            vcfRecords.Add(GetVcfFields(variantSite, altAlleleColumn, varInfo.Qual, varInfo.Filter, sampleGenotypes, varInfo.SampleGqs));
         }
 
-        private void SetGenotypeWithAlleleIndex(List<int> sampleGenotype, byte sampleAlleleAlleleIndex, int currentGenotypeIndex)
-        {
-            if (sampleGenotype.Count == sampleAlleleAlleleIndex)
-            {
-                sampleGenotype.Add(currentGenotypeIndex);
-                return;
-            }
+        return vcfRecords;
+    }
 
-            if (sampleGenotype.Count < sampleAlleleAlleleIndex)
-            {
-                int extraSpace = sampleAlleleAlleleIndex - sampleGenotype.Count + 1;
-                sampleGenotype.AddRange(Enumerable.Repeat(-1, extraSpace));
-            }
-            sampleGenotype[sampleAlleleAlleleIndex] = currentGenotypeIndex;
+    private void SetGenotypeWithAlleleIndex(List<int> sampleGenotype, byte sampleAlleleAlleleIndex, int currentGenotypeIndex)
+    {
+        if (sampleGenotype.Count == sampleAlleleAlleleIndex)
+        {
+            sampleGenotype.Add(currentGenotypeIndex);
+            return;
         }
 
-        private string[] GetVcfFields(int start, string refAllele, string altAlleleColumn, List<int>[] sampleGenoTypes, string variantId = VariantId, string qual = Qual, string filter = Filter, string info = InfoTag, string format = FormatTag)
+        if (sampleGenotype.Count < sampleAlleleAlleleIndex)
         {
+            int extraSpace = sampleAlleleAlleleIndex - sampleGenotype.Count + 1;
+            sampleGenotype.AddRange(Enumerable.Repeat(-1, extraSpace));
+        }
+        sampleGenotype[sampleAlleleAlleleIndex] = currentGenotypeIndex;
+    }
 
-            var vcfFields = new List<string>
+    private string[] GetVcfFields(VariantSite varSite, string altAlleleColumn, string qual, string filter, List<int>[] sampleGenoTypes, string[] sampleGqs, string variantId = VariantId, string info = InfoTag, string format = FormatTag)
+    {
+        var vcfFields = new List<string>
             {
                 _chrName,
-                start.ToString(),
+                varSite.Start.ToString(),
                 variantId,
-                refAllele,
+                varSite.RefAllele,
                 altAlleleColumn,
                 qual,
                 filter,
                 info,
                 format
             };
-            foreach (var sampleGenotype in sampleGenoTypes)
-            {
-                vcfFields.Add(GetGenotype(sampleGenotype));
-            }
-            return vcfFields.ToArray();
-        }
 
-        private static string GetGenotype(List<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
+        for (var index = 0; index < sampleGenoTypes.Length; index++)
+        {
+            var sampleGenotypeStr = GetGenotype(sampleGenoTypes[index]);
+            if (sampleGenotypeStr == ".") vcfFields.Add(".:.");
+            else
+            {
+                vcfFields.Add(sampleGenotypeStr + ":" + sampleGqs[index]);
+            }
+        }
+        return vcfFields.ToArray();
     }
+
+    private static string GetGenotype(List<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
 }

@@ -56,8 +56,8 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT	.	.	1|2", string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT	.	1|2	.", string.Join("\t", recomposedPositions[1].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ	.:.	.:.	1|2:.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ	.:.	1|2:.	.:.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
-            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT	1|2	.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT:GQ	1|2:.	.:.", string.Join("\t", recomposedPositions[0].VcfFields));
         }
 
         [Fact]
@@ -119,8 +119,73 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
-            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT	1|2	.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT:GQ	1|2:.	.:.", string.Join("\t", recomposedPositions[0].VcfFields));
         }
 
+        [Fact]
+        public void VariantGenerator_MinQualUsed_DotIgnored()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	45	PASS	.	GT:PS	1|1:301	1|2:789	1|2:456", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	30.1	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 4, 6, 8 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Equal(2, recomposedPositions.Count);
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	45	PASS	RECOMPOSED	GT:GQ	.:.	.:.	1|2:.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	30.1	PASS	RECOMPOSED	GT:GQ	.:.	1|2:.	.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+        }
+
+        [Fact]
+        public void VariantGenerator_FailedFilterTagGivenCorrectly_DotTreatedAsPass()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	.	.	GT:PS	1|1:301	1|2:789	1|2:456", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	FailedForSomeReason	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 4, 6, 8 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Equal(2, recomposedPositions.Count);
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ	.:.	.:.	1|2:.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	FilteredVariantsRecomposed	RECOMPOSED	GT:GQ	.:.	1|2:.	.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+        }
+
+        [Fact]
+        public void VariantGenerator_MinQGUsed_DotAndNullIgnored()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ	0|1:123:.	2/2:.:14.2	0|2:456:.", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ	1|1:301:.	1|2:789:18	1|2:456:15.6", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 4, 6, 8 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Equal(2, recomposedPositions.Count);
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ	.:.	.:.	1|2:15.6", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ	.:.	1|2:14.2	.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+        }
     }
 }
