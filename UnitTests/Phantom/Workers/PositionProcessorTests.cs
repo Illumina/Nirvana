@@ -126,9 +126,9 @@ namespace UnitTests.Phantom.Workers
             var sequenceProvider = mockSequenceProvider.Object;
             var variantGenerator = new VariantGenerator(sequenceProvider);
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT:PS	0|1:123", sequenceProvider.RefNameToChromosome);
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT:PS	0|1:.", sequenceProvider.RefNameToChromosome);
             var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	G	.	PASS	.	GT	1/1", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:PS	0|1:123", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	0|1", sequenceProvider.RefNameToChromosome);
 
             var positions = new List<ISimplePosition> { position1, position2, position3 };
             var recomposable = new List<bool> { true, true, true };

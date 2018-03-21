@@ -119,9 +119,10 @@ namespace Phantom.DataStructures
 
         internal static int ExtractSamplePhaseSet(int phaseSetTagIndex, string[] sampleInfo)
         {
-            if (phaseSetTagIndex == -1) return 0;
+            if (phaseSetTagIndex == -1) return -1;
+            if (sampleInfo.Length == 1 && sampleInfo[0] == ".") return -1;
             var phaseSet = sampleInfo[phaseSetTagIndex];
-            return phaseSet == "." ? 0 : int.Parse(phaseSet);
+            return phaseSet == "." ? -1 : int.Parse(phaseSet);
         }
 
         internal static string ExtractSampleGq(int gqTagIndex, string[] sampleInfo) => (gqTagIndex == -1) ? "." : sampleInfo[gqTagIndex];
@@ -151,7 +152,12 @@ namespace Phantom.DataStructures
             {
                 var thisSampleInfo = positionSet._sampleInfo[i, sampleIndex];
                 int currentPhaseSetId = ExtractSamplePhaseSet(phaseSetTagIndexes[i], thisSampleInfo);
-                if (IsNewPhaseSet(currentPhaseSetId, previousPhaseSetId))
+                if (i == 0)
+                {
+                    // ReSharper disable once RedundantAssignment
+                    previousPhaseSetId = currentPhaseSetId;
+                }
+                else if (currentPhaseSetId != previousPhaseSetId)
                 {
                     if (gtTags.Count > 1)
                     {
@@ -169,8 +175,6 @@ namespace Phantom.DataStructures
             }
             return genotypesAndStartIndexes;
         }
-
-        private static bool IsNewPhaseSet(int currentPhaseSetId, int previousPhaseSetId) => previousPhaseSetId != 0 && currentPhaseSetId != 0 && currentPhaseSetId != previousPhaseSetId;
 
         private static HashSet<string>[] GetAllelesWithUnsupportedTypes(PositionSet positionSet)
         {

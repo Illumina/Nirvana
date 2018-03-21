@@ -41,15 +41,15 @@ namespace UnitTests.Phantom.DataStructures
         }
 
         [Fact]
-        public void ExtractSamplePhaseSet_NegativePSIndex_ReturnZero()
+        public void ExtractSamplePhaseSet_NegativePSIndex_ReturnNegOne()
         {
-            Assert.Equal(0, PositionSet.ExtractSamplePhaseSet(-1, new[] { "0|1", "." }));
+            Assert.Equal(-1, PositionSet.ExtractSamplePhaseSet(-1, new[] { "0|1", "." }));
         }
 
         [Fact]
-        public void ExtractSamplePhaseSet_PSIsDot_ReturnZero()
+        public void ExtractSamplePhaseSet_PSIsDot_ReturnNegOne()
         {
-            Assert.Equal(0, PositionSet.ExtractSamplePhaseSet(1, new[] { "0|1", "." }));
+            Assert.Equal(-1, PositionSet.ExtractSamplePhaseSet(1, new[] { "0|1", "." }));
         }
 
         [Fact]
