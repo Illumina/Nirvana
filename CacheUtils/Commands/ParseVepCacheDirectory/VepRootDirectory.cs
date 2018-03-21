@@ -21,9 +21,9 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             var vepDirectories = Directory.GetDirectories(dirPath);
             var referenceDict  = new Dictionary<ushort, string>();
 
-            foreach (var dir in vepDirectories)
+            foreach (string dir in vepDirectories)
             {
-                var referenceName = Path.GetFileName(dir);
+                string referenceName = Path.GetFileName(dir);
                 var chromosome    = ReferenceNameUtilities.GetChromosome(_refNameToChromosome, referenceName);
                 if (chromosome.IsEmpty()) continue;
                 
@@ -39,7 +39,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 
             foreach (string filePath in filePaths)
             {
-                var fileName = Path.GetFileName(filePath);
+                string fileName = Path.GetFileName(filePath);
                 if (fileName == null) continue;
 
                 int hyphenPos = fileName.IndexOf("-", StringComparison.Ordinal);

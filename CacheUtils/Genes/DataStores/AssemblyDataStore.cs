@@ -28,9 +28,9 @@ namespace CacheUtils.Genes.DataStores
             FilePaths.AssemblySpecificPaths paths, IDictionary<string, IChromosome> refNameToChromosome,
             IDictionary<string, IChromosome> accessionToChromosome, bool useGrch37)
         {
-            var ensemblGtfPath      = useGrch37 ? ExternalFiles.EnsemblGtfFile37.FilePath      : ExternalFiles.EnsemblGtfFile38.FilePath;
-            var refseqGffPath       = useGrch37 ? ExternalFiles.RefSeqGffFile37.FilePath       : ExternalFiles.RefSeqGffFile38.FilePath;
-            var refseqGenomeGffPath = useGrch37 ? ExternalFiles.RefSeqGenomeGffFile37.FilePath : ExternalFiles.RefSeqGenomeGffFile38.FilePath;
+            string ensemblGtfPath      = useGrch37 ? ExternalFiles.EnsemblGtfFile37.FilePath      : ExternalFiles.EnsemblGtfFile38.FilePath;
+            string refseqGffPath       = useGrch37 ? ExternalFiles.RefSeqGffFile37.FilePath       : ExternalFiles.RefSeqGffFile38.FilePath;
+            string refseqGenomeGffPath = useGrch37 ? ExternalFiles.RefSeqGenomeGffFile37.FilePath : ExternalFiles.RefSeqGenomeGffFile38.FilePath;
 
             var ensemblGtf = EnsemblGtf.Create(ensemblGtfPath, refNameToChromosome);
             var refSeqGff  = RefSeqGff.Create(refseqGffPath, refseqGenomeGffPath, accessionToChromosome);

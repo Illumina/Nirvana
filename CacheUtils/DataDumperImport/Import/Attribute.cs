@@ -2,6 +2,7 @@
 using System.IO;
 using System.Text.RegularExpressions;
 using CacheUtils.DataDumperImport.DataStructures.Import;
+using CacheUtils.DataDumperImport.Utilities;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
@@ -30,14 +31,17 @@ namespace CacheUtils.DataDumperImport.Import
         /// returns an array of miRNAs given a list of ObjectValues (AbstractData)
         /// </summary>
         public static (IInterval[] MicroRnas, IRnaEdit[] RnaEdits, bool CdsStartNotFound, bool CdsEndNotFound) ParseList(
-            IEnumerable<IListMember> importNodes)
+            IImportNode importNode)
         {
-            var microRnaList      = new List<IInterval>();
-            var rnaEditList       = new List<IRnaEdit>();
-            bool cdsStartNotFound = false;
-            bool cdsEndNotFound   = false;
+            var listMembers = importNode.GetListMembers();
+            if (listMembers == null) throw new InvalidDataException("Encountered an attribute node that could not be converted to a member list.");
 
-            foreach (var node in importNodes)
+            var microRnaList     = new List<IInterval>();
+            var rnaEditList      = new List<IRnaEdit>();
+            var cdsStartNotFound = false;
+            var cdsEndNotFound   = false;
+
+            foreach (var node in listMembers)
             {
                 if (!(node is ObjectValueNode objectValue))
                     throw new InvalidDataException($"Could not transform the AbstractData object into an ObjectValue: [{node.GetType()}]");

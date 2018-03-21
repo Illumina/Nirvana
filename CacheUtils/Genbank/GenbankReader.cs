@@ -13,7 +13,6 @@ namespace CacheUtils.Genbank
         // ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.*.rna.gbff.gz
 
         private const string LocusTag      = "LOCUS";
-        private const string VersionTag    = "VERSION";
         private const string FeaturesTag   = "FEATURES";
         private const string OriginTag     = "ORIGIN";
         private const string TerminatorTag = "//";
@@ -32,73 +31,109 @@ namespace CacheUtils.Genbank
 
         public GenbankEntry GetGenbankEntry()
         {
-            string transcriptId    = null;
-            string proteinId       = null;
-            string geneId          = null;
-            string geneSymbol      = null;
-            IInterval codingRegion = null;
-            var exons              = new List<IInterval>();
-            byte transcriptVersion = 0;
-            byte proteinVersion    = 0;
-
-            var currentState = GenbankState.Header;
-            var featureState = FeaturesState.Unknown;
-            
             // assert that the record starts with LOCUS
             if (!HasLocus()) return null;
 
+            var (transcriptId, transcriptVersion) = ParseHeader();
+            var featureData = ParseFeatures();
+            ParseOrigin();
+
+            var exons = featureData.Exons.Count == 0 ? null : featureData.Exons.ToArray();
+
+            return transcriptId == null
+                ? null
+                : new GenbankEntry(transcriptId, transcriptVersion, featureData.ProteinId, featureData.ProteinVersion,
+                    featureData.GeneId, featureData.GeneSymbol, featureData.CodingRegion, exons);
+        }
+
+        private void ParseOrigin()
+        {
+            string line;
+            do
+            {
+                line = GetNextLine();
+            } while (line != null);
+        }
+
+        private string GetNextLine()
+        {
+            string line = _reader.ReadLine();
+            if (line == null || line.StartsWith(TerminatorTag)) return null;
+            return line;
+        }
+
+        private FeatureData ParseFeatures()
+        {
+            var featureState = FeaturesState.Unknown;
+            var featureData = new FeatureData();
+
             while (true)
             {
-                var line = _reader.ReadLine();
-                if (line == null || line.StartsWith(TerminatorTag)) break;
+                string line = GetNextLine();
+                if (line == null || line.StartsWith(OriginTag)) break;
 
-                if (line.StartsWith(FeaturesTag)) currentState = GenbankState.Features;
-                else if (line.StartsWith(OriginTag)) currentState = GenbankState.Origin;
+                bool isNewState;
+                (featureState, isNewState) = GetFeatureState(line, featureState);
+                string info = line.Substring(FeatureColumnLength);
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (currentState)
+                switch (featureState)
                 {
-                    case GenbankState.Header:
-                        if (line.StartsWith(VersionTag)) (transcriptId, transcriptVersion) = ParseVersion(line);
+                    case FeaturesState.Gene:
+                        ParseGeneFeature(info, featureData);
                         break;
-
-                    case GenbankState.Features:
-                        bool isNewState;
-                        (featureState, isNewState) = GetFeatureState(featureState, line);
-                        var info    = line.Substring(FeatureColumnLength);
-
-                        // ReSharper disable once SwitchStatementMissingSomeCases
-                        switch (featureState)
-                        {
-                            case FeaturesState.Gene:
-                                if (info.StartsWith(GeneIdTag))     geneId     = ParseGeneId(info);
-                                if (info.StartsWith(GeneSymbolTag)) geneSymbol = ParseGeneSymbol(info);
-                                break;
-                            case FeaturesState.Cds:
-                                if (isNewState) codingRegion = GetInterval(info);
-                                if (info.StartsWith(ProteinIdTag)) (proteinId, proteinVersion) = ParseProteinId(info);
-                                break;
-                            case FeaturesState.Exon:
-                                if (isNewState) exons.Add(GetInterval(info));
-                                break;
-                        }
+                    case FeaturesState.Cds:
+                        ParseCdsFeature(isNewState, featureData, info);
+                        break;
+                    case FeaturesState.Exon:
+                        ParseExonFeature(isNewState, featureData, info);
                         break;
                 }
             }
 
-            return transcriptId == null
-                ? null
-                : new GenbankEntry(transcriptId, transcriptVersion, proteinId, proteinVersion, geneId, geneSymbol,
-                    codingRegion, exons.Count == 0 ? null : exons.ToArray());
+            return featureData;
+        }
+
+        private static void ParseExonFeature(bool isNewState, FeatureData featureData, string info)
+        {
+            if (isNewState) featureData.Exons.Add(GetInterval(info));
+        }
+
+        private static void ParseCdsFeature(bool isNewState, FeatureData featureData, string info)
+        {
+            if (isNewState) featureData.CodingRegion = GetInterval(info);
+            if (info.StartsWith(ProteinIdTag)) ParseProteinId(featureData, info);
+        }
+
+        private static void ParseGeneFeature(string info, FeatureData featureData)
+        {
+            if (info.StartsWith(GeneIdTag)) featureData.GeneId = ParseGeneId(info);
+            if (info.StartsWith(GeneSymbolTag)) featureData.GeneSymbol = ParseGeneSymbol(info);
+        }
+
+        private (string TranscriptId, byte TranscriptVersion) ParseHeader()
+        {
+            const string versionTag = "VERSION";
+            string transcriptId     = null;
+            byte transcriptVersion  = 0;
+
+            while (true)
+            {
+                string line = GetNextLine();
+                if (line == null || line.StartsWith(FeaturesTag)) break;
+                if (line.StartsWith(versionTag)) (transcriptId, transcriptVersion) = ParseVersion(line);
+            }
+
+            return (transcriptId, transcriptVersion);
         }
 
         private static string ParseGeneSymbol(string info) => info.Substring(GeneSymbolTag.Length).Trim('"');
         private static string ParseGeneId(string info)     => info.Substring(GeneIdTag.Length).Trim('"');
 
-        private static (string Id, byte Version) ParseProteinId(string info)
+        private static void ParseProteinId(FeatureData featureData, string info)
         {
-            var rawId = info.Substring(ProteinIdTag.Length).Trim('"');
-            return FormatUtilities.SplitVersion(rawId);
+            string rawId = info.Substring(ProteinIdTag.Length).Trim('"');
+            (featureData.ProteinId, featureData.ProteinVersion) = FormatUtilities.SplitVersion(rawId);
         }
 
         private static IInterval GetInterval(string info)
@@ -108,22 +143,22 @@ namespace CacheUtils.Genbank
             var coordinates = info.Split("..");
             if (coordinates.Length != 2) throw new InvalidDataException("Expected two coordinates in the exon feature line.");
 
-            var start = int.Parse(coordinates[0].TrimStart('<'));
-            var end   = int.Parse(coordinates[1].TrimStart('>'));
+            int start = int.Parse(coordinates[0].TrimStart('<'));
+            int end   = int.Parse(coordinates[1].TrimStart('>'));
             return new Interval(start, end);
         }
 
         private static IInterval GetJoinInterval(string info)
         {
             var cols  = info.Substring(5, info.Length - 6).Split(',');
-            var start = int.Parse(cols[0].Split("..")[0]);
-            var end   = int.Parse(cols[1].Split("..")[1]);
+            int start = int.Parse(cols[0].Split("..")[0]);
+            int end   = int.Parse(cols[1].Split("..")[1]);
             return new Interval(start, end);
         }
 
-        private static (FeaturesState State, bool IsNewState) GetFeatureState(FeaturesState featureState, string line)
+        private static (FeaturesState State, bool IsNewState) GetFeatureState(string line, FeaturesState featureState)
         {
-            var label = line.Substring(0, FeatureColumnLength).Trim();
+            string label = line.Substring(0, FeatureColumnLength).Trim();
             if (string.IsNullOrEmpty(label)) return (featureState, false);
 
             if (label.StartsWith(GeneFeatureTag)) return (FeaturesState.Gene, true);
@@ -133,16 +168,26 @@ namespace CacheUtils.Genbank
 
         private bool HasLocus()
         {
-            var line = _reader.ReadLine();
+            string line = _reader.ReadLine();
             return line != null && line.StartsWith(LocusTag);
         }
 
         private static (string TranscriptId, byte TranscriptVersion) ParseVersion(string line)
         {
-            var accession = line.Substring(12).Trim();
+            string accession = line.Substring(12).Trim();
             return FormatUtilities.SplitVersion(accession);
         }
 
         public void Dispose() => _reader.Dispose();
+
+        private sealed class FeatureData
+        {
+            public string ProteinId;
+            public byte ProteinVersion;
+            public string GeneId;
+            public string GeneSymbol;
+            public IInterval CodingRegion;
+            public readonly List<IInterval> Exons = new List<IInterval>();
+        }
     }
 }

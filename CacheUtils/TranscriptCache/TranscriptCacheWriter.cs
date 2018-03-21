@@ -104,7 +104,7 @@ namespace CacheUtils.TranscriptCache
             var index = new Dictionary<T, int>(comparer);
             if (array == null) return index;
 
-            for (int currentIndex = 0; currentIndex < array.Count; currentIndex++)
+            for (var currentIndex = 0; currentIndex < array.Count; currentIndex++)
                 index[array[currentIndex]] = currentIndex;
 
             return index;

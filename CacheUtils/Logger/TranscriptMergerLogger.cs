@@ -14,8 +14,14 @@ namespace CacheUtils.Logger
         public void WriteLine(string s) => _writer.WriteLine(s);
         public void Write(string s)     => _writer.Write(s);
 
-        public void SetBold()    { }
-        public void ResetColor() { }
+        public void SetBold()    {
+            // not used
+        }
+
+        public void ResetColor()
+        {
+            // not used
+        }
 
         public void Dispose() => _writer.Dispose();
     }

@@ -32,9 +32,9 @@ namespace CacheUtils.Genes.DataStructures
 
         public override string ToString()
         {
-            var interval37 = GetInterval(GRCh37);
-            var interval38 = GetInterval(GRCh38);
-            string strand  = OnReverseStrand ? "R" : "F";
+            string interval37 = GetInterval(GRCh37);
+            string interval38 = GetInterval(GRCh38);
+            string strand     = OnReverseStrand ? "R" : "F";
             return $"{Chromosome.UcscName}\t{Chromosome.EnsemblName}\t{Symbol}\t{interval37}\t{interval38}\t{strand}\t{HgncId}\t{EnsemblId}\t{EntrezGeneId}";
         }
 

@@ -34,18 +34,18 @@ namespace CacheUtils.TranscriptCache.Comparers
         }
 
 
-        public override int GetHashCode(UgaGene x)
+        public override int GetHashCode(UgaGene obj)
         {
             unchecked
             {
-                var hashCode = x.Chromosome.Index.GetHashCode();
-                if (x.GRCh37 != null) hashCode = (hashCode * 397) ^ GetHashCode(x.GRCh37);
-                if (x.GRCh38 != null) hashCode = (hashCode * 397) ^ GetHashCode(x.GRCh38);
-                hashCode = (hashCode * 397) ^ x.OnReverseStrand.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.HgncId;
-                if (x.Symbol != null) hashCode = (hashCode * 397) ^ x.Symbol.GetHashCode();
-                if (x.EntrezGeneId != null) hashCode = (hashCode * 397) ^ x.EntrezGeneId.GetHashCode();
-                if (x.EnsemblId != null) hashCode = (hashCode * 397) ^ x.EnsemblId.GetHashCode();
+                int hashCode = obj.Chromosome.Index.GetHashCode();
+                if (obj.GRCh37 != null) hashCode = (hashCode * 397) ^ GetHashCode(obj.GRCh37);
+                if (obj.GRCh38 != null) hashCode = (hashCode * 397) ^ GetHashCode(obj.GRCh38);
+                hashCode = (hashCode * 397) ^ obj.OnReverseStrand.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.HgncId;
+                if (obj.Symbol != null) hashCode = (hashCode * 397) ^ obj.Symbol.GetHashCode();
+                if (obj.EntrezGeneId != null) hashCode = (hashCode * 397) ^ obj.EntrezGeneId.GetHashCode();
+                if (obj.EnsemblId != null) hashCode = (hashCode * 397) ^ obj.EnsemblId.GetHashCode();
                 return hashCode;
             }
         }

@@ -16,7 +16,7 @@ namespace CacheUtils.Genes.IO
         public GeneInfoReader(StreamReader reader)
         {
             _reader = reader;
-            var headerLine = _reader.ReadLine();
+            string headerLine = _reader.ReadLine();
             SetColumnIndices(headerLine);
         }
 
@@ -28,9 +28,9 @@ namespace CacheUtils.Genes.IO
             var cols = line.Split('\t');
             if (cols.Length == 1) cols = line.Split(' ');
 
-            for (int index = 0; index < cols.Length; index++)
+            for (var index = 0; index < cols.Length; index++)
             {
-                var header = cols[index];
+                string header = cols[index];
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (header)
@@ -72,15 +72,15 @@ namespace CacheUtils.Genes.IO
 
             try
             {
-                var entrezGeneId = cols[_entrezGeneIndex];
-                var symbol       = cols[_symbolIndex];
+                string entrezGeneId = cols[_entrezGeneIndex];
+                string symbol       = cols[_symbolIndex];
 
                 return new GeneInfo(symbol, entrezGeneId);
             }
             catch (Exception)
             {
                 Console.WriteLine("Offending line: {0}", line);
-                for (int i = 0; i < cols.Length; i++) Console.WriteLine("- col {0}: [{1}]", i, cols[i]);
+                for (var i = 0; i < cols.Length; i++) Console.WriteLine("- col {0}: [{1}]", i, cols[i]);
                 throw;
             }
         }

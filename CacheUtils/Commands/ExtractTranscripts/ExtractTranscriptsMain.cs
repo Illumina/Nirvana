@@ -42,13 +42,13 @@ namespace CacheUtils.Commands.ExtractTranscripts
             var chromosome = ReferenceNameUtilities.GetChromosome(bundle.SequenceReader.RefNameToChromosome, _referenceName);
             bundle.Load(chromosome);
 
-            var outputStub  = GetOutputStub(chromosome, bundle.Source);
+            string outputStub  = GetOutputStub(chromosome, bundle.Source);
             var interval    = new ChromosomeInterval(chromosome, _referencePosition, _referenceEndPosition);
             var transcripts = GetTranscripts(logger, bundle, interval);
 
-            var sift           = GetPredictionStaging(logger, "SIFT", transcripts, chromosome, bundle.SiftPredictions, bundle.SiftReader, x => x.SiftIndex, numRefSeqs);
-            var polyphen       = GetPredictionStaging(logger, "PolyPhen", transcripts, chromosome, bundle.PolyPhenPredictions, bundle.PolyPhenReader, x => x.PolyPhenIndex, numRefSeqs);
-            var referenceBases = GetReferenceBases(logger, bundle.SequenceReader, interval);
+            var sift              = GetPredictionStaging(logger, "SIFT", transcripts, chromosome, bundle.SiftPredictions, bundle.SiftReader, x => x.SiftIndex, numRefSeqs);
+            var polyphen          = GetPredictionStaging(logger, "PolyPhen", transcripts, chromosome, bundle.PolyPhenPredictions, bundle.PolyPhenReader, x => x.PolyPhenIndex, numRefSeqs);
+            string referenceBases = GetReferenceBases(logger, bundle.SequenceReader, interval);
 
             var regulatoryRegionIntervalArrays = GetRegulatoryRegionIntervalArrays(logger, bundle.TranscriptCache, interval, numRefSeqs);
             var transcriptIntervalArrays = PredictionUtilities.UpdateTranscripts(transcripts, bundle.SiftPredictions,
@@ -101,7 +101,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
         {
             logger.Write("- retrieving reference bases... ");
             reader.GetCompressedSequence(interval.Chromosome);
-            var referenceBases = reader.Sequence.Substring(interval.Start, interval.End - interval.Start + 1);
+            string referenceBases = reader.Sequence.Substring(interval.Start, interval.End - interval.Start + 1);
             logger.WriteLine($"{referenceBases.Length} bases extracted.");
 
             return referenceBases;
@@ -127,8 +127,8 @@ namespace CacheUtils.Commands.ExtractTranscripts
         {
             var refPredictions = new Prediction[indexSet.Count];
 
-            int predIdx = 0;
-            foreach (var index in indexSet) refPredictions[predIdx++] = oldPredictions[index];
+            var predIdx = 0;
+            foreach (int index in indexSet) refPredictions[predIdx++] = oldPredictions[index];
 
             var predictions = new Prediction[numRefSeqs][];
             predictions[chromosome.Index] = refPredictions;
@@ -140,7 +140,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
             var indexSet = new HashSet<int>();
             foreach (var transcript in transcripts)
             {
-                var index = indexFunc(transcript);
+                int index = indexFunc(transcript);
                 if (index == -1) continue;
                 indexSet.Add(index);
             }
@@ -202,7 +202,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
                 }
             };
 
-            var commandLineExample = $"{command} --in <prefix> --out <dir> -r <ref path> --chr <name> -p <pos> --endpos <pos>\n";
+            string commandLineExample = $"{command} --in <prefix> --out <dir> -r <ref path> --chr <name> -p <pos> --endpos <pos>\n";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())

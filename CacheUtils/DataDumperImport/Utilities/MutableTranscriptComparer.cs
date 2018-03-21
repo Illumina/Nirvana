@@ -58,7 +58,7 @@ namespace CacheUtils.DataDumperImport.Utilities
             if (x == null || y == null) return false;
             if (x.Length != y.Length)   return false;
             // ReSharper disable once LoopCanBeConvertedToQuery
-            for (int i = 0; i < x.Length; i++) if (!equals(x[i], y[i])) return false;
+            for (var i = 0; i < x.Length; i++) if (!equals(x[i], y[i])) return false;
             return true;
         }
 
@@ -95,17 +95,17 @@ namespace CacheUtils.DataDumperImport.Utilities
                        CodingRegionEquals(x.CodingRegion, y.CodingRegion);
         }
 
-        public override int GetHashCode(MutableTranscript x)
+        public override int GetHashCode(MutableTranscript obj)
         {
             unchecked
             {
-                var hashCode = x.Chromosome.Index.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Start.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.End.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Id.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Version.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.BioType.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Source.GetHashCode();
+                int hashCode = obj.Chromosome.Index.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Start.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.End.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Id.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Version.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.BioType.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Source.GetHashCode();
                 return hashCode;
             }
         }

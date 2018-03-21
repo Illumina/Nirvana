@@ -10,7 +10,7 @@ namespace CacheUtils.Genes
     {
         public static int Consolidate(this Dictionary<ushort, List<MutableGene>> genesByRef)
         {
-            int numHgncIds = 0;
+            var numHgncIds = 0;
 
             foreach (var refKvp in genesByRef.OrderBy(x => x.Key))
             {
@@ -31,7 +31,7 @@ namespace CacheUtils.Genes
         private static void CreateAggregateGene(IReadOnlyList<MutableGene> genes)
         {
             var seedGene = genes[0];
-            for (int i = 1; i < genes.Count; i++)
+            for (var i = 1; i < genes.Count; i++)
             {
                 genes[i].GeneId = null;
                 genes[i].HgncId = -1;

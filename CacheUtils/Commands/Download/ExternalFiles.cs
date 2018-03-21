@@ -56,18 +56,17 @@ namespace CacheUtils.Commands.Download
 
             fileList.Execute(logger, "downloads", file => file.Download(logger));
 
-            if (genbankFiles != null)
-            {
-                genbankFiles.Execute(logger, "file parsing", file => file.Parse());
-                var genbankEntries = GetIdToGenbankEntryDict(genbankFiles);
-                WriteDictionary(logger, genbankEntries);
-            }
+            if (genbankFiles == null) return;
+
+            genbankFiles.Execute(logger, "file parsing", file => file.Parse());
+            var genbankEntries = GetIdToGenbankEntryDict(genbankFiles);
+            WriteDictionary(logger, genbankEntries);
         }
 
         private static IEnumerable<GenbankEntry> GetIdToGenbankEntryDict(IEnumerable<GenbankFile> files) =>
             files.SelectMany(file => file.GenbankDict.Values).OrderBy(x => x.TranscriptId).ToList();
 
-        private static List<GenbankFile> GetGenbankFiles(ILogger logger, List<RemoteFile> fileList)
+        private static List<GenbankFile> GetGenbankFiles(ILogger logger, ICollection<RemoteFile> fileList)
         {
             var genbankFileInfo = new FileInfo(GenbankFilePath);
             if (genbankFileInfo.Exists && GetElapsedDays(genbankFileInfo.CreationTime) < 30.0) return null;
@@ -75,7 +74,7 @@ namespace CacheUtils.Commands.Download
             int numGenbankFiles = GetNumGenbankFiles(logger);
             var genbankFiles    = new List<GenbankFile>(numGenbankFiles);
 
-            for (int i = 0; i < numGenbankFiles; i++)
+            for (var i = 0; i < numGenbankFiles; i++)
             {
                 var genbankFile = new GenbankFile(logger, i + 1);
                 fileList.Add(genbankFile.RemoteFile);
@@ -92,16 +91,16 @@ namespace CacheUtils.Commands.Download
             var fileList = new RemoteFile("RefSeq filelist", "ftp://ftp.ncbi.nlm.nih.gov/refseq/H_sapiens/mRNA_Prot/human.files.installed");
             fileList.Download(logger);
 
-            int maxNum = 0;
+            var maxNum = 0;
 
             using (var reader = new StreamReader(FileUtilities.GetReadStream(fileList.FilePath)))
             {
                 while (true)
                 {
-                    var line = reader.ReadLine();
+                    string line = reader.ReadLine();
                     if (line == null) break;
 
-                    var filename = line.Split('\t')[1];
+                    string filename = line.Split('\t')[1];
                     if (!filename.EndsWith(".rna.gbff.gz")) continue;
 
                     int num = int.Parse(filename.Substring(6, filename.Length - 18));

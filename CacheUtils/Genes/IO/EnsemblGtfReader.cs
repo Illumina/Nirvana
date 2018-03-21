@@ -31,7 +31,7 @@ namespace CacheUtils.Genes.IO
 
             while (true)
             {
-                var line = _reader.ReadLine();
+                string line = _reader.ReadLine();
                 if (line == null) break;
 
                 if (line.StartsWith("#")) continue;
@@ -39,7 +39,7 @@ namespace CacheUtils.Genes.IO
                 var cols = line.Split('\t');
                 if (cols.Length != 9) throw new InvalidDataException($"Expected 9 columns but found {cols.Length} when parsing the GFF entry.");
 
-                var featureType = cols[FeatureTypeIndex];
+                string featureType = cols[FeatureTypeIndex];
                 if (featureType != "gene") continue;
 
                 AddGene(cols, genes);
@@ -67,7 +67,7 @@ namespace CacheUtils.Genes.IO
             {
                 Console.WriteLine();
                 Console.WriteLine("Offending line: {0}", string.Join('\t', cols));
-                for (int i = 0; i < cols.Length; i++) Console.WriteLine("- col {0}: [{1}]", i, cols[i]);
+                for (var i = 0; i < cols.Length; i++) Console.WriteLine("- col {0}: [{1}]", i, cols[i]);
                 throw;
             }
         }
@@ -77,11 +77,11 @@ namespace CacheUtils.Genes.IO
             string ensemblId = null;
             string symbol    = null;
 
-            foreach (var col in cols)
+            foreach (string col in cols)
             {
-                var kvp   = col.Trim().Split(' ');
-                var key   = kvp[0];
-                var value = kvp[1].Trim('\"');
+                var kvp      = col.Trim().Split(' ');
+                string key   = kvp[0];
+                string value = kvp[1].Trim('\"');
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (key)

@@ -20,8 +20,8 @@ namespace CacheUtils.PredictionCache
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var transcript in transcripts)
             {
-                var siftIndex     = GetNewIndex(oldSiftPredictions, transcript.SiftIndex, siftDict);
-                var polyphenIndex = GetNewIndex(oldPolyPhenPredictions, transcript.PolyPhenIndex, polyphenDict);
+                int siftIndex     = GetNewIndex(oldSiftPredictions, transcript.SiftIndex, siftDict);
+                int polyphenIndex = GetNewIndex(oldPolyPhenPredictions, transcript.PolyPhenIndex, polyphenDict);
                 newTranscripts.Add(transcript.UpdatePredictions(siftIndex, polyphenIndex));
             }
 

@@ -34,7 +34,7 @@ namespace CacheUtils.IntermediateIO
 
             while (true)
             {
-                var transcript = GetNextTranscript();                
+                var transcript = GetNextTranscript();
                 if (transcript == null) break;
                 transcripts.Add(transcript);
             }
@@ -44,7 +44,7 @@ namespace CacheUtils.IntermediateIO
 
         private MutableTranscript GetNextTranscript()
         {
-            var line = _reader.ReadLine();
+            string line = _reader.ReadLine();
             if (line == null) return null;
 
             var transcriptInfo  = ReadTranscriptInfo(line);
@@ -57,7 +57,7 @@ namespace CacheUtils.IntermediateIO
             var selenocysteines = ReadSelenocysteines();
             var rnaEdits        = ReadRnaEdits();
 
-            var transcript =  new MutableTranscript(transcriptInfo.Chromosome, transcriptInfo.Start, transcriptInfo.End,
+            var transcript = new MutableTranscript(transcriptInfo.Chromosome, transcriptInfo.Start, transcriptInfo.End,
                 transcriptInfo.Id, transcriptInfo.Version, transcriptInfo.CcdsId, transcriptInfo.RefSeqId,
                 transcriptInfo.BioType, transcriptInfo.IsCanonical, translation.CodingRegion, translation.Id,
                 translation.Version, translation.PeptideSeq, transcriptInfo.Source, gene, exons,
@@ -96,9 +96,9 @@ namespace CacheUtils.IntermediateIO
             if (numPositions == 0) return null;
 
             var positions = new int[numPositions];
-            int colIndex = 2;
+            var colIndex = 2;
 
-            for (int i = 0; i < numPositions; i++) positions[i] = int.Parse(cols[colIndex++]);
+            for (var i = 0; i < numPositions; i++) positions[i] = int.Parse(cols[colIndex++]);
             return positions;
         }
 
@@ -110,13 +110,13 @@ namespace CacheUtils.IntermediateIO
             if (numRnaEdits == 0) return null;
 
             var rnaEdits = new IRnaEdit[numRnaEdits];
-            int colIndex = 2;
+            var colIndex = 2;
 
-            for (int i = 0; i < numRnaEdits; i++)
+            for (var i = 0; i < numRnaEdits; i++)
             {
-                var start   = int.Parse(cols[colIndex++]);
-                var end     = int.Parse(cols[colIndex++]);
-                var bases   = cols[colIndex++];
+                int start    = int.Parse(cols[colIndex++]);
+                int end      = int.Parse(cols[colIndex++]);
+                string bases = cols[colIndex++];
                 rnaEdits[i] = new RnaEdit(start, end, bases);
             }
 
@@ -131,9 +131,9 @@ namespace CacheUtils.IntermediateIO
             if (numCdnaMaps == 0) return null;
 
             var cdnaMaps = new MutableTranscriptRegion[numCdnaMaps];
-            int colIndex = 2;
+            var colIndex = 2;
 
-            for (int i = 0; i < numCdnaMaps; i++)
+            for (var i = 0; i < numCdnaMaps; i++)
             {
                 int start     = int.Parse(cols[colIndex++]);
                 int end       = int.Parse(cols[colIndex++]);
@@ -153,9 +153,9 @@ namespace CacheUtils.IntermediateIO
             if (numIntervals == 0) return null;
 
             var intervals = new IInterval[numIntervals];
-            int colIndex  = 2;
+            var colIndex = 2;
 
-            for (int i = 0; i < numIntervals; i++)
+            for (var i = 0; i < numIntervals; i++)
             {
                 int start    = int.Parse(cols[colIndex++]);
                 int end      = int.Parse(cols[colIndex++]);
@@ -172,15 +172,15 @@ namespace CacheUtils.IntermediateIO
             int numExons = int.Parse(cols[1]);
             if (numExons == 0) return null;
 
-            var exons    = new MutableExon[numExons];
-            int colIndex = 2;
+            var exons = new MutableExon[numExons];
+            var colIndex = 2;
 
-            for (int i = 0; i < numExons; i++)
+            for (var i = 0; i < numExons; i++)
             {
-                int start  = int.Parse(cols[colIndex++]);
-                int end    = int.Parse(cols[colIndex++]);
-                byte phase = (byte)(int.Parse(cols[colIndex++]) + 1);
-                exons[i]   = new MutableExon(chromosome, start, end, phase);
+                int start = int.Parse(cols[colIndex++]);
+                int end   = int.Parse(cols[colIndex++]);
+                var phase = (byte)(int.Parse(cols[colIndex++]) + 1);
+                exons[i]  = new MutableExon(chromosome, start, end, phase);
             }
 
             return exons;
@@ -190,13 +190,13 @@ namespace CacheUtils.IntermediateIO
         {
             var cols = GetColumns("Translation");
 
-            var id         = cols[1];
-            var version    = byte.Parse(cols[2]);
-            var start      = int.Parse(cols[3]);
-            var end        = int.Parse(cols[4]);
-            var cdnaStart  = int.Parse(cols[5]);
-            var cdnaEnd    = int.Parse(cols[6]);
-            var peptideSeq = cols[7];
+            string id         = cols[1];
+            byte version      = byte.Parse(cols[2]);
+            int start         = int.Parse(cols[3]);
+            int end           = int.Parse(cols[4]);
+            int cdnaStart     = int.Parse(cols[5]);
+            int cdnaEnd       = int.Parse(cols[6]);
+            string peptideSeq = cols[7];
 
             var codingRegion = start == -1 && end == -1
                 ? null
@@ -209,13 +209,13 @@ namespace CacheUtils.IntermediateIO
         {
             var cols = GetColumns("Gene");
 
-            var id              = cols[1];
-            var start           = int.Parse(cols[4]);
-            var end             = int.Parse(cols[5]);
-            var onReverseStrand = cols[6] == "R";
-            var symbol          = cols[7];
-            var symbolSource    = (GeneSymbolSource)int.Parse(cols[8]);
-            var hgncId          = int.Parse(cols[9]);
+            string id            = cols[1];
+            int start            = int.Parse(cols[4]);
+            int end              = int.Parse(cols[5]);
+            bool onReverseStrand = cols[6] == "R";
+            string symbol        = cols[7];
+            var symbolSource     = (GeneSymbolSource)int.Parse(cols[8]);
+            int hgncId           = int.Parse(cols[9]);
 
             return new MutableGene(chromosome, start, end, onReverseStrand, symbol, symbolSource, id, hgncId);
         }
@@ -227,23 +227,23 @@ namespace CacheUtils.IntermediateIO
         {
             var cols = GetColumns("Transcript", line);
 
-            var id                = cols[1];
-            var version           = byte.Parse(cols[2]);
-            var referenceIndex    = ushort.Parse(cols[4]);
-            var start             = int.Parse(cols[5]);
-            var end               = int.Parse(cols[6]);
+            string id             = cols[1];
+            byte version          = byte.Parse(cols[2]);
+            ushort referenceIndex = ushort.Parse(cols[4]);
+            int start             = int.Parse(cols[5]);
+            int end               = int.Parse(cols[6]);
             var biotype           = (BioType)byte.Parse(cols[8]);
-            var isCanonical       = cols[9] == "Y";
-            var totalExonLength   = int.Parse(cols[10]);
-            var ccdsId            = cols[11];
-            var refSeqId          = cols[12];
+            bool isCanonical      = cols[9] == "Y";
+            int totalExonLength   = int.Parse(cols[10]);
+            string ccdsId         = cols[11];
+            string refSeqId       = cols[12];
             var source            = (Source)byte.Parse(cols[13]);
-            var cdsStartNotFound  = cols[14] == "Y";
-            var cdsEndNotFound    = cols[15] == "Y";
-            var startExonPhase    = int.Parse(cols[16]);
-            var bamEditStatus     = cols[17];
+            bool cdsStartNotFound = cols[14] == "Y";
+            bool cdsEndNotFound   = cols[15] == "Y";
+            int startExonPhase    = int.Parse(cols[16]);
+            string bamEditStatus  = cols[17];
 
-            var translateableSequence = _reader.ReadLine();
+            string translateableSequence = _reader.ReadLine();
             var chromosome = ReferenceNameUtilities.GetChromosome(_refIndexToChromosome, referenceIndex);
 
             return (id, version, chromosome, start, end, biotype, isCanonical, totalExonLength, ccdsId, refSeqId, source

@@ -10,10 +10,10 @@ namespace CacheUtils.Sequence
         {
             _convertBaseToNumber = new byte[256];
 
-            for (int index = 0; index < 256; ++index)
+            for (var index = 0; index < 256; ++index)
                 _convertBaseToNumber[index] = 10;
 
-            for (int index = 0; index < "GCTA".Length; ++index)
+            for (var index = 0; index < "GCTA".Length; ++index)
             {
                 _convertBaseToNumber["GCTA"[index]] = (byte)index;
                 _convertBaseToNumber[char.ToLower("GCTA"[index])] = (byte)index;
@@ -23,11 +23,11 @@ namespace CacheUtils.Sequence
         public void Compress(string bases, TwoBitSequence twoBitSequence)
         {
             twoBitSequence.Allocate(bases.Length);
-            byte num1 = 0;
-            int index1 = 0;
-            int num2 = 0;
+            byte num1  = 0;
+            var index1 = 0;
+            var num2   = 0;
 
-            foreach (var index2 in bases)
+            foreach (char index2 in bases)
             {
                 byte num3 = _convertBaseToNumber[index2];
                 if (num3 == 10) num3 = 0;
@@ -44,7 +44,7 @@ namespace CacheUtils.Sequence
 
             if (num2 != 0) twoBitSequence.Buffer[index1] = (byte)((uint)num1 << (4 - num2) * 2);
 
-            for (int index2 = 0; index2 < bases.Length; ++index2)
+            for (var index2 = 0; index2 < bases.Length; ++index2)
             {
                 if (bases[index2] != 'N') continue;
 

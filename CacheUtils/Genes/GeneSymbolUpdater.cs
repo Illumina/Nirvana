@@ -44,7 +44,7 @@ namespace CacheUtils.Genes
         private void UpdateGeneSymbol(UgaGene gene)
         {
             string originalSymbol = gene.Symbol;
-            var isUpdated = UpdateBySymbolDict(gene, x => x.HgncId, x => x == -1, _hgncIdToSymbol);
+            bool isUpdated = UpdateBySymbolDict(gene, x => x.HgncId, x => x == -1, _hgncIdToSymbol);
 
             if (isUpdated)
             {
@@ -71,10 +71,7 @@ namespace CacheUtils.Genes
             isUpdated = UpdateBySymbolDict(gene, x => x.EntrezGeneId, string.IsNullOrEmpty, _refseqGeneIdToSymbol);
 
             // ReSharper disable once InvertIf
-            if (isUpdated)
-            {
-                if (gene.Symbol != originalSymbol) _numUpdatedByRefSeqGff++;
-            }
+            if (isUpdated && gene.Symbol != originalSymbol) _numUpdatedByRefSeqGff++;
         }
 
         private static bool UpdateBySymbolDict<T>(UgaGene gene, Func<UgaGene, T> idFunc, Func<T, bool> isEmpty, IReadOnlyDictionary<T, string> idToSymbol)
@@ -82,7 +79,7 @@ namespace CacheUtils.Genes
             var key = idFunc(gene);
             if (isEmpty(key)) return false;
 
-            if (!idToSymbol.TryGetValue(idFunc(gene), out var symbol)) return false;
+            if (!idToSymbol.TryGetValue(idFunc(gene), out string symbol)) return false;
             gene.Symbol = symbol;
             return true;
         }

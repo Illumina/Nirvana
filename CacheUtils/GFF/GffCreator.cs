@@ -20,7 +20,7 @@ namespace CacheUtils.GFF
             _observedGenes    = new HashSet<int>();
         }
 
-        public void Create(IntervalArray<ITranscript>[] transcriptIntervalArrays)
+        public void Create(IEnumerable<IntervalArray<ITranscript>> transcriptIntervalArrays)
         {
             Console.Write("- writing GFF entries... ");
             foreach (var transcriptArray in transcriptIntervalArrays)
@@ -99,17 +99,17 @@ namespace CacheUtils.GFF
         private static IGffGene GetGene(IGene gene, string id) => new GffGene(gene.Start, gene.End, id,
             gene.EntrezGeneId.WithVersion, gene.EnsemblId.WithVersion, gene.Symbol);
 
-        private IRequiredFields GetRequiredFields(ITranscript transcript)
+        private static IRequiredFields GetRequiredFields(ITranscript transcript)
         {
-            var source = transcript.Source.ToString();
+            string source = transcript.Source.ToString();
             return new RequiredFields(transcript.Chromosome.UcscName, source, transcript.Gene.OnReverseStrand);
         }
 
         private IGeneralAttributes GetGeneralAttributes(ITranscript transcript)
         {
-            var bioType        = AnnotatedTranscript.GetBioType(transcript.BioType);
-            var internalGeneId = _geneToInternalId[transcript.Gene];
-            var geneId         = transcript.Source == Source.Ensembl
+            string bioType     = AnnotatedTranscript.GetBioType(transcript.BioType);
+            int internalGeneId = _geneToInternalId[transcript.Gene];
+            string geneId      = transcript.Source == Source.Ensembl
                 ? transcript.Gene.EnsemblId.WithVersion
                 : transcript.Gene.EntrezGeneId.WithVersion;
 

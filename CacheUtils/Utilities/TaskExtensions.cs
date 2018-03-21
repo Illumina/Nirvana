@@ -16,7 +16,7 @@ namespace CacheUtils.Utilities
             var tasks     = new Task[items.Count];
             var maxThread = new SemaphoreSlim(numThreads);
 
-            for (int i = 0; i < items.Count; i++)
+            for (var i = 0; i < items.Count; i++)
             {
                 maxThread.Wait();
                 var item = items[i];

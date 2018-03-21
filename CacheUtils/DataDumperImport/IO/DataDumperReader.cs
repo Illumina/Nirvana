@@ -75,7 +75,7 @@ namespace CacheUtils.DataDumperImport.IO
 
         private ObjectValueNode GetObjectValue()
         {
-            string type = "(unknown)";
+            var type = "(unknown)";
             var nodes   = new List<IImportNode>();
 
             while (true)

@@ -14,15 +14,15 @@ namespace CacheUtils.TranscriptCache.Comparers
                    x.Type              == y.Type;
         }
 
-        public override int GetHashCode(IRegulatoryRegion x)
+        public override int GetHashCode(IRegulatoryRegion obj)
         {
             unchecked
             {
-                var hashCode = x.Start;
-                hashCode = (hashCode * 397) ^ x.End;
-                hashCode = (hashCode * 397) ^ x.Chromosome.Index.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Id.WithoutVersion.GetHashCode();
-                hashCode = (hashCode * 397) ^ (int)x.Type;
+                int hashCode = obj.Start;
+                hashCode = (hashCode * 397) ^ obj.End;
+                hashCode = (hashCode * 397) ^ obj.Chromosome.Index.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Id.WithoutVersion.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int)obj.Type;
                 return hashCode;
             }
         }

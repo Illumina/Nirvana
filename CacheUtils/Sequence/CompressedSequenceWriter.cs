@@ -89,7 +89,7 @@ namespace CacheUtils.Sequence
 
             _writer.WriteOpt(_refSeqIndex.Count);
 
-            for (int i = 0; i < _refSeqIndex.Count; i++)
+            for (var i = 0; i < _refSeqIndex.Count; i++)
             {
                 _writer.WriteOptAscii(_refSeqNames[i]);
                 var indexEntry = _refSeqIndex[i];

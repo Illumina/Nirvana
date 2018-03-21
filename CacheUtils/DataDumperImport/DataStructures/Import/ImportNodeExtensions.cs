@@ -6,10 +6,10 @@ namespace CacheUtils.DataDumperImport.DataStructures.Import
     {
         public static int GetInt32(this IImportNode node)
         {
-            var s = GetString(node);
+            string s = GetString(node);
             if (s == null) return -1;
 
-            if (!int.TryParse(s, out var ret))
+            if (!int.TryParse(s, out int ret))
             {
                 throw new InvalidDataException($"Unable to convert the string ({s}) to an integer.");
             }
@@ -30,7 +30,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Import
                 throw new InvalidDataException($"Unable to convert the AbstractData type to a StringKeyValue type: [{node.Key}]");
             }
 
-            var s = stringKeyValue.Value;
+            string s = stringKeyValue.Value;
             if (s == "" || s == "-") s = null;
             return s;
         }

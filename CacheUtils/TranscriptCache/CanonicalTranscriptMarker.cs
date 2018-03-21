@@ -33,7 +33,7 @@ namespace CacheUtils.TranscriptCache
 
                 int cdsLength        = transcript.CodingRegion?.Length ?? 0;
                 int transcriptLength = transcript.End - transcript.Start + 1;
-                var isLrg            = _lrgTranscriptIds.Contains(transcript.Id);
+                bool isLrg           = _lrgTranscriptIds.Contains(transcript.Id);
                 int accession        = AccessionUtilities.GetAccessionNumber(transcript.Id);
 
                 var metadata = new TranscriptMetadata(idWithVersion, accession, transcriptLength, cdsLength, isLrg);
@@ -69,13 +69,13 @@ namespace CacheUtils.TranscriptCache
         {
             if (string.IsNullOrEmpty(geneId)) throw new InvalidDataException("Expected a non-empty Entrez gene ID during canonical aggregation.");
             if (geneId.StartsWith("ENSG")) geneId = geneId.Substring(4);
-            if (!int.TryParse(geneId, out var geneIdNumber)) throw new InvalidDataException($"Unable to convert Entrez gene ID ({geneId}) to an integer.");
+            if (!int.TryParse(geneId, out int geneIdNumber)) throw new InvalidDataException($"Unable to convert Entrez gene ID ({geneId}) to an integer.");
             return geneIdNumber;
         }
 
         private static int SetCanonicalFlags(IReadOnlyDictionary<int, string> canonicalTranscriptsByGeneId, IEnumerable<MutableTranscript> transcripts)
         {
-            int numCanonicalTranscripts = 0;
+            var numCanonicalTranscripts = 0;
 
             foreach (var transcript in transcripts)
             {
@@ -83,7 +83,7 @@ namespace CacheUtils.TranscriptCache
                 transcript.IsCanonical = false;
 
                 // no canonical transcript
-                if (!canonicalTranscriptsByGeneId.TryGetValue(geneId, out var canonicalTranscriptId)) continue;
+                if (!canonicalTranscriptsByGeneId.TryGetValue(geneId, out string canonicalTranscriptId)) continue;
                 string idWithVersion = transcript.Id + '.' + transcript.Version;
                 if (idWithVersion != canonicalTranscriptId) continue;
 
@@ -143,7 +143,7 @@ namespace CacheUtils.TranscriptCache
             {
                 unchecked
                 {
-                    var hashCode = TranscriptId != null ? TranscriptId.GetHashCode() : 0;
+                    int hashCode = TranscriptId != null ? TranscriptId.GetHashCode() : 0;
                     hashCode = (hashCode * 397) ^ CdsLength;
                     hashCode = (hashCode * 397) ^ TranscriptLength;
                     hashCode = (hashCode * 397) ^ IsLrg.GetHashCode();

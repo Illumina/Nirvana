@@ -10,7 +10,7 @@ namespace CacheUtils.TranscriptCache
 {
     public static class TranscriptRegionMerger
     {
-        public static ITranscriptRegion[] GetTranscriptRegions(MutableTranscriptRegion[] cdnaMaps, MutableExon[] exons,
+        public static ITranscriptRegion[] GetTranscriptRegions(IEnumerable<MutableTranscriptRegion> cdnaMaps, MutableExon[] exons,
             IInterval[] introns, bool onReverseStrand)
         {
             var sortedRegions = cdnaMaps.OrderBy(x => x.Start).ThenBy(x => x.End).ToList();
@@ -33,7 +33,7 @@ namespace CacheUtils.TranscriptCache
 
         private static List<MutableTranscriptRegion> AddCoords(this List<MutableTranscriptRegion> regions, TranscriptRegionType targetRegionType, bool onReverseStrand)
         {
-            for (int regionIndex = 0; regionIndex < regions.Count; regionIndex++)
+            for (var regionIndex = 0; regionIndex < regions.Count; regionIndex++)
             {
                 var region = regions[regionIndex];
                 if (region.Type != targetRegionType) continue;
@@ -45,7 +45,7 @@ namespace CacheUtils.TranscriptCache
             return regions;
         }
 
-        private static (int CdnaStart, int CdnaEnd) GetExonCoords(this List<MutableTranscriptRegion> regions,
+        private static (int CdnaStart, int CdnaEnd) GetExonCoords(this IReadOnlyList<MutableTranscriptRegion> regions,
             int regionIndex, bool onReverseStrand)
         {
             int cdnaStart = -1;
@@ -56,12 +56,10 @@ namespace CacheUtils.TranscriptCache
             {
                 testIndex--;
                 var region = regions[testIndex];
-                if (region.Type == TranscriptRegionType.Exon)
-                {
-                    if (onReverseStrand) cdnaEnd = region.CdnaStart;
-                    else cdnaStart = region.CdnaEnd;
-                    break;
-                }
+                if (region.Type != TranscriptRegionType.Exon) continue;
+                if (onReverseStrand) cdnaEnd = region.CdnaStart;
+                else cdnaStart = region.CdnaEnd;
+                break;
             }
 
             testIndex = regionIndex;
@@ -69,12 +67,10 @@ namespace CacheUtils.TranscriptCache
             {
                 testIndex++;
                 var region = regions[testIndex];
-                if (region.Type == TranscriptRegionType.Exon)
-                {
-                    if (onReverseStrand) cdnaStart = region.CdnaEnd;
-                    else cdnaEnd = region.CdnaStart;
-                    break;
-                }
+                if (region.Type != TranscriptRegionType.Exon) continue;
+                if (onReverseStrand) cdnaStart = region.CdnaEnd;
+                else cdnaEnd = region.CdnaStart;
+                break;
             }
 
             return (cdnaStart, cdnaEnd);
@@ -83,7 +79,7 @@ namespace CacheUtils.TranscriptCache
         private static ITranscriptRegion[] ToInterfaceArray(this IReadOnlyList<MutableTranscriptRegion> mutableRegions)
         {
             var regions = new ITranscriptRegion[mutableRegions.Count];
-            for (int i = 0; i < mutableRegions.Count; i++)
+            for (var i = 0; i < mutableRegions.Count; i++)
             {
                 var region = mutableRegions[i];
                 regions[i] = new TranscriptRegion(region.Type, region.Id, region.Start, region.End, region.CdnaStart,
@@ -95,8 +91,8 @@ namespace CacheUtils.TranscriptCache
         private static IdInterval[] CreateIntervals(IEnumerable<IInterval> intervals, int numIntervals, bool onReverseStrand)
         {
             var idIntervals = new IdInterval[numIntervals];
-            ushort id         = onReverseStrand ? (ushort)numIntervals : (ushort)1;
-            int index       = 0;
+            ushort id       = onReverseStrand ? (ushort)numIntervals : (ushort)1;
+            var index       = 0;
 
             foreach (var interval in intervals)
             {
@@ -110,7 +106,7 @@ namespace CacheUtils.TranscriptCache
         }
 
         private static List<MutableTranscriptRegion> AddIds(this List<MutableTranscriptRegion> regions,
-            IdInterval[] intervals, TranscriptRegionType targetRegionType, TranscriptRegionType matchRegionType)
+            IReadOnlyList<IdInterval> intervals, TranscriptRegionType targetRegionType, TranscriptRegionType matchRegionType)
         {
             if (intervals == null) return regions;
 
@@ -131,14 +127,14 @@ namespace CacheUtils.TranscriptCache
             return regions;
         }
 
-        private static int BinarySearch(this IdInterval[] intervals, int position)
+        private static int BinarySearch(this IReadOnlyList<IdInterval> intervals, int position)
         {
             var begin = 0;
-            var end = intervals.Length - 1;
+            int end = intervals.Count - 1;
 
             while (begin <= end)
             {
-                var index = begin + (end - begin >> 1);
+                int index = begin + (end - begin >> 1);
                 var interval = intervals[index];
 
                 if (position >= interval.Start && position <= interval.End) return index;
@@ -151,7 +147,7 @@ namespace CacheUtils.TranscriptCache
 
         private static List<MutableTranscriptRegion> AddGaps(this List<MutableTranscriptRegion> sortedRegions)
         {
-            for (int i = 1; i < sortedRegions.Count; i++)
+            for (var i = 1; i < sortedRegions.Count; i++)
             {
                 var prevRegion = sortedRegions[i - 1];
                 var region     = sortedRegions[i];
@@ -187,7 +183,7 @@ namespace CacheUtils.TranscriptCache
                 if (ReferenceEquals(this, other)) return 0;
                 if (ReferenceEquals(null, other)) return 1;
 
-                var startComparison = Start.CompareTo(other.Start);
+                int startComparison = Start.CompareTo(other.Start);
                 return startComparison != 0 ? startComparison : End.CompareTo(other.End);
             }
         }

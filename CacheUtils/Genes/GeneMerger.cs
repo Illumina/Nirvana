@@ -21,8 +21,8 @@ namespace CacheUtils.Genes
             AddGenes(data.EnsemblGenesByRef, genesByRef);
             AddGenes(data.RefSeqGenesByRef, genesByRef);
 
-            int totalOrphanEntries = 0;
-            int totalMergedEntries = 0;
+            var totalOrphanEntries = 0;
+            var totalMergedEntries = 0;
 
             foreach (var kvp in genesByRef)
             {
@@ -62,8 +62,8 @@ namespace CacheUtils.Genes
             Dictionary<string, List<MutableGene>> hgncIdToGenes, bool isGrch37)
         {
             var mergedGenes      = new List<UgaGene>();
-            int numOrphanEntries = 0;
-            int numMergedEntries = 0;
+            var numOrphanEntries = 0;
+            var numMergedEntries = 0;
 
             foreach (var kvp in hgncIdToGenes)
             {

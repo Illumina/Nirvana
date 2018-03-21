@@ -57,19 +57,56 @@ namespace CacheUtils.TranscriptCache
                 {
                     var transcript = interval.Value;
                     geneSet.Add(transcript.Gene);
-                    if (transcript.Translation?.PeptideSeq != null) peptideSet.Add(transcript.Translation.PeptideSeq);
-                    if (transcript.TranscriptRegions       != null) foreach (var region in transcript.TranscriptRegions) transcriptRegionSet.Add(region);
-                    // ReSharper disable once InvertIf
-                    if (transcript.MicroRnas               != null) foreach (var mirna in transcript.MicroRnas) mirnaSet.Add(mirna);
+                    AddString(peptideSet, transcript.Translation?.PeptideSeq);
+                    AddTranscriptRegions(transcriptRegionSet, transcript.TranscriptRegions);
+                    AddIntervals(mirnaSet, transcript.MicroRnas);
                 }
             }
 
-            var genes             = geneSet.Count             > 0 ? geneSet.Sort().ToArray()                     : null;
-            var transcriptRegions = transcriptRegionSet.Count > 0 ? transcriptRegionSet.SortInterval().ToArray() : null;
-            var mirnas            = mirnaSet.Count            > 0 ? mirnaSet.SortInterval().ToArray()            : null;
-            var peptideSeqs       = peptideSet.Count          > 0 ? peptideSet.OrderBy(x => x).ToArray()         : null;
+            var genes             = GetUniqueGenes(geneSet);
+            var transcriptRegions = GetUniqueTranscriptRegions(transcriptRegionSet);
+            var mirnas            = GetUniqueIntervals(mirnaSet);
+            var peptideSeqs       = GetUniqueStrings(peptideSet);
 
             return (genes, transcriptRegions, mirnas, peptideSeqs);
+        }
+
+        private static void AddIntervals(ISet<IInterval> intervalSet, IInterval[] intervals)
+        {
+            if (intervals == null) return;
+            foreach (var interval in intervals) intervalSet.Add(interval);
+        }
+
+        private static void AddTranscriptRegions(ISet<ITranscriptRegion> transcriptRegionSet, ITranscriptRegion[] regions)
+        {
+            if (regions == null) return;
+            foreach (var region in regions) transcriptRegionSet.Add(region);
+        }
+
+        private static void AddString(ISet<string> stringSet, string s)
+        {
+            if (string.IsNullOrEmpty(s)) return;
+            stringSet.Add(s);
+        }
+
+        private static string[] GetUniqueStrings(ICollection<string> peptideSet)
+        {
+            return peptideSet.Count > 0 ? peptideSet.OrderBy(x => x).ToArray() : null;
+        }
+
+        private static IInterval[] GetUniqueIntervals(ICollection<IInterval> mirnaSet)
+        {
+            return mirnaSet.Count > 0 ? mirnaSet.SortInterval().ToArray() : null;
+        }
+
+        private static ITranscriptRegion[] GetUniqueTranscriptRegions(ICollection<ITranscriptRegion> transcriptRegionSet)
+        {
+            return transcriptRegionSet.Count > 0 ? transcriptRegionSet.SortInterval().ToArray() : null;
+        }
+
+        private static IGene[] GetUniqueGenes(ICollection<IGene> geneSet)
+        {
+            return geneSet.Count > 0 ? geneSet.Sort().ToArray() : null;
         }
     }
 }

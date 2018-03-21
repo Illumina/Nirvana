@@ -37,7 +37,7 @@ namespace CacheUtils.Commands.UniversalGeneArchive
                 return ExitCodes.Success;
             }
 
-            var jsonPath  = "CacheUtils.dll.gene.json";
+            const string jsonPath = "CacheUtils.dll.gene.json";
             var filePaths = GetFilePaths(jsonPath);
             
             var ds = LoadDataStores(logger, filePaths);
@@ -176,7 +176,7 @@ namespace CacheUtils.Commands.UniversalGeneArchive
                 }
             };
 
-            var commandLineExample = $"{command} -i <intermediate cache dir> -r <reference dir>";
+            string commandLineExample = $"{command} -i <intermediate cache dir> -r <reference dir>";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())

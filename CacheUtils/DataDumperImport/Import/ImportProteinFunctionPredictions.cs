@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
+using CacheUtils.DataDumperImport.Utilities;
 
 namespace CacheUtils.DataDumperImport.Import
 {
@@ -19,9 +20,6 @@ namespace CacheUtils.DataDumperImport.Import
             };
         }
 
-        /// <summary>
-        /// parses the relevant data from each protein function predictions object
-        /// </summary>
         public static (string SiftMatrix, string PolyphenMatrix) Parse(ObjectValueNode objectValue)
         {
             string siftData     = null;
@@ -37,39 +35,16 @@ namespace CacheUtils.DataDumperImport.Import
 
                 switch (node.Key)
                 {
+                    case ImportKeys.PolyPhen:
                     case ImportKeys.PolyPhenHumDiv:
                         // not used
                         break;
-                    case ImportKeys.PolyPhen:
-                        if (node.IsUndefined())
-                        {
-                            // do nothing
-                        }
-                        else
-                        {
-                            throw new InvalidDataException($"Could not handle the PolyPhen key: [{node.GetType()}]");
-                        }
-                        break;
                     case ImportKeys.PolyPhenHumVar:
                         // used by default
-                        if (node is ObjectKeyValueNode polyPhenHumVarNode)
-                        {
-                            polyphenData = ImportPrediction.Parse(polyPhenHumVarNode.Value);
-                        }
-                        else if (!node.IsUndefined())
-                        {
-                            throw new InvalidDataException($"Could not transform the AbstractData object into an ObjectKeyValue: [{node.GetType()}]");
-                        }
+                        polyphenData = node.GetPredictionData();
                         break;
                     case ImportKeys.Sift:
-                        if (node is ObjectKeyValueNode siftNode)
-                        {
-                            siftData = ImportPrediction.Parse(siftNode.Value);
-                        }
-                        else if (!node.IsUndefined())
-                        {
-                            throw new InvalidDataException($"Could not transform the AbstractData object into an ObjectKeyValue: [{node.GetType()}]");
-                        }
+                        siftData = node.GetPredictionData();
                         break;
                     default:
                         throw new InvalidDataException($"Unknown key found: {node.Key}");

@@ -37,12 +37,12 @@ namespace CacheUtils.GFF
         public static IEnumerable<ITranscriptRegion> GetExons(this ITranscriptRegion[] regions) =>
             regions.FilterNonExons().Merge().OrderBy(x => x.Start).ThenBy(x => x.End);
 
-        private static ITranscriptRegion[] FilterNonExons(this ITranscriptRegion[] regions) =>
+        private static ITranscriptRegion[] FilterNonExons(this IEnumerable<ITranscriptRegion> regions) =>
             regions.Where(region => region.Type == TranscriptRegionType.Exon).ToArray();
 
-        private static IEnumerable<ITranscriptRegion> Merge(this ITranscriptRegion[] exons)
+        private static IEnumerable<ITranscriptRegion> Merge(this IReadOnlyCollection<ITranscriptRegion> exons)
         {
-            if (exons.Length == 1) return exons;
+            if (exons.Count == 1) return exons;
 
             var mergedExons = new List<ITranscriptRegion>();
             var exonsById   = exons.GetMultiValueDict(x => x.Id);
@@ -55,7 +55,7 @@ namespace CacheUtils.GFF
             return mergedExons;
         }
 
-        private static ITranscriptRegion MergeTranscriptRegions(ushort exonId, List<ITranscriptRegion> regions)
+        private static ITranscriptRegion MergeTranscriptRegions(ushort exonId, IReadOnlyList<ITranscriptRegion> regions)
         {
             if (regions.Count == 1) return regions[0];
 

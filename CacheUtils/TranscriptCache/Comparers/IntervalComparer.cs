@@ -7,11 +7,11 @@ namespace CacheUtils.TranscriptCache.Comparers
     {
         public override bool Equals(IInterval x, IInterval y) => x.Start == y.Start && x.End == y.End;
 
-        public override int GetHashCode(IInterval x)
+        public override int GetHashCode(IInterval obj)
         {
             unchecked
             {
-                return (x.Start * 397) ^ x.End;
+                return (obj.Start * 397) ^ obj.End;
             }
         }
     }

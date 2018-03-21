@@ -27,11 +27,11 @@ namespace CacheUtils.IntermediateIO
             var predictionData              = new string[chromosomeHeader.NumPredictions];
             var transcriptToPredictionIndex = new Dictionary<int, int>(chromosomeHeader.NumPredictions);
 
-            for (int predictionIndex = 0; predictionIndex < chromosomeHeader.NumPredictions; predictionIndex++)
+            for (var predictionIndex = 0; predictionIndex < chromosomeHeader.NumPredictions; predictionIndex++)
             {
                 var prediction = GetNextPrediction();
                 predictionData[predictionIndex] = prediction.PredictionData;
-                foreach (var index in prediction.TranscriptIndices)
+                foreach (int index in prediction.TranscriptIndices)
                     transcriptToPredictionIndex[index] = predictionIndex;
             }
                               
@@ -40,7 +40,7 @@ namespace CacheUtils.IntermediateIO
 
         private (IChromosome Chromosome, int NumPredictions) GetChromosomeHeader()
         {
-            var line = _reader.ReadLine();
+            string line = _reader.ReadLine();
             var cols = line?.Split('\t');
             if (cols == null) throw new InvalidDataException("Found an unexpected null line when parsing the chromosome header in the prediction reader.");
             if (cols.Length != 3) throw new InvalidDataException($"Expected 3 columns in the chromosome header, but found {cols.Length}");
@@ -54,14 +54,14 @@ namespace CacheUtils.IntermediateIO
 
         private (List<int> TranscriptIndices, string PredictionData) GetNextPrediction()
         {
-            var line = _reader.ReadLine();
+            string line = _reader.ReadLine();
             if (line == null) throw new InvalidDataException("Found an unexpected empty line while parsing the prediction file.");
 
             var cols = line.Split('\t');
             if (cols.Length != 2) throw new InvalidDataException($"Expected 2 columns in the prediction entry, but found {cols.Length}");
 
             var transcriptIndices = GetTranscriptIndices(cols[0]);
-            var predictionData    = cols[1];
+            string predictionData = cols[1];
 
             return (transcriptIndices, predictionData);
         }
@@ -70,7 +70,7 @@ namespace CacheUtils.IntermediateIO
         {
             var indexStrings = s.Split(',');
             var indices      = new int[indexStrings.Length];
-            for (int i = 0; i < indexStrings.Length; i++) indices[i] = int.Parse(indexStrings[i]);
+            for (var i = 0; i < indexStrings.Length; i++) indices[i] = int.Parse(indexStrings[i]);
             return indices.ToList();
         }
 

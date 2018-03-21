@@ -2,6 +2,7 @@
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
+using CacheUtils.DataDumperImport.Utilities;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.DataDumperImport.Import
@@ -31,8 +32,11 @@ namespace CacheUtils.DataDumperImport.Import
         /// parses the relevant data from each translation object
         /// </summary>
         public static (int Start, int End, string ProteinId, byte ProteinVersion, MutableExon startExon, MutableExon
-            endExon) Parse(ObjectValueNode objectValue, IChromosome currentChromosome)
+            endExon) Parse(IImportNode importNode, IChromosome currentChromosome)
         {
+            var objectValue = importNode.GetObjectValueNode();
+            if (objectValue == null) throw new InvalidDataException("Encountered a translation import node that could not be converted to an object value node.");
+
             int start             = -1;
             int end               = -1;
             string proteinId      = null;

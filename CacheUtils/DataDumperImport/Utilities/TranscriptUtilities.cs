@@ -23,14 +23,8 @@ namespace CacheUtils.DataDumperImport.Utilities
             };
         }
 
-        /// <summary>
-        /// returns the biotype given the specialized string key/value type
-        /// </summary>
         public static BioType GetBiotype(IImportNode node) => BioTypeHelper.GetBioType(node.GetString());
 
-        /// <summary>
-        /// returns the mapper unit type given the specialized string key/value type
-        /// </summary>
         public static MapperUnitType GetMapperUnitType(IImportNode node)
         {
             string mapperUnitTypeString = node.GetString();
@@ -43,9 +37,18 @@ namespace CacheUtils.DataDumperImport.Utilities
             return ret;
         }
 
-        /// <summary>
-        /// returns true if the annotation is on the reverse strand, false otherwise
-        /// </summary>
+        public static ObjectValueNode GetObjectValueNode(this IImportNode node)
+        {
+            if (node is ObjectKeyValueNode objectKeyValueNode) return objectKeyValueNode.Value;
+            return null;
+        }
+
+        public static List<IListMember> GetListMembers(this IImportNode node)
+        {
+            if (node is ListObjectKeyValueNode listObjectKeyValueNode) return listObjectKeyValueNode.Values;
+            return null;
+        }
+
         public static bool GetStrand(IImportNode node)
         {
             int strandNum = node.GetInt32();
@@ -57,6 +60,16 @@ namespace CacheUtils.DataDumperImport.Utilities
             }
 
             return strandNum == -1;
+        }
+
+        public static int GetHgncId(this IImportNode node)
+        {
+            string hgnc = node.GetString();
+            if (hgnc != null && hgnc.StartsWith("HGNC:")) hgnc = hgnc.Substring(5);
+
+            int hgncId = -1;
+            if (hgnc != null) hgncId = int.Parse(hgnc);
+            return hgncId;
         }
     }
 }

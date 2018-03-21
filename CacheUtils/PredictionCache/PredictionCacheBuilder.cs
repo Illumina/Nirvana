@@ -89,7 +89,7 @@ namespace CacheUtils.PredictionCache
             int numReferenceSeqs  = roundedPredictionsPerRef.Count;
             var predictionsPerRef = new Prediction[numReferenceSeqs][];
 
-            for (int i = 0; i < numReferenceSeqs; i++)
+            for (var i = 0; i < numReferenceSeqs; i++)
             {
                 predictionsPerRef[i] = ConvertReferencePredictions(roundedPredictionsPerRef[i], roundedEntryToLutIndex, lut);
             }
@@ -105,7 +105,7 @@ namespace CacheUtils.PredictionCache
             int numPredictions = roundedEntryPredictions.Count;
             var predictions    = new Prediction[numPredictions];
 
-            for (int i = 0; i < numPredictions; i++)
+            for (var i = 0; i < numPredictions; i++)
                 predictions[i] = roundedEntryPredictions[i].Convert(roundedEntryToLutIndex, lut);
 
             return predictions;
@@ -135,7 +135,7 @@ namespace CacheUtils.PredictionCache
             var lut                    = new Prediction.Entry[scores.Count];
             var roundedEntryToLutIndex = new Dictionary<RoundedEntry, byte>();
 
-            int currentIndex = 0;
+            var currentIndex = 0;
             foreach (var entry in scores.OrderBy(x => x.EnumIndex).ThenBy(x => x.Score))
             {
                 roundedEntryToLutIndex[entry] = (byte)currentIndex;

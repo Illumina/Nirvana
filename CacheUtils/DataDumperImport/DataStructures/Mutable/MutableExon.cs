@@ -31,7 +31,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         {
             unchecked
             {
-                var hashCode = _chromosome.Index.GetHashCode();
+                int hashCode = _chromosome.Index.GetHashCode();
                 hashCode = (hashCode * 397) ^ Start;
                 hashCode = (hashCode * 397) ^ End;
                 hashCode = (hashCode * 397) ^ Phase.GetHashCode();

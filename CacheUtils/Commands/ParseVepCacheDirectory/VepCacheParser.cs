@@ -50,7 +50,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 
             foreach (string dumpPath in VepRootDirectory.GetSortedFiles(files))
             {
-                //if (!dumpPath.Contains("88000001-89000000_transcripts_data_dumper.txt.gz") && !dumpPath.Contains("89000001-90000000_transcripts_data_dumper.txt.gz")) continue;
                 ParseTranscriptDumpFile(chromosome, dumpPath, transcripts);
             }
 

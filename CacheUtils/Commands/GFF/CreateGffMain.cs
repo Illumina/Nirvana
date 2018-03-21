@@ -17,7 +17,7 @@ namespace CacheUtils.Commands.GFF
 
         private static ExitCodes ProgramExecution()
         {
-            var cachePath                    = CacheConstants.TranscriptPath(_inputPrefix);
+            string cachePath                 = CacheConstants.TranscriptPath(_inputPrefix);
             var (refIndexToChromosome, _, _) = SequenceHelper.GetDictionaries(_compressedReferencePath);
             var cache                        = TranscriptCacheHelper.GetCache(cachePath, refIndexToChromosome);
             var geneToInternalId             = InternalGenes.CreateDictionary(cache.Genes);
@@ -52,7 +52,7 @@ namespace CacheUtils.Commands.GFF
                 }
             };
 
-            var commandLineExample = $"{command} --in <cache prefix> --out <GFF path>";
+            string commandLineExample = $"{command} --in <cache prefix> --out <GFF path>";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())

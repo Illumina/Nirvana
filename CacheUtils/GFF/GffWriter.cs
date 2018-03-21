@@ -14,11 +14,11 @@ namespace CacheUtils.GFF
 
         private void WriteRequiredFields(IInterval interval, IRequiredFields fields, string feature)
         {
-            var strand = fields.OnReverseStrand ? '-' : '+';
+            char strand = fields.OnReverseStrand ? '-' : '+';
             _writer.Write($"{fields.UcscName}\t{fields.Source}\t{feature}\t{interval.Start}\t{interval.End}\t.\t{strand}\t.\t");
         }
 
-        private bool NotEmpty(string s) => !string.IsNullOrEmpty(s);
+        private static bool NotEmpty(string s) => !string.IsNullOrEmpty(s);
 
         private void WriteGeneralAttributes(IGeneralAttributes attribs)
         {

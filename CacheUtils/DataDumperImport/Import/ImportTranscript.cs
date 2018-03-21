@@ -4,6 +4,7 @@ using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
+using CacheUtils.DataDumperImport.Utilities;
 using CacheUtils.Helpers;
 using CacheUtils.Utilities;
 using VariantAnnotation.Caches.DataStructures;
@@ -82,11 +83,11 @@ namespace CacheUtils.DataDumperImport.Import
             int hgncId             = -1;
 
             // gene
-            int geneStart            = -1;
-            int geneEnd              = -1;
-            bool geneOnReverseStrand = false;
-            string geneSymbol        = null;
-            var geneSymbolSource     = GeneSymbolSource.Unknown;
+            int geneStart           = -1;
+            int geneEnd             = -1;
+            var geneOnReverseStrand = false;
+            string geneSymbol       = null;
+            var geneSymbolSource    = GeneSymbolSource.Unknown;
 
             // translation
             int translationStart             = -1;
@@ -104,17 +105,17 @@ namespace CacheUtils.DataDumperImport.Import
             IInterval[] introns                = null;
             string peptideSequence             = null;
             string translateableSequence       = null;
-            bool isCanonical                   = false;
+            var isCanonical                    = false;
             int compDnaCodingStart             = -1;
             int compDnaCodingEnd               = -1;
             int start                          = -1;
             int end                            = -1;
             MutableExon[] exons                = null;
-            bool cdsStartNotFound              = false;
-            bool cdsEndNotFound                = false;
+            var cdsStartNotFound               = false;
+            var cdsEndNotFound                 = false;
             int[] selenocysteinePositions      = null;
             IRnaEdit[] rnaEdits                = null;
-            string bamEditStatus          = null;
+            string bamEditStatus               = null;
 
             foreach (var node in objectValue.Values)
             {
@@ -154,7 +155,7 @@ namespace CacheUtils.DataDumperImport.Import
                         bamEditStatus = node.GetString();
                         break;
                     case ImportKeys.Attributes:
-                        if (node is ListObjectKeyValueNode attributesList) (microRnas, rnaEdits, cdsStartNotFound, cdsEndNotFound) = Attribute.ParseList(attributesList.Values);
+                        (microRnas, rnaEdits, cdsStartNotFound, cdsEndNotFound) = Attribute.ParseList(node);
                         break;
                     case ImportKeys.Biotype:
                         bioType = TranscriptUtilities.GetBiotype(node);
@@ -172,9 +173,7 @@ namespace CacheUtils.DataDumperImport.Import
                         end = node.GetInt32();
                         break;
                     case ImportKeys.GeneHgncId:
-                        var hgnc = node.GetString();
-                        if (hgnc != null && hgnc.StartsWith("HGNC:")) hgnc = hgnc.Substring(5);
-                        if (hgnc != null) hgncId = int.Parse(hgnc);
+                        hgncId = node.GetHgncId();
                         break;
                     case ImportKeys.GeneSymbol:
                     case ImportKeys.GeneHgnc: // older key
@@ -184,10 +183,7 @@ namespace CacheUtils.DataDumperImport.Import
                         geneSymbolSource = GeneSymbolSourceHelper.GetGeneSymbolSource(node.GetString());
                         break;
                     case ImportKeys.Gene:
-                        if (node is ObjectKeyValueNode geneNode)
-                        {
-                            (geneStart, geneEnd, geneId, geneOnReverseStrand) = ImportGene.Parse(geneNode.Value);
-                        }
+                        (geneStart, geneEnd, geneId, geneOnReverseStrand) = ImportGene.Parse(node);
                         break;
                     case ImportKeys.IsCanonical:
                         isCanonical = node.GetBool();
@@ -202,22 +198,13 @@ namespace CacheUtils.DataDumperImport.Import
                         start = node.GetInt32();
                         break;
                     case ImportKeys.TransExonArray:
-                        if (node is ListObjectKeyValueNode exonsList)
-                        {
-                            exons = ImportExon.ParseList(exonsList.Values, chromosome);
-                        }
+                        exons = ImportExon.ParseList(node, chromosome);
                         break;
                     case ImportKeys.Translation:
-                        if (node is ObjectKeyValueNode translationNode)
-                        {
-                            (translationStart, translationEnd, proteinId, proteinVersion, translationStartExon, translationEndExon) = ImportTranslation.Parse(translationNode.Value, chromosome);
-                        }
+                        (translationStart, translationEnd, proteinId, proteinVersion, translationStartExon, translationEndExon) = ImportTranslation.Parse(node, chromosome);
                         break;
                     case ImportKeys.VariationEffectFeatureCache:
-                        if (node is ObjectKeyValueNode cacheNode)
-                        {
-                            (cdnaMaps, introns, peptideSequence, translateableSequence, siftData, polyphenData, selenocysteinePositions) = ImportVariantEffectFeatureCache.Parse(cacheNode.Value);
-                        }                        
+                        (cdnaMaps, introns, peptideSequence, translateableSequence, siftData, polyphenData, selenocysteinePositions) = ImportVariantEffectFeatureCache.Parse(node);
                         break;
                     case ImportKeys.Version:
                         transcriptVersion = (byte)node.GetInt32();
@@ -237,8 +224,8 @@ namespace CacheUtils.DataDumperImport.Import
                 GetCodingRegionEnd(geneOnReverseStrand, translationStartExon, translationEndExon, translationStart, translationEnd), 
                 compDnaCodingStart, compDnaCodingEnd, 0);
 
-            var totalExonLength = GetTotalExonLength(exons);
-            var startExonPhase  = translationStartExon?.Phase ?? int.MinValue;
+            int totalExonLength = GetTotalExonLength(exons);
+            int startExonPhase  = translationStartExon?.Phase ?? int.MinValue;
 
             return new MutableTranscript(chromosome, start, end, fixedTranscript.Id, fixedTranscript.Version, ccdsId,
                 refSeqId, bioType, isCanonical, codingRegion, fixedProtein.Id, fixedProtein.Version,
@@ -250,7 +237,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// returns the start position of the coding region. Returns -1 if no translation was possible.
         /// </summary>
-        private static int GetCodingRegionStart(bool onReverseStrand, MutableExon startExon, MutableExon endExon,
+        private static int GetCodingRegionStart(bool onReverseStrand, IInterval startExon, IInterval endExon,
             int translationStart, int translationEnd)
         {
             if (startExon == null || endExon == null) return -1;
@@ -262,7 +249,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// returns the start position of the coding region. Returns -1 if no translation was possible.
         /// </summary>
-        private static int GetCodingRegionEnd(bool onReverseStrand, MutableExon startExon, MutableExon endExon,
+        private static int GetCodingRegionEnd(bool onReverseStrand, IInterval startExon, IInterval endExon,
             int translationStart, int translationEnd)
         {
             if (startExon == null || endExon == null) return -1;

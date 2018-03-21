@@ -34,9 +34,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                     logMessage = $"Filtered on exon 9 start: {transcriptId}";
                     break;
                 case "NM_001278597":
-                    filteredTranscripts = transcripts.Where(transcript => transcript.CdnaMaps.Length == 26).ToList();
-                    logMessage = $"Filtered on exon count (26): {transcriptId}";
-                    break;
                 case "NM_001278596":
                     filteredTranscripts = transcripts.Where(transcript => transcript.CdnaMaps.Length == 26).ToList();
                     logMessage = $"Filtered on exon count (26): {transcriptId}";
@@ -58,10 +55,10 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         public static List<MutableTranscript> InvestigateInconsistentCdnaMaps(this List<MutableTranscript> transcripts,
             ILogger logger, string transcriptId)
         {
-            int index = 0;
+            var index = 0;
             foreach (var transcript in transcripts)
             {
-                var onReverseStrand = transcript.Gene.OnReverseStrand ? "R" : "F";
+                string onReverseStrand = transcript.Gene.OnReverseStrand ? "R" : "F";
 
                 if (transcript.Exons.Length != transcript.CdnaMaps.Length)
                 {
@@ -80,11 +77,12 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts;
         }
 
-        private static bool DiffExonsAndCdnaMaps(MutableExon[] exons, MutableTranscriptRegion[] cdnaMaps)
+        private static bool DiffExonsAndCdnaMaps(IReadOnlyList<MutableExon> exons,
+            IReadOnlyList<MutableTranscriptRegion> cdnaMaps)
         {
-            int numExons = exons.Length;
+            int numExons = exons.Count;
 
-            for (int i = 0; i < numExons; i++)
+            for (var i = 0; i < numExons; i++)
             {
                 var exon    = exons[i];
                 var cdnaMap = cdnaMaps[i];
@@ -126,7 +124,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             var versionToTranscript = transcripts.GetMultiValueDict(x => x.Version);
             if (versionToTranscript.Count == 1) return transcripts;
 
-            var maxVersion = versionToTranscript.Keys.Max();
+            byte maxVersion = versionToTranscript.Keys.Max();
             transcripts.RemoveAll(x => x.Version != maxVersion);
 
             logger.Log(transcripts[0].Id, "Filtered transcripts with lower versions");
@@ -202,26 +200,35 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
+        private static readonly BioType[] MiscRnaBioTypes =
+        {
+            BioType.antisense_RNA,
+            BioType.miRNA,
+            BioType.pseudogene,
+            BioType.lncRNA,
+            BioType.protein_coding,
+            BioType.rRNA,
+            BioType.SRP_RNA,
+            BioType.vaultRNA,
+            BioType.Y_RNA
+        };
+
+        private static readonly BioType[] LncRnaBioTypes =
+        {
+            BioType.antisense_RNA,
+            BioType.pseudogene
+        };
+
         private static BioType GetDesiredBioType(ICollection<BioType> biotypes)
         {
             if (biotypes.Contains(BioType.misc_RNA))
             {
-                if (biotypes.Contains(BioType.antisense_RNA))  return BioType.antisense_RNA;
-                if (biotypes.Contains(BioType.miRNA))          return BioType.miRNA;
-                if (biotypes.Contains(BioType.pseudogene))     return BioType.pseudogene;
-                if (biotypes.Contains(BioType.lncRNA))         return BioType.lncRNA;
-                if (biotypes.Contains(BioType.protein_coding)) return BioType.protein_coding;
-                if (biotypes.Contains(BioType.rRNA))           return BioType.rRNA;
-                if (biotypes.Contains(BioType.SRP_RNA))        return BioType.SRP_RNA;
-                if (biotypes.Contains(BioType.vaultRNA))       return BioType.vaultRNA;
-                if (biotypes.Contains(BioType.Y_RNA))          return BioType.Y_RNA;
+                foreach (var biotype in MiscRnaBioTypes)
+                    if (biotypes.Contains(biotype))
+                        return biotype;
             }
 
-            if (biotypes.Contains(BioType.lncRNA))
-            {
-                if (biotypes.Contains(BioType.antisense_RNA)) return BioType.lncRNA;
-                if (biotypes.Contains(BioType.pseudogene))    return BioType.lncRNA;
-            }
+            if (biotypes.Contains(BioType.lncRNA) && LncRnaBioTypes.Any(biotypes.Contains)) return BioType.lncRNA;
 
             if (biotypes.Contains(BioType.mRNA) && biotypes.Contains(BioType.protein_coding))
                 return BioType.protein_coding;
@@ -252,7 +259,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             var geneIds = transcripts.GetSet(x => x.Gene.GeneId).ToList();
             if (geneIds.Count == 1) return transcripts;
 
-            var geneId = geneIds[0];
+            string geneId = geneIds[0];
             foreach (var transcript in transcripts) transcript.Gene.GeneId = geneId;
             logger.Log(transcripts[0].Id, "Normalized gene ID (unsupervised)");
             return transcripts.Unique();
@@ -297,7 +304,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             if (hgncIds.Count == 1) return transcripts;
 
             if (hgncIds.Contains(-1)) hgncIds.Remove(-1);
-            var hgncId = hgncIds.First();
+            int hgncId = hgncIds.First();
 
             foreach (var transcript in transcripts) transcript.Gene.HgncId = hgncId;
             logger.Log(transcripts[0].Id, "Normalized HGNC ID");
@@ -340,7 +347,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             ILogger logger, List<string> symbols)
         {
             var nonLocGeneSymbols = symbols.FindAll(x => !string.IsNullOrEmpty(x) && !x.StartsWith("LOC"));
-            var symbol = nonLocGeneSymbols.Count > 0 ? nonLocGeneSymbols[0] : symbols[0];
+            string symbol = nonLocGeneSymbols.Count > 0 ? nonLocGeneSymbols[0] : symbols[0];
 
             foreach (var transcript in transcripts) transcript.Gene.Symbol = symbol;
             logger.Log(transcripts[0].Id, "Normalized gene symbol (unsupervised)");
@@ -352,7 +359,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             int bestDelta = int.MaxValue;
             int bestValue = -1;
 
-            foreach (var value in values)
+            foreach (int value in values)
             {
                 int delta = Math.Abs(value - targetValue);
                 if (delta >= bestDelta) continue;

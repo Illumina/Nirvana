@@ -59,7 +59,7 @@ namespace CacheUtils.Genes.Utilities
         public static Dictionary<T, int> CreateIndex<T>(this IEnumerable<T> elements)
         {
             var index = new Dictionary<T, int>();
-            int currentIndex = 0;
+            var currentIndex = 0;
             foreach (var element in elements) index[element] = currentIndex++;
             return index;
         }

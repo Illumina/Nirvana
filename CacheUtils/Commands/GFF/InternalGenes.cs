@@ -12,11 +12,11 @@ namespace CacheUtils.Commands.GFF
             var geneComparer     = new GeneComparer();
             var geneToInternalId = new Dictionary<IGene, int>(geneComparer);
 
-            for (int geneIndex = 0; geneIndex < genes.Length; geneIndex++)
+            for (var geneIndex = 0; geneIndex < genes.Length; geneIndex++)
             {
                 var gene = genes[geneIndex];
 
-                if (geneToInternalId.TryGetValue(gene, out var oldGeneIndex))
+                if (geneToInternalId.TryGetValue(gene, out int oldGeneIndex))
                 {
                     throw new UserErrorException($"Found a duplicate gene in the dictionary: {genes[geneIndex]} ({geneIndex} vs {oldGeneIndex})");
                 }

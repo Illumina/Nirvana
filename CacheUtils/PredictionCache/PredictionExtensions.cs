@@ -8,8 +8,8 @@ namespace CacheUtils.PredictionCache
         public static RoundedEntryPrediction[] GetRoundedEntryPredictions(this string[] predictionStrings)
         {
             var predictions = new RoundedEntryPrediction[predictionStrings.Length];
-            int currentIndex = 0;
-            foreach (var s in predictionStrings) predictions[currentIndex++] = s.GetRoundedEntryPrediction();
+            var currentIndex = 0;
+            foreach (string s in predictionStrings) predictions[currentIndex++] = s.GetRoundedEntryPrediction();
             return predictions;
         }
 
@@ -32,7 +32,7 @@ namespace CacheUtils.PredictionCache
             Buffer.BlockCopy(uncompressedDataWithHeader, headerLength, data, 0, newLength);
 
             var roundedEntries = new RoundedEntry[data.Length];
-            for (int i = 0; i < data.Length; i++) roundedEntries[i] = new RoundedEntry(data[i]);
+            for (var i = 0; i < data.Length; i++) roundedEntries[i] = new RoundedEntry(data[i]);
             return new RoundedEntryPrediction(roundedEntries);
         }
     }

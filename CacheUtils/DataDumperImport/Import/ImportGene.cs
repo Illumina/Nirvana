@@ -20,15 +20,15 @@ namespace CacheUtils.DataDumperImport.Import
             };
         }
 
-        /// <summary>
-        /// returns a new gene given an ObjectValue
-        /// </summary>
-        public static (int Start, int End, string Id, bool OnReverseStrand) Parse(ObjectValueNode objectValue)
+        public static (int Start, int End, string Id, bool OnReverseStrand) Parse(IImportNode importNode)
         {
-            int start            = -1;
-            int end              = -1;
-            string stableId      = null;
-            bool onReverseStrand = false;
+            var objectValue = importNode.GetObjectValueNode();
+            if (objectValue == null) throw new InvalidDataException("Encountered a gene import node that could not be converted to an object value node.");
+
+            int start           = -1;
+            int end             = -1;
+            string stableId     = null;
+            var onReverseStrand = false;
 
             foreach (var node in objectValue.Values)
             {

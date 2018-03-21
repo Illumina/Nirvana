@@ -24,7 +24,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// parses the relevant data from each seqedits object
         /// </summary>
-        public static int[] Parse(IEnumerable<IListMember> members)
+        public static int[] Parse(List<IListMember> members)
         {
             var selenocysteineList = new List<int>();
 

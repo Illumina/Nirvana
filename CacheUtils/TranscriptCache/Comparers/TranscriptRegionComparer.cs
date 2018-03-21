@@ -12,16 +12,16 @@ namespace CacheUtils.TranscriptCache.Comparers
                    x.CdnaStart == y.CdnaStart && x.CdnaEnd == y.CdnaEnd;
         }
 
-        public override int GetHashCode(ITranscriptRegion x)
+        public override int GetHashCode(ITranscriptRegion obj)
         {
             unchecked
             {
-                var hashCode = (int)x.Type;
-                hashCode = (hashCode * 397) ^ x.Id.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Start;
-                hashCode = (hashCode * 397) ^ x.End;
-                hashCode = (hashCode * 397) ^ x.CdnaStart;
-                hashCode = (hashCode * 397) ^ x.CdnaEnd;
+                var hashCode = (int)obj.Type;
+                hashCode = (hashCode * 397) ^ obj.Id.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Start;
+                hashCode = (hashCode * 397) ^ obj.End;
+                hashCode = (hashCode * 397) ^ obj.CdnaStart;
+                hashCode = (hashCode * 397) ^ obj.CdnaEnd;
                 return hashCode;
             }
         }

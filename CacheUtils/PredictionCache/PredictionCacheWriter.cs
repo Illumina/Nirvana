@@ -31,7 +31,7 @@ namespace CacheUtils.PredictionCache
         /// <summary>
         /// writes the annotations to the current database file
         /// </summary>
-        public void Write(Prediction.Entry[] lut, Prediction[][] predictionsPerRef)
+        internal void Write(Prediction.Entry[] lut, Prediction[][] predictionsPerRef)
         {
             _blockStream.WriteHeader(_header.Write);
             WriteLookupTable(_writer, lut);
@@ -48,7 +48,7 @@ namespace CacheUtils.PredictionCache
             var indexEntries  = customHeader.Entries;
             var blockPosition = new BlockStream.BlockPosition();
 
-            for (int i = 0; i < predictionsPerRef.Count; i++)
+            for (var i = 0; i < predictionsPerRef.Count; i++)
             {
 	            var refPredictions = predictionsPerRef[i];
 

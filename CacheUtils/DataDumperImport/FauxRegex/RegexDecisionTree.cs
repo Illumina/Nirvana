@@ -55,13 +55,13 @@ namespace CacheUtils.DataDumperImport.FauxRegex
 
         private static (EntryType, string Key, string Value) GetEntryTypeFatArrow(string s, int fatArrowPos)
         {
-            var key = GetKey(s, fatArrowPos - 2);
+            string key = GetKey(s, fatArrowPos - 2);
 
             int firstPosAfterFatArrow = fatArrowPos + 3;
             if (s[firstPosAfterFatArrow] == '\'') return GetEntryTypeStringKeyValue(s, firstPosAfterFatArrow + 1, key);
             if (s[s.Length - 1] == '{') return (EntryType.ObjectKeyValue, key, null);
 
-            var afterFatArrow = s.Substring(firstPosAfterFatArrow);
+            string afterFatArrow = s.Substring(firstPosAfterFatArrow);
 
             // ReSharper disable once ConvertIfStatementToSwitchStatement
             if (afterFatArrow == "undef") return (EntryType.UndefKeyValue, key, null);
@@ -94,7 +94,7 @@ namespace CacheUtils.DataDumperImport.FauxRegex
         private static string GetForwardString(string s, int afterFirstQuote)
         {
             int secondQuotePos = s.IndexOf('\'', afterFirstQuote);
-            var result = s.Substring(afterFirstQuote, secondQuotePos - afterFirstQuote);
+            string result = s.Substring(afterFirstQuote, secondQuotePos - afterFirstQuote);
             return result;
         }
 

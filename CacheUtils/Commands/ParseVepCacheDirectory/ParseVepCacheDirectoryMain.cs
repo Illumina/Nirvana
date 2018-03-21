@@ -40,9 +40,9 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             var vepRootDirectory = new VepRootDirectory(sequenceReader.RefNameToChromosome);
             var refIndexToVepDir = vepRootDirectory.GetRefIndexToVepDir(_inputVepDirectory);
 
-            var genomeAssembly  = GenomeAssemblyHelper.Convert(_genomeAssembly);
-            var vepReleaseTicks = DateTime.Parse(_vepReleaseDate).Ticks;
-            var idToGenbank     = GetIdToGenbank(logger, genomeAssembly, transcriptSource);
+            var genomeAssembly   = GenomeAssemblyHelper.Convert(_genomeAssembly);
+            long vepReleaseTicks = DateTime.Parse(_vepReleaseDate).Ticks;
+            var idToGenbank      = GetIdToGenbank(logger, genomeAssembly, transcriptSource);
 
             // =========================
             // create the pre-cache file
@@ -52,10 +52,10 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             int numRefSeqs = sequenceReader.NumRefSeqs;            
             var header     = new IntermediateIoHeader(_vepVersion, vepReleaseTicks, transcriptSource, genomeAssembly, numRefSeqs);
 
-            var siftPath       = _outputStub + ".sift.gz";
-            var polyphenPath   = _outputStub + ".polyphen.gz";
-            var transcriptPath = _outputStub + ".transcripts.gz";
-            var regulatoryPath = _outputStub + ".regulatory.gz";
+            string siftPath       = _outputStub + ".sift.gz";
+            string polyphenPath   = _outputStub + ".polyphen.gz";
+            string transcriptPath = _outputStub + ".transcripts.gz";
+            string regulatoryPath = _outputStub + ".regulatory.gz";
 
             using (var mergeLogger            = new TranscriptMergerLogger(FileUtilities.GetCreateStream(_outputStub + ".merge_transcripts.log")))
             using (var siftWriter             = new PredictionWriter(GZipUtilities.GetStreamWriter(siftPath), header, IntermediateIoCommon.FileType.Sift))
@@ -70,7 +70,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                 {
                     var chromosome = sequenceReader.RefIndexToChromosome[refIndex];
 
-                    if (!refIndexToVepDir.TryGetValue(refIndex, out var vepSubDir))
+                    if (!refIndexToVepDir.TryGetValue(refIndex, out string vepSubDir))
                     {
                         siftWriter.Write(chromosome, emptyPredictionDict);
                         polyphenWriter.Write(chromosome, emptyPredictionDict);
@@ -78,7 +78,6 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                     }
 
                     Console.WriteLine("Parsing reference sequence [{0}]:", chromosome.UcscName);
-                    //if (vepSubDir.Chromosome.Index < 2) continue;
 
                     var rawData                 = converter.ParseDumpDirectory(chromosome, vepSubDir);
                     var mergedTranscripts       = TranscriptMerger.Merge(mergeLogger, rawData.Transcripts, idToGenbank);
@@ -131,10 +130,10 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         {
             var predictionDict = new Dictionary<string, List<int>>(StringComparer.Ordinal);
 
-            for (int transcriptIndex = 0; transcriptIndex < transcripts.Count; transcriptIndex++)
+            for (var transcriptIndex = 0; transcriptIndex < transcripts.Count; transcriptIndex++)
             {
-                var transcript     = transcripts[transcriptIndex];
-                var predictionData = predictionFunc(transcript);
+                var transcript        = transcripts[transcriptIndex];
+                string predictionData = predictionFunc(transcript);
                 if (predictionData == null) continue;
 
                 if (predictionDict.TryGetValue(predictionData, out var transcriptIdList)) transcriptIdList.Add(transcriptIndex);
@@ -193,7 +192,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                 }
             };
 
-            var commandLineExample = $"{command} --in <VEP directory> --out <Nirvana pre-cache file> --vep <VEP version>";
+            string commandLineExample = $"{command} --in <VEP directory> --out <Nirvana pre-cache file> --vep <VEP version>";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())

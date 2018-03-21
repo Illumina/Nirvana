@@ -33,11 +33,11 @@ namespace CacheUtils.Commands.CreateCache
 
         private static ExitCodes ProgramExecution()
         {
-            var logger         = new ConsoleLogger();
-            var transcriptPath = _inputPrefix + ".transcripts.gz";
-            var siftPath       = _inputPrefix + ".sift.gz";
-            var polyphenPath   = _inputPrefix + ".polyphen.gz";
-            var regulatoryPath = _inputPrefix + ".regulatory.gz";
+            var logger            = new ConsoleLogger();
+            string transcriptPath = _inputPrefix + ".transcripts.gz";
+            string siftPath       = _inputPrefix + ".sift.gz";
+            string polyphenPath   = _inputPrefix + ".polyphen.gz";
+            string regulatoryPath = _inputPrefix + ".regulatory.gz";
 
             var (refIndexToChromosome, refNameToChromosome, numRefSeqs) = SequenceHelper.GetDictionaries(_inputReferencePath);
 
@@ -47,10 +47,10 @@ namespace CacheUtils.Commands.CreateCache
             using (var polyphenReader   = new PredictionReader(GZipUtilities.GetAppropriateReadStream(polyphenPath), refIndexToChromosome, IntermediateIoCommon.FileType.Polyphen))
             using (var geneReader       = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.UniversalGeneFilePath), refNameToChromosome))
             {
-                var genomeAssembly  = transcriptReader.Header.GenomeAssembly;
-                var source          = transcriptReader.Header.Source;
-                var vepReleaseTicks = transcriptReader.Header.VepReleaseTicks;
-                var vepVersion      = transcriptReader.Header.VepVersion;
+                var genomeAssembly   = transcriptReader.Header.GenomeAssembly;
+                var source           = transcriptReader.Header.Source;
+                long vepReleaseTicks = transcriptReader.Header.VepReleaseTicks;
+                ushort vepVersion    = transcriptReader.Header.VepVersion;
 
                 logger.Write("- loading universal gene archive file... ");
                 var genes      = geneReader.GetGenes();
@@ -92,7 +92,7 @@ namespace CacheUtils.Commands.CreateCache
 
         private static IIntervalForest<UgaGene> CreateGeneForest(IEnumerable<UgaGene> genes, int numRefSeqs, GenomeAssembly genomeAssembly)
         {
-            var useGrch37     = genomeAssembly == GenomeAssembly.GRCh37;
+            bool useGrch37    = genomeAssembly == GenomeAssembly.GRCh37;
             var intervalLists = new List<Interval<UgaGene>>[numRefSeqs];
 
             for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<UgaGene>>();
@@ -145,7 +145,7 @@ namespace CacheUtils.Commands.CreateCache
                 }
             };
 
-            var commandLineExample = $"{command} --in <prefix> --out <prefix> --ref <path>";
+            string commandLineExample = $"{command} --in <prefix> --out <prefix> --ref <path>";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())

@@ -94,7 +94,7 @@ namespace CacheUtils.Genes.DataStores
         public Hgnc Clone()
         {
             var newGenes = new HgncGene[HgncGenes.Length];
-            for (int i = 0; i < HgncGenes.Length; i++) newGenes[i] = HgncGenes[i].Clone();
+            for (var i = 0; i < HgncGenes.Length; i++) newGenes[i] = HgncGenes[i].Clone();
             return new Hgnc(newGenes, HgncIdToSymbol);
         }
 
@@ -123,7 +123,7 @@ namespace CacheUtils.Genes.DataStores
             Func<HgncGene, string> idFunc, Action<HgncGene> nullAction)
         {
             var hgncByGeneId = newHgncGenes.GetMultiValueDict(idFunc);
-            int numGeneIdsRemoved = 0;
+            var numGeneIdsRemoved = 0;
 
             foreach (var kvp in hgncByGeneId)
             {

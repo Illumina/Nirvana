@@ -38,18 +38,18 @@ namespace CacheUtils.Genes.IO
 
             try
             {
-                var hgncId       = int.Parse(cols[HgncIdIndex].Substring(5));
-                var symbol       = cols[SymbolIndex];
-                var chromosome   = GetChromosome(cols[LocationIndex]);
-                var entrezGeneId = GetId(cols[EntrezIdIndex]);
-                var ensemblId    = GetId(cols[EnsemblIdIndex]);
+                int hgncId             = int.Parse(cols[HgncIdIndex].Substring(5));
+                string symbol          = cols[SymbolIndex];
+                IChromosome chromosome = GetChromosome(cols[LocationIndex]);
+                string entrezGeneId    = GetId(cols[EntrezIdIndex]);
+                string ensemblId       = GetId(cols[EnsemblIdIndex]);
 
                 return new HgncGene(chromosome, -1, -1, symbol, entrezGeneId, ensemblId, hgncId);
             }
             catch (Exception)
             {
                 Console.WriteLine("Offending line: {0}", line);
-                for (int i = 0; i < cols.Length; i++) Console.WriteLine("- col {0}: [{1}]", i, cols[i]);
+                for (var i = 0; i < cols.Length; i++) Console.WriteLine("- col {0}: [{1}]", i, cols[i]);
                 throw;
             }
         }
@@ -73,7 +73,7 @@ namespace CacheUtils.Genes.IO
             int armPos = GetArmPos(cytogeneticBand);
             if (armPos == -1) return new EmptyChromosome(cytogeneticBand);
 
-            var chrName = cytogeneticBand.Substring(0, armPos);
+            string chrName = cytogeneticBand.Substring(0, armPos);
             return ReferenceNameUtilities.GetChromosome(_refNameToChromosome, chrName);
         }
 

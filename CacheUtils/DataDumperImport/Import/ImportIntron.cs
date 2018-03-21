@@ -75,7 +75,7 @@ namespace CacheUtils.DataDumperImport.Import
         {
             var introns = new IInterval[members.Count];
 
-            for (int intronIndex = 0; intronIndex < members.Count; intronIndex++)
+            for (var intronIndex = 0; intronIndex < members.Count; intronIndex++)
             {
                 if (!(members[intronIndex] is ObjectValueNode objectValue))
                 {

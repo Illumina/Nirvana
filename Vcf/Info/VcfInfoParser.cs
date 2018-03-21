@@ -30,7 +30,7 @@ namespace Vcf.Info
 
             int? svLen = null, end = null, copyNumber = null, depth = null, jointSomaticNormalQuality = null;
 			VariantType svType = VariantType.unknown;
-            bool colocalizedWithCnv = false;
+            var colocalizedWithCnv = false;
             int[] ciPos = null, ciEnd = null;
             double? strandBias = null, recalibratedQuality = null;
 	        bool isInv3=false, isInv5=false;

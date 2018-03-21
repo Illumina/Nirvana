@@ -21,7 +21,7 @@ namespace CacheUtils.TranscriptCache
             var intervalArrays = new IntervalArray<T>[numRefSeqs];
             var itemsByRef     = items.GetMultiValueDict(x => x.Chromosome.Index);
 
-            foreach (var refIndex in itemsByRef.Keys.OrderBy(x => x))
+            foreach (ushort refIndex in itemsByRef.Keys.OrderBy(x => x))
             {
                 var unsortedItems = itemsByRef[refIndex];
                 var intervals     = unsortedItems.OrderBy(x => x.Start).ThenBy(x => x.End).ToIntervals(unsortedItems.Count);
@@ -34,7 +34,7 @@ namespace CacheUtils.TranscriptCache
         private static Interval<T>[] ToIntervals<T>(this IEnumerable<T> items, int numItems) where T : IChromosomeInterval
         {
             var intervals = new Interval<T>[numItems];
-            int i = 0;
+            var i = 0;
 
             foreach (var item in items)
             {

@@ -2,6 +2,7 @@
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
+using CacheUtils.DataDumperImport.Utilities;
 using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.DataDumperImport.Import
@@ -34,8 +35,11 @@ namespace CacheUtils.DataDumperImport.Import
         /// parses the relevant data from each variant effect feature cache
         /// </summary>
         public static (MutableTranscriptRegion[] CdnaMaps, IInterval[] Introns, string PeptideSequence, string
-            TranslateableSequence, string SiftData, string PolyPhenData, int[] SelenocysteinePositions) Parse(ObjectValueNode objectValue)
+            TranslateableSequence, string SiftData, string PolyPhenData, int[] SelenocysteinePositions) Parse(IImportNode importNode)
         {
+            var objectValue = importNode.GetObjectValueNode();
+            if (objectValue == null) throw new InvalidDataException("Encountered a variant effect feature cache node that could not be converted to an object value node.");
+
             MutableTranscriptRegion[] cdnaMaps = null;
             IInterval[] introns                = null;
             string peptideSequence             = null;
@@ -64,24 +68,10 @@ namespace CacheUtils.DataDumperImport.Import
                         // not used
                         break;
                     case ImportKeys.Introns:
-                        if (node is ListObjectKeyValueNode intronsList)
-                        {
-                            introns = ImportIntron.ParseList(intronsList.Values);
-                        }
-                        else if (!node.IsUndefined())
-                        {
-                            throw new InvalidDataException($"Could not transform the AbstractData object into a ListObjectKeyValue: [{node.GetType()}]");
-                        }
+                        introns = node.ParseListObjectKeyValueNode(ImportIntron.ParseList);
                         break;
                     case ImportKeys.Mapper:
-                        if (node is ObjectKeyValueNode mapperNode)
-                        {
-                            cdnaMaps = ImportTranscriptMapper.Parse(mapperNode.Value);
-                        }
-                        else
-                        {
-                            throw new InvalidDataException($"Could not transform the AbstractData object into an ObjectKeyValue: [{node.GetType()}]");
-                        }
+                        cdnaMaps = node.ParseObjectKeyValueNode(ImportTranscriptMapper.Parse);
                         break;
                     case ImportKeys.Peptide:
                         peptideSequence = node.GetString();
@@ -97,10 +87,7 @@ namespace CacheUtils.DataDumperImport.Import
                         }
                         break;
                     case ImportKeys.SeqEdits:
-                        if (node is ListObjectKeyValueNode seqEditsNodes)
-                        {
-                            selenocysteinePositions = ImportSeqEdits.Parse(seqEditsNodes.Values);
-                        }
+                        selenocysteinePositions = node.ParseListObjectKeyValueNode(ImportSeqEdits.Parse);
                         break;
                     case ImportKeys.TranslateableSeq:
                         translateableSequence = node.GetString();
