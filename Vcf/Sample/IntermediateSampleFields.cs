@@ -17,7 +17,7 @@ namespace Vcf.Sample
         public float? DenovoQuality { get; }
         public float? AQ { get; }
         public float? LQ { get; }
-        public float? VF { get; }
+        public double? VF { get; }
 
         // ReSharper disable InconsistentNaming
         public int? TIR { get; }
@@ -62,7 +62,7 @@ namespace Vcf.Sample
             CHC                  = GetBool(GetString(formatIndices.CHC, sampleCols), "+");
             AQ                   = GetFloat(GetString(formatIndices.AQ, sampleCols));
             LQ                   = GetFloat(GetString(formatIndices.LQ, sampleCols));
-            VF                   = GetFloat(GetString(formatIndices.VF, sampleCols));
+            VF                   = GetDouble(GetString(formatIndices.VF, sampleCols));
 
             (CopyNumber, RepeatNumber) = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
 
@@ -88,6 +88,13 @@ namespace Vcf.Sample
         {
             if (s == null) return null;
             if (float.TryParse(s, out var ret)) return ret;
+            return null;
+        }
+
+        internal static double? GetDouble(string s)
+        {
+            if (s == null) return null;
+            if (double.TryParse(s, out var ret)) return ret;
             return null;
         }
 

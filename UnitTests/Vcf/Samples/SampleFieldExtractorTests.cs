@@ -240,6 +240,7 @@ namespace UnitTests.Vcf.Samples
         [InlineData("T", "GT:AD", "1/1:3,70", "0.9589")]                                 // allele depths
         [InlineData("T", "GT:NR:NV", "1/1:10:7", "0.7")]                                 // NR/NV
         [InlineData("T", "GT:AU:CU:GU:TU:AD", "1/1:.:20,21:30,31:40,41:7,11", "0.6111")] // missing allele count
+        [InlineData("T", "GT:AD:DP:VF", "0/1:317,200:517:0.38685", "0.3869")]            // VF (rounding issue)
         public void VariantFrequency_Nominal(string altAllele, string formatCol, string sampleCol, string expectedResults)
         {
             string vcfLine = $"chr1\t5592503\t.\tC\t{altAllele}\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
