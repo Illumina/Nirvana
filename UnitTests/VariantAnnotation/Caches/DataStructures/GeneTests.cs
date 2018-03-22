@@ -16,15 +16,14 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void Gene_EndToEnd()
         {
-            int expectedStart              = int.MaxValue;
-            int expectedEnd                = int.MinValue;
-            IChromosome expectedChromosome = new Chromosome("chrBob", "Bob", 1);
-            bool expectedReverseStrand     = true;
-            var expectedSymbol             = "anavrin";
-            var expectedEntrezGeneId       = "7157";
-            var expectedEnsemblId          = "ENSG00000141510";
-            int expectedHgncId             = int.MaxValue;
-            int expectedMimNumber          = int.MinValue;
+            const int expectedStart           = int.MaxValue;
+            const int expectedEnd             = int.MinValue;
+            IChromosome expectedChromosome    = new Chromosome("chrBob", "Bob", 1);
+            const bool expectedReverseStrand  = true;
+            const string expectedSymbol       = "anavrin";
+            const string expectedEntrezGeneId = "7157";
+            const string expectedEnsemblId    = "ENSG00000141510";
+            const int expectedHgncId          = int.MaxValue;
 
             var indexToChromosome = new Dictionary<ushort, IChromosome>
             {
@@ -34,7 +33,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             var gene = new Gene(expectedChromosome, expectedStart, expectedEnd, expectedReverseStrand,
                 expectedSymbol, expectedHgncId, CompactId.Convert(expectedEntrezGeneId),
-                CompactId.Convert(expectedEnsemblId), expectedMimNumber);
+                CompactId.Convert(expectedEnsemblId));
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             IGene observedGene;
@@ -63,7 +62,6 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.Equal(expectedEntrezGeneId,     observedGene.EntrezGeneId.ToString());
             Assert.Equal(expectedEnsemblId,        observedGene.EnsemblId.ToString());
             Assert.Equal(expectedHgncId,           observedGene.HgncId);
-            Assert.Equal(expectedMimNumber,        observedGene.MimNumber);
         }
     }
 }

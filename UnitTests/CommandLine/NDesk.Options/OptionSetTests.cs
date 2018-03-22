@@ -76,7 +76,7 @@ namespace UnitTests.CommandLine.NDesk.Options
             Assert.Equal(42, n);
 
             extra = optionSet.Parse(new[] { "-a=" });
-            Assert.Equal(0, extra.Count);
+            Assert.Empty(extra);
             Assert.Equal("", a);
         }
 
@@ -316,12 +316,12 @@ namespace UnitTests.CommandLine.NDesk.Options
             };
 
             var extra = optionSet.Parse(new[] { "-abcf", "foo", "bar" });
-            Assert.Equal(extra.Count, 1);
-            Assert.Equal(extra[0], "bar");
-            Assert.Equal(a, "a");
-            Assert.Equal(b, "b");
-            Assert.Equal(c, "c");
-            Assert.Equal(f, "foo");
+            Assert.Single(extra);
+            Assert.Equal("bar", extra[0]);
+            Assert.Equal("a", a);
+            Assert.Equal("b", b);
+            Assert.Equal("c", c);
+            Assert.Equal("foo", f);
         }
 
         [Fact]
@@ -330,13 +330,13 @@ namespace UnitTests.CommandLine.NDesk.Options
             var optionSet = new OptionSet
             {
                 { "a", "", v => {} },
-                { "b", "", v => {} },
+                { "b", "", v => {} }
             };
 
             var e = optionSet.Parse(new[] { "-a", "-b", "--", "-a", "-b" });
-            Assert.Equal(e.Count, 2);
-            Assert.Equal(e[0], "-a");
-            Assert.Equal(e[1], "-b");
+            Assert.Equal(2, e.Count);
+            Assert.Equal("-a", e[0]);
+            Assert.Equal("-b", e[1]);
         }
 
         private sealed class ContextCheckerOption : Option
@@ -355,7 +355,7 @@ namespace UnitTests.CommandLine.NDesk.Options
 
             protected override void OnParseComplete(OptionContext c)
             {
-                Assert.Equal(c.OptionValues.Count, 1);
+                Assert.Equal(1, c.OptionValues.Count);
                 Assert.Equal(c.OptionValues[0], _eValue);
                 Assert.Equal(c.OptionName, _eName);
                 Assert.Equal(c.OptionIndex, _index);
@@ -372,9 +372,9 @@ namespace UnitTests.CommandLine.NDesk.Options
                 new ContextCheckerOption ("a=", "a desc", "/a",   "a-val", 1),
                 new ContextCheckerOption ("b",  "b desc", "--b+", "--b+",  2),
                 new ContextCheckerOption ("c=", "c desc", "--c",  "C",     3),
-                new ContextCheckerOption ("d",  "d desc", "/d-",  null,    4),
+                new ContextCheckerOption ("d",  "d desc", "/d-",  null,    4)
             };
-            Assert.Equal(optionSet.Count, 4);
+            Assert.Equal(4, optionSet.Count);
             optionSet.Parse(new[] { "/a", "a-val", "--b+", "--c=C", "/d-" });
         }
 
@@ -384,15 +384,15 @@ namespace UnitTests.CommandLine.NDesk.Options
             var extra = new List<string>();
             var optionSet = new OptionSet
             {
-                { "<>", "", v => extra.Add (v) },
+                { "<>", "", v => extra.Add (v) }
             };
             var e = optionSet.Parse(new[] { "-a", "b", "--c=D", "E" });
-            Assert.Equal(e.Count, 0);
-            Assert.Equal(extra.Count, 4);
-            Assert.Equal(extra[0], "-a");
-            Assert.Equal(extra[1], "b");
-            Assert.Equal(extra[2], "--c=D");
-            Assert.Equal(extra[3], "E");
+            Assert.Empty(e);
+            Assert.Equal(4, extra.Count);
+            Assert.Equal("-a", extra[0]);
+            Assert.Equal("b", extra[1]);
+            Assert.Equal("--c=D", extra[2]);
+            Assert.Equal("E", extra[3]);
         }
 
         [Fact]
@@ -401,16 +401,16 @@ namespace UnitTests.CommandLine.NDesk.Options
             var tests = new List<string>();
             var optionSet = new OptionSet
             {
-                { "t|<>=", "", v => tests.Add (v) },
+                { "t|<>=", "", v => tests.Add (v) }
             };
             var e = optionSet.Parse(new[] { "-tA", "-t:B", "-t=C", "D", "--E=F" });
-            Assert.Equal(e.Count, 0);
-            Assert.Equal(tests.Count, 5);
-            Assert.Equal(tests[0], "A");
-            Assert.Equal(tests[1], "B");
-            Assert.Equal(tests[2], "C");
-            Assert.Equal(tests[3], "D");
-            Assert.Equal(tests[4], "--E=F");
+            Assert.Empty(e);
+            Assert.Equal(5, tests.Count);
+            Assert.Equal("A", tests[0]);
+            Assert.Equal("B", tests[1]);
+            Assert.Equal("C", tests[2]);
+            Assert.Equal("D", tests[3]);
+            Assert.Equal("--E=F", tests[4]);
         }
 
         [Fact]
@@ -424,27 +424,26 @@ namespace UnitTests.CommandLine.NDesk.Options
                 { "f|format=", "", v => format = v },
                 { "<>",
                     "", v => {
-                        List<string> f;
-                        if (!formats.TryGetValue (format, out f)) {
+                        if (!formats.TryGetValue (format, out var f)) {
                             f = new List<string> ();
                             formats.Add (format, f);
                         }
                         f.Add (v);
-                    } },
+                    } }
             };
 
             var e = optionSet.Parse(new[] { "a", "b", "-fbar", "c", "d", "--format=baz", "e", "f" });
-            Assert.Equal(e.Count, 0);
-            Assert.Equal(formats.Count, 3);
-            Assert.Equal(formats["foo"].Count, 2);
-            Assert.Equal(formats["foo"][0], "a");
-            Assert.Equal(formats["foo"][1], "b");
-            Assert.Equal(formats["bar"].Count, 2);
-            Assert.Equal(formats["bar"][0], "c");
-            Assert.Equal(formats["bar"][1], "d");
-            Assert.Equal(formats["baz"].Count, 2);
-            Assert.Equal(formats["baz"][0], "e");
-            Assert.Equal(formats["baz"][1], "f");
+            Assert.Empty(e);
+            Assert.Equal(3, formats.Count);
+            Assert.Equal(2, formats["foo"].Count);
+            Assert.Equal("a", formats["foo"][0]);
+            Assert.Equal("b", formats["foo"][1]);
+            Assert.Equal(2, formats["bar"].Count);
+            Assert.Equal("c",formats["bar"][0]);
+            Assert.Equal("d",formats["bar"][1]);
+            Assert.Equal(2, formats["baz"].Count);
+            Assert.Equal("e", formats["baz"][0]);
+            Assert.Equal("f", formats["baz"][1]);
         }
 
         // ReSharper disable once ClassNeverInstantiated.Local

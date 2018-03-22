@@ -16,6 +16,7 @@
 	    bool IsProteinAlteringVariant();
 	    bool IsSpliceRegionVariant();
 	    bool IsIncompleteTerminalCodonVariant();
+	    bool IsStartRetained();
 	    bool IsSynonymousVariant();
 	    bool IsCodingSequenceVariant();
 	    bool IsFivePrimeUtrVariant();

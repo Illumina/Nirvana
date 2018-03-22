@@ -5,7 +5,7 @@ namespace VariantAnnotation.Interface.IO
     public static class VcfCommon
     {
         public const string ChromosomeHeader = "#CHROM";
-
+        public const string GatkNonRefAllele = "<NON_REF>";
         public const int MinNumColumnsSampleGenotypes = 10;
 
         // define the column names
@@ -20,10 +20,7 @@ namespace VariantAnnotation.Interface.IO
         public const int FormatIndex = 8;
         public const int GenotypeIndex = 9;
 
-        public const string NonVariant = ".";
-        public const string StructuralVariantTag = "SVTYPE";
-        public const string GatkNonRefAllele = "<NON_REF>";
         public static readonly HashSet<string> NonInformativeAltAllele = new HashSet<string> { "<*>", "*", "<M>", GatkNonRefAllele };
-        public static string StrTag = "STR";
+        public static readonly HashSet<string> ReferenceAltAllele = new HashSet<string> { ".", GatkNonRefAllele };
     }
 }

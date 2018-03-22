@@ -4,14 +4,13 @@ using Compression.Utilities;
 using ErrorHandling;
 using SAUtils.InputFileParsers;
 using SAUtils.TsvWriters;
-using VariantAnnotation.Interface;
 
 namespace SAUtils.GeneScoresTsv
 {
     public sealed class GeneScoresMain
     {
         private const string JsonKeyName = "exac";
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             var geneScoreCreator= new GeneScoreTsvCreator(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputPath), 
                 new GeneAnnotationTsvWriter(ConfigurationSettings.OutputDirectory, 
@@ -44,10 +43,10 @@ namespace SAUtils.GeneScoresTsv
                 .Parse()
                 .CheckInputFilenameExists(ConfigurationSettings.InputPath, "gene scores file", "--in")
                 .CheckDirectoryExists(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
-                .ShowBanner(Constants.Authors)
+                .SkipBanner()
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }

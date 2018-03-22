@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
-using VariantAnnotation.GeneAnnotation;
-using VariantAnnotation.Interface.GeneAnnotation;
+using SAUtils.Interface;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
+using VariantAnnotation.SA;
 
 namespace SAUtils.MergeInterimTsvs
 {
@@ -55,7 +55,7 @@ namespace SAUtils.MergeInterimTsvs
                 .ToList();
 
             if (uniqueAssemblies.Count > 1)
-                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {String.Join(", ", uniqueAssemblies.ToArray())}");
+                throw new InvalidDataException($"ERROR: The genome assembly for all data sources should be the same. Found {string.Join(", ", uniqueAssemblies.ToArray())}");
         }
 
 
@@ -67,15 +67,6 @@ namespace SAUtils.MergeInterimTsvs
             {
                 enumerators.Remove(enumerator);
             }
-        }
-
-        public static IAnnotatedGene MergeGeneAnnotations(List<IAnnotatedGene> geneAnnotations)
-        {
-            if (geneAnnotations == null || geneAnnotations.Count == 0) return null;
-
-            var annotations = geneAnnotations.SelectMany(x => x.Annotations).ToArray();
-
-            return new AnnotatedGene(geneAnnotations[0].GeneName, annotations);
         }
 
         public static List<ISupplementaryInterval> GetIntervals(IEnumerable<ParallelIntervalTsvReader> intervalReaders, string refName)
@@ -94,6 +85,28 @@ namespace SAUtils.MergeInterimTsvs
         public static List<ISupplementaryInterval> GetSpecificIntervals(ReportFor reportFor, IEnumerable<ISupplementaryInterval> intervals)
         {
             return intervals.Where(interval => interval.ReportingFor == reportFor).ToList();
+        }
+
+        public static (int, ISaPosition) GetSaPosition(List<IInterimSaItem> saItems)
+        {
+            if (saItems == null || saItems.Count == 0) return (0,null);
+
+            var position = saItems[0].Position;
+            var dataSources = new List<ISaDataSource>();
+            string globalMajorAllele = null;
+            foreach (var intermediateSaItem in saItems)
+            {
+                if (intermediateSaItem.KeyName == InterimSaCommon.RefMinorTag)
+                {
+                    if (intermediateSaItem is SaMiscellanies miscItem) globalMajorAllele = miscItem.GlobalMajorAllele;
+                }
+                else
+                {
+                    dataSources.Add(intermediateSaItem as ISaDataSource);
+                }
+            }
+
+            return (position, new SaPosition(dataSources.ToArray(), globalMajorAllele));
         }
     }
 }

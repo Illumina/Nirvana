@@ -27,7 +27,8 @@ namespace Jasix
         #endregion
 
         #region IDisposable
-        bool _disposed;
+
+        private bool _disposed;
 
         /// <summary>
         /// public implementation of Dispose pattern callable by consumers. 
@@ -81,7 +82,7 @@ namespace Jasix
         public void CreateIndex()
         {
             var searchTag = $"\"{SectionToIndex}\":[";
-            var headerTag = "{\"header\":";
+            const string headerTag = "{\"header\":";
             var index = new JasixIndex();
             string line;
 
@@ -124,19 +125,18 @@ namespace Jasix
             Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(wallTimeSpan));
         }
 
-        private string ExtractHeader(string line)
+        private static string ExtractHeader(string line)
         {
             string res = null;
             var reader = new JsonTextReader(new StringReader(line));
             while (reader.Read())
             {
-                if (reader.TokenType == JsonToken.PropertyName)
-                {
-                    // Load each object from the stream and do something with it
-                    var obj = JToken.ReadFrom(reader);
-                    res = obj.ToString(Formatting.None);
-                    break;
-                }
+                if (reader.TokenType != JsonToken.PropertyName) continue;
+
+                // Load each object from the stream and do something with it
+                var obj = JToken.ReadFrom(reader);
+                res = obj.ToString(Formatting.None);
+                break;
             }
             return res;
         }
@@ -148,19 +148,16 @@ namespace Jasix
             {
                 throw new UserErrorException($"the Json file is not sorted at {chr}: {pos}");
             }
+
             if (chr == previousChr && pos < previousPos)
             {
                 throw new UserErrorException($"the Json file is not sorted at {chr}: {pos}");
             }
-            if (chr != previousChr)
-            {
-                if (previousChr != "")
-                {
-                    Console.WriteLine($"Ref Sequence {previousChr} indexed in {Benchmark.ToHumanReadable(_chromBenchmark.GetElapsedTime())}");
-                    _chromBenchmark.Reset();
-                }
-            }
 
+            if (chr == previousChr || previousChr == "") return;
+
+            Console.WriteLine($"Ref Sequence {previousChr} indexed in {Benchmark.ToHumanReadable(_chromBenchmark.GetElapsedTime())}");
+            _chromBenchmark.Reset();
         }
 
         internal static (string chr, int position, int end) GetChromPosition(string line)

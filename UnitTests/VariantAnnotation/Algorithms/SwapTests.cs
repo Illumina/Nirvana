@@ -8,8 +8,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
         [Fact]
         public void Swap_Int()
         {
-            int expectedA = 5;
-            int expectedB = 3;
+            const int expectedA = 5;
+            const int expectedB = 3;
 
             int observedA = expectedB;
             int observedB = expectedA;

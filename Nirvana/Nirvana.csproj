@@ -6,11 +6,17 @@
     <DebugType>Full</DebugType>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.0.1" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\Jasix\Jasix.csproj" />
+    <ProjectReference Include="..\Phantom\Phantom.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />

@@ -10,8 +10,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void VersionProvider_Set()
         {
-            string observedString;
-            var ops = new OptionSet { { "test=", "test", v => observedString = v } };
+            var ops = new OptionSet { { "test=", "test", v => { } } };
 
             var data = new ConsoleAppBuilder(null, ops).UseVersionProvider(new VersionProvider())
                 .Parse()
@@ -26,8 +25,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void ShowBanner_EnabledOutput()
         {
-            string observedString;
-            var ops = new OptionSet { { "test=", "test", v => observedString = v } };
+            var ops = new OptionSet { { "test=", "test", v => { } } };
 
             var banner = new ConsoleAppBuilder(null, ops).UseVersionProvider(new VersionProvider())
                 .Parse()

@@ -7,8 +7,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 	{
         ISaDataSource SaDataSource { get; }
         bool IsAlleleSpecific { get; }
-
 	    IList<string> GetJsonStrings();
-	    IList<string> GetVcfStrings();
+	    IEnumerable<string> GetVcfStrings();
 	}
 }

@@ -18,7 +18,8 @@ namespace Jasix
 	    #endregion
 
 		#region IDisposable
-		bool _disposed;
+
+	    private bool _disposed;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 

@@ -1,14 +1,11 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using SAUtils.ExtractMiniXml;
-using VariantAnnotation.Interface;
 
-namespace ExtractMiniXml
+namespace SAUtils.ExtractMiniXml
 {
-    public sealed class ExtractMiniXmlMain
+    public static class ExtractMiniXmlMain
 	{
-
 	    private static ExitCodes ProgramExecution()
         {
 	        var extractor = new XmlExtractor(ConfigurationSettings.InputXmlFile, ConfigurationSettings.RcvId, ConfigurationSettings.OutputDir);
@@ -18,7 +15,7 @@ namespace ExtractMiniXml
         }
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-			var ops = new OptionSet()
+			var ops = new OptionSet
 			{
 				{
 					"i|in=",
@@ -43,13 +40,12 @@ namespace ExtractMiniXml
 	            .Parse()
 	            .CheckInputFilenameExists(ConfigurationSettings.InputXmlFile, "input XML file", "--in")
 	            .HasRequiredParameter(ConfigurationSettings.OutputDir, "output directory", "--out")
-	            .ShowBanner(Constants.Authors)
-	            .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
+			    .SkipBanner()
+                .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
 	            .ShowErrors()
 	            .Execute(ProgramExecution);
 	        
 	        return exitCode;
-		}
-		
+		}		
 	}
 }

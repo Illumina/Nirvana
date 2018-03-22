@@ -7,16 +7,14 @@ namespace SAUtils.DataStructures
         public string KeyName { get; }
         public string Chromosome { get; }
         public int Position { get; }
-        public bool IsRefMinor { get; }
         public string GlobalMajorAllele { get; }
 
-        public SaMiscellanies(string keyName, string chr, int pos, string globalMajorAllele, bool isRefMinor)
+        public SaMiscellanies(string keyName, string chr, int pos, string globalMajorAllele)
         {
-            KeyName = keyName;
-            Chromosome = chr;
-            Position = pos;
+            KeyName           = keyName;
+            Chromosome        = chr;
+            Position          = pos;
             GlobalMajorAllele = globalMajorAllele;
-            IsRefMinor = isRefMinor;
         }
 
         public int CompareTo(IInterimSaItem otherItem)
@@ -24,6 +22,5 @@ namespace SAUtils.DataStructures
             if (otherItem == null) return -1;
             return Chromosome.Equals(otherItem.Chromosome) ? Position.CompareTo(otherItem.Position) : string.CompareOrdinal(Chromosome, otherItem.Chromosome);
         }
-
     }
 }

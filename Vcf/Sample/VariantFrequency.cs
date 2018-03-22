@@ -1,128 +1,143 @@
-﻿namespace Vcf.Sample
+﻿using System.Linq;
+
+namespace Vcf.Sample
 {
     internal static class VariantFrequency
     {
-        /// <summary>
-        /// returns the variant frequency given different sources of information
-        /// </summary>
-        public static double? GetVariantFrequency(IntermediateSampleFields intermediateSampleFields)
+        private static readonly double[] ZeroVf = { 0.0 };
+
+        public static double[] GetVariantFrequencies(IntermediateSampleFields sampleFields)
         {
-            double? vf = null;
+            double[] vf = null;
+
+            // use VF
+            if (sampleFields.VF != null) vf = GetVariantFrequenciesUsingVf(sampleFields);
 
             // use TAR & TIR
-            if (intermediateSampleFields.TAR != null && intermediateSampleFields.TIR != null) vf = GetVariantFrequencyUsingTarTir(intermediateSampleFields);
+            if (sampleFields.TAR != null && sampleFields.TIR != null) vf = GetVariantFrequenciesUsingTarTir(sampleFields);
 
             // use allele counts
-            if (vf == null && intermediateSampleFields.TotalAlleleCount != null) vf = GetVariantFrequencyUsingAlleleCounts(intermediateSampleFields);
+            if (vf == null && sampleFields.TotalAlleleCount != null) vf = GetVariantFrequenciesUsingAlleleCounts(sampleFields);
 
             // use allele depths
-            if (vf == null && intermediateSampleFields.FormatIndices.AD != null) vf = GetVariantFrequencyUsingAlleleDepths(intermediateSampleFields);
+            if (vf == null && sampleFields.FormatIndices.AD != null) vf = GetVariantFrequenciesUsingAlleleDepths(sampleFields);
 
             // use NR & NV
-            if (vf == null && intermediateSampleFields.NR != null && intermediateSampleFields.NV != null) vf = GetVariantFrequencyUsingNrNv(intermediateSampleFields);
+            if (vf == null && sampleFields.NR != null && sampleFields.NV != null) vf = GetVariantFrequenciesUsingNrNv(sampleFields);
 
             return vf;
         }
 
-        /// <summary>
-        /// returns the variant frequency using raw allele counts
-        /// </summary>
-        private static  double? GetVariantFrequencyUsingAlleleCounts(IntermediateSampleFields intermediateSampleFields)
+        private static double[] GetVariantFrequenciesUsingVf(IntermediateSampleFields sampleFields)
         {
-            // for this to work we need a single-base reference allele and all raw allele
-            // counts must be available
-            if (intermediateSampleFields.TotalAlleleCount == null || intermediateSampleFields.VcfRefAllele == null || intermediateSampleFields.VcfRefAllele.Length != 1) return null;
+            if (sampleFields.AltAlleles.Length > 1 || sampleFields.VF == null) return null;
+            return new double[] { sampleFields.VF.Value };
+        }
 
-	        if (intermediateSampleFields.TotalAlleleCount == 0) return 0;
-			
-            // get the reference count
-            int? refCount = null;
+        private static double[] GetVariantFrequenciesUsingAlleleCounts(IntermediateSampleFields sampleFields)
+        {
+            bool isRefSingleBase      = sampleFields.VcfRefAllele.Length == 1;
+            bool areAllAltsSingleBase = sampleFields.AltAlleles.All(altAllele => altAllele.Length == 1);
 
-            switch (intermediateSampleFields.VcfRefAllele)
+            // for this to work we need a single-base reference allele and all raw allele counts must be available
+            if (sampleFields.TotalAlleleCount == null || !isRefSingleBase || !areAllAltsSingleBase) return null;
+
+            int numAltAlleles = sampleFields.AltAlleles.Length;
+            double[] variantFreqs = new double[numAltAlleles];
+
+            if (sampleFields.TotalAlleleCount == 0) return variantFreqs;
+
+            for (int i = 0; i < numAltAlleles; i++)
+            {
+                var alleleCount = GetAlleleCount(sampleFields, i);
+                variantFreqs[i] = alleleCount / (double)sampleFields.TotalAlleleCount;
+            }
+
+            return variantFreqs;
+        }
+
+        private static int GetAlleleCount(IntermediateSampleFields sampleFields, int alleleIndex)
+        {
+            string altAllele = sampleFields.AltAlleles[alleleIndex];
+            int alleleCount = 0;
+
+            switch (altAllele)
             {
                 case "A":
-                    refCount = intermediateSampleFields.ACount;
+                    alleleCount = sampleFields.ACount ?? 0;
                     break;
                 case "C":
-                    refCount = intermediateSampleFields.CCount;
+                    alleleCount = sampleFields.CCount ?? 0;
                     break;
                 case "G":
-                    refCount = intermediateSampleFields.GCount;
+                    alleleCount = sampleFields.GCount ?? 0;
                     break;
                 case "T":
-                    refCount = intermediateSampleFields.TCount;
+                    alleleCount = sampleFields.TCount ?? 0;
                     break;
             }
 
-            // sanity check: make sure we have a canonical base (A,C,G,T)
-            if (refCount == null) return null;
-
-            // calculate the variant frequency
-            return  ((double)intermediateSampleFields.TotalAlleleCount - (double)refCount) / (double)intermediateSampleFields.TotalAlleleCount;
+            return alleleCount;
         }
 
-        /// <summary>
-        /// returns the variant frequency using TIR and TAR
-        /// </summary>
-        private static  double? GetVariantFrequencyUsingTarTir(IntermediateSampleFields intermediateSampleFields)
+        private static double[] GetVariantFrequenciesUsingTarTir(IntermediateSampleFields sampleFields)
         {
-            if (intermediateSampleFields.TIR == null || intermediateSampleFields.TAR == null) return null;
-	        if (intermediateSampleFields.TIR + intermediateSampleFields.TAR == 0) return 0;
-            var tir = (double)intermediateSampleFields.TIR;
-            var tar = (double)intermediateSampleFields.TAR;
-            return tir / (tar + tir);
+            // TAR and TIR: never observed with multiple alternate alleles
+            if (sampleFields.TIR == null || sampleFields.TAR == null || sampleFields.AltAlleles.Length > 1) return null;
+            if (sampleFields.TIR + sampleFields.TAR == 0) return ZeroVf;
+
+            var tir = (double)sampleFields.TIR;
+            var tar = (double)sampleFields.TAR;
+            return new[] { tir / (tar + tir) };
         }
 
-        /// <summary>
-        /// returns the variant frequency using TIR and TAR
-        /// </summary>
-        private static  double? GetVariantFrequencyUsingNrNv(IntermediateSampleFields intermediateSampleFields)
+        private static double[] GetVariantFrequenciesUsingNrNv(IntermediateSampleFields sampleFields)
         {
-            if (intermediateSampleFields.NR == null || intermediateSampleFields.NV == null || intermediateSampleFields.AltAlleles.Length > 1) return null;
-            if (intermediateSampleFields.NR == 0) return 0;
-            var nr = (double)intermediateSampleFields.NR;
-            var nv = (double)intermediateSampleFields.NV;
-            return nv / nr;
+            // NR and NV: never observed with multiple alternate alleles
+            if (sampleFields.NR == null || sampleFields.NV == null || sampleFields.AltAlleles.Length > 1) return null;
+            if (sampleFields.NR == 0) return ZeroVf;
+
+            var nr = (double)sampleFields.NR;
+            var nv = (double)sampleFields.NV;
+            return new[] { nv / nr };
         }
 
-        /// <summary>
-        /// returns the variant frequency using allele depths
-        /// </summary>
-        private static  double? GetVariantFrequencyUsingAlleleDepths(IntermediateSampleFields intermediateSampleFields)
+        private static double[] GetVariantFrequenciesUsingAlleleDepths(IntermediateSampleFields sampleFields)
         {
-            if (intermediateSampleFields.FormatIndices.AD == null || intermediateSampleFields.SampleColumns.Length <= intermediateSampleFields.FormatIndices.AD.Value) return null;
-            var alleleDepths = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.AD.Value].Split(',');
+            if (sampleFields.FormatIndices.AD == null || sampleFields.SampleColumns.Length <= sampleFields.FormatIndices.AD.Value) return null;
 
-            // one allele depth
-            if (alleleDepths.Length == 1)
-            {
-                int num;
-                if(int.TryParse(alleleDepths[0], out num) ) return 0;
-                return null;
-            }
+            int numAltAlleles     = sampleFields.AltAlleles.Length;
+            double[] variantFreqs = new double[numAltAlleles];
 
-            var hasRefDepth = false;
-            var refDepth = 0;
-            var totalDepth = 0;
-
-            foreach (var depthString in alleleDepths)
-            {
-                int depth;
-                if (!int.TryParse(depthString, out depth)) return null;
-
-                totalDepth += depth;
-
-                if (!hasRefDepth)
-                {
-                    refDepth = depth;
-                    hasRefDepth = true;
-                }
-            }
+            var adField = sampleFields.SampleColumns[sampleFields.FormatIndices.AD.Value];
+            var (alleleDepths, allValuesAreValid, totalDepth) = GetAlleleDepths(adField);
+            if (!allValuesAreValid || numAltAlleles != alleleDepths.Length) return null;
 
             // sanity check: make sure we handle NaNs properly
-            if (totalDepth == 0) return 0;
+            if (totalDepth == 0) return variantFreqs;
 
-            return (totalDepth - refDepth) / (double)totalDepth;
+            for (int alleleIndex = 0; alleleIndex < numAltAlleles; alleleIndex++)
+            {
+                variantFreqs[alleleIndex] = alleleDepths[alleleIndex] / (double)totalDepth;
+            }
+
+            return variantFreqs;
+        }
+
+        private static (int[] AlleleDepths, bool AllValuesAreValid, int totalDepth) GetAlleleDepths(string adField)
+        {
+            var adFields = adField.Split(",");
+            var alleleDepths = new int[adFields.Length - 1];
+            int totalDepth = 0;
+
+            for (int i = 0; i < adFields.Length; i++)
+            {
+                if (!int.TryParse(adFields[i], out var ad)) return (null, false, totalDepth);
+                if (i > 0) alleleDepths[i - 1] = ad;
+                totalDepth += ad;
+            }
+
+            return (alleleDepths, true, totalDepth);
         }
     }
 }

@@ -62,6 +62,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         public IEnumerable<IAnnotatedGene> GetItems()
         {
+            var annotatedGenes = new List<IAnnotatedGene>();
             string line;
             //getting to the chromosome
             while ((line = _reader.ReadLine()) != null)
@@ -70,8 +71,10 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
                 var annotationItem = ExtractItem(line);
                 if (annotationItem == null) continue;
-                yield return annotationItem;
+                annotatedGenes.Add(annotationItem);
             }
+
+            return annotatedGenes.Count == 0 ? null : annotatedGenes;
         }
 
 

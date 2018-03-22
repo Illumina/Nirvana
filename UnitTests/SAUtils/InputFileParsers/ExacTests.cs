@@ -5,7 +5,7 @@ using VariantAnnotation.IO;
 using VariantAnnotation.Sequence;
 using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     [Collection("ChromosomeRenamer")]
     public sealed class ExacTests

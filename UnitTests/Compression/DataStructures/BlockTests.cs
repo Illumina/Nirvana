@@ -41,8 +41,7 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void QuickLzBlock()
         {
-            int copyLength;
-            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out copyLength);
+            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out var copyLength);
             ms.Seek(0, SeekOrigin.Begin);
 
             var readBlock = new Block(Qlz);

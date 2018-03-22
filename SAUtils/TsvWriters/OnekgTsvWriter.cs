@@ -17,7 +17,8 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		#region IDisposable
-		bool _disposed;
+
+	    private bool _disposed;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 
@@ -72,8 +73,7 @@ namespace SAUtils.TsvWriters
 			var onekGenItems = new List<OneKGenItem>();
 			foreach (var item in saItems)
 			{
-				var onekGenItem = item as OneKGenItem;
-				if (onekGenItem== null)
+			    if (!(item is OneKGenItem onekGenItem))
 					throw new InvalidDataException("Expected OnekGenItems list!!");
 				onekGenItems.Add(onekGenItem);
 			}
@@ -105,11 +105,12 @@ namespace SAUtils.TsvWriters
 				_refMinorWriter.AddEntry(onekGenItems[0].Chromosome.EnsemblName, onekGenItems[0].Start,GetMajorAllele(alleleFrequencies),onekGenItems[0].ReferenceAllele);
 		}
 
-	    private string GetMajorAllele(Dictionary<string, double> alleleFrequencies)
+	    private static string GetMajorAllele(Dictionary<string, double> alleleFrequencies)
 	    {
-	        var maxFreq = 0.0;
+	        var maxFreq        = 0.0;
 	        string majorAllele = null;
-	        foreach (var kvp in alleleFrequencies)
+
+            foreach (var kvp in alleleFrequencies)
 	        {
 	            if (kvp.Value > maxFreq)
 	            {
@@ -117,6 +118,7 @@ namespace SAUtils.TsvWriters
 	                majorAllele = kvp.Key;
 	            }
 	        }
+
 	        return majorAllele;
 	    }
 
@@ -125,14 +127,7 @@ namespace SAUtils.TsvWriters
 			if (allele.Length != 1) return false;
 
 			allele = allele.ToUpper();
-
-			if (allele == "A" || allele == "C" || allele == "G" || allele == "T") return true;
-
-			return false;
+			return allele == "A" || allele == "C" || allele == "G" || allele == "T";
 		}
-
-
-
-        
     }
 }

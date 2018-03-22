@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
   <ClinVarSet ID="17828091">
@@ -114,7 +114,7 @@
       <ClinicalSignificance DateLastEvaluated="2016-05-26">
         <ReviewStatus>criteria provided, single submitter</ReviewStatus>
         <Description>Pathogenic</Description>
-        <Comment>The c.164_171dupAGGCCGGG variant in the VHL gene has been reported previously in associationwith von Hippel-Lindau syndrome (Chacon-Camacho et al., 2014). The duplication causes aframeshift starting with codon Arginine 60, changes this amino acid to a Glycine residue and creates apremature Stop codon at position 10 of the new reading frame, denoted p.Arg60GlyfsX10. Thisvariant is predicted to cause loss of normal protein function either through protein truncation ornonsense-mediated mRNA decay. Based on the currently available information, we considerc.164_171dupAGGCCGGG to be pathogenic.</Comment>
+        <Comment>The c.164_171dupAGGCCGGG variant in the VHL gene has been reported previously in associationwith von Hippel-Lindau syndrome (Chacon-Camacho et al., 2014). The duplication causes aframeshift starting with codon Arginine 60, changes this amino acid to a Glycine residue and creates apremature Stop codon at simplePosition 10 of the new reading frame, denoted p.Arg60GlyfsX10. Thisvariant is predicted to cause loss of normal protein function either through protein truncation ornonsense-mediated mRNA decay. Based on the currently available information, we considerc.164_171dupAGGCCGGG to be pathogenic.</Comment>
       </ClinicalSignificance>
       <Assertion Type="variation to disease" />
       <ExternalID DB="GeneDx" ID="GDX:704969" />

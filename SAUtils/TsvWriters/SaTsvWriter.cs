@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using CommonUtilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
@@ -23,7 +23,7 @@ namespace SAUtils.TsvWriters
 
         #region IDisposable
 
-        bool _disposed;
+        private bool _disposed;
 
         /// <summary>
         /// public implementation of Dispose pattern callable by consumers. 
@@ -56,29 +56,29 @@ namespace SAUtils.TsvWriters
         }
         #endregion
 
-        public SaTsvWriter(string outputPath, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion, string jsonKey, string vcfKeys,
-            bool isAlleleSpecific, ISequenceProvider sequenceProvider, bool isArray = false) : this(outputPath, dataSourceVersion, assembly, schemaVersion, jsonKey, vcfKeys, isAlleleSpecific, isArray)
+        public SaTsvWriter(string outputDir, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion, string jsonKey, string vcfKeys,
+            bool isAlleleSpecific, ISequenceProvider sequenceProvider, bool isArray = false) : this(outputDir, dataSourceVersion, assembly, schemaVersion, jsonKey, vcfKeys, isAlleleSpecific, isArray)
         {
             _sequenceProvider = sequenceProvider;
         }
 
-        private SaTsvWriter(string outputPath, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion,
+        private SaTsvWriter(string outputDir, DataSourceVersion dataSourceVersion, string assembly, int schemaVersion,
             string jsonKey, string vcfKeys,
             bool isAlleleSpecific, bool isArray = false)
         {
             var fileName = jsonKey + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".tsv.gz";
 
-            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputPath, fileName));
+            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputDir, fileName));
 
             _bgzipTextWriter.Write(GetHeader(dataSourceVersion, schemaVersion, assembly, jsonKey, vcfKeys, isAlleleSpecific, isArray));
 
-            _tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName + ".tvi"));
+            _tsvIndex = new TsvIndex(Path.Combine(outputDir, fileName + ".tvi"));
         }
 
 
-        private string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
+        private static string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             sb.Append($"#name={dataSourceVersion.Name}\n");
             if (!string.IsNullOrEmpty(assembly)) sb.Append($"#assembly={assembly}\n");
@@ -93,7 +93,7 @@ namespace SAUtils.TsvWriters
             sb.Append($"#jsonKey={jsonKey}\n");
             sb.Append($"#vcfKeys={vcfKeys}\n");
             sb.Append("#CHROM\tPOS\tREF\tALT\tVCF\tJSON\n");
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         public void AddEntry(string chromosome, int position, string refAllele, string altAllele, string vcfString, List<string> jsonStrings)
@@ -130,10 +130,10 @@ namespace SAUtils.TsvWriters
         {
             if (_sequenceProvider == null) return true;
 
-            var refDictionary = _sequenceProvider.GetChromosomeDictionary();
+            var refDictionary = _sequenceProvider.RefNameToChromosome;
             if (!refDictionary.ContainsKey(chromosome)) return false;
 
-            var chrom = _sequenceProvider.GetChromosomeDictionary()[chromosome];
+            var chrom = refDictionary[chromosome];
 
             _sequenceProvider.LoadChromosome(chrom);
             var refSequence = _sequenceProvider.Sequence.Substring(position - 1, ReferenceWindow);

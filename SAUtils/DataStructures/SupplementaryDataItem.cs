@@ -18,8 +18,7 @@ namespace SAUtils.DataStructures
         public int CompareTo(SupplementaryDataItem otherItem)
         {
             if (otherItem == null) return -1;
-            if (Chromosome.Equals(otherItem.Chromosome)) return Start.CompareTo(otherItem.Start);
-            return string.CompareOrdinal(Chromosome.UcscName, otherItem.Chromosome.UcscName);
+            return Chromosome.Equals(otherItem.Chromosome) ? Start.CompareTo(otherItem.Start) : string.CompareOrdinal(Chromosome.UcscName, otherItem.Chromosome.UcscName);
         }
 
         public bool Equals(SupplementaryDataItem other)

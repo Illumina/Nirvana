@@ -11,18 +11,15 @@ namespace VariantAnnotation.IO
         private readonly StringBuilder _sb;
         private bool _needsComma;
 
-        public const char Comma = ',';
-        private const char DoubleQuote = '\"';
-        private const char OpenBracket = '[';
-        private const char CloseBracket = ']';
-        public const char OpenBrace = '{';
-        public const char CloseBrace = '}';
+        public const char Comma          = ',';
+        private const char DoubleQuote   = '\"';
+        private const char OpenBracket   = '[';
+        private const char CloseBracket  = ']';
+        public const char OpenBrace      = '{';
+        public const char CloseBrace     = '}';
         private const string ColonString = "\":";
 
-        public JsonObject(StringBuilder sb)
-        {
-            _sb = sb;
-        }
+        public JsonObject(StringBuilder sb) => _sb = sb;
 
         private void AddKey(string description)
         {
@@ -31,12 +28,10 @@ namespace VariantAnnotation.IO
             _sb.Append(ColonString);
         }
 
-        /// <summary>
-        /// adds the boolean KVP to the string builder
-        /// </summary>
         public void AddBoolValue(string description, bool b, bool outputFalse = false)
         {
-            if (!b && !outputFalse) return;//we do not want to print out false flags by default.
+            // we do not want to print out false flags by default.
+            if (!b && !outputFalse) return;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
@@ -45,9 +40,6 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// adds the string KVP to the string builder
-        /// </summary>
         public void AddIntValue(string description, int? i)
         {
             if (i == null) return;
@@ -59,9 +51,6 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// Add an integer array kvp to the StringBuilder
-        /// </summary>
         public void AddIntValues(string description, int[] values)
         {
             if (values == null || values.Length == 0) return;
@@ -83,9 +72,16 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// adds the string KVP to the string builder
-        /// </summary>
+        public void AddDoubleValues(string description, double[] values, string format = "0.####")
+        {
+            if (values == null || values.Length == 0) return;
+
+            var valueList = values.Select(value => value.ToString(format)).ToList();
+
+            AddStringValues(description, valueList, false);
+            _needsComma = true;
+        }
+
         public void AddStringValue(string description, string s, bool useQuote = true)
         {
             if (string.IsNullOrEmpty(s) || s == ".") return;
@@ -133,9 +129,6 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// adds the object values to this current JSON object
-        /// </summary>
         public void AddObjectValues<T>(string description, IEnumerable<T> values, bool seperatedByNewLine = false) where T : IJsonSerializer
         {
             if (values == null) return;
@@ -159,9 +152,6 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// adds the object values to this current JSON object
-        /// </summary>
         public void AddGroupedObjectValues<T>(string description, string[] groupDescriptions, params IList<T>[] groups) where T : IJsonSerializer
         {
             if (groupDescriptions == null) return;
@@ -187,12 +177,6 @@ namespace VariantAnnotation.IO
             _needsComma = true;
         }
 
-        /// <summary>
-        /// resets the current JSON object
-        /// </summary>
-        private void Reset(bool needsComma = false)
-        {
-            _needsComma = needsComma;
-        }
+        private void Reset(bool needsComma = false) => _needsComma = needsComma;
     }
 }

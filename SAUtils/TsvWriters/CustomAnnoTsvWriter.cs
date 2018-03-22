@@ -16,7 +16,8 @@ namespace SAUtils.TsvWriters
 		#endregion
 
 		#region IDisposable
-		bool _disposed;
+
+	    private bool _disposed;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 
@@ -64,8 +65,7 @@ namespace SAUtils.TsvWriters
 			var customItems = new List<CustomItem>();
 			foreach (var item in saItems)
 			{
-				var customItem = item as CustomItem;
-				if (customItem == null)
+			    if (!(item is CustomItem customItem))
 					throw new InvalidDataException("Expected customItem list!!");
 				customItems.Add(customItem);
 			}

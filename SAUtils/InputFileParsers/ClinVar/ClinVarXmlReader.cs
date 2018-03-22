@@ -63,7 +63,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private HashSet<string> _allilicOmimIDs;
 		private HashSet<string> _orphanetIDs;
 
-		HashSet<long> _pubMedIds= new HashSet<long>();
+        private HashSet<long> _pubMedIds= new HashSet<long>();
 		private long _lastUpdatedDate;
 
 		#endregion
@@ -95,7 +95,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             _sequenceProvider = sequenceProvider;
             _aligner = new VariantAligner(_sequenceProvider.Sequence);
             _clinVarXmlFileInfo = clinVarXmlFileInfo;
-            _refChromDict = sequenceProvider.GetChromosomeDictionary();
+            _refChromDict = sequenceProvider.RefNameToChromosome;
         }
 
         private const string ClinVarSetTag = "ClinVarSet";
@@ -260,10 +260,9 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    if (string.IsNullOrEmpty(refAllele)) return true;
 
 	        var refLength = clinvarVariant.Stop - clinvarVariant.Start + 1;
-	        if (refLength != refAllele.Length) return false;
+	        return refLength == refAllele.Length && _sequenceProvider.Sequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
 
-	        return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
-            //var stop = clinvarVariant.Start + refAllele.Length - 1;
+	        //var stop = clinvarVariant.Start + refAllele.Length - 1;
             //return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
 
         }
@@ -361,7 +360,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    foreach (var element in xElement.Elements(XrefTag))
 		        ParseXref(element);
 
-		    ParsePnenotype(xElement.Element(NameTag));
+		    foreach (var element in xElement.Elements(NameTag))
+                ParsePnenotype(element);
 		}
 
         private const string ElementValueTag = "ElementValue";

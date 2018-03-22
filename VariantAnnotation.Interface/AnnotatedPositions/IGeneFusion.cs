@@ -2,10 +2,10 @@
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {
-    public interface IGeneFusion:IJsonSerializer
+    public interface IGeneFusion : IJsonSerializer
     {
         int? Exon { get; }
         int? Intron { get; }
-        string HgvsCodingName { get; }
+        string HgvsCoding { get; }
     }
 }

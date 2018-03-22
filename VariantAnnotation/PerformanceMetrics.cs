@@ -1,98 +1,49 @@
 ﻿using System;
 using CommandLine.Utilities;
+using VariantAnnotation.Interface;
+using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation
 {
     public sealed class PerformanceMetrics
     {
-        #region members
+        private readonly Benchmark _benchmark = new Benchmark();
+        private readonly ILogger _logger;
 
-        private readonly Benchmark _referenceBenchmark;
-        private readonly Benchmark _cacheBenchmark;
-        private readonly Benchmark _annotationBenchmark;
-
-        private readonly bool _disableOutput = false;
-
-        private string _referenceName;
-        private string _referenceTime;
-
-        private const int LineLength = 75;
-        private readonly string _divider;
+        private const int LineLength          = 75;
+        private const int ReferenceNameLength = 51;
 
         private int _numVariantsInReference;
         private bool _hasStartedAnnotation;
 
-        #endregion
-
-        /// <summary>
-        /// private constructor for our singleton
-        /// </summary>
-        private PerformanceMetrics()
+        public PerformanceMetrics(ILogger logger)
         {
-            _referenceBenchmark = new Benchmark();
-            _cacheBenchmark = new Benchmark();
-            _annotationBenchmark = new Benchmark();
-
-            _divider = new string('-', LineLength);
+            _logger = logger;
+            ShowTableHeader();
         }
 
-        /// <summary>
-        /// access PerformanceMetrics.Instance to get the singleton object
-        /// </summary>
-        public static PerformanceMetrics Instance { get; } = new PerformanceMetrics();
-
-        /// <summary>
-        /// starts benchmarking the reference loading time
-        /// </summary>
-        public void StartReference(string referenceName)
+        private void ShowTableHeader()
         {
-            StopAnnotation();
-            _referenceName = referenceName;
-            _referenceBenchmark.Reset();
-            _cacheBenchmark.Reset();
-            _annotationBenchmark.Reset();
+            var divider = new string('-', LineLength);
+            _logger.SetBold();
+            _logger.WriteLine("Reference                                              Time      Variants/s");
+            _logger.ResetColor();
+            _logger.WriteLine(divider);
+        }
+
+        public void StartAnnotatingReference(IChromosome chromosome)
+        {
+            if (_hasStartedAnnotation) ShowAnnotationTime();
+
+            ShowReferenceName(chromosome.UcscName);
+
+            _benchmark.Reset();
             _hasStartedAnnotation = true;
         }
 
-        /// <summary>
-        /// stop benchmarking the reference loading time
-        /// </summary>
-        public void StopReference()
+        private void ShowReferenceName(string referenceName)
         {
-            _referenceTime = Benchmark.ToHumanReadable(_referenceBenchmark.GetElapsedTime());
-            if (!_disableOutput) ShowReferenceTime();
-            if (!_disableOutput) Console.WriteLine("cache & sa: {0}", Benchmark.ToHumanReadable(_cacheBenchmark.GetElapsedTime()));
-           
-        }
-
-        /// <summary>
-        /// stop benchmarking the annotation time
-        /// </summary>
-        private void StopAnnotation()
-        {
-            if (!_hasStartedAnnotation) return;
-
-            double dummy;
-            if (!_disableOutput) Console.WriteLine("annotation: {0}", _annotationBenchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out dummy));
-            _numVariantsInReference = 0;
-        }
-
-        /// <summary>
-        /// increments the variant counter
-        /// </summary>
-        public void Increment()
-        {
-            _numVariantsInReference++;
-        }
-
-        /// <summary>
-        /// returns a string representation of the performance metrics
-        /// </summary>
-        private void ShowReferenceTime()
-        {
-            // create the filler string
-            const int referenceTimeLength = 22;
-            int fillerLength = LineLength - referenceTimeLength - _referenceName.Length;
+            int fillerLength = ReferenceNameLength - referenceName.Length + 1;
 
             if (fillerLength < 1)
             {
@@ -100,13 +51,19 @@ namespace VariantAnnotation
             }
 
             var filler = new string(' ', fillerLength);
-
-            // display the reference time
-            Console.WriteLine(_divider);
-            Console.Write("reference:  {0}{1}", _referenceTime, filler);
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine(_referenceName);
-            Console.ResetColor();
+            _logger.Write($"{referenceName}{filler}");
         }
+
+        public void ShowAnnotationTime()
+        {
+            var annotationTime = Benchmark.ToHumanReadable(_benchmark.GetElapsedTime());
+
+            _benchmark.GetElapsedIterationTime(_numVariantsInReference, "variants", out double variantsPerSecond);
+            _numVariantsInReference = 0;
+
+            _logger.WriteLine($"{annotationTime} {variantsPerSecond,12:N0}");
+        }
+
+        public void Increment() => _numVariantsInReference++;
     }
 }

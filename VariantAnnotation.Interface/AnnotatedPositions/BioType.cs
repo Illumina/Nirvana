@@ -3,12 +3,13 @@
     public enum BioType : byte
     {
         // ReSharper disable InconsistentNaming
-        Unknown,
+        aligned_transcript,
         ambiguous_orf,
         antisense,
         antisense_RNA,
-        bidirectional_promoter_lncrna,
+        bidirectional_promoter_lncRNA,
         guide_RNA,
+        IG_pseudogene,
         IG_C_gene,
         IG_C_pseudogene,
         IG_D_gene,
@@ -26,6 +27,7 @@
         non_coding,
         nonsense_mediated_decay,
         non_stop_decay,
+        other,
         polymorphic_pseudogene,
         processed_pseudogene,
         processed_transcript,
@@ -47,7 +49,7 @@
         snoRNA,
         snRNA,
         telomerase_RNA,
-        three_prime_overlapping_ncrna,
+        three_prime_overlapping_ncRNA,
         transcribed_processed_pseudogene,
         transcribed_unitary_pseudogene,
         transcribed_unprocessed_pseudogene,

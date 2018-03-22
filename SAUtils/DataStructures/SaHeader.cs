@@ -16,7 +16,7 @@ namespace SAUtils.DataStructures
         public SaHeader(string name, string assembly, string version, string releaseDate, string description)
         {
             Name = name;
-            GenomeAssembly = GenomeAssemblyUtilities.Convert(assembly);
+            GenomeAssembly = GenomeAssemblyHelper.Convert(assembly);
             Version = version;
             Description = description;
             ReleaseDate = releaseDate;

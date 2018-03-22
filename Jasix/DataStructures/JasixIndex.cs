@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 
 namespace Jasix.DataStructures
@@ -17,7 +18,7 @@ namespace Jasix.DataStructures
 			_chrIndices = new Dictionary<string, JasixChrIndex>();
 		}
 
-		private JasixIndex(ExtendedBinaryReader reader):this()
+		private JasixIndex(IExtendedBinaryReader reader):this()
 		{
 			var version = reader.ReadOptInt32();
 			if (version != JasixCommons.Version)
@@ -89,9 +90,7 @@ namespace Jasix.DataStructures
 		{
 			if (_chrIndices == null || _chrIndices.Count == 0) return null;
 
-			if (!_chrIndices.ContainsKey(chr)) return null;
-
-			return _chrIndices[chr].FindLargeVariants(begin, end);
+			return !_chrIndices.ContainsKey(chr) ? null : _chrIndices[chr].FindLargeVariants(begin, end);
 		}
 
 		public IEnumerable<string> GetChromosomeList()

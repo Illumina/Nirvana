@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using CommonUtilities;
-using SAUtils.InputFileParsers.MitoMAP;
+using SAUtils.InputFileParsers.MitoMap;
 using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar
@@ -52,20 +52,17 @@ namespace SAUtils.InputFileParsers.ClinVar
                 var newRefAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
                 return (trimmedPos, newRefAllele, ""); //alt is empty for deletion
             }
-            else
+
+            //insertion
+            combinedSeq += trimmedAltAllele;
+            repeatLength = trimmedAltAllele.Length;
+
+            for (i = combinedSeq.Length - 1; i >= repeatLength; i--, trimmedPos--)
             {
-                //insertion
-                combinedSeq += trimmedAltAllele;
-                repeatLength = trimmedAltAllele.Length;
-
-                for (i = combinedSeq.Length - 1; i >= repeatLength; i--, trimmedPos--)
-                {
-                    if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
-                }
-                var newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
-                return (trimmedPos, "", newAltAllele);
+                if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
             }
-
+            var newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
+            return (trimmedPos, "", newAltAllele);
         }
 
         private string GetUpstreamSeq(int position, int length, bool isCircularGenome)
@@ -76,6 +73,7 @@ namespace SAUtils.InputFileParsers.ClinVar
                 var interval = (position - length, position -1);
                 return circularGenome.ExtractIntervalSequence(interval);
             }
+
             var adjustedLength = length < position ? length : position - 1;
             return _compressedSequence.Substring(position - 1 - adjustedLength, adjustedLength);
         }

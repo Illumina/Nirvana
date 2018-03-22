@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 // ReSharper disable NonReadonlyMemberInGetHashCode
@@ -193,10 +192,10 @@ namespace SAUtils.DataStructures
 
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddIntValue("coverage", Coverage);
-		    if (HasFailedFilters) jsonObject.AddBoolValue("hasFailedFilters", true);
+		    if (HasFailedFilters) jsonObject.AddBoolValue("failedFilter", true);
 
             jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
 		    jsonObject.AddIntValue("allAn", AllAlleleNumber);
@@ -243,7 +242,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddIntValue("othAc", OthAlleleCount);
 		    jsonObject.AddIntValue("othHc", OthHomCount);
 
-            return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
         public override SupplementaryIntervalItem GetSupplementaryInterval()

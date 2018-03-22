@@ -32,14 +32,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var consequences = annotatedRegulatoryRegion.Consequences.ToList();
 
             Assert.NotNull(annotatedRegulatoryRegion);
-            Assert.Equal(1, consequences.Count);
+            Assert.Single(consequences);
             Assert.Equal(expectedConsequence, consequences[0]);
         }
 
         private IRegulatoryRegion GetRegulatoryRegion()
         {
             return new RegulatoryRegion(_chromosome, 948000, 950401, CompactId.Convert("ENSR00001037666"),
-                RegulatoryElementType.promoter);
+                RegulatoryRegionType.promoter);
         }
 
         private static IVariant GetVariant()

@@ -13,9 +13,9 @@ namespace VariantAnnotation.Sequence
 {
     public sealed class CompressedSequenceReader : IDisposable
     {
-        #region members
+        public readonly Dictionary<string, IChromosome> RefNameToChromosome;
+        public readonly Dictionary<ushort, IChromosome> RefIndexToChromosome;
 
-        public ReferenceMetadata[] Metadata { get; private set; }
         public Band[][] CytogeneticBands { get; private set; }
 
         // buffer specific
@@ -26,8 +26,9 @@ namespace VariantAnnotation.Sequence
         public readonly CompressedSequence Sequence;
         public GenomeAssembly Assembly => Sequence.GenomeAssembly;
 
-        private readonly Dictionary<string, int> _nameToIndex = new Dictionary<string, int>();
-        private readonly List<SequenceIndexEntry> _refSeqIndex = new List<SequenceIndexEntry>();
+        private readonly Dictionary<string, int> _nameToIndex         = new Dictionary<string, int>();
+        private readonly List<SequenceIndexEntry> _refSeqIndex        = new List<SequenceIndexEntry>();
+        public readonly List<ReferenceMetadata> ReferenceMetadataList = new List<ReferenceMetadata>();
 
         private long _dataStartOffset;
         private long _indexOffset;
@@ -37,42 +38,13 @@ namespace VariantAnnotation.Sequence
         // ReSharper disable once NotAccessedField.Local
         private long _maskedIntervalsOffset;
 
-        #endregion
-
-        #region IDisposable
-
-        /// <summary>
-        /// Public implementation of Dispose pattern callable by consumers
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// Protected implementation of Dispose pattern
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                // Free any other managed objects here
-                _stream.Dispose();
-            }
-
-            // Free any unmanaged objects here
-        }
-
-        #endregion
-
-        /// <summary>
-        /// stream constructor
-        /// </summary>
         public CompressedSequenceReader(Stream stream)
         {
-            _stream  = stream;
-            _reader  = new ExtendedBinaryReader(stream);
-            Sequence = new CompressedSequence();
+            _stream              = stream;
+            _reader              = new ExtendedBinaryReader(stream);
+            Sequence             = new CompressedSequence();
+            RefNameToChromosome  = new Dictionary<string, IChromosome>();
+            RefIndexToChromosome = new Dictionary<ushort, IChromosome>();
 
             CheckHeaderVersion();
             LoadHeader();
@@ -86,6 +58,12 @@ namespace VariantAnnotation.Sequence
 
             // jump back to the data start position
             _stream.Position = _dataStartOffset;
+        }
+
+        public void Dispose()
+        {
+            _reader.Dispose();
+            _stream.Dispose();
         }
 
         /// <summary>
@@ -125,9 +103,7 @@ namespace VariantAnnotation.Sequence
         /// </summary>
         private SequenceIndexEntry GetIndexEntry(string ensemblReferenceName)
         {
-            int refIndex;
-            if (!_nameToIndex.TryGetValue(ensemblReferenceName, out refIndex)) return null;
-            return _refSeqIndex[refIndex];
+            return !_nameToIndex.TryGetValue(ensemblReferenceName, out var refIndex) ? null : _refSeqIndex[refIndex];
         }
 
         /// <summary>
@@ -144,8 +120,13 @@ namespace VariantAnnotation.Sequence
 
             // grab the reference metadata
             NumRefSeqs = (ushort)_reader.ReadOptInt32();
-            Metadata = new ReferenceMetadata[NumRefSeqs];
-            for (int i = 0; i < NumRefSeqs; i++) Metadata[i] = ReferenceMetadata.Read(_reader);
+
+            for (ushort i = 0; i < NumRefSeqs; i++)
+            {
+                var metadata = ReferenceMetadata.Read(_reader);
+                ReferenceMetadataList.Add(metadata);
+                AddReferenceName(metadata.EnsemblName, metadata.UcscName, i);
+            }
 
             // read the cytogenetic bands
             CytogeneticBands = VariantAnnotation.Sequence.CytogeneticBands.Read(_reader);
@@ -162,6 +143,27 @@ namespace VariantAnnotation.Sequence
             }
 
             _dataStartOffset = _stream.Position;
+        }
+
+        /// <summary>
+        /// adds a Ensembl/UCSC reference name pair to the current dictionary
+        /// </summary>
+        private void AddReferenceName(string ensemblReferenceName, string ucscReferenceName, ushort refIndex)
+        {
+            var isUcscEmpty    = string.IsNullOrEmpty(ucscReferenceName);
+            var isEnsemblEmpty = string.IsNullOrEmpty(ensemblReferenceName);
+
+            // sanity check: make sure we have at least one reference name
+            if (isUcscEmpty && isEnsemblEmpty) return;
+
+            if (isUcscEmpty) ucscReferenceName = ensemblReferenceName;
+            if (isEnsemblEmpty) ensemblReferenceName = ucscReferenceName;
+
+            var chromosome = new Chromosome(ucscReferenceName, ensemblReferenceName, refIndex);
+
+            RefNameToChromosome[ucscReferenceName]    = chromosome;
+            RefNameToChromosome[ensemblReferenceName] = chromosome;
+            RefIndexToChromosome[refIndex]            = chromosome;
         }
 
         /// <summary>

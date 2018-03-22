@@ -241,7 +241,7 @@ namespace VariantAnnotation.PhyloP
             if (score > _maxValue) _maxValue = score;
         }
 
-        private void ScoresToBytes(byte[] bytes, short[] scores, int count)
+        private static void ScoresToBytes(byte[] bytes, short[] scores, int count)
         {
             for (var i = 0; i < count; i++)
             {

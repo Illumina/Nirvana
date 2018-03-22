@@ -24,12 +24,11 @@ namespace UnitTests.CommandLine.Builders
         {
             var tempDir = Path.GetTempPath();
 
-            string suffix = ".txt";
+            const string suffix = ".txt";
             var randomPath = GetRandomPath() + suffix;
             File.Create(randomPath);
 
-            string observedString;
-            var ops = new OptionSet { { "id=", "id", v => observedString = v } };
+            var ops = new OptionSet { { "id=", "id", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--id", tempDir }, ops)
                 .Parse()
@@ -42,10 +41,9 @@ namespace UnitTests.CommandLine.Builders
         public void CheckEachDirectoryContainsFiles_MissingFiles_FileNotFoundExitCode()
         {
             var tempDir = Path.GetTempPath();
-            string suffix = ".anavrin";
+            const string suffix = ".anavrin";
 
-            string observedString;
-            var ops = new OptionSet { { "id=", "id", v => observedString = v } };
+            var ops = new OptionSet { { "id=", "id", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--id", tempDir }, ops)
                 .Parse()
@@ -57,8 +55,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckEachDirectoryContainsFiles_MissingArguments_MissingCommandLineExitCode()
         {
-            string observedString;
-            var ops = new OptionSet { { "id=", "id", v => observedString = v } };
+            var ops = new OptionSet { { "id=", "id", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(null, ops)
                 .Parse()
@@ -73,8 +70,7 @@ namespace UnitTests.CommandLine.Builders
             var randomPath = GetRandomPath();
             File.Create(randomPath);
 
-            string observedString;
-            var ops = new OptionSet { { "if=", "if", v => observedString = v } };
+            var ops = new OptionSet { { "if=", "if", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--if", randomPath }, ops)
                 .Parse()
@@ -88,8 +84,7 @@ namespace UnitTests.CommandLine.Builders
         {
             var randomPath = GetRandomPath() + ".anavrin";
 
-            string observedString;
-            var ops = new OptionSet { { "if=", "if", v => observedString = v } };
+            var ops = new OptionSet { { "id=", "id", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--if", randomPath }, ops)
                 .Parse()
@@ -101,8 +96,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckInputFilenameExists_MissingArguments_MissingCommandLineExitCode()
         {
-            string observedString;
-            var ops = new OptionSet { { "if=", "if", v => observedString = v } };
+            var ops = new OptionSet { { "if=", "if", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(null, ops)
                 .Parse()
@@ -114,8 +108,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckInputFilenameExists_EmptyPath_MissingCommandLineExitCode()
         {
-            string observedString;
-            var ops = new OptionSet { { "if=", "if", v => observedString = v } };
+            var ops = new OptionSet { { "if=", "if", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--if" }, ops)
                 .Parse()
@@ -127,8 +120,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckInputFilenameExists_IgnoredPath_SuccessExitCode()
         {
-            string observedString;
-            var ops = new OptionSet { { "if=", "if", v => observedString = v } };
+            var ops = new OptionSet { { "if=", "if", v => { } } };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--if", "-" }, ops)
                 .Parse()
@@ -157,13 +149,12 @@ namespace UnitTests.CommandLine.Builders
         public void HasRequiredParameter_DoesNotExist_MissingCommandLineExitCode()
         {
             string testString           = default(string);
-            string barString            = default(string);
             const string expectedString = default(string);
 
             var ops = new OptionSet
             {
                 {"test=", "test", v => testString = v},
-                {"bar=", "bar", v => barString = v}
+                {"bar=", "bar", v => { } }
             };
 
             var exitCode = Execute(new ConsoleAppBuilder(new[] { "--bar", "bar" }, ops)
@@ -178,7 +169,6 @@ namespace UnitTests.CommandLine.Builders
         public void HasRequiredParameter_MissingArguments_MissingCommandLineExitCode()
         {
             string observedString = default(string);
-
             var ops = new OptionSet { { "test=", "test", v => observedString = v } };
 
             var exitCode = Execute(new ConsoleAppBuilder(null, ops)
@@ -191,10 +181,8 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void Enable_True_ExecuteMethod()
         {
-            string observedString;
             bool observedFlag = false;
-
-            var ops = new OptionSet { { "test=", "test", v => observedString = v } };
+            var ops = new OptionSet { { "test=", "test", v => { } } };
 
             Execute(new ConsoleAppBuilder(new[] { "--test", "test" }, ops)
                 .Parse()
@@ -206,10 +194,8 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void Enable_False_SkipMethod()
         {
-            string observedString;
             bool observedFlag = false;
-
-            var ops = new OptionSet { { "test=", "test", v => observedString = v } };
+            var ops = new OptionSet { { "test=", "test", v => { } } };
 
             Execute(new ConsoleAppBuilder(new[] { "--test", "test" }, ops)
                 .Parse()

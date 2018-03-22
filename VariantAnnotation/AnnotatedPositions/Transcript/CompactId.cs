@@ -5,124 +5,162 @@ using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
-	public struct CompactId : ICompactId
-	{
-		public IdType Id { get; }
-		public int Info { get; }
+    public struct CompactId : ICompactId
+    {
+        private readonly IdType _id;
+        private readonly byte _version;
+        private readonly uint _info;
 
-		private const int NumShift = 4;
-		private const int LengthMask = 0xf;
+        private const int NoInfo     = int.MaxValue;
+        private const byte NoVersion = byte.MaxValue;
+        private const int NumShift   = 4;
+        private const int LengthMask = 0xf;
+        private const int MaxNumber  = 0xfffffff;
 
-		public bool IsEmpty => Id == IdType.Unknown;
-		public static CompactId Empty => new CompactId(IdType.Unknown, 0);
-		private static int ToInfo(int num, int len) => num << 4 | (len & LengthMask);
+        internal static CompactId Empty => new CompactId(IdType.Unknown, NoVersion, NoInfo);
+        public bool IsEmpty()           => _id == IdType.Unknown;
 
-		private int Length => Info & LengthMask;
-		private int Num => Info >> NumShift;
+        private CompactId(IdType id, byte version, uint info)
+        {
+            _id      = id;
+            _version = version;
+            _info    = info;
+        }
 
-		/// <summary>
-		/// constructor
-		/// </summary>
-		private CompactId(IdType id, int info)
-		{
-			Id = id;
-			Info = info;
-		}
+        public override string ToString() => ConvertToString(true);
+        public string WithVersion         => ConvertToString(true);
+        public string WithoutVersion      => ConvertToString(false);
 
-		//#region IEquatable methods
+        public static CompactId Convert(string s, byte version = NoVersion)
+        {
+            if (string.IsNullOrEmpty(s)) return Empty;
 
-		//public override int GetHashCode() => Id.GetHashCode() ^ Info.GetHashCode();
-		//public bool Equals(CompactId value) => Id == value.Id && Info == value.Info;
+            if (s.StartsWith("ENSG"))    return GetCompactId(s, 4, IdType.EnsemblGene, version);
+            if (s.StartsWith("ENST"))    return GetCompactId(s, 4, IdType.EnsemblTranscript, version);
+            if (s.StartsWith("ENSP"))    return GetCompactId(s, 4, IdType.EnsemblProtein, version);
+            if (s.StartsWith("ENSESTG")) return GetCompactId(s, 7, IdType.EnsemblEstGene, version);
+            if (s.StartsWith("ENSESTP")) return GetCompactId(s, 7, IdType.EnsemblEstProtein, version);
+            if (s.StartsWith("ENSR"))    return GetCompactId(s, 4, IdType.EnsemblRegulatory, version);
+            if (s.StartsWith("CCDS"))    return GetCompactId(s, 4, IdType.Ccds, version);
+            if (s.StartsWith("NR_"))     return GetCompactId(s, 3, IdType.RefSeqNonCodingRNA, version);
+            if (s.StartsWith("NM_"))     return GetCompactId(s, 3, IdType.RefSeqMessengerRNA, version);
+            if (s.StartsWith("NP_"))     return GetCompactId(s, 3, IdType.RefSeqProtein, version);
+            if (s.StartsWith("XR_"))     return GetCompactId(s, 3, IdType.RefSeqPredictedNonCodingRNA, version);
+            if (s.StartsWith("XM_"))     return GetCompactId(s, 3, IdType.RefSeqPredictedMessengerRNA, version);
+            if (s.StartsWith("XP_"))     return GetCompactId(s, 3, IdType.RefSeqPredictedProtein, version);
 
-		//#endregion
-
-		public static CompactId Convert(string s)
-		{
-			if (s == "") return new CompactId(IdType.Unknown, 0);
-
-			if (s.StartsWith("ENSG")) return GetCompactId(s, 4, IdType.EnsemblGene);
-			if (s.StartsWith("ENST")) return GetCompactId(s, 4, IdType.EnsemblTranscript);
-			if (s.StartsWith("ENSP")) return GetCompactId(s, 4, IdType.EnsemblProtein);
-			if (s.StartsWith("ENSESTG")) return GetCompactId(s, 7, IdType.EnsemblEstGene);
-			if (s.StartsWith("ENSR")) return GetCompactId(s, 4, IdType.EnsemblRegulatory);
-			if (s.StartsWith("CCDS")) return GetCompactId(s, 4, IdType.Ccds);
-			if (s.StartsWith("NR_")) return GetCompactId(s, 3, IdType.RefSeqNonCodingRNA);
-			if (s.StartsWith("NM_")) return GetCompactId(s, 3, IdType.RefSeqMessengerRNA);
-			if (s.StartsWith("NP_")) return GetCompactId(s, 3, IdType.RefSeqProtein);
-			if (s.StartsWith("XR_")) return GetCompactId(s, 3, IdType.RefSeqPredictedNonCodingRNA);
-			if (s.StartsWith("XM_")) return GetCompactId(s, 3, IdType.RefSeqPredictedMessengerRNA);
-			if (s.StartsWith("XP_")) return GetCompactId(s, 3, IdType.RefSeqPredictedProtein);
-
-            if (int.TryParse(s, out int i))
-            {
-                return new CompactId(IdType.OnlyNumbers, ToInfo(i, s.Length));
-            }
+            if (int.TryParse(s, out int i)) return GetNumericalCompactId(i, s.Length);
 
             Console.WriteLine("Unknown ID: [{0}] ({1})", s, s.Length);
-			return Empty;
-		}
+            return Empty;
+        }
 
-		private static CompactId GetCompactId(string s, int prefixLen, IdType idType)
-		{
-			var tuple = FormatUtilities.SplitVersion(s);
-			var num = int.Parse(tuple.Id.Substring(prefixLen));
-			return new CompactId(idType, ToInfo(num, tuple.Id.Length - prefixLen));
-		}
+        private static uint ToInfo(int num, int len) => (uint)(num << 4 | (len & LengthMask));
 
-		/// <summary>
-		/// returns a string representation of this compact ID
-		/// </summary>
-		public override string ToString()
-		{
-			var num = Num.ToString("D" + Length);
+        private static CompactId GetCompactId(string s, int prefixLen, IdType idType, byte version)
+        {
+            var (id, _) = FormatUtilities.SplitVersion(s);
+            var num     = int.Parse(id.Substring(prefixLen));
+            return new CompactId(idType, version, ToInfo(num, id.Length - prefixLen));
+        }
 
-			switch (Id)
-			{
-				case IdType.EnsemblGene:
-					return $"ENSG{num}";
-				case IdType.EnsemblTranscript:
-					return $"ENST{num}";
-				case IdType.EnsemblProtein:
-					return $"ENSP{num}";
-				case IdType.EnsemblEstGene:
-					return $"ENSESTG{num}";
-				case IdType.EnsemblRegulatory:
-					return $"ENSR{num}";
-				case IdType.Ccds:
-					return $"CCDS{num}";
-				case IdType.RefSeqNonCodingRNA:
-					return $"NR_{num}";
-				case IdType.RefSeqMessengerRNA:
-					return $"NM_{num}";
-				case IdType.RefSeqProtein:
-					return $"NP_{num}";
-				case IdType.RefSeqPredictedNonCodingRNA:
-					return $"XR_{num}";
-				case IdType.RefSeqPredictedMessengerRNA:
-					return $"XM_{num}";
-				case IdType.RefSeqPredictedProtein:
-					return $"XP_{num}";
-				case IdType.OnlyNumbers:
-					return Num.ToString();
-			}
+        private static CompactId GetNumericalCompactId(int num, int paddedLength)
+        {
+            if (num > MaxNumber) throw new ArgumentOutOfRangeException($"Could not convert the number ({num}) to a CompactID. Max supported number is {MaxNumber}.");
+            return new CompactId(IdType.OnlyNumbers, NoVersion, ToInfo(num, paddedLength));
+        }
 
-			return "";
-		}
+        private string ConvertToString(bool showVersion)
+        {
+            if (_id == IdType.Unknown) return null;
+            var prefix  = GetPrefix();
+            var number  = GetNumber();
+            var version = GetVersion(showVersion);
+            return prefix + number + version;
+        }
 
-		public void Write(IExtendedBinaryWriter writer)
-		{
-			writer.Write((byte)Id);
-			writer.WriteOpt(Info);
-		}
+        private string GetVersion(bool showVersion)
+        {
+            if (!showVersion || _version == NoVersion) return null;
+            return "." + _version;
+        }
 
-		public static CompactId Read(IExtendedBinaryReader reader)
-		{
-			var id = (IdType)reader.ReadByte();
-			var info = reader.ReadOptInt32();
-			return new CompactId(id, info);
-		}
-		
-	}
+        private string GetNumber()
+        {
+            var num    = _info >> NumShift;
+            var length = _info & LengthMask;
+            return num.ToString("D" + length);
+        }
 
-	
+        private string GetPrefix()
+        {
+            switch (_id)
+            {
+                case IdType.EnsemblGene:
+                    return "ENSG";
+                case IdType.EnsemblTranscript:
+                    return "ENST";
+                case IdType.EnsemblProtein:
+                    return "ENSP";
+                case IdType.EnsemblEstGene:
+                    return "ENSESTG";
+                case IdType.EnsemblEstProtein:
+                    return "ENSESTP";
+                case IdType.EnsemblRegulatory:
+                    return "ENSR";
+                case IdType.Ccds:
+                    return "CCDS";
+                case IdType.RefSeqNonCodingRNA:
+                    return "NR_";
+                case IdType.RefSeqMessengerRNA:
+                    return "NM_";
+                case IdType.RefSeqProtein:
+                    return "NP_";
+                case IdType.RefSeqPredictedNonCodingRNA:
+                    return "XR_";
+                case IdType.RefSeqPredictedMessengerRNA:
+                    return "XM_";
+                case IdType.RefSeqPredictedProtein:
+                    return "XP_";
+            }
+
+            return null;
+        }
+
+        public void Write(IExtendedBinaryWriter writer)
+        {
+            writer.Write((byte)_id);
+            writer.Write(_version);
+            writer.Write(_info);
+        }
+
+        public static CompactId Read(IExtendedBinaryReader reader)
+        {
+            var id      = (IdType)reader.ReadByte();
+            var version = reader.ReadByte();
+            var info    = reader.ReadUInt32();
+            return new CompactId(id, version, info);
+        }
+    }
+
+    public enum IdType : byte
+    {
+        // ReSharper disable InconsistentNaming
+        Unknown,
+        Ccds,
+        EnsemblEstGene,
+        EnsemblEstProtein,
+        EnsemblGene,
+        EnsemblProtein,
+        EnsemblRegulatory,
+        EnsemblTranscript,
+        OnlyNumbers,
+        RefSeqMessengerRNA,
+        RefSeqNonCodingRNA,
+        RefSeqPredictedMessengerRNA,
+        RefSeqPredictedNonCodingRNA,
+        RefSeqPredictedProtein,
+        RefSeqProtein
+        // ReSharper restore InconsistentNaming
+    }
 }

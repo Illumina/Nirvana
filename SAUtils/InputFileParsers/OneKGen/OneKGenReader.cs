@@ -274,7 +274,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 		}
 		private static bool IsNucleotide(char c)
 		{
-			c = Char.ToUpper(c);
+			c = char.ToUpper(c);
 			return c == 'A' || c == 'C' || c == 'G' || c == 'T' || c == 'N';
 		}
 		

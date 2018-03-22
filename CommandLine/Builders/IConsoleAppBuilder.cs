@@ -20,6 +20,7 @@ namespace CommandLine.Builders
     {
         IConsoleAppValidator DisableOutput(bool condition);
         IConsoleAppBanner ShowBanner(string authors);
+        IConsoleAppBanner SkipBanner();
         IConsoleAppBuilderData Data { get; }
         bool SkipValidation { get; }
     }

@@ -2,7 +2,7 @@
   "profiles": {
     "SAUtils": {
       "commandName": "Project",
-      "commandLineArgs": "createTSV --cvr c:\\Development\\ExternalDataSources\\ClinVar\\20170907\\ClinVarFullRelease_2017-09.xml.gz --out c:\\Development\\IntermediateTsvs\\GRCh37 --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat",
+      "commandLineArgs": "createTSV --dir c:\\Development\\IntermediateTsvs\\test --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\rCRS"
     },
     "OMIM_SK": {
@@ -12,13 +12,18 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\GRCh37 --out c:\\Development\\SupplementaryDatabase\\test",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": " getCosmicSvs --cnv CosmicCompleteCNA.tsv.gz --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o c:\\Development\\IntermediateTsvs\\test",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\COSMIC\\v84\\GRCh37"
     },
     "MITOMAP": {
       "commandName": "Project",
-      "commandLineArgs": "createTSV --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\MutationsRNA --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\MutationsCodingControl --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\PolymorphismsCoding --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\PolymorphismsControl  --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\InsertionsSimple --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2017-09-25\\DeletionsSingle  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
+      "commandLineArgs": "createTSV --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsRNA --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsCodingControl --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsCoding --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsControl  --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\InsertionsSimple --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\DeletionsSingle  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_MitoMap\\"
+    },
+    "RR_omim": {
+      "commandName": "Project",
+      "commandLineArgs": " createomimtsv --in ExternalDataSources\\OMIM\\20180213\\genemap2.txt --mim ExternalDataSources\\OMIM\\20180213\\mim2gene.txt --uga Cache\\26\\UGA.tsv.gz --ref References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out SupplementaryDatabase\\test",
+      "workingDirectory": "c:\\Development"
     }
   }
 }

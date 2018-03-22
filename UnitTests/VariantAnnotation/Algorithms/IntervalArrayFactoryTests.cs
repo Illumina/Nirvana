@@ -39,13 +39,13 @@ namespace UnitTests.VariantAnnotation.Algorithms
         private IRegulatoryRegion[] GetRegulatoryRegions()
         {
             var regulatoryRegions = new IRegulatoryRegion[7];
-            regulatoryRegions[0] = new RegulatoryRegion(_chr17, 100,200,CompactId.Empty, RegulatoryElementType.enhancer);
-            regulatoryRegions[1] = new RegulatoryRegion(_chr17, 200, 300, CompactId.Empty, RegulatoryElementType.enhancer);
-            regulatoryRegions[2] = new RegulatoryRegion(_chr17, 300, 400, CompactId.Empty, RegulatoryElementType.enhancer);
-            regulatoryRegions[3] = new RegulatoryRegion(_chr1, 1000, 2000, CompactId.Empty, RegulatoryElementType.enhancer);
-            regulatoryRegions[4] = new RegulatoryRegion(_chr1, 2000, 3000, CompactId.Empty, RegulatoryElementType.enhancer);
-            regulatoryRegions[5] = new RegulatoryRegion(_chr11, 150, 250, CompactId.Empty, RegulatoryElementType.enhancer);
-            regulatoryRegions[6] = new RegulatoryRegion(_chr11, 250, 350, CompactId.Empty, RegulatoryElementType.enhancer);
+            regulatoryRegions[0] = new RegulatoryRegion(_chr17, 100,200,CompactId.Empty, RegulatoryRegionType.enhancer);
+            regulatoryRegions[1] = new RegulatoryRegion(_chr17, 200, 300, CompactId.Empty, RegulatoryRegionType.enhancer);
+            regulatoryRegions[2] = new RegulatoryRegion(_chr17, 300, 400, CompactId.Empty, RegulatoryRegionType.enhancer);
+            regulatoryRegions[3] = new RegulatoryRegion(_chr1, 1000, 2000, CompactId.Empty, RegulatoryRegionType.enhancer);
+            regulatoryRegions[4] = new RegulatoryRegion(_chr1, 2000, 3000, CompactId.Empty, RegulatoryRegionType.enhancer);
+            regulatoryRegions[5] = new RegulatoryRegion(_chr11, 150, 250, CompactId.Empty, RegulatoryRegionType.enhancer);
+            regulatoryRegions[6] = new RegulatoryRegion(_chr11, 250, 350, CompactId.Empty, RegulatoryRegionType.enhancer);
             return regulatoryRegions;
         }
     }

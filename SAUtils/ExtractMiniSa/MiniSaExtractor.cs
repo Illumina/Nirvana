@@ -33,7 +33,7 @@ namespace SAUtils.ExtractMiniSa
             _end    = end;
             _saPath = saPath;
 
-            var refChromDict       = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).GetChromosomeDictionary();
+            var refChromDict = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
 
             var referenceName = GetReferenceName(saPath, refChromDict);
             _miniSaPath       = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
@@ -41,7 +41,7 @@ namespace SAUtils.ExtractMiniSa
             Console.WriteLine($"MiniSA output to: {_miniSaPath}");
         }
 
-        private string GetMiniSaPath(string referenceName, int begin, int end, string dataSourceName, string outputDir)
+        private static string GetMiniSaPath(string referenceName, int begin, int end, string dataSourceName, string outputDir)
         {
             string miniSaPath = dataSourceName == null
                 ? $"{referenceName}_{begin}_{end}.nsa"
@@ -51,7 +51,7 @@ namespace SAUtils.ExtractMiniSa
             return miniSaPath;
         }
 
-        private string GetReferenceName(string saPath, IDictionary<string,IChromosome> refChromDict)
+        private static string GetReferenceName(string saPath, IDictionary<string,IChromosome> refChromDict)
         {
             ISupplementaryAnnotationHeader header;
 
@@ -65,7 +65,7 @@ namespace SAUtils.ExtractMiniSa
 
         }
 
-        private SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
+        private static SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
             List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
             List<ISupplementaryInterval> allVariantIntervals,List<(int,string)> globalMajorAlleleInRefMinors)
         {
@@ -74,7 +74,7 @@ namespace SAUtils.ExtractMiniSa
             return new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantIntervals,globalMajorAlleleInRefMinors);
         }
 
-        private SaReader GetSaReader(string saPath)
+        private static SaReader GetSaReader(string saPath)
         {
             var stream    = FileUtilities.GetReadStream(saPath);
             var idxStream = FileUtilities.GetReadStream(saPath + ".idx");

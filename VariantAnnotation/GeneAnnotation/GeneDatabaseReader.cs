@@ -13,12 +13,8 @@ namespace VariantAnnotation.GeneAnnotation
 {
     public sealed class GeneDatabaseReader
     {
-
         private readonly ExtendedBinaryReader _reader;
-        private GenomeAssembly GenomeAssembly;
-        private long _creationTime;
         public readonly List<IDataSourceVersion> DataSourceVersions;
-
 
         public GeneDatabaseReader(Stream geneDatabaseFileStream)
         {
@@ -33,17 +29,15 @@ namespace VariantAnnotation.GeneAnnotation
             if (header != SaDataBaseCommon.DataHeader)
                 throw new FormatException("Unrecognized header in this database");
 
-            var dataVersion = _reader.ReadUInt16();
-            
+            // ReSharper disable UnusedVariable
+            var dataVersion = _reader.ReadUInt16();            
 
             var schema = _reader.ReadUInt16();
-            if (schema != SaDataBaseCommon.SchemaVersion)
-                throw new UserErrorException(
-                    $"Gene database schema mismatch. Expected {SaDataBaseCommon.SchemaVersion}, observed {schema}");
+            if (schema != SaDataBaseCommon.SchemaVersion) throw new UserErrorException($"Gene database schema mismatch. Expected {SaDataBaseCommon.SchemaVersion}, observed {schema}");
 
-            GenomeAssembly = (GenomeAssembly)_reader.ReadByte();
-
-            _creationTime = _reader.ReadInt64();
+            var genomeAssembly = (GenomeAssembly)_reader.ReadByte();
+            var creationTime   = _reader.ReadInt64();
+            // ReSharper restore UnusedVariable
 
             var dataSourseVersionsCount = _reader.ReadOptInt32();
 
@@ -57,7 +51,6 @@ namespace VariantAnnotation.GeneAnnotation
 
         public IEnumerable<IAnnotatedGene> Read()
         {
-
             IAnnotatedGene annotatedGene;
             while ((annotatedGene = AnnotatedGene.Read(_reader)) != null)
             {

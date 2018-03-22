@@ -12,22 +12,25 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void EncodedTranscriptData_EndToEnd()
         {
-            var expectedBiotype          = BioType.non_stop_decay;
-            byte expectedVersion         = 31;
-            var expectedTranscriptSource = Source.BothRefSeqAndEnsembl;
-            bool expectedCanonical       = true;
-            bool expectedSift            = true;
-            bool expectedPolyPhen        = true;
-            bool expectedMirnas          = true;
-            bool expectedIntrons         = true;
-            bool expectedCdnaMaps        = true;
-            bool expectedTranslation     = true;
-            byte expectedStartExonPhase  = 3;
+            const BioType expectedBiotype        = BioType.Y_RNA;
+            const bool expectedCdsStartNotFound  = true;
+            const bool expectedCdsEndNotFound    = true;
+            const Source expectedSource          = Source.BothRefSeqAndEnsembl;
+            const bool expectedCanonical         = true;
+            const bool expectedSift              = true;
+            const bool expectedPolyPhen          = true;
+            const bool expectedMirnas            = true;
+            const bool expectedRnaEdits          = true;
+            const bool expectedSelenocysteines   = true;
+            const bool expectedTranscriptRegions = true;
+            const bool expectedTranslation       = true;
+            const byte expectedStartExonPhase    = 3;
 
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
-            var encodedData = new EncodedTranscriptData(expectedBiotype, expectedVersion, expectedTranscriptSource,                
-                expectedCanonical, expectedSift, expectedPolyPhen, expectedMirnas, expectedIntrons,                
-                expectedCdnaMaps, expectedTranslation, expectedStartExonPhase);
+            var encodedData = EncodedTranscriptData.GetEncodedTranscriptData(expectedBiotype, expectedCdsStartNotFound,
+                expectedCdsEndNotFound, expectedSource, expectedCanonical, expectedSift, expectedPolyPhen,
+                expectedMirnas, expectedRnaEdits, expectedSelenocysteines, expectedTranscriptRegions,
+                expectedTranslation, expectedStartExonPhase);
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             EncodedTranscriptData observedEncodedTranscriptData;
@@ -43,24 +46,20 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
                 using (var reader = new ExtendedBinaryReader(ms))
                 {
-                    var info     = reader.ReadUInt16();
-                    var contents = reader.ReadByte();
-                    observedEncodedTranscriptData = new EncodedTranscriptData(info, contents);
+                    observedEncodedTranscriptData = EncodedTranscriptData.Read(reader);
                 }
             }
 
             Assert.NotNull(observedEncodedTranscriptData);
-            Assert.Equal(expectedBiotype,          observedEncodedTranscriptData.BioType);
-            Assert.Equal(expectedVersion,          observedEncodedTranscriptData.Version);
-            Assert.Equal(expectedTranscriptSource, observedEncodedTranscriptData.TranscriptSource);
-            Assert.Equal(expectedCanonical,        observedEncodedTranscriptData.IsCanonical);
-            Assert.Equal(expectedSift,             observedEncodedTranscriptData.HasSift);
-            Assert.Equal(expectedPolyPhen,         observedEncodedTranscriptData.HasPolyPhen);
-            Assert.Equal(expectedMirnas,           observedEncodedTranscriptData.HasMirnas);
-            Assert.Equal(expectedIntrons,          observedEncodedTranscriptData.HasIntrons);
-            Assert.Equal(expectedCdnaMaps,         observedEncodedTranscriptData.HasCdnaMaps);
-            Assert.Equal(expectedTranslation,      observedEncodedTranscriptData.HasTranslation);
-            Assert.Equal(expectedStartExonPhase,   observedEncodedTranscriptData.StartExonPhase);
+            Assert.Equal(expectedBiotype,           observedEncodedTranscriptData.BioType);
+            Assert.Equal(expectedSource,            observedEncodedTranscriptData.TranscriptSource);
+            Assert.Equal(expectedCanonical,         observedEncodedTranscriptData.IsCanonical);
+            Assert.Equal(expectedSift,              observedEncodedTranscriptData.HasSift);
+            Assert.Equal(expectedPolyPhen,          observedEncodedTranscriptData.HasPolyPhen);
+            Assert.Equal(expectedMirnas,            observedEncodedTranscriptData.HasMirnas);
+            Assert.Equal(expectedTranscriptRegions, observedEncodedTranscriptData.HasTranscriptRegions);
+            Assert.Equal(expectedTranslation,       observedEncodedTranscriptData.HasTranslation);
+            Assert.Equal(expectedStartExonPhase,    observedEncodedTranscriptData.StartExonPhase);
         }
     }
 }

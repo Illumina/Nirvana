@@ -1,4 +1,5 @@
-﻿using CacheUtils.IO.Caches;
+﻿using System.Collections.Generic;
+using CacheUtils.TranscriptCache;
 using Xunit;
 
 namespace UnitTests.CacheUtils.IO.Caches
@@ -9,7 +10,7 @@ namespace UnitTests.CacheUtils.IO.Caches
         public void CreateIndex_PopulatedDictionary()
         {
             var strings = new[] { "A", "B", "D", "P", "Z" };
-            var dict = TranscriptCacheWriter.CreateIndex(strings);
+            var dict = TranscriptCacheWriter.CreateIndex(strings, EqualityComparer<string>.Default);
             Assert.NotNull(dict);
             Assert.Equal(3, dict["P"]);
         }
@@ -17,9 +18,9 @@ namespace UnitTests.CacheUtils.IO.Caches
         [Fact]
         public void CreateIndex_EmptyDictionary_WhenInputNull()
         {
-            var dict = TranscriptCacheWriter.CreateIndex<string>(null);
+            var dict = TranscriptCacheWriter.CreateIndex(null, EqualityComparer<string>.Default);
             Assert.NotNull(dict);
-            Assert.Equal(0, dict.Count);
+            Assert.Empty(dict);
         }
     }
 }

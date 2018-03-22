@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
 <ClinVarSet ID="13234711">
@@ -151,7 +151,7 @@
           <XRef ID="HGNC:4573" DB="HGNC" />
         </MeasureRelationship>
         <XRef Type="rs" ID="58044961" DB="dbSNP" />
-        <Comment DataSource="NCBI curation" Type="MissingFromAssembly">G in position 5292 of NG_009377.2 is in a single base gap when aligned to NC_000023.10 in GRCh37 assembly.  Thus what is asserted as an assertion relative to GRCh37 is no change on 38 and the refSeqGene</Comment>
+        <Comment DataSource="NCBI curation" Type="MissingFromAssembly">G in simplePosition 5292 of NG_009377.2 is in a single base gap when aligned to NC_000023.10 in GRCh37 assembly.  Thus what is asserted as an assertion relative to GRCh37 is no change on 38 and the refSeqGene</Comment>
       </Measure>
       <Name>
         <ElementValue Type="Preferred">NM_000828.4(GRIA3):c.-2G=</ElementValue>

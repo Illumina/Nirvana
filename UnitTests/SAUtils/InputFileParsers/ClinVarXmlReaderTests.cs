@@ -16,29 +16,26 @@ namespace UnitTests.SAUtils.InputFileParsers
     [Collection("ChromosomeRenamer")]
     public sealed class ClinVarXmlReaderTests
     {
-        private readonly Dictionary<string, IChromosome> _refNameDict;
-        /// <summary>
-        /// constructor
-        /// </summary>
+        private readonly Dictionary<string, IChromosome> _refNameToChromosome;
+
         public ClinVarXmlReaderTests()
         {
-            _refNameDict = new Dictionary<string, IChromosome>
+            _refNameToChromosome = new Dictionary<string, IChromosome>
             {
                 {"17", new Chromosome("chr17", "17", 16)},
                 {"1", new Chromosome("chr1", "1", 0)},
                 {"2", new Chromosome("chr2", "2", 1)},
                 {"22", new Chromosome("chr22", "2", 21)}
             };
-            
         }
 
         private static ISequenceProvider GetSequenceProvider(GenomeAssembly assembly, IChromosome chromosome, int start, string refSequence)
         {
             var seqProvider = new Mock<ISequenceProvider>();
-            if (chromosome.EnsemblName=="X" || chromosome.EnsemblName == "Y")
-                seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() { { "X", new Chromosome("chrX", "X", 1)},{"Y", new Chromosome("chrY", "Y", 2)} });
+            if (chromosome.EnsemblName == "X" || chromosome.EnsemblName == "Y")
+                seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome> { { "X", new Chromosome("chrX", "X", 1) }, { "Y", new Chromosome("chrY", "Y", 2) } });
             else
-                seqProvider.Setup(x => x.GetChromosomeDictionary()).Returns(new Dictionary<string, IChromosome>() {{chromosome.EnsemblName, chromosome}});
+                seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome> { { chromosome.EnsemblName, chromosome } });
             seqProvider.Setup(x => x.GenomeAssembly).Returns(assembly);
             seqProvider.Setup(x => x.Sequence).Returns(new SimpleSequence(refSequence, start - 1));
             return seqProvider.Object;
@@ -48,7 +45,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void BasicReadTest()
         {
             var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr17", "17", 16), 41234419, "A");
-            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000077146.xml")),sequenceProvider);
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000077146.xml")), sequenceProvider);
 
             Assert.True(reader.GetItems().Any());
 
@@ -64,7 +61,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                         Assert.Equal("A", clinVarItem.ReferenceAllele);
                         Assert.Equal("C", clinVarItem.AlternateAllele);
                         Assert.Equal(ClinVarXmlReader.ParseDate("2016-07-31"), clinVarItem.LastUpdatedDate);
-                        Assert.True(clinVarItem.AlleleOrigins.SequenceEqual(new List<string> {"germline"}));
+                        Assert.True(clinVarItem.AlleleOrigins.SequenceEqual(new List<string> { "germline" }));
                         Assert.Equal("C2676676", clinVarItem.MedGenIDs.First());
                         Assert.Equal("145", clinVarItem.OrphanetIDs.First());
                         Assert.Equal("604370", clinVarItem.OmimIDs.First());
@@ -94,7 +91,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         //public void MultiEntryXmlParsing()
         //{
         //    var mockProvider = new Mock<ISequenceProvider>();
-        //    mockProvider.Setup(x => x.GetChromosomeDictionary()).Returns(_refNameDict);
+        //    mockProvider.Setup(x => x.GetChromosomeDictionary()).Returns(_refNameToChromosome);
 
         //    var sequenceProvider = mockProvider.Object;
 
@@ -193,8 +190,6 @@ namespace UnitTests.SAUtils.InputFileParsers
                         throw new InvalidDataException($"Unexpected clinvar item start point : {clinVarItem.Start}");
                 }
             }
-
-            
         }
 
         [Fact]
@@ -307,7 +302,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void NoClinVarItem()
         {
             var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.Setup(x => x.GetChromosomeDictionary()).Returns(_refNameDict);
+            mockProvider.Setup(x => x.RefNameToChromosome).Returns(_refNameToChromosome);
 
             var sequenceProvider = mockProvider.Object;
 
@@ -330,7 +325,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 Assert.Equal(clinVarItem.ReferenceAllele, clinVarItem.AlternateAllele);
             }
 
-            Assert.Equal(1, clinVarList.Count);
+            Assert.Single(clinVarList);
         }
 
         [Fact]
@@ -579,7 +574,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(1, clinVarItem.OmimIDs.Count());
+                Assert.Single(clinVarItem.OmimIDs);
             }
         }
 
@@ -594,7 +589,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(1, clinVarItem.OmimIDs.Count());
+                Assert.Single(clinVarItem.OmimIDs);
                 Assert.Equal("609060", clinVarItem.OmimIDs.FirstOrDefault());
             }
         }
@@ -690,10 +685,10 @@ namespace UnitTests.SAUtils.InputFileParsers
             var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000170338.xml")), sequenceProvider);
 
             var clinvarItems = reader.GetItems().ToList();
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
 
             var clinvarItem = clinvarItems[0];
-            Assert.Equal(1, clinvarItem.OmimIDs.Count());
+            Assert.Single(clinvarItem.OmimIDs);
             Assert.Equal("612800.0003", clinvarItem.OmimIDs.First());
         }
 
@@ -706,10 +701,10 @@ namespace UnitTests.SAUtils.InputFileParsers
             var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000170338.xml")), sequenceProvider);
 
             var clinvarItems = reader.GetItems().ToList();
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
 
             var clinvarItem = clinvarItems[0];
-            Assert.Equal(1, clinvarItem.OmimIDs.Count());
+            Assert.Single(clinvarItem.OmimIDs);
             Assert.Equal("612800.0002", clinvarItem.OmimIDs.First());
         }
 
@@ -722,10 +717,10 @@ namespace UnitTests.SAUtils.InputFileParsers
             var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000050055.xml")), sequenceProvider);
 
             var clinvarItems = reader.GetItems().ToList();
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
 
             var clinvarItem = clinvarItems[0];
-            Assert.Equal(1, clinvarItem.OmimIDs.Count());
+            Assert.Single(clinvarItem.OmimIDs);
             Assert.Equal("216550", clinvarItem.OmimIDs.First());
         }
 
@@ -739,7 +734,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
 
             foreach (var clinVarItem in clinvarItems)
             {
@@ -757,7 +752,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
 
             foreach (var clinVarItem in clinvarItems)
             {
@@ -775,7 +770,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
         }
 
         [Fact]
@@ -788,7 +783,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
         }
 
         [Fact]
@@ -810,7 +805,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000342164.xml")), sequenceProvider);
 
             var clinvarItems = reader.GetItems().ToList();
-            Assert.Equal(1, clinvarItems.Count);
+            Assert.Single(clinvarItems);
         }
 
         [Fact]
@@ -820,6 +815,17 @@ namespace UnitTests.SAUtils.InputFileParsers
             var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000342164.xml")), sequenceProvider);
 
             Assert.False(reader.GetItems().Any());
+        }
+
+        [Fact]
+        public void Alternate_phenotypes()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr2", "2", 1), 204732740, "G");
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000537563.xml")), sequenceProvider);
+
+            var clinvarItems = reader.GetItems().ToList();
+
+            Assert.Equal(2, clinvarItems[0].Phenotypes.Count());
         }
     }
 }

@@ -7,17 +7,27 @@ namespace VariantAnnotation.IO
 {
     public sealed class ExtendedBinaryWriter : BinaryWriter, IExtendedBinaryWriter
     {
-        /// <summary>
-        /// constructor
-        /// </summary>
         public ExtendedBinaryWriter(Stream output) : this(output, new UTF8Encoding(false, true)) { }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public ExtendedBinaryWriter(Stream output, Encoding encoding, bool leaveOpen = false)
             : base(output, encoding, leaveOpen)
         {
+        }
+
+        /// <summary>
+        /// writes an unsigned short to the binary writer
+        /// </summary>
+        public void WriteOpt(ushort value)
+        {
+            ushort num = value;
+
+            while (num >= 128U)
+            {
+                Write((byte)(num | 128U));
+                num >>= 7;
+            }
+
+            Write((byte)num);
         }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -177,11 +177,10 @@ namespace SAUtils.DataStructures
             // If parameter is null return false.
 
             // if other cannot be cast into OneKGenItem, return false
-            var otherItem = other as OneKGenItem;
-            if (otherItem == null) return false;
+            if (!(other is OneKGenItem otherItem)) return false;
 
             // Return true if the fields match:
-            return string.Equals(Chromosome, otherItem.Chromosome)
+            return Equals(Chromosome, otherItem.Chromosome)
                 && Start == otherItem.Start
                 && AlternateAllele.Equals(otherItem.AlternateAllele)
                 ;
@@ -208,7 +207,7 @@ namespace SAUtils.DataStructures
 
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddStringValue("ancestralAllele", AncestralAllele);
 			jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
@@ -232,9 +231,7 @@ namespace SAUtils.DataStructures
 			if (EurAlleleCount != null) jsonObject.AddIntValue("eurAc", EurAlleleCount.Value);
 			if (SasAlleleCount != null) jsonObject.AddIntValue("sasAc", SasAlleleCount.Value);
 
-			return sb.ToString();
-
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
-
 	}
 }

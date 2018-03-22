@@ -23,7 +23,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 		private string _topKey;
 	    public bool IsPositional { get; private set; }
 
-	    readonly List<CustomItem> _customItemList;
+	    private readonly List<CustomItem> _customItemList;
 	    private readonly IDictionary<string, IChromosome> _refChromDict;
 
 
@@ -183,7 +183,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 			
 		}
 
-		void ParseHeaderLine(string line)
+	    private void ParseHeaderLine(string line)
 		{
 			//##IAE_TOP=<KEY=cosmic,MATCH=Allele>
 			if (line.StartsWith("##IAE_TOP=")) GetTopLevelKey(line);
@@ -248,7 +248,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 			return _customItemList;
 		}
 
-		void ParseInfoField(string infoFields)
+	    private void ParseInfoField(string infoFields)
 		{
 			// 1       69345   COSM911918      C       A       .       .       GENE=OR4F5;STRAND=+;CDS=c.255C>A;AA=p.I85I;CNT=1;EX_TARGET
 			foreach (var infoField in infoFields.Split(';'))

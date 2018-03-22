@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 
@@ -69,19 +68,18 @@ namespace SAUtils.DataStructures
         {
             // If parameter is null return false.
 
-            var otherItem = other as DgvItem;
-            if (otherItem == null) return false;
+            if (!(other is DgvItem otherItem)) return false;
 
             // Return true if the fields match:
-            return string.Equals(Chromosome, otherItem.Chromosome)
+            return Equals(Chromosome, otherItem.Chromosome)
                    && Start          == otherItem.Start
                    && End            == otherItem.End
                    && ObservedGains  == otherItem.ObservedGains
                    && SampleSize     == otherItem.SampleSize
                    && ObservedLosses == otherItem.ObservedLosses
                    && string.Equals(Id, otherItem.Id)
-                   && Object.Equals(VariantType, otherItem.VariantType)
-                   && Object.Equals(VariantFreqAll, otherItem.VariantFreqAll);
+                   && Equals(VariantType, otherItem.VariantType)
+                   && Equals(VariantFreqAll, otherItem.VariantFreqAll);
         }
 
         public override int GetHashCode()

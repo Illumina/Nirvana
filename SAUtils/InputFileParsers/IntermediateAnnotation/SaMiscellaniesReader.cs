@@ -69,13 +69,10 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             }
         }
 
-        private SaMiscellanies ExtractItem(string line)
+        private static SaMiscellanies ExtractItem(string line)
         {
             var columns = line.Split('\t');
-            if (columns.Length < 3) return null;
-
-            return new SaMiscellanies(InterimSaCommon.RefMinorTag, columns[0], Convert.ToInt32(columns[1]), columns[2],
-                true);
+            return columns.Length < 3 ? null : new SaMiscellanies(InterimSaCommon.RefMinorTag, columns[0], Convert.ToInt32(columns[1]), columns[2]);
         }
         
         

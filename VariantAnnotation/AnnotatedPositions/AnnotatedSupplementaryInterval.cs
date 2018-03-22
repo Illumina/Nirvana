@@ -1,4 +1,4 @@
-﻿using System.Text;
+﻿using CommonUtilities;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
@@ -18,13 +18,13 @@ namespace VariantAnnotation.AnnotatedPositions
 
         public override string ToString()
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             sb.Append(JsonObject.OpenBrace + SupplementaryInterval.JsonString);
             if(ReciprocalOverlap!=null)
                 sb.Append(JsonObject.Comma + "\"reciprocalOverlap\":" + ReciprocalOverlap.Value.ToString("0.#####"));
             sb.Append(JsonObject.CloseBrace);
 
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
     }
 }

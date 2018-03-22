@@ -1,6 +1,6 @@
 ﻿using Xunit;
 
-namespace UnitTests.SaUtilsTests.InputFileParsers
+namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class CustomIntervalDbRead
     {

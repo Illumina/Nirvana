@@ -9,7 +9,7 @@ namespace UnitTests.VariantAnnotation.Sequence
 {
     public sealed class CytogeneticBandTests
     {
-		private CytogeneticBands GetCytogeneticBands()
+		private static CytogeneticBands GetCytogeneticBands()
         {
             var bands = new Band[25][];
 
@@ -91,21 +91,6 @@ namespace UnitTests.VariantAnnotation.Sequence
             var chromosome = new Chromosome("bob", "bob", CompressedSequenceReader.UnknownReferenceIndex);
             var observedCytogeneticBand = cytogeneticBands.GetCytogeneticBand(chromosome, 100, 200);
             Assert.Null(observedCytogeneticBand);
-        }
-
-        [Theory(Skip = "need a functional annotator to execute them")]
-		[InlineData("ENST00000368232_chr1_Ensembl84", "chr1\t156565049\t.\tA\tAAC\t3070.00\tPASS\t.", "1q23.1")]
-        [InlineData("ENST00000416839_chr1_Ensembl84", "chr1\t220603308\t.\tTGTGTGA\tT,TGT\t40.00\tLowGQXHetDel\t.", "1q41")]
-        [InlineData("ENST00000600779_chr1_Ensembl84", "chr1\t2258668\t.\tGACACAGAAAC\tG\t688.00\tPASS\t.", "1p36.33")]
-        [InlineData("ENST00000464439_chr1_Ensembl84", "chr1\t47280746\t.\tGAT\tG\t98.00\tPASS\t.", "1p33")]
-        [InlineData("ENST00000391369_chr1_Ensembl84", "chr1\t32379996\t.\tCTATT\tC\t98.00\tPASS\t.", "1p35.2")]
-		public void EndToEnd(string cacheFileName, string vcfLine, string expectedCytogeneticBand)
-        {
-            //var annotatedVariant = AnnotationUtilities.GetVariant(Resources.CacheGRCh37(cacheFileName), null, vcfLine);
-            //Assert.NotNull(annotatedVariant);
-
-            //var expectedJsonEntry = $"\"cytogeneticBand\":\"{expectedCytogeneticBand}\"";
-            //Assert.Contains(expectedJsonEntry, annotatedVariant.ToString());
         }
     }
 }

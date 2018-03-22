@@ -5,15 +5,24 @@
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <DebugType>Full</DebugType>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
+    <PackageReference Include="System.Memory" Version="4.5.0-preview1-26216-02" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="ExtractMiniXml\" />
+    <Folder Include="Interface\" />
   </ItemGroup>
-
 </Project>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
 
@@ -28,7 +28,7 @@ namespace VariantAnnotation.IO
         private void WriteHeader(string annotator, string creationTime, string genomeAssembly, int schemaVersion,
             string vepDataVersion, List<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             sb.Append("{\"header\":{");
@@ -43,7 +43,7 @@ namespace VariantAnnotation.IO
             if (sampleNames != null) jsonObject.AddStringValues("samples", sampleNames);
             sb.Append("},\"positions\":[\n");
 
-            Header = sb.ToString();
+            Header = StringBuilderCache.GetStringAndRelease(sb);
             _writer.Write(Header);
         }
 

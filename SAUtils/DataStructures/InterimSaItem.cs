@@ -13,7 +13,7 @@ namespace SAUtils.DataStructures
         public bool IsArray { get; }
         public string Chromosome { get; }
         public int Position { get; }
-        public string RefAllele { get; }
+        private string RefAllele { get; }
         public string AltAllele { get; }
         public string[] JsonStrings { get; }
         public string VcfString { get; }

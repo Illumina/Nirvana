@@ -88,6 +88,8 @@ namespace CommandLine.Builders
             else if (!Data.DisableOutput) CommandLineUtilities.DisplayBanner(authors);
             return new ConsoleAppBanner(Data);
         }
+
+        public IConsoleAppBanner SkipBanner() => new ConsoleAppBanner(Data);
     }
 
     public sealed class ConsoleAppBanner : IConsoleAppBanner
@@ -98,6 +100,7 @@ namespace CommandLine.Builders
 
         public IConsoleAppHelpMenu ShowHelpMenu(string description, string commandLineExample)
         {
+            // ReSharper disable once InvertIf
             if (_data.ShowHelpMenu || _data.Errors.Count > 0)
             {
                 Help.Show(_data.Ops, commandLineExample, description);
@@ -116,9 +119,10 @@ namespace CommandLine.Builders
 
         public IConsoleAppErrors ShowErrors()
         {
+            // ReSharper disable once InvertIf
             if (_data.Errors.Count > 0)
             {
-                Console.WriteLine("Some problems were encountered when parsing the command line options:");
+                Console.WriteLine("\nSome problems were encountered when parsing the command line options:");
                 PrintErrors();
                 Console.WriteLine("\nFor a complete list of command line options, type \"dotnet {0} -h\"", CommandLineUtilities.CommandFileName);
             }

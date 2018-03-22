@@ -5,11 +5,9 @@ namespace VariantAnnotation.Interface.Providers
 {
     public interface ISequenceProvider : IAnnotationProvider
     {
-        ushort NumRefSeqs { get; }
         ISequence Sequence { get; }
-        IDictionary<string, IChromosome> GetChromosomeDictionary();
-	    IDictionary<ushort, IChromosome> GetChromosomeIndexDictionary();
+        IDictionary<string, IChromosome> RefNameToChromosome { get; }
+	    IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
         void LoadChromosome(IChromosome chromosome);
-
     }
 }

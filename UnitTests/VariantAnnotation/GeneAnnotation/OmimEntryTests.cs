@@ -31,10 +31,8 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
                 observedEntry = OmimEntry.Read(reader);
             }
 
-            Assert.Equal(omimEntry.Hgnc,observedEntry.Hgnc);
+            Assert.Equal(omimEntry.GeneSymbol, observedEntry.GeneSymbol);
             Assert.Equal("{\"mimNumber\":123345,\"description\":\"gene for test\",\"phenotypes\":[{\"phenotype\":\"test phenotype1\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"dominant\"],\"comments\":\"nondiseases\"},{\"phenotype\":\"test phenotype2\",\"mapping\":\"chromosome deletion or duplication syndrome\",\"inheritances\":[\"recessive\",\"autosomal\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}", observedEntry.ToString());
-
         }
-
     }
 }

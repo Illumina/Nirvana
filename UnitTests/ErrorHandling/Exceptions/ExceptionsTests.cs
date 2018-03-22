@@ -18,7 +18,7 @@ namespace UnitTests.ErrorHandling.Exceptions
                 new object[] { new InvalidFileFormatException("test"),         ExitCodes.InvalidFileFormat},
                 new object[] { new MissingCompressionLibraryException("test"), ExitCodes.MissingCompressionLibrary},
                 new object[] { new ProcessLockedFileException("test"),         ExitCodes.SharingViolation},
-                new object[] { new UserErrorException("test"),                 ExitCodes.UserError},
+                new object[] { new UserErrorException("test"),                 ExitCodes.UserError}
             };
 
             public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();

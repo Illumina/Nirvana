@@ -18,7 +18,7 @@ namespace SAUtils.TsvWriters
 
 		#region IDisposable
 
-		bool _disposed;
+	    private bool _disposed;
 
 		/// <summary>
 		/// public implementation of Dispose pattern callable by consumers. 
@@ -57,7 +57,7 @@ namespace SAUtils.TsvWriters
 			Console.WriteLine(version.ToString());
 		}
 
-		public EvsTsvWriter(SaTsvWriter writer)
+	    private EvsTsvWriter(SaTsvWriter writer)
 		{
 			_writer = writer;
 		}
@@ -69,8 +69,7 @@ namespace SAUtils.TsvWriters
 			var evsItems = new List<EvsItem>();
 			foreach (var item in saItems)
 			{
-				var evsItem = item as EvsItem;
-				if (evsItem == null)
+			    if (!(item is EvsItem evsItem))
 					throw new InvalidDataException("Expected EvsItems list!!");
 				evsItems.Add(evsItem);
 			}

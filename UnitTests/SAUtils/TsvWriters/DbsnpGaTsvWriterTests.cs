@@ -71,7 +71,7 @@ namespace UnitTests.SAUtils.TsvWriters
             var sequenceProvider = new Mock<ISequenceProvider>();
             var simpleSequence = new SimpleSequence("ATGCGGT", 99);
             sequenceProvider.SetupGet(x => x.Sequence).Returns(simpleSequence);
-            sequenceProvider.Setup(x => x.GetChromosomeDictionary()).Returns(chromDict);
+            sequenceProvider.Setup(x => x.RefNameToChromosome).Returns(chromDict);
             var dataVersion = new DataSourceVersion("dbsnp", "77", 123456);
             var dbsnpWriter = new SaTsvWriter(randomDbsnpPath, dataVersion, "GRCh37",10,"dbsnp","dbsnp",true,sequenceProvider.Object);
             var globalAlleleWriter = new SaTsvWriter(randomDbsnpPath, dataVersion, "GRCh37", 10, "globalAllele", "GMAF", true, sequenceProvider.Object);
@@ -81,7 +81,7 @@ namespace UnitTests.SAUtils.TsvWriters
                 var dbSnpItemsPos100 = new List<SupplementaryDataItem>
                 {
                     new DbSnpItem(chromosome,100,123456,"A",0.2,"G",0.4),
-                    new DbSnpItem(chromosome,100,123458,"A",0.2,"T",0.4),
+                    new DbSnpItem(chromosome,100,123458,"A",0.2,"T",0.4)
                 };
                 var dbSnpItemsPos103 = new List<SupplementaryDataItem>
                 {

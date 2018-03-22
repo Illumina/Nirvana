@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using CommonUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -55,7 +55,7 @@ namespace SAUtils.DataStructures
 			[ReviewStatusEnum.practice_guideline]              = "practice guideline",
 			[ReviewStatusEnum.multiple_submitters]             = "classified by multiple submitters",
 			[ReviewStatusEnum.conflicting_interpretations]     = "criteria provided, conflicting interpretations",
-			[ReviewStatusEnum.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts",
+			[ReviewStatusEnum.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts"
 			
 		};
 
@@ -127,7 +127,7 @@ namespace SAUtils.DataStructures
 
 		public string GetJsonString()
 		{
-			var sb = new StringBuilder();
+			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
 			//converting empty alleles to '-'
@@ -154,7 +154,7 @@ namespace SAUtils.DataStructures
 
 			jsonObject.AddStringValues("pubMedIds", PubmedIds?.Select(id => id.ToString()));
 
-			return sb.ToString();
+		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
 		public override SupplementaryIntervalItem GetSupplementaryInterval()

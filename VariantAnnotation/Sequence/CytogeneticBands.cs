@@ -20,6 +20,7 @@ namespace VariantAnnotation.Sequence
 			_cytogeneticBands = cytogeneticBands;
 		}
 
+		/// <inheritdoc />
 		/// <summary>
 		/// returns the correct cytogenetic band representation for this chromosome given
 		/// the start and end coordinates

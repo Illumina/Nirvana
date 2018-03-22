@@ -4,28 +4,21 @@ using VariantAnnotation.AnnotatedPositions.Transcript;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
-    public class Prediction
+    public sealed class Prediction
     {
-        #region members
-
         private readonly byte[] _data;
         private readonly Entry[] _lut;
 
-        //                                                  A   X  C  D  E  F  G  H  I   X  K  L   M   N   X   P   Q   R   S   T   X   V   W   X   Y   X
+        //                                                 A   X  C  D  E  F  G  H  I   X  K  L   M   N   X   P   Q   R   S   T   X   V   W   X   Y   X
         private static readonly int[] AminoAcidIndices = { 0, -1, 1, 2, 3, 4, 5, 6, 7, -1, 8, 9, 10, 11, -1, 12, 13, 14, 15, 16, -1, 17, 18, -1, 19, -1 };
 
         private const int NumAminoAcids = 20;
-        private const byte NullEntry = 0xff;
+        private const byte NullEntry    = 0xff;
 
-        #endregion
-
-        /// <summary>
-        /// constructor
-        /// </summary>
         public Prediction(byte[] data, Entry[] lut)
         {
             _data = data;
-            _lut = lut;
+            _lut  = lut;
         }
 
         /// <summary>
@@ -42,11 +35,7 @@ namespace VariantAnnotation.Caches.DataStructures
             if (index >= _data.Length) return null;
 
             var entry = _data[index];
-
-            // handle situations where the AA matches the reference
-            if (entry == NullEntry) return null;
-
-            return _lut[entry];
+            return entry == NullEntry ? null : _lut[entry];
         }
 
         /// <summary>
@@ -82,7 +71,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public static Prediction Read(BinaryReader reader, Entry[] lut)
         {
             var numBytes = reader.ReadInt32();
-            var data = reader.ReadBytes(numBytes);
+            var data     = reader.ReadBytes(numBytes);
             return new Prediction(data, lut);
         }
 
@@ -93,13 +82,13 @@ namespace VariantAnnotation.Caches.DataStructures
 
             public Entry(double score, byte enumIndex)
             {
-                Score = score;
+                Score     = score;
                 EnumIndex = enumIndex;
             }
 
             public static Entry Read(BinaryReader reader)
             {
-                var score = reader.ReadDouble();
+                var score     = reader.ReadDouble();
                 var enumIndex = reader.ReadByte();
                 return new Entry(score, enumIndex);
             }

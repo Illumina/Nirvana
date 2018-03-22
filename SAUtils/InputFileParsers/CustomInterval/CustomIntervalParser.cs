@@ -118,7 +118,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			return new DataStructures.CustomInterval(chr, start, end, KeyName, stringValues, nonStringValues);
 		}
 
-		void ParseInfoField(string infoFieldsLine)
+	    private void ParseInfoField(string infoFieldsLine)
 		{
 			// OR4F5;0.0;3.60208899915;Some_evidence_of_constraint
 			var infoFields = infoFieldsLine.Split(';');
@@ -222,11 +222,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			{
 				throw new Exception("duplicate index:\n" + line);
 			}
-			else
-			{
-				_fieldIndex[index.Value] = json;
-			}
-
+		    _fieldIndex[index.Value] = json;
 		}
 		
 	}

@@ -71,6 +71,7 @@ namespace Vcf.Sample
         {
             int? ac = null;
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (s)
             {
                 case "A":
@@ -102,8 +103,7 @@ namespace Vcf.Sample
             var alleleDepths = new int[nAllele];
             for (int i = 0; i < nAllele; i++)
             {
-                int num;
-                if (!int.TryParse(ad[i], out num)) return null;
+                if (!int.TryParse(ad[i], out var num)) return null;
                 alleleDepths[i] = num;
             }
             return alleleDepths;

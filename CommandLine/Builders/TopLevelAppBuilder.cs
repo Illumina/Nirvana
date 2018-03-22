@@ -49,8 +49,7 @@ namespace CommandLine.Builders
 
         public ITopLevelAppBanner ShowBanner(string authors)
         {
-            if(_data.ShowHelpMenu || _data.Errors.Count >0)
-                CommandLineUtilities.DisplayBanner(authors);
+            CommandLineUtilities.DisplayBanner(authors);
             return new TopLevelAppBanner(_data);
         }
     }
@@ -63,6 +62,7 @@ namespace CommandLine.Builders
 
         public ITopLevelAppHelpMenu ShowHelpMenu(string description)
         {
+            // ReSharper disable once InvertIf
             if (_data.ShowHelpMenu || _data.Errors.Count > 0)
             {
                 Console.WriteLine(description);
@@ -81,7 +81,7 @@ namespace CommandLine.Builders
 
         private static void DisplayCommands(Dictionary<string, TopLevelOption> ops)
         {
-            string label  = "COMMAND: ";
+            const string label = "COMMAND: ";
             string filler = new string(' ', label.Length);
 
             int commandColumnLen = GetMaxCommandLen(ops.Keys) + 3;
@@ -115,6 +115,7 @@ namespace CommandLine.Builders
 
         public ITopLevelAppErrors ShowErrors()
         {
+            // ReSharper disable once InvertIf
             if (_data.Errors.Count > 0)
             {
                 Console.WriteLine("\nSome problems were encountered when parsing the command line options:");
@@ -148,13 +149,12 @@ namespace CommandLine.Builders
         {
             if (!Continue) return _data.ExitCode;
 
-            var benchmark = new Benchmark();
             ExitCodes exitCode;
 
             try
             {
-                exitCode = _data.ExecuteMethod(_data.Command, _data.Arguments.Skip(1).ToArray());
-                ShowPerformanceData(benchmark);
+                var arguments = _data.Arguments.Skip(1).ToArray();
+                exitCode = _data.ExecuteMethod(_data.Command, arguments);
             }
             catch (Exception e)
             {
@@ -162,16 +162,6 @@ namespace CommandLine.Builders
             }
 
             return exitCode;
-        }
-
-        private static void ShowPerformanceData(Benchmark benchmark)
-        {
-            var peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
-            var wallTimeSpan = benchmark.GetElapsedTime();
-
-            Console.WriteLine();
-            if (peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(peakMemoryUsageBytes));
-            Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(wallTimeSpan));
         }
     }
 
@@ -187,8 +177,7 @@ namespace CommandLine.Builders
         
         public bool ShowHelpMenu { get; set; }
         public Func<string, string[], ExitCodes> ExecuteMethod { get; set; }
-        
-        
+                
         public TopLevelAppBuilderData(string[] arguments, Dictionary<string, TopLevelOption> ops)
         {
             Arguments = arguments;

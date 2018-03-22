@@ -1,0 +1,11 @@
+CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	GRCh	Chromosome:G_Start..G_Stop
+6119374	68055	LGALS9C	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	0	0	loss	619	37	17:18358950..18464587
+6119374	107031	FAM106A	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	0	0	loss	619	37	17:18358950..18464587
+6128754	69785	DAZ2	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	7	0	gain	619	37	Y:24624108..26404340
+6119398	94344	PCDH11Y_ENST00000215473	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	0	0	loss	619	37	Y:5532303..5565780
+6128754	103307	DAZ1	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	7	0	gain	619	37	Y:24624108..26404340
+6128754	66769	PRY	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	7	0	gain	619	37	Y:24624108..26404340
+6128754	106281	DAZ1_ENST00000382510	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	7	0	gain	619	37	Y:24624108..26404340
+6128756	75765	BPY2B	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	10	0	gain	619	37	Y:26409790..27684355
+6128756	69787	DAZ3	683665	611825	haematopoietic_and_lymphoid_tissue	NS	NS	NS	lymphoid_neoplasm	plasma_cell_myeloma	NS	NS	MC-CAR	10	0	gain	619	37	Y:26409790..27684355
+610835	95782	MT-CYB_ENST00000361789	2384185	2247017	skin	NS	NS	NS	carcinoma	NS	NS	NS	ML_33_T_01			gain	656	37	25:2..15814

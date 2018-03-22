@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CacheUtils.TranscriptCache;
 using Moq;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
@@ -20,21 +21,19 @@ namespace UnitTests.VariantAnnotation.Caches
     {
         private readonly ITranscriptCache _cache;
         private readonly IEnumerable<IDataSourceVersion> _expectedDataSourceVersions;
-        private readonly GenomeAssembly _expectedGenomeAssembly = GenomeAssembly.hg19;
-        private readonly ITranscript[] _expectedTranscripts;
-        private readonly IRegulatoryRegion[] _expectedRegulatoryRegions;
+        private const GenomeAssembly ExpectedGenomeAssembly = GenomeAssembly.hg19;
 
         private readonly IChromosome _chr1  = new Chromosome("chr1", "1", 0);
         private readonly IChromosome _chr11 = new Chromosome("chr11", "11", 10);
 
         public TranscriptCacheTests()
         {
-            _expectedDataSourceVersions = GetDataSourceVersions();
-            _expectedTranscripts        = GetTranscripts();
-            _expectedRegulatoryRegions  = GetRegulatoryRegions();
+            _expectedDataSourceVersions        = GetDataSourceVersions();
+            var transcriptIntervalArrays       = GetTranscripts().ToIntervalArrays(11);
+            var regulatoryRegionIntervalArrays = GetRegulatoryRegions().ToIntervalArrays(11);
 
-            _cache = new TranscriptCache(_expectedDataSourceVersions, _expectedGenomeAssembly, _expectedTranscripts,
-                _expectedRegulatoryRegions, 25);
+            _cache = new TranscriptCache(_expectedDataSourceVersions, ExpectedGenomeAssembly, transcriptIntervalArrays,
+                regulatoryRegionIntervalArrays);
         }
 
         [Fact]
@@ -45,7 +44,7 @@ namespace UnitTests.VariantAnnotation.Caches
             interval.SetupGet(x => x.Start).Returns(100);
             interval.SetupGet(x => x.End).Returns(200);
 
-            var overlappingTranscripts = _cache.GetOverlappingFlankingTranscripts(interval.Object);
+            var overlappingTranscripts = _cache.GetOverlappingTranscripts(interval.Object);
 
             Assert.NotNull(overlappingTranscripts);
             Assert.Equal(2, overlappingTranscripts.Length);
@@ -59,7 +58,7 @@ namespace UnitTests.VariantAnnotation.Caches
             interval.SetupGet(x => x.Start).Returns(5000);
             interval.SetupGet(x => x.End).Returns(5001);
 
-            var overlappingTranscripts = _cache.GetOverlappingFlankingTranscripts(interval.Object);
+            var overlappingTranscripts = _cache.GetOverlappingTranscripts(interval.Object);
 
             Assert.Null(overlappingTranscripts);
         }
@@ -75,7 +74,7 @@ namespace UnitTests.VariantAnnotation.Caches
             var overlappingRegulatoryRegions = _cache.GetOverlappingRegulatoryRegions(interval.Object);
 
             Assert.NotNull(overlappingRegulatoryRegions);
-            Assert.Equal(1, overlappingRegulatoryRegions.Length);
+            Assert.Single(overlappingRegulatoryRegions);
         }
 
         [Fact]
@@ -95,14 +94,14 @@ namespace UnitTests.VariantAnnotation.Caches
         public void GenomeAssembly_Get()
         {
             var observedGenomeAssembly = _cache.GenomeAssembly;
-            Assert.Equal(_expectedGenomeAssembly, observedGenomeAssembly);
+            Assert.Equal(ExpectedGenomeAssembly, observedGenomeAssembly);
         }
 
         [Fact]
         public void DataSourceVersions_Get()
         {
             var observedDataSourceVersions = _cache.DataSourceVersions.ToArray();
-            Assert.Equal(1, observedDataSourceVersions.Length);
+            Assert.Single(observedDataSourceVersions);
 
             var expectedDataSourceVersion = _expectedDataSourceVersions.ToArray()[0];
             var observedDataSourceVersion = observedDataSourceVersions[0];
@@ -123,31 +122,28 @@ namespace UnitTests.VariantAnnotation.Caches
             var regulatoryRegions = new IRegulatoryRegion[3];
 
             regulatoryRegions[0] = new RegulatoryRegion(_chr11, 11000, 12000, CompactId.Empty,
-                RegulatoryElementType.promoter);
+                RegulatoryRegionType.promoter);
 
             regulatoryRegions[1] = new RegulatoryRegion(_chr1, 120, 180, CompactId.Empty,
-                RegulatoryElementType.promoter);
+                RegulatoryRegionType.promoter);
 
             regulatoryRegions[2] = new RegulatoryRegion(_chr1, 300, 320, CompactId.Empty,
-                RegulatoryElementType.promoter);
+                RegulatoryRegionType.promoter);
 
             return regulatoryRegions;
         }
 
         private ITranscript[] GetTranscripts()
         {
-            var transcripts = new ITranscript[3];
-
-            transcripts[0] = new Transcript(_chr11, 11000, 12000, CompactId.Empty, 0, null, BioType.Unknown, null, 0, 0,
-                false, null, null, null, 0, 0, Source.None);
-
-            transcripts[1] = new Transcript(_chr1, 120, 180, CompactId.Empty, 0, null, BioType.Unknown, null, 0, 0,
-                false, null, null, null, 0, 0, Source.None);
-
-            transcripts[2] = new Transcript(_chr1, 300, 320, CompactId.Empty, 0, null, BioType.Unknown, null, 0, 0,
-                false, null, null, null, 0, 0, Source.None);
-
-            return transcripts;
+            return new ITranscript[]
+            {
+                new Transcript(_chr11, 11000, 12000, CompactId.Empty, null, BioType.other, null, 0, 0,
+                    false, null, 0, null, 0, 0, Source.None, false, false, null, null),
+                new Transcript(_chr1, 120, 180, CompactId.Empty, null, BioType.other, null, 0, 0,
+                    false, null, 0, null, 0, 0, Source.None, false, false, null, null),
+                new Transcript(_chr1, 300, 320, CompactId.Empty, null, BioType.other, null, 0, 0,
+                    false, null, 0, null, 0, 0, Source.None, false, false, null, null)
+            };
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Text;
+using CommonUtilities;
 using Compression.FileHandling;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -19,7 +19,7 @@ namespace SAUtils.TsvWriters
 
         #region IDisposable
 
-        bool _disposed;
+        private bool _disposed;
 
         /// <summary>
         /// public implementation of Dispose pattern callable by consumers. 
@@ -65,16 +65,16 @@ namespace SAUtils.TsvWriters
 
         }
 
-        private string GetHeader(DataSourceVersion dataSourceVersion, string assembly)
+        private static string GetHeader(DataSourceVersion dataSourceVersion, string assembly)
         {
-            var sb = new StringBuilder();
+            var sb = StringBuilderCache.Acquire();
 
             sb.Append($"#name={dataSourceVersion.Name}\n");
             sb.Append($"#assembly={assembly}\n");
             sb.Append($"#version={dataSourceVersion.Version}\n");
             sb.Append($"#description={dataSourceVersion.Description}\n");
             sb.Append("#CHROM\tPOS\tGlobalMajorAllele\n");
-            return sb.ToString();
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
 
@@ -104,10 +104,10 @@ namespace SAUtils.TsvWriters
         {
             if (_sequenceProvider == null) return true;
 
-            var refDictionary = _sequenceProvider.GetChromosomeDictionary();
+            var refDictionary = _sequenceProvider.RefNameToChromosome;
             if (!refDictionary.ContainsKey(chromosome)) return false;
 
-            var chrom = _sequenceProvider.GetChromosomeDictionary()[chromosome];
+            var chrom = refDictionary[chromosome];
 
             _sequenceProvider.LoadChromosome(chrom);
             var refSequence = _sequenceProvider.Sequence.Substring(position - 1, ReferenceWindow);

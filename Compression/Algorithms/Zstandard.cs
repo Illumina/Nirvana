@@ -8,9 +8,6 @@ namespace Compression.Algorithms
     {
         private readonly int _compressionLevel;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public Zstandard(int compressionLevel = 17)
         {
             _compressionLevel = compressionLevel;

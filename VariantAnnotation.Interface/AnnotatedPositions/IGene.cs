@@ -10,6 +10,5 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         ICompactId EntrezGeneId { get; }
         ICompactId EnsemblId { get; }
         int HgncId { get; }
-        int MimNumber { get; }
     }
 }
