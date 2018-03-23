@@ -21,6 +21,7 @@ namespace VariantAnnotation.IO.VcfWriter
         private const string CsqRInfoTag = "##INFO=<ID=CSQR,";
         private const string CsqTInfoTag = "##INFO=<ID=CSQT,";
         private const string InfoTag = "##INFO=";
+        private const string FilteredVariantsRecomposedHeaderLineTag = "##FILTER=<ID=FilteredVariantsRecomposed,";
 
         private const string CsqtHeaderLine = "##INFO=<ID=CSQT,Number=.,Type=String,Description=\"Consequence type as predicted by Nirvana. Format: GenotypeIndex|HGNC|TranscriptID|Consequence\">";
         private const string CsqrHeaderLine = "##INFO=<ID=CSQR,Number=.,Type=String,Description=\"Predicted regulatory consequence type. Format: GenotypeIndex|RegulatoryID|Consequence\">";
@@ -35,6 +36,8 @@ namespace VariantAnnotation.IO.VcfWriter
             "##INFO=<ID=RefMinor,Number=0,Type=Flag,Description=\"Denotes positions where the reference base is a minor allele and is annotated as though it were a variant\">\n" +
             "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">\n" +
             "##INFO=<ID=RECOMPOSED,Number=0,Type=Flag,Description=\"The position is recomposed\">";
+
+        private const string FilteredVariantsRecomposedHeaderLine = "##FILTER=<ID=FilteredVariantsRecomposed,Description=\"Any of the decomposed variants has a filter status other than PASS or .\">";
 
         #endregion
 
@@ -117,7 +120,9 @@ namespace VariantAnnotation.IO.VcfWriter
 
             // add the CSQT and CSQR header lines
             sb.Append(CsqtHeaderLine + '\n');
-            sb.Append(CsqrHeaderLine);
+            sb.Append(CsqrHeaderLine + '\n');
+
+            sb.Append(FilteredVariantsRecomposedHeaderLine);
 
             return StringBuilderCache.GetStringAndRelease(sb);
         }
@@ -136,7 +141,8 @@ namespace VariantAnnotation.IO.VcfWriter
                         !line.StartsWith(AnnotationServiceUriTag) &&
                         !line.StartsWith(CsqInfoTag) &&
                         !line.StartsWith(CsqRInfoTag) &&
-                        !line.StartsWith(CsqTInfoTag)).ToList();
+                        !line.StartsWith(CsqTInfoTag) &&
+                        !line.StartsWith(FilteredVariantsRecomposedHeaderLineTag)).ToList();
 
             // find where we should place our info field and annotator tags
             var lastIndex = currentHeaderLines.FindLastIndex(x => x.StartsWith(InfoTag));
