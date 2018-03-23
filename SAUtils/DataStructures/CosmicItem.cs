@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using CommonUtilities;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
@@ -33,60 +31,43 @@ namespace SAUtils.DataStructures
             string gene,
             HashSet<CosmicStudy> studies, int? sampleCount)
         {
-            Chromosome = chromosome;
-            Start = start;
-            Id = id;
+            Chromosome      = chromosome;
+            Start           = start;
+            Id              = id;
             ReferenceAllele = refAllele;
             AlternateAllele = altAllele;
-            Gene = gene;
-
-            Studies = studies;
-            SampleCount = sampleCount;
+            Gene            = gene;
+            Studies         = studies;
+            SampleCount     = sampleCount;
 
         }
 
-        public sealed class CosmicStudy : IEquatable<CosmicStudy>, IJsonSerializer
+        public sealed class CosmicStudy : IEquatable<CosmicStudy>
         {
             #region members
 
             public string Id { get; }
-            public string Histology { get; }
-            public string PrimarySite { get; }
+            public IEnumerable<string> Histologies { get; }
+            public IEnumerable<string> Sites { get; }
 
             #endregion
 
-            public CosmicStudy(string studyId, string histology, string primarySite)
+            public CosmicStudy(string studyId, IEnumerable<string> histologies, IEnumerable<string> sites)
             {
-                Id = studyId;
-                Histology = histology;
-                PrimarySite = primarySite;
+                Id          = studyId;
+                Sites       = sites;
+                Histologies = histologies;
             }
 
             public bool Equals(CosmicStudy other)
             {
-                return Id.Equals(other?.Id) &&
-                       Histology.Equals(other?.Histology) &&
-                       PrimarySite.Equals(other?.PrimarySite);
+                return Id.Equals(other?.Id);
             }
 
             public override int GetHashCode()
             {
                 var hashCode = Id?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ (Histology?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (PrimarySite?.GetHashCode() ?? 0);
                 return hashCode;
-            }
-
-
-            public void SerializeJson(StringBuilder sb)
-            {
-                var jsonObject = new JsonObject(sb);
-
-                sb.Append(JsonObject.OpenBrace);
-                if (!string.IsNullOrEmpty(Id)) jsonObject.AddStringValue("id", Id, false);
-                jsonObject.AddStringValue("histology", Histology?.Replace('_', ' '));
-                jsonObject.AddStringValue("primarySite", PrimarySite?.Replace('_', ' '));
-                sb.Append(JsonObject.CloseBrace);
             }
         }
 
@@ -143,9 +124,61 @@ namespace SAUtils.DataStructures
                 SupplementaryAnnotationUtilities.ReverseSaReducedAllele(AlternateAllele));
             jsonObject.AddStringValue("gene", Gene);
             jsonObject.AddIntValue("sampleCount", SampleCount);
-            jsonObject.AddObjectValues("studies", Studies);
+
+            jsonObject.AddStringValues("cancerTypes", GetJsonStrings(GetCancerTypeCounts()), false);
+            jsonObject.AddStringValues("tissues", GetJsonStrings(GetTissueCounts()), false);
 
             return StringBuilderCache.GetStringAndRelease(sb);
+        }
+
+        internal IDictionary<string,int> GetTissueCounts()
+        {
+            if (Studies == null) return null;
+            var tissueCounts = new Dictionary<string, int>();
+            foreach (var study in Studies)
+            {
+                if (study.Sites == null) return null;
+
+                foreach (var site in study.Sites)
+                {
+                    if (tissueCounts.TryGetValue(site, out var _))
+                    {
+                        tissueCounts[site]++;
+                    }
+                    else tissueCounts[site] = 1;
+                }
+            }
+
+            return tissueCounts; 
+        }
+
+        internal IDictionary<string,int> GetCancerTypeCounts()
+        {
+            if (Studies == null) return null;
+            var cancerTypeCounts = new Dictionary<string, int>();
+            foreach (var study in Studies)
+            {
+                if (study.Histologies == null) return null;
+                foreach (var histology in study.Histologies)
+                {
+                    if (cancerTypeCounts.TryGetValue(histology, out var _))
+                    {
+                        cancerTypeCounts[histology]++;
+                    }
+                    else cancerTypeCounts[histology] = 1;
+                }
+            }
+
+            return cancerTypeCounts;
+        }
+
+        private static IEnumerable<string> GetJsonStrings(IDictionary<string, int> dictionary)
+        {
+            if (dictionary == null) yield break;
+            foreach (var kvp in dictionary)
+            {
+                yield return $"{{\"{kvp.Key.Replace('_', ' ')}\":{kvp.Value}}}";
+            }
         }
 
         public void MergeStudies(CosmicItem otherItem)

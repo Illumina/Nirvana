@@ -6,9 +6,13 @@ namespace SAUtils.ExtractMiniXml
 {
     public static class ExtractMiniXmlMain
 	{
+	    private  static string _inputXmlFile;
+	    private  static string _rcvId;
+	    private  static string _outputDir;
+
 	    private static ExitCodes ProgramExecution()
         {
-	        var extractor = new XmlExtractor(ConfigurationSettings.InputXmlFile, ConfigurationSettings.RcvId, ConfigurationSettings.OutputDir);
+	        var extractor = new XmlExtractor(_inputXmlFile, _rcvId, _outputDir);
 	        extractor.Extract();
 
             return ExitCodes.Success;
@@ -20,17 +24,17 @@ namespace SAUtils.ExtractMiniXml
 				{
 					"i|in=",
 					"Input XML {file}",
-					v => ConfigurationSettings.InputXmlFile = v
+					v => _inputXmlFile = v
 				},
 				{
 					"r|rcv=",
 					"RCV ID",
-					v => ConfigurationSettings.RcvId = v
+					v => _rcvId = v
 				},
 				{
 					"o|out=",
 					"Output {dir}",
-					v => ConfigurationSettings.OutputDir = v
+					v => _outputDir = v
 				}
 			};
 
@@ -38,14 +42,14 @@ namespace SAUtils.ExtractMiniXml
 
 			var exitCode = new ConsoleAppBuilder(commandArgs, ops)
 	            .Parse()
-	            .CheckInputFilenameExists(ConfigurationSettings.InputXmlFile, "input XML file", "--in")
-	            .HasRequiredParameter(ConfigurationSettings.OutputDir, "output directory", "--out")
+	            .CheckInputFilenameExists(_inputXmlFile, "input XML file", "--in")
+	            .HasRequiredParameter<string>(_outputDir, "output directory", "--out")
 			    .SkipBanner()
                 .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
 	            .ShowErrors()
 	            .Execute(ProgramExecution);
 	        
 	        return exitCode;
-		}		
+		}
 	}
 }

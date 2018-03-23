@@ -16,14 +16,30 @@ namespace SAUtils.InputFileParsers.Cosmic
         private string _geneName;
         private int? _sampleCount;
 
-        private int _mutationIdIndex = -1;
-        private int _primarySiteIndex = -1;
-        private int _primaryHistologyIndex = -1;
+        private int _mutationIdIndex       = -1;
+        private int _primarySiteIndex      = -1;
+        private int _siteSubtypeOneIndex   = -1;
+        private int _siteSubtypeTwoIndex   = -1;
+        private int _siteSubtypeThreeIndex = -1;
+
+        private int _primaryHistologyIndex      = -1;
+        private int _histologySubtypeOneIndex   = -1;
+        private int _histologySubtypeTwoIndex   = -1;
+        private int _histologySubtypeThreeIndex = -1;
+
         private int _studyIdIndex = -1;
 
-        private const string MutationIdTag = "Mutation ID";
-        private const string PrimarySiteTag = "Primary site";
-        private const string HistologyTag = "Primary histology";
+        private const string MutationIdTag       = "Mutation ID";
+        private const string PrimarySiteTag      = "Primary site";
+        private const string SiteSubtypeOneTag   = "Site subtype 1";
+        private const string SiteSubtypeTwoTag   = "Site subtype 2";
+        private const string SiteSubtypeThreeTag = "Site subtype 3";
+
+        private const string PrimaryHistologyTag      = "Primary histology";
+        private const string HistologySubtypeOneTag   = "Histology subtype 1";
+        private const string HistologySubtypeTwoTag   = "Histology subtype 2";
+        private const string HistologySubtypeThreeTag = "Histology subtype 3";
+
         private const string StudyIdTag = "ID_STUDY";
 
         private readonly IDictionary<string, IChromosome> _refChromDict;
@@ -36,8 +52,8 @@ namespace SAUtils.InputFileParsers.Cosmic
         {
             _vcfFileReader = vcfFileReader;
             _tsvFileReader = tsvFileReader;
-            _refChromDict     = refChromDict;
-            _studies     = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
+            _refChromDict  = refChromDict;
+            _studies       = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
         }
 
         
@@ -81,15 +97,45 @@ namespace SAUtils.InputFileParsers.Cosmic
 
             var mutationId  = columns[_mutationIdIndex];
             var studyId     = columns[_studyIdIndex];
-            var primarySite = columns[_primarySiteIndex];
-            var histology   = columns[_primaryHistologyIndex];
+            var sites       = GetSites(columns);
+            var histologies = GetHistologies(columns);
 
             if (string.IsNullOrEmpty(mutationId)) return;
 
-            var study = new CosmicItem.CosmicStudy(studyId, histology, primarySite);
+            var study = new CosmicItem.CosmicStudy(studyId, histologies, sites);
             if (_studies.TryGetValue(mutationId, out var studySet))
                 studySet.Add(study);
             else _studies[mutationId] = new HashSet<CosmicItem.CosmicStudy> { study };
+        }
+
+        private IEnumerable<string> GetHistologies(string[] columns)
+        {
+            var histologies = new HashSet<string>();
+
+            TryAddValue(columns[_primaryHistologyIndex], histologies);
+            TryAddValue(columns[_histologySubtypeOneIndex], histologies);
+            TryAddValue(columns[_histologySubtypeTwoIndex], histologies);
+            TryAddValue(columns[_histologySubtypeThreeIndex], histologies);
+
+            return histologies;
+        }
+
+        private IEnumerable<string> GetSites(string[] columns)
+        {
+            var sites = new HashSet<string>();
+
+            TryAddValue(columns[_primarySiteIndex], sites);
+            TryAddValue(columns[_siteSubtypeOneIndex], sites);
+            TryAddValue(columns[_siteSubtypeTwoIndex], sites);
+            TryAddValue(columns[_siteSubtypeThreeIndex], sites);
+
+            return sites;
+        }
+
+        private void TryAddValue(string value, HashSet<string> sites)
+        {
+           if (!string.IsNullOrEmpty(value) && value != "NS")
+                sites.Add(value);
         }
 
         private static bool IsHeaderLine(string line)
@@ -120,9 +166,29 @@ namespace SAUtils.InputFileParsers.Cosmic
                     case PrimarySiteTag:
                         _primarySiteIndex = i;
                         break;
-                    case HistologyTag:
+                    case SiteSubtypeOneTag:
+                        _siteSubtypeOneIndex = i;
+                        break;
+                    case SiteSubtypeTwoTag:
+                        _siteSubtypeTwoIndex = i;
+                        break;
+                    case SiteSubtypeThreeTag:
+                        _siteSubtypeThreeIndex = i;
+                        break;
+
+                    case PrimaryHistologyTag:
                         _primaryHistologyIndex = i;
                         break;
+                    case HistologySubtypeOneTag:
+                        _histologySubtypeOneIndex = i;
+                        break;
+                    case HistologySubtypeTwoTag:
+                        _histologySubtypeTwoIndex = i;
+                        break;
+                    case HistologySubtypeThreeTag:
+                        _histologySubtypeThreeIndex = i;
+                        break;
+
                 }
             }
 
@@ -159,12 +225,12 @@ namespace SAUtils.InputFileParsers.Cosmic
 
             foreach (var altAllele in altAlleles)
             {
-                if (_studies.ContainsKey(cosmicId))
-                    foreach (var study in _studies[cosmicId])
-                    {
-                        cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, new HashSet<CosmicItem.CosmicStudy> { new CosmicItem.CosmicStudy(study.Id, study.Histology, study.PrimarySite) }, _sampleCount));
-                    }
+                if (_studies.TryGetValue(cosmicId, out var studies))
+                {
+                    cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, studies, _sampleCount));
+                }
                 else cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, null, _sampleCount));
+                
             }
 
             return cosmicItems;
