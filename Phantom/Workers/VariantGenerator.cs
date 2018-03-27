@@ -79,7 +79,12 @@ namespace Phantom.Workers
             for (int i = 0; i < numSamples; i++)
                 gqValues[i] = GetStringWithMinValueOrDot(new ArraySegment<string>(positionSet.GqInfo[i], startIndex, numPositions).ToArray());
 
-            return new VariantInfo(qual, filter, gqValues);
+            string[] psValues = new string[numSamples];
+            for (int i = 0; i < numSamples; i++)
+                // PS tags are the same in the decomposed variants
+                psValues[i] = positionSet.PsInfo[i][startIndex]; 
+
+            return new VariantInfo(qual, filter, gqValues, psValues);
         }
 
         private static string GetStringWithMinValueOrDot(string[] strings)
@@ -163,13 +168,15 @@ namespace Phantom.Workers
         public readonly string Qual;
         public readonly string Filter;
         public readonly string[] SampleGqs;
+        public readonly string[] SamplePhaseSets;
         public readonly Dictionary<string, List<SampleAllele>> AltAlleleToSample = new Dictionary<string, List<SampleAllele>>();
 
-        public VariantInfo(string qual, string filter, string[] sampleGqs)
+        public VariantInfo(string qual, string filter, string[] sampleGqs, string[]samplePhaseSets)
         {
             Qual = qual;
             Filter = filter;
             SampleGqs = sampleGqs;
+            SamplePhaseSets = samplePhaseSets;
         }
 
         public void AddAllele(string altAllele, List<SampleAllele> sampleAlleles)
@@ -187,7 +194,7 @@ internal sealed class RecomposedAlleleSet
     private readonly string _chrName;
     private const string VariantId = ".";
     private const string InfoTag = "RECOMPOSED";
-    private const string FormatTag = "GT:GQ";
+    private const string FormatTag = "GT:GQ:PS";
 
 
     public RecomposedAlleleSet(string chrName, int numSamples)
@@ -228,7 +235,7 @@ internal sealed class RecomposedAlleleSet
                 }
             }
             var altAlleleColumn = string.Join(",", altAlleleList);
-            vcfRecords.Add(GetVcfFields(variantSite, altAlleleColumn, varInfo.Qual, varInfo.Filter, sampleGenotypes, varInfo.SampleGqs));
+            vcfRecords.Add(GetVcfFields(variantSite, altAlleleColumn, varInfo.Qual, varInfo.Filter, sampleGenotypes, varInfo.SampleGqs, varInfo.SamplePhaseSets));
         }
 
         return vcfRecords;
@@ -250,7 +257,7 @@ internal sealed class RecomposedAlleleSet
         sampleGenotype[sampleAlleleAlleleIndex] = currentGenotypeIndex;
     }
 
-    private string[] GetVcfFields(VariantSite varSite, string altAlleleColumn, string qual, string filter, List<int>[] sampleGenoTypes, string[] sampleGqs, string variantId = VariantId, string info = InfoTag, string format = FormatTag)
+    private string[] GetVcfFields(VariantSite varSite, string altAlleleColumn, string qual, string filter, List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, string variantId = VariantId, string info = InfoTag, string format = FormatTag)
     {
         var vcfFields = new List<string>
             {
@@ -268,10 +275,10 @@ internal sealed class RecomposedAlleleSet
         for (var index = 0; index < sampleGenoTypes.Length; index++)
         {
             var sampleGenotypeStr = GetGenotype(sampleGenoTypes[index]);
-            if (sampleGenotypeStr == ".") vcfFields.Add(".:.");
+            if (sampleGenotypeStr == ".") vcfFields.Add(".:.:.");
             else
             {
-                vcfFields.Add(sampleGenotypeStr + ":" + sampleGqs[index]);
+                vcfFields.Add(sampleGenotypeStr + ":" + sampleGqs[index] + ":" + samplePhasesets[index]);
             }
         }
         return vcfFields.ToArray();
