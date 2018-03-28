@@ -43,7 +43,7 @@ namespace Compression.FileHandling
                 FillBuffer();
 
             if (_bufferLength == 0) return null;
-            var startIndex = _bufferIndex;
+            int startIndex = _bufferIndex;
 
             while (_buffer[_bufferIndex++] != _newLineChar)
             {
@@ -60,13 +60,13 @@ namespace Compression.FileHandling
                 ? Encoding.UTF8.GetString(SubArray(_buffer, startIndex, _bufferIndex - startIndex - 1))
                 : Encoding.UTF8.GetString(SubArray(_buffer, startIndex, _bufferIndex - startIndex)));
 
-            var result = StringBuilderCache.GetStringAndRelease(sb);
+            string result = StringBuilderCache.GetStringAndRelease(sb);
             return result.Length == 0 ? null : result;
         }
 
         private static T[] SubArray<T>(T[] data, int index, int length)
         {
-            T[] result = new T[length];
+            var result = new T[length];
             Array.Copy(data, index, result, 0, length);
             return result;
         }

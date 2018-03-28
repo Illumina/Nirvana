@@ -25,20 +25,20 @@ namespace CommandLine.Utilities
         {
             if (numBytes > NumBytesInGB)
             {
-                var gigaBytes = numBytes / (double)NumBytesInGB;
+                double gigaBytes = numBytes / (double)NumBytesInGB;
                 return $"{gigaBytes:0.000} GB";
             }
 
             if (numBytes > NumBytesInMB)
             {
-                var megaBytes = numBytes / (double)NumBytesInMB;
+                double megaBytes = numBytes / (double)NumBytesInMB;
                 return $"{megaBytes:0.0} MB";
             }
 
             // ReSharper disable once InvertIf
             if (numBytes > NumBytesInKB)
             {
-                var kiloBytes = numBytes / (double)NumBytesInKB;
+                double kiloBytes = numBytes / (double)NumBytesInKB;
                 return $"{kiloBytes:0.0} KB";
             }
 

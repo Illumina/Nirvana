@@ -82,10 +82,10 @@ namespace CommandLine.Builders
         private static void DisplayCommands(Dictionary<string, TopLevelOption> ops)
         {
             const string label = "COMMAND: ";
-            string filler = new string(' ', label.Length);
+            var filler = new string(' ', label.Length);
 
             int commandColumnLen = GetMaxCommandLen(ops.Keys) + 3;
-            bool useLabel = true;
+            var useLabel = true;
 
             foreach (var op in ops)
             {
@@ -96,7 +96,7 @@ namespace CommandLine.Builders
                 }
                 else Console.Write(filler);
 
-                string commandFiller = new string(' ', commandColumnLen - op.Key.Length);
+                var commandFiller = new string(' ', commandColumnLen - op.Key.Length);
                 Console.WriteLine(op.Key + commandFiller + op.Value.Description);
             }
         }
@@ -127,7 +127,7 @@ namespace CommandLine.Builders
 
         private void PrintErrors()
         {
-            foreach (var error in _data.Errors)
+            foreach (string error in _data.Errors)
             {
                 Console.Write("- ");
                 Console.ForegroundColor = ConsoleColor.Red;

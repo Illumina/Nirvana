@@ -15,15 +15,13 @@ namespace Compression.FileHandling
 
         public long Position => _bgzipStream.Position + _bufferIndex;
 
+        public BgzipTextWriter(string path) : this(new BlockGZipStream(FileUtilities.GetCreateStream(path),
+            CompressionMode.Compress))
+        {}
 
-        
-        public BgzipTextWriter(string path) : this(new BlockGZipStream(FileUtilities.GetCreateStream(path), CompressionMode.Compress))
+        private BgzipTextWriter(BlockGZipStream bgzipStream) : base(Console.OpenStandardError())
         {
-        }
-        // the stream writer needs to have a stream but we cannot provide it with 
-        private BgzipTextWriter(BlockGZipStream bgzipStream):base(Console.OpenStandardError())
-        {
-            _buffer = new byte[BufferSize];//4kb blocks
+            _buffer      = new byte[BufferSize];
             _bgzipStream = bgzipStream;
         }
 
@@ -34,20 +32,14 @@ namespace Compression.FileHandling
             _bufferIndex = 0;
         }
 
-        public override void WriteLine()
-        {
-            Write("\n");
-        }
+        public override void WriteLine() => Write("\n");
 
-        public override void WriteLine(string s)
-        {
-            Write(s+"\n");
-        }
+        public override void WriteLine(string value) => Write(value + "\n");
 
-        public override void Write(string line)
+        public override void Write(string value)
         {
-            if (string.IsNullOrEmpty(line)) return;
-            var lineBytes = Encoding.UTF8.GetBytes(line);
+            if (string.IsNullOrEmpty(value)) return;
+            var lineBytes = Encoding.UTF8.GetBytes(value);
 
             if (lineBytes.Length <= BufferSize - _bufferIndex)
             {
@@ -58,7 +50,7 @@ namespace Compression.FileHandling
             {
                 // fill up the buffer
                 Array.Copy(lineBytes, 0, _buffer, _bufferIndex, BufferSize - _bufferIndex);
-                var lineIndex = BufferSize - _bufferIndex;
+                int lineIndex = BufferSize - _bufferIndex;
 
                 // write it out to the stream
                 _bgzipStream.Write(_buffer, 0, BufferSize);

@@ -132,7 +132,7 @@ namespace CommandLine.Builders
 
         private void PrintErrors()
         {
-            foreach (var error in _data.Errors)
+            foreach (string error in _data.Errors)
             {
                 Console.Write("- ");
                 Console.ForegroundColor = ConsoleColor.Red;
@@ -174,8 +174,8 @@ namespace CommandLine.Builders
         {
             if (_data.DisableOutput) return;
 
-            var peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
-            var wallTimeSpan         = benchmark.GetElapsedTime();
+            long peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
+            var wallTimeSpan          = benchmark.GetElapsedTime();
 
             Console.WriteLine();
             if (peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(peakMemoryUsageBytes));

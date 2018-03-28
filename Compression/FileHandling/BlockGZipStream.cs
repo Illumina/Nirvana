@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using Compression.Algorithms;
@@ -13,8 +14,6 @@ namespace Compression.FileHandling
 
     public sealed class BlockGZipStream : Stream
     {
-        #region members
-
         private readonly byte[] _compressedBlock;
         private readonly byte[] _uncompressedBlock;
         private int _blockOffset;
@@ -31,16 +30,10 @@ namespace Compression.FileHandling
 
         public static class BlockGZipFormatCommon
         {
-            #region members
-
             public const int BlockSize         = 65280;
             public const int MaxBlockSize      = 65536;
             public const int BlockHeaderLength = 18;
-
-            #endregion
         }
-
-        #endregion
 
         #region Stream
 
@@ -103,10 +96,6 @@ namespace Compression.FileHandling
 
         #endregion
 
-        /// <inheritdoc />
-        /// <summary>
-        /// private constructor
-        /// </summary>
         private BlockGZipStream(CompressionMode compressionMode, int compressionLevel)
         {
             _bgzf = new Zlib(compressionLevel);
@@ -116,10 +105,6 @@ namespace Compression.FileHandling
             _compressedBlock   = new byte[_bgzf.GetCompressedBufferBounds(BlockGZipFormatCommon.MaxBlockSize)];            
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// stream constructor
-        /// </summary>
         public BlockGZipStream(Stream stream, CompressionMode compressionMode, bool leaveStreamOpen = false, int compressionLevel = 1)
             : this(compressionMode, compressionLevel)
         {
@@ -135,9 +120,6 @@ namespace Compression.FileHandling
             if (!_isCompressor && !_stream.CanRead)  throw new CompressionException("A stream lacking read capability was provided to the block GZip decompressor.");
         }
 
-        /// <summary>
-        /// flushes the BGZF stream
-        /// </summary>
         private void Flush(int uncompressedSize)
         {
             int blockLength = _bgzf.Compress(_uncompressedBlock, uncompressedSize, _compressedBlock, BlockGZipFormatCommon.MaxBlockSize);
@@ -147,11 +129,7 @@ namespace Compression.FileHandling
 			_blockAddress = _stream.Position;	
         }
 
-        /// <summary>
-        /// returns true if this GZip block has a valid header
-        /// </summary>
-        // ReSharper disable once SuggestBaseTypeForParameter
-        private static bool HasValidHeader(int numHeaderBytes, byte[] header)
+        private static bool HasValidHeader(int numHeaderBytes, IReadOnlyList<byte> header)
         {
             if (numHeaderBytes != BlockGZipFormatCommon.BlockHeaderLength) return false;
 
@@ -163,9 +141,6 @@ namespace Compression.FileHandling
                    header[13] == 67;
         }
 
-        /// <summary>
-        /// reads the next GZip block from the disk
-        /// </summary>
         private void ReadBlock()
         {
             var header = new byte[BlockGZipFormatCommon.BlockHeaderLength];
@@ -212,20 +187,16 @@ namespace Compression.FileHandling
             _blockLength  = count;
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// reads from the disk into the byte array
-        /// </summary>
-        public override int Read(byte[] data, int offset, int numBytesToRead)
+        public override int Read(byte[] buffer, int offset, int count)
         {
             if (_isCompressor) throw new CompressionException("Tried to read data from a compression BlockGZipStream.");
 
-            if (numBytesToRead == 0) return 0;
+            if (count == 0) return 0;
 
-            int numBytesRead = 0;
+            var numBytesRead = 0;
             int dataOffset   = offset;
 
-            while (numBytesRead < numBytesToRead)
+            while (numBytesRead < count)
             {
                 int numBytesAvailable = _blockLength - _blockOffset;
 
@@ -236,8 +207,8 @@ namespace Compression.FileHandling
                     if (numBytesAvailable <= 0) break;
                 }
 
-                int copyLength = Math.Min(numBytesToRead - numBytesRead, numBytesAvailable);
-                Buffer.BlockCopy(_uncompressedBlock, _blockOffset, data, dataOffset, copyLength);
+                int copyLength = Math.Min(count - numBytesRead, numBytesAvailable);
+                Buffer.BlockCopy(_uncompressedBlock, _blockOffset, buffer, dataOffset, copyLength);
 
                 _blockOffset += copyLength;
                 dataOffset   += copyLength;
@@ -254,22 +225,18 @@ namespace Compression.FileHandling
             return numBytesRead;
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// writes the byte array to disk. Returns the number of bytes written
-        /// </summary>
-        public override void Write(byte[] data, int offset, int numBytesToWrite)
+        public override void Write(byte[] buffer, int offset, int count)
         {
             if (!_isCompressor) throw new CompressionException("Tried to write data to a decompression BlockGZipStream.");
 
-            int numBytesWritten = 0;
+            var numBytesWritten = 0;
             int dataOffset      = offset;
 
             // copy the data to the buffer
-            while (numBytesWritten < numBytesToWrite)
+            while (numBytesWritten < count)
             {
-                int copyLength = Math.Min(BlockGZipFormatCommon.BlockSize - _blockOffset, numBytesToWrite - numBytesWritten);
-                Buffer.BlockCopy(data, dataOffset, _uncompressedBlock, _blockOffset, copyLength);
+                int copyLength = Math.Min(BlockGZipFormatCommon.BlockSize - _blockOffset, count - numBytesWritten);
+                Buffer.BlockCopy(buffer, dataOffset, _uncompressedBlock, _blockOffset, copyLength);
 
                 _blockOffset    += copyLength;
                 dataOffset      += copyLength;
@@ -279,30 +246,23 @@ namespace Compression.FileHandling
             }
         }
 
-		/// <summary>
-		/// Method to seek to a virtual position within the filestream.
-		/// </summary>
-		/// <param name="virtualPosition">Virtual positions are comprised of the first 48 bits being the file byte offset
-		/// and the last 16 bits being the offset within the uncompressed data block.</param>
-		private void SeekVirtualFilePointer(ulong virtualPosition)
-		{
-			var compressedOffset = GetCompressedOffset(virtualPosition);
-			var uncompressedOffset = GetUncompressedOffset(virtualPosition);
-			// if we're already in the right block, no need to reload buffer.
-			if (_blockAddress != compressedOffset)
-			{
-				_blockAddress = compressedOffset;
-				_stream.Position = _blockAddress;
-				ReadBlock();
-			}
-			_blockOffset = uncompressedOffset;
-		}
-		/// <summary>
-		/// Extract the file byte offset from the Virtual Position.
-		/// </summary>
-		/// <param name="virtualPosition">64-bit number with the first 48 bits being the position to extract.</param>
-		/// <returns>A long file byte offset.</returns>
-		private static long GetCompressedOffset(ulong virtualPosition)
+        private void SeekVirtualFilePointer(ulong virtualPosition)
+        {
+            long compressedOffset  = GetCompressedOffset(virtualPosition);
+            int uncompressedOffset = GetUncompressedOffset(virtualPosition);
+
+            // if we're already in the right block, no need to reload buffer.
+            if (_blockAddress != compressedOffset)
+            {
+                _blockAddress = compressedOffset;
+                _stream.Position = _blockAddress;
+                ReadBlock();
+            }
+
+            _blockOffset = uncompressedOffset;
+        }
+
+        private static long GetCompressedOffset(ulong virtualPosition)
 		{
 			unchecked
 			{
@@ -310,11 +270,6 @@ namespace Compression.FileHandling
 			}
 		}
 
-		/// <summary>
-		/// Extract the offset within the uncompressed block from the Virtual Position.
-		/// </summary>
-		/// <param name="virtualPosition">64-bit number with the last 16 bits being the position to extract.</param>
-		/// <returns>An int offset of the uncompressed block.</returns>
 		private static int GetUncompressedOffset(ulong virtualPosition)
 		{
 			unchecked

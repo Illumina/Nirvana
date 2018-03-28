@@ -61,7 +61,7 @@ namespace Compression.FileHandling
             throw new NotImplementedException();
         }
 
-        public override void Write(byte[] array, int offset, int count)
+        public override void Write(byte[] buffer, int offset, int count)
         {
             throw new NotImplementedException();
         }
@@ -110,10 +110,6 @@ namespace Compression.FileHandling
 
         #endregion
 
-        /// <inheritdoc />
-        /// <summary>
-        /// constructor
-        /// </summary>
         public PeekStream(Stream stream, int bufferSize = DefaultBufferSize)
         {
             if (bufferSize <= 0) throw new ArgumentOutOfRangeException(nameof(bufferSize));
@@ -140,17 +136,17 @@ namespace Compression.FileHandling
             return readbytes;
         }
 
-        public override int Read(byte[] array, int offset, int count)
+        public override int Read(byte[] buffer, int offset, int count)
         {
-            if (array == null)                 throw new ArgumentNullException(nameof(array));
-            if (offset < 0)                    throw new ArgumentOutOfRangeException(nameof(offset));
-            if (count < 0)                     throw new ArgumentOutOfRangeException(nameof(count));
-            if (array.Length - offset < count) throw new ArgumentException();
+            if (buffer == null)                 throw new ArgumentNullException(nameof(buffer));
+            if (offset < 0)                     throw new ArgumentOutOfRangeException(nameof(offset));
+            if (count < 0)                      throw new ArgumentOutOfRangeException(nameof(count));
+            if (buffer.Length - offset < count) throw new ArgumentException($"The buffer is not large enough to read in an additional {count} bytes.");
 
             EnsureNotClosed();
             EnsureCanRead();
 
-            int bytesFromBuffer = ReadFromBuffer(array, offset, count);
+            int bytesFromBuffer = ReadFromBuffer(buffer, offset, count);
             if (bytesFromBuffer == count) return bytesFromBuffer;
 
             int alreadySatisfied = bytesFromBuffer;
@@ -164,12 +160,12 @@ namespace Compression.FileHandling
 
             if (count >= _bufferSize)
             {
-                return _stream.Read(array, offset, count) + alreadySatisfied;
+                return _stream.Read(buffer, offset, count) + alreadySatisfied;
             }
 
             _readLen = _stream.Read(_buffer, 0, _bufferSize);
 
-            bytesFromBuffer = ReadFromBuffer(array, offset, count);
+            bytesFromBuffer = ReadFromBuffer(buffer, offset, count);
             return bytesFromBuffer + alreadySatisfied;
         }
 

@@ -30,7 +30,7 @@ namespace CommandLine.Builders
         public static IConsoleAppValidator CheckEachFilenameExists(this IConsoleAppValidator validator,
             IEnumerable<string> filePaths, string description, string commandLineOption, bool isRequired = true)
         {
-            foreach (var filePath in filePaths)
+            foreach (string filePath in filePaths)
             {
                 validator.CheckInputFilenameExists(filePath, description, commandLineOption, isRequired);
             }
@@ -51,8 +51,7 @@ namespace CommandLine.Builders
                     $"The {description} file was not specified. Please use the {commandLineOption} parameter.",
                     ExitCodes.MissingCommandLineOption);
             }
-            else if (!isRequired || ignoreValue != null && filePath == ignoreValue) { }
-            else if (!File.Exists(filePath))
+            else if (isRequired && (ignoreValue == null || filePath != ignoreValue) && !File.Exists(filePath))
             {
                 validator.Data.AddError($"The {description} file ({filePath}) does not exist.", ExitCodes.FileNotFound);
             }
@@ -106,7 +105,7 @@ namespace CommandLine.Builders
         {
             if (validator.SkipValidation) return validator;
 
-            foreach (var directoryPath in directories)
+            foreach (string directoryPath in directories)
             {
                 var files = Directory.Exists(directoryPath) ? Directory.GetFiles(directoryPath, searchPattern) : null;
                 if (files != null && files.Length != 0) continue;

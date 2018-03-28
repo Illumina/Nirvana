@@ -18,7 +18,7 @@ namespace CommandLine.Builders
 
     public interface IConsoleAppValidator
     {
-        IConsoleAppValidator DisableOutput(bool condition);
+        IConsoleAppValidator DisableOutput(bool condition = true);
         IConsoleAppBanner ShowBanner(string authors);
         IConsoleAppBanner SkipBanner();
         IConsoleAppBuilderData Data { get; }
