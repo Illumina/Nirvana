@@ -45,16 +45,16 @@ namespace UnitTests.SAUtils.InputFileParsers
                         foreach (var study in cosmicItem.Studies)
                         {
                             Assert.Equal("544", study.Id);
-                            Assert.Equal("haematopoietic_and_lymphoid_tissue", study.PrimarySite);
-                            Assert.Equal("haematopoietic_neoplasm", study.Histology);
+                            Assert.Equal(new [] {"haematopoietic_and_lymphoid_tissue"}, study.Sites);
+                            Assert.Equal(new [] { "haematopoietic_neoplasm", "acute_myeloid_leukaemia" }, study.Histologies);
                         }
                         break;
                     case 1:
                         foreach (var study in cosmicItem.Studies)
                         {
                             Assert.Equal("544", study.Id);
-                            Assert.Equal("haematopoietic;lymphoid_tissue", study.PrimarySite);
-                            Assert.Equal("haematopoietic_neoplasm", study.Histology);
+                            Assert.Equal(new[] { "haematopoietic;lymphoid_tissue"}, study.Sites);
+                            Assert.Equal(new[] { "haematopoietic_neoplasm", "acute_myeloid_leukaemia" }, study.Histologies);
                         }
                         break;
                 }
@@ -106,9 +106,9 @@ namespace UnitTests.SAUtils.InputFileParsers
             var vcfReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM18152.vcf"));
             var tsvReader = GZipUtilities.GetAppropriateStreamReader(Resources.TopPath("COSM18152.tsv"));
             var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
-            var items = cosmicReader.GetCosmicItems().ToList();
+            var items = cosmicReader.GetCosmicItems();
 
-            Assert.Equal(3, items.Count);
+            Assert.Single(items);
         }
     }
 }

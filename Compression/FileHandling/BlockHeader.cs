@@ -42,7 +42,7 @@ namespace Compression.FileHandling
             int numBytesRead = stream.Read(_header, 0, HeaderSize);
             if (numBytesRead != HeaderSize) throw new IOException($"Expected {HeaderSize} bytes from the block header, but received only {numBytesRead} bytes.");
 
-            var headerId = GetInt(0);
+            int headerId = GetInt(0);
             if (headerId != HeaderId) throw new CompressionException($"Expected the header ID ({HeaderId}), but found the following: {headerId}");
 
             NumUncompressedBytes = GetInt(4);

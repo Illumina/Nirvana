@@ -9,12 +9,14 @@ namespace SAUtils.GeneScoresTsv
 {
     public sealed class GeneScoresMain
     {
+        private  static string _inputPath;
+        private  static string _outputDirectory;
         private const string JsonKeyName = "exac";
         private static ExitCodes ProgramExecution()
         {
-            var geneScoreCreator= new GeneScoreTsvCreator(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputPath), 
-                new GeneAnnotationTsvWriter(ConfigurationSettings.OutputDirectory, 
-                DataSourceVersionReader.GetSourceVersion(ConfigurationSettings.InputPath+".version"), null, 0, JsonKeyName, false));
+            var geneScoreCreator= new GeneScoreTsvCreator(GZipUtilities.GetAppropriateStreamReader(_inputPath), 
+                new GeneAnnotationTsvWriter(_outputDirectory, 
+                DataSourceVersionReader.GetSourceVersion(_inputPath+".version"), null, 0, JsonKeyName, false));
 
             return geneScoreCreator.Create();
         }
@@ -28,12 +30,12 @@ namespace SAUtils.GeneScoresTsv
                 {
                     "in|i=",
                     "input gene scores {path}",
-                    v => ConfigurationSettings.InputPath = v
+                    v => _inputPath = v
                 },
                 {
                     "out|o=",
                     "output directory {path}",
-                    v => ConfigurationSettings.OutputDirectory = v
+                    v => _outputDirectory = v
                 }
             };
 
@@ -41,8 +43,8 @@ namespace SAUtils.GeneScoresTsv
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-                .CheckInputFilenameExists(ConfigurationSettings.InputPath, "gene scores file", "--in")
-                .CheckDirectoryExists(ConfigurationSettings.OutputDirectory, "Output directory", "--out")
+                .CheckInputFilenameExists(_inputPath, "gene scores file", "--in")
+                .CheckDirectoryExists(_outputDirectory, "Output directory", "--out")
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided OMIM data files and populates tsv file", commandLineExample)
                 .ShowErrors()

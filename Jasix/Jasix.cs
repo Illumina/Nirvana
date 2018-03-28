@@ -107,10 +107,8 @@ namespace Jasix
                     "query range",
                     v => ConfigurationSettings.Queries.Add(v)
                 }
-
             };
 
-            var jasix = new Jasix();
             var exitCode = new ConsoleAppBuilder(args, ops)
                 .Parse()
                 .CheckInputFilenameExists(ConfigurationSettings.InputJson, "input Json file", "[in.json.gz]")

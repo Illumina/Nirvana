@@ -173,9 +173,9 @@ namespace CommandLine.NDesk.Options
 
         private OptionValueType ParsePrototype()
         {
-            char type = '\0';
-            List<string> seps = new List<string>();
-            for (int i = 0; i < Names.Length; ++i)
+            var type = '\0';
+            var seps = new List<string>();
+            for (var i = 0; i < Names.Length; ++i)
             {
                 string name = Names[i];
                 if (name.Length == 0)
@@ -202,12 +202,19 @@ namespace CommandLine.NDesk.Options
                     string.Format("Cannot provide key/value separators for Options taking {0} value(s).", MaxValueCount),
                     nameof(MaxValueCount));
             if (MaxValueCount <= 1) return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
-            if (seps.Count == 0)
-                ValueSeparators = new[] { ":", "=" };
-            else if (seps.Count == 1 && seps[0].Length == 0)
-                ValueSeparators = null;
-            else
-                ValueSeparators = seps.ToArray();
+
+            switch (seps.Count)
+            {
+                case 0:
+                    ValueSeparators = new[] { ":", "=" };
+                    break;
+                case 1 when seps[0].Length == 0:
+                    ValueSeparators = null;
+                    break;
+                default:
+                    ValueSeparators = seps.ToArray();
+                    break;
+            }
 
             return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
         }
@@ -293,11 +300,11 @@ namespace CommandLine.NDesk.Options
         {
             if (option == null)
                 throw new ArgumentNullException(nameof(option));
-            List<string> added = new List<string>(option.Names.Length);
+            var added = new List<string>(option.Names.Length);
             try
             {
                 // KeyedCollection.InsertItem/SetItem handle the 0th name.
-                for (int i = 1; i < option.Names.Length; ++i)
+                for (var i = 1; i < option.Names.Length; ++i)
                 {
                     Dictionary.Add(option.Names[i], option);
                     added.Add(option.Names[i]);
@@ -371,8 +378,8 @@ namespace CommandLine.NDesk.Options
         {
             OptionContext c = CreateOptionContext();
             c.OptionIndex = -1;
-            bool process = true;
-            List<string> unprocessed = new List<string>();
+            var process = true;
+            var unprocessed = new List<string>();
             Option def = Contains("<>") ? this["<>"] : null;
             foreach (string argument in arguments)
             {
@@ -439,7 +446,7 @@ namespace CommandLine.NDesk.Options
                 return true;
             }
 
-            if (!GetOptionParts(argument, out var f, out var n, out var s, out var v))
+            if (!GetOptionParts(argument, out string f, out string n, out string s, out string v))
                 return false;
 
             if (!Contains(n)) return ParseBool(argument, n, c) || ParseBundledValue(f, n + s + v, c);
@@ -499,7 +506,7 @@ namespace CommandLine.NDesk.Options
         {
             if (f != "-")
                 return false;
-            for (int i = 0; i < n.Length; ++i)
+            for (var i = 0; i < n.Length; ++i)
             {
                 string opt = f + n[i];
                 string rn = n[i].ToString();
@@ -545,7 +552,7 @@ namespace CommandLine.NDesk.Options
         {
             foreach (Option p in this)
             {
-                int written = 0;
+                var written = 0;
                 if (!WriteOptionPrototype(o, p, ref written))
                     continue;
 
@@ -557,8 +564,8 @@ namespace CommandLine.NDesk.Options
                     o.Write(new string(' ', OptionWidth));
                 }
 
-                bool indent = false;
-                string prefix = new string(' ', OptionWidth + 2);
+                var indent = false;
+                var prefix = new string(' ', OptionWidth + 2);
                 foreach (string line in GetLines(GetDescription(p.Description)))
                 {
                     if (indent)
@@ -571,7 +578,7 @@ namespace CommandLine.NDesk.Options
 
         private static bool WriteOptionPrototype(TextWriter o, Option p, ref int written)
         {
-            string[] names = p.Names;
+            var names = p.Names;
 
             int i = GetNextOptionIndex(names, 0);
             if (i == names.Length)
@@ -596,26 +603,24 @@ namespace CommandLine.NDesk.Options
                 Write(o, ref written, names[i]);
             }
 
-            if (p.OptionValueType == OptionValueType.Optional ||
-                p.OptionValueType == OptionValueType.Required)
+            if (p.OptionValueType != OptionValueType.Optional && p.OptionValueType != OptionValueType.Required) return true;
+
+            Write(o, ref written, " ");
+            if (p.OptionValueType == OptionValueType.Optional)
             {
-                Write(o, ref written, " ");
-                if (p.OptionValueType == OptionValueType.Optional)
-                {
-                    Write(o, ref written, "[");
-                }
-                Write(o, ref written, "<" + GetArgumentName(0, p.MaxValueCount, p.Description) + '>');
-                string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
-                    ? p.ValueSeparators[0]
-                    : " ";
-                for (int c = 1; c < p.MaxValueCount; ++c)
-                {
-                    Write(o, ref written, sep + GetArgumentName(c, p.MaxValueCount, p.Description));
-                }
-                if (p.OptionValueType == OptionValueType.Optional)
-                {
-                    Write(o, ref written, "]");
-                }
+                Write(o, ref written, "[");
+            }
+            Write(o, ref written, "<" + GetArgumentName(0, p.MaxValueCount, p.Description) + '>');
+            string sep = p.ValueSeparators != null && p.ValueSeparators.Length > 0
+                ? p.ValueSeparators[0]
+                : " ";
+            for (var c = 1; c < p.MaxValueCount; ++c)
+            {
+                Write(o, ref written, sep + GetArgumentName(c, p.MaxValueCount, p.Description));
+            }
+            if (p.OptionValueType == OptionValueType.Optional)
+            {
+                Write(o, ref written, "]");
             }
             return true;
         }
@@ -663,7 +668,7 @@ namespace CommandLine.NDesk.Options
                 return string.Empty;
             StringBuilder sb = StringBuilderCache.Acquire(description.Length);
             int start = -1;
-            for (int i = 0; i < description.Length; ++i)
+            for (var i = 0; i < description.Length; ++i)
             {
                 switch (description[i])
                 {
