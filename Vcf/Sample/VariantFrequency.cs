@@ -31,16 +31,17 @@ namespace Vcf.Sample
         private static double[] GetVariantFrequenciesUsingVf(IntermediateSampleFields sampleFields)
         {
             if (sampleFields.AltAlleles.Length > 1 || sampleFields.VF == null) return null;
-            return new double[] { sampleFields.VF.Value };
+            return new[] { sampleFields.VF.Value };
         }
 
         private static double[] GetVariantFrequenciesUsingAlleleCounts(IntermediateSampleFields sampleFields)
         {
             bool isRefSingleBase      = sampleFields.VcfRefAllele.Length == 1;
             bool areAllAltsSingleBase = sampleFields.AltAlleles.All(altAllele => altAllele.Length == 1);
+            bool isReference          = sampleFields.AltAlleles.Length == 1 && sampleFields.AltAlleles[0] == ".";
 
             // for this to work we need a single-base reference allele and all raw allele counts must be available
-            if (sampleFields.TotalAlleleCount == null || !isRefSingleBase || !areAllAltsSingleBase) return null;
+            if (sampleFields.TotalAlleleCount == null || isReference || !isRefSingleBase || !areAllAltsSingleBase) return null;
 
             int numAltAlleles = sampleFields.AltAlleles.Length;
             double[] variantFreqs = new double[numAltAlleles];
