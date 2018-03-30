@@ -5,25 +5,24 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.InputFileParsers.TOPMed
 {
-    public sealed class TopMedItem: SupplementaryDataItem
+    public sealed class TopMedItem : SupplementaryDataItem
     {
-        private readonly int? _numSamples;
         private readonly int? _alleleNum;
         private readonly int? _alleleCount;
         private readonly int? _homCount;
-        private readonly bool _hasFailedFilters;
+        private readonly bool _failedFilter;
 
-        public TopMedItem(IChromosome chrom, int position, string refAllele, string altAllele, int? numSamples, int? alleleNum, int? alleleCount, int? homCount, bool hasFailedFilters)
+        public TopMedItem(IChromosome chrom, int position, string refAllele, string altAllele, int? alleleNum,
+            int? alleleCount, int? homCount, bool failedFilter)
         {
-            Chromosome        = chrom;
-            Start             = position;
-            ReferenceAllele   = refAllele;
-            AlternateAllele   = altAllele;
-            _numSamples       = numSamples;
-            _alleleNum        = alleleNum;
-            _alleleCount      = alleleCount;
-            _homCount         = homCount;
-            _hasFailedFilters = hasFailedFilters;
+            Chromosome      = chrom;
+            Start           = position;
+            ReferenceAllele = refAllele;
+            AlternateAllele = altAllele;
+            _alleleNum      = alleleNum;
+            _alleleCount    = alleleCount;
+            _homCount       = homCount;
+            _failedFilter   = failedFilter;
         }
 
         public override bool Equals(object other)
@@ -50,24 +49,18 @@ namespace SAUtils.InputFileParsers.TOPMed
 
         public string GetJsonString()
         {
-            var sb = new StringBuilder();
+            var sb         = new StringBuilder();
             var jsonObject = new JsonObject(sb);
-            
-            if (_hasFailedFilters) jsonObject.AddBoolValue("hasFailedFilters", true);
-            jsonObject.AddIntValue("numSamples", _numSamples);
-            jsonObject.AddStringValue("alleleFreq", ComputingUtilities.ComputeFrequency(_alleleNum, _alleleCount), false);
-            jsonObject.AddIntValue("alleleNumber", _alleleNum);
-            jsonObject.AddIntValue("alleleCount", _alleleCount);
-            jsonObject.AddIntValue("homCount", _homCount);
+
+            jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(_alleleNum, _alleleCount), false);
+            jsonObject.AddIntValue("allAn", _alleleNum);
+            jsonObject.AddIntValue("allAc", _alleleCount);            
+            jsonObject.AddIntValue("allHc", _homCount);
+            if (_failedFilter) jsonObject.AddBoolValue("failedFilter", true);
 
             return sb.ToString();
         }
 
-        public override SupplementaryIntervalItem GetSupplementaryInterval()
-        {
-            return null;
-        }
-
-
+        public override SupplementaryIntervalItem GetSupplementaryInterval() => null;
     }
 }
