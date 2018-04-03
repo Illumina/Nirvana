@@ -162,9 +162,14 @@ namespace VariantAnnotation.AnnotatedPositions
                 return (region.CdnaStart + (onReverseStrand ? region.End - position : position - region.Start), 0);
             }
 
-            if (region.Type != TranscriptRegionType.Intron) return (-1, -1);
+            return region.Type == TranscriptRegionType.Gap
+                ? GetGapPositionAndOffset(position, region, onReverseStrand)
+                : GetIntronPositionAndOffset(position, region, onReverseStrand);
+        }
 
-            // intron
+        private static (int Position, int Offset) GetIntronPositionAndOffset(int position, ITranscriptRegion region,
+            bool onReverseStrand)
+        {
             int leftDist  = position - region.Start + 1;
             int rightDist = region.End - position + 1;
 
@@ -185,6 +190,15 @@ namespace VariantAnnotation.AnnotatedPositions
                 : region.CdnaStart;
 
             return (cdnaPosition, offset);
+        }
+
+        private static (int Position, int Offset) GetGapPositionAndOffset(int position, ITranscriptRegion region, bool onReverseStrand)
+        {
+            int leftDist  = position - region.Start + 1;
+            int rightDist = region.End - position + 1;
+
+            if (leftDist < rightDist && !onReverseStrand || rightDist < leftDist && onReverseStrand) return (region.CdnaStart, 0);
+            return (region.CdnaEnd, 0);
         }
 
         private static (string CdnaCoord, bool HasStopCodonNotation, bool HasNoPosition) GetCdnaCoord(int position,

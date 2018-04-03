@@ -264,6 +264,8 @@ namespace UnitTests.Vcf.Samples
         [InlineData("C", "T,A", "GT:GQ:GQX:DP:DPF:AD:VF", "1/1:208:47:70:3:0,70:0.75")] // multiple alleles (VF)
         [InlineData("C", "T,A", "GT:NR:NV", "1/1:10:7")]                                // multiple alleles (NR/NV)
         [InlineData("CG", "T", "GT:AU:CU:GU:TU", "1/1:10,11:20,21:30,31:40,41")]        // multiple ref bases (AC)
+        [InlineData("C", ".", "DP:AU:CU:GU:TU", "19:0,0:14,14:0,0:5,6")]                // ref minor (AC)
+        [InlineData("C", ".", "DP:AU:CU:GU:TU", "75:0,0:72,77:0,0:0,2")]                // ref minor (AC)
         public void VariantFrequency_ReturnNull(string refAllele, string altAllele, string formatCol, string sampleCol)
         {
             var vcfLine    = $"chr1\t5592503\t.\t{refAllele}\t{altAllele}\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
