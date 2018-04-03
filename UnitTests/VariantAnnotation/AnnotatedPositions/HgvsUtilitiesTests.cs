@@ -265,6 +265,106 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Equal("*909+909", po.Value);
         }
 
+        private static ITranscript GetForwardGapTranscript()
+        {
+            var regions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon,   1, 1001, 1100, 1, 100),
+                new TranscriptRegion(TranscriptRegionType.Gap,    1, 1101, 1103, 100, 101),
+                new TranscriptRegion(TranscriptRegionType.Exon,   1, 1104, 1203, 101, 200),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 1204, 1303, 200, 201),
+                new TranscriptRegion(TranscriptRegionType.Exon,   2, 1304, 1403, 201, 300)
+            };
+
+            var translation = new Mock<ITranslation>();
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(1051, 1353, 51, 250, 200));
+
+            var transcript = new Mock<ITranscript>();
+            transcript.SetupGet(x => x.Start).Returns(1001);
+            transcript.SetupGet(x => x.End).Returns(1403);
+            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
+            transcript.SetupGet(x => x.TranscriptRegions).Returns(regions);
+            transcript.SetupGet(x => x.Translation).Returns(translation.Object);
+
+            return transcript.Object;
+        }
+
+        [Fact]
+        public void GetCdnaPositionOffset_Gap_LeftSide_Forward()
+        {
+            var transcript = GetForwardGapTranscript();
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1101, 1);
+
+            Assert.NotNull(po);
+            Assert.False(po.HasStopCodonNotation);
+            Assert.Equal(0, po.Offset);
+            Assert.Equal(100, po.Position);
+            Assert.Equal("50", po.Value);
+        }
+
+        [Fact]
+        public void GetCdnaPositionOffset_Gap_RightSide_Forward()
+        {
+            var transcript = GetForwardGapTranscript();
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1102, 1);
+
+            Assert.NotNull(po);
+            Assert.False(po.HasStopCodonNotation);
+            Assert.Equal(0, po.Offset);
+            Assert.Equal(101, po.Position);
+            Assert.Equal("51", po.Value);
+        }
+
+        private static ITranscript GetReverseGapTranscript()
+        {
+            var regions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon,   1, 1001, 1100, 201, 300),
+                new TranscriptRegion(TranscriptRegionType.Gap,    1, 1101, 1103, 200, 201),
+                new TranscriptRegion(TranscriptRegionType.Exon,   1, 1104, 1203, 101, 200),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 1204, 1303, 100, 101),
+                new TranscriptRegion(TranscriptRegionType.Exon,   1, 1304, 1403, 1, 100)
+            };
+
+            var translation = new Mock<ITranslation>();
+            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(1051, 1353, 51, 250, 200));
+
+            var transcript = new Mock<ITranscript>();
+            transcript.SetupGet(x => x.Start).Returns(1001);
+            transcript.SetupGet(x => x.End).Returns(1403);
+            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
+            transcript.SetupGet(x => x.TranscriptRegions).Returns(regions);
+            transcript.SetupGet(x => x.Translation).Returns(translation.Object);
+
+            return transcript.Object;
+        }
+
+        [Fact]
+        public void GetCdnaPositionOffset_Gap_LeftSide_Reverse()
+        {
+            var transcript = GetReverseGapTranscript();
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1102, 1);
+
+            Assert.NotNull(po);
+            Assert.False(po.HasStopCodonNotation);
+            Assert.Equal(0, po.Offset);
+            Assert.Equal(201, po.Position);
+            Assert.Equal("151", po.Value);
+        }
+
+        [Fact]
+        public void GetCdnaPositionOffset_Gap_RightSide_Reverse()
+        {
+            var transcript = GetReverseGapTranscript();
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1103, 1);
+
+            Assert.NotNull(po);
+            Assert.False(po.HasStopCodonNotation);
+            Assert.Equal(0, po.Offset);
+            Assert.Equal(200, po.Position);
+            Assert.Equal("150", po.Value);
+        }
+
         [Fact]
         public void GetCdnaPositionOffset_Intron_RltL_Forward()
         {
@@ -349,7 +449,12 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             transcript.SetupGet(x => x.Translation).Returns(translation.Object);
 
             var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 135001, 0);
-            Assert.Null(po);
+
+            Assert.NotNull(po);
+            Assert.True(po.HasStopCodonNotation);
+            Assert.Equal(0, po.Offset);
+            Assert.Equal(1760, po.Position);
+            Assert.Equal("*910", po.Value);
         }
 
         private static ISequence GetGenomicRefSequence()

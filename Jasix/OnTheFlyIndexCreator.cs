@@ -29,14 +29,15 @@ namespace Jasix
 
         public void Add(IPosition position, long fileLocation)
         {
-            var chromName = position.VcfFields[VcfCommon.ChromIndex];//we want to preserve the chrom name from input
+            var chromName = position.VcfFields[VcfCommon.ChromIndex];
             var start     = position.Start;
             var end       = position.InfoData.End;
 
             if (chromName == _lastChromName && start < _lastPosition)
             {
-                throw new UserErrorException($"the Json file is not sorted at {position.Chromosome.UcscName}: {start}");
+                throw new UserErrorException($"The Json file is not sorted at {position.Chromosome.UcscName}: {start}");
             }
+
             _lastPosition  = start;
             _lastChromName = chromName;
 
