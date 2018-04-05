@@ -56,7 +56,7 @@ namespace Nirvana
             var plugins                      = PluginUtilities.LoadPlugins(_pluginDirectory);
             var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
             var recomposer = _disableRecomposition ? new NullRecomposer() : Recomposer.Create(sequenceProvider, _inputCachePrefix);
-            var logger  = _outputFileName == "" ? (ILogger)new NullLogger() : new ConsoleLogger();
+            var logger  = _outputFileName == "-" ? (ILogger) new NullLogger() : new ConsoleLogger();
             var metrics = new PerformanceMetrics(logger);
 
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
