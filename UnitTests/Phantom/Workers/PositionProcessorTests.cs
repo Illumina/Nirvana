@@ -140,7 +140,7 @@ namespace UnitTests.Phantom.Workers
             var expectedOutput = new string[4][];
             expectedOutput[0] = position1.VcfFields;
             expectedOutput[1] = new[]
-                {"chr1", "2", ".", "AGCTG", "AGGTG,TGGTC", ".", "PASS", "RECOMPOSED", "GT:GQ:PS", "1|2:.:."};
+                {"chr1", "2", ".", "AGCTG", "AGGTG,TGGTC", ".", "PASS", "RECOMPOSED", "GT", "1|2"};
             expectedOutput[2] = position2.VcfFields;
             expectedOutput[3] = position3.VcfFields;
 

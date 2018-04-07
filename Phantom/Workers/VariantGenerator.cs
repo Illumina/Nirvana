@@ -194,7 +194,6 @@ internal sealed class RecomposedAlleleSet
     private readonly string _chrName;
     private const string VariantId = ".";
     private const string InfoTag = "RECOMPOSED";
-    private const string FormatTag = "GT:GQ:PS";
 
 
     public RecomposedAlleleSet(string chrName, int numSamples)
@@ -257,7 +256,7 @@ internal sealed class RecomposedAlleleSet
         sampleGenotype[sampleAlleleAlleleIndex] = currentGenotypeIndex;
     }
 
-    private string[] GetVcfFields(VariantSite varSite, string altAlleleColumn, string qual, string filter, List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, string variantId = VariantId, string info = InfoTag, string format = FormatTag)
+    private string[] GetVcfFields(VariantSite varSite, string altAlleleColumn, string qual, string filter, List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, string variantId = VariantId, string info = InfoTag)
     {
         var vcfFields = new List<string>
             {
@@ -268,17 +267,39 @@ internal sealed class RecomposedAlleleSet
                 altAlleleColumn,
                 qual,
                 filter,
-                info,
-                format
+                info
             };
 
-        for (var index = 0; index < sampleGenoTypes.Length; index++)
+        var formatTags = "GT";
+        var hasGq = false;
+        var hasPs = false;
+        int numSamples = sampleGenoTypes.Length;
+
+        var sampleGenotypeStrings = new string[numSamples];
+        for (var index = 0; index < numSamples; index++)
         {
-            var sampleGenotypeStr = GetGenotype(sampleGenoTypes[index]);
-            if (sampleGenotypeStr == ".") vcfFields.Add(".:.:.");
+            sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
+            if (sampleGenotypeStrings[index] == ".") continue;
+            if (sampleGqs[index] != ".") hasGq = true; 
+            if (samplePhasesets[index] != ".") hasPs = true;
+            if (hasGq && hasPs) break;
+        }
+
+        if (hasGq) formatTags += ":GQ";
+        if (hasPs) formatTags += ":PS";
+
+        vcfFields.Add(formatTags);
+
+        for (var index = 0; index < numSamples; index++)
+        {
+            var sampleGenotypeStr = sampleGenotypeStrings[index];
+            if (sampleGenotypeStr == ".") vcfFields.Add(".");
             else
             {
-                vcfFields.Add(sampleGenotypeStr + ":" + sampleGqs[index] + ":" + samplePhasesets[index]);
+                var sampleColumnStr = sampleGenotypeStr;
+                if (hasGq) sampleColumnStr += $":{sampleGqs[index]}";
+                if (hasPs) sampleColumnStr += $":{samplePhasesets[index]}";
+                vcfFields.Add(sampleColumnStr);
             }
         }
         return vcfFields.ToArray();

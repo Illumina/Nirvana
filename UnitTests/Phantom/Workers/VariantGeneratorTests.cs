@@ -56,8 +56,8 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	.:.:.	1|2:.:456", string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	1|2:.:789	.:.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:PS	.	.	1|2:456", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:PS	.	1|2:789	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
 
         [Fact]
@@ -98,7 +98,7 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
-            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT:GQ:PS	1|2:.:.	.:.:.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT	1|2	.", string.Join("\t", recomposedPositions[0].VcfFields));
         }
 
         [Fact]
@@ -119,7 +119,7 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
-            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT:GQ:PS	1|2:.:.	.:.:.", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,TGA	.	PASS	RECOMPOSED	GT	1|2	.", string.Join("\t", recomposedPositions[0].VcfFields));
         }
 
         [Fact]
@@ -140,8 +140,8 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG	45	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	.:.:.	1|2:.:456", string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	30.1	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	1|2:.:.	.:.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	45	PASS	RECOMPOSED	GT:PS	.	.	1|2:456", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	30.1	PASS	RECOMPOSED	GT	.	1|2	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
 
         [Fact]
@@ -162,8 +162,8 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	.:.:.	1|2:.:456", string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	FilteredVariantsRecomposed	RECOMPOSED	GT:GQ:PS	.:.:.	1|2:.:.	.:.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:PS	.	.	1|2:456", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	FilteredVariantsRecomposed	RECOMPOSED	GT	.	1|2	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
 
         [Fact]
@@ -184,8 +184,8 @@ namespace UnitTests.Phantom.Workers
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	.:.:.	1|2:15.6:456", string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ:PS	.:.:.	1|2:14.2:.	.:.:.", string.Join("\t", recomposedPositions[1].VcfFields));
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG	.	PASS	RECOMPOSED	GT:GQ:PS	.	.	1|2:15.6:456", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ	.	1|2:14.2	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
     }
 }
