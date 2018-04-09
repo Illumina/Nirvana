@@ -82,7 +82,7 @@ namespace Phantom.Workers
             string[] psValues = new string[numSamples];
             for (int i = 0; i < numSamples; i++)
                 // PS tags are the same in the decomposed variants
-                psValues[i] = positionSet.PsInfo[i][startIndex]; 
+                psValues[i] = positionSet.PsInfo[i][startIndex];
 
             return new VariantInfo(qual, filter, gqValues, psValues);
         }
@@ -171,7 +171,7 @@ namespace Phantom.Workers
         public readonly string[] SamplePhaseSets;
         public readonly Dictionary<string, List<SampleAllele>> AltAlleleToSample = new Dictionary<string, List<SampleAllele>>();
 
-        public VariantInfo(string qual, string filter, string[] sampleGqs, string[]samplePhaseSets)
+        public VariantInfo(string qual, string filter, string[] sampleGqs, string[] samplePhaseSets)
         {
             Qual = qual;
             Filter = filter;
@@ -270,6 +270,12 @@ internal sealed class RecomposedAlleleSet
                 info
             };
 
+        AddFormatAndSampleColumns(sampleGenoTypes, sampleGqs, samplePhasesets, ref vcfFields);
+        return vcfFields.ToArray();
+    }
+
+    private static void AddFormatAndSampleColumns(List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, ref List<string> vcfFields)
+    {
         var formatTags = "GT";
         var hasGq = false;
         var hasPs = false;
@@ -280,13 +286,23 @@ internal sealed class RecomposedAlleleSet
         {
             sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
             if (sampleGenotypeStrings[index] == ".") continue;
-            if (sampleGqs[index] != ".") hasGq = true; 
+            if (sampleGqs[index] != ".") hasGq = true;
             if (samplePhasesets[index] != ".") hasPs = true;
             if (hasGq && hasPs) break;
         }
 
-        if (hasGq) formatTags += ":GQ";
-        if (hasPs) formatTags += ":PS";
+        int numFields = 1;
+
+        if (hasGq)
+        {
+            formatTags += ":GQ";
+            numFields++;
+        }
+        if (hasPs)
+        {
+            formatTags += ":PS";
+            numFields++;
+        }
 
         vcfFields.Add(formatTags);
 
@@ -296,13 +312,34 @@ internal sealed class RecomposedAlleleSet
             if (sampleGenotypeStr == ".") vcfFields.Add(".");
             else
             {
-                var sampleColumnStr = sampleGenotypeStr;
-                if (hasGq) sampleColumnStr += $":{sampleGqs[index]}";
-                if (hasPs) sampleColumnStr += $":{samplePhasesets[index]}";
+                var nonMissingFields = new string[numFields];
+                nonMissingFields[0] = sampleGenotypeStr;
+                var fieldIndex = 1;
+                if (hasGq)
+                {
+                    nonMissingFields[fieldIndex] = sampleGqs[index];
+                    fieldIndex++;
+                }
+                if (hasPs)
+                {
+                    nonMissingFields[fieldIndex] = samplePhasesets[index];
+                }
+
+                var sampleColumnStr = string.Join(":", TrimTrailingMissValues(nonMissingFields));
                 vcfFields.Add(sampleColumnStr);
             }
         }
-        return vcfFields.ToArray();
+    }
+
+    private static string[] TrimTrailingMissValues(string[] values)
+    {
+        int indexLastRemainedValue = values.Length - 1;
+        // Need to have at least one value remained
+        for (; indexLastRemainedValue > 0; indexLastRemainedValue--)
+        {
+            if (values[indexLastRemainedValue] != ".") break;
+        }
+        return new ArraySegment<string>(values, 0, indexLastRemainedValue + 1).ToArray();
     }
 
     private static string GetGenotype(List<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);

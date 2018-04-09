@@ -122,13 +122,13 @@ namespace Phantom.DataStructures
 
         internal static string ExtractSamplePhaseSet(int phaseSetTagIndex, string[] sampleInfo)
         {
-            if (phaseSetTagIndex == -1) return ".";
+            if (phaseSetTagIndex == -1 || sampleInfo.Length <= phaseSetTagIndex) return ".";
             if (sampleInfo.Length == 1 && sampleInfo[0] == ".") return ".";
             var phaseSet = sampleInfo[phaseSetTagIndex];
             return phaseSet;
         }
 
-        internal static string ExtractSampleGq(int gqTagIndex, string[] sampleInfo) => (gqTagIndex == -1) ? "." : sampleInfo[gqTagIndex];
+        internal static string ExtractSampleGq(int gqTagIndex, string[] sampleInfo) => gqTagIndex == -1 || sampleInfo.Length <= gqTagIndex ? "." : sampleInfo[gqTagIndex];
 
         private static Dictionary<(string Genotypes, int Start), List<int>> GetGenotypeToSampleIndex(PositionSet positionSet)
         {
