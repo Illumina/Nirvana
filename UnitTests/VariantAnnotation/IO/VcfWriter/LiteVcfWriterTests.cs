@@ -28,16 +28,13 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             "##INFO=<ID=clinvar,Number=.,Type=String,Description=\"Clinical significance. Format: GenotypeIndex|Significance\">",
             "##INFO=<ID=EVS,Number=A,Type=String,Description=\"Allele frequency, coverage and sample count taken from the Exome Variant Server (EVS). Format: AlleleFreqEVS|EVSCoverage|EVSSamples.\">",
             "##INFO=<ID=RefMinor,Number=0,Type=Flag,Description=\"Denotes positions where the reference base is a minor allele and is annotated as though it were a variant\">",
-            "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">",
-            "##INFO=<ID=RECOMPOSED,Number=0,Type=Flag,Description=\"The position is recomposed\">"
+            "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">"
         };
-
-        private const string FilteredVariantsRecomposedHeaderLine = "##FILTER=<ID=FilteredVariantsRecomposed,Description=\"Any of the decomposed variants has a filter status other than PASS or .\">";
 
         [Fact]
         public void Vcf_header_write_as_expected()
         {
-            var ms = new MemoryStream();
+            var ms     = new MemoryStream();
             var writer = new StreamWriter(ms, Encoding.Default, 1024, true);
 
             var currentHeaderLines = new List<string>
@@ -46,7 +43,6 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
                 "##source=IsaacVariantCaller",
                 "#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  Mother"
-
             };
 
             var dataSourceVersions = new IDataSourceVersion[]
@@ -78,7 +74,6 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             expectedLines.AddRange(_infoHeaderLines);
             expectedLines.Add(CsqtHeaderLine);
             expectedLines.Add(CsqrHeaderLine);
-            expectedLines.Add(FilteredVariantsRecomposedHeaderLine);
             expectedLines.Add("#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  Mother");
             expectedLines.Add(vcfLine);
 
@@ -89,10 +84,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 int i = 0;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    Assert.Equal(expectedLines[i],line);
+                    Assert.Equal(expectedLines[i], line);
                     i++;
                 }
-                Assert.Equal(22,i);
+                Assert.Equal(20, i);
             }
         }
     }

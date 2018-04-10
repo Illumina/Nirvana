@@ -11,7 +11,9 @@ using Jasix.DataStructures;
 using Phantom.Workers;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -56,7 +58,7 @@ namespace Nirvana
             var plugins                      = PluginUtilities.LoadPlugins(_pluginDirectory);
             var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
             var recomposer = _disableRecomposition ? new NullRecomposer() : Recomposer.Create(sequenceProvider, _inputCachePrefix);
-            var logger  = _outputFileName == "" ? (ILogger)new NullLogger() : new ConsoleLogger();
+            var logger  = _outputFileName == "-" ? (ILogger) new NullLogger() : new ConsoleLogger();
             var metrics = new PerformanceMetrics(logger);
 
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
@@ -72,7 +74,7 @@ namespace Nirvana
             using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var jasixIndexCreator = new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)))
             {
-                var bgzipTextWriter = outputWriter as BgzipTextWriter;
+                if (!(outputWriter is BgzipTextWriter bgzipTextWriter)) throw new NullReferenceException("Unable to create the bgzip text writer.");
 
                 try
                 {
@@ -94,19 +96,10 @@ namespace Nirvana
 
                         var annotatedPosition = annotator.Annotate(position);
 
-                        var jsonOutput = annotatedPosition.GetJsonString();
-                        if (jsonOutput != null)
-                        {
-                            if (bgzipTextWriter != null)
-                                jasixIndexCreator.Add(annotatedPosition.Position, bgzipTextWriter.Position);
-                        }
-                        jsonWriter.WriteJsonEntry(jsonOutput);
+                        string json = annotatedPosition.GetJsonString();
 
-                        if (annotatedPosition.AnnotatedVariants?.Length > 0) vcfWriter?.Write(_conversion.Convert(annotatedPosition));
-
-                        gvcfWriter?.Write(annotatedPosition.AnnotatedVariants?.Length > 0
-                            ? _conversion.Convert(annotatedPosition)
-                            : string.Join("\t", position.VcfFields));
+                        if (json != null) WriteOutput(annotatedPosition, bgzipTextWriter.Position, jasixIndexCreator, jsonWriter, vcfWriter, gvcfWriter, json);
+                        else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
 
                         metrics.Increment();
                     }
@@ -123,6 +116,20 @@ namespace Nirvana
             metrics.ShowAnnotationTime();
 
             return ExitCodes.Success;
+        }
+
+        private void WriteOutput(IAnnotatedPosition annotatedPosition, long textWriterPosition,
+            OnTheFlyIndexCreator jasixIndexCreator, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter,
+            LiteVcfWriter gvcfWriter, string jsonOutput)
+        {
+            jasixIndexCreator.Add(annotatedPosition.Position, textWriterPosition);
+            jsonWriter.WriteJsonEntry(jsonOutput);
+
+            if (vcfWriter == null && gvcfWriter == null || annotatedPosition.Position.IsRecomposed) return;
+
+            string vcfLine = _conversion.Convert(annotatedPosition);
+            vcfWriter?.Write(vcfLine);
+            gvcfWriter?.Write(vcfLine);
         }
 
         private static List<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
