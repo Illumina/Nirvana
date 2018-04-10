@@ -74,7 +74,7 @@ namespace Nirvana
             using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var jasixIndexCreator = new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)))
             {
-                var bgzipTextWriter = outputWriter as BgzipTextWriter;
+                if (!(outputWriter is BgzipTextWriter bgzipTextWriter)) throw new NullReferenceException("Unable to create the bgzip text writer.");
 
                 try
                 {
@@ -95,7 +95,11 @@ namespace Nirvana
                         previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
 
                         var annotatedPosition = annotator.Annotate(position);
-                        WriteOutput(annotatedPosition, bgzipTextWriter, jasixIndexCreator, jsonWriter, vcfWriter, gvcfWriter, position.VcfFields);
+
+                        string json = annotatedPosition.GetJsonString();
+
+                        if (json != null) WriteOutput(annotatedPosition, bgzipTextWriter.Position, jasixIndexCreator, jsonWriter, vcfWriter, gvcfWriter, json);
+                        else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
 
                         metrics.Increment();
                     }
@@ -114,22 +118,17 @@ namespace Nirvana
             return ExitCodes.Success;
         }
 
-        private void WriteOutput(IAnnotatedPosition annotatedPosition, BgzipTextWriter bgzipTextWriter,
+        private void WriteOutput(IAnnotatedPosition annotatedPosition, long textWriterPosition,
             OnTheFlyIndexCreator jasixIndexCreator, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter,
-            LiteVcfWriter gvcfWriter, string[] vcfFields)
+            LiteVcfWriter gvcfWriter, string jsonOutput)
         {
-            string jsonOutput = annotatedPosition.GetJsonString();
-            if (jsonOutput == null) return;
-
-            if (bgzipTextWriter != null) jasixIndexCreator.Add(annotatedPosition.Position, bgzipTextWriter.Position);
+            jasixIndexCreator.Add(annotatedPosition.Position, textWriterPosition);
             jsonWriter.WriteJsonEntry(jsonOutput);
 
             if (vcfWriter == null && gvcfWriter == null || annotatedPosition.Position.IsRecomposed) return;
 
-            bool hasAnnotatedVariants = annotatedPosition.AnnotatedVariants?.Length > 0;
-            string vcfLine = hasAnnotatedVariants ? _conversion.Convert(annotatedPosition) : string.Join("\t", vcfFields);
-
-            if (hasAnnotatedVariants) vcfWriter?.Write(vcfLine);
+            string vcfLine = _conversion.Convert(annotatedPosition);
+            vcfWriter?.Write(vcfLine);
             gvcfWriter?.Write(vcfLine);
         }
 

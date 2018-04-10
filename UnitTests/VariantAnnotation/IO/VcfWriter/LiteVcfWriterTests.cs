@@ -31,12 +31,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             "##INFO=<ID=phyloP,Number=A,Type=Float,Description=\"PhyloP conservation score. Denotes how conserved the reference sequence is between species throughout evolution\">"
         };
 
-        private const string FilteredVariantsRecomposedHeaderLine = "##FILTER=<ID=FilteredVariantsRecomposed,Description=\"Any of the decomposed variants has a filter status other than PASS or .\">";
-
         [Fact]
         public void Vcf_header_write_as_expected()
         {
-            var ms = new MemoryStream();
+            var ms     = new MemoryStream();
             var writer = new StreamWriter(ms, Encoding.Default, 1024, true);
 
             var currentHeaderLines = new List<string>
@@ -45,7 +43,6 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 "##FORMAT=<ID=GT,Number=1,Type=String,Description=\"Genotype\">",
                 "##source=IsaacVariantCaller",
                 "#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  Mother"
-
             };
 
             var dataSourceVersions = new IDataSourceVersion[]
@@ -77,7 +74,6 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             expectedLines.AddRange(_infoHeaderLines);
             expectedLines.Add(CsqtHeaderLine);
             expectedLines.Add(CsqrHeaderLine);
-            expectedLines.Add(FilteredVariantsRecomposedHeaderLine);
             expectedLines.Add("#CHROM  POS     ID      REF     ALT     QUAL    FILTER  INFO    FORMAT  Mother");
             expectedLines.Add(vcfLine);
 
@@ -91,7 +87,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                     Assert.Equal(expectedLines[i], line);
                     i++;
                 }
-                Assert.Equal(21, i);
+                Assert.Equal(20, i);
             }
         }
     }
