@@ -116,6 +116,26 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             Assert.Equal("GMAF=G|0.002", observedVcf);
         }
 
+        [Fact]
+        public void Phylop_positional()
+        {
+            var vcfFields = "chr1	101	sa123	A	T	.	.	.".Split("\t");
+            var chrom = new Chromosome("chr1", "1", 0);
+            var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
+                false, false, "", null, null);
+            var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var annotatedVariant = new AnnotatedVariant(variant);
+
+            annotatedVariant.PhylopScore = -0.567;
+            IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
+            var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+
+            var converter = new VcfConversion();
+            var observedVcf = converter.Convert(annotatedPosition).Split("\t")[VcfCommon.InfoIndex];
+
+            Assert.Equal("phyloP=-0.567", observedVcf);
+        }
 
 
         [Fact]

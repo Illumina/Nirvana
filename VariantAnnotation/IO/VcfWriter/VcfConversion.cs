@@ -34,11 +34,11 @@ namespace VariantAnnotation.IO.VcfWriter
             }
 
             // add dbSNP id
-            var dbSnpId = ExtractDbId(annotatedPosition);
+            string dbSnpId = ExtractDbId(annotatedPosition);
             _sb.Append(dbSnpId);
             _sb.Append('\t');
 
-            for (var vcfIndex = VcfCommon.IdIndex + 1; vcfIndex < VcfCommon.InfoIndex; vcfIndex++)
+            for (int vcfIndex = VcfCommon.IdIndex + 1; vcfIndex < VcfCommon.InfoIndex; vcfIndex++)
             {
                 _sb.Append(fields[vcfIndex]);
                 _sb.Append('\t');
@@ -47,8 +47,8 @@ namespace VariantAnnotation.IO.VcfWriter
             AddInfoField(annotatedPosition, _sb);
 
             // add all of the fields after the info field
-            var numColumns = fields.Length;
-            for (var vcfIndex = VcfCommon.InfoIndex + 1; vcfIndex < numColumns; vcfIndex++)
+            int numColumns = fields.Length;
+            for (int vcfIndex = VcfCommon.InfoIndex + 1; vcfIndex < numColumns; vcfIndex++)
             {
                 _sb.Append('\t');
                 _sb.Append(fields[vcfIndex]);
@@ -63,14 +63,14 @@ namespace VariantAnnotation.IO.VcfWriter
 
             var nonDbsnpIds = GetNonDbsnpIds(annotatedPosition.Position.VcfFields[VcfCommon.IdIndex]);
 
-            if (nonDbsnpIds != null) foreach (var nonDbsnpId in nonDbsnpIds) dbSnp.Add(nonDbsnpId);
+            if (nonDbsnpIds != null) foreach (string nonDbsnpId in nonDbsnpIds) dbSnp.Add(nonDbsnpId);
 
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 foreach (var suppAnnotation in annotatedVariant.SupplementaryAnnotations)
                 {
                     if (suppAnnotation.SaDataSource.KeyName != DbSnpKeyName) continue;
-                    foreach (var s in suppAnnotation.GetVcfStrings())
+                    foreach (string s in suppAnnotation.GetVcfStrings())
                     {
                         dbSnp.Add(s);
                     }
@@ -92,7 +92,7 @@ namespace VariantAnnotation.IO.VcfWriter
         private void AddInfoField(IAnnotatedPosition annotatedPosition, StringBuilder sb)
         {
             var infoEntries = new VcfField();
-            var infoField = annotatedPosition.Position.InfoData.UpdatedInfoField;
+            string infoField = annotatedPosition.Position.InfoData.UpdatedInfoField;
 
             if (!string.IsNullOrEmpty(infoField))
             {
@@ -128,11 +128,11 @@ namespace VariantAnnotation.IO.VcfWriter
         {
             var alleleFreq1000G = new VcfInfoKeyValue("AF1000G");
             var ancestralAllele = new VcfPositionalInfo("AA");
-            var phyloP          = new VcfInfoKeyValue("phyloP");
+            var phyloP          = new VcfPositionalInfo("phyloP");
 
             var suppAnnotationSources = new Dictionary<string, VcfInfoKeyValue>();
             var isSaArrayInfo = new Dictionary<string, bool>();
-            var numInputAltAlleles = annotatedPosition.Position.AltAlleles.Length;
+            int numInputAltAlleles = annotatedPosition.Position.AltAlleles.Length;
 
             foreach (var alternateAllele in annotatedPosition.AnnotatedVariants)
             {
@@ -160,13 +160,13 @@ namespace VariantAnnotation.IO.VcfWriter
             var inputGenotypeIndex = GetInputGenotypeIndex(annotatedPosition.Position.AltAlleles, annotatedPosition.AnnotatedVariants);
 
             // understand the number of annotation contains in the whole vcf line
-            for (int i = 0; i < annotatedPosition.AnnotatedVariants.Length; i++)
+            for (var i = 0; i < annotatedPosition.AnnotatedVariants.Length; i++)
             {
                 var annotatedVariant = annotatedPosition.AnnotatedVariants[i];
-                var genotypeIndex = inputGenotypeIndex[i] + 1;
+                int genotypeIndex = inputGenotypeIndex[i] + 1;
                 if (annotatedVariant.Variant.IsRefMinor) infoEntries.Add("RefMinor");
 
-                phyloP.Add(annotatedVariant.PhylopScore?.ToString(CultureInfo.InvariantCulture));
+                phyloP.AddValue(annotatedVariant.PhylopScore?.ToString(CultureInfo.InvariantCulture));
 
                 foreach (var sa in annotatedVariant.SupplementaryAnnotations)
                 {
@@ -174,15 +174,15 @@ namespace VariantAnnotation.IO.VcfWriter
                     if (sa.SaDataSource.KeyName == DbSnpKeyName) continue;
                     if (sa.SaDataSource.KeyName == RefMinorKeyName) continue;
 
-                    foreach (var vcfAnnotation in sa.GetVcfStrings())
+                    foreach (string vcfAnnotation in sa.GetVcfStrings())
                     {
                         if (string.IsNullOrEmpty(vcfAnnotation)) continue;
 
                         if (sa.SaDataSource.KeyName == OneKgKeyName)
                         {
                             var contents = vcfAnnotation.Split(';');
-                            var freq = contents[0];
-                            var ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
+                            string freq = contents[0];
+                            string ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
 
                             alleleFreq1000G.Add(freq, genotypeIndex);
                             ancestralAllele.AddValue(ancestryAllele);
@@ -259,7 +259,7 @@ namespace VariantAnnotation.IO.VcfWriter
         private string GetCsqtAndCsqrVcfInfo(List<CsqEntry> csqList)
         {
             // make sure we have some tags
-            var numCsqTags = csqList.Count;
+            int numCsqTags = csqList.Count;
             if (numCsqTags == 0) return null;
 
             // build our vcf INFO fields
@@ -287,8 +287,8 @@ namespace VariantAnnotation.IO.VcfWriter
                 }
             }
 
-            var hasCsqT = _csqtStrings.Count > 0;
-            var hasCsqR = _csqrStrings.Count > 0;
+            bool hasCsqT = _csqtStrings.Count > 0;
+            bool hasCsqR = _csqrStrings.Count > 0;
 
             if (hasCsqT) _csqInfoBuilder.Append("CSQT=" + string.Join(",", _csqtStrings));
             if (hasCsqT && hasCsqR) _csqInfoBuilder.Append(';');
@@ -301,7 +301,7 @@ namespace VariantAnnotation.IO.VcfWriter
         {
             for (int i = 0; i < unifiedJson.AnnotatedVariants.Length; i++)
             {
-                var genotypeIndex = i + 1;
+                int genotypeIndex = i + 1;
                 var jsonVariant = unifiedJson.AnnotatedVariants[i];
 
                 csqs.AddRange(
