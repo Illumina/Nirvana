@@ -13,7 +13,6 @@ namespace SAUtils.TsvWriters
     {
         #region members
 
-        private const int ReferenceWindow = 10;
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly TsvIndex _tsvIndex;
         private string _currentChromosome;
@@ -76,7 +75,7 @@ namespace SAUtils.TsvWriters
         }
 
 
-        private static string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
+        public static string GetHeader(DataSourceVersion dataSourceVersion, int schemaVersion, string assembly, string jsonKey, string vcfKeys, bool matchByAllele, bool isArray)
         {
             var sb = StringBuilderCache.Acquire();
 
@@ -101,7 +100,7 @@ namespace SAUtils.TsvWriters
             if ((jsonStrings == null || jsonStrings.Count == 0) && string.IsNullOrEmpty(vcfString)) return;
 
             //validate the vcf reference
-            if (!ValidateReference(chromosome, position, refAllele)) return;
+            if (!SaUtilsCommon.ValidateReference(chromosome, position, refAllele, _sequenceProvider)) return;
 
             if (!chromosome.Equals(_currentChromosome))
             {
@@ -126,18 +125,6 @@ namespace SAUtils.TsvWriters
             _bgzipTextWriter.Write("\n");
         }
 
-        private bool ValidateReference(string chromosome, int position, string refAllele)
-        {
-            if (_sequenceProvider == null) return true;
-
-            var refDictionary = _sequenceProvider.RefNameToChromosome;
-            if (!refDictionary.ContainsKey(chromosome)) return false;
-
-            var chrom = refDictionary[chromosome];
-
-            _sequenceProvider.LoadChromosome(chrom);
-            var refSequence = _sequenceProvider.Sequence.Substring(position - 1, ReferenceWindow);
-            return SupplementaryAnnotationUtilities.ValidateRefAllele(refAllele, refSequence);
-        }
+        
     }
 }

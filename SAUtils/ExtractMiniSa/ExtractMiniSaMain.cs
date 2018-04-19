@@ -35,8 +35,7 @@ namespace SAUtils.ExtractMiniSa
 		
 		public static ExitCodes Run(string command,string[] commandArgs)
 		{
-            var extractor = new ExtractMiniSaMain();
-
+            
 			var ops = new OptionSet
 			{
 				{
@@ -77,7 +76,7 @@ namespace SAUtils.ExtractMiniSa
                 .Parse()
                 .CheckInputFilenameExists(_inputSuppAnnotPath, "Nirvana supplementary annotations", "--in")
                 .CheckInputFilenameExists(_compressedReference, "Compressed reference sequence file name", "--ref")
-                .HasRequiredParameter<string>(_miniSaDirectory, "output directory", "--out")
+                .HasRequiredParameter(_miniSaDirectory, "output directory", "--out")
                 .SkipBanner()
                 .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
                 .ShowErrors()

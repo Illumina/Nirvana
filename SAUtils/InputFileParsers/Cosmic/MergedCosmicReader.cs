@@ -225,12 +225,11 @@ namespace SAUtils.InputFileParsers.Cosmic
 
             foreach (var altAllele in altAlleles)
             {
-                if (_studies.TryGetValue(cosmicId, out var studies))
-                {
-                    cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, studies, _sampleCount));
-                }
-                else cosmicItems.Add(new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, null, _sampleCount));
-                
+                cosmicItems.Add(_studies.TryGetValue(cosmicId, out var studies)
+                    ? new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, studies,
+                        _sampleCount)
+                    : new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, null,
+                        _sampleCount));
             }
 
             return cosmicItems;

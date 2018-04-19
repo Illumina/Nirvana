@@ -121,7 +121,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddStringValue("isAlleleSpecific", IsAlleleSpecific, false);
             jsonObject.AddStringValue("refAllele", string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele);
             jsonObject.AddStringValue("altAllele",
-                SupplementaryAnnotationUtilities.ReverseSaReducedAllele(AlternateAllele));
+                SaUtilsCommon.ReverseSaReducedAllele(AlternateAllele));
             jsonObject.AddStringValue("gene", Gene);
             jsonObject.AddIntValue("sampleCount", SampleCount);
 

@@ -59,6 +59,16 @@
       "commandName": "Project",
       "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf  -o Pedigree_NIR_Phan_out",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+    },
+    "RR_zodiacSnv": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\44\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in debug.vcf --out debug",
+      "workingDirectory": "c:\\Development\\TestDatasets"
+    },
+    "RR_momGen": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\45\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in C:\\Development\\TestDatasets\\Mother.genome.vcf.gz --out C:\\Development\\TestDatasets\\momGen",
+      "workingDirectory": "C:\\Development\\TestDatasets\\"
     }
   }
 }

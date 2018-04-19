@@ -23,8 +23,7 @@ namespace SAUtils.GeneScoresTsv
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-            var creator = new GeneScoresMain();
-
+            
             var ops = new OptionSet
             {
                 {

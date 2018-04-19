@@ -82,7 +82,7 @@ namespace SAUtils.TsvWriters
                 var altAllele = kvp.Key.AlternateAllele;
 
                 var groupedItems = kvp.Value;
-                var vcfString = string.Join(",", groupedItems.OrderBy(x => x.Id).Select(x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
+                var vcfString = string.Join(",", groupedItems.OrderBy(x => x.Id).Select(x => SaUtilsCommon.ConvertToVcfInfoString(x.Significance)));
                 var jsonStrings = groupedItems.OrderBy(x => x.Id).Select(x => x.GetJsonString()).ToList();
 
                 var firstItem = groupedItems[0];
@@ -96,7 +96,7 @@ namespace SAUtils.TsvWriters
 			//foreach (var groupedItem in alleleGroupedItems)
 			//{
 			//	var uniqueItems = groupedItem.GroupBy(p => p.ID).Select(x => x.First()).ToList();
-			//	var vcfString = string.Join(",", uniqueItems.Select(x => SupplementaryAnnotationUtilities.ConvertToVcfInfoString(x.Significance)));
+			//	var vcfString = string.Join(",", uniqueItems.Select(x => SaUtilsCommon.ConvertToVcfInfoString(x.Significance)));
 			//	var jsonStrings = uniqueItems.Select(x => x.GetVariantJsonString()).ToList();
 
 			//	// since the reference allele for different items in the group may be different, we only use the first base as it is supposed to be the common padding base.

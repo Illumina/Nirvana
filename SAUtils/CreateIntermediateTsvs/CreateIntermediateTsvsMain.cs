@@ -5,7 +5,7 @@ using ErrorHandling;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
-    public sealed class CreateIntermediateTsvsMain
+    public static class CreateIntermediateTsvsMain
     {
         private static string _compressedReference;
         private static string _inputDbSnpFileName;

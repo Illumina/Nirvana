@@ -132,7 +132,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
 			var chromosome = columns[ChrIndex];
             // position, ref and alt are in VCF style. We need to reduce them to our internal representation.
-            var newAlleles = SupplementaryAnnotationUtilities.GetReducedAlleles(int.Parse(columns[PositionIndex]), columns[RefAlleleIndex], columns[AltAlleleIndex]);
+            var newAlleles = SaUtilsCommon.GetReducedAlleles(int.Parse(columns[PositionIndex]), columns[RefAlleleIndex], columns[AltAlleleIndex]);
 
             var position  = newAlleles.Item1;
             var refAllele = newAlleles.Item2;

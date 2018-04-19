@@ -43,7 +43,7 @@ namespace SAUtils.ExtractMiniXml
 			var exitCode = new ConsoleAppBuilder(commandArgs, ops)
 	            .Parse()
 	            .CheckInputFilenameExists(_inputXmlFile, "input XML file", "--in")
-	            .HasRequiredParameter<string>(_outputDir, "output directory", "--out")
+	            .HasRequiredParameter(_outputDir, "output directory", "--out")
 			    .SkipBanner()
                 .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
 	            .ShowErrors()
