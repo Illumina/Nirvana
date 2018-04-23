@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -11,13 +12,74 @@ using VariantAnnotation.Utilities;
 
 namespace Jasix
 {
-    public sealed class Jasix 
+    public static class Jasix 
     {
+        private static string _inputJson;
+        private static string _outputFile;
+        private static readonly List<string> Queries = new List<string>();
+        private static bool _printHeader;
+        private static bool _printHeaderOnly;
+        private static bool _listChromosomeName;
+        private static bool _createIndex;
+
+        public static int Main(string[] args)
+        {
+            var ops = new OptionSet
+            {
+                {
+                    "header|t",
+                    "print also the header lines",
+                    v => _printHeader = v != null
+                },
+                {
+                    "only-header|H",
+                    "print only the header lines",
+                    v => _printHeaderOnly = v != null
+                },
+                {
+                    "chromosomes|l",
+                    "list chromosome names",
+                    v => _listChromosomeName = v != null
+                },
+                {
+                    "index|c",
+                    "create index",
+                    v => _createIndex = v != null
+                },
+                {
+                    "in|i=",
+                    "input",
+                    v => _inputJson = v
+                },
+                {
+                    "out|o=",
+                    "compressed output file name (default:console)",
+                    v => _outputFile = v
+                },
+                {
+                    "query|q=",
+                    "query range",
+                    v => Queries.Add(v)
+                }
+            };
+
+            var exitCode = new ConsoleAppBuilder(args, ops)
+                .Parse()
+                .CheckInputFilenameExists(_inputJson, "input Json file", "[in.json.gz]")
+                .DisableOutput(!_createIndex && _outputFile == null)
+                .ShowBanner(Constants.Authors)
+                .ShowHelpMenu("Indexes a Nirvana annotated JSON file", "-i in.json.gz [options]")
+                .ShowErrors()
+                .Execute(ProgramExecution);
+
+            return (int)exitCode;
+        }
+
         private static ExitCodes ProgramExecution()
         {
-            if (ConfigurationSettings.CreateIndex)
+            if (_createIndex)
             {
-                using (var indexCreator = new IndexCreator(ConfigurationSettings.InputJson))
+                using (var indexCreator = new IndexCreator(_inputJson))
                 {
                     indexCreator.CreateIndex();
                 }
@@ -25,34 +87,34 @@ namespace Jasix
                 return ExitCodes.Success;
             }
 
-            var indexFileName = ConfigurationSettings.InputJson + JasixCommons.FileExt;
+            string indexFileName = _inputJson + JasixCommons.FileExt;
 
             ValidateIndexFile(indexFileName);
-            var writer = string.IsNullOrEmpty(ConfigurationSettings.OutputFile)
-                ? null : GZipUtilities.GetStreamWriter(ConfigurationSettings.OutputFile);
+            var writer = string.IsNullOrEmpty(_outputFile)
+                ? null : GZipUtilities.GetStreamWriter(_outputFile);
 
-            using (var queryProcessor = new QueryProcessor(GZipUtilities.GetAppropriateStreamReader(ConfigurationSettings.InputJson),
+            using (var queryProcessor = new QueryProcessor(GZipUtilities.GetAppropriateStreamReader(_inputJson),
                     FileUtilities.GetReadStream(indexFileName), writer))
             {
-                if (ConfigurationSettings.ListChromosomeName)
+                if (_listChromosomeName)
                 {
                     queryProcessor.PrintChromosomeList();
                     return ExitCodes.Success;
                 }
 
-                if (ConfigurationSettings.PrintHeaderOnly)
+                if (_printHeaderOnly)
                 {
                     queryProcessor.PrintHeader();
                     return ExitCodes.Success;
                 }
 
-                if (ConfigurationSettings.Queries == null)
+                if (Queries == null)
                 {
-                    Console.WriteLine("Plese specify query region");
+                    Console.WriteLine("Plese specify query region(s)");
                     return ExitCodes.BadArguments;
                 }
                 
-                queryProcessor.ProcessQuery(ConfigurationSettings.Queries, ConfigurationSettings.PrintHeader);
+                queryProcessor.ProcessQuery(Queries, _printHeader);
                 
             }
             return ExitCodes.Success;
@@ -63,62 +125,9 @@ namespace Jasix
             if (!File.Exists(indexFileName))
                 throw new UserErrorException("No index file found,please generate index file first.");
             var indexFileCreateTime = File.GetCreationTime(indexFileName);
-            var fileCreateTime = File.GetCreationTime(ConfigurationSettings.InputJson);
+            var fileCreateTime = File.GetCreationTime(_inputJson);
             if (fileCreateTime > indexFileCreateTime)
                 throw new UserErrorException("Index file is older than the input file, please re-generate the index.");
-        }
-
-        public static int Main(string[] args)
-        {
-            var ops = new OptionSet
-            {
-                {
-                    "header|t",
-                    "print also the header lines",
-                    v => ConfigurationSettings.PrintHeader = v != null
-                },
-                {
-                    "only-header|H",
-                    "print only the header lines",
-                    v => ConfigurationSettings.PrintHeaderOnly = v != null
-                },
-                {
-                    "chromosomes|l",
-                    "list chromosome names",
-                    v => ConfigurationSettings.ListChromosomeName = v != null
-                },
-                {
-                    "index|c",
-                    "create index",
-                    v => ConfigurationSettings.CreateIndex = v != null
-                },
-                {
-                    "in|i=",
-                    "input",
-                    v => ConfigurationSettings.InputJson = v
-                },
-                {
-                    "out|o=",
-                    "compressed output file name (default:console)",
-                    v => ConfigurationSettings.OutputFile = v
-                },
-                {
-                    "query|q=",
-                    "query range",
-                    v => ConfigurationSettings.Queries.Add(v)
-                }
-            };
-
-            var exitCode = new ConsoleAppBuilder(args, ops)
-                .Parse()
-                .CheckInputFilenameExists(ConfigurationSettings.InputJson, "input Json file", "[in.json.gz]")
-                .DisableOutput(!ConfigurationSettings.CreateIndex && ConfigurationSettings.OutputFile == null)
-                .ShowBanner(Constants.Authors)
-                .ShowHelpMenu("Indexes a Nirvana annotated JSON file", "-i in.json.gz [options]")
-                .ShowErrors()
-                .Execute(ProgramExecution);
-
-            return (int)exitCode;
         }
         
     }

@@ -99,7 +99,7 @@ namespace Jasix
 		    foreach (var queryString in queryStrings)
             {
                 var query = Utilities.ParseQuery(queryString);
-                if (!_jasixIndex.ContainsChr(query.Item1)) continue;
+                if (!_jasixIndex.ContainsChr(query.Chromosome)) continue;
                 var needComma = PrintLargeVariantsExtendingIntoQuery(query);
                 PrintAllVariantsFromQueryBegin(query, needComma);
             }
@@ -181,14 +181,16 @@ namespace Jasix
 					Console.WriteLine($"Error in line:\n{line}");
 					throw;
 				}
-                
-				if (jsonEntry.chromosome != query.Item1) break;
 
-				if (jsonEntry.Start > query.Item3) break;
+			    string indexChromName = _jasixIndex.GetIndexChromName(query.Chr);
+			    string jsonChrom = _jasixIndex.GetIndexChromName(jsonEntry.chromosome);
+				if (jsonChrom != indexChromName) break;
 
-				if (!jsonEntry.Overlaps(query.Item2, query.Item3)) continue;
+				if (jsonEntry.Start > query.End) break;
+
+				if (!jsonEntry.Overlaps(query.Start, query.End)) continue;
 				// if there is an SV that starts before the query start that is printed by the large variant printer
-				if (Utilities.IsLargeVariant(jsonEntry.Start, jsonEntry.End) && jsonEntry.Start < query.Item2) continue;
+				if (Utilities.IsLargeVariant(jsonEntry.Start, jsonEntry.End) && jsonEntry.Start < query.Start) continue;
 				yield return line;
 			}
 		}

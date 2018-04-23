@@ -2,7 +2,7 @@
   "profiles": {
     "Jasix": {
       "commandName": "Project",
-      "commandLineArgs": " -i test.json.gz -c",
+      "commandLineArgs": " -i clinvar.json.gz -q chr1",
       "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }

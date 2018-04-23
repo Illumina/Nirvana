@@ -29,7 +29,7 @@ namespace Jasix
 
         public void Add(IPosition position, long fileLocation)
         {
-            var chromName = position.VcfFields[VcfCommon.ChromIndex];
+            var chromName = position.Chromosome.EnsemblName;
             var start     = position.Start;
             var end       = position.InfoData.End;
 
@@ -49,7 +49,7 @@ namespace Jasix
                 end = Math.Max(position.RefAllele.Length - 1, altAlleleOffset) + start;
             }
 
-            _jasixIndex.Add(position.Chromosome.EnsemblName, start, end.Value, fileLocation);
+            _jasixIndex.Add(position.Chromosome.EnsemblName, start, end.Value, fileLocation, position.Chromosome.UcscName);
         }
 
         public void Dispose()
