@@ -62,7 +62,7 @@ namespace CacheUtils.MiniCache
             {
                 cacheData = transcriptReader.Read(sequenceReader.RefIndexToChromosome);
                 cache     = cacheData.GetCache();
-                source    = transcriptReader.Header.TranscriptSource;
+                source    = transcriptReader.Header.Source;
             }
 
             return new DataBundle(sequenceReader, siftReader, polyPhenReader, cacheData, cache, source);

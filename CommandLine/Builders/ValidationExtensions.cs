@@ -146,7 +146,7 @@ namespace CommandLine.Builders
             validator.HasRequiredParameter(date, description, commandLineOption);
             if (string.IsNullOrEmpty(date)) return validator;
 
-            if (!DateTime.TryParse(date, out var _))
+            if (!DateTime.TryParse(date, out _))
             {
                 validator.Data.AddError($"The {description} was not specified as a date (YYYY-MM-dd). Please use the {commandLineOption} parameter.", ExitCodes.BadArguments);
             }

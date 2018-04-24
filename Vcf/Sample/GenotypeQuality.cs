@@ -1,23 +1,23 @@
-﻿namespace Vcf.Sample
+﻿using OptimizedCore;
+
+namespace Vcf.Sample
 {
     internal static class GenotypeQuality
     {
-        /// <summary>
-        /// returns the genotype quality given different sources of information
-        /// </summary>
         public static int? GetGenotypeQuality(IntermediateSampleFields intermediateSampleFields)
         {
-            var hasGqx = intermediateSampleFields.FormatIndices.GQX != null;
-            var hasGq  = intermediateSampleFields.FormatIndices.GQ != null;
+            bool hasGqx = intermediateSampleFields.FormatIndices.GQX != null;
+            bool hasGq  = intermediateSampleFields.FormatIndices.GQ != null;
 
             if (!hasGqx && !hasGq)  return null;
 
-            var gqIndex = hasGqx ? intermediateSampleFields.FormatIndices.GQX.Value : intermediateSampleFields.FormatIndices.GQ.Value;
+            int gqIndex = hasGqx ? intermediateSampleFields.FormatIndices.GQX.Value : intermediateSampleFields.FormatIndices.GQ.Value;
             if (intermediateSampleFields.SampleColumns.Length <= gqIndex) return null;
 
-            var gq = intermediateSampleFields.SampleColumns[gqIndex];
-            if (int.TryParse(gq, out int num)) return num;
-            return null;
+            string gq = intermediateSampleFields.SampleColumns[gqIndex];
+
+            (int number, bool foundError) = gq.OptimizedParseInt32();
+            return foundError ? null : (int?)number;
         }
     }
 }

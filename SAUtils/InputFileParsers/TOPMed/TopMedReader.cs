@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
 
@@ -37,7 +38,7 @@ namespace SAUtils.InputFileParsers.TOPMed
                 string line;
                 while ((line = _reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                    if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
 
                     var topMedItem = ExtractItems(line);
                     if (topMedItem == null) continue;
@@ -49,7 +50,7 @@ namespace SAUtils.InputFileParsers.TOPMed
         private TopMedItem ExtractItems(string vcfLine)
         {
             if (vcfLine == null) return null;
-            var splitLine = vcfLine.Split('\t');
+            var splitLine = vcfLine.OptimizedSplit('\t');
 
             if (splitLine.Length < 8) return null;
 
@@ -85,19 +86,14 @@ namespace SAUtils.InputFileParsers.TOPMed
         private void ParseInfoField(string infoFields)
         {
             if (infoFields == "" || infoFields == ".") return;
+            var infoItems = infoFields.OptimizedSplit(';');
 
-            var infoItems = infoFields.Split(';');
-            foreach (var infoItem in infoItems)
+            foreach (string infoItem in infoItems)
             {
-                var infoKeyValue = infoItem.Split('=');
+                (string key, string value) = infoItem.OptimizedKeyValue();
 
-                if (infoKeyValue.Length == 2)
-                {
-                    var key   = infoKeyValue[0];
-                    var value = infoKeyValue[1];
-
-                    SetInfoField(key, value);
-                }
+                // sanity check
+                if (value != null) SetInfoField(key, value);
             }
         }
 

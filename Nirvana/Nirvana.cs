@@ -55,17 +55,18 @@ namespace Nirvana
             var conservationProvider         = ProviderUtilities.GetConservationProvider(SupplementaryAnnotationDirectories);
             var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(SupplementaryAnnotationDirectories);
             var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
-            var plugins                      = PluginUtilities.LoadPlugins(_pluginDirectory);
-            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
+
+            var plugins    = PluginUtilities.LoadPlugins(_pluginDirectory);
+            var annotator  = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
             var recomposer = _disableRecomposition ? new NullRecomposer() : Recomposer.Create(sequenceProvider, _inputCachePrefix);
-            var logger  = _outputFileName == "-" ? (ILogger) new NullLogger() : new ConsoleLogger();
-            var metrics = new PerformanceMetrics(logger);
+            var logger     = _outputFileName == "-" ? (ILogger)new NullLogger() : new ConsoleLogger();
+            var metrics    = new PerformanceMetrics(logger);
 
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
                 geneAnnotationProvider, conservationProvider);
  
-            var vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
-            var jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
+            string vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
+            string jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
             using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))

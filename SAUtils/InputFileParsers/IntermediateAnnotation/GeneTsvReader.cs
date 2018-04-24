@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
 using VariantAnnotation.IO;
@@ -67,7 +68,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             //getting to the chromosome
             while ((line = _reader.ReadLine()) != null)
             {
-                if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
 
                 var annotationItem = ExtractItem(line);
                 if (annotationItem == null) continue;
@@ -80,7 +81,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private IAnnotatedGene ExtractItem(string line)
         {
-            var columns = line.Split('\t');
+            var columns = line.OptimizedSplit('\t');
             if (columns.Length < MinNoOfColumns)
                 throw new InvalidDataException("Line contains too few columns:\n" + line);
 
@@ -91,11 +92,8 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private void ParseHeaderLine(string line)
         {
-            var words = line.Split('=');
-            if (words.Length < 2) return;
-
-            var key = words[0];
-            var value = words[1];
+            (string key, string value) = line.OptimizedKeyValue();
+            if (key == null || value == null) return;
 
             switch (key)
             {

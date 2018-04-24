@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -26,8 +27,8 @@ namespace Vcf
                 Chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]),
                 RefAllele = vcfFields[VcfCommon.RefIndex]
             };
-            simplePosition.End = vcfFields[VcfCommon.AltIndex].StartsWith("<") || vcfFields[VcfCommon.AltIndex] == "*" ? -1 : simplePosition.Start + simplePosition.RefAllele.Length - 1;
-            simplePosition.AltAlleles = vcfFields[VcfCommon.AltIndex].Split(",");
+            simplePosition.End = vcfFields[VcfCommon.AltIndex].OptimizedStartsWith('<') || vcfFields[VcfCommon.AltIndex] == "*" ? -1 : simplePosition.Start + simplePosition.RefAllele.Length - 1;
+            simplePosition.AltAlleles = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',');
             simplePosition.VcfFields = vcfFields;
             simplePosition.IsRecomposed = isRecomposed;
             simplePosition.IsDecomposed = new bool[simplePosition.AltAlleles.Length]; // fasle by default
@@ -36,6 +37,6 @@ namespace Vcf
 
         public static SimplePosition GetSimplePosition(string vcfLine,
             IDictionary<string, IChromosome> refNameToChromosome) => vcfLine == null ? null :
-            GetSimplePosition(vcfLine.Split("\t"), refNameToChromosome);
+            GetSimplePosition(vcfLine.OptimizedSplit('\t'), refNameToChromosome);
     }
 }

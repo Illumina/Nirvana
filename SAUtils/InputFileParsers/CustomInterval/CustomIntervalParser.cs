@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.CustomInterval
@@ -48,7 +49,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 				{
 					// Skip empty lines.
 					if (string.IsNullOrWhiteSpace(line)) continue;
-					if (line.StartsWith("#"))
+					if (line.OptimizedStartsWith('#'))
 					{
 						ParseHeaderLine(line);
 					}
@@ -71,7 +72,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 				{
 					// Skip empty lines.
 					if (string.IsNullOrWhiteSpace(line)) continue;
-					if (line.StartsWith("#")) continue;
+					if (line.OptimizedStartsWith('#')) continue;
 
 					var customInterval = ExtractCustomInterval(line);
 					if (customInterval == null) continue;
@@ -84,7 +85,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 		private DataStructures.CustomInterval ExtractCustomInterval(string bedLine)
 		{
 			if (bedLine == null) return null;
-			var bedFields = bedLine.Split('\t');
+			var bedFields = bedLine.OptimizedSplit('\t');
 
 			if (bedFields.Length < BedCommon.MinNoOfFields) 
 				throw new Exception("Bed file line must contain at least"+ BedCommon.MinNoOfFields+" fields. Current line:\n "+ bedLine);
@@ -121,7 +122,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 	    private void ParseInfoField(string infoFieldsLine)
 		{
 			// OR4F5;0.0;3.60208899915;Some_evidence_of_constraint
-			var infoFields = infoFieldsLine.Split(';');
+			var infoFields = infoFieldsLine.OptimizedSplit(';');
 			for (int i = 0; i < infoFields.Length; i++)
 			{
 				var key = _fieldIndex[i];
@@ -151,79 +152,68 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			line = line.Substring(11);//removing ##IAE_TOP=<
 			line = line.Substring(0, line.Length - 1);//removing the last '>'
 
-			var keyField = line.Split('=');
-			var key      = keyField[0];
-			var val      = keyField[1];
+		    (string key, string value) = line.OptimizedKeyValue();
 
-			switch (key)
+            switch (key)
 			{
 				case "TYPE":
-					KeyName = val;
+					KeyName = value;
 					break;
 				default:
 					throw new Exception("Unknown field in top level key line :\n " + line);
-
-			}
-			
+			}			
 		}
 
-		private void AddInfoField(string line)
-		{
-			//##IAE_INFO=<INFO=GENE,Type=String,JSON=gene>
-			line = line.Substring(12);//removing ##IAE_INFO=<
-			line = line.Substring(0, line.Length - 1);//removing the last '>'
+        private void AddInfoField(string line)
+        {
+            //##IAE_INFO=<INFO=GENE,Type=String,JSON=gene>
+            line = line.Substring(12);//removing ##IAE_INFO=<
+            line = line.Substring(0, line.Length - 1);//removing the last '>'
 
-			var fields = line.Split(',');
+            var fields = line.OptimizedSplit(',');
 
-			string type = null, json = null;
-			int ? index = null;
+            string type = null, json = null;
+            int? index = null;
 
-			foreach (var field in fields)
-			{
-				var keyValue = field.Split('=');
+            foreach (var field in fields)
+            {
+                (string key, string value) = field.OptimizedKeyValue();
+                if (value == null) throw new InvalidDataException("Invalid info field: " + field);
 
-				if (keyValue.Length != 2)
-					throw new Exception("Invalid info field: " + field);
+                switch (key.ToUpper())
+                {
+                    case "INFO":
+                        break;
+                    case "TYPE":
+                        type = value;
+                        break;
+                    case "JSON":
+                        json = value;
+                        break;
+                    case "INDEX":
+                        index = Convert.ToInt16(value);
+                        break;
+                    default:
+                        throw new Exception("Unknown field in info field line :\n" + line);
+                }
+            }
 
-				var key = keyValue[0].ToUpper();
-				var value = keyValue[1];
+            if (type == null || json == null || index == null)
+                throw new Exception("Missing mandatory field from IAE_INFO:\n" + line);
 
-				switch (key)
-				{
-					case "INFO":
-						break;
-					case "TYPE":
-						type = value;
-						break;
-					case "JSON":
-						json = value;
-						break;
-					case "INDEX":
-						index = Convert.ToInt16(value);
-						break;
-					default:
-						throw new Exception("Unknown field in info field line :\n" + line);
-
-				}
-			}
-
-			if (type == null || json == null || index ==null )
-				throw new Exception("Missing mandatory field from IAE_INFO:\n" + line);
-
-			if (type.ToLower() == "string")
-			{
-				_stringFields.Add(json);
-			}
-			else
-			{
-				_nonstringFields.Add(json);
-			}
-			if (_fieldIndex.ContainsKey(index.Value))
-			{
-				throw new Exception("duplicate index:\n" + line);
-			}
-		    _fieldIndex[index.Value] = json;
-		}
-		
-	}
+            if (type.ToLower() == "string")
+            {
+                _stringFields.Add(json);
+            }
+            else
+            {
+                _nonstringFields.Add(json);
+            }
+            if (_fieldIndex.ContainsKey(index.Value))
+            {
+                throw new Exception("duplicate index:\n" + line);
+            }
+            _fieldIndex[index.Value] = json;
+        }
+    }
 }

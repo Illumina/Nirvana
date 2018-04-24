@@ -18,27 +18,15 @@ namespace VariantAnnotation.IO.Caches
         private readonly IndexEntry[] _indexEntries;
         public readonly PredictionHeader Header;
 
-        public PredictionCacheReader(Stream fs, string[] predictionDescriptions)
+        public PredictionCacheReader(Stream stream, string[] predictionDescriptions)
         {
-            _blockStream            = new BlockStream(new Zstandard(), fs, CompressionMode.Decompress);
-            _reader                 = new BinaryReader(_blockStream, Encoding.UTF8, true);
+            _blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Decompress);
+            Header       = PredictionHeader.Read(stream, _blockStream);
+
+            _reader = new BinaryReader(_blockStream, Encoding.UTF8, true);
             _predictionDescriptions = predictionDescriptions;
 
-            Header        = GetHeader();
-            _indexEntries = GetIndexEntries(Header.Header);
-        }
-
-        private PredictionHeader GetHeader()
-        {
-            var header = _blockStream.ReadHeader(CacheHeader.Read, PredictionCacheCustomHeader.Read) as CacheHeader;
-            var lut    = ReadLookupTable(_reader);
-            return new PredictionHeader(header, lut);
-        }
-
-        private static IndexEntry[] GetIndexEntries(CacheHeader header)
-        {
-            var customHeader = header.CustomHeader as PredictionCacheCustomHeader;
-            return customHeader?.Entries;
+            _indexEntries = Header.Custom.Entries;
         }
 
         public void Dispose()
@@ -47,21 +35,13 @@ namespace VariantAnnotation.IO.Caches
             _blockStream.Dispose();
         }
 
-        private static Prediction.Entry[] ReadLookupTable(BinaryReader reader)
-        {
-            var numEntries = reader.ReadInt32();
-            var lut = new Prediction.Entry[numEntries];
-            for (int i = 0; i < numEntries; i++) lut[i] = Prediction.Entry.Read(reader);
-            return lut;
-        }
-
         /// <summary>
         /// parses the database cache file and populates the specified lists and interval trees
         /// </summary>
         public IPredictionCache Read(ushort refIndex)
         {
             var predictions = GetPredictions(refIndex);
-            return new PredictionCache(Header.Header.GenomeAssembly, predictions, _predictionDescriptions);
+            return new PredictionCache(Header.GenomeAssembly, predictions, _predictionDescriptions);
         }
 
         public Prediction[] GetPredictions(ushort refIndex)
@@ -72,7 +52,7 @@ namespace VariantAnnotation.IO.Caches
             _blockStream.SetBlockPosition(bp);
 
             var predictions = new Prediction[indexEntry.Count];
-            for (int i = 0; i < indexEntry.Count; i++) predictions[i] = Prediction.Read(_reader, Header.Lut);
+            for (var i = 0; i < indexEntry.Count; i++) predictions[i] = Prediction.Read(_reader, Header.LookupTable);
 
             return predictions;
         }
@@ -87,17 +67,5 @@ namespace VariantAnnotation.IO.Caches
         {
             "probably damaging", "possibly damaging", "benign", "unknown"
         };
-
-        public sealed class PredictionHeader
-        {
-            public readonly CacheHeader Header;
-            public readonly Prediction.Entry[] Lut;
-
-            public PredictionHeader(CacheHeader header, Prediction.Entry[] lut)
-            {
-                Header = header;
-                Lut    = lut;
-            }
-        }
     }
 }

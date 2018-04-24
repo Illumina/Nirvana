@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
@@ -41,7 +42,7 @@ namespace CacheUtils.IntermediateIO
         private (IChromosome Chromosome, int NumPredictions) GetChromosomeHeader()
         {
             string line = _reader.ReadLine();
-            var cols = line?.Split('\t');
+            var cols = line?.OptimizedSplit('\t');
             if (cols == null) throw new InvalidDataException("Found an unexpected null line when parsing the chromosome header in the prediction reader.");
             if (cols.Length != 3) throw new InvalidDataException($"Expected 3 columns in the chromosome header, but found {cols.Length}");
 
@@ -57,7 +58,7 @@ namespace CacheUtils.IntermediateIO
             string line = _reader.ReadLine();
             if (line == null) throw new InvalidDataException("Found an unexpected empty line while parsing the prediction file.");
 
-            var cols = line.Split('\t');
+            var cols = line.OptimizedSplit('\t');
             if (cols.Length != 2) throw new InvalidDataException($"Expected 2 columns in the prediction entry, but found {cols.Length}");
 
             var transcriptIndices = GetTranscriptIndices(cols[0]);
@@ -68,7 +69,7 @@ namespace CacheUtils.IntermediateIO
 
         private static List<int> GetTranscriptIndices(string s)
         {
-            var indexStrings = s.Split(',');
+            var indexStrings = s.OptimizedSplit(',');
             var indices      = new int[indexStrings.Length];
             for (var i = 0; i < indexStrings.Length; i++) indices[i] = int.Parse(indexStrings[i]);
             return indices.ToList();

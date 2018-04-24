@@ -40,7 +40,7 @@ namespace CacheUtils.Genes.DataStores
         {
             foreach (var hgncGene in HgncGenes)
             {
-                var (refSeqGenes, ensemblGene, numMatches) = GetGenes(hgncGene.EntrezGeneId,
+                (var refSeqGenes, EnsemblGene ensemblGene, int numMatches) = GetGenes(hgncGene.EntrezGeneId,
                     refSeqGff.EntrezGeneIdToGene, hgncGene.EnsemblId, ensemblGtf.EnsemblIdToGene);
 
                 switch (numMatches)

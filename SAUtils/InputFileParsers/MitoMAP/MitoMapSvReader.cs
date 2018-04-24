@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Interface.Positions;
@@ -58,7 +59,7 @@ namespace SAUtils.InputFileParsers.MitoMap
                         continue;
                     }
                     // last item
-                    if (line.StartsWith("[") && line.EndsWith("]],")) isDataLine = false;
+                    if (line.OptimizedStartsWith('[') && line.EndsWith("]],")) isDataLine = false;
 
                     foreach (var supplementaryIntervalItem in ParseLine(line, _dataType))
                     {
@@ -72,7 +73,7 @@ namespace SAUtils.InputFileParsers.MitoMap
         private List<MitoMapItem> ParseLine(string line, string dataType)
         {
             // line validation
-            if (!(line.StartsWith("[") && line.EndsWith("],")))
+            if (!(line.OptimizedStartsWith('[') && line.EndsWith("],")))
                 throw new InvalidFileFormatException($"Data line doesn't start with \"[\" or end with \"],\": {line}");
             var info = line.TrimEnd(',').TrimEnd(']').Trim('[', ']').Split("\",\"").Select(x => x.Trim('"')).ToList();
             return dataType == MitoMapDataTypes.MitoMapInsertionsSimple ? ExtractSvItemFromSimpleInsertions(info) : ExtractSvItemFromDeletionsSingle(info);
@@ -80,7 +81,7 @@ namespace SAUtils.InputFileParsers.MitoMap
 
         private List<MitoMapItem> ExtractSvItemFromDeletionsSingle(List<string> info)
         {
-            var junctions = info[0].Split(':').Select(int.Parse).ToList();
+            var junctions = info[0].OptimizedSplit(':').Select(int.Parse).ToList();
             var start = junctions[0] + 1; 
             var end = junctions[1] - 1;
             if (end < start)

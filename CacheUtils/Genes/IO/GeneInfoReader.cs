@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genes.DataStructures;
+using OptimizedCore;
 
 namespace CacheUtils.Genes.IO
 {
@@ -22,11 +23,11 @@ namespace CacheUtils.Genes.IO
 
         private void SetColumnIndices(string line)
         {
-            if (line.StartsWith("#Format: ")) line = line.Substring(9);
-            if (line.StartsWith("#"))         line = line.Substring(1);
+            if (line.StartsWith("#Format: "))  line = line.Substring(9);
+            if (line.OptimizedStartsWith('#')) line = line.Substring(1);
 
-            var cols = line.Split('\t');
-            if (cols.Length == 1) cols = line.Split(' ');
+            var cols = line.OptimizedSplit('\t');
+            if (cols.Length == 1) cols = line.OptimizedSplit(' ');
 
             for (var index = 0; index < cols.Length; index++)
             {
@@ -67,7 +68,7 @@ namespace CacheUtils.Genes.IO
 
             if (!line.StartsWith("9606")) return null;
 
-            var cols = line.Split('\t');
+            var cols = line.OptimizedSplit('\t');
             if (cols.Length != 16) throw new InvalidDataException($"Expected 16 columns but found {cols.Length} when parsing the gene entry:\n[{line}]");
 
             try

@@ -1,10 +1,9 @@
-﻿namespace Vcf.Sample
+﻿using OptimizedCore;
+
+namespace Vcf.Sample
 {
     internal static class TotalDepth
     {
-        /// <summary>
-        /// returns the total depth given different sources of information
-        /// </summary>
         public static int? GetTotalDepth(int? infoDepth, IntermediateSampleFields intermediateSampleFields)
         {
             // use TAR & TIR
@@ -26,43 +25,24 @@
             return infoDepth;
         }
 
-        /// <summary>
-        /// returns the total depth using TAR & TIR
-        /// </summary>
-        private static int? GetTotalDepthUsingTarTir(IntermediateSampleFields intermediateSampleFields)
-        {
-            return intermediateSampleFields.TAR + intermediateSampleFields.TIR;
-        }
+        private static int? GetTotalDepthUsingTarTir(IntermediateSampleFields intermediateSampleFields) => intermediateSampleFields.TAR + intermediateSampleFields.TIR;
 
-        /// <summary>
-        /// returns the total depth using tier 1 allele counts
-        /// </summary>
-        private static int? GetTotalDepthUsingAlleleCounts(IntermediateSampleFields intermediateSampleFields)
-        {
-            return intermediateSampleFields.TotalAlleleCount;
-        }
+        private static int? GetTotalDepthUsingAlleleCounts(IntermediateSampleFields intermediateSampleFields) => intermediateSampleFields.TotalAlleleCount;
 
-        /// <summary>
-        /// returns the total depth using DPI
-        /// </summary>
         private static int? GetTotalDepthUsingDpi(IntermediateSampleFields intermediateSampleFields)
         {
             if (intermediateSampleFields.FormatIndices.DPI == null || intermediateSampleFields.SampleColumns.Length <= intermediateSampleFields.FormatIndices.DPI.Value) return null;
-            var depth = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.DPI.Value];
-            if (int.TryParse(depth, out int num)) return num;
-            return null;
-
+            string depth = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.DPI.Value];
+            (int number, bool foundError) = depth.OptimizedParseInt32();
+            return foundError ? null : (int?)number;
         }
 
-        /// <summary>
-        /// returns the total depth using DP
-        /// </summary>
         private static int? GetTotalDepthUsingDp(IntermediateSampleFields intermediateSampleFields)
         {
             if (intermediateSampleFields.FormatIndices.DP == null || intermediateSampleFields.SampleColumns.Length <= intermediateSampleFields.FormatIndices.DP.Value) return null;
-            var depth = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.DP.Value];
-            if (int.TryParse(depth, out int num)) return num;
-            return null;
+            string depth = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.DP.Value];
+            (int number, bool foundError) = depth.OptimizedParseInt32();
+            return foundError ? null : (int?)number;
         }
     }
 }

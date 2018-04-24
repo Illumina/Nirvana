@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -55,7 +56,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
                 {
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
-                    if (line.StartsWith("#"))
+                    if (line.OptimizedStartsWith('#'))
                     {
                         ParseHeaderLine(line);
                     }
@@ -82,7 +83,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 				{
 					// Skip empty lines.
 					if (string.IsNullOrWhiteSpace(line)) continue;
-					if (line.StartsWith("#"))
+					if (line.OptimizedStartsWith('#'))
 					{
 						continue;
 					}
@@ -97,93 +98,82 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 			}
 		}
 
-		private void GetTopLevelKey(string line)
-		{
-			//##IAE_TOP=<KEY=cosmic,MATCH=Allele>
-			line = line.Substring(11);//removing ##IAE_TOP=<
-			line = line.Substring(0, line.Length - 1);//removing the last '>'
-			var fields= line.Split(',');
+        private void GetTopLevelKey(string line)
+        {
+            //##IAE_TOP=<KEY=cosmic,MATCH=Allele>
+            line = line.Substring(11);//removing ##IAE_TOP=<
+            line = line.Substring(0, line.Length - 1);//removing the last '>'
+            var fields = line.OptimizedSplit(',');
 
-			foreach (var field in fields)
-			{
-				var keyValue = field.Split('=');
-				var key = keyValue[0];
-				var value = keyValue[1];
-				switch (key)
-				{
-					case "KEY":
-						_topKey = value;
-						break;
-					case "MATCH":
-						// default is allele specific
-						IsPositional = value == "Position";
-						break;
-					default:
-						throw new Exception("Unknown field in top level key line :\n "+ line);
+            foreach (string field in fields)
+            {
+                (string key, string value) = field.OptimizedKeyValue();
 
-				}
-			}
-			
-		}
+                switch (key)
+                {
+                    case "KEY":
+                        _topKey = value;
+                        break;
+                    case "MATCH":
+                        // default is allele specific
+                        IsPositional = value == "Position";
+                        break;
+                    default:
+                        throw new Exception("Unknown field in top level key line :\n " + line);
+                }
+            }
+        }
 
-		private void AddInfoField(string line)
-		{
-			//##IAE_INFO=<INFO=GENE,Type=String,JSON=gene>
-			line = line.Substring(12);//removing ##IAE_INFO=<
-			line = line.Substring(0, line.Length - 1);//removing the last '>'
+        private void AddInfoField(string line)
+        {
+            //##IAE_INFO=<INFO=GENE,Type=String,JSON=gene>
+            line = line.Substring(12);//removing ##IAE_INFO=<
+            line = line.Substring(0, line.Length - 1);//removing the last '>'
 
-			var fields = line.Split(',');
+            var fields = line.OptimizedSplit(',');
+            string info = null, type = null, json = null;
 
-			string info=null, type=null, json=null;
-				
-			foreach (var field in fields)
-			{
-				var keyValue = field.Split('=');
+            foreach (var field in fields)
+            {
+                (string key, string value) = field.OptimizedKeyValue();
+                if (value == null) throw new Exception("Invalid info field: " + field);
 
-				if (keyValue.Length!=2)
-					throw new Exception("Invalid info field: "+field);
+                switch (key)
+                {
+                    case "INFO":
+                        info = value;
+                        break;
+                    case "Type":
+                        type = value;
+                        break;
+                    case "JSON":
+                        json = value;
+                        break;
+                    default:
+                        throw new Exception("Unknown field in info field line :\n" + line);
+                }
+            }
 
-				var key   = keyValue[0];
-				var value = keyValue[1];
+            if (type == null || info == null || json == null)
+                throw new InvalidDataException("Missing mandatory field from IAE_INFO:\n" + line);
 
-				switch (key)
-				{
-					case "INFO":
-						info = value;
-						break;
-					case "Type":
-						type = value;
-						break;
-					case "JSON":
-						json = value;
-						break;
-					default:
-						throw new Exception("Unknown field in info field line :\n" + line);
+            switch (type)
+            {
+                case "String":
+                    _desiredStringFields[info] = json;
+                    break;
+                case "Number":
+                    _desiredNumberFields[info] = json;
+                    break;
+                case "Boolean":
+                    _desiredBoolFields[info] = json;
+                    break;
+                default:
+                    throw new Exception("Unsupported data type: " + type + " in:\n" + line);
+            }
+        }
 
-				}
-			}
-
-			if (type==null || info==null || json ==null)
-				throw new Exception("Missing mandatory field from IAE_INFO:\n"+line);
-
-			switch (type)
-			{
-				case "String":
-					_desiredStringFields[info] = json;
-					break;
-				case "Number":
-					_desiredNumberFields[info] = json;
-					break;
-				case "Boolean":
-					_desiredBoolFields[info] = json;
-					break;
-				default:
-					throw new Exception("Unsupported data type: "+type+ " in:\n"+ line);
-			}
-			
-		}
-
-	    private void ParseHeaderLine(string line)
+        private void ParseHeaderLine(string line)
 		{
 			//##IAE_TOP=<KEY=cosmic,MATCH=Allele>
 			if (line.StartsWith("##IAE_TOP=")) GetTopLevelKey(line);
@@ -195,7 +185,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 	    private List<CustomItem> ExtractCustomItems(string vcfline)
 		{
 			if (vcfline == null) return null;
-			var splitLine = vcfline.Split('\t');// we don't care about the many fields after info field
+			var splitLine = vcfline.OptimizedSplit('\t');// we don't care about the many fields after info field
 
 			if (splitLine.Length < 8) return null;
 
@@ -206,7 +196,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
 			var refAllele  = splitLine[VcfCommon.RefIndex];
-			var altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
+			var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
 			var id         = splitLine[VcfCommon.IdIndex];
 			var infoFields = splitLine[VcfCommon.InfoIndex];
 
@@ -231,7 +221,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 					numberValues[keyValue.Key] = keyValue.Value[i];
 				}
 
-				var boolValues   = _boolValues.Select(value => value.Split(',')[i]).ToList();
+				var boolValues   = _boolValues.Select(value => value.OptimizedSplit(',')[i]).ToList();
 
 				_customItemList.Add(new CustomItem(
 					chromosome,
@@ -248,32 +238,29 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 			return _customItemList;
 		}
 
-	    private void ParseInfoField(string infoFields)
-		{
-			// 1       69345   COSM911918      C       A       .       .       GENE=OR4F5;STRAND=+;CDS=c.255C>A;AA=p.I85I;CNT=1;EX_TARGET
-			foreach (var infoField in infoFields.Split(';'))
-			{
-				var keyValue = infoField.Split('=');
-				var key = keyValue[0];
-				if (keyValue.Length == 1)
-				{
-					// undefined boolean keys will be skipped
-					if (_desiredBoolFields.ContainsKey(key))
-						_boolValues.Add(_desiredBoolFields[key]);
-					continue;
-				}
+        private void ParseInfoField(string infoFields)
+        {
+            // 1       69345   COSM911918      C       A       .       .       GENE=OR4F5;STRAND=+;CDS=c.255C>A;AA=p.I85I;CNT=1;EX_TARGET
+            foreach (string infoField in infoFields.OptimizedSplit(';'))
+            {
+                (string key, string value) = infoField.OptimizedKeyValue();
 
-				var value = keyValue[1];
+                if (value == null)
+                {
+                    // undefined boolean keys will be skipped
+                    if (_desiredBoolFields.ContainsKey(key))
+                        _boolValues.Add(_desiredBoolFields[key]);
+                    continue;
+                }
 
-				// undefined string keys will be skipped
-				if (_desiredStringFields.ContainsKey(key))
-					_stringValues[_desiredStringFields[key]] = value.Split(',').ToList();
+                // undefined string keys will be skipped
+                if (_desiredStringFields.ContainsKey(key))
+                    _stringValues[_desiredStringFields[key]] = value.OptimizedSplit(',').ToList();
 
-				// undefined number keys will be skipped
-				if (_desiredNumberFields.ContainsKey(key))
-					_numberValues[_desiredNumberFields[key]] = value.Split(',').Select(double.Parse).ToList();
-			}
-		}
-
-	}
+                // undefined number keys will be skipped
+                if (_desiredNumberFields.ContainsKey(key))
+                    _numberValues[_desiredNumberFields[key]] = value.OptimizedSplit(',').Select(double.Parse).ToList();
+            }
+        }
+    }
 }

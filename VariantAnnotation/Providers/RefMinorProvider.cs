@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.SA;
@@ -18,7 +19,7 @@ namespace VariantAnnotation.Providers
             {
                 foreach (var file in Directory.GetFiles(directory, "*.idx"))
                 {
-                    var chromeName = Path.GetFileNameWithoutExtension(file).Split('.')[0];
+                    var chromeName = Path.GetFileNameWithoutExtension(file).OptimizedSplit('.')[0];
                     var refMinorPostions = SaIndex.Read(FileUtilities.GetReadStream(file)).GlobalMajorAlleleForRefMinor;
                     if (refMinorPostions.Length > 0) _positionDict[chromeName] = refMinorPostions.ToDictionary(x => x.Position, x => x.GlobalMajorAllele);
 

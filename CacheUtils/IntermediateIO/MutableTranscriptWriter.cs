@@ -53,7 +53,7 @@ namespace CacheUtils.IntermediateIO
             }
 
             _writer.Write($"Sec\t{positions.Count}");
-            foreach (var pos in positions) _writer.Write($"\t{pos}");
+            foreach (int pos in positions) _writer.Write($"\t{pos}");
             _writer.WriteLine();
         }
 
@@ -89,7 +89,7 @@ namespace CacheUtils.IntermediateIO
 
         private static void WriteGene(TextWriter writer, MutableGene gene)
         {
-            var strand = gene.OnReverseStrand ? 'R' : 'F';
+            char strand = gene.OnReverseStrand ? 'R' : 'F';
             writer.WriteLine($"Gene\t{gene.GeneId}\t{gene.Chromosome.UcscName}\t{gene.Chromosome.Index}\t{gene.Start}\t{gene.End}\t{strand}\t{gene.Symbol}\t{(int)gene.SymbolSource}\t{gene.HgncId}");
         }
 

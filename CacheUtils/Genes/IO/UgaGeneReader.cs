@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using CacheUtils.Genes.DataStructures;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Sequence;
 
@@ -39,23 +40,23 @@ namespace CacheUtils.Genes.IO
 
         private UgaGene GetNextGene()
         {
-            var line = _reader.ReadLine();
+            string line = _reader.ReadLine();
             if (line == null) return null;
 
-            var cols = line.Split('\t');
+            var cols = line.OptimizedSplit('\t');
             if (cols.Length != 11) throw new InvalidDataException($"Expected 11 columns, but found {cols.Length} columns.");
 
-            var ucscRefName     = cols[0];
-            var chromosome      = ReferenceNameUtilities.GetChromosome(_refNameToChromosome, ucscRefName);
-            var symbol          = cols[2];
-            var start37         = int.Parse(cols[3]);
-            var end37           = int.Parse(cols[4]);
-            var start38         = int.Parse(cols[5]);
-            var end38           = int.Parse(cols[6]);
-            var onReverseStrand = cols[7] == "R";
-            var hgncId          = int.Parse(cols[8]);
-            var ensemblId       = cols[9];
-            var entrezGeneId    = cols[10];
+            string ucscRefName   = cols[0];
+            var chromosome       = ReferenceNameUtilities.GetChromosome(_refNameToChromosome, ucscRefName);
+            string symbol        = cols[2];
+            int start37          = int.Parse(cols[3]);
+            int end37            = int.Parse(cols[4]);
+            int start38          = int.Parse(cols[5]);
+            int end38            = int.Parse(cols[6]);
+            bool onReverseStrand = cols[7] == "R";
+            int hgncId           = int.Parse(cols[8]);
+            string ensemblId     = cols[9];
+            string entrezGeneId  = cols[10];
 
             var grch37 = new Interval(start37, end37);
             var grch38 = new Interval(start38, end38);

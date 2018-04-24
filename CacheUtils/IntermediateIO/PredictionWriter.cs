@@ -25,7 +25,7 @@ namespace CacheUtils.IntermediateIO
 
         private void WritePrediction(IEnumerable<int> transcriptIds, string predictionData)
         {
-            var transcriptIdString = string.Join(',', transcriptIds);
+            string transcriptIdString = string.Join(',', transcriptIds);
             _writer.WriteLine($"{transcriptIdString}\t{predictionData}");
         }
 

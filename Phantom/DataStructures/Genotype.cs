@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using OptimizedCore;
 
 namespace Phantom.DataStructures
 {
@@ -19,10 +20,14 @@ namespace Phantom.DataStructures
         public static Genotype GetGenotype(string genotypeString)
         {
             char separator = GetGenotypeSeparator(genotypeString);
-            var gtIndexStrings = genotypeString.Split(separator);
+            var gtIndexStrings = genotypeString.OptimizedSplit(separator);
             var gtIndexes = new int[gtIndexStrings.Length];
             for (var i = 0; i < gtIndexStrings.Length; i++)
-                gtIndexes[i] = gtIndexStrings[i] == "." ? -1 : int.Parse(gtIndexStrings[i]);
+            {
+                (int number, bool foundError) = gtIndexStrings[i].OptimizedParseInt32();
+                gtIndexes[i] = foundError ? -1 : number;
+            }
+                
             return new Genotype(gtIndexes, separator == '|');
         }
 

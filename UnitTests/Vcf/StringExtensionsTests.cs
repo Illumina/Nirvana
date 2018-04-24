@@ -32,21 +32,21 @@ namespace UnitTests.Vcf
         [InlineData("12,13.0", null)]
         public void SplitToArray_int(string input, int[] exp)
         {
-            var observe = input.SplitToArray<int>(',',int.TryParse);
+            var observe = input.SplitToArray();
             Assert.Equal(exp, observe);
         }
 
 
-        [Theory]
-        [InlineData("12", new double[] { 12 })]
-        [InlineData("12,13", new double[] { 12, 13 })]
-        [InlineData("12,13.0", new[] { 12, 13.0})]
-        [InlineData("12.a,13.0", null)]
-        public void SplitToArray_double(string input, double[] exp)
-        {
-            var observe = input.SplitToArray<double>(',', double.TryParse);
-            Assert.Equal(exp, observe);
-        }
+        //[Theory]
+        //[InlineData("12", new double[] { 12 })]
+        //[InlineData("12,13", new double[] { 12, 13 })]
+        //[InlineData("12,13.0", new[] { 12, 13.0})]
+        //[InlineData("12.a,13.0", null)]
+        //public void SplitToArray_double(string input, double[] exp)
+        //{
+        //    var observe = input.SplitToArray<double>(',', double.TryParse);
+        //    Assert.Equal(exp, observe);
+        //}
 
     }
 }

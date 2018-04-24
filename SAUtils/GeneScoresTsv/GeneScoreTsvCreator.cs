@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using CommonUtilities;
 using ErrorHandling;
+using OptimizedCore;
 using SAUtils.TsvWriters;
 using VariantAnnotation.IO;
 
@@ -99,7 +100,7 @@ namespace SAUtils.GeneScoresTsv
 
         private (string gene, double pLi, double pRec, double pNull) GetGeneAndScores(string line)
         {
-            var cols  = line.Split('\t');
+            var cols  = line.OptimizedSplit('\t');
             var gene  = cols[_geneIndex];
             var pLi   = double.Parse(cols[_pliIndex]);
             var pRec  = double.Parse(cols[_precIndex]);
@@ -110,7 +111,7 @@ namespace SAUtils.GeneScoresTsv
 
         private void GetColumnIndices(string line)
         {
-            var cols = line.Split("\t");
+            var cols = line.OptimizedSplit('\t');
 
             _geneIndex  = Array.IndexOf(cols, GeneTag);
             _pliIndex   = Array.IndexOf(cols, PliTag);

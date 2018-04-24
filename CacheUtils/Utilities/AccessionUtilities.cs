@@ -8,7 +8,7 @@ namespace CacheUtils.Utilities
     {
         internal static (string Id, byte Version) GetMaxVersion(string originalId, byte originalVersion)
         {
-            var (pureId, idVersion) = FormatUtilities.SplitVersion(originalId);
+            (string pureId, byte idVersion) = FormatUtilities.SplitVersion(originalId);
             return (pureId, Math.Max(originalVersion, idVersion));
         }
 

@@ -10,7 +10,7 @@ namespace Vcf
         internal static IPosition ParseVcfLine(string vcfLine, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
         {
             var simplePosition = SimplePosition.GetSimplePosition(vcfLine, refNameToChromosome);
-            return Position.CreatFromSimplePosition(simplePosition, variantFactory);
+            return Position.ToPosition(simplePosition, variantFactory);
         }
     }
 }

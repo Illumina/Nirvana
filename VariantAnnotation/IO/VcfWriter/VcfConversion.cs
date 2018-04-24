@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
 
@@ -83,7 +84,7 @@ namespace VariantAnnotation.IO.VcfWriter
         private static IEnumerable<string> GetNonDbsnpIds(string idField)
         {
             if (idField == null || idField == ".") return null;
-            var idList = idField.Split(';').Where(id => !id.StartsWith("rs")).ToList();
+            var idList = idField.OptimizedSplit(';').Where(id => !id.StartsWith("rs")).ToList();
 
             return idList.Count == 0 ? null : idList;
         }
@@ -180,7 +181,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
                         if (sa.SaDataSource.KeyName == OneKgKeyName)
                         {
-                            var contents = vcfAnnotation.Split(';');
+                            var contents = vcfAnnotation.OptimizedSplit(';');
                             string freq = contents[0];
                             string ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
 

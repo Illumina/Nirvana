@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using OptimizedCore;
 using VariantAnnotation.Utilities;
 
 namespace CacheUtils.IntermediateIO
@@ -17,14 +18,14 @@ namespace CacheUtils.IntermediateIO
             {
                 while (true)
                 {
-                    var line = reader.ReadLine();
+                    string line = reader.ReadLine();
                     if (line == null) break;
-                    if (line.StartsWith("#")) continue;
+                    if (line.OptimizedStartsWith('#')) continue;
 
-                    var cols = line.Split('\t');
+                    var cols = line.OptimizedSplit('\t');
                     if (cols.Length != 8) throw new InvalidDataException($"Expected 8 columns, but found {cols.Length}: [{line}]");
 
-                    var nucleotideId = cols[NucleotideIdIndex];
+                    string nucleotideId = cols[NucleotideIdIndex];
                     if (!nucleotideId.StartsWith("ENST")) continue;
 
                     var ccds    = FormatUtilities.SplitVersion(cols[CcdsIdIndex]);

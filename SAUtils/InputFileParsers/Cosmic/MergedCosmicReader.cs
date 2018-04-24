@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -79,7 +80,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     // Skip comments.
-                    if (line.StartsWith("#")) continue;
+                    if (line.OptimizedStartsWith('#')) continue;
                     var cosmicItems = ExtractCosmicItems(line);
                     if (cosmicItems == null) continue;
 
@@ -93,7 +94,7 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private void AddCosmicStudy(string line)
         {
-            var columns = line.Split('\t');
+            var columns = line.OptimizedSplit('\t');
 
             var mutationId  = columns[_mutationIdIndex];
             var studyId     = columns[_studyIdIndex];
@@ -152,7 +153,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             _primarySiteIndex      = -1;
             _primaryHistologyIndex = -1;
 
-            var columns = headerLine.Split('\t');
+            var columns = headerLine.OptimizedSplit('\t');
             for (int i = 0; i < columns.Length; i++)
             {
                 switch (columns[i])
@@ -214,7 +215,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);
             var cosmicId   = splitLine[VcfCommon.IdIndex];
             var refAllele  = splitLine[VcfCommon.RefIndex];
-            var altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
+            var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
             var infoField  = splitLine[VcfCommon.InfoIndex];
 
             Clear();
@@ -244,20 +245,16 @@ namespace SAUtils.InputFileParsers.Cosmic
         private void ParseInfoField(string infoFields)
         {
             if (infoFields == "" || infoFields == ".") return;
+            var infoItems = infoFields.OptimizedSplit(';');
 
-            var infoItems = infoFields.Split(';');
-            foreach (var infoItem in infoItems)
+            foreach (string infoItem in infoItems)
             {
                 if (string.IsNullOrEmpty(infoItem)) continue;
 
-                var infoKeyValue = infoItem.Split('=');
-                if (infoKeyValue.Length == 2)//sanity check
-                {
-                    var key = infoKeyValue[0];
-                    var value = infoKeyValue[1];
+                (string key, string value) = infoItem.OptimizedKeyValue();
 
-                    SetInfoField(key, value);
-                }
+                // sanity check
+                if (value != null) SetInfoField(key, value);
             }
         }
 

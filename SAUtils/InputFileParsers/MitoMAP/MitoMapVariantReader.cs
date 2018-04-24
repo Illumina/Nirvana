@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Providers;
@@ -78,7 +79,7 @@ namespace SAUtils.InputFileParsers.MitoMap
                         continue;
                     }
                     // last item
-                    if (line.StartsWith("[") && line.EndsWith("]],")) isDataLine = false;
+                    if (line.OptimizedStartsWith('[') && line.EndsWith("]],")) isDataLine = false;
 
                     foreach (var mitoMapMutItem in ParseLine(line, _dataType))
                     {
@@ -93,7 +94,7 @@ namespace SAUtils.InputFileParsers.MitoMap
         private List<MitoMapItem> ParseLine(string line, string dataType)
         {
             // line validation
-            if (!(line.StartsWith("[") && line.EndsWith("],")))
+            if (!(line.OptimizedStartsWith('[') && line.EndsWith("],")))
                 throw new InvalidFileFormatException($"Data line doesn't start with \"[\" or end with \"],\": {line}");
             /* example lines
             ["582","<a href='/MITOMAP/GenomeLoci#MTTF'>MT-TF</a>","Mitochondrial myopathy","T582C","tRNA Phe","-","+","Reported","<span style='display:inline-block;white-space:nowrap;'><a href='/cgi-bin/mitotip?pos=582&alt=C&quart=2'><u>72.90%</u></a> <i class='fa fa-arrow-up' style='color:orange' aria-hidden='true'></i></span>","0","<a href='/cgi-bin/print_ref_list?refs=90165,91590&title=RNA+Mutation+T582C' target='_blank'>2</a>"],
@@ -112,7 +113,7 @@ namespace SAUtils.InputFileParsers.MitoMap
 
         private List<MitoMapItem> ExtractVariantItemFromDeletionsSingle(List<string> info)
         {
-            var junctions = info[0].Split(':').Select(int.Parse).ToList();
+            var junctions = info[0].OptimizedSplit(':').Select(int.Parse).ToList();
             var start = junctions[0] + 1;
             var end = junctions[1] - 1;
             if (end < start)
@@ -196,7 +197,7 @@ namespace SAUtils.InputFileParsers.MitoMap
         }
 
         // there may be multiple alt alleles concatenated by ";"
-        internal static IEnumerable<string> GetAltAlleles(string rawAltAllele) => rawAltAllele.Split(";").Select(DegenerateBaseUtilities.GetAllPossibleSequences).SelectMany(x => x);
+        internal static IEnumerable<string> GetAltAlleles(string rawAltAllele) => rawAltAllele.OptimizedSplit(';').Select(DegenerateBaseUtilities.GetAllPossibleSequences).SelectMany(x => x);
 
 
         private static bool DescribedAsDuplicatedRecord(string mitomapDiseaseString)

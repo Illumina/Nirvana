@@ -107,7 +107,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
             unchecked
             {
                 // ReSharper disable NonReadonlyMemberInGetHashCode
-                var hashCode = Chromosome.Index.GetHashCode();
+                int hashCode = Chromosome.Index.GetHashCode();
                 hashCode = (hashCode * 397) ^ Start;
                 hashCode = (hashCode * 397) ^ End;
                 hashCode = (hashCode * 397) ^ Id.GetHashCode();

@@ -5,7 +5,6 @@ using System.Text;
 using Compression.Algorithms;
 using Compression.DataStructures;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Interface.IO;
 
 namespace Compression.FileHandling
 {
@@ -110,14 +109,6 @@ namespace Compression.FileHandling
         {
             _headerWrite = headerWrite;
             _headerWrite(_writer);
-        }
-
-        public IFileHeader ReadHeader(Func<BinaryReader, Func<BinaryReader, ICustomCacheHeader>, IFileHeader> headerRead,
-            Func<BinaryReader, ICustomCacheHeader> customRead)
-        {
-            IFileHeader header;
-            using (var reader = new BinaryReader(_stream, Encoding.UTF8, true)) header = headerRead(reader, customRead);
-            return header;
         }
 
         public override int Read(byte[] buffer, int offset, int count)

@@ -26,7 +26,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         private static MutableTranscript Merge(ILogger logger, IReadOnlyList<MutableTranscript> transcripts,
             Dictionary<string, GenbankEntry> idToGenbankEntry)
         {
-            var transcriptId = transcripts[0].Id;
+            string transcriptId = transcripts[0].Id;
 
             if (transcripts.Count == 1)
             {

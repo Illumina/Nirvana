@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OptimizedCore;
 
 namespace SAUtils.CreateOmimTsv
 {
@@ -33,7 +34,7 @@ namespace SAUtils.CreateOmimTsv
 
                     if (IsCommentLine(line)) continue;
 
-                    var contents      = line.Split('\t');
+                    var contents      = line.OptimizedSplit('\t');
                     var mimNumber     = Convert.ToInt32(contents[_mimNumberCol]);
                     var geneSymbol    = contents[_hgncCol];
                     var description   = _geneDescriptionCol >= 0 ? contents[_geneDescriptionCol].Replace(@"\\'", @"'") : null;
@@ -52,7 +53,7 @@ namespace SAUtils.CreateOmimTsv
         private void ParseHeader(string line)
         {
             line = line.Trim('#').Trim(' ');
-            var colNames = line.Split('\t').Select(x => x.Trim(' ')).ToList();
+            var colNames = line.OptimizedSplit('\t').Select(x => x.Trim(' ')).ToList();
 
             for (var index = 0; index < colNames.Count; index++)
             {
@@ -87,7 +88,7 @@ namespace SAUtils.CreateOmimTsv
 
         private static bool IsHeader(string line) => line.StartsWith("# Chromosome\t") || line.StartsWith("# MIM Number\t");
 
-        private static bool IsCommentLine(string line) => line.StartsWith("#");
+        private static bool IsCommentLine(string line) => line.OptimizedStartsWith('#');
 
         public void Dispose() => _stream.Dispose();
     }

@@ -9,19 +9,19 @@ namespace Nirvana
 {
     public static class PluginUtilities
     {
-        private const string DllExtension = ".dll";
+        private const string DllExtension    = ".dll";
         private const string ConfigExtension = ".config";
+
         public static IPlugin[] LoadPlugins(string pluginDirectory)
         {
-            var executableLocation = Assembly.GetEntryAssembly().Location;
-            var path = pluginDirectory ?? Path.Combine(Path.GetDirectoryName(executableLocation), "Plugins");
+            string executableLocation = Assembly.GetEntryAssembly().Location;
+            string path               = pluginDirectory ?? Path.Combine(Path.GetDirectoryName(executableLocation), "Plugins");
 
             if (!Directory.Exists(path)) return null;
 
             var pluginFileNames = Directory.GetFiles(path, "*.dll", SearchOption.TopDirectoryOnly);
-            var assemblies = pluginFileNames.Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToArray();
-
-            var configuration = new ContainerConfiguration().WithAssemblies(assemblies);
+            var assemblies      = pluginFileNames.Select(AssemblyLoadContext.Default.LoadFromAssemblyPath).ToArray();
+            var configuration   = new ContainerConfiguration().WithAssemblies(assemblies);
 
             IPlugin[] plugins;
             using (var container = configuration.CreateContainer())
@@ -31,12 +31,11 @@ namespace Nirvana
 
             foreach (var plugin in plugins)
             {
-                var configFilePath = Path.Combine(path, plugin.Name + DllExtension + ConfigExtension);
-                if (!File.Exists(configFilePath))
-                    throw new FileNotFoundException($"Missing expected config file: {configFilePath}!!");
+                string configFilePath = Path.Combine(path, plugin.Name + DllExtension + ConfigExtension);
+                if (!File.Exists(configFilePath)) throw new FileNotFoundException($"Missing expected config file: {configFilePath}!!");
             }
+
             return plugins;
         }
-
     }
 }

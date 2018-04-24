@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Sequence;
 
@@ -27,7 +28,7 @@ namespace SAUtils.InputFileParsers.DGV
         /// </summary>
         public static DgvItem ExtractDgvItem(string line, IDictionary<string, IChromosome> refChromDict)
         {
-            var cols = line.Split('\t');
+            var cols = line.OptimizedSplit('\t');
             if (cols.Length < 8) return null;
 
             var id = cols[0];

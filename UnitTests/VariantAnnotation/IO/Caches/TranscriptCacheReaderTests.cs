@@ -38,8 +38,9 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
             const GenomeAssembly genomeAssembly = GenomeAssembly.GRCh38;
 
+            var baseHeader   = new Header("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly);
             var customHeader = new TranscriptCacheCustomHeader(1, 2);
-            _expectedHeader = new CacheHeader("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly, customHeader);
+            _expectedHeader  = new CacheHeader(baseHeader, customHeader);
 
             var transcriptRegions = new ITranscriptRegion[]
             {
@@ -104,7 +105,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
         {
             Assert.Equal(expected.Length, observed.Length);
 
-            for (int refIndex = 0; refIndex < expected.Length; refIndex++)
+            for (var refIndex = 0; refIndex < expected.Length; refIndex++)
             {
                 var expectedIntervalArray = expected[refIndex];
                 var observedIntervalArray = observed[refIndex];
@@ -115,7 +116,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
                 Assert.NotNull(observedIntervalArray);
                 Assert.Equal(expectedIntervalArray.Array.Length, observedIntervalArray.Array.Length);
 
-                for (int i = 0; i < expectedIntervalArray.Array.Length; i++)
+                for (var i = 0; i < expectedIntervalArray.Array.Length; i++)
                 {
                     var expectedInterval = expectedIntervalArray.Array[i];
                     var observedInterval = observedIntervalArray.Array[i];
@@ -133,7 +134,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
             Assert.Equal(expectedList.Count, observedList.Count);
 
-            for (int i = 0; i < expectedList.Count; i++)
+            for (var i = 0; i < expectedList.Count; i++)
             {
                 var expectedEntry = expectedList[i];
                 var observedEntry = observedList[i];
@@ -150,7 +151,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
             Assert.Equal(expectedList.Count, observedList.Count);
 
-            for (int i = 0; i < expectedList.Count; i++)
+            for (var i = 0; i < expectedList.Count; i++)
             {
                 var expectedEntry = expectedList[i];
                 var observedEntry = observedList[i];

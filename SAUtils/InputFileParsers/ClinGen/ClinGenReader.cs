@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -33,7 +34,7 @@ namespace SAUtils.InputFileParsers.ClinGen
                 {
                     if (IsClinGenHeader(line)) continue;
 
-                    var cols         = line.Split('\t');
+                    var cols         = line.OptimizedSplit('\t');
                     string id        = cols[0];
                     string ucscChrom = cols[1];
                     if(!_refNameDict.ContainsKey(ucscChrom)) continue;
@@ -45,8 +46,8 @@ namespace SAUtils.InputFileParsers.ClinGen
                     var variantType        = GetVariantType(cols[6]);
                     var clinInterpretation = GetClinInterpretation(cols[7]);
                     bool validated         = cols[8].Equals("True");
-                    var phenotypes         = cols[9] == "" ? null : new HashSet<string>(cols[9].Split(','));
-                    var phenotypeIds       = cols[10] == "" ? null : new HashSet<string>(cols[10].Split(','));
+                    var phenotypes         = cols[9] == "" ? null : new HashSet<string>(cols[9].OptimizedSplit(','));
+                    var phenotypeIds       = cols[10] == "" ? null : new HashSet<string>(cols[10].OptimizedSplit(','));
 
                     var currentItem = new ClinGenItem(id, chrom, start, end, variantType, observedGains, observedLosses,
                         clinInterpretation, validated, phenotypes, phenotypeIds);
@@ -91,7 +92,7 @@ namespace SAUtils.InputFileParsers.ClinGen
 
         private static bool IsClinGenHeader(string line)
         {
-            return line.StartsWith("#");
+            return line.OptimizedStartsWith('#');
         }
     }
 }

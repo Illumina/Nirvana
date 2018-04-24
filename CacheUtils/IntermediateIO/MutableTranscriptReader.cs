@@ -5,6 +5,7 @@ using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.TranscriptCache;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -253,7 +254,7 @@ namespace CacheUtils.IntermediateIO
         private string[] GetColumns(string keyword, string line = null)
         {
             if (line == null) line = _reader.ReadLine();
-            var cols = line?.Split('\t');
+            var cols = line?.OptimizedSplit('\t');
             if (cols == null) throw new InvalidDataException("Found an unexpected null when parsing the columns in the transcript reader.");
             if (cols[0] != keyword) throw new InvalidDataException($"Could not find the {keyword} keyword in the transcripts file.");
             return cols;

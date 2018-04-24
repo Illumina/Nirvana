@@ -17,13 +17,13 @@ namespace CacheUtils.IntermediateIO
 
         internal void Write(GenbankEntry entry)
         {
-            var numExons = entry.Exons?.Length ?? 0;
+            int numExons = entry.Exons?.Length ?? 0;
 
-            var codingRegionStart = entry.CodingRegion?.Start ?? -1;
-            var codingRegionEnd   = entry.CodingRegion?.End   ?? -1;
+            int codingRegionStart = entry.CodingRegion?.Start ?? -1;
+            int codingRegionEnd   = entry.CodingRegion?.End   ?? -1;
 
-            var proteinId      = entry.ProteinId ?? "";
-            var proteinVersion = entry.ProteinVersion;
+            string proteinId    = entry.ProteinId ?? "";
+            byte proteinVersion = entry.ProteinVersion;
 
             _writer.WriteLine($"{entry.TranscriptId}\t{entry.TranscriptVersion}\t{proteinId}\t{proteinVersion}\t{entry.GeneId}\t{entry.Symbol}\t{codingRegionStart}\t{codingRegionEnd}\t{numExons}");
             if (entry.Exons == null) return;

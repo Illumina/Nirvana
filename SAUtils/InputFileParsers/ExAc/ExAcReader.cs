@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -76,7 +77,7 @@ namespace SAUtils.InputFileParsers.ExAc
 					// Skip empty lines.
 					if (string.IsNullOrWhiteSpace(line)) continue;
 					// Skip comments.
-					if (line.StartsWith("#")) continue;
+					if (line.OptimizedStartsWith('#')) continue;
 					var exacItemsList = ExtractItems(line);
 					if (exacItemsList == null) continue;
 					foreach (var exacItem in exacItemsList)
@@ -96,9 +97,9 @@ namespace SAUtils.InputFileParsers.ExAc
 		public List<ExacItem> ExtractItems(string vcfline)
 		{
 			if (vcfline == null) return null;
-			var splitLine = vcfline.Split( '\t');// we don't care about the many fields after info field
-			
-			if (splitLine.Length < 8) return null;
+            var splitLine = vcfline.OptimizedSplit('\t');
+
+            if (splitLine.Length < 8) return null;
 
 			Clear();
 
@@ -108,7 +109,7 @@ namespace SAUtils.InputFileParsers.ExAc
 		    var chrom = _refChromDict[chromosome];
 			var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
 			var refAllele  = splitLine[VcfCommon.RefIndex];
-			var altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
+			var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
 			var infoFields = splitLine[VcfCommon.InfoIndex];
 
 			// parses the info fields and extract frequencies, coverage, num samples.
@@ -143,67 +144,63 @@ namespace SAUtils.InputFileParsers.ExAc
 			return alleleCounts[i];
 		}
 
-		/// <summary>
-		/// split up the info field and extract information from each of them.
-		/// </summary>
-		/// <param name="infoFields"></param>
-		private void ParseInfoField(string infoFields)
-		{
-			if (infoFields == "" || infoFields == ".") return;
+        /// <summary>
+        /// split up the info field and extract information from each of them.
+        /// </summary>
+        /// <param name="infoFields"></param>
+        private void ParseInfoField(string infoFields)
+        {
+            if (infoFields == "" || infoFields == ".") return;
+            var infoItems = infoFields.OptimizedSplit(';');
 
-			var infoItems = infoFields.Split(';');
-			foreach (var infoItem in infoItems)
-			{
-				var infoKeyValue = infoItem.Split('=');
-				if (infoKeyValue.Length == 2)//sanity check
-				{
-					var key = infoKeyValue[0];
-					var value = infoKeyValue[1];
+            foreach (string infoItem in infoItems)
+            {
+                (string key, string value) = infoItem.OptimizedKeyValue();
 
-					SetInfoField(key, value);
-				}
-			}
-		}
+                // sanity check
+                if (value != null) SetInfoField(key, value);
+            }
+        }
 
-		/// <summary>
-		/// Get a key value pair and using the key, set appropriate values
-		/// </summary>
-		/// <param name="vcfId"></param>
-		/// <param name="value"></param>
-		private void SetInfoField(string vcfId, string value)
+        /// <summary>
+        /// Get a key value pair and using the key, set appropriate values
+        /// </summary>
+        /// <param name="vcfId"></param>
+        /// <param name="value"></param>
+        private void SetInfoField(string vcfId, string value)
 		{
 			switch (vcfId)
 			{
 				case "AC_Adj":
-					_acAdj = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acAdj = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_AFR":
-					_acAfr = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acAfr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_AMR":
-					_acAmr = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acAmr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_EAS":
-					_acEas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acEas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_FIN":
-					_acFin = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acFin = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_NFE":
-					_acNfe = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acNfe = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_OTH":
-					_acOth = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acOth = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AC_SAS":
-					_acSas = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_acSas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 				case "AN_Adj":

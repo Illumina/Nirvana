@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OptimizedCore;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
@@ -56,7 +57,7 @@ namespace Phantom.DataStructures
                 for (int sampleIndex = 0; sampleIndex < positionSet.NumSamples; sampleIndex++)
                 {
                     int sampleColIndex = sampleIndex + VcfCommon.GenotypeIndex;
-                    sampleInfo[i, sampleIndex] = positionSet.SimplePositions[i].VcfFields[sampleColIndex].Split(":");
+                    sampleInfo[i, sampleIndex] = positionSet.SimplePositions[i].VcfFields[sampleColIndex].OptimizedSplit(':');
                 }
             }
             return sampleInfo;
@@ -89,7 +90,7 @@ namespace Phantom.DataStructures
 
             for (int i = 0; i < _numPositions; i++)
             {
-                var tags = SimplePositions[i].VcfFields[VcfCommon.FormatIndex].Split(":");
+                var tags = SimplePositions[i].VcfFields[VcfCommon.FormatIndex].OptimizedSplit(':');
                 int numTagsExtracted = 0;
                 for (int j = 0; j < tags.Length; j++)
                 {
@@ -186,7 +187,7 @@ namespace Phantom.DataStructures
 
         private static bool IsSupportedVariantType(string refAllele, string altAllele)
         {
-            return !(altAllele.StartsWith("<") || altAllele == "*") && SupportedVariantTypes.Contains(Vcf.VariantCreator.SmallVariantCreator.GetVariantType(refAllele, altAllele));
+            return !(altAllele.OptimizedStartsWith('<') || altAllele == "*") && SupportedVariantTypes.Contains(Vcf.VariantCreator.SmallVariantCreator.GetVariantType(refAllele, altAllele));
         }
     }
 

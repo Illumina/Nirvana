@@ -6,6 +6,7 @@ using CacheUtils.Genbank;
 using CacheUtils.IntermediateIO;
 using CacheUtils.Utilities;
 using Compression.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
@@ -100,7 +101,7 @@ namespace CacheUtils.Commands.Download
                     string line = reader.ReadLine();
                     if (line == null) break;
 
-                    string filename = line.Split('\t')[1];
+                    string filename = line.OptimizedSplit('\t')[1];
                     if (!filename.EndsWith(".rna.gbff.gz")) continue;
 
                     int num = int.Parse(filename.Substring(6, filename.Length - 18));

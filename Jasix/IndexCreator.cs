@@ -8,6 +8,7 @@ using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using OptimizedCore;
 using VariantAnnotation.Utilities;
 
 
@@ -101,7 +102,7 @@ namespace Jasix
             int previousPos = 0;
             while ((line = _reader.ReadLine()) != null)
             {
-                if (line.StartsWith("]")) break;
+                if (line.OptimizedStartsWith(']')) break;
                 line = line.TrimEnd(',');
                 var chrPos = GetChromPosition(line);
 

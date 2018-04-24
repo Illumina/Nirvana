@@ -15,16 +15,17 @@ namespace Vcf.VariantCreator
         {
             if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant cann't be both decomposed and recomposed");
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
-            var end = start + refAllele.Length - 1;
+            int end = start + refAllele.Length - 1;
 
             var variantType = GetVariantType(refAllele, altAllele);
-            var vid         = GetVid(chromosome.EnsemblName, start, end, altAllele, variantType);
+            string vid      = GetVid(chromosome.EnsemblName, start, end, altAllele, variantType);
 
-			return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, null, null, SmallVariantBehavior);
-		}
-		private static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
-		{
-            var referenceName = ensemblName;
+            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, null, null, SmallVariantBehavior);
+        }
+
+        private static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
+        {
+            string referenceName = ensemblName;
 
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (type)
@@ -49,18 +50,17 @@ namespace Vcf.VariantCreator
 
             var md5Hash    = MD5.Create();
             var md5Builder = StringBuilderCache.Acquire();
-
-            var data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(altAllele));
+            var data       = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(altAllele));
 
             md5Builder.Clear();
-            foreach (var b in data) md5Builder.Append(b.ToString("x2"));
+            foreach (byte b in data) md5Builder.Append(b.ToString("x2"));
             return StringBuilderCache.GetStringAndRelease(md5Builder);
         }
 
         public static VariantType GetVariantType(string refAllele, string altAllele)
         {
-            var referenceAlleleLen = refAllele.Length;
-            var alternateAlleleLen = altAllele.Length;
+            int referenceAlleleLen = refAllele.Length;
+            int alternateAlleleLen = altAllele.Length;
 
             if (alternateAlleleLen != referenceAlleleLen)
             {

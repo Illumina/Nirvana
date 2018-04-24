@@ -1,4 +1,5 @@
 ﻿using System;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 
@@ -245,7 +246,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             {
                 var stopPos = _alternateAminoAcids.IndexOf(AminoAcids.StopCodon, StringComparison.Ordinal);
                 var altAminoAcidesBeforeStop = _alternateAminoAcids.Substring(0, stopPos);
-                if (_alternateAminoAcids.StartsWith(AminoAcids.StopCodon) ||
+                if (_alternateAminoAcids.OptimizedStartsWith(AminoAcids.StopCodonChar) ||
                     _referenceAminoAcids.StartsWith(altAminoAcidesBeforeStop))
                     return true;
             }
@@ -358,7 +359,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             var result = true;
 
             var sameLen = _referenceAminoAcidsLen == _alternateAminoAcidsLen;
-            var startsWithTer = _referenceAminoAcids.StartsWith("X") || _alternateAminoAcids.StartsWith("X");
+            var startsWithTer = _referenceAminoAcids.OptimizedStartsWith('X') || _alternateAminoAcids.OptimizedStartsWith('X');
 
             var isInframeDeletion = IsInframeDeletion();
             // Note: sequence ontology says that stop retained should not be here (http://www.sequenceontology.org/browser/current_svn/term/SO:0001567)

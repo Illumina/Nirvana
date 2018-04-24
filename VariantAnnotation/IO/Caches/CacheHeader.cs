@@ -1,56 +1,37 @@
-﻿using System;
-using System.IO;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
+﻿using System.IO;
+using System.Text;
 
 namespace VariantAnnotation.IO.Caches
 {
-    public sealed class CacheHeader : IFileHeader
+    public sealed class CacheHeader : Header
     {
-        private readonly string _identifier;
-        public readonly ushort SchemaVersion;
-        public readonly ushort DataVersion;
-        public readonly Source TranscriptSource;
-        public readonly long CreationTimeTicks;
-        public readonly GenomeAssembly GenomeAssembly;
-        public readonly ICustomCacheHeader CustomHeader;
+        public readonly TranscriptCacheCustomHeader Custom;
 
-        public CacheHeader(string identifier, ushort schemaVersion, ushort dataVersion, Source transcriptSource,
-            long creationTimeTicks, GenomeAssembly genomeAssembly, ICustomCacheHeader customHeader)
+        public CacheHeader(Header header, TranscriptCacheCustomHeader customHeader) : base(header.Identifier,
+            header.SchemaVersion, header.DataVersion, header.Source, header.CreationTimeTicks,
+            header.GenomeAssembly)
         {
-            _identifier       = identifier;
-            SchemaVersion     = schemaVersion;
-            DataVersion       = dataVersion;
-            TranscriptSource  = transcriptSource;
-            CreationTimeTicks = creationTimeTicks;
-            GenomeAssembly    = genomeAssembly;
-            CustomHeader      = customHeader;
+            Custom = customHeader;
         }
 
-        public void Write(BinaryWriter writer)
+        public new void Write(BinaryWriter writer)
         {
-            writer.Write(_identifier);
-            writer.Write(SchemaVersion);
-            writer.Write(DataVersion);
-            writer.Write((byte)TranscriptSource);
-            writer.Write(CreationTimeTicks);
-            writer.Write((byte)GenomeAssembly);
-            CustomHeader.Write(writer);
+            base.Write(writer);
+            Custom.Write(writer);
         }
 
-        public static IFileHeader Read(BinaryReader reader, Func<BinaryReader, ICustomCacheHeader> customRead)
+        public static CacheHeader Read(Stream stream)
         {
-            var identifier        = reader.ReadString();
-            var schemaVersion     = reader.ReadUInt16();
-            var dataVersion       = reader.ReadUInt16();
-            var transcriptSource  = (Source)reader.ReadByte();
-            var creationTimeTicks = reader.ReadInt64();
-            var genomeAssembly    = (GenomeAssembly)reader.ReadByte();
-            var customHeader      = customRead(reader);
+            CacheHeader header;
 
-            return new CacheHeader(identifier, schemaVersion, dataVersion, transcriptSource,
-                creationTimeTicks, genomeAssembly, customHeader);
+            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
+            {
+                var baseHeader   = Read(reader);
+                var customHeader = TranscriptCacheCustomHeader.Read(reader);
+                header = new CacheHeader(baseHeader, customHeader);
+            }
+
+            return header;
         }
     }
 }

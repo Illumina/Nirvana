@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Sequence;
 
@@ -30,7 +31,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 					// Skip empty lines.
 					if (string.IsNullOrWhiteSpace(line)) continue;
 					// Skip comments.
-					if (line.StartsWith("#")) continue;
+					if (line.OptimizedStartsWith('#')) continue;
 					var oneKSvGenItem = ExtractOneKGenSvItem(line, _refNameDict);
 					if (oneKSvGenItem == null ) continue;
 					yield return oneKSvGenItem;
@@ -41,7 +42,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 
 		private static OneKGenItem ExtractOneKGenSvItem(string line, IDictionary<string,IChromosome> refNameDict)
 		{
-			var cols = line.Split('\t');
+			var cols = line.OptimizedSplit('\t');
 			if (cols.Length < 8) return null;
 
 			var id = cols[0];

@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Algorithms;
+﻿using OptimizedCore;
+using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
@@ -25,10 +26,10 @@ namespace VariantAnnotation.AnnotatedPositions
 
 			var peptideSeq = transcript.Translation.PeptideSeq;
 
-			// Amino acid seq should never go past the stop codon
-	        refAminoAcids = !refAminoAcids.EndsWith(AminoAcids.StopCodon) && refAminoAcids.Contains(AminoAcids.StopCodon)
-		        ? refAminoAcids.Split(AminoAcids.StopCodon[0])[0]+AminoAcids.StopCodon
-		        : refAminoAcids;
+            // Amino acid seq should never go past the stop codon
+            refAminoAcids = !refAminoAcids.EndsWith(AminoAcids.StopCodon) && refAminoAcids.Contains(AminoAcids.StopCodon)
+                ? refAminoAcids.OptimizedSplit(AminoAcids.StopCodon[0])[0] + AminoAcids.StopCodon
+                : refAminoAcids;
 
             int proteinStart = position.ProteinStart;
 			HgvsUtilities.ShiftAndRotateAlleles(ref proteinStart, ref refAminoAcids, ref altAminoAcids, peptideSeq);
@@ -135,7 +136,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
 			// todo: add start gained
 		    // according to var nom, only if the Stop codon is effected, we call it an extension
-			if (variantEffect.IsStopLost() && refAminoAcids.StartsWith(AminoAcids.StopCodon)) return ProteinChange.Extension;
+			if (variantEffect.IsStopLost() && refAminoAcids.OptimizedStartsWith(AminoAcids.StopCodonChar)) return ProteinChange.Extension;
 
 			if (variantEffect.IsFrameshiftVariant()) return ProteinChange.Frameshift;
 

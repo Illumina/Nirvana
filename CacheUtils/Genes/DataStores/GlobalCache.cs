@@ -55,8 +55,8 @@ namespace CacheUtils.Genes.DataStores
 
                 foreach (var transcript in transcripts)
                 {
-                    var gene = transcript.Gene;
-                    var key  = GetGeneKey(gene);
+                    var gene   = transcript.Gene;
+                    string key = GetGeneKey(gene);
                     if (geneDict.ContainsKey(key)) continue;
 
                     gene.Chromosome = refNameToChromosome38[gene.Chromosome.UcscName];

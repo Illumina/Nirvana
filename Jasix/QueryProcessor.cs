@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
+using OptimizedCore;
 using VariantAnnotation.Algorithms;
 
 namespace Jasix
@@ -165,7 +166,7 @@ namespace Jasix
 			RepositionReader(position);
 
 			string line;
-			while ((line = _jsonReader.ReadLine()) != null && !line.StartsWith("]"))
+			while ((line = _jsonReader.ReadLine()) != null && !line.OptimizedStartsWith(']'))
 				//The array of positions entry end with "]," Going past it will cause the json parser to crash
 			{
 				line = line.TrimEnd(',');

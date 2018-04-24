@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 
 namespace SAUtils.DbSnpRemapper
@@ -33,11 +34,11 @@ namespace SAUtils.DbSnpRemapper
                 //read to the first data line
                 while ((srcLine = _srcReader.ReadLine()) != null)
                 {
-                    if (!srcLine.StartsWith("#")) break;
+                    if (!srcLine.OptimizedStartsWith('#')) break;
                 }
                 while ((destLine= _destReader.ReadLine()) != null)
                 {
-                    if (!destLine.StartsWith("#")) break;
+                    if (!destLine.OptimizedStartsWith('#')) break;
                 }
 
                 // dictionary of leftover rsIds from previous chromosomes
@@ -48,18 +49,10 @@ namespace SAUtils.DbSnpRemapper
                     destRsidLocations.Clear();
                     destLine = GetNextChromDestinations(destLine, destRsidLocations);
                     srcLine = ProcessNextChromSource(srcLine, destRsidLocations);
-
-                    //debug
-                    //if (srcLine.StartsWith("chr3")) break;
-                }
-                
+                }                
             }
 
             // these writers need to be kept open so that the leftover mapper can append to them
-            //foreach (var writer in _writers.Values)
-            //{
-            //    writer.Dispose();
-            //}
             Console.WriteLine($"Total leftover count:{_leftoverCount}");
             return _writers;
         }

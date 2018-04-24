@@ -39,7 +39,7 @@ namespace CacheUtils.Commands.CreateCache
             string polyphenPath   = _inputPrefix + ".polyphen.gz";
             string regulatoryPath = _inputPrefix + ".regulatory.gz";
 
-            var (refIndexToChromosome, refNameToChromosome, numRefSeqs) = SequenceHelper.GetDictionaries(_inputReferencePath);
+            (var refIndexToChromosome, var refNameToChromosome, int numRefSeqs) = SequenceHelper.GetDictionaries(_inputReferencePath);
 
             using (var transcriptReader = new MutableTranscriptReader(GZipUtilities.GetAppropriateReadStream(transcriptPath), refIndexToChromosome))
             using (var regulatoryReader = new RegulatoryRegionReader(GZipUtilities.GetAppropriateReadStream(regulatoryPath), refIndexToChromosome))

@@ -27,7 +27,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SAUtils", "SAUtils\SAUtils.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jasix", "Jasix\Jasix.csproj", "{ECC7869C-1B21-42C1-B8BD-4190F15B3B6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phantom", "Phantom\Phantom.csproj", "{86DB686A-17A8-446B-A2C4-100CD6ADCB39}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Phantom", "Phantom\Phantom.csproj", "{86DB686A-17A8-446B-A2C4-100CD6ADCB39}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OptimizedCore", "OptimizedCore\OptimizedCore.csproj", "{76FEE3B3-FB8E-4421-A63F-CA659FB1ACA0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +89,10 @@ Global
 		{86DB686A-17A8-446B-A2C4-100CD6ADCB39}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86DB686A-17A8-446B-A2C4-100CD6ADCB39}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86DB686A-17A8-446B-A2C4-100CD6ADCB39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76FEE3B3-FB8E-4421-A63F-CA659FB1ACA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76FEE3B3-FB8E-4421-A63F-CA659FB1ACA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76FEE3B3-FB8E-4421-A63F-CA659FB1ACA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76FEE3B3-FB8E-4421-A63F-CA659FB1ACA0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

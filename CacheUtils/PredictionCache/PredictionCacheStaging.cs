@@ -10,14 +10,12 @@ namespace CacheUtils.PredictionCache
 {
     public sealed class PredictionCacheStaging : IStaging
     {
-        private readonly Prediction.Entry[] _lookupTable;
         private readonly Prediction[][] _predictionsPerRef;
-        private readonly CacheHeader _header;
+        private readonly PredictionHeader _header;
 
-        internal PredictionCacheStaging(CacheHeader header, Prediction.Entry[] lut, Prediction[][] predictionsPerRef)
+        internal PredictionCacheStaging(PredictionHeader header, Prediction[][] predictionsPerRef)
         {
             _header            = header;
-            _lookupTable       = lut;
             _predictionsPerRef = predictionsPerRef;
         }
 
@@ -26,7 +24,7 @@ namespace CacheUtils.PredictionCache
             using (var blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Compress))
             using (var writer      = new PredictionCacheWriter(blockStream, _header))
             {
-                writer.Write(_lookupTable, _predictionsPerRef);
+                writer.Write(_header.LookupTable, _predictionsPerRef);
             }
         }
     }

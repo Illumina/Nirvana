@@ -11,10 +11,10 @@ namespace CacheUtils.PredictionCache
     {
         private readonly BinaryWriter _writer;
         private readonly BlockStream _blockStream;
-        private readonly CacheHeader _header;
+        private readonly PredictionHeader _header;
         private readonly bool _leaveOpen;
 
-        public PredictionCacheWriter(BlockStream blockStream, CacheHeader header, bool leaveOpen = false)
+        public PredictionCacheWriter(BlockStream blockStream, PredictionHeader header, bool leaveOpen = false)
         {
             _blockStream = blockStream;
             _writer      = new BinaryWriter(blockStream);
@@ -41,11 +41,7 @@ namespace CacheUtils.PredictionCache
 
         private void WritePredictions(IReadOnlyList<Prediction[]> predictionsPerRef)
         {
-            // ReSharper disable once UsePatternMatching
-            var customHeader = _header.CustomHeader as PredictionCacheCustomHeader;
-            if (customHeader == null) throw new InvalidCastException();
-
-            var indexEntries  = customHeader.Entries;
+            var indexEntries  = _header.Custom.Entries;
             var blockPosition = new BlockStream.BlockPosition();
 
             for (var i = 0; i < predictionsPerRef.Count; i++)

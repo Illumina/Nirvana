@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
 using VariantAnnotation.Utilities;
@@ -66,7 +67,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 	            // Skip empty lines.
 	            if (string.IsNullOrWhiteSpace(line)) continue;
 
-	            if (!line.StartsWith("#")) break;
+	            if (!line.OptimizedStartsWith('#')) break;
 
 	            ParseHeaderLine(line);
 	        }
@@ -93,7 +94,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                    if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
                     // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
                     if (line.StartsWith(refName + "\t")) break;
                 }
@@ -126,7 +127,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private InterimSaItem ExtractItem(string line)
 		{
-			var columns = line.Split('\t');
+			var columns = line.OptimizedSplit('\t');
 			if ( columns.Length < MinNoOfColumns)
 				throw new InvalidDataException("Line contains too few columns:\n"+line);
 
@@ -150,13 +151,10 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
 		private void ParseHeaderLine(string line)
 		{
-			var words = line.Split('=');
-			if (words.Length < 2) return;
+		    (string key, string value) = line.OptimizedKeyValue();
+		    if (key == null || value == null) return;
 
-			var key = words[0];
-			var value = words[1];
-
-			switch (key)
+            switch (key)
 			{
 				case "#name":
 					_name = value;

@@ -27,7 +27,7 @@ namespace CacheUtils.Genes
             foreach (var kvp in genesByRef)
             {
                 var hgncIdToGenes = kvp.Value.GetMultiValueDict(x => x.HgncId.ToString() + '|' + (x.OnReverseStrand ? 'R' : 'F'));
-                var (mergedGenes, numOrphanEntries, numMergedEntries) = GetMergedGenes(hgncIdToGenes, isGrch37);
+                (var mergedGenes, int numOrphanEntries, int numMergedEntries) = GetMergedGenes(hgncIdToGenes, isGrch37);
 
                 mergedGenesByRef[kvp.Key] = mergedGenes;
 
@@ -99,13 +99,13 @@ namespace CacheUtils.Genes
 
         private static UgaGene GetMergedGene(MutableGene geneA, MutableGene geneB, bool isGrch37)
         {
-            var (ensemblGene, refSeqGene) = geneA.GeneId.StartsWith("ENSG") ? (geneA, geneB) : (geneB, geneA);
+            (MutableGene ensemblGene, MutableGene refSeqGene) = geneA.GeneId.StartsWith("ENSG") ? (geneA, geneB) : (geneB, geneA);
 
             if (ensemblGene.Chromosome.Index != refSeqGene.Chromosome.Index) throw new InvalidDataException($"The two genes are on different chromosomes: {geneA.GeneId} & {geneB.GeneId}");
             if (ensemblGene.OnReverseStrand  != refSeqGene.OnReverseStrand)  throw new InvalidDataException($"Both genes do not have the same orientation: {geneA.GeneId} & {geneB.GeneId}");
 
             IInterval interval = GetMergedInterval(ensemblGene, refSeqGene);
-            var (grch37, grch38) = isGrch37 ? (interval, null as IInterval) : (null as IInterval, interval);
+            (IInterval grch37, IInterval grch38) = isGrch37 ? (interval, null as IInterval) : (null as IInterval, interval);
 
             return new UgaGene(ensemblGene.Chromosome, grch37, grch38, ensemblGene.OnReverseStrand, refSeqGene.GeneId,
                 ensemblGene.GeneId, ensemblGene.Symbol, ensemblGene.HgncId);

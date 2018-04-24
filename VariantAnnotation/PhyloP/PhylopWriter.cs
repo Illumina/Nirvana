@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Compression.Algorithms;
 using Compression.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
@@ -194,7 +195,7 @@ namespace VariantAnnotation.PhyloP
         private void StartNewInterval(string line)
         {
             var words     = line.Split();
-            var chromName = words[1].Split('=')[1];
+            var chromName = words[1].OptimizedKeyValue().Value;
 
             // checking if the writer needs to be initiated/re-initiated
             if (_writer == null)
@@ -214,8 +215,8 @@ namespace VariantAnnotation.PhyloP
                 WriteInterval(_currentInterval, _writer);
             }
 
-            var start = Convert.ToInt32(words[2].Split('=')[1]);
-            var step  = Convert.ToInt16(words[3].Split('=')[1]);
+            var start = Convert.ToInt32(words[2].OptimizedKeyValue().Value);
+            var step  = Convert.ToInt16(words[3].OptimizedKeyValue().Value);
 
             _currentInterval = new PhylopInterval(start, 0, step);
         }

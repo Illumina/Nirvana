@@ -31,7 +31,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 
         public override string ToString()
         {
-            var strand = OnReverseStrand ? "R" : "F";
+            string strand = OnReverseStrand ? "R" : "F";
             return $"{GeneId}: {Chromosome.UcscName} {Start}-{End} {strand} symbol: {Symbol} ({SymbolSource}), HGNC ID: {HgncId}";
         }
 
@@ -53,7 +53,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
             unchecked
             {
                 // ReSharper disable NonReadonlyMemberInGetHashCode
-                var hashCode = Chromosome.Index.GetHashCode();
+                int hashCode = Chromosome.Index.GetHashCode();
                 hashCode = (hashCode * 397) ^ Start;
                 hashCode = (hashCode * 397) ^ End;
                 hashCode = (hashCode * 397) ^ OnReverseStrand.GetHashCode();
@@ -69,10 +69,10 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 
         public UgaGene ToUgaGene(bool isGrch37)
         {
-            var (ensemblGeneId, entrezGeneId) = GeneId.StartsWith("ENSG") ? (GeneId, null as string) : (null as string, GeneId);
+            (string ensemblGeneId, string entrezGeneId) = GeneId.StartsWith("ENSG") ? (GeneId, null as string) : (null as string, GeneId);
 
             IInterval interval = new Interval(Start, End);
-            var (grch37, grch38) = isGrch37 ? (interval, null as IInterval) : (null as IInterval, interval);
+            (IInterval grch37, IInterval grch38) = isGrch37 ? (interval, null as IInterval) : (null as IInterval, interval);
 
             return new UgaGene(Chromosome, grch37, grch38, OnReverseStrand, entrezGeneId, ensemblGeneId, Symbol,
                 HgncId);

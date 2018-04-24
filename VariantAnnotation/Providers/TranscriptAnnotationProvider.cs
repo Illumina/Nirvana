@@ -50,20 +50,19 @@ namespace VariantAnnotation.Providers
             _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)), PredictionCacheReader.PolyphenDescriptions);
         }
 
-        private static (TranscriptCache cache, ushort vepVersion) InitiateCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refGenomeAssembly)
+        private static (TranscriptCache cache, ushort vepVersion) InitiateCache(Stream stream,
+            IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refGenomeAssembly)
         {
             TranscriptCache cache;
             ushort vepVersion;
 
             using (var reader = new TranscriptCacheReader(stream))
             {
-                var customHeader = reader.Header.CustomHeader as TranscriptCacheCustomHeader;
-                vepVersion = customHeader?.VepVersion ?? 0;
-
+                vepVersion = reader.Header.Custom.VepVersion;
                 CheckHeaderVersion(reader.Header, refGenomeAssembly);
                 cache = reader.Read(refIndexToChromosome).GetCache();
             }
-                
+
             return (cache, vepVersion);
         }
 

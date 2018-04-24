@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using OptimizedCore;
 
 namespace Vcf.Sample
 {
@@ -54,7 +55,8 @@ namespace Vcf.Sample
 
             // handle alternate alleles
             var index = 1;
-            foreach (var altAllele in intermediateSampleFields.AltAlleles)
+
+            foreach (string altAllele in intermediateSampleFields.AltAlleles)
             {
                 ac = GetAlleleCountString(altAllele, intermediateSampleFields);
                 if (ac == null) return null;
@@ -96,16 +98,22 @@ namespace Vcf.Sample
         /// </summary>
         private static int[] GetAlleleDepthsUsingAd(IntermediateSampleFields intermediateSampleFields)
         {
-            if (intermediateSampleFields.FormatIndices.AD == null || intermediateSampleFields.SampleColumns.Length <= intermediateSampleFields.FormatIndices.AD.Value) return null;
-            var ad = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.AD.Value].Split(',');
+            if (intermediateSampleFields.FormatIndices.AD == null || intermediateSampleFields.SampleColumns.Length <=
+                intermediateSampleFields.FormatIndices.AD.Value) return null;
+
+            var ad = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.AD.Value].OptimizedSplit(',');
             if (ad[0] == ".") return null;
-            var nAllele = ad.Length;
+
+            int nAllele = ad.Length;
             var alleleDepths = new int[nAllele];
-            for (int i = 0; i < nAllele; i++)
+
+            for (var i = 0; i < nAllele; i++)
             {
-                if (!int.TryParse(ad[i], out var num)) return null;
-                alleleDepths[i] = num;
+                (int number, bool foundError) = ad[i].OptimizedParseInt32();
+                if (foundError) return null;
+                alleleDepths[i] = number;
             }
+
             return alleleDepths;
         }
 
