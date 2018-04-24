@@ -136,9 +136,7 @@ namespace Jasix.DataStructures
 
 	    public bool ContainsChr(string chr)
 	    {
-	        if (_synonymToChrName.TryGetValue(chr, out string indexName))
-	            return _chrIndices.Keys.Contains(indexName);
-            return _chrIndices.Keys.Contains(chr);
+	        return _chrIndices.Keys.Contains(_synonymToChrName.TryGetValue(chr, out string indexName) ? indexName : chr);
 	    }
 
 	    public string GetIndexChromName(string chromName)

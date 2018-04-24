@@ -104,7 +104,7 @@ namespace Jasix
 
                 if (_printHeaderOnly)
                 {
-                    queryProcessor.PrintHeader();
+                    queryProcessor.PrintHeaderOnly();
                     return ExitCodes.Success;
                 }
 

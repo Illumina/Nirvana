@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Compression.DataStructures;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
 using OptimizedCore;
@@ -16,47 +17,18 @@ namespace Jasix
 		private readonly Stream _indexStream;
 		private readonly JasixIndex _jasixIndex;
 
-	    #endregion
+        #endregion
 
-		#region IDisposable
+        #region IDisposable
+	    public void Dispose()
+	    {
+	        _jsonReader?.Dispose();
+	        _writer?.Dispose();
+	        _indexStream?.Dispose();
+	    }
+        #endregion
 
-	    private bool _disposed;
-
-		/// <summary>
-		/// public implementation of Dispose pattern callable by consumers. 
-		/// </summary>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-
-		/// <summary>
-		/// protected implementation of Dispose pattern. 
-		/// </summary>
-		private void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-
-			if (disposing)
-			{
-				// Free any other managed objects here.
-				_jsonReader.Dispose();
-				_indexStream.Dispose();
-                _writer.Dispose();
-			}
-
-			// Free any unmanaged objects here.
-			//
-			_disposed = true;
-			// Free any other managed objects here.
-
-		}
-		#endregion
-
-		public QueryProcessor(StreamReader jsonReader, Stream indexStream, StreamWriter writer=null)
+        public QueryProcessor(StreamReader jsonReader, Stream indexStream, StreamWriter writer=null)
 		{
 			_jsonReader  = jsonReader;
 		    _writer      = writer ?? new StreamWriter(Console.OpenStandardOutput());
@@ -70,65 +42,71 @@ namespace Jasix
 			return _jasixIndex.HeaderLine;
 		}
 
-		
-		public void PrintChromosomeList()
+        public void PrintChromosomeList()
 		{
-			foreach (var chrName in _jasixIndex.GetChromosomeList())
+			foreach (string chrName in _jasixIndex.GetChromosomeList())
 			{
                 _writer.WriteLine(chrName);
 			}
 		}
 
-		public void PrintHeader()
+		public void PrintHeaderOnly()
 		{
 
-			var headerString = _jasixIndex.HeaderLine;
+			string headerString = _jasixIndex.HeaderLine;
 			_writer.WriteLine("{" + headerString+"}");
 		}
 
 		
-		public void ProcessQuery(IEnumerable<string> queryStrings, bool printHeader = false)
+		public int ProcessQuery(IEnumerable<string> queryStrings, bool printHeader = false)
 		{
 			_writer.Write("{");
 			if (printHeader)
 			{
-				var headerString = _jasixIndex.HeaderLine;
+				string headerString = _jasixIndex.HeaderLine;
 				_writer.Write(headerString + ",");
 			}
 			Utilities.PrintQuerySectionOpening(JasixCommons.SectionToIndex, _writer);
 
-		    foreach (var queryString in queryStrings)
+		    var count = 0;
+		    foreach (string queryString in queryStrings)
             {
                 var query = Utilities.ParseQuery(queryString);
+                query.Chromosome = _jasixIndex.GetIndexChromName(query.Chromosome);
                 if (!_jasixIndex.ContainsChr(query.Chromosome)) continue;
-                var needComma = PrintLargeVariantsExtendingIntoQuery(query);
-                PrintAllVariantsFromQueryBegin(query, needComma);
+
+                count = PrintLargeVariantsExtendingIntoQuery(query);
+                count += PrintAllVariantsFromQueryBegin(query, count > 0);
             }
 
             Utilities.PrintQuerySectionClosing(_writer);
 			_writer.WriteLine("}");
+		    return count;
 
 		}
 
-		private void PrintAllVariantsFromQueryBegin((string, int, int) query, bool needComma)
+		private int PrintAllVariantsFromQueryBegin((string, int, int) query, bool needComma)
 		{
-			foreach (var line in ReadOverlappingJsonLines(query))
+		    var count = 0;
+			foreach (string line in ReadOverlappingJsonLines(query))
 			{
 				Utilities.PrintJsonEntry(line, needComma, _writer);
 				needComma = true;
+			    count++;
 			}
 
+		    return count;
 		}
-		private bool PrintLargeVariantsExtendingIntoQuery((string, int, int) query)
+		private int PrintLargeVariantsExtendingIntoQuery((string, int, int) query)
 		{
-			var needComma = false;
-			foreach (var line in ReadJsonLinesExtendingInto(query))
+		    var count = 0;
+			foreach (string line in ReadJsonLinesExtendingInto(query))
 			{
-				Utilities.PrintJsonEntry(line, needComma, _writer);
-				needComma = true;
+				Utilities.PrintJsonEntry(line, count>0, _writer);
+			    count++;
 			}
 
-			return needComma;
+			return count;
 		}
 
 		internal IEnumerable<string> ReadJsonLinesExtendingInto((string Chr, int Start, int End) query)
@@ -138,7 +116,7 @@ namespace Jasix
 
 			if (locations == null || locations.Length == 0) yield break;
 
-			foreach (var location in locations)
+			foreach (long location in locations)
 			{
 				RepositionReader(location);
 
@@ -159,7 +137,7 @@ namespace Jasix
 
 		internal IEnumerable<string> ReadOverlappingJsonLines((string Chr, int Start, int End) query)
 		{
-			var position = _jasixIndex.GetFirstVariantPosition(query.Chr, query.Start, query.End);
+			long position = _jasixIndex.GetFirstVariantPosition(query.Chr, query.Start, query.End);
 
 			if (position == -1) yield break;
 
@@ -183,9 +161,8 @@ namespace Jasix
 					throw;
 				}
 
-			    string indexChromName = _jasixIndex.GetIndexChromName(query.Chr);
 			    string jsonChrom = _jasixIndex.GetIndexChromName(jsonEntry.chromosome);
-				if (jsonChrom != indexChromName) break;
+				if (jsonChrom != query.Chr) break;
 
 				if (jsonEntry.Start > query.End) break;
 
@@ -196,6 +173,7 @@ namespace Jasix
 			}
 		}
 
-		
+
+	    
 	}
 }

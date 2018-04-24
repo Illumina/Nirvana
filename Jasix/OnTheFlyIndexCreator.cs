@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 
 namespace Jasix
