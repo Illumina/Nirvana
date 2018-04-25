@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
-using CommonUtilities;
 using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
@@ -147,10 +146,7 @@ namespace Nirvana
         private static void WriteGeneAnnotations(ICollection<IAnnotatedGene> annotatedGenes, JsonWriter writer)
         {
             if (annotatedGenes.Count == 0) return;
-            var sb = StringBuilderCache.Acquire();
-            var jsonObject = new JsonObject(sb);
-            jsonObject.AddObjectValues("genes", annotatedGenes, true);
-            writer.WriteAnnotatedGenes(StringBuilderCache.GetStringAndRelease(sb));
+            writer.WriteAnnotatedGenes(annotatedGenes);
         }
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome, PerformanceMetrics metrics)

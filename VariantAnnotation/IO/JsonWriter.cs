@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CommonUtilities;
+using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
 
@@ -45,6 +46,7 @@ namespace VariantAnnotation.IO
 
             Header = StringBuilderCache.GetStringAndRelease(sb);
             _writer.Write(Header);
+            _writer.Flush();//closing the block
         }
 
         public void Dispose()
@@ -61,14 +63,31 @@ namespace VariantAnnotation.IO
             _writer.Write(entry);
         }
 
-        public void WriteAnnotatedGenes(string data)
+        public void WriteAnnotatedGenes(IEnumerable<IAnnotatedGene> annotatedGenes)
         {
-            _writer.WriteLine();
-            _writer.Write("],");
             _positionFieldClosed = true;
-            _writer.Write(data);
-        }
+            _writer.Flush();//closing the last block for positions section
 
+            _writer.WriteLine();
+            _writer.Write("],\"genes\":[\n");
+            _writer.Flush();//creating a tiny block for the genes section label
+
+            var sb = StringBuilderCache.Acquire();
+            var firstGeneEntry = true;
+            foreach (IAnnotatedGene annotatedGene in annotatedGenes)
+            {
+                sb.Clear();
+                annotatedGene.SerializeJson(sb);
+                if (!firstGeneEntry) _writer.WriteLine(",");
+                firstGeneEntry = false;
+                _writer.Write(sb.ToString());
+            }
+
+            _writer.Flush();//closing the last block of genes section
+            StringBuilderCache.GetStringAndRelease(sb);
+            _writer.WriteLine();
+            _writer.Write("]");
+        }
         /// <summary>
         /// write the footer
         /// </summary>
@@ -82,5 +101,7 @@ namespace VariantAnnotation.IO
             }
             _writer.WriteLine("}");
         }
+
+       
     }
 }

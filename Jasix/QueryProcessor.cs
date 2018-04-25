@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Compression.DataStructures;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
 using OptimizedCore;
