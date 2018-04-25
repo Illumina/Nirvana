@@ -20,9 +20,9 @@ namespace VariantAnnotation.IO.Caches
 
         public TranscriptCacheReader(Stream stream)
         {
+            Header          = CacheHeader.Read(stream);
             var blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Decompress);
             _reader         = new ExtendedBinaryReader(blockStream, Encoding.UTF8);
-            Header          = blockStream.ReadHeader(CacheHeader.Read, TranscriptCacheCustomHeader.Read) as CacheHeader;
         }
 
         public void Dispose() => _reader.Dispose();

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Phantom.DataStructures;
+﻿using Phantom.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;

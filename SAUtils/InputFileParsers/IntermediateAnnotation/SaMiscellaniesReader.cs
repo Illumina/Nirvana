@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
@@ -39,7 +39,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrWhiteSpace(line) || line.StartsWith("#")) continue;
+                    if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
                     // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
                     if (line.StartsWith(refName + "\t")) break;
                 }
@@ -71,7 +71,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
         private static SaMiscellanies ExtractItem(string line)
         {
-            var columns = line.Split('\t');
+            var columns = line.OptimizedSplit('\t');
             return columns.Length < 3 ? null : new SaMiscellanies(InterimSaCommon.RefMinorTag, columns[0], Convert.ToInt32(columns[1]), columns[2]);
         }
         

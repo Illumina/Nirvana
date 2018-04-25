@@ -8,9 +8,9 @@ namespace CacheUtils.Genes.Combiners
     {
         public static UgaGene Merge(UgaGene gene37, UgaGene gene38)
         {
-            var ensemblId    = CombineField(gene37.EnsemblId,    gene38.EnsemblId);
-            var entrezGeneId = CombineField(gene37.EntrezGeneId, gene38.EntrezGeneId);
-            var hgncId       = CombineField(gene37.HgncId,       gene38.HgncId);
+            string ensemblId    = CombineField(gene37.EnsemblId, gene38.EnsemblId);
+            string entrezGeneId = CombineField(gene37.EntrezGeneId, gene38.EntrezGeneId);
+            int hgncId          = CombineField(gene37.HgncId, gene38.HgncId);
             return new UgaGene(gene37.Chromosome, gene37.GRCh37, gene38.GRCh38, gene37.OnReverseStrand, entrezGeneId,
                 ensemblId, gene37.Symbol, hgncId);
         }

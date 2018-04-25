@@ -135,7 +135,7 @@ namespace SAUtils.DataStructures
 			var altAllele = string.IsNullOrEmpty(AlternateAllele) ? "-" : AlternateAllele;
 
 			//the reduced alt allele should never be output
-			altAllele = SupplementaryAnnotationUtilities.ReverseSaReducedAllele(altAllele);
+			altAllele = SaUtilsCommon.ReverseSaReducedAllele(altAllele);
 
 			jsonObject.AddStringValue("id", Id);
 			jsonObject.AddStringValue("reviewStatus", ReviewStatusStrings[ReviewStatus]);

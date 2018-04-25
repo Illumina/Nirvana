@@ -4,11 +4,12 @@ using System.IO;
 using System.IO.Compression;
 using CommandLine.Utilities;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using VariantAnnotation.Utilities;
+using OptimizedCore;
 
 
 namespace Jasix
@@ -101,11 +102,11 @@ namespace Jasix
             int previousPos = 0;
             while ((line = _reader.ReadLine()) != null)
             {
-                if (line.StartsWith("]")) break;
+                if (line.OptimizedStartsWith(']')) break;
                 line = line.TrimEnd(',');
                 var chrPos = GetChromPosition(line);
 
-                CheckFileSorted(chrPos.chr, chrPos.position, previousChr, previousPos);
+                CheckSorting(chrPos.chr, chrPos.position, previousChr, previousPos);
 
                 index.Add(chrPos.chr, chrPos.position, chrPos.end, fileLoc);
                 fileLoc = _reader.Position;
@@ -142,7 +143,7 @@ namespace Jasix
         }
 
         // ReSharper disable once UnusedParameter.Local
-        private void CheckFileSorted(string chr, int pos, string previousChr, int previousPos)
+        private void CheckSorting(string chr, int pos, string previousChr, int previousPos)
         {
             if (chr != previousChr && _processedChromosome.Contains(chr))
             {

@@ -18,7 +18,6 @@ using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.UniversalGeneArchive
 {

@@ -1,6 +1,4 @@
-﻿using VariantAnnotation.Interface.Intervals;
-
-namespace VariantAnnotation.Interface.Positions
+﻿namespace VariantAnnotation.Interface.Positions
 {
     public interface IPosition : ISimplePosition
     {

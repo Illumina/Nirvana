@@ -24,7 +24,7 @@ namespace CacheUtils.Genes.Combiners
             var keyToGene38 = uga38.GetMultiValueDict(GetKey);
             var keys        = GetAllKeys(keyToGene37.Keys, keyToGene38.Keys);
 
-            foreach (var key in keys)
+            foreach (string key in keys)
             {
                 var genes37 = GetGenesByKey(keyToGene37, key);
                 var genes38 = GetGenesByKey(keyToGene38, key);
@@ -57,8 +57,8 @@ namespace CacheUtils.Genes.Combiners
         private static IEnumerable<string> GetAllKeys(IEnumerable<string> keys37, IEnumerable<string> keys38)
         {
             var keys = new HashSet<string>();
-            foreach (var key in keys37) keys.Add(key);
-            foreach (var key in keys38) keys.Add(key);
+            foreach (string key in keys37) keys.Add(key);
+            foreach (string key in keys38) keys.Add(key);
             return keys;
         }
 

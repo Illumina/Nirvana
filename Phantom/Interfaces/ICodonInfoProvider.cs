@@ -1,5 +1,4 @@
 ﻿using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
 
 namespace Phantom.Interfaces
 {

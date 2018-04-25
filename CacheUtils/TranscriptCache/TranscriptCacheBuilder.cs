@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.Utilities;
+using CacheUtils.Utilities;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
@@ -41,8 +41,7 @@ namespace CacheUtils.TranscriptCache
             var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(numRefSeqs);
 
             var customHeader = new TranscriptCacheCustomHeader(_vepVersion, _vepReleaseTicks);
-            var header = new CacheHeader(CacheConstants.Identifier, CacheConstants.SchemaVersion,
-                CacheConstants.DataVersion, _source, DateTime.Now.Ticks, _genomeAssembly, customHeader);
+            var header       = new CacheHeader(HeaderUtilities.GetHeader(_source, _genomeAssembly), customHeader);
 
             return TranscriptCacheStaging.GetStaging(header, transcriptIntervalArrays, regulatoryRegionIntervalArrays);
         }
@@ -56,7 +55,7 @@ namespace CacheUtils.TranscriptCache
 
                 if (ugaGenes == null)
                 {
-                    var strand = originalGene.OnReverseStrand ? "R" : "F";
+                    string strand = originalGene.OnReverseStrand ? "R" : "F";
                     throw new InvalidDataException($"Found a transcript ({transcript.Id}) that does not have an overlapping UGA gene: gene ID: {originalGene.GeneId} {originalGene.Chromosome.UcscName} {originalGene.Start} {originalGene.End} {strand}");
                 }
 

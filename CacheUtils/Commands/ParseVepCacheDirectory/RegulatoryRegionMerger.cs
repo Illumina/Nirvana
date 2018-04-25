@@ -18,7 +18,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             {
                 if (currentRegion.Id.IsEmpty()) throw new InvalidOperationException("Found a regulatory region without an ID.");
 
-                var regulatoryKey = $"{currentRegion.Id}.{currentRegion.Start}.{currentRegion.End}";
+                string regulatoryKey = $"{currentRegion.Id}.{currentRegion.Start}.{currentRegion.End}";
 
                 if (regulatoryDict.TryGetValue(regulatoryKey, out var previousRegion))
                 {

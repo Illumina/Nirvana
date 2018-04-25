@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -99,7 +100,7 @@ namespace SAUtils.InputFileParsers.OneKGen
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     // Skip comments.
-                    if (line.StartsWith("#")) continue;
+                    if (line.OptimizedStartsWith('#')) continue;
                     var oneKGenItemsList = ExtractItems(line);
 	                if (oneKGenItemsList == null) continue;
 	                foreach (var oneKGenItem in oneKGenItemsList)
@@ -124,11 +125,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 			var position    = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
             var rsId        = splitLine[VcfCommon.IdIndex];
             _refAllele      = splitLine[VcfCommon.RefIndex];
-			_altAlleles     = splitLine[VcfCommon.AltIndex].Split(',');
+			_altAlleles     = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
 			var infoFields  = splitLine[VcfCommon.InfoIndex];
 
 			// parses the info fields and extract frequencies, ancestral allele, allele counts, etc.
-			var hasSymbolicAllele = _altAlleles.Any(x => x.StartsWith("<") && x.EndsWith(">"));
+			var hasSymbolicAllele = _altAlleles.Any(x => x.OptimizedStartsWith('<') && x.OptimizedEndsWith('>'));
 	        if (hasSymbolicAllele) return null;
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
@@ -173,27 +174,21 @@ namespace SAUtils.InputFileParsers.OneKGen
 		    return alleleCounts[i];
 	    }
 
-	    private  void ParseInfoField(string infoFields, bool hasSymbolicAllele)
-		{
-			if (infoFields == "" || infoFields == ".") return;
+        private void ParseInfoField(string infoFields, bool hasSymbolicAllele)
+        {
+            if (infoFields == "" || infoFields == ".") return;
+            var infoItems = infoFields.OptimizedSplit(';');
 
-			var infoItems = infoFields.Split(';');
-			foreach (var infoItem in infoItems)
-			{
-				var infoKeyValue = infoItem.Split('=');
-				if (infoKeyValue.Length == 2)//sanity check
-				{
-					var key = infoKeyValue[0];
-					var value = infoKeyValue[1];
+            foreach (string infoItem in infoItems)
+            {
+                (string key, string value) = infoItem.OptimizedKeyValue();
 
-					SetInfoField(key, value, hasSymbolicAllele);
-				}
+                // sanity check
+                if (value != null) SetInfoField(key, value, hasSymbolicAllele);
+            }
+        }
 
-			}
-
-		}
-
-		private  void SetInfoField(string vcfAfId, string value, bool hasSymbolicAllele)
+        private  void SetInfoField(string vcfAfId, string value, bool hasSymbolicAllele)
 		{
 			switch (vcfAfId)
 			{
@@ -212,14 +207,14 @@ namespace SAUtils.InputFileParsers.OneKGen
 				case "CIEND":
 					/*if (hasSymbolicAllele)
 					{
-						var endBoundaries = value.Split(',');
+						var endBoundaries = value.OptimizedSplit(',');
 						Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
 					}
 					break;*/
 				case "CIPOS":
 					/*if (hasSymbolicAllele)
 					{
-						var beginBoundaries = value.Split(',');
+						var beginBoundaries = value.OptimizedSplit(',');
 						Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
 					}*/
 					break;
@@ -242,22 +237,22 @@ namespace SAUtils.InputFileParsers.OneKGen
 					_sasAlleleNumber = Convert.ToInt32(value);
 					break;
 				case "AC":
-					_allAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_allAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 				case "AMR_AC":
-					_amrAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_amrAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 				case "AFR_AC":
-					_afrAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_afrAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 				case "EUR_AC":
-					_eurAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_eurAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 				case "EAS_AC":
-					_easAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_easAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 				case "SAS_AC":
-					_sasAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					_sasAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
 			}
@@ -268,7 +263,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 		{
 			if (value == "" || value == ".") return null;
 
-			var ancestralAllele = value.Split('|')[0];
+			var ancestralAllele = value.OptimizedSplit('|')[0];
 			if (string.IsNullOrEmpty(ancestralAllele)) return null;
 			return ancestralAllele.All(IsNucleotide) ? ancestralAllele : null;
 		}

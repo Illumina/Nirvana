@@ -2,7 +2,6 @@
 using System.IO;
 using System.Xml;
 using Compression.Utilities;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.ExtractMiniXml
 {

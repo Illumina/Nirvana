@@ -3,8 +3,6 @@ using System.Linq;
 using Phantom.DataStructures;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.IO;
-using Vcf;
 
 namespace Phantom.Workers
 {

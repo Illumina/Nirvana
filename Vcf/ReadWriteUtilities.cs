@@ -22,7 +22,7 @@ namespace Vcf
 	    public static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary,
 	        IRefMinorProvider refMinorProvider, bool verboseTranscript, IRecomposer recomposer)
 	    {
-	        var useStdInput = vcfPath == "-";
+	        bool useStdInput = vcfPath == "-";
 
 	        var peekStream =
 	            new PeekStream(useStdInput

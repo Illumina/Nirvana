@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -33,7 +34,7 @@ namespace SAUtils.InputFileParsers.DbSnp
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     // Skip comments.
-                    if (line.StartsWith("#")) continue;
+                    if (line.OptimizedStartsWith('#')) continue;
                     var dbSnpItems = ExtractItem(line);
 	                if (dbSnpItems == null || dbSnpItems.Count == 0) continue;
 	                foreach (var dbSnpItem in dbSnpItems)
@@ -52,7 +53,7 @@ namespace SAUtils.InputFileParsers.DbSnp
         /// <returns></returns>
         public List<DbSnpItem> ExtractItem(string vcfline)
         {
-            var splitLine = vcfline.Split('\t');
+            var splitLine = vcfline.OptimizedSplit('\t');
             if (splitLine.Length < 8) return null;
 
             var chromosomeName = splitLine[VcfCommon.ChromIndex];
@@ -63,7 +64,7 @@ namespace SAUtils.InputFileParsers.DbSnp
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);
 			var dbSnpId    = Convert.ToInt64(splitLine[VcfCommon.IdIndex].Substring(2));
 			var refAllele  = splitLine[VcfCommon.RefIndex];
-			var altAlleles = splitLine[VcfCommon.AltIndex].Split(',');
+			var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
 	        var infoField  = splitLine[VcfCommon.InfoIndex];
 			
 			var alleleFrequencies = GetAlleleFrequencies(infoField, refAllele, altAlleles);
@@ -72,41 +73,41 @@ namespace SAUtils.InputFileParsers.DbSnp
         }
 
 
-	    private static Dictionary<string, double> GetAlleleFrequencies(string infoField, string refAllele, string[] altAlleles)
-	    {
-		    var freqDict = new Dictionary<string, double> {[refAllele] = double.MinValue};
+        private static Dictionary<string, double> GetAlleleFrequencies(string infoField, string refAllele, string[] altAlleles)
+        {
+            var freqDict = new Dictionary<string, double> { [refAllele] = double.MinValue };
 
-		    foreach (var altAllele in altAlleles)
-		    {
-			    freqDict[altAllele] = double.MinValue;
-		    }
+            foreach (var altAllele in altAlleles)
+            {
+                freqDict[altAllele] = double.MinValue;
+            }
 
-			if (infoField.Trim() == ".") return freqDict;
+            if (infoField.Trim() == ".") return freqDict;
 
-			// for now we also want to disregard anything other than SNVs
-		    var allSnv = refAllele.Length == 1 && altAlleles.All(altAllele => altAllele.Length == 1);
-		    if (! allSnv) return freqDict;
-		    
-			// return if there are no freq information
-		    if (!infoField.Contains("CAF="))
-			    return freqDict;
+            // for now we also want to disregard anything other than SNVs
+            var allSnv = refAllele.Length == 1 && altAlleles.All(altAllele => altAllele.Length == 1);
+            if (!allSnv) return freqDict;
 
-			foreach (var info in infoField.Split(';'))
-		    {
-			    if (!info.StartsWith("CAF=")) continue;
-			    var alleleFrequencies = info.Split('=')[1].Split(',');
+            // return if there are no freq information
+            if (!infoField.Contains("CAF="))
+                return freqDict;
 
-			    freqDict[refAllele] = GetFrequency(alleleFrequencies[0]);
+            foreach (var info in infoField.OptimizedSplit(';'))
+            {
+                if (!info.StartsWith("CAF=")) continue;
+                var alleleFrequencies = info.OptimizedKeyValue().Value.OptimizedSplit(',');
 
-			    for (int i = 1; i < alleleFrequencies.Length; i++)
-				    freqDict[altAlleles[i - 1]] = GetFrequency(alleleFrequencies[i]);
-			    break;
-		    }
-			return freqDict;
-			
-	    }
+                freqDict[refAllele] = GetFrequency(alleleFrequencies[0]);
 
-	    private static double GetFrequency(string alleleFrequency)
+                for (int i = 1; i < alleleFrequencies.Length; i++)
+                    freqDict[altAlleles[i - 1]] = GetFrequency(alleleFrequencies[i]);
+                break;
+            }
+
+            return freqDict;
+        }
+
+        private static double GetFrequency(string alleleFrequency)
 	    {
 		    return alleleFrequency == "." || alleleFrequency == "0" ? double.MinValue : Convert.ToDouble(alleleFrequency);
 	    }

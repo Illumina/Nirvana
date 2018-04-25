@@ -17,19 +17,17 @@ namespace Vcf.VariantCreator
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele,
             IBreakEnd[] breakEnds, IInfoData infoData, bool enableVerboseTranscript)
         {
-
             var svType = infoData?.SvType ?? VariantType.unknown;
             if (svType == VariantType.duplication && altAllele == TandemDuplicationAltAllele)
                 svType = VariantType.tandem_duplication;
 
             if (svType != VariantType.translocation_breakend) start++;
-            var end = infoData?.End ?? start;
-            var vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
+            int end    = infoData?.End ?? start;
+            string vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
             
             return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
                 breakEnds, enableVerboseTranscript ? VerbosedStructuralVariantBehavior : StructuralVariantBehavior);
         }
-
         
         private static string GetVid(string ensemblName, int start, int end, VariantType variantType,
             IReadOnlyList<IBreakEnd> breakEnds)

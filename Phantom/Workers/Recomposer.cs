@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using Compression.Utilities;
 using Phantom.DataStructures;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Utilities;
 using ReadWriteUtilities = Phantom.Utilities.ReadWriteUtilities;
 
 namespace Phantom.Workers

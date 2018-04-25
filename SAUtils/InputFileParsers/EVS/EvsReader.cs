@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
@@ -47,7 +48,7 @@ namespace SAUtils.InputFileParsers.EVS
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
                     // Skip comments.
-                    if (line.StartsWith("#")) continue;
+                    if (line.OptimizedStartsWith('#')) continue;
                     var evsItemsList = ExtractItems(line);
 	                if (evsItemsList == null) continue;
 	                foreach (var evsItem in evsItemsList)
@@ -72,7 +73,7 @@ namespace SAUtils.InputFileParsers.EVS
 			var position    = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
             var rsId        = splitLine[VcfCommon.IdIndex];
             var refAllele   = splitLine[VcfCommon.RefIndex];
-            var altAlleles  = splitLine[VcfCommon.AltIndex].Split(',');
+            var altAlleles  = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
 			var infoFields  = splitLine[VcfCommon.InfoIndex];
 
 			//return null if the position is -1. This happens for entries in GRCh38
@@ -100,45 +101,39 @@ namespace SAUtils.InputFileParsers.EVS
 	        return evsItemsList;
         }
 
-		private void ParseInfoField(string infoFields)
-		{
-			if (infoFields == "" || infoFields == ".") return;
+        private void ParseInfoField(string infoFields)
+        {
+            if (infoFields == "" || infoFields == ".") return;
+            var infoItems = infoFields.OptimizedSplit(';');
 
-			var infoItems = infoFields.Split(';');
-			foreach (var infoItem in infoItems)
-			{
-				var infoKeyValue = infoItem.Split('=');
-				if (infoKeyValue.Length == 2)//sanity check
-				{
-					var key = infoKeyValue[0];
-					var value = infoKeyValue[1];
+            foreach (string infoItem in infoItems)
+            {
+                (string key, string value) = infoItem.OptimizedKeyValue();
 
-					SetInfoField(key, value);
-				}
+                //sanity check
+                if (value != null) SetInfoField(key, value);
+            }
+        }
 
-			}
-
-		}
-
-		private void SetInfoField(string vcfId, string value)
+        private void SetInfoField(string vcfId, string value)
 		{
 
 			switch (vcfId)
 			{
 				case "EA_AC":
-					var europeanAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					var europeanAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					var totalEurAlleleCount = europeanAlleleCounts.Sum();
 
 					_europeanFrequencies = europeanAlleleCounts.Select(val => 1.0*val/totalEurAlleleCount).ToArray();
 					break;
 				case "AA_AC":
-					var africanAlleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					var africanAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					var totalAfrAlleleCount = africanAlleleCounts.Sum();
 
 					_africanFrequencies = africanAlleleCounts.Select(val => 1.0*val/totalAfrAlleleCount).ToArray();
 					break;
 				case "TAC":
-					var alleleCounts = value.Split(',').Select(val => Convert.ToInt32(val)).ToArray();
+					var alleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					var totalAlleleCount = alleleCounts.Sum();
 
 					_allFrequencies = alleleCounts.Select(val => 1.0*val/totalAlleleCount).ToArray();
@@ -147,7 +142,7 @@ namespace SAUtils.InputFileParsers.EVS
 					_coverage = value;
 					break;
 				case "GTC":
-					int count = value.Split(',').Sum(Convert.ToInt32);
+					int count = value.OptimizedSplit(',').Sum(Convert.ToInt32);
 					_numSamples = count.ToString(CultureInfo.InvariantCulture);
 					break;
 			}

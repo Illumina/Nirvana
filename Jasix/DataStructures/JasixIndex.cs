@@ -9,6 +9,7 @@ namespace Jasix.DataStructures
 	public sealed class JasixIndex
 	{
 		private readonly Dictionary<string, JasixChrIndex> _chrIndices;
+	    private readonly Dictionary<string, string> _synonymToChrName;
 		public string HeaderLine;
 
 		// the json file might contain sections. We want to be able to index these sections too
@@ -16,6 +17,7 @@ namespace Jasix.DataStructures
 		public JasixIndex()
 		{
 			_chrIndices = new Dictionary<string, JasixChrIndex>();
+            _synonymToChrName = new Dictionary<string, string>();
 		}
 
 		private JasixIndex(IExtendedBinaryReader reader):this()
@@ -32,6 +34,15 @@ namespace Jasix.DataStructures
 				var chrIndex = new JasixChrIndex(reader);
 				_chrIndices[chrIndex.ReferenceSequence]= chrIndex;
 			}
+
+		    int synonymCount = reader.ReadOptInt32();
+		    if (synonymCount == 0) return;
+		    for (var i = 0; i < synonymCount; i++)
+		    {
+		        string synonym = reader.ReadAsciiString();
+		        string indexName = reader.ReadAsciiString();
+		        _synonymToChrName[synonym] = indexName;
+		    }
 		}
 
 		public JasixIndex(Stream stream) : this(new ExtendedBinaryReader(stream))
@@ -52,6 +63,14 @@ namespace Jasix.DataStructures
 			{
 				chrIndex.Write(writer);
 			}
+
+            writer.WriteOpt(_synonymToChrName.Count);
+		    if (_synonymToChrName.Count == 0) return;
+		    foreach (var pair in _synonymToChrName)
+		    {
+		        writer.Write(pair.Key);
+		        writer.Write(pair.Value);
+            }
 		}
 
 		public void Flush()
@@ -62,15 +81,24 @@ namespace Jasix.DataStructures
 			}
 		}
 
-		public void Add(string chr, int start, int end, long fileLoc)
+		public void Add(string chr, int start, int end, long fileLoc, string chrSynonym=null)
 		{
+		    if (!string.IsNullOrEmpty(chrSynonym))
+		    {
+		        _synonymToChrName[chrSynonym] = chr;
+		    }
 
-			if (!_chrIndices.ContainsKey(chr))
-			{
-				_chrIndices[chr] = new JasixChrIndex(chr);
-			}
+		    if (_chrIndices.TryGetValue(chr, out var chrIndex))
+		    {
+                chrIndex.Add(start, end, fileLoc);
+		    }
+		    else
+		    {
+		        _chrIndices[chr] = new JasixChrIndex(chr);
+		        _chrIndices[chr].Add(start, end, fileLoc);
 
-			_chrIndices[chr].Add(start, end, fileLoc);
+            }
+
 		}
 
 		
@@ -79,9 +107,14 @@ namespace Jasix.DataStructures
 		{
 			if (_chrIndices == null || _chrIndices.Count == 0) return -1;
 
-			if (!_chrIndices.ContainsKey(chr)) return -1;
-			
-			return _chrIndices[chr].FindFirstSmallVariant(start, end);
+		    if (_synonymToChrName.TryGetValue(chr, out string indexName))
+		        chr = indexName;
+
+		    if (_chrIndices.TryGetValue(chr, out var chrIndex))
+		    {
+		        return chrIndex.FindFirstSmallVariant(start, end);
+		    }
+		    return -1;
 
 		}
 
@@ -90,7 +123,10 @@ namespace Jasix.DataStructures
 		{
 			if (_chrIndices == null || _chrIndices.Count == 0) return null;
 
-			return !_chrIndices.ContainsKey(chr) ? null : _chrIndices[chr].FindLargeVariants(begin, end);
+		    if (_synonymToChrName.TryGetValue(chr, out string indexName))
+		        chr = indexName;
+
+		    return _chrIndices.TryGetValue(chr, out var chrIndex) ? chrIndex.FindLargeVariants(begin, end) : null;
 		}
 
 		public IEnumerable<string> GetChromosomeList()
@@ -100,7 +136,13 @@ namespace Jasix.DataStructures
 
 	    public bool ContainsChr(string chr)
 	    {
-	        return _chrIndices.Keys.Contains(chr);
+	        return _chrIndices.Keys.Contains(_synonymToChrName.TryGetValue(chr, out string indexName) ? indexName : chr);
+	    }
+
+	    public string GetIndexChromName(string chromName)
+	    {
+	        if (_chrIndices.ContainsKey(chromName)) return chromName;
+	        return _synonymToChrName.TryGetValue(chromName, out string indexName) ? indexName : null;
 	    }
 	}
 }

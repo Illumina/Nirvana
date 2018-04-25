@@ -12,8 +12,8 @@
     },
     "RR_sautils": {
       "commandName": "Project",
-      "commandLineArgs": " getCosmicSvs --cnv CosmicCompleteCNA.tsv.gz --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o c:\\Development\\IntermediateTsvs\\test",
-      "workingDirectory": "c:\\Development\\ExternalDataSources\\COSMIC\\v84\\GRCh37"
+      "commandLineArgs": "  createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\test1 --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "c:\\Development"
     },
     "MITOMAP": {
       "commandName": "Project",

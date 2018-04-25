@@ -5,6 +5,7 @@ using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
 using CommonUtilities;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling;
 using Jasix;
 using Jasix.DataStructures;
@@ -55,30 +56,29 @@ namespace Nirvana
             var conservationProvider         = ProviderUtilities.GetConservationProvider(SupplementaryAnnotationDirectories);
             var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(SupplementaryAnnotationDirectories);
             var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
-            var plugins                      = PluginUtilities.LoadPlugins(_pluginDirectory);
-            var annotator                    = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
+
+            var plugins    = PluginUtilities.LoadPlugins(_pluginDirectory);
+            var annotator  = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
             var recomposer = _disableRecomposition ? new NullRecomposer() : Recomposer.Create(sequenceProvider, _inputCachePrefix);
-            var logger  = _outputFileName == "-" ? (ILogger) new NullLogger() : new ConsoleLogger();
-            var metrics = new PerformanceMetrics(logger);
+            var logger     = _outputFileName == "-" ? (ILogger)new NullLogger() : new ConsoleLogger();
+            var metrics    = new PerformanceMetrics(logger);
 
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
                 geneAnnotationProvider, conservationProvider);
  
-            var vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
-            var jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
+            string vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
+            string jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
             using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))
             using (var jsonWriter        = new JsonWriter(outputWriter, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
             using (var vcfWriter         = _vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
-            using (var jasixIndexCreator = new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)))
+            using (var jasixIndexCreator = outputWriter is BgzipTextWriter ? new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)) : null)
             {
-                if (!(outputWriter is BgzipTextWriter bgzipTextWriter)) throw new NullReferenceException("Unable to create the bgzip text writer.");
-
                 try
                 {
-                    jasixIndexCreator.SetHeader(jsonWriter.Header);
+                    jasixIndexCreator?.SetHeader(jsonWriter.Header);
 
                     if (vcfReader.IsRcrsMitochondrion && annotator.GenomeAssembly == GenomeAssembly.GRCh37
                         || annotator.GenomeAssembly == GenomeAssembly.GRCh38
@@ -89,6 +89,9 @@ namespace Nirvana
                     IPosition position;
                     var sortedVcfChecker = new SortedVcfChecker();
 
+                    var bgzipTextWriter = outputWriter as BgzipTextWriter;
+                    long writerPosition = bgzipTextWriter?.Position ?? -1;
+
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
                         sortedVcfChecker.CheckVcfOrder(position.Chromosome.UcscName);
@@ -98,7 +101,7 @@ namespace Nirvana
 
                         string json = annotatedPosition.GetJsonString();
 
-                        if (json != null) WriteOutput(annotatedPosition, bgzipTextWriter.Position, jasixIndexCreator, jsonWriter, vcfWriter, gvcfWriter, json);
+                        if (json != null) WriteOutput(annotatedPosition, writerPosition, jasixIndexCreator, jsonWriter, vcfWriter, gvcfWriter, json);
                         else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
 
                         metrics.Increment();
@@ -122,7 +125,7 @@ namespace Nirvana
             OnTheFlyIndexCreator jasixIndexCreator, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter,
             LiteVcfWriter gvcfWriter, string jsonOutput)
         {
-            jasixIndexCreator.Add(annotatedPosition.Position, textWriterPosition);
+            jasixIndexCreator?.Add(annotatedPosition.Position, textWriterPosition);
             jsonWriter.WriteJsonEntry(jsonOutput);
 
             if (vcfWriter == null && gvcfWriter == null || annotatedPosition.Position.IsRecomposed) return;

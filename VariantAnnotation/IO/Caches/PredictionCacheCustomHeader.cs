@@ -1,17 +1,13 @@
 ﻿using System.IO;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.IO.Caches
 {
-    public sealed class PredictionCacheCustomHeader : ICustomCacheHeader
+    public sealed class PredictionCacheCustomHeader
     {
         public readonly IndexEntry[] Entries;
 
-        public PredictionCacheCustomHeader(IndexEntry[] entries)
-        {
-            Entries = entries;
-        }
+        public PredictionCacheCustomHeader(IndexEntry[] entries) => Entries = entries;
 
         public void Write(BinaryWriter writer)
         {
@@ -19,11 +15,11 @@ namespace VariantAnnotation.IO.Caches
             foreach (var entry in Entries) entry.Write(writer);
         }
 
-        public static ICustomCacheHeader Read(BinaryReader reader)
+        public static PredictionCacheCustomHeader Read(BinaryReader reader)
         {
-            var numReferenceSeqs = reader.ReadUInt16();
-            var entries          = new IndexEntry[numReferenceSeqs];
-            for (int i = 0; i < numReferenceSeqs; i++) entries[i].Read(reader);
+            ushort numReferenceSeqs = reader.ReadUInt16();
+            var entries             = new IndexEntry[numReferenceSeqs];
+            for (var i = 0; i < numReferenceSeqs; i++) entries[i].Read(reader);
             return new PredictionCacheCustomHeader(entries);
         }
     }

@@ -65,7 +65,7 @@ namespace SAUtils.DataStructures
 
         public T GetMin()
         {
-            return _itemArray.Count == 0 ? default(T) : _itemArray[0];
+            return _itemArray.Count == 0 ? default : _itemArray[0];
         }
 
         public int Count()

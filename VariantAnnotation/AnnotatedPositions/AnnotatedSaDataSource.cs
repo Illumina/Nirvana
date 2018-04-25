@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
@@ -39,7 +40,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
         public IEnumerable<string> GetVcfStrings()
         {
-            return SaDataSource.VcfString.Split(',');
+            return SaDataSource.VcfString.OptimizedSplit(',');
         }
     }
 }

@@ -10,6 +10,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Algorithms;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -20,7 +21,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.CombineCacheDirectories
 {
@@ -47,8 +47,8 @@ namespace CacheUtils.Commands.CombineCacheDirectories
             var siftPredictionsPerRef     = new Prediction[numRefSeqs][];
             var polyphenPredictionsPerRef = new Prediction[numRefSeqs][];
 
-            PredictionCacheReader.PredictionHeader siftHeader;
-            PredictionCacheReader.PredictionHeader polyphenHeader;
+            PredictionHeader siftHeader;
+            PredictionHeader polyphenHeader;
 
             using (var siftReader       = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(_inputPrefix)), PredictionCacheReader.SiftDescriptions))
             using (var siftReader2      = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(_inputPrefix2)), PredictionCacheReader.SiftDescriptions))
@@ -83,7 +83,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
             logger.WriteLine();
             WritePredictions(logger, "SIFT", CacheConstants.SiftPath(_outputPrefix), siftHeader, siftPredictionsPerRef);
             WritePredictions(logger, "PolyPhen", CacheConstants.PolyPhenPath(_outputPrefix), polyphenHeader, polyphenPredictionsPerRef);
-            WriteTranscripts(logger, GetHeader(caches.Cache.Header), combinedIntervalArrays,
+            WriteTranscripts(logger, CloneHeader(caches.Cache.Header), combinedIntervalArrays,
                 caches.Cache.RegulatoryRegionIntervalArrays);
 
             return ExitCodes.Success;
@@ -101,14 +101,14 @@ namespace CacheUtils.Commands.CombineCacheDirectories
         }
 
         private static void WritePredictions(ILogger logger, string description, string filePath,
-            PredictionCacheReader.PredictionHeader header, Prediction[][] predictionsPerRef)
+            PredictionHeader header, Prediction[][] predictionsPerRef)
         {
             logger.Write($"- writing {description} predictions... ");
 
             using (var stream = new BlockStream(new Zstandard(), FileUtilities.GetCreateStream(filePath), CompressionMode.Compress))
-            using (var writer = new PredictionCacheWriter(stream, GetHeader(header.Header)))
+            using (var writer = new PredictionCacheWriter(stream, CloneHeader(header)))
             {
-                writer.Write(header.Lut, predictionsPerRef);
+                writer.Write(header.LookupTable, predictionsPerRef);
             }
 
             logger.WriteLine("finished.");
@@ -161,9 +161,15 @@ namespace CacheUtils.Commands.CombineCacheDirectories
             return new Interval<ITranscript>(transcript.Start, transcript.End, updatedTranscript);
         }
 
-        private static CacheHeader GetHeader(CacheHeader header) => new CacheHeader(CacheConstants.Identifier,
-            header.SchemaVersion, header.DataVersion, Source.BothRefSeqAndEnsembl, DateTime.Now.Ticks,
-            header.GenomeAssembly, header.CustomHeader);
+        private static VariantAnnotation.IO.Caches.Header CloneBaseHeader(VariantAnnotation.IO.Caches.Header header) =>
+            new VariantAnnotation.IO.Caches.Header(CacheConstants.Identifier, header.SchemaVersion, header.DataVersion,
+                Source.BothRefSeqAndEnsembl, DateTime.Now.Ticks, header.GenomeAssembly);
+
+        private static PredictionHeader CloneHeader(PredictionHeader header) =>
+            new PredictionHeader(CloneBaseHeader(header), header.Custom, header.LookupTable);
+
+        private static CacheHeader CloneHeader(CacheHeader header) =>
+            new CacheHeader(CloneBaseHeader(header), header.Custom);
 
         private static (Prediction[] Predictions, int Offset) CombinePredictions(ILogger logger, IChromosome chromosome,
             string description, PredictionCacheReader reader, PredictionCacheReader reader2)

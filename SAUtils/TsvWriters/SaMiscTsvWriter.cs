@@ -111,7 +111,7 @@ namespace SAUtils.TsvWriters
 
             _sequenceProvider.LoadChromosome(chrom);
             var refSequence = _sequenceProvider.Sequence.Substring(position - 1, ReferenceWindow);
-            return SupplementaryAnnotationUtilities.ValidateRefAllele(refAllele, refSequence);
+            return SaUtilsCommon.ValidateRefAllele(refAllele, refSequence);
         }
 
     }

@@ -5,9 +5,9 @@ using System.Linq;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Genes.Utilities;
+using Compression.Utilities;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Genes.DataStores
 {
@@ -40,7 +40,7 @@ namespace CacheUtils.Genes.DataStores
         {
             foreach (var hgncGene in HgncGenes)
             {
-                var (refSeqGenes, ensemblGene, numMatches) = GetGenes(hgncGene.EntrezGeneId,
+                (var refSeqGenes, EnsemblGene ensemblGene, int numMatches) = GetGenes(hgncGene.EntrezGeneId,
                     refSeqGff.EntrezGeneIdToGene, hgncGene.EnsemblId, ensemblGtf.EnsemblIdToGene);
 
                 switch (numMatches)

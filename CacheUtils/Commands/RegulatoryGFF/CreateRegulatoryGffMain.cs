@@ -21,7 +21,7 @@ namespace CacheUtils.Commands.RegulatoryGFF
         {
             using (var writer = GZipUtilities.GetStreamWriter(_outputFileName))
             {
-                var cachePath    = CacheConstants.TranscriptPath(_inputPrefix);
+                string cachePath    = CacheConstants.TranscriptPath(_inputPrefix);
                 var sequenceData = SequenceHelper.GetDictionaries(_referencePath);
 
                 // load the cache
@@ -62,7 +62,7 @@ namespace CacheUtils.Commands.RegulatoryGFF
                 }
             };
 
-            var commandLineExample = $"{command} --in <cache prefix> --out <GFF path>";
+            string commandLineExample = $"{command} --in <cache prefix> --out <GFF path>";
 
             return new ConsoleAppBuilder(args, ops)
                 .UseVersionProvider(new VersionProvider())

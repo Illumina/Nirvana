@@ -1,5 +1,5 @@
 ﻿using System.Linq;
-using System.Reflection.Metadata.Ecma335;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
@@ -44,22 +44,25 @@ namespace Vcf
             IsRecomposed = isRecomposed;
         }
 
-        public static Position CreatFromSimplePosition(ISimplePosition simplePosition, VariantFactory variantFactory)
+        public static IPosition ToPosition(ISimplePosition simplePosition, VariantFactory variantFactory)
         {
             if (simplePosition == null) return null;
-            var vcfFields = simplePosition.VcfFields;
-            var infoData = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
-            var id = vcfFields[VcfCommon.IdIndex];
-            int end = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length); // re-calculate the end by checking INFO field
-            string[] altAlleles = vcfFields[VcfCommon.AltIndex].Split(',').ToArray();
-            double? quality = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
-            string[] filters = vcfFields[VcfCommon.FilterIndex].Split(';');
-            var samples = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 
-            var variants = variantFactory.CreateVariants(simplePosition.Chromosome, id, simplePosition.Start, end, simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
+            var vcfFields  = simplePosition.VcfFields;
+            var infoData   = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            int end        = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
+            var altAlleles = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',').ToArray();
+            var quality    = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            var filters    = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
+            var samples    = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 
-            return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele, altAlleles, quality, filters, variants, samples,
-                infoData, vcfFields, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
+            var variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
+                simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
+                simplePosition.IsRecomposed);
+
+            return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
+                altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,
+                simplePosition.IsRecomposed);
         }
 
         private static int ExtractEnd(IInfoData infoData, int start, int refAlleleLength)
@@ -67,7 +70,5 @@ namespace Vcf
             if (infoData.End != null) return infoData.End.Value;
             return start + refAlleleLength - 1;
         }
-
-        
     }
 }

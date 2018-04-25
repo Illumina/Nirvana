@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
+using Compression.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers
 {
@@ -63,22 +64,22 @@ namespace SAUtils.InputFileParsers
 
             while ((line = _reader.ReadLine()) != null)
             {
-                var words = line.Split('=');
-                if (words.Length < 2) continue;
+                (string key, string value) = line.OptimizedKeyValue();
+                if (key == null || value == null) continue;
 
-                switch (words[0])
+                switch (key)
                 {
                     case "NAME":
-                        name = words[1];
+                        name = value;
                         break;
                     case "VERSION":
-                        version = words[1];
+                        version = value;
                         break;
                     case "DATE":
-                        date = words[1];
+                        date = value;
                         break;
                     case "DESCRIPTION":
-                        description = words[1];
+                        description = value;
                         break;
                 }
             }

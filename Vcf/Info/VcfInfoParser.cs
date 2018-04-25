@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.Positions;
 
 namespace Vcf.Info
@@ -24,23 +25,30 @@ namespace Vcf.Info
 
         public static IInfoData Parse(string infoField)
         {
-            if (string.IsNullOrEmpty(infoField) ) return null;
+            if (string.IsNullOrEmpty(infoField)) return null;
 
             var infoKeyValue = ExtractInfoFields(infoField, out string updatedInfoField);
 
-            int? svLen = null, end = null, copyNumber = null, depth = null, jointSomaticNormalQuality = null;
-			VariantType svType = VariantType.unknown;
-            var colocalizedWithCnv = false;
-            int[] ciPos = null, ciEnd = null;
-            double? strandBias = null, recalibratedQuality = null;
-	        bool isInv3=false, isInv5=false;
-	        int? refRepeatCount=null;
-	        string repeatUnit=null;
+            int? svLen                     = null;
+            int? end                       = null;
+            int? copyNumber                = null;
+            int? depth                     = null;
+            int? jointSomaticNormalQuality = null;
+            VariantType svType             = VariantType.unknown;
+            var colocalizedWithCnv         = false;
+            int[] ciPos                    = null;
+            int[] ciEnd                    = null;
+            double? strandBias             = null;
+            double? recalibratedQuality    = null;
+            var isInv3                     = false;
+            var isInv5                     = false;
+            int? refRepeatCount            = null;
+            string repeatUnit              = null;
 
-			foreach (var kvp in infoKeyValue)
+            foreach (var kvp in infoKeyValue)
             {
-                var key = kvp.Key;
-                var value = kvp.Value;
+                string key   = kvp.Key;
+                string value = kvp.Value;
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (key)
@@ -51,92 +59,92 @@ namespace Vcf.Info
                     case "QSI_NT":
                     case "SOMATICSCORE":
                     case "QSS_NT":
-                        jointSomaticNormalQuality = value.GetNullableValue<int>(int.TryParse);
+                        jointSomaticNormalQuality = value.GetNullableInt();
                         break;
                     case "VQSR":
                         recalibratedQuality = value.GetNullableValue<double>(double.TryParse);
                         break;
                     case "CN": // SENECA
-                        copyNumber = value.GetNullableValue<int>(int.TryParse);
+                        copyNumber = value.GetNullableInt();
                         break;
                     case "DP": // Pisces
-                        depth = value.GetNullableValue<int>(int.TryParse);
+                        depth = value.GetNullableInt();
                         break;
                     case "CIPOS":
-                        ciPos = value.SplitToArray<int>(',', int.TryParse);
+                        ciPos = value.SplitToArray();
                         break;
                     case "CIEND":
-                        ciEnd = value.SplitToArray<int>(',', int.TryParse);
+                        ciEnd = value.SplitToArray();
                         break;
                     case "SVLEN":
-                        svLen = value.GetNullableValue<int>(int.TryParse);
+                        svLen = value.GetNullableInt();
                         if (svLen != null)
                             svLen = Math.Abs(svLen.Value);
                         break;
-					case "SVTYPE":
-						svType = GetSvType(value);
-						break;
-                    case "END":
-                        end = value.GetNullableValue<int>(int.TryParse);
+                    case "SVTYPE":
+                        svType = GetSvType(value);
                         break;
-					case "INV3":
-						isInv3 = true;
-						break;
-					case "INV5":
-		                isInv5 = true;
-		                break;
-	                case "ColocalizedCanvas":
+                    case "END":
+                        end = value.GetNullableInt();
+                        break;
+                    case "INV3":
+                        isInv3 = true;
+                        break;
+                    case "INV5":
+                        isInv5 = true;
+                        break;
+                    case "ColocalizedCanvas":
                         colocalizedWithCnv = true;
                         break;
-	                case "REF":
-		                refRepeatCount = Convert.ToInt32(value);
-		                break;
-	                case "RU":
-		                repeatUnit = value;
-		                break;
-				}
+                    case "REF":
+                        refRepeatCount = Convert.ToInt32(value);
+                        break;
+                    case "RU":
+                        repeatUnit = value;
+                        break;
+                }
             }
 
-			var infoData = new InfoData(end, svLen, svType, strandBias, recalibratedQuality, jointSomaticNormalQuality,
+            var infoData = new InfoData(end, svLen, svType, strandBias, recalibratedQuality, jointSomaticNormalQuality,
                 copyNumber, depth, colocalizedWithCnv, ciPos, ciEnd, isInv3, isInv5, updatedInfoField, repeatUnit, refRepeatCount);
             return infoData;
         }
 
-	    private static VariantType GetSvType(string value)
-	    {
-			switch (value)
-			{
-				case "DEL":
-					return VariantType.deletion;
-				case "INS":
-					return VariantType.insertion;
-				case "DUP":
-					return VariantType.duplication;
-				case "INV":
-					return VariantType.inversion;
-				case "TDUP":
-					return VariantType.tandem_duplication;
-				case "BND":
-					return VariantType.translocation_breakend;
-				case "CNV":
-					return VariantType.copy_number_variation;
-				case "STR":
-					return VariantType.short_tandem_repeat_variation;
-				case "ALU":
-					return VariantType.mobile_element_insertion;
-				case "LINE1":
-					return VariantType.mobile_element_insertion;
-				case "LOH":
-					return VariantType.copy_number_variation;
-				case "SVA":
-					return VariantType.mobile_element_insertion;
-				default:
-					return VariantType.unknown;
-				
-			}
-		}
+        private static VariantType GetSvType(string value)
+        {
+            switch (value)
+            {
+                case "DEL":
+                    return VariantType.deletion;
+                case "INS":
+                    return VariantType.insertion;
+                case "DUP":
+                    return VariantType.duplication;
+                case "INV":
+                    return VariantType.inversion;
+                case "TDUP":
+                    return VariantType.tandem_duplication;
+                case "BND":
+                    return VariantType.translocation_breakend;
+                case "CNV":
+                    return VariantType.copy_number_variation;
+                case "STR":
+                    return VariantType.short_tandem_repeat_variation;
+                case "ALU":
+                    return VariantType.mobile_element_insertion;
+                case "LINE1":
+                    return VariantType.mobile_element_insertion;
+                case "LOH":
+                    return VariantType.copy_number_variation;
+                case "SVA":
+                    return VariantType.mobile_element_insertion;
+                default:
+                    return VariantType.unknown;
 
-		private static Dictionary<string, string> ExtractInfoFields(string infoField, out string updatedInfoField)
+            }
+        }
+
+        private static Dictionary<string, string> ExtractInfoFields(string infoField, out string updatedInfoField)
         {
             var infoKeyValue = new Dictionary<string, string>();
 
@@ -145,22 +153,21 @@ namespace Vcf.Info
                 updatedInfoField = "";
                 return infoKeyValue;
             }
-            var infoFields = infoField.Split(';');
+
+            var infoFields = infoField.OptimizedSplit(';');
 
             var sb = StringBuilderCache.Acquire();
 
-            foreach (var field in infoFields)
+            foreach (string field in infoFields)
             {
-                var keyValue = field.Split('=');
-
-                var key = keyValue[0];
+                (string key, string value) = field.OptimizedKeyValue();
                 if (TagsToRemove.Contains(key)) continue;
 
                 sb.Append(field);
                 sb.Append(';');
 
-                if (keyValue.Length == 1) infoKeyValue[key] = "true";
-                if (keyValue.Length != 1) infoKeyValue[key] = keyValue[1];
+                if (value == null) infoKeyValue[key] = "true";
+                else infoKeyValue[key] = value;
             }
 
             if (sb.Length > 0)
@@ -173,5 +180,5 @@ namespace Vcf.Info
 
             return infoKeyValue;
         }
-	}
+    }
 }

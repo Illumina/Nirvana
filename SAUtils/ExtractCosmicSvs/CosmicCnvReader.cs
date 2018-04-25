@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using OptimizedCore;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 
@@ -109,7 +110,7 @@ namespace SAUtils.ExtractCosmicSvs
             _chromStartStopIndex        = -1;
             _studyIdIndex               = -1;
 
-            var columns = headerLine.Split('\t');
+            var columns = headerLine.OptimizedSplit('\t');
             for (int i = 0; i < columns.Length; i++)
             {
                 switch (columns[i])
@@ -175,7 +176,7 @@ namespace SAUtils.ExtractCosmicSvs
         private CosmicCnvItem ExtractCosmicCnv(string line)
         {
             
-            var splits = line.Split('\t');
+            var splits = line.OptimizedSplit('\t');
 
             if (splits.Length == 1) return null;
 

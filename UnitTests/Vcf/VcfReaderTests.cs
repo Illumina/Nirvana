@@ -3,16 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Moq;
-using Phantom.Workers;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
 using Vcf;
-using Vcf.Info;
-using Vcf.Sample;
-using Vcf.VariantCreator;
 using Xunit;
 
 namespace UnitTests.Vcf

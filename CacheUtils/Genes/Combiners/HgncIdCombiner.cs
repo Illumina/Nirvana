@@ -13,7 +13,7 @@ namespace CacheUtils.Genes.Combiners
             var genesByHgnc37 = remainingGenes37.GetMultiValueDict(x => x.HgncId);
             var genesByHgnc38 = remainingGenes38.GetMultiValueDict(x => x.HgncId);
 
-            foreach (var hgncId in hgncIds)
+            foreach (int hgncId in hgncIds)
             {
                 var genes37 = GetGenesByHgncId(genesByHgnc37, hgncId);
                 var genes38 = GetGenesByHgncId(genesByHgnc38, hgncId);

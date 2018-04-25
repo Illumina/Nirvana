@@ -1,9 +1,8 @@
 ﻿using System.IO;
-using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.IO.Caches
 {
-    public sealed class TranscriptCacheCustomHeader : ICustomCacheHeader
+    public sealed class TranscriptCacheCustomHeader
     {
         public readonly ushort VepVersion;
         private readonly long _vepReleaseTicks;
@@ -20,10 +19,10 @@ namespace VariantAnnotation.IO.Caches
             writer.Write(VepVersion);
         }
 
-        public static ICustomCacheHeader Read(BinaryReader reader)
+        public static TranscriptCacheCustomHeader Read(BinaryReader reader)
         {
-            var vepReleaseTicks = reader.ReadInt64();
-            var vepVersion      = reader.ReadUInt16();
+            long vepReleaseTicks = reader.ReadInt64();
+            ushort vepVersion      = reader.ReadUInt16();
             return new TranscriptCacheCustomHeader(vepVersion, vepReleaseTicks);
         }
     }

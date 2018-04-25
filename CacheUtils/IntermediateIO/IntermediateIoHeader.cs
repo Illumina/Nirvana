@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
 
@@ -30,20 +31,20 @@ namespace CacheUtils.IntermediateIO
 
         internal static (string Id, IntermediateIoCommon.FileType Type, IntermediateIoHeader Header) Read(StreamReader reader)
         {
-            var cols  = reader.ReadLine()?.Split('\t');
-            var cols2 = reader.ReadLine()?.Split('\t');
+            var cols  = reader.ReadLine()?.OptimizedSplit('\t');
+            var cols2 = reader.ReadLine()?.OptimizedSplit('\t');
 
             if (cols == null || cols2 == null)
                 throw new InvalidDataException("Found unexpected null lines when parsing the intermediate I/O file header");
 
-            var id              = cols[0];
-            var type            = (IntermediateIoCommon.FileType)byte.Parse(cols[1]);
+            string id = cols[0];
+            var type  = (IntermediateIoCommon.FileType)byte.Parse(cols[1]);
 
-            var vepVersion      = ushort.Parse(cols2[0]);
-            var vepReleaseTicks = long.Parse(cols2[1]);
-            var source          = (Source)byte.Parse(cols2[2]);
-            var genomeAssembly  = (GenomeAssembly)byte.Parse(cols2[3]);
-            var numRefSeqs      = int.Parse(cols2[4]);
+            ushort vepVersion    = ushort.Parse(cols2[0]);
+            long vepReleaseTicks = long.Parse(cols2[1]);
+            var source           = (Source)byte.Parse(cols2[2]);
+            var genomeAssembly   = (GenomeAssembly)byte.Parse(cols2[3]);
+            int numRefSeqs       = int.Parse(cols2[4]);
 
             var header = new IntermediateIoHeader(vepVersion, vepReleaseTicks, source, genomeAssembly, numRefSeqs);
             return (id, type, header);

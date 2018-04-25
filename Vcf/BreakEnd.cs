@@ -11,8 +11,8 @@ namespace Vcf
         public BreakEnd(IChromosome chromosome, IChromosome chromosome2, int position, int position2, bool isSuffix,
             bool isSuffix2)
         {
-            var orientation1 = isSuffix ? '-' : '+';
-            var orientation2 = isSuffix2 ? '+' : '-';
+            char orientation1 = isSuffix ? '-' : '+';
+            char orientation2 = isSuffix2 ? '+' : '-';
             Piece1 = new BreakEndPiece(chromosome, position, isSuffix, orientation1);
             Piece2 = new BreakEndPiece(chromosome2, position2, isSuffix2, orientation2);
         }

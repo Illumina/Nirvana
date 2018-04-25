@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.FauxRegex;
+using OptimizedCore;
 
 namespace CacheUtils.DataDumperImport.IO
 {
@@ -65,7 +66,7 @@ namespace CacheUtils.DataDumperImport.IO
             while (true)
             {
                 string line = GetNextLine().Trim();
-                if (line.StartsWith("\'")) break;
+                if (line.OptimizedStartsWith('\'')) break;
                 _sb.Append(' ');
                 _sb.Append(line);
             }

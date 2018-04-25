@@ -144,6 +144,23 @@ namespace UnitTests.Jasix
         }
 
         [Fact]
+        public void Query_onthefly_Ensembl_and_Ucsc()
+        {
+            var readStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz")), CompressionMode.Decompress);
+            var indexStream = ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz.jsi"));
+
+            using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
+            {
+                int ucscCount = qp.ProcessQuery(new[] {"chr1"});
+                int ensemblCount = qp.ProcessQuery(new[] { "1" });
+
+                Assert.Equal(13, ucscCount);
+                Assert.Equal(13, ensemblCount);
+            }
+        }
+
+
+        [Fact]
         public void Report_overlapping_small_and_extending_large_variants()
         {
             var readStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("JasixTest.json.gz")), CompressionMode.Decompress);

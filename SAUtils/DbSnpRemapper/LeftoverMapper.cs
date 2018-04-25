@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 
 namespace SAUtils.DbSnpRemapper
@@ -44,7 +45,7 @@ namespace SAUtils.DbSnpRemapper
             var leftoversWithDest = new Dictionary<long, GenomicLocation>();
             while ((line = _destReader.ReadLine()) != null)
             {
-                if (line.StartsWith("#")) continue;
+                if (line.OptimizedStartsWith('#')) continue;
                 var splits = line.Split('\t', 4);
                 var ids = Utilities.GetRsids(splits[VcfCommon.IdIndex]);
 

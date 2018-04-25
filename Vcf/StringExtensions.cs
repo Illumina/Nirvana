@@ -1,10 +1,17 @@
 ﻿using System;
+using OptimizedCore;
 
 namespace Vcf
 {
     public static class StringExtensions
     {
         public delegate bool TryParse<T>(string str, out T value);
+
+        public static int? GetNullableInt(this string str)
+        {
+            (int number, bool foundError) = str.OptimizedParseInt32();
+            return foundError ? null : (int?) number;
+        }
 
         public static T? GetNullableValue<T>(this string str, TryParse<T> parseFunc) where T : struct
         {
@@ -19,28 +26,26 @@ namespace Vcf
             }
         }
 
-        public static T[] SplitToArray<T>(this string str, char separator, TryParse<T> parseFunc)
+        public static int[] SplitToArray(this string s)
         {
             try
             {
-                var contents = str.Split(separator);
-                var vals = new T[contents.Length];
+                var cols = s.OptimizedSplit(',');
+                var values = new int[cols.Length];
 
-                for (int i = 0; i < contents.Length; i++)
+                for (var i = 0; i < cols.Length; i++)
                 {
-                    if (!parseFunc(contents[i], out T val)) return null;
-                    vals[i] = val;
+                    (int number, bool foundError) = cols[i].OptimizedParseInt32();
+                    if (foundError) return null;
+                    values[i] = number;
                 }
 
-                return vals;
+                return values;
             }
             catch (InvalidCastException)
             {
                 return null;
             }
         }
-
-        
-
     }
 }

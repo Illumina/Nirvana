@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.Positions;
+﻿using OptimizedCore;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf.VariantCreator
@@ -10,16 +11,19 @@ namespace Vcf.VariantCreator
 		{
 			start++;//for the padding base
 			if (infoData.RefRepeatCount == 0) return null;
-			
-			var repeatCount = int.Parse(altAllele.Trim('<', '>').Substring(3));
+
+		    (int number, bool foundError) = altAllele.Trim('<', '>').Substring(3).OptimizedParseInt32();
+		    if (foundError) return null;
+
+            int repeatCount = number;
 
 			var svType = repeatCount == infoData.RefRepeatCount ? VariantType.short_tandem_repeat_variation: 
 				repeatCount > infoData.RefRepeatCount
 					? VariantType.short_tandem_repeat_expansion
 					: VariantType.short_tandem_repeat_contraction;
 			
-			var end = infoData.End ?? 0;
-			var vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
+			int end    = infoData.End ?? 0;
+			string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
 
 			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, RepeatExpansionBehavior);
 		}

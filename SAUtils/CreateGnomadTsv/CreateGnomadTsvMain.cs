@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -9,7 +8,6 @@ using ErrorHandling;
 using ErrorHandling.Exceptions;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateGnomadTsv
 {
@@ -26,23 +24,23 @@ namespace SAUtils.CreateGnomadTsv
             if (!_supportedSequencingDataType.Contains(_sequencingDataType)) 
                 throw new ArgumentException($"Only the following sequencing data types are supported: {string.Join(_supportedSequencingDataType.ToString(), ", ")}");
 
-            var inputStreamReaders = Directory.GetFiles(_inputDirectory, "*.vcf.bgz").Select(fileName => GZipUtilities.GetAppropriateStreamReader(Path.Combine(_inputDirectory, fileName))).ToArray();
+            var inputFiles = Directory.GetFiles(_inputDirectory, "*.vcf.bgz");
             
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
 
-            if (inputStreamReaders.Length == 0)
+            if (inputFiles.Length == 0)
                 throw new UserErrorException("input directory does not conatin any .vcf.bgz files");
 
             var versionFiles = Directory.GetFiles(_inputDirectory, "*.version");
             if (versionFiles.Length != 1)
                 throw new InvalidDataException("more than one .version file found in input directory");
 
-            Console.WriteLine($"Creating gnomAD TSV file from {inputStreamReaders.Length} input files");
+            Console.WriteLine($"Creating gnomAD TSV file from {inputFiles.Length} input files");
 
             var version = DataSourceVersionReader.GetSourceVersion(versionFiles[0]);
-            var gnomadTsvCreator = new GnomadTsvCreator(inputStreamReaders, referenceProvider, version, _outputDirectory, _sequencingDataType);
+            var gnomadTsvCreator = new GnomadTsvCreator(inputFiles, referenceProvider, version, _outputDirectory, _sequencingDataType);
 
-            gnomadTsvCreator.CreateTsvs();
+            gnomadTsvCreator.CreateTsvsParallel();
             return ExitCodes.Success;
         }
 

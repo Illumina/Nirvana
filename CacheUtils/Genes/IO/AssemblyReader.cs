@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
@@ -16,14 +17,14 @@ namespace CacheUtils.Genes.IO
 
             while (true)
             {
-                var line = reader.ReadLine();
+                string line = reader.ReadLine();
                 if (line == null) break;
 
-                if (line.StartsWith("#")) continue;
+                if (line.OptimizedStartsWith('#')) continue;
 
-                var cols      = line.Split('\t');
-                var accession = cols[AccessionIndex];
-                var ucscName  = cols[UcscIndex];
+                var cols         = line.OptimizedSplit('\t');
+                string accession = cols[AccessionIndex];
+                string ucscName  = cols[UcscIndex];
 
                 if (!refNameToChromosome.TryGetValue(ucscName, out IChromosome chromosome)) continue;
                 accessionToChromosome[accession] = chromosome;

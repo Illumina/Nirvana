@@ -3,6 +3,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.Utilities;
+using OptimizedCore;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
@@ -46,7 +47,7 @@ namespace CacheUtils.DataDumperImport.Import
                 if (!(node is ObjectValueNode objectValue))
                     throw new InvalidDataException($"Could not transform the AbstractData object into an ObjectValue: [{node.GetType()}]");
 
-                (var key, var value) = ParseKeyValue(objectValue);
+                (string key, string value) = ParseKeyValue(objectValue);
                 if (key == null) continue;
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
@@ -85,7 +86,7 @@ namespace CacheUtils.DataDumperImport.Import
 
         private static RnaEdit GetRnaEdit(string s)
         {
-            var cols = s.Split(' ');
+            var cols = s.OptimizedSplit(' ');
             if (cols.Length != 3) throw new InvalidDataException($"Expected 3 columns but found {cols.Length} when parsing RNA edit");
 
             int start    = int.Parse(cols[0]);

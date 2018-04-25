@@ -43,10 +43,9 @@ namespace VariantAnnotation.Caches
             var dataSourceVersions = new List<IDataSourceVersion>();
             if (header == null) return dataSourceVersions;
 
-            var customHeader = header.CustomHeader as TranscriptCacheCustomHeader;
-            var vepVersion   = customHeader?.VepVersion;
+            ushort vepVersion = header.Custom.VepVersion;
 
-            var dataSourceVersion = new DataSourceVersion("VEP", vepVersion.ToString(), header.CreationTimeTicks, header.TranscriptSource.ToString());
+            var dataSourceVersion = new DataSourceVersion("VEP", vepVersion.ToString(), header.CreationTimeTicks, header.Source.ToString());
             dataSourceVersions.Add(dataSourceVersion);
             return dataSourceVersions;
         }

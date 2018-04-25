@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genes.DataStructures;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
@@ -32,9 +33,9 @@ namespace CacheUtils.Genes.IO
                 string line = _reader.ReadLine();
                 if (line == null) break;
 
-                if (line.StartsWith("#")) continue;
+                if (line.OptimizedStartsWith('#')) continue;
 
-                var cols = line.Split('\t');
+                var cols = line.OptimizedSplit('\t');
                 if (cols.Length != 9) throw new InvalidDataException($"Expected 9 columns but found {cols.Length} when parsing the GFF entry.");
 
                 string featureType = cols[FeatureTypeIndex];
@@ -52,7 +53,7 @@ namespace CacheUtils.Genes.IO
                 int start            = int.Parse(cols[StartIndex]);
                 int end              = int.Parse(cols[EndIndex]);
                 bool onReverseStrand = cols[StrandIndex] == "-";
-                var infoCols         = cols[InfoIndex].Split(';');
+                var infoCols         = cols[InfoIndex].OptimizedSplit(';');
                 var info             = GetGffFields(infoCols);
 
                 var gene = new RefSeqGene(chromosome, start, end, onReverseStrand, info.EntrezGeneId, info.Name, info.HgncId);
@@ -82,15 +83,13 @@ namespace CacheUtils.Genes.IO
 
             foreach (string col in cols)
             {
-                var kvp      = col.Split('=');
-                string key   = kvp[0];
-                string value = kvp[1];
+                (string key, string value) = col.OptimizedKeyValue();
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (key)
                 {
                     case "Dbxref":
-                        var ids = value.Split(',');
+                        var ids = value.OptimizedSplit(',');
                         (entrezGeneId, hgncId) = GetIds(ids);
                         break;
                     case "Name":
@@ -109,7 +108,7 @@ namespace CacheUtils.Genes.IO
 
             foreach (string idPair in ids)
             {
-                var cols = idPair.Split(':');
+                var cols = idPair.OptimizedSplit(':');
 
                 // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (cols[0])

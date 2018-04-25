@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using OptimizedCore;
 
 namespace Vcf.Sample
 {
@@ -44,13 +45,13 @@ namespace Vcf.Sample
             if (sampleFields.TotalAlleleCount == null || isReference || !isRefSingleBase || !areAllAltsSingleBase) return null;
 
             int numAltAlleles = sampleFields.AltAlleles.Length;
-            double[] variantFreqs = new double[numAltAlleles];
+            var variantFreqs  = new double[numAltAlleles];
 
             if (sampleFields.TotalAlleleCount == 0) return variantFreqs;
 
-            for (int i = 0; i < numAltAlleles; i++)
+            for (var i = 0; i < numAltAlleles; i++)
             {
-                var alleleCount = GetAlleleCount(sampleFields, i);
+                int alleleCount = GetAlleleCount(sampleFields, i);
                 variantFreqs[i] = alleleCount / (double)sampleFields.TotalAlleleCount;
             }
 
@@ -60,8 +61,9 @@ namespace Vcf.Sample
         private static int GetAlleleCount(IntermediateSampleFields sampleFields, int alleleIndex)
         {
             string altAllele = sampleFields.AltAlleles[alleleIndex];
-            int alleleCount = 0;
+            var alleleCount = 0;
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (altAllele)
             {
                 case "A":
@@ -107,17 +109,17 @@ namespace Vcf.Sample
         {
             if (sampleFields.FormatIndices.AD == null || sampleFields.SampleColumns.Length <= sampleFields.FormatIndices.AD.Value) return null;
 
-            int numAltAlleles     = sampleFields.AltAlleles.Length;
-            double[] variantFreqs = new double[numAltAlleles];
+            int numAltAlleles = sampleFields.AltAlleles.Length;
+            var variantFreqs  = new double[numAltAlleles];
 
-            var adField = sampleFields.SampleColumns[sampleFields.FormatIndices.AD.Value];
-            var (alleleDepths, allValuesAreValid, totalDepth) = GetAlleleDepths(adField);
+            string adField = sampleFields.SampleColumns[sampleFields.FormatIndices.AD.Value];
+            (var alleleDepths, bool allValuesAreValid, int totalDepth) = GetAlleleDepths(adField);
             if (!allValuesAreValid || numAltAlleles != alleleDepths.Length) return null;
 
             // sanity check: make sure we handle NaNs properly
             if (totalDepth == 0) return variantFreqs;
 
-            for (int alleleIndex = 0; alleleIndex < numAltAlleles; alleleIndex++)
+            for (var alleleIndex = 0; alleleIndex < numAltAlleles; alleleIndex++)
             {
                 variantFreqs[alleleIndex] = alleleDepths[alleleIndex] / (double)totalDepth;
             }
@@ -127,13 +129,14 @@ namespace Vcf.Sample
 
         private static (int[] AlleleDepths, bool AllValuesAreValid, int totalDepth) GetAlleleDepths(string adField)
         {
-            var adFields = adField.Split(",");
+            var adFields = adField.OptimizedSplit(',');
             var alleleDepths = new int[adFields.Length - 1];
-            int totalDepth = 0;
+            var totalDepth = 0;
 
-            for (int i = 0; i < adFields.Length; i++)
+            for (var i = 0; i < adFields.Length; i++)
             {
-                if (!int.TryParse(adFields[i], out var ad)) return (null, false, totalDepth);
+                (int ad, bool foundError) = adFields[i].OptimizedParseInt32();
+                if(foundError) return (null, false, totalDepth);
                 if (i > 0) alleleDepths[i - 1] = ad;
                 totalDepth += ad;
             }

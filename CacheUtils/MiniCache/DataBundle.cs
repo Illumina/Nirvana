@@ -1,9 +1,9 @@
-﻿using VariantAnnotation.Caches.DataStructures;
+﻿using Compression.Utilities;
+using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
 using VC = VariantAnnotation.Caches;
 
 namespace CacheUtils.MiniCache
@@ -62,7 +62,7 @@ namespace CacheUtils.MiniCache
             {
                 cacheData = transcriptReader.Read(sequenceReader.RefIndexToChromosome);
                 cache     = cacheData.GetCache();
-                source    = transcriptReader.Header.TranscriptSource;
+                source    = transcriptReader.Header.Source;
             }
 
             return new DataBundle(sequenceReader, siftReader, polyPhenReader, cacheData, cache, source);

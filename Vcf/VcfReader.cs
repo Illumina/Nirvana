@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
@@ -75,7 +76,7 @@ namespace Vcf
                 }
 
                 // skip headers already produced by Nirvana
-                var duplicateTag = _nirvanaInfoTags.Any(infoTag => line.StartsWith(infoTag));
+                bool duplicateTag = _nirvanaInfoTags.Any(infoTag => line.StartsWith(infoTag));
                 if (duplicateTag) continue;
 
                 if (line.StartsWith("##contig=<ID") && line.Contains("M") && line.Contains("length=16569>")) IsRcrsMitochondrion = true;
@@ -95,20 +96,20 @@ namespace Vcf
             return hasSampleColumn;
         }
 
-        private bool HasSampleColumn(string line)
+        private static bool HasSampleColumn(string line)
         {
-            string[] vcfHeaderFields = line?.Trim().Split("\t");
+            var vcfHeaderFields = line?.Trim().OptimizedSplit('\t');
             return vcfHeaderFields?.Length >= VcfCommon.MinNumColumnsSampleGenotypes;
         }
 
         private static string[] ExtractSampleNames(string line)
         {
-            var cols = line.Split('\t');
-            var hasSampleGenotypes = cols.Length >= VcfCommon.MinNumColumnsSampleGenotypes;
+            var cols = line.OptimizedSplit('\t');
+            bool hasSampleGenotypes = cols.Length >= VcfCommon.MinNumColumnsSampleGenotypes;
             if (!hasSampleGenotypes) return null;
 
             var samplesList = new List<string>();
-            for (var i = VcfCommon.GenotypeIndex; i < cols.Length; i++)
+            for (int i = VcfCommon.GenotypeIndex; i < cols.Length; i++)
                 samplesList.Add(cols[i]);
 
             return samplesList.ToArray();
@@ -131,7 +132,7 @@ namespace Vcf
             return _queuedPositions.Count == 0 ? null: _queuedPositions.Dequeue();
         }
 
-        public IPosition GetNextPosition() => Position.CreatFromSimplePosition(GetNextSimplePosition(), _variantFactory);
+        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _variantFactory);
 
         public void Dispose() => _reader?.Dispose();
     }

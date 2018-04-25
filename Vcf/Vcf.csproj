@@ -7,6 +7,7 @@
   <ItemGroup>
     <ProjectReference Include="..\CommonUtilities\CommonUtilities.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
+    <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
   </ItemGroup>
 </Project>

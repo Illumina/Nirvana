@@ -10,7 +10,7 @@ namespace Vcf.VariantCreator
 
         private static string GetVid(string ensemblName, int start, int end, string refAllele, VariantType variantType)
         {
-            var referenceName = ensemblName;
+            string referenceName = ensemblName;
 
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (variantType)
@@ -30,9 +30,9 @@ namespace Vcf.VariantCreator
         public static IVariant Create(IChromosome chromosome, int start, int end, string refallele, string altAllele,
             string refMinorGlobalMajorAllele)
         {
-            var isRefMinor  = end == start && refMinorGlobalMajorAllele != null;
+            bool isRefMinor = end == start && refMinorGlobalMajorAllele != null;
             var variantType = DetermineVariantType(isRefMinor);
-            var vid         = GetVid(chromosome.EnsemblName, start, end, refallele, variantType);
+            string vid      = GetVid(chromosome.EnsemblName, start, end, refallele, variantType);
 
             return isRefMinor
                 ? new Variant(chromosome, start, end, refMinorGlobalMajorAllele, refallele, variantType, vid,

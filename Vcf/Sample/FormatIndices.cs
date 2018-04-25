@@ -1,4 +1,6 @@
-﻿namespace Vcf.Sample
+﻿using OptimizedCore;
+
+namespace Vcf.Sample
 {
     public sealed class FormatIndices
     {
@@ -19,7 +21,7 @@
         internal int? VF;
         internal int? MCC;
         internal int? CN;
-        internal int? CI;//confidence interval for STRs
+        internal int? CI;
         internal int? NR;
         internal int? NV;
         internal int? DQ;
@@ -35,23 +37,20 @@
         internal int? DID;
         internal int? DST;
         internal int? PCH;
-        internal int? CHC;
-        // ReSharper restore InconsistentNaming
+        internal int? CHC;        
 
         // PEPE
         internal int? AQ;
         internal int? LQ;
+        // ReSharper restore InconsistentNaming
 
-        /// <summary>
-        /// extracts the index from each genotype format field
-        /// </summary>
         internal static FormatIndices Extract(string formatColumn)
         {
             // sanity check: make sure we have a format column
             if (formatColumn == null) return null;
 
             var formatIndices = new FormatIndices();
-            var formatCols    = formatColumn.Split(':');
+            var formatCols    = formatColumn.OptimizedSplit(':');
 
             for (var index = 0; index < formatCols.Length; index++)
             {

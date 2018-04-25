@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Compression.Utilities;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Helpers
 {

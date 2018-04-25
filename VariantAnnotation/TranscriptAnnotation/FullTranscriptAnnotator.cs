@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;

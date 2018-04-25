@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genes.DataStructures;
 using ErrorHandling.Exceptions;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
@@ -34,9 +35,9 @@ namespace CacheUtils.Genes.IO
                 string line = _reader.ReadLine();
                 if (line == null) break;
 
-                if (line.StartsWith("#")) continue;
+                if (line.OptimizedStartsWith('#')) continue;
 
-                var cols = line.Split('\t');
+                var cols = line.OptimizedSplit('\t');
                 if (cols.Length != 9) throw new InvalidDataException($"Expected 9 columns but found {cols.Length} when parsing the GFF entry.");
 
                 string featureType = cols[FeatureTypeIndex];
@@ -79,7 +80,7 @@ namespace CacheUtils.Genes.IO
 
             foreach (string col in cols)
             {
-                var kvp      = col.Trim().Split(' ');
+                var kvp      = col.Trim().OptimizedSplit(' ');
                 string key   = kvp[0];
                 string value = kvp[1].Trim('\"');
 

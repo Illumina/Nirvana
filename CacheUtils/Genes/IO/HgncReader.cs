@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genes.DataStructures;
 using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
@@ -33,7 +34,7 @@ namespace CacheUtils.Genes.IO
             string line = _reader.ReadLine();
             if (line == null) return null;
 
-            var cols = line.Split('\t');
+            var cols = line.OptimizedSplit('\t');
             if (cols.Length != 49) throw new InvalidDataException($"Expected 48 columns but found {cols.Length} when parsing the gene entry:[{line}]");
 
             try

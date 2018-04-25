@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.IO;
+﻿using OptimizedCore;
+using VariantAnnotation.Interface.IO;
 
 namespace Vcf.Sample
 {
@@ -15,11 +16,10 @@ namespace Vcf.Sample
         public string RepeatNumber { get; }
         public string RepeatNumberSpan { get; }
         public float? DenovoQuality { get; }
+        // ReSharper disable InconsistentNaming
         public float? AQ { get; }
         public float? LQ { get; }
         public double? VF { get; }
-
-        // ReSharper disable InconsistentNaming
         public int? TIR { get; }
         public int? TAR { get; }
         public int? ACount { get; }
@@ -39,10 +39,11 @@ namespace Vcf.Sample
         public bool CHC { get; }
         // ReSharper restore InconsistentNaming
 
+        // ReSharper disable once SuggestBaseTypeForParameter
         public IntermediateSampleFields(string[] vcfColumns, FormatIndices formatIndices, string[] sampleCols)
         {
             VcfRefAllele  = vcfColumns[VcfCommon.RefIndex];
-            AltAlleles    = vcfColumns[VcfCommon.AltIndex].Split(',');
+            AltAlleles    = vcfColumns[VcfCommon.AltIndex].OptimizedSplit(',');
             FormatIndices = formatIndices;
             SampleColumns = sampleCols;
 
@@ -71,10 +72,11 @@ namespace Vcf.Sample
                 GetString(formatIndices.GU, sampleCols), GetString(formatIndices.TU, sampleCols));
         }
 
+        // ReSharper disable once SuggestBaseTypeForParameter
         private static string GetString(int? index, string[] cols)
         {
             if (index == null) return null;
-            var s = cols[index.Value];
+            string s = cols[index.Value];
             return s == "." ? null : s;
         }
 
@@ -87,22 +89,22 @@ namespace Vcf.Sample
         internal static float? GetFloat(string s)
         {
             if (s == null) return null;
-            if (float.TryParse(s, out var ret)) return ret;
+            if (float.TryParse(s, out float ret)) return ret;
             return null;
         }
 
-        internal static double? GetDouble(string s)
+        private static double? GetDouble(string s)
         {
             if (s == null) return null;
-            if (double.TryParse(s, out var ret)) return ret;
+            if (double.TryParse(s, out double ret)) return ret;
             return null;
         }
 
         internal static int? GetInteger(string s)
         {
             if (s == null) return null;
-            if (int.TryParse(s, out var ret)) return ret;
-            return null;
+            (int number, bool foundError) = s.OptimizedParseInt32();
+            return foundError ? null : (int?)number;
         }
 
         private static int[] GetIntegers(string s)
@@ -111,7 +113,12 @@ namespace Vcf.Sample
             if (cols == null) return null;
 
             var result = new int[cols.Length];
-            for (int i = 0; i < cols.Length; i++) result[i] = int.Parse(cols[i]);
+            for (var i = 0; i < cols.Length; i++)
+            {
+                (int number, bool foundError) = cols[i].OptimizedParseInt32();
+                if (foundError) return null;
+                result[i] = number;
+            }
             return result;
         }
 
@@ -123,7 +130,7 @@ namespace Vcf.Sample
             return (num, num2);
         }
 
-        private static string[] GetStrings(string s) => s?.Split(',');
+        private static string[] GetStrings(string s) => s?.OptimizedSplit(',');
 
         private static (int? CopyNumber, string RepeatNumber) GetCopyNumber(string s, bool containsStr)
         {

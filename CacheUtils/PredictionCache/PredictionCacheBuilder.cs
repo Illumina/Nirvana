@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.IntermediateIO;
+using CacheUtils.Utilities;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -16,13 +16,11 @@ namespace CacheUtils.PredictionCache
     {
         private readonly ILogger _logger;
         private readonly GenomeAssembly _genomeAssembly;
-        private readonly long _currentTicks;
 
         public PredictionCacheBuilder(ILogger logger, GenomeAssembly genomeAssembly)
         {
             _logger         = logger;
             _genomeAssembly = genomeAssembly;
-            _currentTicks   = DateTime.Now.Ticks;
         }
 
         public (PredictionCacheStaging Sift, PredictionCacheStaging PolyPhen) CreatePredictionCaches(
@@ -72,15 +70,14 @@ namespace CacheUtils.PredictionCache
             var predictionsPerRef = ConvertPredictions(roundedPredictionsPerRef, roundedEntryToLutIndex, lut);
             _logger.WriteLine("finished.");
 
-            var header = CreateHeader(numReferenceSeqs);
-            return new PredictionCacheStaging(header, lut, predictionsPerRef);
+            var header = CreateHeader(numReferenceSeqs, lut);
+            return new PredictionCacheStaging(header, predictionsPerRef);
         }
 
-        private CacheHeader CreateHeader(int numReferenceSeqs)
+        private PredictionHeader CreateHeader(int numReferenceSeqs, Prediction.Entry[] lut)
         {
             var customHeader = new PredictionCacheCustomHeader(new IndexEntry[numReferenceSeqs]);
-            return new CacheHeader(CacheConstants.Identifier, CacheConstants.SchemaVersion, CacheConstants.DataVersion,
-                Source.None, _currentTicks, _genomeAssembly, customHeader);
+            return new PredictionHeader(HeaderUtilities.GetHeader(Source.None, _genomeAssembly), customHeader, lut);
         }
 
         private static Prediction[][] ConvertPredictions(IReadOnlyList<RoundedEntryPrediction[]> roundedPredictionsPerRef,

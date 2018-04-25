@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using OptimizedCore;
 using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.CreateOmimTsv
@@ -14,7 +15,7 @@ namespace SAUtils.CreateOmimTsv
 
             if (string.IsNullOrEmpty(line)) return phenotypes;
 
-            var infos = line.Split(';');
+            var infos = line.OptimizedSplit(';');
             phenotypes.AddRange(infos.Select(ExtractPhenotype));
 
             return phenotypes;
@@ -44,7 +45,7 @@ namespace SAUtils.CreateOmimTsv
             var inheritances = new HashSet<string>();
             if (string.IsNullOrEmpty(inheritance)) return inheritances;
 
-            foreach (var content in inheritance.Split(','))
+            foreach (var content in inheritance.OptimizedSplit(','))
             {
                 var trimmedContent = content.Trim(' ');
                 inheritances.Add(trimmedContent);
@@ -65,11 +66,11 @@ namespace SAUtils.CreateOmimTsv
             }
             else
             {
-                if (phenotypeGroup.StartsWith("{"))
+                if (phenotypeGroup.OptimizedStartsWith('{'))
                 {
                     comments = OmimEntry.Comments.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
                 }
-                else if (phenotypeGroup.StartsWith("["))
+                else if (phenotypeGroup.OptimizedStartsWith('['))
                 {
                     comments = OmimEntry.Comments.nondiseases;
                 }

@@ -73,7 +73,8 @@ namespace SAUtils.DataStructures
 
         public void AddTagPosition(string tag, long position)
         {
-            TagPositions[tag] = position;
+            if (!TagPositions.TryAdd(tag, position))
+                throw new InvalidDataException($"second block of entries for chrom:{tag}!!");
         }
 
         private void WriteToFile()
