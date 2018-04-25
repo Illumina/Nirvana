@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateGnomadTsv
 {

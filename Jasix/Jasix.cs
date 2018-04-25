@@ -8,7 +8,6 @@ using ErrorHandling;
 using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Utilities;
 
 namespace Jasix
 {

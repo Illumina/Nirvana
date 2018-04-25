@@ -3,10 +3,10 @@ using System.IO.Compression;
 using System.Text;
 using Jasix;
 using Jasix.DataStructures;
-using VariantAnnotation.Utilities;
 using Xunit;
 using UnitTests.TestUtilities;
 using Compression.FileHandling;
+using Compression.Utilities;
 
 namespace UnitTests.Jasix
 {

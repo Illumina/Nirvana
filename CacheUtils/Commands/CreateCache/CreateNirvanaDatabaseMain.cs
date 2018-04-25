@@ -20,7 +20,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.CreateCache
 {

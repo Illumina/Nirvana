@@ -10,7 +10,6 @@ using SAUtils.DataStructures;
 using SAUtils.InputFileParsers;
 using SAUtils.TsvWriters;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateGnomadTsv
 {

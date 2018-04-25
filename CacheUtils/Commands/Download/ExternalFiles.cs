@@ -10,7 +10,6 @@ using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.Download
 {

@@ -10,6 +10,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Algorithms;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -20,7 +21,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.CombineCacheDirectories
 {

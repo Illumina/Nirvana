@@ -5,9 +5,9 @@ using System.Linq;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Genes.Utilities;
+using Compression.Utilities;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Genes.DataStores
 {

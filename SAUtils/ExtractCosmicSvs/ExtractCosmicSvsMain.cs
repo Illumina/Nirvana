@@ -4,7 +4,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.ExtractCosmicSvs
 {

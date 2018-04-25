@@ -3,9 +3,9 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.Compression.FileHandling

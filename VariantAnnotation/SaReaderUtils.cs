@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
@@ -10,7 +11,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation
 {

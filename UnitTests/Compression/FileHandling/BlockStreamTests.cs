@@ -7,6 +7,7 @@ using System.Text;
 using Compression.Algorithms;
 using Compression.DataStructures;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -14,7 +15,6 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.Compression.FileHandling

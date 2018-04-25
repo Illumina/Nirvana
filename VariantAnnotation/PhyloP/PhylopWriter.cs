@@ -9,7 +9,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.PhyloP
 {

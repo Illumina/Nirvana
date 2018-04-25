@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
+using Compression.Utilities;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.PhyloP;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.PhyloP

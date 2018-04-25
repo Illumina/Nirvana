@@ -8,6 +8,7 @@ using CacheUtils.TranscriptCache;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommonUtilities;
+using Compression.Utilities;
 using ErrorHandling;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface;
@@ -19,7 +20,6 @@ using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.ExtractTranscripts
 {

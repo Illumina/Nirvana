@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using CommonUtilities;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
@@ -13,7 +14,6 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.TranscriptAnnotation;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Providers
 {

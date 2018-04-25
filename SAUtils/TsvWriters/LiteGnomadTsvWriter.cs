@@ -2,9 +2,9 @@
 using System.IO;
 using System.IO.Compression;
 using Compression.FileHandling;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.TsvWriters
 {

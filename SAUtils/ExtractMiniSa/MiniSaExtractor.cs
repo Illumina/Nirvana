@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Compression.Utilities;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.SA;
@@ -8,7 +9,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.ExtractMiniSa
 {

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using Compression.Utilities;
 using OptimizedCore;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers
 {

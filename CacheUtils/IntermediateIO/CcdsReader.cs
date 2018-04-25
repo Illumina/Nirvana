@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Compression.Utilities;
 using OptimizedCore;
 using VariantAnnotation.Utilities;
 

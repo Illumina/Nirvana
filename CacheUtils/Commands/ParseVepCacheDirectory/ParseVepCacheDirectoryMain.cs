@@ -15,7 +15,6 @@ using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
 {

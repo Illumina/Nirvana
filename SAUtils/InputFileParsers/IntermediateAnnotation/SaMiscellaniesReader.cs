@@ -5,7 +5,6 @@ using Compression.Utilities;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {

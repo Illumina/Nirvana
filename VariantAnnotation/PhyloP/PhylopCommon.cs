@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.PhyloP
 {

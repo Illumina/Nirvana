@@ -4,12 +4,12 @@ using System.IO;
 using System.IO.Compression;
 using CommandLine.Utilities;
 using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OptimizedCore;
-using VariantAnnotation.Utilities;
 
 
 namespace Jasix

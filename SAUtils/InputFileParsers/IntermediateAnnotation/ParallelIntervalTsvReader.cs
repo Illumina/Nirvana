@@ -8,7 +8,6 @@ using SAUtils.Interface;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {

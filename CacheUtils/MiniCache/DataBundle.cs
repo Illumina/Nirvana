@@ -1,9 +1,9 @@
-﻿using VariantAnnotation.Caches.DataStructures;
+﻿using Compression.Utilities;
+using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
 using VC = VariantAnnotation.Caches;
 
 namespace CacheUtils.MiniCache

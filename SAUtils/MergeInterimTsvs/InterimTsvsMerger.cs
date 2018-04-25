@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -12,7 +13,6 @@ using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 using VariantAnnotation.Interface.GeneAnnotation;
 
 namespace SAUtils.MergeInterimTsvs

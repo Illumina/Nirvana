@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
+using Compression.Utilities;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Helpers
 {

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.Providers
 {

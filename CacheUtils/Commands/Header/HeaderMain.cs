@@ -1,11 +1,11 @@
 ﻿using System;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Commands.Header
 {

@@ -6,9 +6,9 @@ using System.Linq;
 using CommandLine.Utilities;
 using CommonUtilities;
 using Compression.FileHandling;
+using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils
 {

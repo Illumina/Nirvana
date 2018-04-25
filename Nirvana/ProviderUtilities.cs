@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using VariantAnnotation;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
@@ -8,7 +9,6 @@ using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Utilities;
 
 namespace Nirvana
 {

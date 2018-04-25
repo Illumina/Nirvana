@@ -23,7 +23,6 @@ using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
