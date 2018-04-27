@@ -21,7 +21,7 @@ namespace UnitTests.Phantom.Workers
         private readonly Mock<ICodonInfoProvider> _codonInfoProviderMock = new Mock<ICodonInfoProvider>();
 
 
-[Fact]
+        [Fact]
         public void GenerateOutput_EmptyBuffer_ReturnEmptyVcfFieldList()
         {
 

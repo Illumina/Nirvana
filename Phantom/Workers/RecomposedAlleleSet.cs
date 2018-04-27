@@ -46,7 +46,7 @@ namespace Phantom.Workers
                     }
                     foreach (var sampleAllele in sampleAlleles)
                     {
-                        SetGenotypeWithAlleleIndex(sampleGenotypes[sampleAllele.SampleIndex], sampleAllele.AlleleIndex,
+                        SetGenotypeWithAlleleIndex(sampleGenotypes[sampleAllele.SampleIndex], sampleAllele.HaplotypeIndex,
                             currentGenotypeIndex);
                     }
                 }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using OptimizedCore;
 using Phantom.Interfaces;
+using Phantom.Utilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 
@@ -18,7 +19,7 @@ namespace Phantom.DataStructures
         public string ChrName { get; }
         private readonly int _numPositions;
         public AlleleSet AlleleSet { get; private set; }
-        public Dictionary<AlleleIndexBlock, List<SampleAllele>> AlleleIndexBlockToSampleIndex { get; private set; }
+        public Dictionary<AlleleBlock, List<SampleHaplotype>> AlleleBlockToSampleHaplotype { get; private set; }
         private HashSet<int>[] _allelesWithUnsupportedTypes;
         private string[,][] _sampleInfo;
         public TagInfo<string> GqInfo;
@@ -45,7 +46,8 @@ namespace Phantom.DataStructures
             positionSet.PsInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[1], ExtractSampleValue, x => x);
             positionSet.GqInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[2], ExtractSampleValue, x => x);
             var genotypeToSampleIndex = GetGenotypeToSampleIndex(positionSet);
-            positionSet.AlleleIndexBlockToSampleIndex = AlleleIndexBlock.GetAlleleIndexBlockToSampleIndex(genotypeToSampleIndex, positionSet._allelesWithUnsupportedTypes, positionSet.AlleleSet.Starts, positionSet.FunctionBlockRanges);
+            var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSampleIndex, positionSet._allelesWithUnsupportedTypes, positionSet.AlleleSet.Starts, positionSet.FunctionBlockRanges, out var alleleBlockGraph);
+            positionSet.AlleleBlockToSampleHaplotype = AlleleBlockMerger.Merge(alleleBlockToSampleHaplotype, alleleBlockGraph);
             return positionSet;
         }
 

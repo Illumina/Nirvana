@@ -25,8 +25,8 @@ namespace Phantom.Workers
         {
             var positionSet = PositionSet.CreatePositionSet(recomposablePositions, functionBlockRanges);
             var alleleSet = positionSet.AlleleSet;
-            var alleleIndexBlockToSampleIndex = positionSet.AlleleIndexBlockToSampleIndex;
-            var numSamples = positionSet.NumSamples;
+            var alleleIndexBlockToSampleIndex = positionSet.AlleleBlockToSampleHaplotype;
+            int numSamples = positionSet.NumSamples;
             _sequenceProvider.LoadChromosome(alleleSet.Chromosome);
             int regionStart = alleleSet.Starts[0];
             string lastRefAllele = alleleSet.VariantArrays.Last()[0];
@@ -56,15 +56,15 @@ namespace Phantom.Workers
             return recomposedAlleleSet.GetRecomposedVcfRecords().Select(x => SimplePosition.GetSimplePosition(x, _sequenceProvider.RefNameToChromosome, true));
         }
 
-        private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleIndexBlock alleleIndexBlock)
+        private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleBlock alleleBlock)
         {
-            string filter = "PASS";
+            var filter = "PASS";
             var positions = positionSet.SimplePositions;
-            var startIndex = alleleIndexBlock.PositionIndex;
-            var numPositions = alleleIndexBlock.AlleleIndexes.Length;
-            var numSamples = positionSet.NumSamples;
+            int startIndex = alleleBlock.PositionIndex;
+            int numPositions = alleleBlock.AlleleIndexes.Length;
+            int numSamples = positionSet.NumSamples;
 
-            string[] quals = new string[numPositions];
+            var quals = new string[numPositions];
             for (int i = startIndex; i < startIndex + numPositions; i++)
             {
                 quals[i - startIndex] = positions[i].VcfFields[VcfCommon.QualIndex];
@@ -74,12 +74,12 @@ namespace Phantom.Workers
             }
             string qual = GetStringWithMinValueOrDot(quals);
 
-            string[] gqValues = new string[numSamples];
-            for (int i = 0; i < numSamples; i++)
+            var gqValues = new string[numSamples];
+            for (var i = 0; i < numSamples; i++)
                 gqValues[i] = GetStringWithMinValueOrDot(new ArraySegment<string>(positionSet.GqInfo.Values[i], startIndex, numPositions).ToArray());
 
-            string[] psValues = new string[numSamples];
-            for (int i = 0; i < numSamples; i++)
+            var psValues = new string[numSamples];
+            for (var i = 0; i < numSamples; i++)
             {
                 var psTagsThisSample =
                     new ArraySegment<string>(positionSet.PsInfo.Values[i], startIndex, numPositions);
@@ -92,7 +92,7 @@ namespace Phantom.Workers
 
         private static string GetStringWithMinValueOrDot(string[] strings)
         {
-            string currentString = ".";
+            var currentString = ".";
             float currentValue = float.MaxValue;
             foreach (string thisString in strings)
             {
@@ -116,11 +116,11 @@ namespace Phantom.Workers
             return ".";
         }
 
-        internal static (int Start, int End, string Ref, string Alt) GetPositionsAndRefAltAlleles(AlleleIndexBlock alleleIndexBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, HashSet<(int, int)> decomposedPosVarIndex)
+        internal static (int Start, int End, string Ref, string Alt) GetPositionsAndRefAltAlleles(AlleleBlock alleleBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, HashSet<(int, int)> decomposedPosVarIndex)
         {
-            int numPositions = alleleIndexBlock.AlleleIndexes.Length;
-            int firstPositionIndex = alleleIndexBlock.PositionIndex;
-            int lastPositionIndex = alleleIndexBlock.PositionIndex + numPositions - 1;
+            int numPositions = alleleBlock.AlleleIndexes.Length;
+            int firstPositionIndex = alleleBlock.PositionIndex;
+            int lastPositionIndex = alleleBlock.PositionIndex + numPositions - 1;
 
             int blockStart = alleleSet.Starts[firstPositionIndex];
             int blockEnd = alleleSet.Starts[lastPositionIndex];
@@ -133,7 +133,7 @@ namespace Phantom.Workers
             for (int positionIndex = firstPositionIndex; positionIndex <= lastPositionIndex; positionIndex++)
             {
                 int indexInBlock = positionIndex - firstPositionIndex;
-                int alleleIndex = alleleIndexBlock.AlleleIndexes[indexInBlock];
+                int alleleIndex = alleleBlock.AlleleIndexes[indexInBlock];
                 if (alleleIndex == 0) continue;
 
                 //only mark positions with non-reference alleles being recomposed as "decomposed"
@@ -181,7 +181,7 @@ namespace Phantom.Workers
         public readonly string Filter;
         public readonly string[] SampleGqs;
         public readonly string[] SamplePhaseSets;
-        public readonly Dictionary<string, List<SampleAllele>> AltAlleleToSample = new Dictionary<string, List<SampleAllele>>();
+        public readonly Dictionary<string, List<SampleHaplotype>> AltAlleleToSample = new Dictionary<string, List<SampleHaplotype>>();
 
         public VariantInfo(string qual, string filter, string[] sampleGqs, string[] samplePhaseSets)
         {
@@ -191,7 +191,7 @@ namespace Phantom.Workers
             SamplePhaseSets = samplePhaseSets;
         }
 
-        public void AddAllele(string altAllele, List<SampleAllele> sampleAlleles)
+        public void AddAllele(string altAllele, List<SampleHaplotype> sampleAlleles)
         {
             AltAlleleToSample.Add(altAllele, sampleAlleles);
         }
