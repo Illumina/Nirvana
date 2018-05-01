@@ -1,4 +1,5 @@
 ﻿using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace Vcf.Info
 {

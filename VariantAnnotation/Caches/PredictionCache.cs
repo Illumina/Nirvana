@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Caches
 {
@@ -11,13 +11,13 @@ namespace VariantAnnotation.Caches
     {
         private readonly Prediction[] _predictions;
 	    public string Name { get; } = string.Empty;
-	    public GenomeAssembly GenomeAssembly { get; }
+	    public GenomeAssembly Assembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = new List<IDataSourceVersion>();
         private readonly string[] _descriptions;
 
         public PredictionCache(GenomeAssembly genomeAssembly, Prediction[] predictions, string[] descriptions)
         {
-            GenomeAssembly = genomeAssembly;
+            Assembly = genomeAssembly;
             _predictions   = predictions;
             _descriptions  = descriptions;
         }

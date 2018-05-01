@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using CacheUtils.Genes.Combiners;
 using CacheUtils.Genes.DataStructures;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
+using Genome;
+using Intervals;
 using Xunit;
 
 namespace UnitTests.CacheUtils.Genes.Combiners

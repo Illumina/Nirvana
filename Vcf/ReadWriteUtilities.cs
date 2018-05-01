@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using Compression.FileHandling;
 using Compression.Utilities;
+using Genome;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf
 {

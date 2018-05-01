@@ -1,5 +1,5 @@
-﻿using UnitTests.TestDataStructures;
-using VariantAnnotation.Utilities;
+﻿using Genome;
+using UnitTests.TestDataStructures;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Utilities

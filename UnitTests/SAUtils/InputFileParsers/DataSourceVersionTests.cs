@@ -1,5 +1,5 @@
 ﻿using System;
-using CommonUtilities;
+using OptimizedCore;
 using SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Providers;

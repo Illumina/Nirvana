@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using SAUtils.InputFileParsers.ExAc;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

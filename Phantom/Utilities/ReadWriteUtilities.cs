@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.Caches.DataStructures;
+using Genome;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 
 namespace Phantom.Utilities

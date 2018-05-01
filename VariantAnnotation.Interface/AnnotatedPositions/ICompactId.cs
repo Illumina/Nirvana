@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.Interface.IO;
+﻿using IO;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {

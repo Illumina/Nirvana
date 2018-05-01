@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CommonUtilities;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace Vcf.VariantCreator
 {

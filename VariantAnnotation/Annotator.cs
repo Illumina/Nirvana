@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonUtilities;
 using ErrorHandling.Exceptions;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
@@ -10,7 +11,7 @@ using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace VariantAnnotation
 {
@@ -25,7 +26,7 @@ namespace VariantAnnotation
         private readonly HashSet<string> _affectedGenes;
 
         private bool _annotateMito;
-        public GenomeAssembly GenomeAssembly { get; }        
+        public GenomeAssembly Assembly { get; }        
 
         public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider,
             IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,
@@ -38,32 +39,32 @@ namespace VariantAnnotation
             _geneAnnotationProvider = geneAnnotationProvider;
             _affectedGenes          = new HashSet<string>();
             _plugins                = plugins;
-            GenomeAssembly          = GetGenomeAssembly();
+            Assembly                = GetAssembly();
         }
 
-        private GenomeAssembly GetGenomeAssembly()
+        private GenomeAssembly GetAssembly()
         {
             var assemblies = new Dictionary<GenomeAssembly, List<string>>();
-            AddGenomeAssembly(assemblies, _taProvider);
-            AddGenomeAssembly(assemblies, _saProviders);
-            AddGenomeAssembly(assemblies, _sequenceProvider);
-            AddGenomeAssembly(assemblies, _conservationProvider);
+            AddAssembly(assemblies, _taProvider);
+            AddAssembly(assemblies, _saProviders);
+            AddAssembly(assemblies, _sequenceProvider);
+            AddAssembly(assemblies, _conservationProvider);
 
             if (assemblies.Count == 0) return GenomeAssembly.Unknown;
-            if (assemblies.Count != 1) throw new UserErrorException(GetGenomeAssemblyErrorMessage(assemblies));
+            if (assemblies.Count != 1) throw new UserErrorException(GetAssemblyErrorMessage(assemblies));
 
-            CheckPluginGenomeAssemblyConsistency(assemblies.First().Key);
+            CheckPluginAssemblyConsistency(assemblies.First().Key);
             return assemblies.First().Key;
         }
 
-        private static void AddGenomeAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
+        private static void AddAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
         {
             if (provider == null) return;
-            if (assemblies.TryGetValue(provider.GenomeAssembly, out var assemblyList)) assemblyList.Add(provider.Name);
-            else assemblies[provider.GenomeAssembly] = new List<string> { provider.Name };
+            if (assemblies.TryGetValue(provider.Assembly, out var assemblyList)) assemblyList.Add(provider.Name);
+            else assemblies[provider.Assembly] = new List<string> { provider.Name };
         }
 
-        private static string GetGenomeAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
+        private static string GetAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
         {
             var sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
@@ -71,14 +72,14 @@ namespace VariantAnnotation
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        private void CheckPluginGenomeAssemblyConsistency(GenomeAssembly systemGenomeAssembly)
+        private void CheckPluginAssemblyConsistency(GenomeAssembly systemAssembly)
         {
             if (_plugins == null || !_plugins.Any()) return;
 
             foreach (var plugin in _plugins)
             {
-                if (plugin.GenomeAssembly == systemGenomeAssembly || plugin.GenomeAssembly == GenomeAssembly.Unknown) continue;
-                throw new UserErrorException($"At least one plugin does not have the same genome assembly ({plugin.GenomeAssembly}) as the system genome assembly ({systemGenomeAssembly})");
+                if (plugin.Assembly == systemAssembly || plugin.Assembly == GenomeAssembly.Unknown) continue;
+                throw new UserErrorException($"At least one plugin does not have the same genome assembly ({plugin.Assembly}) as the system genome assembly ({systemAssembly})");
             }
         }
 

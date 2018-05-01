@@ -44,7 +44,7 @@ namespace VariantAnnotation.IO.VcfWriter
         {
             if (_entries.Count < genotypeIndex)
             {
-                throw new ArgumentOutOfRangeException("GenotypeIndex for vcf info field is larger than the total number of alleles");
+                throw new ArgumentOutOfRangeException(nameof(genotypeIndex));
             }
             if (genotypeIndex <= 0)
             {

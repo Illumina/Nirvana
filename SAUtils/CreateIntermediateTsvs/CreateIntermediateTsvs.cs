@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
 using Compression.Utilities;
+using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers;
 using SAUtils.InputFileParsers.ClinGen;
@@ -16,13 +17,11 @@ using SAUtils.InputFileParsers.DbSnp;
 using SAUtils.InputFileParsers.DGV;
 using SAUtils.InputFileParsers.EVS;
 using SAUtils.InputFileParsers.ExAc;
-using SAUtils.InputFileParsers.MitoMap;
+using SAUtils.InputFileParsers.MitoMAP;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils.CreateIntermediateTsvs
 {
@@ -73,7 +72,7 @@ namespace SAUtils.CreateIntermediateTsvs
             _compressedReferencePath = compressedReferencePath;
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferencePath));
             _refNamesDictionary = sequenceProvider.RefNameToChromosome;
-            _genomeAssembly = sequenceProvider.GenomeAssembly;
+            _genomeAssembly = sequenceProvider.Assembly;
 
         }
 

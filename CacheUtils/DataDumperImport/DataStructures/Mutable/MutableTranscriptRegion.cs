@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
+﻿using IO;
+using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 {

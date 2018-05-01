@@ -6,6 +6,7 @@ using CommandLine.Utilities;
 using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
+using Genome;
 using Jasix;
 using Jasix.DataStructures;
 using Phantom.Workers;
@@ -17,7 +18,6 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.IO.VcfWriter;
@@ -70,7 +70,7 @@ namespace Nirvana
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
             using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))
-            using (var jsonWriter        = new JsonWriter(outputWriter, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.GenomeAssembly.ToString(), vcfReader.GetSampleNames()))
+            using (var jsonWriter        = new JsonWriter(outputWriter, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.Assembly.ToString(), vcfReader.GetSampleNames()))
             using (var vcfWriter         = _vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var jasixIndexCreator = outputWriter is BgzipTextWriter ? new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)) : null)
@@ -79,8 +79,8 @@ namespace Nirvana
                 {
                     jasixIndexCreator?.SetHeader(jsonWriter.Header);
 
-                    if (vcfReader.IsRcrsMitochondrion && annotator.GenomeAssembly == GenomeAssembly.GRCh37
-                        || annotator.GenomeAssembly == GenomeAssembly.GRCh38
+                    if (vcfReader.IsRcrsMitochondrion && annotator.Assembly == GenomeAssembly.GRCh37
+                        || annotator.Assembly == GenomeAssembly.GRCh38
                         || _forceMitochondrialAnnotation)
                         annotator.EnableMitochondrialAnnotation();
 

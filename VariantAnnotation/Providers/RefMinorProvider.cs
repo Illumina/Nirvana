@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.SA;
 
 namespace VariantAnnotation.Providers

@@ -2,10 +2,9 @@
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using Genome;
 using SAUtils.InputFileParsers.Cosmic;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

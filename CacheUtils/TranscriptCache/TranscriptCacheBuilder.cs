@@ -4,10 +4,10 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.Utilities;
 using CacheUtils.Utilities;
+using Genome;
+using Intervals;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 
 namespace CacheUtils.TranscriptCache

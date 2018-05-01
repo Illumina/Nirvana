@@ -1,8 +1,8 @@
-﻿using Phantom.DataStructures;
+﻿using Genome;
+using Intervals;
+using Phantom.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace Phantom.Interfaces
 {

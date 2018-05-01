@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonUtilities;
+using OptimizedCore;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
@@ -8,7 +8,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
     {
         public const string StopCodon   = "*";
         public const char StopCodonChar = '*';
-        public const string StartCodon  = "M";
 
         private readonly CodonConversion _codonConversionScheme = CodonConversion.HumanChromosome;
 
@@ -182,9 +181,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 _mitoDifferences.TryGetValue(upperTriplet, out var mitoAminoAcid)) return mitoAminoAcid;
 
             // the default case
-            if (_aminoAcidLookupTable.TryGetValue(upperTriplet, out var aminoAcid)) return aminoAcid;
-
-            return 'X';
+            return _aminoAcidLookupTable.TryGetValue(upperTriplet, out var aminoAcid) ? aminoAcid : 'X';
         }
 
 

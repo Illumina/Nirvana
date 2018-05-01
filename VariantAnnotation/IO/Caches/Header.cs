@@ -1,6 +1,6 @@
 ﻿using System.IO;
+using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.IO.Caches
 {
@@ -11,7 +11,7 @@ namespace VariantAnnotation.IO.Caches
         public readonly ushort DataVersion;
         public readonly Source Source;
         public readonly long CreationTimeTicks;
-        public readonly GenomeAssembly GenomeAssembly;
+        public readonly GenomeAssembly Assembly;
 
         public Header(string identifier, ushort schemaVersion, ushort dataVersion, Source source,
             long creationTimeTicks, GenomeAssembly genomeAssembly)
@@ -21,7 +21,7 @@ namespace VariantAnnotation.IO.Caches
             DataVersion       = dataVersion;
             Source            = source;
             CreationTimeTicks = creationTimeTicks;
-            GenomeAssembly    = genomeAssembly;
+            Assembly    = genomeAssembly;
         }
 
         protected void Write(BinaryWriter writer)
@@ -31,7 +31,7 @@ namespace VariantAnnotation.IO.Caches
             writer.Write(DataVersion);
             writer.Write((byte)Source);
             writer.Write(CreationTimeTicks);
-            writer.Write((byte)GenomeAssembly);
+            writer.Write((byte)Assembly);
         }
 
         protected static Header Read(BinaryReader reader)

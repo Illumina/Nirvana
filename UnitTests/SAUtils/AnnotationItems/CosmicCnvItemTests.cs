@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Genome;
 using SAUtils.ExtractCosmicSvs;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Sequence;
+using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.AnnotationItems
@@ -14,22 +14,22 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
                 }, 1);
 
             var item2 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology3", 1},
                     {"histology4", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue3", 2},
                     { "tissue4", 1}
@@ -46,11 +46,11 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
@@ -65,11 +65,11 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, -1,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
@@ -85,22 +85,22 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
                 },1);
 
             var item2 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
@@ -117,22 +117,22 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
                 }, 1);
 
             var item2 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
@@ -148,22 +148,22 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
                 },1);
 
             var item2 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
@@ -179,22 +179,22 @@ namespace UnitTests.SAUtils.AnnotationItems
         {
             var chrom = new Chromosome("chrW", "W", 1);
             var item1 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_loss, 0,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}
                 },1);
 
             var item2 = new CosmicCnvItem(1, chrom, 100, 1000, VariantType.copy_number_gain, 3,
-                new Dictionary<string, int>()
+                new Dictionary<string, int>
                 {
                     {"histology1", 1},
                     {"histology2", 2}
-                }, new Dictionary<string, int>()
+                }, new Dictionary<string, int>
                 {
                     { "tissue1", 2},
                     { "tissue2", 1}

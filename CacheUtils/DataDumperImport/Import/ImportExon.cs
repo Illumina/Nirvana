@@ -3,7 +3,7 @@ using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Utilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 
 namespace CacheUtils.DataDumperImport.Import
 {

@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonUtilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
 {

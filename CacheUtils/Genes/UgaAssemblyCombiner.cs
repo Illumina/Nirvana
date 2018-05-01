@@ -5,7 +5,7 @@ using System.Linq;
 using CacheUtils.Genes.Combiners;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.TranscriptCache.Comparers;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace CacheUtils.Genes
 {

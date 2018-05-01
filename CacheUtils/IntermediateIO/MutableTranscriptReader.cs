@@ -4,13 +4,12 @@ using System.IO;
 using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.TranscriptCache;
-using CommonUtilities;
+using Genome;
+using Intervals;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
 {

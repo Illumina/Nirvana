@@ -1,23 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <OutputType>Library</OutputType>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <DebugType>Full</DebugType>
-    <ApplicationIcon />
-    <StartupObject />
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE;RELEASE;NETCOREAPP2_0</DefineConstants>
-  </PropertyGroup>
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-    <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
-    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
+    <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />

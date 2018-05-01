@@ -9,7 +9,7 @@ using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Providers;
 
-namespace SAUtils.InputFileParsers.MitoMap
+namespace SAUtils.InputFileParsers.MitoMAP
 {
     public sealed class MitoMapVariantReader
     {

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
-using CommonUtilities;
+using Genome;
+using Intervals;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace Phantom.DataStructures
 {

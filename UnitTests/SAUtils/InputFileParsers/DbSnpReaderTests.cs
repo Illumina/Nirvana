@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.DbSnp;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

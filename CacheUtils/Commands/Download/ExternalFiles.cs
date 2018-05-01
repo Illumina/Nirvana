@@ -6,10 +6,10 @@ using CacheUtils.Genbank;
 using CacheUtils.IntermediateIO;
 using CacheUtils.Utilities;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Commands.Download
 {

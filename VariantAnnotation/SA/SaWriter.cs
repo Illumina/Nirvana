@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Compression.Algorithms;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
@@ -53,7 +53,7 @@ namespace VariantAnnotation.SA
             _writer.WriteOptAscii(SaDataBaseCommon.DataHeader);
             _writer.Write(SaDataBaseCommon.DataVersion);
             _writer.Write(SaDataBaseCommon.SchemaVersion);
-            _writer.Write((byte)header.GenomeAssembly);
+            _writer.Write((byte)header.Assembly);
             _writer.Write(DateTime.Now.Ticks);
             _writer.WriteOptAscii(header.ReferenceSequenceName);
 

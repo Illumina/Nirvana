@@ -7,7 +7,7 @@ using VariantAnnotation.Providers;
 
 namespace SAUtils.ExtractCosmicSvs
 {
-    public sealed class ExtractCosmicSvsMain
+    public static class ExtractCosmicSvsMain
     {
         private static string _breakendTsv;
         private static string _cnvTsv;
@@ -40,7 +40,6 @@ namespace SAUtils.ExtractCosmicSvs
                 }
             };
 
-            var extractor = new ExtractCosmicSvsMain();
             var commandLineExample = $"{command} [options]";
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
@@ -52,12 +51,12 @@ namespace SAUtils.ExtractCosmicSvs
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
-                .Execute(extractor.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }
 
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             var version = DataSourceVersionReader.GetSourceVersion(_cnvTsv+ ".version");
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
@@ -66,7 +65,7 @@ namespace SAUtils.ExtractCosmicSvs
             var breakendStream = _breakendTsv == null ? null : GZipUtilities.GetAppropriateReadStream(_breakendTsv);
 
             using (var cosmicSvExtractor = new CosmicSvReader(cnvStream, breakendStream, version, _outputDir,
-                referenceProvider.GenomeAssembly, referenceProvider.RefNameToChromosome))
+                referenceProvider.Assembly, referenceProvider.RefNameToChromosome))
             {
                 cosmicSvExtractor.CreateTsv();
             }

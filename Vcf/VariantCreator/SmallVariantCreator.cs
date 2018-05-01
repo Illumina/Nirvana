@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using System.Security.Cryptography;
 using System.Text;
-using CommonUtilities;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using OptimizedCore;
+using Variants;
 
 namespace Vcf.VariantCreator
 {
@@ -13,7 +13,7 @@ namespace Vcf.VariantCreator
 
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed)
         {
-            if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant cann't be both decomposed and recomposed");
+            if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant can't be both decomposed and recomposed");
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
             int end = start + refAllele.Length - 1;
 

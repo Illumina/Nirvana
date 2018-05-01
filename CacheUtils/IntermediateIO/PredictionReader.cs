@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonUtilities;
+using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
 {

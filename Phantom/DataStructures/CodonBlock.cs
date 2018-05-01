@@ -1,5 +1,5 @@
-﻿using Phantom.Interfaces;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using Phantom.Interfaces;
 
 namespace Phantom.DataStructures
 {

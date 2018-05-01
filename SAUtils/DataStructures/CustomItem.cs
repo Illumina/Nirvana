@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using CommonUtilities;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures

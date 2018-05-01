@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Genome;
+using Intervals;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;
@@ -6,9 +8,7 @@ using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {
@@ -120,8 +120,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             return positionalEffect;
         }
 
-        private static List<ConsequenceTag> GetConsequences(ITranscript transcript, IVariant variant,
-            VariantEffect variantEffect)
+        private static List<ConsequenceTag> GetConsequences(IInterval transcript, IVariant variant,
+            IVariantEffect variantEffect)
         {
             var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant,
                 variant.Behavior.StructuralVariantConsequence);

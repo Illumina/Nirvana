@@ -1,5 +1,4 @@
-﻿using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
+﻿using Intervals;
 
 namespace VariantAnnotation.Sequence
 {

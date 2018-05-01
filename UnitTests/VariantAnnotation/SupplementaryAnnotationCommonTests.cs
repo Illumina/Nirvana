@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Genome;
 using UnitTests.TestUtilities;
 using VariantAnnotation;
-using VariantAnnotation.Interface.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation
@@ -24,10 +24,10 @@ namespace UnitTests.VariantAnnotation
         }
 
 	    [Fact]
-	    public void GetGenomeAssembly_grch37()
+	    public void GetAssembly_grch37()
 	    {
 		    var grch37SaDir = Resources.SaGRCh37("");
-		    var genomeAssembly = SaReaderUtils.GetGenomeAssembly(new List<string> {grch37SaDir});
+		    var genomeAssembly = SaReaderUtils.GetAssembly(new List<string> {grch37SaDir});
 
 			Assert.Equal(GenomeAssembly.GRCh37, genomeAssembly);
 	    }

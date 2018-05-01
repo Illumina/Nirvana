@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genbank;
+using Intervals;
 using OptimizedCore;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.IntermediateIO
 {

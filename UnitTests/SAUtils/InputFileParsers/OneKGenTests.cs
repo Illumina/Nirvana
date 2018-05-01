@@ -2,12 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OneKGen;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
+using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

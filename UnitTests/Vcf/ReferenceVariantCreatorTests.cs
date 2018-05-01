@@ -1,5 +1,5 @@
-﻿using Moq;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using Moq;
 using Vcf.VariantCreator;
 using Xunit;
 

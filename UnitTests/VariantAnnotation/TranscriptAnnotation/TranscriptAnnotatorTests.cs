@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using Genome;
+using Intervals;
 using Moq;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.TranscriptAnnotation;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.TranscriptAnnotation

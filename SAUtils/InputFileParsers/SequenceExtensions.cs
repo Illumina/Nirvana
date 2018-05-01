@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
 
 namespace SAUtils.InputFileParsers
 {
@@ -8,7 +8,6 @@ namespace SAUtils.InputFileParsers
         {
             var expSequence = referenceSequence.Substring(start - 1, end - start + 1);
             return testSequence == expSequence;
-
         }
     }
 }

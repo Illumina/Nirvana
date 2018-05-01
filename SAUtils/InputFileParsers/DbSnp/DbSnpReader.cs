@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.DbSnp
 {
@@ -15,14 +15,11 @@ namespace SAUtils.InputFileParsers.DbSnp
 	    private readonly Stream _stream;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
-
-
         public DbSnpReader(Stream stream, IDictionary<string, IChromosome> refChromDict)
         {
             _stream = stream;
             _refChromDict = refChromDict;
         }
-
 	    
 	    public IEnumerable<DbSnpItem> GetDbSnpItems()
         {

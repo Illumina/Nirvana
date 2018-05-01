@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using Moq;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Vcf;
 using Xunit;
 

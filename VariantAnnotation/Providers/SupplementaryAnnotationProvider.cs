@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Genome;
+using Intervals;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace VariantAnnotation.Providers
 {
 	public sealed class SupplementaryAnnotationProvider : IAnnotationProvider
 	{
 		public string Name { get; }
-		public GenomeAssembly GenomeAssembly => SaReaderUtils.GetGenomeAssembly(_saDirs);
+		public GenomeAssembly Assembly => SaReaderUtils.GetAssembly(_saDirs);
 
 		public IEnumerable<IDataSourceVersion> DataSourceVersions =>
 			SaReaderUtils.GetDataSourceVersions(_saDirs);

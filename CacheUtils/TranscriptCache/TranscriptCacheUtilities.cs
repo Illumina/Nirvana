@@ -2,9 +2,9 @@
 using System.Linq;
 using CacheUtils.Genes.Utilities;
 using CacheUtils.MiniCache;
-using VariantAnnotation.Caches.DataStructures;
+using Genome;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.TranscriptCache
 {

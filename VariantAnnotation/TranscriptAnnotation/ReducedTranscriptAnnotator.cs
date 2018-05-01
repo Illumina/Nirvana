@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using Intervals;
 using VariantAnnotation.AnnotatedPositions.Consequence;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {
@@ -39,7 +39,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 endIndex);
         }
 
-        private static IEnumerable<ConsequenceTag> GetConsequences(ITranscript transcript, IVariant variant,
+        private static IEnumerable<ConsequenceTag> GetConsequences(IInterval transcript, ISimpleVariant variant,
             bool hasGeneFusionAnnotation)
         {
             var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant, true);

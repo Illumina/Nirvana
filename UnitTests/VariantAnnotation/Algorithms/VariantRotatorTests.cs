@@ -1,10 +1,8 @@
-﻿using Moq;
+﻿using Genome;
+using Moq;
 using UnitTests.TestDataStructures;
-using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Algorithms

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using Nirvana;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 using Vcf;
 using Vcf.VariantCreator;
 
@@ -27,7 +27,7 @@ namespace UnitTests.TestUtilities
 	        return annotatedPosition;
 	    }
 
-        private static (Annotator Annotator, IDictionary<string,IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
+        private static (Annotator Annotator, IDictionary<string, IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
         {
             var sequenceFilePath             = cacheFilePrefix + ".bases";
             var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);

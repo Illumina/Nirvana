@@ -1,4 +1,4 @@
-using VariantAnnotation.IO;
+using IO;
 
 namespace VariantAnnotation.Sequence
 {

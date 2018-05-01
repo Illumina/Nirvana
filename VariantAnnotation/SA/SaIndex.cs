@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
+using Intervals;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {

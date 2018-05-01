@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Caches.DataStructures;
+using Intervals;
+using IO;
 
 namespace Jasix.DataStructures
 {

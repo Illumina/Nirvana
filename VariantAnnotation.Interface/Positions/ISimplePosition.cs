@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.Interface.Intervals;
+﻿using Genome;
 
 namespace VariantAnnotation.Interface.Positions
 {

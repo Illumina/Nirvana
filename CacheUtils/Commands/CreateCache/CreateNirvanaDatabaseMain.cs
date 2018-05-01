@@ -13,10 +13,9 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
-using VariantAnnotation.Caches.DataStructures;
+using Genome;
+using Intervals;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
@@ -46,7 +45,7 @@ namespace CacheUtils.Commands.CreateCache
             using (var polyphenReader   = new PredictionReader(GZipUtilities.GetAppropriateReadStream(polyphenPath), refIndexToChromosome, IntermediateIoCommon.FileType.Polyphen))
             using (var geneReader       = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.UniversalGeneFilePath), refNameToChromosome))
             {
-                var genomeAssembly   = transcriptReader.Header.GenomeAssembly;
+                var genomeAssembly   = transcriptReader.Header.Assembly;
                 var source           = transcriptReader.Header.Source;
                 long vepReleaseTicks = transcriptReader.Header.VepReleaseTicks;
                 ushort vepVersion    = transcriptReader.Header.VepVersion;

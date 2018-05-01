@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Genome;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Caches.DataStructures
 {

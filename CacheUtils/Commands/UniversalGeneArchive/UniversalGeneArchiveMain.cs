@@ -13,9 +13,9 @@ using CommandLine.Utilities;
 using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
+using Genome;
 using Microsoft.Extensions.Configuration;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 

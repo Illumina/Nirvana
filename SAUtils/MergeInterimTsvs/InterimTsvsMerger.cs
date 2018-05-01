@@ -5,12 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
 using Compression.Utilities;
+using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -36,7 +36,7 @@ namespace SAUtils.MergeInterimTsvs
             _outputDirectory = outputDirectory;
 
             var refSequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReference));
-            _genomeAssembly         = refSequenceProvider.GenomeAssembly;
+            _genomeAssembly         = refSequenceProvider.Assembly;
             _refNameToChromosome    = refSequenceProvider.RefNameToChromosome;
             
             _tsvReaders      = ReaderUtilities.GetSaTsvReaders(annotationFiles);
@@ -137,7 +137,7 @@ namespace SAUtils.MergeInterimTsvs
         {
             var geneAnnotationDatabasePath = Path.Combine(outputDirectory, SaDataBaseCommon.GeneLevelAnnotationFileName);
             var geneAnnotationStream       = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
-            var databaseHeader             = new SupplementaryAnnotationHeader("", DateTime.Now.Ticks, SaDataBaseCommon.DataVersion, geneHeaders.Select(x => x.GetDataSourceVersion()), assembly);
+            var databaseHeader             = new SupplementaryAnnotationHeader("", geneHeaders.Select(x => x.GetDataSourceVersion()), assembly);
 
             using (var writer = new GeneDatabaseWriter(geneAnnotationStream, databaseHeader))
             {
@@ -187,8 +187,7 @@ namespace SAUtils.MergeInterimTsvs
 
             var ucscRefName = _refNameToChromosome[refName].UcscName;
 
-            var header = new SupplementaryAnnotationHeader(ucscRefName, DateTime.Now.Ticks,
-                SaDataBaseCommon.DataVersion, dataSourceVersions, _genomeAssembly);
+            var header = new SupplementaryAnnotationHeader(ucscRefName, dataSourceVersions, _genomeAssembly);
 
             //we need a list because we will enumerate over it multiple times
             var intervals = MergeUtilities.GetIntervals(_intervalReaders,refName).OrderBy(x => x.Start).ThenBy(x => x.End).ToList();

@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Genome;
 using Moq;
 using VariantAnnotation;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Vcf;
 using Vcf.VariantCreator;
 using Xunit;

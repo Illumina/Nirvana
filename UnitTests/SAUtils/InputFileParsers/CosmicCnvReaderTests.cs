@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using SAUtils.ExtractCosmicSvs;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -19,7 +18,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
-                new Dictionary<string, IChromosome>() {{"W", new Chromosome("chrW", "W", 1)}},
+                new Dictionary<string, IChromosome> {{"W", new Chromosome("chrW", "W", 1)}},
                 GenomeAssembly.GRCh37);
 
             cnvReader.GetColumnIndices(header);
@@ -34,7 +33,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
-                new Dictionary<string, IChromosome>() { { "W", new Chromosome("chrW", "W", 1) } },
+                new Dictionary<string, IChromosome> { { "W", new Chromosome("chrW", "W", 1) } },
                 GenomeAssembly.GRCh37);
 
             Assert.Throws<InvalidDataException>(()=>cnvReader.GetColumnIndices(header));
@@ -46,7 +45,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
-                new Dictionary<string, IChromosome>()
+                new Dictionary<string, IChromosome>
                 {
                     { "17", new Chromosome("chr17", "17", 1) },
                     { "Y", new Chromosome("chrY", "Y", 2) },

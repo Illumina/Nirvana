@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using Intervals;
 
 namespace VariantAnnotation.Sequence
 {
@@ -8,7 +8,7 @@ namespace VariantAnnotation.Sequence
 		#region members
 
 	    public int Length { get; private set; }
-		public GenomeAssembly GenomeAssembly { get; set; }
+		public GenomeAssembly Assembly { get; set; }
 
 	    private int _sequenceOffset;
 		private byte[] _buffer;

@@ -1,5 +1,5 @@
-﻿using CommonUtilities;
-using Moq;
+﻿using Moq;
+using OptimizedCore;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.GeneAnnotation;
 using Xunit;

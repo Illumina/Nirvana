@@ -51,6 +51,16 @@ namespace Jasix
             _jasixIndex.Add(position.Chromosome.EnsemblName, start, end.Value, fileLocation, position.Chromosome.UcscName);
         }
 
+        public bool BeginSection(string sectionName, long fileLocation)
+        {
+            return _jasixIndex.BeginSection(sectionName, fileLocation);
+        }
+
+        public bool EndSection(string sectionName, long fileLocation)
+        {
+            return _jasixIndex.EndSection(sectionName, fileLocation);
+        }
+
         public void Dispose()
         {
             _jasixIndex.Write(_indexStream);

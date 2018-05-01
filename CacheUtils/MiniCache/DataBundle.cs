@@ -1,7 +1,7 @@
 ﻿using Compression.Utilities;
+using Genome;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Sequence;
 using VC = VariantAnnotation.Caches;

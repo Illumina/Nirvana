@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
+using Genome;
+using Intervals;
 using Moq;
 using Phantom.DataStructures;
 using Phantom.Interfaces;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.Phantom.DataStructures

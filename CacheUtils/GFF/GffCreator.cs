@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Intervals;
 using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.GFF
 {

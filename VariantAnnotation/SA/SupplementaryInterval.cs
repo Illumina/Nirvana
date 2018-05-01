@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 using VariantAnnotation.Interface.SA;
 
 namespace VariantAnnotation.SA

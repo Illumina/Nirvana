@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace SAUtils.ExtractCosmicSvs
 {

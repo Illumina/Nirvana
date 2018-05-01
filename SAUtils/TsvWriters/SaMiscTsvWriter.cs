@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using CommonUtilities;
 using Compression.FileHandling;
+using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
@@ -65,7 +65,7 @@ namespace SAUtils.TsvWriters
 
         }
 
-        private static string GetHeader(DataSourceVersion dataSourceVersion, string assembly)
+        private static string GetHeader(IDataSourceVersion dataSourceVersion, string assembly)
         {
             var sb = StringBuilderCache.Acquire();
 

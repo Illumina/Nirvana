@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Intervals;
 using OptimizedCore;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Genbank

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches.DataStructures

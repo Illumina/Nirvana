@@ -1,5 +1,5 @@
 ﻿using System;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.DataStructures
@@ -7,7 +7,7 @@ namespace SAUtils.DataStructures
     public class SaHeader
     {
         protected string Name { get; }
-        public GenomeAssembly GenomeAssembly { get; }
+        public GenomeAssembly Assembly { get; }
         protected string Version { get; }
         protected string ReleaseDate { get; }
         private string Description { get; }
@@ -15,12 +15,11 @@ namespace SAUtils.DataStructures
 
         public SaHeader(string name, string assembly, string version, string releaseDate, string description)
         {
-            Name = name;
-            GenomeAssembly = GenomeAssemblyHelper.Convert(assembly);
-            Version = version;
+            Name        = name;
+            Assembly    = GenomeAssemblyHelper.Convert(assembly);
+            Version     = version;
             Description = description;
             ReleaseDate = releaseDate;
-
         }
 
         public DataSourceVersion GetDataSourceVersion()

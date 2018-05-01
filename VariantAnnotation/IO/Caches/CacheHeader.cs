@@ -9,7 +9,7 @@ namespace VariantAnnotation.IO.Caches
 
         public CacheHeader(Header header, TranscriptCacheCustomHeader customHeader) : base(header.Identifier,
             header.SchemaVersion, header.DataVersion, header.Source, header.CreationTimeTicks,
-            header.GenomeAssembly)
+            header.Assembly)
         {
             Custom = customHeader;
         }

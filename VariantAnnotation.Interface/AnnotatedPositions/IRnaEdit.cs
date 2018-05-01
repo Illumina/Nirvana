@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
+﻿using Intervals;
+using IO;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {

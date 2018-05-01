@@ -4,11 +4,11 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using CommandLine.Utilities;
-using CommonUtilities;
 using Compression.FileHandling;
 using Compression.Utilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils
 {
@@ -24,13 +24,13 @@ namespace SAUtils
         public static string ReverseSaReducedAllele(string saAltAllele, string emptyAllele = "-")
         {
             if (saAltAllele == null) return null;
-            if (saAltAllele.All(Char.IsDigit)) return emptyAllele; // this was a deletion
+            if (saAltAllele.All(char.IsDigit)) return emptyAllele; // this was a deletion
 
             int firstBaseIndex;
             for (firstBaseIndex = 0; firstBaseIndex < saAltAllele.Length; firstBaseIndex++)
             {
                 if (saAltAllele[firstBaseIndex] != 'i' && saAltAllele[firstBaseIndex] != '<' &&
-                    !Char.IsDigit(saAltAllele[firstBaseIndex]))
+                    !char.IsDigit(saAltAllele[firstBaseIndex]))
                     break;
             }
 
@@ -151,11 +151,11 @@ namespace SAUtils
             altAllele = trimmedTuple.AltAllele;
 
             // we have detected a deletion after trimming
-            if (String.IsNullOrEmpty(altAllele))
+            if (string.IsNullOrEmpty(altAllele))
                 return (start, refAllele, refAllele.Length.ToString(CultureInfo.InvariantCulture));
 
             // we have an insertion and we indicate that with an i at the beginning
-            if (String.IsNullOrEmpty(refAllele))
+            if (string.IsNullOrEmpty(refAllele))
                 return (start, refAllele, 'i' + altAllele);
 
             if (refAllele.Length == altAllele.Length) //SNV or CNV
@@ -169,11 +169,11 @@ namespace SAUtils
 
         private static bool NeedsReduction(string refAllele, string altAllele)
         {
-            if (String.IsNullOrEmpty(altAllele)) return true;
+            if (string.IsNullOrEmpty(altAllele)) return true;
 
-            if (!String.IsNullOrEmpty(refAllele) && altAllele.All(x => x == 'N')) return false;
+            if (!string.IsNullOrEmpty(refAllele) && altAllele.All(x => x == 'N')) return false;
 
-            return !(altAllele[0] == 'i' || altAllele[0] == '<' || Char.IsDigit(altAllele[0]));
+            return !(altAllele[0] == 'i' || altAllele[0] == '<' || char.IsDigit(altAllele[0]));
         }
 
         public static string ConvertToVcfInfoString(string s)

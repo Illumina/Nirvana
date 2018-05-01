@@ -1,7 +1,7 @@
 ﻿using System;
 using CommandLine.Utilities;
+using Genome;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation
 {

@@ -1,5 +1,4 @@
-﻿using VariantAnnotation.Algorithms;
-using Xunit;
+﻿using Xunit;
 
 namespace UnitTests.VariantAnnotation.Algorithms
 {
@@ -14,7 +13,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         [InlineData(5, 10, 1, 7, true)]
         public void Overlaps_Theory(int start1, int end1, int start2, int end2, bool expectedResult)
         {
-            var observedResult = IntervalUtilities.Overlaps(start1, end1, start2, end2);
+            var observedResult = Intervals.Utilities.Overlaps(start1, end1, start2, end2);
             Assert.Equal(expectedResult, observedResult);
         }
 
@@ -27,7 +26,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         [InlineData(5, 10, 1, 7, false)]
         public void Contains_Theory(int start1, int end1, int start2, int end2, bool expectedResult)
         {
-            var observedResult = IntervalUtilities.Contains(start1, end1, start2, end2);
+            var observedResult = Intervals.Utilities.Contains(start1, end1, start2, end2);
             Assert.Equal(expectedResult, observedResult);
         }
     }

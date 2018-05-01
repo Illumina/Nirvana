@@ -27,44 +27,6 @@ namespace Jasix
 
         #endregion
 
-        #region IDisposable
-
-        private bool _disposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.
-                _reader.Dispose();
-                _writeStream.Flush();
-                _writeStream.Dispose();
-            }
-
-            // Free any unmanaged objects here.
-            //
-            _disposed = true;
-            // Free any other managed objects here.
-
-        }
-        #endregion
-
         public IndexCreator(BlockGZipStream readStream, Stream writeStream)
         {
             _reader              = new BgzipTextReader(readStream);
@@ -177,6 +139,13 @@ namespace Jasix
 			var end = Utilities.GetJsonEntryEnd(jsonEntry);
 
             return (jsonEntry.chromosome, jsonEntry.position, end);
+        }
+
+        public void Dispose()
+        {
+            _writeStream.Flush();
+            _reader.Dispose();
+            _writeStream.Dispose();
         }
     }
 }

@@ -49,7 +49,7 @@ namespace SAUtils.MergeInterimTsvs
 
         public static void CheckAssemblyConsistancy(IEnumerable<SaHeader> saHeaders)
         {
-            var uniqueAssemblies = saHeaders.Select(x => x.GenomeAssembly)
+            var uniqueAssemblies = saHeaders.Select(x => x.Assembly)
                 .Where(x => !InterimTsvsMerger.AssembliesIgnoredInConsistancyCheck.Contains(x))
                 .Distinct()
                 .ToList();

@@ -1,11 +1,10 @@
-﻿using Moq;
-using VariantAnnotation.Algorithms;
+﻿using Genome;
+using Intervals;
+using Moq;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Sequence;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
@@ -14,7 +13,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
     {
         private readonly Mock<ITranscript> _forwardTranscript; // use info from "ENST00000455979.1" with modification
         private readonly Mock<ITranscript> _reverseTranscript; // use info from "ENST00000385042"
-        private readonly ITranscriptRegion[] _forwardTranscriptRegions;
         private readonly ITranscriptRegion[] _otherTranscriptRegions;
 
         public TranscriptPositionalEffectTests()
@@ -32,7 +30,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new TranscriptRegion(TranscriptRegionType.Exon, 3, 710, 800, 350, 465)
             };
 
-            _forwardTranscriptRegions = new ITranscriptRegion[]
+            var forwardTranscriptRegions = new ITranscriptRegion[]
             {
                 new TranscriptRegion(TranscriptRegionType.Exon, 1, 874655, 874840, 1, 186),
                 new TranscriptRegion(TranscriptRegionType.Intron, 1, 874841, 876523, 186, 187),
@@ -65,7 +63,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             _forwardTranscript.SetupGet(x => x.Start).Returns(start);
             _forwardTranscript.SetupGet(x => x.End).Returns(end);
             _forwardTranscript.SetupGet(x => x.Gene).Returns(gene.Object);
-            _forwardTranscript.SetupGet(x => x.TranscriptRegions).Returns(_forwardTranscriptRegions);
+            _forwardTranscript.SetupGet(x => x.TranscriptRegions).Returns(forwardTranscriptRegions);
             _forwardTranscript.SetupGet(x => x.Translation).Returns(translation.Object);
             _forwardTranscript.SetupGet(x => x.TotalExonLength).Returns(1731);
 

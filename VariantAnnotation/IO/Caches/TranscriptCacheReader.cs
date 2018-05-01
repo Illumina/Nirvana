@@ -5,11 +5,11 @@ using System.IO.Compression;
 using System.Text;
 using Compression.Algorithms;
 using Compression.FileHandling;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.IO.Caches
 {
@@ -34,7 +34,7 @@ namespace VariantAnnotation.IO.Caches
         {
             var genes             = ReadItems(_reader,     () => Gene.Read(_reader, refIndexToChromosome));
             var transcriptRegions = ReadItems(_reader,     () => TranscriptRegion.Read(_reader));
-            var mirnas            = ReadItems(_reader,     () => Interval.Read(_reader));
+            var mirnas            = ReadItems(_reader,     () => IntervalExtensions.Read(_reader));
             var peptideSeqs       = ReadItems(_reader,     () => _reader.ReadAsciiString());
             var regulatoryRegions = ReadIntervals(_reader, () => RegulatoryRegion.Read(_reader, refIndexToChromosome));
             var transcripts       = ReadIntervals(_reader, () => Transcript.Read(_reader, refIndexToChromosome, genes, transcriptRegions, mirnas, peptideSeqs));

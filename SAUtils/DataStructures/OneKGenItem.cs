@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonUtilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
@@ -145,7 +145,7 @@ namespace SAUtils.DataStructures
             var stringValues = new Dictionary<string, string>();
             var boolValues   = new List<string>();
 
-            var suppInterval = new SupplementaryIntervalItem(Chromosome,Start, SvEnd, AlternateAllele, seqAltType,
+            var suppInterval = new SupplementaryIntervalItem(Chromosome,Start, SvEnd, seqAltType,
                 "1000 Genomes Project", intValues, doubleValues, freqValues, stringValues, boolValues);
 
             if (Id != null) suppInterval.AddStringValue("id", Id);

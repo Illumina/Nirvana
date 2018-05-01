@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.IO;
+﻿using IO;
+using VariantAnnotation.Interface.GeneAnnotation;
 
 namespace VariantAnnotation.GeneAnnotation
 {

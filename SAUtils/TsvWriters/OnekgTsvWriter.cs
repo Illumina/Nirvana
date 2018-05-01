@@ -1,57 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
 namespace SAUtils.TsvWriters
 {
-	public sealed class OnekgTsvWriter:ISaItemTsvWriter
-	{
+    public sealed class OnekgTsvWriter : ISaItemTsvWriter
+    {
 		#region members
 		private readonly SaTsvWriter _onekgWriter;
 		private readonly SaMiscTsvWriter _refMinorWriter;
 		#endregion
 
-		#region IDisposable
-
-	    private bool _disposed;
-
-		/// <summary>
-		/// public implementation of Dispose pattern callable by consumers. 
-		/// </summary>
-		public void Dispose()
-		{
-			Dispose(true);
-			GC.SuppressFinalize(this);
-		}
-
-		
-		/// <summary>
-		/// protected implementation of Dispose pattern. 
-		/// </summary>
-		private void Dispose(bool disposing)
-		{
-			if (_disposed)
-				return;
-
-			if (disposing)
-			{
-				// Free any other managed objects here.
-				_onekgWriter.Dispose();
-				_refMinorWriter.Dispose();
-			}
-
-			// Free any unmanaged objects here.
-			//
-			_disposed = true;
-			// Free any other managed objects here.
-
-		}
-		#endregion
 
 		public OnekgTsvWriter(DataSourceVersion version, string outputDirectory, GenomeAssembly genomeAssembly, ISequenceProvider sequenceProvider)
 		{
@@ -129,5 +93,11 @@ namespace SAUtils.TsvWriters
 			allele = allele.ToUpper();
 			return allele == "A" || allele == "C" || allele == "G" || allele == "T";
 		}
+
+        public void Dispose()
+        {
+            _onekgWriter.Dispose();
+            _refMinorWriter.Dispose();
+        }
     }
 }

@@ -2,9 +2,8 @@
 using System.Text;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Interface.IO;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {

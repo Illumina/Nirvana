@@ -12,7 +12,7 @@ namespace VariantAnnotation.IO.Caches
 
         public PredictionHeader(Header header, PredictionCacheCustomHeader customHeader, Prediction.Entry[] lookupTable)
             : base(header.Identifier, header.SchemaVersion, header.DataVersion, header.Source,
-                header.CreationTimeTicks, header.GenomeAssembly)
+                header.CreationTimeTicks, header.Assembly)
         {
             Custom      = customHeader;
             LookupTable = lookupTable;

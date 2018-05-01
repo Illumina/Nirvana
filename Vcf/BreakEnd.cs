@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using Variants;
 
 namespace Vcf
 {

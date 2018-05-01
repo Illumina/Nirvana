@@ -41,7 +41,7 @@ namespace VariantAnnotation.IO.Caches
         public IPredictionCache Read(ushort refIndex)
         {
             var predictions = GetPredictions(refIndex);
-            return new PredictionCache(Header.GenomeAssembly, predictions, _predictionDescriptions);
+            return new PredictionCache(Header.Assembly, predictions, _predictionDescriptions);
         }
 
         public Prediction[] GetPredictions(ushort refIndex)

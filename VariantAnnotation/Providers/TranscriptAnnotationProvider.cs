@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonUtilities;
 using Compression.Utilities;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Algorithms;
+using Genome;
+using Intervals;
+using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.TranscriptAnnotation;
+using Variants;
 
 namespace VariantAnnotation.Providers
 {
@@ -25,7 +25,7 @@ namespace VariantAnnotation.Providers
         private readonly ISequence _sequence;
 
 	    public string Name { get; }
-	    public GenomeAssembly GenomeAssembly { get; }
+	    public GenomeAssembly Assembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
         public ushort VepVersion { get; }
 
@@ -41,9 +41,9 @@ namespace VariantAnnotation.Providers
             _sequence = sequenceProvider.Sequence;
 
             (_transcriptCache, VepVersion) = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)),
-                sequenceProvider.RefIndexToChromosome, sequenceProvider.GenomeAssembly);
+                sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
 
-            GenomeAssembly     = _transcriptCache.GenomeAssembly;
+            Assembly           = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
             _siftReader     = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(pathPrefix)),     PredictionCacheReader.SiftDescriptions);
@@ -51,7 +51,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static (TranscriptCache cache, ushort vepVersion) InitiateCache(Stream stream,
-            IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refGenomeAssembly)
+            IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refAssembly)
         {
             TranscriptCache cache;
             ushort vepVersion;
@@ -59,30 +59,29 @@ namespace VariantAnnotation.Providers
             using (var reader = new TranscriptCacheReader(stream))
             {
                 vepVersion = reader.Header.Custom.VepVersion;
-                CheckHeaderVersion(reader.Header, refGenomeAssembly);
+                CheckHeaderVersion(reader.Header, refAssembly);
                 cache = reader.Read(refIndexToChromosome).GetCache();
             }
 
             return (cache, vepVersion);
         }
 
-        private static void CheckHeaderVersion(CacheHeader header, GenomeAssembly refGenomeAssembly)
-
+        private static void CheckHeaderVersion(Header header, GenomeAssembly refAssembly)
         {
-            if (header.GenomeAssembly != refGenomeAssembly)
-                throw new UserErrorException(GetGenomeAssemblyErrorMessage(header.GenomeAssembly, refGenomeAssembly));
+            if (header.Assembly != refAssembly)
+                throw new UserErrorException(GetAssemblyErrorMessage(header.Assembly, refAssembly));
 
             if (header.SchemaVersion != CacheConstants.SchemaVersion)
                 throw new UserErrorException(
                     $"Expected the cache schema version ({CacheConstants.SchemaVersion}) to be identical to the schema version in the cache header ({header.SchemaVersion})");
         }
 
-        private static string GetGenomeAssemblyErrorMessage(GenomeAssembly cacheGenomeAssembly, GenomeAssembly refGenomeAssembly)
+        private static string GetAssemblyErrorMessage(GenomeAssembly cacheAssembly, GenomeAssembly refAssembly)
         {
             var sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
-            sb.AppendLine($"- Using {refGenomeAssembly}: Reference sequence provider");
-            sb.AppendLine($"- Using {cacheGenomeAssembly}: Transcript annotation provider");
+            sb.AppendLine($"- Using {refAssembly}: Reference sequence provider");
+            sb.AppendLine($"- Using {cacheAssembly}: Transcript annotation provider");
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 

@@ -1,6 +1,6 @@
 ﻿using System.IO;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 using VariantAnnotation.SA;
 using Xunit;
 

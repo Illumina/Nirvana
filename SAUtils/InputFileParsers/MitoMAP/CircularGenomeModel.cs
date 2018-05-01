@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 
-namespace SAUtils.InputFileParsers.MitoMap
+namespace SAUtils.InputFileParsers.MitoMAP
 {
     public sealed class CircularGenomeModel
     {
@@ -13,9 +13,6 @@ namespace SAUtils.InputFileParsers.MitoMap
             _compressedSequence = compressedSequence;
             _genomeLength = compressedSequence.Length;
         }
-
-        // convert an interval on the circular genome position into that on a linear pseudogenome, where the end point may be bigger than the genome length 
-        private (int, int) CircularToPseudo((int, int) interval) => ( interval.Item1, interval.Item2 >= interval.Item1 ? interval.Item2 : interval.Item2 + _genomeLength);
 
         // convert linear pseudogenome position back to the circular genome position 
         private (int, int) PseudoToCircular((int, int) interval) =>  (GetCircularPosition(interval.Item1), GetCircularPosition(interval.Item2));

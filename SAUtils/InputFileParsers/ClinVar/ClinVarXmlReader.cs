@@ -5,9 +5,9 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Compression.Utilities;
+using Genome;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
@@ -498,7 +498,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		    foreach (var element in xElement.Elements(SeqLocationTag))
             {
-		        var variant = GetClinvarVariant(element, _sequenceProvider.GenomeAssembly, _refChromDict);
+		        var variant = GetClinvarVariant(element, _sequenceProvider.Assembly, _refChromDict);
 
 		        if (variant == null) continue;
 
@@ -557,8 +557,8 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string RefAlleleTag = "referenceAllele";
         private const string AltAlleleTag = "alternateAllele";
 
-        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly,IDictionary<string,IChromosome> refChromDict)
-		{
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
+        {
 		    if (xElement == null ) return null;//|| xElement.IsEmpty) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
 

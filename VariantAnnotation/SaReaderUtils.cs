@@ -4,11 +4,11 @@ using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using ErrorHandling.Exceptions;
+using Genome;
+using IO;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -85,7 +85,7 @@ namespace VariantAnnotation
         }
 
 
-        public static GenomeAssembly GetGenomeAssembly(List<string> saDirs)
+        public static GenomeAssembly GetAssembly(List<string> saDirs)
         {
             if (saDirs == null || saDirs.Count == 0) return GenomeAssembly.Unknown;
 
@@ -114,7 +114,7 @@ namespace VariantAnnotation
 			var assemblies = new HashSet<GenomeAssembly>();
 		    foreach (var saFile in saFiles)
 		    {
-			    assemblies.Add(GetHeader(saFile).GenomeAssembly);
+			    assemblies.Add(GetHeader(saFile).Assembly);
 		    }
 		    return assemblies;
 	    }

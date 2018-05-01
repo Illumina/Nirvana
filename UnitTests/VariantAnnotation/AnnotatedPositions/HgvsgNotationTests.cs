@@ -1,16 +1,16 @@
-﻿using UnitTests.TestDataStructures;
+﻿using Genome;
+using Intervals;
+using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions
 {
-    public class HgvsgNotationTests
+    public sealed class HgvsgNotationTests
     {
-        private static ISequence _simpleSequence = new SimpleSequence("ATCGGTGCTGACGATACCTGACGTAAGTA");
-        private IInterval _referenceInterval = new Interval(0, _simpleSequence.Length);
+        private static readonly ISequence SimpleSequence = new SimpleSequence("ATCGGTGCTGACGATACCTGACGTAAGTA");
+        private readonly IInterval _referenceInterval = new Interval(0, SimpleSequence.Length);
         private const string ReferenceAssertion = "NC_012920.1";
 
         [Theory]
@@ -24,7 +24,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetNotation_tests(int start,int end,string referenceAllele,string altAllele, VariantType type, string expectedHgvsg)
         {
             var simpleVariant = new SimpleVariant(null,start,end,referenceAllele,altAllele,type);
-            var observedHgvsg = HgvsgNotation.GetNotation(ReferenceAssertion, simpleVariant, _simpleSequence, _referenceInterval);
+            var observedHgvsg = HgvsgNotation.GetNotation(ReferenceAssertion, simpleVariant, SimpleSequence, _referenceInterval);
             Assert.Equal(expectedHgvsg,observedHgvsg);
         }
     }

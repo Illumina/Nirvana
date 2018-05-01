@@ -1,11 +1,10 @@
-﻿using Moq;
+﻿using Genome;
+using Intervals;
+using Moq;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.Interface.Positions;
+using Variants;
 using Xunit;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 {

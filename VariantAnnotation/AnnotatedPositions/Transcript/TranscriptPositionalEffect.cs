@@ -1,8 +1,7 @@
 ﻿using System.Linq;
-using VariantAnnotation.Algorithms;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
@@ -124,12 +123,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 transcript.BioType == BioType.miRNA);
         }
 
-        private static bool HasExonRegionOverlap(ITranscriptRegion region, IInterval variant)
-        {
-            if (region == null || region.Type != TranscriptRegionType.Exon) return false;
-            return region.Overlaps(variant);
-        }
-
         internal static bool IsMatureMirnaVariant(int cdnaStart, int cdnaEnd, IInterval[] microRnas, bool isMiRna)
         {
             if (microRnas == null) return false;
@@ -145,7 +138,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 return true;
             }
 
-            var result = IntervalUtilities.Overlaps(variantRefBegin, variantRefEnd, codingRegionEnd + 1, transcriptEnd);
+            var result = Intervals.Utilities.Overlaps(variantRefBegin, variantRefEnd, codingRegionEnd + 1, transcriptEnd);
 
             return result;
         }
@@ -155,7 +148,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             // special case to handle insertions before the CDS start
             if (variantRefBegin == variantRefEnd + 1 && variantRefBegin == codingRegionStart) return true;
 
-            bool result = IntervalUtilities.Overlaps(variantRefBegin, variantRefEnd, transcriptStart, codingRegionStart - 1);
+            bool result = Intervals.Utilities.Overlaps(variantRefBegin, variantRefEnd, transcriptStart, codingRegionStart - 1);
             return result;
         }
 

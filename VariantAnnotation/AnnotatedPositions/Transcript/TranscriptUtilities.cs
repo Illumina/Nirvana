@@ -1,7 +1,6 @@
-﻿using CommonUtilities;
+﻿using Genome;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {

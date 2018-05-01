@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.Cosmic
 {
@@ -133,7 +133,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             return sites;
         }
 
-        private void TryAddValue(string value, HashSet<string> sites)
+        private static void TryAddValue(string value, HashSet<string> sites)
         {
            if (!string.IsNullOrEmpty(value) && value != "NS")
                 sites.Add(value);

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
+using Genome;
+using IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
@@ -33,8 +33,6 @@ namespace VariantAnnotation.PhyloP
         private readonly short[] _scores;
         private int _scoreCount;
         private byte[] _scoreBytes;
-
-        private bool IsInitialized { get; set; }
 
         private string _currentReferenceName;
 
@@ -74,7 +72,7 @@ namespace VariantAnnotation.PhyloP
         }
         #endregion
 
-        public GenomeAssembly GenomeAssembly => PhylopCommon.GetGenomeAssembly(_saDirectory);
+        public GenomeAssembly Assembly => PhylopCommon.GetAssembly(_saDirectory);
 
         public IEnumerable<IDataSourceVersion> DataSourceVersions => PhylopCommon.GetDataSourceVersions(_saDirectory);
 
@@ -125,7 +123,6 @@ namespace VariantAnnotation.PhyloP
 
         public void LoadChromosome(string ucscReferenceName)
         {
-            IsInitialized = false;
             if (_saDirectory == null || ucscReferenceName == _currentReferenceName) return;
             _currentReferenceName = ucscReferenceName;
 
@@ -170,7 +167,6 @@ namespace VariantAnnotation.PhyloP
             CheckGuard();
 
             LoadChromosomeIntervals();
-            IsInitialized = true;
         }
 
         public IDataSourceVersion GetDataSourceVersion()
@@ -178,7 +174,7 @@ namespace VariantAnnotation.PhyloP
             return _version;
         }
 
-        public GenomeAssembly GetGenomeAssembly()
+        public GenomeAssembly GetAssembly()
         {
             return _genomeAssembly;
         }

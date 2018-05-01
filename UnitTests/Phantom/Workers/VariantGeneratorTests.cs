@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Genome;
 using Moq;
 using Phantom.DataStructures;
 using Phantom.Utilities;
@@ -7,8 +8,6 @@ using Phantom.Workers;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Vcf;
 using Xunit;
 

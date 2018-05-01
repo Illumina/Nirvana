@@ -1,6 +1,5 @@
-﻿using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
+﻿using IO;
+using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.Caches.DataStructures
 {

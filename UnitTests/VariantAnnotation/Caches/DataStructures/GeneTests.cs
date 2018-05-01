@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Genome;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches.DataStructures

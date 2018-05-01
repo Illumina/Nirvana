@@ -56,7 +56,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 
             return header;
         }
-        private IntervalAnnotationHeader ReadHeader(StreamReader reader)
+        private IntervalAnnotationHeader ReadHeader(TextReader reader)
         {
             string line;
             while ((line = reader.ReadLine()) != null)

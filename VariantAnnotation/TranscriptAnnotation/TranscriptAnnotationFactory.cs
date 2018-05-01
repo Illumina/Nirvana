@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Algorithms;
+using Genome;
+using Intervals;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {

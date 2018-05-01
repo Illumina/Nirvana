@@ -1,6 +1,6 @@
-﻿using Moq;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using Moq;
+using Variants;
 using Vcf.VariantCreator;
 using Xunit;
 
@@ -30,7 +30,6 @@ namespace UnitTests.Vcf
             Assert.False(variant.IsDecomposed);
             Assert.False(variant.IsRecomposed);
             Assert.Null(variant.LinkedVids);
-
         }
 
 

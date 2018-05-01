@@ -7,17 +7,16 @@ using ErrorHandling.Exceptions;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Providers;
+using Variants;
 
-namespace SAUtils.InputFileParsers.MitoMap
+namespace SAUtils.InputFileParsers.MitoMAP
 {
     public sealed class MitoMapSvReader
     {
         private readonly FileInfo _mitoMapFileInfo;
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
-        private readonly CircularGenomeModel _mitoGenomeModel;
         private readonly VariantAligner _variantAligner;
 
 
@@ -32,7 +31,6 @@ namespace SAUtils.InputFileParsers.MitoMap
             _mitoMapFileInfo = mitoMapFileInfo;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
-            _mitoGenomeModel = new CircularGenomeModel(sequenceProvider.Sequence);
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
         }
 

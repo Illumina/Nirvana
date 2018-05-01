@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using VariantAnnotation.IO;
+using IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO

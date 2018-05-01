@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Text;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches.DataStructures

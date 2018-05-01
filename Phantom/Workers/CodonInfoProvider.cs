@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Intervals;
 using Phantom.Interfaces;
 using Phantom.Utilities;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
 
 namespace Phantom.Workers
@@ -62,7 +61,7 @@ namespace Phantom.Workers
                 }
                 var allUniqueCodonBlocks = new List<ICodonBlock>();
                 geneList.ForEach(x => allUniqueCodonBlocks.AddRange(GetUniqueCodonBlocks(geneToCodonBlocks[x])));
-                codonBlockIntervalArrays[chrIndex] = new IntervalArray<ICodonBlock>(allUniqueCodonBlocks.Select(GetCodonBlockInterval).ToArray<Interval<ICodonBlock>>());
+                codonBlockIntervalArrays[chrIndex] = new IntervalArray<ICodonBlock>(allUniqueCodonBlocks.Select(GetCodonBlockInterval).ToArray());
             }
             return codonBlockIntervalArrays;
         }

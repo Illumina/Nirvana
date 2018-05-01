@@ -12,7 +12,7 @@ namespace UnitTests.CommandLine.Builders
         private static ExitCodes Execute(IConsoleAppValidator validator)
         {
             return validator
-                .DisableOutput(true)
+                .DisableOutput()
                 .ShowBanner("authors")
                 .ShowHelpMenu("description", "example")
                 .ShowErrors()

@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using Compression.Algorithms;
 using Compression.Utilities;
+using Genome;
+using IO;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 

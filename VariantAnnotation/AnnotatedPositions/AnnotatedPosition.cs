@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {

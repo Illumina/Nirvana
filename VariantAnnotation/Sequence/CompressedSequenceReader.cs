@@ -4,10 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
+using Genome;
+using Intervals;
+using IO;
 
 namespace VariantAnnotation.Sequence
 {
@@ -24,7 +23,7 @@ namespace VariantAnnotation.Sequence
         private readonly ExtendedBinaryReader _reader;
         private readonly Stream _stream;
         public readonly CompressedSequence Sequence;
-        public GenomeAssembly Assembly => Sequence.GenomeAssembly;
+        public GenomeAssembly Assembly => Sequence.Assembly;
 
         private readonly Dictionary<string, int> _nameToIndex         = new Dictionary<string, int>();
         private readonly List<SequenceIndexEntry> _refSeqIndex        = new List<SequenceIndexEntry>();
@@ -32,8 +31,7 @@ namespace VariantAnnotation.Sequence
 
         private long _dataStartOffset;
         private long _indexOffset;
-        public ushort NumRefSeqs { get; private set; }
-        public const ushort UnknownReferenceIndex = ushort.MaxValue;
+        public ushort NumRefSeqs { get; private set; }        
 
         // ReSharper disable once NotAccessedField.Local
         private long _maskedIntervalsOffset;
@@ -129,10 +127,10 @@ namespace VariantAnnotation.Sequence
             }
 
             // read the cytogenetic bands
-            CytogeneticBands = VariantAnnotation.Sequence.CytogeneticBands.Read(_reader);
+            CytogeneticBands = Genome.CytogeneticBands.Read(_reader);
 
             // read the genome assembly
-            Sequence.GenomeAssembly = (GenomeAssembly)_reader.ReadByte();
+            Sequence.Assembly = (GenomeAssembly)_reader.ReadByte();
 
             // grab the data start tag
             ulong dataStartTag = _reader.ReadUInt64();

@@ -1,4 +1,4 @@
-﻿using CommonUtilities;
+﻿using OptimizedCore;
 using VariantAnnotation.Interface.Positions;
 
 namespace VariantAnnotation.IO

@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonUtilities;
-using VariantAnnotation.Interface.Positions;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
-using VariantAnnotation.Sequence;
+using Variants;
 
 namespace SAUtils.DataStructures
 {
@@ -35,13 +35,13 @@ namespace SAUtils.DataStructures
     public sealed class MitoMapItem : SupplementaryDataItem
     {
         private readonly List<string> _diseases;
-        private bool? _homoplasmy;
-        private bool? _heteroplasmy;
+        private readonly bool? _homoplasmy;
+        private readonly bool? _heteroplasmy;
         private readonly string _status;
         private readonly string _clinicalSignificance;
         private readonly string _scorePercentile;
-        private int? _intervalEnd;
-        private VariantType? _variantType;
+        private readonly int? _intervalEnd;
+        private readonly VariantType? _variantType;
         private static readonly Chromosome ChromM = new Chromosome("chrM", "MT", 24);
 
         public MitoMapItem(int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType, ISequenceProvider sequenceProvider)
@@ -68,22 +68,21 @@ namespace SAUtils.DataStructures
             _variantType = variantType;
         }
 
-        private (int, string, string) TryAddPaddingBase(string refAllele, string altAllele, int position, ISequenceProvider sequenceProvider)
+        private static (int, string, string) TryAddPaddingBase(string refAllele, string altAllele, int position, ISequenceProvider sequenceProvider)
         {
             // insertion
             if (IsEmptyOrDash(refAllele)) return AddPaddingBase(altAllele, true, position, sequenceProvider);
             // deletion
-            if (IsEmptyOrDash(altAllele)) return AddPaddingBase(refAllele, false, position, sequenceProvider);
-            return (position, refAllele, altAllele);
+            return IsEmptyOrDash(altAllele) ? AddPaddingBase(refAllele, false, position, sequenceProvider) : (position, refAllele, altAllele);
         }
 
-        private (int, string, string) AddPaddingBase(string allele, bool isInsertion, int position, ISequenceProvider sequenceProvider)
+        private static (int, string, string) AddPaddingBase(string allele, bool isInsertion, int position, ISequenceProvider sequenceProvider)
         {
             string paddingBase = sequenceProvider.Sequence.Substring(position - 2, 1);
             return isInsertion ? (position - 1, paddingBase, paddingBase + allele) : (position - 1, paddingBase + allele, paddingBase);
         }
 
-        private bool IsEmptyOrDash(string allele) => string.IsNullOrEmpty(allele) || allele == "-";
+        private static bool IsEmptyOrDash(string allele) => string.IsNullOrEmpty(allele) || allele == "-";
 
         public string GetVariantJsonString()
         {
@@ -114,7 +113,7 @@ namespace SAUtils.DataStructures
             var stringValues = new Dictionary<string, string>();
             var boolValues = new List<string>();
 
-            var suppInterval = new SupplementaryIntervalItem(Chromosome, Start, _intervalEnd.Value, null, _variantType.Value,
+            var suppInterval = new SupplementaryIntervalItem(Chromosome, Start, _intervalEnd.Value, _variantType.Value,
                 InterimSaCommon.MitoMapTag, intValues, doubleValues, freqValues, stringValues, boolValues);
             return suppInterval;
         }

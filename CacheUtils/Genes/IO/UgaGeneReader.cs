@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using CacheUtils.Genes.DataStructures;
-using CommonUtilities;
+using Genome;
+using Intervals;
 using OptimizedCore;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
 {

@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using IO;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneAnnotation
@@ -42,8 +42,7 @@ namespace VariantAnnotation.GeneAnnotation
         {
             writer.Write(GeneName);
             writer.WriteOpt(Annotations.Length);
-            for (int i = 0; i < Annotations.Length; i++)
-                Annotations[i].Write(writer);
+            foreach (IGeneAnnotationSource geneSource in Annotations) geneSource.Write(writer);
         }
 
         public static IAnnotatedGene Read(IExtendedBinaryReader reader)

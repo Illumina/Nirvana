@@ -3,8 +3,8 @@ using System.Text;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.Import;
 using CacheUtils.DataDumperImport.IO;
+using Genome;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.CacheUtils.DataDumperImport.Import

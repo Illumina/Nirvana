@@ -5,7 +5,7 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.DataStores;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.Utilities;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace CacheUtils.Genes
 {

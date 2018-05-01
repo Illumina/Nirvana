@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.TOPMed
 {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Intervals;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
 using OptimizedCore;
-using VariantAnnotation.Algorithms;
+using Utilities = Jasix.DataStructures.Utilities;
 
 namespace Jasix
 {

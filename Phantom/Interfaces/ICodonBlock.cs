@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.Intervals;
+﻿
+using Genome;
 
 namespace Phantom.Interfaces
 {

@@ -9,11 +9,10 @@ using Compression.DataStructures;
 using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling.Exceptions;
+using Genome;
+using IO;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using Xunit;
 
@@ -22,7 +21,7 @@ namespace UnitTests.Compression.FileHandling
     public sealed class BlockStreamTests : RandomFileBase
     {
         private const long NumTicks                         = 3;
-        private const GenomeAssembly ExpectedGenomeAssembly = GenomeAssembly.hg19;
+        private const GenomeAssembly ExpectedAssembly = GenomeAssembly.hg19;
         private const string SmallString                    = "Testing 123";
         private const string FinalString                    = "Squeamish Ossifrage";
 
@@ -36,7 +35,7 @@ namespace UnitTests.Compression.FileHandling
 
             var customHeader = new DemoCustomHeader(new BlockStream.BlockPosition());
             var header = new DemoHeader(CacheConstants.Identifier, CacheConstants.SchemaVersion,
-                CacheConstants.DataVersion, Source.Ensembl, NumTicks, ExpectedGenomeAssembly, customHeader);
+                CacheConstants.DataVersion, Source.Ensembl, NumTicks, ExpectedAssembly, customHeader);
 
             using (var ms = new MemoryStream())
             {                
@@ -64,7 +63,7 @@ namespace UnitTests.Compression.FileHandling
         {
             // grab the header
             var header = DemoHeader.Read(ms);
-            Assert.Equal(ExpectedGenomeAssembly, header.GenomeAssembly);
+            Assert.Equal(ExpectedAssembly, header.Assembly);
 
             using (var blockStream  = new BlockStream(compressionAlgorithm, ms, CompressionMode.Decompress))
             using (var reader = new ExtendedBinaryReader(blockStream))
@@ -311,7 +310,7 @@ namespace UnitTests.Compression.FileHandling
                 var customHeader = DemoCustomHeader.Read(reader);
 
                 header = new DemoHeader(baseHeader.Identifier, baseHeader.SchemaVersion, baseHeader.DataVersion,
-                    baseHeader.Source, baseHeader.CreationTimeTicks, baseHeader.GenomeAssembly, customHeader);
+                    baseHeader.Source, baseHeader.CreationTimeTicks, baseHeader.Assembly, customHeader);
             }
 
             return header;

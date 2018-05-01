@@ -1,7 +1,7 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
+﻿using Intervals;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
@@ -300,8 +300,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             Assert.Equal(-1, proteinEnd);
         }
 
-        private ITranscriptRegion GetExon() => new TranscriptRegion(TranscriptRegionType.Exon, 0, 10001, 10199, 1, 199);
-        private ITranscriptRegion GetIntron() => new TranscriptRegion(TranscriptRegionType.Intron, 0, 10200, 10299, 199, 200);
+        private static ITranscriptRegion GetExon() => new TranscriptRegion(TranscriptRegionType.Exon, 0, 10001, 10199, 1, 199);
+        private static ITranscriptRegion GetIntron() => new TranscriptRegion(TranscriptRegionType.Intron, 0, 10200, 10299, 199, 200);
 
         [Fact]
         public void FoundExonEndpointInsertion_NotInsertion_ReturnFalse()

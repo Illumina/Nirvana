@@ -1,5 +1,4 @@
-﻿using VariantAnnotation.Algorithms;
-using VariantAnnotation.Interface.Intervals;
+﻿using Intervals;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Algorithms

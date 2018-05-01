@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
+using Genome;
+using Variants;
 using Vcf.Info;
 using Vcf.VariantCreator;
 using Xunit;

@@ -1,7 +1,7 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
+﻿using Genome;
+using Intervals;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.DataStructures
 {

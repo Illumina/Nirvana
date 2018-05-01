@@ -37,7 +37,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             SaHeader = ReadHeader(_reader);
         }
 
-        private SaHeader ReadHeader(StreamReader reader)
+        private SaHeader ReadHeader(TextReader reader)
         {
             string line;
             while ((line = reader.ReadLine()) != null)

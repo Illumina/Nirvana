@@ -1,4 +1,4 @@
-﻿using SAUtils.InputFileParsers.MitoMap;
+﻿using SAUtils.InputFileParsers.MitoMAP;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

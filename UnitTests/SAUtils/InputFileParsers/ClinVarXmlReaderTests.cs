@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using Moq;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -36,7 +35,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome> { { "X", new Chromosome("chrX", "X", 1) }, { "Y", new Chromosome("chrY", "Y", 2) } });
             else
                 seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome> { { chromosome.EnsemblName, chromosome } });
-            seqProvider.Setup(x => x.GenomeAssembly).Returns(assembly);
+            seqProvider.Setup(x => x.Assembly).Returns(assembly);
             seqProvider.Setup(x => x.Sequence).Returns(new SimpleSequence(refSequence, start - 1));
             return seqProvider.Object;
         }

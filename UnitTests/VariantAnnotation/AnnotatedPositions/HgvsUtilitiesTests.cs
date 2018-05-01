@@ -1,9 +1,9 @@
-﻿using Moq;
+﻿using Genome;
+using Moq;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions

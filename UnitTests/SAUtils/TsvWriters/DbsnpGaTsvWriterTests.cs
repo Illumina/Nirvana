@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Genome;
 using Moq;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.TsvWriters;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.TsvWriters

@@ -3,16 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CacheUtils.TranscriptCache;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO.Caches

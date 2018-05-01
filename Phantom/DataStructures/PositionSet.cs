@@ -7,6 +7,7 @@ using Phantom.Interfaces;
 using Phantom.Utilities;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace Phantom.DataStructures
 {
@@ -53,7 +54,7 @@ namespace Phantom.DataStructures
 
         private static string[,][] GetSampleInfo(PositionSet positionSet)
         {
-            var sampleInfo = new String[positionSet._numPositions, positionSet.NumSamples][];
+            var sampleInfo = new string[positionSet._numPositions, positionSet.NumSamples][];
             for (var i = 0; i < positionSet._numPositions; i++)
             {
                 for (int sampleIndex = 0; sampleIndex < positionSet.NumSamples; sampleIndex++)

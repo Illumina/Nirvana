@@ -1,6 +1,6 @@
 ﻿using System;
+using IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript

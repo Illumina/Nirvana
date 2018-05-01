@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
@@ -49,7 +49,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 #pragma warning restore 414
 
         // empty constructor for onekg reader for unit tests.
-        internal OneKGenReader(IDictionary<string,IChromosome> refNameDict)
+        internal OneKGenReader(IDictionary<string, IChromosome> refNameDict)
         {
             _refNameDictionary = refNameDict;
         }

@@ -1,12 +1,10 @@
 ﻿using System;
-using CommonUtilities;
-using VariantAnnotation.Algorithms;
+using Genome;
+using Intervals;
+using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {

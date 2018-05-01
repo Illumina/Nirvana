@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
+using IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 

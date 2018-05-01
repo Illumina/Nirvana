@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using Compression.Utilities;
+using Genome;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.PhyloP;
 using VariantAnnotation.Providers;
 using Xunit;
@@ -22,7 +22,7 @@ namespace UnitTests.VariantAnnotation.PhyloP
             //var writer = new ExtendedBinaryWriter(FileUtilities.GetCreateStream(randomPath));
 
             //var version = new DataSourceVersion("phylop", "0", DateTime.Now.Ticks, "unit test");
-            //using (var phylopWriter = new PhylopWriter("chr1", version, GenomeAssembly.Unknown, randShorts, writer))
+            //using (var phylopWriter = new PhylopWriter("chr1", version, Assembly.Unknown, randShorts, writer))
             //{
             //    phylopWriter.ScoresToBytes(scoreBytes, randShorts, randShorts.Length);
             //}
@@ -52,7 +52,7 @@ namespace UnitTests.VariantAnnotation.PhyloP
             //var testInterval = new PhylopInterval(100, 0, 1);
             //var version = new DataSourceVersion("phylop", "0", DateTime.Now.Ticks, "unit test");
 
-            //using (var phylopWriter = new PhylopWriter("chr1", version, GenomeAssembly.Unknown, randShorts, writer))
+            //using (var phylopWriter = new PhylopWriter("chr1", version, Assembly.Unknown, randShorts, writer))
             //{
             //    phylopWriter.WriteInterval(testInterval, writer);
             //}
@@ -80,7 +80,7 @@ namespace UnitTests.VariantAnnotation.PhyloP
 
             //var version = new DataSourceVersion("phylop", "0", DateTime.Now.Ticks, "unit test");
 
-            //var phylopWriter = new PhylopWriter("chr1", version, GenomeAssembly.Unknown, 100, writer);
+            //var phylopWriter = new PhylopWriter("chr1", version, Assembly.Unknown, 100, writer);
 
             //foreach (short s in randShorts)
             //    phylopWriter.AddScore(s); // artificially forcing the writer to flush at every 100 scores

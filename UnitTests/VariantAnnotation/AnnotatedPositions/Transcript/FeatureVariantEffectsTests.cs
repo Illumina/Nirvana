@@ -1,6 +1,6 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
+﻿using Intervals;
+using VariantAnnotation.AnnotatedPositions.Transcript;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript

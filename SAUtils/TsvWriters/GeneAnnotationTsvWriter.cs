@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CommonUtilities;
 using Compression.Utilities;
+using OptimizedCore;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
@@ -22,7 +23,7 @@ namespace SAUtils.TsvWriters
             _writer.Write(GetHeader(dataSourceVersion, dataVersion, assembly, keyName, isArray));
         }
 
-        private static string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
+        private static string GetHeader(IDataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
         {
             var sb = StringBuilderCache.Acquire();
 

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.Caches.DataStructures
 {

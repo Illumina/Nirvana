@@ -40,7 +40,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
-using CommonUtilities;
+using OptimizedCore;
 
 namespace CommandLine.NDesk.Options
 {

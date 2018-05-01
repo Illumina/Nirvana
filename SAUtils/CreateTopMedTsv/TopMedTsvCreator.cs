@@ -26,7 +26,7 @@ namespace SAUtils.CreateTopMedTsv
         {
             var benchMark = new Benchmark();
 
-            using (var writer = new TopMedTsvWriter(_version, _outputDirName, _refProvider.GenomeAssembly, _refProvider))
+            using (var writer = new TopMedTsvWriter(_version, _outputDirName, _refProvider.Assembly, _refProvider))
             using (var reader = new TopMedReader(_streamReader, _refProvider.RefNameToChromosome))
             {
                 TsvWriterUtilities.WriteSortedItems(reader.GetGnomadItems(), writer);

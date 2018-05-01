@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using IO;
 using VariantAnnotation.GeneAnnotation;
-using VariantAnnotation.IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.GeneAnnotation

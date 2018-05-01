@@ -5,7 +5,7 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.Utilities;
 using CacheUtils.IntermediateIO;
 using Compression.Utilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 
 namespace CacheUtils.Genes.DataStores
 {

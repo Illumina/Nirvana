@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Interface.Intervals;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 
 namespace VariantAnnotation.SA
 {
-    public class SaReader:ISupplementaryAnnotationReader, IDisposable
+    public class SaReader : ISupplementaryAnnotationReader, IDisposable
     {
         private readonly Stream _stream;
         private readonly ExtendedBinaryReader _reader;
@@ -67,7 +67,7 @@ namespace VariantAnnotation.SA
         public static ISupplementaryAnnotationHeader GetHeader(ExtendedBinaryReader reader)
         {
             var header = reader.ReadAsciiString();
-            var dataVersion = reader.ReadUInt16();
+            reader.ReadUInt16();
             var schemaVersion = reader.ReadUInt16();
             var genomeAssembly = (GenomeAssembly)reader.ReadByte();
 
@@ -77,14 +77,14 @@ namespace VariantAnnotation.SA
                 throw new UserErrorException($"The header check failed for the supplementary annotation file: ID: exp: {SaDataBaseCommon.DataHeader} obs: {header}, schema version: exp:{SaDataBaseCommon.SchemaVersion} obs: {schemaVersion}");
             }
 
-            var creationTimeTicks = reader.ReadInt64();
+            reader.ReadInt64();
             var referenceSequenceName = reader.ReadAsciiString();
 
             var dataSourceVersions = new HashSet<IDataSourceVersion>();
             var numDataSourceVersions = reader.ReadOptInt32();
             for (var i = 0; i < numDataSourceVersions; i++) dataSourceVersions.Add(DataSourceVersion.Read(reader));
 
-            var saHeader = new SupplementaryAnnotationHeader(referenceSequenceName, creationTimeTicks, dataVersion,
+            var saHeader = new SupplementaryAnnotationHeader(referenceSequenceName,
                 dataSourceVersions, genomeAssembly);
 
             return saHeader;

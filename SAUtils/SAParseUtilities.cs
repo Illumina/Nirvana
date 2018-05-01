@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.Interface.Positions;
+﻿using Variants;
 
 namespace SAUtils
 {

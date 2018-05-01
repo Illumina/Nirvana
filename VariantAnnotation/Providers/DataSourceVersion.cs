@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using VariantAnnotation.Interface.IO;
+using IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using VariantAnnotation.Utilities;

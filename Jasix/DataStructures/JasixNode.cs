@@ -1,5 +1,5 @@
 ﻿using System;
-using VariantAnnotation.Interface.IO;
+using IO;
 
 namespace Jasix.DataStructures { 
 	public sealed class JasixNode : IComparable<JasixNode>

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Text;
-using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 using Xunit;

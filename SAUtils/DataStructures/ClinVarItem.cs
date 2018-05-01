@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommonUtilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures

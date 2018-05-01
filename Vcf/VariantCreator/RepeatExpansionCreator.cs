@@ -1,6 +1,7 @@
-﻿using OptimizedCore;
+﻿using Genome;
+using OptimizedCore;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace Vcf.VariantCreator
 {

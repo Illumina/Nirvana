@@ -49,7 +49,7 @@ namespace SAUtils.CreateGnomadTsv
                     new StreamWriter(new BlockGZipStream(FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, HeaderFileName)),
                         CompressionMode.Compress)))
                 {
-                    var header = SaTsvWriter.GetHeader(_version, SaTsvCommon.SchemaVersion, _refSeqProvider.GenomeAssembly.ToString(),
+                    var header = SaTsvWriter.GetHeader(_version, SaTsvCommon.SchemaVersion, _refSeqProvider.Assembly.ToString(),
                         "gnomad", null, true, false);
                     headerWriter.Write(header);
                 }
@@ -78,7 +78,7 @@ namespace SAUtils.CreateGnomadTsv
             var chrom = GetChromName(filePath);
             ISaItemTsvWriter writer;
             if (chrom == "all")
-                writer = new GnomadTsvWriter(_version, _outputDirectory, _refSeqProvider.GenomeAssembly, _refSeqProvider,
+                writer = new GnomadTsvWriter(_version, _outputDirectory, _refSeqProvider.Assembly, _refSeqProvider,
                     _sequencingDataType); 
             else
                 writer = new LiteGnomadTsvWriter(Path.Combine(_outputDirectory, chrom + ".tsv.gz"), _refSeqProvider);
@@ -96,7 +96,7 @@ namespace SAUtils.CreateGnomadTsv
 
         }
 
-        private string GetChromName(string filePath)
+        private static string GetChromName(string filePath)
         {
             var pathSplits = filePath.Split(Path.PathSeparator);
             var fileName = pathSplits[pathSplits.Length - 1];

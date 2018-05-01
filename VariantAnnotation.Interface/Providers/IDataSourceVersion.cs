@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.IO;
+﻿using IO;
+using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.Interface.Providers
 {

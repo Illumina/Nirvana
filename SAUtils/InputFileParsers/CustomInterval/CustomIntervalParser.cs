@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.CustomInterval
 {
@@ -17,7 +17,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 		private readonly List<string> _nonstringFields;
 		public string KeyName;
 		private readonly Dictionary<int, string> _fieldIndex;
-        private readonly IDictionary<string,IChromosome> _refChromDict;
+        private readonly IDictionary<string, IChromosome> _refChromDict;
         #endregion
 
         // constructor

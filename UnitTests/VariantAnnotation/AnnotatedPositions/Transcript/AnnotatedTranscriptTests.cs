@@ -1,10 +1,9 @@
-﻿using CommonUtilities;
+﻿using Genome;
+using OptimizedCore;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Sequence;
 using VariantAnnotation.TranscriptAnnotation;
-using Vcf;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript

@@ -1,8 +1,9 @@
 ﻿using System.Linq;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 using Vcf.Info;
 using Vcf.Sample;
 using Vcf.VariantCreator;

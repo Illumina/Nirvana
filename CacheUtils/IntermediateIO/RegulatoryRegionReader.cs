@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CommonUtilities;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
 {

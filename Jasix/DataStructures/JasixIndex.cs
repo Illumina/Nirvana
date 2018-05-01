@@ -1,15 +1,27 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
+using IO;
 
 namespace Jasix.DataStructures
 {
-	public sealed class JasixIndex
+    public struct FileRange
+    {
+        public long BeginLocation;
+        public long EndLocation;
+
+        public FileRange(long begin, long end = long.MaxValue)
+        {
+            BeginLocation = begin;
+            EndLocation = end;
+        }
+    }
+
+    public sealed class JasixIndex
 	{
 		private readonly Dictionary<string, JasixChrIndex> _chrIndices;
 	    private readonly Dictionary<string, string> _synonymToChrName;
+	    private readonly Dictionary<string, FileRange> _sectionRanges;
 		public string HeaderLine;
 
 		// the json file might contain sections. We want to be able to index these sections too
@@ -18,6 +30,7 @@ namespace Jasix.DataStructures
 		{
 			_chrIndices = new Dictionary<string, JasixChrIndex>();
             _synonymToChrName = new Dictionary<string, string>();
+            _sectionRanges = new Dictionary<string, FileRange>();
 		}
 
 		private JasixIndex(IExtendedBinaryReader reader):this()
@@ -101,9 +114,25 @@ namespace Jasix.DataStructures
 
 		}
 
-		
-		//returns file location of the first node that overlapping the given position chr:start-end
-		public long GetFirstVariantPosition(string chr, int start, int end)
+	    public bool BeginSection(string section, long fileLoc)
+	    {
+	        if (_sectionRanges.ContainsKey(section)) return false;
+
+            _sectionRanges[section] = new FileRange(fileLoc);
+	        return true;
+	    }
+
+	    public bool EndSection(string section, long fileLoc)
+	    {
+	        if (!_sectionRanges.TryGetValue(section, out var fileRange)) return false;
+
+	        fileRange.EndLocation = fileLoc;
+	        _sectionRanges[section] = fileRange;
+	        return true;
+	    }
+
+        //returns file location of the first node that overlapping the given position chr:start-end
+        public long GetFirstVariantPosition(string chr, int start, int end)
 		{
 			if (_chrIndices == null || _chrIndices.Count == 0) return -1;
 

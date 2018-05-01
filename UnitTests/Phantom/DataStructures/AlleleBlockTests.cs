@@ -55,7 +55,7 @@ namespace UnitTests.Phantom.DataStructures
 
 
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSample,
-                indexOfUnsupportedVars, starts, functionBlockRanges, out var _);
+                indexOfUnsupportedVars, starts, functionBlockRanges, out _);
             var expectedBlock1 = new AlleleBlock(0, new[] { 1, 1, 0 }, 0, 0);
             var expectedBlock2 = new AlleleBlock(0, new[] { 2, 1, 1 }, 0, 0);
             var expectedBlock3 = new AlleleBlock(2, new[] { 1, 1 }, 1, 0);
@@ -97,7 +97,7 @@ namespace UnitTests.Phantom.DataStructures
             var functionBlockRanges = starts.Select(x => x + 2).ToList();
 
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSample,
-                indexOfUnsupportedVars, starts, functionBlockRanges, out var _);
+                indexOfUnsupportedVars, starts, functionBlockRanges, out _);
             var expectedBlock1 = new AlleleBlock(1, new[] { 1, 0, 1 }, 0, 0);
             var expectedBlock2 = new AlleleBlock(1, new[] { 2, 0, 1 }, 0, 0);
 
@@ -129,7 +129,7 @@ namespace UnitTests.Phantom.DataStructures
             var functionBlockRanges = starts.Select(x => x + 2).ToList();
 
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSample,
-                indexOfUnsupportedVars, starts, functionBlockRanges, out var _);
+                indexOfUnsupportedVars, starts, functionBlockRanges, out _);
             var expectedBlock1 = new AlleleBlock(0, new[] { 1, 0, 1 }, 0, 0);
             var expectedBlock2 = new AlleleBlock(0, new[] { 0, 1, 0 }, 0, 0);
             var expectedBlock3 = new AlleleBlock(1, new[] { 1, 0 }, 0, 0);
@@ -161,7 +161,7 @@ namespace UnitTests.Phantom.DataStructures
                     {genotypeBlock1, new List<int> {0}},
                     {genotypeBlock2, new List<int> {1}},
                     {genotypeBlock3, new List<int> {2}},
-                    {genotypeBlock4, new List<int> {3}},
+                    {genotypeBlock4, new List<int> {3}}
                 };
             var indexOfUnsupportedVars = Enumerable.Repeat(new HashSet<int>(), 4).ToArray();
             var starts = Enumerable.Range(100, 4).ToArray();
@@ -169,7 +169,7 @@ namespace UnitTests.Phantom.DataStructures
 
 
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSample,
-                indexOfUnsupportedVars, starts, functionBlockRanges, out var _);
+                indexOfUnsupportedVars, starts, functionBlockRanges, out _);
             var expectedBlock1 = new AlleleBlock(1, new[] { 1, 1 }, 1, 1);
             var expectedBlock2 = new AlleleBlock(1, new[] { 1, 1 }, 1, 0);
             var expectedBlock3 = new AlleleBlock(1, new[] { 1, 1 }, 0, 1);

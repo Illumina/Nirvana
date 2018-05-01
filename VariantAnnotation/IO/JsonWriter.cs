@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
@@ -13,6 +13,7 @@ namespace VariantAnnotation.IO
         private bool _firstEntry;
         private bool _positionFieldClosed;
         public string Header { get; private set; }
+        
         
         public JsonWriter(StreamWriter writer, string annotator, string creationTime, string vepDataVersion,
             List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)

@@ -1,6 +1,6 @@
-﻿using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
+﻿using Genome;
+using IO;
+using VariantAnnotation.Interface.Caches;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
@@ -22,7 +22,7 @@ namespace UnitTests.VariantAnnotation.SA
                 new DataSourceVersion("clinvar","20",DateTime.Today.Ticks,"clinvar dataset"),
                 new DataSourceVersion("dbSnp","18",DateTime.Parse("12/20/2010").Ticks,"dbSNP") 
             };
-            var header = new SupplementaryAnnotationHeader("chr1",DateTime.Now.Ticks,1,dataSourceVersions,GenomeAssembly.GRCh37);
+            var header = new SupplementaryAnnotationHeader("chr1", dataSourceVersions, GenomeAssembly.GRCh37);
             var smallIntervals = new List<ISupplementaryInterval>
             {
                 new SupplementaryInterval("data1","chr1",100,150,"",ReportFor.SmallVariants)
