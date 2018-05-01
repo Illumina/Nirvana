@@ -21,16 +21,11 @@ namespace Jasix
             _jasixIndex  = new JasixIndex();
         }
 
-        public void SetHeader(string header)
-        {
-            _jasixIndex.HeaderLine = header;
-        }
-
         public void Add(IPosition position, long fileLocation)
         {
-            var chromName = position.Chromosome.EnsemblName;
-            var start     = position.Start;
-            var end       = position.InfoData.End;
+            string chromName = position.Chromosome.EnsemblName;
+            int start        = position.Start;
+            var end          = position.InfoData?.End;
 
             if (chromName == _lastChromName && start < _lastPosition)
             {
@@ -51,14 +46,14 @@ namespace Jasix
             _jasixIndex.Add(position.Chromosome.EnsemblName, start, end.Value, fileLocation, position.Chromosome.UcscName);
         }
 
-        public bool BeginSection(string sectionName, long fileLocation)
+        public void BeginSection(string sectionName, long fileLocation)
         {
-            return _jasixIndex.BeginSection(sectionName, fileLocation);
+            _jasixIndex.BeginSection(sectionName, fileLocation);
         }
 
-        public bool EndSection(string sectionName, long fileLocation)
+        public void EndSection(string sectionName, long fileLocation)
         {
-            return _jasixIndex.EndSection(sectionName, fileLocation);
+            _jasixIndex.EndSection(sectionName, fileLocation);
         }
 
         public void Dispose()

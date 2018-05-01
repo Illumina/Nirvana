@@ -37,11 +37,7 @@ namespace Jasix
 
 		}
 
-		public string GetHeader()
-		{
-			return _jasixIndex.HeaderLine;
-		}
-
+		
         public void PrintChromosomeList()
 		{
 			foreach (string chrName in _jasixIndex.GetChromosomeList())
@@ -53,7 +49,7 @@ namespace Jasix
 		public void PrintHeaderOnly()
 		{
 
-			string headerString = _jasixIndex.HeaderLine;
+		    string headerString = GetHeader();
 			_writer.WriteLine("{" + headerString+"}");
 		}
 
@@ -63,10 +59,10 @@ namespace Jasix
 			_writer.Write("{");
 			if (printHeader)
 			{
-				string headerString = _jasixIndex.HeaderLine;
+			    string headerString = GetHeader();
 				_writer.Write(headerString + ",");
 			}
-			Utilities.PrintQuerySectionOpening(JasixCommons.SectionToIndex, _writer);
+			Utilities.PrintQuerySectionOpening(JasixCommons.PositionsSectionTag, _writer);
 
 		    var count = 0;
 		    foreach (string queryString in queryStrings)
@@ -135,7 +131,18 @@ namespace Jasix
 			_jsonReader.BaseStream.Position = location;
 		}
 
-		internal IEnumerable<string> ReadOverlappingJsonLines((string Chr, int Start, int End) query)
+	    public string GetHeader()
+	    {
+	        long headerLocation = _jasixIndex.GetSectionBegin(JasixCommons.HeaderSectionTag);
+	        RepositionReader(headerLocation);
+
+	        string headerLine = _jsonReader.ReadLine();
+	        string additionalTail = $",\"{JasixCommons.PositionsSectionTag}\":[";
+
+	        return headerLine?.Substring(1, headerLine.Length - 1 - additionalTail.Length);
+	    }
+
+        internal IEnumerable<string> ReadOverlappingJsonLines((string Chr, int Start, int End) query)
 		{
 			long position = _jasixIndex.GetFirstVariantPosition(query.Chr, query.Start, query.End);
 

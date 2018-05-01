@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
-using Compression.FileHandling;
-using Compression.Utilities;
 using ErrorHandling;
 using Genome;
-using Jasix;
 using Jasix.DataStructures;
 using Phantom.Workers;
 using VariantAnnotation;
@@ -70,15 +67,12 @@ namespace Nirvana
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
             using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))
-            using (var jsonWriter        = new JsonWriter(outputWriter, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.Assembly.ToString(), vcfReader.GetSampleNames()))
+            using (var jsonWriter        = new JsonWriter(outputWriter, jasixFileName, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.Assembly.ToString(), vcfReader.GetSampleNames()))
             using (var vcfWriter         = _vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
             using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
-            using (var jasixIndexCreator = outputWriter is BgzipTextWriter ? new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName)) : null)
             {
                 try
                 {
-                    jasixIndexCreator?.SetHeader(jsonWriter.Header);
-
                     if (vcfReader.IsRcrsMitochondrion && annotator.Assembly == GenomeAssembly.GRCh37
                         || annotator.Assembly == GenomeAssembly.GRCh38
                         || _forceMitochondrialAnnotation)
@@ -87,9 +81,6 @@ namespace Nirvana
                     int previousChromIndex = -1;
                     IPosition position;
                     var sortedVcfChecker = new SortedVcfChecker();
-
-                    var bgzipTextWriter = outputWriter as BgzipTextWriter;
-                    long writerPosition = bgzipTextWriter?.Position ?? -1;
 
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
@@ -100,7 +91,7 @@ namespace Nirvana
 
                         string json = annotatedPosition.GetJsonString();
 
-                        if (json != null) WriteOutput(annotatedPosition, writerPosition, jasixIndexCreator, jsonWriter, vcfWriter, gvcfWriter, json);
+                        if (json != null) WriteOutput(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json);
                         else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
 
                         metrics.Increment();
@@ -120,12 +111,9 @@ namespace Nirvana
             return ExitCodes.Success;
         }
 
-        private void WriteOutput(IAnnotatedPosition annotatedPosition, long textWriterPosition,
-            OnTheFlyIndexCreator jasixIndexCreator, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter,
-            LiteVcfWriter gvcfWriter, string jsonOutput)
+        private void WriteOutput(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput)
         {
-            jasixIndexCreator?.Add(annotatedPosition.Position, textWriterPosition);
-            jsonWriter.WriteJsonEntry(jsonOutput);
+            jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
 
             if (vcfWriter == null && gvcfWriter == null || annotatedPosition.Position.IsRecomposed) return;
 

@@ -91,10 +91,10 @@ namespace UnitTests.Jasix
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
             {
                 var header = qp.GetHeader();
-                Assert.Equal("\"header\":{\"annotator\":\"Illumina Annotation Engine 1.3.3.1633\",\"creationTime\":\"2016-12-09 09:49:24\",\"genomeAssembly\":\"GRCh37\",\"schemaVersion\":4,\"dataVersion\":\"84.22.36\",\"dataSources\":[{\"name\":\"VEP\",\"version\":\"84\",\"description\":\"Ensembl\",\"releaseDate\":\"2016-04-29\"},{\"name\":\"phyloP\",\"version\":\"hg19\",\"description\":\"46 way conservation score between humans and 45 other vertebrates\",\"releaseDate\":\"2009-11-10\"},{\"name\":\"OMIM\",\"version\":\"unknown\",\"description\":\"An Online Catalog of Human Genes and Genetic Disorders\",\"releaseDate\":\"2016-09-02\"},{\"name\":\"dbSNP\",\"version\":\"147\",\"description\":\"Identifiers for observed variants\",\"releaseDate\":\"2016-06-01\"},{\"name\":\"COSMIC\",\"version\":\"78\",\"description\":\"Somatic mutation and related details and information relating to human cancers\",\"releaseDate\":\"2016-09-05\"},{\"name\":\"1000 Genomes Project\",\"version\":\"Phase 3 v5a\",\"description\":\"A public catalogue of human variation and genotype data\",\"releaseDate\":\"2013-05-27\"},{\"name\":\"EVS\",\"version\":\"2\",\"releaseDate\":\"2013-11-13\"},{\"name\":\"ExAC\",\"version\":\"0.3.1\",\"description\":\"Allele frequency data from the ExAC project\",\"releaseDate\":\"2016-03-16\"},{\"name\":\"ClinVar\",\"version\":\"unknown\",\"description\":\"A freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence\",\"releaseDate\":\"2016-09-01\"},{\"name\":\"DGV\",\"version\":\"unknown\",\"description\":\"Provides a comprehensive summary of structural variation in the human genome\",\"releaseDate\":\"2016-05-15\"},{\"name\":\"ClinGen\",\"version\":\"unknown\",\"releaseDate\":\"2016-04-14\"}]}", header);
+                Assert.Equal("\"header\":{\"annotator\":\"Nirvana 2.0.9.0\",\"creationTime\":\"2018-04-30 15:44:31\",\"genomeAssembly\":\"GRCh37\",\"schemaVersion\":6,\"dataVersion\":\"91.26.45\",\"dataSources\":[{\"name\":\"VEP\",\"version\":\"91\",\"description\":\"Ensembl\",\"releaseDate\":\"2018-03-05\"},{\"name\":\"ClinVar\",\"version\":\"20180129\",\"description\":\"A freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence\",\"releaseDate\":\"2018-01-29\"},{\"name\":\"COSMIC\",\"version\":\"84\",\"description\":\"somatic mutation and related details and information relating to human cancers\",\"releaseDate\":\"2018-02-13\"},{\"name\":\"dbSNP\",\"version\":\"150\",\"description\":\"Identifiers for observed variants\",\"releaseDate\":\"2017-04-03\"},{\"name\":\"gnomAD_exome\",\"version\":\"2.0.2\",\"description\":\"Exome allele frequencies from Genome Aggregation Database (gnomAD)\",\"releaseDate\":\"2017-10-05\"},{\"name\":\"gnomAD\",\"version\":\"2.0.2\",\"description\":\"Whole genome allele frequencies from Genome Aggregation Database (gnomAD)\",\"releaseDate\":\"2017-10-05\"},{\"name\":\"MITOMAP\",\"version\":\"20180228\",\"description\":\"Small variants in the MITOMAP human mitochondrial genome database\",\"releaseDate\":\"2018-02-28\"},{\"name\":\"1000 Genomes Project\",\"version\":\"Phase 3 v5a\",\"description\":\"A public catalogue of human variation and genotype data\",\"releaseDate\":\"2013-05-27\"},{\"name\":\"TOPMed\",\"version\":\"freeze_5\",\"description\":\"Allele frequencies from TOPMed data lifted over using dbSNP ids.\",\"releaseDate\":\"2017-08-28\"},{\"name\":\"ClinGen\",\"version\":\"20160414\",\"releaseDate\":\"2016-04-14\"},{\"name\":\"DGV\",\"version\":\"20160515\",\"description\":\"Provides a comprehensive summary of structural variation in the human genome\",\"releaseDate\":\"2016-05-15\"},{\"name\":\"MITOMAP\",\"version\":\"20180228\",\"description\":\"Large structural variants in the MITOMAP human mitochondrial genome database\",\"releaseDate\":\"2018-02-28\"},{\"name\":\"ExAC\",\"version\":\"0.3.1\",\"description\":\"Gene scores from the ExAC project\",\"releaseDate\":\"2016-03-16\"},{\"name\":\"OMIM\",\"version\":\"20180213\",\"description\":\"An Online Catalog of Human Genes and Genetic Disorders\",\"releaseDate\":\"2018-02-13\"},{\"name\":\"phyloP\",\"version\":\"hg19\",\"description\":\"46 way conservation score between humans and 45 other vertebrates\",\"releaseDate\":\"2009-11-10\"}]}", header);
 
                 var results =
-                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("chr1:9775924"));
+                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("1:9775924"));
                 Assert.Single(results);
             }
         }
@@ -108,7 +108,7 @@ namespace UnitTests.Jasix
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
             {
                 var results =
-                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("chr1:9775924-9778952"));
+                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("1:9775924-9778952"));
                 Assert.Equal(3, results.Count());
 
             }
@@ -123,7 +123,7 @@ namespace UnitTests.Jasix
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
             {
                 var results =
-                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("chr1:27023180-27023190"));
+                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("1:27023180-27023190"));
                 Assert.Equal(2, results.Count());
             }
         }
@@ -137,7 +137,7 @@ namespace UnitTests.Jasix
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream))
             {
                 var results =
-                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("chr1"));
+                    qp.ReadOverlappingJsonLines(Utilities.ParseQuery("1"));
 
                 Assert.Equal(422, results.Count());
             }

@@ -10,6 +10,7 @@
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\Intervals\Intervals.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
+    <ProjectReference Include="..\Jasix\Jasix.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\Variants\Variants.csproj" />
