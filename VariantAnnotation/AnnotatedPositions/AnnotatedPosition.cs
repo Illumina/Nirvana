@@ -42,7 +42,7 @@ namespace VariantAnnotation.AnnotatedPositions
                 jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
             }
             
-			jsonObject.AddIntValue("svEnd",          Position.InfoData.End);
+			if (AnnotatedVariants.Any(IsStructVariant)) jsonObject.AddIntValue("svEnd", Position.InfoData.End);
             jsonObject.AddStringValue("refAllele",   Position.RefAllele);
             jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
 
@@ -73,6 +73,9 @@ namespace VariantAnnotation.AnnotatedPositions
 			sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);
         }
+
+        private static bool IsStructVariant(IAnnotatedVariant annotatedVariant) =>
+            annotatedVariant.Variant.Behavior.StructuralVariantConsequence;
 
         private bool IsShortTandemRepeat()
         {

@@ -107,5 +107,19 @@ namespace UnitTests.Vcf.VariantCreator
 
 			Assert.Equal(VariantType.tandem_duplication, variants[0].Type);
 		}
-	}
+
+        //1       789256  .       T       <NON_REF>       .       QUAL    END=789256      GT:DP:GQ:MIN_DP:PL      0/0:32:0:32:0,0,0
+	    [Fact]
+	    public void GatkNonRef_WithEndInfo_TreatedAsRef()
+	    {
+            var infoData = VcfInfoParser.Parse("END=789256");
+			var chromosome1 = new Chromosome("chr1", "1", 0);
+			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, null, false);
+
+			var variants = variantFactory.CreateVariants(chromosome1, 789256, 789256, "T", new[] { "<NON_REF>" }, infoData, new[] { false }, false);
+
+            Assert.NotNull(variants);
+            Assert.Equal(VariantType.reference, variants[0].Type);        
+	    }
+    }
 }
