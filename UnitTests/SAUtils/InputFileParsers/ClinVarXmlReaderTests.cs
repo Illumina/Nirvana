@@ -72,6 +72,32 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
+        public void RCV000001373_NoExtraOmimId()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr20", "20", 19), 3209662, "AGCAGACGGGCA");
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000001373.xml")), sequenceProvider);
+            var clinVarItems = reader.GetItems().ToArray();
+            Assert.Single(clinVarItems);
+
+            var clinVarItem = clinVarItems[0];
+            Assert.Equal("RCV000001373.3", clinVarItem.Id);
+
+            var omimIds = clinVarItem.OmimIDs.ToArray();
+            Assert.Single(omimIds);
+            Assert.Equal("610206.0007", omimIds[0]);
+        }
+
+        [Fact]
+        public void RCV000435546_NotMissing()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr12", "12", 11), 110221557, "CGCGG");
+            var reader = new ClinVarXmlReader(new FileInfo(Resources.ClinvarXmlFiles("RCV000435546.xml")), sequenceProvider);
+            var clinVarItems = reader.GetItems();
+            Assert.True(clinVarItems.Any());
+        }
+
+
+        [Fact]
         public void MissingAltAllele()
         {
             var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 0), 118165691, "C");

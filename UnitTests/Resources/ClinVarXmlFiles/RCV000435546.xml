@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="25257283">
+    <RecordStatus>current</RecordStatus>
+    <Title>NM_021625.4(TRPV4):c.[2481_2484delCCGC;2486T&gt;A] AND Avascular necrosis of femoral head, primary, 2</Title>
+    <ReferenceClinVarAssertion DateCreated="2017-03-07" DateLastUpdated="2017-12-31" ID="1020239">
+      <ClinVarAccession Acc="RCV000435546" Version="1" Type="RCV" DateUpdated="2017-12-31" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2017-03-03">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+          <FamilyData NumFamilies="1" />
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="23992950">
+          <Attribute Type="Description">In 4 sibs from a Greek family with avascular necrosis of the femoral head (ANFH2; 617383), Mah et al. (2016) identified heterozygosity for a 4-bp deletion (c.2480_2483delCCCG, NM_021625.4) followed by a c.2486T-A transversion (c.2486T-A, NM_021625.4) in a highly conserved region of the TRPV4 gene, causing a frameshift that results in a premature termination codon (Val829TrpfsTer3). The mutation was not found in an unaffected brother, or in the 1000 Genomes or Exome Variant Server databases; parental DNA was unavailable, but the sibs' father reportedly had symptoms of joint pain that were never evaluated. Functional analysis in patient fibroblasts and transduced HEK293 cells indicated that the mutation results in a gain-of-function of TRPV4 channels by impeding channel closure.</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">27330106</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Haplotype" ID="378057">
+        <Measure Type="Deletion" ID="380146">
+          <Name>
+            <ElementValue Type="Preferred">NM_021625.4(TRPV4):c.2481_2484delCCGC (p.Arg828Trpfs)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.2481_2484delCCGC" Accession="LRG_372t1" Type="HGVS, coding, LRG">LRG_372t1:c.2481_2484delCCGC</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.2481_2484delCCGC" Accession="NM_021625" Version="4" Type="HGVS, coding, RefSeq">NM_021625.4:c.2481_2484delCCGC</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.54652_54655delCCGC" Accession="LRG_372" Type="HGVS, genomic, LRG">LRG_372:g.54652_54655delCCGC</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.54652_54655delCCGC" Accession="NG_017090" Version="1" Type="HGVS, genomic, RefSeqGene">NG_017090.1:g.54652_54655delCCGC</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.109783753_109783756delGCGG" Accession="NC_000012" Version="12" Type="HGVS, genomic, top level" integerValue="38">NC_000012.12:g.109783753_109783756delGCGG</Attribute>
+            <XRef ID="38" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.110221558_110221561delGCGG" Accession="NC_000012" Version="11" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000012.11:g.110221558_110221561delGCGG</Attribute>
+            <XRef ID="37" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Arg828Trpfs" Accession="LRG_372p1" Type="HGVS, protein">LRG_372p1:p.Arg828Trpfs</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Arg828Trpfs" Accession="NP_067638" Version="3" Type="HGVS, protein, RefSeq">NP_067638.3:p.Arg828Trpfs</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+            <XRef ID="SO:0001589" DB="Sequence Ontology" />
+            <XRef ID="NM_021625.4:c.2481_2484delCCGC" DB="RefSeq" />
+          </AttributeSet>
+          <CytogeneticLocation>12q24.11</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="12" Accession="NC_000012.12" start="109783753" stop="109783756" display_start="109783753" display_stop="109783756" variantLength="4" referenceAllele="GCGG" alternateAllele="-" positionVCF="109783752" referenceAlleleVCF="CGCGG" alternateAlleleVCF="C" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="12" Accession="NC_000012.11" start="110221558" stop="110221561" display_start="110221558" display_stop="110221561" variantLength="4" referenceAllele="GCGG" alternateAllele="-" positionVCF="110221557" referenceAlleleVCF="CGCGG" alternateAlleleVCF="C" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">transient receptor potential cation channel subfamily V member 4</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">TRPV4</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="12" Accession="NC_000012.12" start="109783087" stop="109833407" display_start="109783087" display_stop="109833407" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="12" Accession="NC_000012.11" start="110220891" stop="110271211" display_start="110220891" display_stop="110271211" variantLength="50321" Strand="-" />
+            <XRef ID="59341" DB="Gene" />
+            <XRef Type="MIM" ID="605427" DB="OMIM" />
+            <XRef ID="HGNC:18083" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef Type="Allelic variant" ID="605427.0034" DB="OMIM" />
+          <XRef Type="rs" ID="1057520305" DB="dbSNP" />
+        </Measure>
+        <Measure Type="single nucleotide variant" ID="472257">
+          <Name>
+            <ElementValue Type="Preferred">NM_021625.4(TRPV4):c.2486T&gt;A (p.Val829Glu)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.2486T&gt;A" Accession="LRG_372t1" Type="HGVS, coding, LRG">LRG_372t1:c.2486T&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.2486T&gt;A" Accession="NM_021625" Version="4" Type="HGVS, coding, RefSeq">NM_021625.4:c.2486T&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.54657T&gt;A" Accession="LRG_372" Type="HGVS, genomic, LRG">LRG_372:g.54657T&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.54657T&gt;A" Accession="NG_017090" Version="1" Type="HGVS, genomic, RefSeqGene">NG_017090.1:g.54657T&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.109783751A&gt;T" Accession="NC_000012" Version="12" Type="HGVS, genomic, top level" integerValue="38">NC_000012.12:g.109783751A&gt;T</Attribute>
+            <XRef ID="38" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.110221556A&gt;T" Accession="NC_000012" Version="11" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000012.11:g.110221556A&gt;T</Attribute>
+            <XRef ID="37" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Val829Glu" Accession="LRG_372p1" Type="HGVS, protein">LRG_372p1:p.Val829Glu</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Val829Glu" Accession="NP_067638" Version="3" Type="HGVS, protein, RefSeq">NP_067638.3:p.Val829Glu</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">missense variant</Attribute>
+            <XRef ID="SO:0001583" DB="Sequence Ontology" />
+            <XRef ID="NM_021625.4:c.2486T&gt;A" DB="RefSeq" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange1LetterCode">V829E</Attribute>
+          </AttributeSet>
+          <CytogeneticLocation>12q24.11</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="12" Accession="NC_000012.12" start="109783751" stop="109783751" display_start="109783751" display_stop="109783751" variantLength="1" referenceAllele="A" alternateAllele="T" positionVCF="109783751" referenceAlleleVCF="A" alternateAlleleVCF="T" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="12" Accession="NC_000012.11" start="110221556" stop="110221556" display_start="110221556" display_stop="110221556" variantLength="1" referenceAllele="A" alternateAllele="T" positionVCF="110221556" referenceAlleleVCF="A" alternateAlleleVCF="T" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">transient receptor potential cation channel subfamily V member 4</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">TRPV4</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="12" Accession="NC_000012.12" start="109783087" stop="109833407" display_start="109783087" display_stop="109833407" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="12" Accession="NC_000012.11" start="110220891" stop="110271211" display_start="110220891" display_stop="110271211" variantLength="50321" Strand="-" />
+            <XRef ID="59341" DB="Gene" />
+            <XRef Type="MIM" ID="605427" DB="OMIM" />
+            <XRef ID="HGNC:18083" DB="HGNC" />
+          </MeasureRelationship>
+        </Measure>
+        <Name>
+          <ElementValue Type="Preferred">NM_021625.4(TRPV4):c.[2481_2484delCCGC;2486T&gt;A]</ElementValue>
+        </Name>
+        <Name>
+          <ElementValue Type="Alternate">TRPV4, 4-BP DEL, 2480CCCG AND 2486T-A</ElementValue>
+          <XRef Type="Allelic variant" ID="605427.0034" DB="OMIM" />
+        </Name>
+        <AttributeSet>
+          <Attribute Type="HGVS, coding, RefSeq" Change="c.[2481_2484delCCGC;2486T&gt;A]">NM_021625.4:c.[2481_2484delCCGC;2486T&gt;A]</Attribute>
+        </AttributeSet>
+        <XRef Type="Allelic variant" ID="605427.0034" DB="OMIM" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="35229">
+        <Trait ID="37036" Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Avascular necrosis of femoral head, primary, 2</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">ANFH2</ElementValue>
+            <XRef Type="MIM" ID="617383" DB="OMIM" />
+          </Symbol>
+          <XRef ID="CN240839" DB="MedGen" />
+          <XRef Type="MIM" ID="617383" DB="OMIM" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="978775">
+      <ClinVarSubmissionID localKey="605427.0034_AVASCULAR NECROSIS OF FEMORAL HEAD, PRIMARY, 2 (1 family)" submitter="OMIM" submitterDate="2017-03-03" title="TRPV4, 4-BP DEL, 2480CCCG AND 2486T-A_AVASCULAR NECROSIS OF FEMORAL HEAD, PRIMARY, 2 (1 family)" />
+      <ClinVarAccession Acc="SCV000513422" OrgType="primary" OrganizationCategory="resource" Version="1" Type="SCV" OrgID="3" DateUpdated="2017-04-07" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2017-03-03">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="OMIM" ID="605427.0034" Type="Allelic variant" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species>human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+          <FamilyData NumFamilies="1" />
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">In 4 sibs from a Greek family with avascular necrosis of the femoral head (ANFH2; 617383), Mah et al. (2016) identified heterozygosity for a 4-bp deletion (c.2480_2483delCCCG, NM_021625.4) followed by a c.2486T-A transversion (c.2486T-A, NM_021625.4) in a highly conserved region of the TRPV4 gene, causing a frameshift that results in a premature termination codon (Val829TrpfsTer3). The mutation was not found in an unaffected brother, or in the 1000 Genomes or Exome Variant Server databases; parental DNA was unavailable, but the sibs' father reportedly had symptoms of joint pain that were never evaluated. Functional analysis in patient fibroblasts and transduced HEK293 cells indicated that the mutation results in a gain-of-function of TRPV4 channels by impeding channel closure.</Attribute>
+          <Citation>
+            <ID Source="PubMed">27330106</ID>
+          </Citation>
+          <XRef DB="OMIM" ID="617383" Type="MIM" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Preferred">TRPV4, 4-BP DEL, 2480CCCG AND 2486T-A</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="NonHGVS">4-BP DEL, 2480CCCG AND 2486T-A</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">TRPV4</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+          <XRef DB="OMIM" ID="605427.0034" Type="Allelic variant" />
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">AVASCULAR NECROSIS OF FEMORAL HEAD, PRIMARY, 2 (1 family)</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
+</ReleaseSet>
