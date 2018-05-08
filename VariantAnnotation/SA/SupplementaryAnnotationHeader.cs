@@ -16,8 +16,8 @@ namespace VariantAnnotation.SA
             IEnumerable<IDataSourceVersion> dataSourceVersions, GenomeAssembly genomeAssembly)
         {
             ReferenceSequenceName = referenceSequenceName;
-            DataSourceVersions = dataSourceVersions;
-            Assembly = genomeAssembly;
+            DataSourceVersions    = dataSourceVersions;
+            Assembly              = genomeAssembly;
         }
     }
 }

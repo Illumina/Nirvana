@@ -37,9 +37,6 @@ namespace VariantAnnotation.IO.VcfWriter
 
         private bool _isDisposed;
 
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);

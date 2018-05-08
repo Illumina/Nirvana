@@ -1,16 +1,16 @@
 ﻿using System.IO;
-using Compression.Utilities;
+using IO;
 using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Compression.Utilities
 {
-    public sealed class FileUtilitiesTests : RandomFileBase
+    public sealed class FileUtilitiesTests
     {
         [Fact]
         public void GetReadStream_GetCreateStream_Loopback()
         {
-            var random = GetRandomPath();
+            var random = RandomPath.GetRandomPath();
             const string expectedString = "charlie";
 
             using (var writer = new StreamWriter(FileUtilities.GetCreateStream(random)))
@@ -19,7 +19,7 @@ namespace UnitTests.Compression.Utilities
             }
 
             string observedString;
-            using (var reader = new StreamReader(FileUtilities.GetReadStream(random)))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(random)))
             {
                 observedString = reader.ReadLine();
             }

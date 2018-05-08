@@ -22,7 +22,7 @@ namespace VariantAnnotation.Caches.DataStructures
             CdnaEnd   = cdnaEnd;
         }
 
-        public static ITranscriptRegion Read(ExtendedBinaryReader reader)
+        public static ITranscriptRegion Read(BufferedBinaryReader reader)
         {
             TranscriptRegionType type = (TranscriptRegionType)reader.ReadByte();
             ushort id                 = reader.ReadOptUInt16();

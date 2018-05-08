@@ -62,7 +62,7 @@ namespace SAUtils.TsvWriters
 
 			}
 
-			var isRefMinor = totalAltAlleleFreq >= SaDataBaseCommon.RefMinorThreshold;
+			var isRefMinor = totalAltAlleleFreq >= SaCommon.RefMinorThreshold;
 
 
 			if(isRefMinor)

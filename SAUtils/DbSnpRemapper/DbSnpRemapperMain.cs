@@ -47,7 +47,7 @@ namespace SAUtils.DbSnpRemapper
 
         private static ExitCodes ProgramExecution()
         {
-            var tempLeftoverFilename = "LeftOvers.vcf.gz";
+            const string tempLeftoverFilename = "LeftOvers.vcf.gz";
             Dictionary<string, StreamWriter> writers;
 
             using (var srcReader = GZipUtilities.GetAppropriateStreamReader(_srcMapFile))

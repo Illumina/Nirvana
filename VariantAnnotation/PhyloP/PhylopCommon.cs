@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
+using IO;
 using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.PhyloP

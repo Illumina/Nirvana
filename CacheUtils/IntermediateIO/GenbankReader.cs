@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genbank;
 using Intervals;
+using IO;
 using OptimizedCore;
 
 namespace CacheUtils.IntermediateIO
@@ -13,7 +14,7 @@ namespace CacheUtils.IntermediateIO
 
         internal GenbankReader(Stream stream)
         {
-            _reader = new StreamReader(stream);
+            _reader = FileUtilities.GetStreamReader(stream);
             IntermediateIoCommon.ReadHeader(_reader, IntermediateIoCommon.FileType.Genbank);
         }
 

@@ -12,6 +12,7 @@ using VariantAnnotation.Providers;
 
 namespace VariantAnnotation.PhyloP
 {
+    /// <inheritdoc />
     /// <summary>
     /// Reads the wigFix files and creates a list of nirvana phylop database objects (one object per file). 
     /// </summary>
@@ -50,9 +51,6 @@ namespace VariantAnnotation.PhyloP
 
         private bool _isDisposed;
 
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -268,7 +266,7 @@ namespace VariantAnnotation.PhyloP
             WriteScores(writer, _compressedBuffer, compressedSize);
         }
 
-        private static void WriteScores(ExtendedBinaryWriter writer, byte[] compressedBuffer, int length)
+        private static void WriteScores(BinaryWriter writer, byte[] compressedBuffer, int length)
         {
             writer.Write(length);
             writer.Write(compressedBuffer, 0, length);

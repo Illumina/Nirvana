@@ -175,7 +175,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
                 ms.Position = 0;
 
-                using (var reader = new ExtendedBinaryReader(ms))
+                using (var reader = new BufferedBinaryReader(ms))
                 {
                     observedStrings = TranscriptCacheReader.ReadItems(reader, () => reader.ReadAsciiString());
                 }
@@ -195,7 +195,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
                 {
                     using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true)) writer.Write(7);
                     ms.Position = 0;
-                    using (var reader = new ExtendedBinaryReader(ms)) TranscriptCacheReader.CheckGuard(reader);
+                    using (var reader = new BufferedBinaryReader(ms)) TranscriptCacheReader.CheckGuard(reader);
                 }
             });
         }

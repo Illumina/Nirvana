@@ -5,7 +5,7 @@ using System.IO.Compression;
 using System.Linq;
 using CommandLine.Utilities;
 using Compression.FileHandling;
-using Compression.Utilities;
+using IO;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using Variants;

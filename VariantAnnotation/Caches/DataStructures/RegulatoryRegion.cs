@@ -24,10 +24,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Chromosome = chromosome;
         }
 
-        /// <summary>
-        /// reads the regulatory element data from the binary reader
-        /// </summary>
-        public static IRegulatoryRegion Read(IExtendedBinaryReader reader, IDictionary<ushort, IChromosome> chromosomeIndexDictionary)
+        public static IRegulatoryRegion Read(IBufferedBinaryReader reader, IDictionary<ushort, IChromosome> chromosomeIndexDictionary)
         {
             var refIndex = reader.ReadOptUInt16();
             int start    = reader.ReadOptInt32();
@@ -38,9 +35,6 @@ namespace VariantAnnotation.Caches.DataStructures
             return new RegulatoryRegion(chromosomeIndexDictionary[refIndex], start, end, id, type);
         }
 
-        /// <summary>
-        /// writes the regulatory element data to the binary writer
-        /// </summary>
         public void Write(IExtendedBinaryWriter writer)
         {
             writer.WriteOpt(Chromosome.Index);

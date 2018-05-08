@@ -22,8 +22,8 @@ namespace VariantAnnotation.Sequence
 
         public static ReferenceMetadata Read(ExtendedBinaryReader reader)
         {
-            var ucscName    = reader.ReadAsciiString();
-            var ensemblName = reader.ReadAsciiString();
+            string ucscName    = reader.ReadAsciiString();
+            string ensemblName = reader.ReadAsciiString();
             reader.ReadBoolean(); // TODO: Remove this when we update the reference file format
 
             return new ReferenceMetadata(ucscName, ensemblName);

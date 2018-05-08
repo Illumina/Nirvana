@@ -28,9 +28,6 @@ namespace CacheUtils.PredictionCache
             _writer.Dispose();
         }
 
-        /// <summary>
-        /// writes the annotations to the current database file
-        /// </summary>
         internal void Write(Prediction.Entry[] lut, Prediction[][] predictionsPerRef)
         {
             _blockStream.WriteHeader(_header.Write);
@@ -41,15 +38,14 @@ namespace CacheUtils.PredictionCache
 
         private void WritePredictions(IReadOnlyList<Prediction[]> predictionsPerRef)
         {
-            var indexEntries  = _header.Custom.Entries;
-            var blockPosition = new BlockStream.BlockPosition();
+            var indexEntries = _header.Custom.Entries;
 
             for (var i = 0; i < predictionsPerRef.Count; i++)
             {
 	            var refPredictions = predictionsPerRef[i];
 
-				_blockStream.GetBlockPosition(blockPosition);
-                indexEntries[i].FileOffset = blockPosition.FileOffset;
+				var position = _blockStream.GetBlockPosition();
+                indexEntries[i].FileOffset = position.FileOffset;
                 indexEntries[i].Count      = refPredictions?.Length ?? 0;
 
                 if (refPredictions != null)

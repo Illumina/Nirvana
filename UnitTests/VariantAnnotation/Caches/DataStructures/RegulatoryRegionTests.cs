@@ -43,7 +43,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
                 ms.Position = 0;
 
-                using (var reader = new ExtendedBinaryReader(ms))
+                using (var reader = new BufferedBinaryReader(ms))
                 {
                     observedRegulatoryRegion = RegulatoryRegion.Read(reader, indexToChromosome);
                 }

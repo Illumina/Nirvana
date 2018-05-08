@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using CacheUtils.Genes.DataStructures;
 using Genome;
 using Intervals;
+using IO;
 using OptimizedCore;
 
 namespace CacheUtils.Genes.IO
@@ -17,7 +17,7 @@ namespace CacheUtils.Genes.IO
         public UgaGeneReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome, bool leaveOpen = false)
         {
             _refNameToChromosome = refNameToChromosome;
-            _reader = new StreamReader(stream, Encoding.ASCII, leaveOpen);
+            _reader = FileUtilities.GetStreamReader(stream, leaveOpen);
             _reader.ReadLine();
         }
 

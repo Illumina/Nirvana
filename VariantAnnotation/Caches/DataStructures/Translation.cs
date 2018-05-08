@@ -17,7 +17,7 @@ namespace VariantAnnotation.Caches.DataStructures
             PeptideSeq   = peptideSeq;
         }
 
-        public static ITranslation Read(ExtendedBinaryReader reader, string[] peptideSeqs)
+        public static ITranslation Read(BufferedBinaryReader reader, string[] peptideSeqs)
         {
             var codingRegion = DataStructures.CodingRegion.Read(reader);
             var proteinId    = CompactId.Read(reader);

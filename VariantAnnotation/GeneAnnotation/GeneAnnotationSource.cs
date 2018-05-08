@@ -26,7 +26,7 @@ namespace VariantAnnotation.GeneAnnotation
                 writer.Write(jsonString);
         }
 
-        public static IGeneAnnotationSource Read(IExtendedBinaryReader reader)
+        public static IGeneAnnotationSource Read(ExtendedBinaryReader reader)
         {
             var dataSource = reader.ReadAsciiString();
             var isArray = reader.ReadBoolean();

@@ -6,7 +6,6 @@ using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
@@ -19,7 +18,7 @@ namespace SAUtils.TsvWriters
 		private string _currentChromosome;
 		#endregion
 
-		public IntervalTsvWriter(string outputPath, DataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
+		public IntervalTsvWriter(string outputPath, IDataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
 			ReportFor reportingFor)
 		{
 			var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ","_") + ".interval.tsv.gz";

@@ -8,7 +8,7 @@ namespace VariantAnnotation.GeneAnnotation
     public sealed class GeneAnnotationProvider : IGeneAnnotationProvider
     {
 	    public string Name { get; }
-	    public GenomeAssembly Assembly { get; }
+        public GenomeAssembly Assembly => GenomeAssembly.Unknown;
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
         private readonly Dictionary<string, IAnnotatedGene> _geneAnnotationDict;

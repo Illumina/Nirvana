@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Compression.Utilities;
+using IO;
 using Phantom.DataStructures;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;

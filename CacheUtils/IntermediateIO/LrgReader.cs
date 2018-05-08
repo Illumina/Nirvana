@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Utilities;
 
@@ -16,7 +16,7 @@ namespace CacheUtils.IntermediateIO
         {
             var transcriptIds = new HashSet<string>();
 
-            using (var reader = new StreamReader(FileUtilities.GetReadStream(lrgPath)))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(lrgPath)))
             {
                 while (true)
                 {

@@ -76,7 +76,7 @@ namespace VariantAnnotation.Caches.DataStructures
             return new EncodedTranscriptData(info, contents);
         }
 
-        public static EncodedTranscriptData Read(ExtendedBinaryReader reader)
+        public static EncodedTranscriptData Read(BufferedBinaryReader reader)
         {
             var info     = reader.ReadUInt16();
             var contents = reader.ReadByte();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using IO;
 
 namespace VariantAnnotation.PhyloP
 {
@@ -21,7 +22,7 @@ namespace VariantAnnotation.PhyloP
 			FilePosition = -1;
 		}
 
-		public PhylopInterval(BinaryReader reader)
+		public PhylopInterval(ExtendedBinaryReader reader)
 		{
 			Read(reader);
 		}
@@ -45,12 +46,12 @@ namespace VariantAnnotation.PhyloP
 			binaryWriter.Write(FilePosition);
 		}
 
-		private void Read(BinaryReader binaryReader)
+		private void Read(ExtendedBinaryReader reader)
 		{
-			Begin        = binaryReader.ReadInt32();
-			Length       = binaryReader.ReadInt32();
-			StepSize     = binaryReader.ReadInt16();
-			FilePosition = binaryReader.ReadInt64();			
+			Begin        = reader.ReadInt32();
+			Length       = reader.ReadInt32();
+			StepSize     = reader.ReadInt16();
+			FilePosition = reader.ReadInt64();			
 		}
 
 		public override string ToString()

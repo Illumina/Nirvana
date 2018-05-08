@@ -1,9 +1,9 @@
 ﻿using System;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
-using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
+using IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 

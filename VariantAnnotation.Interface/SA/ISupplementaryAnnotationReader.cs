@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Intervals;
 
 namespace VariantAnnotation.Interface.SA
 {
-    public interface ISupplementaryAnnotationReader
+    public interface ISupplementaryAnnotationReader : IDisposable
     {
         IEnumerable<Interval<ISupplementaryInterval>> SmallVariantIntervals { get; }
         IEnumerable<Interval<ISupplementaryInterval>> SvIntervals { get; }

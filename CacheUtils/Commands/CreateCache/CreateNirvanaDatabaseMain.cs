@@ -15,6 +15,7 @@ using Compression.Utilities;
 using ErrorHandling;
 using Genome;
 using Intervals;
+using IO;
 using VariantAnnotation.Interface;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;

@@ -4,7 +4,6 @@ using Compression.FileHandling;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
@@ -21,9 +20,6 @@ namespace SAUtils.TsvWriters
 
         private bool _disposed;
 
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -53,12 +49,12 @@ namespace SAUtils.TsvWriters
         #endregion
 
 
-        public SaMiscTsvWriter(string outputPath,DataSourceVersion dataSourceVersion, string assembly,string keyName, ISequenceProvider sequenceProvider)
+        public SaMiscTsvWriter(string outputPath, IDataSourceVersion dataSourceVersion, string assembly, string keyName, ISequenceProvider sequenceProvider)
         {
             var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".misc.tsv.gz";
             _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputPath, fileName));
 
-            _bgzipTextWriter.Write(GetHeader(dataSourceVersion,assembly));
+            _bgzipTextWriter.Write(GetHeader(dataSourceVersion, assembly));
 
             _tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName + ".tvi"));
             _sequenceProvider = sequenceProvider;

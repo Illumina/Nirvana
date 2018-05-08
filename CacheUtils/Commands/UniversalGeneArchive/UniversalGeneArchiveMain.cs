@@ -14,6 +14,7 @@ using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
 using Genome;
+using IO;
 using Microsoft.Extensions.Configuration;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Logger;

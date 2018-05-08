@@ -30,7 +30,7 @@ namespace VariantAnnotation.Caches.DataStructures
 	        Chromosome		= chromosome;
         }
 
-        public static IGene Read(IExtendedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
+        public static IGene Read(IBufferedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
         {
             ushort referenceIndex = reader.ReadOptUInt16();
             int start             = reader.ReadOptInt32();

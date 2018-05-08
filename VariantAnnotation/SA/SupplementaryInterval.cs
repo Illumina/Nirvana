@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Intervals;
+using IO;
 using VariantAnnotation.Interface.SA;
 
 namespace VariantAnnotation.SA
@@ -25,14 +26,14 @@ namespace VariantAnnotation.SA
             ReportingFor  = reportingFor;
         }
 
-        public static SupplementaryInterval Read(BinaryReader reader)
+        public static SupplementaryInterval Read(ExtendedBinaryReader reader)
         {
-            var keyName       = reader.ReadString();
-            var referenceName = reader.ReadString();
-            var start         = reader.ReadInt32();
-            var end           = reader.ReadInt32();
-            var jsonString    = reader.ReadString();
-            var reportingFor  = (ReportFor)reader.ReadByte();
+            string keyName       = reader.ReadString();
+            string referenceName = reader.ReadString();
+            int start            = reader.ReadInt32();
+            int end              = reader.ReadInt32();
+            string jsonString    = reader.ReadString();
+            var reportingFor     = (ReportFor)reader.ReadByte();
 
             return new SupplementaryInterval(keyName, referenceName, start, end, jsonString, reportingFor);
         }
@@ -50,9 +51,9 @@ namespace VariantAnnotation.SA
         public double? GetReciprocalOverlap(IInterval variant)
         {
             if (Start >= End || variant.Start > variant.End) return null;
-            var overlapStart = Math.Max(Start, variant.Start);
-            var overlapEnd   = Math.Min(End, variant.End);
-            var maxLen       = Math.Max(variant.End - variant.Start + 1, End - Start + 1);
+            int overlapStart = Math.Max(Start, variant.Start);
+            int overlapEnd   = Math.Min(End, variant.End);
+            int maxLen       = Math.Max(variant.End - variant.Start + 1, End - Start + 1);
             return Math.Max(0, (overlapEnd - overlapStart + 1) * 1.0 / maxLen);
         }
     }

@@ -62,7 +62,7 @@ namespace Nirvana
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
                 geneAnnotationProvider, conservationProvider);
  
-            string vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaDataBaseCommon.DataVersion;
+            string vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
             string jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))

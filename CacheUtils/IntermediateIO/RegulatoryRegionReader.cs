@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Genome;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
@@ -18,7 +19,7 @@ namespace CacheUtils.IntermediateIO
         internal RegulatoryRegionReader(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             _refIndexToChromosome = refIndexToChromosome;
-            _reader = new StreamReader(stream);
+            _reader = FileUtilities.GetStreamReader(stream);
             IntermediateIoCommon.ReadHeader(_reader, IntermediateIoCommon.FileType.Regulatory);
         }
 

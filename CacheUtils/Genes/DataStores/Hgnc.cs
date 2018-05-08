@@ -5,8 +5,8 @@ using System.Linq;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Genes.Utilities;
-using Compression.Utilities;
 using Genome;
+using IO;
 
 namespace CacheUtils.Genes.DataStores
 {

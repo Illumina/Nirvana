@@ -133,7 +133,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             return sites;
         }
 
-        private static void TryAddValue(string value, HashSet<string> sites)
+        private static void TryAddValue(string value, ISet<string> sites)
         {
            if (!string.IsNullOrEmpty(value) && value != "NS")
                 sites.Add(value);

@@ -18,7 +18,7 @@ namespace VariantAnnotation.IO.Caches
         public static PredictionCacheCustomHeader Read(BinaryReader reader)
         {
             ushort numReferenceSeqs = reader.ReadUInt16();
-            var entries             = new IndexEntry[numReferenceSeqs];
+            var entries = new IndexEntry[numReferenceSeqs];
             for (var i = 0; i < numReferenceSeqs; i++) entries[i].Read(reader);
             return new PredictionCacheCustomHeader(entries);
         }

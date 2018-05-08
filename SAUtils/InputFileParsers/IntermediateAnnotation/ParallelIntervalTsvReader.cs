@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
@@ -40,7 +41,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
         public ParallelIntervalTsvReader(string fileName)
         {
             _fileName = fileName;
-            using (var tsvIndex = new TsvIndex(new BinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
+            using (var tsvIndex = new TsvIndex(new ExtendedBinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
             {
                 _refNameOffsets = tsvIndex.TagPositions;
             }

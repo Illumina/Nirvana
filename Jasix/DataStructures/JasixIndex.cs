@@ -33,7 +33,7 @@ namespace Jasix.DataStructures
             _sectionRanges = new Dictionary<string, FileRange>();
 		}
 
-		private JasixIndex(IExtendedBinaryReader reader):this()
+		private JasixIndex(ExtendedBinaryReader reader):this()
 		{
 			int version = reader.ReadOptInt32();
 			if (version != JasixCommons.Version)
@@ -65,8 +65,6 @@ namespace Jasix.DataStructures
 		    }
 
 		}
-
-
 
 		public JasixIndex(Stream stream) : this(new ExtendedBinaryReader(stream))
 		{

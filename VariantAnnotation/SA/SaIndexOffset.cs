@@ -7,13 +7,10 @@ namespace VariantAnnotation.SA
         public int Position { get; }
         public int Offset { get; }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public SaIndexOffset(int position, int offset)
         {
             Position = position;
-            Offset = offset;
+            Offset   = offset;
         }
     }
 }

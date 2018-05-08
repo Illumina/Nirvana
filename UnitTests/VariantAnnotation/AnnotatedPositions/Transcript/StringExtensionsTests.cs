@@ -3,7 +3,7 @@ using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 {
-    public class StringExtensionsTests
+    public sealed class StringExtensionsTests
     {
         [Theory]
         [InlineData(null,null,0)]

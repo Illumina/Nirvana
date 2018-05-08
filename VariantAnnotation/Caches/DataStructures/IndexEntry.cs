@@ -10,7 +10,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public void Read(BinaryReader reader)
         {
             FileOffset = reader.ReadInt64();
-            Count = reader.ReadInt32();
+            Count      = reader.ReadInt32();
         }
 
         public void Write(BinaryWriter writer)

@@ -4,7 +4,6 @@ using System.IO;
 using Compression.Utilities;
 using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
@@ -14,7 +13,7 @@ namespace SAUtils.TsvWriters
         private readonly StreamWriter _writer;
         #endregion
 
-        public GeneAnnotationTsvWriter(string outputDirectory, DataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
+        public GeneAnnotationTsvWriter(string outputDirectory, IDataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
             bool isArray)
         {
             var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".gene.tsv.gz";

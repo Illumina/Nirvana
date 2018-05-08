@@ -10,7 +10,7 @@ namespace Phantom.DataStructures
         public readonly bool IsPhased;
         public readonly bool IsHomozygous;
 
-        public Genotype(int[] alleleIndexes, bool isPhased)
+        private Genotype(int[] alleleIndexes, bool isPhased)
         {
             AlleleIndexes = alleleIndexes;
             IsPhased = isPhased;

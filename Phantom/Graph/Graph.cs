@@ -21,7 +21,7 @@ namespace Phantom.Graph
             return true;
         }
 
-        public void SetVertexAndNeighbors(T vertex, LinkedList<T> neighbors) => _vertexToNeighbors[vertex] = neighbors;
+        private void SetVertexAndNeighbors(T vertex, LinkedList<T> neighbors) => _vertexToNeighbors[vertex] = neighbors;
 
         public void AddEdge(T oneVertex, T otherVertex)
         {
@@ -37,7 +37,7 @@ namespace Phantom.Graph
             }
         }
 
-        public void AddVertexAndNeighbor(T sourceVertex, T targetVertex)
+        private void AddVertexAndNeighbor(T sourceVertex, T targetVertex)
         {
             if (_vertexToNeighbors.TryGetValue(sourceVertex, out var neighbors))
             {
@@ -64,7 +64,7 @@ namespace Phantom.Graph
 
         public LinkedList<T> GetNeighbors(T vertex) => _vertexToNeighbors[vertex];
 
-        public bool HasVertex(T vertex) => _vertexToNeighbors.ContainsKey(vertex);
+        private bool HasVertex(T vertex) => _vertexToNeighbors.ContainsKey(vertex);
 
         public Graph<T> CreateGraphFromLinkedVertices(IReadOnlyList<T> vertices)
         {

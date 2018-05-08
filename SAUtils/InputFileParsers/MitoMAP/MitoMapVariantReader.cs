@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
@@ -67,7 +68,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         {
             Console.WriteLine($"Processing {_dataType} file");
             bool isDataLine = false;
-            using (var reader = new StreamReader(_mitoMapFileInfo.FullName))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(_mitoMapFileInfo.FullName)))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
@@ -23,7 +24,7 @@ namespace SAUtils.InputFileParsers.DbSnp
 	    
 	    public IEnumerable<DbSnpItem> GetDbSnpItems()
         {
-            using (var reader = new StreamReader(_stream))
+            using (var reader = FileUtilities.GetStreamReader(_stream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

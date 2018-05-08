@@ -1,5 +1,5 @@
-﻿using Compression.Utilities;
-using Genome;
+﻿using Genome;
+using IO;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;

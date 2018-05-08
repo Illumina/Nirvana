@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches;

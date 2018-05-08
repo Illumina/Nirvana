@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
@@ -52,7 +53,7 @@ namespace Vcf
         public VcfReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
             IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer)
         {
-            _reader = new StreamReader(stream);
+            _reader = FileUtilities.GetStreamReader(stream);
             _variantFactory = new VariantFactory(refNameToChromosome, refMinorProvider, enableVerboseTranscript);
             _refNameToChromosome = refNameToChromosome;
             bool hasSampleColumn = ParseHeader();

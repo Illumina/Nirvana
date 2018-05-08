@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Compression.FileHandling;
-using Compression.Utilities;
+using IO;
 using Jasix;
 using Jasix.DataStructures;
 using OptimizedCore;

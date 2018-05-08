@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
 using Genome;
+using IO;
 using VariantAnnotation.Caches;
 using VariantAnnotation.IO.Caches;
 

@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using Compression.Utilities;
+using IO;
 
 namespace Compression.FileHandling
 {

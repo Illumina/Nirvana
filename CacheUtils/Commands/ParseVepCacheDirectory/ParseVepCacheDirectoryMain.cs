@@ -10,6 +10,7 @@ using CacheUtils.Commands.Download;
 using CacheUtils.Genbank;
 using CacheUtils.Logger;
 using Genome;
+using IO;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Logger;

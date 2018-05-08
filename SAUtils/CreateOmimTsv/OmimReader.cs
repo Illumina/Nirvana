@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using IO;
 using OptimizedCore;
 
 namespace SAUtils.CreateOmimTsv
@@ -21,7 +22,7 @@ namespace SAUtils.CreateOmimTsv
 
         public void AddOmimEntries(Dictionary<int, OmimImportEntry> omimEntries)
         {
-            using (var reader = new StreamReader(_stream))
+            using (var reader = FileUtilities.GetStreamReader(_stream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

@@ -165,7 +165,7 @@ namespace UnitTests.Phantom.DataStructures
         }
 
 
-        internal static IPosition GetMockedIPositionOnChr1(int start, int end, string altAllele="A", string formatCol = "GT")
+        private static IPosition GetMockedIPositionOnChr1(int start, int end, string altAllele="A", string formatCol = "GT")
         {
             var positionMock = new Mock<IPosition>();
             var chromosome = new Chromosome("chr1", "1", 0);

@@ -7,7 +7,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
-	public class DataSourceVersionTests
+	public sealed class DataSourceVersionTests
 	{
 		[Fact]
 		public void ReadDataVersionFromFile()

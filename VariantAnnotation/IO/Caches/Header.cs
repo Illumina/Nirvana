@@ -21,7 +21,7 @@ namespace VariantAnnotation.IO.Caches
             DataVersion       = dataVersion;
             Source            = source;
             CreationTimeTicks = creationTimeTicks;
-            Assembly    = genomeAssembly;
+            Assembly          = genomeAssembly;
         }
 
         protected void Write(BinaryWriter writer)

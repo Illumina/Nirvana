@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using Genome;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;

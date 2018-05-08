@@ -4,8 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
-using Compression.Utilities;
 using Genome;
+using IO;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.IntermediateAnnotation;
 using SAUtils.Interface;
@@ -135,7 +135,7 @@ namespace SAUtils.MergeInterimTsvs
 
         private static void MergeGene(IReadOnlyList<GeneTsvReader> geneReaders, IEnumerable<SaHeader> geneHeaders, string outputDirectory, GenomeAssembly assembly)
         {
-            var geneAnnotationDatabasePath = Path.Combine(outputDirectory, SaDataBaseCommon.GeneLevelAnnotationFileName);
+            var geneAnnotationDatabasePath = Path.Combine(outputDirectory, SaCommon.GeneLevelAnnotationFileName);
             var geneAnnotationStream       = FileUtilities.GetCreateStream(geneAnnotationDatabasePath);
             var databaseHeader             = new SupplementaryAnnotationHeader("", geneHeaders.Select(x => x.GetDataSourceVersion()), assembly);
 

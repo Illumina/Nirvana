@@ -7,23 +7,18 @@ using VariantAnnotation.Interface.SA;
 
 namespace VariantAnnotation.SA
 {
-    public class SaIndex : ISaIndex
+    public sealed class SaIndex : ISaIndex
     {
         private readonly IIntervalSearch<long> _fileOffsetIntervals;
         public (int Position, string GlobalMajorAllele)[] GlobalMajorAlleleForRefMinor { get; }
 
         private Interval<long> _cachedInterval = IntervalArray<long>.EmptyInterval;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         private SaIndex(IIntervalSearch<long> fileOffsetIntervals, (int, string)[] globalMajorAlleleForRefMinor)
         {
-            _fileOffsetIntervals = fileOffsetIntervals;
+            _fileOffsetIntervals         = fileOffsetIntervals;
             GlobalMajorAlleleForRefMinor = globalMajorAlleleForRefMinor;
         }
-
-
 
         public long GetOffset(int position)
         {
@@ -37,7 +32,6 @@ namespace VariantAnnotation.SA
             return interval.Value;
         }
 
-
         public static ISaIndex Read(Stream stream)
         {
             IntervalArray<long> intervalArray;
@@ -45,14 +39,14 @@ namespace VariantAnnotation.SA
 
             using (var reader = new ExtendedBinaryReader(stream))
             {
-                var numEntries = reader.ReadOptInt32();
-                var intervals = new Interval<long>[numEntries];
+                int numEntries = reader.ReadOptInt32();
+                var intervals  = new Interval<long>[numEntries];
 
-                for (int i = 0; i < numEntries; i++)
+                for (var i = 0; i < numEntries; i++)
                 {
-                    var begin = reader.ReadOptInt32();
-                    var end = reader.ReadOptInt32();
-                    var fileOffset = reader.ReadOptInt64();
+                    int begin       = reader.ReadOptInt32();
+                    int end         = reader.ReadOptInt32();
+                    long fileOffset = reader.ReadOptInt64();
 
                     intervals[i] = new Interval<long>(begin, end, fileOffset);
                 }
@@ -65,20 +59,19 @@ namespace VariantAnnotation.SA
             return new SaIndex(intervalArray, globalMajorAlleleForRefMinors);
         }
 
-        private static (int Position, string GlobalMajorAllele)[] GetGlobalMajorAlleleInRefMinor(IExtendedBinaryReader reader)
+        private static (int Position, string GlobalMajorAllele)[] GetGlobalMajorAlleleInRefMinor(ExtendedBinaryReader reader)
         {
-            var numPositions = reader.ReadOptInt32();
+            int numPositions                  = reader.ReadOptInt32();
             var globalMajorAlleleForRefMinors = new(int, string)[numPositions];
-            int oldPosition = 0;
+            var oldPosition                   = 0;
 
-            for (int i = 0; i < numPositions; i++)
+            for (var i = 0; i < numPositions; i++)
             {
-                var deltaPosition = reader.ReadOptInt32();
-                var refMinorPosition = oldPosition + deltaPosition;
-                oldPosition = refMinorPosition;
-                var globalMajorAllele = reader.ReadAsciiString();
+                int deltaPosition                = reader.ReadOptInt32();
+                int refMinorPosition             = oldPosition + deltaPosition;
+                oldPosition                      = refMinorPosition;
+                string globalMajorAllele         = reader.ReadAsciiString();
                 globalMajorAlleleForRefMinors[i] = (refMinorPosition, globalMajorAllele);
-
             }
 
             return globalMajorAlleleForRefMinors;
@@ -103,14 +96,14 @@ namespace VariantAnnotation.SA
         {
             writer.WriteOpt(refMinorPositions.Count);
 
-            int oldPosition = 0;
+            var oldPosition = 0;
 
             foreach (var globalMajorAllele in refMinorPositions.OrderBy(x => x.Position))
             {
-                var position = globalMajorAllele.Position;
+                int position      = globalMajorAllele.Position;
                 int deltaPosition = position - oldPosition;
                 writer.WriteOpt(deltaPosition);
-                oldPosition = position;
+                oldPosition       = position;
                 writer.WriteOptAscii(globalMajorAllele.GlobalMajorAllele);
             }
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
 using Genome;
 using Intervals;
 using IO;
@@ -22,9 +21,6 @@ namespace SAUtils.ExtractMiniSa
 
         #endregion
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public MiniSaExtractor(string compressedRefFile, string saPath, int begin, int end, string datasourceName = null,
             string outputDir = null)
         {
@@ -34,8 +30,8 @@ namespace SAUtils.ExtractMiniSa
 
             var refChromDict = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
 
-            var referenceName = GetReferenceName(saPath, refChromDict);
-            _miniSaPath       = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
+            string referenceName = GetReferenceName(saPath, refChromDict);
+            _miniSaPath = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
 
             Console.WriteLine($"MiniSA output to: {_miniSaPath}");
         }
@@ -93,7 +89,7 @@ namespace SAUtils.ExtractMiniSa
                 using (var writer = GetSaWriter(_miniSaPath, reader.Header, smallVariantIntervals, svIntervals,
                         allVariantIntervals,globalMajorAlleles))
                 {
-                    for (var position = _begin; position <= _end; position++)
+                    for (int position = _begin; position <= _end; position++)
                     {
                         var saPosition = reader.GetAnnotation(position);
                         if (saPosition == null) continue;

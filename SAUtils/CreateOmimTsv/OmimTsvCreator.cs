@@ -4,6 +4,7 @@ using VariantAnnotation.GeneAnnotation;
 using System.Linq;
 using Compression.Utilities;
 using ErrorHandling;
+using IO;
 using SAUtils.TsvWriters;
 using SAUtils.InputFileParsers;
 

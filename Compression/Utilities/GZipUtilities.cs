@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Compression;
 using Compression.FileHandling;
 using ErrorHandling.Exceptions;
+using IO;
 
 namespace Compression.Utilities
 {
@@ -17,20 +18,11 @@ namespace Compression.Utilities
             BlockGZip
         }
 
-        /// <summary>
-        /// returns a stream reader that handles compressed or uncompressed files.
-        /// </summary>
-        public static StreamReader GetAppropriateStreamReader(string filePath)
-        {
-            return new StreamReader(GetAppropriateReadStream(filePath));
-        }
-
-        public static Stream GetAppropriateStream(PeekStream peekStream)
-        {
-            var header = peekStream.PeekBytes(NumHeaderBytes);
-            var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
-            return GetAppropriateStream(peekStream, compressionAlgorithm);
-        }
+        public static StreamReader GetAppropriateStreamReader(string filePath) => FileUtilities.GetStreamReader(GetAppropriateReadStream(filePath));
+        public static BinaryReader GetAppropriateBinaryReader(string filePath) => new BinaryReader(GetAppropriateReadStream(filePath));
+        public static StreamWriter GetStreamWriter(string filePath)            => new StreamWriter(GetWriteStream(filePath));
+        public static BinaryWriter GetBinaryWriter(string filePath)            => new BinaryWriter(GetWriteStream(filePath));
+        private static Stream GetWriteStream(string filePath)                  => new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
 
         private static Stream GetAppropriateStream(Stream stream, CompressionAlgorithm compressionAlgorithm)
         {
@@ -53,47 +45,12 @@ namespace Compression.Utilities
             return newStream;
         }
 
-        /// <summary>
-        /// returns a stream reader that handles compressed or uncompressed files.
-        /// </summary>
-        public static BinaryReader GetAppropriateBinaryReader(string filePath)
-        {
-            return new BinaryReader(GetAppropriateReadStream(filePath));
-        }
-
-        /// <summary>
-        /// returns a stream reader that handles compressed or uncompressed files.
-        /// </summary>
         public static Stream GetAppropriateReadStream(string filePath)
         {
-            var header = GetHeader(filePath);
+            var header               = GetHeader(filePath);
             var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
-            var fileStream = FileUtilities.GetReadStream(filePath);
+            var fileStream           = FileUtilities.GetReadStream(filePath);
             return GetAppropriateStream(fileStream, compressionAlgorithm);
-        }
-
-        /// <summary>
-        /// returns a stream writer that produces compressed files
-        /// </summary>
-        public static StreamWriter GetStreamWriter(string filePath)
-        {
-            return new StreamWriter(GetWriteStream(filePath));
-        }
-
-        /// <summary>
-        /// returns a binary writer that produces compressed files
-        /// </summary>
-        public static BinaryWriter GetBinaryWriter(string filePath)
-        {
-            return new BinaryWriter(GetWriteStream(filePath));
-        }
-
-        /// <summary>
-        /// returns a stream reader that handles compressed or uncompressed files.
-        /// </summary>
-        private static Stream GetWriteStream(string filePath)
-        {
-            return new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
         }
 
         private static byte[] GetHeader(string filePath)
@@ -102,7 +59,7 @@ namespace Compression.Utilities
 
             try
             {
-                using (var reader = new BinaryReader(FileUtilities.GetReadStream(filePath)))
+                using (var reader = new ExtendedBinaryReader(FileUtilities.GetReadStream(filePath)))
                 {
                     header = reader.ReadBytes(NumHeaderBytes);
                 }

@@ -16,7 +16,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Bases = bases;
         }
 
-        public static IRnaEdit Read(ExtendedBinaryReader reader)
+        public static IRnaEdit Read(BufferedBinaryReader reader)
         {
             int start    = reader.ReadOptInt32();
             int end      = reader.ReadOptInt32();

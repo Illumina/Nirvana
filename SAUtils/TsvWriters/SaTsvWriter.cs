@@ -24,9 +24,6 @@ namespace SAUtils.TsvWriters
 
         private bool _disposed;
 
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using IO;
 
 namespace SAUtils.DataStructures
 {
@@ -21,7 +22,7 @@ namespace SAUtils.DataStructures
             TagPositions = new Dictionary<string, long>();
         }
 
-        public TsvIndex(BinaryReader reader)
+        public TsvIndex(ExtendedBinaryReader reader)
         {
             var count = reader.ReadInt32();
             if (count == 0) return;

@@ -1,12 +1,11 @@
 ﻿using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.CommandLine.Builders
 {
-    public sealed class ConsoleAppBuilderTests : RandomFileBase
+    public sealed class ConsoleAppBuilderTests
     {
         [Fact]
         public void Parse_UnsupportedOption()

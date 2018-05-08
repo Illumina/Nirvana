@@ -45,7 +45,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 predictionScores.Sift, predictionScores.PolyPhen, consequences, null);
         }
 
-        internal static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
+        private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
             AltAminoAcids, string RefCodons, string AltCodons, string TranscriptAltAllele) AnnotateTranscript(ITranscript transcript, ISimpleVariant variant, AminoAcids aminoAcids,
                 ISequence refSequence)
         {

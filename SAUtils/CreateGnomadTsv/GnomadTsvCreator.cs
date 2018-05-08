@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommandLine.Utilities;
 using Compression.FileHandling;
 using Compression.Utilities;
+using IO;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers;
 using SAUtils.TsvWriters;

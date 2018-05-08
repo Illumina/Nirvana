@@ -2,6 +2,7 @@
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
 

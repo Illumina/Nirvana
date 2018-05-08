@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
+using IO;
 using VariantAnnotation;
+using CommandLine.Utilities;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -40,7 +42,11 @@ namespace Nirvana
 
         public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path, ISequenceProvider sequenceProvider)
         {
-            return new TranscriptAnnotationProvider(path, sequenceProvider);
+            var benchmark = new Benchmark();
+            var provider = new TranscriptAnnotationProvider(path, sequenceProvider);
+            var wallTimeSpan = benchmark.GetElapsedTime();
+            Console.WriteLine("Cache Time: {0} ms", wallTimeSpan.TotalMilliseconds);
+			return provider;
         }
 
         public static IRefMinorProvider GetRefMinorProvider(List<string> supplementaryAnnotationDirectories)

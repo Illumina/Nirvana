@@ -23,7 +23,7 @@ namespace UnitTests
         {
             const string vcfLine = "chr12	7054859	.	G	.	100	PASS	.	.	.";
             var annotatedPosition = AnnotationUtilities.GetAnnotatedPosition(_cacheFilePrefix, null, vcfLine, false);
-            var output = annotatedPosition.GetJsonString();
+            string output = annotatedPosition.GetJsonString();
             Assert.Null(output);
         }
 

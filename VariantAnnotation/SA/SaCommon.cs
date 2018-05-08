@@ -1,6 +1,6 @@
 ﻿namespace VariantAnnotation.SA
 {
-    public static class SaDataBaseCommon
+    public static class SaCommon
     {
         public const uint GuardInt = 4041327495;
 

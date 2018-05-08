@@ -6,6 +6,7 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\IO\IO.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\BlockCompression\BlockCompression.dll" Link="BlockCompression.dll">

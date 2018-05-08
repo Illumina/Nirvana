@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Providers;
@@ -78,7 +79,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             expectedLines.Add(vcfLine);
 
             ms.Position = 0;
-            using (var reader = new StreamReader(ms))
+            using (var reader = FileUtilities.GetStreamReader(ms))
             {
                 string line;
                 int i = 0;

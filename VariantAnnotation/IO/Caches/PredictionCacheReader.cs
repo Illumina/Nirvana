@@ -4,6 +4,7 @@ using System.IO.Compression;
 using System.Text;
 using Compression.Algorithms;
 using Compression.FileHandling;
+using IO;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.Caches;
@@ -12,7 +13,7 @@ namespace VariantAnnotation.IO.Caches
 {
     public sealed class PredictionCacheReader : IDisposable
     {
-        private readonly BinaryReader _reader;
+        private readonly ExtendedBinaryReader _reader;
         private readonly BlockStream _blockStream;
         private readonly string[] _predictionDescriptions;
         private readonly IndexEntry[] _indexEntries;
@@ -23,7 +24,7 @@ namespace VariantAnnotation.IO.Caches
             _blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Decompress);
             Header       = PredictionHeader.Read(stream, _blockStream);
 
-            _reader = new BinaryReader(_blockStream, Encoding.UTF8, true);
+            _reader = new ExtendedBinaryReader(_blockStream, Encoding.Default, true);
             _predictionDescriptions = predictionDescriptions;
 
             _indexEntries = Header.Custom.Entries;
@@ -47,9 +48,9 @@ namespace VariantAnnotation.IO.Caches
         public Prediction[] GetPredictions(ushort refIndex)
         {
             var indexEntry = _indexEntries[refIndex];
-            var bp = new BlockStream.BlockPosition { FileOffset = indexEntry.FileOffset };
 
-            _blockStream.SetBlockPosition(bp);
+            _blockStream.SetBlockPosition(indexEntry.FileOffset);
+            //_reader.Reset();
 
             var predictions = new Prediction[indexEntry.Count];
             for (var i = 0; i < indexEntry.Count; i++) predictions[i] = Prediction.Read(_reader, Header.LookupTable);
