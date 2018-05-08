@@ -41,10 +41,19 @@ namespace VariantAnnotation.AnnotatedPositions
                 jsonObject.AddStringValue("repeatUnit",  Position.InfoData.RepeatUnit);
                 jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
             }
-            
-			if (AnnotatedVariants.Any(IsStructVariant)) jsonObject.AddIntValue("svEnd", Position.InfoData.End);
-            jsonObject.AddStringValue("refAllele",   Position.RefAllele);
-            jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
+
+            if (AnnotatedVariants.Any(IsStructVariant)) jsonObject.AddIntValue("svEnd", Position.InfoData.End);
+
+            if (Position.Variants.Length == 1 && Position.Variants[0].IsRefMinor)
+            {
+                jsonObject.AddStringValue("refAllele", Position.Variants[0].RefAllele);
+                jsonObject.AddStringValues("altAlleles", new []{Position.Variants[0].AltAllele});
+            }
+            else
+            {
+                jsonObject.AddStringValue("refAllele", Position.RefAllele);
+                jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
+            }
 
             jsonObject.AddDoubleValue("quality", Position.Quality);
 
