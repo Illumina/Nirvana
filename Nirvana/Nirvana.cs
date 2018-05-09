@@ -6,7 +6,7 @@ using CommandLine.Utilities;
 using ErrorHandling;
 using Genome;
 using Jasix.DataStructures;
-using Phantom.Workers;
+using Phantom.Recomposer;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
