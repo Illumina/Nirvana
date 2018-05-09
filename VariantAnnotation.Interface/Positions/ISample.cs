@@ -10,7 +10,7 @@
         bool FailedFilter { get; }
         int? CopyNumber { get; }
         bool IsLossOfHeterozygosity { get; }
-        float? DeNovoQuality { get; }
+        double? DeNovoQuality { get; }
         int[] SplitReadCounts { get; }
         int[] PairEndReadCounts { get; }
 		string RepeatNumbers { get; }
