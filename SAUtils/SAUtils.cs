@@ -11,6 +11,7 @@ using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GeneScoresTsv;
 using SAUtils.MergeInterimTsvs;
+using SAUtils.ProcessSpliceNetTsv;
 using VariantAnnotation.Interface;
 
 namespace SAUtils
@@ -31,7 +32,8 @@ namespace SAUtils
                 ["createTopMedTsv"] = new TopLevelOption("create TOPMed tsv file", CreateTopMedTsvMain.Run),
                 ["createCosmicSvs"] = new TopLevelOption("create COSMIC SV tsv files", ExtractCosmicSvsMain.Run),
                 ["createTsvIndex"] = new TopLevelOption("create index (tvi) from a tsv file", CreateTsvIndexMain.Run),
-                ["remapWithDbsnp"]  = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run)
+                ["remapWithDbsnp"]  = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
+                ["filterSpliceNetTsv"]  = new TopLevelOption("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run)
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)

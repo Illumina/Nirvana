@@ -14,7 +14,7 @@ namespace Intervals
 		}
 
 		/// <summary>
-		/// returns values for all intervals that overlap the specified interval
+		/// returns whether there is any interval that overlaps the specified interval
 		/// </summary>
 		public bool OverlapsAny(ushort refIndex, int begin, int end)
 		{
