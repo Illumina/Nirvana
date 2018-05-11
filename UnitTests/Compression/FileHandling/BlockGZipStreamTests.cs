@@ -229,8 +229,8 @@ namespace UnitTests.Compression.FileHandling
                 // compress our data
                 using (var writer = new StreamWriter(new BlockGZipStream(ms, CompressionMode.Compress, true)))
                 {
-                    int currentIndex = 1;
-                    int numBytes = 0;
+                    var currentIndex = 1;
+                    var numBytes     = 0;
 
                     while (true)
                     {
@@ -247,7 +247,7 @@ namespace UnitTests.Compression.FileHandling
                 // decompress our data
                 using (var reader = FileUtilities.GetStreamReader(new BlockGZipStream(ms, CompressionMode.Decompress)))
                 {
-                    int index = 1;
+                    var index = 1;
 
                     while (true)
                     {

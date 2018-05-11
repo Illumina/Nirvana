@@ -15,7 +15,6 @@ namespace VariantAnnotation.PhyloP
     public sealed class PhylopReader : IDisposable
     {
         private readonly string _saDirectory;
-        private readonly Stream _stream;
         private ExtendedBinaryReader _reader;
         private readonly ICompressionAlgorithm _qlz;
 
@@ -35,7 +34,7 @@ namespace VariantAnnotation.PhyloP
         private IDataSourceVersion _version;
         private GenomeAssembly _genomeAssembly;
 
-        public GenomeAssembly Assembly => PhylopCommon.GetAssembly(_saDirectory);
+        public GenomeAssembly GenomeAssembly => PhylopCommon.GetGenomeAssembly(_saDirectory);
 
         public IEnumerable<IDataSourceVersion> DataSourceVersions => PhylopCommon.GetDataSourceVersions(_saDirectory);
 
@@ -52,23 +51,23 @@ namespace VariantAnnotation.PhyloP
         public PhylopReader(Stream stream) : this()
         {
             if (stream == null) return;
-            _stream = stream;
             _reader = new ExtendedBinaryReader(stream);
             LoadHeader();
         }
 
         public PhylopReader(IEnumerable<string> saDirectories) : this()
         {
-            _saDirectory = null;
-            foreach (string saDir in saDirectories)
-            {
-                var phylopFiles = Directory.GetFiles(saDir, "*.npd");
-                if (phylopFiles.Length > 0)
-                {
-                    _saDirectory = saDir;
-                    break;
-                }
-            }
+	        _saDirectory = null;
+
+	        foreach (string saDir in saDirectories)
+	        {
+				var phylopFiles = Directory.GetFiles(saDir, "*.npd");
+		        if (phylopFiles.Length > 0)
+		        {
+			        _saDirectory = saDir;
+					break;
+		        }
+			}
         }
 
         public void LoadChromosome(string ucscReferenceName)
@@ -121,7 +120,7 @@ namespace VariantAnnotation.PhyloP
 
         public IDataSourceVersion GetDataSourceVersion() => _version;
 
-        public GenomeAssembly GetAssembly() => _genomeAssembly;
+        public GenomeAssembly GetGenomeAssembly() => _genomeAssembly;
 
         private void CheckGuard()
         {
@@ -134,8 +133,9 @@ namespace VariantAnnotation.PhyloP
 
         private void LoadChromosomeIntervals()
         {
-            _stream.Position = _intervalListPosition;
-            //_reader.Reset();
+            long currentPos = _reader.BaseStream.Position;
+
+            _reader.BaseStream.Position = _intervalListPosition;
 
             CheckGuard();
 
@@ -146,6 +146,8 @@ namespace VariantAnnotation.PhyloP
                 var chromosomeInterval = new PhylopInterval(_reader);
                 _phylopIntervals.Add(chromosomeInterval);
             }
+
+            _reader.BaseStream.Position = currentPos;
         }
 
         private void ReadIntervalScores(PhylopInterval interval)
@@ -153,11 +155,9 @@ namespace VariantAnnotation.PhyloP
             if (interval == null) return;
 
             long filePosition = interval.FilePosition;
+            //going to the file location that contains this interval.
             if (filePosition != -1)
-            {
-                _stream.Position = filePosition;
-                //_reader.Reset();
-            }
+                _reader.BaseStream.Position = filePosition;
             else return;
 
             int length           = _reader.ReadInt32();
@@ -190,14 +190,14 @@ namespace VariantAnnotation.PhyloP
                     return _currentIntervalIndex;
             }
 
-            var pointInterval           = new PhylopInterval(position, 1, 1); // overload construtor for points
-            int containingIntervalIndex = _phylopIntervals.BinarySearch(pointInterval);
+            var pointInterval = new PhylopInterval(position, 1, 1);// overload construtor for points
 
+            int containingIntervalIndex = _phylopIntervals.BinarySearch(pointInterval);
             // The zero-based index of item in the sorted List<T>, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of Count.
             if (containingIntervalIndex == -1)
             {
                 // smaller than the first position of the first interval
-                return -1; // empty string represe
+                return -1;// empty string represe
             }
 
             if (containingIntervalIndex < 0) containingIntervalIndex = ~containingIntervalIndex - 1;

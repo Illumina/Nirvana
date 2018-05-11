@@ -6,23 +6,10 @@ namespace Compression.Algorithms
 {
     public sealed class QuickLZ : ICompressionAlgorithm
     {
-        #region members
-
         private const int CompressionOverhead = 400;
 
-        #endregion
+        public QuickLZ() => LibraryUtilities.CheckLibrary();
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public QuickLZ()
-        {
-            LibraryUtilities.CheckLibrary();
-        }
-
-        /// <summary>
-        /// compresses a source byte array and stores the compressed bytes in the destination byte array
-        /// </summary>
         public int Compress(byte[] source, int srcLength, byte[] destination, int destLength)
 		{
 			if (destination == null || GetCompressedBufferBounds(srcLength) > destination.Length)
@@ -33,9 +20,6 @@ namespace Compression.Algorithms
 			return SafeNativeMethods.QuickLzCompress(source, srcLength, destination, destLength);
 		}
 
-        /// <summary>
-        /// decompresses a source byte array and stores the uncompressed bytes in the destination byte array
-        /// </summary>
         public int Decompress(byte[] source, int srcLength, byte[] destination, int destLength)
         {
             if (destination == null)
@@ -46,21 +30,9 @@ namespace Compression.Algorithms
             return SafeNativeMethods.QuickLzDecompress(source, destination, destLength);
         }
 
-        /// <summary>
-        /// returns the appropriate length of the decompression buffer
-        /// </summary>
-        public int GetDecompressedLength(byte[] source, int srcLength)
-        {
-            return (int)SafeNativeMethods.qlz_size_decompressed(source);
-        }
+        public int GetDecompressedLength(byte[] source, int srcLength) => (int)SafeNativeMethods.qlz_size_decompressed(source);
 
-        /// <summary>
-        /// returns the appropriate length of the compression buffer
-        /// </summary>
-        public int GetCompressedBufferBounds(int srcLength)
-        {
-            return srcLength + CompressionOverhead;
-        }
+        public int GetCompressedBufferBounds(int srcLength) => srcLength + CompressionOverhead;
 
         private static class SafeNativeMethods
         {

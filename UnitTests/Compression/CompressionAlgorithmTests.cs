@@ -10,13 +10,7 @@ namespace UnitTests.Compression
         private const int NumOriginalBytes = 20000;
         private readonly byte[] _originalBytes;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public CompressionAlgorithmTests()
-        {
-            _originalBytes = BlockStreamTests.GetRandomBytes(NumOriginalBytes);
-        }
+        public CompressionAlgorithmTests() => _originalBytes = BlockStreamTests.GetRandomBytes(NumOriginalBytes);
 
         [Theory]
         [InlineData(CompressionAlgorithms.QuickLz)]
@@ -26,9 +20,9 @@ namespace UnitTests.Compression
         {
             var compressionAlgorithm = GetCompressionAlgorithm(ca);
 
-            int compressedBufferSize = compressionAlgorithm.GetCompressedBufferBounds(NumOriginalBytes);
+            int compressedBufferSize    = compressionAlgorithm.GetCompressedBufferBounds(NumOriginalBytes);
             var observedCompressedBytes = new byte[compressedBufferSize];
-            var smallBuffer = new byte[10];
+            var smallBuffer             = new byte[10];
 
             Assert.Throws<InvalidOperationException>(delegate
             {

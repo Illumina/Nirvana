@@ -21,7 +21,7 @@ namespace VariantAnnotation.Providers
 		{
             Name                      = "Conservation score provider";
             _phylopReader             = new PhylopReader(dirPaths);
-            Assembly                  = _phylopReader.Assembly;
+            Assembly                  = _phylopReader.GenomeAssembly;
             DataSourceVersions        = _phylopReader.DataSourceVersions;
             _currentUcscReferenceName = "";
         }

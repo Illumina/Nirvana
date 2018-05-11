@@ -25,7 +25,7 @@ namespace VariantAnnotation.PhyloP
 			return  phylopFiles.Length == 0 ? new List<IDataSourceVersion>() : new List<IDataSourceVersion> { GetPhylopHeader(saDir).Version };
         }
 
-        public static GenomeAssembly GetAssembly(string saDir)
+        public static GenomeAssembly GetGenomeAssembly(string saDir)
         {
 			if (saDir == null)
 				return GenomeAssembly.Unknown;
@@ -35,7 +35,7 @@ namespace VariantAnnotation.PhyloP
 			return phylopFiles.Length == 0 ? GenomeAssembly.Unknown : GetPhylopHeader(saDir).Item1;
         }
 
-        private static (GenomeAssembly Assembly, IDataSourceVersion Version) GetPhylopHeader(string saDir)
+        private static (GenomeAssembly GenomeAssembly, IDataSourceVersion Version) GetPhylopHeader(string saDir)
         {
             var phylopFiles = Directory.GetFiles(saDir, "*.npd");
             if (phylopFiles == null || phylopFiles.Length==0) throw new UserErrorException($"Unable to find any phyloP files in the following directory: {saDir}");
@@ -46,7 +46,7 @@ namespace VariantAnnotation.PhyloP
             using (var reader = new PhylopReader(FileUtilities.GetReadStream(phylopFiles.First())))
             {
                 version        = reader.GetDataSourceVersion();
-                genomeAssembly = reader.GetAssembly();
+                genomeAssembly = reader.GetGenomeAssembly();
             }
 
             return (genomeAssembly, version);
@@ -56,7 +56,7 @@ namespace VariantAnnotation.PhyloP
         {
             if (string.IsNullOrEmpty(directory)) return null;
 
-            var phylopPath = Path.Combine(directory, ucscReferenceName + ".npd");
+            string phylopPath = Path.Combine(directory, ucscReferenceName + ".npd");
 
             return !File.Exists(phylopPath)
                 ? null
