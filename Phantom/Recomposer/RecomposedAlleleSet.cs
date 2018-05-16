@@ -103,9 +103,9 @@ namespace Phantom.Recomposer
             {
                 sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
                 if (sampleGenotypeStrings[index] == ".") continue;
+
                 if (sampleGqs[index] != ".") hasGq = true;
                 if (samplePhasesets[index] != ".") hasPs = true;
-                if (hasGq && hasPs) break;
             }
 
             int numFields = 1;
@@ -126,7 +126,7 @@ namespace Phantom.Recomposer
             for (var index = 0; index < numSamples; index++)
             {
                 var sampleGenotypeStr = sampleGenotypeStrings[index];
-                if (sampleGenotypeStr == ".") vcfFields.Add(".");
+                if (sampleGenotypeStr == null || sampleGenotypeStr == ".") vcfFields.Add(".");
                 else
                 {
                     var nonMissingFields = new string[numFields];

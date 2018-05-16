@@ -40,10 +40,14 @@ namespace Phantom.PositionCollections
             positionSet.AlleleSet = GenerateAlleleSet(positionSet);
             positionSet._allelesWithUnsupportedTypes = GetAllelesWithUnsupportedTypes(positionSet);
             positionSet._sampleInfo = GetSampleInfo(positionSet);
-            var phaseSetAndGqIndexes = positionSet.GetSampleTagIndexes(new[] { "GT", "PS", "GQ" });
+
+            var phaseSetAndGqIndexes = positionSet.GetSampleTagIndexes(new[] { "GT", "PS", "GQ", "GQX" });
             positionSet.GtInfo = TagInfo<Genotype>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[0], ExtractSampleValue, Genotype.GetGenotype);
             positionSet.PsInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[1], ExtractSampleValue, x => x);
             positionSet.GqInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[2], ExtractSampleValue, x => x);
+            var gqxInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[3], ExtractSampleValue, x => x);
+            positionSet.GqInfo.Update(gqxInfo);
+
             var genotypeToSampleIndex = GetGenotypeToSampleIndex(positionSet);
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSampleIndex, positionSet._allelesWithUnsupportedTypes, positionSet.AlleleSet.Starts, positionSet.FunctionBlockRanges, out var alleleBlockGraph);
             positionSet.AlleleBlockToSampleHaplotype = AlleleBlockMerger.Merge(alleleBlockToSampleHaplotype, alleleBlockGraph);
@@ -217,6 +221,20 @@ namespace Phantom.PositionCollections
             }
             return new TagInfo<T>(tagInfo);
         }
+    }
 
+    public static class TagInfoExtension
+    {
+        public static void Update(this TagInfo<string>tagInfo, TagInfo<string> newTagInfo)
+        {
+           for (var i = 0; i < tagInfo.Values.Length; i++)
+           for (var j = 0; j < tagInfo.Values[0].Length; j++)
+           {
+               if (newTagInfo.Values[i][j] != ".")
+               {
+                   tagInfo.Values[i][j] = newTagInfo.Values[i][j];
+               }
+           }
+        }
     }
 }
