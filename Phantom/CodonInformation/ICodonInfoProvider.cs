@@ -1,9 +1,11 @@
-﻿using Intervals;
+﻿using Genome;
 
 namespace Phantom.CodonInformation
 {
     public interface ICodonInfoProvider
     {
-        int GetFunctionBlockRanges(IInterval interval);
+        int[] GetFunctionBlockDistances(IChromosomeInterval chrInterval);
+
+        int GetLongestFunctionBlockDistance(IChromosomeInterval chrInterval);
     }
 }

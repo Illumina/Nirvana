@@ -1,4 +1,6 @@
-﻿namespace Intervals
+﻿using System;
+
+namespace Intervals
 {
     public static class Utilities
     {
@@ -13,5 +15,13 @@
         /// </summary>
         public static bool Contains(int firstStart, int firstEnd, int secondStart, int secondEnd) =>
             firstStart <= secondStart && secondEnd <= firstEnd;
+
+        /// <summary>
+        /// get the intersection of the two intervals
+        /// </summary>
+        public static (int Start, int End) Intersect(int firstStart, int firstEnd, int secondStart, int secondEnd) =>
+            Overlaps(firstStart, firstEnd, secondStart, secondEnd)
+                ? (Math.Max(firstStart, secondStart), Math.Min(firstEnd, secondEnd))
+                : (-1, -1);
     }
 }

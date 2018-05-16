@@ -47,7 +47,7 @@ namespace Phantom.Recomposer
 
         private void ResetBuffer(ISimplePosition simplePosition, bool recomposable)
         {
-            var functionBlockRanges = recomposable ? new List<int> { CodonInfoProvider.GetFunctionBlockRanges(simplePosition) } : new List<int>();
+            var functionBlockRanges = recomposable ? new List<int> { CodonInfoProvider.GetLongestFunctionBlockDistance(simplePosition) } : new List<int>();
             BufferedPositions = new BufferedPositions(new List<ISimplePosition> { simplePosition }, new List<bool> { recomposable }, functionBlockRanges);
             CurrentChromosome = simplePosition.Chromosome;
         }
@@ -60,7 +60,7 @@ namespace Phantom.Recomposer
 
         public void UpdateFunctionBlockRanges(ISimplePosition simplePosition)
         {
-            BufferedPositions.FunctionBlockRanges.Add(CodonInfoProvider.GetFunctionBlockRanges(simplePosition));
+            BufferedPositions.FunctionBlockRanges.Add(CodonInfoProvider.GetLongestFunctionBlockDistance(simplePosition));
         }
 
         public BufferedPositions Purge()

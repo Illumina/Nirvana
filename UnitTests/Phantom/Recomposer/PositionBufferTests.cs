@@ -47,7 +47,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var position1 = GetMockedIPositionOnChr1(99, 99);
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 100, 100)).Returns(true);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position1)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position1)).Returns(101);
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             positionBuffer.AddPosition(position1);
             var position2 = GetMockedIPositionOnChr1(100, 100, "C");
@@ -59,7 +59,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var position1 = GetMockedIPositionOnChr1(99, 99);
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 100, 100)).Returns(true);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position1)).Returns(99);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position1)).Returns(99);
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             positionBuffer.AddPosition(position1);
             var position2 = GetMockedIPositionOnChr1(100, 100, "C");
@@ -71,7 +71,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var position1 = GetMockedIPositionOnChr1(99, 99);
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 100, 100)).Returns(false);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position1)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position1)).Returns(101);
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             positionBuffer.AddPosition(position1);
             var position2 = GetMockedIPositionOnChr1(100, 100, "C");
@@ -92,7 +92,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var position1 = GetMockedIPositionOnChr1(99, 99);
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 100, 100)).Returns(true);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position1)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position1)).Returns(101);
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             positionBuffer.AddPosition(position1);
             var position2 = GetMockedIPositionOnChr1(100, 100, "C");
@@ -109,8 +109,8 @@ namespace UnitTests.Phantom.Recomposer
             var position2 = GetMockedIPositionOnChr1(100, 100, ".");
             var position3 = GetMockedIPositionOnChr1(110, 110, "C");
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 100, 100)).Returns(true);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position1)).Returns(101);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position2)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position1)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position2)).Returns(101);
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             positionBuffer.AddPosition(position1);
             positionBuffer.AddPosition(position2);
@@ -130,8 +130,8 @@ namespace UnitTests.Phantom.Recomposer
             var position1 = GetMockedIPositionOnChr1(99, 99);
             var position2 = GetMockedIPositionOnChr1(100, 100, ".");
             _geneIntervalForestMock.Setup(x => x.OverlapsAny(0, 100, 100)).Returns(true);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position1)).Returns(101);
-            _codonInfoProviderMock.Setup(x => x.GetFunctionBlockRanges(position2)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position1)).Returns(101);
+            _codonInfoProviderMock.Setup(x => x.GetLongestFunctionBlockDistance(position2)).Returns(101);
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             positionBuffer.AddPosition(position1);
             positionBuffer.AddPosition(position2);
