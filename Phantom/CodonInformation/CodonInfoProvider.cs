@@ -192,7 +192,7 @@ namespace Phantom.CodonInformation
         private static IInterval[] ConstructCdsIntervalsFromTranscript(ITranscript transcript)
         {
             var cdsIntervals = new List<IInterval>();
-            if (transcript.BioType != BioType.protein_coding) return null;
+            if (transcript.Translation == null) return null;
 
             ICodingRegion codingRegion = transcript.Translation.CodingRegion;
             List<ITranscriptRegion> exonRegions = transcript.TranscriptRegions.Where(x => x.Type == TranscriptRegionType.Exon).ToList();
