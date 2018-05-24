@@ -75,7 +75,11 @@ namespace Phantom.CodonInformation
             bool hasSingleBases = boundary.Value.SingleBaseBlocks.Count > 0;
             
             //first boundary and no single base block
-            if (startPosition == -1 && !hasSingleBases) return thisPosition;
+            if (startPosition == -1 && !hasSingleBases)
+            {
+                boundary.Value.Starts.ForEach(x => inCodingRegion[x] = true);
+                return thisPosition;
+            }
 
             boundary.Value.Ends.ForEach(x => inCodingRegion[x] = false);
 
