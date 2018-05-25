@@ -275,5 +275,31 @@ namespace UnitTests.Phantom.Recomposer
             Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ	.	1|2:14.2	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
 
+        [Fact]
+        public void VariantGenerator_HomozygousSitesAndPhasedSites_Recomposed()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	3	.	G	A,G	45	PASS	.	GT:PS	1|1:2	1|2:2	1|2:2", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	45	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
+            var position4 = SimplePosition.GetSimplePosition("chr1	5	.	T	A,G	45	PASS	.	GT:PS	1|1:4	1|2:2	1|2:4", sequenceProvider.RefNameToChromosome);
+            var position5 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	30	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
+
+            var functionBlockRanges = new List<int> { 4, 5, 6, 7, 8 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3, position4, position5 }, functionBlockRanges).ToList();
+
+            Assert.Equal(3, recomposedPositions.Count);
+            Assert.Equal("chr1	2	.	AGC	TAA,TGA	45	PASS	RECOMPOSED	GT:PS	.	.	1|2:2", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	TAAAC,TGAGC	30	PASS	RECOMPOSED	GT:PS	1|1	1|2:2	.", string.Join("\t", recomposedPositions[1].VcfFields));
+            Assert.Equal("chr1	4	.	CTG	AAC,AGC	30	PASS	RECOMPOSED	GT:PS	.	.	1|2:4", string.Join("\t", recomposedPositions[2].VcfFields));
+        }
+
     }
 }

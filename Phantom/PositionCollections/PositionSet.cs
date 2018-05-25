@@ -110,7 +110,7 @@ namespace Phantom.PositionCollections
             return indexes;
         }
 
-       internal static string ExtractSampleValue(int tagIndex, string[] sampleInfo) => tagIndex == -1 || sampleInfo.Length <= tagIndex ? "." : sampleInfo[tagIndex];
+        internal static string ExtractSampleValue(int tagIndex, string[] sampleInfo) => tagIndex == -1 || sampleInfo.Length <= tagIndex ? "." : sampleInfo[tagIndex];
 
         private static Dictionary<GenotypeBlock, List<int>> GetGenotypeToSampleIndex(PositionSet positionSet)
         {
@@ -135,42 +135,44 @@ namespace Phantom.PositionCollections
         {
             var genotypes = positionSet.GtInfo.Values[sampleIndex];
             var entireBlock = new GenotypeBlock(genotypes);
-            var blockRanges = GetGenotypeBlockRange(positionSet.PsInfo.Values[sampleIndex], genotypes.Select(x => x.IsHomozygous).ToArray());
-            var genotypeBlocks = new LinkedList<GenotypeBlock>();
+            var blockRanges = GetGenotypeBlockRange(positionSet.PsInfo.Values[sampleIndex], genotypes.Select(x => x.IsPhased).ToArray(), genotypes.Select(x => x.IsHomozygous).ToArray());
+            var genotypeBlocks = new List<GenotypeBlock>();
             foreach (var range in blockRanges)
-                genotypeBlocks.AddLast(entireBlock.GetSubBlock(range.StartIndex, range.PositionCount));
-            
+                genotypeBlocks.Add(entireBlock.GetSubBlock(range.StartIndex, range.PositionCount));
+
             return genotypeBlocks;
         }
 
         // Just do a minimal process here as only phase set informatin is sample specific
         // Non sample specific information (i.e. genotype) can be shared by multiple samples and will further processed 
-        private static IEnumerable<(int StartIndex, int PositionCount)> GetGenotypeBlockRange(string[] phaseSetIds,
-            bool[] isHomomzygous)
+        private static IEnumerable<(int StartIndex, int PositionCount)> GetGenotypeBlockRange(string[] phaseSetIds, bool[] isPhased, bool[] isHomomzygous)
         {
-            var blocks = new LinkedList<(int, int)>();
+            var blocks = new List<(int, int)>();
             int numPositions = phaseSetIds.Length;
             int startCurrentHomoBlock = -1;
             int startCurrentBlock = 0;
-            string previousPhaseSetId = phaseSetIds[0];
+            string previousPhaseSetId = isPhased[0] ? phaseSetIds[0] : null;
             for (var i = 1; i < numPositions; i++)
             {
-                bool inPreviousPhaseSet = phaseSetIds[i] == previousPhaseSetId;
+                bool bothPhasedAndDiffPhaseSet = previousPhaseSetId != null && isPhased[i] && phaseSetIds[i] != previousPhaseSetId;
                 if (!isHomomzygous[i])
                 {
-                    if (!inPreviousPhaseSet)
+                    if (bothPhasedAndDiffPhaseSet)
                     {
-                        blocks.AddLast((startCurrentBlock, i - startCurrentBlock + 1));
+                        blocks.Add((startCurrentBlock, i - startCurrentBlock));
                         startCurrentBlock = startCurrentHomoBlock == -1 ? i : startCurrentHomoBlock;
                     }
+
                     startCurrentHomoBlock = -1;
                 }
-                else if (inPreviousPhaseSet)
-                {
+                else if (startCurrentHomoBlock == -1)
+                { 
                     startCurrentHomoBlock = i;
                 }
+
+                if (isPhased[i]) previousPhaseSetId = phaseSetIds[i];
             }
-            blocks.AddLast((startCurrentBlock, numPositions - startCurrentBlock));
+            blocks.Add((startCurrentBlock, numPositions - startCurrentBlock));
             return blocks;
         }
 
@@ -183,7 +185,7 @@ namespace Phantom.PositionCollections
                 var thisPosition = positionSet.SimplePositions[posIndex];
                 for (int varIndex = 0; varIndex < thisPosition.AltAlleles.Length; varIndex++)
                 {
-                    if (!(IsSupportedVariantType(thisPosition.RefAllele, thisPosition.AltAlleles[varIndex]) || thisPosition.VcfFields[VcfCommon.AltIndex] == VcfCommon.GatkNonRefAllele)) 
+                    if (!(IsSupportedVariantType(thisPosition.RefAllele, thisPosition.AltAlleles[varIndex]) || thisPosition.VcfFields[VcfCommon.AltIndex] == VcfCommon.GatkNonRefAllele))
                         allelesWithUnsupportedTypes[posIndex].Add(varIndex + 1); // GT tag is 1-based
                 }
             }
@@ -225,16 +227,16 @@ namespace Phantom.PositionCollections
 
     public static class TagInfoExtension
     {
-        public static void Update(this TagInfo<string>tagInfo, TagInfo<string> newTagInfo)
+        public static void Update(this TagInfo<string> tagInfo, TagInfo<string> newTagInfo)
         {
-           for (var i = 0; i < tagInfo.Values.Length; i++)
-           for (var j = 0; j < tagInfo.Values[0].Length; j++)
-           {
-               if (newTagInfo.Values[i][j] != ".")
-               {
-                   tagInfo.Values[i][j] = newTagInfo.Values[i][j];
-               }
-           }
+            for (var i = 0; i < tagInfo.Values.Length; i++)
+                for (var j = 0; j < tagInfo.Values[0].Length; j++)
+                {
+                    if (newTagInfo.Values[i][j] != ".")
+                    {
+                        tagInfo.Values[i][j] = newTagInfo.Values[i][j];
+                    }
+                }
         }
     }
 }
