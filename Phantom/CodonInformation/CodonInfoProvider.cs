@@ -138,7 +138,7 @@ namespace Phantom.CodonInformation
             return codingGraph;
         }
 
-        private static CodingBlock[][] GetTranscriptToCodingBlocks(List<PhasedIntervalArray> transcriptIntervals, bool onReverseStrand)
+        internal static CodingBlock[][] GetTranscriptToCodingBlocks(List<PhasedIntervalArray> transcriptIntervals, bool onReverseStrand)
         {
             var transcriptToCommonIntervals = IntervalPartitioner.GetCommonIntervals(transcriptIntervals.Select(x => x.IntervalArray).ToArray());
             var startPhases = transcriptIntervals.Select(x => x.StartPhase).ToArray();
