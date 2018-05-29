@@ -5,6 +5,7 @@ using System.Linq;
 using IO;
 using VariantAnnotation;
 using CommandLine.Utilities;
+using Genome;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -49,9 +50,11 @@ namespace Nirvana
 			return provider;
         }
 
-        public static IRefMinorProvider GetRefMinorProvider(List<string> supplementaryAnnotationDirectories)
+        public static IRefMinorProvider GetRefMinorProvider(IDictionary<string, IChromosome> refNameToChromosome, List<string> supplementaryAnnotationDirectories)
         {
-            return supplementaryAnnotationDirectories == null || supplementaryAnnotationDirectories.Count == 0 ? null : new RefMinorProvider(supplementaryAnnotationDirectories);
+            return supplementaryAnnotationDirectories == null || supplementaryAnnotationDirectories.Count == 0
+                ? null
+                : new RefMinorProvider(refNameToChromosome, supplementaryAnnotationDirectories);
         }
 
         public static IGeneAnnotationProvider GetGeneAnnotationProvider(IEnumerable<string> supplementaryAnnotationDirectories)

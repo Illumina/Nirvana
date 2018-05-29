@@ -50,7 +50,7 @@ namespace Nirvana
             var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(_inputCachePrefix, sequenceProvider);
             var saProvider                   = ProviderUtilities.GetSaProvider(SupplementaryAnnotationDirectories);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(SupplementaryAnnotationDirectories);
-            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(SupplementaryAnnotationDirectories);
+            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(sequenceProvider.RefNameToChromosome, SupplementaryAnnotationDirectories);
             var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
 
             var plugins    = PluginUtilities.LoadPlugins(_pluginDirectory);
@@ -87,9 +87,8 @@ namespace Nirvana
                         sortedVcfChecker.CheckVcfOrder(position.Chromosome.UcscName);
                         previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
 
-                        var annotatedPosition = annotator.Annotate(position);
-
-                        string json = annotatedPosition.GetJsonString();
+                        var annotatedPosition = position.Variants != null ? annotator.Annotate(position) : null;
+                        string json = annotatedPosition?.GetJsonString();
 
                         if (json != null) WriteOutput(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json);
                         else gvcfWriter?.Write(string.Join("\t", position.VcfFields));

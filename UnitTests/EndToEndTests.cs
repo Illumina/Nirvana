@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using UnitTests.TestUtilities;
 using Xunit;
 
@@ -11,18 +12,21 @@ namespace UnitTests
     {
         private readonly string _cacheFilePrefix;
         private readonly List<string> _saDirs;
+        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 
         public EndToEndTests()
         {
             _cacheFilePrefix = Resources.EndToEnd37("chr12_7018490_7086889_Both");
-            _saDirs          = new List<string> {Resources.EndToEnd37("")};
+            _saDirs          = new List<string> { Resources.EndToEnd37("") };
+
+            _refNameToChromosome = new Dictionary<string, IChromosome> { ["chr12"] = new Chromosome("chr12", "12", 11) };
         }
 
         [Fact]
         public void Annotation_RefMinor_not_annotated_when_no_SA()
         {
             const string vcfLine = "chr12	7054859	.	G	.	100	PASS	.	.	.";
-            var annotatedPosition = AnnotationUtilities.GetAnnotatedPosition(_cacheFilePrefix, null, vcfLine, false);
+            var annotatedPosition = AnnotationUtilities.GetAnnotatedPosition(_cacheFilePrefix, null, vcfLine, false, _refNameToChromosome);
             string output = annotatedPosition.GetJsonString();
             Assert.Null(output);
         }
@@ -51,8 +55,8 @@ namespace UnitTests
             "{\"chromosome\":\"chr12\",\"position\":7043410,\"refAllele\":\"CT\",\"altAlleles\":[\"GATG\"],\"quality\":50,\"filters\":[\"PASS\"],\"cytogeneticBand\":\"12p13.31\",\"samples\":[{\"isEmpty\":true}],\"variants\":[{\"vid\":\"12:7043410:7043411:GATG\",\"chromosome\":\"chr12\",\"begin\":7043410,\"end\":7043411,\"refAllele\":\"CT\",\"altAllele\":\"GATG\",\"variantType\":\"indel\",\"transcripts\":{\"refSeq\":[{\"transcript\":\"NM_001007026.1\",\"bioType\":\"protein_coding\",\"codons\":\"gcCTcc/gcGATGcc\",\"aminoAcids\":\"AS/AMX\",\"cdnaPos\":\"336-337\",\"cdsPos\":\"99-100\",\"exons\":\"3/10\",\"proteinPos\":\"33-34\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"frameshift_variant\"],\"hgvsc\":\"NM_001007026.1:c.99_100delCTinsGATG\",\"hgvsp\":\"NP_001007027.1:p.(Ser34MetfsTer27)\",\"isCanonical\":true,\"proteinId\":\"NP_001007027.1\"},{\"transcript\":\"XM_005253672.1\",\"bioType\":\"protein_coding\",\"codons\":\"gcCTcc/gcGATGcc\",\"aminoAcids\":\"AS/AMX\",\"cdnaPos\":\"429-430\",\"cdsPos\":\"99-100\",\"exons\":\"3/10\",\"proteinPos\":\"33-34\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"frameshift_variant\"],\"hgvsc\":\"XM_005253672.1:c.99_100delCTinsGATG\",\"hgvsp\":\"XP_005253729.1:p.(Ser34MetfsTer27)\",\"proteinId\":\"XP_005253729.1\"},{\"transcript\":\"NM_001940.3\",\"bioType\":\"protein_coding\",\"codons\":\"gcCTcc/gcGATGcc\",\"aminoAcids\":\"AS/AMX\",\"cdnaPos\":\"329-330\",\"cdsPos\":\"99-100\",\"exons\":\"3/10\",\"proteinPos\":\"33-34\",\"geneId\":\"1822\",\"hgnc\":\"ATN1\",\"consequence\":[\"frameshift_variant\"],\"hgvsc\":\"NM_001940.3:c.99_100delCTinsGATG\",\"hgvsp\":\"NP_001931.2:p.(Ser34MetfsTer27)\",\"proteinId\":\"NP_001931.2\"}],\"ensembl\":[{\"transcript\":\"ENST00000356654.4\",\"bioType\":\"protein_coding\",\"codons\":\"gcCTcc/gcGATGcc\",\"aminoAcids\":\"AS/AMX\",\"cdnaPos\":\"336-337\",\"cdsPos\":\"99-100\",\"exons\":\"3/10\",\"proteinPos\":\"33-34\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"frameshift_variant\"],\"hgvsc\":\"ENST00000356654.4:c.99_100delCTinsGATG\",\"hgvsp\":\"ENSP00000349076.3:p.(Ser34MetfsTer27)\",\"isCanonical\":true,\"proteinId\":\"ENSP00000349076.3\"},{\"transcript\":\"ENST00000396684.2\",\"bioType\":\"protein_coding\",\"codons\":\"gcCTcc/gcGATGcc\",\"aminoAcids\":\"AS/AMX\",\"cdnaPos\":\"333-334\",\"cdsPos\":\"99-100\",\"exons\":\"3/10\",\"proteinPos\":\"33-34\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"frameshift_variant\"],\"hgvsc\":\"ENST00000396684.2:c.99_100delCTinsGATG\",\"hgvsp\":\"ENSP00000379915.2:p.(Ser34MetfsTer27)\",\"proteinId\":\"ENSP00000379915.2\"},{\"transcript\":\"ENST00000541029.1\",\"bioType\":\"retained_intron\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"upstream_gene_variant\"]},{\"transcript\":\"ENST00000537488.1\",\"bioType\":\"retained_intron\",\"geneId\":\"ENSG00000111676\",\"hgnc\":\"ATN1\",\"consequence\":[\"upstream_gene_variant\"]}]}}]}")]
         public void Annotate_with_SA(string vcfline, string expectedResults)
         {
-            var annotatedPosition = AnnotationUtilities.GetAnnotatedPosition(_cacheFilePrefix, _saDirs, vcfline, false);
-            var observedResults   = annotatedPosition.GetJsonString();
+            var annotatedPosition  = AnnotationUtilities.GetAnnotatedPosition(_cacheFilePrefix, _saDirs, vcfline, false, _refNameToChromosome);
+            string observedResults = annotatedPosition.GetJsonString();
             Assert.Equal(expectedResults, observedResults);
         }
     }

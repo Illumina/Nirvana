@@ -1,8 +1,8 @@
-﻿using System.Linq;
-using Genome;
+﻿using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
 using Variants;
 using Vcf.Info;
 using Vcf.Sample;
@@ -45,24 +45,40 @@ namespace Vcf
             IsRecomposed = isRecomposed;
         }
 
-        public static IPosition ToPosition(ISimplePosition simplePosition, VariantFactory variantFactory)
+        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, VariantFactory variantFactory)
         {
             if (simplePosition == null) return null;
 
-            var vcfFields  = simplePosition.VcfFields;
+            var vcfFields    = simplePosition.VcfFields;
+            var altAlleles   = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',');
+            bool isReference = altAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(altAlleles[0]);
+
+            string globalMajorAllele = isReference
+                ? refMinorProvider?.GetGlobalMajorAllele(simplePosition.Chromosome, simplePosition.Start)
+                : null;
+
+            bool isRefMinor = isReference && globalMajorAllele != null;
+            if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
+
             var infoData   = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
             int end        = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
-            var altAlleles = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',').ToArray();
             var quality    = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
             var filters    = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
             var samples    = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
 
             var variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
-                simplePosition.IsRecomposed);
+                simplePosition.IsRecomposed, globalMajorAllele);
 
             return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
                 altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,
+                simplePosition.IsRecomposed);
+        }
+
+        private static IPosition GetReferencePosition(ISimplePosition simplePosition)
+        {
+            return new Position(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start, simplePosition.RefAllele,
+                simplePosition.AltAlleles, null, null, null, null, null, simplePosition.VcfFields, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed);
         }
 

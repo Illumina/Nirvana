@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using OptimizedCore;
+﻿using OptimizedCore;
 
 namespace Vcf.Sample
 {
@@ -38,7 +37,7 @@ namespace Vcf.Sample
         private static double[] GetVariantFrequenciesUsingAlleleCounts(IntermediateSampleFields sampleFields)
         {
             bool isRefSingleBase      = sampleFields.VcfRefAllele.Length == 1;
-            bool areAllAltsSingleBase = sampleFields.AltAlleles.All(altAllele => altAllele.Length == 1);
+            bool areAllAltsSingleBase = sampleFields.AltAlleles.AreAllAltAllelesSingleBase();
             bool isReference          = sampleFields.AltAlleles.Length == 1 && sampleFields.AltAlleles[0] == ".";
 
             // for this to work we need a single-base reference allele and all raw allele counts must be available
@@ -56,6 +55,14 @@ namespace Vcf.Sample
             }
 
             return variantFreqs;
+        }
+
+        internal static bool AreAllAltAllelesSingleBase(this string[] altAlleles)
+        {
+            foreach (string altAllele in altAlleles)
+                if (altAllele.Length != 1)
+                    return false;
+            return true;
         }
 
         private static int GetAlleleCount(IntermediateSampleFields sampleFields, int alleleIndex)
