@@ -2,8 +2,8 @@
 using CacheUtils.Commands.Download;
 using CacheUtils.Commands.UniversalGeneArchive;
 using CacheUtils.Helpers;
+using Genome;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.DataStores
 {

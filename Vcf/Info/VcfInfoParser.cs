@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonUtilities;
 using OptimizedCore;
 using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace Vcf.Info
 {

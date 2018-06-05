@@ -3,16 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using CacheUtils.TranscriptCache;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO.Caches
@@ -176,7 +175,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
                 ms.Position = 0;
 
-                using (var reader = new ExtendedBinaryReader(ms))
+                using (var reader = new BufferedBinaryReader(ms))
                 {
                     observedStrings = TranscriptCacheReader.ReadItems(reader, () => reader.ReadAsciiString());
                 }
@@ -196,7 +195,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
                 {
                     using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true)) writer.Write(7);
                     ms.Position = 0;
-                    using (var reader = new ExtendedBinaryReader(ms)) TranscriptCacheReader.CheckGuard(reader);
+                    using (var reader = new BufferedBinaryReader(ms)) TranscriptCacheReader.CheckGuard(reader);
                 }
             });
         }

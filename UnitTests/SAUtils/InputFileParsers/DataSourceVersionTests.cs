@@ -1,5 +1,5 @@
 ﻿using System;
-using CommonUtilities;
+using OptimizedCore;
 using SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Providers;
@@ -7,7 +7,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
-	public class DataSourceVersionTests
+	public sealed class DataSourceVersionTests
 	{
 		[Fact]
 		public void ReadDataVersionFromFile()

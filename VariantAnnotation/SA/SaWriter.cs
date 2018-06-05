@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Compression.Algorithms;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
@@ -23,20 +23,21 @@ namespace VariantAnnotation.SA
         private readonly List<Interval<long>> _intervals;
         private readonly List<(int, string)> _globalMajorAllleInRefMinors;
         private readonly bool _leaveOpen;
-        
+
         public int RefMinorCount => _globalMajorAllleInRefMinors.Count;
 
         public SaWriter(Stream stream, Stream idxStream, ISupplementaryAnnotationHeader header,
             List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
-            List<ISupplementaryInterval> allVariantIntervals,List<(int,string)> globalMajorAllelesInRefMinors,bool leaveOpen=false)
+            List<ISupplementaryInterval> allVariantIntervals, List<(int, string)> globalMajorAllelesInRefMinors,
+            bool leaveOpen = false)
         {
-            _leaveOpen = leaveOpen;
-            _stream = stream;
-            _writer = new ExtendedBinaryWriter(stream, new UTF8Encoding(false, true), _leaveOpen);
-            _idxStream = idxStream;
-            _block = new SaWriteBlock(new Zstandard(1));
+            _leaveOpen    = leaveOpen;
+            _stream       = stream;
+            _writer       = new ExtendedBinaryWriter(stream, new UTF8Encoding(false, true), _leaveOpen);
+            _idxStream    = idxStream;
+            _block        = new SaWriteBlock(new Zstandard(1));
             _memoryStream = new MemoryStream();
-            _msWriter = new ExtendedBinaryWriter(_memoryStream);
+            _msWriter     = new ExtendedBinaryWriter(_memoryStream);
 
             _intervals = new List<Interval<long>>(34000);
 
@@ -50,10 +51,10 @@ namespace VariantAnnotation.SA
 
         private void WriteHeader(ISupplementaryAnnotationHeader header)
         {
-            _writer.WriteOptAscii(SaDataBaseCommon.DataHeader);
-            _writer.Write(SaDataBaseCommon.DataVersion);
-            _writer.Write(SaDataBaseCommon.SchemaVersion);
-            _writer.Write((byte)header.GenomeAssembly);
+            _writer.WriteOptAscii(SaCommon.DataHeader);
+            _writer.Write(SaCommon.DataVersion);
+            _writer.Write(SaCommon.SchemaVersion);
+            _writer.Write((byte)header.Assembly);
             _writer.Write(DateTime.Now.Ticks);
             _writer.WriteOptAscii(header.ReferenceSequenceName);
 
@@ -72,10 +73,9 @@ namespace VariantAnnotation.SA
         {
             Flush();
             WriteIndex();
-            //Console.WriteLine($"positions/block={_blockPositionCount*1.0/_blockCount}");
-            if(!_leaveOpen) _stream.Dispose();
+            if (!_leaveOpen) _stream.Dispose();
             _writer.Dispose();
-            
+
         }
 
         private void WriteIndex()
@@ -99,8 +99,8 @@ namespace VariantAnnotation.SA
         {
             if (_block.BlockOffset == 0) return;
 
-            var fileOffset = _stream.Position;
-            var positions = _block.Write(_stream);
+            long fileOffset = _stream.Position;
+            var positions   = _block.Write(_stream);
             _intervals.Add(new Interval<long>(positions.FirstPosition, positions.LastPosition, fileOffset));
         }
 

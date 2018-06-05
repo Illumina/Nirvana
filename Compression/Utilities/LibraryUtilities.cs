@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using ErrorHandling.Exceptions;
 
@@ -8,10 +9,13 @@ namespace Compression.Utilities
     {
         public static void CheckLibrary()
         {
+            const int expectedLibraryId = -822411574; // cafeface
+
             // check to see if we have our compression library
             try
             {
-                Marshal.PtrToStringAnsi(SafeNativeMethods.GetVersion());
+                int observedLibraryId = SafeNativeMethods.get_library_id();
+                if (observedLibraryId != expectedLibraryId) throw new InvalidDataException("Received an incorrect library ID when validating the Block Compression library.");
             }
             catch (Exception)
             {
@@ -21,8 +25,8 @@ namespace Compression.Utilities
 
         private static class SafeNativeMethods
         {
-            [DllImport("BlockCompression", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
-            public static extern IntPtr GetVersion();
+            [DllImport("BlockCompression", CallingConvention = CallingConvention.Cdecl)]
+            public static extern int get_library_id();
         }
     }
 }

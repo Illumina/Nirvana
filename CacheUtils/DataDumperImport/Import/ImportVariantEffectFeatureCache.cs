@@ -3,7 +3,7 @@ using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Utilities;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace CacheUtils.DataDumperImport.Import
 {

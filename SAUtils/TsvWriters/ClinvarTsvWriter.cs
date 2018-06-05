@@ -2,53 +2,17 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters
 {
-    public sealed class ClinvarTsvWriter:ISaItemTsvWriter
-	{
+    public sealed class ClinvarTsvWriter : ISaItemTsvWriter
+    {
 		#region members
 		private readonly SaTsvWriter _writer;
-        #endregion
-
-        #region IDisposable
-
-        private bool _disposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.
-                _writer.Dispose();
-            }
-
-            // Free any unmanaged objects here.
-            //
-            _disposed = true;
-            // Free any other managed objects here.
-
-        }
         #endregion
 
         private ClinvarTsvWriter(SaTsvWriter saTsvWriter)
@@ -124,5 +88,6 @@ namespace SAUtils.TsvWriters
             return groups;
         }
 
+        public void Dispose() => _writer.Dispose();
     }
 }

@@ -3,30 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
+using Genome;
+using IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
 namespace VariantAnnotation.PhyloP
 {
-    /// <summary>
-    /// This is the database object that gives the user the ability to query phylop score for any chormosome location.
-    /// </summary>
     public sealed class PhylopReader : IDisposable
     {
-        #region members
-
         private readonly string _saDirectory;
         private ExtendedBinaryReader _reader;
         private readonly ICompressionAlgorithm _qlz;
 
-        //in wigFix files, values for all positions are not available.
-        //They come as contiguous intervals and knowing the file location of the score of a particular location is not possible.
-        //This limitation motivated creation of the npd binary file format.
-        //This list is our data structure that helps us to determine file location of the score of a chromosome location.
+        // in wigFix files, values for all positions are not available.
+        // They come as contiguous intervals and knowing the file location of the score of a particular location is not possible.
+        // This limitation motivated creation of the npd binary file format.
+        // This list is our data structure that helps us to determine file location of the score of a chromosome location.
         private readonly List<PhylopInterval> _phylopIntervals;
         private int _currentIntervalIndex;
         private long _intervalListPosition;
@@ -34,58 +29,15 @@ namespace VariantAnnotation.PhyloP
         private int _scoreCount;
         private byte[] _scoreBytes;
 
-        private bool IsInitialized { get; set; }
-
         private string _currentReferenceName;
 
-        #endregion
-        #region IDisposable
-
-        private bool _isDisposed;
         private IDataSourceVersion _version;
         private GenomeAssembly _genomeAssembly;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (_isDisposed) return;
-
-                if (disposing)
-                {
-                    // Free any other managed objects here. 
-                    Close();
-                }
-
-                // Free any unmanaged objects here. 
-                _isDisposed = true;
-            }
-        }
-        #endregion
 
         public GenomeAssembly GenomeAssembly => PhylopCommon.GetGenomeAssembly(_saDirectory);
 
         public IEnumerable<IDataSourceVersion> DataSourceVersions => PhylopCommon.GetDataSourceVersions(_saDirectory);
 
-        private void Close()
-        {
-            _reader.Dispose();
-        }
-
-        /// <summary>
-        /// constructor
-        /// </summary>
         private PhylopReader()
         {
             _phylopIntervals      = new List<PhylopInterval>();
@@ -96,9 +48,6 @@ namespace VariantAnnotation.PhyloP
             _qlz        = new QuickLZ();
         }
 
-        /// <summary>
-        /// constructor (stream)
-        /// </summary>
         public PhylopReader(Stream stream) : this()
         {
             if (stream == null) return;
@@ -106,13 +55,11 @@ namespace VariantAnnotation.PhyloP
             LoadHeader();
         }
 
-        /// <summary>
-        /// constructor (SA directory)
-        /// </summary>
         public PhylopReader(IEnumerable<string> saDirectories) : this()
         {
 	        _saDirectory = null;
-	        foreach (var saDir in saDirectories)
+
+	        foreach (string saDir in saDirectories)
 	        {
 				var phylopFiles = Directory.GetFiles(saDir, "*.npd");
 		        if (phylopFiles.Length > 0)
@@ -125,7 +72,6 @@ namespace VariantAnnotation.PhyloP
 
         public void LoadChromosome(string ucscReferenceName)
         {
-            IsInitialized = false;
             if (_saDirectory == null || ucscReferenceName == _currentReferenceName) return;
             _currentReferenceName = ucscReferenceName;
 
@@ -147,20 +93,20 @@ namespace VariantAnnotation.PhyloP
 
         private void LoadHeader()
         {
-            var identifier = _reader.ReadString();
+            string identifier = _reader.ReadString();
             if (identifier != PhylopCommon.Header)
                 throw new InvalidDataException("Unrecognized file header: " + identifier);
 
-            var schemaVersion = _reader.ReadInt16();
+            short schemaVersion = _reader.ReadInt16();
             if (schemaVersion != PhylopCommon.SchemaVersion)
                 throw new InvalidDataException("Expected phylop schema version:" + PhylopCommon.SchemaVersion + " observed schema version: " + schemaVersion);
 
-            var dataVersion = _reader.ReadInt16();
+            short dataVersion = _reader.ReadInt16();
             if (dataVersion != PhylopCommon.DataVersion)
                 Console.WriteLine("WARNING: Expected phylop data version:" + PhylopCommon.DataVersion + " observed data version: " + dataVersion);
 
             _genomeAssembly = (GenomeAssembly)_reader.ReadByte();
-            _version = DataSourceVersion.Read(_reader);
+            _version        = DataSourceVersion.Read(_reader);
 
             // skip the reference name
             _reader.ReadString();
@@ -170,37 +116,30 @@ namespace VariantAnnotation.PhyloP
             CheckGuard();
 
             LoadChromosomeIntervals();
-            IsInitialized = true;
         }
 
-        public IDataSourceVersion GetDataSourceVersion()
-        {
-            return _version;
-        }
+        public IDataSourceVersion GetDataSourceVersion() => _version;
 
-        public GenomeAssembly GetGenomeAssembly()
-        {
-            return _genomeAssembly;
-        }
+        public GenomeAssembly GetGenomeAssembly() => _genomeAssembly;
 
         private void CheckGuard()
         {
-            var observedGuard = _reader.ReadUInt32();
+            uint observedGuard = _reader.ReadUInt32();
             if (observedGuard != CacheConstants.GuardInt)
             {
-                throw new InvalidFileFormatException($"Expected a guard integer ({SaDataBaseCommon.GuardInt}), but found another value: ({observedGuard})");
+                throw new InvalidFileFormatException($"Expected a guard integer ({SaCommon.GuardInt}), but found another value: ({observedGuard})");
             }
         }
 
         private void LoadChromosomeIntervals()
         {
-            var currentPos = _reader.BaseStream.Position;
+            long currentPos = _reader.BaseStream.Position;
 
             _reader.BaseStream.Position = _intervalListPosition;
 
             CheckGuard();
 
-            var intervalCount = _reader.ReadInt32();
+            int intervalCount = _reader.ReadInt32();
 
             for (var i = 0; i < intervalCount; i++)
             {
@@ -215,19 +154,19 @@ namespace VariantAnnotation.PhyloP
         {
             if (interval == null) return;
 
-            var filePosition = interval.FilePosition;
+            long filePosition = interval.FilePosition;
             //going to the file location that contains this interval.
             if (filePosition != -1)
                 _reader.BaseStream.Position = filePosition;
             else return;
 
-            var length = _reader.ReadInt32();
+            int length           = _reader.ReadInt32();
             var compressedScores = _reader.ReadBytes(length);
 
             int requiredBufferSize = _qlz.GetDecompressedLength(compressedScores, length);
             if (requiredBufferSize > _scoreBytes.Length) _scoreBytes = new byte[requiredBufferSize];
 
-            var uncompressedLength = _qlz.Decompress(compressedScores, length, _scoreBytes, _scoreBytes.Length);
+            int uncompressedLength = _qlz.Decompress(compressedScores, length, _scoreBytes, _scoreBytes.Length);
 
             BytesToScores(uncompressedLength, _scoreBytes, _scores);
 
@@ -253,7 +192,7 @@ namespace VariantAnnotation.PhyloP
 
             var pointInterval = new PhylopInterval(position, 1, 1);// overload construtor for points
 
-            var containingIntervalIndex = _phylopIntervals.BinarySearch(pointInterval);
+            int containingIntervalIndex = _phylopIntervals.BinarySearch(pointInterval);
             // The zero-based index of item in the sorted List<T>, if item is found; otherwise, a negative number that is the bitwise complement of the index of the next element that is larger than item or, if there is no larger element, the bitwise complement of Count.
             if (containingIntervalIndex == -1)
             {
@@ -269,7 +208,6 @@ namespace VariantAnnotation.PhyloP
         private void LoadScores(int intervalIndex)
         {
             _currentIntervalIndex = intervalIndex;
-
             if (intervalIndex == -1) return;
 
             ReadIntervalScores(_phylopIntervals[_currentIntervalIndex]);
@@ -277,8 +215,8 @@ namespace VariantAnnotation.PhyloP
 
         public double? GetScore(int position)
         {
-            //locate the interval that contains this position
-            var intervalIndex = FindInterval(position);
+            // locate the interval that contains this position
+            int intervalIndex = FindInterval(position);
             if (_currentIntervalIndex != intervalIndex)
                 LoadScores(intervalIndex);
 
@@ -290,10 +228,11 @@ namespace VariantAnnotation.PhyloP
             if (_scoreCount == 0 || !interval.ContainsPosition(position))
                 return null;
 
-            var score = _scores[position - interval.Begin];
+            short score = _scores[position - interval.Begin];
 
-	        return score * 0.001;
-            //return (score * 0.001).ToString(CultureInfo.InvariantCulture);
+            return score * 0.001;
         }
+
+        public void Dispose() => _reader.Dispose();
     }
 }

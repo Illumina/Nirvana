@@ -7,10 +7,10 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Utilities;
 using CacheUtils.Helpers;
 using CacheUtils.Utilities;
+using Genome;
+using Intervals;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 using TranscriptUtilities = CacheUtils.DataDumperImport.Utilities.TranscriptUtilities;
 
 namespace CacheUtils.DataDumperImport.Import

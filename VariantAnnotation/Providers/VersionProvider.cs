@@ -7,6 +7,6 @@ namespace VariantAnnotation.Providers
 {
     public sealed class VersionProvider : IVersionProvider
     {
-        public string DataVersion { get; } = $"Cache version: {CacheConstants.DataVersion}, Supplementary annotation version: {SaDataBaseCommon.DataVersion}, Reference version: {CompressedSequenceCommon.HeaderVersion}";
+        public string DataVersion { get; } = $"Cache version: {CacheConstants.DataVersion}, Supplementary annotation version: {SaCommon.DataVersion}, Reference version: {CompressedSequenceCommon.HeaderVersion}";
     }
 }

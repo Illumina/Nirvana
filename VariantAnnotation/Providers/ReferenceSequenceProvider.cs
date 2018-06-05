@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Genome;
+using Intervals;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Sequence;
 
 namespace VariantAnnotation.Providers
@@ -13,7 +13,7 @@ namespace VariantAnnotation.Providers
     {
         public IDictionary<string, IChromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
         public IDictionary<ushort, IChromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
-        public GenomeAssembly GenomeAssembly                         => _sequenceReader.Assembly;
+        public GenomeAssembly Assembly                               => _sequenceReader.Assembly;
         public ISequence Sequence                                    => _sequenceReader.Sequence;
 
         public string Name { get; } = "Reference sequence provider";
@@ -30,9 +30,6 @@ namespace VariantAnnotation.Providers
             _cytogeneticBands  = new CytogeneticBands(_sequenceReader.CytogeneticBands);
         }
 
-        /// <summary>
-        /// returns true if the specified reference sequence is in the standard reference sequences and in VEP
-        /// </summary>
         public void Annotate(IAnnotatedPosition annotatedPosition)
         {
             LoadChromosome(annotatedPosition.Position.Chromosome);
@@ -42,6 +39,7 @@ namespace VariantAnnotation.Providers
                 annotatedPosition.Position.End);
 
             if (annotatedPosition.Position.Chromosome.UcscName != "chrM") return;
+
             const string assertionNumber = "NC_012920.1";
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {

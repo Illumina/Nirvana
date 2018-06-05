@@ -22,7 +22,7 @@ namespace VariantAnnotation.IO.Caches
         public static TranscriptCacheCustomHeader Read(BinaryReader reader)
         {
             long vepReleaseTicks = reader.ReadInt64();
-            ushort vepVersion      = reader.ReadUInt16();
+            ushort vepVersion    = reader.ReadUInt16();
             return new TranscriptCacheCustomHeader(vepVersion, vepReleaseTicks);
         }
     }

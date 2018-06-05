@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
+using Intervals;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.TranscriptCache
 {

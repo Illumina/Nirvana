@@ -1,4 +1,4 @@
-﻿using CommonUtilities;
+﻿using OptimizedCore;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;

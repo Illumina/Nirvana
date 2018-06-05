@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Genome;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using Vcf.VariantCreator;
 
 namespace Vcf
@@ -17,15 +17,17 @@ namespace Vcf
         private readonly StreamReader _reader;
         private readonly IRecomposer _recomposer;
         private readonly VariantFactory _variantFactory;
+        private readonly IRefMinorProvider _refMinorProvider;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+
         public bool IsRcrsMitochondrion { get; private set; }
+        public string VcfLine { get; private set; }
+
         private string[] _sampleNames;
         private List<string> _headerLines;
-        public string VcfLine { get; private set; }
         private readonly Queue<ISimplePosition> _queuedPositions = new Queue<ISimplePosition>();
 
-        private readonly HashSet<string> _nirvanaInfoTags = new HashSet<string>
-        {
+        private readonly string[] _nirvanaInfoTags = {
             "##INFO=<ID=CSQT",
             "##INFO=<ID=CSQR",
             "##INFO=<ID=AF1000G",
@@ -52,11 +54,12 @@ namespace Vcf
         public VcfReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
             IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer)
         {
-            _reader = new StreamReader(stream);
-            _variantFactory = new VariantFactory(refNameToChromosome, refMinorProvider, enableVerboseTranscript);
+            _reader              = FileUtilities.GetStreamReader(stream);
+            _variantFactory      = new VariantFactory(refNameToChromosome, enableVerboseTranscript);
+            _refMinorProvider    = refMinorProvider;
             _refNameToChromosome = refNameToChromosome;
             bool hasSampleColumn = ParseHeader();
-            _recomposer = hasSampleColumn ? recomposer : new NullRecomposer();
+            _recomposer          = hasSampleColumn ? recomposer : new NullRecomposer();
         }
 
         private bool ParseHeader()
@@ -75,8 +78,7 @@ namespace Vcf
                     break;
                 }
 
-                // skip headers already produced by Nirvana
-                bool duplicateTag = _nirvanaInfoTags.Any(infoTag => line.StartsWith(infoTag));
+                bool duplicateTag = FoundNirvanaHeaderLine(line);
                 if (duplicateTag) continue;
 
                 if (line.StartsWith("##contig=<ID") && line.Contains("M") && line.Contains("length=16569>")) IsRcrsMitochondrion = true;
@@ -96,6 +98,14 @@ namespace Vcf
             return hasSampleColumn;
         }
 
+        private bool FoundNirvanaHeaderLine(string s)
+        {
+            foreach(string infoTag in _nirvanaInfoTags)
+                if (s.StartsWith(infoTag))
+                    return true;
+            return false;
+        }
+
         private static bool HasSampleColumn(string line)
         {
             var vcfHeaderFields = line?.Trim().OptimizedSplit('\t');
@@ -108,11 +118,10 @@ namespace Vcf
             bool hasSampleGenotypes = cols.Length >= VcfCommon.MinNumColumnsSampleGenotypes;
             if (!hasSampleGenotypes) return null;
 
-            var samplesList = new List<string>();
-            for (int i = VcfCommon.GenotypeIndex; i < cols.Length; i++)
-                samplesList.Add(cols[i]);
-
-            return samplesList.ToArray();
+            int numSamples = cols.Length - VcfCommon.GenotypeIndex;
+            var samples = new string[numSamples];
+            for (var i = 0; i < numSamples; i++) samples[i] = cols[VcfCommon.GenotypeIndex + i];
+            return samples;
         }
 
         public IEnumerable<string> GetHeaderLines() => _headerLines;
@@ -132,7 +141,7 @@ namespace Vcf
             return _queuedPositions.Count == 0 ? null: _queuedPositions.Dequeue();
         }
 
-        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _variantFactory);
+        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _variantFactory);
 
         public void Dispose() => _reader?.Dispose();
     }

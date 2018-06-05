@@ -7,7 +7,7 @@ using SAUtils.TsvWriters;
 
 namespace SAUtils.GeneScoresTsv
 {
-    public sealed class GeneScoresMain
+    public static class GeneScoresMain
     {
         private  static string _inputPath;
         private  static string _outputDirectory;

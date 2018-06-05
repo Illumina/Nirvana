@@ -5,9 +5,8 @@ using System.Linq;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Genes.Utilities;
-using Compression.Utilities;
-using VariantAnnotation.Algorithms;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using IO;
 
 namespace CacheUtils.Genes.DataStores
 {
@@ -70,7 +69,7 @@ namespace CacheUtils.Genes.DataStores
 
             foreach (var refSeqGene in refSeqGenes)
             {
-                if (!IntervalUtilities.Overlaps(hgncGene.Start, hgncGene.End, refSeqGene.Start, refSeqGene.End)) continue;
+                if (!Intervals.Utilities.Overlaps(hgncGene.Start, hgncGene.End, refSeqGene.Start, refSeqGene.End)) continue;
                 AddCoordinatesFromGene(hgncGene, refSeqGene);
             }
         }

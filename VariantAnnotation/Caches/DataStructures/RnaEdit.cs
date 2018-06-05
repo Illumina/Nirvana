@@ -1,6 +1,5 @@
-﻿using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
+﻿using IO;
+using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
@@ -17,7 +16,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Bases = bases;
         }
 
-        public static IRnaEdit Read(ExtendedBinaryReader reader)
+        public static IRnaEdit Read(BufferedBinaryReader reader)
         {
             int start    = reader.ReadOptInt32();
             int end      = reader.ReadOptInt32();

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Genome;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
@@ -30,7 +30,7 @@ namespace VariantAnnotation.Caches.DataStructures
 	        Chromosome		= chromosome;
         }
 
-        public static IGene Read(IExtendedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
+        public static IGene Read(IBufferedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
         {
             ushort referenceIndex = reader.ReadOptUInt16();
             int start             = reader.ReadOptInt32();

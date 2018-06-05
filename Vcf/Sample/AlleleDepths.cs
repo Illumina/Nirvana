@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using OptimizedCore;
+﻿using OptimizedCore;
 
 namespace Vcf.Sample
 {
@@ -44,7 +43,7 @@ namespace Vcf.Sample
             if (intermediateSampleFields.TotalAlleleCount == null) return null;
 
             // sanity check: make sure all alternate alleles are SNVs
-            if (intermediateSampleFields.VcfRefAllele.Length != 1 || intermediateSampleFields.AltAlleles.Any(altAllele => altAllele.Length != 1)) return null;
+            if (intermediateSampleFields.VcfRefAllele.Length != 1 || !intermediateSampleFields.AltAlleles.AreAllAltAllelesSingleBase()) return null;
 
             var ad = new int[intermediateSampleFields.AltAlleles.Length + 1];
 

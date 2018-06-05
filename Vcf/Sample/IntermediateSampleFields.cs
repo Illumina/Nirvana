@@ -15,7 +15,7 @@ namespace Vcf.Sample
         public int? CopyNumber { get; }        
         public string RepeatNumber { get; }
         public string RepeatNumberSpan { get; }
-        public float? DenovoQuality { get; }
+        public double? DenovoQuality { get; }
         // ReSharper disable InconsistentNaming
         public float? AQ { get; }
         public float? LQ { get; }
@@ -51,7 +51,7 @@ namespace Vcf.Sample
             (NR, NV)             = GetLinkedIntegers(GetString(formatIndices.NR, sampleCols), GetString(formatIndices.NV, sampleCols));
             RepeatNumberSpan     = GetString(formatIndices.CI, sampleCols);
             MajorChromosomeCount = GetInteger(GetString(formatIndices.MCC, sampleCols));
-            DenovoQuality        = GetFloat(GetString(formatIndices.DQ, sampleCols));
+            DenovoQuality        = GetDouble(GetString(formatIndices.DQ, sampleCols));
             MAD                  = GetIntegers(GetString(formatIndices.MAD, sampleCols));
             SCH                  = GetString(formatIndices.SCH, sampleCols);
             PLG                  = GetIntegers(GetString(formatIndices.PLG, sampleCols));

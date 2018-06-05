@@ -3,10 +3,9 @@ using System.IO;
 using System.Linq;
 using CacheUtils.MiniCache;
 using CacheUtils.TranscriptCache.Comparers;
+using Intervals;
 using VariantAnnotation.Caches;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.IO.Caches;
 
 namespace CacheUtils.TranscriptCache

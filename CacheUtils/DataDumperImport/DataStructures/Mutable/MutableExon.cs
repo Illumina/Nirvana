@@ -1,6 +1,6 @@
 ﻿using System;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using Intervals;
 
 namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 {

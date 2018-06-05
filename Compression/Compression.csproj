@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
-	    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
     <DebugType>Full</DebugType>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\IO\IO.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\BlockCompression\BlockCompression.dll" Link="BlockCompression.dll">

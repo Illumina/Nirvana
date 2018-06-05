@@ -1,9 +1,9 @@
 ﻿using System.IO;
 using System.Text;
 using CacheUtils.TranscriptCache.Comparers;
+using IO;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches.DataStructures
@@ -31,7 +31,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
                 ms.Position = 0;
 
-                using (var reader = new ExtendedBinaryReader(ms))
+                using (var reader = new BufferedBinaryReader(ms))
                 {
                     for (int i = 0; i < expectedResults.Length; i++)
                     {

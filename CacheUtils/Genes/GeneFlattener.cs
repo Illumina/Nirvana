@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.Genes.DataStructures;
-using VariantAnnotation.Algorithms;
 
 namespace CacheUtils.Genes
 {
@@ -30,7 +29,7 @@ namespace CacheUtils.Genes
 
             foreach (var gene in genes)
             {
-                if (IntervalUtilities.Overlaps(seedGene.Start, seedGene.End, gene.Start, gene.End))
+                if (Intervals.Utilities.Overlaps(seedGene.Start, seedGene.End, gene.Start, gene.End))
                 {
                     seedGene.End = Math.Max(seedGene.End, gene.End);
                     continue;

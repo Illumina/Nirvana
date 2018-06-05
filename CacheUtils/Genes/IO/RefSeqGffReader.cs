@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genes.DataStructures;
+using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
 {

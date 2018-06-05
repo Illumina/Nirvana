@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using OptimizedCore;
 
 namespace SAUtils.DbSnpRemapper
@@ -8,7 +7,7 @@ namespace SAUtils.DbSnpRemapper
     {
         public static long[] GetRsids(string idField)
         {
-            var ids = (from idStr in idField.OptimizedSplit(';') where idStr.StartsWith("rs") select Int64.Parse(idStr.Substring(2))).ToArray();
+            var ids = (from idStr in idField.OptimizedSplit(';') where idStr.StartsWith("rs") select long.Parse(idStr.Substring(2))).ToArray();
 
             return ids.Length == 0 ? null : ids;
         }

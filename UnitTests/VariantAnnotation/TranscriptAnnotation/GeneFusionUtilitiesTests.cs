@@ -1,10 +1,10 @@
-﻿using Moq;
+﻿using Genome;
+using Moq;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Sequence;
 using VariantAnnotation.TranscriptAnnotation;
+using Variants;
 using Vcf;
 using Xunit;
 

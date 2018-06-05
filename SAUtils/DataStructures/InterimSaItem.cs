@@ -1,5 +1,5 @@
-﻿using SAUtils.Interface;
-using VariantAnnotation.Interface.IO;
+﻿using IO;
+using SAUtils.Interface;
 using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.DataStructures
@@ -13,7 +13,6 @@ namespace SAUtils.DataStructures
         public bool IsArray { get; }
         public string Chromosome { get; }
         public int Position { get; }
-        private string RefAllele { get; }
         public string AltAllele { get; }
         public string[] JsonStrings { get; }
         public string VcfString { get; }
@@ -22,7 +21,7 @@ namespace SAUtils.DataStructures
         /// <summary>
         /// constructor
         /// </summary>
-        public InterimSaItem(string keyName, string vcfkeyName, string chr, int pos, string refAllele, string altAllele,
+        public InterimSaItem(string keyName, string vcfkeyName, string chr, int pos, string altAllele,
             bool matchByAllele, bool isArray, string vcfString, string[] jsonStrings)
         {
             KeyName = keyName;
@@ -31,7 +30,6 @@ namespace SAUtils.DataStructures
             IsArray = isArray;
             Chromosome = chr;
             Position = pos;
-            RefAllele = refAllele;
             AltAllele = altAllele;
             JsonStrings = jsonStrings;
             VcfString = vcfString;

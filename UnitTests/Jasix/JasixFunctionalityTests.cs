@@ -3,7 +3,7 @@ using Xunit;
 
 namespace UnitTests.Jasix
 {
-    public class JasixFunctionalityTests
+    public sealed class JasixFunctionalityTests
     {
         [Fact]
         public void ParsingDeletionJsonLine()

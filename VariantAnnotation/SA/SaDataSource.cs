@@ -1,10 +1,9 @@
-﻿using VariantAnnotation.Interface.IO;
+﻿using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
-    public class SaDataSource : ISaDataSource
+    public sealed class SaDataSource : ISaDataSource
     {
         public string KeyName { get; }
         public string VcfkeyName { get; }
@@ -14,38 +13,35 @@ namespace VariantAnnotation.SA
         public string[] JsonStrings { get; }
         public string VcfString { get; }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public SaDataSource(string keyName, string vcfkeyName, string altAllele, bool matchByAllele, bool isArray,
             string vcfString, string[] jsonStrings)
         {
-            KeyName = keyName;
-            VcfkeyName = vcfkeyName;
+            KeyName       = keyName;
+            VcfkeyName    = vcfkeyName;
             MatchByAllele = matchByAllele;
-            IsArray = isArray;
-            AltAllele = altAllele;
-            JsonStrings = jsonStrings;
-            VcfString = vcfString;
+            IsArray       = isArray;
+            AltAllele     = altAllele;
+            JsonStrings   = jsonStrings;
+            VcfString     = vcfString;
         }
 
         public static ISaDataSource Read(ExtendedBinaryReader reader)
         {
-            var keyName = reader.ReadString();
-            var vcfkeyName = reader.ReadString();
-            var altAllele = reader.ReadString();
-            var flags = reader.ReadByte();
-            var matchByAllele = (flags & 1) != 0;
-            var isArray = (flags & 2) != 0;
-            var vcfString = reader.ReadString();
+            string keyName     = reader.ReadString();
+            string vcfkeyName  = reader.ReadString();
+            string altAllele   = reader.ReadString();
+            byte flags         = reader.ReadByte();
+            bool matchByAllele = (flags & 1) != 0;
+            bool isArray       = (flags & 2) != 0;
+            string vcfString   = reader.ReadString();
 
-            var numJsonStrings = reader.ReadOptInt32();
+            int numJsonStrings = reader.ReadOptInt32();
 
             string[] jsonStrings = null;
             if (numJsonStrings > 0)
             {
                 jsonStrings = new string[numJsonStrings];
-                for (int i = 0; i < numJsonStrings; i++) jsonStrings[i] = reader.ReadString();
+                for (var i = 0; i < numJsonStrings; i++) jsonStrings[i] = reader.ReadString();
             }
 
             return new SaDataSource(keyName, vcfkeyName, altAllele, matchByAllele, isArray, vcfString, jsonStrings);
@@ -65,7 +61,7 @@ namespace VariantAnnotation.SA
             writer.Write(VcfString);
 
             writer.WriteOpt(JsonStrings.Length);
-            foreach (var jsonString in JsonStrings) writer.Write(jsonString);
+            foreach (string jsonString in JsonStrings) writer.Write(jsonString);
         }
     }
 }

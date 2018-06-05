@@ -87,7 +87,7 @@ namespace SAUtils.CreateOmimTsv
                     "uga|u=",
                     "universal gene archive {path}",
                     v => _universalGeneArchivePath = v
-                },
+                }
             };
 
             var commandLineExample = $"{command} [options]";

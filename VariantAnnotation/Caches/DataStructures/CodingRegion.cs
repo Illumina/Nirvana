@@ -1,10 +1,9 @@
-﻿using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
+﻿using IO;
+using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
-    public class CodingRegion : ICodingRegion
+    public sealed class CodingRegion : ICodingRegion
     {
         public int Start { get; }
         public int End { get; }
@@ -21,7 +20,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Length    = length;
         }
 
-        public static ICodingRegion Read(ExtendedBinaryReader reader)
+        public static ICodingRegion Read(BufferedBinaryReader reader)
         {
             int genomicStart = reader.ReadOptInt32();
             int genomicEnd   = reader.ReadOptInt32();

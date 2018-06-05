@@ -1,15 +1,13 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using Moq;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.SA;
-using VariantAnnotation.Sequence;
-using Vcf;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions
@@ -52,7 +50,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             AddRegulatoryRegion(annotatedVariant);
             AddTranscript(annotatedVariant);
 
-            const string expectedResult = "{\"vid\":\"bob:100:G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"isReferenceMinorAllele\":true,\"refAllele\":\"G\",\"variantType\":\"SNV\",\"regulatoryRegions\":[{\"id\":\"7157\",\"type\":\"TF_binding_site\",\"consequence\":[\"regulatory_region_amplification\"]}],\"transcripts\":{\"ensembl\":[]}}";
+            const string expectedResult = "{\"vid\":\"bob:100:G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"isReferenceMinorAllele\":true,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"regulatoryRegions\":[{\"id\":\"7157\",\"type\":\"TF_binding_site\",\"consequence\":[\"regulatory_region_amplification\"]}],\"transcripts\":{\"ensembl\":[]}}";
             var observedResult = annotatedVariant.GetJsonString(originalChromosomeName);
 
             Assert.Equal(expectedResult, observedResult);

@@ -1,7 +1,6 @@
-﻿using VariantAnnotation.Algorithms;
+﻿using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
@@ -22,7 +21,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         {
             _isSv = isSv;
 
-            _completelyOverlaps = IntervalUtilities.Contains(variant.Start, variant.End, feature.Start, feature.End);
+            _completelyOverlaps = Intervals.Utilities.Contains(variant.Start, variant.End, feature.Start, feature.End);
             _overlaps           = feature.Overlaps(variant);
             _completelyWithin   = variant.Start >= feature.Start && variant.End <= feature.End;
 

@@ -2,10 +2,10 @@
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.Helpers;
+using Genome;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.DataDumperImport.Import
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using IO;
 
 namespace SAUtils.DataStructures
 {
@@ -15,48 +16,13 @@ namespace SAUtils.DataStructures
 
         #endregion
 
-        #region IDisposable
-
-        private bool _disposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            if (_disposed)
-                return;
-
-            if (disposing)
-            {
-                // Free any other managed objects here.				
-                WriteToFile();
-                _writer?.Flush();
-                _writer?.Dispose();
-            }
-
-            // Free any unmanaged objects here.
-            _disposed = true;
-        }
-
-        #endregion
-
         public TsvIndex(string fileName)
         {
             _writer = new BinaryWriter(File.Open(fileName, FileMode.Create, FileAccess.Write));
             TagPositions = new Dictionary<string, long>();
         }
 
-        public TsvIndex(BinaryReader reader)
+        public TsvIndex(ExtendedBinaryReader reader)
         {
             var count = reader.ReadInt32();
             if (count == 0) return;
@@ -86,6 +52,13 @@ namespace SAUtils.DataStructures
                 _writer.Write(tagPosition.Key);
                 _writer.Write(tagPosition.Value);
             }
+        }
+
+        public void Dispose()
+        {
+            WriteToFile();
+            _writer?.Flush();
+            _writer?.Dispose();
         }
     }
 }

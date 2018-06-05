@@ -4,10 +4,10 @@ using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.IntermediateIO;
 using CacheUtils.Utilities;
+using Genome;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 
 namespace CacheUtils.PredictionCache

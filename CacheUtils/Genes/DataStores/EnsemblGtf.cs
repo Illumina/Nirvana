@@ -4,7 +4,7 @@ using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Genes.Utilities;
 using Compression.Utilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 
 namespace CacheUtils.Genes.DataStores
 {

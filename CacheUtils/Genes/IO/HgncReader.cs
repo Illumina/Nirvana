@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using CacheUtils.Genes.DataStructures;
-using CommonUtilities;
+using Genome;
+using IO;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
 {
@@ -22,7 +22,7 @@ namespace CacheUtils.Genes.IO
         public HgncReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome)
         {
             _refNameToChromosome = refNameToChromosome;
-            _reader = new StreamReader(stream);
+            _reader = FileUtilities.GetStreamReader(stream);
             _reader.ReadLine();
         }
 

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonUtilities;
+using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
@@ -40,9 +41,10 @@ namespace VariantAnnotation.AnnotatedPositions
                 jsonObject.AddStringValue("repeatUnit",  Position.InfoData.RepeatUnit);
                 jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
             }
-            
-			jsonObject.AddIntValue("svEnd",          Position.InfoData.End);
-            jsonObject.AddStringValue("refAllele",   Position.RefAllele);
+
+            if (AnnotatedVariants.Any(IsStructVariant)) jsonObject.AddIntValue("svEnd", Position.InfoData.End);
+
+            jsonObject.AddStringValue("refAllele", Position.RefAllele);
             jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
 
             jsonObject.AddDoubleValue("quality", Position.Quality);
@@ -72,6 +74,9 @@ namespace VariantAnnotation.AnnotatedPositions
 			sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);
         }
+
+        private static bool IsStructVariant(IAnnotatedVariant annotatedVariant) =>
+            annotatedVariant.Variant.Behavior.StructuralVariantConsequence;
 
         private bool IsShortTandemRepeat()
         {

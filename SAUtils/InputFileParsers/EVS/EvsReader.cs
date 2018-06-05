@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.EVS
 {
@@ -18,12 +18,12 @@ namespace SAUtils.InputFileParsers.EVS
 		private double[] _africanFrequencies;
 	    private string _coverage;
 	    private string _numSamples;
-        private readonly IDictionary<string,IChromosome> _refChromDict;
+        private readonly IDictionary<string, IChromosome> _refChromDict;
 
-        public EvsReader(StreamReader evsStream, IDictionary<string,IChromosome> refChromDicr) 
+        public EvsReader(StreamReader evsStream, IDictionary<string, IChromosome> refChromDict)
         {
             _evsFileReader = evsStream;
-            _refChromDict = refChromDicr;
+            _refChromDict = refChromDict;
         }
 
 

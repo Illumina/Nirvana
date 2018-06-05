@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using Moq;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Vcf;
 using Xunit;
 
@@ -21,7 +20,7 @@ namespace UnitTests.Vcf
         {
             _ms = new MemoryStream();
             _streamWriter = new StreamWriter(_ms);
-            foreach (var headline in lines)
+            foreach (string headline in lines)
             {
                 _streamWriter.WriteLine(headline);
             }
@@ -95,7 +94,7 @@ namespace UnitTests.Vcf
             var chromosome = new Chromosome("chr1", "1", 0);
 
             var refMinorProvider = new Mock<IRefMinorProvider>();
-            refMinorProvider.Setup(x => x.IsReferenceMinor(chromosome, 13133)).Returns(false);
+            //refMinorProvider.Setup(x => x.GetGlobalMajorAllele(chromosome, 13133)).Returns(null);
 
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
 

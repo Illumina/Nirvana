@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <DebugType>Full</DebugType>
+  </PropertyGroup>
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\Intervals\Intervals.csproj" />
+    <ProjectReference Include="..\Genome\Genome.csproj" />
+  </ItemGroup>
+</Project>

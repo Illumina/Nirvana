@@ -4,12 +4,13 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Providers;
 
-namespace SAUtils.InputFileParsers.MitoMap
+namespace SAUtils.InputFileParsers.MitoMAP
 {
     public sealed class MitoMapVariantReader
     {
@@ -67,7 +68,7 @@ namespace SAUtils.InputFileParsers.MitoMap
         {
             Console.WriteLine($"Processing {_dataType} file");
             bool isDataLine = false;
-            using (var reader = new StreamReader(_mitoMapFileInfo.FullName))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(_mitoMapFileInfo.FullName)))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

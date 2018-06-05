@@ -2,6 +2,7 @@
 using System.IO;
 using CacheUtils.Genes.Utilities;
 using CacheUtils.TranscriptCache;
+using Intervals;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 

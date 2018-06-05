@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.TOPMed;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.TsvWriters

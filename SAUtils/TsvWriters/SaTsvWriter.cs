@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CommonUtilities;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 using Compression.FileHandling;
+using OptimizedCore;
 
 namespace SAUtils.TsvWriters
 {
@@ -24,9 +24,6 @@ namespace SAUtils.TsvWriters
 
         private bool _disposed;
 
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
         public void Dispose()
         {
             Dispose(true);

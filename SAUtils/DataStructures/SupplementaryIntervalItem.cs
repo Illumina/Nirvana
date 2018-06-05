@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using CommonUtilities;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.IO;
+using Variants;
 
 namespace SAUtils.DataStructures
 {
@@ -13,7 +12,6 @@ namespace SAUtils.DataStructures
         public int Start { get; }
         public int End { get; }
         public IChromosome Chromosome { get; }
-        private string AlternateAllele { get; }
         public VariantType VariantType { get; }
         public string Source { get; }
         private readonly Dictionary<string, string> _stringValues;
@@ -30,7 +28,7 @@ namespace SAUtils.DataStructures
         private IReadOnlyDictionary<string, IEnumerable<string>> StringLists => _stringLists;
 
 
-        public SupplementaryIntervalItem(IChromosome chromsome, int start, int end,  string altAllele, VariantType variantType,
+        public SupplementaryIntervalItem(IChromosome chromsome, int start, int end, VariantType variantType,
             string source,  Dictionary<string, int> intValues = null,
             Dictionary<string, double> doubleValues = null, Dictionary<string, double> freqValues = null,
             Dictionary<string, string> stringValues = null, List<string> boolValues = null,
@@ -38,7 +36,6 @@ namespace SAUtils.DataStructures
         {
             Start = start;
             End = end;
-            AlternateAllele = altAllele;
             VariantType = variantType;
             Source = source;
 

@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using ErrorHandling.Exceptions;
+using Genome;
 using Moq;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
+using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation
@@ -50,12 +50,12 @@ namespace UnitTests.VariantAnnotation
             position.SetupGet(x => x.Chromosome).Returns(new Chromosome("chr1", "1", 0));
 
             var csProvider = new Mock<IAnnotationProvider>();
-            csProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             csProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).
                 Callback((IAnnotatedPosition x) => { x.CytogeneticBand = "testCytoBand"; });
 
             var taProvider = new Mock<IAnnotationProvider>();
-            taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            taProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             taProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).Callback((IAnnotatedPosition x) => { });//do nothing
 
             var annotator = new Annotator(taProvider.Object, null, null, csProvider.Object, null);
@@ -73,12 +73,12 @@ namespace UnitTests.VariantAnnotation
             position.SetupGet(x => x.Chromosome).Returns(new Chromosome("chrM", "MT", 0));
 
             var csProvider = new Mock<IAnnotationProvider>();
-            csProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             csProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).
                 Callback((IAnnotatedPosition x) => { x.CytogeneticBand = "testCytoBand"; });
 
             var taProvider = new Mock<IAnnotationProvider>();
-            taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            taProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             taProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).Callback((IAnnotatedPosition x) => { });//do nothing
 
             var annotator = new Annotator(taProvider.Object, null, null, csProvider.Object, null);
@@ -96,12 +96,12 @@ namespace UnitTests.VariantAnnotation
             position.SetupGet(x => x.Chromosome).Returns(new Chromosome("chrM", "MT", 0));
 
             var csProvider = new Mock<IAnnotationProvider>();
-            csProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             csProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).
                 Callback((IAnnotatedPosition x) => { x.CytogeneticBand = "testCytoBand"; });
 
             var taProvider = new Mock<IAnnotationProvider>();
-            taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            taProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             taProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).Callback((IAnnotatedPosition x) => { });//do nothing
 
             var annotator = new Annotator(taProvider.Object, null, null, csProvider.Object, null);
@@ -125,10 +125,10 @@ namespace UnitTests.VariantAnnotation
         public void TrackAffectedGenes()
         {
             var taProvider = new Mock<IAnnotationProvider>();
-            taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            taProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
             taProvider.Setup(x => x.Annotate(It.IsAny<IAnnotatedPosition>())).Callback((IAnnotatedPosition x) => { });//do nothing
             var geneAnnotationProvider = new Mock<IGeneAnnotationProvider>();
-            geneAnnotationProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            geneAnnotationProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var annotator          = new Annotator(taProvider.Object, null, null, null, geneAnnotationProvider.Object);
             var annotatedPosition  = new Mock<IAnnotatedPosition>();
@@ -157,19 +157,19 @@ namespace UnitTests.VariantAnnotation
 
 
         [Fact]
-        public void CheckGenomeAssemblyConsistancy_consistant()
+        public void CheckAssemblyConsistancy_consistant()
         {
             var taProvider = new Mock<IAnnotationProvider>();
-            taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            taProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var saProvider = new Mock<IAnnotationProvider>();
-            saProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            saProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var csProvider = new Mock<IAnnotationProvider>();
-            csProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var omimProvider = new Mock<IGeneAnnotationProvider>();
-            omimProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            omimProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var annotator = new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object);
 
@@ -177,19 +177,19 @@ namespace UnitTests.VariantAnnotation
         }
 
         [Fact]
-        public void CheckGenomeAssemblyConsistancy_inconsistant()
+        public void CheckAssemblyConsistancy_inconsistant()
         {
             var taProvider = new Mock<IAnnotationProvider>();
-            taProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            taProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var saProvider = new Mock<IAnnotationProvider>();
-            saProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            saProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             var csProvider = new Mock<IAnnotationProvider>();
-            csProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh38);
+            csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh38);
 
             var omimProvider = new Mock<IGeneAnnotationProvider>();
-            omimProvider.SetupGet(x => x.GenomeAssembly).Returns(GenomeAssembly.GRCh37);
+            omimProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
 
             Assert.Throws<UserErrorException>(() => new Annotator(taProvider.Object, null, saProvider.Object, csProvider.Object, omimProvider.Object));
         }

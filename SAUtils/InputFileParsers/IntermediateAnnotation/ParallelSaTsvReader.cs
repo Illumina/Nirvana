@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Interface;
@@ -41,7 +42,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 	    public ParallelSaTsvReader(string fileName)
 	    {
 	        _fileName = fileName;
-	        using (var tsvIndex = new TsvIndex(new BinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
+	        using (var tsvIndex = new TsvIndex(new ExtendedBinaryReader(FileUtilities.GetReadStream(_fileName + TsvIndex.FileExtension))))
 	        {
 	            _refNameOffsets = tsvIndex.TagPositions;
 	        }
@@ -58,7 +59,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             return header;
         }
 
-        private SmallAnnotationHeader ReadHeader(StreamReader reader)
+        private SmallAnnotationHeader ReadHeader(TextReader reader)
 	    {
 	        string line;
 	        while ((line = reader.ReadLine()) != null)
@@ -135,8 +136,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             var newAlleles = SaUtilsCommon.GetReducedAlleles(int.Parse(columns[PositionIndex]), columns[RefAlleleIndex], columns[AltAlleleIndex]);
 
             var position  = newAlleles.Item1;
-            var refAllele = newAlleles.Item2;
-            var altAllele = newAlleles.Item3;
+		    var altAllele = newAlleles.Item3;
 
             var vcfString = columns[VcfStringIndex];
 
@@ -144,7 +144,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
 		    for (int i = JsonStringIndex; i < columns.Length; i++)
 		        jsonStrings.Add(columns[i]);
 
-		    return new InterimSaItem(_jsonKey, _vcfKey, chromosome, position, refAllele, altAllele, _matchByAllele, _isArray,
+		    return new InterimSaItem(_jsonKey, _vcfKey, chromosome, position, altAllele, _matchByAllele, _isArray,
 		        vcfString, jsonStrings.ToArray());
 		}
 

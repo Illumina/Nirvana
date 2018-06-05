@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 
 namespace VariantAnnotation.Caches.DataStructures
@@ -21,9 +22,6 @@ namespace VariantAnnotation.Caches.DataStructures
             _lut  = lut;
         }
 
-        /// <summary>
-        /// returns a prediction and score given the new AA and the AA position
-        /// </summary>
         public Entry GetPrediction(char newAminoAcid, int aaPosition)
         {
             // sanity check: skip stop codons
@@ -34,7 +32,7 @@ namespace VariantAnnotation.Caches.DataStructures
             // sanity check: skip instances where the data isn't long enough
             if (index >= _data.Length) return null;
 
-            var entry = _data[index];
+            byte entry = _data[index];
             return entry == NullEntry ? null : _lut[entry];
         }
 
@@ -68,9 +66,9 @@ namespace VariantAnnotation.Caches.DataStructures
             writer.Write(_data);
         }
 
-        public static Prediction Read(BinaryReader reader, Entry[] lut)
+        public static Prediction Read(ExtendedBinaryReader reader, Entry[] lut)
         {
-            var numBytes = reader.ReadInt32();
+            int numBytes = reader.ReadInt32();
             var data     = reader.ReadBytes(numBytes);
             return new Prediction(data, lut);
         }
@@ -86,10 +84,10 @@ namespace VariantAnnotation.Caches.DataStructures
                 EnumIndex = enumIndex;
             }
 
-            public static Entry Read(BinaryReader reader)
+            public static Entry Read(ExtendedBinaryReader reader)
             {
-                var score     = reader.ReadDouble();
-                var enumIndex = reader.ReadByte();
+                double score   = reader.ReadDouble();
+                byte enumIndex = reader.ReadByte();
                 return new Entry(score, enumIndex);
             }
 

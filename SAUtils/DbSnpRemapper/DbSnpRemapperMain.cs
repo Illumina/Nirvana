@@ -8,7 +8,7 @@ using ErrorHandling;
 
 namespace SAUtils.DbSnpRemapper
 {
-    public sealed class DbSnpRemapperMain
+    public static class DbSnpRemapperMain
     {
         private static string _srcMapFile;
         private static string _destMapFile;
@@ -16,7 +16,6 @@ namespace SAUtils.DbSnpRemapper
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-        var creator = new DbSnpRemapperMain();
             var ops = new OptionSet
             {
                 {
@@ -41,14 +40,14 @@ namespace SAUtils.DbSnpRemapper
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }
 
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
-            var tempLeftoverFilename = "LeftOvers.vcf.gz";
+            const string tempLeftoverFilename = "LeftOvers.vcf.gz";
             Dictionary<string, StreamWriter> writers;
 
             using (var srcReader = GZipUtilities.GetAppropriateStreamReader(_srcMapFile))

@@ -5,7 +5,7 @@ using ErrorHandling;
 
 namespace SAUtils.ExtractMiniSa
 {
-    internal sealed class ExtractMiniSaMain 
+    internal static class ExtractMiniSaMain 
 	{
 	    #region members
 

@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using System.Text;
-using Compression.Utilities;
+using IO;
 
 namespace Compression.FileHandling
 {
@@ -19,7 +19,8 @@ namespace Compression.FileHandling
             CompressionMode.Compress))
         {}
 
-        private BgzipTextWriter(BlockGZipStream bgzipStream) : base(Console.OpenStandardError())
+        private BgzipTextWriter(BlockGZipStream bgzipStream) : base(new MemoryStream())
+        // we do not pass bgzipStream to the base constructor because that disposes the bgzipStream before Dispose is called on BgzipTextWriter, leaving out the last block
         {
             _buffer      = new byte[BufferSize];
             _bgzipStream = bgzipStream;

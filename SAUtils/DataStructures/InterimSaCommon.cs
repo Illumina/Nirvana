@@ -21,6 +21,6 @@ namespace SAUtils.DataStructures
         public const string DgvTag          = "dgv";
         public const string ClinGenTag      = "clingen";
         public const string MitoMapTag      = "mitomap";
-        public static string TopMedTag      = "topmed";
+        public const string TopMedTag       = "topmed";
     }
 }

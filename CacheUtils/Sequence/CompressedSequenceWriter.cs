@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
+using Genome;
+using IO;
 using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Sequence

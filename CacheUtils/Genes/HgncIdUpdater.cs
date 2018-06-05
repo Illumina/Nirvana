@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.Utilities;
-using VariantAnnotation.Algorithms;
 
 namespace CacheUtils.Genes
 {
@@ -23,7 +22,7 @@ namespace CacheUtils.Genes
             {
                 gene.HgncId = -1;
                 if (!geneIdToHgncGene.TryGetValue(gene.GeneId, out var hgncGene)) continue;
-                if (!IntervalUtilities.Overlaps(hgncGene.Start, hgncGene.End, gene.Start, gene.End)) continue;
+                if (!Intervals.Utilities.Overlaps(hgncGene.Start, hgncGene.End, gene.Start, gene.End)) continue;
 
                 gene.HgncId = hgncGene.HgncId;
             }

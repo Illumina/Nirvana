@@ -1,6 +1,6 @@
 ﻿using System.Text;
+using Genome;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO;
 
 namespace SAUtils.InputFileParsers.TOPMed

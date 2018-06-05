@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Compression.Algorithms;
-using VariantAnnotation.Interface.IO;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
@@ -15,7 +14,7 @@ namespace VariantAnnotation.SA
         private readonly List<ISaIndexOffset> _blockPositions;
         internal int BlockOffset;
 
-        public const int DefaultBlockSize = 524288 * 8;
+        public const int DefaultBlockSize = 4_194_304;
 
         public SaWriteBlock(ICompressionAlgorithm compressionAlgorithm, int size = DefaultBlockSize)
             : base(compressionAlgorithm, size)
@@ -47,8 +46,8 @@ namespace VariantAnnotation.SA
 
             BlockOffset = 0;
 
-            var firstPosition = _blockPositions[0].Position;
-            var lastPosition = _blockPositions[_blockPositions.Count - 1].Position;
+            int firstPosition = _blockPositions[0].Position;
+            int lastPosition = _blockPositions[_blockPositions.Count - 1].Position;
             _blockPositions.Clear();
 
             return (firstPosition, lastPosition);
@@ -58,7 +57,7 @@ namespace VariantAnnotation.SA
         {
             writer.WriteOpt(_blockPositions.Count);
 
-            int oldPosition = 0;
+            var oldPosition = 0;
             long oldBlockOffset = 0;
 
             foreach (var offset in _blockPositions.OrderBy(x => x.Position))

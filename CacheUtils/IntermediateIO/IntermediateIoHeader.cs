@@ -1,7 +1,7 @@
 ﻿using System.IO;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
 {
@@ -10,7 +10,7 @@ namespace CacheUtils.IntermediateIO
         public readonly ushort VepVersion;
         public readonly long VepReleaseTicks;
         public readonly Source Source;
-        public readonly GenomeAssembly GenomeAssembly;
+        public readonly GenomeAssembly Assembly;
         private readonly int _numRefSeqs;
 
         public IntermediateIoHeader(ushort vepVersion, long vepReleaseTicks, Source transcriptSource,
@@ -19,14 +19,14 @@ namespace CacheUtils.IntermediateIO
             VepVersion      = vepVersion;
             VepReleaseTicks = vepReleaseTicks;
             Source          = transcriptSource;
-            GenomeAssembly  = genomeAssembly;
+            Assembly        = genomeAssembly;
             _numRefSeqs     = numRefSeqs;
         }
 
         internal void Write(StreamWriter writer, IntermediateIoCommon.FileType fileType)
         {
             writer.WriteLine($"{IntermediateIoCommon.Header}\t{(byte)fileType}");
-            writer.WriteLine($"{VepVersion}\t{VepReleaseTicks}\t{(byte)Source}\t{(byte)GenomeAssembly}\t{_numRefSeqs}");
+            writer.WriteLine($"{VepVersion}\t{VepReleaseTicks}\t{(byte)Source}\t{(byte)Assembly}\t{_numRefSeqs}");
         }
 
         internal static (string Id, IntermediateIoCommon.FileType Type, IntermediateIoHeader Header) Read(StreamReader reader)

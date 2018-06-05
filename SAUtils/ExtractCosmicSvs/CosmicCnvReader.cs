@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
+using IO;
 using OptimizedCore;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace SAUtils.ExtractCosmicSvs
 {
@@ -48,7 +49,7 @@ namespace SAUtils.ExtractCosmicSvs
 
         public CosmicCnvReader(Stream cnvStream, IDictionary<string, IChromosome> refNameToChorm, GenomeAssembly assembly)
         {
-            _reader = new StreamReader(cnvStream);
+            _reader = FileUtilities.GetStreamReader(cnvStream);
             _refToChrom = refNameToChorm; 
             _assembly = assembly;
         }

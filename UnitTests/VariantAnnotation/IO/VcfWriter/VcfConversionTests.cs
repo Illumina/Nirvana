@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using Moq;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.SA;
-using VariantAnnotation.Sequence;
+using Variants;
 using Vcf;
 using Vcf.Info;
 using Xunit;
@@ -125,9 +125,8 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
             var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
-            var annotatedVariant = new AnnotatedVariant(variant);
+            var annotatedVariant = new AnnotatedVariant(variant) {PhylopScore = -0.567};
 
-            annotatedVariant.PhylopScore = -0.567;
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 

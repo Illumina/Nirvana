@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using VariantAnnotation.Interface.Intervals;
+using Genome;
+using Intervals;
 
 namespace CacheUtils.TranscriptCache
 {

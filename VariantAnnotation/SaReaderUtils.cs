@@ -2,13 +2,12 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using ErrorHandling.Exceptions;
+using Genome;
+using IO;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -21,9 +20,9 @@ namespace VariantAnnotation
             if (saDirs == null) return null;
             if (!saDirs.Any()) return null;
 
-            foreach (var saDir in saDirs)
+            foreach (string saDir in saDirs)
             {
-                var geneAnnotationPath = Path.Combine(saDir, SaDataBaseCommon.GeneLevelAnnotationFileName);
+                string geneAnnotationPath = Path.Combine(saDir, SaCommon.GeneLevelAnnotationFileName);
                 if (File.Exists(geneAnnotationPath)) return new GeneDatabaseReader(FileUtilities.GetReadStream(geneAnnotationPath));
             }
 
@@ -34,10 +33,10 @@ namespace VariantAnnotation
         {
             if (string.IsNullOrEmpty(saDir)) return null;
 
-            var saPath = Path.Combine(saDir, ucscReferenceName + ".nsa");
+            string saPath = Path.Combine(saDir, ucscReferenceName + ".nsa");
             if (!File.Exists(saPath)) return null;
 
-            var stream = FileUtilities.GetReadStream(saPath);
+            var stream    = FileUtilities.GetReadStream(saPath);
             var idxStream = FileUtilities.GetReadStream(saPath + ".idx");
             return new SaReader(stream, idxStream);
         }
@@ -51,19 +50,12 @@ namespace VariantAnnotation
             return readers;
         }
 
-
-        /// <summary>
-        /// get a reduced allele to represent both (trimmed) refAllele and (trimmed) altAllele 
-        /// </summary>
-        /// <param name="refAllele"></param>
-        /// <param name="altAllele"></param>
-        /// <returns></returns>
         public static string GetReducedAllele(string refAllele, string altAllele)
         {
             if (!NeedsReduction(refAllele, altAllele)) return altAllele;
 
             if (string.IsNullOrEmpty(altAllele))
-                return  refAllele.Length.ToString(CultureInfo.InvariantCulture);
+                return refAllele.Length.ToString(CultureInfo.InvariantCulture);
 
 
             if (string.IsNullOrEmpty(refAllele))
@@ -78,20 +70,19 @@ namespace VariantAnnotation
         private static bool NeedsReduction(string refAllele, string altAllele)
         {
             if (string.IsNullOrEmpty(altAllele)) return true;
-
             if (!string.IsNullOrEmpty(refAllele) && altAllele.All(x => x == 'N')) return false;
 
             return !(altAllele[0] == 'i' || altAllele[0] == '<' || char.IsDigit(altAllele[0]));
         }
 
 
-        public static GenomeAssembly GetGenomeAssembly(List<string> saDirs)
+        public static GenomeAssembly GetAssembly(List<string> saDirs)
         {
             if (saDirs == null || saDirs.Count == 0) return GenomeAssembly.Unknown;
 
             var genomeAssemblies = new HashSet<GenomeAssembly>();
 
-            foreach (var saDir in saDirs)
+            foreach (string saDir in saDirs)
             {
                 var assemblies = GetGenomeAssemblies(saDir);
                 genomeAssemblies.UnionWith(assemblies);
@@ -99,28 +90,27 @@ namespace VariantAnnotation
 
             if (genomeAssemblies.Count > 1)
             {
-                var assembliesInfo = string.Join(",", genomeAssemblies);
+                string assembliesInfo = string.Join(",", genomeAssemblies);
                 throw new UserErrorException($"Found {genomeAssemblies.Count} set of Genome Assemblies represented in sa Dirs: {assembliesInfo}");
             }
 
             return genomeAssemblies.Count == 1 ? genomeAssemblies.First() : GenomeAssembly.Unknown;
         }
 
-	    private static IEnumerable<GenomeAssembly> GetGenomeAssemblies(string saDir)
-	    {
-			var saFiles = Directory.GetFiles(saDir, "*.nsa");
-		    if (saFiles == null) throw new UserErrorException($"Unable to find any supplementary annotation files in the following directory: {saDir}");
+        private static IEnumerable<GenomeAssembly> GetGenomeAssemblies(string saDir)
+        {
+            var saFiles = Directory.GetFiles(saDir, "*.nsa");
+            if (saFiles == null) throw new UserErrorException($"Unable to find any supplementary annotation files in the following directory: {saDir}");
 
-			var assemblies = new HashSet<GenomeAssembly>();
-		    foreach (var saFile in saFiles)
-		    {
-			    assemblies.Add(GetHeader(saFile).GenomeAssembly);
-		    }
-		    return assemblies;
-	    }
+            var assemblies = new HashSet<GenomeAssembly>();
+            foreach (string saFile in saFiles)
+            {
+                assemblies.Add(GetHeader(saFile).Assembly);
+            }
+            return assemblies;
+        }
 
-
-		private static ISupplementaryAnnotationHeader GetSaHeader(string saDir)
+        private static ISupplementaryAnnotationHeader GetSaHeader(string saDir)
         {
             var saFiles = Directory.GetFiles(saDir, "*.nsa");
             if (saFiles == null) throw new UserErrorException($"Unable to find any supplementary annotation files in the following directory: {saDir}");
@@ -146,7 +136,7 @@ namespace VariantAnnotation
             var dataSourceVersions = new HashSet<IDataSourceVersion>(new DataSourceVersionComparer());
             if (saDirs == null || saDirs.Count == 0) return dataSourceVersions;
 
-            foreach (var saDir in saDirs)
+            foreach (string saDir in saDirs)
             {
                 var header = GetSaHeader(saDir);
                 if (header != null) foreach (var version in header.DataSourceVersions) dataSourceVersions.Add(version);

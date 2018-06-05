@@ -1,9 +1,9 @@
-﻿using Moq;
+﻿using Genome;
+using Moq;
 using VariantAnnotation;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
+using Variants;
 using Vcf;
 using Vcf.Info;
 using Vcf.Sample;

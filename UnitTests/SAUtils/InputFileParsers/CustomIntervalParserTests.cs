@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using SAUtils.InputFileParsers.CustomInterval;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -21,9 +21,8 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void CustomIntervalTypeReaderTest()
         {
-            var customFile = new FileInfo(Resources.TopPath("icslInterval.bed"));
-
-            var customReader = new CustomIntervalParser(customFile,_refChromDict);
+            var customFile   = new FileInfo(Resources.TopPath("icslInterval.bed"));
+            var customReader = new CustomIntervalParser(customFile, _refChromDict);
 
             // all items from this file should be of type cosmic.
             foreach (var customInterval in customReader.GetCustomIntervals())

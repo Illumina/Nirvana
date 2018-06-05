@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonUtilities;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf
 {

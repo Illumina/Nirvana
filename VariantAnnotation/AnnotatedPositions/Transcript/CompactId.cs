@@ -1,6 +1,6 @@
 ﻿using System;
+using IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Utilities;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
@@ -134,7 +134,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             writer.Write(_info);
         }
 
-        public static CompactId Read(IExtendedBinaryReader reader)
+        public static CompactId Read(IBufferedBinaryReader reader)
         {
             var id      = (IdType)reader.ReadByte();
             var version = reader.ReadByte();

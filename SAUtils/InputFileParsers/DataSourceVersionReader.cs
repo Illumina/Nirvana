@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
-using Compression.Utilities;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.InputFileParsers
 {
+    /// <inheritdoc />
     /// <summary>
     /// reads data version from a file that is expected to be found alongside each supplementary data file
     /// </summary>

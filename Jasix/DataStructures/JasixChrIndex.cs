@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Caches.DataStructures;
+using Intervals;
+using IO;
 
 namespace Jasix.DataStructures
 {
@@ -23,7 +22,7 @@ namespace Jasix.DataStructures
             _intervalArray    = null;
         }
 
-        public JasixChrIndex(IExtendedBinaryReader reader) : this("")
+        public JasixChrIndex(ExtendedBinaryReader reader) : this("")
         {
             ReferenceSequence = reader.ReadAsciiString();
             var count = reader.ReadOptInt32();
@@ -39,7 +38,7 @@ namespace Jasix.DataStructures
             _intervalArray = new IntervalArray<long>(_largeVariants.ToArray());
         }
 
-        private static Interval<long> ReadInterval(IExtendedBinaryReader reader)
+        private static Interval<long> ReadInterval(ExtendedBinaryReader reader)
         {
             var begin    = reader.ReadOptInt32();
             var end      = reader.ReadOptInt32();

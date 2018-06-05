@@ -2,12 +2,13 @@
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.CreateTopMedTsv
 {
-    public sealed class CreateTopMedTsvMain
+    public static class CreateTopMedTsvMain
     {
         private static string _compressedReferenceArg;
         private static string _inputFileArg;
@@ -15,7 +16,6 @@ namespace SAUtils.CreateTopMedTsv
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-            var creator = new CreateTopMedTsvMain();
             var ops = new OptionSet
             {
                 {
@@ -46,12 +46,12 @@ namespace SAUtils.CreateTopMedTsv
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }
 
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
             var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileArg);
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReferenceArg));

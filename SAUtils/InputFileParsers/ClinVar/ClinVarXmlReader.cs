@@ -5,9 +5,9 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Compression.Utilities;
+using Genome;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
@@ -47,7 +47,6 @@ namespace SAUtils.InputFileParsers.ClinVar
         #endregion
 
         
-        
         #region clinVarItem fields
 
         private readonly List<ClinvarVariant> _variantList= new List<ClinvarVariant>();
@@ -68,8 +67,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		#endregion
 
-		private bool _hasDbSnpId;
-
         private void ClearClinvarFields()
 		{
 			_variantList.Clear();
@@ -85,8 +82,6 @@ namespace SAUtils.InputFileParsers.ClinVar
             _orphanetIDs       = new HashSet<string>();
 			_pubMedIds         = new HashSet<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
 			_lastUpdatedDate   = long.MinValue;
-		    _hasDbSnpId = false;
-
 		}
 
 		// constructor
@@ -352,6 +347,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			    ParseTrait(element);
 		}
 
+        private const string XrefTag = "XRef";
         private const string NameTag = "Name";
 		private void ParseTrait(XElement xElement)
 		{
@@ -365,32 +361,28 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
         private const string ElementValueTag = "ElementValue";
-        private const string XrefTag = "XRef";
         private void ParsePnenotype(XElement xElement)
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
-		    var isPreferred = ParsePhenotypeElementValue(xElement.Element(ElementValueTag));
-		    if (!isPreferred)
-		        return;//we do not want to parse XRef for alternates
-
-		    foreach (var element in xElement.Elements(XrefTag))
-                ParseXref(element);
+	        ParsePhenotypeElementValue(xElement.Element(ElementValueTag));
 		}
 
         private const string TypeTag = "Type";
 
-        private bool ParsePhenotypeElementValue(XElement xElement)
+        private void ParsePhenotypeElementValue(XElement xElement)
 		{
 		    var phenotype = xElement.Attribute(TypeTag);
-		    if (phenotype == null) return false;
+		    if (phenotype == null) return;
 
-			if (phenotype.Value == "Preferred") 
-				_prefPhenotypes.Add(xElement.Value);
-			if (phenotype.Value == "Alternate")
-				_altPhenotypes.Add(xElement.Value);
-
-		    return phenotype.Value == "Preferred";
+		    if (phenotype.Value == "Preferred")
+		    {
+		        _prefPhenotypes.Add(xElement.Value);
+		    }
+		    else if (phenotype.Value == "Alternate")
+		    {
+		        _altPhenotypes.Add(xElement.Value);
+		    }
 		}
 
 
@@ -419,9 +411,6 @@ namespace SAUtils.InputFileParsers.ClinVar
                             _allilicOmimIDs.Add(TrimOmimId(id));
                         else
                             _omimIDs.Add(TrimOmimId(id));
-					break;
-				case "dbSNP":
-				    _hasDbSnpId = true;
 					break;
 			}
 		}
@@ -485,7 +474,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
-			_hasDbSnpId = false;
             _allilicOmimIDs.Clear();
 
 			//the variant type is available in the attributes
@@ -498,7 +486,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		    foreach (var element in xElement.Elements(SeqLocationTag))
             {
-		        var variant = GetClinvarVariant(element, _sequenceProvider.GenomeAssembly, _refChromDict);
+		        var variant = GetClinvarVariant(element, _sequenceProvider.Assembly, _refChromDict);
 
 		        if (variant == null) continue;
 
@@ -508,12 +496,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 		        else
 		            variantList.Add(variant);
 		    }
-
-            if (! _hasDbSnpId)
-            {
-                _variantList.Clear();
-                return;
-            }
 
             if (_allilicOmimIDs.Count != 0) 
             {
@@ -557,8 +539,8 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string RefAlleleTag = "referenceAllele";
         private const string AltAlleleTag = "alternateAllele";
 
-        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly,IDictionary<string,IChromosome> refChromDict)
-		{
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
+        {
 		    if (xElement == null ) return null;//|| xElement.IsEmpty) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
 

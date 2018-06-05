@@ -4,21 +4,16 @@ using System.IO;
 using System.Linq;
 using Compression.Algorithms;
 using Compression.Utilities;
+using Genome;
+using IO;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 
 namespace VariantAnnotation.PhyloP
 {
-    /// <summary>
-    /// Reads the wigFix files and creates a list of nirvana phylop database objects (one object per file). 
-    /// </summary>
     public sealed class PhylopWriter : IDisposable
     {
-        #region members
-
         private string _refSeqName;
         private readonly StreamReader _reader;
         private ExtendedBinaryWriter _writer;
@@ -44,40 +39,6 @@ namespace VariantAnnotation.PhyloP
 
         private readonly ICompressionAlgorithm _compressor;
 
-        #endregion
-
-        #region IDisposable
-
-        private bool _isDisposed;
-
-        /// <summary>
-        /// public implementation of Dispose pattern callable by consumers. 
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (_isDisposed) return;
-
-                if (disposing)
-                {
-                    // Free any other managed objects here. 
-                    Close();
-                }
-
-                // Free any unmanaged objects here. 
-                _isDisposed = true;
-            }
-        }
-
         private void Close()
         {
             if (_writer == null) return;
@@ -91,8 +52,6 @@ namespace VariantAnnotation.PhyloP
             _reader?.Dispose();
             _writer?.Dispose();
         }
-
-        #endregion
 
         private void CloseWriter()
         {
@@ -127,7 +86,7 @@ namespace VariantAnnotation.PhyloP
 
             Clear();
 
-            var outputFileName = _outputNirvanaDirectory + Path.DirectorySeparatorChar + _refSeqName + ".npd";
+            string outputFileName = _outputNirvanaDirectory + Path.DirectorySeparatorChar + _refSeqName + ".npd";
 
             Console.WriteLine("Creating file: {0}", outputFileName);
             _writer = new ExtendedBinaryWriter(FileUtilities.GetCreateStream(outputFileName));
@@ -135,23 +94,20 @@ namespace VariantAnnotation.PhyloP
             WriteHeader();
         }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         private PhylopWriter(string refSeqName, DataSourceVersion version, GenomeAssembly genomeAssembly,
             int intervalLength = PhylopCommon.MaxIntervalLength)
         {
-            _scores             = new short[intervalLength];
-            _scoreBytes         = new byte[intervalLength * 2];
-            _intervalLength     = intervalLength;
-            _refSeqName         = refSeqName;
-            _version            = version;
-            _compressor         = new QuickLZ();
+            _scores              = new short[intervalLength];
+            _scoreBytes          = new byte[intervalLength * 2];
+            _intervalLength      = intervalLength;
+            _refSeqName          = refSeqName;
+            _version             = version;
+            _compressor          = new QuickLZ();
             _chromosomeIntervals = new List<PhylopInterval>();
-            _genomeAssembly     = genomeAssembly;
+            _genomeAssembly      = genomeAssembly;
 
-            var requiredBufferSize = _compressor.GetCompressedBufferBounds(_scoreBytes.Length);
-            _compressedBuffer      = new byte[requiredBufferSize];
+            int requiredBufferSize = _compressor.GetCompressedBufferBounds(_scoreBytes.Length);
+            _compressedBuffer = new byte[requiredBufferSize];
         }
 
         public PhylopWriter(string inputWigFixFile, DataSourceVersion version, GenomeAssembly genomeAssembly,
@@ -193,8 +149,8 @@ namespace VariantAnnotation.PhyloP
 
         private void StartNewInterval(string line)
         {
-            var words     = line.Split();
-            var chromName = words[1].OptimizedKeyValue().Value;
+            var words = line.Split();
+            string chromName = words[1].OptimizedKeyValue().Value;
 
             // checking if the writer needs to be initiated/re-initiated
             if (_writer == null)
@@ -214,8 +170,8 @@ namespace VariantAnnotation.PhyloP
                 WriteInterval(_currentInterval, _writer);
             }
 
-            var start = Convert.ToInt32(words[2].OptimizedKeyValue().Value);
-            var step  = Convert.ToInt16(words[3].OptimizedKeyValue().Value);
+            int start  = Convert.ToInt32(words[2].OptimizedKeyValue().Value);
+            short step = Convert.ToInt16(words[3].OptimizedKeyValue().Value);
 
             _currentInterval = new PhylopInterval(start, 0, step);
         }
@@ -245,8 +201,8 @@ namespace VariantAnnotation.PhyloP
         {
             for (var i = 0; i < count; i++)
             {
-                var rawByte      = BitConverter.GetBytes(scores[i]);
-                bytes[2 * i]     = rawByte[0];
+                var rawByte = BitConverter.GetBytes(scores[i]);
+                bytes[2 * i] = rawByte[0];
                 bytes[2 * i + 1] = rawByte[1];
             }
         }
@@ -256,7 +212,7 @@ namespace VariantAnnotation.PhyloP
             if (_scoreCount == 0) return;
             ScoresToBytes(_scoreBytes, _scores, _scoreCount);
 
-            var compressedSize = _compressor.Compress(_scoreBytes, _scoreCount * 2, _compressedBuffer, _compressedBuffer.Length);
+            int compressedSize = _compressor.Compress(_scoreBytes, _scoreCount * 2, _compressedBuffer, _compressedBuffer.Length);
 
             // finalizing the file position for this chromosome interval
             interval.FilePosition   = _writer.BaseStream.Position;
@@ -298,14 +254,14 @@ namespace VariantAnnotation.PhyloP
 
         private static short GetPhylopShortValue(string line)
         {
-            var phylopScore = Convert.ToDouble(line); // double.parse
+            double phylopScore = Convert.ToDouble(line); // double.parse
 
             if (phylopScore * 1000 > 32767 || phylopScore * 1000 < -32768)
             {
                 throw new InvalidDataException("PhyloP score beyond int16 range. Score:" + phylopScore);
             }
 
-            var phylopShortValue = Convert.ToInt16(phylopScore * 1000);
+            short phylopShortValue = Convert.ToInt16(phylopScore * 1000);
             return phylopShortValue;
         }
 
@@ -326,5 +282,7 @@ namespace VariantAnnotation.PhyloP
                 chromosomeInterval.Write(_writer);
             }
         }
+
+        public void Dispose() => Close();
     }
 }

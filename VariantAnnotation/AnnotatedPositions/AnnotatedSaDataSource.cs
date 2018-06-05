@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using CommonUtilities;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.SA;

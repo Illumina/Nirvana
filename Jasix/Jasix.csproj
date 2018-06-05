@@ -12,7 +12,6 @@
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
-    <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
   </ItemGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
 </Project>

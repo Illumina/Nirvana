@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
+using Genome;
 using SAUtils.InputFileParsers.CustomAnnotation;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -10,7 +10,7 @@ namespace UnitTests.SAUtils.InputFileParsers
     [Collection("ChromosomeRenamer")]
     public sealed class CustomAnnotationTests
     {
-        private readonly IDictionary<string,IChromosome> _refChromDict;
+        private readonly IDictionary<string, IChromosome> _refChromDict;
 
         /// <summary>
         /// constructor

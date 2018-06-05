@@ -6,8 +6,8 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Import;
 using CacheUtils.DataDumperImport.IO;
 using Compression.Utilities;
+using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
 {

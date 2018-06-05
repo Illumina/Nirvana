@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
 
 namespace SAUtils.DataStructures
 {

@@ -1,7 +1,7 @@
 ﻿using System.IO;
-using CommonUtilities;
-using SAUtils.InputFileParsers.MitoMap;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using SAUtils.InputFileParsers.MitoMAP;
+using Variants;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {

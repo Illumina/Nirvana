@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions.Consequence
 {

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace SAUtils.InputFileParsers.ClinGen
 {
@@ -16,9 +16,7 @@ namespace SAUtils.InputFileParsers.ClinGen
         private readonly IDictionary<string, IChromosome> _refNameDict;
 
         #endregion
-
         
-        // constructor
         public ClinGenReader(FileInfo clinGenFileInfo, IDictionary<string, IChromosome> refNameDict)
         {
             _clinGenFileInfo = clinGenFileInfo;

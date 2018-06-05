@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using SAUtils.ExtractCosmicSvs;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -14,12 +13,12 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetColumnIndices_valid_header()
         {
-            var header = @"CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	GRCh	Chromosome:G_Start..G_Stop";
+            const string header = @"CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	GRCh	Chromosome:G_Start..G_Stop";
 
             var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
-                new Dictionary<string, IChromosome>() {{"W", new Chromosome("chrW", "W", 1)}},
+                new Dictionary<string, IChromosome> {{"W", new Chromosome("chrW", "W", 1)}},
                 GenomeAssembly.GRCh37);
 
             cnvReader.GetColumnIndices(header);
@@ -29,12 +28,12 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetColumnIndices_missing_column()
         {
-            var header = @"CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	Chromosome:G_Start..G_Stop";
+            const string header = @"CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	Chromosome:G_Start..G_Stop";
 
             var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
-                new Dictionary<string, IChromosome>() { { "W", new Chromosome("chrW", "W", 1) } },
+                new Dictionary<string, IChromosome> { { "W", new Chromosome("chrW", "W", 1) } },
                 GenomeAssembly.GRCh37);
 
             Assert.Throws<InvalidDataException>(()=>cnvReader.GetColumnIndices(header));
@@ -46,7 +45,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
-                new Dictionary<string, IChromosome>()
+                new Dictionary<string, IChromosome>
                 {
                     { "17", new Chromosome("chr17", "17", 1) },
                     { "Y", new Chromosome("chrY", "Y", 2) },

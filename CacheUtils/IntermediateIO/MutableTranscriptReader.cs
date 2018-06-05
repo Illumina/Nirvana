@@ -4,13 +4,13 @@ using System.IO;
 using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.TranscriptCache;
-using CommonUtilities;
+using Genome;
+using Intervals;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
 {
@@ -25,7 +25,7 @@ namespace CacheUtils.IntermediateIO
         internal MutableTranscriptReader(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             _refIndexToChromosome = refIndexToChromosome;
-            _reader = new StreamReader(stream);
+            _reader = FileUtilities.GetStreamReader(stream);
             Header  = IntermediateIoCommon.ReadHeader(_reader, IntermediateIoCommon.FileType.Transcript);
         }
 

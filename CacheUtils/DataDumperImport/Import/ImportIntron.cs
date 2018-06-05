@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Import;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace CacheUtils.DataDumperImport.Import
 {

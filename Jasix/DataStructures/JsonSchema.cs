@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 // ReSharper disable InconsistentNaming
 // The names have to be this way as they have to match the json schema exactly

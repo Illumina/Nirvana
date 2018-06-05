@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace VariantAnnotation.Interface.SA
 {

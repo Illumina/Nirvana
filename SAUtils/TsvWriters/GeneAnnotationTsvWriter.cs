@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CommonUtilities;
 using Compression.Utilities;
-using VariantAnnotation.Providers;
+using OptimizedCore;
+using VariantAnnotation.Interface.Providers;
 
 namespace SAUtils.TsvWriters
 {
@@ -13,7 +13,7 @@ namespace SAUtils.TsvWriters
         private readonly StreamWriter _writer;
         #endregion
 
-        public GeneAnnotationTsvWriter(string outputDirectory, DataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
+        public GeneAnnotationTsvWriter(string outputDirectory, IDataSourceVersion dataSourceVersion, string assembly, int dataVersion, string keyName,
             bool isArray)
         {
             var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".gene.tsv.gz";
@@ -22,7 +22,7 @@ namespace SAUtils.TsvWriters
             _writer.Write(GetHeader(dataSourceVersion, dataVersion, assembly, keyName, isArray));
         }
 
-        private static string GetHeader(DataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
+        private static string GetHeader(IDataSourceVersion dataSourceVersion, int dataVersion, string assembly, string keyName, bool isArray)
         {
             var sb = StringBuilderCache.Acquire();
 

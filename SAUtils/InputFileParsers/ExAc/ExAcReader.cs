@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.ExAc
 {
@@ -35,14 +35,11 @@ namespace SAUtils.InputFileParsers.ExAc
 
 		private int _totalDepth;
 
-
 		public ExacReader(FileInfo exacInfo, IDictionary<string, IChromosome> refChromDict) 
 		{
 			_exacFileInfo = exacInfo;
 		    _refChromDict = refChromDict;
 		}
-
-        
 
 		private void Clear()
 		{

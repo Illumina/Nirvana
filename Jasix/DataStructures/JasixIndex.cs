@@ -1,16 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
+using ErrorHandling.Exceptions;
+using IO;
 
 namespace Jasix.DataStructures
 {
-	public sealed class JasixIndex
+    public struct FileRange
+    {
+        public readonly long Begin;
+        public long End;
+
+        public FileRange(long begin, long end = long.MaxValue)
+        {
+            Begin = begin;
+            End = end;
+        }
+    }
+
+    public sealed class JasixIndex
 	{
 		private readonly Dictionary<string, JasixChrIndex> _chrIndices;
 	    private readonly Dictionary<string, string> _synonymToChrName;
-		public string HeaderLine;
+	    private readonly Dictionary<string, FileRange> _sectionRanges;
 
 		// the json file might contain sections. We want to be able to index these sections too
 
@@ -18,16 +30,16 @@ namespace Jasix.DataStructures
 		{
 			_chrIndices = new Dictionary<string, JasixChrIndex>();
             _synonymToChrName = new Dictionary<string, string>();
+            _sectionRanges = new Dictionary<string, FileRange>();
 		}
 
-		private JasixIndex(IExtendedBinaryReader reader):this()
+		private JasixIndex(ExtendedBinaryReader reader):this()
 		{
-			var version = reader.ReadOptInt32();
+			int version = reader.ReadOptInt32();
 			if (version != JasixCommons.Version)
 				throw new InvalidDataException($"Invalid Jasix version: Observed {version}, expected{JasixCommons.Version}");
 
-			HeaderLine = reader.ReadAsciiString();
-			var count = reader.ReadOptInt32();
+			int count = reader.ReadOptInt32();
 
 			for (var i = 0; i < count; i++)
 			{
@@ -36,13 +48,22 @@ namespace Jasix.DataStructures
 			}
 
 		    int synonymCount = reader.ReadOptInt32();
-		    if (synonymCount == 0) return;
 		    for (var i = 0; i < synonymCount; i++)
 		    {
-		        string synonym = reader.ReadAsciiString();
-		        string indexName = reader.ReadAsciiString();
+		        string synonym             = reader.ReadAsciiString();
+		        string indexName           = reader.ReadAsciiString();
 		        _synonymToChrName[synonym] = indexName;
 		    }
+
+		    int sectionCount = reader.ReadOptInt32();
+		    for (var i = 0; i < sectionCount; i++)
+		    {
+		        string sectionName = reader.ReadAsciiString();
+		        long begin         = reader.ReadOptInt64();
+		        long end           = reader.ReadOptInt64();
+                _sectionRanges[sectionName] = new FileRange(begin, end);
+		    }
+
 		}
 
 		public JasixIndex(Stream stream) : this(new ExtendedBinaryReader(stream))
@@ -54,26 +75,30 @@ namespace Jasix.DataStructures
 			var writer = new ExtendedBinaryWriter(writeStream);
 			writer.WriteOpt(JasixCommons.Version);
 
-			writer.WriteOptAscii(HeaderLine);
-
 			writer.WriteOpt(_chrIndices.Count);
-			if (_chrIndices.Count == 0) return;
-			
 			foreach (var chrIndex in _chrIndices.Values)
 			{
 				chrIndex.Write(writer);
 			}
 
             writer.WriteOpt(_synonymToChrName.Count);
-		    if (_synonymToChrName.Count == 0) return;
 		    foreach (var pair in _synonymToChrName)
 		    {
 		        writer.Write(pair.Key);
 		        writer.Write(pair.Value);
             }
+
+            writer.WriteOpt(_sectionRanges.Count);
+		    foreach ((string name, FileRange sectionRange) in _sectionRanges)
+		    {
+		        writer.WriteOptAscii(name);
+                writer.WriteOpt(sectionRange.Begin);
+                writer.WriteOpt(sectionRange.End);
+		    }
+
 		}
 
-		public void Flush()
+	    public void Flush()
 		{
 			foreach (var chrIndex in _chrIndices.Values)
 			{
@@ -101,9 +126,28 @@ namespace Jasix.DataStructures
 
 		}
 
-		
-		//returns file location of the first node that overlapping the given position chr:start-end
-		public long GetFirstVariantPosition(string chr, int start, int end)
+	    public void BeginSection(string section, long fileLoc)
+	    {
+	        if (_sectionRanges.ContainsKey(section)) 
+                throw new UserErrorException($"Multiple beginning for section:{section}!!");
+
+            _sectionRanges[section] = new FileRange(fileLoc);
+	    }
+
+	    public void EndSection(string section, long fileLoc)
+	    {
+	        if (!_sectionRanges.TryGetValue(section, out var fileRange))
+	            throw new UserErrorException($"Attempting to close section:{section} before opening it!!");
+
+            if (fileRange.End!=long.MaxValue)
+                throw new UserErrorException($"Multiple closing for section{section} !!");
+
+            fileRange.End = fileLoc;
+	        _sectionRanges[section] = fileRange;
+	    }
+
+        //returns file location of the first node that overlapping the given position chr:start-end
+        public long GetFirstVariantPosition(string chr, int start, int end)
 		{
 			if (_chrIndices == null || _chrIndices.Count == 0) return -1;
 
@@ -144,5 +188,14 @@ namespace Jasix.DataStructures
 	        if (_chrIndices.ContainsKey(chromName)) return chromName;
 	        return _synonymToChrName.TryGetValue(chromName, out string indexName) ? indexName : null;
 	    }
-	}
+
+	    public long GetSectionBegin(string section)
+	    {
+	        return _sectionRanges[section].Begin;
+	    }
+	    public long GetSectionEnd(string section)
+	    {
+	        return _sectionRanges[section].End;
+	    }
+    }
 }

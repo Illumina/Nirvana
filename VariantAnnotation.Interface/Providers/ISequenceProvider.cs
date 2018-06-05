@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
 
 namespace VariantAnnotation.Interface.Providers
 {

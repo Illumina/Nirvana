@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace Vcf.VariantCreator
 {

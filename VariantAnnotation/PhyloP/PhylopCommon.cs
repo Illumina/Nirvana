@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using ErrorHandling.Exceptions;
+using Genome;
+using IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.PhyloP
 {
@@ -56,7 +56,7 @@ namespace VariantAnnotation.PhyloP
         {
             if (string.IsNullOrEmpty(directory)) return null;
 
-            var phylopPath = Path.Combine(directory, ucscReferenceName + ".npd");
+            string phylopPath = Path.Combine(directory, ucscReferenceName + ".npd");
 
             return !File.Exists(phylopPath)
                 ? null

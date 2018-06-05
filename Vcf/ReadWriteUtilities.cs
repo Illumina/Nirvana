@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using Compression.FileHandling;
 using Compression.Utilities;
+using Genome;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace Vcf
 {
@@ -23,13 +23,8 @@ namespace Vcf
 	        IRefMinorProvider refMinorProvider, bool verboseTranscript, IRecomposer recomposer)
 	    {
 	        bool useStdInput = vcfPath == "-";
-
-	        var peekStream =
-	            new PeekStream(useStdInput
-	                ? Console.OpenStandardInput()
-	                : GZipUtilities.GetAppropriateReadStream(vcfPath));
-
-	        return new VcfReader(peekStream, chromosomeDictionary, refMinorProvider, verboseTranscript, recomposer);
+            var stream = useStdInput ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(vcfPath);
+            return new VcfReader(stream, chromosomeDictionary, refMinorProvider, verboseTranscript, recomposer);
         }
         
 	    public static StreamWriter GetVcfOutputWriter(string outputPath)

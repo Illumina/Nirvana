@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonUtilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures

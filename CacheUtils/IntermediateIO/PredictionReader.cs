@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommonUtilities;
+using Genome;
+using IO;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.IntermediateIO
 {
@@ -17,7 +17,7 @@ namespace CacheUtils.IntermediateIO
             IntermediateIoCommon.FileType expectedFileType)
         {
             _refIndexToChromosome = refIndexToChromosome;
-            _reader = new StreamReader(stream);
+            _reader = FileUtilities.GetStreamReader(stream);
             IntermediateIoCommon.ReadHeader(_reader, expectedFileType);
         }
 

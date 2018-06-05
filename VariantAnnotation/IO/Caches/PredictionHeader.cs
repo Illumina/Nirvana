@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using Compression.FileHandling;
+using IO;
 using VariantAnnotation.Caches.DataStructures;
 
 namespace VariantAnnotation.IO.Caches
@@ -12,7 +13,7 @@ namespace VariantAnnotation.IO.Caches
 
         public PredictionHeader(Header header, PredictionCacheCustomHeader customHeader, Prediction.Entry[] lookupTable)
             : base(header.Identifier, header.SchemaVersion, header.DataVersion, header.Source,
-                header.CreationTimeTicks, header.GenomeAssembly)
+                header.CreationTimeTicks, header.Assembly)
         {
             Custom      = customHeader;
             LookupTable = lookupTable;
@@ -30,13 +31,13 @@ namespace VariantAnnotation.IO.Caches
             PredictionCacheCustomHeader customHeader;
             Prediction.Entry[] lookupTable;
 
-            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
+            using (var reader = new BinaryReader(stream, Encoding.Default, true))
             {
                 baseHeader = Read(reader);
                 customHeader = PredictionCacheCustomHeader.Read(reader);
             }
 
-            using (var reader = new BinaryReader(blockStream, Encoding.UTF8, true))
+            using (var reader = new ExtendedBinaryReader(blockStream, Encoding.Default, true))
             {
                 lookupTable = ReadLookupTable(reader);
             }
@@ -44,7 +45,7 @@ namespace VariantAnnotation.IO.Caches
             return new PredictionHeader(baseHeader, customHeader, lookupTable);
         }
 
-        private static Prediction.Entry[] ReadLookupTable(BinaryReader reader)
+        private static Prediction.Entry[] ReadLookupTable(ExtendedBinaryReader reader)
         {
             int numEntries = reader.ReadInt32();
             var lut = new Prediction.Entry[numEntries];

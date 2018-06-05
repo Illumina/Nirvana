@@ -11,16 +11,13 @@ namespace VariantAnnotation.SA
         protected readonly byte[] CompressedBlock;
         public readonly byte[] UncompressedBlock;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         protected SaBlock(ICompressionAlgorithm compressionAlgorithm, int size)
         {
-            CompressionAlgorithm = compressionAlgorithm;
-            UncompressedBlock = new byte[size];
-            var compressedBlockSize = compressionAlgorithm.GetCompressedBufferBounds(size);
-            CompressedBlock = new byte[compressedBlockSize];
-            Header = new BlockHeader();
+            CompressionAlgorithm    = compressionAlgorithm;
+            UncompressedBlock       = new byte[size];
+            int compressedBlockSize = compressionAlgorithm.GetCompressedBufferBounds(size);
+            CompressedBlock         = new byte[compressedBlockSize];
+            Header                  = new BlockHeader();
         }
     }
 }

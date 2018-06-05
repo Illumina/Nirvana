@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.IntermediateIO
 {

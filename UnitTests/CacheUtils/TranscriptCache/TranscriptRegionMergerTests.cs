@@ -1,10 +1,10 @@
 ﻿using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.TranscriptCache;
 using CacheUtils.TranscriptCache.Comparers;
+using Genome;
+using Intervals;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.CacheUtils.TranscriptCache

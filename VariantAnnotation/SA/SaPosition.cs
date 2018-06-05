@@ -1,33 +1,29 @@
-﻿using VariantAnnotation.Interface.IO;
+﻿using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
-    public class SaPosition : ISaPosition
+    public sealed class SaPosition : ISaPosition
     {
         public ISaDataSource[] DataSources { get; }
         public string GlobalMajorAllele { get; }
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public SaPosition(ISaDataSource[] dataSources, string globalMajorAllele)
         {
-            DataSources = dataSources;
+            DataSources       = dataSources;
             GlobalMajorAllele = globalMajorAllele;
         }
 
         public static ISaPosition Read(ExtendedBinaryReader reader)
         {
-            var globalMajorAllele = reader.ReadAsciiString();
-            var numDataSources = reader.ReadOptInt32();
+            string globalMajorAllele = reader.ReadAsciiString();
+            int numDataSources       = reader.ReadOptInt32();
 
             ISaDataSource[] dataSources = null;
             if (numDataSources > 0)
             {
                 dataSources = new ISaDataSource[numDataSources];
-                for (int i = 0; i < numDataSources; i++) dataSources[i] = SaDataSource.Read(reader);
+                for (var i = 0; i < numDataSources; i++) dataSources[i] = SaDataSource.Read(reader);
             }
 
             return new SaPosition(dataSources, globalMajorAllele);

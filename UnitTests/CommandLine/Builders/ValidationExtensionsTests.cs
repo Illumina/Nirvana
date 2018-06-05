@@ -7,12 +7,12 @@ using Xunit;
 
 namespace UnitTests.CommandLine.Builders
 {
-    public sealed class ValidationExtensionsTests : RandomFileBase
+    public sealed class ValidationExtensionsTests
     {
         private static ExitCodes Execute(IConsoleAppValidator validator)
         {
             return validator
-                .DisableOutput(true)
+                .DisableOutput()
                 .ShowBanner("authors")
                 .ShowHelpMenu("description", "example")
                 .ShowErrors()
@@ -22,10 +22,10 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckEachDirectoryContainsFiles_ContainsFiles_SuccessExitCode()
         {
-            var tempDir = Path.GetTempPath();
+            string tempDir = Path.GetTempPath();
 
             const string suffix = ".txt";
-            var randomPath = GetRandomPath() + suffix;
+            string randomPath = RandomPath.GetRandomPath() + suffix;
             File.Create(randomPath);
 
             var ops = new OptionSet { { "id=", "id", v => { } } };
@@ -40,7 +40,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckEachDirectoryContainsFiles_MissingFiles_FileNotFoundExitCode()
         {
-            var tempDir = Path.GetTempPath();
+            string tempDir = Path.GetTempPath();
             const string suffix = ".anavrin";
 
             var ops = new OptionSet { { "id=", "id", v => { } } };
@@ -67,7 +67,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckInputFilenameExists_FileExists_SuccessExitCode()
         {
-            var randomPath = GetRandomPath();
+            string randomPath = RandomPath.GetRandomPath();
             File.Create(randomPath);
 
             var ops = new OptionSet { { "if=", "if", v => { } } };
@@ -82,7 +82,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void CheckInputFilenameExists_MissingFiles_FileNotFoundExitCode()
         {
-            var randomPath = GetRandomPath() + ".anavrin";
+            string randomPath = RandomPath.GetRandomPath() + ".anavrin";
 
             var ops = new OptionSet { { "id=", "id", v => { } } };
 
@@ -181,7 +181,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void Enable_True_ExecuteMethod()
         {
-            bool observedFlag = false;
+            var observedFlag = false;
             var ops = new OptionSet { { "test=", "test", v => { } } };
 
             Execute(new ConsoleAppBuilder(new[] { "--test", "test" }, ops)
@@ -194,7 +194,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void Enable_False_SkipMethod()
         {
-            bool observedFlag = false;
+            var observedFlag = false;
             var ops = new OptionSet { { "test=", "test", v => { } } };
 
             Execute(new ConsoleAppBuilder(new[] { "--test", "test" }, ops)

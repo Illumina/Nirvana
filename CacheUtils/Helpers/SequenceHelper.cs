@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Compression.Utilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using IO;
 using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Helpers

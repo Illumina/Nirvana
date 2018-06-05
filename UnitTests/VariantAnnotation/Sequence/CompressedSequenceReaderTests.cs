@@ -1,5 +1,5 @@
-﻿using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Sequence;
 using Xunit;
 

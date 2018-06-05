@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Caches.DataStructures;
+using Genome;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.Caches
 {
@@ -14,7 +14,7 @@ namespace VariantAnnotation.Caches
         private readonly IIntervalForest<IRegulatoryRegion> _regulatoryIntervalForest;
 
 	    public string Name { get; }
-	    public GenomeAssembly GenomeAssembly { get; }
+	    public GenomeAssembly Assembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
         public TranscriptCache(IEnumerable<IDataSourceVersion> dataSourceVersions, GenomeAssembly genomeAssembly,
@@ -23,7 +23,7 @@ namespace VariantAnnotation.Caches
         {
 	        Name                      = "Transcript annotation provider";
             DataSourceVersions        = dataSourceVersions;
-            GenomeAssembly            = genomeAssembly;
+            Assembly            = genomeAssembly;
             _transcriptIntervalForest = new IntervalForest<ITranscript>(transcriptIntervalArrays);
             _regulatoryIntervalForest = new IntervalForest<IRegulatoryRegion>(regulatoryRegionIntervalArrays);
         }

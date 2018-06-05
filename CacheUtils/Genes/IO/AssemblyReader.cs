@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Genes.IO
 {

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
+using Genome;
+using Intervals;
+using IO;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {

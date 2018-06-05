@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using Nirvana;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
+using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
 using Vcf;
 using Vcf.VariantCreator;
 
@@ -10,24 +12,29 @@ namespace UnitTests.TestUtilities
 {
     public static class AnnotationUtilities
 	{
-	    internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
-            string vcfLine, bool enableVerboseTranscripts)
+        internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
+            string vcfLine, bool enableVerboseTranscripts, IDictionary<string, IChromosome> refNameToChromosome)
+        {
+            var refMinorProvider = ProviderUtilities.GetRefMinorProvider(refNameToChromosome, saPaths);
+            var annotatorAndRef = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
+
+            var annotator      = annotatorAndRef.Annotator;
+            var refNames       = annotatorAndRef.RefNames;
+            var variantFactory = new VariantFactory(refNames, enableVerboseTranscripts);
+
+            var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
+            var annotatedPosition = annotator.Annotate(position);
+
+            return annotatedPosition;
+        }
+
+	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
 	    {
-	        var refMinorProvider = ProviderUtilities.GetRefMinorProvider(saPaths);
-	        var annotatorAndRef = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
-
-	        var annotator = annotatorAndRef.Annotator;
-            var refNames = annotatorAndRef.RefNames;
-            var variantFactory = new VariantFactory(refNames,refMinorProvider,enableVerboseTranscripts);
-
-	        var position = VcfReaderUtils.ParseVcfLine(vcfLine,variantFactory,refNames);
-
-	        var annotatedPosition = annotator.Annotate(position);
-
-	        return annotatedPosition;
+	        var simplePosition = SimplePosition.GetSimplePosition(vcfLine, refNameToChromosome);
+	        return Position.ToPosition(simplePosition, refMinorProvider, variantFactory);
 	    }
 
-        private static (Annotator Annotator, IDictionary<string,IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
+        private static (Annotator Annotator, IDictionary<string, IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
         {
             var sequenceFilePath             = cacheFilePrefix + ".bases";
             var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);

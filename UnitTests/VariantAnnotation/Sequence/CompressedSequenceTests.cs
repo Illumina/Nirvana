@@ -1,6 +1,5 @@
-﻿using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
+﻿using Genome;
+using Intervals;
 using VariantAnnotation.Sequence;
 using Xunit;
 
@@ -13,7 +12,7 @@ namespace UnitTests.VariantAnnotation.Sequence
 
 		public CompressedSequenceTests()
 		{
-            _compressedSequence = new CompressedSequence { GenomeAssembly = GenomeAssembly.hg19 };
+            _compressedSequence = new CompressedSequence { Assembly = GenomeAssembly.hg19 };
 
             // create the following sequence: NNATGTTTCCACTTTCTCCTCATTAGANNNTAACGAATGGGTGATTTCCCTAN
             var buffer = new byte[] { 14, 42, 93, 169, 150, 122, 204, 11, 211, 224, 35, 169, 91, 0 };
@@ -29,9 +28,9 @@ namespace UnitTests.VariantAnnotation.Sequence
 		}
 
 	    [Fact]
-	    public void GenomeAssembly_hg19()
+	    public void Assembly_hg19()
 	    {
-	        Assert.Equal(GenomeAssembly.hg19, _compressedSequence.GenomeAssembly);
+	        Assert.Equal(GenomeAssembly.hg19, _compressedSequence.Assembly);
 	    }
 
         [Fact]

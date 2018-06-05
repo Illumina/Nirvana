@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
-using VariantAnnotation.Algorithms;
-using VariantAnnotation.Interface.Intervals;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -23,9 +21,6 @@ namespace SAUtils.ExtractMiniSa
 
         #endregion
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public MiniSaExtractor(string compressedRefFile, string saPath, int begin, int end, string datasourceName = null,
             string outputDir = null)
         {
@@ -35,8 +30,8 @@ namespace SAUtils.ExtractMiniSa
 
             var refChromDict = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
 
-            var referenceName = GetReferenceName(saPath, refChromDict);
-            _miniSaPath       = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
+            string referenceName = GetReferenceName(saPath, refChromDict);
+            _miniSaPath = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
 
             Console.WriteLine($"MiniSA output to: {_miniSaPath}");
         }
@@ -51,7 +46,7 @@ namespace SAUtils.ExtractMiniSa
             return miniSaPath;
         }
 
-        private static string GetReferenceName(string saPath, IDictionary<string,IChromosome> refChromDict)
+        private static string GetReferenceName(string saPath, IDictionary<string, IChromosome> refChromDict)
         {
             ISupplementaryAnnotationHeader header;
 
@@ -62,7 +57,6 @@ namespace SAUtils.ExtractMiniSa
             }
 
             return refChromDict[header.ReferenceSequenceName].UcscName;
-
         }
 
         private static SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
@@ -95,7 +89,7 @@ namespace SAUtils.ExtractMiniSa
                 using (var writer = GetSaWriter(_miniSaPath, reader.Header, smallVariantIntervals, svIntervals,
                         allVariantIntervals,globalMajorAlleles))
                 {
-                    for (var position = _begin; position <= _end; position++)
+                    for (int position = _begin; position <= _end; position++)
                     {
                         var saPosition = reader.GetAnnotation(position);
                         if (saPosition == null) continue;

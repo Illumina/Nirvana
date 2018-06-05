@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using CommandLine.Utilities;
+using Genome;
 using SAUtils.DataStructures;
 using SAUtils.TsvWriters;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.ExtractCosmicSvs
@@ -26,7 +26,7 @@ namespace SAUtils.ExtractCosmicSvs
             _version         = version;
             _outputDirectory = outputDir;
             _genomeAssembly  = assembly;
-            _refNameToChorm = refNameToChromosome;
+            _refNameToChorm  = refNameToChromosome;
         }
 
         public void CreateTsv()

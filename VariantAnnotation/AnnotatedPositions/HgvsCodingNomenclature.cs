@@ -1,9 +1,8 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
+﻿using Genome;
+using Intervals;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Utilities;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
@@ -17,16 +16,16 @@ namespace VariantAnnotation.AnnotatedPositions
             //               and make sure that we have protein coordinates
             if (variant.Type == VariantType.reference || SequenceUtilities.HasNonCanonicalBase(variant.AltAllele)) return null;
 
-            var onReverseStrand = transcript.Gene.OnReverseStrand;
+            bool onReverseStrand = transcript.Gene.OnReverseStrand;
 
-            var refAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele;
-            var altAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.AltAllele) : variant.AltAllele;
+            string refAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele;
+            string altAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.AltAllele) : variant.AltAllele;
 
             // decide event type from HGVS nomenclature
             var genomicChange = GetGenomicChange(transcript, onReverseStrand, refSequence, variant);
 
-            var variantStart = variant.Start;
-            var variantEnd   = variant.End;
+            int variantStart = variant.Start;
+            int variantEnd   = variant.End;
 
             if (genomicChange == GenomicChange.Duplication)
             {
@@ -48,7 +47,7 @@ namespace VariantAnnotation.AnnotatedPositions
             // sanity check: make sure we have coordinates
             if (startPositionOffset == null || endPositionOffset == null) return null;
 
-            var transcriptLen = transcript.End - transcript.Start + 1;
+            int transcriptLen = transcript.End - transcript.Start + 1;
 
             //_hgvs notation past the transcript
             if (startPositionOffset.Position > transcriptLen || endPositionOffset.Position > transcriptLen) return null;
@@ -66,12 +65,12 @@ namespace VariantAnnotation.AnnotatedPositions
         internal static (int Start, int End, string RefAllele, int RegionStart, int RegionEnd) ShiftDuplication(
             this ITranscriptRegion[] regions, int start, string altAllele, bool onReverseStrand)
         {
-            var incrementLength = altAllele.Length;
-            var dupStart = onReverseStrand ? start + incrementLength - 1    : start - incrementLength;
-            var dupEnd   = onReverseStrand ? dupStart - incrementLength + 1 : dupStart + incrementLength - 1;
+            int incrementLength = altAllele.Length;
+            int dupStart = onReverseStrand ? start + incrementLength - 1    : start - incrementLength;
+            int dupEnd   = onReverseStrand ? dupStart - incrementLength + 1 : dupStart + incrementLength - 1;
 
-            var (regionStart, _) = MappedPositionUtilities.FindRegion(regions, dupStart);
-            var (regionEnd, _)   = MappedPositionUtilities.FindRegion(regions, dupEnd);
+            (int regionStart, _) = MappedPositionUtilities.FindRegion(regions, dupStart);
+            (int regionEnd, _)   = MappedPositionUtilities.FindRegion(regions, dupEnd);
 
             return (dupStart, dupEnd, altAllele, regionStart, regionEnd);
         }
@@ -79,11 +78,11 @@ namespace VariantAnnotation.AnnotatedPositions
         public static GenomicChange GetGenomicChange(IInterval interval, bool onReverseStrand, ISequence refSequence, ISimpleVariant variant)
         {
             // length of the reference allele. Negative lengths make no sense
-            var refLength = variant.End - variant.Start + 1;
+            int refLength = variant.End - variant.Start + 1;
             if (refLength < 0) refLength = 0;
 
             // length of alternative allele
-            var altLength = variant.AltAllele.Length;
+            int altLength = variant.AltAllele.Length;
 
             // sanity check: make sure that the alleles are different
             if (variant.RefAllele == variant.AltAllele) return GenomicChange.Unknown;
@@ -97,7 +96,7 @@ namespace VariantAnnotation.AnnotatedPositions
                 if (refLength == 1) return GenomicChange.Substitution;
 
                 // inversion
-                var rcRefAllele = SequenceUtilities.GetReverseComplement(variant.RefAllele);
+                string rcRefAllele = SequenceUtilities.GetReverseComplement(variant.RefAllele);
                 return variant.AltAllele == rcRefAllele ? GenomicChange.Inversion : GenomicChange.DelIns;
             }
 
@@ -106,7 +105,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
             // If this is an insertion, we should check if the preceeding reference nucleotides
             // match the insertion. In that case it should be annotated as a multiplication.
-            var isGenomicDuplicate = HgvsUtilities.IsDuplicateWithinInterval(refSequence, variant, interval, onReverseStrand);
+            bool isGenomicDuplicate = HgvsUtilities.IsDuplicateWithinInterval(refSequence, variant, interval, onReverseStrand);
 
             return isGenomicDuplicate ? GenomicChange.Duplication : GenomicChange.Insertion;
         }

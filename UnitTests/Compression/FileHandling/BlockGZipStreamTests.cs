@@ -3,14 +3,14 @@ using System.IO;
 using System.IO.Compression;
 using System.Text;
 using Compression.FileHandling;
-using Compression.Utilities;
 using ErrorHandling.Exceptions;
+using IO;
 using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Compression.FileHandling
 {
-    public sealed class BlockGZipStreamTests : RandomFileBase
+    public sealed class BlockGZipStreamTests
     {
         #region members
 
@@ -28,7 +28,7 @@ namespace UnitTests.Compression.FileHandling
 		public void FileIO()
         {
             var observedDecompressedBuffer = new byte[_expectedDecompressedBuffer.Length];
-            string randomPath = GetRandomPath();
+            string randomPath = RandomPath.GetRandomPath();
 
             // compress the data
             long observedPosition;
@@ -193,7 +193,7 @@ namespace UnitTests.Compression.FileHandling
         [Fact]
         public void StreamTypeMismatch()
         {
-            string randomPath = GetRandomPath();
+            string randomPath = RandomPath.GetRandomPath();
 
             using (var writeStream = new FileStream(randomPath, FileMode.Create, FileAccess.Write))
             {
@@ -229,8 +229,8 @@ namespace UnitTests.Compression.FileHandling
                 // compress our data
                 using (var writer = new StreamWriter(new BlockGZipStream(ms, CompressionMode.Compress, true)))
                 {
-                    int currentIndex = 1;
-                    int numBytes = 0;
+                    var currentIndex = 1;
+                    var numBytes     = 0;
 
                     while (true)
                     {
@@ -245,9 +245,9 @@ namespace UnitTests.Compression.FileHandling
                 ms.Seek(0, SeekOrigin.Begin);
 
                 // decompress our data
-                using (var reader = new StreamReader(new BlockGZipStream(ms, CompressionMode.Decompress)))
+                using (var reader = FileUtilities.GetStreamReader(new BlockGZipStream(ms, CompressionMode.Decompress)))
                 {
-                    int index = 1;
+                    var index = 1;
 
                     while (true)
                     {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Utilities;
 
@@ -15,7 +15,7 @@ namespace CacheUtils.IntermediateIO
         {
             var ccdsIdToEnsemblId = new Dictionary<string, List<string>>();
 
-            using (var reader = new StreamReader(FileUtilities.GetReadStream(ccdsPath)))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(ccdsPath)))
             {
                 while (true)
                 {

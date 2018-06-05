@@ -4,20 +4,20 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Providers;
+using Variants;
 
-namespace SAUtils.InputFileParsers.MitoMap
+namespace SAUtils.InputFileParsers.MitoMAP
 {
     public sealed class MitoMapSvReader
     {
         private readonly FileInfo _mitoMapFileInfo;
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
-        private readonly CircularGenomeModel _mitoGenomeModel;
         private readonly VariantAligner _variantAligner;
 
 
@@ -32,7 +32,6 @@ namespace SAUtils.InputFileParsers.MitoMap
             _mitoMapFileInfo = mitoMapFileInfo;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
-            _mitoGenomeModel = new CircularGenomeModel(sequenceProvider.Sequence);
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
         }
 
@@ -47,7 +46,7 @@ namespace SAUtils.InputFileParsers.MitoMap
         private IEnumerable<MitoMapItem> GetMitoMapItems()
         {
             bool isDataLine = false;
-            using (var reader = new StreamReader(_mitoMapFileInfo.FullName))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(_mitoMapFileInfo.FullName)))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)

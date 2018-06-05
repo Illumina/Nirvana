@@ -16,7 +16,7 @@ namespace SAUtils.DataStructures
         {
             if (other == null) return false;
             return Name.Equals(other.Name)
-                   && GenomeAssembly == other.GenomeAssembly
+                   && Assembly == other.Assembly
                    && Version.Equals(other.Version)
                    && ReleaseDate.Equals(other.ReleaseDate)
                    && MatchByAllele == other.MatchByAllele;

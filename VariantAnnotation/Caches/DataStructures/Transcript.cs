@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
@@ -62,7 +61,7 @@ namespace VariantAnnotation.Caches.DataStructures
             RnaEdits          = rnaEdits;
         }
 
-        public static ITranscript Read(ExtendedBinaryReader reader,
+        public static ITranscript Read(BufferedBinaryReader reader,
             IDictionary<ushort, IChromosome> chromosomeIndexDictionary, IGene[] cacheGenes,
             ITranscriptRegion[] cacheTranscriptRegions, IInterval[] cacheMirnas, string[] cachePeptideSeqs)
         {
@@ -146,7 +145,7 @@ namespace VariantAnnotation.Caches.DataStructures
             if (encoded.HasSelenocysteines) WriteItems(writer, Selenocysteines, (x, y) => y.WriteOpt(x));
         }
 
-        private static T[] ReadItems<T>(ExtendedBinaryReader reader, Func<ExtendedBinaryReader, T> readFunc)
+        private static T[] ReadItems<T>(BufferedBinaryReader reader, Func<BufferedBinaryReader, T> readFunc)
         {
             int numItems = reader.ReadOptInt32();
             var items    = new T[numItems];
@@ -160,7 +159,7 @@ namespace VariantAnnotation.Caches.DataStructures
             foreach (var item in items) writeAction(item, writer);
         }
 
-        private static T[] ReadIndices<T>(IExtendedBinaryReader reader, T[] cachedItems)
+        private static T[] ReadIndices<T>(IBufferedBinaryReader reader, T[] cachedItems)
         {
             int numItems = reader.ReadOptInt32();
             var items = new T[numItems];

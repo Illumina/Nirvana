@@ -3,10 +3,10 @@ using System.IO;
 using System.Text.RegularExpressions;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.Utilities;
+using Intervals;
 using OptimizedCore;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace CacheUtils.DataDumperImport.Import
 {

@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using CommonUtilities;
+using IO;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 

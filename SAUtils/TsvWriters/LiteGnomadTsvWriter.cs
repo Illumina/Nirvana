@@ -2,7 +2,7 @@
 using System.IO;
 using System.IO.Compression;
 using Compression.FileHandling;
-using Compression.Utilities;
+using IO;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 

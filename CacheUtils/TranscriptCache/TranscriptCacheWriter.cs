@@ -6,11 +6,11 @@ using System.Text;
 using CacheUtils.TranscriptCache.Comparers;
 using Compression.Algorithms;
 using Compression.FileHandling;
+using Intervals;
+using IO;
 using VariantAnnotation.Caches;
-using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
+using VariantAnnotation.IO;
 
 
 namespace CacheUtils.TranscriptCache
@@ -45,7 +45,7 @@ namespace CacheUtils.TranscriptCache
 
             WriteItems(_writer, cacheData.Genes,             x => x.Write(_writer));
             WriteItems(_writer, cacheData.TranscriptRegions, x => x.Write(_writer));
-            WriteItems(_writer, cacheData.Mirnas,            x => ((ISerializable)x).Write(_writer));
+            WriteItems(_writer, cacheData.Mirnas,            x => x.Write(_writer));
             WriteItems(_writer, cacheData.PeptideSeqs,       x => _writer.WriteOptAscii(x));
 
             var geneComparer             = new GeneComparer();

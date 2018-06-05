@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.Sequence;
+﻿
+using Genome;
 
 namespace CacheUtils.Genes.DataStructures
 {

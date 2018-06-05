@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Compression.Utilities;
+using IO;
 
 namespace UnitTests.TestUtilities
 {

@@ -9,7 +9,7 @@ namespace VariantAnnotation.IO.Caches
 
         public CacheHeader(Header header, TranscriptCacheCustomHeader customHeader) : base(header.Identifier,
             header.SchemaVersion, header.DataVersion, header.Source, header.CreationTimeTicks,
-            header.GenomeAssembly)
+            header.Assembly)
         {
             Custom = customHeader;
         }
@@ -24,11 +24,11 @@ namespace VariantAnnotation.IO.Caches
         {
             CacheHeader header;
 
-            using (var reader = new BinaryReader(stream, Encoding.UTF8, true))
+            using (var reader = new BinaryReader(stream, Encoding.Default, true))
             {
                 var baseHeader   = Read(reader);
                 var customHeader = TranscriptCacheCustomHeader.Read(reader);
-                header = new CacheHeader(baseHeader, customHeader);
+                header           = new CacheHeader(baseHeader, customHeader);
             }
 
             return header;

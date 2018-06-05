@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using VariantAnnotation.IO;
+using IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO
 {
-    public sealed class ExtendedBinaryReaderTests
+    public sealed class BufferedBinaryReaderTests
     {
         [Theory]
         [InlineData(3)]
@@ -126,7 +126,7 @@ namespace UnitTests.VariantAnnotation.IO
         }
 
         [Fact]
-        public void ExtendedBinaryReader_EndToEnd_DoNotLeaveOpen()
+        public void BufferedBinaryReader_EndToEnd_DoNotLeaveOpen()
         {
             const int expectedResult = 5;
             int observedResult;

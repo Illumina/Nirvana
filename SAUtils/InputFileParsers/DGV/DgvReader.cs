@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.IO;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers.DGV
 {

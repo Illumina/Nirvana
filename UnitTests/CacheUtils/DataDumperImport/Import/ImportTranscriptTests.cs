@@ -4,9 +4,9 @@ using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.Import;
 using CacheUtils.DataDumperImport.IO;
+using Genome;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.CacheUtils.DataDumperImport.Import

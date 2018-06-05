@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Genome;
+using Intervals;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;
@@ -6,9 +8,7 @@ using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {
@@ -45,7 +45,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 predictionScores.Sift, predictionScores.PolyPhen, consequences, null);
         }
 
-        internal static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
+        private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
             AltAminoAcids, string RefCodons, string AltCodons, string TranscriptAltAllele) AnnotateTranscript(ITranscript transcript, ISimpleVariant variant, AminoAcids aminoAcids,
                 ISequence refSequence)
         {
@@ -120,8 +120,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             return positionalEffect;
         }
 
-        private static List<ConsequenceTag> GetConsequences(ITranscript transcript, IVariant variant,
-            VariantEffect variantEffect)
+        private static List<ConsequenceTag> GetConsequences(IInterval transcript, IVariant variant,
+            IVariantEffect variantEffect)
         {
             var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant,
                 variant.Behavior.StructuralVariantConsequence);

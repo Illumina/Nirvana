@@ -2,10 +2,10 @@
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
+using Genome;
+using IO;
 using SAUtils.InputFileParsers.Cosmic;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -66,8 +66,8 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void IndelWithNoLeadingBase()
         {
-            var tsvReader = new StreamReader(new MemoryStream());
-            var vcfReader = new StreamReader(new MemoryStream());
+            var tsvReader = FileUtilities.GetStreamReader(new MemoryStream());
+            var vcfReader = FileUtilities.GetStreamReader(new MemoryStream());
             var cosmicReader = new MergedCosmicReader(vcfReader, tsvReader, _refChromDict);
 
             const string vcfLine1 = "3	10188320	COSM14426	GGTACTGAC	A	.	.	GENE=VHL;STRAND=+;CDS=c.463G>A;AA=p.?;CNT=2";

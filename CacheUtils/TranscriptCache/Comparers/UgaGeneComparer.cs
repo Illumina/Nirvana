@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using CacheUtils.Genes.DataStructures;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace CacheUtils.TranscriptCache.Comparers
 {

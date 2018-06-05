@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Positions;
+using Variants;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {

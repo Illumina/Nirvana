@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
@@ -155,7 +155,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 
                 ms.Position = 0;
 
-                using (var reader = new ExtendedBinaryReader(ms))
+                using (var reader = new BufferedBinaryReader(ms))
                 {
                     observedId = CompactId.Read(reader);
                 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
-using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
+using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
 

@@ -1,7 +1,6 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
+﻿using IO;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
@@ -18,7 +17,7 @@ namespace VariantAnnotation.Caches.DataStructures
             PeptideSeq   = peptideSeq;
         }
 
-        public static ITranslation Read(ExtendedBinaryReader reader, string[] peptideSeqs)
+        public static ITranslation Read(BufferedBinaryReader reader, string[] peptideSeqs)
         {
             var codingRegion = DataStructures.CodingRegion.Read(reader);
             var proteinId    = CompactId.Read(reader);

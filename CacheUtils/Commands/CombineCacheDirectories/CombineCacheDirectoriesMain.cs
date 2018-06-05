@@ -10,14 +10,14 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Algorithms;
 using Compression.FileHandling;
-using Compression.Utilities;
 using ErrorHandling;
+using Genome;
+using Intervals;
+using IO;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Sequence;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
@@ -163,7 +163,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
 
         private static VariantAnnotation.IO.Caches.Header CloneBaseHeader(VariantAnnotation.IO.Caches.Header header) =>
             new VariantAnnotation.IO.Caches.Header(CacheConstants.Identifier, header.SchemaVersion, header.DataVersion,
-                Source.BothRefSeqAndEnsembl, DateTime.Now.Ticks, header.GenomeAssembly);
+                Source.BothRefSeqAndEnsembl, DateTime.Now.Ticks, header.Assembly);
 
         private static PredictionHeader CloneHeader(PredictionHeader header) =>
             new PredictionHeader(CloneBaseHeader(header), header.Custom, header.LookupTable);

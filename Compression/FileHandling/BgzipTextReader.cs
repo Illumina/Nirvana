@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using IO;
 
 namespace Compression.FileHandling
 {
@@ -30,7 +31,7 @@ namespace Compression.FileHandling
         private void FillBuffer()
         {
             _streamPosition = _stream.Position;
-            _bufferLength   = _stream.Read(_buffer, 0, _buffer.Length);
+            _bufferLength   = _stream.ForcedRead(_buffer, 0, _buffer.Length);
             _bufferIndex    = 0;
         }
 

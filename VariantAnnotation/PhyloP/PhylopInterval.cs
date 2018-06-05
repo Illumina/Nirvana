@@ -21,12 +21,9 @@ namespace VariantAnnotation.PhyloP
 			FilePosition = -1;
 		}
 
-		public PhylopInterval(BinaryReader reader)
-		{
-			Read(reader);
-		}
-		
-		public int CompareTo(PhylopInterval otherInterval)
+		public PhylopInterval(BinaryReader reader) => Read(reader);
+
+	    public int CompareTo(PhylopInterval otherInterval)
 		{
 		    // A null value means that this object is greater. 
 		    return otherInterval == null ? 1 : Begin.CompareTo(otherInterval.Begin);

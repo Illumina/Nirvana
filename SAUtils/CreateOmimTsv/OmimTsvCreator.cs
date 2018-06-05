@@ -4,6 +4,7 @@ using VariantAnnotation.GeneAnnotation;
 using System.Linq;
 using Compression.Utilities;
 using ErrorHandling;
+using IO;
 using SAUtils.TsvWriters;
 using SAUtils.InputFileParsers;
 
@@ -64,7 +65,7 @@ namespace SAUtils.CreateOmimTsv
             }
         }
 
-        private Dictionary<string, List<OmimEntry>> GetGeneToOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry)
+        private static Dictionary<string, List<OmimEntry>> GetGeneToOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry)
         {
             var geneToOmimEntries = new Dictionary<string, List<OmimEntry>>();
 
@@ -94,7 +95,7 @@ namespace SAUtils.CreateOmimTsv
             }
         }
 
-        private void AddOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry, string omimPath)
+        private static void AddOmimEntries(Dictionary<int, OmimImportEntry> mimIdToEntry, string omimPath)
         {
             using (var stream = GZipUtilities.GetAppropriateReadStream(omimPath))
             using (var reader = new OmimReader(stream))

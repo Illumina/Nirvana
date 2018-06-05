@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Genome;
+using IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -26,14 +26,14 @@ namespace VariantAnnotation.GeneAnnotation
         private void ReadHeader()
         {
             var header = _reader.ReadString();
-            if (header != SaDataBaseCommon.DataHeader)
+            if (header != SaCommon.DataHeader)
                 throw new FormatException("Unrecognized header in this database");
 
             // ReSharper disable UnusedVariable
             var dataVersion = _reader.ReadUInt16();            
 
             var schema = _reader.ReadUInt16();
-            if (schema != SaDataBaseCommon.SchemaVersion) throw new UserErrorException($"Gene database schema mismatch. Expected {SaDataBaseCommon.SchemaVersion}, observed {schema}");
+            if (schema != SaCommon.SchemaVersion) throw new UserErrorException($"Gene database schema mismatch. Expected {SaCommon.SchemaVersion}, observed {schema}");
 
             var genomeAssembly = (GenomeAssembly)_reader.ReadByte();
             var creationTime   = _reader.ReadInt64();
@@ -61,9 +61,9 @@ namespace VariantAnnotation.GeneAnnotation
         private void CheckGuard()
         {
             var observedGuard = _reader.ReadUInt32();
-            if (observedGuard != SaDataBaseCommon.GuardInt)
+            if (observedGuard != SaCommon.GuardInt)
             {
-                throw new UserErrorException($"Expected a guard integer ({SaDataBaseCommon.GuardInt}), but found another value: ({observedGuard})");
+                throw new UserErrorException($"Expected a guard integer ({SaCommon.GuardInt}), but found another value: ({observedGuard})");
             }
         }
     }

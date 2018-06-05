@@ -1,5 +1,5 @@
 ﻿using System;
-using VariantAnnotation.Interface.IO;
+using IO;
 
 namespace Jasix.DataStructures { 
 	public sealed class JasixNode : IComparable<JasixNode>
@@ -16,7 +16,7 @@ namespace Jasix.DataStructures {
 			FileLocation = location;
 		}
 
-		public JasixNode(IExtendedBinaryReader reader)
+		public JasixNode(ExtendedBinaryReader reader)
 		{
 			_start        = reader.ReadOptInt32();
 			//on disk we will store the end as an offset to save space

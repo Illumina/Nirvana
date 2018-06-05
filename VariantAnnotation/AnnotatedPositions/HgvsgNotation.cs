@@ -1,8 +1,7 @@
 ﻿using System;
-using VariantAnnotation.Algorithms;
-using VariantAnnotation.Interface.Intervals;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using Intervals;
+using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {

@@ -2,9 +2,8 @@
 using System.Text;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
-using VariantAnnotation.Interface.IO;
+using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace VariantAnnotation.SA
 {
@@ -12,9 +11,6 @@ namespace VariantAnnotation.SA
     {
         private ISaIndexOffset[] _blockOffsets;
 
-        /// <summary>
-        /// constructor
-        /// </summary>
         public SaReadBlock(ICompressionAlgorithm compressionAlgorithm, int size = SaWriteBlock.DefaultBlockSize)
             : base(compressionAlgorithm, size)
         { }
@@ -35,19 +31,19 @@ namespace VariantAnnotation.SA
 
         private void ReadBlockOffsets(IExtendedBinaryReader reader)
         {
-            var numEntries = reader.ReadOptInt32();
-            _blockOffsets = new ISaIndexOffset[numEntries];
+            int numEntries = reader.ReadOptInt32();
+            _blockOffsets  = new ISaIndexOffset[numEntries];
 
-            int oldPosition = 0;
-            int oldBlockOffset = 0;
+            var oldPosition    = 0;
+            var oldBlockOffset = 0;
 
-            for (int i = 0; i < numEntries; i++)
+            for (var i = 0; i < numEntries; i++)
             {
-                var deltaPosition = reader.ReadOptInt32();
-                var deltaBlockOffset = reader.ReadOptInt32();
+                int deltaPosition    = reader.ReadOptInt32();
+                int deltaBlockOffset = reader.ReadOptInt32();
 
-                var position = oldPosition + deltaPosition;
-                var blockOffset = oldBlockOffset + deltaBlockOffset;
+                int position    = oldPosition + deltaPosition;
+                int blockOffset = oldBlockOffset + deltaBlockOffset;
 
                 _blockOffsets[i] = new SaIndexOffset(position, blockOffset);
 
@@ -58,7 +54,7 @@ namespace VariantAnnotation.SA
 
         private void ReadCompressedBlock(Stream inputStream)
         {
-            var numBytesRead = inputStream.Read(CompressedBlock, 0, Header.NumCompressedBytes);
+            int numBytesRead = inputStream.Read(CompressedBlock, 0, Header.NumCompressedBytes);
             if (numBytesRead != Header.NumCompressedBytes)
             {
                 throw new IOException($"Expected {Header.NumCompressedBytes} bytes from the block, but received only {numBytesRead} bytes.");
@@ -73,7 +69,7 @@ namespace VariantAnnotation.SA
 
         private void ReadUncompressedBlock(Stream inputStream)
         {
-            var numUncompressedBytes = inputStream.Read(UncompressedBlock, 0, Header.NumUncompressedBytes);
+            int numUncompressedBytes = inputStream.Read(UncompressedBlock, 0, Header.NumUncompressedBytes);
             if (numUncompressedBytes != Header.NumUncompressedBytes)
             {
                 throw new IOException($"Expected {Header.NumUncompressedBytes} bytes from the uncompressed block, but received only {numUncompressedBytes} bytes.");
@@ -92,13 +88,13 @@ namespace VariantAnnotation.SA
         private int BinarySearch(int position)
         {
             var begin = 0;
-            var end = _blockOffsets.Length - 1;
+            int end = _blockOffsets.Length - 1;
 
             while (begin <= end)
             {
-                var index = begin + (end - begin >> 1);
+                int index = begin + (end - begin >> 1);
 
-                var ret = _blockOffsets[index].Position.CompareTo(position);
+                int ret = _blockOffsets[index].Position.CompareTo(position);
                 if (ret == 0) return index;
                 if (ret < 0) begin = index + 1;
                 else end = index - 1;

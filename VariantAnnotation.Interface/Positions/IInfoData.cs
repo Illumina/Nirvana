@@ -1,4 +1,6 @@
-﻿namespace VariantAnnotation.Interface.Positions
+﻿using Variants;
+
+namespace VariantAnnotation.Interface.Positions
 {
     public interface IInfoData
     {

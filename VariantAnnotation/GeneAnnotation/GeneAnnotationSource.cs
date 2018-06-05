@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.IO;
+﻿using IO;
+using VariantAnnotation.Interface.GeneAnnotation;
 
 namespace VariantAnnotation.GeneAnnotation
 {
@@ -26,7 +26,7 @@ namespace VariantAnnotation.GeneAnnotation
                 writer.Write(jsonString);
         }
 
-        public static IGeneAnnotationSource Read(IExtendedBinaryReader reader)
+        public static IGeneAnnotationSource Read(ExtendedBinaryReader reader)
         {
             var dataSource = reader.ReadAsciiString();
             var isArray = reader.ReadBoolean();

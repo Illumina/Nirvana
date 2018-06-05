@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using System.Text;
-using VariantAnnotation.Interface.Sequence;
-using VariantAnnotation.IO;
-using VariantAnnotation.Sequence;
+using Genome;
+using IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Sequence
@@ -88,7 +87,7 @@ namespace UnitTests.VariantAnnotation.Sequence
         public void GetCytogeneticBand_UnknownReferenceIndex_ReturnNull()
         {
             var cytogeneticBands = GetCytogeneticBands();
-            var chromosome = new Chromosome("bob", "bob", CompressedSequenceReader.UnknownReferenceIndex);
+            var chromosome = new Chromosome("bob", "bob", Chromosome.UnknownReferenceIndex);
             var observedCytogeneticBand = cytogeneticBands.GetCytogeneticBand(chromosome, 100, 200);
             Assert.Null(observedCytogeneticBand);
         }

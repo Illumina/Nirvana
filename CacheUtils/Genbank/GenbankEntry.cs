@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.Interface.Intervals;
+﻿using Intervals;
 
 namespace CacheUtils.Genbank
 {

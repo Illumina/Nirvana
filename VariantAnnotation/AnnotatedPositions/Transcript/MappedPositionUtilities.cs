@@ -1,7 +1,7 @@
-﻿using VariantAnnotation.Algorithms;
+﻿using Intervals;
+using VariantAnnotation.Algorithms;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
@@ -68,8 +68,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private static ITranscriptRegion GetCoveredRegion(this ITranscriptRegion[] regions, int regionIndex)
         {
             if (regionIndex == -1) return regions[0];
-            if (regionIndex == ~regions.Length) return regions[regions.Length - 1];
-            return regions[regionIndex];
+            return regionIndex == ~regions.Length ? regions[regions.Length - 1] : regions[regionIndex];
         }
 
         private static int GetCoveredCdnaPosition(int cdnaPosition, ITranscriptRegion region, int regionIndex, bool onReverseStrand, int codingEnd)

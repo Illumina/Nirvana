@@ -1,6 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
+using IO;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneAnnotation
@@ -42,11 +43,10 @@ namespace VariantAnnotation.GeneAnnotation
         {
             writer.Write(GeneName);
             writer.WriteOpt(Annotations.Length);
-            for (int i = 0; i < Annotations.Length; i++)
-                Annotations[i].Write(writer);
+            foreach (IGeneAnnotationSource geneSource in Annotations) geneSource.Write(writer);
         }
 
-        public static IAnnotatedGene Read(IExtendedBinaryReader reader)
+        public static IAnnotatedGene Read(ExtendedBinaryReader reader)
         {
             var geneName = reader.ReadAsciiString();
             var annotationLength = reader.ReadOptInt32();
@@ -61,7 +61,7 @@ namespace VariantAnnotation.GeneAnnotation
 
         public int CompareTo(IAnnotatedGene other)
         {
-            return GeneName.CompareTo(other.GeneName);
+            return string.Compare(GeneName, other.GeneName, StringComparison.Ordinal);
         }
 
         public static IAnnotatedGene CreateEmptyGene()

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using Variants;
 
 namespace SAUtils.DataStructures
 {
@@ -60,7 +60,7 @@ namespace SAUtils.DataStructures
             var boolValues   = new List<string>();
             var stringLists  = new Dictionary<string, IEnumerable<string>>();
 
-            var suppInterval = new SupplementaryIntervalItem(Chromosome,Start, End, null, VariantType,
+            var suppInterval = new SupplementaryIntervalItem(Chromosome,Start, End, VariantType,
                 "ClinGen", intValues, doubleValues, freqValues, stringValues, boolValues, stringLists);
 
             if (Id                     != null) suppInterval.AddStringValue("id", Id);

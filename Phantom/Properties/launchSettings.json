@@ -9,7 +9,7 @@
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom"
     },
     "Test2": {
-      "commandName": "Project",
+      "commandName": "Executable",
       "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh38\\Ensembl90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o Pedigree_test_out",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
     },

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Intervals;
+using Intervals;
 
 namespace CacheUtils.TranscriptCache.Comparers
 {

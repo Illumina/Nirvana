@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
+using Genome;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.Sequence;
 
 namespace VariantAnnotation.GeneAnnotation
 {
-    public sealed class GeneAnnotationProvider:IGeneAnnotationProvider
+    public sealed class GeneAnnotationProvider : IGeneAnnotationProvider
     {
 	    public string Name { get; }
-	    public GenomeAssembly GenomeAssembly { get; }
+        public GenomeAssembly Assembly => GenomeAssembly.Unknown;
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
         private readonly Dictionary<string, IAnnotatedGene> _geneAnnotationDict;

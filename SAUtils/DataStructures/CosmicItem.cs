@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using CommonUtilities;
-using VariantAnnotation.Interface.Sequence;
+using Genome;
+using OptimizedCore;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
@@ -141,7 +141,7 @@ namespace SAUtils.DataStructures
 
                 foreach (var site in study.Sites)
                 {
-                    if (tissueCounts.TryGetValue(site, out var _))
+                    if (tissueCounts.TryGetValue(site, out _))
                     {
                         tissueCounts[site]++;
                     }
@@ -161,7 +161,7 @@ namespace SAUtils.DataStructures
                 if (study.Histologies == null) return null;
                 foreach (var histology in study.Histologies)
                 {
-                    if (cancerTypeCounts.TryGetValue(histology, out var _))
+                    if (cancerTypeCounts.TryGetValue(histology, out _))
                     {
                         cancerTypeCounts[histology]++;
                     }

@@ -6,10 +6,11 @@ using CacheUtils.Genbank;
 using CacheUtils.IntermediateIO;
 using CacheUtils.Utilities;
 using Compression.Utilities;
+using Genome;
+using IO;
 using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Sequence;
 
 namespace CacheUtils.Commands.Download
 {
@@ -93,7 +94,7 @@ namespace CacheUtils.Commands.Download
 
             var maxNum = 0;
 
-            using (var reader = new StreamReader(FileUtilities.GetReadStream(fileList.FilePath)))
+            using (var reader = FileUtilities.GetStreamReader(FileUtilities.GetReadStream(fileList.FilePath)))
             {
                 while (true)
                 {

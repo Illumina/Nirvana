@@ -2,17 +2,17 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Sequence;
 
 namespace SAUtils.InputFileParsers
 {
 	public sealed class GnomadReader 
 	{
-	    private readonly StreamReader _reader;
-        private readonly IDictionary<string,IChromosome> _refChromDict;
+        private readonly StreamReader _reader;
+        private readonly IDictionary<string, IChromosome> _refChromDict;
 
         private int[] _acAll;
 		private int[] _acAfr;
