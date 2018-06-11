@@ -68,51 +68,53 @@ namespace SAUtils.DataStructures
             RemoveAlleleNumberZero();
         }
 
+        
+
         private void RemoveAlleleNumberZero()
         {
-            if (AllAlleleNumber == null || AllAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AllAlleleNumber))
             {
                 AllAlleleNumber = null;
                 AllAlleleCount = null;
             }
 
-            if (AfrAlleleNumber == null || AfrAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AfrAlleleNumber))
             {
                 AfrAlleleNumber = null;
                 AfrAlleleCount = null;
             }
 
-            if (AmrAlleleNumber == null || AmrAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AmrAlleleNumber))
             {
                 AmrAlleleNumber = null;
                 AmrAlleleCount = null;
             }
 
-            if (EasAlleleNumber == null || EasAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(EasAlleleNumber ))
             {
                 EasAlleleNumber = null;
                 EasAlleleCount = null;
             }
 
-            if (FinAlleleNumber == null || FinAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(FinAlleleNumber ))
             {
                 FinAlleleNumber = null;
                 FinAlleleCount = null;
             }
 
-            if (NfeAlleleNumber == null || NfeAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(NfeAlleleNumber ))
             {
                 NfeAlleleNumber = null;
                 NfeAlleleCount = null;
             }
 
-            if (OthAlleleNumber == null || OthAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(OthAlleleNumber ))
             {
                 OthAlleleNumber = null;
                 OthAlleleCount = null;
             }
 
-            if (SasAlleleNumber == null || SasAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(SasAlleleNumber ))
             {
                 SasAlleleNumber = null;
                 SasAlleleCount = null;
@@ -123,12 +125,12 @@ namespace SAUtils.DataStructures
 
 
         // note that for an ExacItem, the chromosome, position and alt allele should uniquely identify it. If not, there is an error in the data source.
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
             // If parameter is null return false.
 
             // if other cannot be cast into OneKGenItem, return false
-            if (!(other is ExacItem otherItem)) return false;
+            if (!(obj is ExacItem otherItem)) return false;
 
             // Return true if the fields match:
             return Equals(Chromosome, otherItem.Chromosome)
@@ -162,23 +164,23 @@ namespace SAUtils.DataStructures
 			jsonObject.AddStringValue("sasAf", ComputingUtilities.ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
 			jsonObject.AddStringValue("othAf", ComputingUtilities.ComputeFrequency(OthAlleleNumber, OthAlleleCount), false);
 
-			if (AllAlleleNumber != null) jsonObject.AddIntValue("allAn", AllAlleleNumber.Value);
-			if (AfrAlleleNumber != null) jsonObject.AddIntValue("afrAn", AfrAlleleNumber.Value);
-			if (AmrAlleleNumber != null) jsonObject.AddIntValue("amrAn", AmrAlleleNumber.Value);
-			if (EasAlleleNumber != null) jsonObject.AddIntValue("easAn", EasAlleleNumber.Value);
-			if (FinAlleleNumber != null) jsonObject.AddIntValue("finAn", FinAlleleNumber.Value);
-			if (NfeAlleleNumber != null) jsonObject.AddIntValue("nfeAn", NfeAlleleNumber.Value);
-			if (SasAlleleNumber != null) jsonObject.AddIntValue("sasAn", SasAlleleNumber.Value);
-			if (OthAlleleNumber != null) jsonObject.AddIntValue("othAn", OthAlleleNumber.Value);
+			jsonObject.AddIntValue("allAn", AllAlleleNumber);
+			jsonObject.AddIntValue("afrAn", AfrAlleleNumber);
+			jsonObject.AddIntValue("amrAn", AmrAlleleNumber);
+			jsonObject.AddIntValue("easAn", EasAlleleNumber);
+			jsonObject.AddIntValue("finAn", FinAlleleNumber);
+			jsonObject.AddIntValue("nfeAn", NfeAlleleNumber);
+			jsonObject.AddIntValue("sasAn", SasAlleleNumber);
+			jsonObject.AddIntValue("othAn", OthAlleleNumber);
 
-			if (AllAlleleCount != null) jsonObject.AddIntValue("allAc", AllAlleleCount.Value);
-			if (AfrAlleleCount != null) jsonObject.AddIntValue("afrAc", AfrAlleleCount.Value);
-			if (AmrAlleleCount != null) jsonObject.AddIntValue("amrAc", AmrAlleleCount.Value);
-			if (EasAlleleCount != null) jsonObject.AddIntValue("easAc", EasAlleleCount.Value);
-			if (FinAlleleCount != null) jsonObject.AddIntValue("finAc", FinAlleleCount.Value);
-			if (NfeAlleleCount != null) jsonObject.AddIntValue("nfeAc", NfeAlleleCount.Value);
-			if (SasAlleleCount != null) jsonObject.AddIntValue("sasAc", SasAlleleCount.Value);
-			if (OthAlleleCount != null) jsonObject.AddIntValue("othAc", OthAlleleCount.Value);
+			jsonObject.AddIntValue("allAc", AllAlleleCount);
+			jsonObject.AddIntValue("afrAc", AfrAlleleCount);
+			jsonObject.AddIntValue("amrAc", AmrAlleleCount);
+			jsonObject.AddIntValue("easAc", EasAlleleCount);
+			jsonObject.AddIntValue("finAc", FinAlleleCount);
+			jsonObject.AddIntValue("nfeAc", NfeAlleleCount);
+			jsonObject.AddIntValue("sasAc", SasAlleleCount);
+			jsonObject.AddIntValue("othAc", OthAlleleCount);
 
 		    return StringBuilderCache.GetStringAndRelease(sb);
 		}

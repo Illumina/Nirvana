@@ -35,10 +35,10 @@ namespace SAUtils.DataStructures
             VcfString = vcfString;
         }
 
-        public int CompareTo(IInterimSaItem otherItem)
+        public int CompareTo(IInterimSaItem other)
         {
-            if (otherItem == null) return -1;
-            return Chromosome.Equals(otherItem.Chromosome) ? Position.CompareTo(otherItem.Position) : string.CompareOrdinal(Chromosome, otherItem.Chromosome);
+            if (other == null) return -1;
+            return Chromosome.Equals(other.Chromosome) ? Position.CompareTo(other.Position) : string.CompareOrdinal(Chromosome, other.Chromosome);
         }
 
         public void Write(IExtendedBinaryWriter writer)

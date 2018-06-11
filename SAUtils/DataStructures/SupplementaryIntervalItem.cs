@@ -74,6 +74,7 @@ namespace SAUtils.DataStructures
 
         public void AddFrequencyValue(string key, double value)
         {
+
             _freqValues[key] = value;
         }
 

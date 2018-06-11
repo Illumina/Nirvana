@@ -8,6 +8,7 @@ using Compression.Utilities;
 using Genome;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
@@ -197,31 +198,17 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 			if (xElement == null || xElement.IsEmpty) return null;
 
-			foreach (var element in xElement.Elements(RefAssertionTag))
-			    ParseRefClinVarAssertion(element);
+			ParseAssertions(xElement);
 
-		    foreach (var element in xElement.Elements(ClinVarAssertionTag))
-                ParseClinvarAssertion(element);
-		    
-
-			
 		    var clinvarList = new List<ClinVarItem>();
 
             foreach (var variant in _variantList)
-		    {
-		        if (variant.Chromosome == null) continue;
+            {
+                if (IsInvalidVariant(variant)) continue;
 
-		        if ((variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
-		            && string.IsNullOrEmpty(variant.AltAllele)) continue;
+                var extendedOmimIds = GetOmimIds(variant);
 
-                var extendedOmimIds = new HashSet<string>(_omimIDs);
-
-		        foreach (var omimId in variant.AllelicOmimIds)
-		        {
-		            extendedOmimIds.Add(omimId);
-                }
-
-		        var reviewStatEnum = ReviewStatusEnum.no_assertion;
+                var reviewStatEnum = ReviewStatusEnum.no_assertion;
 		        if (ClinVarItem.ReviewStatusNameMapping.ContainsKey(_reviewStatus))
 		            reviewStatEnum = ClinVarItem.ReviewStatusNameMapping[_reviewStatus];
 
@@ -229,25 +216,54 @@ namespace SAUtils.InputFileParsers.ClinVar
 		            new ClinVarItem(variant.Chromosome,
 		                variant.Start,
                         variant.Stop,
-		                _alleleOrigins.Any()? _alleleOrigins: null,
+		                _alleleOrigins.Count > 0 ? _alleleOrigins: null,
 		                variant.AltAllele ,
                         variant.VariantType,
 		                _id,
 		                reviewStatEnum,
-		                _medGenIDs.Any()?_medGenIDs: null,
-		                extendedOmimIds.Any()?extendedOmimIds:null,
-		                _orphanetIDs.Any()?_orphanetIDs:null,
-		                _prefPhenotypes.Any() ? _prefPhenotypes: _altPhenotypes,
+		                _medGenIDs.Count > 0 ?_medGenIDs: null,
+		                extendedOmimIds.Count > 0 ?extendedOmimIds:null,
+		                _orphanetIDs.Count >0 ?_orphanetIDs:null,
+		                _prefPhenotypes.Count >0 ? _prefPhenotypes: _altPhenotypes,
 		                variant.ReferenceAllele ,
 		                _significance,
-		                _pubMedIds.Any()? _pubMedIds.OrderBy(x=>x): null,
+		                _pubMedIds.Count >0? _pubMedIds.OrderBy(x=>x): null,
 		                _lastUpdatedDate));
             }
 
 			return clinvarList.Count > 0 ? clinvarList: null;
 		}
 
-	    private bool ValidateRefAllele(ClinVarItem clinvarVariant)
+        private HashSet<string> GetOmimIds(ClinvarVariant variant)
+        {
+            var extendedOmimIds = new HashSet<string>(_omimIDs);
+
+            foreach (var omimId in variant.AllelicOmimIds)
+            {
+                extendedOmimIds.Add(omimId);
+            }
+
+            return extendedOmimIds;
+        }
+
+        private void ParseAssertions(XElement xElement)
+        {
+            foreach (var element in xElement.Elements(RefAssertionTag))
+                ParseRefClinVarAssertion(element);
+
+            foreach (var element in xElement.Elements(ClinVarAssertionTag))
+                ParseClinvarAssertion(element);
+        }
+
+        private bool IsInvalidVariant(ClinvarVariant variant)
+        {
+            return (variant.Chromosome == null
+                || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
+                && string.IsNullOrEmpty(variant.AltAllele));
+            
+        }
+
+        private bool ValidateRefAllele(ClinVarItem clinvarVariant)
 	    {
 	        if (string.IsNullOrEmpty(clinvarVariant.ReferenceAllele) || clinvarVariant.ReferenceAllele == "-") return true;
 

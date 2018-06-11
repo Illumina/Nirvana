@@ -123,11 +123,6 @@ namespace SAUtils.MergeInterimTsvs
 
 
             MergeGene(_geneReaders, _geneHeaders, _outputDirectory, _genomeAssembly);
-            //dispose the gene annotators
-            foreach (var geneReader in _geneReaders)
-            {
-                geneReader.Dispose();
-            }
             
             Parallel.ForEach(_refNames, new ParallelOptions { MaxDegreeOfParallelism = 4 }, MergeChrom);
             
@@ -157,12 +152,15 @@ namespace SAUtils.MergeInterimTsvs
 
             foreach (var reader in geneReaders)
             {
-                foreach (var annotatedGene in reader.GetItems()?? Enumerable.Empty<IAnnotatedGene>())
+                using (reader)
                 {
-                    var geneName = annotatedGene.GeneName;
-                    if (!geneAnnotations.TryAdd(geneName, annotatedGene))
+                    foreach (var annotatedGene in reader.GetItems() ?? Enumerable.Empty<IAnnotatedGene>())
                     {
-                        geneAnnotations[geneName] = new AnnotatedGene(geneName, geneAnnotations[geneName].Annotations.Concat(annotatedGene.Annotations).ToArray());
+                        var geneName = annotatedGene.GeneName;
+                        if (!geneAnnotations.TryAdd(geneName, annotatedGene))
+                        {
+                            geneAnnotations[geneName] = new AnnotatedGene(geneName, geneAnnotations[geneName].Annotations.Concat(annotatedGene.Annotations).ToArray());
+                        }
                     }
                 }
                 

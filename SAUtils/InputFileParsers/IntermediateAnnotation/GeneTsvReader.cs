@@ -12,7 +12,7 @@ using VariantAnnotation.GeneAnnotation;
 
 namespace SAUtils.InputFileParsers.IntermediateAnnotation
 {
-    public sealed class GeneTsvReader:ITsvReader
+    public sealed class GeneTsvReader:ITsvReader, IDisposable
     {
         private readonly StreamReader _reader;
 

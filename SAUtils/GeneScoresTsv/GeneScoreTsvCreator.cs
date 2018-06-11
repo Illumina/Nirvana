@@ -43,30 +43,8 @@ namespace SAUtils.GeneScoresTsv
                 {
                     if (isFirstLine)
                     {
-                        GetColumnIndices(line);
-                        if (_geneIndex < 0)
-                        {
-                            Console.WriteLine("gene column not found");
-                            return ExitCodes.InvalidData;
-                        }
-                        if (_pliIndex < 0)
-                        {
-                            Console.WriteLine("pLI column not found");
-                            return ExitCodes.InvalidData;
-                        }
-                        if (_precIndex < 0)
-                        {
-                            Console.WriteLine("pRec column not found");
-                            return ExitCodes.InvalidData;
-                        }
-                        if (_pnullIndex < 0)
-                        {
-                            Console.WriteLine("pNull column not found");
-                            return ExitCodes.InvalidData;
-                        }
-
+                        if(!GetColumnIndices(line)) return ExitCodes.InvalidData;
                         isFirstLine = false;
-
                     }
                     else
                         genes.Add(GetGeneAndScores(line));
@@ -108,7 +86,7 @@ namespace SAUtils.GeneScoresTsv
             return (gene, pLi, pRec, pNull);
         }
 
-        private void GetColumnIndices(string line)
+        private bool GetColumnIndices(string line)
         {
             var cols = line.OptimizedSplit('\t');
 
@@ -116,6 +94,29 @@ namespace SAUtils.GeneScoresTsv
             _pliIndex   = Array.IndexOf(cols, PliTag);
             _pnullIndex = Array.IndexOf(cols, PnullTag);
             _precIndex  = Array.IndexOf(cols, PrecTag);
+
+            if (_geneIndex < 0)
+            {
+                Console.WriteLine("gene column not found");
+                return false;
+            }
+            if (_pliIndex < 0)
+            {
+                Console.WriteLine("pLI column not found");
+                return false;
+            }
+            if (_precIndex < 0)
+            {
+                Console.WriteLine("pRec column not found");
+                return false;
+            }
+            if (_pnullIndex < 0)
+            {
+                Console.WriteLine("pNull column not found");
+                return false;
+            }
+
+            return true;
         }
     }
 }

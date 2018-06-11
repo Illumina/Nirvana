@@ -34,9 +34,9 @@ namespace SAUtils.DataStructures
             return Chromosome != other.Chromosome ? Chromosome.Index.CompareTo(other.Chromosome.Index) : Start.CompareTo(other.Start);
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            if (!(other is CustomInterval otherItem)) return false;
+            if (!(obj is CustomInterval otherItem)) return false;
 
             return Chromosome.Equals(otherItem.Chromosome)
                    && Start.Equals(otherItem.Start)

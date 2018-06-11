@@ -33,9 +33,9 @@ namespace SAUtils.DataStructures
             IsAlleleSpecific = isAlleleSpecific;
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
 		{
-		    if (!(other is CustomItem otherItem)) return false;
+		    if (!(obj is CustomItem otherItem)) return false;
 
 			return Chromosome.Equals(otherItem.Chromosome)
 				   && Start.Equals(otherItem.Start)

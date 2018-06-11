@@ -25,9 +25,9 @@ namespace SAUtils.InputFileParsers.TOPMed
             _failedFilter   = failedFilter;
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
-            if (!(other is GnomadItem otherItem)) return false;
+            if (!(obj is GnomadItem otherItem)) return false;
 
             // Return true if the fields match:
             return Equals(Chromosome, otherItem.Chromosome)

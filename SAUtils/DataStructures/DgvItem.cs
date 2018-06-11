@@ -64,11 +64,11 @@ namespace SAUtils.DataStructures
             return suppInterval;
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
             // If parameter is null return false.
 
-            if (!(other is DgvItem otherItem)) return false;
+            if (!(obj is DgvItem otherItem)) return false;
 
             // Return true if the fields match:
             return Equals(Chromosome, otherItem.Chromosome)

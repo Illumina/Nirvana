@@ -15,10 +15,10 @@ namespace SAUtils.DataStructures
 
 		public abstract SupplementaryIntervalItem GetSupplementaryInterval();
 
-        public int CompareTo(SupplementaryDataItem otherItem)
+        public int CompareTo(SupplementaryDataItem other)
         {
-            if (otherItem == null) return -1;
-            return Chromosome.Equals(otherItem.Chromosome) ? Start.CompareTo(otherItem.Start) : string.CompareOrdinal(Chromosome.UcscName, otherItem.Chromosome.UcscName);
+            if (other == null) return -1;
+            return Chromosome.Equals(other.Chromosome) ? Start.CompareTo(other.Start) : string.CompareOrdinal(Chromosome.UcscName, other.Chromosome.UcscName);
         }
 
         public bool Equals(SupplementaryDataItem other)

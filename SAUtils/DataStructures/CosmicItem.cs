@@ -79,18 +79,18 @@ namespace SAUtils.DataStructures
         }
 
 
-        public bool Equals(CosmicItem otherItem)
+        public bool Equals(CosmicItem other)
         {
             // If parameter is null return false.
-            if (otherItem == null) return false;
+            if (other == null) return false;
 
             // Return true if the fields match:
-            return Equals(Chromosome, otherItem.Chromosome) &&
-                   Start == otherItem.Start &&
-                   string.Equals(Id, otherItem.Id) &&
-                   string.Equals(ReferenceAllele, otherItem.ReferenceAllele) &&
-                   string.Equals(AlternateAllele, otherItem.AlternateAllele) &&
-                   string.Equals(Gene, otherItem.Gene);
+            return Equals(Chromosome, other.Chromosome) &&
+                   Start == other.Start &&
+                   string.Equals(Id, other.Id) &&
+                   string.Equals(ReferenceAllele, other.ReferenceAllele) &&
+                   string.Equals(AlternateAllele, other.AlternateAllele) &&
+                   string.Equals(Gene, other.Gene);
         }
 
         public override int GetHashCode()

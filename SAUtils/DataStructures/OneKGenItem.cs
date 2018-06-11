@@ -172,12 +172,12 @@ namespace SAUtils.DataStructures
 
 
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
             // If parameter is null return false.
 
             // if other cannot be cast into OneKGenItem, return false
-            if (!(other is OneKGenItem otherItem)) return false;
+            if (!(obj is OneKGenItem otherItem)) return false;
 
             // Return true if the fields match:
             return Equals(Chromosome, otherItem.Chromosome)
