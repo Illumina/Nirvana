@@ -46,7 +46,7 @@ namespace VariantAnnotation.Caches.DataStructures
             // sanity check: make sure the array index is within range
             if (asciiIndex < 0 || asciiIndex >= 26)
             {
-                throw new IndexOutOfRangeException($"Expected an array index on the interval [0, 25], but observed the following: {asciiIndex} ({newAminoAcid})");
+                throw new InvalidDataException($"Expected an array index on the interval [0, 25], but observed the following: {asciiIndex} ({newAminoAcid})");
             }
 
             int aaIndex = AminoAcidIndices[asciiIndex];
@@ -54,7 +54,7 @@ namespace VariantAnnotation.Caches.DataStructures
             // sanity check: make sure the array index is within range
             if (aaIndex == -1)
             {
-                throw new ArgumentOutOfRangeException($"An invalid amino acid was given: {newAminoAcid}");
+                throw new InvalidDataException($"An invalid amino acid was given: {newAminoAcid}");
             }
 
             return NumAminoAcids * (aaPosition - 1) + aaIndex;

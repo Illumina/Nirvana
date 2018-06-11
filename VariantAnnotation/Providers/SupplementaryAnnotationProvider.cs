@@ -37,13 +37,10 @@ namespace VariantAnnotation.Providers
 			_currentUcscReferenceName = "";
 
 			_smallVariantIntervalArray = new NullIntervalSearch<ISupplementaryInterval>();
-			_svIntervalArray = new NullIntervalSearch<ISupplementaryInterval>();
-			_allVariantIntervalArray = new NullIntervalSearch<ISupplementaryInterval>();
+			_svIntervalArray           = new NullIntervalSearch<ISupplementaryInterval>();
+			_allVariantIntervalArray   = new NullIntervalSearch<ISupplementaryInterval>();
 			_saDirs = saDirs.ToList();
-
 		}
-
-
 
 		public void Annotate(IAnnotatedPosition annotatedPosition)
 		{
@@ -90,11 +87,7 @@ namespace VariantAnnotation.Providers
 			if (firstAltAllele.Behavior.NeedSaInterval)
 			{
 				if (_hasSmallVariantIntervals) AddIntervals(annotatedPosition, _smallVariantIntervalArray, begin, end);
-			}
-
-			if (firstAltAllele.Behavior.NeedSaInterval)
-			{
-				if (_hasSvIntervals) AddIntervals(annotatedPosition, _svIntervalArray, begin, end);
+				if (_hasSvIntervals)           AddIntervals(annotatedPosition, _svIntervalArray, begin, end);
 			}
 
 			if (_hasAllVariantIntervals) AddIntervals(annotatedPosition, _allVariantIntervalArray, begin, end);

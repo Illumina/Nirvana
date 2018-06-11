@@ -50,7 +50,6 @@ namespace VariantAnnotation.IO.Caches
             var indexEntry = _indexEntries[refIndex];
 
             _blockStream.SetBlockPosition(indexEntry.FileOffset);
-            //_reader.Reset();
 
             var predictions = new Prediction[indexEntry.Count];
             for (var i = 0; i < indexEntry.Count; i++) predictions[i] = Prediction.Read(_reader, Header.LookupTable);

@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using OptimizedCore;
@@ -113,8 +113,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
             ExtractCsqs(annotatedPosition, csqs);
 
-            if (csqs.Count != 0)
-                if (infoField.Length > 0) sb.Append(";");
+            if (csqs.Count != 0 && infoField.Length > 0) sb.Append(";");
 
             // append CSQ tags using delegate from annotator
             sb.Append(GetCsqtAndCsqrVcfInfo(csqs));
@@ -229,7 +228,7 @@ namespace VariantAnnotation.IO.VcfWriter
             }
 
             if (annotatedVarIndex < numAnnotatedVar)
-                throw new Exception($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
+                throw new InvalidDataException($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
             return inputGenotypeIndex;
         }
 

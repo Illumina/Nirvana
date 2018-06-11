@@ -263,8 +263,8 @@ namespace VariantAnnotation.AnnotatedPositions
                     sb.Append(start + referenceBases + '>' + alternateBases);
                     break;
                 case GenomicChange.DelIns:
-                    sb.Append(coordinates + "del" + referenceBases + "ins" + alternateBases); //TODO: change to delins, now use del--ins-- to reduce anavarin differences
-                    //sb.Append(coordinates + "delins" + alternateBases);
+                    // NOTE: change to delins, now use del--ins-- to reduce anavarin differences
+                    sb.Append(coordinates + "del" + referenceBases + "ins" + alternateBases); 
                     break;
                 case GenomicChange.Insertion:
                     sb.Append(coordinates + "ins" + alternateBases);

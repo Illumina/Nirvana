@@ -17,14 +17,14 @@ namespace VariantAnnotation.Sequence
         {
             writer.WriteOptAscii(UcscName);
             writer.WriteOptAscii(EnsemblName);
-            writer.Write(true); // TODO: Remove this when we update the reference file format
+            writer.Write(true);
         }
 
         public static ReferenceMetadata Read(ExtendedBinaryReader reader)
         {
             string ucscName    = reader.ReadAsciiString();
             string ensemblName = reader.ReadAsciiString();
-            reader.ReadBoolean(); // TODO: Remove this when we update the reference file format
+            reader.ReadBoolean();
 
             return new ReferenceMetadata(ucscName, ensemblName);
         }

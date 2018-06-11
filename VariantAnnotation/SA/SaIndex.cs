@@ -12,7 +12,7 @@ namespace VariantAnnotation.SA
         private readonly IIntervalSearch<long> _fileOffsetIntervals;
         public (int Position, string GlobalMajorAllele)[] GlobalMajorAlleleForRefMinor { get; }
 
-        private Interval<long> _cachedInterval = IntervalArray<long>.EmptyInterval;
+        private readonly Interval<long> _cachedInterval = IntervalArray<long>.EmptyInterval;
 
         private SaIndex(IIntervalSearch<long> fileOffsetIntervals, (int, string)[] globalMajorAlleleForRefMinor)
         {

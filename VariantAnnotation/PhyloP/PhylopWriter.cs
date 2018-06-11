@@ -126,7 +126,7 @@ namespace VariantAnnotation.PhyloP
                 string line;
                 while ((line = _reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrEmpty(line)) continue;
+                    if (line.Length == 0) continue;
 
                     if (!line.Any(char.IsLetter))
                     {
@@ -254,7 +254,7 @@ namespace VariantAnnotation.PhyloP
 
         private static short GetPhylopShortValue(string line)
         {
-            double phylopScore = Convert.ToDouble(line); // double.parse
+            double phylopScore = Convert.ToDouble(line);
 
             if (phylopScore * 1000 > 32767 || phylopScore * 1000 < -32768)
             {

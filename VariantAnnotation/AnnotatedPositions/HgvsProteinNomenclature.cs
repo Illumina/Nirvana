@@ -47,7 +47,6 @@ namespace VariantAnnotation.AnnotatedPositions
 					return HgvspNotation.GetSubstitutionNotation(proteinId, proteinStart, refAbbreviation, altAbbreviation);
 
 				case ProteinChange.Unknown:
-					//todo:not defined in hgvs standards
 					return HgvspNotation.GetUnknownNotation(proteinId, proteinStart, end, refAbbreviation, altAbbreviation);
 
 				case ProteinChange.Deletion:
@@ -133,7 +132,6 @@ namespace VariantAnnotation.AnnotatedPositions
 
 		    if (variantEffect.IsStartLost()) return ProteinChange.StartLost;
 
-			// todo: add start gained
 		    // according to var nom, only if the Stop codon is effected, we call it an extension
 			if (variantEffect.IsStopLost() && refAminoAcids.OptimizedStartsWith(AminoAcids.StopCodonChar)) return ProteinChange.Extension;
 

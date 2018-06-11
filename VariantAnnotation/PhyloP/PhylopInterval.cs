@@ -23,10 +23,10 @@ namespace VariantAnnotation.PhyloP
 
 		public PhylopInterval(BinaryReader reader) => Read(reader);
 
-	    public int CompareTo(PhylopInterval otherInterval)
+	    public int CompareTo(PhylopInterval other)
 		{
 		    // A null value means that this object is greater. 
-		    return otherInterval == null ? 1 : Begin.CompareTo(otherInterval.Begin);
+		    return other == null ? 1 : Begin.CompareTo(other.Begin);
 		}
 
 		public bool Equals(PhylopInterval other)

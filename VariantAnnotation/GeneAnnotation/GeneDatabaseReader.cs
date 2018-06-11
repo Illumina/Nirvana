@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Genome;
 using IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
@@ -26,18 +25,15 @@ namespace VariantAnnotation.GeneAnnotation
         private void ReadHeader()
         {
             var header = _reader.ReadString();
-            if (header != SaCommon.DataHeader)
-                throw new FormatException("Unrecognized header in this database");
+            if (header != SaCommon.DataHeader) throw new FormatException("Unrecognized header in this database");
 
-            // ReSharper disable UnusedVariable
-            var dataVersion = _reader.ReadUInt16();            
+            _reader.ReadUInt16(); // data version
 
             var schema = _reader.ReadUInt16();
             if (schema != SaCommon.SchemaVersion) throw new UserErrorException($"Gene database schema mismatch. Expected {SaCommon.SchemaVersion}, observed {schema}");
 
-            var genomeAssembly = (GenomeAssembly)_reader.ReadByte();
-            var creationTime   = _reader.ReadInt64();
-            // ReSharper restore UnusedVariable
+            _reader.ReadByte(); // genome assembly
+            _reader.ReadInt64(); // creation time
 
             var dataSourseVersionsCount = _reader.ReadOptInt32();
 
