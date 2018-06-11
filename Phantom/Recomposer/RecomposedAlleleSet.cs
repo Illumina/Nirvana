@@ -98,15 +98,7 @@ namespace Phantom.Recomposer
             var hasPs = false;
             int numSamples = sampleGenoTypes.Length;
 
-            var sampleGenotypeStrings = new string[numSamples];
-            for (var index = 0; index < numSamples; index++)
-            {
-                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
-                if (sampleGenotypeStrings[index] == ".") continue;
-
-                if (sampleGqs[index] != ".") hasGq = true;
-                if (samplePhasesets[index] != ".") hasPs = true;
-            }
+            string[] sampleGenotypeStrings = GetSampleGenotypeStrings(sampleGenoTypes, sampleGqs, samplePhasesets, ref hasGq, ref hasPs, numSamples);
 
             int numFields = 1;
 
@@ -146,6 +138,21 @@ namespace Phantom.Recomposer
                     vcfFields.Add(sampleColumnStr);
                 }
             }
+        }
+
+        private static string[] GetSampleGenotypeStrings(List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, ref bool hasGq, ref bool hasPs, int numSamples)
+        {
+            var sampleGenotypeStrings = new string[numSamples];
+            for (var index = 0; index < numSamples; index++)
+            {
+                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
+                if (sampleGenotypeStrings[index] == ".") continue;
+
+                if (sampleGqs[index] != ".") hasGq = true;
+                if (samplePhasesets[index] != ".") hasPs = true;
+            }
+
+            return sampleGenotypeStrings;
         }
 
         private static string[] TrimTrailingMissValues(string[] values)

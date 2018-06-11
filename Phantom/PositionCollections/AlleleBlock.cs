@@ -70,22 +70,11 @@ namespace Phantom.PositionCollections
             var isRefPositions = genotypeBlock.Genotypes.Select(x => IsRefPosition(x.AlleleIndexes)).ToArray();
             foreach (var functionBlock in genotypeBlock.Split(starts, functionBlockRanges))
             {
+
                 int startInThisBlock = functionBlock.PosIndex - startPosition;
                 int numPositions = functionBlock.Genotypes.Length;
                 int endInThisBlock = startInThisBlock + numPositions - 1;
-                int numRefPosBefore = 0;
-                int numRefPosAfter = 0;
-
-                for (int i = startInThisBlock - 1; i >= 0; i--)
-                {
-                    if (isRefPositions[i]) numRefPosBefore++;
-                    else break;
-                }
-                for (int i = endInThisBlock + 1; i < isRefPositions.Length; i++)
-                {
-                    if (isRefPositions[i]) numRefPosAfter++;
-                    else break;
-                }
+                var (numRefPosBefore, numRefPosAfter) = GetRefPosNums(isRefPositions, startInThisBlock, numPositions, endInThisBlock);
 
                 var alleleIndexBlocks = new List<AlleleBlock>();
                 for (int haplotypeIndex = 0; haplotypeIndex < ploidy; haplotypeIndex++)
@@ -106,6 +95,25 @@ namespace Phantom.PositionCollections
                         alleleIndexBlockGraph.AddEdge(alleleIndexBlocks[i], alleleIndexBlocks[j]);
                     }
             }
+        }
+
+        private static (int, int ) GetRefPosNums(bool[] isRefPositions, int startInThisBlock, int numPositions, int endInThisBlock)
+        {
+            int numRefPosBefore = 0;
+            int numRefPosAfter = 0;
+
+            for (int i = startInThisBlock - 1; i >= 0; i--)
+            {
+                if (isRefPositions[i]) numRefPosBefore++;
+                else break;
+            }
+            for (int i = endInThisBlock + 1; i < isRefPositions.Length; i++)
+            {
+                if (isRefPositions[i]) numRefPosAfter++;
+                else break;
+            }
+
+            return (numRefPosBefore, numRefPosAfter);
         }
 
         private static bool IsRefPosition(int[] genotypeIndexes) => genotypeIndexes.All(x => x == 0);

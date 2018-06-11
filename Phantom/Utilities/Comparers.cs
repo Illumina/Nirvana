@@ -18,21 +18,21 @@ namespace Phantom.Utilities
                    x.HgncId == y.HgncId;
         }
 
-        public override int GetHashCode(IGene x)
+        public override int GetHashCode(IGene obj)
         {
-            var entrezGeneId = x.EntrezGeneId.WithVersion;
-            var ensemblId = x.EnsemblId.WithVersion;
+            var entrezGeneId = obj.EntrezGeneId.WithVersion;
+            var ensemblId = obj.EnsemblId.WithVersion;
 
             unchecked
             {
-                var hashCode = x.Start;
-                hashCode = (hashCode * 397) ^ x.End;
-                hashCode = (hashCode * 397) ^ x.Chromosome.Index;
-                hashCode = (hashCode * 397) ^ x.OnReverseStrand.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Symbol.GetHashCode();
+                var hashCode = obj.Start;
+                hashCode = (hashCode * 397) ^ obj.End;
+                hashCode = (hashCode * 397) ^ obj.Chromosome.Index;
+                hashCode = (hashCode * 397) ^ obj.OnReverseStrand.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Symbol.GetHashCode();
                 if (entrezGeneId != null) hashCode = (hashCode * 397) ^ entrezGeneId.GetHashCode();
                 if (ensemblId != null) hashCode = (hashCode * 397) ^ ensemblId.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.HgncId;
+                hashCode = (hashCode * 397) ^ obj.HgncId;
                 return hashCode;
             }
         }

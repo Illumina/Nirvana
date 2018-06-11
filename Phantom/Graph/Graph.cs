@@ -23,17 +23,17 @@ namespace Phantom.Graph
 
         private void SetVertexAndNeighbors(T vertex, LinkedList<T> neighbors) => _vertexToNeighbors[vertex] = neighbors;
 
-        public void AddEdge(T oneVertex, T otherVertex)
+        public void AddEdge(T sourceVertex, T targetVertex)
         {
-            AddVertexAndNeighbor(oneVertex, otherVertex);
+            AddVertexAndNeighbor(sourceVertex, targetVertex);
             if (!_isDirected)
             {
-                AddVertexAndNeighbor(otherVertex, oneVertex);
+                AddVertexAndNeighbor(targetVertex, sourceVertex);
             }
             // Try add the other vertex to the graph if directed  
             else
             {
-                TryAddVertex(otherVertex);
+                TryAddVertex(targetVertex);
             }
         }
 

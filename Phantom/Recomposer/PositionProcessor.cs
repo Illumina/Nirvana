@@ -7,6 +7,7 @@ namespace Phantom.Recomposer
 {
     public sealed class PositionProcessor
     {
+        // ReSharper disable once NotAccessedField.Local
         private readonly ICodonInfoProvider _codonInfoProvider;
         private readonly IVariantGenerator _variantGenerator;
         private readonly IPositionBuffer _positionBuffer;

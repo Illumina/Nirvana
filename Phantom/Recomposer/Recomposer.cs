@@ -12,6 +12,7 @@ namespace Phantom.Recomposer
     public sealed class Recomposer : IRecomposer
     {
         private readonly PositionProcessor _positionProcessor;
+        // ReSharper disable once NotAccessedField.Local
         private readonly ISequenceProvider _sequenceProvider;
 
         private Recomposer(PositionProcessor positionProcessor, ISequenceProvider sequenceProvider)

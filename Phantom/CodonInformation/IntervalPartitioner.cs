@@ -6,14 +6,14 @@ namespace Phantom.CodonInformation
 {
     public static class IntervalPartitioner
     {
-        public static List<IInterval>[] GetCommonIntervals(IInterval[][] codingIntervalLists)
+        public static List<IInterval>[] GetCommonIntervals(TranscriptIntervalsInGene transcript)
         {
-            int numTranscripts = codingIntervalLists.Length;
+            int numTranscripts = transcript.NumTranscripts;
             var transcriptIntervals = new List<IInterval>[numTranscripts];
             for (int i = 0; i < numTranscripts; i++) transcriptIntervals[i] = new List<IInterval>();
             var inCodingRegion = new Dictionary<int, bool>();
 
-            var boundaryInfo = GetBoundaryInfo(codingIntervalLists);
+            var boundaryInfo = GetBoundaryInfo(transcript.Intervals);
             var sortedBoundaries = boundaryInfo.OrderBy(x => x.Key);
 
             int startPosition = -1;

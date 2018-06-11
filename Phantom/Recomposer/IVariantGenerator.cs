@@ -5,6 +5,6 @@ namespace Phantom.Recomposer
 {
     public interface IVariantGenerator
     {
-        IEnumerable<ISimplePosition> Recompose(List<ISimplePosition> simaplePositions, List<int> functionBlockRanges);
+        IEnumerable<ISimplePosition> Recompose(List<ISimplePosition> simplePositions, List<int> functionBlockRanges);
     }
 }

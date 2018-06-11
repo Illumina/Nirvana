@@ -12,7 +12,8 @@ namespace Phantom.CodonInformation
     public sealed class CodonInfoProvider : ICodonInfoProvider
     {
         private readonly IntervalForest<ICodingBlock> _commonIntervalForest;
-        private Graph<ICodingBlock>[] _codingBlockGraphs;
+        // ReSharper disable once NotAccessedField.Local
+        private readonly Graph<ICodingBlock>[] _codingBlockGraphs;
 
         private CodonInfoProvider(IntervalForest<ICodingBlock> commonIntervalForest, Graph<ICodingBlock>[] codingBlockGraphs)
         {
@@ -140,7 +141,7 @@ namespace Phantom.CodonInformation
 
         internal static CodingBlock[][] GetTranscriptToCodingBlocks(List<PhasedIntervalArray> transcriptIntervals, bool onReverseStrand)
         {
-            var transcriptToCommonIntervals = IntervalPartitioner.GetCommonIntervals(transcriptIntervals.Select(x => x.IntervalArray).ToArray());
+            var transcriptToCommonIntervals = IntervalPartitioner.GetCommonIntervals(new TranscriptIntervalsInGene(transcriptIntervals.Select(x => x.IntervalArray).ToArray()));
             var startPhases = transcriptIntervals.Select(x => x.StartPhase).ToArray();
             var codingBlockArrays = new CodingBlock[transcriptToCommonIntervals.Length][];
             if (onReverseStrand)

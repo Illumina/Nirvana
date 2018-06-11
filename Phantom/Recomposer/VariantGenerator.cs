@@ -20,9 +20,9 @@ namespace Phantom.Recomposer
             _sequenceProvider = sequenceProvider;
         }
 
-        public IEnumerable<ISimplePosition> Recompose(List<ISimplePosition> recomposablePositions, List<int> functionBlockRanges)
+        public IEnumerable<ISimplePosition> Recompose(List<ISimplePosition> simplePositions, List<int> functionBlockRanges)
         {
-            var positionSet = PositionSet.CreatePositionSet(recomposablePositions, functionBlockRanges);
+            var positionSet = PositionSet.CreatePositionSet(simplePositions, functionBlockRanges);
             var alleleSet = positionSet.AlleleSet;
             var alleleIndexBlockToSampleIndex = positionSet.AlleleBlockToSampleHaplotype;
             int numSamples = positionSet.NumSamples;
@@ -50,7 +50,7 @@ namespace Phantom.Recomposer
             // Set decomposed tag to positions used for recomposition
             foreach (var indexTuple in decomposedPosVarIndex)
             {
-                recomposablePositions[indexTuple.PosIndex].IsDecomposed[indexTuple.VarIndex] = true;
+                simplePositions[indexTuple.PosIndex].IsDecomposed[indexTuple.VarIndex] = true;
             }
             return recomposedAlleleSet.GetRecomposedVcfRecords().Select(x => SimplePosition.GetSimplePosition(x, _sequenceProvider.RefNameToChromosome, true));
         }
@@ -171,7 +171,7 @@ namespace Phantom.Recomposer
             RefAllele = refAllele;
         }
 
-        public int CompareTo(VariantSite that) => Start != that.Start ? Start.CompareTo(that.Start) : string.Compare(RefAllele, that.RefAllele, StringComparison.Ordinal);
+        public int CompareTo(VariantSite other) => Start != other.Start ? Start.CompareTo(other.Start) : string.Compare(RefAllele, other.RefAllele, StringComparison.Ordinal);
     }
 
     public sealed class VariantInfo

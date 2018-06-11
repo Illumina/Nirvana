@@ -10,6 +10,7 @@ namespace Phantom.Utilities
 {
     public static class ReadWriteUtilities
     {
+        // ReSharper disable once UnusedTupleComponentInReturnValue
         public static (IntervalForest<IGene>, Dictionary<IGene, List<ITranscript>>) GetIntervalAndTranscriptsForeachGene(IntervalArray<ITranscript>[] transcriptIntervalArrays)
         {
             int numChromesomes = transcriptIntervalArrays.Length;
@@ -35,7 +36,7 @@ namespace Phantom.Utilities
                     }
                     else
                     {
-                        geneToTranscripts[gene].Append(transcript);
+                        geneToTranscripts[gene].Add(transcript);
                     }
                 }
                 geneIntervalArrays[chrIndex] = new IntervalArray<IGene>(geneList.Select(GetGeneInterval).ToArray());
