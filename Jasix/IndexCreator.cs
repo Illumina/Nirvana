@@ -43,9 +43,83 @@ namespace Jasix
 
         public void CreateIndex()
         {
+            var index = new JasixIndex();
+            IndexHeader(index);
+
+            string lastLine = IndexPositions(index);
+
+            IndexGenes(lastLine, index);
+
+            index.Write(_writeStream);
+
+            Console.WriteLine();
+
+            long peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
+            var wallTimeSpan = _benchmark.GetElapsedTime();
+            Console.WriteLine();
+            if (peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(peakMemoryUsageBytes));
+            Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(wallTimeSpan));
+        }
+
+        private string IndexPositions(JasixIndex index)
+        {
+// we need the location before accessing the line
+            long linePosition = _reader.Position;
+            index.BeginSection(JasixCommons.PositionsSectionTag, linePosition);
+            Console.WriteLine($"section:{JasixCommons.PositionsSectionTag} starts at {linePosition}");
+
+            var previousChr = "";
+            var previousPos = 0;
+            string line;
+            while ((line = _reader.ReadLine()) != null)
+            {
+                if (line.OptimizedStartsWith(']'))
+                {
+                    index.EndSection(JasixCommons.PositionsSectionTag, linePosition);
+                    Console.WriteLine($"section:{JasixCommons.PositionsSectionTag} ends at {linePosition}");
+                    break;
+                }
+
+                line = line.TrimEnd(',');
+                var chrPos = GetChromPosition(line);
+
+                CheckSorting(chrPos.chr, chrPos.position, previousChr, previousPos);
+
+                index.Add(chrPos.chr, chrPos.position, chrPos.end, linePosition);
+                linePosition = _reader.Position;
+                previousChr = chrPos.chr;
+                previousPos = chrPos.position;
+            }
+
+            return line;
+        }
+
+        private void IndexGenes(string lastLine, JasixIndex index)
+        {
+            if (lastLine == null) return;
+            do
+            {
+                long linePosition = _reader.Position;
+                
+                if (lastLine.EndsWith($",\"{JasixCommons.GenesSectionTag}\":["))
+                {
+                    index.BeginSection(JasixCommons.GenesSectionTag, _reader.Position);
+                    Console.WriteLine($"section:{JasixCommons.GenesSectionTag} starts at {_reader.Position}");
+                }
+
+                if (lastLine.EndsWith("]}"))
+                {
+                    index.EndSection(JasixCommons.GenesSectionTag, linePosition);
+                    Console.WriteLine($"section:{JasixCommons.GenesSectionTag} ends at {linePosition}");
+                    break;
+                }
+            } while ((lastLine = _reader.ReadLine()) != null);
+        }
+
+        private void IndexHeader(JasixIndex index)
+        {
             string searchTag = $"\"{JasixCommons.PositionsSectionTag}\":[";
             string headerTag = $"{{\"{JasixCommons.HeaderSectionTag}\":";
-            var index = new JasixIndex();
             string line;
 
             long previousPosition = _reader.Position;
@@ -56,6 +130,7 @@ namespace Jasix
                     index.BeginSection(JasixCommons.HeaderSectionTag, previousPosition);
                     Console.WriteLine($"section:{JasixCommons.HeaderSectionTag} starts at {previousPosition}");
                 }
+
                 if (line.EndsWith(searchTag))
                 {
                     {
@@ -68,62 +143,6 @@ namespace Jasix
                 previousPosition = _reader.Position;
             }
 
-            // we need the location before accessing the line
-            long linePosition = _reader.Position;
-            index.BeginSection(JasixCommons.PositionsSectionTag, linePosition);
-            Console.WriteLine($"section:{JasixCommons.PositionsSectionTag} starts at {linePosition}");
-
-            var previousChr = "";
-            var previousPos = 0;
-            while ((line = _reader.ReadLine()) != null)
-            {
-                if (line.OptimizedStartsWith(']'))
-                {
-                    index.EndSection(JasixCommons.PositionsSectionTag, linePosition);
-                    Console.WriteLine($"section:{JasixCommons.PositionsSectionTag} ends at {linePosition}");
-                    break;
-                }
-                line = line.TrimEnd(',');
-                var chrPos = GetChromPosition(line);
-
-                CheckSorting(chrPos.chr, chrPos.position, previousChr, previousPos);
-
-                index.Add(chrPos.chr, chrPos.position, chrPos.end, linePosition);
-                linePosition = _reader.Position;
-                previousChr = chrPos.chr;
-                previousPos = chrPos.position;
-
-            }
-
-            //go through the genes section
-            do
-            {
-                linePosition = _reader.Position;
-                if (line == null) break;
-                if (line.EndsWith($",\"{JasixCommons.GenesSectionTag}\":["))
-                {
-                    index.BeginSection(JasixCommons.GenesSectionTag, _reader.Position);
-                    Console.WriteLine($"section:{JasixCommons.GenesSectionTag} starts at {_reader.Position}");
-                }
-
-                if (line.EndsWith("]}"))
-                {
-                    index.EndSection(JasixCommons.GenesSectionTag, linePosition);
-                    Console.WriteLine($"section:{JasixCommons.GenesSectionTag} ends at {linePosition}");
-                    break;
-                }
-                
-            } while ((line = _reader.ReadLine()) != null);
-
-            index.Write(_writeStream);
-
-            Console.WriteLine();
-
-            long peakMemoryUsageBytes = MemoryUtilities.GetPeakMemoryUsage();
-            var wallTimeSpan = _benchmark.GetElapsedTime();
-            Console.WriteLine();
-            if (peakMemoryUsageBytes > 0) Console.WriteLine("Peak memory usage: {0}", MemoryUtilities.ToHumanReadable(peakMemoryUsageBytes));
-            Console.WriteLine("Time: {0}", Benchmark.ToHumanReadable(wallTimeSpan));
         }
 
         // ReSharper disable once UnusedParameter.Local

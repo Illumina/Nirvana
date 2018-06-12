@@ -4,12 +4,12 @@
 	{
 		#region IIntervalForest
 
-		public bool OverlapsAny(ushort referenceIndex, int begin, int end)
+		public bool OverlapsAny(ushort refIndex, int begin, int end)
 		{
 			return false;
 		}
 
-		public T[] GetAllOverlappingValues(ushort referenceIndex, int begin, int end)
+		public T[] GetAllOverlappingValues(ushort refIndex, int begin, int end)
 		{
 			return null;
 		}
