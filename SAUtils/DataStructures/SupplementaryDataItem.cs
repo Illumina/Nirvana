@@ -33,7 +33,6 @@ namespace SAUtils.DataStructures
 				return;
 
 		    var newAlleles = BiDirectionalTrimmer.Trim(Start, ReferenceAllele, AlternateAllele);
-            //SaUtilsCommon.GetReducedAlleles(Start, ReferenceAllele, AlternateAllele);
 
 		    Start           = newAlleles.Item1;
 		    ReferenceAllele = newAlleles.Item2;

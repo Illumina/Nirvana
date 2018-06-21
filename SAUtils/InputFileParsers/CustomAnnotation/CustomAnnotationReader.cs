@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Compression.Utilities;
@@ -119,7 +118,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
                         IsPositional = value == "Position";
                         break;
                     default:
-                        throw new Exception("Unknown field in top level key line :\n " + line);
+                        throw new InvalidDataException("Unknown field in top level key line :\n " + line);
                 }
             }
         }
@@ -136,7 +135,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
             foreach (var field in fields)
             {
                 (string key, string value) = field.OptimizedKeyValue();
-                if (value == null) throw new Exception("Invalid info field: " + field);
+                if (value == null) throw new InvalidDataException("Invalid info field: " + field);
 
                 switch (key)
                 {
@@ -150,7 +149,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
                         json = value;
                         break;
                     default:
-                        throw new Exception("Unknown field in info field line :\n" + line);
+                        throw new InvalidDataException("Unknown field in info field line :\n" + line);
                 }
             }
 
@@ -169,7 +168,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
                     _desiredBoolFields[info] = json;
                     break;
                 default:
-                    throw new Exception("Unsupported data type: " + type + " in:\n" + line);
+                    throw new InvalidDataException("Unsupported data type: " + type + " in:\n" + line);
             }
         }
 

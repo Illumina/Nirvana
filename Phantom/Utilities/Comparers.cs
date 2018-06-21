@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace Phantom.Utilities
@@ -37,39 +36,4 @@ namespace Phantom.Utilities
             }
         }
     }
-
-    internal sealed class ListComparer<T> : IEqualityComparer<List<T>>
-    {
-        public bool Equals(List<T> x, List<T> y)
-        {
-            return x.SequenceEqual(y);
-        }
-        public int GetHashCode(List<T> obj)
-        {
-            int hashCode = 0;
-            foreach (T t in obj)
-            {
-                if (t != null) hashCode = (hashCode * 397) ^ t.GetHashCode();
-            }
-            return hashCode;
-        }
-    }
-
-    internal sealed class ArrayComparer<T> : IEqualityComparer<T[]>
-    {
-        public bool Equals(T[] x, T[] y)
-        {
-            return x.SequenceEqual(y);
-        }
-        public int GetHashCode(T[] obj)
-        {
-            int hashCode = 0;
-            foreach (T t in obj)
-            {
-                if (t != null) hashCode = (hashCode * 397) ^ t.GetHashCode();
-            }
-            return hashCode;
-        }
-    }
-
 }

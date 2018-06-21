@@ -2,7 +2,6 @@
 using System.Linq;
 using Genome;
 using Moq;
-using Phantom.CodonInformation;
 using Phantom.Recomposer;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.Interface.Positions;
@@ -16,14 +15,13 @@ namespace UnitTests.Phantom.Recomposer
     {
         private readonly Mock<IVariantGenerator> _variantGeneratorMock = new Mock<IVariantGenerator>();
         private readonly Mock<IPositionBuffer> _positionBufferMock = new Mock<IPositionBuffer>();
-        private readonly Mock<ICodonInfoProvider> _codonInfoProviderMock = new Mock<ICodonInfoProvider>();
 
 
         [Fact]
         public void GenerateOutput_EmptyBuffer_ReturnEmptyVcfFieldList()
         {
 
-            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _codonInfoProviderMock.Object, _variantGeneratorMock.Object);
+            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _variantGeneratorMock.Object);
             Assert.Empty(positionProcessor.GenerateOutput(new BufferedPositions(new List<ISimplePosition>(), new List<bool>(), new List<int>())));
         }
 
@@ -48,7 +46,7 @@ namespace UnitTests.Phantom.Recomposer
             var functionBlockRanges = new List<int>();
 
             var bufferedPositions = new BufferedPositions(positions, recomposable, functionBlockRanges);
-            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _codonInfoProviderMock.Object, _variantGeneratorMock.Object);
+            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _variantGeneratorMock.Object);
             var output = positionProcessor.GenerateOutput(bufferedPositions).ToArray();
             for (int i = 0; i < output.Length; i++)
             {
@@ -77,7 +75,7 @@ namespace UnitTests.Phantom.Recomposer
             var functionBlockRanges = new List<int> {4};
 
             var bufferedPositions = new BufferedPositions(positions, recomposable, functionBlockRanges);
-            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _codonInfoProviderMock.Object, _variantGeneratorMock.Object);
+            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _variantGeneratorMock.Object);
             var output = positionProcessor.GenerateOutput(bufferedPositions).ToArray();
             for (int i = 0; i < output.Length; i++)
             {
@@ -104,7 +102,7 @@ namespace UnitTests.Phantom.Recomposer
             var recomposable = new List<bool> { true, true, true };
             var functionBlockRanges = new List<int> {4, 6, 8};
             var bufferedPositions = new BufferedPositions(positions, recomposable, functionBlockRanges);
-            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _codonInfoProviderMock.Object, variantGenerator);
+            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, variantGenerator);
             var output = positionProcessor.GenerateOutput(bufferedPositions).ToArray();
 
             for (int i = 0; i < output.Length; i++)
@@ -132,7 +130,7 @@ namespace UnitTests.Phantom.Recomposer
             var recomposable = new List<bool> { true, true, true };
             var functionBlockRanges = new List<int> { 4, 6, 8 };
             var bufferedPositions = new BufferedPositions(positions, recomposable, functionBlockRanges);
-            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _codonInfoProviderMock.Object, variantGenerator);
+            var positionProcessor = new PositionProcessor(_positionBufferMock.Object, variantGenerator);
             var output = positionProcessor.GenerateOutput(bufferedPositions).ToArray();
 
             var expectedOutput = new string[4][];

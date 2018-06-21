@@ -20,7 +20,7 @@ namespace Phantom.Recomposer
             RecomposedAlleles = new Dictionary<VariantSite, VariantInfo>();
         }
 
-        public List<string[]> GetRecomposedVcfRecords()
+        public IEnumerable<string[]> GetRecomposedVcfRecords()
         {
             var vcfRecords = new List<string[]>();
             foreach (var variantSite in RecomposedAlleles.Keys.OrderBy(x => x))
@@ -140,7 +140,7 @@ namespace Phantom.Recomposer
             }
         }
 
-        private static string[] GetSampleGenotypeStrings(List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, ref bool hasGq, ref bool hasPs, int numSamples)
+        private static string[] GetSampleGenotypeStrings(IReadOnlyList<List<int>> sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, ref bool hasGq, ref bool hasPs, int numSamples)
         {
             var sampleGenotypeStrings = new string[numSamples];
             for (var index = 0; index < numSamples; index++)
@@ -166,6 +166,6 @@ namespace Phantom.Recomposer
             return new ArraySegment<string>(values, 0, indexLastRemainedValue + 1).ToArray();
         }
 
-        private static string GetGenotype(List<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
+        private static string GetGenotype(IReadOnlyCollection<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
     }
 }

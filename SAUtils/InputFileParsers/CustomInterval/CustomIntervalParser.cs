@@ -160,7 +160,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 					KeyName = value;
 					break;
 				default:
-					throw new Exception("Unknown field in top level key line :\n " + line);
+					throw new InvalidDataException("Unknown field in top level key line :\n " + line);
 			}			
 		}
 
@@ -194,12 +194,12 @@ namespace SAUtils.InputFileParsers.CustomInterval
                         index = Convert.ToInt16(value);
                         break;
                     default:
-                        throw new Exception("Unknown field in info field line :\n" + line);
+                        throw new InvalidDataException("Unknown field in info field line :\n" + line);
                 }
             }
 
             if (type == null || json == null || index == null)
-                throw new Exception("Missing mandatory field from IAE_INFO:\n" + line);
+                throw new InvalidDataException("Missing mandatory field from IAE_INFO:\n" + line);
 
             if (type.ToLower() == "string")
             {
@@ -211,7 +211,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
             }
             if (_fieldIndex.ContainsKey(index.Value))
             {
-                throw new Exception("duplicate index:\n" + line);
+                throw new InvalidDataException("duplicate index:\n" + line);
             }
             _fieldIndex[index.Value] = json;
         }

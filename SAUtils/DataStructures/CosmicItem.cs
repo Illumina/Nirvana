@@ -8,19 +8,11 @@ namespace SAUtils.DataStructures
 {
     public sealed class CosmicItem : SupplementaryDataItem, IEquatable<CosmicItem>
     {
-        #region members
-
         public string Id { get; }
         private string Gene { get; }
         private int? SampleCount { get; }
-
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
         private string IsAlleleSpecific { get; set; }
-
         public HashSet<CosmicStudy> Studies { get; private set; }
-
-        #endregion
 
         public CosmicItem(
             IChromosome chromosome,

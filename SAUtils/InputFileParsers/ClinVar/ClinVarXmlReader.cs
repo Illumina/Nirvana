@@ -8,7 +8,6 @@ using Compression.Utilities;
 using Genome;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using Variants;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
@@ -110,7 +109,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 				//skipping the top level element to go down to its elementren
 			    xmlReader.ReadToDescendant(ClinVarSetTag);
 
-			    //var benchmark = new Benchmark();
                 do
 				{
 					var subTreeReader = xmlReader.ReadSubtree();
@@ -208,7 +206,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 var extendedOmimIds = GetOmimIds(variant);
 
-                var reviewStatEnum = ReviewStatusEnum.no_assertion;
+                var reviewStatEnum = ReviewStatus.no_assertion;
 		        if (ClinVarItem.ReviewStatusNameMapping.ContainsKey(_reviewStatus))
 		            reviewStatEnum = ClinVarItem.ReviewStatusNameMapping[_reviewStatus];
 
@@ -272,10 +270,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 	        var refLength = clinvarVariant.Stop - clinvarVariant.Start + 1;
 	        return refLength == refAllele.Length && _sequenceProvider.Sequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
-
-	        //var stop = clinvarVariant.Start + refAllele.Length - 1;
-            //return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
-
         }
 
         private static string GetReferenceAllele(ClinVarItem variant, ISequence compressedSequence)
@@ -557,7 +551,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
         {
-		    if (xElement == null ) return null;//|| xElement.IsEmpty) return null;
+		    if (xElement == null ) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
 
 			if (genomeAssembly.ToString()!= xElement.Attribute(AssemblyTag)?.Value

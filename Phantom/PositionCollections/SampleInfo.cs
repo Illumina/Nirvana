@@ -1,16 +1,16 @@
 ﻿namespace Phantom.PositionCollections
 {
-    public class SampleInfo
+    public sealed class SampleInfo
     {
-        public string[,][] Values;
-        public int NumPositions;
-        public int NumSamples;
+        public readonly string[,][] Values;
+        public readonly int NumPositions;
+        public readonly int NumSamples;
 
         public SampleInfo(string[,][] values)
         {
-            Values = values;
+            Values       = values;
             NumPositions = values.GetLength(0);
-            NumSamples = values.GetLength(1);
+            NumSamples   = values.GetLength(1);
         }
     }
 }

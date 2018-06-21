@@ -175,33 +175,27 @@ namespace CommandLine.NDesk.Options
         {
             var type = '\0';
             var seps = new List<string>();
+
             for (var i = 0; i < Names.Length; ++i)
             {
                 string name = Names[i];
-                if (name.Length == 0)
-                    throw new ArgumentException("Empty option names are not supported.", nameof(name));
+                if (name.Length == 0) throw new InvalidDataException($"Empty option names are not supported: {nameof(name)}");
 
                 int end = name.IndexOfAny(NameTerminator);
-                if (end == -1)
-                    continue;
+                if (end == -1) continue;
+
                 Names[i] = name.Substring(0, end);
-                if (type == '\0' || type == name[end])
-                    type = name[end];
-                else
-                    throw new ArgumentException(
-                        string.Format("Conflicting option types: '{0}' vs. '{1}'.", type, name[end]),
-                        nameof(type));
+
+                if (type == '\0' || type == name[end]) type = name[end];
+                else throw new InvalidDataException($"Conflicting option types: '{type}' vs. '{name[end]}'.");
+
                 AddSeparators(name, end, seps);
             }
 
-            if (type == '\0')
-                return OptionValueType.None;
+            if (type == '\0') return OptionValueType.None;
 
-            if (MaxValueCount <= 1 && seps.Count != 0)
-                throw new ArgumentException(
-                    string.Format("Cannot provide key/value separators for Options taking {0} value(s).", MaxValueCount),
-                    nameof(MaxValueCount));
-            if (MaxValueCount <= 1) return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
+            if (MaxValueCount <= 1 && seps.Count != 0) throw new InvalidDataException($"Cannot provide key/value separators for Options taking {MaxValueCount} value(s).");
+            if (MaxValueCount <= 1) return GetOptionValueType(type);
 
             switch (seps.Count)
             {
@@ -216,8 +210,11 @@ namespace CommandLine.NDesk.Options
                     break;
             }
 
-            return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
+            return GetOptionValueType(type);
         }
+
+        private static OptionValueType GetOptionValueType(char type) =>
+            type == '=' ? OptionValueType.Required : OptionValueType.Optional;
 
         private static void AddSeparators(string name, int end, ICollection<string> seps)
         {

@@ -78,7 +78,7 @@ namespace SAUtils.TsvWriters
         {
             if (globalMajorAllele == null)
             {
-                throw new Exception($"no global major allele for {chromosome}:{position}");
+                throw new InvalidDataException($"no global major allele for {chromosome}:{position}");
             }
 
             //validate the vcf reference
@@ -87,7 +87,6 @@ namespace SAUtils.TsvWriters
             if (!chromosome.Equals(_currentChromosome))
             {
                 _tsvIndex.AddTagPosition(chromosome, _bgzipTextWriter.Position);
-                //Console.WriteLine($"chr {chromosome}, filePos: {_bgzipTextWriter.Position}");
                 _currentChromosome = chromosome;
             }
 

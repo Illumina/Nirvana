@@ -25,8 +25,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             _overlaps           = feature.Overlaps(variant);
             _completelyWithin   = variant.Start >= feature.Start && variant.End <= feature.End;
 
-            _lossOrDeletion      = vt == VariantType.copy_number_loss || vt == VariantType.deletion || vt == VariantType.copy_number_loss;
-            _gainOrDuplication   = vt == VariantType.copy_number_gain || vt == VariantType.duplication || vt == VariantType.tandem_duplication || vt == VariantType.copy_number_gain;
+            _lossOrDeletion      = vt == VariantType.copy_number_loss || vt == VariantType.deletion;
+            _gainOrDuplication   = vt == VariantType.copy_number_gain || vt == VariantType.duplication || vt == VariantType.tandem_duplication;
             _isInsertionDeletion = vt == VariantType.indel;
             _isInsertion         = vt == VariantType.insertion;
         }

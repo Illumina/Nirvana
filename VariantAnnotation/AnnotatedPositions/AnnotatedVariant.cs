@@ -22,11 +22,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
         public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
 
-        public AnnotatedVariant(IVariant variant)
-        {
-            Variant = variant;
-        }
-
+        public AnnotatedVariant(IVariant variant) => Variant = variant;
 
         public string GetJsonString(string originalChromName)
         {
@@ -76,6 +72,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
         private static VariantType GetVariantType(VariantType variantType)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (variantType)
             {
                 case VariantType.short_tandem_repeat_variation:

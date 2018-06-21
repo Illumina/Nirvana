@@ -51,7 +51,7 @@ namespace Phantom.PositionCollections
             return alleleBreaks;
         }
 
-        private int ProcessNonRefAllele(int haplotypeIndex, int[] starts, List<int> functionBlockRanges, bool[] alleleBreaks, int lastNonRefPosition, int gtIndex)
+        private int ProcessNonRefAllele(int haplotypeIndex, int[] starts, IReadOnlyList<int> functionBlockRanges, bool[] alleleBreaks, int lastNonRefPosition, int gtIndex)
         {
             if (gtIndex > 0)
             {
@@ -89,7 +89,7 @@ namespace Phantom.PositionCollections
             }
         }
 
-        private List<GenotypeBlock> GetGenotypeBlocks(bool[] finalBreaks)
+        private IEnumerable<GenotypeBlock> GetGenotypeBlocks(bool[] finalBreaks)
         {
             var subGenotypeBlocks = new List<GenotypeBlock>();
             int subBlockStart = 0;

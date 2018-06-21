@@ -10,14 +10,13 @@ using Variants;
 
 namespace VariantAnnotation.Providers
 {
-	public sealed class SupplementaryAnnotationProvider : IAnnotationProvider
+    public sealed class SupplementaryAnnotationProvider : IAnnotationProvider
 	{
 		public string Name { get; }
 		public GenomeAssembly Assembly => SaReaderUtils.GetAssembly(_saDirs);
 
 		public IEnumerable<IDataSourceVersion> DataSourceVersions =>
 			SaReaderUtils.GetDataSourceVersions(_saDirs);
-
 
 	    private List<ISupplementaryAnnotationReader> _saReaders;
 	    private string _currentUcscReferenceName;
@@ -93,17 +92,17 @@ namespace VariantAnnotation.Providers
 			if (_hasAllVariantIntervals) AddIntervals(annotatedPosition, _allVariantIntervalArray, begin, end);
 		}
 
-	    private static void AddIntervals(IAnnotatedPosition annotatedPosition,
+	    private void AddIntervals(IAnnotatedPosition annotatedPosition,
 	        IIntervalSearch<ISupplementaryInterval> intervalArray, int begin, int end)
 	    {
 			var intervals = intervalArray.GetAllOverlappingValues(begin, end);
 		    if (intervals == null) return;
-
+           
 			foreach (var overlappingInterval in intervals)
 			{
-			    var reciprocalOverlap = annotatedPosition.Position.Start >= annotatedPosition.Position.End
-			        ? null
-			        : overlappingInterval.GetReciprocalOverlap(annotatedPosition.AnnotatedVariants[0].Variant);
+                var reciprocalOverlap = annotatedPosition.Position.Start >= annotatedPosition.Position.End
+                ? null
+                : overlappingInterval.GetReciprocalOverlap(annotatedPosition.AnnotatedVariants[0].Variant);
 
                 annotatedPosition.SupplementaryIntervals.Add(
 					new AnnotatedSupplementaryInterval(overlappingInterval, reciprocalOverlap));
@@ -152,5 +151,7 @@ namespace VariantAnnotation.Providers
 			if (intervals.Count == 0) return new NullIntervalSearch<ISupplementaryInterval>();
 			return new IntervalArray<ISupplementaryInterval>(intervals.ToArray());
 		}
+
+
 	}
 }

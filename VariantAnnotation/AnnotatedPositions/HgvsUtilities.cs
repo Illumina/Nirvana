@@ -248,6 +248,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
             // format rest of string according to type
             // note: inversion and multiple are never assigned as genomic changes
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (type)
             {
                 case GenomicChange.Deletion:

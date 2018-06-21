@@ -55,7 +55,5 @@ namespace Phantom.Utilities
             }
             return transcriptIntervalArrays;
         }
-
-        public static void WriteLines(StreamWriter writer, IEnumerable<string> lines) => lines.ToList().ForEach(writer.WriteLine);
     }
 }

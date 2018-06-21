@@ -55,22 +55,6 @@ namespace SAUtils.TsvWriters
                     refAllele,
                     altAllele, vcfString, jsonStrings);
             }
-
-   //         var alleleGroupedItems = clinvarItems.GroupBy(x => x.AlternateAllele);
-			//foreach (var groupedItem in alleleGroupedItems)
-			//{
-			//	var uniqueItems = groupedItem.GroupBy(p => p.ID).Select(x => x.First()).ToList();
-			//	var vcfString = string.Join(",", uniqueItems.Select(x => SaUtilsCommon.ConvertToVcfInfoString(x.Significance)));
-			//	var jsonStrings = uniqueItems.Select(x => x.GetVariantJsonString()).ToList();
-
-			//	// since the reference allele for different items in the group may be different, we only use the first base as it is supposed to be the common padding base.
-			//	_writer.AddEntry(groupedItem.First().Chromosome,
-			//		groupedItem.First().Start,
-			//		groupedItem.First().ReferenceAllele, 
-			//		groupedItem.Key, vcfString, jsonStrings);
-			//}
-			
-
 		}
 
         private static Dictionary<(string ReferenceAllele, string AlternateAllele), List<ClinVarItem>> GroupByAltAllele(List<ClinVarItem> clinVarItems)

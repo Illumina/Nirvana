@@ -28,7 +28,6 @@ namespace SAUtils.CreateIntermediateTsvs
 {
     internal sealed class CreateIntermediateTsvs
     {
-        #region fileNames
         private readonly List<string> _customAnnotationFiles;
         private readonly List<string> _customIntervalFiles;
         private readonly string _onekGFileName;
@@ -44,15 +43,11 @@ namespace SAUtils.CreateIntermediateTsvs
         private readonly List<string> _mitoMapVarFileNames;
         private readonly List<string> _mitoMapSvFileNames;
         private readonly string _outputDirectory;
-        #endregion
 
-        #region members
         private readonly IDictionary<string, IChromosome> _refNamesDictionary;
         private readonly GenomeAssembly _genomeAssembly;
-        //private readonly ISequenceProvider _sequenceProvider;
         private readonly string _compressedReferencePath;
 
-        #endregion
         public CreateIntermediateTsvs(string compressedReferencePath, string outputDirectory, string dbSnpFileName, string cosmicVcfFileName, string cosmicTsvFileName, string clinVarFileName, string onekGFileName, string evsFile, string exacFile, string dgvFile, string onekGSvFileName, string clinGenFileName, List<string> mitoMapVarFileNames, List<string> mitoMapSvFileNames, List<string> customAnnotationFiles, List<string> customIntervalFiles)
         {
             _outputDirectory = outputDirectory;
@@ -79,17 +74,6 @@ namespace SAUtils.CreateIntermediateTsvs
 
         public void CreateTsvs()
         {
-            //CreateDbsnpGaTsv(_dbSnpFileName);
-            //CreateOnekgTsv(_onekGFileName);
-            //CreateClinvarTsv(_clinVarFileName);
-            //CreateExacTsv(_exacFile);
-            //CreateEvsTsv(_evsFile);
-            //CreateCosmicTsv(_cosmicVcfFileName, _cosmicTsvFileName);
-            //CreateSvTsv(InterimSaCommon.DgvTag, _dgvFile);
-            //CreateSvTsv(InterimSaCommon.ClinGenTag, _clinGenFileName);
-            //CreateSvTsv(InterimSaCommon.OnekSvTag, _onekGSvFileName);
-            //ThreadPool.SetMaxThreads(Environment.ProcessorCount, Environment.ProcessorCount);
-
             var tasks = new List<Task>
             {
                 Task.Factory.StartNew(() => CreateDbsnpGaTsv(_dbSnpFileName)),
@@ -176,7 +160,6 @@ namespace SAUtils.CreateIntermediateTsvs
             if (string.IsNullOrEmpty(fileName)) return;
 
             var benchMark = new Benchmark();
-            //Console.WriteLine($"Creating TSV from {fileName}");
             var dataSource = "";
             var version = DataSourceVersionReader.GetSourceVersion(fileName);
             switch (sourceName)

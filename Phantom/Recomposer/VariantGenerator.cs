@@ -95,13 +95,12 @@ namespace Phantom.Recomposer
             float currentValue = float.MaxValue;
             foreach (string thisString in strings)
             {
-                if (thisString != ".")
-                {
-                    var thisValue = float.Parse(thisString);
-                    if (thisValue >= currentValue) continue;
-                    currentString = thisString;
-                    currentValue = thisValue;
-                }
+                if (thisString == ".") continue;
+
+                float thisValue = float.Parse(thisString);
+                if (thisValue >= currentValue) continue;
+                currentString = thisString;
+                currentValue = thisValue;
             }
             return currentString;
         }

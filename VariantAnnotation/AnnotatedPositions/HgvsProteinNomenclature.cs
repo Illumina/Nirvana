@@ -40,8 +40,8 @@ namespace VariantAnnotation.AnnotatedPositions
 			var proteinId     = transcript.Translation.ProteinId.WithVersion;
 			var proteinChange = GetProteinChange(proteinStart, refAminoAcids, altAminoAcids, peptideSeq, variantEffect);
 
-
-			switch (proteinChange)
+            // ReSharper disable once SwitchStatementMissingSomeCases
+            switch (proteinChange)
 			{
 				case ProteinChange.Substitution:
 					return HgvspNotation.GetSubstitutionNotation(proteinId, proteinStart, refAbbreviation, altAbbreviation);
@@ -124,35 +124,31 @@ namespace VariantAnnotation.AnnotatedPositions
         internal static ProteinChange GetProteinChange(int start, string refAminoAcids, string altAminoAcids,
             string peptideSeq, IVariantEffect variantEffect)
         {
-		    if (refAminoAcids == altAminoAcids
-				|| variantEffect.IsStopRetained()) return ProteinChange.None;
+            var insertionBeforeTranscript = refAminoAcids.Length == 0 && start == 1;
+            if (refAminoAcids == altAminoAcids || variantEffect.IsStopRetained() || insertionBeforeTranscript) return ProteinChange.None;
 
-            //insertion before the transcript
-            if(refAminoAcids.Length==0 && start==1) return ProteinChange.None;
+            if (variantEffect.IsStartLost()) return ProteinChange.StartLost;
 
-		    if (variantEffect.IsStartLost()) return ProteinChange.StartLost;
+            // according to var nom, only if the Stop codon is effected, we call it an extension
+            if (variantEffect.IsStopLost() && refAminoAcids.OptimizedStartsWith(AminoAcids.StopCodonChar)) return ProteinChange.Extension;
 
-		    // according to var nom, only if the Stop codon is effected, we call it an extension
-			if (variantEffect.IsStopLost() && refAminoAcids.OptimizedStartsWith(AminoAcids.StopCodonChar)) return ProteinChange.Extension;
+            if (variantEffect.IsFrameshiftVariant()) return ProteinChange.Frameshift;
 
-			if (variantEffect.IsFrameshiftVariant()) return ProteinChange.Frameshift;
+            if (altAminoAcids.Length > refAminoAcids.Length &&
+                HgvsUtilities.IsAminoAcidDuplicate(start, altAminoAcids, peptideSeq)) return ProteinChange.Duplication;
 
-			
-			if (altAminoAcids.Length > refAminoAcids.Length && HgvsUtilities.IsAminoAcidDuplicate(start, altAminoAcids, peptideSeq))
-				return ProteinChange.Duplication;
-		    
-			if (refAminoAcids.Length == 0 && altAminoAcids.Length != 0) return ProteinChange.Insertion;
+            if (refAminoAcids.Length == 0 && altAminoAcids.Length != 0) return ProteinChange.Insertion;
 
-			if (refAminoAcids.Length != 0 && altAminoAcids.Length == 0) return ProteinChange.Deletion;
-			
-		    if (refAminoAcids.Length == 1 && altAminoAcids.Length == 1) return ProteinChange.Substitution;
-		    
-		    // the only remaining possibility is deletions/insertions
-		    return ProteinChange.DelIns;
-		}
+            if (refAminoAcids.Length != 0 && altAminoAcids.Length == 0) return ProteinChange.Deletion;
+
+            if (refAminoAcids.Length == 1 && altAminoAcids.Length == 1) return ProteinChange.Substitution;
+
+            // the only remaining possibility is deletions/insertions
+            return ProteinChange.DelIns;
+        }
     }
 
-	public enum ProteinChange
+    public enum ProteinChange
     {
         Unknown,
         Deletion,

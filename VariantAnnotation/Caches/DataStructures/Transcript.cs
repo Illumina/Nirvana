@@ -173,7 +173,7 @@ namespace VariantAnnotation.Caches.DataStructures
             return items;
         }
 
-        private static void WriteIndices<T>(IExtendedBinaryWriter writer, T[] items, Dictionary<T, int> indices)
+        private static void WriteIndices<T>(IExtendedBinaryWriter writer, T[] items, IReadOnlyDictionary<T, int> indices)
         {
             writer.WriteOpt(items.Length);
             foreach (var item in items) writer.WriteOpt(GetIndex(item, indices));

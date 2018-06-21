@@ -14,7 +14,6 @@ namespace SAUtils.InputFileParsers.TOPMed
 
         private int? _alleleNum;
         private int? _alleleCount;
-        private bool _failedFilter;
         private int? _homCount;
 
         public TopMedReader(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict)
@@ -28,7 +27,6 @@ namespace SAUtils.InputFileParsers.TOPMed
             _alleleNum    = null;
             _alleleCount  = null;
             _homCount     = null;
-            _failedFilter = false;
         }
 
         public IEnumerable<TopMedItem> GetGnomadItems()
@@ -73,14 +71,14 @@ namespace SAUtils.InputFileParsers.TOPMed
                 throw new InvalidDataException("het site found!!");
             }
 
-            _failedFilter = !(filters.Equals("PASS") || filters.Equals("."));
+            var failedFilter = !(filters.Equals("PASS") || filters.Equals("."));
 
             ParseInfoField(infoFields);
 
             if (_alleleNum == 0) return null;
 
             return new TopMedItem(chrom, position, refAllele, altAllele, _alleleNum, _alleleCount, _homCount,
-                _failedFilter);
+                failedFilter);
         }
 
         private void ParseInfoField(string infoFields)

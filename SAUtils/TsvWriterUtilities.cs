@@ -54,11 +54,9 @@ namespace SAUtils
                     {
                         //flushing out the remaining items in buffer
                         WriteToPosition(writer, itemsMinHeap, int.MaxValue);
-                        //Console.WriteLine($"Wrote out chr{currentRefIndex} items in {benchmark.GetElapsedTime()}");
                         benchmark.Reset();
                     }
                     currentRefIndex = saItem.Chromosome.Index;
-                    //Console.WriteLine("Writing items from chromosome:" + currentRefIndex);
                 }
 
                 //the items come in sorted order of the pre-trimmed position. 

@@ -78,6 +78,7 @@ namespace SAUtils.DataStructures
 
         private static string GetClinicalDescription(ClinicalInterpretation clinicalInterpretation)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (clinicalInterpretation)
             {
                 case ClinicalInterpretation.uncertain_significance:

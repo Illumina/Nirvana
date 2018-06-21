@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using Genome;
 using OptimizedCore;
@@ -9,15 +10,13 @@ namespace SAUtils.DataStructures
 {
     public sealed class ClinVarItem : SupplementaryDataItem
     {
-        #region members
-
         public int Stop { get; }
         public string VariantType { get; }
         public string Id { get; }
         public IEnumerable<string> AlleleOrigins { get; }
         public IEnumerable<string> Phenotypes { get; }
         public string Significance { get;  }
-	    public ReviewStatusEnum ReviewStatus { get;}
+	    public ReviewStatus ReviewStatus { get;}
 	    private string IsAlleleSpecific { get; }
 		public IEnumerable<string> MedGenIDs { get; }
         public IEnumerable<string> OmimIDs { get; }
@@ -26,40 +25,38 @@ namespace SAUtils.DataStructures
         public IEnumerable<long> PubmedIds { get; }
         public long LastUpdatedDate { get; }
 		
-		public static readonly Dictionary<string, ReviewStatusEnum> ReviewStatusNameMapping = new Dictionary<string, ReviewStatusEnum>
+		public static readonly ImmutableDictionary<string, ReviewStatus> ReviewStatusNameMapping = new Dictionary<string, ReviewStatus>
 		{
-			["no_assertion"]                                         = ReviewStatusEnum.no_assertion,
-			["no_criteria"]                                          = ReviewStatusEnum.no_criteria,
-			["guideline"]                                            = ReviewStatusEnum.practice_guideline,
-			["single"]                                               = ReviewStatusEnum.single_submitter,
-			["mult"]                                                 = ReviewStatusEnum.multiple_submitters,
-			["conf"]                                                 = ReviewStatusEnum.conflicting_interpretations,
-			["exp"]                                                  = ReviewStatusEnum.expert_panel,
-			//the following are the long forms found in XML
-			["no assertion provided"]                                = ReviewStatusEnum.no_assertion,
-			["no assertion criteria provided"]                       = ReviewStatusEnum.no_criteria,
-			["practice guideline"]                                   = ReviewStatusEnum.practice_guideline,
-			["criteria provided, conflicting interpretations"]       = ReviewStatusEnum.conflicting_interpretations,
-			["reviewed by expert panel"]                             = ReviewStatusEnum.expert_panel,
-			["classified by multiple submitters"]                    = ReviewStatusEnum.multiple_submitters,
-			["criteria provided, multiple submitters, no conflicts"] = ReviewStatusEnum.multiple_submitters_no_conflict,
-			["criteria provided, single submitter"]                  = ReviewStatusEnum.single_submitter
-		};
+			["no_assertion"]                                         = ReviewStatus.no_assertion,
+			["no_criteria"]                                          = ReviewStatus.no_criteria,
+			["guideline"]                                            = ReviewStatus.practice_guideline,
+			["single"]                                               = ReviewStatus.single_submitter,
+			["mult"]                                                 = ReviewStatus.multiple_submitters,
+			["conf"]                                                 = ReviewStatus.conflicting_interpretations,
+			["exp"]                                                  = ReviewStatus.expert_panel,
+			// the following are the long forms found in XML
+			["no assertion provided"]                                = ReviewStatus.no_assertion,
+			["no assertion criteria provided"]                       = ReviewStatus.no_criteria,
+			["practice guideline"]                                   = ReviewStatus.practice_guideline,
+			["criteria provided, conflicting interpretations"]       = ReviewStatus.conflicting_interpretations,
+			["reviewed by expert panel"]                             = ReviewStatus.expert_panel,
+			["classified by multiple submitters"]                    = ReviewStatus.multiple_submitters,
+			["criteria provided, multiple submitters, no conflicts"] = ReviewStatus.multiple_submitters_no_conflict,
+			["criteria provided, single submitter"]                  = ReviewStatus.single_submitter
+		}.ToImmutableDictionary();
 
-		private static readonly Dictionary< ReviewStatusEnum, string> ReviewStatusStrings = new Dictionary<ReviewStatusEnum, string>
+		private static readonly Dictionary< ReviewStatus, string> ReviewStatusStrings = new Dictionary<ReviewStatus, string>
 		{			
-			[ReviewStatusEnum.no_criteria]                     = "no assertion criteria provided",
-			[ReviewStatusEnum.no_assertion]                    = "no assertion provided",
-			[ReviewStatusEnum.expert_panel]                    = "reviewed by expert panel",
-			[ReviewStatusEnum.single_submitter]                = "criteria provided, single submitter",
-			[ReviewStatusEnum.practice_guideline]              = "practice guideline",
-			[ReviewStatusEnum.multiple_submitters]             = "classified by multiple submitters",
-			[ReviewStatusEnum.conflicting_interpretations]     = "criteria provided, conflicting interpretations",
-			[ReviewStatusEnum.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts"
+			[ReviewStatus.no_criteria]                     = "no assertion criteria provided",
+			[ReviewStatus.no_assertion]                    = "no assertion provided",
+			[ReviewStatus.expert_panel]                    = "reviewed by expert panel",
+			[ReviewStatus.single_submitter]                = "criteria provided, single submitter",
+			[ReviewStatus.practice_guideline]              = "practice guideline",
+			[ReviewStatus.multiple_submitters]             = "classified by multiple submitters",
+			[ReviewStatus.conflicting_interpretations]     = "criteria provided, conflicting interpretations",
+			[ReviewStatus.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts"
 			
 		};
-
-		#endregion
 
 		#region Equality Overrides
 
@@ -94,7 +91,7 @@ namespace SAUtils.DataStructures
 			string altAllele,
             string variantType,
 			string id,
-			ReviewStatusEnum reviewStatus,
+			ReviewStatus reviewStatus,
 		    IEnumerable<string> medGenIds,
 		    IEnumerable<string> omimIds,
 		    IEnumerable<string> orphanetIds,
@@ -105,25 +102,24 @@ namespace SAUtils.DataStructures
 			long lastUpdatedDate = long.MinValue
 			)
 		{
-			Chromosome         = chromosome;
-			Start              = position;
-		    Stop               = stop;
-			AlleleOrigins      = alleleOrigins;
-			AlternateAllele    = altAllele;
-		    VariantType        = variantType;
-		    Id                 = id;
-		    MedGenIDs          = medGenIds ;
-			OmimIDs            = omimIds;
-			OrphanetIDs        = orphanetIds;
-			Phenotypes         = phenotypes; 
-			ReferenceAllele    = referenceAllele;
-			Significance       = significance;
-			PubmedIds          = pubmedIds;
-			LastUpdatedDate    = lastUpdatedDate;
-			IsAlleleSpecific   = null;
-		    ReviewStatus = reviewStatus;
-
-		}
+            Chromosome       = chromosome;
+            Start            = position;
+            Stop             = stop;
+            AlleleOrigins    = alleleOrigins;
+            AlternateAllele  = altAllele;
+            VariantType      = variantType;
+            Id               = id;
+            MedGenIDs        = medGenIds;
+            OmimIDs          = omimIds;
+            OrphanetIDs      = orphanetIds;
+            Phenotypes       = phenotypes;
+            ReferenceAllele  = referenceAllele;
+            Significance     = significance;
+            PubmedIds        = pubmedIds;
+            LastUpdatedDate  = lastUpdatedDate;
+            IsAlleleSpecific = null;
+            ReviewStatus     = reviewStatus;
+        }
 
 		public string GetJsonString()
 		{
@@ -161,14 +157,9 @@ namespace SAUtils.DataStructures
 		{
 			throw new NotImplementedException();
 		}
-
-
-
-
-
 	}
 
-	public enum ReviewStatusEnum
+	public enum ReviewStatus
 	{
 		// ReSharper disable InconsistentNaming
 		no_assertion,
@@ -180,6 +171,5 @@ namespace SAUtils.DataStructures
 		expert_panel,
 		practice_guideline
 		// ReSharper restore InconsistentNaming
-
 	}
 }

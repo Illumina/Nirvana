@@ -118,7 +118,7 @@ namespace SAUtils.DataStructures
             return suppInterval;
         }
 
-        public static Dictionary<(string, string), MitoMapItem> AggregatedMutationsSomePosition(List<MitoMapItem> mitoMapMutItems)
+        public static Dictionary<(string, string), MitoMapItem> AggregatedMutationsSomePosition(IEnumerable<MitoMapItem> mitoMapMutItems)
         {
             var aggregatedMutations = new Dictionary<(string, string), MitoMapItem>();
 

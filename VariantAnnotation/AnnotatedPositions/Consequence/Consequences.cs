@@ -56,6 +56,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
         private void DetermineRepeatExpansionEffect(VariantType variantType)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (variantType)
             {
                 case VariantType.short_tandem_repeat_variation:
@@ -72,6 +73,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
         private void DetermineCopyNumberEffect(VariantType variantType)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (variantType)
             {
                 case VariantType.copy_number_gain:

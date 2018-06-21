@@ -2,10 +2,10 @@
 
 namespace Phantom.CodonInformation
 {
-    public class TranscriptIntervalsInGene
+    public sealed class TranscriptIntervalsInGene
     {
-        public IInterval[][] Intervals;
-        public int NumTranscripts;
+        public readonly IInterval[][] Intervals;
+        public readonly int NumTranscripts;
 
         public TranscriptIntervalsInGene(IInterval[][] intervals)
         {

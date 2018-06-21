@@ -25,7 +25,7 @@ namespace SAUtils
             return sequences;
         }
 
-        private static void GetSequences(string inputSequence, List<string> outputSequences, int index, string subSequence)
+        private static void GetSequences(string inputSequence, ICollection<string> outputSequences, int index, string subSequence)
         {
             if (index == inputSequence.Length)
             {

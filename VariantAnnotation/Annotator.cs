@@ -57,7 +57,7 @@ namespace VariantAnnotation
             return assemblies.First().Key;
         }
 
-        private static void AddAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
+        private static void AddAssembly(IDictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
         {
             if (provider == null) return;
             if (assemblies.TryGetValue(provider.Assembly, out var assemblyList)) assemblyList.Add(provider.Name);
@@ -111,34 +111,25 @@ namespace VariantAnnotation
 
             foreach (var variant in annotatedPosition.AnnotatedVariants)
             {
-                if (variant.OverlappingGenes != null)
-                {
-                    foreach (var gene in variant.OverlappingGenes)
-                    {
-                        _affectedGenes.Add(gene);
-                    }
-                }
+                AddGenesFromTranscripts(variant.EnsemblTranscripts);
+                AddGenesFromTranscripts(variant.RefSeqTranscripts);
+            }
+        }
 
-                foreach (var ensemblTranscript in variant.EnsemblTranscripts)
-                {
-                    if (!ensemblTranscript.Consequences.Contains(ConsequenceTag.downstream_gene_variant) &&
-                        !ensemblTranscript.Consequences.Contains(ConsequenceTag.upstream_gene_variant))
-                        _affectedGenes.Add(ensemblTranscript.Transcript.Gene.Symbol);
-                }
-
-                foreach (var refSeqTranscript in variant.RefSeqTranscripts)
-                {
-                    if (!refSeqTranscript.Consequences.Contains(ConsequenceTag.downstream_gene_variant) &&
-                        !refSeqTranscript.Consequences.Contains(ConsequenceTag.upstream_gene_variant))
-                        _affectedGenes.Add(refSeqTranscript.Transcript.Gene.Symbol);
-                }
+        private void AddGenesFromTranscripts(IList<IAnnotatedTranscript> transcripts)
+        {
+            foreach (var transcript in transcripts)
+            {
+                if (!transcript.Consequences.Contains(ConsequenceTag.downstream_gene_variant) &&
+                    !transcript.Consequences.Contains(ConsequenceTag.upstream_gene_variant))
+                    _affectedGenes.Add(transcript.Transcript.Gene.Symbol);
             }
         }
 
         internal static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
         {
             if (variants?[0].Behavior == null) return null;
-            var numVariants = variants.Length;
+            int numVariants = variants.Length;
             var annotatedVariants = new IAnnotatedVariant[numVariants];
             for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(variants[i]);
             return annotatedVariants;

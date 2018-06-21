@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -29,7 +30,9 @@ namespace SAUtils.MergeInterimTsvs
         private readonly GenomeAssembly _genomeAssembly;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly HashSet<string> _refNames;
-        public static readonly HashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck = new HashSet<GenomeAssembly> { GenomeAssembly.Unknown, GenomeAssembly.rCRS };
+
+        public static readonly ImmutableHashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck =
+            new HashSet<GenomeAssembly> {GenomeAssembly.Unknown, GenomeAssembly.rCRS}.ToImmutableHashSet();
 
         public InterimTsvsMerger(IEnumerable<string> annotationFiles, IEnumerable<string> intervalFiles, string miscFile, IEnumerable<string> geneFiles, string compressedReference, string outputDirectory)
         {
@@ -177,8 +180,6 @@ namespace SAUtils.MergeInterimTsvs
             int refMinorCount;
 
             var saEnumerators = GetSaEnumerators(refName);
-
-            //return;
             var globalMajorAlleleInRefMinors = GetGlobalMajorAlleleForRefMinors(refName);
 
             var dataSourceVersions = MergeUtilities.GetDataSourceVersions(_saHeaders);

@@ -35,20 +35,28 @@ namespace SAUtils.CreateOmimTsv
 
                     if (IsCommentLine(line)) continue;
 
-                    var contents      = line.OptimizedSplit('\t');
-                    var mimNumber     = Convert.ToInt32(contents[_mimNumberCol]);
-                    var geneSymbol    = contents[_hgncCol];
-                    var description   = _geneDescriptionCol >= 0 ? contents[_geneDescriptionCol].Replace(@"\\'", @"'") : null;
-                    var phenotypeInfo = _phenotypeCol >= 0 ? contents[_phenotypeCol].Replace(@",,", @",") : null;
-                    var entrezGeneId  = _entrezGeneIdCol >= 0 ? contents[_entrezGeneIdCol] : null;
-                    var ensemblGeneId = _ensemblGeneIdCol >= 0 ? contents[_ensemblGeneIdCol] : null;
+                    var result = ExtractContent(line);
+                    if (string.IsNullOrEmpty(result.GeneSymbol) || omimEntries.ContainsKey(result.MimNumber)) continue;
 
-                    if (string.IsNullOrEmpty(geneSymbol) || omimEntries.ContainsKey(mimNumber)) continue;
-
-                    omimEntries[mimNumber] = new OmimImportEntry(mimNumber, geneSymbol, description, phenotypeInfo,
-                        entrezGeneId, ensemblGeneId);
+                    omimEntries[result.MimNumber] = new OmimImportEntry(result.MimNumber, result.GeneSymbol,
+                        result.Description, result.PhenotypeInfo, result.EntrezGeneId, result.EnsemblGeneId);
                 }
             }
+        }
+
+        private (int MimNumber, string GeneSymbol, string Description, string PhenotypeInfo, string EntrezGeneId, string
+            EnsemblGeneId) ExtractContent(string line)
+        {
+            var contents = line.OptimizedSplit('\t');
+
+            var mimNumber     = Convert.ToInt32(contents[_mimNumberCol]);
+            var geneSymbol    = contents[_hgncCol];
+            var description   = _geneDescriptionCol >= 0 ? contents[_geneDescriptionCol].Replace(@"\\'", @"'") : null;
+            var phenotypeInfo = _phenotypeCol       >= 0 ? contents[_phenotypeCol].Replace(@",,", @",")        : null;
+            var entrezGeneId  = _entrezGeneIdCol    >= 0 ? contents[_entrezGeneIdCol]                          : null;
+            var ensemblGeneId = _ensemblGeneIdCol   >= 0 ? contents[_ensemblGeneIdCol]                         : null;
+
+            return (mimNumber, geneSymbol, description, phenotypeInfo, entrezGeneId, ensemblGeneId);
         }
 
         private void ParseHeader(string line)

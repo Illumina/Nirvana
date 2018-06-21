@@ -63,7 +63,7 @@ namespace Phantom.PositionCollections
         }
 
         private static void AddAlleleIndexBlocks(GenotypeBlock genotypeBlock, List<int> sampleIndexes, int[] starts,
-            List<int> functionBlockRanges, Dictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele, Graph<AlleleBlock> alleleIndexBlockGraph)
+            List<int> functionBlockRanges, IDictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele, Graph<AlleleBlock> alleleIndexBlockGraph)
         {
             int startPosition = genotypeBlock.PosIndex;
             int ploidy = genotypeBlock.Genotypes[0].AlleleIndexes.Length;
@@ -74,7 +74,7 @@ namespace Phantom.PositionCollections
                 int startInThisBlock = functionBlock.PosIndex - startPosition;
                 int numPositions = functionBlock.Genotypes.Length;
                 int endInThisBlock = startInThisBlock + numPositions - 1;
-                var (numRefPosBefore, numRefPosAfter) = GetRefPosNums(isRefPositions, startInThisBlock, numPositions, endInThisBlock);
+                var (numRefPosBefore, numRefPosAfter) = GetRefPosNums(isRefPositions, startInThisBlock, endInThisBlock);
 
                 var alleleIndexBlocks = new List<AlleleBlock>();
                 for (int haplotypeIndex = 0; haplotypeIndex < ploidy; haplotypeIndex++)
@@ -97,7 +97,7 @@ namespace Phantom.PositionCollections
             }
         }
 
-        private static (int, int ) GetRefPosNums(bool[] isRefPositions, int startInThisBlock, int numPositions, int endInThisBlock)
+        private static (int, int ) GetRefPosNums(bool[] isRefPositions, int startInThisBlock, int endInThisBlock)
         {
             int numRefPosBefore = 0;
             int numRefPosAfter = 0;
@@ -118,7 +118,7 @@ namespace Phantom.PositionCollections
 
         private static bool IsRefPosition(int[] genotypeIndexes) => genotypeIndexes.All(x => x == 0);
 
-        private static void UpdateBlockToSampleAlleleMapping(AlleleBlock alleleBlock, List<SampleHaplotype> currentSampleAlleles, Dictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele)
+        private static void UpdateBlockToSampleAlleleMapping(AlleleBlock alleleBlock, List<SampleHaplotype> currentSampleAlleles, IDictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele)
         {
             if (alleleIndexBlockToSampleAllele.TryGetValue(alleleBlock, out var sampleAlleles))
             {
@@ -131,7 +131,7 @@ namespace Phantom.PositionCollections
             }
         }
 
-        private static List<SampleHaplotype> GetSampleAlleles(List<int> sampleIndexes, byte alleleIndex)
+        private static List<SampleHaplotype> GetSampleAlleles(IEnumerable<int> sampleIndexes, byte alleleIndex)
         {
             var sampleAlleleList = new List<SampleHaplotype>();
             foreach (int sampleIndex in sampleIndexes)
@@ -155,7 +155,7 @@ namespace Phantom.PositionCollections
 
         private static bool HasReducedPloidy(int[] genotypeIndexes, int blockPloidy) => genotypeIndexes.Length < blockPloidy;
 
-        private static bool HasUndeterminedOrUnsupportedGenotype(int[] genotypeIndexes, HashSet<int> indexOfSkippedTypes) => genotypeIndexes.Any(x => x == -1 || indexOfSkippedTypes.Contains(x));
+        private static bool HasUndeterminedOrUnsupportedGenotype(int[] genotypeIndexes, ICollection<int> indexOfSkippedTypes) => genotypeIndexes.Any(x => x == -1 || indexOfSkippedTypes.Contains(x));
 
         private static bool IsUnphasedHeterozygote(Genotype genotype) => !genotype.IsPhased && !genotype.IsHomozygous;
 

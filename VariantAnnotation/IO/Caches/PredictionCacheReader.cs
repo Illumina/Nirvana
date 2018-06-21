@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -15,11 +16,11 @@ namespace VariantAnnotation.IO.Caches
     {
         private readonly ExtendedBinaryReader _reader;
         private readonly BlockStream _blockStream;
-        private readonly string[] _predictionDescriptions;
+        private readonly ImmutableArray<string> _predictionDescriptions;
         private readonly IndexEntry[] _indexEntries;
         public readonly PredictionHeader Header;
 
-        public PredictionCacheReader(Stream stream, string[] predictionDescriptions)
+        public PredictionCacheReader(Stream stream, ImmutableArray<string> predictionDescriptions)
         {
             _blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Decompress);
             Header       = PredictionHeader.Read(stream, _blockStream);
@@ -57,15 +58,10 @@ namespace VariantAnnotation.IO.Caches
             return predictions;
         }
 
-        public static readonly string[] SiftDescriptions =
-        {
-            "tolerated", "deleterious", "tolerated - low confidence",
-            "deleterious - low confidence"
-        };
+        public static readonly ImmutableArray<string> SiftDescriptions = ImmutableArray.Create("tolerated",
+            "deleterious", "tolerated - low confidence", "deleterious - low confidence");
 
-        public static readonly string[] PolyphenDescriptions =
-        {
-            "probably damaging", "possibly damaging", "benign", "unknown"
-        };
+        public static readonly ImmutableArray<string> PolyphenDescriptions =
+            ImmutableArray.Create("probably damaging", "possibly damaging", "benign", "unknown");
     }
 }

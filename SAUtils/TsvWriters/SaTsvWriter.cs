@@ -102,7 +102,6 @@ namespace SAUtils.TsvWriters
             if (!chromosome.Equals(_currentChromosome))
             {
                 _tsvIndex.AddTagPosition(chromosome, _bgzipTextWriter.Position);
-               // Console.WriteLine($"chr {chromosome}, filePos: {_bgzipTextWriter.Position}");
                 _currentChromosome = chromosome;
             }
 

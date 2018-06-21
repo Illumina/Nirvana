@@ -21,7 +21,7 @@ namespace SAUtils.CreateOmimTsv
         private static ExitCodes ProgramExecution()
         {
             var (ensemblGeneIdToSymbol, entrezGeneIdToSymbol) = ParseUniversalGeneArchive();
-            var geneSymbolUpdater = new GeneSymbolUpdater(ensemblGeneIdToSymbol, entrezGeneIdToSymbol);
+            var geneSymbolUpdater = new GeneSymbolUpdater(entrezGeneIdToSymbol, ensemblGeneIdToSymbol);
             var omimTsvCreator    = new OmimTsvCreator(_inputGeneMap2Path, _mim2GenePath, geneSymbolUpdater, _outputTsvDirectory);
 
             return omimTsvCreator.Create();

@@ -60,7 +60,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
         private string GetDataType()
         {
             var dataType = _mitoMapFileInfo.Name.Replace(".html", "");
-            if (!_mitoMapMutationColumnDefinitions.ContainsKey(dataType)) throw new InvalidFileFormatException($"Unexpected data file: {_mitoMapFileInfo.Name}");
+            if (!_mitoMapMutationColumnDefinitions.ContainsKey(dataType)) throw new InvalidDataException($"Unexpected data file: {_mitoMapFileInfo.Name}");
             return dataType;
         }
 
@@ -109,7 +109,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 case MitoMapDataTypes.MitoMapDeletionsSingle:
                     return ExtractVariantItemFromDeletionsSingle(info);
             }
-            return ExtracVariantItem(info, _mitoMapMutationColumnDefinitions[dataType]);
+            return ExtractVariantItem(info, _mitoMapMutationColumnDefinitions[dataType]);
         }
 
         private List<MitoMapItem> ExtractVariantItemFromDeletionsSingle(List<string> info)
@@ -148,39 +148,44 @@ namespace SAUtils.InputFileParsers.MitoMAP
             // expect a string of allele sequence then
             else
             {
-                if (altAlleleInfo.Contains(" ")) throw new Exception($"Cannot parse {altAlleleInfo}");
+                if (altAlleleInfo.Contains(" ")) throw new InvalidDataException($"Cannot parse {altAlleleInfo}");
                 altAllele = altAlleleInfo;
             }
             var firstNumberPattern = new Regex(@"(?<firstNumber>^\d+)");
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
-            if (!firstNumberMatch.Success) throw new Exception($"Failed to extract variant position from {info[3]}");
+            if (!firstNumberMatch.Success) throw new InvalidDataException($"Failed to extract variant position from {info[3]}");
             var position = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
             var leftAlgnResults = GetLeftAlignedVariant(position, "", altAllele); // insertion
             return new List<MitoMapItem>{new MitoMapItem(leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null, _sequenceProvider) };
         }
 
-        private List<MitoMapItem> ExtracVariantItem(List<string> info, int[] fields)
+        private List<MitoMapItem> ExtractVariantItem(List<string> info, int[] fields)
         {
             List<MitoMapItem> mitoMapVarItems = new List<MitoMapItem>();
             int position = int.Parse(info[fields[0]]);
             var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
             if (DescribedAsDuplicatedRecord(mitomapDiseaseString)) return mitoMapVarItems;
+
             var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : new List<string> {mitomapDiseaseString};
             var (refAllele, rawAltAllele, extractedPosition) = GetRefAltAlleles(info[fields[2]]);
+
             if (extractedPosition.HasValue && position != extractedPosition)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {position}; allele {info[fields[2]]}");
+
             if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(rawAltAllele))
             {
                 Console.WriteLine($"No reference and alternative alleles could be extracted: {position}; allele {info[fields[2]]}");
                 return mitoMapVarItems;
             }
+
             if (_mitoMapDelSymbolSet.Contains(rawAltAllele)) rawAltAllele = DelSymbol;
-            bool? homoplasmy = null;
-            if (fields[3] != -1 && _symbolToBools.ContainsKey(info[fields[3]])) homoplasmy = _symbolToBools[info[fields[3]]];
-            bool? heteroplasmy = null;
-            if (fields[4] != -1 && _symbolToBools.ContainsKey(info[fields[4]])) heteroplasmy = _symbolToBools[info[fields[4]]];
+
+            var homoplasmy   = GetPlasmy(info, fields[3]);
+            var heteroplasmy = GetPlasmy(info, fields[4]);
+
             string status = fields[5] == -1 ? null : info[fields[5]];
-            var (scorePercentile, clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
+            (string scorePercentile, string clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
+
             if (!string.IsNullOrEmpty(rawAltAllele))
             {
                 foreach (var altAllele in GetAltAlleles(rawAltAllele))
@@ -191,10 +196,18 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 if (mitoMapVarItems.Count > 1) Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {position}");
                 return mitoMapVarItems;         
             }
+
             var leftAlignResults = GetLeftAlignedVariant(position, refAllele, rawAltAllele);
             mitoMapVarItems.Add(new MitoMapItem(leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, _sequenceProvider));
+
             return mitoMapVarItems;
+        }
+
+        private bool? GetPlasmy(List<string> info, int fields)
+        {
+            if (fields == -1 || !_symbolToBools.TryGetValue(info[fields], out bool b)) return null;
+            return b;
         }
 
         // there may be multiple alt alleles concatenated by ";"
@@ -246,111 +259,162 @@ namespace SAUtils.InputFileParsers.MitoMAP
             return _clininalSigfincances[(arrowType, nArrows)];
         }
 
-        private (string, string, int?) GetRefAltAlleles(string alleleString)
+        private (string RefAllele, string RawAltAllele, int? ExtractedPosition) GetRefAltAlleles(string alleleString)
         {
-            // C123T, A-del or A123del
-            var regexPattern1 = new Regex(@"(?<ref>^[ACGTacgtNn]+)(?<position>(\d+|-))(?<alt>([ACGTBDHKMRSVWYNacgtbdhkmrsvwyn]+|:|del[ACGTacgtNn]*|d)$)");
-            var match1 = regexPattern1.Match(alleleString);
-            if (match1.Success)
-            {
-                int? extractedPosition = null;
-                if (match1.Groups["position"].Value != "-") extractedPosition = int.Parse(match1.Groups["position"].Value);
-                return (match1.Groups["ref"].Value, match1.Groups["alt"].Value, extractedPosition);
-            }
+            var results = Evaluate_C123T(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
-            // 16021_16022del
-            var regexPattern2 = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)del");
-            var match2 = regexPattern2.Match(alleleString);
-            if (match2.Success)
-            {
-                var start = int.Parse(match2.Groups["start"].Value);
-                var end = int.Parse(match2.Groups["end"].Value);
-                return (GetRefAllelesFromReferece(_sequenceProvider, start, end - start + 1), "-", start);
-            }
-            // 8042del2
-            var regexPattern3 = new Regex(@"(?<position>^\d+)del(?<length>\d+)");
-            var match3 = regexPattern3.Match(alleleString);
-            if (match3.Success)
-            {
-                var extractedPosition = int.Parse(match3.Groups["position"].Value);
-                return (GetRefAllelesFromReferece(_sequenceProvider, extractedPosition,
-                    int.Parse(match3.Groups["length"].Value)), "-", extractedPosition);
-            }
-            // C9537insC
-            var regexPattern4 = new Regex(@"(?<ref>[ACGTacgtNn])(?<position>\d+)ins(?<extra>[ACGTacgtNn]+)");
-            var match4 = regexPattern4.Match(alleleString);
-            if (match4.Success)
-            {
-                var extractedPosition = int.Parse(match4.Groups["position"].Value);
-                var refAllele = match4.Groups["ref"].Value;
-                var altAllele = refAllele + match4.Groups["extra"].Value;
-                return (refAllele, altAllele, extractedPosition);
-            }
-            // 3902_3908invACCTTGC
-            var regexPattern5 = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)inv(?<seq>[ACGTacgtNn]+)");
-            var match5 = regexPattern5.Match(alleleString);
-            if (match5.Success)
-            {
-                var start = int.Parse(match5.Groups["start"].Value);
-                var end = int.Parse(match5.Groups["end"].Value);
-                var refSequence = GetRefAllelesFromReferece(_sequenceProvider, start, end - start + 1);
-                if (refSequence != match5.Groups["seq"].Value) throw new Exception($"Inconsistent sequences: reference {refSequence}, annotation {match5.Groups["seq"].Value}");
-                return (refSequence, ReverseSequence(refSequence), start);
-            }
-            //A-Cor CC
-            var regexPattern6 = new Regex(@"(?<ref>[ACGTacgtNn]+)[_|-](?<alt1>[ACGTacgtNn]+) ?or ?(?<alt2>[ACGTacgtNn]+)");
-            var match6 = regexPattern6.Match(alleleString);
-            if (match6.Success)
-            {
-                var altAllele = match6.Groups["alt1"].Value + ";" + match6.Groups["alt2"].Value;
-                return (match6.Groups["ref"].Value, altAllele, null);
-            }
-            // C-C(2-8)
-            var regexPattern7 = new Regex(@"(?<ref>[ACGTacgtNn])[_|-](?<alt>[ACGTacgtNn])\((?<min>\d+)-(?<max>\d+)\)");
-            var match7 = regexPattern7.Match(alleleString);
-            if (match7.Success)
-            {
-                var altBase = char.Parse(match7.Groups["alt"].Value);
-                int minRepeat = int.Parse(match7.Groups["min"].Value);
-                int maxRepeat = int.Parse(match7.Groups["max"].Value);
-                var altAlleleSequences = new List<string>();
-                for (int i = minRepeat; i <= maxRepeat; i++)
-                {
-                    altAlleleSequences.Add(new string(altBase, i));
-                }
-                return (match7.Groups["ref"].Value, string.Join(";", altAlleleSequences), null);
-            }
-            // 8042delAT
-            var regexPattern8 = new Regex(@"(?<position>^\d+)del(?<del>[ACGTacgtNn]+)");
-            var match8 = regexPattern8.Match(alleleString);
-            if (match8.Success)
-            {
-                var extractedPosition = int.Parse(match8.Groups["position"].Value);
-                string deletedSeq = match8.Groups["del"].Value;
-                string deletedReferenceSeq = GetRefAllelesFromReferece(_sequenceProvider, extractedPosition,deletedSeq.Length);
-                if (deletedSeq != deletedReferenceSeq)
-                {
-                    throw new Exception($"Deleted sequence at {extractedPosition}: annoation is {deletedSeq}, reference sequence is {deletedReferenceSeq}");
-                }
-                return (deletedReferenceSeq, "-", extractedPosition);
-            }
-            return (null, null, null);
+            results = Evaluate_16021_16022del(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
+
+            results = Evaluate_8042del2(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
+
+            results = Evaluate_C9537insC(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
+
+            results = Evaluate_3902_3908invACCTTGC(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
+
+            results = Evaluate_A_Cor_CC(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
+
+            results = Evaluate_C_C_2_8(alleleString);
+            if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
+
+            results = Evaluate_8042delAT(alleleString);
+
+            return results.Success
+                ? (results.RefAllele, results.RawAltAllele, results.ExtractedPosition)
+                : (null, null, null);
         }
 
-        private static string GetRefAllelesFromReferece(ReferenceSequenceProvider sequenceProvider, int start, int length)
+        // 8042delAT
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_8042delAT(string alleleString)
         {
-            return sequenceProvider.Sequence.Substring(start - 1, length);
+            var regex = new Regex(@"(?<position>^\d+)del(?<del>[ACGTacgtNn]+)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var extractedPosition      = int.Parse(match.Groups["position"].Value);
+            string deletedSeq          = match.Groups["del"].Value;
+            string deletedReferenceSeq = GetRefAllelesFromReference(_sequenceProvider, extractedPosition, deletedSeq.Length);
+
+            if (deletedSeq != deletedReferenceSeq)
+            {
+                throw new InvalidDataException($"Deleted sequence at {extractedPosition}: annoation is {deletedSeq}, reference sequence is {deletedReferenceSeq}");
+            }
+
+            return (true, deletedReferenceSeq, "-", extractedPosition);
         }
+
+        // C-C(2-8)
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C_C_2_8(string alleleString)
+        {
+            var regex = new Regex(@"(?<ref>[ACGTacgtNn])[_|-](?<alt>[ACGTacgtNn])\((?<min>\d+)-(?<max>\d+)\)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var altBase = char.Parse(match.Groups["alt"].Value);
+            int minRepeat = int.Parse(match.Groups["min"].Value);
+            int maxRepeat = int.Parse(match.Groups["max"].Value);
+            var altAlleleSequences = new List<string>();
+
+            for (int i = minRepeat; i <= maxRepeat; i++)
+            {
+                altAlleleSequences.Add(new string(altBase, i));
+            }
+
+            return (true, match.Groups["ref"].Value, string.Join(";", altAlleleSequences), null);
+        }
+
+        //A-Cor CC
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_A_Cor_CC(string alleleString)
+        {
+            var regex = new Regex(@"(?<ref>[ACGTacgtNn]+)[_|-](?<alt1>[ACGTacgtNn]+) ?or ?(?<alt2>[ACGTacgtNn]+)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var altAllele = match.Groups["alt1"].Value + ";" + match.Groups["alt2"].Value;
+            return (true, match.Groups["ref"].Value, altAllele, null);
+        }
+
+        // 3902_3908invACCTTGC
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_3902_3908invACCTTGC(string alleleString)
+        {
+            var regex = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)inv(?<seq>[ACGTacgtNn]+)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var start       = int.Parse(match.Groups["start"].Value);
+            var end         = int.Parse(match.Groups["end"].Value);
+            var refSequence = GetRefAllelesFromReference(_sequenceProvider, start, end - start + 1);
+            if (refSequence != match.Groups["seq"].Value) throw new InvalidDataException($"Inconsistent sequences: reference {refSequence}, annotation {match.Groups["seq"].Value}");
+            return (true, refSequence, ReverseSequence(refSequence), start);
+        }
+
+        // C9537insC
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C9537insC(string alleleString)
+        {
+            var regex = new Regex(@"(?<ref>[ACGTacgtNn])(?<position>\d+)ins(?<extra>[ACGTacgtNn]+)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var extractedPosition = int.Parse(match.Groups["position"].Value);
+            var refAllele         = match.Groups["ref"].Value;
+            var altAllele         = refAllele + match.Groups["extra"].Value;
+            return (true, refAllele, altAllele, extractedPosition);
+        }
+
+        // 8042del2
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_8042del2(string alleleString)
+        {
+            var regex = new Regex(@"(?<position>^\d+)del(?<length>\d+)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var extractedPosition = int.Parse(match.Groups["position"].Value);
+            return (true, GetRefAllelesFromReference(_sequenceProvider, extractedPosition, int.Parse(match.Groups["length"].Value)), "-", extractedPosition);
+        }
+
+        // 16021_16022del
+        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_16021_16022del(string alleleString)
+        {
+            var regex = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)del");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            var start = int.Parse(match.Groups["start"].Value);
+            var end   = int.Parse(match.Groups["end"].Value);
+            return (true, GetRefAllelesFromReference(_sequenceProvider, start, end - start + 1), "-", start);
+        }
+
+        // C123T, A-del or A123del
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C123T(string alleleString)
+        {            
+            var regex = new Regex(@"(?<ref>^[ACGTacgtNn]+)(?<position>(\d+|-))(?<alt>([ACGTBDHKMRSVWYNacgtbdhkmrsvwyn]+|:|del[ACGTacgtNn]*|d)$)");
+            var match = regex.Match(alleleString);
+            if (!match.Success) return (false, null, null, null);
+
+            int? extractedPosition = null;
+            if (match.Groups["position"].Value != "-") extractedPosition = int.Parse(match.Groups["position"].Value);
+            return (true, match.Groups["ref"].Value, match.Groups["alt"].Value, extractedPosition);
+        }
+
+        private static string GetRefAllelesFromReference(ReferenceSequenceProvider sequenceProvider, int start,
+            int length) => sequenceProvider.Sequence.Substring(start - 1, length);
 
         private static string ReverseSequence(string sequence)
         {
             var reversedNucleotide = new char[sequence.Length];
             var i = sequence.Length - 1;
+
             foreach (var nucleotide in sequence)
             {
                 reversedNucleotide[i] = nucleotide;
                 i--;
             }
+
             return new string(reversedNucleotide);
         }
 
@@ -378,7 +442,7 @@ namespace SAUtils.InputFileParsers.MitoMAP
                 Console.WriteLine($"Deletion of {newRefAllele.Length} bps. Original start start position: {position}; new position after left-alignment {newPosition}.");
             else
             {
-                throw new Exception($"{position}:{refAllele}:{altAllele} becomes {newPosition}:{newRefAllele}:{newAltAllele} after left alignment. Left-alignment should be only performed for deletions and insertions");
+                throw new InvalidDataException($"{position}:{refAllele}:{altAllele} becomes {newPosition}:{newRefAllele}:{newAltAllele} after left alignment. Left-alignment should be only performed for deletions and insertions");
             }
             return leftAlgnResults;
         }

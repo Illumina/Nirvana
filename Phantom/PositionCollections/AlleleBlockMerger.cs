@@ -39,7 +39,7 @@ namespace Phantom.PositionCollections
            return mergedBlocksToSampleHaplotype;
         }
 
-        private static Func<AlleleBlock, AlleleBlock> CheckAlleleBlocks(List<AlleleBlock> alleleBlocks, LinkedList<AlleleBlock> seedBlocks)
+        private static Func<AlleleBlock, AlleleBlock> CheckAlleleBlocks(IReadOnlyList<AlleleBlock> alleleBlocks, LinkedList<AlleleBlock> seedBlocks)
         {
             var seedBlock = seedBlocks.First;
             while (seedBlock != null) 

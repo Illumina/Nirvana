@@ -23,7 +23,7 @@ namespace Phantom.CodonInformation
         {
             unchecked
             {
-                var hashCode = Start;
+                int hashCode = Start;
                 hashCode = (hashCode * 1201) ^ End;
                 hashCode = (hashCode * 1201) ^ StartPhase;
                 return hashCode;

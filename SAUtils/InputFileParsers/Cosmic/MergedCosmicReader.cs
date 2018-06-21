@@ -10,8 +10,6 @@ namespace SAUtils.InputFileParsers.Cosmic
 {
     public sealed class MergedCosmicReader 
     {
-        #region members
-
         private readonly StreamReader _vcfFileReader;
         private readonly StreamReader _tsvFileReader;
         private string _geneName;
@@ -30,25 +28,11 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private int _studyIdIndex = -1;
 
-        private const string MutationIdTag       = "Mutation ID";
-        private const string PrimarySiteTag      = "Primary site";
-        private const string SiteSubtypeOneTag   = "Site subtype 1";
-        private const string SiteSubtypeTwoTag   = "Site subtype 2";
-        private const string SiteSubtypeThreeTag = "Site subtype 3";
-
-        private const string PrimaryHistologyTag      = "Primary histology";
-        private const string HistologySubtypeOneTag   = "Histology subtype 1";
-        private const string HistologySubtypeTwoTag   = "Histology subtype 2";
-        private const string HistologySubtypeThreeTag = "Histology subtype 3";
-
         private const string StudyIdTag = "ID_STUDY";
 
         private readonly IDictionary<string, IChromosome> _refChromDict;
         private readonly Dictionary<string, HashSet<CosmicItem.CosmicStudy>> _studies;
 
-        #endregion
-
-        // constructor
         public MergedCosmicReader(StreamReader vcfFileReader, StreamReader tsvFileReader, IDictionary<string, IChromosome> refChromDict)
         {
             _vcfFileReader = vcfFileReader;
@@ -56,18 +40,17 @@ namespace SAUtils.InputFileParsers.Cosmic
             _refChromDict  = refChromDict;
             _studies       = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
         }
-
         
         public IEnumerable<CosmicItem> GetCosmicItems()
         {
-            //taking up all studies in to the dictionary
+            // taking up all studies in to the dictionary
             using (_tsvFileReader)
             {
                 string line;
                 while ((line = _tsvFileReader.ReadLine()) != null)
                 {
                     if (IsHeaderLine(line))
-                        GetColumnIndexes(line);//the first line is supposed to be a the header line
+                        GetColumnIndexes(line); // the first line is supposed to be a the header line
                     else AddCosmicStudy(line);
                 }
             }
@@ -139,10 +122,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 sites.Add(value);
         }
 
-        private static bool IsHeaderLine(string line)
-        {
-            return line.Contains(StudyIdTag);
-        }
+        private static bool IsHeaderLine(string line) => line.Contains(StudyIdTag);
 
         private void GetColumnIndexes(string headerLine)
         {
@@ -158,38 +138,37 @@ namespace SAUtils.InputFileParsers.Cosmic
             {
                 switch (columns[i])
                 {
-                    case MutationIdTag:
+                    case "Mutation ID":
                         _mutationIdIndex = i;
                         break;
                     case StudyIdTag:
                         _studyIdIndex = i;
                         break;
-                    case PrimarySiteTag:
+                    case "Primary site":
                         _primarySiteIndex = i;
                         break;
-                    case SiteSubtypeOneTag:
+                    case "Site subtype 1":
                         _siteSubtypeOneIndex = i;
                         break;
-                    case SiteSubtypeTwoTag:
+                    case "Site subtype 2":
                         _siteSubtypeTwoIndex = i;
                         break;
-                    case SiteSubtypeThreeTag:
+                    case "Site subtype 3":
                         _siteSubtypeThreeIndex = i;
                         break;
 
-                    case PrimaryHistologyTag:
+                    case "Primary histology":
                         _primaryHistologyIndex = i;
                         break;
-                    case HistologySubtypeOneTag:
+                    case "Histology subtype 1":
                         _histologySubtypeOneIndex = i;
                         break;
-                    case HistologySubtypeTwoTag:
+                    case "Histology subtype 2":
                         _histologySubtypeTwoIndex = i;
                         break;
-                    case HistologySubtypeThreeTag:
+                    case "Histology subtype 3":
                         _histologySubtypeThreeIndex = i;
                         break;
-
                 }
             }
 
@@ -269,8 +248,6 @@ namespace SAUtils.InputFileParsers.Cosmic
                     _sampleCount = Convert.ToInt32(value);
                     break;
             }
-        }
-
-        
+        }       
     }
 }

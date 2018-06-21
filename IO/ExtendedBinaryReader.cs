@@ -18,7 +18,7 @@ namespace IO
 	    public ushort ReadOptUInt16()
 	    {
 	        ushort count = 0;
-	        int shift = 0;
+	        var shift = 0;
 
 	        while (shift != 21)
 	        {
@@ -37,8 +37,8 @@ namespace IO
         /// </summary>
         public int ReadOptInt32()
 		{
-			int count = 0;
-			int shift = 0;
+			var count = 0;
+			var shift = 0;
 
 			while (shift != 35)
 			{
@@ -58,7 +58,7 @@ namespace IO
 		public long ReadOptInt64()
 		{
 			long count = 0;
-			int shift = 0;
+			var shift = 0;
 
 			while (shift != 70)
 			{
@@ -74,7 +74,7 @@ namespace IO
 
 		public T[] ReadOptArray<T>(Func<T> readOptFunc)
 		{
-			var count = ReadOptInt32();
+			int count = ReadOptInt32();
 			if (count == 0) return null;
 
 			var values = new T[count];

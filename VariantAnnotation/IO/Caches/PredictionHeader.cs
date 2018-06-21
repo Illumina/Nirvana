@@ -49,7 +49,7 @@ namespace VariantAnnotation.IO.Caches
         {
             int numEntries = reader.ReadInt32();
             var lut = new Prediction.Entry[numEntries];
-            for (var i = 0; i < numEntries; i++) lut[i] = Prediction.Entry.Read(reader);
+            for (var i = 0; i < numEntries; i++) lut[i] = Prediction.Entry.ReadEntry(reader);
             return lut;
         }
     }

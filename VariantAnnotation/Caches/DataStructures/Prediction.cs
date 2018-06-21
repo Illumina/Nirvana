@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 
@@ -36,9 +35,6 @@ namespace VariantAnnotation.Caches.DataStructures
             return entry == NullEntry ? null : _lut[entry];
         }
 
-        /// <summary>
-        /// returns the index given the new AA and the AA position
-        /// </summary>
         private static int GetIndex(char newAminoAcid, int aaPosition)
         {
             int asciiIndex = char.ToUpper(newAminoAcid) - 'A';
@@ -84,7 +80,7 @@ namespace VariantAnnotation.Caches.DataStructures
                 EnumIndex = enumIndex;
             }
 
-            public static Entry Read(ExtendedBinaryReader reader)
+            public static Entry ReadEntry(ExtendedBinaryReader reader)
             {
                 double score   = reader.ReadDouble();
                 byte enumIndex = reader.ReadByte();

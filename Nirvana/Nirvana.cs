@@ -106,7 +106,6 @@ namespace Nirvana
             }
 
             metrics.ShowAnnotationTime();
-
             return ExitCodes.Success;
         }
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using CommandLine.NDesk.Options;
 using Xunit;
 
@@ -29,7 +30,7 @@ namespace UnitTests.CommandLine.NDesk.Options
         [Fact]
         public void Should_ThrowException_When_OptionNameEmpty()
         {
-            Assert.Throws<ArgumentException>(delegate
+            Assert.Throws<InvalidDataException>(delegate
             {
                 // ReSharper disable once UnusedVariable
                 var option = new DefaultOption("a|b||c=", null);
@@ -39,7 +40,7 @@ namespace UnitTests.CommandLine.NDesk.Options
         [Fact]
         public void Should_ThrowException_When_OptionTypesConflict()
         {
-            Assert.Throws<ArgumentException>(delegate
+            Assert.Throws<InvalidDataException>(delegate
             {
                 // ReSharper disable once UnusedVariable
                 var option = new DefaultOption("a=|b:", null);
@@ -146,19 +147,19 @@ namespace UnitTests.CommandLine.NDesk.Options
         [Fact]
         public void Should_ThrowException_When_CannotProvideSeparatorsWhenTakingOneValue()
         {
-            Assert.Throws<ArgumentException>(delegate
+            Assert.Throws<InvalidDataException>(delegate
             {
                 // ReSharper disable once UnusedVariable
                 var option = new DefaultOption("a==", null);
             });
 
-            Assert.Throws<ArgumentException>(delegate
+            Assert.Throws<InvalidDataException>(delegate
             {
                 // ReSharper disable once UnusedVariable
                 var option = new DefaultOption("a={}", null);
             });
 
-            Assert.Throws<ArgumentException>(delegate
+            Assert.Throws<InvalidDataException>(delegate
             {
                 // ReSharper disable once UnusedVariable
                 var option = new DefaultOption("a=+-*/", null);
