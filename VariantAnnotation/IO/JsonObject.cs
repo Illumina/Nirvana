@@ -98,34 +98,28 @@ namespace VariantAnnotation.IO
         public void AddStringValues(string description, IEnumerable<string> values, bool useQuote = true)
         {
             if (values == null) return;
-            var index = 0;
 
-            foreach (var value in values)
+            var validEntries = new List<string>();
+            foreach (string value in values) if (value != ".") validEntries.Add(value);
+
+            if (validEntries.Count == 0) return;
+
+            if (_needsComma) _sb.Append(Comma);
+            AddKey(description);
+            _sb.Append(OpenBracket);
+
+            var needsComma = false;
+
+            foreach (string value in validEntries)
             {
-                if (value == ".") continue;
-
-                if (index == 0)
-                {
-                    if (_needsComma) _sb.Append(Comma);
-                    AddKey(description);
-                    _sb.Append(OpenBracket);
-
-                    if (useQuote) _sb.Append(DoubleQuote);
-                    _sb.Append(value);
-                    if (useQuote) _sb.Append(DoubleQuote);
-                }
-                else
-                {
-                    _sb.Append(Comma);
-                    if (useQuote) _sb.Append(DoubleQuote);
-                    _sb.Append(value);
-                    if (useQuote) _sb.Append(DoubleQuote);
-                }
-                index++;
+                if (needsComma) _sb.Append(Comma);
+                if (useQuote) _sb.Append(DoubleQuote);
+                _sb.Append(value);
+                if (useQuote) _sb.Append(DoubleQuote);
+                needsComma = true;
             }
 
-            if (index > 0)
-                _sb.Append(CloseBracket);
+            _sb.Append(CloseBracket);
             _needsComma = true;
         }
 

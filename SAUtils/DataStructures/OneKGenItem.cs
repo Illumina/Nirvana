@@ -8,8 +8,6 @@ namespace SAUtils.DataStructures
 {
     public sealed class OneKGenItem : SupplementaryDataItem
     {
-        #region members
-
         private string Id { get; }
         private string AncestralAllele { get; }
         
@@ -38,8 +36,6 @@ namespace SAUtils.DataStructures
         private int SvEnd { get; }
         private int ObservedGains { get; }
         private int ObservedLosses { get; }
-
-        #endregion
 
         public OneKGenItem(IChromosome chromosome,
             int position,
@@ -149,19 +145,20 @@ namespace SAUtils.DataStructures
                 "1000 Genomes Project", intValues, doubleValues, freqValues, stringValues, boolValues);
 
             if (Id != null) suppInterval.AddStringValue("id", Id);
-            if (AfrFreq != null) suppInterval.AddFrequencyValue("variantFreqAfr", Convert.ToDouble(AfrFreq));
-            if (AllFreq != null) suppInterval.AddFrequencyValue("variantFreqAll", Convert.ToDouble(AllFreq));
-            if (AmrFreq != null) suppInterval.AddFrequencyValue("variantFreqAmr", Convert.ToDouble(AmrFreq));
-            if (EasFreq != null) suppInterval.AddFrequencyValue("variantFreqEas", Convert.ToDouble(EasFreq));
-            if (EurFreq != null) suppInterval.AddFrequencyValue("variantFreqEur", Convert.ToDouble(EurFreq));
-            if (SasFreq != null) suppInterval.AddFrequencyValue("variantFreqSas", Convert.ToDouble(SasFreq));
 
-            if (AllAlleleNumber != null && AllAlleleNumber.Value > 0) suppInterval.AddIntValue("sampleSize", AllAlleleNumber.Value);
-            if (AfrAlleleNumber != null && AfrAlleleNumber.Value > 0) suppInterval.AddIntValue("sampleSizeAfr", AfrAlleleNumber.Value);
-            if (AmrAlleleNumber != null && AmrAlleleNumber.Value > 0) suppInterval.AddIntValue("sampleSizeAmr", AmrAlleleNumber.Value);
-            if (EasAlleleNumber != null && EasAlleleNumber.Value > 0) suppInterval.AddIntValue("sampleSizeEas", EasAlleleNumber.Value);
-            if (EurAlleleNumber != null && EurAlleleNumber.Value > 0) suppInterval.AddIntValue("sampleSizeEur", EurAlleleNumber.Value);
-            if (SasAlleleNumber != null && SasAlleleNumber.Value > 0) suppInterval.AddIntValue("sampleSizeSas", SasAlleleNumber.Value);
+            AddAlleleFrequency(AfrFreq, "variantFreqAfr", suppInterval);
+            AddAlleleFrequency(AllFreq, "variantFreqAll", suppInterval);
+            AddAlleleFrequency(AmrFreq, "variantFreqAmr", suppInterval);
+            AddAlleleFrequency(EasFreq, "variantFreqEas", suppInterval);
+            AddAlleleFrequency(EurFreq, "variantFreqEur", suppInterval);
+            AddAlleleFrequency(SasFreq, "variantFreqSas", suppInterval);
+
+            AddAlleleNumber(AllAlleleNumber, "sampleSize", suppInterval);
+            AddAlleleNumber(AfrAlleleNumber, "sampleSizeAfr", suppInterval);
+            AddAlleleNumber(AmrAlleleNumber, "sampleSizeAmr", suppInterval);
+            AddAlleleNumber(EasAlleleNumber, "sampleSizeEas", suppInterval);
+            AddAlleleNumber(EurAlleleNumber, "sampleSizeEur", suppInterval);
+            AddAlleleNumber(SasAlleleNumber, "sampleSizeSas", suppInterval);
 
             if (ObservedGains != 0) suppInterval.AddIntValue("observedGains", ObservedGains);
             if (ObservedLosses != 0) suppInterval.AddIntValue("observedLosses", ObservedLosses);
@@ -169,8 +166,17 @@ namespace SAUtils.DataStructures
             return suppInterval;
         }
 
+        private void AddAlleleNumber(int? alleleNumber, string description, SupplementaryIntervalItem intervalItem)
+        {
+            if (alleleNumber == null || alleleNumber.Value == 0) return;
+            intervalItem.AddIntValue(description, alleleNumber.Value);
+        }
 
-
+        private void AddAlleleFrequency(string freqString, string description, SupplementaryIntervalItem intervalItem)
+        {
+            if (freqString == null) return;
+            intervalItem.AddFrequencyValue(description, Convert.ToDouble(freqString));
+        }
 
         public override bool Equals(object obj)
         {

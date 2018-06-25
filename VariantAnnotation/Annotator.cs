@@ -111,9 +111,16 @@ namespace VariantAnnotation
 
             foreach (var variant in annotatedPosition.AnnotatedVariants)
             {
+                AddGenesFromOverlappingGenes(variant.OverlappingGenes);
                 AddGenesFromTranscripts(variant.EnsemblTranscripts);
                 AddGenesFromTranscripts(variant.RefSeqTranscripts);
             }
+        }
+
+        private void AddGenesFromOverlappingGenes(ISet<string> genes)
+        {
+            if (genes == null) return;
+            foreach (string gene in genes) _affectedGenes.Add(gene);
         }
 
         private void AddGenesFromTranscripts(IList<IAnnotatedTranscript> transcripts)
