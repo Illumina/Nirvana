@@ -51,26 +51,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                     continue;
                 }
 
-                if (variant.Overlaps(region.Start, region.Start + 1))
-                {
-                    IsStartSpliceSite = true;
-                }
-
-                if (variant.Overlaps(region.End - 1, region.End))
-                {
-                    IsEndSpliceSite = true;
-                }
-
-                // we need to special case insertions between the donor and acceptor sites
-
-                //make sure the size of intron is larger than 4
-                if (region.Start <= region.End - 4 && (variant.Overlaps(region.Start + 2, region.End - 2) ||
-                                                       isInsertion &&
-                                                       (variant.Start == region.Start + 2 ||
-                                                        variant.End == region.End - 2)))
-                {
-                    IsWithinIntron = true;
-                }
+                CheckSpliceSiteOverlap(variant, region);
+                CheckIntronOverlap(variant, isInsertion, region);
 
                 // the definition of splice_region (SO:0001630) is "within 1-3 bases of the
                 // exon or 3-8 bases of the intron." We also need to special case insertions
@@ -85,6 +67,32 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                                             variant.End == region.End ||
                                             variant.Start == region.Start + 2 ||
                                             variant.End == region.End - 2);
+            }
+        }
+
+        private void CheckSpliceSiteOverlap(IInterval variant, ITranscriptRegion region)
+        {
+            if (variant.Overlaps(region.Start, region.Start + 1))
+            {
+                IsStartSpliceSite = true;
+            }
+
+            if (variant.Overlaps(region.End - 1, region.End))
+            {
+                IsEndSpliceSite = true;
+            }
+        }
+
+        private void CheckIntronOverlap(IInterval variant, bool isInsertion, ITranscriptRegion region)
+        {
+            // we need to special case insertions between the donor and acceptor sites
+            // make sure the size of intron is larger than 4
+            if (region.Start <= region.End - 4 && (variant.Overlaps(region.Start + 2, region.End - 2) ||
+                                                   isInsertion &&
+                                                   (variant.Start == region.Start + 2 ||
+                                                    variant.End == region.End - 2)))
+            {
+                IsWithinIntron = true;
             }
         }
 
