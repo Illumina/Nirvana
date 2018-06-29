@@ -661,50 +661,61 @@ namespace CommandLine.NDesk.Options
 
         private static string GetDescription(string description)
         {
-            if (description == null)
-                return string.Empty;
+            if (description == null) return string.Empty;
+
             StringBuilder sb = StringBuilderCache.Acquire(description.Length);
-            int start = -1;
-            for (var i = 0; i < description.Length; ++i)
+            int start        = -1;
+
+            for (var position = 0; position < description.Length; ++position)
             {
-                switch (description[i])
-                {
-                    case '{':
-                        if (i == start)
-                        {
-                            sb.Append('{');
-                            start = -1;
-                        }
-                        else if (start < 0)
-                            start = i + 1;
-                        break;
-                    case '}':
-                        if (start < 0)
-                        {
-                            if (i + 1 == description.Length || description[i + 1] != '}')
-                                throw new InvalidOperationException("Invalid option description: " + description);
-                            ++i;
-                            sb.Append("}");
-                        }
-                        else
-                        {
-                            sb.Append(description.Substring(start, i - start));
-                            start = -1;
-                        }
-                        break;
-                    case ':':
-                        if (start < 0)
-                            goto default;
-                        start = i + 1;
-                        break;
-                    default:
-                        if (start < 0)
-                            sb.Append(description[i]);
-                        break;
-                }
+                position = ParseDescription(description, position, sb, ref start);
             }
 
             return StringBuilderCache.GetStringAndRelease(sb);
+        }
+
+        private static int ParseDescription(string description, int position, StringBuilder sb, ref int start)
+        {
+            switch (description[position])
+            {
+                case '{':
+                    if (position == start)
+                    {
+                        sb.Append('{');
+                        start = -1;
+                        break;
+                    }
+                    if (start < 0) start = position + 1;
+                    break;
+
+                case '}':
+                    if (start < 0)
+                    {
+                        if (position + 1 == description.Length || description[position + 1] != '}')
+                            throw new InvalidOperationException("Invalid option description: " + description);
+                        ++position;
+                        sb.Append("}");
+                        break;
+                    }
+                    sb.Append(description.Substring(start, position - start));
+                    start = -1;
+                    break;
+
+                case ':':
+                    if (start < 0)
+                    {
+                        sb.Append(description[position]);
+                        break;
+                    }
+                    start = position + 1;
+                    break;
+
+                default:
+                    if (start < 0) sb.Append(description[position]);
+                    break;
+            }
+
+            return position;
         }
 
         private static IEnumerable<string> GetLines(string description)
