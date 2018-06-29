@@ -30,7 +30,7 @@ namespace SAUtils.InputFileParsers.DbSnp
                 while ((line = reader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    if (line.IsWhiteSpace()) continue;
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
                     var dbSnpItems = ExtractItem(line);

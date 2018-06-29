@@ -9,7 +9,6 @@ namespace SAUtils.InputFileParsers.CustomInterval
 {
 	public sealed class CustomIntervalParser
 	{
-		#region member
 		private readonly FileInfo _customFileInfo;
 		private readonly List<string> _stringFields;
 		private readonly Dictionary<string, string> _stringValues;
@@ -18,19 +17,17 @@ namespace SAUtils.InputFileParsers.CustomInterval
 		public string KeyName;
 		private readonly Dictionary<int, string> _fieldIndex;
         private readonly IDictionary<string, IChromosome> _refChromDict;
-        #endregion
 
-        // constructor
         public CustomIntervalParser(FileInfo customFileInfo, IDictionary<string, IChromosome> refChromDict)
 		{
-            _customFileInfo       = customFileInfo;
-            _stringFields         = new List<string>();
-            _stringValues         = new Dictionary<string, string>();
-            _nonstringFields      = new List<string>();
-            _nonstringValues      = new Dictionary<string, string>();
-            _fieldIndex           = new Dictionary<int, string>();
-            _refChromDict         = refChromDict;
-			ReadHeader();
+            _customFileInfo  = customFileInfo;
+            _stringFields    = new List<string>();
+            _stringValues    = new Dictionary<string, string>();
+            _nonstringFields = new List<string>();
+            _nonstringValues = new Dictionary<string, string>();
+            _fieldIndex      = new Dictionary<int, string>();
+            _refChromDict    = refChromDict;
+            ReadHeader();
         }
 
         private void Clear()
@@ -48,7 +45,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 				while ((line = reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.IsWhiteSpace()) continue;
 					if (line.OptimizedStartsWith('#'))
 					{
 						ParseHeaderLine(line);
@@ -71,7 +68,7 @@ namespace SAUtils.InputFileParsers.CustomInterval
 				while ((line = reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.IsWhiteSpace()) continue;
 					if (line.OptimizedStartsWith('#')) continue;
 
 					var customInterval = ExtractCustomInterval(line);
@@ -87,10 +84,10 @@ namespace SAUtils.InputFileParsers.CustomInterval
 			if (bedLine == null) return null;
 			var bedFields = bedLine.OptimizedSplit('\t');
 
-			if (bedFields.Length < BedCommon.MinNoOfFields) 
-				throw new Exception("Bed file line must contain at least"+ BedCommon.MinNoOfFields+" fields. Current line:\n "+ bedLine);
+			if (bedFields.Length < BedCommon.MinNoOfFields)
+                throw new InvalidDataException($"Bed file line must contain at least {BedCommon.MinNoOfFields} fields. Current line:\n {bedLine}");
 
-			var chromosome = bedFields[BedCommon.ChromIndex];
+            var chromosome = bedFields[BedCommon.ChromIndex];
 			if (!_refChromDict.ContainsKey(chromosome)) return null;
 		    var chr = _refChromDict[chromosome];
 

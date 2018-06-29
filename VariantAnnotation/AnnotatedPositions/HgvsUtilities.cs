@@ -147,7 +147,8 @@ namespace VariantAnnotation.AnnotatedPositions
             if (po.Position == -1) return null;
 
             var cdnaCoord = GetCdnaCoord(po.Position, po.Offset, codingRegionStart, codingRegionEnd);
-            var value     = cdnaCoord.HasNoPosition ? "*" + po.Offset : cdnaCoord.CdnaCoord + (po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0"));
+            string offset = po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0");
+            string value  = cdnaCoord.HasNoPosition ? "*" + po.Offset : cdnaCoord.CdnaCoord + offset;
 
             return new PositionOffset(po.Position, po.Offset, value, cdnaCoord.HasStopCodonNotation);
         }

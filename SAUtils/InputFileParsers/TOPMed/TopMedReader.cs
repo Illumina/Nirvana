@@ -36,7 +36,7 @@ namespace SAUtils.InputFileParsers.TOPMed
                 string line;
                 while ((line = _reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
+                    if (line.IsWhiteSpace() || line.OptimizedStartsWith('#')) continue;
 
                     var topMedItem = ExtractItems(line);
                     if (topMedItem == null) continue;

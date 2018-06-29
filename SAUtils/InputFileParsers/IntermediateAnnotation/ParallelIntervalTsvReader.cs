@@ -63,7 +63,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             while ((line = reader.ReadLine()) != null)
             {
                 // Skip empty lines.
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (line.IsWhiteSpace()) continue;
                 if (!line.OptimizedStartsWith('#')) break;
 
                 ParseHeaderLine(line);
@@ -94,7 +94,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
                 //getting to the chromosome
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
+                    if (line.IsWhiteSpace() || line.OptimizedStartsWith('#')) continue;
                     // finding desired chromosome. We need this because the GetLocation for GZipStream may return a position a few lines before the start of the chromosome
                     if (line.StartsWith(refName + "\t")) break;
                 }

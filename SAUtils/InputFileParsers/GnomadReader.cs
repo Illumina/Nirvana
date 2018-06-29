@@ -85,7 +85,6 @@ namespace SAUtils.InputFileParsers
 		    _hcSas = null;
 
             _totalDepth = null;
-		    //_hasFailedFilters = false;
 		}
 
 		/// <summary>
@@ -101,7 +100,7 @@ namespace SAUtils.InputFileParsers
 				while ((line = _reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.IsWhiteSpace()) continue;
 					// Skip comments.
 					if (line.OptimizedStartsWith('#')) continue;
 					var gnomadItemsList = ExtractItems(line);

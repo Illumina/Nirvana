@@ -29,7 +29,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 				while ((line = reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.IsWhiteSpace()) continue;
 					// Skip comments.
 					if (line.OptimizedStartsWith('#')) continue;
 					var oneKSvGenItem = ExtractOneKGenSvItem(line, _refNameDict);

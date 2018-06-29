@@ -28,7 +28,7 @@ namespace Variants
             int shiftStart, shiftEnd;
             var hasShifted = false;
 
-            // TODO: probably a VEP bug, just use it for consistency
+            // probably a VEP bug, just use it for consistency
             var numBases = rotatingBases.Length;
 
             for (shiftStart = 0, shiftEnd = numBases; shiftEnd < combinedSequence.Length; shiftStart++, shiftEnd++)

@@ -95,5 +95,11 @@ namespace OptimizedCore
         public static bool OptimizedStartsWith(this string s, char ch) => s.Length > 0 && s[0] == ch;
 
         public static bool OptimizedEndsWith(this string s, char ch) => s.Length > 0 && s[s.Length - 1] == ch;
+
+        public static bool IsWhiteSpace(this string s)
+        {
+            foreach (char c in s) if (!char.IsWhiteSpace(c)) return false;
+            return true;
+        }
     }
 }

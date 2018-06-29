@@ -43,7 +43,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             while ((line = reader.ReadLine()) != null)
             {
                 // Skip empty lines.
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (line.IsWhiteSpace()) continue;
                 if (reader.Peek() != '#') break;
 
                 ParseHeaderLine(line);
@@ -68,7 +68,7 @@ namespace SAUtils.InputFileParsers.IntermediateAnnotation
             //getting to the chromosome
             while ((line = _reader.ReadLine()) != null)
             {
-                if (string.IsNullOrWhiteSpace(line) || line.OptimizedStartsWith('#')) continue;
+                if (line.IsWhiteSpace() || line.OptimizedStartsWith('#')) continue;
 
                 var annotationItem = ExtractItem(line);
                 if (annotationItem == null) continue;

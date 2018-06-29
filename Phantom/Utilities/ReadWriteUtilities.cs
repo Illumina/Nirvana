@@ -10,19 +10,22 @@ namespace Phantom.Utilities
 {
     public static class ReadWriteUtilities
     {
+        public static readonly IntervalArray<IGene> EmptyIntervalArray = new IntervalArray<IGene>(new Interval<IGene>[0]);
+
         // ReSharper disable once UnusedTupleComponentInReturnValue
         public static (IntervalForest<IGene>, Dictionary<IGene, List<ITranscript>>) GetIntervalAndTranscriptsForeachGene(IntervalArray<ITranscript>[] transcriptIntervalArrays)
         {
-            int numChromesomes = transcriptIntervalArrays.Length;
+            int numChromesomes     = transcriptIntervalArrays.Length;
             var geneIntervalArrays = new IntervalArray<IGene>[numChromesomes];
-            var geneComparer = new GeneComparer();
-            var geneToTranscripts = new Dictionary<IGene, List<ITranscript>>(geneComparer);
-            for (int chrIndex = 0; chrIndex < numChromesomes; chrIndex++)
+            var geneComparer       = new GeneComparer();
+            var geneToTranscripts  = new Dictionary<IGene, List<ITranscript>>(geneComparer);
+
+            for (var chrIndex = 0; chrIndex < numChromesomes; chrIndex++)
             {
                 if (transcriptIntervalArrays[chrIndex] == null)
                 {
-                    geneIntervalArrays[chrIndex] = new IntervalArray<IGene>(new Interval<IGene>[0]);
-                    continue; //TODO: assign an empty IntervalArray to this chr
+                    geneIntervalArrays[chrIndex] = EmptyIntervalArray;
+                    continue; // assign an empty IntervalArray to this chr
                 }
                 var geneList = new List<IGene>(); // keeps the order of genes, as the intervals are already sorted at trasncripts level
                 foreach (var transcriptInterval in transcriptIntervalArrays[chrIndex].Array)

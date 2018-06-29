@@ -63,7 +63,7 @@ namespace SAUtils.InputFileParsers.DGV
                     if (line == null) break;
 
                     // skip header and empty lines
-                    if (string.IsNullOrWhiteSpace(line) || IsDgvHeader(line)) continue;
+                    if (line.IsWhiteSpace() || IsDgvHeader(line)) continue;
                     var dgvItem = ExtractDgvItem(line, _refChromDict);
                     if (dgvItem == null) continue;
                     yield return dgvItem;

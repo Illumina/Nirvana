@@ -54,7 +54,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
                 while ((line = reader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    if (line.IsWhiteSpace()) continue;
                     if (line.OptimizedStartsWith('#'))
                     {
                         ParseHeaderLine(line);
@@ -81,7 +81,7 @@ namespace SAUtils.InputFileParsers.CustomAnnotation
 				while ((line = reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.IsWhiteSpace()) continue;
 					if (line.OptimizedStartsWith('#'))
 					{
 						continue;

@@ -87,7 +87,7 @@ namespace Phantom.CodonInformation
 
         private static int GetFunctionBlockRange(IInterval interval, ICodingBlock overlappingCodingBlock)
         {
-            //todo: only check codon boundary in the same exon for now
+            // only check codon boundary in the same exon for now
             return GetCodonRange(interval.Start, overlappingCodingBlock);
         }
 

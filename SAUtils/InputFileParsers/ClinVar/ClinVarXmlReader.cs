@@ -257,9 +257,9 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private bool IsInvalidVariant(ClinvarVariant variant)
         {
-            return (variant.Chromosome == null
-                || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
-                && string.IsNullOrEmpty(variant.AltAllele));
+            return variant.Chromosome == null
+                   || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
+                   && string.IsNullOrEmpty(variant.AltAllele);
 
         }
 

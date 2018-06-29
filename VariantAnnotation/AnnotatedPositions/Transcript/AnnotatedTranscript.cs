@@ -99,8 +99,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             ? "3prime_overlapping_ncRNA"
             : bioType.ToString();
 
-        private static string GetAlleleString(string a, string b) =>
-            a == b ? a : $"{(string.IsNullOrEmpty(a) ? "-" : a)}/{(string.IsNullOrEmpty(b) ? "-" : b)}";
+        private static string GetAlleleString(string a, string b)
+        {
+            if (a == b) return a;
+            a = string.IsNullOrEmpty(a) ? "-" : a;
+            b = string.IsNullOrEmpty(b) ? "-" : b;
+            return $"{a}/{b}";
+        }
 
         private static string GetRangeString(int start, int end)
         {
