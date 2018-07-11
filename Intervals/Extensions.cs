@@ -15,10 +15,10 @@
         public static bool Contains(this IInterval interval1, IInterval interval2) => Utilities.Contains(
             interval1.Start, interval1.End, interval2.Start, interval2.End);
 
-        public static Interval Intersect(this IInterval interval1, IInterval interval2)
+        public static Interval Intersects(this IInterval interval1, IInterval interval2)
         {
-            var (newStart, newEnd) = Utilities.Intersect(interval1.Start, interval1.End, interval2.Start, interval2.End);
-            return new Interval(newStart, newEnd);
+            (int start, int end) = Utilities.Intersects(interval1.Start, interval1.End, interval2.Start, interval2.End);
+            return new Interval(start, end);
         }
     }
 }

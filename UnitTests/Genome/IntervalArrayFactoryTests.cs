@@ -6,7 +6,7 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Algorithms
+namespace UnitTests.Genome
 {
     public sealed class IntervalArrayFactoryTests
     {
@@ -15,16 +15,13 @@ namespace UnitTests.VariantAnnotation.Algorithms
         private readonly IChromosome _chr11 = new Chromosome("chr11", "11", 10);
         private readonly IChromosome _chr17 = new Chromosome("chr17", "17", 16);
 
-        public IntervalArrayFactoryTests()
-        {
-            _regulatoryRegions = GetRegulatoryRegions();
-        }
+        public IntervalArrayFactoryTests() => _regulatoryRegions = GetRegulatoryRegions();
 
         [Fact]
         public void CreateIntervalForest_WithIntervals()
         {
             var intervalForest = IntervalArrayFactory.CreateIntervalForest(_regulatoryRegions, 17);
-            var observedResult = intervalForest.OverlapsAny(_chr11.Index, 160, 170);
+            bool observedResult = intervalForest.OverlapsAny(_chr11.Index, 160, 170);
             Assert.True(observedResult);
         }
 

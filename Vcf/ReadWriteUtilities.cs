@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using Compression.FileHandling;
 using Compression.Utilities;
 using Genome;
+using IO;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Providers;
@@ -14,9 +16,11 @@ namespace Vcf
 	{
 		public static StreamWriter GetOutputWriter(string outputPath)
 		{
-		    return outputPath == "-"
-		        ? new StreamWriter(Console.OpenStandardOutput())
-		        : new BgzipTextWriter(outputPath + ".json.gz");
+		    if (outputPath == "-") return new StreamWriter(Console.OpenStandardOutput());
+
+		    var stream = new BlockGZipStream(FileUtilities.GetCreateStream(outputPath + ".json.gz"),
+		        CompressionMode.Compress, true);
+            return new BgzipTextWriter(stream);
 		}
 
 	    public static IVcfReader GetVcfReader(string vcfPath, IDictionary<string, IChromosome> chromosomeDictionary,

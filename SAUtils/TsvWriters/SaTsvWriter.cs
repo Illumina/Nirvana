@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 using Compression.FileHandling;
+using IO;
 using OptimizedCore;
 
 namespace SAUtils.TsvWriters
@@ -64,7 +66,7 @@ namespace SAUtils.TsvWriters
         {
             var fileName = jsonKey + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".tsv.gz";
 
-            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputDir, fileName));
+            _bgzipTextWriter = new BgzipTextWriter(new BlockGZipStream(FileUtilities.GetCreateStream(Path.Combine(outputDir, fileName)), CompressionMode.Compress));
 
             _bgzipTextWriter.Write(GetHeader(dataSourceVersion, schemaVersion, assembly, jsonKey, vcfKeys, isAlleleSpecific, isArray));
 

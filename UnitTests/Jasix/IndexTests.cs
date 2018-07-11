@@ -148,7 +148,7 @@ namespace UnitTests.Jasix
             var stream = ResourceUtilities.GetReadStream(Resources.TopPath("TinyAnnotated.json"));
 
             var lineCount = 0;
-            using (var jasixReader = new BgzipTextReader(stream))
+            using (var jasixReader = new StreamReader(stream))
             {
                 while (jasixReader.ReadLine() != null)
                 {

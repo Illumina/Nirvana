@@ -13,15 +13,12 @@
 		public readonly T Value;
 		public int Max;
 
-		/// <summary>
-		/// constructor
-		/// </summary>
 		public Interval(int begin, int end, T value)
 		{
 			Begin = begin;
-			End = end;
+			End   = end;
 			Value = value;
-			Max = -1;
+			Max   = -1;
 		}
 
 		/// <summary>
@@ -39,14 +36,6 @@
 		public bool Overlaps(int intervalBegin, int intervalEnd)
 		{
 			return End >= intervalBegin && Begin <= intervalEnd;
-		}
-
-		/// <summary>
-		/// returns a string representation of this interval
-		/// </summary>
-		public override string ToString()
-		{
-			return $"{Begin} - {End} ({Max}). Value: {Value}";
 		}
 
 		public bool Contains(int position) => position >= Begin && position <= End;

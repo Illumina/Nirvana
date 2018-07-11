@@ -13,6 +13,7 @@ namespace CommandLine.Builders
     public interface ITopLevelAppValidator
     {
         ITopLevelAppBanner ShowBanner(string authors);
+        ITopLevelAppBuilderData Data { get; }
     }
 
     public interface ITopLevelAppBanner

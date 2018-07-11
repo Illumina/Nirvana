@@ -5,7 +5,7 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Algorithms
+namespace UnitTests.Variants
 {
     public sealed class VariantRotatorTests
     {
@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
                 new string('A', VariantRotator.MaxDownstreamLength), 965891);
 
         [Fact]
-        public void Right_Deletion()
+        public void Right_Deletion_ForwardStrand()
         {
             // chr1	966391	.	ATG	A	2694.00	PASS	.
             var variant = GetDeletion();
@@ -27,10 +27,27 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotatedVariant = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            var rotatedVariant = VariantRotator.Right(variant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
 
-            Assert.False(ReferenceEquals(variant.Object, rotatedVariant));
+            Assert.False(ReferenceEquals(variant, rotatedVariant));
             Assert.Equal(966400, rotatedVariant.Start);
+            Assert.Equal("TG", rotatedVariant.RefAllele);
+        }
+
+        [Fact]
+        public void Right_Deletion_ReverseStrand()
+        {
+            var variant = new SimpleVariant(Chromosome, 966399, 966401, "TG", "", VariantType.deletion);
+
+            var transcript = new Mock<ITranscript>();
+            transcript.SetupGet(x => x.Start).Returns(966300);
+            transcript.SetupGet(x => x.End).Returns(966405);
+            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
+
+            var rotatedVariant = VariantRotator.Right(variant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+
+            Assert.False(ReferenceEquals(variant, rotatedVariant));
+            Assert.Equal(966393, rotatedVariant.Start);
             Assert.Equal("TG", rotatedVariant.RefAllele);
         }
 
@@ -44,9 +61,9 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotated = VariantRotator.Right(variant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            var rotated = VariantRotator.Right(variant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
 
-            Assert.False(ReferenceEquals(variant.Object, rotated));
+            Assert.False(ReferenceEquals(variant, rotated));
             Assert.Equal(966403, rotated.Start);
             Assert.Equal("TG", rotated.AltAllele);
         }
@@ -55,17 +72,16 @@ namespace UnitTests.VariantAnnotation.Algorithms
         public void Right_Identity_WhenRefSequenceNull()
         {
             var originalVariant = GetDeletion();
-            var rotatedVariant = VariantRotator.Right(originalVariant.Object, null, null, false);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotatedVariant));
+            var rotatedVariant  = VariantRotator.Right(originalVariant, null, null, false);
+            Assert.True(ReferenceEquals(originalVariant, rotatedVariant));
         }
 
         [Fact]
         public void Right_Identity_WhenNotInsertionOrDeletion()
         {
-            var originalVariant = GetDeletion();
-            originalVariant.SetupGet(x => x.Type).Returns(VariantType.SNV);
-            var rotated = VariantRotator.Right(originalVariant.Object, null, _refSequence, false);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotated));
+            var originalVariant = new SimpleVariant(Chromosome, 966392, 966392, "T", "A", VariantType.SNV);
+            var rotated = VariantRotator.Right(originalVariant, null, _refSequence, false);
+            Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
         [Fact]
@@ -77,8 +93,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.Start).Returns(966397);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotated));
+            var rotated = VariantRotator.Right(originalVariant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
         [Fact]
@@ -90,8 +106,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966390);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
 
-            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotated));
+            var rotated = VariantRotator.Right(originalVariant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
         [Fact]
@@ -103,8 +119,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966392);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotated));
+            var rotated = VariantRotator.Right(originalVariant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
         [Fact]
@@ -121,32 +137,14 @@ namespace UnitTests.VariantAnnotation.Algorithms
             transcript.SetupGet(x => x.End).Returns(966405);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
 
-            var rotated = VariantRotator.Right(originalVariant.Object, transcript.Object, refSequence, transcript.Object.Gene.OnReverseStrand);
-            Assert.True(ReferenceEquals(originalVariant.Object, rotated));
+            var rotated = VariantRotator.Right(originalVariant, transcript.Object, refSequence, transcript.Object.Gene.OnReverseStrand);
+            Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
-        private static Mock<ISimpleVariant> GetDeletion()
-        {
-            var variant = new Mock<ISimpleVariant>();
-            variant.SetupGet(x => x.Chromosome).Returns(Chromosome);
-            variant.SetupGet(x => x.Start).Returns(966392);
-            variant.SetupGet(x => x.End).Returns(966394);
-            variant.SetupGet(x => x.RefAllele).Returns("TG");
-            variant.SetupGet(x => x.AltAllele).Returns("");
-            variant.SetupGet(x => x.Type).Returns(VariantType.deletion);
-            return variant;
-        }
+        private static ISimpleVariant GetDeletion() =>
+            new SimpleVariant(Chromosome, 966392, 966394, "TG", "", VariantType.deletion);
 
-        private static Mock<ISimpleVariant> GetInsertion()
-        {
-            var variant = new Mock<ISimpleVariant>();
-            variant.SetupGet(x => x.Chromosome).Returns(Chromosome);
-            variant.SetupGet(x => x.Type).Returns(VariantType.insertion);
-            variant.SetupGet(x => x.Start).Returns(966397);
-            variant.SetupGet(x => x.End).Returns(966396);
-            variant.SetupGet(x => x.RefAllele).Returns("");
-            variant.SetupGet(x => x.AltAllele).Returns("TG");
-            return variant;
-        }
+        private static ISimpleVariant GetInsertion() =>
+            new SimpleVariant(Chromosome, 966397, 966396, "", "TG", VariantType.insertion);
     }
 }

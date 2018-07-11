@@ -1,35 +1,28 @@
 ﻿using System;
 using System.IO;
-using System.IO.Compression;
 using System.Text;
-using IO;
 
 namespace Compression.FileHandling
 {
     public sealed class BgzipTextWriter : StreamWriter, IDisposable
     {
-        private readonly BlockGZipStream _bgzipStream;
+        private readonly BlockGZipStream _stream;
         private readonly byte[] _buffer;
         private int _bufferIndex;
         private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
 
-        public long Position => _bgzipStream.Position + _bufferIndex;
+        public long Position => _stream.Position + _bufferIndex;
 
-        public BgzipTextWriter(string path) : this(new BlockGZipStream(FileUtilities.GetCreateStream(path),
-            CompressionMode.Compress))
-        {}
-
-        private BgzipTextWriter(BlockGZipStream bgzipStream) : base(new MemoryStream())
-        // we do not pass bgzipStream to the base constructor because that disposes the bgzipStream before Dispose is called on BgzipTextWriter, leaving out the last block
+        public BgzipTextWriter(BlockGZipStream stream) : base(stream, Encoding.UTF8, BufferSize, true)
         {
-            _buffer      = new byte[BufferSize];
-            _bgzipStream = bgzipStream;
+            _buffer = new byte[BufferSize];
+            _stream = stream;
         }
 
         public override void Flush()
         {
             if (_bufferIndex == 0) return;
-            _bgzipStream.Write(_buffer, 0, _bufferIndex);
+            _stream.Write(_buffer, 0, _bufferIndex);
             _bufferIndex = 0;
         }
 
@@ -54,12 +47,12 @@ namespace Compression.FileHandling
                 int lineIndex = BufferSize - _bufferIndex;
 
                 // write it out to the stream
-                _bgzipStream.Write(_buffer, 0, BufferSize);
+                _stream.Write(_buffer, 0, BufferSize);
                 _bufferIndex = 0;
 
                 while (lineIndex + BufferSize <= lineBytes.Length)
                 {
-                    _bgzipStream.Write(lineBytes, lineIndex, BufferSize);
+                    _stream.Write(lineBytes, lineIndex, BufferSize);
                     lineIndex += BufferSize;
                 }
 
@@ -73,7 +66,7 @@ namespace Compression.FileHandling
         public new void Dispose()
         {
             Flush();
-            _bgzipStream.Dispose();
+            _stream.Dispose();
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Intervals;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Caches.DataStructures
+namespace UnitTests.Intervals
 {
     public sealed class NullIntervalSearchTests
     {

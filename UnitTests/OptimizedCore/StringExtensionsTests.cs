@@ -67,5 +67,16 @@ namespace UnitTests.OptimizedCore
             bool expectedResult = s.EndsWith(leadingChar);
             Assert.Equal(expectedResult, observedResult);
         }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData("c\tr", false)]
+        [InlineData("\n", true)]
+        [InlineData("<CNV>", false)]
+        public void IsWhiteSpace(string s, bool expectedResult)
+        {
+            bool observedResult = s.IsWhiteSpace();
+            Assert.Equal(expectedResult, observedResult);
+        }
     }
 }

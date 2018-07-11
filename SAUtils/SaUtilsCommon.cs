@@ -18,6 +18,7 @@ namespace SAUtils
         {
             return item == null || item.Value == 0;
         }
+
         /// <summary>
         /// Returns a regular alternate allele when a provided with one have SA format.
         /// In case of long insertions or InsDel, where the saAltAllele contains an MD5 hash, the hash is returned.

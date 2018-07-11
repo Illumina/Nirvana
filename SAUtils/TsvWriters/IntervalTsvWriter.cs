@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using Compression.FileHandling;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -22,7 +24,7 @@ namespace SAUtils.TsvWriters
 			ReportFor reportingFor)
 		{
 			var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ","_") + ".interval.tsv.gz";
-			_bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputPath, fileName));
+			_bgzipTextWriter = new BgzipTextWriter(new BlockGZipStream(FileUtilities.GetCreateStream(Path.Combine(outputPath, fileName)), CompressionMode.Compress));
 
 			_bgzipTextWriter.Write(GetHeader(dataSourceVersion, dataVersion, assembly, keyName, reportingFor ));
 			_tsvIndex = new TsvIndex(Path.Combine(outputPath, fileName) + ".tvi");

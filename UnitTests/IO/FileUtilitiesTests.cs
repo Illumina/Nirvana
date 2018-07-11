@@ -3,14 +3,14 @@ using IO;
 using UnitTests.TestUtilities;
 using Xunit;
 
-namespace UnitTests.Compression.Utilities
+namespace UnitTests.IO
 {
     public sealed class FileUtilitiesTests
     {
         [Fact]
         public void GetReadStream_GetCreateStream_Loopback()
         {
-            var random = RandomPath.GetRandomPath();
+            string random = RandomPath.GetRandomPath();
             const string expectedString = "charlie";
 
             using (var writer = new StreamWriter(FileUtilities.GetCreateStream(random)))

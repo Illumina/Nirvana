@@ -4,7 +4,7 @@ using Genome;
 using IO;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Sequence
+namespace UnitTests.Genome
 {
     public sealed class CytogeneticBandTests
     {

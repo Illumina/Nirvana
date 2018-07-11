@@ -2,6 +2,7 @@
 using System.Linq;
 using Intervals;
 using Phantom.CodonInformation;
+using VariantAnnotation.Interface.AnnotatedPositions;
 using Xunit;
 
 namespace UnitTests.Phantom.CodonInformation
@@ -11,7 +12,7 @@ namespace UnitTests.Phantom.CodonInformation
         [Fact]
         public void GetCodonRange_AsExpected()
         {
-            var position = 73115941;
+            const int position = 73115941;
             var codingBlock = new CodingBlock(73115838, 73116000, 1);
 
             int range = CodonInfoProvider.GetCodonRange(position, codingBlock);
@@ -19,9 +20,8 @@ namespace UnitTests.Phantom.CodonInformation
             Assert.Equal(73115941, range);
         }
 
-
         [Fact]
-        public void GetTranscriptToCodingBlocks_AsExpect()
+        public void GetTranscriptToCodingBlocks_AsExpected()
         {
             var intervalArray1 = new IInterval[]
             {
@@ -45,7 +45,6 @@ namespace UnitTests.Phantom.CodonInformation
                 new Interval(41, 50),
                 new Interval(61, 70)
             };
-
 
             var phasedIntervalArrays = new List<PhasedIntervalArray>
             {
@@ -84,7 +83,7 @@ namespace UnitTests.Phantom.CodonInformation
 
             var expectedBlockLists = new[] { expectedBlockList1, expectedBlockList2, expectedBlockList3 };
 
-            for (int i = 0; i < 3; i++)
+            for (var i = 0; i < 3; i++)
             {
                 Assert.True(expectedBlockLists[i].SequenceEqual(codingBlocklists[i]));
             }
@@ -114,7 +113,6 @@ namespace UnitTests.Phantom.CodonInformation
             };
 
             Assert.True(expectedBlockList.SequenceEqual(codingBlocklists[0]));
-
         }
 
         [Fact]
@@ -156,10 +154,15 @@ namespace UnitTests.Phantom.CodonInformation
 
             var expectedBlockLists = new[] { expectedBlockList1, expectedBlockList2};
 
-            for (int i = 0; i < 2; i++)
+            for (var i = 0; i < 2; i++)
             {
                 Assert.True(expectedBlockLists[i].SequenceEqual(codingBlocklists[i]));
             }
+        }
+
+        [Fact]
+        public void CreateCodinInfoProvider_AsExpected()
+        {
         }
     }
 }

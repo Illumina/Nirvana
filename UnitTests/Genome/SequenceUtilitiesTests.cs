@@ -2,7 +2,7 @@
 using UnitTests.TestDataStructures;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Utilities
+namespace UnitTests.Genome
 {
     public sealed class SequenceUtilitiesTests
     {

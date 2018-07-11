@@ -10,7 +10,7 @@ namespace Phantom.Utilities
 {
     public static class ReadWriteUtilities
     {
-        public static readonly IntervalArray<IGene> EmptyIntervalArray = new IntervalArray<IGene>(new Interval<IGene>[0]);
+        private static readonly IntervalArray<IGene> EmptyIntervalArray = new IntervalArray<IGene>(new Interval<IGene>[0]);
 
         // ReSharper disable once UnusedTupleComponentInReturnValue
         public static (IntervalForest<IGene>, Dictionary<IGene, List<ITranscript>>) GetIntervalAndTranscriptsForeachGene(IntervalArray<ITranscript>[] transcriptIntervalArrays)

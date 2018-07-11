@@ -43,14 +43,14 @@ namespace CommandLine.Builders
 
     public sealed class TopLevelAppValidator : ITopLevelAppValidator
     {
-        private readonly ITopLevelAppBuilderData _data;
+        public ITopLevelAppBuilderData Data { get; }
 
-        public TopLevelAppValidator(ITopLevelAppBuilderData data) => _data = data;
+        public TopLevelAppValidator(ITopLevelAppBuilderData data) => Data = data;
 
         public ITopLevelAppBanner ShowBanner(string authors)
         {
             CommandLineUtilities.DisplayBanner(authors);
-            return new TopLevelAppBanner(_data);
+            return new TopLevelAppBanner(Data);
         }
     }
 

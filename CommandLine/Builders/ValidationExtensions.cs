@@ -17,16 +17,12 @@ namespace CommandLine.Builders
         {
             if (num == 0)
             {
-                validator.Data.AddError(
-                    $"At least one {description} should be provided.",
+                validator.Data.AddError($"At least one {description} should be provided.",
                     ExitCodes.MissingCommandLineOption);
             }
             return validator;
         }
 
-        /// <summary>
-        /// check if each file exists
-        /// </summary>
         public static IConsoleAppValidator CheckEachFilenameExists(this IConsoleAppValidator validator,
             IEnumerable<string> filePaths, string description, string commandLineOption, bool isRequired = true)
         {
@@ -37,9 +33,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        /// <summary>
-        /// checks if an input file exists
-        /// </summary>
         public static IConsoleAppValidator CheckInputFilenameExists(this IConsoleAppValidator validator,
             string filePath, string description, string commandLineOption, bool isRequired = true, string ignoreValue = null)
         {
@@ -59,9 +52,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        /// <summary>
-        /// checks if an input file exists and has the appropriate filename suffix
-        /// </summary>
         public static IConsoleAppValidator CheckOutputFilenameSuffix(this IConsoleAppValidator validator,
             string filePath, string fileSuffix, string description)
         {
@@ -75,9 +65,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        /// <summary>
-        /// checks if an input directory exists
-        /// </summary>
         public static IConsoleAppValidator CheckDirectoryExists(this IConsoleAppValidator validator, string dirPath,
             string description, string commandLineOption)
         {
@@ -97,9 +84,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        /// <summary>
-        /// checks if an input directory exists
-        /// </summary>
         public static IConsoleAppValidator CheckEachDirectoryContainsFiles(this IConsoleAppValidator validator,
             IEnumerable<string> directories, string description, string commandLineOption, string searchPattern)
         {
@@ -118,9 +102,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        /// <summary>
-        /// checks if the required parameter has been set
-        /// </summary>
         public static IConsoleAppValidator HasRequiredParameter<T>(this IConsoleAppValidator validator,
             T parameterValue, string description, string commandLineOption)
         {
@@ -135,9 +116,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        /// <summary>
-        /// checks if the required date has been set and is parseable
-        /// </summary>
         public static IConsoleAppValidator HasRequiredDate(this IConsoleAppValidator validator, string date,
             string description, string commandLineOption)
         {

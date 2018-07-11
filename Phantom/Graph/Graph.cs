@@ -13,12 +13,10 @@ namespace Phantom.Graph
             _isDirected = isDirected;
         }
 
-        public bool TryAddVertex(T vertex)
+        public void TryAddVertex(T vertex)
         {
-            if (HasVertex(vertex)) return false;
-
+            if (HasVertex(vertex)) return;
             _vertexToNeighbors[vertex] = new LinkedList<T>();
-            return true;
         }
 
         public void AddEdge(T sourceVertex, T targetVertex)

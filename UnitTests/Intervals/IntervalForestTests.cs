@@ -4,7 +4,7 @@ using System.Linq;
 using Intervals;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Caches.DataStructures
+namespace UnitTests.Intervals
 {
     public sealed class IntervalForestTests
     {
@@ -63,7 +63,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.Throws<ArgumentOutOfRangeException>(delegate
             {
                 // ReSharper disable once UnusedVariable
-                var result = _intervalForest.OverlapsAny(3, 10, 20);
+                bool result = _intervalForest.OverlapsAny(3, 10, 20);
             });
         }
 

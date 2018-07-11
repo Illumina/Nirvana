@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.IO.Compression;
 using Compression.FileHandling;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -52,7 +54,7 @@ namespace SAUtils.TsvWriters
         public SaMiscTsvWriter(string outputPath, IDataSourceVersion dataSourceVersion, string assembly, string keyName, ISequenceProvider sequenceProvider)
         {
             var fileName = keyName + "_" + dataSourceVersion.Version.Replace(" ", "_") + ".misc.tsv.gz";
-            _bgzipTextWriter = new BgzipTextWriter(Path.Combine(outputPath, fileName));
+            _bgzipTextWriter = new BgzipTextWriter(new BlockGZipStream(FileUtilities.GetCreateStream(Path.Combine(outputPath, fileName)), CompressionMode.Compress));
 
             _bgzipTextWriter.Write(GetHeader(dataSourceVersion, assembly));
 

@@ -29,6 +29,8 @@ namespace SAUtils.ExtractCosmicSvs
         private int _chromStartStopIndex        = -1;
         private int _studyIdIndex               = -1;
 
+        private static readonly char[] ChromosomeDelimiters = {':', '.'};
+
         //CNV_ID  ID_GENE gene_name       ID_SAMPLE       ID_TUMOUR       Primary site    Site subtype 1  Site subtype 2  Site subtype 3  Primary histology       Histology subtype 1     Histology subtype 2     Histology subtype 3     SAMPLE_NAME     TOTAL_CN        MINOR_ALLELE    MUT_TYPE        ID_STUDY        GRCh    Chromosome:G_Start..G_Stop
 
         public CosmicCnvReader(Stream cnvStream, IDictionary<string, IChromosome> refNameToChorm, GenomeAssembly assembly)
@@ -203,9 +205,9 @@ namespace SAUtils.ExtractCosmicSvs
 
         private static (string, int, int) GetChromStartStop(string chromPos)
         {
-            //17:18358950..18464587 Chromosome:G_Start..G_Stop
-            var splits = chromPos.Split(':', '.');
-            var chrom = splits[0];
+            // 17:18358950..18464587 Chromosome:G_Start..G_Stop
+            var splits   = chromPos.Split(ChromosomeDelimiters);
+            string chrom = splits[0];
             if (chrom == "25") chrom = "MT";
             return (chrom, int.Parse(splits[1]), int.Parse(splits[3]));
         }

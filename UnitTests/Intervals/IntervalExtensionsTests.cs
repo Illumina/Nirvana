@@ -1,7 +1,7 @@
 ﻿using Intervals;
 using Xunit;
 
-namespace UnitTests.VariantAnnotation.Algorithms
+namespace UnitTests.Intervals
 {
     public sealed class IntervalExtensionsTests
     {
@@ -13,7 +13,7 @@ namespace UnitTests.VariantAnnotation.Algorithms
         {
             var interval  = new Interval(start1, end1);
             var interval2 = new Interval(start2, end2);
-            var observedResult = interval.Overlaps(interval2, flankingLength);
+            bool observedResult = interval.Overlaps(interval2, flankingLength);
             Assert.Equal(expectedResult, observedResult);
         }
 
@@ -22,8 +22,8 @@ namespace UnitTests.VariantAnnotation.Algorithms
         [InlineData(1, 7, 5, 10, true)]
         public void Overlaps_IntervalAndCoordinates(int start1, int end1, int start2, int end2, bool expectedResult)
         {
-            var interval = new Interval(start1, end1);
-            var observedResult = interval.Overlaps(start2, end2);
+            var interval        = new Interval(start1, end1);
+            bool observedResult = interval.Overlaps(start2, end2);
             Assert.Equal(expectedResult, observedResult);
         }
 
@@ -32,8 +32,21 @@ namespace UnitTests.VariantAnnotation.Algorithms
         {
             var interval1 = new Interval(1, 10);
             var interval2 = new Interval(5, 6);
-            var observedResult = interval1.Contains(interval2);
+            bool observedResult = interval1.Contains(interval2);
             Assert.True(observedResult);
+        }
+
+        [Theory]
+        [InlineData(1, 3, 5, 7, -1, -1)]
+        [InlineData(1, 7, 5, 7, 5, 7)]
+        public void Intersects_TwoIntervals(int start1, int end1, int start2, int end2, int expectedStart,
+            int expectedEnd)
+        {
+            var interval         = new Interval(start1, end1);
+            var interval2        = new Interval(start2, end2);
+            var observedInterval = interval.Intersects(interval2);
+            Assert.Equal(expectedStart, observedInterval.Start);
+            Assert.Equal(expectedEnd, observedInterval.End);
         }
     }
 }
