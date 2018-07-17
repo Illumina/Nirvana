@@ -18,8 +18,7 @@ namespace Vcf
 		{
 		    if (outputPath == "-") return new StreamWriter(Console.OpenStandardOutput());
 
-		    var stream = new BlockGZipStream(FileUtilities.GetCreateStream(outputPath + ".json.gz"),
-		        CompressionMode.Compress, true);
+		    var stream = new BlockGZipStream(FileUtilities.GetCreateStream(outputPath + ".json.gz"), CompressionMode.Compress);
             return new BgzipTextWriter(stream);
 		}
 

@@ -25,9 +25,9 @@
       "commandLineArgs": "-c Cache\\26\\GRCh37\\Ensembl -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i Data\\Mother\\Mother.vcf.gz -o mother",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
-    "MS Test": {
+    "MS Zodiac": {
       "commandName": "Project",
-      "commandLineArgs": "-c Cache\\26\\GRCh37\\Both -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i test.vcf -o test",
+      "commandLineArgs": "-c Cache\\26\\GRCh37\\Ensembl -r References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd SupplementaryDatabase\\44\\GRCh37 -i Data\\Zodiac\\Zodiac_all_observed-dummyInfo-dummyInfo-short-hg19.vcf.gz -o zodiac",
       "workingDirectory": "E:\\Data\\Nirvana"
     },
     "RR clinvar": {

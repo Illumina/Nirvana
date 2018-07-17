@@ -254,7 +254,7 @@ namespace Compression.FileHandling
             _blockOffset = uncompressedOffset;
         }
 
-        internal static long GetCompressedOffset(ulong virtualPosition)
+        private static long GetCompressedOffset(ulong virtualPosition)
 		{
 			unchecked
 			{

@@ -18,20 +18,19 @@ namespace VariantAnnotation.IO
         private bool _firstEntry;
         private bool _positionFieldClosed;
 
-        
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
-        
+
         public JsonWriter(StreamWriter writer, string jasixFileName, string annotator, string creationTime, string vepDataVersion,
             List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
         {
-            _writer         = writer;
-            _writer.NewLine = "\n";
-            _firstEntry     = true;
+            _writer              = writer;
+            _writer.NewLine      = "\n";
+            _firstEntry          = true;
             _positionFieldClosed = false;
 
             _bgzipTextWriter = writer as BgzipTextWriter;
-            
+
             _jasixIndexCreator = _bgzipTextWriter != null
                 ? new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName))
                 : null;
@@ -45,7 +44,7 @@ namespace VariantAnnotation.IO
         {
             _jasixIndexCreator?.BeginSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position);
 
-            var sb = StringBuilderCache.Acquire();
+            var sb         = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             sb.Append($"{{\"{JasixCommons.HeaderSectionTag}\":{{");
@@ -61,8 +60,8 @@ namespace VariantAnnotation.IO
             sb.Append($"}},\"{JasixCommons.PositionsSectionTag}\":[\n");
 
             _writer.Write(StringBuilderCache.GetStringAndRelease(sb));
-            _writer.Flush();//closing the block
-            _jasixIndexCreator?.EndSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position-1);
+            _writer.Flush();
+            _jasixIndexCreator?.EndSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position - 1);
         }
 
         public void Dispose()
@@ -86,16 +85,18 @@ namespace VariantAnnotation.IO
         public void WriteAnnotatedGenes(IEnumerable<IAnnotatedGene> annotatedGenes)
         {
             _positionFieldClosed = true;
-            _writer.Flush();//closing the last block for positions section
+            _writer.Flush();
             _jasixIndexCreator?.EndSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position - 1);
 
             _writer.WriteLine();
             _writer.Write($"],\"{JasixCommons.GenesSectionTag}\":[\n");
-            _writer.Flush();//creating a tiny block for the genes section label
+            _writer.Flush();
 
             _jasixIndexCreator?.BeginSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position);
-            var sb = StringBuilderCache.Acquire();
+
+            var sb             = StringBuilderCache.Acquire();
             var firstGeneEntry = true;
+
             foreach (IAnnotatedGene annotatedGene in annotatedGenes)
             {
                 sb.Clear();
@@ -105,19 +106,16 @@ namespace VariantAnnotation.IO
                 _writer.Write(sb.ToString());
             }
 
-            _writer.Flush();//closing the last block of genes section
+            _writer.Flush();
             _jasixIndexCreator?.EndSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position - 1);
 
             StringBuilderCache.GetStringAndRelease(sb);
             _writer.WriteLine();
             _writer.Write("]");
         }
-        /// <summary>
-        /// write the footer
-        /// </summary>
+
         private void WriteFooter()
         {
-            
             if (!_positionFieldClosed)
             {
                 _writer.WriteLine();
@@ -125,7 +123,5 @@ namespace VariantAnnotation.IO
             }
             _writer.WriteLine("}");
         }
-
-       
     }
 }
