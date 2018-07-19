@@ -11,9 +11,11 @@ namespace Compression.FileHandling
         private int _bufferIndex;
         private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
 
+        private static readonly UTF8Encoding Utf8WithoutBom = new UTF8Encoding(false);
+
         public long Position => _stream.Position + _bufferIndex;
 
-        public BgzipTextWriter(BlockGZipStream stream) : base(stream, Encoding.UTF8, BufferSize, true)
+        public BgzipTextWriter(BlockGZipStream stream) : base(stream, Utf8WithoutBom, BufferSize, true)
         {
             _buffer = new byte[BufferSize];
             _stream = stream;
