@@ -37,6 +37,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Genome", "Genome\Genome.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IO", "IO\IO.csproj", "{654069F3-3B86-4325-823F-BC78946A26FF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tabix", "Tabix\Tabix.csproj", "{F337E3F6-72AA-44B4-B11F-D69EE14B6152}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{654069F3-3B86-4325-823F-BC78946A26FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{654069F3-3B86-4325-823F-BC78946A26FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{654069F3-3B86-4325-823F-BC78946A26FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
