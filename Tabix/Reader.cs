@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Genome;
 
 namespace Tabix
 {
     public static class Reader
     {
-        public static Index Read(BinaryReader reader)
+        public static Index Read(BinaryReader reader, IDictionary<string, IChromosome> refNameToChromosome)
         {
             int magic = reader.ReadInt32();
             if (magic != Constants.TabixMagic) throw new InvalidDataException("This does not seem to be a tabix file. Did you use a GZipStream?");
@@ -26,7 +27,9 @@ namespace Tabix
 
             for (var i = 0; i < numReferenceSequences; i++)
             {
-                referenceSequences[i] = ReadReferenceSequence(reader, referenceSequenceNames[i]);
+                string chromosomeName = referenceSequenceNames[i];
+                var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, chromosomeName);
+                referenceSequences[i] = ReadReferenceSequence(reader, chromosome);
             }
 
             return new Index(format, sequenceNameIndex, sequenceBeginIndex, sequenceEndIndex, commentChar,
@@ -57,7 +60,7 @@ namespace Tabix
             return nullPositions;
         }
 
-        private static ReferenceSequence ReadReferenceSequence(BinaryReader reader, string name)
+        private static ReferenceSequence ReadReferenceSequence(BinaryReader reader, IChromosome chromosome)
         {
             int numBins = reader.ReadInt32();
             var idToChunks = new Dictionary<int, Interval[]>();
@@ -76,7 +79,7 @@ namespace Tabix
                 linearFileOffsets[i] = reader.ReadUInt64();
             }
 
-            return new ReferenceSequence(name, idToChunks, linearFileOffsets);
+            return new ReferenceSequence(chromosome, idToChunks, linearFileOffsets);
         }
 
         private static (int Id, Interval[] Chunks) ReadBin(BinaryReader reader)

@@ -7,6 +7,8 @@ namespace UnitTests.Tabix
 {
     public sealed class SearchTests
     {
+        private static IChromosome _chr2 = new Chromosome("chr2", "2", 1);
+
         [Fact]
         public void GetMinOffset_Nominal()
         {
@@ -19,7 +21,7 @@ namespace UnitTests.Tabix
                 [6310] = new[] { new Interval(1, 1) }
             };
 
-            var refSeq = new ReferenceSequence("2", idToChunks, linearFileOffsets);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, linearFileOffsets);
             ulong observedResults = Search.GetMinOffset(refSeq, 26699125);
 
             Assert.Equal(expectedResults, observedResults);
@@ -37,7 +39,7 @@ namespace UnitTests.Tabix
                 [6876] = new[] { new Interval(1, 1) }
             };
 
-            var refSeq = new ReferenceSequence("2", idToChunks, linearFileOffsets);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, linearFileOffsets);
             ulong observedResults = Search.GetMinOffset(refSeq, 35979265);
 
             Assert.Equal(expectedResults, observedResults);
@@ -55,7 +57,7 @@ namespace UnitTests.Tabix
                 [1254] = new[] { new Interval(1, 1) }
             };
 
-            var refSeq = new ReferenceSequence("2", idToChunks, linearFileOffsets);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, linearFileOffsets);
             ulong observedResults = Search.GetMinOffset(refSeq, 87687168);
 
             Assert.Equal(expectedResults, observedResults);
@@ -71,7 +73,7 @@ namespace UnitTests.Tabix
                 [6311] = new[] { new Interval(3591443312067, 3592132724129) }
             };
 
-            var refSeq = new ReferenceSequence("2", idToChunks, null);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 26699126);
 
             Assert.Equal(expectedResults, observedResults);
@@ -87,7 +89,7 @@ namespace UnitTests.Tabix
                 [6878] = new[] { new Interval(3724057593420, 3724057615020) }
             };
 
-            var refSeq = new ReferenceSequence("2", idToChunks, null);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 35962881);
 
             Assert.Equal(expectedResults, observedResults);
@@ -103,7 +105,7 @@ namespace UnitTests.Tabix
                 [860] = new[] { new Interval(3724908138137, 3724908155075) }
             };
 
-            var refSeq = new ReferenceSequence("2", idToChunks, null);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 36028417);
 
             Assert.Equal(expectedResults, observedResults);
@@ -116,7 +118,7 @@ namespace UnitTests.Tabix
 
             var idToChunks = new Dictionary<int, Interval[]>();
 
-            var refSeq = new ReferenceSequence("2", idToChunks, null);
+            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 243171329);
 
             Assert.Equal(expectedResults, observedResults);
@@ -172,7 +174,7 @@ namespace UnitTests.Tabix
             var idToChunks = GetIdToChunks();
 
             var refSeqs = new ReferenceSequence[2];
-            refSeqs[1] = new ReferenceSequence(chr2.EnsemblName, idToChunks, linearFileOffsets);
+            refSeqs[1] = new ReferenceSequence(chr2, idToChunks, linearFileOffsets);
 
             var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
 
@@ -207,7 +209,7 @@ namespace UnitTests.Tabix
             };
 
             var refSeqs = new ReferenceSequence[2];
-            refSeqs[1] = new ReferenceSequence(chr2.EnsemblName, idToChunks, linearFileOffsets);
+            refSeqs[1] = new ReferenceSequence(chr2, idToChunks, linearFileOffsets);
 
             var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
 
@@ -228,7 +230,7 @@ namespace UnitTests.Tabix
             var idToChunks = new Dictionary<int, Interval[]>();
 
             var refSeqs = new ReferenceSequence[2];
-            refSeqs[1] = new ReferenceSequence(chr1.EnsemblName, idToChunks, linearFileOffsets);
+            refSeqs[1] = new ReferenceSequence(chr1, idToChunks, linearFileOffsets);
 
             var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
 

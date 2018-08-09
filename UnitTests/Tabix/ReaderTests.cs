@@ -1,6 +1,8 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using Compression.Utilities;
+using Genome;
 using Tabix;
 using UnitTests.TestUtilities;
 using Xunit;
@@ -12,9 +14,11 @@ namespace UnitTests.Tabix
         [Fact]
         public void Read_Nominal()
         {
+            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr17"] = new Chromosome("chr17", "17", 16) };
+
             using (var indexReader = GZipUtilities.GetAppropriateBinaryReader(Resources.TopPath("AU144A_BadVariant.vcf.gz.tbi")))
             {
-                Index index = Reader.Read(indexReader);
+                Index index = Reader.Read(indexReader, refNameToChromosome);
 
                 Assert.Equal(1, index.BeginIndex);
                 Assert.Equal('#', index.CommentChar);
@@ -26,7 +30,7 @@ namespace UnitTests.Tabix
                 Assert.Single(index.ReferenceSequences);
 
                 var refSeq = index.ReferenceSequences[0];
-                Assert.Equal("chr17", refSeq.Chromosome);
+                Assert.Equal("chr17", refSeq.Chromosome.UcscName);
                 Assert.Equal(4028, refSeq.LinearFileOffsets.Length);
                 Assert.Equal((ulong)6051, refSeq.LinearFileOffsets[4027]);
 
@@ -58,7 +62,7 @@ namespace UnitTests.Tabix
                 {
                     Assert.Throws<InvalidDataException>(delegate
                     {
-                        Reader.Read(reader);
+                        Reader.Read(reader, null);
                     });
                 }
             }

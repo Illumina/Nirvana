@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
+using Genome;
 
 namespace Tabix
 {
     public sealed class ReferenceSequence
     {
-        public readonly string Chromosome;
+        public readonly IChromosome Chromosome;
         public readonly Dictionary<int, Interval[]> IdToChunks;
 
         // for each 16 kbp interval
         public readonly ulong[] LinearFileOffsets;
 
-        public ReferenceSequence(string chromosome, Dictionary<int, Interval[]> idToChunks, ulong[] linearFileOffsets)
+        public ReferenceSequence(IChromosome chromosome, Dictionary<int, Interval[]> idToChunks, ulong[] linearFileOffsets)
         {
             Chromosome        = chromosome;
             IdToChunks        = idToChunks;
