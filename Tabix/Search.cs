@@ -25,8 +25,17 @@ namespace Tabix
 
             int bin = BinUtilities.ConvertPositionToBin(begin);
 
-            long minOverlapOffset = GetMinOverlapOffset(refSeq.IdToChunks[bin], minOffset, maxOffset);
-            return minOverlapOffset;
+            long offset;
+            if (refSeq.IdToChunks.TryGetValue(bin, out var chunks))
+            {
+                offset = GetMinOverlapOffset(chunks, minOffset, maxOffset);
+            }
+            else
+            {
+                offset = (long)refSeq.LinearFileOffsets[begin >> Constants.MinShift];
+            }
+
+            return offset;
         }
 
         internal static long GetMinOverlapOffset(Interval[] chunks, ulong minOffset, ulong maxOffset)

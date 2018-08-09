@@ -215,5 +215,26 @@ namespace UnitTests.Tabix
 
             Assert.Equal(3213608733669, observedResult);
         }
+
+        [Fact]
+        public void GetOffset_NoOverlappingBins_UseLinearIndex()
+        {
+            const long expectedOffset = 11418;
+            var chr1 = new Chromosome("chr1", "1", 1);
+
+            var linearFileOffsets = new ulong[7];
+            linearFileOffsets[6] = expectedOffset;
+
+            var idToChunks = new Dictionary<int, Interval[]>();
+
+            var refSeqs = new ReferenceSequence[2];
+            refSeqs[1] = new ReferenceSequence(chr1.EnsemblName, idToChunks, linearFileOffsets);
+
+            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
+
+            long observedResult = index.GetOffset(chr1, 100_000);
+
+            Assert.Equal(expectedOffset, observedResult);
+        }
     }
 }
