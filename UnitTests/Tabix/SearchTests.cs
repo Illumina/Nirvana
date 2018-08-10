@@ -7,7 +7,14 @@ namespace UnitTests.Tabix
 {
     public sealed class SearchTests
     {
-        private static IChromosome _chr2 = new Chromosome("chr2", "2", 1);
+        private static readonly IChromosome Chr2 = new Chromosome("chr2", "2", 1);
+        private readonly Dictionary<ushort, ushort> _refIndexToTabixIndex = new Dictionary<ushort, ushort>();
+
+        public SearchTests()
+        {
+            _refIndexToTabixIndex[0] = 0;
+            _refIndexToTabixIndex[1] = 1;
+        }
 
         [Fact]
         public void GetMinOffset_Nominal()
@@ -21,7 +28,7 @@ namespace UnitTests.Tabix
                 [6310] = new[] { new Interval(1, 1) }
             };
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, linearFileOffsets);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, linearFileOffsets);
             ulong observedResults = Search.GetMinOffset(refSeq, 26699125);
 
             Assert.Equal(expectedResults, observedResults);
@@ -39,7 +46,7 @@ namespace UnitTests.Tabix
                 [6876] = new[] { new Interval(1, 1) }
             };
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, linearFileOffsets);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, linearFileOffsets);
             ulong observedResults = Search.GetMinOffset(refSeq, 35979265);
 
             Assert.Equal(expectedResults, observedResults);
@@ -57,7 +64,7 @@ namespace UnitTests.Tabix
                 [1254] = new[] { new Interval(1, 1) }
             };
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, linearFileOffsets);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, linearFileOffsets);
             ulong observedResults = Search.GetMinOffset(refSeq, 87687168);
 
             Assert.Equal(expectedResults, observedResults);
@@ -73,7 +80,7 @@ namespace UnitTests.Tabix
                 [6311] = new[] { new Interval(3591443312067, 3592132724129) }
             };
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 26699126);
 
             Assert.Equal(expectedResults, observedResults);
@@ -89,7 +96,7 @@ namespace UnitTests.Tabix
                 [6878] = new[] { new Interval(3724057593420, 3724057615020) }
             };
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 35962881);
 
             Assert.Equal(expectedResults, observedResults);
@@ -105,7 +112,7 @@ namespace UnitTests.Tabix
                 [860] = new[] { new Interval(3724908138137, 3724908155075) }
             };
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 36028417);
 
             Assert.Equal(expectedResults, observedResults);
@@ -118,7 +125,7 @@ namespace UnitTests.Tabix
 
             var idToChunks = new Dictionary<int, Interval[]>();
 
-            var refSeq = new ReferenceSequence(_chr2, idToChunks, null);
+            var refSeq = new ReferenceSequence(Chr2, idToChunks, null);
             ulong observedResults = Search.GetMaxOffset(refSeq, 243171329);
 
             Assert.Equal(expectedResults, observedResults);
@@ -166,19 +173,37 @@ namespace UnitTests.Tabix
         [Fact]
         public void GetOffset_Nominal()
         {
-            var chr2 = new Chromosome("chr2", "2", 1);
-
             var linearFileOffsets = new ulong[1630];
             linearFileOffsets[1629] = 3591443256775;
 
             var idToChunks = GetIdToChunks();
 
             var refSeqs = new ReferenceSequence[2];
-            refSeqs[1] = new ReferenceSequence(chr2, idToChunks, linearFileOffsets);
+            refSeqs[1] = new ReferenceSequence(Chr2, idToChunks, linearFileOffsets);
 
-            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
+            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs, _refIndexToTabixIndex);
 
-            long observedResult = index.GetOffset(chr2, 26699126);
+            long observedResult = index.GetOffset(Chr2, 26699126);
+
+            Assert.Equal(3591443256857, observedResult);
+        }
+
+        [Fact]
+        public void GetOffset_HandleDiff_TabixIndex_And_RefIndex()
+        {
+            var linearFileOffsets = new ulong[1630];
+            linearFileOffsets[1629] = 3591443256775;
+
+            var idToChunks = GetIdToChunks();
+
+            // tabix index 10 = chr2 = ref index 1
+            var refSeqs = new ReferenceSequence[11];
+            refSeqs[10] = new ReferenceSequence(Chr2, idToChunks, linearFileOffsets);
+
+            var refIndexToTabixIndex = new Dictionary<ushort, ushort> { [1] = 10 };
+            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs, refIndexToTabixIndex);
+
+            long observedResult = index.GetOffset(Chr2, 26699126);
 
             Assert.Equal(3591443256857, observedResult);
         }
@@ -187,7 +212,7 @@ namespace UnitTests.Tabix
         public void GetOffset_UnknownChromosome_ReturnZero()
         {
             var chrUn = new Chromosome("chrUn", "unk", ushort.MaxValue);
-            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, null);
+            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, null, _refIndexToTabixIndex);
 
             long observedResult = index.GetOffset(chrUn, 26699126);
             Assert.Equal(0, observedResult);
@@ -196,8 +221,6 @@ namespace UnitTests.Tabix
         [Fact]
         public void GetOffset_FixNegativeBeginCoordinate()
         {
-            var chr2 = new Chromosome("chr2", "2", 1);
-
             var linearFileOffsets = new ulong[1];
             linearFileOffsets[0] = 3213608733669;
 
@@ -209,11 +232,11 @@ namespace UnitTests.Tabix
             };
 
             var refSeqs = new ReferenceSequence[2];
-            refSeqs[1] = new ReferenceSequence(chr2, idToChunks, linearFileOffsets);
+            refSeqs[1] = new ReferenceSequence(Chr2, idToChunks, linearFileOffsets);
 
-            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
+            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs, _refIndexToTabixIndex);
 
-            long observedResult = index.GetOffset(chr2, 0);
+            long observedResult = index.GetOffset(Chr2, 0);
 
             Assert.Equal(3213608733669, observedResult);
         }
@@ -232,7 +255,7 @@ namespace UnitTests.Tabix
             var refSeqs = new ReferenceSequence[2];
             refSeqs[1] = new ReferenceSequence(chr1, idToChunks, linearFileOffsets);
 
-            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs);
+            var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, refSeqs, _refIndexToTabixIndex);
 
             long observedResult = index.GetOffset(chr1, 100_000);
 

@@ -9,7 +9,7 @@ namespace Tabix
         /// </summary>
         public static long GetOffset(this Index index, IChromosome chromosome, int begin)
         {
-            if (chromosome.IsEmpty() || chromosome.Index >= index.ReferenceSequences.Length) return 0;
+            if (chromosome.IsEmpty() || !index.RefIndexToTabixIndex.TryGetValue(chromosome.Index, out ushort tabixIndex)) return 0;
 
             // N.B. tabix assumes begin is 0-based and end is 1-based
             int end = begin;
@@ -17,7 +17,7 @@ namespace Tabix
 
             if (begin < 0) begin = 0;
 
-            var refSeq = index.ReferenceSequences[chromosome.Index];
+            var refSeq = index.ReferenceSequences[tabixIndex];
             if (begin == 0) return (long)refSeq.LinearFileOffsets[0];
 
             ulong minOffset = GetMinOffset(refSeq, begin);
