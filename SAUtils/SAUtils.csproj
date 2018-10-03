@@ -7,11 +7,22 @@
   </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
+    <Compile Remove="InputFileParsers\EVS\**" />
+    <Compile Remove="InputFileParsers\IntermediateAnnotation\**" />
+    <EmbeddedResource Remove="InputFileParsers\EVS\**" />
+    <EmbeddedResource Remove="InputFileParsers\IntermediateAnnotation\**" />
+    <None Remove="InputFileParsers\EVS\**" />
+    <None Remove="InputFileParsers\IntermediateAnnotation\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="InputFileParsers\CustomAnnotation\" />
   </ItemGroup>
 </Project>

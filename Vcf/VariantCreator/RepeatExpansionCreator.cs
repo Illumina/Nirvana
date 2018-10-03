@@ -17,12 +17,17 @@ namespace Vcf.VariantCreator
             (int repeatCount, bool foundError) = altAllele.Trim('<', '>').Substring(3).OptimizedParseInt32();
             if (foundError) return null;
 
-            var svType = GetRepeatExpansionType(infoData.RefRepeatCount.Value, repeatCount);
+            if (infoData.RefRepeatCount != null)
+            {
+                var svType = GetRepeatExpansionType(infoData.RefRepeatCount.Value, repeatCount);
 
-            int end    = infoData.End ?? 0;
-            string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
+                int end = infoData.End ?? 0;
+                string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, RepeatExpansionBehavior);
+                return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
+                    null, RepeatExpansionBehavior);
+            }
+            return null;
         }
 
         private static VariantType GetRepeatExpansionType(int refRepeatCount, int repeatCount)

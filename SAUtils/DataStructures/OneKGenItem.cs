@@ -1,16 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class OneKGenItem : SupplementaryDataItem
+    public sealed class OneKGenItem : ISupplementaryDataItem
     {
+        public IChromosome Chromosome { get; }
+        public int Position { get; set; }
+        public string RefAllele { get; set; }
+        public string AltAllele { get; set; }
+
         private string Id { get; }
         private string AncestralAllele { get; }
-        
+
         private string AfrFreq { get; }
         private string AllFreq { get; }
         private string AmrFreq { get; }
@@ -18,14 +23,14 @@ namespace SAUtils.DataStructures
         private string EurFreq { get; }
         private string SasFreq { get; }
 
-        public int? AllAlleleNumber { get; }
+        private int? AllAlleleNumber { get; }
         private int? AfrAlleleNumber { get; }
         private int? AmrAlleleNumber { get; }
         private int? EurAlleleNumber { get; }
         private int? EasAlleleNumber { get; }
         private int? SasAlleleNumber { get; }
 
-        public int? AllAlleleCount { get; }
+        private int? AllAlleleCount { get; }
         private int? AfrAlleleCount { get; }
         private int? AmrAlleleCount { get; }
         private int? EurAlleleCount { get; }
@@ -60,12 +65,11 @@ namespace SAUtils.DataStructures
             )
         {
             Chromosome = chromosome;
-            Start = position;
+            Position = position;
             Id = id;
-            ReferenceAllele = refAllele;
-            AlternateAllele = alternateAllele;
+            RefAllele = refAllele;
+            AltAllele = alternateAllele;
             AncestralAllele = ancestralAllele;
-
 
             AllAlleleCount = allAlleleCount;
             AfrAlleleCount = afrAlleleCount;
@@ -84,7 +88,6 @@ namespace SAUtils.DataStructures
             SvType = svType;
             SvEnd = svEnd;
 
-            IsInterval = svType != null;
         }
 
         public OneKGenItem(IChromosome chromosome,
@@ -129,115 +132,35 @@ namespace SAUtils.DataStructures
             SasFreq = sasFreq;
         }
 
-        public override SupplementaryIntervalItem GetSupplementaryInterval()
-        {
-            if (!IsInterval) return null;
-
-            var seqAltType = SaParseUtilities.GetSequenceAlteration(SvType, ObservedGains, ObservedLosses);
-
-            var intValues    = new Dictionary<string, int>();
-            var doubleValues = new Dictionary<string, double>();
-            var freqValues   = new Dictionary<string, double>();
-            var stringValues = new Dictionary<string, string>();
-            var boolValues   = new List<string>();
-
-            var suppInterval = new SupplementaryIntervalItem(Chromosome,Start, SvEnd, seqAltType,
-                "1000 Genomes Project", intValues, doubleValues, freqValues, stringValues, boolValues);
-
-            if (Id != null) suppInterval.AddStringValue("id", Id);
-
-            AddAlleleFrequency(AfrFreq, "variantFreqAfr", suppInterval);
-            AddAlleleFrequency(AllFreq, "variantFreqAll", suppInterval);
-            AddAlleleFrequency(AmrFreq, "variantFreqAmr", suppInterval);
-            AddAlleleFrequency(EasFreq, "variantFreqEas", suppInterval);
-            AddAlleleFrequency(EurFreq, "variantFreqEur", suppInterval);
-            AddAlleleFrequency(SasFreq, "variantFreqSas", suppInterval);
-
-            AddAlleleNumber(AllAlleleNumber, "sampleSize", suppInterval);
-            AddAlleleNumber(AfrAlleleNumber, "sampleSizeAfr", suppInterval);
-            AddAlleleNumber(AmrAlleleNumber, "sampleSizeAmr", suppInterval);
-            AddAlleleNumber(EasAlleleNumber, "sampleSizeEas", suppInterval);
-            AddAlleleNumber(EurAlleleNumber, "sampleSizeEur", suppInterval);
-            AddAlleleNumber(SasAlleleNumber, "sampleSizeSas", suppInterval);
-
-            if (ObservedGains != 0) suppInterval.AddIntValue("observedGains", ObservedGains);
-            if (ObservedLosses != 0) suppInterval.AddIntValue("observedLosses", ObservedLosses);
-
-            return suppInterval;
-        }
-
-        private void AddAlleleNumber(int? alleleNumber, string description, SupplementaryIntervalItem intervalItem)
-        {
-            if (alleleNumber == null || alleleNumber.Value == 0) return;
-            intervalItem.AddIntValue(description, alleleNumber.Value);
-        }
-
-        private void AddAlleleFrequency(string freqString, string description, SupplementaryIntervalItem intervalItem)
-        {
-            if (freqString == null) return;
-            intervalItem.AddFrequencyValue(description, Convert.ToDouble(freqString));
-        }
-
-        public override bool Equals(object obj)
-        {
-            // If parameter is null return false.
-
-            // if other cannot be cast into OneKGenItem, return false
-            if (!(obj is OneKGenItem otherItem)) return false;
-
-            // Return true if the fields match:
-            return Equals(Chromosome, otherItem.Chromosome)
-                && Start == otherItem.Start
-                && AlternateAllele.Equals(otherItem.AlternateAllele)
-                ;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Id?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ (ReferenceAllele?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (AlternateAllele?.GetHashCode() ?? 0);
-
-                return hashCode;
-            }
-        }
-
-		public string GetVcfString()
-		{
-			var freq = ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount) ?? "";
-			var ancestralAlleleString = AncestralAllele ?? "";
-			return freq + ";" + ancestralAlleleString;
-		}
-
+        
 		public string GetJsonString()
 		{
-			var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
-			jsonObject.AddStringValue("ancestralAllele", AncestralAllele);
-			jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
+		    jsonObject.AddStringValue("ancestralAllele", AncestralAllele);
+            jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
 			jsonObject.AddStringValue("afrAf", ComputingUtilities.ComputeFrequency(AfrAlleleNumber, AfrAlleleCount), false);
 			jsonObject.AddStringValue("amrAf", ComputingUtilities.ComputeFrequency(AmrAlleleNumber, AmrAlleleCount), false);
 			jsonObject.AddStringValue("easAf", ComputingUtilities.ComputeFrequency(EasAlleleNumber, EasAlleleCount), false);
 			jsonObject.AddStringValue("eurAf", ComputingUtilities.ComputeFrequency(EurAlleleNumber, EurAlleleCount), false);
 			jsonObject.AddStringValue("sasAf", ComputingUtilities.ComputeFrequency(SasAlleleNumber, SasAlleleCount), false);
 
-			if (AllAlleleNumber != null) jsonObject.AddIntValue("allAn", AllAlleleNumber.Value);
-			if (AfrAlleleNumber != null) jsonObject.AddIntValue("afrAn", AfrAlleleNumber.Value);
-			if (AmrAlleleNumber != null) jsonObject.AddIntValue("amrAn", AmrAlleleNumber.Value);
-			if (EasAlleleNumber != null) jsonObject.AddIntValue("easAn", EasAlleleNumber.Value);
-			if (EurAlleleNumber != null) jsonObject.AddIntValue("eurAn", EurAlleleNumber.Value);
-			if (SasAlleleNumber != null) jsonObject.AddIntValue("sasAn", SasAlleleNumber.Value);
+			jsonObject.AddIntValue("allAn", AllAlleleNumber);
+			jsonObject.AddIntValue("afrAn", AfrAlleleNumber);
+			jsonObject.AddIntValue("amrAn", AmrAlleleNumber);
+			jsonObject.AddIntValue("easAn", EasAlleleNumber);
+			jsonObject.AddIntValue("eurAn", EurAlleleNumber);
+			jsonObject.AddIntValue("sasAn", SasAlleleNumber);
 
-			if (AllAlleleCount != null) jsonObject.AddIntValue("allAc", AllAlleleCount.Value);
-			if (AfrAlleleCount != null) jsonObject.AddIntValue("afrAc", AfrAlleleCount.Value);
-			if (AmrAlleleCount != null) jsonObject.AddIntValue("amrAc", AmrAlleleCount.Value);
-			if (EasAlleleCount != null) jsonObject.AddIntValue("easAc", EasAlleleCount.Value);
-			if (EurAlleleCount != null) jsonObject.AddIntValue("eurAc", EurAlleleCount.Value);
-			if (SasAlleleCount != null) jsonObject.AddIntValue("sasAc", SasAlleleCount.Value);
+			jsonObject.AddIntValue("allAc", AllAlleleCount);
+			jsonObject.AddIntValue("afrAc", AfrAlleleCount);
+			jsonObject.AddIntValue("amrAc", AmrAlleleCount);
+			jsonObject.AddIntValue("easAc", EasAlleleCount);
+			jsonObject.AddIntValue("eurAc", EurAlleleCount);
+			jsonObject.AddIntValue("sasAc", SasAlleleCount);
 
 		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
-	}
+        
+    }
 }

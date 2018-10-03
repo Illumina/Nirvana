@@ -4,7 +4,7 @@ using System.Text;
 
 namespace IO
 {
-	public sealed class ExtendedBinaryReader : BinaryReader, IExtendedBinaryReader
+	public sealed class ExtendedBinaryReader : BinaryReader
 	{
 		public ExtendedBinaryReader(Stream s) : this(s, new UTF8Encoding()) { }
 

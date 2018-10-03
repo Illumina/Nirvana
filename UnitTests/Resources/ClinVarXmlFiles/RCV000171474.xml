@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="25595893">
+    <RecordStatus>current</RecordStatus>
+    <Title>Single allele AND not provided</Title>
+    <ReferenceClinVarAssertion DateCreated="2015-05-29" DateLastUpdated="2018-01-25" ID="408375">
+      <ClinVarAccession Acc="RCV000171474" Version="1" Type="RCV" DateUpdated="2018-01-25" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance>
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Likely pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>yes</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>research</MethodType>
+        </Method>
+        <ObservedData ID="24314126">
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="191283">
+        <Measure Type="single nucleotide variant" ID="189086">
+          <CytogeneticLocation>13q13.3</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="13" Accession="NC_000013.10" start="36888396" stop="36888396" display_start="36888396" display_stop="36888396" variantLength="1" referenceAllele="-" alternateAllele="T" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">spartin</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">SPART</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="13" Accession="NC_000013.11" start="36301638" stop="36370180" display_start="36301638" display_stop="36370180" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="13" Accession="NC_000013.10" start="36875774" stop="36944316" display_start="36875774" display_stop="36944316" variantLength="68543" Strand="-" />
+            <XRef ID="23111" DB="Gene" />
+            <XRef Type="MIM" ID="607111" DB="OMIM" />
+            <XRef ID="HGNC:18514" DB="HGNC" />
+          </MeasureRelationship>
+        </Measure>
+        <Name>
+          <ElementValue Type="Preferred">Single allele</ElementValue>
+        </Name>
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="9460">
+        <Trait ID="17556" Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">not provided</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="public definition">The term 'not provided' is registered in MedGen to support identification of submissions to ClinVar for which no condition was named when assessing the variant. 'not provided' differs from 'not specified', which is used when a variant is asserted to be benign, likely benign, or of uncertain significance for conditions that have not been specified.</Attribute>
+          </AttributeSet>
+          <XRef ID="CN517202" DB="MedGen" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="407940">
+      <ClinVarSubmissionID localKey="SGP2014-1596-1|Not provided" submitter="Developmental Genetics Unit,King Faisal Specialist Hospital &amp; Research Centre" submitterDate="2015-04-14" />
+      <ClinVarAccession Acc="SCV000221673" OrgType="primary" OrganizationCategory="laboratory" Version="1" Type="SCV" OrgID="500184" DateUpdated="2017-06-24" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance>
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Likely pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="Developmental Genetics Unit" ID="SGP2014-1596-1" />
+      <AttributeSet>
+        <Attribute Type="AssertionMethod">ACMG guidelines</Attribute>
+        <Citation>
+          <ID Source="PubMed">25741868</ID>
+        </Citation>
+      </AttributeSet>
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>yes</AffectedStatus>
+          <Indication Type="Indication">
+            <Trait Type="Finding">
+              <Name>
+                <ElementValue Type="Preferred">Neurological phenotype</ElementValue>
+              </Name>
+            </Trait>
+          </Indication>
+        </Sample>
+        <Method>
+          <MethodType>research</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <SequenceLocation Assembly="GRCh37" Chr="13" alternateAllele="T" referenceAllele="-" start="36888396" stop="36888396" variantLength="1" />
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">SPG20</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Not provided</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
+</ReleaseSet>

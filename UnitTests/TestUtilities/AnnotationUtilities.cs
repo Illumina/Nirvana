@@ -15,7 +15,7 @@ namespace UnitTests.TestUtilities
         internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
             string vcfLine, bool enableVerboseTranscripts, IDictionary<string, IChromosome> refNameToChromosome)
         {
-            var refMinorProvider = ProviderUtilities.GetRefMinorProvider(refNameToChromosome, saPaths);
+            var refMinorProvider = ProviderUtilities.GetRefMinorProvider(saPaths);
             var annotatorAndRef = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
 
             var annotator      = annotatorAndRef.Annotator;
@@ -40,7 +40,7 @@ namespace UnitTests.TestUtilities
             var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
             var refNames                     = sequenceProvider.RefNameToChromosome;
             var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
-            var saProvider                   = ProviderUtilities.GetSaProvider(saPaths);
+            var saProvider                   = ProviderUtilities.GetNsaProvider(saPaths);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(saPaths);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);

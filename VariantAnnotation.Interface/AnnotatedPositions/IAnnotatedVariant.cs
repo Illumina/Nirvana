@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using VariantAnnotation.Interface.SA;
 using Variants;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
@@ -12,7 +13,8 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 	    IList<IAnnotatedTranscript> EnsemblTranscripts { get; }
 	    IList<IAnnotatedTranscript> RefSeqTranscripts { get; }
 	    IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; }
-        ISet<string> OverlappingGenes { get; }
+	    IList<ISupplementaryAnnotation> SaList { get; }
+	    ISet<string> OverlappingGenes { get; }
         IList<IOverlappingTranscript>  OverlappingTranscripts { get; }
 		double? PhylopScore { get; set; }
 

@@ -92,7 +92,7 @@ namespace SAUtils.InputFileParsers
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<GnomadItem> GetGnomadItems()
+		public IEnumerable<GnomadItem> GetItems()
 		{
 			using (_reader)
 			{

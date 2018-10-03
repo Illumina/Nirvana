@@ -68,7 +68,7 @@ namespace SAUtils.ExtractCosmicSvs
             using (var cosmicSvExtractor = new CosmicSvReader(cnvStream, breakendStream, version, _outputDir,
                 referenceProvider.Assembly, referenceProvider.RefNameToChromosome))
             {
-                cosmicSvExtractor.CreateTsv();
+                //cosmicSvExtractor.CreateTsv();
             }
             
             return ExitCodes.Success;

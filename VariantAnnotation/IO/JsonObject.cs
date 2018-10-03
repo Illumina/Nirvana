@@ -13,8 +13,8 @@ namespace VariantAnnotation.IO
 
         public const char Comma          = ',';
         private const char DoubleQuote   = '\"';
-        private const char OpenBracket   = '[';
-        private const char CloseBracket  = ']';
+        public const char OpenBracket   = '[';
+        public const char CloseBracket  = ']';
         public const char OpenBrace      = '{';
         public const char CloseBrace     = '}';
         private const string ColonString = "\":";

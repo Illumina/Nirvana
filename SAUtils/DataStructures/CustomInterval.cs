@@ -1,83 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
+using Variants;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class CustomInterval : IComparable<CustomInterval>
+    public sealed class CustomInterval : ISuppIntervalItem
     {
         public IChromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }
-        public string Type { get; }
+        public VariantType VariantType { get; }
+
         public IDictionary<string, string> StringValues { get; }
-        public IDictionary<string, string> NonStringValues { get; }
 
         /// <summary>
         /// constructor
         /// </summary>
-        public CustomInterval(IChromosome chromosome, int start, int end, string type,
-            IDictionary<string, string> stringValues, IDictionary<string, string> nonStringValues)
+        public CustomInterval(IChromosome chromosome, int start, int end, IDictionary<string, string> stringValues)
         {
-            Chromosome   = chromosome;
+            Chromosome      = chromosome;
             Start           = start;
             End             = end;
-            Type            = type;
+            VariantType     = VariantType.structural_alteration;
             StringValues    = stringValues;
-            NonStringValues = nonStringValues;
         }
 
-        public int CompareTo(CustomInterval other)
-        {
-            return Chromosome != other.Chromosome ? Chromosome.Index.CompareTo(other.Chromosome.Index) : Start.CompareTo(other.Start);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is CustomInterval otherItem)) return false;
-
-            return Chromosome.Equals(otherItem.Chromosome)
-                   && Start.Equals(otherItem.Start)
-                   && End.Equals(otherItem.End)
-                   && Type.Equals(otherItem.Type);
-        }
-
-        public override int GetHashCode()
-        {
-            var hashCode = Start.GetHashCode() ^ Chromosome.GetHashCode();
-            hashCode = (hashCode * 397) ^ End.GetHashCode();
-            hashCode = (hashCode * 397) ^ Type.GetHashCode();
-
-            return hashCode;
-        }
-
-		public string GetJsonString()
+        public string GetJsonString()
 		{
 			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
-			jsonObject.AddStringValue("start", Start.ToString(), false);
-			jsonObject.AddStringValue("end", End.ToString(), false);
+			jsonObject.AddStringValue("start", Start.ToString());
+			jsonObject.AddStringValue("end", End.ToString());
 
-			if (StringValues != null)
-			{
-				foreach (var kvp in StringValues)
-				{
-					jsonObject.AddStringValue(kvp.Key, kvp.Value);
-				}
-			}
+		    foreach ((string key, string value) in StringValues)
+		    {
+		        jsonObject.AddStringValue(key, value);
+		    }
 
-			if (NonStringValues != null)
-			{
-				foreach (var kvp in NonStringValues)
-				{
-					jsonObject.AddStringValue(kvp.Key, kvp.Value, false);
-				}
-			}
-
-		    return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderCache.GetStringAndRelease(sb);
 		}
 	}
 }

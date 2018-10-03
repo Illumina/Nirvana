@@ -5,7 +5,6 @@ using IO;
 using Jasix;
 using Jasix.DataStructures;
 using OptimizedCore;
-using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -22,7 +21,7 @@ namespace VariantAnnotation.IO
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
 
         public JsonWriter(StreamWriter writer, string jasixFileName, string annotator, string creationTime, string vepDataVersion,
-            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
+            IEnumerable<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
         {
             _writer              = writer;
             _writer.NewLine      = "\n";
@@ -40,7 +39,7 @@ namespace VariantAnnotation.IO
         }
 
         private void WriteHeader(string annotator, string creationTime, string genomeAssembly, int schemaVersion,
-            string vepDataVersion, List<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
+            string vepDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
         {
             _jasixIndexCreator?.BeginSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position);
 
@@ -82,14 +81,16 @@ namespace VariantAnnotation.IO
             _writer.Write(entry);
         }
 
-        public void WriteAnnotatedGenes(IEnumerable<IAnnotatedGene> annotatedGenes)
+        public void WriteAnnotatedGenes(IEnumerable<string> annotatedGenes)
         {
             _positionFieldClosed = true;
             _writer.Flush();
             _jasixIndexCreator?.EndSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position - 1);
 
-            _writer.WriteLine();
-            _writer.Write($"],\"{JasixCommons.GenesSectionTag}\":[\n");
+            _writer.Write("\n]");
+
+            if (annotatedGenes == null) return;
+            _writer.Write($",\"{JasixCommons.GenesSectionTag}\":[\n");
             _writer.Flush();
 
             _jasixIndexCreator?.BeginSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position);
@@ -97,15 +98,14 @@ namespace VariantAnnotation.IO
             var sb             = StringBuilderCache.Acquire();
             var firstGeneEntry = true;
 
-            foreach (IAnnotatedGene annotatedGene in annotatedGenes)
+            foreach (string jsonString in annotatedGenes)
             {
-                sb.Clear();
-                annotatedGene.SerializeJson(sb);
-                if (!firstGeneEntry) _writer.WriteLine(",");
+                if (!firstGeneEntry) sb.Append(",\n");
+                sb.Append(jsonString);
                 firstGeneEntry = false;
-                _writer.Write(sb.ToString());
             }
 
+            _writer.Write(sb.ToString());
             _writer.Flush();
             _jasixIndexCreator?.EndSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position - 1);
 

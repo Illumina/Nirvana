@@ -2,7 +2,6 @@
 using System.Linq;
 using Intervals;
 using Phantom.CodonInformation;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using Xunit;
 
 namespace UnitTests.Phantom.CodonInformation

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using Genome;
@@ -12,7 +11,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 {
     public sealed class OneKGenReader 
     {
-        private readonly FileInfo _oneKGenFile;
+        private readonly string _fileName;
         private readonly IDictionary<string,IChromosome> _refNameDictionary;
 
         private  string _ancestralAllele;
@@ -36,7 +35,7 @@ namespace SAUtils.InputFileParsers.OneKGen
         // empty constructor for onekg reader for unit tests.
         internal OneKGenReader(IDictionary<string, IChromosome> refNameDict) => _refNameDictionary = refNameDict;
 
-        public OneKGenReader(FileInfo oneKGenFile, IDictionary<string, IChromosome> refNameDict) : this(refNameDict) => _oneKGenFile = oneKGenFile;
+        public OneKGenReader(string oneKGenFile, IDictionary<string, IChromosome> refNameDict) : this(refNameDict) => _fileName = oneKGenFile;
 
         private void Clear()
 	    {
@@ -61,9 +60,9 @@ namespace SAUtils.InputFileParsers.OneKGen
 			_svType = null;
 	    }
 
-	    public IEnumerable<OneKGenItem> GetOneKGenItems()
+	    public IEnumerable<OneKGenItem> GetItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_oneKGenFile.FullName))
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -116,7 +115,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 					rsId,
 					refAllele,
 					altAlleles[i],
-					_ancestralAllele,
+                    _ancestralAllele,
 					GetAlleleCount(_allAlleleCounts, i),
 					GetAlleleCount(_afrAlleleCounts,i),
 					GetAlleleCount(_amrAlleleCounts,i),

@@ -43,7 +43,7 @@ namespace VariantAnnotation.PhyloP
             IDataSourceVersion version;
             GenomeAssembly genomeAssembly;
 
-            using (var reader = new PhylopReader(FileUtilities.GetReadStream(phylopFiles.First())))
+            using (var reader = new PhylopDbReader(FileUtilities.GetReadStream(phylopFiles.First())))
             {
                 version        = reader.GetDataSourceVersion();
                 genomeAssembly = reader.GetGenomeAssembly();

@@ -3,13 +3,16 @@ using System.Collections.Generic;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class MinHeap<T> where T : IComparable<T>
+    public sealed class MinHeap<T>
     {
         private readonly List<T> _itemArray;
+        private readonly Func<T, T, int> _comparerFunc;
 
-        public MinHeap()
+        
+        public MinHeap(Func<T,T, int> comparerFunc)
         {
             _itemArray = new List<T>();
+            _comparerFunc = comparerFunc;
         }
 
         public void Add(T item)
@@ -24,7 +27,8 @@ namespace SAUtils.DataStructures
             while (i > 0)
             {
                 var j = i % 2 == 0 ? i / 2 - 1 : i / 2;//the index of the parent
-                if (_itemArray[i].CompareTo(_itemArray[j]) < 0)
+                //if (_itemArray[i].CompareTo(_itemArray[j]) < 0)
+                if (_comparerFunc(_itemArray[i], _itemArray[j]) < 0)
                     SwapItems(_itemArray, i, j);
 
                 i = j;
@@ -44,11 +48,11 @@ namespace SAUtils.DataStructures
             {
                 var j = 2 * i + 1;
 
-                if (j + 1 < _itemArray.Count && _itemArray[j].CompareTo(_itemArray[j + 1]) > 0)
+                if (j + 1 < _itemArray.Count && _comparerFunc(_itemArray[j], _itemArray[j + 1]) > 0)
                     // both children are present
                     j++; //A[2*i+2] is the smaller child
 
-                if (_itemArray[i].CompareTo(_itemArray[j]) > 0)
+                if (_comparerFunc(_itemArray[i],_itemArray[j]) > 0)
                     SwapItems(_itemArray, i, j);
 
                 i = j;

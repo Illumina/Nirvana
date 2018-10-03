@@ -12,10 +12,8 @@ namespace UnitTests.SAUtils.InputFileParsers
 		[Fact]
 		public void ReadDataVersionFromFile()
 		{
-		    var versionFile = ResourceUtilities.GetReadStream(Resources.TopPath("dbSNP.version"));
-
-		    DataSourceVersion version;
-		    using (var reader = new DataSourceVersionReader(versionFile))
+            DataSourceVersion version;
+		    using (var reader = new DataSourceVersionReader(Resources.TopPath("dbSNP.version")))
 		    {
                 version = reader.GetVersion();
             }

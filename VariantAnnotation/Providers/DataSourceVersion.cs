@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using IO;
 using VariantAnnotation.Interface.Providers;
@@ -55,9 +56,10 @@ namespace VariantAnnotation.Providers
             if (ReleaseDateTicks != 0) jsonObject.AddStringValue("releaseDate", GetReleaseDate());
             sb.Append(JsonObject.CloseBrace);
         }
+        
+        
     }
-
-    internal sealed class DataSourceVersionComparer : EqualityComparer<IDataSourceVersion>
+    public sealed class DataSourceVersionComparer : EqualityComparer<IDataSourceVersion>
     {
         public override bool Equals(IDataSourceVersion x, IDataSourceVersion y)
         {
@@ -73,7 +75,7 @@ namespace VariantAnnotation.Providers
             {
                 var hashCode = obj.Name.GetHashCode();
                 if (obj.Description != null) hashCode = (hashCode * 397) ^ obj.Description.GetHashCode();
-                if (obj.Version     != null) hashCode = (hashCode * 397) ^ obj.Version.GetHashCode();
+                if (obj.Version != null) hashCode = (hashCode * 397) ^ obj.Version.GetHashCode();
                 hashCode = (hashCode * 397) ^ obj.ReleaseDateTicks.GetHashCode();
                 return hashCode;
             }

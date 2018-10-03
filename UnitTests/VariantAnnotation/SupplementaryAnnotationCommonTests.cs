@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Genome;
 using UnitTests.TestUtilities;
 using VariantAnnotation;
@@ -23,24 +22,6 @@ namespace UnitTests.VariantAnnotation
             Assert.Equal(expectedOut,reducedAllele);
         }
 
-	    [Fact]
-	    public void GetAssembly_grch37()
-	    {
-		    var grch37SaDir = Resources.SaGRCh37("");
-		    var genomeAssembly = SaReaderUtils.GetAssembly(new List<string> {grch37SaDir});
-
-			Assert.Equal(GenomeAssembly.GRCh37, genomeAssembly);
-	    }
-
-	    [Fact]
-	    public void GetDataSourceVersions_grch37()
-	    {
-		 
-			var grch37SaDir = Resources.SaGRCh37("");
-			var dataSourceVersions = SaReaderUtils.GetDataSourceVersions(new List<string> { grch37SaDir });
-
-			Assert.True(dataSourceVersions.Any());
-
-		}
+	    
     }
 }

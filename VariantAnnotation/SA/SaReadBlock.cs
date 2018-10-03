@@ -10,17 +10,24 @@ namespace VariantAnnotation.SA
     public sealed class SaReadBlock : SaBlock
     {
         private ISaIndexOffset[] _blockOffsets;
+        public int FirstPosition => _blockOffsets[0].Position;
+        public int LastPosition => _blockOffsets[_blockOffsets.Length - 1].Position;
+        private readonly MemoryStream _stream;
+        private readonly ExtendedBinaryReader _reader;
 
         public SaReadBlock(ICompressionAlgorithm compressionAlgorithm, int size = SaWriteBlock.DefaultBlockSize)
             : base(compressionAlgorithm, size)
-        { }
+        {
+            _stream = new MemoryStream(UncompressedBlock);
+            _reader = new ExtendedBinaryReader(_stream);
+        }
 
         public void Read(Stream inputStream)
         {
             Header.Read(inputStream);
             if (Header.IsEmpty) throw new IOException("Unexpected empty header found while reading SaBlock header.");
 
-            using (var reader = new ExtendedBinaryReader(inputStream, Encoding.ASCII, true))
+            using (var reader = new ExtendedBinaryReader(inputStream, Encoding.UTF8, true))
             {
                 ReadBlockOffsets(reader);
             }
@@ -29,7 +36,7 @@ namespace VariantAnnotation.SA
             else ReadCompressedBlock(inputStream);
         }
 
-        private void ReadBlockOffsets(IExtendedBinaryReader reader)
+        private void ReadBlockOffsets(ExtendedBinaryReader reader)
         {
             int numEntries = reader.ReadOptInt32();
             _blockOffsets  = new ISaIndexOffset[numEntries];
@@ -80,6 +87,15 @@ namespace VariantAnnotation.SA
         {
             int index = BinarySearch(position);
             return index < 0 ? -1 : _blockOffsets[index].Offset;
+        }
+
+        public ExtendedBinaryReader GetAnnotationReader(int position)
+        {
+            var offset = GetBlockOffset(position);
+            if (offset < 0) return null;
+
+            _stream.Position = offset;
+            return _reader;
         }
 
         /// <summary>

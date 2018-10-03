@@ -10,9 +10,9 @@ namespace VariantAnnotation.GeneAnnotation
     {
         private const string NullGene = "nullGene";
         public string GeneName { get; }
-        public IGeneAnnotationSource[] Annotations { get; }
+        public IGeneAnnotation[] Annotations { get; }
 
-        public AnnotatedGene(string geneName, IGeneAnnotationSource[] annotations)
+        public AnnotatedGene(string geneName, IGeneAnnotation[] annotations)
         {
             GeneName = geneName;
             Annotations = annotations;
@@ -43,17 +43,17 @@ namespace VariantAnnotation.GeneAnnotation
         {
             writer.Write(GeneName);
             writer.WriteOpt(Annotations.Length);
-            foreach (IGeneAnnotationSource geneSource in Annotations) geneSource.Write(writer);
+            foreach (IGeneAnnotation geneSource in Annotations) geneSource.Write(writer);
         }
 
         public static IAnnotatedGene Read(ExtendedBinaryReader reader)
         {
             var geneName = reader.ReadAsciiString();
             var annotationLength = reader.ReadOptInt32();
-            var annotations = new IGeneAnnotationSource[annotationLength];
+            var annotations = new IGeneAnnotation[annotationLength];
             for (int i = 0; i < annotationLength; i++)
             {
-                annotations[i] = GeneAnnotationSource.Read(reader);
+                annotations[i] = GeneAnnotation.Read(reader);
             }
 
             return geneName == NullGene ? null : new AnnotatedGene(geneName, annotations);
@@ -66,7 +66,7 @@ namespace VariantAnnotation.GeneAnnotation
 
         public static IAnnotatedGene CreateEmptyGene()
         {
-            return new AnnotatedGene(NullGene, new IGeneAnnotationSource[0]);
+            return new AnnotatedGene(NullGene, new IGeneAnnotation[0]);
         }
     }
 }

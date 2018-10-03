@@ -26,17 +26,9 @@ namespace SAUtils.InputFileParsers
         /// <summary>
         /// constructor
         /// </summary>
-        private DataSourceVersionReader(string fileName)
+        public DataSourceVersionReader(string fileName)
         {
             _reader = new StreamReader(FileUtilities.GetReadStream(fileName));
-        }
-
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public DataSourceVersionReader(Stream stream)
-        {
-            _reader = new StreamReader(stream);
         }
 
         public static DataSourceVersion GetSourceVersion(string versionFileName)

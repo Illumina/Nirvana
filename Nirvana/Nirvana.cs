@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
@@ -10,7 +11,6 @@ using Phantom.Recomposer;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
@@ -48,9 +48,9 @@ namespace Nirvana
         {
             var sequenceProvider             = ProviderUtilities.GetSequenceProvider(_refSequencePath);
             var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(_inputCachePrefix, sequenceProvider);
-            var saProvider                   = ProviderUtilities.GetSaProvider(SupplementaryAnnotationDirectories);
+            var saProvider                   = ProviderUtilities.GetNsaProvider(SupplementaryAnnotationDirectories);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(SupplementaryAnnotationDirectories);
-            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(sequenceProvider.RefNameToChromosome, SupplementaryAnnotationDirectories);
+            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(SupplementaryAnnotationDirectories);
             var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
 
             var plugins    = PluginUtilities.LoadPlugins(_pluginDirectory);
@@ -60,10 +60,15 @@ namespace Nirvana
             var metrics    = new PerformanceMetrics(logger);
 
             var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
-                geneAnnotationProvider, conservationProvider);
+                geneAnnotationProvider, conservationProvider).ToList();
  
             string vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
             string jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
+
+            //read VCF to get positions for all variants
+            var variantPositions = PreLoadUtilities.GetPositions(_vcfPath, sequenceProvider.RefNameToChromosome);
+            //preload annotation providers
+
 
             using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
             using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))
@@ -85,6 +90,12 @@ namespace Nirvana
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
                         sortedVcfChecker.CheckVcfOrder(position.Chromosome.UcscName);
+                        if (previousChromIndex != position.Chromosome.Index &&
+                            variantPositions.ContainsKey(position.Chromosome))
+                        {
+                            saProvider?.PreLoad(position.Chromosome, variantPositions[position.Chromosome]);
+                        }
+
                         previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
 
                         var annotatedPosition = position.Variants != null ? annotator.Annotate(position) : null;
@@ -96,7 +107,7 @@ namespace Nirvana
                         metrics.Increment();
                     }
 
-                    WriteGeneAnnotations(annotator.GetAnnotatedGenes(), jsonWriter);
+                    jsonWriter.WriteAnnotatedGenes(annotator.GetGeneAnnotations());
                 }
                 catch (Exception e)
                 {
@@ -120,19 +131,14 @@ namespace Nirvana
             gvcfWriter?.Write(vcfLine);
         }
 
-        private static List<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
+        private static IEnumerable<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
             params IProvider[] providers)
         {
             var dataSourceVersions = new List<IDataSourceVersion>();
             if (plugins != null) foreach (var provider in plugins) if (provider.DataSourceVersions != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
             foreach (var provider in providers) if (provider != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
-            return dataSourceVersions;
-        }
 
-        private static void WriteGeneAnnotations(ICollection<IAnnotatedGene> annotatedGenes, JsonWriter writer)
-        {
-            if (annotatedGenes.Count == 0) return;
-            writer.WriteAnnotatedGenes(annotatedGenes);
+            return dataSourceVersions.ToHashSet(new DataSourceVersionComparer());
         }
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome, PerformanceMetrics metrics)
@@ -217,7 +223,7 @@ namespace Nirvana
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.PolyPhenPath(_inputCachePrefix), "PolyPhen cache", "--cache")
-                .CheckEachDirectoryContainsFiles(SupplementaryAnnotationDirectories, "supplementary annotation", "--sd", "*.nsa")
+                //.CheckEachDirectoryContainsFiles(SupplementaryAnnotationDirectories, "supplementary annotation", "--sd", "*.nsa")
                 .HasRequiredParameter(_outputFileName, "output file stub", "--out")
                 .Enable(_outputFileName == "-", () =>
                 {

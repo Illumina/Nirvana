@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Genome;
 using OptimizedCore;
+using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 
 namespace SAUtils.InputFileParsers.TOPMed
@@ -29,7 +30,7 @@ namespace SAUtils.InputFileParsers.TOPMed
             _homCount     = null;
         }
 
-        public IEnumerable<TopMedItem> GetGnomadItems()
+        public IEnumerable<TopMedItem> GetItems()
         {
             using (_reader)
             {
@@ -53,11 +54,11 @@ namespace SAUtils.InputFileParsers.TOPMed
             if (splitLine.Length < 8) return null;
 
             Clear();
+            // chr1    10169   TOPMed_freeze_5?chr1:10,169     T       C       255     SVM     VRT=1;NS=62784;AN=125568;AC=20;AF=0.000159276;Het=20;Hom=0      NA:FRQ  125568:0.000159276
 
             var chromosome = splitLine[VcfCommon.ChromIndex];
             if (!_refChromDict.ContainsKey(chromosome)) return null;
 
-            // chr1    10169   TOPMed_freeze_5?chr1:10,169     T       C       255     SVM     VRT=1;NS=62784;AN=125568;AC=20;AF=0.000159276;Het=20;Hom=0      NA:FRQ  125568:0.000159276
             var chrom      = _refChromDict[chromosome];
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
             var refAllele  = splitLine[VcfCommon.RefIndex];

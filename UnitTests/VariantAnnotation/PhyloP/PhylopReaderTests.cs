@@ -11,12 +11,12 @@ namespace UnitTests.VariantAnnotation.PhyloP
 {
     public sealed class PhylopReaderTests
     {
-        private readonly PhylopReader _phylopReader;
+        private readonly PhylopDbReader _phylopDbReader;
 
         public PhylopReaderTests()
         {
             // TODO: Fix fragile constructor
-            _phylopReader = new PhylopReader(ResourceUtilities.GetReadStream(Resources.TopPath("chr1_10918_150000.npd")));
+            _phylopDbReader = new PhylopDbReader(ResourceUtilities.GetReadStream(Resources.TopPath("chr1_10918_150000.npd")));
         }
 
         [Fact]
@@ -25,14 +25,14 @@ namespace UnitTests.VariantAnnotation.PhyloP
             var wigFixFile = new FileInfo(Resources.TopPath("mini.WigFix"));
             var version = new DataSourceVersion("phylop", "0", DateTime.Now.Ticks, "unit test");
 
-            var phylopWriter = new PhylopWriter(wigFixFile.FullName, version, GenomeAssembly.Unknown, Path.GetTempPath(), 50);
+            var phylopWriter = new PhylopDbWriter(wigFixFile.FullName, version, GenomeAssembly.Unknown, Path.GetTempPath(), 50);
 
             using (phylopWriter)
             {
                 phylopWriter.ExtractPhylopScores();
             }
 
-            var phylopReader = new PhylopReader(FileUtilities.GetReadStream(Path.GetTempPath() + Path.DirectorySeparatorChar + "chr1.npd"));
+            var phylopReader = new PhylopDbReader(FileUtilities.GetReadStream(Path.GetTempPath() + Path.DirectorySeparatorChar + "chr1.npd"));
 
             using (phylopReader)
             {
@@ -52,7 +52,7 @@ namespace UnitTests.VariantAnnotation.PhyloP
         [Fact]
         public void GetScore_BeforeFirstPosition()
         {
-            var obtainedValue = _phylopReader.GetScore(10910);
+            var obtainedValue = _phylopDbReader.GetScore(10910);
             Assert.Null(obtainedValue);
         }
 
@@ -60,7 +60,7 @@ namespace UnitTests.VariantAnnotation.PhyloP
         public void GetScore_FirstPosition()
         {
             const double desiredValue = 0.064;
-            var obtainedValue = _phylopReader.GetScore(10918);
+            var obtainedValue = _phylopDbReader.GetScore(10918);
             Assert.Equal(desiredValue, obtainedValue);
         }
 
@@ -68,14 +68,14 @@ namespace UnitTests.VariantAnnotation.PhyloP
         public void GetScore_LastPositionOfFirstInterval()
         {
             const double desiredValue = 0.179;
-            var obtainedValue = _phylopReader.GetScore(34041);
+            var obtainedValue = _phylopDbReader.GetScore(34041);
             Assert.Equal(desiredValue, obtainedValue);
         }
 
         [Fact]
         public void GetScore_BetweenFirstAndSecondInterval()
         {
-            var obtainedValue = _phylopReader.GetScore(34044);
+            var obtainedValue = _phylopDbReader.GetScore(34044);
             Assert.Null(obtainedValue);
         }
 
@@ -83,21 +83,21 @@ namespace UnitTests.VariantAnnotation.PhyloP
         public void GetScore_InsideInterval()
         {
             const double desiredValue = 0.058;
-            var obtainedValue = _phylopReader.GetScore(84285); // this is in the 5th interval
+            var obtainedValue = _phylopDbReader.GetScore(84285); // this is in the 5th interval
             Assert.Equal(desiredValue, obtainedValue);
         }
 
         [Fact]
         public void GetScore_LastPosition()
         {
-            var obtainedValue = _phylopReader.GetScore(168044);
+            var obtainedValue = _phylopDbReader.GetScore(168044);
             Assert.Equal(0.301, obtainedValue);
         }
 
         [Fact]
         public void GetScore_PastLastInterval()
         {
-            var obtainedValue = _phylopReader.GetScore(168045); //this should be past the last position of our tiny npd file
+            var obtainedValue = _phylopDbReader.GetScore(168045); //this should be past the last position of our tiny npd file
             Assert.Null(obtainedValue);
         }
     }

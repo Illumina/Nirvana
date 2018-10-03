@@ -47,6 +47,11 @@ namespace VariantAnnotation.Providers
             }
         }
 
+        public void PreLoad(IChromosome chromosome, List<int> positions)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LoadChromosome(IChromosome chromosome)
         {
             if (chromosome.Index == _currentChromosome.Index) return;

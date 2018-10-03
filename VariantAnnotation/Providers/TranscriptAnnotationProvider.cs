@@ -96,6 +96,11 @@ namespace VariantAnnotation.Providers
             AddTranscripts(annotatedPosition);
         }
 
+        public void PreLoad(IChromosome chromosome, List<int> positions)
+        {
+            throw new System.NotImplementedException();
+        }
+
         private void LoadPredictionCaches(ushort refIndex)
         {
             if (refIndex == _currentRefIndex) return;

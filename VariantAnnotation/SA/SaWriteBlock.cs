@@ -12,7 +12,7 @@ namespace VariantAnnotation.SA
     public sealed class SaWriteBlock : SaBlock
     {
         private readonly List<ISaIndexOffset> _blockPositions;
-        internal int BlockOffset;
+        public int BlockOffset { get; private set; }
 
         public const int DefaultBlockSize = 4_194_304;
 
@@ -32,17 +32,35 @@ namespace VariantAnnotation.SA
             BlockOffset += source.Length;
         }
 
-        public (int FirstPosition, int LastPosition) Write(Stream stream)
+        public void Add(byte[] buffer, int length, int position)
         {
+            _blockPositions.Add(new SaIndexOffset(position, BlockOffset));
+
+            Buffer.BlockCopy(buffer, 0, UncompressedBlock, BlockOffset, length);
+            BlockOffset += length;
+        }
+
+        public (int FirstPosition, int LastPosition,int numBytes) Write(Stream stream)
+        {
+            long initialPosition = stream.Position;
             WriteHeader(stream);
 
-            using (var writer = new ExtendedBinaryWriter(stream, Encoding.ASCII, true))
+            using (var writer = new ExtendedBinaryWriter(stream, Encoding.UTF8, true))
             {
                 WriteBlockOffsets(writer);
             }
 
-            if (Header.NumCompressedBytes > Header.NumUncompressedBytes) WriteUncompressedBlock(stream);
-            else WriteCompressedBlock(stream);
+            int numBytes = (int)(stream.Position - initialPosition);
+            if (Header.NumCompressedBytes > Header.NumUncompressedBytes)
+            {
+                WriteUncompressedBlock(stream);
+                numBytes += Header.NumUncompressedBytes;
+            }
+            else
+            {
+                WriteCompressedBlock(stream);
+                numBytes += Header.NumCompressedBytes;
+            }
 
             BlockOffset = 0;
 
@@ -50,7 +68,7 @@ namespace VariantAnnotation.SA
             int lastPosition = _blockPositions[_blockPositions.Count - 1].Position;
             _blockPositions.Clear();
 
-            return (firstPosition, lastPosition);
+            return (firstPosition, lastPosition, numBytes);
         }
 
         private void WriteBlockOffsets(IExtendedBinaryWriter writer)

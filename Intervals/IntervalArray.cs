@@ -43,7 +43,22 @@ namespace Intervals
 			return firstIndex == -1 ? null : AddOverlappingValues(firstIndex, begin, end);
 		}
 
-		/// <summary>
+        public Interval<T>[] GetAllOverlappingIntervals(int begin, int end)
+        {
+            var intervals = new List<Interval<T>>();
+            var firstIndex = GetFirstIndex(begin, end);
+            if (firstIndex == -1) return null;
+            for (var index = firstIndex; index < Array.Length; index++)
+            {
+                var interval = Array[index];
+                if (interval.Begin > end) break;
+                if (interval.Overlaps(begin, end)) intervals.Add(interval);
+            }
+
+            return intervals.ToArray();
+        }
+
+        /// <summary>
 		/// adds the overlapping values for all intervals overlapping the specified interval
 		/// </summary>
 		private T[] AddOverlappingValues(int firstIndex, int begin, int end)

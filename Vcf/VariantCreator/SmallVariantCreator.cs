@@ -9,7 +9,7 @@ namespace Vcf.VariantCreator
 {
     public static class SmallVariantCreator
     {
-        private static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false, false);
+        public static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false, false);
 
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed)
         {

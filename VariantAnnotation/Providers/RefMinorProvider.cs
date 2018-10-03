@@ -2,52 +2,39 @@
 using System.IO;
 using Genome;
 using IO;
-using OptimizedCore;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.NSA;
 using VariantAnnotation.SA;
 
 namespace VariantAnnotation.Providers
 {
     public sealed class RefMinorProvider : IRefMinorProvider
     {
-        private readonly Dictionary<int, string>[] _refMinorDictByChromosome;
+        private readonly RefMinorDbReader _reader;
 
-        public RefMinorProvider(IDictionary<string, IChromosome> refNameToChromosome, List<string> supplementaryAnnotationDirectories)
+        public RefMinorProvider(List<string> supplementaryAnnotationDirectories)
         {
-            int maxRefIndex = GetMaxRefIndex(refNameToChromosome);
-
-            _refMinorDictByChromosome = new Dictionary<int, string>[maxRefIndex + 1];
-            for (var i = 0; i <= maxRefIndex; i++) _refMinorDictByChromosome[i] = new Dictionary<int, string>();
-
             foreach (string directory in supplementaryAnnotationDirectories)
             {
-                foreach (string file in Directory.GetFiles(directory, "*.idx"))
+                foreach (string file in Directory.GetFiles(directory, "*"+SaCommon.RefMinorFileSuffix))
                 {
-                    string chromosomeName = Path.GetFileNameWithoutExtension(file).OptimizedSplit('.')[0];
-                    var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, chromosomeName);
-                    if (chromosome.Index == ushort.MaxValue) continue;
-
-                    var refMinorDict = _refMinorDictByChromosome[chromosome.Index];
-                    var refMinorPostions  = SaIndex.Read(FileUtilities.GetReadStream(file)).GlobalMajorAlleleForRefMinor;
-                    foreach (var kvp in refMinorPostions) refMinorDict[kvp.Position] = kvp.GlobalMajorAllele;
+                    var dbExtReader = new ExtendedBinaryReader(FileUtilities.GetReadStream(file));
+                    var indexFileName = file + SaCommon.IndexSufix;
+                    var indexExtReader = new ExtendedBinaryReader(FileUtilities.GetReadStream(indexFileName));
+                    _reader= new RefMinorDbReader(dbExtReader, indexExtReader);
+                    
                 }
             }
         }
 
-        private static int GetMaxRefIndex(IDictionary<string, IChromosome> refNameToChromosome)
+        public void PreLoad(IChromosome chromosome)
         {
-            ushort maxIndex = 0;
-            foreach(var chromosome in refNameToChromosome.Values)
-                if (chromosome.Index > maxIndex)
-                    maxIndex = chromosome.Index;
-            return maxIndex;
+            _reader.PreLoad(chromosome);
         }
 
         public string GetGlobalMajorAllele(IChromosome chromosome, int pos)
         {
-            if (chromosome.Index == ushort.MaxValue) return null;
-            var refMinorDict = _refMinorDictByChromosome[chromosome.Index];
-            return refMinorDict.TryGetValue(pos, out string globalMajorAllele) ? globalMajorAllele : null;
+            return _reader.GetGlobalMajorAllele(chromosome, pos);
         }
     }
 }

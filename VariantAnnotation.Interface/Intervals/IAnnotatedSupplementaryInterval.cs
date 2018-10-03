@@ -4,7 +4,7 @@ namespace VariantAnnotation.Interface.Intervals
 {
     public interface IAnnotatedSupplementaryInterval
     {
-        ISupplementaryInterval SupplementaryInterval { get; }
+        ISuppIntervalItem SupplementaryInterval { get; }
         double? ReciprocalOverlap { get; }
     }
 }

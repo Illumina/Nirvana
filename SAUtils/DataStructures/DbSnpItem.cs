@@ -1,61 +1,36 @@
 ﻿using Genome;
+using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.DataStructures
 {
-	public sealed class DbSnpItem: SupplementaryDataItem
+	public sealed class DbSnpItem: ISupplementaryDataItem
 	{
-		public long RsId { get; }
-	    public double RefAlleleFreq { get; }
-		public double AltAlleleFreq { get; }
+	    public IChromosome Chromosome { get; }
+	    public int Position { get; set; }
+	    public string RefAllele { get; set; }
+	    public string AltAllele { get; set; }
 
+        public long RsId { get; }
+	    
 	    public DbSnpItem(IChromosome chromosome,
 			int position,
 			long rsId,
 			string refAllele,
-			double refAlleleFreq,
-			string alternateAllele,
-			double altAlleleFreq)
+			string alternateAllele)
 		{
 			Chromosome      = chromosome;
-			Start           = position;
+			Position           = position;
 			RsId            = rsId;
-			ReferenceAllele = refAllele;
-			AlternateAllele = alternateAllele;
-			RefAlleleFreq   = refAlleleFreq;
-			AltAlleleFreq   = altAlleleFreq;
+			RefAllele = refAllele;
+			AltAllele = alternateAllele;
+			
 		}
 
 
-		public override SupplementaryIntervalItem GetSupplementaryInterval()
-		{
-			throw new System.NotImplementedException();
-		}
-
-
-
-		public override bool Equals(object obj)
-		{
-			// If parameter is null return false.
-
-		    if (!(obj is DbSnpItem otherItem)) return false;
-
-			// Return true if the fields match:
-			return Equals(Chromosome, otherItem.Chromosome)
-			       && Start == otherItem.Start
-			       && RsId == otherItem.RsId
-			       && string.Equals(ReferenceAllele, otherItem.ReferenceAllele)
-			       && AlternateAllele.Equals(otherItem.AlternateAllele);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				var hashCode = RsId.GetHashCode();
-				hashCode = (hashCode * 397) ^ (ReferenceAllele?.GetHashCode() ?? 0);
-				hashCode = (hashCode * 397) ^ (AlternateAllele?.GetHashCode() ?? 0);
-				return hashCode;
-			}
-		}
+		public string GetJsonString()
+	    {
+	        return $"\"rs{RsId}\"";
+	    }
+	    
 	}
 }

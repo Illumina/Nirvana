@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 using Variants;
 
@@ -14,6 +15,7 @@ namespace VariantAnnotation.AnnotatedPositions
         public IList<IAnnotatedTranscript> EnsemblTranscripts { get; } = new List<IAnnotatedTranscript>();
         public IList<IAnnotatedTranscript> RefSeqTranscripts { get; } = new List<IAnnotatedTranscript>();
         public IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; } = new List<IAnnotatedSaDataSource>();
+        public IList<ISupplementaryAnnotation> SaList { get; } = new List<ISupplementaryAnnotation>();
         public ISet<string> OverlappingGenes { get; } = new HashSet<string>();
         public IList<IOverlappingTranscript> OverlappingTranscripts { get; } = new List<IOverlappingTranscript>();
         public double? PhylopScore { get; set; }
@@ -52,7 +54,11 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
-            if (SupplementaryAnnotations.Count > 0) AddSAstoJsonObject(jsonObject);
+            
+            foreach (ISupplementaryAnnotation saItem in SaList)
+            {
+                jsonObject.AddStringValue(saItem.JsonKey, saItem.GetJsonString(), false);
+            }
             foreach (var pluginData in PluginDataSet)
             {
                 jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
@@ -81,35 +87,6 @@ namespace VariantAnnotation.AnnotatedPositions
                     return VariantType.short_tandem_repeat_variation;
                 default:
                     return variantType;
-            }
-        }
-
-        private void AddSAstoJsonObject(JsonObject jsonObject)
-        {
-            var saDict = new Dictionary<string, (bool, List<string>)>();
-            foreach (var annotatedSa in SupplementaryAnnotations)
-            {
-                var sa = annotatedSa.SaDataSource;
-
-                if (!saDict.ContainsKey(sa.KeyName))
-                {
-                    saDict[sa.KeyName] = (sa.IsArray, new List<string>());
-                }
-
-                var jsonStrings = annotatedSa.GetJsonStrings();
-                if (jsonStrings != null) saDict[sa.KeyName].Item2.AddRange(jsonStrings);
-            }
-
-            foreach (var kvp in saDict)
-            {
-                if (kvp.Value.Item1)
-                {
-                    jsonObject.AddStringValues(kvp.Key, kvp.Value.Item2.ToArray(), false);
-                }
-                else
-                {
-                    jsonObject.AddStringValue(kvp.Key, kvp.Value.Item2[0], false);
-                }
             }
         }
     }

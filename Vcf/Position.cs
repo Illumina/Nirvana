@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
@@ -48,7 +49,7 @@ namespace Vcf
         public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, VariantFactory variantFactory)
         {
             if (simplePosition == null) return null;
-
+            
             var vcfFields    = simplePosition.VcfFields;
             var altAlleles   = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',');
             bool isReference = altAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(altAlleles[0]);
@@ -58,6 +59,7 @@ namespace Vcf
                 : null;
 
             bool isRefMinor = isReference && globalMajorAllele != null;
+            
             if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
 
             var infoData   = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);

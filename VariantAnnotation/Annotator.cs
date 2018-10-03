@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -86,7 +86,6 @@ namespace VariantAnnotation
         public IAnnotatedPosition Annotate(IPosition position)
         {
             if (position == null) return null;
-
             var annotatedVariants = GetAnnotatedVariants(position.Variants);
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 
@@ -142,7 +141,19 @@ namespace VariantAnnotation
             return annotatedVariants;
         }
 
-        public IList<IAnnotatedGene> GetAnnotatedGenes() => GeneAnnotator.Annotate(_affectedGenes, _geneAnnotationProvider);
+        public IEnumerable<string> GetGeneAnnotations()
+        {
+            var geneAnnotations = new List<string>();
+            foreach (string gene in _affectedGenes)
+            {
+                var annotation = _geneAnnotationProvider.Annotate(gene);
+                if (string.IsNullOrEmpty(annotation)) continue;
+
+                geneAnnotations.Add(annotation);
+            }
+
+            return geneAnnotations.Count>0? geneAnnotations: null;
+        }
 
         public void EnableMitochondrialAnnotation() => _annotateMito = true;
     }

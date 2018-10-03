@@ -4,12 +4,18 @@ using System.Collections.Immutable;
 using System.Linq;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class ClinVarItem : SupplementaryDataItem
+    public sealed class ClinVarItem : ISupplementaryDataItem, IComparable<ClinVarItem>
     {
+        public IChromosome Chromosome { get; }
+        public int Position { get; set; }
+        public string RefAllele { get; set; }
+        public string AltAllele { get; set; }
+
         public int Stop { get; }
         public string VariantType { get; }
         public string Id { get; }
@@ -58,77 +64,53 @@ namespace SAUtils.DataStructures
 			
 		};
 
-		#region Equality Overrides
-
-		public override int GetHashCode()
-		{
-		    // ReSharper disable NonReadonlyMemberInGetHashCode
-            var hashCode = Start.GetHashCode();
-            if (Chromosome      != null) hashCode ^= Chromosome.GetHashCode();
-            if (Id              != null) hashCode ^= Id.GetHashCode();
-            if (AlternateAllele != null) hashCode ^= AlternateAllele.GetHashCode();
-            if (ReferenceAllele != null) hashCode ^= ReferenceAllele.GetHashCode();
-            // ReSharper restore NonReadonlyMemberInGetHashCode
-            return hashCode;
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is ClinVarItem item)) return false;
-            return Chromosome == item.Chromosome
-                   && Start == item.Start
-                   && Id.Equals(item.Id)
-                   && ReferenceAllele.Equals(item.ReferenceAllele)
-                   && AlternateAllele.Equals(item.AlternateAllele);
-        }
-
-        #endregion
-
 		public ClinVarItem(IChromosome chromosome,
 			int position,
             int stop,
-			IEnumerable<string> alleleOrigins,
-			string altAllele,
-            string variantType,
+		    string referenceAllele,
+		    string altAllele, 
+		    IEnumerable<string> alleleOrigins,
+			string variantType,
 			string id,
 			ReviewStatus reviewStatus,
 		    IEnumerable<string> medGenIds,
 		    IEnumerable<string> omimIds,
 		    IEnumerable<string> orphanetIds,
 		    IEnumerable<string> phenotypes,
-			string referenceAllele,
 			string significance,
 		    IEnumerable<long> pubmedIds = null,
 			long lastUpdatedDate = long.MinValue
 			)
 		{
             Chromosome       = chromosome;
-            Start            = position;
+            Position         = position;
             Stop             = stop;
             AlleleOrigins    = alleleOrigins;
-            AlternateAllele  = altAllele;
+            AltAllele  = altAllele;
             VariantType      = variantType;
             Id               = id;
             MedGenIDs        = medGenIds;
             OmimIDs          = omimIds;
             OrphanetIDs      = orphanetIds;
             Phenotypes       = phenotypes;
-            ReferenceAllele  = referenceAllele;
+            RefAllele  = referenceAllele;
             Significance     = significance;
             PubmedIds        = pubmedIds;
             LastUpdatedDate  = lastUpdatedDate;
             IsAlleleSpecific = null;
             ReviewStatus     = reviewStatus;
-        }
+		}
 
-		public string GetJsonString()
+        
+
+        public string GetJsonString()
 		{
 			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
 			//converting empty alleles to '-'
-			var refAllele = string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele;
-			var altAllele = string.IsNullOrEmpty(AlternateAllele) ? "-" : AlternateAllele;
+			var refAllele = string.IsNullOrEmpty(RefAllele) ? "-" : RefAllele;
+			var altAllele = string.IsNullOrEmpty(AltAllele) ? "-" : AltAllele;
 
 			//the reduced alt allele should never be output
 			altAllele = SaUtilsCommon.ReverseSaReducedAllele(altAllele);
@@ -153,11 +135,13 @@ namespace SAUtils.DataStructures
 		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
-		public override SupplementaryIntervalItem GetSupplementaryInterval()
-		{
-			throw new NotImplementedException();
-		}
-	}
+        public int CompareTo(ClinVarItem other)
+        {
+            return Chromosome.Index != other.Chromosome.Index
+                ? Chromosome.Index.CompareTo(other.Chromosome.Index)
+                : Position.CompareTo(other.Position);
+        }
+    }
 
 	public enum ReviewStatus
 	{
