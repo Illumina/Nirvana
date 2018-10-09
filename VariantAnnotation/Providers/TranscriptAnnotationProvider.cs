@@ -24,8 +24,8 @@ namespace VariantAnnotation.Providers
         private readonly ITranscriptCache _transcriptCache;
         private readonly ISequence _sequence;
 
-	    public string Name { get; }
-	    public GenomeAssembly Assembly { get; }
+        public string Name { get; }
+        public GenomeAssembly Assembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
         public ushort VepVersion { get; }
 
@@ -35,19 +35,23 @@ namespace VariantAnnotation.Providers
         private IPredictionCache _polyphenCache;
         private ushort _currentRefIndex = ushort.MaxValue;
 
-        public TranscriptAnnotationProvider(string pathPrefix,  ISequenceProvider sequenceProvider)
+        public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider)
         {
-            Name      = "Transcript annotation provider";
+            Name = "Transcript annotation provider";
             _sequence = sequenceProvider.Sequence;
 
-            (_transcriptCache, VepVersion) = InitiateCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)),
-                sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
+            var transcriptStream = StreamSourceUtils.GetStream(CacheConstants.TranscriptPath(pathPrefix));
+            (_transcriptCache, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
 
-            Assembly           = _transcriptCache.Assembly;
+            Assembly = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
-            _siftReader     = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.SiftPath(pathPrefix)),     PredictionCacheReader.SiftDescriptions);
-            _polyphenReader = new PredictionCacheReader(FileUtilities.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix)), PredictionCacheReader.PolyphenDescriptions);
+
+            var siftStream = StreamSourceUtils.GetStream(CacheConstants.SiftPath(pathPrefix));
+            _siftReader = new PredictionCacheReader(siftStream, PredictionCacheReader.SiftDescriptions);
+
+            var polyphenStream = StreamSourceUtils.GetStream(CacheConstants.PolyPhenPath(pathPrefix));
+            _polyphenReader = new PredictionCacheReader(polyphenStream, PredictionCacheReader.PolyphenDescriptions);
         }
 
         private static (TranscriptCache cache, ushort vepVersion) InitiateCache(Stream stream,
@@ -109,8 +113,8 @@ namespace VariantAnnotation.Providers
                 ClearCache();
                 return;
             }
-            _siftCache       = _siftReader.Read(refIndex);
-            _polyphenCache   = _polyphenReader.Read(refIndex);
+            _siftCache = _siftReader.Read(refIndex);
+            _polyphenCache = _polyphenReader.Read(refIndex);
             _currentRefIndex = refIndex;
         }
 
@@ -118,7 +122,7 @@ namespace VariantAnnotation.Providers
         {
             _siftCache = null;
             _polyphenCache = null;
-            _currentRefIndex = ushort.MaxValue; 
+            _currentRefIndex = ushort.MaxValue;
         }
 
         private void AddTranscripts(IAnnotatedPosition annotatedPosition)
@@ -134,7 +138,7 @@ namespace VariantAnnotation.Providers
 
                 TranscriptAnnotationFactory.GetAnnotatedTranscripts(annotatedVariant.Variant, overlappingTranscripts,
                     _sequence, annotatedTranscripts, annotatedVariant.OverlappingGenes,
-                    annotatedVariant.OverlappingTranscripts,_siftCache,_polyphenCache, geneFusionCandidates);
+                    annotatedVariant.OverlappingTranscripts, _siftCache, _polyphenCache, geneFusionCandidates);
 
                 if (annotatedTranscripts.Count == 0) continue;
 
@@ -174,8 +178,8 @@ namespace VariantAnnotation.Providers
                 // In case of insertions, the base(s) are assumed to be inserted at the end position
 
                 // if this is an insertion just before the beginning of the regulatory element, this takes care of it
-                var variant      = annotatedVariant.Variant;
-                var variantEnd   = variant.End;
+                var variant = annotatedVariant.Variant;
+                var variantEnd = variant.End;
                 var variantBegin = variant.Type == VariantType.insertion ? variant.End : variant.Start;
 
                 // disable regulatory region for SV larger than 50kb

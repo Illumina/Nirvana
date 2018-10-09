@@ -33,7 +33,7 @@ namespace SAUtils.RefMinorDb
         public void Write(IEnumerable<ISupplementaryDataItem> saItems)
         {
             var itemsMinHeap = new MinHeap<ISupplementaryDataItem>(SuppDataUtilities.CompareTo);
-            var chromIndex = UInt16.MaxValue;
+            var chromIndex = ushort.MaxValue;
             var currentEnsemblName = "";
 
             var benchmark = new Benchmark();
@@ -45,7 +45,7 @@ namespace SAUtils.RefMinorDb
                     if (chromIndex != ushort.MaxValue)
                     {
                         //flushing out the remaining items in buffer
-                        WriteUptoPosition(itemsMinHeap, Int32.MaxValue);
+                        WriteUptoPosition(itemsMinHeap, int.MaxValue);
                         Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
                         benchmark.Reset();
                     }
@@ -66,7 +66,7 @@ namespace SAUtils.RefMinorDb
 
             }
             //flushing out the remaining items in buffer
-            WriteUptoPosition(itemsMinHeap, Int32.MaxValue);
+            WriteUptoPosition(itemsMinHeap, int.MaxValue);
             Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
             _refMinorIndex.Write(_stream.Position);

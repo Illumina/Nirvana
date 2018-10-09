@@ -27,7 +27,7 @@ namespace SAUtils.Custom
             _intervals = new List<CustomInterval>();
 
             var firstLine = _reader.ReadLine();
-            if (!firstLine.StartsWith("#title"))
+            if (firstLine != null && !firstLine.StartsWith("#title"))
                 throw new UserErrorException("TSV file is required to begin with #title");
 
             var splits = firstLine.OptimizedSplit('=');

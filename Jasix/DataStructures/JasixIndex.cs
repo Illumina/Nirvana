@@ -137,7 +137,8 @@ namespace Jasix.DataStructures
 	    public void EndSection(string section, long fileLoc)
 	    {
 	        if (!_sectionRanges.TryGetValue(section, out var fileRange))
-	            throw new UserErrorException($"Attempting to close section:{section} before opening it!!");
+	            return;
+	        //    throw new UserErrorException($"Attempting to close section:{section} before opening it!!");
 
             if (fileRange.End!=long.MaxValue)
                 throw new UserErrorException($"Multiple closing for section{section} !!");

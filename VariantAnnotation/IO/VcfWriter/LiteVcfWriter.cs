@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OptimizedCore;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
 
@@ -73,6 +74,12 @@ namespace VariantAnnotation.IO.VcfWriter
             // write out the header lines                
             WriteHeader(headerLines, BuildVcfHeaderLines(nirvanaVersion, nirvanaDataVersion, dataSourceVersions));
         }
+
+        public LiteVcfWriter(StreamWriter vcfWriter, IEnumerable<string> headerLines,
+            IAnnotationResources annotationResources) : this(vcfWriter, headerLines,
+            annotationResources.AnnotatorVersionTag, annotationResources.VepDataVersion,
+            annotationResources.DataSourceVersions)
+        { }
 
         private static string BuildVcfHeaderLines(string nirvanaVersion,string nirvanaDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions)
         {

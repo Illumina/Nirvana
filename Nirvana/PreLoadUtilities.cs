@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.IO;
 using CommandLine.Utilities;
-using Compression.Utilities;
+using Compression.FileHandling;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
@@ -11,12 +13,21 @@ namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static Dictionary<IChromosome, List<int>> GetPositions(string vcfFile, IDictionary<string, IChromosome> refNameToChrom)
+        public static ImmutableDictionary<IChromosome, List<int>> GetPositions(BlockGZipStream vcfStream, AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom)
         {
             var benchmark = new Benchmark();
             Console.Write("Preloading variant positions....");
             var chromPositions = new Dictionary<IChromosome, List<int>>();
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(vcfFile))
+
+            IChromosome chromToAnnotate = null;
+            int endPosition = int.MaxValue;
+            if (annotationRange != null)
+            {
+                chromToAnnotate = ReferenceNameUtilities.GetChromosome(refNameToChrom, annotationRange.chromosome);
+                endPosition = annotationRange.end;
+            }
+
+            using (var reader = new StreamReader(vcfStream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -24,24 +35,25 @@ namespace Nirvana
                     if (line.StartsWith('#')) continue;
                     var splits = line.Split('\t', 6);
 
-                    string chrom     = splits[VcfCommon.ChromIndex];
-                    if (!refNameToChrom.TryGetValue(chrom, out var iChrom)) continue;
+                    string chrom = splits[VcfCommon.ChromIndex];
 
-                    int position     = int.Parse(splits[VcfCommon.PosIndex]);
+                    if (!refNameToChrom.TryGetValue(chrom, out var iChrom)) continue;
+                    if (annotationRange != null && chromToAnnotate != iChrom) continue;
+
+                    int position = int.Parse(splits[VcfCommon.PosIndex]);
+                    if (position > endPosition) break;
+
                     string refAllele = splits[VcfCommon.RefIndex];
                     string altAllele = splits[VcfCommon.AltIndex];
+
+                    if (!chromPositions.ContainsKey(iChrom)) chromPositions.Add(iChrom, new List<int>(16 *1024));
 
                     foreach (string allele in altAllele.OptimizedSplit(','))
                     {
                         if (allele.OptimizedStartsWith('<')|| allele.Equals(".")) continue;
                         
                         (int trimPos, string _, string _) = BiDirectionalTrimmer.Trim(position, refAllele,allele);
-                        
-                        if (chromPositions.TryGetValue(iChrom, out var positionList))
-                            positionList.Add(trimPos);
-                        else
-                            chromPositions.Add(iChrom, new List<int>(16*1024){trimPos});
-                        
+                        chromPositions[iChrom].Add(trimPos);
                     }
                 }
             }
@@ -55,7 +67,7 @@ namespace Nirvana
 
             Console.WriteLine($"{count} positions found in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
-            return chromPositions;
+            return chromPositions.ToImmutableDictionary();
         }
     }
 }

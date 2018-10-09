@@ -1,27 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO.Compression;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
+using Compression.FileHandling;
+using Compression.Utilities;
 using ErrorHandling;
-using Genome;
+using IO;
+using IO.StreamSource;
 using Jasix.DataStructures;
-using Phantom.Recomposer;
-using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Plugins;
-using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.IO;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.IO.VcfWriter;
-using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
-using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 using Vcf;
 
 namespace Nirvana
@@ -46,78 +40,27 @@ namespace Nirvana
 
         private ExitCodes ProgramExecution()
         {
-            var sequenceProvider             = ProviderUtilities.GetSequenceProvider(_refSequencePath);
-            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(_inputCachePrefix, sequenceProvider);
-            var saProvider                   = ProviderUtilities.GetNsaProvider(SupplementaryAnnotationDirectories);
-            var conservationProvider         = ProviderUtilities.GetConservationProvider(SupplementaryAnnotationDirectories);
-            var refMinorProvider             = ProviderUtilities.GetRefMinorProvider(SupplementaryAnnotationDirectories);
-            var geneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(SupplementaryAnnotationDirectories);
 
-            var plugins    = PluginUtilities.LoadPlugins(_pluginDirectory);
-            var annotator  = ProviderUtilities.GetAnnotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, geneAnnotationProvider, plugins);
-            var recomposer = _disableRecomposition ? new NullRecomposer() : Recomposer.Create(sequenceProvider, _inputCachePrefix);
-            var logger     = _outputFileName == "-" ? (ILogger)new NullLogger() : new ConsoleLogger();
-            var metrics    = new PerformanceMetrics(logger);
+            var annotationResources = GetAnnotationResources();
 
-            var dataSourceVersions = GetDataSourceVersions(plugins, transcriptAnnotationProvider, saProvider,
-                geneAnnotationProvider, conservationProvider).ToList();
- 
-            string vepDataVersion = transcriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
-            string jasixFileName  = _outputFileName + ".json.gz" + JasixCommons.FileExt;
+            string jasixFileName = _outputFileName == "-" ? null : _outputFileName + ".json.gz" + JasixCommons.FileExt;
+            using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(new FileStreamSource(_vcfPath)))
+            using (var outputJsonStream = _outputFileName == "-" ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
+            using (var outputJsonIndexStream = jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName))
+            using (var outputVcfStream = !_vcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".vcf.gz"))
+            using (var outputGvcfStream = !_gvcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".genome.vcf.gz"))
+                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, outputVcfStream,
+                    outputGvcfStream, annotationResources, new NullVcfFilter());
+        }
 
-            //read VCF to get positions for all variants
-            var variantPositions = PreLoadUtilities.GetPositions(_vcfPath, sequenceProvider.RefNameToChromosome);
-            //preload annotation providers
-
-
-            using (var outputWriter      = ReadWriteUtilities.GetOutputWriter(_outputFileName))
-            using (var vcfReader         = ReadWriteUtilities.GetVcfReader(_vcfPath, sequenceProvider.RefNameToChromosome, refMinorProvider, _reportAllSvOverlappingTranscripts, recomposer))
-            using (var jsonWriter        = new JsonWriter(outputWriter, jasixFileName, _annotatorVersionTag, Date.CurrentTimeStamp, vepDataVersion, dataSourceVersions, sequenceProvider.Assembly.ToString(), vcfReader.GetSampleNames()))
-            using (var vcfWriter         = _vcf ? new LiteVcfWriter(ReadWriteUtilities.GetVcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
-            using (var gvcfWriter        = _gvcf ? new LiteVcfWriter(ReadWriteUtilities.GetGvcfOutputWriter(_outputFileName), vcfReader.GetHeaderLines(), _annotatorVersionTag, vepDataVersion, dataSourceVersions) : null)
+        private AnnotationResources GetAnnotationResources()
+        {
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _reportAllSvOverlappingTranscripts, _forceMitochondrialAnnotation);
+            using (var preloadVcfStream = new BlockGZipStream(FileUtilities.GetReadStream(_vcfPath), CompressionMode.Decompress))
             {
-                try
-                {
-                    if (vcfReader.IsRcrsMitochondrion && annotator.Assembly == GenomeAssembly.GRCh37
-                        || annotator.Assembly == GenomeAssembly.GRCh38
-                        || _forceMitochondrialAnnotation)
-                        annotator.EnableMitochondrialAnnotation();
-
-                    int previousChromIndex = -1;
-                    IPosition position;
-                    var sortedVcfChecker = new SortedVcfChecker();
-
-                    while ((position = vcfReader.GetNextPosition()) != null)
-                    {
-                        sortedVcfChecker.CheckVcfOrder(position.Chromosome.UcscName);
-                        if (previousChromIndex != position.Chromosome.Index &&
-                            variantPositions.ContainsKey(position.Chromosome))
-                        {
-                            saProvider?.PreLoad(position.Chromosome, variantPositions[position.Chromosome]);
-                        }
-
-                        previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
-
-                        var annotatedPosition = position.Variants != null ? annotator.Annotate(position) : null;
-                        string json = annotatedPosition?.GetJsonString();
-
-                        if (json != null) WriteOutput(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json);
-                        else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
-
-                        metrics.Increment();
-                    }
-
-                    jsonWriter.WriteAnnotatedGenes(annotator.GetGeneAnnotations());
-                }
-                catch (Exception e)
-                {
-                    e.Data[ExitCodeUtilities.VcfLine] = vcfReader.VcfLine;
-                    throw;
-                }
+                annotationResources.GetVariantPositions(preloadVcfStream, null);
             }
-
-            metrics.ShowAnnotationTime();
-            return ExitCodes.Success;
+            return annotationResources;
         }
 
         private void WriteOutput(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput)
@@ -131,29 +74,7 @@ namespace Nirvana
             gvcfWriter?.Write(vcfLine);
         }
 
-        private static IEnumerable<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
-            params IProvider[] providers)
-        {
-            var dataSourceVersions = new List<IDataSourceVersion>();
-            if (plugins != null) foreach (var provider in plugins) if (provider.DataSourceVersions != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
-            foreach (var provider in providers) if (provider != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
-
-            return dataSourceVersions.ToHashSet(new DataSourceVersionComparer());
-        }
-
-        private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome, PerformanceMetrics metrics)
-        {
-            // ReSharper disable once InvertIf
-            if (chromosome.Index != previousChromIndex)
-            {
-                metrics.StartAnnotatingReference(chromosome);
-                previousChromIndex = chromosome.Index;
-            }
-
-            return previousChromIndex;
-        }
-
-        private static int Main(string[] args)
+        public static int Main(string[] args)
         {
             var nirvana = new Nirvana();
             var ops = new OptionSet

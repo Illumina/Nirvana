@@ -18,7 +18,7 @@ namespace Phantom.Recomposer
         public static IRecomposer Create(ISequenceProvider sequenceProvider,
             string inputCachePrefix)
         {
-            var transcriptIntervalArrays = ReadWriteUtilities.ReadCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(inputCachePrefix)), sequenceProvider.RefIndexToChromosome);
+            var transcriptIntervalArrays = ReadWriteUtilities.ReadCache(StreamSourceUtils.GetStream(CacheConstants.TranscriptPath(inputCachePrefix)), sequenceProvider.RefIndexToChromosome);
             var (geneIntervalForest, _)  = ReadWriteUtilities.GetIntervalAndTranscriptsForeachGene(transcriptIntervalArrays);
             var codonInfoProvider        = CodonInfoProvider.CreateCodonInfoProvider(transcriptIntervalArrays);
             var variantGenerator         = new VariantGenerator(sequenceProvider);

@@ -6,6 +6,7 @@ using CacheUtils.Genes.Utilities;
 using CacheUtils.IntermediateIO;
 using Compression.Utilities;
 using Genome;
+using IO.StreamSource;
 
 namespace CacheUtils.Genes.DataStores
 {
@@ -24,8 +25,8 @@ namespace CacheUtils.Genes.DataStores
         public static GlobalCache Create(string refSeqCachePath, string ensemblCachePath,
             IDictionary<ushort, IChromosome> refIndexToChromosome, IDictionary<string, IChromosome> refNameToChromosome38)
         {
-            var ensemblGenesByRef = FlattenGenes(LoadGenes(GZipUtilities.GetAppropriateReadStream(ensemblCachePath), refIndexToChromosome, refNameToChromosome38));
-            var refSeqGenesByRef  = FlattenGenes(LoadGenes(GZipUtilities.GetAppropriateReadStream(refSeqCachePath),  refIndexToChromosome, refNameToChromosome38));
+            var ensemblGenesByRef = FlattenGenes(LoadGenes(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(ensemblCachePath)), refIndexToChromosome, refNameToChromosome38));
+            var refSeqGenesByRef  = FlattenGenes(LoadGenes(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(refSeqCachePath)),  refIndexToChromosome, refNameToChromosome38));
 
             return new GlobalCache(ensemblGenesByRef, refSeqGenesByRef);
         }

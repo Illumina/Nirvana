@@ -25,8 +25,8 @@ namespace VariantAnnotation.Sequence
         public readonly CompressedSequence Sequence;
         public GenomeAssembly Assembly => Sequence.Assembly;
 
-        private readonly Dictionary<string, int> _nameToIndex         = new Dictionary<string, int>();
-        private readonly List<SequenceIndexEntry> _refSeqIndex        = new List<SequenceIndexEntry>();
+        private readonly Dictionary<string, int> _nameToIndex = new Dictionary<string, int>();
+        private readonly List<SequenceIndexEntry> _refSeqIndex = new List<SequenceIndexEntry>();
         public readonly List<ReferenceMetadata> ReferenceMetadataList = new List<ReferenceMetadata>();
 
         private long _indexOffset;
@@ -34,10 +34,10 @@ namespace VariantAnnotation.Sequence
 
         public CompressedSequenceReader(Stream stream)
         {
-            _stream              = stream;
-            _reader              = new ExtendedBinaryReader(stream);
-            Sequence             = new CompressedSequence();
-            RefNameToChromosome  = new Dictionary<string, IChromosome>();
+            _stream = stream;
+            _reader = new ExtendedBinaryReader(stream);
+            Sequence = new CompressedSequence();
+            RefNameToChromosome = new Dictionary<string, IChromosome>();
             RefIndexToChromosome = new Dictionary<ushort, IChromosome>();
 
             CheckHeaderVersion();
@@ -59,7 +59,7 @@ namespace VariantAnnotation.Sequence
 
         private void CheckHeaderVersion()
         {
-            string headerTag  = _reader.ReadString();
+            string headerTag = _reader.ReadString();
             int headerVersion = _reader.ReadInt32();
 
             if (headerTag != CompressedSequenceCommon.HeaderTag ||
@@ -121,7 +121,7 @@ namespace VariantAnnotation.Sequence
 
         private void AddReferenceName(string ensemblReferenceName, string ucscReferenceName, ushort refIndex)
         {
-            bool isUcscEmpty    = string.IsNullOrEmpty(ucscReferenceName);
+            bool isUcscEmpty = string.IsNullOrEmpty(ucscReferenceName);
             bool isEnsemblEmpty = string.IsNullOrEmpty(ensemblReferenceName);
 
             // sanity check: make sure we have at least one reference name
@@ -132,9 +132,9 @@ namespace VariantAnnotation.Sequence
 
             var chromosome = new Chromosome(ucscReferenceName, ensemblReferenceName, refIndex);
 
-            RefNameToChromosome[ucscReferenceName]    = chromosome;
+            RefNameToChromosome[ucscReferenceName] = chromosome;
             RefNameToChromosome[ensemblReferenceName] = chromosome;
-            RefIndexToChromosome[refIndex]            = chromosome;
+            RefIndexToChromosome[refIndex] = chromosome;
         }
 
         private void LoadIndex()
@@ -145,11 +145,11 @@ namespace VariantAnnotation.Sequence
             // read the index
             for (var refIndex = 0; refIndex < numRefSeqs; refIndex++)
             {
-                string name         = _reader.ReadAsciiString();
+                string name = _reader.ReadAsciiString();
                 int encodedNumBases = _reader.ReadOptInt32();
-                int numBases        = encodedNumBases & CompressedSequenceCommon.NumBasesMask;
-                long fileOffset     = _reader.ReadOptInt64();
-                int sequenceOffset  = CompressedSequenceCommon.HasSequenceOffset(encodedNumBases) ? _reader.ReadOptInt32() : 0;
+                int numBases = encodedNumBases & CompressedSequenceCommon.NumBasesMask;
+                long fileOffset = _reader.ReadOptInt64();
+                int sequenceOffset = CompressedSequenceCommon.HasSequenceOffset(encodedNumBases) ? _reader.ReadOptInt32() : 0;
 
                 _refSeqIndex.Add(new SequenceIndexEntry { NumBases = numBases, FileOffset = fileOffset, SequenceOffset = sequenceOffset });
                 _nameToIndex[name] = refIndex;
@@ -165,12 +165,12 @@ namespace VariantAnnotation.Sequence
             for (var refIndex = 0; refIndex < numRefSeqs; refIndex++)
             {
                 int numMaskedIntervals = _reader.ReadOptInt32();
-                var maskedIntervals    = new List<Interval<MaskedEntry>>();
+                var maskedIntervals = new List<Interval<MaskedEntry>>();
 
                 for (var intervalIndex = 0; intervalIndex < numMaskedIntervals; intervalIndex++)
                 {
                     int begin = _reader.ReadOptInt32();
-                    int end   = _reader.ReadOptInt32();
+                    int end = _reader.ReadOptInt32();
 
                     maskedIntervals.Add(new Interval<MaskedEntry>(begin, end, new MaskedEntry(begin, end)));
                 }

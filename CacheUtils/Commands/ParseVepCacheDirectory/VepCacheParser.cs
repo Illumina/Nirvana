@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Import;
 using CacheUtils.DataDumperImport.IO;
 using Compression.Utilities;
 using Genome;
+using IO;
+using IO.StreamSource;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
@@ -32,8 +36,9 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 
         private static List<IRegulatoryRegion> ParseRegulatoryFiles(IChromosome chromosome, string dirPath)
         {
-            var files             = Directory.GetFiles(dirPath, "*_reg_regulatory_regions_data_dumper.txt.gz");
             var regulatoryRegions = new List<IRegulatoryRegion>();
+            var files = FileUtilities.GetFileNamesInDir(dirPath, "*_reg_regulatory_regions_data_dumper.txt.gz")
+                    .ToArray();
 
             foreach (string dumpPath in VepRootDirectory.GetSortedFiles(files))
             {
@@ -45,8 +50,8 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 
         private List<MutableTranscript> ParseTranscriptFiles(IChromosome chromosome, string dirPath)
         {
-            var files       = Directory.GetFiles(dirPath, "*_transcripts_data_dumper.txt.gz");
             var transcripts = new List<MutableTranscript>();
+            var files = FileUtilities.GetFileNamesInDir(dirPath, "*_transcripts_data_dumper.txt.gz").ToArray();
 
             foreach (string dumpPath in VepRootDirectory.GetSortedFiles(files))
             {
@@ -61,7 +66,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         {
             Console.WriteLine("- processing {0}", Path.GetFileName(filePath));
 
-            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(filePath)))
+            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(filePath))))
             {
                 foreach (var ad in reader.GetRootNode().Value.Values)
                 {
@@ -90,7 +95,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         {
             Console.WriteLine("- processing {0}", Path.GetFileName(filePath));
 
-            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(filePath)))
+            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(filePath))))
             {
                 foreach (var node in reader.GetRootNode().Value.Values)
                 {
@@ -98,7 +103,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 
                     foreach (var tNode in transcriptNodes.Values)
                     {
-                        if (!(tNode is ObjectValueNode transcriptNode))        throw new InvalidOperationException("Expected a transcript object value node, but the current node is not an object value.");
+                        if (!(tNode is ObjectValueNode transcriptNode)) throw new InvalidOperationException("Expected a transcript object value node, but the current node is not an object value.");
                         if (transcriptNode.Type != "Bio::EnsEMBL::Transcript") throw new InvalidOperationException($"Expected a transcript node, but the current data type is: [{transcriptNode.Type}]");
 
                         var transcript = ImportTranscript.Parse(transcriptNode, chromosome, _source);

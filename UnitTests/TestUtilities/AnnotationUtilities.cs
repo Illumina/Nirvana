@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Genome;
+using IO;
 using Nirvana;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -15,15 +17,16 @@ namespace UnitTests.TestUtilities
         internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
             string vcfLine, bool enableVerboseTranscripts, IDictionary<string, IChromosome> refNameToChromosome)
         {
-            var refMinorProvider = ProviderUtilities.GetRefMinorProvider(saPaths);
-            var annotatorAndRef = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
+            var annoationStreamSourceCollections = saPaths?.Select(StreamSourceUtils.GetStreamSourceCollection).ToArray();
+            var refMinorProvider                 = ProviderUtilities.GetRefMinorProvider(annoationStreamSourceCollections);
+            var annotatorAndRef                  = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
 
-            var annotator      = annotatorAndRef.Annotator;
-            var refNames       = annotatorAndRef.RefNames;
-            var variantFactory = new VariantFactory(refNames, enableVerboseTranscripts);
+            var annotator                        = annotatorAndRef.Annotator;
+            var refNames                         = annotatorAndRef.RefNames;
+            var variantFactory                   = new VariantFactory(refNames, enableVerboseTranscripts);
 
-            var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
-            var annotatedPosition = annotator.Annotate(position);
+            var position                         = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
+            var annotatedPosition                = annotator.Annotate(position);
 
             return annotatedPosition;
         }
@@ -36,12 +39,13 @@ namespace UnitTests.TestUtilities
 
         private static (Annotator Annotator, IDictionary<string, IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
         {
-            var sequenceFilePath             = cacheFilePrefix + ".bases";
-            var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
-            var refNames                     = sequenceProvider.RefNameToChromosome;
-            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
-            var saProvider                   = ProviderUtilities.GetNsaProvider(saPaths);
-            var conservationProvider         = ProviderUtilities.GetConservationProvider(saPaths);
+            var annoationStreamSourceCollections = saPaths?.Select(StreamSourceUtils.GetStreamSourceCollection).ToArray();
+            var sequenceFilePath                 = cacheFilePrefix + ".bases";
+            var sequenceProvider                 = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
+            var refNames                         = sequenceProvider.RefNameToChromosome;
+            var transcriptAnnotationProvider     = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
+            var saProvider                       = ProviderUtilities.GetNsaProvider(annoationStreamSourceCollections);
+            var conservationProvider             = ProviderUtilities.GetConservationProvider(annoationStreamSourceCollections);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);
             return (annotator,refNames);

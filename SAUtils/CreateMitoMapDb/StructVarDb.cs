@@ -69,7 +69,7 @@ namespace SAUtils.CreateMitoMapDb
             var mergedMitoMapVarItems = MitoMapSvReader.MergeAndSort(mitoMapSvReaders);
 
             string outFileName = $"{version.Name}_{version.Version}";
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
+            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
             {
                 var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsaStream), version, GenomeAssembly.rCRS, SaCommon.MitoMapTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion);
                 nsiWriter.Write(mergedMitoMapVarItems);

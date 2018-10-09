@@ -52,7 +52,7 @@
     },
     "SK Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\MS_data\\NA12878_AH72T3CCXX-l2_S1.genome.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh38\\Both90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o NIR_NA12878 ",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\MS_data\\NA12878_AH72T3CCXX-l2_S1.genome.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o NIR_NA12878 ",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
     },
     "SK Pedigree": {
@@ -74,6 +74,11 @@
       "commandName": "Project",
       "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in C:\\Development\\TestDatasets\\Mother.vcf.gz --out C:\\Development\\TestDatasets\\mom",
       "workingDirectory": "C:\\Development\\TestDatasets"
+    },
+    "SK streaming": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache http://illumina-annotation.s3.amazonaws.com/Cache/26/GRCh37/Ensembl --ref http://illumina-annotation.s3.amazonaws.com/References/5/Homo_sapiens.GRCh37.Nirvana.dat  --in https://illumina-annotation.s3.amazonaws.com/Test/Mother.vcf.gz --out .",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\streaming"
     },
     "RR_momGen_chr22_s3": {
       "commandName": "Project",

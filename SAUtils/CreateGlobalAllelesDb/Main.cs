@@ -4,6 +4,7 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
+using IO.StreamSource;
 using SAUtils.InputFileParsers;
 using SAUtils.InputFileParsers.DbSnp;
 using VariantAnnotation.Providers;
@@ -57,7 +58,7 @@ namespace SAUtils.CreateGlobalAllelesDb
         private static ExitCodes ProgramExecution()
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            var globalMinorReader = new GlobalMinorReader(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider.RefNameToChromosome);
+            var globalMinorReader = new GlobalMinorReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(_inputFile)), referenceProvider.RefNameToChromosome);
             var version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             
             string outFileName = $"{version.Name}_{version.Version}_globalMinor";

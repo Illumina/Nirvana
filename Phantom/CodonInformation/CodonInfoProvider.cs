@@ -12,6 +12,7 @@ namespace Phantom.CodonInformation
     public sealed class CodonInfoProvider : ICodonInfoProvider
     {
         private readonly IntervalForest<ICodingBlock> _commonIntervalForest;
+        // ReSharper disable once NotAccessedField.Local
 
         private CodonInfoProvider(IntervalForest<ICodingBlock> commonIntervalForest)
         {
@@ -22,11 +23,9 @@ namespace Phantom.CodonInformation
         {
             int numChromosomes = transcriptIntervalArrays.Length;
             var commonIntervalArrays = new IntervalArray<ICodingBlock>[numChromosomes];
-            var codingBlockGraphs = new Graph<ICodingBlock>[numChromosomes];
 
             for (var chrIndex = 0; chrIndex < numChromosomes; chrIndex++)
             {
-                codingBlockGraphs[chrIndex] = new Graph<ICodingBlock>(true);
                 var transcriptIntervalArray = transcriptIntervalArrays[chrIndex];
                 if (transcriptIntervalArray == null) continue;
                 var geneCdsIntervals = GetPhasedCdsIntervals(transcriptIntervalArray);
@@ -36,7 +35,6 @@ namespace Phantom.CodonInformation
                 {
                     var transcriptToCodingBlocks =
                         GetTranscriptToCodingBlocks(transcriptIntervals, gene.OnReverseStrand);
-                    codingBlockGraphs[chrIndex].MergeGraph(GetCodingGraph(transcriptToCodingBlocks));
                     intervalsWithPhase.AddRange(GetIntervalsWithPhase(transcriptToCodingBlocks));
                 }
                 commonIntervalArrays[chrIndex] = new IntervalArray<ICodingBlock>(intervalsWithPhase.OrderBy(x => x.Begin).ToArray());

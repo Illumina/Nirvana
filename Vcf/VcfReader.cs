@@ -4,6 +4,7 @@ using System.IO;
 using Genome;
 using IO;
 using OptimizedCore;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
@@ -14,11 +15,13 @@ namespace Vcf
 {
     public sealed class VcfReader : IVcfReader
     {
+        private readonly StreamReader _headerReader;
         private readonly StreamReader _reader;
         private readonly IRecomposer _recomposer;
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly IVcfFilter _vcfFilter;
 
         public bool IsRcrsMitochondrion { get; private set; }
         public string VcfLine { get; private set; }
@@ -51,15 +54,56 @@ namespace Vcf
 
         public string[] GetSampleNames() => _sampleNames;
 
-        public VcfReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer)
+        private VcfReader(StreamReader headerReader, StreamReader vcfReader, IDictionary<string, IChromosome> refNameToChromosome,
+            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer, IVcfFilter vcfFilter)
         {
-            _reader              = FileUtilities.GetStreamReader(stream);
-            _variantFactory      = new VariantFactory(refNameToChromosome, enableVerboseTranscript);
-            _refMinorProvider    = refMinorProvider;
+            _headerReader = headerReader;
+            _reader = vcfReader;
+            _variantFactory = new VariantFactory(refNameToChromosome, enableVerboseTranscript);
+            _refMinorProvider = refMinorProvider;
+            _vcfFilter = vcfFilter;
             _refNameToChromosome = refNameToChromosome;
             bool hasSampleColumn = ParseHeader();
-            _recomposer          = hasSampleColumn ? recomposer : new NullRecomposer();
+            _recomposer = hasSampleColumn ? recomposer : new NullRecomposer();
+        }
+
+        private VcfReader(StreamReader headerReader, StreamReader vcfReader, IAnnotationResources annotationResources, IVcfFilter vcfFilter) : this (headerReader, vcfReader,
+            annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider,
+            annotationResources.ReportAllSvOverlappingTranscripts, annotationResources.Recomposer, vcfFilter)
+        { }
+
+        public static VcfReader Create(Stream headerStream, Stream vcfStream,
+            IDictionary<string, IChromosome> refNameToChromosome,
+            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer,
+            IVcfFilter vcfFilter) => new VcfReader(FileUtilities.GetStreamReader(headerStream),
+            FileUtilities.GetStreamReader(vcfStream), refNameToChromosome,
+            refMinorProvider, enableVerboseTranscript, recomposer, vcfFilter);
+
+        public static VcfReader Create(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
+            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer,
+            IVcfFilter vcfFilter)
+        {
+            var reader = FileUtilities.GetStreamReader(stream);
+            return new VcfReader(reader, reader, refNameToChromosome,
+                refMinorProvider, enableVerboseTranscript, recomposer, vcfFilter);
+        }
+
+        private static VcfReader Create(Stream stream, IAnnotationResources annotationResources, IVcfFilter vcfFilter)
+        {
+            var reader = FileUtilities.GetStreamReader(stream);
+            return new VcfReader(reader, reader, annotationResources, vcfFilter);
+        }
+
+        public static VcfReader Create(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
+            IVcfFilter vcfFilter)
+        {
+            if (headerStream == null) return Create(vcfStream, annotationResources, vcfFilter);
+
+            vcfStream.Position = Tabix.VirtualPosition.From(annotationResources.InputStartVirtualPosition).BlockOffset;
+            return new VcfReader(FileUtilities.GetStreamReader(headerStream),
+                    FileUtilities.GetStreamReader(vcfStream),
+                    annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider,
+                    annotationResources.ReportAllSvOverlappingTranscripts, annotationResources.Recomposer, vcfFilter);
         }
 
         private bool ParseHeader()
@@ -71,7 +115,7 @@ namespace Vcf
             while (true)
             {
                 // grab the next line - stop if we have reached the main header or read the entire file
-                line = _reader.ReadLine();
+                line = _headerReader.ReadLine();
                 if (line == null || line.StartsWith(VcfCommon.ChromosomeHeader))
                 {
                     hasSampleColumn = HasSampleColumn(line);
@@ -94,6 +138,8 @@ namespace Vcf
             _headerLines.Add(line);
 
             _sampleNames = ExtractSampleNames(line);
+
+            _vcfFilter.FastForward(_reader);
 
             return hasSampleColumn;
         }
@@ -130,8 +176,10 @@ namespace Vcf
         {
             while (_queuedPositions.Count == 0)
             {
-                VcfLine = _reader.ReadLine();
-                var simplePositions = _recomposer.ProcessSimplePosition(SimplePosition.GetSimplePosition(VcfLine, _refNameToChromosome));
+                VcfLine = _vcfFilter.GetNextLine(_reader);
+
+                var simplePositions = _recomposer.ProcessSimplePosition(
+                    SimplePosition.GetSimplePosition(VcfLine, _vcfFilter, _refNameToChromosome));
                 foreach (var simplePosition in simplePositions)
                 {
                     _queuedPositions.Enqueue(simplePosition);

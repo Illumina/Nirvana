@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
 
 namespace IO
@@ -12,5 +13,14 @@ namespace IO
 
         public static StreamReader GetStreamReader(Stream stream, bool leaveOpen = false) =>
             new StreamReader(stream, Encoding.Default, true, StreamReaderBufferSize, leaveOpen);
+
+        public static string[] GetFileNamesInDir(string directory, string pattern = null)
+        {
+            if (!Directory.Exists(directory))
+            {
+                throw new FileNotFoundException($"{directory} doesn't exist.");
+            }
+            return pattern == null ?  Directory.GetFiles(directory) : Directory.GetFiles(directory, pattern);
+        }
     }
 }

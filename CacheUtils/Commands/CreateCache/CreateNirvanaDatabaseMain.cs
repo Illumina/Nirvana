@@ -16,6 +16,7 @@ using ErrorHandling;
 using Genome;
 using Intervals;
 using IO;
+using IO.StreamSource;
 using VariantAnnotation.Interface;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
@@ -40,11 +41,11 @@ namespace CacheUtils.Commands.CreateCache
 
             (var refIndexToChromosome, var refNameToChromosome, int numRefSeqs) = SequenceHelper.GetDictionaries(_inputReferencePath);
 
-            using (var transcriptReader = new MutableTranscriptReader(GZipUtilities.GetAppropriateReadStream(transcriptPath), refIndexToChromosome))
-            using (var regulatoryReader = new RegulatoryRegionReader(GZipUtilities.GetAppropriateReadStream(regulatoryPath), refIndexToChromosome))
-            using (var siftReader       = new PredictionReader(GZipUtilities.GetAppropriateReadStream(siftPath), refIndexToChromosome, IntermediateIoCommon.FileType.Sift))
-            using (var polyphenReader   = new PredictionReader(GZipUtilities.GetAppropriateReadStream(polyphenPath), refIndexToChromosome, IntermediateIoCommon.FileType.Polyphen))
-            using (var geneReader       = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.UniversalGeneFilePath), refNameToChromosome))
+            using (var transcriptReader = new MutableTranscriptReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(transcriptPath)), refIndexToChromosome))
+            using (var regulatoryReader = new RegulatoryRegionReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(regulatoryPath)), refIndexToChromosome))
+            using (var siftReader       = new PredictionReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(siftPath)), refIndexToChromosome, IntermediateIoCommon.FileType.Sift))
+            using (var polyphenReader   = new PredictionReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(polyphenPath)), refIndexToChromosome, IntermediateIoCommon.FileType.Polyphen))
+            using (var geneReader       = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(ExternalFiles.UniversalGeneFilePath)), refNameToChromosome))
             {
                 var genomeAssembly   = transcriptReader.Header.Assembly;
                 var source           = transcriptReader.Header.Source;

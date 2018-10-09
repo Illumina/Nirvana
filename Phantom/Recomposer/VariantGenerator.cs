@@ -52,7 +52,7 @@ namespace Phantom.Recomposer
             {
                 simplePositions[indexTuple.PosIndex].IsDecomposed[indexTuple.VarIndex] = true;
             }
-            return recomposedAlleleSet.GetRecomposedVcfRecords().Select(x => SimplePosition.GetSimplePosition(x, _sequenceProvider.RefNameToChromosome, true));
+            return recomposedAlleleSet.GetRecomposedVcfRecords().Select(x => SimplePosition.GetSimplePosition(x, new NullVcfFilter(), _sequenceProvider.RefNameToChromosome, true));
         }
 
         private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleBlock alleleBlock)
@@ -107,7 +107,7 @@ namespace Phantom.Recomposer
 
         private static string GetPhaseSetForRecomposedVarint(IEnumerable<string> psTagsThisSample, IEnumerable<bool> isHomozygous)
         {
-            foreach (var (psTag, homozygousity) in psTagsThisSample.Zip(isHomozygous, (a, b) => (a, b)))
+            foreach (var (psTag, homozygousity) in psTagsThisSample.Zip(isHomozygous, (a, b) => new Tuple<string, bool>(a, b)))
             {
                 if (!homozygousity) return psTag;
             }

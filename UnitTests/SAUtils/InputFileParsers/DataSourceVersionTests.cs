@@ -1,4 +1,5 @@
 ﻿using System;
+using IO;
 using OptimizedCore;
 using SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
@@ -13,8 +14,8 @@ namespace UnitTests.SAUtils.InputFileParsers
 		public void ReadDataVersionFromFile()
 		{
             DataSourceVersion version;
-		    using (var reader = new DataSourceVersionReader(Resources.TopPath("dbSNP.version")))
-		    {
+            using (var reader = new DataSourceVersionReader(FileUtilities.GetReadStream(Resources.TopPath("dbSNP.version"))))
+            {
                 version = reader.GetVersion();
             }
 

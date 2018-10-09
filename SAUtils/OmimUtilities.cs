@@ -6,6 +6,7 @@ using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Helpers;
 using Compression.Utilities;
+using IO.StreamSource;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.SA;
@@ -18,7 +19,7 @@ namespace SAUtils
         {
             var phenotypes = new List<OmimItem.Phenotype>();
 
-            if (String.IsNullOrEmpty(line)) return phenotypes;
+            if (string.IsNullOrEmpty(line)) return phenotypes;
 
             var infos = line.OptimizedSplit(';');
             phenotypes.AddRange(infos.Select(ExtractPhenotype));
@@ -30,17 +31,17 @@ namespace SAUtils
         {
             info = info.Trim(' ').Replace(@"\\'", "'");
 
-            if (String.IsNullOrWhiteSpace(info) || String.IsNullOrEmpty(info)) return null;
+            if (string.IsNullOrWhiteSpace(info) || string.IsNullOrEmpty(info)) return null;
 
             var phenotypeRegex = new Regex(@"^(.+?)(?:,\s(\d{6}))?\s\((\d)\)(?:,\s)?(.*)?$");
             var match = phenotypeRegex.Match(info);
             var phenotypeGroup = match.Groups[1].ToString();
             ParsePhenotypeMapping(phenotypeGroup, out var phenotype, out var comments);
 
-            var mimNumber = String.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
+            var mimNumber = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
             var mapping = (OmimItem.Mapping)Convert.ToInt16(match.Groups[3].Value);
 
-            var inheritance = String.IsNullOrEmpty(match.Groups[4].Value) ? null : match.Groups[4].ToString();
+            var inheritance = string.IsNullOrEmpty(match.Groups[4].Value) ? null : match.Groups[4].ToString();
             var inheritances = ExtractInheritances(inheritance);
             return new OmimItem.Phenotype(mimNumber, phenotype, mapping, comments, inheritances);
         }
@@ -48,7 +49,7 @@ namespace SAUtils
         private static HashSet<string> ExtractInheritances(string inheritance)
         {
             var inheritances = new HashSet<string>();
-            if (String.IsNullOrEmpty(inheritance)) return inheritances;
+            if (string.IsNullOrEmpty(inheritance)) return inheritances;
 
             foreach (var content in inheritance.OptimizedSplit(','))
             {
@@ -87,7 +88,7 @@ namespace SAUtils
 
             UgaGene[] genes;
 
-            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(universalGeneArchivePath),
+            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(universalGeneArchivePath)),
                 refNameToChromosome))
             {
                 genes = reader.GetGenes();
@@ -105,7 +106,7 @@ namespace SAUtils
             {
                 var key = geneIdFunc(gene);
                 var symbol = gene.Symbol;
-                if (String.IsNullOrEmpty(key) || String.IsNullOrEmpty(symbol)) continue;
+                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(symbol)) continue;
                 dict[key] = symbol;
             }
             return dict;

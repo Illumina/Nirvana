@@ -5,6 +5,7 @@ using IO;
 using Jasix;
 using Jasix.DataStructures;
 using OptimizedCore;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -21,7 +22,25 @@ namespace VariantAnnotation.IO
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
 
         public JsonWriter(StreamWriter writer, string jasixFileName, string annotator, string creationTime, string vepDataVersion,
-            IEnumerable<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
+            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames) : this(writer, jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName), annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames)
+        {
+        }
+
+        private JsonWriter(Stream jsonStream, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
+            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames) : this(GetProperWriter(jsonStream), indexStream, annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames)
+        {
+        }
+
+        public JsonWriter(Stream jsonStream, Stream indexStream, IAnnotationResources annotationResources, string creationTime, string[] sampleNames) : this(jsonStream, indexStream, annotationResources.AnnotatorVersionTag, creationTime, annotationResources.VepDataVersion, annotationResources.DataSourceVersions, annotationResources.SequenceProvider.Assembly.ToString(), sampleNames)
+        {
+        }
+
+        private static StreamWriter GetProperWriter(Stream jsonStream) => jsonStream is BlockGZipStream
+            ? new BgzipTextWriter((BlockGZipStream)jsonStream)
+            : new StreamWriter(jsonStream);
+
+        public JsonWriter(StreamWriter writer, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
+            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
         {
             _writer              = writer;
             _writer.NewLine      = "\n";
@@ -31,12 +50,13 @@ namespace VariantAnnotation.IO
             _bgzipTextWriter = writer as BgzipTextWriter;
 
             _jasixIndexCreator = _bgzipTextWriter != null
-                ? new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName))
+                ? new OnTheFlyIndexCreator(indexStream)
                 : null;
 
             WriteHeader(annotator, creationTime, genomeAssembly, JsonCommon.SchemaVersion, vepDataVersion,
                 dataSourceVersions, sampleNames);
         }
+
 
         private void WriteHeader(string annotator, string creationTime, string genomeAssembly, int schemaVersion,
             string vepDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
@@ -67,6 +87,7 @@ namespace VariantAnnotation.IO
         {
             WriteFooter();
             _jasixIndexCreator?.Dispose();
+            _writer.Flush();
             _writer.Dispose();
         }
 

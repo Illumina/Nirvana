@@ -34,7 +34,7 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920" };
             AddLines(headers);
-            Assert.Throws<FormatException>(() => new VcfReader(_ms, null, null, false, null));
+            Assert.Throws<FormatException>(() => VcfReader.Create(_ms, null, null, false, null, new NullVcfFilter()));
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16" };
             AddLines(headers);
             IEnumerable<string> observedHeaders;
-            using (var vcfReader = new VcfReader(_ms, null, null, false, new NullRecomposer()))
+            using (var vcfReader = VcfReader.Create(_ms, null, null, false, new NullRecomposer(), new NullVcfFilter()))
             {
                 observedHeaders = vcfReader.GetHeaderLines();
             }
@@ -57,7 +57,7 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "##dataSource=ClinVar,version:unknown,release date:2016-09-01", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
             IEnumerable<string> observedHeaders;
-            using (var vcfReader = new VcfReader(_ms, null, null, false, new NullRecomposer()))
+            using (var vcfReader = VcfReader.Create(_ms, null, null, false, new NullRecomposer(), new NullVcfFilter()))
             {
                 observedHeaders = vcfReader.GetHeaderLines();
             }
@@ -71,7 +71,7 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
             string[] samples;
-            using (var vcfReader = new VcfReader(_ms, null, null, false, new NullRecomposer()))
+            using (var vcfReader = VcfReader.Create(_ms, null, null, false, new NullRecomposer(), new NullVcfFilter()))
             {
                 samples = vcfReader.GetSampleNames();
             }
@@ -99,7 +99,7 @@ namespace UnitTests.Vcf
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
 
             IPosition observedResult;
-            using (var vcfReader = new VcfReader(_ms, refNameToChromosome, refMinorProvider.Object, false, new NullRecomposer()))
+            using (var vcfReader = VcfReader.Create(_ms, refNameToChromosome, refMinorProvider.Object, false, new NullRecomposer(), new NullVcfFilter()))
             {
                 observedResult = vcfReader.GetNextPosition();
             }

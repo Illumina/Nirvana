@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Genome;
 using IO;
+using IO.StreamSourceCollection;
 using OptimizedCore;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
@@ -44,15 +45,15 @@ namespace VariantAnnotation.GeneAnnotation
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        public GeneAnnotationProvider(List<string> supplementaryAnnotationDirectories)
+        public GeneAnnotationProvider(IStreamSourceCollection[] annotationStreamSourceCollections)
         {
             Name = "Gene annotation provider";
             _ngaReaders = new List<NgaReader>();
-            foreach (string directory in supplementaryAnnotationDirectories)
+            foreach (var collection in annotationStreamSourceCollections)
             {
-                foreach (var fileName in Directory.GetFiles(directory, "*" +SaCommon.NgaFileSuffix))
+                foreach (var streamSource in collection.GetStreamSources(SaCommon.NgaFileSuffix))
                 {
-                    _ngaReaders.Add(new NgaReader(FileUtilities.GetReadStream(fileName)));
+                    _ngaReaders.Add(new NgaReader(streamSource.GetStream()));
                 }
             }
         }

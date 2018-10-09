@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Genome;
 using IO;
+using IO.StreamSourceCollection;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
 using VariantAnnotation.SA;
@@ -12,17 +14,15 @@ namespace VariantAnnotation.Providers
     {
         private readonly RefMinorDbReader _reader;
 
-        public RefMinorProvider(List<string> supplementaryAnnotationDirectories)
+        public RefMinorProvider(IEnumerable<IStreamSourceCollection> annotationStreamSourceCollections)
         {
-            foreach (string directory in supplementaryAnnotationDirectories)
+            foreach (var collection in annotationStreamSourceCollections)
             {
-                foreach (string file in Directory.GetFiles(directory, "*"+SaCommon.RefMinorFileSuffix))
+                foreach (var streamSource in collection.GetStreamSources(SaCommon.RefMinorFileSuffix))
                 {
-                    var dbExtReader = new ExtendedBinaryReader(FileUtilities.GetReadStream(file));
-                    var indexFileName = file + SaCommon.IndexSufix;
-                    var indexExtReader = new ExtendedBinaryReader(FileUtilities.GetReadStream(indexFileName));
+                    var dbExtReader = new ExtendedBinaryReader(streamSource.GetStream());
+                    var indexExtReader = new ExtendedBinaryReader(streamSource.GetAssociatedStreamSource(SaCommon.IndexSufix).GetStream());
                     _reader= new RefMinorDbReader(dbExtReader, indexExtReader);
-                    
                 }
             }
         }

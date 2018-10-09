@@ -11,10 +11,10 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ReferenceSequenceProvider : ISequenceProvider
     {
-        public IDictionary<string, IChromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
+        public IDictionary<string, IChromosome> RefNameToChromosome => _sequenceReader.RefNameToChromosome;
         public IDictionary<ushort, IChromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
-        public GenomeAssembly Assembly                               => _sequenceReader.Assembly;
-        public ISequence Sequence                                    => _sequenceReader.Sequence;
+        public GenomeAssembly Assembly => _sequenceReader.Assembly;
+        public ISequence Sequence => _sequenceReader.Sequence;
 
         public string Name { get; } = "Reference sequence provider";
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = null;
@@ -26,8 +26,8 @@ namespace VariantAnnotation.Providers
         public ReferenceSequenceProvider(Stream stream)
         {
             _currentChromosome = new EmptyChromosome(string.Empty);
-            _sequenceReader    = new CompressedSequenceReader(stream);
-            _cytogeneticBands  = new CytogeneticBands(_sequenceReader.CytogeneticBands);
+            _sequenceReader = new CompressedSequenceReader(stream);
+            _cytogeneticBands = new CytogeneticBands(_sequenceReader.CytogeneticBands);
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
@@ -43,7 +43,7 @@ namespace VariantAnnotation.Providers
             const string assertionNumber = "NC_012920.1";
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
-                annotatedVariant.HgvsgNotation =  HgvsgNotation.GetNotation(assertionNumber,annotatedVariant.Variant,Sequence,new Interval(0,Sequence.Length));
+                annotatedVariant.HgvsgNotation = HgvsgNotation.GetNotation(assertionNumber, annotatedVariant.Variant, Sequence, new Interval(0, Sequence.Length));
             }
         }
 

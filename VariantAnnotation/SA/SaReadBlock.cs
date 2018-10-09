@@ -61,7 +61,7 @@ namespace VariantAnnotation.SA
 
         private void ReadCompressedBlock(Stream inputStream)
         {
-            int numBytesRead = inputStream.Read(CompressedBlock, 0, Header.NumCompressedBytes);
+            int numBytesRead = inputStream.ForcedRead(CompressedBlock, 0, Header.NumCompressedBytes);
             if (numBytesRead != Header.NumCompressedBytes)
             {
                 throw new IOException($"Expected {Header.NumCompressedBytes} bytes from the block, but received only {numBytesRead} bytes.");
@@ -76,7 +76,7 @@ namespace VariantAnnotation.SA
 
         private void ReadUncompressedBlock(Stream inputStream)
         {
-            int numUncompressedBytes = inputStream.Read(UncompressedBlock, 0, Header.NumUncompressedBytes);
+            int numUncompressedBytes = inputStream.ForcedRead(UncompressedBlock, 0, Header.NumUncompressedBytes);
             if (numUncompressedBytes != Header.NumUncompressedBytes)
             {
                 throw new IOException($"Expected {Header.NumUncompressedBytes} bytes from the uncompressed block, but received only {numUncompressedBytes} bytes.");

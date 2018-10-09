@@ -11,6 +11,7 @@ using CacheUtils.Genbank;
 using CacheUtils.Logger;
 using Genome;
 using IO;
+using IO.StreamSource;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Logger;
@@ -106,7 +107,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             logger.Write("- loading the intermediate Genbank file... ");
 
             Dictionary<string, GenbankEntry> genbankDict;
-            using (var reader = new IntermediateIO.GenbankReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.GenbankFilePath)))
+            using (var reader = new IntermediateIO.GenbankReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(ExternalFiles.GenbankFilePath))))
             {
                 genbankDict = reader.GetIdToGenbank();
             }

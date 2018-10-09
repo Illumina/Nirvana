@@ -8,7 +8,7 @@ namespace CacheUtils.Helpers
     public static class SequenceHelper
     {
         private static CompressedSequenceReader GetSequenceReader(string referencePath) =>
-            new CompressedSequenceReader(FileUtilities.GetReadStream(referencePath));
+            new CompressedSequenceReader(StreamSourceUtils.GetStream(referencePath));
 
         public static (IDictionary<ushort, IChromosome> refIndexToChromosome, IDictionary<string, IChromosome>
             refNameToChromosome, int numRefSeqs) GetDictionaries(string referencePath)

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Genome;
 using IO;
+using IO.StreamSourceCollection;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.PhyloP;
@@ -13,47 +15,49 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ConservationScoreProvider : IAnnotationProvider
     {
-		private readonly NpdReader _phylopReader;
+        private readonly NpdReader _phylopReader;
 
+        public string Name { get; }
+        public GenomeAssembly Assembly { get; }
+        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
-		public string Name { get; }
-		public GenomeAssembly Assembly { get; }
-		public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
-
-		public ConservationScoreProvider(IEnumerable<string> dirPaths)
-		{
+        public ConservationScoreProvider(NpdReader phylopReader)
+        {
+            _phylopReader = phylopReader;
             Name = "Conservation score provider";
-
-		    foreach (string saDir in dirPaths)
-		    {
-		        var phylopFiles = Directory.GetFiles(saDir, "*"+SaCommon.PhylopFileSuffix);
-		        if (phylopFiles.Length > 0)
-		        {
-		            var npdFile = phylopFiles[0];
-		            var npdIndexFile = npdFile + SaCommon.IndexSufix;
-                    _phylopReader = new NpdReader(FileUtilities.GetReadStream(npdFile), FileUtilities.GetReadStream(npdIndexFile));
-		            break;//we can have only one phylop database
-		        }
-		    }
-
-		    Assembly                  = _phylopReader.Assembly;
-            DataSourceVersions        = new []{_phylopReader.Version};
+            Assembly = phylopReader.Assembly;
+            DataSourceVersions = new[] { phylopReader.Version };
         }
 
-		public void Annotate(IAnnotatedPosition annotatedPosition)
-		{
-			foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
-			{
-				if (annotatedVariant.Variant.Type != VariantType.SNV) continue;
-				annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome, annotatedVariant.Variant.Start);
-			}
-		}
+        public static ConservationScoreProvider GetConservationScoreProvider(IEnumerable<IStreamSourceCollection> annotationStreamSourceCollections)
+        {
+
+            foreach (var collection in annotationStreamSourceCollections)
+            {
+                var phylopStreamSources = collection.GetStreamSources(SaCommon.PhylopFileSuffix).ToArray();
+                if (phylopStreamSources.Length <= 0) continue;
+                var npdSource = phylopStreamSources[0];
+                var npdIndexSource = npdSource.GetAssociatedStreamSource(SaCommon.IndexSufix);
+                //we can have only one phylop database
+                return new ConservationScoreProvider(new NpdReader(npdSource.GetStream(), npdIndexSource.GetStream()));
+            }
+
+            return null;
+        }
+
+        public void Annotate(IAnnotatedPosition annotatedPosition)
+        {
+            foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
+            {
+                if (annotatedVariant.Variant.Type != VariantType.SNV) continue;
+                annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome, annotatedVariant.Variant.Start);
+            }
+        }
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
             throw new NotImplementedException();
         }
 
-        
-	}
+    }
 }

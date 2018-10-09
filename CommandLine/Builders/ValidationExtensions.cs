@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using ErrorHandling;
 
 namespace CommandLine.Builders
@@ -44,13 +45,28 @@ namespace CommandLine.Builders
                     $"The {description} file was not specified. Please use the {commandLineOption} parameter.",
                     ExitCodes.MissingCommandLineOption);
             }
-            else if (isRequired && (ignoreValue == null || filePath != ignoreValue) && !File.Exists(filePath))
+            else if (isRequired && (ignoreValue == null || filePath != ignoreValue) && !File.Exists(filePath) && !CheckUrlExist(filePath))
             {
                 validator.Data.AddError($"The {description} file ({filePath}) does not exist.", ExitCodes.FileNotFound);
             }
 
             return validator;
         }
+
+
+        private static bool CheckUrlExist(string url)
+        {
+            try
+            {
+                WebRequest webRequest = WebRequest.Create(url);
+                webRequest.GetResponse();
+            }
+            catch //If exception thrown then couldn't get response from address
+            {
+                return false;
+            }
+            return true;
+        }      
 
         public static IConsoleAppValidator CheckOutputFilenameSuffix(this IConsoleAppValidator validator,
             string filePath, string fileSuffix, string description)
@@ -91,6 +107,9 @@ namespace CommandLine.Builders
 
             foreach (string directoryPath in directories)
             {
+                //todo: temp code to test http
+                if (directoryPath.StartsWith("http")) continue;
+
                 var files = Directory.Exists(directoryPath) ? Directory.GetFiles(directoryPath, searchPattern) : null;
                 if (files != null && files.Length != 0) continue;
 

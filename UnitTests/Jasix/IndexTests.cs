@@ -198,7 +198,7 @@ namespace UnitTests.Jasix
             Assert.Equal(100, index.GetSectionEnd(section));
         }
 
-        [Fact]
+        [Fact (Skip = "No longer considered as an exception")]
         public void EndSection_before_beginning_throws_exception()
         {
             var index = new JasixIndex();

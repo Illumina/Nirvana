@@ -48,7 +48,7 @@ namespace ErrorHandling
 			};
 		}
 
-	    internal static ExitCodes GetExitCode(Type exceptionType)
+	    public static ExitCodes GetExitCode(Type exceptionType)
 	    {
             if (!ExceptionsToExitCodes.TryGetValue(exceptionType, out ExitCodes exitCode)) exitCode = ExitCodes.InvalidFunction;
             return exitCode;

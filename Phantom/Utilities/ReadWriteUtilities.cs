@@ -49,10 +49,10 @@ namespace Phantom.Utilities
 
         private static Interval<IGene> GetGeneInterval(IGene gene) => new Interval<IGene>(gene.Start, gene.End, gene);
 
-        public static IntervalArray<ITranscript>[] ReadCache(FileStream fileStream, IDictionary<ushort, IChromosome> refIndexToChromosome)
+        public static IntervalArray<ITranscript>[] ReadCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             IntervalArray<ITranscript>[] transcriptIntervalArrays;
-            using (var reader = new TranscriptCacheReader(fileStream))
+            using (var reader = new TranscriptCacheReader(stream))
             {
                 transcriptIntervalArrays = reader.Read(refIndexToChromosome).TranscriptIntervalArrays;
             }

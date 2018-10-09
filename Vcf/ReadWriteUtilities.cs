@@ -26,8 +26,8 @@ namespace Vcf
 	        IRefMinorProvider refMinorProvider, bool verboseTranscript, IRecomposer recomposer)
 	    {
 	        bool useStdInput = vcfPath == "-";
-            var stream = useStdInput ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(vcfPath);
-            return new VcfReader(stream, chromosomeDictionary, refMinorProvider, verboseTranscript, recomposer);
+            var stream = useStdInput ? Console.OpenStandardInput() : new BlockGZipStream(StreamSourceUtils.GetStream(vcfPath), CompressionMode.Decompress);
+            return VcfReader.Create(stream, chromosomeDictionary, refMinorProvider, verboseTranscript, recomposer, new NullVcfFilter());
         }
         
 	    public static StreamWriter GetVcfOutputWriter(string outputPath)
@@ -37,7 +37,8 @@ namespace Vcf
 	            : GZipUtilities.GetStreamWriter(outputPath + ".vcf.gz");
 
 	    }
-	    public static StreamWriter GetGvcfOutputWriter(string outputPath)
+
+        public static StreamWriter GetGvcfOutputWriter(string outputPath)
 	    {
 	        return outputPath == "-"
 	            ? new StreamWriter(Console.OpenStandardOutput())

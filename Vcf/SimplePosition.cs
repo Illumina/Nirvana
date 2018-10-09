@@ -18,7 +18,7 @@ namespace Vcf
         public bool[] IsDecomposed { get; private set; }
         public bool IsRecomposed { get; private set; }
 
-        public SimplePosition(IChromosome chromosome, int start, string refAllele, string[] altAlleles)
+        private SimplePosition(IChromosome chromosome, int start, string refAllele, string[] altAlleles)
         {
             Chromosome = chromosome;
             Start      = start;
@@ -26,14 +26,16 @@ namespace Vcf
             AltAlleles = altAlleles;
         }
 
-        public static SimplePosition GetSimplePosition(string[] vcfFields, IDictionary<string, IChromosome> refNameToChromosome, bool isRecomposed = false)
+        public static SimplePosition GetSimplePosition(string[] vcfFields, IVcfFilter vcfFilter, IDictionary<string, IChromosome> refNameToChromosome, bool isRecomposed = false)
         {
+
             var simplePosition = new SimplePosition(
                 ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]),
-                Convert.ToInt32(vcfFields[VcfCommon.PosIndex]),
+                int.Parse(vcfFields[VcfCommon.PosIndex]),
                 vcfFields[VcfCommon.RefIndex],
                 vcfFields[VcfCommon.AltIndex].OptimizedSplit(','));
             
+            if (vcfFilter.PassedTheEnd(simplePosition.Chromosome, simplePosition.Start)) return null;
             
             simplePosition.End = vcfFields[VcfCommon.AltIndex].OptimizedStartsWith('<') || vcfFields[VcfCommon.AltIndex] == "*" ? -1 : simplePosition.Start + simplePosition.RefAllele.Length - 1;
             simplePosition.VcfFields = vcfFields;
@@ -42,8 +44,10 @@ namespace Vcf
             return simplePosition;
         }
 
-        public static SimplePosition GetSimplePosition(string vcfLine,
+        public static SimplePosition GetSimplePosition(string vcfLine, IVcfFilter vcfFilter,
             IDictionary<string, IChromosome> refNameToChromosome) => vcfLine == null ? null :
-            GetSimplePosition(vcfLine.OptimizedSplit('\t'), refNameToChromosome);
+            GetSimplePosition(vcfLine.OptimizedSplit('\t'), vcfFilter, refNameToChromosome);
+
+        public static SimplePosition GetSimplePosition(string vcfLine, IDictionary<string, IChromosome> refNameToChromosome) => GetSimplePosition(vcfLine, new NullVcfFilter(), refNameToChromosome);
     }
 }

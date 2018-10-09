@@ -13,7 +13,7 @@ using Variants;
 
 namespace VariantAnnotation.Providers
 {
-    public sealed class NsaProvider:IAnnotationProvider
+    public sealed class NsaProvider : IAnnotationProvider
     {
         public string Name => "Supplementary annotation provider";
         public GenomeAssembly Assembly { get; }
@@ -28,7 +28,7 @@ namespace VariantAnnotation.Providers
             _nsaReaders = nsaReaders;
             _nsiReaders = nsiReaders;
 
-            IEnumerable<GenomeAssembly> assemblies=null;
+            IEnumerable<GenomeAssembly> assemblies = null;
             if (_nsaReaders != null)
             {
                 DataSourceVersions = _nsaReaders.Select(x => x.Version);
@@ -42,14 +42,14 @@ namespace VariantAnnotation.Providers
             }
 
             var distinctAssemblies = assemblies?.Where(x => !AssembliesIgnoredInConsistancyCheck.Contains(x)).Distinct().ToArray();
-            if (distinctAssemblies ==null || distinctAssemblies.Length > 1)
+            if (distinctAssemblies == null || distinctAssemblies.Length > 1)
             {
-                if (_nsaReaders!=null)
+                if (_nsaReaders != null)
                     foreach (INsaReader nsaReader in _nsaReaders)
                     {
-                        Console.WriteLine(nsaReader.Version+"\tAssembly:"+nsaReader.Assembly);
+                        Console.WriteLine(nsaReader.Version + "\tAssembly:" + nsaReader.Assembly);
                     }
-                if (_nsiReaders !=null)
+                if (_nsiReaders != null)
                     foreach (INsiReader nsiReader in _nsiReaders)
                     {
                         Console.WriteLine(nsiReader.Version + "\tAssembly:" + nsiReader.Assembly);
@@ -62,9 +62,9 @@ namespace VariantAnnotation.Providers
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
         {
-            if (_nsaReaders!=null) AddSmallVariantAnnotations(annotatedPosition);
+            if (_nsaReaders != null) AddSmallVariantAnnotations(annotatedPosition);
 
-            if (_nsiReaders!=null) GetStructuralVariantAnnotations(annotatedPosition);
+            if (_nsiReaders != null) GetStructuralVariantAnnotations(annotatedPosition);
         }
 
         private void GetStructuralVariantAnnotations(IAnnotatedPosition annotatedPosition)
@@ -105,9 +105,9 @@ namespace VariantAnnotation.Providers
                     }
 
                     if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, annotations, annotatedVariant, variant);
-                    
+
                     else AddNonAlleleSpecificAnnotations(annotations, variant, annotatedVariant, nsaReader);
-                    
+
                 }
             }
         }
