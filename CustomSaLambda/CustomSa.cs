@@ -5,7 +5,6 @@ using Amazon.Lambda.Core;
 using Cloud;
 using Genome;
 using IO;
-using IO.StreamSource;
 using SAUtils;
 using SAUtils.Custom;
 using SAUtils.DataStructures;
@@ -13,6 +12,7 @@ using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using VariantAnnotation.Sequence;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -46,7 +46,7 @@ namespace CustomSaLambda
                 var referenceProvider = new ReferenceSequenceProvider(StreamSourceUtils.GetStream(NirvanaHelper.GetS3RefLocation(genomeAssembly)));
 
                 var refNameToChromosome =
-                    CacheUtils.Helpers.SequenceHelper.GetDictionaries(referencePath).refNameToChromosome;
+                    SequenceHelper.GetDictionaries(referencePath).refNameToChromosome;
 
                 var inputS3Client = S3Utilities.GetS3ClientWrapperFromEnvironment(customSaConfig.inputTsv.bucketName);
                 var customTsvStream = new S3StreamSource(inputS3Client, customSaConfig.inputTsv).GetStream();
@@ -66,6 +66,8 @@ namespace CustomSaLambda
                     SaCommon.SchemaVersion, false))
                 {
                     jsonTag = customReader.JsonTag.TrimEnd();
+                    Console.WriteLine($"Local NSA path is {localNsaPath}");
+                    Console.WriteLine($"{customSaConfig.outputDir.path}, {jsonTag + SaCommon.SaFileSuffix}");
                     nsaWriter.Write(customReader.GetItems());
                     intervals = customReader.GetCustomIntervals();
                 }
@@ -73,7 +75,7 @@ namespace CustomSaLambda
                 var outputS3Client = S3Utilities.GetS3ClientWrapperFromEnvironment(customSaConfig.outputDir.bucketName);
 
                 outputFiles.Add(S3Utilities.UploadBaseAndIndexFiles(outputS3Client, customSaConfig.outputDir,
-                    jsonTag + SaCommon.SaFileSuffix, jsonTag + SaCommon.SaFileSuffix, SaCommon.IndexSufix));
+                    LocalTempOutputPath + jsonTag + SaCommon.SaFileSuffix, jsonTag + SaCommon.SaFileSuffix, SaCommon.IndexSufix));
 
 
                 if (intervals != null)

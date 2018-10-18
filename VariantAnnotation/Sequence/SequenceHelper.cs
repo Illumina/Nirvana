@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Genome;
 using IO;
-using VariantAnnotation.Sequence;
 
-namespace CacheUtils.Helpers
+namespace VariantAnnotation.Sequence
 {
     public static class SequenceHelper
     {

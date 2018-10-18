@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using CacheUtils.Helpers;
 using CacheUtils.PredictionCache;
 using CacheUtils.TranscriptCache;
 using CommandLine.Builders;
@@ -21,6 +20,7 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.CombineCacheDirectories
 {

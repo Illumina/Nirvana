@@ -32,7 +32,7 @@
     },
     "RR clinvar": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar --disable-recomposition",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\46.2\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar --disable-recomposition",
       "workingDirectory": "c:\\Development\\TestDatasets"
     },
     "RR dq": {
@@ -91,7 +91,7 @@
     },
     "RR_refMinor": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-RefMinor-GRCh37.vcf.gz --out C:\\Development\\TestDatasets\\refMinor",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-RefMinor-GRCh37.vcf.gz --out C:\\Development\\TestDatasets\\refMinor",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "RR_dogBeach": {
@@ -112,6 +112,11 @@
     "RR_custom": {
       "commandName": "Project",
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz --out custom",
+      "workingDirectory": "c:\\Development\\TestDatasets"
+    },
+    "RR_dragen_na12878": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in NA12878-dragen-joint.vcf.gz --out dragenNa12878 --disable-recomposition",
       "workingDirectory": "c:\\Development\\TestDatasets"
     }
   }

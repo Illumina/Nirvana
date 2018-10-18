@@ -6,6 +6,7 @@ using Compression.Utilities;
 using ErrorHandling;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.GFF
 {

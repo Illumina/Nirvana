@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
+using Compression.FileHandling;
 using Genome;
 
 namespace Tabix
@@ -36,6 +38,14 @@ namespace Tabix
 
             return new Index(format, sequenceNameIndex, sequenceBeginIndex, sequenceEndIndex, commentChar,
                 numLinesToSkip, referenceSequences, refIndexToTabixIndex);
+        }
+
+        public static Index GetTabixIndex(Stream tabixStream, IDictionary<string, IChromosome> refNameToChromosome)
+        {
+            using (var binaryReader = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress)))
+            {
+                return Read(binaryReader, refNameToChromosome);
+            }
         }
 
         private static string[] GetReferenceSequenceNames(byte[] concatenatedBytes, int numRefSeqs)

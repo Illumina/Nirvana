@@ -95,21 +95,13 @@ namespace AnnotationLambda
             return output;
         }
 
-        public static Index GetTabixIndex(Stream tabixStream, IDictionary<string, IChromosome> refNameToChromosome)
-        {
-            using (var binaryReader = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress)))
-            {
-                return Reader.Read(binaryReader, refNameToChromosome);
-            }
-        }
-
         internal static long GetTabixVirtualPosition(AnnotationConfig annotationConfig, IS3Client s3Client, IDictionary<string, IChromosome> refNameToChromosome)
         {
             // process the entire file if no range specified
             if (annotationConfig.annotationRange == null) return 0;
 
             var tabixStream = new S3StreamSource(s3Client, annotationConfig.inputVcf).GetAssociatedStreamSource(NirvanaHelper.TabixSuffix).GetStream();
-            var tabixIndex = GetTabixIndex(tabixStream, refNameToChromosome);
+            var tabixIndex = Reader.GetTabixIndex(tabixStream, refNameToChromosome);
             var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, annotationConfig.annotationRange.chromosome);
 
             return tabixIndex.GetOffset(chromosome, annotationConfig.annotationRange.start);

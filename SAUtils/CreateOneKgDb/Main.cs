@@ -60,7 +60,7 @@ namespace SAUtils.CreateOneKgDb
             var oneKGenReader = new OneKGenReader(_inputFile, referenceProvider.RefNameToChromosome);
             var version = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             
-            string outFileName = $"{version.Name}_{version.Version}";
+            string outFileName = $"{version.Name}_{version.Version}".Replace(' ','_');
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
             using (var writer = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.OneKgenTag, true, false, SaCommon.SchemaVersion, false))

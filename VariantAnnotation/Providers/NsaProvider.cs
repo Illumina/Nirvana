@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
 using VariantAnnotation.AnnotatedPositions;
@@ -165,11 +166,11 @@ namespace VariantAnnotation.Providers
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
-            //Console.Write("Preloading SA.....");
-            //var benchmark = new Benchmark();
+            Console.Write("\nPreloading SA.....");
+            var benchmark = new Benchmark();
             foreach (INsaReader nsaReader in _nsaReaders)
                 nsaReader.PreLoad(chromosome, positions);
-            //Console.WriteLine($"{Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
+            Console.WriteLine($"{Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
         }
     }
 }

@@ -121,6 +121,7 @@ namespace UnitTests.SAUtils.NsaWriters
                     var saReader = new NsaReader(extReader, indexStream, 1024);
                     Assert.Equal(GenomeAssembly.GRCh37, saReader.Assembly);
                     Assert.Equal(version.ToString(), saReader.Version.ToString());
+                    saReader.PreLoad(_chrom1, new List<int>() { 100, 105 });
                     var annotations = saReader.GetAnnotation(_chrom1, 100).ToList();
 
                     Assert.Equal("T", annotations[0].refAllele);
@@ -131,16 +132,18 @@ namespace UnitTests.SAUtils.NsaWriters
                     Assert.Equal("", annotations[1].altAllele);
                     Assert.Equal("\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":\"significance\",\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[1].annotation);
 
-                    var (refAllele,  altAllele,  annotation) = saReader.GetAnnotation(_chrom2, 200).First();
+                    saReader.PreLoad(_chrom2, new List<int>() { 200, 205 });
+                    var (refAllele, altAllele, annotation) = saReader.GetAnnotation(_chrom2, 200).First();
                     Assert.Equal("G", refAllele);
                     Assert.Equal("A", altAllele);
                     Assert.NotNull(annotation);
                 }
 
-                
+
             }
-            
+
         }
+
 
         private IEnumerable<DbSnpItem> GetDbsnpItems(int count)
         {
@@ -184,7 +187,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var extReader = new ExtendedBinaryReader(saStream))
                 {
                     var saReader = new NsaReader(extReader, indexStream, 1024);
-                    saReader.PreLoad(_chrom2, new List<int> { 200, 205 });
+                    saReader.PreLoad(_chrom1, GetPositions(50, 1000));
 
                     Assert.Null(saReader.GetAnnotation(_chrom1, 90));//before any SA existed
                     Assert.NotNull(saReader.GetAnnotation(_chrom1, 100));//first entry of first block
@@ -194,7 +197,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 }
             }
         }
-        
+
         private List<int> GetPositions(int start, int count)
         {
             var positions = new List<int>();

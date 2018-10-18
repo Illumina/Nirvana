@@ -59,7 +59,7 @@ namespace SAUtils.RefMinorDb
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             var version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
-            string outFileName = $"{version.Name}_{version.Version}_{SaCommon.RefMinorTag}";
+            string outFileName = $"{version.Name}_{version.Version}_{SaCommon.RefMinorTag}".Replace(' ','_');
 
             using (var refMinorReader = new RefMinorReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.RefMinorFileSuffix)))

@@ -6,7 +6,6 @@ using CacheUtils.Genes;
 using CacheUtils.Genes.DataStores;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
-using CacheUtils.Helpers;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
@@ -19,6 +18,7 @@ using Microsoft.Extensions.Configuration;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.UniversalGeneArchive
 {

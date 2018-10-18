@@ -5,7 +5,7 @@
         public const uint GuardInt = 4041327495;
         public const int DefaultBlockSize = 8 * 1024 * 1024;
         public const string DataHeader    = "NirvanaData";
-        public const ushort DataVersion   = 46;
+        public const ushort DataVersion   = 47;
         public const ushort SchemaVersion = 22;
 
         public const double RefMinorThreshold = 0.95;

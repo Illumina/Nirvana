@@ -21,6 +21,7 @@ using VariantAnnotation.Interface;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.CreateCache
 {

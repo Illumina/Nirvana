@@ -10,6 +10,7 @@ using IO.StreamSource;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.SA;
+using VariantAnnotation.Sequence;
 
 namespace SAUtils
 {

@@ -14,7 +14,7 @@ using VariantAnnotation.SA;
 
 namespace SAUtils
 {
-    public sealed class NsaWriter:IDisposable
+    public sealed class NsaWriter : IDisposable
     {
         private readonly ExtendedBinaryWriter _writer;
         private readonly Stream _stream;
@@ -23,27 +23,27 @@ namespace SAUtils
         private readonly MemoryStream _memStream;
         private readonly ExtendedBinaryWriter _memWriter;
 
-        private readonly SaWriteBlock _block;
+        private readonly NsaBlock _block;
         private readonly ChunkedIndex _index;
         private readonly bool _isPositional;
         private readonly ISequenceProvider _refProvider;
 
 
         //todo: filter chromIndex=ushort.Max
-        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, int blockSize= SaCommon.DefaultBlockSize)
+        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream = writer.BaseStream;
             _writer = writer;
             _isPositional = isPositional;
-            _block  = new SaWriteBlock(new Zstandard(), blockSize);
+            _block = new NsaBlock(new Zstandard(), blockSize);
             _refProvider = refProvider;
-        
-            _index     = new ChunkedIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
-            _memBuffer = new byte[short.MaxValue*2];
+
+            _index = new ChunkedIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
+            _memBuffer = new byte[short.MaxValue * 2];
             _memStream = new MemoryStream(_memBuffer);
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
-        
+
         public void Write(IEnumerable<ISupplementaryDataItem> saItems)
         {
             var itemsMinHeap = new MinHeap<ISupplementaryDataItem>(SuppDataUtilities.CompareTo);
@@ -69,9 +69,7 @@ namespace SAUtils
                     _refProvider.LoadChromosome(saItem.Chromosome);
                 }
 
-                //if (saItem.Position== 8021911)
-                //    Console.WriteLine("clinvar bug");
-                if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != _refProvider.Sequence.Substring(saItem.Position-1, saItem.RefAllele.Length)) continue;
+                if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length)) continue;
                 //the items come in sorted order of the pre-trimmed position. 
                 //So when writing out, we have to make sure that we do not write past this position. 
                 //Once a position has been seen in the stream, we can safely write all positions before that.
@@ -88,7 +86,7 @@ namespace SAUtils
             Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
             _index.Write();
-            
+
         }
 
         private void WriteUptoPosition(MinHeap<ISupplementaryDataItem> itemsHeap, int position)
@@ -114,8 +112,6 @@ namespace SAUtils
         private void WritePosition(List<ISupplementaryDataItem> saItems)
         {
             int position = saItems[0].Position;
-            //if (position == 16558315)
-            //    Console.WriteLine("bug");
 
             _memStream.Position = 0;
             if (_isPositional)
@@ -148,14 +144,15 @@ namespace SAUtils
 
         private void Flush(ushort chromIndex)
         {
-            
+
             if (_block.BlockOffset == 0) return;
 
             long fileOffset = _stream.Position;
-            (int firstPosition, int lastPosition, int numBytes)= _block.Write(_stream);
+            (int firstPosition, int lastPosition, int numBytes) = _block.Write(_writer);
+            _block.Clear();
             _index.Add(chromIndex, firstPosition, lastPosition, fileOffset, numBytes);
         }
-        
+
         public void Dispose()
         {
             _writer?.Dispose();

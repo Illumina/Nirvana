@@ -12,6 +12,18 @@ using VariantAnnotation.SA;
 
 namespace VariantAnnotation.NSA
 {
+    public sealed class AnnotationItem
+    {
+        public readonly int Position;
+        public readonly byte[] Data;
+
+        public AnnotationItem(int position, byte[] data)
+        {
+            Position = position;
+            Data = data;
+        }
+    }
+
     public sealed class NsaReader : INsaReader
     {
         private readonly ExtendedBinaryReader _reader;
@@ -19,7 +31,7 @@ namespace VariantAnnotation.NSA
         private readonly ChunkedIndex _index;
         public IDataSourceVersion Version { get; }
 
-        private readonly SaReadBlock _block;
+        private readonly NsaBlock _block;
 
         public string JsonKey { get; }
         public bool MatchByAllele { get; }
@@ -27,12 +39,13 @@ namespace VariantAnnotation.NSA
         public bool IsPositional { get; }
         public readonly int SchemaVersion;
 
-        private Dictionary<int, List<(string, string, string)>> _annotations;
+        private AnnotationItem[] _annotations;
+        private int _annotationsCount;
 
         public NsaReader(ExtendedBinaryReader reader, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _reader = reader;
-            _block = new SaReadBlock(new Zstandard(), blockSize);
+            _block = new NsaBlock(new Zstandard(), blockSize);
 
             _index = new ChunkedIndex(indexStream);
             Assembly = _index.Assembly;
@@ -44,7 +57,7 @@ namespace VariantAnnotation.NSA
             IsPositional = _index.IsPositional;
 
             if (SchemaVersion != SaCommon.SchemaVersion)
-                throw new UserErrorException($"ERROR!! SA schema version mismatch. Expected{SaCommon.SchemaVersion}, observed {SchemaVersion} for {JsonKey}");
+                throw new UserErrorException($"SA schema version mismatch. Expected{SaCommon.SchemaVersion}, observed {SchemaVersion} for {JsonKey}");
 
         }
 
@@ -59,88 +72,87 @@ namespace VariantAnnotation.NSA
             int lastPosition = positions[count - 1];
 
             _cacheInterval = new ChromosomeInterval(chrom, firstPosition, lastPosition);
+            _annotations = new AnnotationItem[positions.Count];
+            _annotationsCount = 0;
+            (long start, _, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
+            if (start == -1) return;
+            _reader.BaseStream.Position = start;
 
-            (long startLocation, long endLocation, int blockCount) = _index.GetFileRange(chrom.Index, firstPosition, lastPosition);
-            if (startLocation == -1) return;
-            _reader.BaseStream.Position = startLocation;
-            var buffer = _reader.ReadBytes((int)(endLocation - startLocation));
-
-            _annotations = new Dictionary<int, List<(string refAllele, string altAllele, string jsonString)>>(positions.Count);
-            var posIndex = 0;
-            using (var memStream = new MemoryStream(buffer))
+            for (int i = 0; i < positions.Count && blockCount >0; blockCount--)
             {
-                for (var i = 0; i < blockCount; i++)
+                _block.Read(_reader);
+                //if (positions[i] < _block.FirstPosition || _block.LastPosition < positions[i]) continue;
+                
+                foreach ((int position, byte[] data) annotation in _block.GetAnnotations())
                 {
-                    _block.Read(memStream);
+                    if (annotation.position < positions[i]) continue;
 
-                    while (posIndex < positions.Count)
-                    {
-                        var position = positions[posIndex];
+                    while (i < positions.Count && positions[i] < annotation.position) i++;
+                    if (i >= positions.Count) break;
 
-                        if (position < _block.FirstPosition)
-                        {
-                            posIndex++;
-                            continue;
-                        }
+                    var position = positions[i];
 
-                        if (_block.LastPosition < position) break;
-                        posIndex++;
+                    if (position != annotation.position) continue;
 
-                        var reader = _block.GetAnnotationReader(position);
-                        if (reader != null) _annotations.TryAdd(position, GetAnnotations(reader));//todo: why TryAdd
-
-                    }
+                    _annotations[_annotationsCount++] = new AnnotationItem(position, annotation.data);
                 }
             }
 
         }
 
-        private List<(string, string, string)> GetAnnotations(ExtendedBinaryReader reader)
+        private IEnumerable<(string refAllele, string altAllele, string jsonString)> ExtractAnnotations(byte[] data)
         {
-            if (IsPositional)
+            using (var reader = new ExtendedBinaryReader(new MemoryStream(data)))
             {
-                var positionalAnno = reader.ReadString();
-                return new List<(string, string, string)> { (null, null, positionalAnno) };
-            }
+                if (IsPositional)
+                {
+                    var positionalAnno = reader.ReadString();
+                    return new List<(string, string, string)> { (null, null, positionalAnno) };
+                }
 
-            var count = reader.ReadOptInt32();
-            var annotations = new List<(string, string, string)>();
-            for (var i = 0; i < count; i++)
-            {
-                string refAllele = reader.ReadAsciiString();
-                string altAllele = reader.ReadAsciiString();
-                string annotation = reader.ReadString();
-                annotations.Add((refAllele ?? "", altAllele ?? "", annotation));
-            }
+                var count = reader.ReadOptInt32();
+                var annotations = new (string, string, string)[count];
+                for (var i = 0; i < count; i++)
+                {
+                    string refAllele = reader.ReadAsciiString();
+                    string altAllele = reader.ReadAsciiString();
+                    string annotation = reader.ReadString();
+                    annotations[i] = (refAllele ?? "", altAllele ?? "", annotation);
+                }
 
-            return annotations;
+                return annotations;
+            }
         }
-        private long _fileOffset = -1;
 
         public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position)
         {
-            if (_cacheInterval != null && _cacheInterval.Overlaps(chrom, position, position))
-            {
-                if (_annotations == null) return null;
-                return _annotations.TryGetValue(position, out var annotations) ? annotations : null;
-            }
+            if (_cacheInterval == null)
+                Console.WriteLine($"WARNING: No data cached for {JsonKey} reader. Did you preload?");
+            else
+                if (!_cacheInterval.Overlaps(chrom, position, position))
+                Console.WriteLine($"WARNING: cached range does not include position:{position} for {JsonKey} reader");
 
-            //no caching performed, proceed with regular query
-            (long startLocation, long _, int _) = _index.GetFileRange(chrom.Index, position, position);
-            if (startLocation < 0) return null;
-
-            if (startLocation != _fileOffset) SetFileOffset(startLocation);
-            var reader = _block.GetAnnotationReader(position);
-
-            return reader != null ? GetAnnotations(reader) : null;
-
+            if (_annotations == null) return null;
+            var index = BinarySearch(position);
+            return index < 0 ? null : ExtractAnnotations(_annotations[index].Data);
         }
 
-        private void SetFileOffset(long fileOffset)
+        private int BinarySearch(int position)
         {
-            _reader.BaseStream.Position = fileOffset;
-            _fileOffset = fileOffset;
-            _block.Read(_reader.BaseStream);
+            var begin = 0;
+            int end = _annotationsCount - 1;
+
+            while (begin <= end)
+            {
+                int index = begin + (end - begin >> 1);
+
+                int ret = _annotations[index].Position.CompareTo(position);
+                if (ret == 0) return index;
+                if (ret < 0) begin = index + 1;
+                else end = index - 1;
+            }
+
+            return ~begin;
         }
 
     }

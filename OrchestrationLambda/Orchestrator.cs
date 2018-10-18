@@ -6,10 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Serialization.Json;
-using AnnotationLambda;
 using Genome;
 using Cloud;
 using OptimizedCore;
+using VariantAnnotation.Sequence;
 
 // Assembly attribute to enable the Lambda function's JSON runConfig to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(JsonSerializer))]
@@ -148,8 +148,8 @@ namespace OrchestrationLambda
         private static IEnumerable<IChromosome> GetChromesomeInVcf(Stream tabixStream, GenomeAssembly genomeAssembly)
         {
             var refFileLocation = NirvanaHelper.GetS3RefLocation(genomeAssembly);
-            var refNameToChromosome = CacheUtils.Helpers.SequenceHelper.GetDictionaries(refFileLocation).refNameToChromosome;
-            return LambdaWrapper.GetTabixIndex(tabixStream, refNameToChromosome).ReferenceSequences.Select(x => x.Chromosome);
+            var refNameToChromosome = SequenceHelper.GetDictionaries(refFileLocation).refNameToChromosome;
+            return Tabix.Reader.GetTabixIndex(tabixStream, refNameToChromosome).ReferenceSequences.Select(x => x.Chromosome);
         }
     }
 }

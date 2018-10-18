@@ -50,7 +50,7 @@ namespace Nirvana
 
                     foreach (string allele in altAllele.OptimizedSplit(','))
                     {
-                        if (allele.OptimizedStartsWith('<')|| allele.Equals(".")) continue;
+                        if (allele.OptimizedStartsWith('<')) continue;
                         
                         (int trimPos, string _, string _) = BiDirectionalTrimmer.Trim(position, refAllele,allele);
                         chromPositions[iChrom].Add(trimPos);
