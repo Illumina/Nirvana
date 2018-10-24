@@ -26,8 +26,8 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.0.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.4.0" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.17" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.25.1" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.17.2" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.26.1" />
   </ItemGroup>
 
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
