@@ -18,7 +18,6 @@
     <ProjectReference Include="..\Intervals\Intervals.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
     <ProjectReference Include="..\Jasix\Jasix.csproj" />
-    <ProjectReference Include="..\AnnotationLambda\AnnotationLambda.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
     <ProjectReference Include="..\Phantom\Phantom.csproj" />
     <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
@@ -26,8 +25,6 @@
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />
-    <ProjectReference Include="..\OrchestrationLambda\OrchestrationLambda.csproj" />
-    <ProjectReference Include="..\CustomSaLambda\CustomSaLambda.csproj" />
     <ProjectReference Include="..\Cloud\Cloud.csproj" />
   </ItemGroup>
   <ItemGroup>
