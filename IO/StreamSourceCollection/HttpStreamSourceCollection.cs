@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using IO.StreamSource;
 
@@ -18,7 +19,9 @@ namespace IO.StreamSourceCollection
         public IEnumerable<IStreamSource> GetStreamSources(string suffix)
         {
             var streamSources = new List<IStreamSource>();
-            var reader = new StreamReader(((IStreamSource) new HttpStreamSource(_url)).GetStream());
+            var urlStream = ((IStreamSource) new HttpStreamSource(_url)).GetStream();
+            var reader = new StreamReader(urlStream);
+            
             string line;
             while ((line = reader.ReadLine()) != null)
             {

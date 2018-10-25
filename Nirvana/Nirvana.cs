@@ -55,7 +55,7 @@ namespace Nirvana
 
         private AnnotationResources GetAnnotationResources()
         {
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _reportAllSvOverlappingTranscripts, _forceMitochondrialAnnotation);
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories[0], _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _reportAllSvOverlappingTranscripts, _forceMitochondrialAnnotation);
             using (var preloadVcfStream = new BlockGZipStream(FileUtilities.GetReadStream(_vcfPath), CompressionMode.Decompress))
             {
                 annotationResources.GetVariantPositions(preloadVcfStream, null);

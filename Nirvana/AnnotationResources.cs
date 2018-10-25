@@ -39,7 +39,7 @@ namespace Nirvana
         public bool ReportAllSvOverlappingTranscripts { get; }
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> supplementaryAnnotationSources, string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition, bool reportAllSvOverlappingTranscripts, bool forceMitochondrialAnnotation)
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, string saManifestUrl, string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition, bool reportAllSvOverlappingTranscripts, bool forceMitochondrialAnnotation)
 
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
@@ -47,13 +47,13 @@ namespace Nirvana
             //_variantPositions = vcfStream == null ? null : PreLoadUtilities.GetPositions(vcfStream, SequenceProvider.RefNameToChromosome);
             //preload annotation providers
 
-            var annoationStreamSourceCollections = supplementaryAnnotationSources?.Select(StreamSourceUtils.GetStreamSourceCollection).ToArray();
+            var annotationStreamSourceCollections = new[] {StreamSourceUtils.GetStreamSourceCollection(saManifestUrl)};
 
             TranscriptAnnotationProvider         = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                           = ProviderUtilities.GetNsaProvider(annoationStreamSourceCollections);
-            ConservationProvider                 = ProviderUtilities.GetConservationProvider(annoationStreamSourceCollections);
-            RefMinorProvider                     = ProviderUtilities.GetRefMinorProvider(annoationStreamSourceCollections);
-            GeneAnnotationProvider               = ProviderUtilities.GetGeneAnnotationProvider(annoationStreamSourceCollections);
+            SaProvider                           = ProviderUtilities.GetNsaProvider(annotationStreamSourceCollections);
+            ConservationProvider                 = ProviderUtilities.GetConservationProvider(annotationStreamSourceCollections);
+            RefMinorProvider                     = ProviderUtilities.GetRefMinorProvider(annotationStreamSourceCollections);
+            GeneAnnotationProvider               = ProviderUtilities.GetGeneAnnotationProvider(annotationStreamSourceCollections);
             Plugins                              = PluginUtilities.LoadPlugins(pluginDirectory);
 
             Annotator = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
