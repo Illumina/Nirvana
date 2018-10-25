@@ -44,7 +44,7 @@ namespace Nirvana
         {
             if (annotationStreamSourceCollections == null || annotationStreamSourceCollections.Length == 0)
                 return null;
-            var nsaReaders = new List<INsaReader>();
+            var nsaReaders = new List<NsaReader>();
             var nsiReaders = new List<INsiReader>();
             foreach (IStreamSourceCollection collection in annotationStreamSourceCollections)
             {

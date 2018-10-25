@@ -6,6 +6,7 @@ namespace IO
     public sealed class HttpFileStream:Stream
     {
         private readonly string _url;
+        public static int Count;
 
         public HttpFileStream(string url)
         {
@@ -20,7 +21,8 @@ namespace IO
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            HttpWebRequest myReq = (HttpWebRequest) WebRequest.Create(_url);//$"https://illumina-annotation.s3.amazonaws.com/SA/44/GRCh37/chr1.nsa");
+            HttpWebRequest myReq = (HttpWebRequest) WebRequest.Create(_url);
+            Count++;
             myReq.AddRange(Position);
             HttpWebResponse response = (HttpWebResponse)myReq.GetResponse();
 

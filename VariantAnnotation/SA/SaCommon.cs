@@ -33,7 +33,7 @@
         public const string MitoMapTag         = "mitomap";
         public const string TopMedTag          = "topmed";
         public const string PhylopTag          = "phylopScore";
-        public const string OmimTag            = "Omim";
+        public const string OmimTag            = "omim";
         public const string ExacScoreTag       = "exac";
     }
 }

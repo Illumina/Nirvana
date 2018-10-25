@@ -6,7 +6,7 @@ namespace IO.StreamSource
     public sealed class HttpStreamSource : IStreamSource
     {
         private readonly string _url;
-
+        public static int Count;
         public HttpStreamSource(string url)
         {
             _url = url;
@@ -16,6 +16,7 @@ namespace IO.StreamSource
 
         public Stream GetRawStream(long start, long end)
         {
+            Count++;
             var request = WebRequest.CreateHttp(_url);
             if (start >= 0) request.AddRange(start, end);
             return ((HttpWebResponse) request.GetResponse()).GetResponseStream();

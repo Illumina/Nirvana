@@ -24,7 +24,7 @@ namespace VariantAnnotation.NSA
         }
     }
 
-    public sealed class NsaReader : INsaReader
+    public sealed class NsaReader :INsaReader
     {
         private readonly ExtendedBinaryReader _reader;
         public GenomeAssembly Assembly { get; }
@@ -63,10 +63,11 @@ namespace VariantAnnotation.NSA
 
         private ChromosomeInterval _cacheInterval;
 
-        public void PreLoad(IChromosome chrom, List<int> positions)
+        public int PreLoad(IChromosome chrom, List<int> positions)
         {
-            if (positions == null || positions.Count == 0) return;
+            if (positions == null || positions.Count == 0) return -1;
 
+            int readCount = 0;
             int count = positions.Count;
             int firstPosition = positions[0];
             int lastPosition = positions[count - 1];
@@ -75,12 +76,12 @@ namespace VariantAnnotation.NSA
             _annotations = new AnnotationItem[positions.Count];
             _annotationsCount = 0;
             (long start, _, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
-            if (start == -1) return;
+            if (start == -1) return -1;
             _reader.BaseStream.Position = start;
 
             for (int i = 0; i < positions.Count && blockCount >0; blockCount--)
             {
-                _block.Read(_reader);
+                readCount+= _block.Read(_reader);
                 //if (positions[i] < _block.FirstPosition || _block.LastPosition < positions[i]) continue;
                 
                 foreach ((int position, byte[] data) annotation in _block.GetAnnotations())
@@ -97,6 +98,8 @@ namespace VariantAnnotation.NSA
                     _annotations[_annotationsCount++] = new AnnotationItem(position, annotation.data);
                 }
             }
+
+            return readCount;
 
         }
 
@@ -126,12 +129,6 @@ namespace VariantAnnotation.NSA
 
         public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position)
         {
-            if (_cacheInterval == null)
-                Console.WriteLine($"WARNING: No data cached for {JsonKey} reader. Did you preload?");
-            else
-                if (!_cacheInterval.Overlaps(chrom, position, position))
-                Console.WriteLine($"WARNING: cached range does not include position:{position} for {JsonKey} reader");
-
             if (_annotations == null) return null;
             var index = BinarySearch(position);
             return index < 0 ? null : ExtractAnnotations(_annotations[index].Data);
