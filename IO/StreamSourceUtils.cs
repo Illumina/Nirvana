@@ -16,6 +16,7 @@ namespace IO
 
         public static IStreamSourceCollection GetStreamSourceCollection(string location)
         {
+            if (location == null) return null;
             if (IsWebLocation(location)) return new HttpStreamSourceCollection(location);
             return Directory.Exists(location) ? new FileDirectory(location) : null;
         }

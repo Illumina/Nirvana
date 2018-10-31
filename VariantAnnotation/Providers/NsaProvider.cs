@@ -168,17 +168,17 @@ namespace VariantAnnotation.Providers
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
-            var benchmark = new Benchmark();
+            //var benchmark = new Benchmark();
             long totalBytes = 0;
             foreach (INsaReader nsaReader in _nsaReaders)
             {
                 totalBytes+= nsaReader.PreLoad(chromosome, positions);
             }
 
-            var totalTime = benchmark.GetElapsedTime();
-            var rate = totalBytes * 1.0 / (totalTime.TotalSeconds * 1_000_000);// MB/sec
-            Console.WriteLine($"Preloaded SA in {Benchmark.ToHumanReadable(totalTime)}. Data rate {rate:#.##} MB/sec");
-            Console.WriteLine($"No of http stream sources created {HttpStreamSource.Count}");
+            //var totalTime = benchmark.GetElapsedTime();
+            //var rate = totalBytes * 1.0 / (totalTime.TotalSeconds * 1_000_000);// MB/sec
+            //Console.WriteLine($"\nPreloaded SA in {Benchmark.ToHumanReadable(totalTime)}. Data rate {rate:#.##} MB/sec");
+            //Console.WriteLine($"No of http stream sources created {HttpStreamSource.Count}");
         }
     }
 }

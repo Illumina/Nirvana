@@ -46,8 +46,8 @@ namespace Nirvana
             //read VCF to get positions for all variants
             //_variantPositions = vcfStream == null ? null : PreLoadUtilities.GetPositions(vcfStream, SequenceProvider.RefNameToChromosome);
             //preload annotation providers
-
-            var annotationStreamSourceCollections = new[] {StreamSourceUtils.GetStreamSourceCollection(saManifestUrl)};
+            var streamSourceCollections = StreamSourceUtils.GetStreamSourceCollection(saManifestUrl);
+            var annotationStreamSourceCollections = streamSourceCollections==null? null: new[]{streamSourceCollections};
 
             TranscriptAnnotationProvider         = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
             SaProvider                           = ProviderUtilities.GetNsaProvider(annotationStreamSourceCollections);
