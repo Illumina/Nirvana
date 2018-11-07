@@ -46,18 +46,18 @@ namespace Nirvana
             //read VCF to get positions for all variants
             //_variantPositions = vcfStream == null ? null : PreLoadUtilities.GetPositions(vcfStream, SequenceProvider.RefNameToChromosome);
             //preload annotation providers
-            var streamSourceCollections = StreamSourceUtils.GetStreamSourceCollection(saManifestUrl);
-            var annotationStreamSourceCollections = streamSourceCollections==null? null: new[]{streamSourceCollections};
+            var streamSourceCollections           = StreamSourceUtils.GetStreamSourceCollection(saManifestUrl);
+            var annotationStreamSourceCollections = streamSourceCollections == null ? null : new[] { streamSourceCollections };
 
-            TranscriptAnnotationProvider         = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                           = ProviderUtilities.GetNsaProvider(annotationStreamSourceCollections);
-            ConservationProvider                 = ProviderUtilities.GetConservationProvider(annotationStreamSourceCollections);
-            RefMinorProvider                     = ProviderUtilities.GetRefMinorProvider(annotationStreamSourceCollections);
-            GeneAnnotationProvider               = ProviderUtilities.GetGeneAnnotationProvider(annotationStreamSourceCollections);
-            Plugins                              = PluginUtilities.LoadPlugins(pluginDirectory);
+            TranscriptAnnotationProvider          = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
+            SaProvider                            = ProviderUtilities.GetNsaProvider(annotationStreamSourceCollections);
+            ConservationProvider                  = ProviderUtilities.GetConservationProvider(annotationStreamSourceCollections);
+            RefMinorProvider                      = ProviderUtilities.GetRefMinorProvider(annotationStreamSourceCollections);
+            GeneAnnotationProvider                = ProviderUtilities.GetGeneAnnotationProvider(annotationStreamSourceCollections);
+            Plugins                               = PluginUtilities.LoadPlugins(pluginDirectory);
 
-            Annotator = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
-                ConservationProvider, GeneAnnotationProvider, Plugins);
+            Annotator                             = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
+                                                    ConservationProvider, GeneAnnotationProvider, Plugins);
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
                 : Phantom.Recomposer.Recomposer.Create(SequenceProvider, inputCachePrefix);

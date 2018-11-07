@@ -38,7 +38,7 @@ namespace Nirvana
         private readonly string _annotatorVersionTag = "Nirvana " + CommandLineUtilities.Version;
         private readonly VcfConversion _conversion   = new VcfConversion();
 
-        private ExitCodes ProgramExecution()
+        private static ExitCodes ProgramExecution()
         {
 
             var annotationResources = GetAnnotationResources();
@@ -53,7 +53,7 @@ namespace Nirvana
                     outputGvcfStream, annotationResources, new NullVcfFilter());
         }
 
-        private AnnotationResources GetAnnotationResources()
+        private static AnnotationResources GetAnnotationResources()
         {
             string saDirectory = null;
             if (SupplementaryAnnotationDirectories != null && SupplementaryAnnotationDirectories.Count > 0)
@@ -144,6 +144,7 @@ namespace Nirvana
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .CheckInputFilenameExists(_vcfPath, "vcf", "--in", true, "-")
+                .CheckInputFilenameExists(_vcfPath + ".tbi", "tabix index file", "--in")
                 .CheckInputFilenameExists(_refSequencePath, "reference sequence", "--ref")
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
@@ -159,7 +160,7 @@ namespace Nirvana
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Annotates a set of variants", "-i <vcf path> -c <cache prefix> --sd <sa dir> -r <ref path> -o <base output filename>")
                 .ShowErrors()
-                .Execute(nirvana.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return (int)exitCode;
         }

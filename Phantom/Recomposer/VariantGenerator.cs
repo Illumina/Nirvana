@@ -42,7 +42,6 @@ namespace Phantom.Recomposer
                 if (!recomposedAlleleSet.RecomposedAlleles.TryGetValue(variantSite, out var variantInfo))
                 {
                     variantInfo = GetVariantInfo(positionSet, alleleIndexBlock);
-
                     recomposedAlleleSet.RecomposedAlleles[variantSite] = variantInfo;
                 }
                 variantInfo.AddAllele(altAllele, sampleAlleles);
@@ -57,21 +56,15 @@ namespace Phantom.Recomposer
 
         private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleBlock alleleBlock)
         {
-            var filter = "PASS";
             var positions = positionSet.SimplePositions;
             int startIndex = alleleBlock.PositionIndex;
             int numPositions = alleleBlock.AlleleIndexes.Length;
             int numSamples = positionSet.NumSamples;
 
-            var quals = new string[numPositions];
-            for (int i = startIndex; i < startIndex + numPositions; i++)
-            {
-                quals[i - startIndex] = positions[i].VcfFields[VcfCommon.QualIndex];
-                string thisFilter = positions[i].VcfFields[VcfCommon.FilterIndex];
-                if (filter == "PASS" && thisFilter != "PASS" && thisFilter != ".")
-                    filter = FailedFilterTag;
-            }
-            string qual = GetStringWithMinValueOrDot(quals);
+            string qual = GetStringWithMinValueOrDot(Enumerable.Range(startIndex, numPositions).Select(x => positions[x].VcfFields[VcfCommon.QualIndex]));
+            string filter = Enumerable.Range(startIndex, numPositions)
+                            .Select(i => positions[i].VcfFields[VcfCommon.FilterIndex])
+                            .Any(x => x != "PASS" && x != ".") ? FailedFilterTag : "PASS";
 
             var gqValues = new string[numSamples];
             for (var i = 0; i < numSamples; i++)
@@ -89,7 +82,7 @@ namespace Phantom.Recomposer
             return new VariantInfo(qual, filter, gqValues, psValues);
         }
 
-        private static string GetStringWithMinValueOrDot(string[] strings)
+        private static string GetStringWithMinValueOrDot(IEnumerable<string> strings)
         {
             var currentString = ".";
             float currentValue = float.MaxValue;
@@ -148,8 +141,7 @@ namespace Phantom.Recomposer
                     throw new UserErrorException($"Conflicting alternative alleles identified at {alleleSet.Chromosome.UcscName}:{alleleSet.Starts[positionIndex]}: both \"{previousAltAllele}\" and \"{altAllele}\" are present.");
                 }
 
-                string refSequenceBefore =
-                    refSequence.Substring(refSequenceStart, refRegionBetweenTwoAltAlleles);
+                string refSequenceBefore = refSequence.Substring(refSequenceStart, refRegionBetweenTwoAltAlleles);
                 altSequenceSegsegments.AddLast(refSequenceBefore);
                 altSequenceSegsegments.AddLast(altAllele);
                 refSequenceStart = positionOnRefSequence + refAllele.Length;

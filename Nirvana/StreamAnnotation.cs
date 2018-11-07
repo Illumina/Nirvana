@@ -58,7 +58,7 @@ namespace Nirvana
 
                         if (json != null) WriteOutput(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json, vcfConversion);
                         else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
-
+                       
                         metrics.Increment();
                     }
 

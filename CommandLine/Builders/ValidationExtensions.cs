@@ -58,7 +58,7 @@ namespace CommandLine.Builders
         {
             try
             {
-                WebRequest webRequest = WebRequest.Create(url);
+                var webRequest = WebRequest.Create(url);
                 webRequest.GetResponse();
             }
             catch //If exception thrown then couldn't get response from address

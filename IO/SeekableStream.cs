@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using IO.StreamSource;
 
 namespace IO
@@ -8,7 +9,10 @@ namespace IO
         private readonly IStreamSource _streamSource;
         private Stream _stream;
         private long _position;
-        private long _end;
+        private readonly long _end;
+        private int _totalRetries;
+        private const int MaxTries = 10;
+        private bool _failureRecovery;
 
         public override bool CanRead { get; }
         public override bool CanSeek { get; }
@@ -38,40 +42,61 @@ namespace IO
             _position = position;
         }
 
-        private void TryInitiateStream(long start, long end)
+        private void InitiateStream(long start, long end)
         {
-            if (_stream == null) _stream = _streamSource.GetRawStream(start, end);
+            if (_stream == null || _failureRecovery)
+                _stream = _streamSource.GetRawStream(start, end);
         }
 
         public override void Flush()
         {
-            throw new System.NotImplementedException();
+            _stream?.Flush();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            TryInitiateStream(_position, _end);
+            int readBytes = FailureRecovery.CallWithRetry(() => TryRead(buffer, offset, count), out int retryCounter);
+            if (retryCounter > 0) Console.WriteLine($"Retried {retryCounter} time(s) in Read method in SeekableStream class.");
 
-            int readCount = _stream.ForcedRead(buffer, offset, count);
-            _position += readCount;
+            _totalRetries += retryCounter;
+            if (_totalRetries > MaxTries) throw new Exception($"Max number of retries (${MaxTries}) reached.");
+            return readBytes;
+        }
 
-            return readCount;
+        private int TryRead(byte[] buffer, int offset, int count)
+        {
+            try
+            {
+                InitiateStream(_position, _end);
+
+                int readCount = _stream.ForcedRead(buffer, offset, count);
+                _position += readCount;
+
+                _failureRecovery = false;
+
+                return readCount;
+            }
+            catch (Exception)
+            {
+                _failureRecovery = true;
+                throw;
+            }
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
             //todo
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void SetLength(long value)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         public new void Dispose()

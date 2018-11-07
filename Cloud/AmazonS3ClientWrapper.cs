@@ -1,10 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Threading.Tasks;
 using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using IO;
 
 namespace Cloud
 {
@@ -33,7 +33,7 @@ namespace Cloud
                 Key = getRequestInfo.FileName
             };
 
-            var getMetadataResponse = _s3Client.GetObjectMetadataAsync(metadataRequest).Result;
+            var getMetadataResponse = FailureRecovery.CallWithRetry(() => _s3Client.GetObjectMetadataAsync(metadataRequest).Result, out int retryCounter);
 
             return getMetadataResponse.ContentLength;
         }
@@ -65,8 +65,11 @@ namespace Cloud
                 ByteRange = byteRange
             };
 
-            return _s3Client.GetObjectAsync(getRequest).Result.ResponseStream;
+            return FailureRecovery.CallWithRetry(() => GetResponseStream(getRequest), out int retryCounter);
         }
+
+        private Stream GetResponseStream(GetObjectRequest getRequest) =>_s3Client.GetObjectAsync(getRequest).Result.ResponseStream;
+
 
         public static (string BuckNameForS3Request, string FileName) GetBucketAndFileNamesForS3Request(S3Path s3Path)
         {
