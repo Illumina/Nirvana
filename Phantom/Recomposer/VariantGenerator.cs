@@ -13,7 +13,6 @@ namespace Phantom.Recomposer
     public sealed class VariantGenerator : IVariantGenerator
     {
         private readonly ISequenceProvider _sequenceProvider;
-        private const string FailedFilterTag = "FilteredVariantsRecomposed";
 
         public VariantGenerator(ISequenceProvider sequenceProvider)
         {
@@ -36,7 +35,7 @@ namespace Phantom.Recomposer
             var decomposedPosVarIndex = new HashSet<(int PosIndex, int VarIndex)>();
             foreach (var (alleleIndexBlock, sampleAlleles) in alleleIndexBlockToSampleIndex)
             {
-                var (start, _, refAllele, altAllele) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet, totalRefSequence, regionStart, decomposedPosVarIndex);
+                (int start, _, string refAllele, string altAllele, var varPosIndexesInAlleleBlock) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet, totalRefSequence, regionStart, decomposedPosVarIndex);
                 var variantSite = new VariantSite(start, refAllele);
 
                 if (!recomposedAlleleSet.RecomposedAlleles.TryGetValue(variantSite, out var variantInfo))
@@ -45,6 +44,7 @@ namespace Phantom.Recomposer
                     recomposedAlleleSet.RecomposedAlleles[variantSite] = variantInfo;
                 }
                 variantInfo.AddAllele(altAllele, sampleAlleles);
+                variantInfo.UpdateSampleFilters(varPosIndexesInAlleleBlock, sampleAlleles);
             }
             // Set decomposed tag to positions used for recomposition
             foreach (var indexTuple in decomposedPosVarIndex)
@@ -62,9 +62,9 @@ namespace Phantom.Recomposer
             int numSamples = positionSet.NumSamples;
 
             string qual = GetStringWithMinValueOrDot(Enumerable.Range(startIndex, numPositions).Select(x => positions[x].VcfFields[VcfCommon.QualIndex]));
-            string filter = Enumerable.Range(startIndex, numPositions)
+            var filters = Enumerable.Range(startIndex, numPositions)
                             .Select(i => positions[i].VcfFields[VcfCommon.FilterIndex])
-                            .Any(x => x != "PASS" && x != ".") ? FailedFilterTag : "PASS";
+                            .ToArray();
 
             var gqValues = new string[numSamples];
             for (var i = 0; i < numSamples; i++)
@@ -79,7 +79,13 @@ namespace Phantom.Recomposer
                 psValues[i] = GetPhaseSetForRecomposedVarint(psTagsThisSample, isHomozygous);
             }
 
-            return new VariantInfo(qual, filter, gqValues, psValues);
+            var sampleFilters = new List<bool>[numSamples];
+            for (var i = 0; i < numSamples; i++)
+            {
+                sampleFilters[i] = new List<bool>();
+            }
+
+            return new VariantInfo(qual, filters, gqValues, psValues, sampleFilters);
         }
 
         private static string GetStringWithMinValueOrDot(IEnumerable<string> strings)
@@ -100,14 +106,14 @@ namespace Phantom.Recomposer
 
         private static string GetPhaseSetForRecomposedVarint(IEnumerable<string> psTagsThisSample, IEnumerable<bool> isHomozygous)
         {
-            foreach (var (psTag, homozygousity) in psTagsThisSample.Zip(isHomozygous, (a, b) => new Tuple<string, bool>(a, b)))
+            foreach ((string psTag, bool homozygousity) in psTagsThisSample.Zip(isHomozygous, (a, b) => new Tuple<string, bool>(a, b)))
             {
                 if (!homozygousity) return psTag;
             }
             return ".";
         }
 
-        internal static (int Start, int End, string Ref, string Alt) GetPositionsAndRefAltAlleles(AlleleBlock alleleBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, HashSet<(int, int)> decomposedPosVarIndex)
+        internal static (int Start, int End, string Ref, string Alt, List<int> VarPosIndexesInAlleleBlock) GetPositionsAndRefAltAlleles(AlleleBlock alleleBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, HashSet<(int, int)> decomposedPosVarIndex)
         {
             int numPositions = alleleBlock.AlleleIndexes.Length;
             int firstPositionIndex = alleleBlock.PositionIndex;
@@ -121,15 +127,18 @@ namespace Phantom.Recomposer
 
             int refSequenceStart = 0;
             var altSequenceSegsegments = new LinkedList<string>();
+            var variantPosIndexesInAlleleBlock = new List<int>();
             for (int positionIndex = firstPositionIndex; positionIndex <= lastPositionIndex; positionIndex++)
             {
                 int indexInBlock = positionIndex - firstPositionIndex;
                 int alleleIndex = alleleBlock.AlleleIndexes[indexInBlock];
                 if (alleleIndex == 0) continue;
 
+                variantPosIndexesInAlleleBlock.Add(positionIndex - firstPositionIndex);
                 //only mark positions with non-reference alleles being recomposed as "decomposed"
                 // alleleIndex is 1-based for altAlleles
                 decomposedPosVarIndex.Add((positionIndex, alleleIndex - 1));
+
                 string refAllele = alleleSet.VariantArrays[positionIndex][0];
                 string altAllele = alleleSet.VariantArrays[positionIndex][alleleIndex];
                 int positionOnRefSequence = alleleSet.Starts[positionIndex] - blockStart;
@@ -147,7 +156,7 @@ namespace Phantom.Recomposer
                 refSequenceStart = positionOnRefSequence + refAllele.Length;
             }
             altSequenceSegsegments.AddLast(refSequence.Substring(refSequenceStart));
-            return (blockStart, blockStart + blockRefLength - 1, refSequence, string.Concat(altSequenceSegsegments));
+            return (blockStart, blockStart + blockRefLength - 1, refSequence, string.Concat(altSequenceSegsegments), variantPosIndexesInAlleleBlock);
         }
     }
 
@@ -163,27 +172,5 @@ namespace Phantom.Recomposer
         }
 
         public int CompareTo(VariantSite other) => Start != other.Start ? Start.CompareTo(other.Start) : string.Compare(RefAllele, other.RefAllele, StringComparison.Ordinal);
-    }
-
-    public sealed class VariantInfo
-    {
-        public readonly string Qual;
-        public readonly string Filter;
-        public readonly string[] SampleGqs;
-        public readonly string[] SamplePhaseSets;
-        public readonly Dictionary<string, List<SampleHaplotype>> AltAlleleToSample = new Dictionary<string, List<SampleHaplotype>>();
-
-        public VariantInfo(string qual, string filter, string[] sampleGqs, string[] samplePhaseSets)
-        {
-            Qual = qual;
-            Filter = filter;
-            SampleGqs = sampleGqs;
-            SamplePhaseSets = samplePhaseSets;
-        }
-
-        public void AddAllele(string altAllele, List<SampleHaplotype> sampleAlleles)
-        {
-            AltAlleleToSample.Add(altAllele, sampleAlleles);
-        }
     }
 }

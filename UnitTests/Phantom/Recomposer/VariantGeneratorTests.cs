@@ -34,8 +34,14 @@ namespace UnitTests.Phantom.Recomposer
             var result1 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[0], alleleSet, refSequence, starts[0], decomposedPositionIndex);
             var result2 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[1], alleleSet, refSequence, starts[0], decomposedPositionIndex);
 
-            Assert.Equal((356, 360, "GAATC", "CATTC"), result1);
-            Assert.Equal((356, 360, "GAATC", "TATTG"), result2);
+            var expectedVarPosIndexes1 = new List<int> { 0, 1 };
+            var expectedVarPosIndexes2 = new List<int> { 0, 1, 2 };
+
+            Assert.Equal((356, 360, "GAATC", "CATTC"), (result1.Start, result1.End, result1.Ref, result1.Alt));
+            for (var i = 0; i < expectedVarPosIndexes1.Count; i++) Assert.Equal(expectedVarPosIndexes1[i], result1.VarPosIndexesInAlleleBlock[i]);
+
+            Assert.Equal((356, 360, "GAATC", "TATTG"), (result2.Start, result2.End, result2.Ref, result2.Alt));
+            for (var i = 0; i < expectedVarPosIndexes2.Count; i++) Assert.Equal(expectedVarPosIndexes2[i], result2.VarPosIndexesInAlleleBlock[i]);
         }
 
 
@@ -124,6 +130,70 @@ namespace UnitTests.Phantom.Recomposer
         }
 
         [Fact]
+        public void VariantGenerator_FilterTag_DotTreatedAsPass()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	.	.	GT:PS	1|1:301	1|2:.	1|2:456", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	FailedForSomeReason	.	GT:PS	.	1|0:.	0/1:456", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 4, 6, 8 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Equal(2, recomposedPositions.Count);
+            Assert.Equal("chr1	2	.	AGC	AGA,GGG,TGA	.	PASS	RECOMPOSED	GT:PS	1|3:123	.	1|2:456", string.Join("\t", recomposedPositions[0].VcfFields));
+            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	FilteredVariantsRecomposed	RECOMPOSED	GT	.	1|2	.", string.Join("\t", recomposedPositions[1].VcfFields));
+        }
+
+        [Fact]
+        public void VariantGenerator_FilterTag_OnlyDecomposedVariantsConsidered()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	FailedForSomeReason	.	GT	0|0	0/1	0|0", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	1|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 6, 8, 10 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Single(recomposedPositions);
+            Assert.Equal("chr1	2	.	AGCTG	AGCTC,TGCTC	.	PASS	RECOMPOSED	GT	1|2	.	.", string.Join("\t", recomposedPositions[0].VcfFields));
+        }
+
+        [Fact]
+        public void VariantGenerator_FilterTag_PassedMnvOverridesFailedOne()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
+            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	FailedForSomeReason	.	GT	0|0	0|1", sequenceProvider.RefNameToChromosome);
+            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
+            var functionBlockRanges = new List<int> { 6, 8, 10 };
+
+            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
+
+            Assert.Single(recomposedPositions);
+            Assert.Equal("chr1	2	.	AGCTG	TGATC,TGCTC	.	PASS	RECOMPOSED	GT	0|2	0|1", string.Join("\t", recomposedPositions[0].VcfFields));
+        }
+
+        [Fact]
         public void VariantGenerator_MinQualUsed_DotIgnored()
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
@@ -144,35 +214,6 @@ namespace UnitTests.Phantom.Recomposer
             Assert.Equal("chr1	2	.	AGC	AGA,GGG,TGA	45	PASS	RECOMPOSED	GT:PS	1|3:123	.	1|2:456", string.Join("\t", recomposedPositions[0].VcfFields));
             Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	30.1	PASS	RECOMPOSED	GT	.	1|2	.", string.Join("\t", recomposedPositions[1].VcfFields));
         }
-
-        [Fact]
-        public void VariantGenerator_FailedFilterTag_DotTreatedAsPass()
-        {
-            var mockSequenceProvider = new Mock<ISequenceProvider>();
-            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> {{"chr1", new Chromosome("chr1", "1", 0)}});
-            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
-            var sequenceProvider = mockSequenceProvider.Object;
-
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456",
-                sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	.	.	GT:PS	1|1:301	1|2:.	1|2:456",
-                sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition(
-                "chr1	6	.	G	C	.	FailedForSomeReason	.	GT:PS	.	1|0:.	0/1:456", sequenceProvider.RefNameToChromosome);
-            var functionBlockRanges = new List<int> {4, 6, 8};
-
-            var recomposer = new VariantGenerator(sequenceProvider);
-            var recomposedPositions = recomposer
-                .Recompose(new List<ISimplePosition> {position1, position2, position3}, functionBlockRanges).ToList();
-
-            Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG,TGA	.	PASS	RECOMPOSED	GT:PS	1|3:123	.	1|2:456",
-                string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	FilteredVariantsRecomposed	RECOMPOSED	GT	.	1|2	.",
-                string.Join("\t", recomposedPositions[1].VcfFields));
-        }
-    
 
         [Fact]
         public void VariantGenerator_MinGQUsed_DotAndNullIgnored()
