@@ -3,7 +3,6 @@ using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation;
 
 namespace VariantAnnotation.Interface
 {

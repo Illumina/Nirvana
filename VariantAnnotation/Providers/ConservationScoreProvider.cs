@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Genome;
-using IO;
-using IO.StreamSourceCollection;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.PhyloP;
-using VariantAnnotation.SA;
 using Variants;
 
 namespace VariantAnnotation.Providers
@@ -18,31 +14,14 @@ namespace VariantAnnotation.Providers
         private readonly NpdReader _phylopReader;
 
         public string Name { get; }
-        public GenomeAssembly Assembly { get; }
+        public GenomeAssembly Assembly => _phylopReader.Assembly;
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
-        public ConservationScoreProvider(NpdReader phylopReader)
+        public ConservationScoreProvider(Stream dbStream, Stream indexStream)
         {
-            _phylopReader = phylopReader;
+            _phylopReader = new NpdReader(dbStream, indexStream);
             Name = "Conservation score provider";
-            Assembly = phylopReader.Assembly;
-            DataSourceVersions = new[] { phylopReader.Version };
-        }
-
-        public static ConservationScoreProvider GetConservationScoreProvider(IEnumerable<IStreamSourceCollection> annotationStreamSourceCollections)
-        {
-
-            foreach (var collection in annotationStreamSourceCollections)
-            {
-                var phylopStreamSources = collection.GetStreamSources(SaCommon.PhylopFileSuffix).ToArray();
-                if (phylopStreamSources.Length <= 0) continue;
-                var npdSource = phylopStreamSources[0];
-                var npdIndexSource = npdSource.GetAssociatedStreamSource(SaCommon.IndexSufix);
-                //we can have only one phylop database
-                return new ConservationScoreProvider(new NpdReader(npdSource.GetStream(), npdIndexSource.GetStream()));
-            }
-
-            return null;
+            DataSourceVersions = new[] { _phylopReader.Version };
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)

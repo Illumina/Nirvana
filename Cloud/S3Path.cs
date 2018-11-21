@@ -6,5 +6,6 @@ namespace Cloud
     {
         public string bucketName;
         public string path;
+        
     }
 }

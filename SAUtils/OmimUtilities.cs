@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
-using CacheUtils.Helpers;
 using Compression.Utilities;
-using IO.StreamSource;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.SA;
@@ -89,7 +87,7 @@ namespace SAUtils
 
             UgaGene[] genes;
 
-            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(universalGeneArchivePath)),
+            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(universalGeneArchivePath),
                 refNameToChromosome))
             {
                 genes = reader.GetGenes();

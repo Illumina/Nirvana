@@ -7,7 +7,6 @@ using IO;
 using Moq;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.RefMinorDb;
-using UnitTests.TestDataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;

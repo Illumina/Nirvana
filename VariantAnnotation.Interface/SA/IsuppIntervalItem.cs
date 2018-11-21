@@ -1,5 +1,4 @@
 ﻿using Genome;
-using Intervals;
 using Variants;
 
 namespace VariantAnnotation.Interface.SA

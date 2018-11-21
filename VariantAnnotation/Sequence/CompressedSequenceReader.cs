@@ -45,7 +45,7 @@ namespace VariantAnnotation.Sequence
 
             // jump to the index offset
             _stream.Position = _indexOffset;
-
+            
             LoadIndex();
             LoadMaskedIntervals();
             VerifyEofTag();

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Import;
@@ -10,7 +9,6 @@ using CacheUtils.DataDumperImport.IO;
 using Compression.Utilities;
 using Genome;
 using IO;
-using IO.StreamSource;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
@@ -66,7 +64,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         {
             Console.WriteLine("- processing {0}", Path.GetFileName(filePath));
 
-            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(filePath))))
+            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(filePath)))
             {
                 foreach (var ad in reader.GetRootNode().Value.Values)
                 {
@@ -95,7 +93,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         {
             Console.WriteLine("- processing {0}", Path.GetFileName(filePath));
 
-            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(filePath))))
+            using (var reader = new DataDumperReader(GZipUtilities.GetAppropriateReadStream(filePath)))
             {
                 foreach (var node in reader.GetRootNode().Value.Values)
                 {

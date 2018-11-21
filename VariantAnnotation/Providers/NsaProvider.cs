@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
-using IO;
-using IO.StreamSource;
-using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;

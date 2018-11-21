@@ -3,7 +3,6 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
-using IO.StreamSource;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
 
@@ -63,8 +62,8 @@ namespace SAUtils.ExtractCosmicSvs
             var version = DataSourceVersionReader.GetSourceVersion(_cnvTsv+ ".version");
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
 
-            var cnvStream = _cnvTsv==null? null: GZipUtilities.GetAppropriateReadStream(new FileStreamSource(_cnvTsv));
-            var breakendStream = _breakendTsv == null ? null : GZipUtilities.GetAppropriateReadStream(new FileStreamSource(_breakendTsv));
+            var cnvStream = _cnvTsv==null? null: GZipUtilities.GetAppropriateReadStream(_cnvTsv);
+            var breakendStream = _breakendTsv == null ? null : GZipUtilities.GetAppropriateReadStream(_breakendTsv);
 
             using (var cosmicSvExtractor = new CosmicSvReader(cnvStream, breakendStream, version, _outputDir,
                 referenceProvider.Assembly, referenceProvider.RefNameToChromosome))

@@ -4,7 +4,6 @@ using System.IO.Compression;
 using Compression.FileHandling;
 using ErrorHandling.Exceptions;
 using IO;
-using IO.StreamSource;
 
 namespace Compression.Utilities
 {
@@ -19,13 +18,11 @@ namespace Compression.Utilities
             BlockGZip
         }
 
-        public static StreamReader GetAppropriateStreamReader(IStreamSource streamSource) => FileUtilities.GetStreamReader(GetAppropriateReadStream(streamSource));
-
-        public static StreamReader GetAppropriateStreamReader(string filePath) => FileUtilities.GetStreamReader(GetAppropriateReadStream(new FileStreamSource(filePath)));
-        public static BinaryReader GetAppropriateBinaryReader(string filePath) => new BinaryReader(GetAppropriateReadStream(new FileStreamSource(filePath)));
-        public static StreamWriter GetStreamWriter(string filePath)            => new StreamWriter(GetWriteStream(filePath));
-        public static BinaryWriter GetBinaryWriter(string filePath)            => new BinaryWriter(GetWriteStream(filePath));
-        public static Stream GetWriteStream(string filePath)                  => new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
+        public static StreamReader GetAppropriateStreamReader(string filePath) => FileUtilities.GetStreamReader(GetAppropriateReadStream(filePath));
+        public static BinaryReader GetAppropriateBinaryReader(string filePath) => new BinaryReader(GetAppropriateReadStream(filePath));
+        public static StreamWriter GetStreamWriter(string filePath) => new StreamWriter(GetWriteStream(filePath));
+        public static BinaryWriter GetBinaryWriter(string filePath) => new BinaryWriter(GetWriteStream(filePath));
+        public static Stream GetWriteStream(string filePath) => new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
 
         private static Stream GetAppropriateStream(Stream stream, CompressionAlgorithm compressionAlgorithm)
         {
@@ -48,34 +45,21 @@ namespace Compression.Utilities
             return newStream;
         }
 
-        public static Stream GetAppropriateReadStream(IStreamSource streamSource)
+        public static Stream GetAppropriateReadStream(string filePath)
         {
-
-            var header = GetHeader(streamSource);
+            var header = GetHeader(filePath);
             var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
-            return GetAppropriateStream(streamSource.GetStream(), compressionAlgorithm);
+            var fileStream = PersistentStreamUtils.GetReadStream(filePath);
+            return GetAppropriateStream(fileStream, compressionAlgorithm);
         }
 
-        //todo: peak the stream
-        private static byte[] GetStreamHeader(Stream stream)
-        {
-            byte[] header;
-
-                using (var reader = new ExtendedBinaryReader(stream))
-                {
-                    header = reader.ReadBytes(NumHeaderBytes);
-                }
-
-            return header;
-        }
-
-        private static byte[] GetHeader(IStreamSource streamSource)
+        private static byte[] GetHeader(string filePath)
         {
             byte[] header = null;
 
             try
             {
-                using (var reader = new ExtendedBinaryReader(streamSource.GetStream()))
+                using (var reader = new ExtendedBinaryReader(PersistentStreamUtils.GetReadStream(filePath)))
                 {
                     header = reader.ReadBytes(NumHeaderBytes);
                 }

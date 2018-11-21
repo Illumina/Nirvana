@@ -40,17 +40,17 @@ namespace VariantAnnotation.Providers
             Name = "Transcript annotation provider";
             _sequence = sequenceProvider.Sequence;
 
-            var transcriptStream = StreamSourceUtils.GetStream(CacheConstants.TranscriptPath(pathPrefix));
+            var transcriptStream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix));
             (_transcriptCache, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
 
             Assembly = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
 
-            var siftStream = StreamSourceUtils.GetStream(CacheConstants.SiftPath(pathPrefix));
+            var siftStream = PersistentStreamUtils.GetReadStream(CacheConstants.SiftPath(pathPrefix));
             _siftReader = new PredictionCacheReader(siftStream, PredictionCacheReader.SiftDescriptions);
 
-            var polyphenStream = StreamSourceUtils.GetStream(CacheConstants.PolyPhenPath(pathPrefix));
+            var polyphenStream = PersistentStreamUtils.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix));
             _polyphenReader = new PredictionCacheReader(polyphenStream, PredictionCacheReader.PolyphenDescriptions);
         }
 

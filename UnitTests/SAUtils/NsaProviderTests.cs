@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Genome;
 using Moq;
-using SAUtils.DataStructures;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;

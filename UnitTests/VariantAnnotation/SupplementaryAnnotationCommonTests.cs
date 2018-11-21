@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Genome;
-using UnitTests.TestUtilities;
-using VariantAnnotation;
+﻿using VariantAnnotation;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation

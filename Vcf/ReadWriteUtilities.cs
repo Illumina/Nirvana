@@ -26,7 +26,7 @@ namespace Vcf
 	        IRefMinorProvider refMinorProvider, bool verboseTranscript, IRecomposer recomposer)
 	    {
 	        bool useStdInput = vcfPath == "-";
-            var stream = useStdInput ? Console.OpenStandardInput() : new BlockGZipStream(StreamSourceUtils.GetStream(vcfPath), CompressionMode.Decompress);
+            var stream = useStdInput ? Console.OpenStandardInput() : new BlockGZipStream(PersistentStreamUtils.GetReadStream(vcfPath), CompressionMode.Decompress);
             return VcfReader.Create(stream, chromosomeDictionary, refMinorProvider, verboseTranscript, recomposer, new NullVcfFilter());
         }
         

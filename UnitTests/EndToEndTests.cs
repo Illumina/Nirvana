@@ -2,7 +2,6 @@
 using Genome;
 using UnitTests.TestUtilities;
 using Xunit;
-using Xunit.Sdk;
 
 namespace UnitTests
 {

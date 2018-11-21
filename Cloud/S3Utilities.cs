@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Amazon;
-using Amazon.S3.Model;
+using Amazon.S3;
+using Amazon.S3.Transfer;
 
 namespace Cloud
 {
@@ -14,30 +14,13 @@ namespace Cloud
         private const string RegionEndpointSuffix = "_region_endpoint";
 
 
-
-        public static void DownloadS3Resource(S3Path input, string localFilePath)
-        {
-            using (var inputStream = new S3StreamSource(GetS3ClientWrapperFromEnvironment(input.bucketName), input).GetStream())
-            using (var fileStream = File.Create(localFilePath))
+        public static S3Path CombineS3DirAndFileName(S3Path s3DirPath, string s3FileName) =>
+            new S3Path()
             {
-                inputStream.CopyTo(fileStream);
-            }
-        }
-
-        public static string UploadBaseAndIndexFiles(IS3Client s3Client, S3Path targetS3DirPath, string localBaseFilePath, string s3BaseFileName, string indexSuffix)
-        {
-
-            s3Client.Upload(CombineS3DirAndFileName(targetS3DirPath, s3BaseFileName + indexSuffix), localBaseFilePath + indexSuffix);
-            return s3Client.Upload(CombineS3DirAndFileName(targetS3DirPath, s3BaseFileName), localBaseFilePath);
-        }
-
-        public static S3Path CombineS3DirAndFileName(S3Path s3DirPath, string s3FileName) => new S3Path
-        {
-            bucketName = s3DirPath.bucketName,
-            path = Path.Combine(s3DirPath.path, s3FileName),
-        };
-
-        internal static (string AccessKey, string SecretKey, RegionEndpoint RegionEndpoint) GetS3KeysFromEnvironment(
+                bucketName = s3DirPath.bucketName, path = Path.Combine(s3DirPath.path, s3FileName)
+            };
+        
+        public static (string AccessKey, string SecretKey, RegionEndpoint RegionEndpoint) GetS3KeysFromEnvironment(
             string bucketName)
         {
             string accessKey = GetBucketInfo(bucketName, AccessKeySuffix);
@@ -47,10 +30,10 @@ namespace Cloud
             return (accessKey, secretKey, regionEndpoint);
         }
 
-        public static IS3Client GetS3ClientWrapperFromEnvironment(string bucketName)
+        public static AmazonS3Client GetAmazonS3Client(string bucketName)
         {
             var (accessKey, secretKey, regionEndpoint) = GetS3KeysFromEnvironment(bucketName);
-            return new AmazonS3ClientWrapper(accessKey, secretKey, regionEndpoint);
+            return new AmazonS3Client(accessKey, secretKey, regionEndpoint);
         }
 
         private static string GetBucketInfo(string bucketName, string infoSuffix) =>
@@ -61,6 +44,20 @@ namespace Cloud
         {
             Regex pattern = new Regex("-");
             return pattern.Replace(bucketNameWithDash, "_");
+        }
+
+        public static void Upload(AmazonS3Client s3Client, string bucketName, string path, string localFilePath)
+        {
+            TransferUtility transferUtility = new TransferUtility(s3Client);
+
+            TransferUtilityUploadRequest transferUtilityRequest = new TransferUtilityUploadRequest
+            {
+                BucketName = bucketName,
+                FilePath = localFilePath,
+                Key = path
+            };
+
+            transferUtility.Upload(transferUtilityRequest);
         }
     }
 }

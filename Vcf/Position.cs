@@ -1,5 +1,4 @@
-﻿using System;
-using Genome;
+﻿using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;

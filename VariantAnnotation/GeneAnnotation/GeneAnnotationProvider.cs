@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
-using IO;
-using IO.StreamSourceCollection;
 using OptimizedCore;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using VariantAnnotation.NSA;
-using VariantAnnotation.SA;
 
 namespace VariantAnnotation.GeneAnnotation
 {
@@ -45,16 +41,13 @@ namespace VariantAnnotation.GeneAnnotation
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        public GeneAnnotationProvider(IStreamSourceCollection[] annotationStreamSourceCollections)
+        public GeneAnnotationProvider(IEnumerable<Stream> dbStreams)
         {
             Name = "Gene annotation provider";
             _ngaReaders = new List<NgaReader>();
-            foreach (var collection in annotationStreamSourceCollections)
+            foreach (var dbStream in dbStreams)
             {
-                foreach (var streamSource in collection.GetStreamSources(SaCommon.NgaFileSuffix))
-                {
-                    _ngaReaders.Add(new NgaReader(streamSource.GetStream()));
-                }
+                _ngaReaders.Add(new NgaReader(dbStream));
             }
         }
         

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ErrorHandling.Exceptions;
-using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 
 namespace VariantAnnotation.NSA

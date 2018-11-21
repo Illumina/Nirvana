@@ -7,7 +7,7 @@ namespace VariantAnnotation.Sequence
     public static class SequenceHelper
     {
         private static CompressedSequenceReader GetSequenceReader(string referencePath) =>
-            new CompressedSequenceReader(StreamSourceUtils.GetStream(referencePath));
+            new CompressedSequenceReader(PersistentStreamUtils.GetReadStream(referencePath));
 
         public static (IDictionary<ushort, IChromosome> refIndexToChromosome, IDictionary<string, IChromosome>
             refNameToChromosome, int numRefSeqs) GetDictionaries(string referencePath)

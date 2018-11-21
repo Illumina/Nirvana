@@ -8,7 +8,6 @@ using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
-using IO.StreamSource;
 using Jasix.DataStructures;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -44,7 +43,7 @@ namespace Nirvana
             var annotationResources = GetAnnotationResources();
 
             string jasixFileName = _outputFileName == "-" ? null : _outputFileName + ".json.gz" + JasixCommons.FileExt;
-            using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(new FileStreamSource(_vcfPath)))
+            using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream((_vcfPath)))
             using (var outputJsonStream = _outputFileName == "-" ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName))
             using (var outputVcfStream = !_vcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".vcf.gz"))
@@ -55,12 +54,9 @@ namespace Nirvana
 
         private static AnnotationResources GetAnnotationResources()
         {
-            string saDirectory = null;
-            if (SupplementaryAnnotationDirectories != null && SupplementaryAnnotationDirectories.Count > 0)
-                saDirectory = SupplementaryAnnotationDirectories[0];
-
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, saDirectory, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _reportAllSvOverlappingTranscripts, _forceMitochondrialAnnotation);
-            using (var preloadVcfStream = new BlockGZipStream(FileUtilities.GetReadStream(_vcfPath), CompressionMode.Decompress))
+            
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _reportAllSvOverlappingTranscripts, _forceMitochondrialAnnotation);
+            using (var preloadVcfStream = new BlockGZipStream(PersistentStreamUtils.GetReadStream(_vcfPath), CompressionMode.Decompress))
             {
                 annotationResources.GetVariantPositions(preloadVcfStream, null);
             }

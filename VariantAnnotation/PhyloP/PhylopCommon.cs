@@ -1,14 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using ErrorHandling.Exceptions;
-using Genome;
-using IO;
-using VariantAnnotation.Interface.Providers;
-using static IO.FileUtilities;
-
-namespace VariantAnnotation.PhyloP
+﻿namespace VariantAnnotation.PhyloP
 {
     public static class PhylopCommon
     {

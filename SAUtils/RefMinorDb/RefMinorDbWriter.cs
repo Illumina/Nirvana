@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using CommandLine.Utilities;
-using Genome;
 using IO;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;

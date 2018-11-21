@@ -4,7 +4,6 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
-using IO.StreamSource;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
@@ -62,7 +61,7 @@ namespace SAUtils.PhyloP
             string outFileName    = $"{version.Name}_{version.Version}";
 
 
-            using (var phylopParser = new PhylopParser(GZipUtilities.GetAppropriateReadStream(new FileStreamSource(_inputFile)), referenceProvider.Assembly, referenceProvider.RefNameToChromosome))
+            using (var phylopParser = new PhylopParser(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider.Assembly, referenceProvider.RefNameToChromosome))
             using (var nsaStream    = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.PhylopFileSuffix)))
             using (var indexStream  = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.PhylopFileSuffix + SaCommon.IndexSufix)))
             using (var writer       = new NpdWriter(nsaStream, indexStream, version, referenceProvider.Assembly, SaCommon.PhylopTag, SaCommon.SchemaVersion))
