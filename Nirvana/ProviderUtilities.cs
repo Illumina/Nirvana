@@ -93,7 +93,7 @@ namespace Nirvana
             var paths = new List<(string, string)>();
             if (Directory.Exists(saDirectoryPath))
             {
-                foreach (var filePath in Directory.GetFiles(saDirectoryPath))
+                foreach (var filePath in Directory.GetFiles(saDirectoryPath,$"*{SaCommon.SaFileSuffix}"))
                 {
                     if(filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
                         paths.Add((filePath, null));
