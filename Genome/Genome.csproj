@@ -6,6 +6,7 @@
   </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
+    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\Intervals\Intervals.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
   </ItemGroup>

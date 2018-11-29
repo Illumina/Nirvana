@@ -1,9 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Text.RegularExpressions;
 using Amazon;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using ErrorHandling.Exceptions;
 
 namespace Cloud
 {
@@ -17,9 +20,10 @@ namespace Cloud
         public static S3Path CombineS3DirAndFileName(S3Path s3DirPath, string s3FileName) =>
             new S3Path()
             {
-                bucketName = s3DirPath.bucketName, path = Path.Combine(s3DirPath.path, s3FileName)
+                bucketName = s3DirPath.bucketName,
+                path = Path.Combine(s3DirPath.path, s3FileName)
             };
-        
+
         public static (string AccessKey, string SecretKey, RegionEndpoint RegionEndpoint) GetS3KeysFromEnvironment(
             string bucketName)
         {
@@ -27,6 +31,7 @@ namespace Cloud
             string secretKey = GetBucketInfo(bucketName, SecretKeySuffix);
             RegionEndpoint regionEndpoint =
                 RegionEndpoint.GetBySystemName(GetBucketInfo(bucketName, RegionEndpointSuffix));
+
             return (accessKey, secretKey, regionEndpoint);
         }
 
@@ -36,8 +41,13 @@ namespace Cloud
             return new AmazonS3Client(accessKey, secretKey, regionEndpoint);
         }
 
-        private static string GetBucketInfo(string bucketName, string infoSuffix) =>
-            Environment.GetEnvironmentVariable(GetTransformedBucketName(bucketName) + infoSuffix);
+        private static string GetBucketInfo(string bucketName, string infoSuffix)
+        {
+
+            string info = Environment.GetEnvironmentVariable(GetTransformedBucketName(bucketName) + infoSuffix);
+            if (info == null) throw new UnauthorizedAccessException($"S3 bucket \"{bucketName}\" is not supported by the Lambda instance. Please use a supported S3 bucket.");
+            return info;
+        }
 
         //todo: temporary solution to handle characters that not valid for environmental variables
         private static string GetTransformedBucketName(string bucketNameWithDash)
@@ -58,6 +68,32 @@ namespace Cloud
             };
 
             transferUtility.Upload(transferUtilityRequest);
+        }
+
+        public static bool FileExist(AmazonS3Client client, S3Path s3Path)
+        {
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = s3Path.bucketName,
+                Key = s3Path.path.TrimStart('/'),
+                Expires = DateTime.Now.AddMinutes(1)
+            };
+
+            return CheckUrlExist(client.GetPreSignedURL(request));
+        }
+
+        private static bool CheckUrlExist(string url)
+        {
+            try
+            {
+                var webRequest = WebRequest.Create(url);
+                webRequest.GetResponse();
+            }
+            catch //If exception thrown then couldn't get response from address
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

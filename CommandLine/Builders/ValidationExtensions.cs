@@ -53,7 +53,6 @@ namespace CommandLine.Builders
             return validator;
         }
 
-
         private static bool CheckUrlExist(string url)
         {
             try

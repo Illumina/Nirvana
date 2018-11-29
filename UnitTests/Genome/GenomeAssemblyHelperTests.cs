@@ -1,4 +1,4 @@
-﻿using System;
+﻿using ErrorHandling.Exceptions;
 using Genome;
 using Xunit;
 
@@ -21,7 +21,7 @@ namespace UnitTests.Genome
         [Fact]
         public void Convert_GenomeAssemblyDoesNotExist()
         {
-            Assert.Throws<ArgumentException>(delegate
+            Assert.Throws<UserErrorException>(delegate
             {
                 GenomeAssemblyHelper.Convert("dummy");
             });

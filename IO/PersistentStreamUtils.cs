@@ -40,6 +40,7 @@ namespace IO
 
             return getMetadataResponse.ContentLength;
         }
+
         public static IEnumerable<Stream> GetStreams(IEnumerable<string> locations)
         {
             if (locations == null) yield break;

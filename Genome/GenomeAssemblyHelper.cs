@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ErrorHandling.Exceptions;
+using System;
 
 namespace Genome
 {
@@ -26,7 +27,7 @@ namespace Genome
                     ret = GenomeAssembly.Unknown;
                     break;
                 default:
-                    throw new ArgumentException($"Unknown genome assembly was specified: {genomeAssembly}");
+                    throw new UserErrorException($"Unknown genome assembly was specified: {genomeAssembly}");
             }
 
             return ret;
