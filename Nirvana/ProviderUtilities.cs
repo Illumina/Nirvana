@@ -93,28 +93,30 @@ namespace Nirvana
             var paths = new List<(string, string)>();
             if (Directory.Exists(saDirectoryPath))
             {
-                foreach (var filePath in Directory.GetFiles(saDirectoryPath,$"*{SaCommon.SaFileSuffix}"))
+                foreach (var filePath in Directory.GetFiles(saDirectoryPath))
                 {
-                    if(filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
+                    if (filePath.EndsWith(SaCommon.SaFileSuffix) || filePath.EndsWith(SaCommon.PhylopFileSuffix) || filePath.EndsWith(SaCommon.RefMinorFileSuffix))
+                        paths.Add((filePath, filePath + SaCommon.IndexSufix));
+
+                    if (filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
                         paths.Add((filePath, null));
-                    else
-                        paths.Add((filePath, filePath+SaCommon.IndexSufix));
-
+                    //skip files with all other extensions
                 }
-
+                
                 return paths;
             }
-            
+
             //if this is the saManifest url
             using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(saDirectoryPath)))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    paths.Add((line, line+SaCommon.IndexSufix));
+                    if (line.EndsWith(SaCommon.SiFileSuffix) || line.EndsWith(SaCommon.NgaFileSuffix))
+                        paths.Add((line, null));
+                    else paths.Add((line, line+SaCommon.IndexSufix));
                 }
             }
-
 
             return paths;
         }
