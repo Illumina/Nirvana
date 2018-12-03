@@ -15,6 +15,9 @@ namespace SAUtils.Custom
         private readonly IDictionary<string, IChromosome> _refChromDict;
         public string JsonTag { get; }
         private string[] _tags;
+        private CustomAnnotationCategories[] _categories;
+        private string[] _descriptions;
+        private CustomAnnotationTypes[] _types;
 
         private const int NumRequiredColumns = 5;
         private readonly List<CustomInterval> _intervals;
@@ -50,6 +53,9 @@ namespace SAUtils.Custom
                         ParseHeaderLine(line);
                         continue;
                     }
+                    // check if tags, categories and description has same number of items
+                    if(_tags.Length != _categories.Length || _categories.Length != _descriptions.Length)
+                        throw new UserErrorException($"Input file has inconsistent number of tags({_tags.Length}), categories({_categories.Length}) and description({_descriptions.Length}).");
 
                     var item = ExtractItems(line);
                     if (item == null) continue;
@@ -69,28 +75,43 @@ namespace SAUtils.Custom
             if (!_refChromDict.ContainsKey(chromosome)) return null;
 
             var chrom = _refChromDict[chromosome];
-            var position = int.Parse(splits[1]);//we have to get it from RSPOS in info
+            var position = int.Parse(splits[1]);
             var refAllele = splits[2];
             var altAllele = splits[3];
             
-            var fieldValues = new Dictionary<string, string>();
+            var stringValues = new Dictionary<string, string>();
+            var boolValues   = new Dictionary<string, bool>();
+            var numValues    = new Dictionary<string, double>();
+
             for (var i = NumRequiredColumns; i < splits.Length; i++)
             {
                 var value = splits[i];
                 if (string.IsNullOrEmpty(value) || value ==".") continue;
-                fieldValues[_tags[i]] = splits[i];
+                switch (_types[i])
+                {
+                    case CustomAnnotationTypes.String:
+                        stringValues[_tags[i]] = splits[i];
+                        break;
+                    case CustomAnnotationTypes.Bool:
+                        boolValues[_tags[i]] = splits[i]=="true";
+                        break;
+                    case CustomAnnotationTypes.Number:
+                        numValues[_tags[i]] = double.Parse(splits[i]);
+                        break;
+                }
+                
             }
 
             //for small variants, the end column should always be "."
             if (splits[4] != ".")
             {
                 int end = int.Parse(splits[4]);
-                _intervals.Add(new CustomInterval(chrom, position, end, fieldValues));
+                _intervals.Add(new CustomInterval(chrom, position, end, stringValues, boolValues, numValues));
                 return null;
             }
 
-            if (fieldValues.Count == 0) return null;
-            return new CustomItem(chrom, position, refAllele, altAllele, fieldValues);
+            if (stringValues.Count == 0 && boolValues.Count==0 && numValues.Count==0) return null;
+            return new CustomItem(chrom, position, refAllele, altAllele, stringValues,boolValues, numValues);
         }
 
         public List<CustomInterval> GetCustomIntervals()
@@ -100,12 +121,83 @@ namespace SAUtils.Custom
 
         internal void ParseHeaderLine(string line)
         {
-            if (line.StartsWith("#CHROM"))
+            var splits = line.OptimizedSplit('\t');
+            switch (splits[0])
             {
-                _tags = line.OptimizedSplit('\t');
+                case "#CHROM":
+                    _tags = splits;
+                    break;
+                case "#type":
+                    ParseTypes(splits);
+                    break;
+                case "#categories":
+                    ParseCategories(splits);
+                    break;
+                case "#descriptions":
+                    ParseDescriptions(splits);
+                    break;
             }
-            //todo: parse categories and description for each field. Needed for Json Schema.
-            //if (line.StartsWith("#categories")) GetFieldCategories(line);
+            
+        }
+
+        private void ParseTypes(string[] splits)
+        {
+            _types = new CustomAnnotationTypes[splits.Length];
+            for (int i = NumRequiredColumns; i < splits.Length; i++)
+            {
+                switch (splits[i])
+                {
+                    case "bool":
+                        _types[i] = CustomAnnotationTypes.Bool;
+                        break;
+                    case "string":
+                        _types[i] = CustomAnnotationTypes.String;
+                        break;
+                    case "number":
+                        _types[i] = CustomAnnotationTypes.Number;
+                        break;
+                    default:
+                        throw new UserErrorException("Invalid value for type column. Valid values are bool, string, number.");
+                }
+            }
+        }
+
+        private void ParseDescriptions(string[] splits)
+        {
+            _descriptions = new string[splits.Length];
+            for (int i = NumRequiredColumns; i < splits.Length; i++)
+            {
+                if (splits[i] == ".") _descriptions[i] = null;
+                else _descriptions[i] = splits[i];
+            }
+        }
+
+        private void ParseCategories(string[] splits)
+        {
+            _categories = new CustomAnnotationCategories[splits.Length];
+            for(int i = NumRequiredColumns; i < splits.Length; i++)
+            {
+                switch (splits[i])
+                {
+                    case "AlleleCount":
+                        _categories[i] = CustomAnnotationCategories.AlleleCount;
+                        break;
+                    case "AlleleNumber":
+                        _categories[i] = CustomAnnotationCategories.AlleleNumber;
+                        break;
+                    case "AlleleFrequency":
+                        _categories[i] = CustomAnnotationCategories.AlleleFrequency;
+                        break;
+                    case "Prediction":
+                        _categories[i] = CustomAnnotationCategories.Prediction;
+                        break;
+                    default:
+                        _categories[i] = CustomAnnotationCategories.Unknown;
+                        break;
+                }
+
+            }
+            
         }
 
         private bool CheckJsonTagConflict(string value)

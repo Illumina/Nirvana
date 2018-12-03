@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
@@ -68,8 +69,6 @@ namespace VariantAnnotation.NSA
         {
             if (!_intervalArrays.ContainsKey(variant.Chromosome.Index)) return null;
 
-            var strings = _intervalArrays[variant.Chromosome.Index]
-                .GetAllOverlappingValues(variant.Start, variant.End);
             var overlappingSvs = _intervalArrays[variant.Chromosome.Index]
                 .GetAllOverlappingIntervals(variant.Start, variant.End);
 

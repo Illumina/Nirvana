@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
@@ -13,16 +14,20 @@ namespace SAUtils.DataStructures
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
 
-        private Dictionary<string, string> FieldValues { get; }
+        private Dictionary<string, string> StringValues { get; }
+        private Dictionary<string, bool> BoolValues { get; }
+        private Dictionary<string, double> NumValues { get; }
         
 
-        public CustomItem(IChromosome chromosome, int start, string refAllele, string altAllele, Dictionary<string, string> fieldValues)
+        public CustomItem(IChromosome chromosome, int start, string refAllele, string altAllele, Dictionary<string, string> stringValues, Dictionary<string, bool> boolValues, Dictionary<string, double> numValues)
         {
-            Chromosome  = chromosome;
-            Position    = start;
-            RefAllele   = refAllele;
-            AltAllele   = altAllele;
-            FieldValues = fieldValues;
+            Chromosome   = chromosome;
+            Position     = start;
+            RefAllele    = refAllele;
+            AltAllele    = altAllele;
+            StringValues = stringValues;
+            BoolValues   = boolValues;
+            NumValues    = numValues;
         }
 
         public string GetJsonString()
@@ -30,13 +35,34 @@ namespace SAUtils.DataStructures
 			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
-			foreach ((string key, string value)  in FieldValues)
-			{
-			    jsonObject.AddStringValue(key, value);
-			}
+            if(StringValues!=null && StringValues.Count > 0 )
+			    foreach ((string key, string value)  in StringValues)
+			    {
+			        jsonObject.AddStringValue(key, value);
+			    }
 
-			return StringBuilderCache.GetStringAndRelease(sb);
-	    }
+	        if (NumValues != null && NumValues.Count > 0)
+	            foreach ((string key, double value) in NumValues)
+	            {
+	                var intValue = (int) value;
+                    if(value.Equals(intValue)) 
+                        jsonObject.AddIntValue(key, intValue);
+	                else
+                        jsonObject.AddDoubleValue(key, value, "0.######");
+	            }
+
+            if (BoolValues != null && BoolValues.Count > 0)
+	            foreach ((string key, bool value) in BoolValues)
+	            {
+	                jsonObject.AddBoolValue(key, value, true);
+	            }
+
+         //   var jsonString = StringBuilderCache.GetStringAndRelease(sb);
+	        //Console.WriteLine("{" + jsonString + "}");
+	        //return jsonString;
+
+            return StringBuilderCache.GetStringAndRelease(sb);
+        }
 
 	}
 }

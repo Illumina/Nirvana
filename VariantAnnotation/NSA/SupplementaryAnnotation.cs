@@ -15,11 +15,11 @@ namespace VariantAnnotation.NSA
         
         public SupplementaryAnnotation(string key, bool isArray, bool isPositional, string jsonString, IEnumerable<string> jsonStrings)
         {
-            JsonKey      = key;
-            _isArray     = isArray;
+            JsonKey       = key;
+            _isArray      = isArray;
             _isPositional = isPositional;
-            _jsonString  = jsonString;
-            _jsonStrings = jsonStrings;
+            _jsonString   = jsonString;
+            _jsonStrings  = jsonStrings;
 
             if (_isArray && _jsonStrings == null)
             {

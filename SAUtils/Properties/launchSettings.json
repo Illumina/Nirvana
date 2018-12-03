@@ -57,7 +57,7 @@
     },
     "RR_custom": {
       "commandName": "Project",
-      "commandLineArgs": " custom  --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in Custom-annotations_short-GRCh37.tsv",
+      "commandLineArgs": " custom  --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in Test.tsv",
       "workingDirectory": "C:\\Development\\ExternalDataSources\\Custom"
     },
     "RR_globalAllele": {

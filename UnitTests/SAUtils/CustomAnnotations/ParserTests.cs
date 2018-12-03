@@ -49,10 +49,14 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             using (var custParser = new CustomAnnotationsParser(GetReadStream("#title=IcslAlleleFrequencies"), _refChromDict))
             {
-                custParser.ParseHeaderLine("#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tallHc\tfailedFilter");
-                var item = custParser.ExtractItems("chr1\t100\tA\tC\t.\t295\t125568\t0.000159\t0\ttrue");
+                custParser.ParseHeaderLine("#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes");
+                custParser.ParseHeaderLine("#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.");
+                custParser.ParseHeaderLine("#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.");
+                custParser.ParseHeaderLine("#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring");
 
-                Assert.Equal("\"allAc\":\"295\",\"allAn\":\"125568\",\"allAf\":\"0.000159\",\"allHc\":\"0\",\"failedFilter\":\"true\"", item.GetJsonString());
+                var item = custParser.ExtractItems("chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t");
+
+                Assert.Equal("\"pathogenicity\":\"VUSS\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true", item.GetJsonString());
             }
         }
 
@@ -60,16 +64,19 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void GetItems()
         {
             var text = "#title=IcslAlleleFrequencies\n" +
-                       "#CHROM\tPOS\tREF\tALT\tEND\ttype\tallAc\tallAn\tallAf\tallHc\tfailedFilter\n" +
-                       "chr1\t100\tA\tC\t.\t.\t295\t125568\t0.000159\t0\ttrue\n" +
-                       "chr1\t102\tT\tG\t.\t.\t79\t100981\t0.000325\t1\tfalse\n" +
-                        "chr1\t200\tT\t.\t1250\tDEL\t20\t253\t0.0003\t2\ttrue";
+                       "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
+                       "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n"+
+                       "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n"+
+                       "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n"+
+                       "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\n" +
+                       "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
+                       "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
             using (var custParser = new CustomAnnotationsParser(GetReadStream(text), _refChromDict))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);
-                Assert.Equal("\"allAc\":\"295\",\"allAn\":\"125568\",\"allAf\":\"0.000159\",\"allHc\":\"0\",\"failedFilter\":\"true\"", items[0].GetJsonString());
-                Assert.Equal("\"allAc\":\"79\",\"allAn\":\"100981\",\"allAf\":\"0.000325\",\"allHc\":\"1\",\"failedFilter\":\"false\"", items[1].GetJsonString());
+                Assert.Equal("\"pathogenicity\":\"VUSS\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true", items[0].GetJsonString());
+                Assert.Equal("\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"failedFilter\":false", items[1].GetJsonString());
             }
         }
 
@@ -77,10 +84,14 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void GetIntervals()
         {
             var text = "#title=IcslAlleleFrequencies\n" +
-                       "#CHROM\tPOS\tREF\tALT\tEND\ttype\tallAc\tallAn\tallAf\tallHc\tfailedFilter\n" +
-                       "chr1\t100\tA\tC\t.\t.\t295\t125568\t0.000159\t0\ttrue\n" +
-                       "chr1\t102\tT\tG\t.\t.\t79\t100981\t0.000325\t1\tfalse\n" +
-                       "chr1\t200\tT\t.\t1250\tDEL\t20\t253\t0.0003\t2\ttrue";
+                       "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
+                       "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                       "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
+                       "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n" +
+                       "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\n" +
+                       "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
+                       "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
+
             using (var custParser = new CustomAnnotationsParser(GetReadStream(text), _refChromDict))
             {
                 var items = custParser.GetItems().ToArray();
@@ -88,7 +99,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
 
                 var intervals = custParser.GetCustomIntervals();
                 Assert.Single(intervals);
-                Assert.Equal("\"start\":\"200\",\"end\":\"1250\",\"type\":\"DEL\",\"allAc\":\"20\",\"allAn\":\"253\",\"allAf\":\"0.0003\",\"allHc\":\"2\",\"failedFilter\":\"true\"", intervals[0].GetJsonString());
+                Assert.Equal("\"start\":46993,\"end\":50879,\"pathogenicity\":\"benign\",\"allAc\":50,\"allAn\":250,\"allAf\":0.001,\"failedFilter\":false", intervals[0].GetJsonString());
             }
         }
 
