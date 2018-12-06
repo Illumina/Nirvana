@@ -12,7 +12,7 @@ namespace IO
         {
             var s3Client = client;
 
-            return (position) =>
+            return position =>
             {
                 var getRequest = new GetObjectRequest
                 {
@@ -27,7 +27,7 @@ namespace IO
 
         public static Func<long, Stream> GetHttpConnectFunc(string url)
         {
-            return (position) =>
+            return position =>
             {
                 var request = WebRequest.CreateHttp(url);
                 if (position < 0) position = 0;
@@ -40,7 +40,7 @@ namespace IO
         public static Func<long, Stream> GetFileConnectFunc(string filePath)
         {
             var path = filePath;
-            return (position) =>
+            return position =>
             {
                 var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read) {Position = position};
                 return stream;
