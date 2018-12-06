@@ -44,22 +44,31 @@ namespace Compression.Utilities
 
             return newStream;
         }
+        //used in custom annotation lambda
+        public static StreamReader GetAppropriateStreamReader(PersistentStream pStream)
+        {
+            var header = GetHeader(pStream);
+            var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
+            pStream.Position = 0;
+            var appropriateStream = GetAppropriateStream(pStream, compressionAlgorithm);
+            return new StreamReader(appropriateStream);
+        }
 
         public static Stream GetAppropriateReadStream(string filePath)
         {
-            var header = GetHeader(filePath);
+            var header = GetHeader(PersistentStreamUtils.GetReadStream(filePath));
             var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
             var fileStream = PersistentStreamUtils.GetReadStream(filePath);
             return GetAppropriateStream(fileStream, compressionAlgorithm);
         }
 
-        private static byte[] GetHeader(string filePath)
+        private static byte[] GetHeader(Stream stream)
         {
             byte[] header = null;
 
             try
             {
-                using (var reader = new ExtendedBinaryReader(PersistentStreamUtils.GetReadStream(filePath)))
+                using (var reader = new ExtendedBinaryReader(stream))
                 {
                     header = reader.ReadBytes(NumHeaderBytes);
                 }
