@@ -10,7 +10,7 @@ namespace ErrorHandling
 		private static readonly Dictionary<Type, ExitCodes> ExceptionsToExitCodes;
 		private static readonly HashSet<Type> UserFriendlyExceptions;
 	    private const string UserError = "User Error";
-	    private const string NirvanaError = "Nirvana Error";
+	    public const string NirvanaError = "Error";
 	    public const string VcfLine = "VcfLine";
 
 		// constructor
@@ -63,7 +63,7 @@ namespace ErrorHandling
 		/// Displays the details behind the exception
 		/// Throw exceptions that are not user friendly if needed
 		/// </summary>
-		public static ExitCodes ShowAndThrowException(Exception e, bool throwUnfriendlyExecptions)
+		public static ExitCodes ShowException(Exception e)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
 			Console.Write("\nERROR: ");
@@ -93,13 +93,9 @@ namespace ErrorHandling
 					Console.ResetColor();
 					Console.WriteLine(e.Data[VcfLine]);
 				}
-
-			    if (throwUnfriendlyExecptions) throw e;
 			}
 
 		    return GetExitCode(exceptionType);
 		}
-
-	    public static ExitCodes ShowException(Exception e) => ShowAndThrowException(e, false);
     }
 }
