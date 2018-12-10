@@ -23,7 +23,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new []{false}, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -42,7 +42,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[]{ false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -61,7 +61,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -123,7 +123,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant) {PhylopScore = -0.567};
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
@@ -144,7 +144,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
@@ -164,7 +164,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "Test=abc", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
@@ -249,11 +249,11 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
-            annotatedVariant.EnsemblTranscripts.Add(mockedTranscript1.Object);
-            annotatedVariant.EnsemblTranscripts.Add(mockedTranscript2.Object);
-            annotatedVariant.RefSeqTranscripts.Add(mockedTranscript3.Object);
+            annotatedVariant.Transcripts.Add(mockedTranscript1.Object);
+            annotatedVariant.Transcripts.Add(mockedTranscript2.Object);
+            annotatedVariant.Transcripts.Add(mockedTranscript3.Object);
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -276,7 +276,7 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "Test=abc", null, null);
             var position = new Position(chrom, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false, false));
+            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             annotatedVariant.RegulatoryRegions.Add(mockedRegulatory.Object);
 

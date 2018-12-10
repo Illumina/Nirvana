@@ -6,7 +6,7 @@ namespace Vcf.VariantCreator
 {
     public static class ReferenceVariantCreator
     {
-        private static readonly AnnotationBehavior RefVariantBehavior = new AnnotationBehavior(true, false, false, true, false, false);
+        private static readonly AnnotationBehavior RefVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
 
         private static string GetVid(string ensemblName, int start, int end, string refAllele, VariantType variantType)
         {

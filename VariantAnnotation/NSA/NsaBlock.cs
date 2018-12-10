@@ -9,7 +9,7 @@ namespace VariantAnnotation.NSA
     {
         private readonly ICompressionAlgorithm _compressionAlgorithm;
         private readonly byte[] _compressedBlock;
-        public readonly byte[] UncompressedBlock;
+        private readonly byte[] _uncompressedBlock;
         private int _compressedLength;
         private int _uncompressedLength;
         private readonly ExtendedBinaryWriter _writer;
@@ -18,13 +18,11 @@ namespace VariantAnnotation.NSA
         private int _lastPosition;
         private int _count;
 
-        public int FirstPosition => _firstPosition;
-        public int LastPosition => _lastPosition;
         public NsaBlock(ICompressionAlgorithm compressionAlgorithm, int size)
         {
             _compressionAlgorithm = compressionAlgorithm;
-            UncompressedBlock = new byte[size];
-            _writer = new ExtendedBinaryWriter(new MemoryStream(UncompressedBlock));
+            _uncompressedBlock = new byte[size];
+            _writer = new ExtendedBinaryWriter(new MemoryStream(_uncompressedBlock));
             int compressedBlockSize = compressionAlgorithm.GetCompressedBufferBounds(size);
             _compressedBlock = new byte[compressedBlockSize];
         }
@@ -38,7 +36,7 @@ namespace VariantAnnotation.NSA
             reader.Read(_compressedBlock, 0, _compressedLength);
 
             _uncompressedLength = _compressionAlgorithm.Decompress(_compressedBlock, _compressedLength,
-                UncompressedBlock, UncompressedBlock.Length);
+                _uncompressedBlock, _uncompressedBlock.Length);
 
             return _uncompressedLength;
         }
@@ -46,7 +44,7 @@ namespace VariantAnnotation.NSA
 
         public bool HasSpace(int length)
         {
-            return BlockOffset + length + 2 * sizeof(int) <= UncompressedBlock.Length; //saving space for length and position
+            return BlockOffset + length + 2 * sizeof(int) <= _uncompressedBlock.Length; //saving space for length and position
         }
 
         public void Add(byte[] data, int length, int position)
@@ -71,7 +69,7 @@ namespace VariantAnnotation.NSA
         {
             if (_uncompressedLength == 0) yield break;
             _lastPosition = _firstPosition;
-            using (var reader = new ExtendedBinaryReader(new MemoryStream(UncompressedBlock, 0, _uncompressedLength)))
+            using (var reader = new ExtendedBinaryReader(new MemoryStream(_uncompressedBlock, 0, _uncompressedLength)))
             {
                 for (int i = 0; i < _count; i++)
                 {
@@ -88,7 +86,7 @@ namespace VariantAnnotation.NSA
 
         public (int firstPosition, int lastPosition, int numBytes) Write(ExtendedBinaryWriter writer)
         {
-            var compressedLength = _compressionAlgorithm.Compress(UncompressedBlock, BlockOffset,
+            var compressedLength = _compressionAlgorithm.Compress(_uncompressedBlock, BlockOffset,
                 _compressedBlock, _compressedBlock.Length);
 
             writer.WriteOpt(compressedLength);

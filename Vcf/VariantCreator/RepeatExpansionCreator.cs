@@ -7,7 +7,7 @@ namespace Vcf.VariantCreator
 {
     public static class RepeatExpansionCreator
     {
-        private static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, false, true);
+        private static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, true);
 
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
         {

@@ -43,13 +43,9 @@ namespace VariantAnnotation.GeneAnnotation
 
         public GeneAnnotationProvider(IEnumerable<Stream> dbStreams)
         {
-            Name = "Gene annotation provider";
+            Name        = "Gene annotation provider";
             _ngaReaders = new List<NgaReader>();
-            foreach (var dbStream in dbStreams)
-            {
-                _ngaReaders.Add(new NgaReader(dbStream));
-            }
-        }
-        
+            foreach (var dbStream in dbStreams) _ngaReaders.Add(new NgaReader(dbStream));
+        }        
     }
 }

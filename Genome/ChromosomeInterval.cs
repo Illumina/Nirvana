@@ -1,6 +1,4 @@
-﻿using Intervals;
-
-namespace Genome
+﻿namespace Genome
 {
     public sealed class ChromosomeInterval : IChromosomeInterval
     {
@@ -13,11 +11,6 @@ namespace Genome
             Chromosome = chromosome;
             Start      = start;
             End        = end;
-        }
-
-        public bool Overlaps(IChromosome chrom, int start, int end)
-        {
-            return Chromosome.Index == chrom.Index && this.Overlaps(start, end);
         }
     }
 }

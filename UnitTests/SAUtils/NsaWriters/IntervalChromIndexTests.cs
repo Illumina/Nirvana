@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Genome;
 using IO;
 using VariantAnnotation.NSA;
 using Xunit;
@@ -8,11 +7,9 @@ using Xunit;
 namespace UnitTests.SAUtils.NsaWriters
 {
     public sealed class IntervalChromIndexTests
-    {
-        
+    {        
         private static IntervalChromIndex CreateIndex()
         {
-            var chrom1 = new Chromosome("chr1", "1", 0);
             long location = 1000;
             var index = new IntervalChromIndex(location);
             var start = 100;

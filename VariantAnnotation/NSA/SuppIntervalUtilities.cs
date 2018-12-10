@@ -1,19 +1,11 @@
 ﻿using System;
 using Genome;
-using IO;
-using VariantAnnotation.Interface.SA;
 using Variants;
 
 namespace VariantAnnotation.NSA
 {
     public static class SuppIntervalUtilities
     {
-        public static void Write(this ISuppIntervalItem item, ExtendedBinaryWriter writer)
-        {
-            writer.Write((byte)item.VariantType);
-            writer.Write(item.GetJsonString());
-        }
-
         public static double? GetReciprocalOverlap( IChromosomeInterval saInterval, IVariant variant)
         {
             if (saInterval.Chromosome.Index != variant.Chromosome.Index) return null;

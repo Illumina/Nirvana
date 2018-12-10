@@ -3,23 +3,19 @@ using System.Collections.Generic;
 using System.IO.Compression;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
-using CommandLine.Utilities;
 using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using Jasix.DataStructures;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Providers;
 using Vcf;
 
 namespace Nirvana
 {
-    public sealed class Nirvana
+    public static class Nirvana
     {
         private static string _inputCachePrefix;
         private static readonly List<string> SupplementaryAnnotationDirectories = new List<string>();
@@ -31,15 +27,10 @@ namespace Nirvana
         private static bool _vcf;
         private static bool _gvcf;
         private static bool _forceMitochondrialAnnotation;
-        private static bool _reportAllSvOverlappingTranscripts;
         private static bool _disableRecomposition;
-
-        private readonly string _annotatorVersionTag = "Nirvana " + CommandLineUtilities.Version;
-        private readonly VcfConversion _conversion   = new VcfConversion();
 
         private static ExitCodes ProgramExecution()
         {
-
             var annotationResources = GetAnnotationResources();
 
             string jasixFileName = _outputFileName == "-" ? null : _outputFileName + ".json.gz" + JasixCommons.FileExt;
@@ -53,9 +44,8 @@ namespace Nirvana
         }
 
         private static AnnotationResources GetAnnotationResources()
-        {
-            
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _reportAllSvOverlappingTranscripts, _forceMitochondrialAnnotation);
+        {            
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _forceMitochondrialAnnotation);
             using (var preloadVcfStream = new BlockGZipStream(PersistentStreamUtils.GetReadStream(_vcfPath), CompressionMode.Decompress))
             {
                 annotationResources.GetVariantPositions(preloadVcfStream, null);
@@ -63,20 +53,8 @@ namespace Nirvana
             return annotationResources;
         }
 
-        private void WriteOutput(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput)
-        {
-            jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
-
-            if (vcfWriter == null && gvcfWriter == null || annotatedPosition.Position.IsRecomposed) return;
-
-            string vcfLine = _conversion.Convert(annotatedPosition);
-            vcfWriter?.Write(vcfLine);
-            gvcfWriter?.Write(vcfLine);
-        }
-
         public static int Main(string[] args)
         {
-            var nirvana = new Nirvana();
             var ops = new OptionSet
             {
                 {
@@ -123,11 +101,6 @@ namespace Nirvana
                     "force-mt",
                     "forces to annotate mitochondrial variants",
                     v => _forceMitochondrialAnnotation = v != null
-                },
-                {
-                    "verbose-transcripts",
-                    "reports all overlapping transcripts for structural variants",
-                    v => _reportAllSvOverlappingTranscripts = v != null
                 },
                 {
                     "disable-recomposition",

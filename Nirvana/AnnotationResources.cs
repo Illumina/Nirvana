@@ -34,33 +34,34 @@ namespace Nirvana
         public string AnnotatorVersionTag { get; } = "Nirvana " + CommandLineUtilities.Version;
         public bool OutputVcf { get; }
         public bool OutputGvcf { get; }
-
-        public bool ReportAllSvOverlappingTranscripts { get; }
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition, bool reportAllSvOverlappingTranscripts, bool forceMitochondrialAnnotation)
-
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths,
+            string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition,
+            bool forceMitochondrialAnnotation)
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
+            
             //read VCF to get positions for all variants
             //_variantPositions = vcfStream == null ? null : PreLoadUtilities.GetPositions(vcfStream, SequenceProvider.RefNameToChromosome);
             //preload annotation providers
             var dataAndIndexPaths = new List<(string dataFile, string indexFile)>();
+
             foreach (var saDirectoryPath in saDirectoryPaths)
             {
                 dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saDirectoryPath));
             }
-            
 
-            TranscriptAnnotationProvider          = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                            = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
-            ConservationProvider                  = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
-            RefMinorProvider                      = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
-            GeneAnnotationProvider                = ProviderUtilities.GetGeneAnnotationProvider(dataAndIndexPaths);
-            Plugins                               = PluginUtilities.LoadPlugins(pluginDirectory);
+            TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
+            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
+            ConservationProvider         = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
+            RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
+            GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(dataAndIndexPaths);
+            Plugins                      = PluginUtilities.LoadPlugins(pluginDirectory);
 
-            Annotator                             = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
-                                                    ConservationProvider, GeneAnnotationProvider, Plugins);
+            Annotator = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
+                ConservationProvider, GeneAnnotationProvider, Plugins);
+
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
                 : Phantom.Recomposer.Recomposer.Create(SequenceProvider, inputCachePrefix);
@@ -69,12 +70,10 @@ namespace Nirvana
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." +
                              SaCommon.DataVersion;
 
-            OutputVcf = outputVcf;
-            OutputGvcf = outputGvcf;
-            ReportAllSvOverlappingTranscripts = reportAllSvOverlappingTranscripts;
+            OutputVcf                    = outputVcf;
+            OutputGvcf                   = outputGvcf;
             ForceMitochondrialAnnotation = forceMitochondrialAnnotation;
         }
-
 
         private static IEnumerable<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
             params IProvider[] providers)

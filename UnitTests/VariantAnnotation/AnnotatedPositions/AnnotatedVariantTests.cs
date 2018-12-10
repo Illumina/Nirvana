@@ -20,24 +20,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             _chromosome = new Chromosome("chrBob", "bob", 3);
         }
 
-        //[Fact]
-        //public void GetJsonString_Variant_WithSupplementaryAnnotation()
-        //{
-        //    IVariant variant = GetVariant();
-        //    var annotatedVariant = new AnnotatedVariant(variant);
-
-        //    const string originalChromosomeName = "BoB";
-
-        //    AddRegulatoryRegion(annotatedVariant);
-        //    AddSupplementaryAnnotation(annotatedVariant);
-        //    annotatedVariant.PhylopScore = -0.314;
-
-        //    const string expectedResult = "{\"vid\":\"bob:100:G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"phylopScore\":-0.314,\"regulatoryRegions\":[{\"id\":\"7157\",\"type\":\"TF_binding_site\",\"consequence\":[\"regulatory_region_amplification\"]}],\"clinVar\":{\"good\":\"result\"},\"exac\":[{\"bad\":\"temper\"},{\"brutal\":\"kangaroo\"}]}";
-        //    var observedResult = annotatedVariant.GetJsonString(originalChromosomeName);
-
-        //    Assert.Equal(expectedResult, observedResult);
-        //}
-
         [Fact]
         public void GetJsonString_RefMinor_WithTranscripts()
         {
@@ -49,7 +31,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             AddRegulatoryRegion(annotatedVariant);
             AddTranscript(annotatedVariant);
 
-            const string expectedResult = "{\"vid\":\"bob:100:G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"isReferenceMinorAllele\":true,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"regulatoryRegions\":[{\"id\":\"7157\",\"type\":\"TF_binding_site\",\"consequence\":[\"regulatory_region_amplification\"]}],\"transcripts\":{\"ensembl\":[]}}";
+            const string expectedResult = "{\"vid\":\"bob:100:G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"isReferenceMinorAllele\":true,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"regulatoryRegions\":[{\"id\":\"7157\",\"type\":\"TF_binding_site\",\"consequence\":[\"regulatory_region_amplification\"]}],\"transcripts\":[]}";
             var observedResult = annotatedVariant.GetJsonString(originalChromosomeName);
 
             Assert.Equal(expectedResult, observedResult);
@@ -72,7 +54,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             annotatedTranscript.SetupGet(x => x.Transcript.End).Returns(966405);
             annotatedTranscript.SetupGet(x => x.AlternateCodons).Returns("cAt/cGt");
 
-            annotatedVariant.EnsemblTranscripts.Add(annotatedTranscript.Object);
+            annotatedVariant.Transcripts.Add(annotatedTranscript.Object);
         }
 
         //private static void AddSupplementaryAnnotation(IAnnotatedVariant annotatedVariant)
@@ -89,16 +71,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         //    annotatedVariant.SupplementaryAnnotations.Add(annotatedSaDataSource2);
         //}
 
-        private IVariant GetVariant()
-        {
-            var behavior = new AnnotationBehavior(false, false, false, false, false, false);
-            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", false, false, false,
-                new[] { "bob:100:102:TAT" }, null, behavior);
-        }
-
         private IVariant GetRefMinorVariant()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false, false);
+            var behavior = new AnnotationBehavior(false, false, false, false, false);
             return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
                 new[] { "bob:100:102:TAT" }, null, behavior);
         }

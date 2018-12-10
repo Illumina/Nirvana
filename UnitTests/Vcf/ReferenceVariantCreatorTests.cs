@@ -29,7 +29,6 @@ namespace UnitTests.Vcf
             Assert.True(variant.Behavior.NeedSaPosition);
             Assert.False(variant.Behavior.NeedSaInterval);
             Assert.False(variant.Behavior.ReducedTranscriptAnnotation);
-            Assert.False(variant.Behavior.ReportOverlappingGenes);
             Assert.False(variant.Behavior.StructuralVariantConsequence);
 
 	        var variant2 = ReferenceVariantCreator.Create(chrom.Object, 101, 101, "A", ".", null);

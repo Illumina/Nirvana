@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using VariantAnnotation.Interface.IO;
@@ -13,8 +12,8 @@ namespace VariantAnnotation.IO
 
         public const char Comma          = ',';
         private const char DoubleQuote   = '\"';
-        public const char OpenBracket   = '[';
-        public const char CloseBracket  = ']';
+        public const char OpenBracket    = '[';
+        public const char CloseBracket   = ']';
         public const char OpenBrace      = '{';
         public const char CloseBrace     = '}';
         private const string ColonString = "\":";
@@ -145,32 +144,5 @@ namespace VariantAnnotation.IO
             _sb.Append(CloseBracket);
             _needsComma = true;
         }
-
-        public void AddGroupedObjectValues<T>(string description, string[] groupDescriptions, params IList<T>[] groups) where T : IJsonSerializer
-        {
-            if (groupDescriptions == null) return;
-
-            if (groups.Length != groupDescriptions.Length)
-                throw new ArgumentException(
-                    $"The count ({groupDescriptions.Length}) of descriptions does not match the count ({groups.Length}) of groups");
-
-            if (_needsComma) _sb.Append(Comma);
-            AddKey(description);
-            _sb.Append(OpenBrace);
-
-            var i = 0;
-            Reset();
-            foreach (var group in groups)
-            {
-                i++;
-                if (group == null || !group.Any()) continue;
-                AddObjectValues(groupDescriptions[i - 1], group);
-            }
-
-            _sb.Append(CloseBrace);
-            _needsComma = true;
-        }
-
-        private void Reset(bool needsComma = false) => _needsComma = needsComma;
     }
 }

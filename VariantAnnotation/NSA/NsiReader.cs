@@ -53,7 +53,7 @@ namespace VariantAnnotation.NSA
                 {
                     var saInterval = new SuppInterval(memReader);
                     if (suppIntervals.TryGetValue(saInterval.Chromosome.Index, out var intervals)) intervals.Add(new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()));
-                    else suppIntervals[saInterval.Chromosome.Index] = new List<Interval<string>>() { new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()) };
+                    else suppIntervals[saInterval.Chromosome.Index] = new List<Interval<string>> { new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()) };
                 }
 
                 _intervalArrays = new Dictionary<ushort, IntervalArray<string>>(suppIntervals.Count);

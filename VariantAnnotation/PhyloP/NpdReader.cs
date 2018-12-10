@@ -24,19 +24,16 @@ namespace VariantAnnotation.PhyloP
         public GenomeAssembly Assembly { get; }
         public IDataSourceVersion Version { get; }
 
-        public readonly int SchemaVersion;
-
         public NpdReader(Stream dbStream, Stream indexStream)
         {
             _reader = new ExtendedBinaryReader(dbStream);
 
-            _index        = new NpdIndex(new ExtendedBinaryReader(indexStream));
-            Assembly      = _index.Assembly;
-            Version       = _index.Version;
-            SchemaVersion = _index.SchemaVersion;
+            _index   = new NpdIndex(new ExtendedBinaryReader(indexStream));
+            Assembly = _index.Assembly;
+            Version  = _index.Version;
 
-            if (SchemaVersion != SaCommon.SchemaVersion)
-                throw new UserErrorException($"ERROR!! SA schema version mismatch. Expected{SaCommon.SchemaVersion}, observed {SchemaVersion}");
+            if (_index.SchemaVersion != SaCommon.SchemaVersion)
+                throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion}");
 
             var scoreMap= new Dictionary<byte, double>();
             foreach ((double score, byte code)in _index.ScoreMap)
@@ -50,7 +47,8 @@ namespace VariantAnnotation.PhyloP
         }
 
         private IChromosome _chromosome;
-        public void PreLoad(IChromosome chrom)
+
+        private void PreLoad(IChromosome chrom)
         {
             _chromosome = chrom;
 

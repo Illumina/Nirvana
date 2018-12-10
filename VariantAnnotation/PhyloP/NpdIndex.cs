@@ -15,7 +15,7 @@ namespace VariantAnnotation.PhyloP
         public readonly IDataSourceVersion Version;
         public readonly GenomeAssembly Assembly;
         public readonly int SchemaVersion;
-        public readonly string JsonKey;
+        private readonly string _jsonKey;
         public readonly ImmutableDictionary<double, byte> ScoreMap;
 
         public const int MaxChromLength = 250_000_000;
@@ -25,7 +25,7 @@ namespace VariantAnnotation.PhyloP
             _writer       = new ExtendedBinaryWriter(stream);
             Assembly      = assembly;
             Version       = version;
-            JsonKey       = jsonKey;
+            _jsonKey       = jsonKey;
             SchemaVersion = schemaVersion;
 
             _chromRanges = new Dictionary<ushort, (long, int)>(32);
@@ -46,7 +46,7 @@ namespace VariantAnnotation.PhyloP
         {
             _writer.Write((byte)Assembly);
             Version.Write(_writer);
-            _writer.WriteOptAscii(JsonKey);
+            _writer.WriteOptAscii(_jsonKey);
             _writer.WriteOpt(SchemaVersion);
 
             _writer.WriteOpt(_chromRanges.Count);
@@ -70,7 +70,7 @@ namespace VariantAnnotation.PhyloP
         {
             Assembly = (GenomeAssembly)reader.ReadByte();
             Version = DataSourceVersion.Read(reader);
-            JsonKey = reader.ReadAsciiString();
+            _jsonKey = reader.ReadAsciiString();
             SchemaVersion = reader.ReadOptInt32();
 
             var chromCount = reader.ReadOptInt32();

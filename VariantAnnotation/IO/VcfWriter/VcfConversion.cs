@@ -320,7 +320,7 @@ namespace VariantAnnotation.IO.VcfWriter
                 var jsonVariant = unifiedJson.AnnotatedVariants[i];
 
                 csqs.AddRange(
-                    jsonVariant.EnsemblTranscripts.Where(x => x.Transcript.IsCanonical)
+                    jsonVariant.Transcripts.Where(x => x.Transcript.IsCanonical)
                         .Select(transcript => new CsqEntry
                         {
                             Allele      = genotypeIndex.ToString(),
@@ -329,17 +329,6 @@ namespace VariantAnnotation.IO.VcfWriter
                             Symbol      = transcript.Transcript.Gene.Symbol,
                             Consequence = transcript.Consequences == null ? null : string.Join("&", transcript.Consequences.Select(ConsequenceUtil.GetConsequence))
                         }));
-
-                csqs.AddRange(from transcript in jsonVariant.RefSeqTranscripts
-                              where transcript.Transcript.IsCanonical
-                              select new CsqEntry
-                              {
-                                  Allele      = genotypeIndex.ToString(),
-                                  Feature     = transcript.Transcript.Id.WithVersion,
-                                  FeatureType = CsqCommon.TranscriptFeatureType,
-                                  Symbol      = transcript.Transcript.Gene.Symbol,
-                                  Consequence = transcript.Consequences == null ? null : string.Join("&", transcript.Consequences.Select(ConsequenceUtil.GetConsequence))
-                              });
 
                 csqs.AddRange(jsonVariant.RegulatoryRegions.Select(regulatoryRegion => new CsqEntry
                 {

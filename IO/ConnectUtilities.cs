@@ -46,6 +46,7 @@ namespace IO
                 return stream;
             };
         }
+
         public static Stream ConnectWithRetries(Func<long, Stream> connect, long position, int retryCount)
         {
             while (retryCount > 0)

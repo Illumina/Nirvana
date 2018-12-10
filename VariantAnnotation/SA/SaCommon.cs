@@ -2,9 +2,7 @@
 {
     public static class SaCommon
     {
-        public const uint GuardInt = 4041327495;
         public const int DefaultBlockSize = 8 * 1024 * 1024;
-        public const string DataHeader    = "NirvanaData";
         public const ushort DataVersion   = 47;
         public const ushort SchemaVersion = 22;
 

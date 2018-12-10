@@ -11,8 +11,8 @@ namespace VariantAnnotation.NSA
     //these are non-overlapping buckets of positions 
     public sealed class IndexBucket : IComparable<IndexBucket>
     {
-        public int FirstPosition { get; private set; }
-        public int LastPosition { get; private set; }
+        private int FirstPosition { get; }
+        private int LastPosition { get; set; }
         private readonly long _firstFileLocation;
         private readonly ushort _firstRecordLength;
         public int Count { get; private set; }
@@ -26,17 +26,6 @@ namespace VariantAnnotation.NSA
         private readonly List<long> _fileLocations;
         private readonly byte[] _memStreamArray;
         private readonly byte[] _compressedBytes;
-
-        private static IndexBucket _dummy;
-
-        //we use this method and the static _dummy object to avoid creating new objects every time we need to perform a binary search
-        public static IndexBucket GetComparableBucket(int position)
-        {
-            if (_dummy==null ) _dummy = new IndexBucket(1, 1, 0);
-
-            _dummy.FirstPosition = position;
-            return _dummy;
-        }
 
         public IndexBucket(int firstPosition, long firstFileLocation, ushort firstRecordLength, int maxCount= IndexCommons.MaxBucketSize)
         {

@@ -13,15 +13,9 @@ namespace Vcf.VariantCreator
     public sealed class VariantFactory
     {
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
-        private readonly bool _enableVerboseTranscript;
-
         private const string StrPrefix = "<STR";
 
-        public VariantFactory(IDictionary<string, IChromosome> refNameToChromosome, bool enableVerboseTranscript)
-        {
-            _refNameToChromosome     = refNameToChromosome;
-            _enableVerboseTranscript = enableVerboseTranscript;
-        }
+        public VariantFactory(IDictionary<string, IChromosome> refNameToChromosome) => _refNameToChromosome = refNameToChromosome;
 
         private static VariantCategory GetVariantCategory(string firstAltAllele, bool isReference, bool isSymbolicAllele, VariantType svType)
         {
@@ -88,9 +82,9 @@ namespace Vcf.VariantCreator
                     var svBreakEnds = infoData.SvType == VariantType.translocation_breakend ?
                         GetTranslocationBreakends(chromosome, refAllele, altAllele, start)
                         : GetSvBreakEnds(chromosome.EnsemblName, start, infoData.SvType, infoData.End, infoData.IsInv3, infoData.IsInv5);
-                    return StructuralVariantCreator.Create(chromosome, start, refAllele, altAllele, svBreakEnds, infoData, _enableVerboseTranscript);
+                    return StructuralVariantCreator.Create(chromosome, start, refAllele, altAllele, svBreakEnds, infoData);
                 case VariantCategory.CNV:
-                    return CnvCreator.Create(chromosome, start, refAllele, altAllele, infoData, _enableVerboseTranscript);
+                    return CnvCreator.Create(chromosome, start, refAllele, altAllele, infoData);
                 case VariantCategory.RepeatExpansion:
                     return RepeatExpansionCreator.Create(chromosome, start, refAllele, altAllele, infoData);
                 default:

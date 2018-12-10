@@ -13,9 +13,8 @@ namespace UnitTests.TestUtilities
     public static class AnnotationUtilities
 	{
         internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
-            string vcfLine, bool enableVerboseTranscripts, IDictionary<string, IChromosome> refNameToChromosome)
+            string vcfLine)
         {
-
             List<(string dataFile, string indexFile)> dataAndIndexPaths = null;
             if(saPaths!=null)
             {
@@ -24,18 +23,17 @@ namespace UnitTests.TestUtilities
                 {
                     dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saPath));
                 }
-
             }
 
-            var refMinorProvider                 = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
-            var annotatorAndRef                  = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
+            var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
+            var annotatorAndRef   = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
 
-            var annotator                        = annotatorAndRef.Annotator;
-            var refNames                         = annotatorAndRef.RefNames;
-            var variantFactory                   = new VariantFactory(refNames, enableVerboseTranscripts);
+            var annotator         = annotatorAndRef.Annotator;
+            var refNames          = annotatorAndRef.RefNames;
+            var variantFactory    = new VariantFactory(refNames);
 
-            var position                         = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
-            var annotatedPosition                = annotator.Annotate(position);
+            var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
+            var annotatedPosition = annotator.Annotate(position);
 
             return annotatedPosition;
         }

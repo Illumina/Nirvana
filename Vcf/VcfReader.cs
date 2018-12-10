@@ -22,7 +22,6 @@ namespace Vcf
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly IVcfFilter _vcfFilter;
-
         public bool IsRcrsMitochondrion { get; private set; }
         public string VcfLine { get; private set; }
 
@@ -55,11 +54,11 @@ namespace Vcf
         public string[] GetSampleNames() => _sampleNames;
 
         private VcfReader(StreamReader headerReader, StreamReader vcfReader, IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer, IVcfFilter vcfFilter)
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter)
         {
             _headerReader = headerReader;
             _reader = vcfReader;
-            _variantFactory = new VariantFactory(refNameToChromosome, enableVerboseTranscript);
+            _variantFactory = new VariantFactory(refNameToChromosome);
             _refMinorProvider = refMinorProvider;
             _vcfFilter = vcfFilter;
             _refNameToChromosome = refNameToChromosome;
@@ -67,33 +66,30 @@ namespace Vcf
             _recomposer = hasSampleColumn ? recomposer : new NullRecomposer();
         }
 
+        [Obsolete("We should not have multiple constructors")]
         private VcfReader(StreamReader headerReader, StreamReader vcfReader, IAnnotationResources annotationResources, IVcfFilter vcfFilter) : this (headerReader, vcfReader,
             annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider,
-            annotationResources.ReportAllSvOverlappingTranscripts, annotationResources.Recomposer, vcfFilter)
+            annotationResources.Recomposer, vcfFilter)
         { }
 
-        public static VcfReader Create(Stream headerStream, Stream vcfStream,
-            IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer,
-            IVcfFilter vcfFilter) => new VcfReader(FileUtilities.GetStreamReader(headerStream),
-            FileUtilities.GetStreamReader(vcfStream), refNameToChromosome,
-            refMinorProvider, enableVerboseTranscript, recomposer, vcfFilter);
-
+        [Obsolete("We should not have multiple constructors")]
         public static VcfReader Create(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider, bool enableVerboseTranscript, IRecomposer recomposer,
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer,
             IVcfFilter vcfFilter)
         {
             var reader = FileUtilities.GetStreamReader(stream);
             return new VcfReader(reader, reader, refNameToChromosome,
-                refMinorProvider, enableVerboseTranscript, recomposer, vcfFilter);
+                refMinorProvider, recomposer, vcfFilter);
         }
 
+        [Obsolete("We should not have multiple constructors")]
         private static VcfReader Create(Stream stream, IAnnotationResources annotationResources, IVcfFilter vcfFilter)
         {
             var reader = FileUtilities.GetStreamReader(stream);
             return new VcfReader(reader, reader, annotationResources, vcfFilter);
         }
 
+        [Obsolete("We should not have multiple constructors")]
         public static VcfReader Create(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
             IVcfFilter vcfFilter)
         {
@@ -103,7 +99,7 @@ namespace Vcf
             return new VcfReader(FileUtilities.GetStreamReader(headerStream),
                     FileUtilities.GetStreamReader(vcfStream),
                     annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider,
-                    annotationResources.ReportAllSvOverlappingTranscripts, annotationResources.Recomposer, vcfFilter);
+                    annotationResources.Recomposer, vcfFilter);
         }
 
         private bool ParseHeader()

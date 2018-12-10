@@ -22,7 +22,4 @@
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="InputFileParsers\CustomAnnotation\" />
-  </ItemGroup>
 </Project>

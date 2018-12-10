@@ -15,14 +15,6 @@ namespace VariantAnnotation.Providers
             _reader = new RefMinorDbReader(new ExtendedBinaryReader(dbStream), new ExtendedBinaryReader(indexStream));
         }
 
-        public void PreLoad(IChromosome chromosome)
-        {
-            _reader.PreLoad(chromosome);
-        }
-
-        public string GetGlobalMajorAllele(IChromosome chromosome, int pos)
-        {
-            return _reader.GetGlobalMajorAllele(chromosome, pos);
-        }
+        public string GetGlobalMajorAllele(IChromosome chromosome, int pos) => _reader.GetGlobalMajorAllele(chromosome, pos);
     }
 }

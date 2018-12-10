@@ -18,5 +18,6 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         IEnumerable<ConsequenceTag> Consequences { get; }
         IGeneFusionAnnotation GeneFusionAnnotation { get; }
         IList<IPluginData> PluginData { get; }
+        bool CompleteOverlap { get; }
     }
 }

@@ -8,14 +8,12 @@ namespace UnitTests.Variants
         [Fact]
         public void AnnotationBehavior_Set()
         {
-            var behavior = new AnnotationBehavior(true, false, true, false, true, false, true);
-            Assert.False(behavior.NeedFlankingTranscript);
-            Assert.False(behavior.NeedSaInterval);
+            var behavior = new AnnotationBehavior(true, true, true, true, true);
+            Assert.True(behavior.NeedFlankingTranscript);
+            Assert.True(behavior.NeedSaInterval);
             Assert.True(behavior.NeedSaPosition);
-            Assert.True(behavior.NeedVerboseTranscripts);
             Assert.True(behavior.ReducedTranscriptAnnotation);
-            Assert.True(behavior.ReportOverlappingGenes);
-            Assert.False(behavior.StructuralVariantConsequence);
+            Assert.True(behavior.StructuralVariantConsequence);
         }
     }
 }

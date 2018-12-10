@@ -13,7 +13,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             consequence.DetermineFlankingVariantEffects(isDownStream);
             return new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null,
-                consequence.GetConsequences(), null);
+                consequence.GetConsequences(), null, false);
         }
     }
 }

@@ -10,26 +10,24 @@ namespace VariantAnnotation.NSA
     {
         private readonly ExtendedBinaryWriter _writer;
         private readonly Dictionary<ushort, (long location, int numBytes, int count)> _chromBlocks;
-        public readonly IDataSourceVersion Version;
-        public readonly GenomeAssembly Assembly;
+        private readonly IDataSourceVersion _version;
+        private readonly GenomeAssembly _assembly;
         public readonly int SchemaVersion;
 
         public RefMinorIndex(ExtendedBinaryWriter writer, GenomeAssembly assembly, DataSourceVersion version, int schemaVersion)
         {
-            _writer = writer;
+            _writer      = writer;
             _chromBlocks = new Dictionary<ushort, (long location, int numBytes, int count)>();
 
-            Assembly = assembly;
-            Version = version;
+            _assembly     = assembly;
+            _version      = version;
             SchemaVersion = schemaVersion;
-            
         }
 
-        private ushort _chromIndex = ushort.MaxValue;
+        private ushort _chromIndex  = ushort.MaxValue;
         private long _chromLocation =-1;
-        private int _blockLength =-1;
+        private int _blockLength    =-1;
         private int _count;
-
         
         public void Add(ushort chromIndex, long location)
         {
@@ -60,8 +58,8 @@ namespace VariantAnnotation.NSA
             //adding the last chrom to index
             _chromBlocks.Add(_chromIndex, (_chromLocation, _blockLength, _count));
 
-            _writer.Write((byte)Assembly);
-            Version.Write(_writer);
+            _writer.Write((byte)_assembly);
+            _version.Write(_writer);
             _writer.WriteOpt(SchemaVersion);
 
             _writer.WriteOpt(_chromBlocks.Count);
@@ -77,8 +75,8 @@ namespace VariantAnnotation.NSA
 
         public RefMinorIndex(ExtendedBinaryReader reader)
         {
-            Assembly      = (GenomeAssembly) reader.ReadByte();
-            Version       = DataSourceVersion.Read(reader);
+            _assembly      = (GenomeAssembly) reader.ReadByte();
+            _version       = DataSourceVersion.Read(reader);
             SchemaVersion = reader.ReadOptInt32();
 
             var chromCount = reader.ReadOptInt32();

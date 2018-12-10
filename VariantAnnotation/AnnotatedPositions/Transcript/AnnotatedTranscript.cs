@@ -20,15 +20,15 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public string HgvsProtein { get; }
         public PredictionScore Sift { get; }
         public PredictionScore PolyPhen { get; }
-
         public IEnumerable<ConsequenceTag> Consequences { get; }
         public IGeneFusionAnnotation GeneFusionAnnotation { get; }
         public IList<IPluginData> PluginData { get; }
+        public bool CompleteOverlap { get; }
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPosition mappedPosition, string hgvsCoding,
             string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
-            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation)
+            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation, bool completeOverlap)
         {
             Transcript           = transcript;
             ReferenceAminoAcids  = referenceAminoAcids;
@@ -43,6 +43,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             Consequences         = consequences;
             GeneFusionAnnotation = geneFusionAnnotation;
             PluginData           = new List<IPluginData>();
+            CompleteOverlap      = completeOverlap;
         }
 
         public void SerializeJson(StringBuilder sb)
@@ -51,7 +52,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             sb.Append(JsonObject.OpenBrace);
             jsonObject.AddStringValue("transcript", Transcript.Id.WithVersion);
-            jsonObject.AddStringValue("bioType", GetBioType(Transcript.BioType));
+            jsonObject.AddStringValue("source", Transcript.Source.ToString());
+            if (!CompleteOverlap) jsonObject.AddStringValue("bioType", GetBioType(Transcript.BioType));
             jsonObject.AddStringValue("codons", GetAlleleString(ReferenceCodons, AlternateCodons));
             jsonObject.AddStringValue("aminoAcids", GetAlleleString(ReferenceAminoAcids, AlternateAminoAcids));
 
@@ -68,7 +70,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 ? Transcript.Gene.EnsemblId.ToString()
                 : Transcript.Gene.EntrezGeneId.ToString();
 
-            jsonObject.AddStringValue("geneId", geneId);
+            if (!CompleteOverlap) jsonObject.AddStringValue("geneId", geneId);
             jsonObject.AddStringValue("hgnc", Transcript.Gene.Symbol);
             jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
             jsonObject.AddStringValue("hgvsc", HgvsCoding);
@@ -80,7 +82,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("polyPhenScore", PolyPhen?.Score);
 
             jsonObject.AddStringValue("polyPhenPrediction", PolyPhen?.Prediction);
-            if (Transcript.Translation != null) jsonObject.AddStringValue("proteinId", Transcript.Translation.ProteinId.WithVersion);
+            if (!CompleteOverlap && Transcript.Translation != null) jsonObject.AddStringValue("proteinId", Transcript.Translation.ProteinId.WithVersion);
 
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
@@ -91,6 +93,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 {
                     jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
                 }
+
+            jsonObject.AddBoolValue("completeOverlap", CompleteOverlap);
 
             sb.Append(JsonObject.CloseBrace);
         }

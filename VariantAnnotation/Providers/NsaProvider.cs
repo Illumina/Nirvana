@@ -185,10 +185,9 @@ namespace VariantAnnotation.Providers
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
             //var benchmark = new Benchmark();
-            long totalBytes = 0;
             foreach (INsaReader nsaReader in _nsaReaders)
             {
-                totalBytes+= nsaReader.PreLoad(chromosome, positions);
+                nsaReader.PreLoad(chromosome, positions);
             }
 
             //var totalTime = benchmark.GetElapsedTime();

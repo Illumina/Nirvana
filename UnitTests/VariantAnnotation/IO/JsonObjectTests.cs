@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
@@ -181,80 +180,6 @@ namespace UnitTests.VariantAnnotation.IO
             var observedResult = StringBuilderCache.GetStringAndRelease(sb);
 
             Assert.Equal(expectedResult, observedResult);
-        }
-
-        [Fact]
-        public void AddGroupedObjectValues_TwoTimes()
-        {
-            var sb = StringBuilderCache.Acquire();
-            var json = new JsonObject(sb);
-
-            var descriptions = new[] { "test1", "test2" };
-            var descriptions2 = new[] { "test3" };
-
-            var points = new Point[2];
-            points[0] = new Point(1, 2);
-            points[1] = new Point(3, 4);
-
-            var points2 = new Point[1];
-            points2[0] = new Point(5, 6);
-
-            json.AddGroupedObjectValues("first", descriptions, points, points2);
-            json.AddGroupedObjectValues("second", descriptions2, points2);
-
-            const string expectedResult = "\"first\":{\"test1\":[{\"X\":1,\"Y\":2},{\"X\":3,\"Y\":4}],\"test2\":[{\"X\":5,\"Y\":6}]},\"second\":{\"test3\":[{\"X\":5,\"Y\":6}]}";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
-
-            Assert.Equal(expectedResult, observedResult);
-        }
-
-        [Fact]
-        public void AddGroupedObjectValues_NullDescriptions()
-        {
-            var sb = StringBuilderCache.Acquire();
-            var json = new JsonObject(sb);
-
-            var points2 = new Point[1];
-            points2[0] = new Point(5, 6);
-
-            json.AddGroupedObjectValues("second", null, points2);
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
-
-            Assert.Equal(string.Empty, observedResult);
-        }
-
-        [Fact]
-        public void AddGroupedObjectValues_OneNullGroup()
-        {
-            var sb = StringBuilderCache.Acquire();
-            var json = new JsonObject(sb);
-
-            var descriptions = new[] { "test1", "test2" };
-            var points2 = new Point[1];
-            points2[0] = new Point(5, 6);
-
-            json.AddGroupedObjectValues("second", descriptions, points2, null as Point[]);
-
-            const string expectedResult = "\"second\":{\"test1\":[{\"X\":5,\"Y\":6}]}";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
-
-            Assert.Equal(expectedResult, observedResult);
-        }
-
-        [Fact]
-        public void AddGroupedObjectValues_MismatchedDescriptionCount()
-        {
-            Assert.Throws<ArgumentException>(delegate
-            {
-                var sb = StringBuilderCache.Acquire();
-                var json = new JsonObject(sb);
-
-                var descriptions = new[] { "test1", "test2" };
-                var points2 = new Point[1];
-                points2[0] = new Point(5, 6);
-
-                json.AddGroupedObjectValues("second", descriptions, points2);
-            });
         }
 
         [Fact]

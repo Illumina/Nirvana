@@ -103,32 +103,37 @@ namespace VariantAnnotation
             return annotatedPosition;
         }
 
-        internal void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
+        private void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
         {
             if (_geneAnnotationProvider == null) return;
 
             foreach (var variant in annotatedPosition.AnnotatedVariants)
             {
-                AddGenesFromOverlappingGenes(variant.OverlappingGenes);
-                AddGenesFromTranscripts(variant.EnsemblTranscripts);
-                AddGenesFromTranscripts(variant.RefSeqTranscripts);
+                AddGenesFromTranscripts(variant.Transcripts);
             }
-        }
-
-        private void AddGenesFromOverlappingGenes(ISet<string> genes)
-        {
-            if (genes == null) return;
-            foreach (string gene in genes) _affectedGenes.Add(gene);
         }
 
         private void AddGenesFromTranscripts(IList<IAnnotatedTranscript> transcripts)
         {
             foreach (var transcript in transcripts)
             {
-                if (!transcript.Consequences.Contains(ConsequenceTag.downstream_gene_variant) &&
-                    !transcript.Consequences.Contains(ConsequenceTag.upstream_gene_variant))
-                    _affectedGenes.Add(transcript.Transcript.Gene.Symbol);
+                if (IsFlankingTranscript(transcript)) continue;
+                _affectedGenes.Add(transcript.Transcript.Gene.Symbol);
             }
+        }
+
+        private static bool IsFlankingTranscript(IAnnotatedTranscript transcript)
+        {
+            if (transcript.Consequences == null) return false;
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var consequence in transcript.Consequences)
+            {
+                if (consequence == ConsequenceTag.downstream_gene_variant ||
+                    consequence == ConsequenceTag.upstream_gene_variant) return true;
+            }
+
+            return false;
         }
 
         internal static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
@@ -143,15 +148,15 @@ namespace VariantAnnotation
         public IEnumerable<string> GetGeneAnnotations()
         {
             var geneAnnotations = new List<string>();
-            foreach (string gene in _affectedGenes)
+
+            foreach (var gene in _affectedGenes.OrderBy(x => x))
             {
                 var annotation = _geneAnnotationProvider.Annotate(gene);
                 if (string.IsNullOrEmpty(annotation)) continue;
-
                 geneAnnotations.Add(annotation);
             }
 
-            return geneAnnotations.Count>0? geneAnnotations: null;
+            return geneAnnotations.Count > 0 ? geneAnnotations : null;
         }
 
         public void EnableMitochondrialAnnotation() => _annotateMito = true;

@@ -44,7 +44,7 @@ namespace VariantAnnotation.NSA
 
         }
 
-        public void PreLoad()
+        private void PreLoad()
         {
             var geneCount = _reader.ReadOptInt32();
             _geneAnnotations = new Dictionary<string, List<string>>(geneCount);
@@ -72,7 +72,7 @@ namespace VariantAnnotation.NSA
         private string GetJsonString(List<string> annotations)
         {
             if (_isArray) return "[" + string.Join(',', annotations) + "]";
-            else return annotations[0];
+            return annotations[0];
         }
 
         public void Dispose()

@@ -22,7 +22,6 @@ namespace VariantAnnotation.Interface
         string AnnotatorVersionTag { get; }
         bool OutputVcf { get; }
         bool OutputGvcf { get; }
-        bool ReportAllSvOverlappingTranscripts { get; }
         bool ForceMitochondrialAnnotation { get; }
         long InputStartVirtualPosition { get; }
     }

@@ -7,13 +7,10 @@ namespace Vcf.VariantCreator
 {
 	public static class CnvCreator
 	{
-		private static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true, true);
-
+		private static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true);
 	    private const string CnvTag = "<CNV>";
 
-		private static readonly AnnotationBehavior VerbosedCnvBehavior = new AnnotationBehavior(false, true, true, false, true, true, true);
-
-		public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData, bool enableVerboseTranscript)
+		public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
 		{
 			start++;
 
@@ -22,7 +19,7 @@ namespace Vcf.VariantCreator
 		    {
 		        int dupEnd = infoData.End ?? start;
                 string dupVid = $"{chromosome.EnsemblName}:{start}:{dupEnd}:DUP";
-                return new Variant(chromosome, start, dupEnd, refAllele, altAllele, VariantType.copy_number_gain, dupVid, false, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
+                return new Variant(chromosome, start, dupEnd, refAllele, altAllele, VariantType.copy_number_gain, dupVid, false, false, false, null, null, CnvBehavior);
             }
 
 		    var copyNumber = GetCopyNumber(altAllele);
@@ -30,7 +27,7 @@ namespace Vcf.VariantCreator
             int end        = infoData.End ?? start;
             string vid     = GetVid(chromosome.EnsemblName, start, end, copyNumber);
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, enableVerboseTranscript ? VerbosedCnvBehavior : CnvBehavior);
+            return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, CnvBehavior);
 		}
 
 	    private static int? GetCopyNumber(string altAllele)

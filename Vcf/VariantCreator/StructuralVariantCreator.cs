@@ -10,13 +10,10 @@ namespace Vcf.VariantCreator
         private const string TandemDuplicationAltAllele = "<DUP:TANDEM>";
 
         private static readonly AnnotationBehavior StructuralVariantBehavior =
-            new AnnotationBehavior(false, true, true, false, true, true);
-
-        private static readonly AnnotationBehavior VerbosedStructuralVariantBehavior =
-            new AnnotationBehavior(false, true, true, false, true, true, true);
+            new AnnotationBehavior(false, true, true, false, true);
 
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele,
-            IBreakEnd[] breakEnds, IInfoData infoData, bool enableVerboseTranscript)
+            IBreakEnd[] breakEnds, IInfoData infoData)
         {
             var svType = infoData?.SvType ?? VariantType.unknown;
             if (svType == VariantType.duplication && altAllele == TandemDuplicationAltAllele)
@@ -27,7 +24,7 @@ namespace Vcf.VariantCreator
             string vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
             
             return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
-                breakEnds, enableVerboseTranscript ? VerbosedStructuralVariantBehavior : StructuralVariantBehavior);
+                breakEnds, StructuralVariantBehavior);
         }
         
         private static string GetVid(string ensemblName, int start, int end, VariantType variantType,

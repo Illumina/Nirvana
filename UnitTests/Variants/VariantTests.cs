@@ -22,7 +22,7 @@ namespace UnitTests.Variants
             const bool expectedRecomposed  = true;
             var expectedLinkedVids         = new[] { "1:102:T:G" };
             var expectedBreakEnds          = new IBreakEnd[] { new BreakEnd(expectedChromosome, expectedChromosome, 100, 200, false, false) };
-            var expectedBehavior           = new AnnotationBehavior(false, false, false, false, false, false, true);
+            var expectedBehavior           = new AnnotationBehavior(false, false, false, false, true);
 
             var variant                    = new Variant(expectedChromosome, expectedStart, expectedEnd, expectedRef, expectedAlt,
                 expectedType, expectedVid, expectedRefMinor, expectedDecomposed, expectedRecomposed, expectedLinkedVids,

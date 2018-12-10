@@ -16,7 +16,7 @@ namespace UnitTests.Vcf.VariantCreator
 			var infoData = VcfInfoParser.Parse("SVTYPE=DEL;END=138730");
 
 			var chromosome1 = new Chromosome("chr1", "1", 0);
-			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, false);
+			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } });
 
 			var variants = variantFactory.CreateVariants(chromosome1, 69391, 138730, "A", new[] { "<DEL>" }, infoData, new[] { false }, false, null);
 			Assert.NotNull(variants);
@@ -29,7 +29,7 @@ namespace UnitTests.Vcf.VariantCreator
 		{
 			var infoData = new InfoData(2581225, null, VariantType.copy_number_variation, null, null, null, 3, null, false, null, null, false, false, null, null, null);
 			var chromosome1 = new Chromosome("chr1", "1", 0);
-			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, false);
+			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } });
 
 			var variants = variantFactory.CreateVariants(chromosome1, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, new[] { false }, false, null);
 			Assert.NotNull(variants);
@@ -45,7 +45,7 @@ namespace UnitTests.Vcf.VariantCreator
 	    {
 	        var infoData = new InfoData(861879, 6984, VariantType.copy_number_variation, null, null, null, 1, null, false, null, null, false, false, null, null, null);
 	        var chromosome1 = new Chromosome("chr1", "1", 0);
-	        var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, false);
+	        var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } });
 
 	        var variants = variantFactory.CreateVariants(chromosome1, 854895, 861879, "N", new[] { "<CN0>", "<CN3>" }, infoData, new[] { false, false }, false, null);
 	        Assert.NotNull(variants);
@@ -64,7 +64,7 @@ namespace UnitTests.Vcf.VariantCreator
 	    {
 	        var infoData = new InfoData(1476229, 13044, VariantType.copy_number_variation, null, null, null, 1, null, false, null, null, false, false, null, null, null);
 	        var chromosome1 = new Chromosome("chr1", "1", 0);
-	        var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, false);
+	        var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } });
 
 	        var variants = variantFactory.CreateVariants(chromosome1, 1463185, 1476229, "N", new[] { "<CN0>", "<DUP>" }, infoData, new[] {false, false}, false, null);
 	        Assert.NotNull(variants);
@@ -83,7 +83,7 @@ namespace UnitTests.Vcf.VariantCreator
 	    {
 	        var infoData = new InfoData(1476229, 13044, VariantType.duplication, null, null, null, 1, null, false, null, null, false, false, null, null, null);
 	        var chromosome1 = new Chromosome("chr1", "1", 0);
-	        var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, false);
+	        var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } });
 
 	        var variants = variantFactory.CreateVariants(chromosome1, 1463185, 1476229, "N", new[] { "<DUP>" }, infoData, new[] { false}, false, null);
 	        Assert.NotNull(variants);
@@ -100,7 +100,7 @@ namespace UnitTests.Vcf.VariantCreator
 		{
 			var infoData = new InfoData(2581225, null, VariantType.duplication, null, null, null, 3, null, false, null, null, false, false, null, null, null);
 			var chromosome1 = new Chromosome("chr1", "1", 0);
-			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } }, false);
+			var variantFactory = new VariantFactory(new Dictionary<string, IChromosome> { { "1", chromosome1 } });
 
 			var variants = variantFactory.CreateVariants(chromosome1, 723707, 2581225, "N", new[] { "<DUP:TANDEM>" }, infoData, new[] { false }, false, null);
 			Assert.NotNull(variants);

@@ -12,16 +12,10 @@ namespace VariantAnnotation.AnnotatedPositions
         public IVariant Variant { get; }
         public string HgvsgNotation { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; } = new List<IAnnotatedRegulatoryRegion>();
-        public IList<IAnnotatedTranscript> EnsemblTranscripts { get; } = new List<IAnnotatedTranscript>();
-        public IList<IAnnotatedTranscript> RefSeqTranscripts { get; } = new List<IAnnotatedTranscript>();
+        public IList<IAnnotatedTranscript> Transcripts { get; } = new List<IAnnotatedTranscript>();
         public IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; } = new List<IAnnotatedSaDataSource>();
         public IList<ISupplementaryAnnotation> SaList { get; } = new List<ISupplementaryAnnotation>();
-        public ISet<string> OverlappingGenes { get; } = new HashSet<string>();
-        public IList<IOverlappingTranscript> OverlappingTranscripts { get; } = new List<IOverlappingTranscript>();
         public double? PhylopScore { get; set; }
-
-        private static readonly string[] TranscriptLabels = { "refSeq", "ensembl" };
-
         public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
 
         public AnnotatedVariant(IVariant variant) => Variant = variant;
@@ -39,6 +33,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddIntValue("begin", Variant.Start);
             jsonObject.AddIntValue("end", Variant.End);
             jsonObject.AddBoolValue("isReferenceMinorAllele", Variant.IsRefMinor);
+            jsonObject.AddBoolValue("isStructuralVariant", Variant.Behavior.StructuralVariantConsequence);
 
             jsonObject.AddStringValue("refAllele",
                 string.IsNullOrEmpty(Variant.RefAllele) ? "-" : Variant.RefAllele);
@@ -59,18 +54,13 @@ namespace VariantAnnotation.AnnotatedPositions
             {
                 jsonObject.AddStringValue(saItem.JsonKey, saItem.GetJsonString(), false);
             }
+
             foreach (var pluginData in PluginDataSet)
             {
                 jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
             }
 
-            if (OverlappingGenes.Count > 0) jsonObject.AddStringValues("overlappingGenes", OverlappingGenes);
-            if (OverlappingTranscripts.Count > 0) jsonObject.AddObjectValues("overlappingTranscripts", OverlappingTranscripts);
-
-            if (EnsemblTranscripts?.Count > 0 || RefSeqTranscripts?.Count > 0)
-            {
-                jsonObject.AddGroupedObjectValues("transcripts", TranscriptLabels, RefSeqTranscripts, EnsemblTranscripts);
-            }
+            if (Transcripts?.Count > 0) jsonObject.AddObjectValues("transcripts", Transcripts);
 
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);

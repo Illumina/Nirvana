@@ -4,39 +4,30 @@ using System.IO;
 using ErrorHandling.Exceptions;
 using Genome;
 using IO;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
 
 namespace VariantAnnotation.NSA
 {
-    public sealed class RefMinorDbReader:IDisposable
+    public sealed class RefMinorDbReader : IDisposable
     {
         private readonly ExtendedBinaryReader _reader;
-        public GenomeAssembly Assembly { get; }
         private readonly RefMinorIndex _index;
-        public IDataSourceVersion Version { get; }
-
-        public readonly int SchemaVersion;
 
         private readonly Dictionary<int, string> _annotations;
 
         public RefMinorDbReader(ExtendedBinaryReader reader, ExtendedBinaryReader indexStream)
         {
-            _reader       = reader;
-            _index        = new RefMinorIndex(indexStream);
-            Assembly      = _index.Assembly;
-            Version       = _index.Version;
-            SchemaVersion = _index.SchemaVersion;
-            _annotations  = new Dictionary<int, string>();
-            
-            if (SchemaVersion != SaCommon.SchemaVersion)
-                throw new UserErrorException($"ERROR!! SA schema version mismatch. Expected{SaCommon.SchemaVersion}, observed {SchemaVersion}");
-            
+            _reader      = reader;
+            _index       = new RefMinorIndex(indexStream);
+            _annotations = new Dictionary<int, string>();
+
+            if (_index.SchemaVersion != SaCommon.SchemaVersion)
+                throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion}");            
         }
 
         private IChromosome _chromosome;
-        
-        public void PreLoad(IChromosome chrom)
+
+        private void PreLoad(IChromosome chrom)
         {
             _annotations.Clear();
             _chromosome = chrom;

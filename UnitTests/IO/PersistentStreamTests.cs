@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Net;
-using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using IO;
 using Moq;
 using Xunit;

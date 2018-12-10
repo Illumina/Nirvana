@@ -60,7 +60,7 @@ namespace SAUtils.DataStructures
             public bool Equals(CosmicStudy other)
             {
                 if (other == null) return false;
-                return Id.Equals(other?.Id)
+                return Id.Equals(other.Id)
                     && Histologies.SequenceEqual(other.Histologies)
                     && Sites.SequenceEqual(other.Sites);
             }

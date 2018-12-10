@@ -35,7 +35,6 @@ namespace VariantAnnotation.NSA
         public bool MatchByAllele { get; }
         public bool IsArray { get; }
         public bool IsPositional { get; }
-        public readonly int SchemaVersion;
 
         private AnnotationItem[] _annotations;
         private int _annotationsCount;
@@ -43,38 +42,29 @@ namespace VariantAnnotation.NSA
         public NsaReader(ExtendedBinaryReader reader, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _reader = reader;
-            _block = new NsaBlock(new Zstandard(), blockSize);
+            _block  = new NsaBlock(new Zstandard(), blockSize);
 
-            _index = new ChunkedIndex(indexStream);
-            Assembly = _index.Assembly;
-            Version = _index.Version;
-            JsonKey = _index.JsonKey;
-            MatchByAllele = _index.MatchByAllele;
-            IsArray = _index.IsArray;
-            SchemaVersion = _index.SchemaVersion;
-            IsPositional = _index.IsPositional;
+            _index         = new ChunkedIndex(indexStream);
+            Assembly       = _index.Assembly;
+            Version        = _index.Version;
+            JsonKey        = _index.JsonKey;
+            MatchByAllele  = _index.MatchByAllele;
+            IsArray        = _index.IsArray;
+            IsPositional   = _index.IsPositional;
 
-            if (SchemaVersion != SaCommon.SchemaVersion)
-                throw new UserErrorException($"SA schema version mismatch. Expected{SaCommon.SchemaVersion}, observed {SchemaVersion} for {JsonKey}");
-
+            if (_index.SchemaVersion != SaCommon.SchemaVersion) throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion} for {JsonKey}");
         }
 
-        private ChromosomeInterval _cacheInterval;
-
-        public int PreLoad(IChromosome chrom, List<int> positions)
+        public void PreLoad(IChromosome chrom, List<int> positions)
         {
-            if (positions == null || positions.Count == 0) return -1;
+            if (positions == null || positions.Count == 0) return;
 
             int readCount = 0;
-            int count = positions.Count;
-            int firstPosition = positions[0];
-            int lastPosition = positions[count - 1];
 
-            _cacheInterval = new ChromosomeInterval(chrom, firstPosition, lastPosition);
             _annotations = new AnnotationItem[positions.Count];
             _annotationsCount = 0;
             (long start, _, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
-            if (start == -1) return -1;
+            if (start == -1) return;
             _reader.BaseStream.Position = start;
 
             for (int i = 0; i < positions.Count && blockCount >0; blockCount--)
@@ -96,9 +86,6 @@ namespace VariantAnnotation.NSA
                     _annotations[_annotationsCount++] = new AnnotationItem(position, annotation.data);
                 }
             }
-
-            return readCount;
-
         }
 
         private IEnumerable<(string refAllele, string altAllele, string jsonString)> ExtractAnnotations(byte[] data)

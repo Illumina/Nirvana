@@ -20,7 +20,7 @@ namespace UnitTests.SAUtils.NsaWriters
             var chrom1 = new Chromosome("chr1", "1", 0);
             var chrom2 = new Chromosome("chr2", "2", 1);
 
-            return new ClinGenItem[]
+            return new[]
             {
                 new ClinGenItem("cg1",chrom1, 145, 2743, VariantType.copy_number_gain, 3, 0, ClinicalInterpretation.likely_benign,true, new HashSet<string>(){"phenotype1", "phenotype2"}, new HashSet<string>(){"pid1", "pid2"} ),
                 new ClinGenItem("cg2",chrom1, 14585, 5872743, VariantType.copy_number_loss, 0, 5, ClinicalInterpretation.likely_pathogenic,true, new HashSet<string>(){"phenotype3", "phenotype5"}, new HashSet<string>(){"pid3", "pid5"} ),
@@ -33,7 +33,6 @@ namespace UnitTests.SAUtils.NsaWriters
         public void Readback_clingen()
         {
             var chrom1 = new Chromosome("chr1", "1", 0);
-            var chrom2 = new Chromosome("chr2", "2", 1);
             var version = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks, "description");
 
             using (var saStream = new MemoryStream())

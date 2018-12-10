@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Compression.FileHandling;
-using IO;
 using Jasix;
 using Jasix.DataStructures;
 using OptimizedCore;
@@ -20,11 +19,6 @@ namespace VariantAnnotation.IO
 
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
-
-        public JsonWriter(StreamWriter writer, string jasixFileName, string annotator, string creationTime, string vepDataVersion,
-            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames) : this(writer, jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName), annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames)
-        {
-        }
 
         private JsonWriter(Stream jsonStream, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
             List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames) : this(GetProperWriter(jsonStream), indexStream, annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames)

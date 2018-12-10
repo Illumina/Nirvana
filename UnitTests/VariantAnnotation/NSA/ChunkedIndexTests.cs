@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using Genome;
 using IO;
-using SAUtils.DataStructures;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
@@ -13,31 +11,6 @@ namespace UnitTests.VariantAnnotation.NSA
 {
     public sealed class ChunkedIndexTests
     {
-        private static (List<int>, List<long>, List<ushort>) AddRandomPositions(Chromosome chrom, ChunkedIndex index, int count)
-        {
-            var random = new Random(chrom.Index);
-            int position = random.Next(1, byte.MaxValue);
-            int fileLoc = random.Next(0, ushort.MaxValue - 1);
-
-            var positions = new List<int>();
-            var fileLocations = new List<long>();
-            var recordLengths = new List<ushort>();
-
-            for (var i = 0; i < count; i++)
-            {
-                var saItem = new DbSnpItem(chrom, position, fileLoc, "A", "T");
-                var recordLength = (ushort)random.Next(0, ushort.MaxValue - 1);
-                positions.Add(position);
-                fileLocations.Add(fileLoc);
-                recordLengths.Add(recordLength);
-                index.Add(saItem.Chromosome.Index, saItem.Position, saItem.Position, fileLoc, recordLength);
-                position += random.Next(0, ushort.MaxValue - 1);
-                fileLoc += recordLength;
-            }
-
-            return (positions, fileLocations, recordLengths);
-        }
-
         [Fact]
         public void Query_chunks_in_same_chrom()
         {

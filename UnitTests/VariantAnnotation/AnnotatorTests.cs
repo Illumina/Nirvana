@@ -15,7 +15,7 @@ namespace UnitTests.VariantAnnotation
     {
         private static IVariant[] GetVariants()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false, false);
+            var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
             variant.SetupGet(x => x.Chromosome).Returns(new Chromosome("chr1", "1", 0));
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);
@@ -29,7 +29,7 @@ namespace UnitTests.VariantAnnotation
 
         private static IVariant[] GetMitoVariants()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false, false);
+            var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
             variant.SetupGet(x => x.Chromosome).Returns(new Chromosome("chrM", "MT", 0));
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);

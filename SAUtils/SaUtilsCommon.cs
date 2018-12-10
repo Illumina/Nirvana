@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using VariantAnnotation.Interface.Providers;
 
 namespace SAUtils
 {
@@ -36,34 +35,5 @@ namespace SAUtils
                 ? saAltAllele.Substring(firstBaseIndex)
                 : saAltAllele;
         }
-
-        private const int ReferenceWindow = 10;
-
-        public static bool ValidateReference(string chromosome, int position, string refAllele, ISequenceProvider sequenceProvider)
-        {
-            if (sequenceProvider == null) return true;
-
-            var refDictionary = sequenceProvider.RefNameToChromosome;
-            if (!refDictionary.ContainsKey(chromosome)) return false;
-
-            var chrom = refDictionary[chromosome];
-
-            sequenceProvider.LoadChromosome(chrom);
-            var refSequence = sequenceProvider.Sequence.Substring(position - 1, ReferenceWindow);
-            return ValidateRefAllele(refAllele, refSequence);
-        }
-        public static bool ValidateRefAllele(string refAllele, string refBases)
-        {
-            if (refBases == null) return true;
-            if (refAllele == ".") return true; //ref base is unknown
-            if (refBases.All(x => x == 'N')) return true;
-
-            return refAllele.Length < refBases.Length ? refBases.StartsWith(refAllele) : refAllele.StartsWith(refBases);
-
-            // in rare cases the refAllele will be too large for our refBases string that is limited in length
-        }
-
-
-        
     }
 }

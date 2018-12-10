@@ -7,20 +7,20 @@ namespace VariantAnnotation.NSA
     public sealed class IntervalIndex
     {
         private readonly Dictionary<ushort, IntervalChromIndex> _chromIndexDictionary;
-        public readonly string JsonKey;
-        public readonly ReportFor ReportFor;
+        private readonly string _jsonKey;
+        private readonly ReportFor _reportFor;
 
         public IntervalIndex(string jsonKey, ReportFor reportFor)
         {
-            JsonKey = jsonKey;
-            ReportFor = reportFor;
+            _jsonKey              = jsonKey;
+            _reportFor            = reportFor;
             _chromIndexDictionary = new Dictionary<ushort, IntervalChromIndex>();
         }
 
         public IntervalIndex(ExtendedBinaryReader reader)
         {
-            JsonKey   = reader.ReadAsciiString();
-            ReportFor = (ReportFor)reader.ReadByte();
+            _jsonKey   = reader.ReadAsciiString();
+            _reportFor = (ReportFor)reader.ReadByte();
             int count = reader.ReadOptInt32();
 
             _chromIndexDictionary = new Dictionary<ushort, IntervalChromIndex>(count);
@@ -55,8 +55,8 @@ namespace VariantAnnotation.NSA
 
         public void Write(ExtendedBinaryWriter writer)
         {
-            writer.WriteOptAscii(JsonKey);
-            writer.WriteOpt((byte)ReportFor);
+            writer.WriteOptAscii(_jsonKey);
+            writer.WriteOpt((byte)_reportFor);
             writer.WriteOpt(_chromIndexDictionary.Count);
             foreach (var kvp in _chromIndexDictionary)
             {

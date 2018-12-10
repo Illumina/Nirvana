@@ -108,60 +108,57 @@ namespace VariantAnnotation.Providers
         private void LoadPredictionCaches(ushort refIndex)
         {
             if (refIndex == _currentRefIndex) return;
+
             if (refIndex == ushort.MaxValue)
             {
                 ClearCache();
                 return;
             }
-            _siftCache = _siftReader.Read(refIndex);
-            _polyphenCache = _polyphenReader.Read(refIndex);
+
+            _siftCache       = _siftReader.Read(refIndex);
+            _polyphenCache   = _polyphenReader.Read(refIndex);
             _currentRefIndex = refIndex;
         }
 
         private void ClearCache()
         {
-            _siftCache = null;
-            _polyphenCache = null;
+            _siftCache       = null;
+            _polyphenCache   = null;
             _currentRefIndex = ushort.MaxValue;
         }
 
         private void AddTranscripts(IAnnotatedPosition annotatedPosition)
         {
             var overlappingTranscripts = _transcriptCache.GetOverlappingTranscripts(annotatedPosition.Position);
-
             if (overlappingTranscripts == null) return;
 
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
-                var geneFusionCandidates = GetGeneFusionCandiates(annotatedVariant.Variant.BreakEnds);
-                var annotatedTranscripts = new List<IAnnotatedTranscript>();
+                var geneFusionCandidates = GetGeneFusionCandidates(annotatedVariant.Variant.BreakEnds);
 
-                TranscriptAnnotationFactory.GetAnnotatedTranscripts(annotatedVariant.Variant, overlappingTranscripts,
-                    _sequence, annotatedTranscripts, annotatedVariant.OverlappingGenes,
-                    annotatedVariant.OverlappingTranscripts, _siftCache, _polyphenCache, geneFusionCandidates);
+                var annotatedTranscripts = TranscriptAnnotationFactory.GetAnnotatedTranscripts(annotatedVariant.Variant,
+                    overlappingTranscripts, _sequence, _siftCache, _polyphenCache, geneFusionCandidates);
 
                 if (annotatedTranscripts.Count == 0) continue;
 
                 foreach (var annotatedTranscript in annotatedTranscripts)
-                {
-                    if (annotatedTranscript.Transcript.Source == Source.Ensembl)
-                        annotatedVariant.EnsemblTranscripts.Add(annotatedTranscript);
-                    else annotatedVariant.RefSeqTranscripts.Add(annotatedTranscript);
-                }
+                    annotatedVariant.Transcripts.Add(annotatedTranscript);
             }
         }
 
-        private ITranscript[] GetGeneFusionCandiates(IBreakEnd[] breakEnds)
+        private ITranscript[] GetGeneFusionCandidates(IBreakEnd[] breakEnds)
         {
             if (breakEnds == null || breakEnds.Length == 0) return null;
 
             var geneFusionCandidates = new HashSet<ITranscript>();
+
             foreach (var breakEnd in breakEnds)
             {
-                var candiates = _transcriptCache.GetOverlappingTranscripts(breakEnd.Piece2.Chromosome,
+                var transcripts = _transcriptCache.GetOverlappingTranscripts(breakEnd.Piece2.Chromosome,
                     breakEnd.Piece2.Position, breakEnd.Piece2.Position);
-                if (candiates == null) continue;
-                foreach (var candiate in candiates) geneFusionCandidates.Add(candiate);
+                if (transcripts == null) continue;
+
+                foreach (var transcript in transcripts) geneFusionCandidates.Add(transcript);
             }
 
             return geneFusionCandidates.ToArray();
