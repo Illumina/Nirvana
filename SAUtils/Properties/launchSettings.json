@@ -1,19 +1,9 @@
 {
   "profiles": {
-    "SAUtils": {
-      "commandName": "Project",
-      "commandLineArgs": "mitomapVarDb --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsRNA --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsCodingControl --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsCoding --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsControl  --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\InsertionsSimple --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\DeletionsSingle --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
-      "workingDirectory": "E:\\Nirvana_resources\\gen_data\\gen_MitoMap"
-    },
     "OMIM_SK": {
       "commandName": "Project",
       "commandLineArgs": "createOMIM --gi ..\\gene_info_2016-10-17 --gi ..\\gene_info_2011-08-28 --hgnc ..\\hgnc_complete_set_2016-10-17.txt --mim mim2gene.txt --in genemap2.txt --out test",
       "workingDirectory": "E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15"
-    },
-    "RR_sautils": {
-      "commandName": "Project",
-      "commandLineArgs": "  createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\test1 --out c:\\Development\\SupplementaryDatabase\\test",
-      "workingDirectory": "c:\\Development"
     },
     "MITOMAP": {
       "commandName": "Project",
@@ -57,8 +47,8 @@
     },
     "RR_custom": {
       "commandName": "Project",
-      "commandLineArgs": " custom  --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in Test.tsv",
-      "workingDirectory": "C:\\Development\\ExternalDataSources\\Custom"
+      "commandLineArgs": " custom  --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in IcslFrequencies.tsv.gz",
+      "workingDirectory": "C:\\Development\\ExternalDataSources\\ICSL\\GRCh37"
     },
     "RR_globalAllele": {
       "commandName": "Project",

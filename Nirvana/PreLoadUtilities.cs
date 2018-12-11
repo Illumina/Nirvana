@@ -13,7 +13,7 @@ namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static ImmutableDictionary<IChromosome, List<int>> GetPositions(BlockGZipStream vcfStream, AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom)
+        public static ImmutableDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom)
         {
             var benchmark = new Benchmark();
             Console.Write("Preloading variant positions....");

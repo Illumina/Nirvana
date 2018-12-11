@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
 using CommandLine.Utilities;
 using Compression.FileHandling;
@@ -84,7 +85,7 @@ namespace Nirvana
             return dataSourceVersions.ToHashSet(new DataSourceVersionComparer());
         }
 
-        public void GetVariantPositions(BlockGZipStream vcfStream, AnnotationRange annotationRange)
+        public void GetVariantPositions(Stream vcfStream, AnnotationRange annotationRange)
         {
             if (vcfStream == null)
             {

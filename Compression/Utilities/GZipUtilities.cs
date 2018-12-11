@@ -45,13 +45,13 @@ namespace Compression.Utilities
             return newStream;
         }
         //used in custom annotation lambda
-        public static StreamReader GetAppropriateStreamReader(PersistentStream pStream)
+        public static Stream GetAppropriateStream(PersistentStream pStream)
         {
             var header = GetHeader(pStream);
             var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
             pStream.Position = 0;
             var appropriateStream = GetAppropriateStream(pStream, compressionAlgorithm);
-            return new StreamReader(appropriateStream);
+            return appropriateStream;
         }
 
         public static Stream GetAppropriateReadStream(string filePath)

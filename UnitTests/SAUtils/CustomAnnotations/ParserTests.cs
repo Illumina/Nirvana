@@ -56,7 +56,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
 
                 var item = custParser.ExtractItems("chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t");
 
-                Assert.Equal("\"pathogenicity\":\"VUSS\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true", item.GetJsonString());
+                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"pathogenicity\":\"VUSS\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true", item.GetJsonString());
             }
         }
 
@@ -75,8 +75,8 @@ namespace UnitTests.SAUtils.CustomAnnotations
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);
-                Assert.Equal("\"pathogenicity\":\"VUSS\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true", items[0].GetJsonString());
-                Assert.Equal("\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"failedFilter\":false", items[1].GetJsonString());
+                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"pathogenicity\":\"VUSS\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true", items[0].GetJsonString());
+                Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"failedFilter\":false", items[1].GetJsonString());
             }
         }
 

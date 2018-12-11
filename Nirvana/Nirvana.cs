@@ -46,7 +46,8 @@ namespace Nirvana
         private static AnnotationResources GetAnnotationResources()
         {            
             var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _forceMitochondrialAnnotation);
-            using (var preloadVcfStream = new BlockGZipStream(PersistentStreamUtils.GetReadStream(_vcfPath), CompressionMode.Decompress))
+            //using (var preloadVcfStream = new BlockGZipStream(PersistentStreamUtils.GetReadStream(_vcfPath), CompressionMode.Decompress))
+            using(var preloadVcfStream = GZipUtilities.GetAppropriateStream(new PersistentStream(PersistentStreamUtils.GetReadStream(_vcfPath), ConnectUtilities.GetFileConnectFunc(_vcfPath),0)))
             {
                 annotationResources.GetVariantPositions(preloadVcfStream, null);
             }
@@ -113,12 +114,11 @@ namespace Nirvana
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .CheckInputFilenameExists(_vcfPath, "vcf", "--in", true, "-")
-                .CheckInputFilenameExists(_vcfPath + ".tbi", "tabix index file", "--in")
+                //.CheckInputFilenameExists(_vcfPath + ".tbi", "tabix index file", "--in")
                 .CheckInputFilenameExists(_refSequencePath, "reference sequence", "--ref")
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.PolyPhenPath(_inputCachePrefix), "PolyPhen cache", "--cache")
-                //.CheckEachDirectoryContainsFiles(SupplementaryAnnotationDirectories, "supplementary annotation", "--sd", "*.nsa")
                 .HasRequiredParameter(_outputFileName, "output file stub", "--out")
                 .Enable(_outputFileName == "-", () =>
                 {

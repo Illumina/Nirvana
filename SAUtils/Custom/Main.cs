@@ -69,9 +69,17 @@ namespace SAUtils.Custom
             using (var customReader = new CustomAnnotationsParser(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
             using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using (var nsaWriter   = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), 
-                version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks), 
-                referenceProvider, customReader.JsonTag, true, false, SaCommon.SchemaVersion, false))
+            using (var nsaWriter   = new NsaWriter(
+                                new ExtendedBinaryWriter(nsaStream), 
+                                new ExtendedBinaryWriter(indexStream), 
+                                version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks),
+                                referenceProvider, 
+                                customReader.JsonTag, 
+                                false,  // match by allele
+                                true, // is array
+                                SaCommon.SchemaVersion, 
+                                false// is positional
+                                ))
             {
                 jsonTag = customReader.JsonTag;
                 nsaWriter.Write(customReader.GetItems());

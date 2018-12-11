@@ -35,6 +35,9 @@ namespace SAUtils.DataStructures
 			var sb = StringBuilderCache.Acquire();
 			var jsonObject = new JsonObject(sb);
 
+            jsonObject.AddStringValue("refAllele", RefAllele);
+            jsonObject.AddStringValue("altAllele", AltAllele);
+
             if(StringValues!=null && StringValues.Count > 0 )
 			    foreach ((string key, string value)  in StringValues)
 			    {
