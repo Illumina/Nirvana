@@ -75,7 +75,7 @@ namespace Vcf.Sample
         // ReSharper disable once SuggestBaseTypeForParameter
         private static string GetString(int? index, string[] cols)
         {
-            if (index == null) return null;
+            if (index == null || index >= cols.Length) return null;
             string s = cols[index.Value];
             return s == "." ? null : s;
         }

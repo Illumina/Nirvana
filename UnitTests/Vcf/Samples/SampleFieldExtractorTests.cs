@@ -400,6 +400,22 @@ namespace UnitTests.Vcf.Samples
         }
 
         [Fact]
+        public void DeNovoQualityInDroppedTrailingField_ShouldBeNull()
+        {
+            const string vcfLine =
+                "chr1\t15045\t.\tC\tT\t53.28\tPASS\t.\tGT:AD:AF:DP:GQ:FT:PL:GL:GP:PP:DQ:DN\t./.:0,0:0.000:0:0:LowDepth;LowGQ:.:.";
+            var vcfColumns = vcfLine.Split('\t');
+
+            var extractor = new SampleFieldExtractor(vcfColumns);
+            var samples   = extractor.ExtractSamples();
+
+            Assert.Single(samples);
+
+            var sample = samples[0];
+            Assert.Null(sample.DeNovoQuality);
+        }
+
+        [Fact]
         public void ArtifactAdjustedQualityScore_LikelihoodRatioQualityScore()
         {
             const string vcfLine = "chr1\t2488109\t.\tG\tA\t5\tLowSupport\tDP=339\tGT:GQ:AD:DP:VF:NL:SB:NC:US:AQ:LQ\t0/1:5:338,1:339:0.00295:30:-7.3191:0.0314:0,0,0,1,0,0,17,1,129,21,148,22:3.366:0.001";
