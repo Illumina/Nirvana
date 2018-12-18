@@ -35,11 +35,6 @@
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar --disable-recomposition",
       "workingDirectory": "c:\\Development\\TestDatasets"
     },
-    "RR dq": {
-      "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh38\\Both --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --disable-recomposition --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq22",
-      "workingDirectory": "c:\\Development\\TestDatasets"
-    },
     "RR platypus": {
       "commandName": "Project",
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\temp --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in Platypus-Platypus-unknown-short-hg19.vcf.gz --out platypus --disable-recomposition",
@@ -84,11 +79,6 @@
       "commandName": "Project",
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd https://illumina-annotation.s3.amazonaws.com/Test/CachableSa --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in C:\\Development\\TestDatasets\\Mother_chr22.genome.vcf.gz --out C:\\Development\\TestDatasets\\momGen22_s3"
     },
-    "RR_canvas": {
-      "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in CanvasNS7-Canvas-Pedigree-WG-hg19.vcf.gz --out canvas",
-      "workingDirectory": "c:\\Development\\TestDatasets"
-    },
     "RR_refMinor": {
       "commandName": "Project",
       "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-RefMinor-GRCh37.vcf.gz --out C:\\Development\\TestDatasets\\refMinor",
@@ -97,11 +87,6 @@
     "RR_dogBeach": {
       "commandName": "Project",
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in DogBeach-SpliceGirl-unknown-WG-hg19.vcf.gz --out dog",
-      "workingDirectory": "c:\\Development\\TestDatasets"
-    },
-    "RR_strelka_MT": {
-      "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-MT-GRCh37.vcf.gz --out noGenes",
       "workingDirectory": "c:\\Development\\TestDatasets"
     },
     "RR_colo_38": {
@@ -123,6 +108,11 @@
       "commandName": "Project",
       "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in miniIcsl.vcf --out mini",
       "workingDirectory": "C:\\Development\\ExternalDataSources\\ICSL\\GRCh37"
+    },
+    "RR_dragen3.2": {
+      "commandName": "Project",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in paul_chrM.vcf.gz --out paul_M",
+      "workingDirectory": "C:\\Development\\TestDatasets"
     }
   }
 }
