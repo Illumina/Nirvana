@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using CommandLine.Utilities;
-using Compression.FileHandling;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;

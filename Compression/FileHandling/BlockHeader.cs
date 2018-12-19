@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using ErrorHandling.Exceptions;
-using IO;
 
 namespace Compression.FileHandling
 {
@@ -23,7 +22,7 @@ namespace Compression.FileHandling
 
         public void Read(Stream stream)
         {
-            int numBytesRead = stream.ForcedRead(_header, 0, HeaderSize);
+            int numBytesRead = stream.Read(_header, 0, HeaderSize);
 
             if (numBytesRead == 0)
             {

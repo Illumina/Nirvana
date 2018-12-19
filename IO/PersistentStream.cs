@@ -8,36 +8,31 @@ namespace IO
     {
         private Stream _stream;
         private readonly Func<long, Stream> _connectFunc;
-        private long _reconnectPosition;
+        private long _position;
         
         private const int MaxRetryAttempts     = 5;
         private const int NumRetryMilliseconds = 2_000;
 
-        #region Stream
-
-        public override bool CanRead  => _stream.CanRead;
-        public override bool CanSeek => _stream.CanSeek;
-        public override bool CanWrite => _stream.CanWrite;
-        public override long Length   => _stream.Length;
-
-        public override long Position
-        {
-            get => _reconnectPosition;
-            set => SetPosition(value);
-        }
-
+        public override bool CanRead                                     => _stream.CanRead;
+        public override bool CanSeek                                     => _stream.CanSeek;
+        public override bool CanWrite                                    => _stream.CanWrite;
+        public override long Length                                      => _stream.Length;
         public override void Flush()                                     => _stream.Flush();
         public override long Seek(long offset, SeekOrigin origin)        => _stream.Seek(offset, origin);
         public override void SetLength(long value)                       => _stream.SetLength(value);
         public override void Write(byte[] buffer, int offset, int count) => _stream.Write(buffer, offset, count);
 
-        #endregion
+        public override long Position
+        {
+            get => _position;
+            set => SetPosition(value);
+        }
 
         public PersistentStream(Stream stream, Func<long, Stream> connectFunc, long position)
         {
-            _stream            = stream;
-            _connectFunc       = connectFunc;
-            _reconnectPosition = position;
+            _stream      = stream;
+            _connectFunc = connectFunc;
+            _position    = position;
         }
 
         [Obsolete("should be removed ASAP")]
@@ -47,7 +42,7 @@ namespace IO
             _stream?.Dispose();
 
             _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, position, MaxRetryAttempts);
-            _reconnectPosition = position;
+            _position = position;
         }
 
         
@@ -62,18 +57,18 @@ namespace IO
 
                 offset       += cnt;
                 numBytesRead += cnt;
+                _position    += cnt;
                 count        -= cnt;
             }
 
-            _reconnectPosition += numBytesRead;
             return numBytesRead;
         }
 
         private int PersistentRead(byte[] buffer, int offset, int count)
         {
-            bool keepTrying  = true;
-            int numRetries   = 0;
-            int numBytesRead = 0;
+            var keepTrying   = true;
+            var numRetries   = 0;
+            var numBytesRead = 0;
 
             while (keepTrying)
             {
@@ -88,7 +83,7 @@ namespace IO
                     if (numRetries == MaxRetryAttempts) throw;
 
                     Thread.Sleep(NumRetryMilliseconds);
-                    _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, _reconnectPosition, MaxRetryAttempts-numRetries);
+                    _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, _position, MaxRetryAttempts-numRetries);
 
                     numRetries++;                    
                 }
