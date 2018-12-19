@@ -3,7 +3,6 @@ using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using CommandLine.Utilities;
-using Compression.FileHandling;
 using Genome;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;

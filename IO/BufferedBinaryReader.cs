@@ -50,7 +50,7 @@ namespace IO
             _bufferPos = 0;
             _bufferLen = numRemainingBytes;
 
-            int numBytesRead = _stream.ForcedRead(_buffer, numRemainingBytes, _buffer.Length - numRemainingBytes);
+            int numBytesRead = _stream.Read(_buffer, numRemainingBytes, _buffer.Length - numRemainingBytes);
             _bufferLen       = numRemainingBytes + numBytesRead;
 
             if (_bufferPos == 0 && _bufferLen == 0) _foundEof = true;

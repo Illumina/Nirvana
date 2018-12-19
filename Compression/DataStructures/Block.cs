@@ -3,7 +3,6 @@ using System.IO;
 using Compression.Algorithms;
 using Compression.FileHandling;
 using ErrorHandling.Exceptions;
-using IO;
 
 namespace Compression.DataStructures
 {
@@ -106,7 +105,7 @@ namespace Compression.DataStructures
 
         private int ReadCompressedBlock(Stream stream)
         {
-            int numBytesRead = stream.ForcedRead(_compressedBlock, 0, _header.NumCompressedBytes);
+            int numBytesRead = stream.Read(_compressedBlock, 0, _header.NumCompressedBytes);
             if (numBytesRead != _header.NumCompressedBytes)
             {
                 throw new IOException($"Expected {_header.NumCompressedBytes} bytes from the block, but received only {numBytesRead} bytes.");
@@ -123,7 +122,7 @@ namespace Compression.DataStructures
 
         private int ReadUncompressedBlock(Stream stream)
         {
-            int numBytesRead = stream.ForcedRead(_uncompressedBlock, 0, _header.NumUncompressedBytes);
+            int numBytesRead = stream.Read(_uncompressedBlock, 0, _header.NumUncompressedBytes);
             if (numBytesRead != _header.NumUncompressedBytes)
             {
                 throw new IOException($"Expected {_header.NumUncompressedBytes} bytes from the uncompressed block, but received only {numBytesRead} bytes.");

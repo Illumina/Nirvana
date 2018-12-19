@@ -4,7 +4,6 @@ using System.IO;
 using System.IO.Compression;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
-using IO;
 
 namespace Compression.FileHandling
 {
@@ -135,9 +134,8 @@ namespace Compression.FileHandling
 
         private void ReadBlock()
         {
-            var header        = new byte[BlockGZipFormatCommon.BlockHeaderLength];
             long blockAddress = _stream.CanSeek ? _stream.Position : 0;
-            int count         = _stream.ForcedRead(header, 0, BlockGZipFormatCommon.BlockHeaderLength);
+            int count         = _stream.Read(_compressedBlock, 0, BlockGZipFormatCommon.BlockHeaderLength);
 
             // handle the case where no data was read
             if (count == 0)
@@ -147,17 +145,15 @@ namespace Compression.FileHandling
             }
 
             // check the header
-            if (!HasValidHeader(count, header))
+            if (!HasValidHeader(count, _compressedBlock))
             {
                 throw new CompressionException($"Found an invalid header when reading the GZip block ({_filePath})");
             }
 
-            int blockLength = BitConverter.ToUInt16(header, 16) + 1;
+            int blockLength = BitConverter.ToUInt16(_compressedBlock, 16) + 1;
             int remaining   = blockLength - BlockGZipFormatCommon.BlockHeaderLength;
 
-            Buffer.BlockCopy(header, 0, _compressedBlock, 0, BlockGZipFormatCommon.BlockHeaderLength);
-
-            count = _stream.ForcedRead(_compressedBlock, BlockGZipFormatCommon.BlockHeaderLength, remaining);
+            count = _stream.Read(_compressedBlock, BlockGZipFormatCommon.BlockHeaderLength, remaining);
 
             // handle unexpected truncation
             if (count != remaining)

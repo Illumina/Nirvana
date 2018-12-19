@@ -1,5 +1,4 @@
 ﻿using ErrorHandling.Exceptions;
-using System;
 
 namespace Genome
 {
