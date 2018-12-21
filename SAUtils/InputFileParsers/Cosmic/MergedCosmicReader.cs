@@ -201,8 +201,6 @@ namespace SAUtils.InputFileParsers.Cosmic
             var altAlleles    = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
             string infoField  = splitLine[VcfCommon.InfoIndex];
 
-            //if (cosmicId == "COSM4387461" || cosmicId == "COSM1717885" || cosmicId == "COSM5878493")
-            //    Console.WriteLine("bug");
             Clear();
 
             ParseInfoField(infoField);

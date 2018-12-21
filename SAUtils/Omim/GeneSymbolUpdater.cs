@@ -37,8 +37,6 @@ namespace SAUtils.Omim
             }
             var ensemblSymbol = GetSymbol(ensemblGeneId, _ensemblGeneIdToSymbol);
             var entrezGeneSymbol = GetSymbol(entrezGeneId, _entrezGeneIdToSymbol);
-            if (entrezGeneSymbol == "LOC100507537")
-                Console.WriteLine("bug");
             _geneSymbols.Clear();
             if (ensemblSymbol != null) _geneSymbols.Add(ensemblSymbol);
             if (entrezGeneSymbol != null) _geneSymbols.Add(entrezGeneSymbol);

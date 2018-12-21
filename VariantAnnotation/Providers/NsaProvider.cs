@@ -90,9 +90,6 @@ namespace VariantAnnotation.Providers
         {
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
-                if (annotatedVariant.Variant.Start > 20129 && annotatedVariant.Variant.Start < 22154)
-                    Console.WriteLine("bug");
-
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
                 foreach (INsaReader nsaReader in _nsaReaders)
                 {
