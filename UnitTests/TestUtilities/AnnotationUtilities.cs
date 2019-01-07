@@ -61,7 +61,7 @@ namespace UnitTests.TestUtilities
             var sequenceProvider                 = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
             var refNames                         = sequenceProvider.RefNameToChromosome;
             var transcriptAnnotationProvider     = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
-            var saProvider                       = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
+            var saProvider                       = ProviderUtilities.GetNsaProvider(dataAndIndexPaths, null, null);
             var conservationProvider             = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);

@@ -2,6 +2,8 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
+using Amazon.S3;
+using Cloud;
 using CommandLine.Utilities;
 using Genome;
 using VariantAnnotation.Interface;
@@ -36,7 +38,7 @@ namespace Nirvana
         public bool OutputGvcf { get; }
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths,
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, AmazonS3Client s3Client, List<S3Path> annotationsInS3,
             string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition,
             bool forceMitochondrialAnnotation)
         {
@@ -53,7 +55,7 @@ namespace Nirvana
             }
 
             TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
+            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths, s3Client, annotationsInS3);
             ConservationProvider         = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
             RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
             GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(dataAndIndexPaths);
