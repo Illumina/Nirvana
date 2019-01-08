@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Amazon.S3;
+using Cloud;
 using IO;
 using VariantAnnotation;
 using CommandLine.Utilities;
@@ -69,19 +71,34 @@ namespace Nirvana
             return ngaFiles.Count > 0? new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(ngaFiles)): null;
         }
 
-        public static IAnnotationProvider GetNsaProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
+        public static IAnnotationProvider GetNsaProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, AmazonS3Client s3Client, List<S3Path> annotationsInS3)
         {
-            if (dataAndIndexFiles == null) return null;
+            if (dataAndIndexFiles == null && annotationsInS3 == null) return null;
 
             var nsaReaders = new List<INsaReader>();
             var nsiReaders = new List<INsiReader>();
-            foreach ((string dataFile, string indexFile)in dataAndIndexFiles)
-            {
-                if(dataFile.EndsWith(SaCommon.SaFileSuffix))
-                    nsaReaders.Add(GetNsaReader(PersistentStreamUtils.GetReadStream(dataFile), PersistentStreamUtils.GetReadStream(indexFile)));
-                if (dataFile.EndsWith(SaCommon.SiFileSuffix))
-                    nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
-            }
+
+            if (dataAndIndexFiles != null)
+                foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
+                {
+                    if (dataFile.EndsWith(SaCommon.SaFileSuffix))
+                        nsaReaders.Add(GetNsaReader(PersistentStreamUtils.GetReadStream(dataFile),
+                            PersistentStreamUtils.GetReadStream(indexFile)));
+                    if (dataFile.EndsWith(SaCommon.SiFileSuffix))
+                        nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
+                }
+
+            if (annotationsInS3 != null)
+                foreach (var annotation in annotationsInS3)
+                {
+                    if (annotation.path.EndsWith(SaCommon.SaFileSuffix))
+                        nsaReaders.Add(GetNsaReader(PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0),
+                            PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path + SaCommon.IndexSufix, 0)));
+                    else
+                    {
+                        nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0)));
+                    }
+                }
 
             if (nsaReaders.Count > 0 || nsiReaders.Count > 0)
                 return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());

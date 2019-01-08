@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0-preview3-35497" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cloud\Cloud.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
