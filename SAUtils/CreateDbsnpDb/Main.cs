@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
@@ -64,7 +65,7 @@ namespace SAUtils.CreateDbsnpDb
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.DbsnpTag, true, true, SaCommon.SchemaVersion, false);
+                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream),  version, referenceProvider, SaCommon.DbsnpTag, true, true, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(dbSnpReader.GetItems());
             }
 

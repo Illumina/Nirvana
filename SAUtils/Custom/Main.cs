@@ -7,6 +7,7 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.DataStructures;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
@@ -62,36 +63,45 @@ namespace SAUtils.Custom
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             
             List<CustomInterval> intervals;
+            ISaJsonSchema intervalJsonSchema;
             string jsonTag;
             DataSourceVersion version;
             string outputPrefix = GetOutputPrefix(_inputFile);
-            
-            using (var customReader = new CustomAnnotationsParser(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
+
+            using (var customReader = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
             using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using (var nsaWriter   = new NsaWriter(
-                                new ExtendedBinaryWriter(nsaStream), 
-                                new ExtendedBinaryWriter(indexStream), 
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))            
+            using (var nsaWriter = new NsaWriter(
+                                new ExtendedBinaryWriter(nsaStream),
+                                new ExtendedBinaryWriter(indexStream),
                                 version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks),
-                                referenceProvider, 
-                                customReader.JsonTag, 
+                                referenceProvider,
+                                customReader.JsonTag,
                                 false,  // match by allele
                                 true, // is array
-                                SaCommon.SchemaVersion, 
+                                SaCommon.SchemaVersion,
                                 false// is positional
                                 ))
+            using (var jsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var schemaWriter = new StreamWriter(jsonSchemaStream))
             {
                 jsonTag = customReader.JsonTag;
-                nsaWriter.Write(customReader.GetItems());
+                nsaWriter.Write(customReader.GetItems(), true);
+                schemaWriter.Write(customReader.JsonSchema);
+
+                intervalJsonSchema = customReader.IntervalJsonSchema;
                 intervals = customReader.GetCustomIntervals();
             }
 
             if (intervals == null) return ExitCodes.Success;
-            
+
             using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix)))
             using (var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsiStream), version, referenceProvider.Assembly, jsonTag, ReportFor.AllVariants, SaCommon.SchemaVersion))
+            using (var jsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var schemaWriter = new StreamWriter(jsonSchemaStream))
             {
                 nsiWriter.Write(intervals);
+                schemaWriter.Write(intervalJsonSchema);
             }
 
             return ExitCodes.Success;

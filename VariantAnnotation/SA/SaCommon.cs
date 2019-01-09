@@ -2,11 +2,11 @@
 {
     public static class SaCommon
     {
-        public const int DefaultBlockSize = 8 * 1024 * 1024;
-        public const ushort DataVersion   = 47;
-        public const ushort SchemaVersion = 22;
+        public const int DefaultBlockSize      = 8 * 1024 * 1024;
+        public const ushort DataVersion        = 47;
+        public const ushort SchemaVersion      = 22;
 
-        public const double RefMinorThreshold = 0.95;
+        public const double RefMinorThreshold  = 0.95;
 
         public const string IndexSufix         = ".idx";
         public const string SaFileSuffix       = ".nsa";
@@ -14,6 +14,7 @@
         public const string RefMinorFileSuffix = ".rma";
         public const string SiFileSuffix       = ".nsi";
         public const string NgaFileSuffix      = ".nga";
+        public const string JsonSchemaSuffix   = ".schema";
 
         public const string DbsnpTag           = "dbsnp";
         public const string GlobalAlleleTag    = "globalAllele";

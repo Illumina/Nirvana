@@ -91,7 +91,7 @@ namespace SAUtils.CreateGnomadDb
 
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using(var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, jsonTag, true, false, SaCommon.SchemaVersion, false))
+            using (var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, jsonTag, true, false, SaCommon.SchemaVersion, false))
             {
                 nsaWriter.Write(GetItems(inputFiles, referenceProvider.RefNameToChromosome));
             }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using CommandLine.Utilities;
 using Compression.Algorithms;
+using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
@@ -43,7 +44,7 @@ namespace SAUtils
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
 
-        public void Write(IEnumerable<ISupplementaryDataItem> saItems)
+        public void Write(IEnumerable<ISupplementaryDataItem> saItems, bool throwIfIncorrectRef = false)
         {
             var itemsMinHeap = new MinHeap<ISupplementaryDataItem>(SuppDataUtilities.CompareTo);
             var chromIndex = ushort.MaxValue;
@@ -68,7 +69,13 @@ namespace SAUtils
                     _refProvider.LoadChromosome(saItem.Chromosome);
                 }
 
-                if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length)) continue;
+                string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
+                if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
+                {
+                    if (throwIfIncorrectRef)
+                        throw new UserErrorException($"The provided reference allele {saItem.RefAllele} at {saItem.Chromosome.UcscName}:{saItem.Position} is different from {refSequence} in the reference genome sequence.");
+                    continue;
+                }
                 //the items come in sorted order of the pre-trimmed position. 
                 //So when writing out, we have to make sure that we do not write past this position. 
                 //Once a position has been seen in the stream, we can safely write all positions before that.
@@ -85,7 +92,6 @@ namespace SAUtils
             Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
             _index.Write();
-
         }
 
         private void WriteUptoPosition(MinHeap<ISupplementaryDataItem> itemsHeap, int position)
