@@ -5,11 +5,6 @@
       "commandLineArgs": "createOMIM --gi ..\\gene_info_2016-10-17 --gi ..\\gene_info_2011-08-28 --hgnc ..\\hgnc_complete_set_2016-10-17.txt --mim mim2gene.txt --in genemap2.txt --out test",
       "workingDirectory": "E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15"
     },
-    "MITOMAP": {
-      "commandName": "Project",
-      "commandLineArgs": "mitomapVarDb --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsRNA --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsCodingControl --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsCoding --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsControl  --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\InsertionsSimple --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\DeletionsSingle --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
-      "workingDirectory": "E:\\Nirvana_resources\\gen_data\\gen_MitoMap"
-    },
     "RR_omim": {
       "commandName": "Project",
       "commandLineArgs": " omim --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --gm2 genemap2.txt --m2g mim2gene.txt --uga c:\\Development\\Cache\\26\\UGA.tsv.gz",
@@ -64,6 +59,11 @@
       "commandName": "Project",
       "commandLineArgs": " OneKgen --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test\\GRCh38 --in ALL_1000Genome_GRCh38_snvRes_5_23_2016_remove_conflicting_entries.removeExtraField.vcf.gz",
       "workingDirectory": "c:\\Development\\ExternalDataSources\\1000Gen\\GRCh38"
+    },
+    "SK_JsonSchema": {
+      "commandName": "Project",
+      "commandLineArgs": "Custom --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in Test.tsv --out .",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_CA"
     }
   }
 }

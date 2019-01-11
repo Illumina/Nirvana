@@ -13,7 +13,7 @@ using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Utilities;
 using Vcf;
-
+using static Vcf.VcfReader;
 
 
 namespace Nirvana
@@ -28,7 +28,7 @@ namespace Nirvana
             var metrics = new PerformanceMetrics(logger);
             var vcfConversion = new VcfConversion();
 
-            using (var vcfReader = VcfReader.Create(headerStream, inputVcfStream, annotationResources, vcfFilter))
+            using (var vcfReader = Create(headerStream, inputVcfStream, annotationResources, vcfFilter))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames()))
             using (var vcfWriter = annotationResources.OutputVcf
                 ? new LiteVcfWriter(new StreamWriter(outputVcfStream), vcfReader.GetHeaderLines(), annotationResources)

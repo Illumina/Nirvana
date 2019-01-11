@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using Moq;
@@ -138,8 +139,6 @@ namespace UnitTests.SAUtils.NsaWriters
                     Assert.Equal("A", altAllele);
                     Assert.NotNull(annotation);
                 }
-
-
             }
 
         }
@@ -207,6 +206,29 @@ namespace UnitTests.SAUtils.NsaWriters
             }
 
             return positions;
+        }
+
+        [Fact]
+        public void WrongRefAllele_ThrowUserException()
+        {
+            var customItem = new CustomItem(_chrom1, 100, new List<string> {"A", "T"}, null);
+
+            Assert.Throws<UserErrorException>(() => WriteCustomSaItem(customItem));
+        }
+
+        private void WriteCustomSaItem(CustomItem customItem)
+        {
+            using (var saStream = new MemoryStream())
+            using (var indexStream = new MemoryStream())
+            using (var saWriter = new NsaWriter(
+                new ExtendedBinaryWriter(saStream),
+                new ExtendedBinaryWriter(indexStream),
+                new DataSourceVersion("customeSa", "test", DateTime.Now.Ticks),
+                GetSequenceProvider(),
+                "customeSa", false, true, SaCommon.SchemaVersion, false))
+            {
+                saWriter.Write(new[] { customItem }, true);
+            }
         }
     }
 }

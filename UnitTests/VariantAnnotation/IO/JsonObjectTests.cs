@@ -9,6 +9,22 @@ namespace UnitTests.VariantAnnotation.IO
     public sealed class JsonObjectTests
     {
         [Fact]
+        public void ProcessBoolValue_True_TwoTimes()
+        {
+            var sb = StringBuilderCache.Acquire();
+            var json = new JsonObject(sb);
+
+            json.AddBoolValue("test1", true);
+            json.AddBoolValue("test2", true);
+
+            const string expectedResult = "\"test1\":true,\"test2\":true";
+            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+
+            Assert.Equal(expectedResult, observedResult);
+        }
+
+
+        [Fact]
         public void AddBoolValue_True_TwoTimes()
         {
             var sb = StringBuilderCache.Acquire();

@@ -63,7 +63,7 @@ namespace SAUtils.CreateClinvarDb
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName+SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.ClinvarTag, false, true, SaCommon.SchemaVersion, false);
+                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream),  version, referenceProvider, SaCommon.ClinvarTag, false, true, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(clinvarReader.GetItems());
             }
 

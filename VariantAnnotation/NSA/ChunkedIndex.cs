@@ -41,7 +41,6 @@ namespace VariantAnnotation.NSA
             indexWriter.Write(isPositional);
 
             _chromChunks = new Dictionary<ushort, List<Chunk>>();
-
         }
 
         public void Add(ushort chromIndex, int start, int end, long filePosition, int dataLength)

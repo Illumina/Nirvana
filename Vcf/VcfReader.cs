@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using OptimizedCore;
@@ -126,6 +127,8 @@ namespace Vcf
                 _headerLines.Add(line);
             }
 
+            CheckValidVcfHeader();
+
             if (line == null || !line.StartsWith(VcfCommon.ChromosomeHeader))
             {
                 throw new FormatException($"Could not find the vcf header (starts with {VcfCommon.ChromosomeHeader}). Is this a valid vcf file?");
@@ -138,6 +141,12 @@ namespace Vcf
             _vcfFilter.FastForward(_reader);
 
             return hasSampleColumn;
+        }
+
+        private void CheckValidVcfHeader()
+        {
+            if (_headerLines.Count == 0 || !_headerLines[0].StartsWith("##fileformat=VCFv")) 
+                throw new UserErrorException("Please provide a valid VCF file.");
         }
 
         private bool FoundNirvanaHeaderLine(string s)

@@ -70,7 +70,7 @@ namespace SAUtils.CreateCosmicDb
             string outFileName = $"{version.Name}_{version.Version}";
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using(var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.CosmicTag, false, true, SaCommon.SchemaVersion, false))
+            using (var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.CosmicTag, false, true, SaCommon.SchemaVersion, false))
             {
                 nsaWriter.Write(cosmicReader.GetItems());
             }
