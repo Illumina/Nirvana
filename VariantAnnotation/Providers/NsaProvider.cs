@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
+using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -181,15 +182,17 @@ namespace VariantAnnotation.Providers
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
-            //var benchmark = new Benchmark();
+            var benchmark = new Benchmark();
+            Console.Write("Pre-loading SA....");
+
             foreach (INsaReader nsaReader in _nsaReaders)
             {
                 nsaReader.PreLoad(chromosome, positions);
             }
 
-            //var totalTime = benchmark.GetElapsedTime();
+            var totalTime = benchmark.GetElapsedTime();
             //var rate = totalBytes * 1.0 / (totalTime.TotalSeconds * 1_000_000);// MB/sec
-            //Console.WriteLine($"\nPreloaded SA in {Benchmark.ToHumanReadable(totalTime)}. Data rate {rate:#.##} MB/sec");
+            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");//. Data rate {rate:#.##} MB/sec");
             //Console.WriteLine($"No of http stream sources created {HttpStreamSource.Count}");
         }
     }

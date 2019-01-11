@@ -35,6 +35,12 @@ namespace IO
             _position    = position;
         }
 
+        //the final _stream needs to be disposed
+        ~PersistentStream()
+        {
+            _stream?.Dispose();
+        }
+
         [Obsolete("should be removed ASAP")]
         private void SetPosition(long position)
         {
@@ -49,7 +55,7 @@ namespace IO
         public override int Read(byte[] buffer, int offset, int count)
         {
             var numBytesRead = 0;
-
+            
             while (count > 0)
             {
                 int cnt = PersistentRead(buffer, offset, count);

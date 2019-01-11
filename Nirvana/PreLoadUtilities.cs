@@ -15,7 +15,7 @@ namespace Nirvana
         public static ImmutableDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom)
         {
             var benchmark = new Benchmark();
-            Console.Write("Preloading variant positions....");
+            Console.Write("Scanning positions required for SA pre-loading....");
             var chromPositions = new Dictionary<IChromosome, List<int>>();
 
             IChromosome chromToAnnotate = null;
