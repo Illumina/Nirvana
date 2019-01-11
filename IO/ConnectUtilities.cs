@@ -30,8 +30,6 @@ namespace IO
             return position =>
             {
                 var request = WebRequest.CreateHttp(url);
-                request.Timeout = 5_000;
-
                 if (position < 0) position = 0;
 
                 request.AddRange(position);
