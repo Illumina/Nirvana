@@ -60,12 +60,12 @@ namespace ErrorHandling
 		public static ExitCodes ShowException(Exception e)
 		{
 			Console.ForegroundColor = ConsoleColor.Red;
-			Console.Write("\nERROR: ");
+			Console.Error.Write("\nERROR: ");
 			Console.ResetColor();
 
             while (e.InnerException != null) e = e.InnerException;
 
-            Console.WriteLine("{0}", e.Message);
+            Console.Error.WriteLine("{0}", e.Message);
 
 			var exceptionType = e.GetType();
 
@@ -74,18 +74,18 @@ namespace ErrorHandling
 			{
 				// print the stack trace
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("\nStack trace:");
+				Console.Error.WriteLine("\nStack trace:");
 				Console.ResetColor();
-				Console.WriteLine(e.StackTrace);
+				Console.Error.WriteLine(e.StackTrace);
 
 				// extract out the vcf line
 			    // ReSharper disable once InvertIf
 				if (e.Data.Contains(VcfLine))
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("\nVCF line:");
+					Console.Error.WriteLine("\nVCF line:");
 					Console.ResetColor();
-					Console.WriteLine(e.Data[VcfLine]);
+					Console.Error.WriteLine(e.Data[VcfLine]);
 				}
 			}
 
