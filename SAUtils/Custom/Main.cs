@@ -63,7 +63,7 @@ namespace SAUtils.Custom
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             
             List<CustomInterval> intervals;
-            ISaJsonSchema intervalJsonSchema;
+            SaJsonSchema intervalJsonSchema;
             string jsonTag;
             DataSourceVersion version;
             string outputPrefix = GetOutputPrefix(_inputFile);

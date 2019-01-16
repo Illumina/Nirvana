@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Genome;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.DataStructures
@@ -13,10 +12,10 @@ namespace SAUtils.DataStructures
         public string AltAllele { get; set; }
 
         private readonly List<string> _values;
-        private readonly ISaJsonSchema _jsonSchema;
+        private readonly SaJsonSchema _jsonSchema;
 
 
-        public CustomItem(IChromosome chromosome, int start, List<string> values, ISaJsonSchema jsonSchema)
+        public CustomItem(IChromosome chromosome, int start, List<string> values, SaJsonSchema jsonSchema)
         {
             Chromosome   = chromosome;
             Position     = start;
