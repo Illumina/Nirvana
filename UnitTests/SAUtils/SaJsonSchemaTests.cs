@@ -76,31 +76,38 @@ namespace UnitTests.SAUtils
         }
 
         [Fact]
-        public void CheckAndGetBoolValueFromString_AsExpected()
+        public void CheckAndGetBoolFromString_AsExpected()
         {
-            Assert.True(SaJsonSchema.CheckAndGetBoolValueFromString("true"));
-            Assert.True(SaJsonSchema.CheckAndGetBoolValueFromString("TRUE"));
-            Assert.False(SaJsonSchema.CheckAndGetBoolValueFromString("false"));
-            Assert.False(SaJsonSchema.CheckAndGetBoolValueFromString("False"));
-            Assert.False(SaJsonSchema.CheckAndGetBoolValueFromString(""));
-            Assert.False(SaJsonSchema.CheckAndGetBoolValueFromString("."));
+            Assert.True(SaJsonSchema.CheckAndGetBoolFromString("true"));
+            Assert.True(SaJsonSchema.CheckAndGetBoolFromString("TRUE"));
+            Assert.False(SaJsonSchema.CheckAndGetBoolFromString("false"));
+            Assert.False(SaJsonSchema.CheckAndGetBoolFromString("False"));
+            Assert.False(SaJsonSchema.CheckAndGetBoolFromString(""));
+            Assert.False(SaJsonSchema.CheckAndGetBoolFromString("."));
         }
 
         [Fact]
-        public void CheckAndGetBoolValueFromString_InvalidValue_ThrowException()
+        public void CheckAndGetBoolFromString_InvalidValue_ThrowException()
         {
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolValueFromString("T"));
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolValueFromString("F"));
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolValueFromString("0"));
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolValueFromString("-"));
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolFromString("T"));
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolFromString("F"));
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolFromString("0"));
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetBoolFromString("-"));
         }
 
         [Fact]
-        public void CheckAndGetDoubleValueFromString_NotANum_ThrowException()
+        public void CheckAndGetNullableDoubleFromString_GetNull_AsExpected()
         {
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetDoubleValueFromString("Bob"));
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetDoubleValueFromString("1+1"));
-            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetDoubleValueFromString("bool"));
+            Assert.Null(SaJsonSchema.CheckAndGetNullableDoubleFromString(""));
+            Assert.Null(SaJsonSchema.CheckAndGetNullableDoubleFromString("."));
+        }
+
+        [Fact]
+        public void CheckAndGetNullableDoubleFromString_NotANum_ThrowException()
+        { 
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetNullableDoubleFromString("Bob"));
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetNullableDoubleFromString("1+1"));
+            Assert.Throws<UserErrorException>(() => SaJsonSchema.CheckAndGetNullableDoubleFromString("bool"));
         }
 
         [Fact]

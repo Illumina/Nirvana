@@ -101,12 +101,12 @@ namespace SAUtils
                             actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, value), key));
                         break;
                     case JsonDataType.Bool:
-                        actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddBoolValue(key, CheckAndGetBoolValueFromString(value)), key));
+                        actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddBoolValue(key, CheckAndGetBoolFromString(value)), key));
                         break;
                     case JsonDataType.Number:
                         actions.Add((jsonObject, value) =>
                         {
-                            double doubleValue = CheckAndGetDoubleValueFromString(value);
+                            var doubleValue = CheckAndGetNullableDoubleFromString(value);
                             CustomAnnotationCategories keyCategory = GetCategory(key);
                             CountKeyIfAdded(keyCategory == CustomAnnotationCategories.AlleleFrequency
                                 ? jsonObject.AddDoubleValue(key, doubleValue, "0.######") 
@@ -161,7 +161,7 @@ namespace SAUtils
             _jsonObject.EndObject();
         }
 
-        internal static bool CheckAndGetBoolValueFromString(string value)
+        internal static bool CheckAndGetBoolFromString(string value)
         {
             switch (value.ToLower())
             {
@@ -176,10 +176,13 @@ namespace SAUtils
             }
         }
 
-        internal static double CheckAndGetDoubleValueFromString(string value)
+        internal static double? CheckAndGetNullableDoubleFromString(string value)
         {
+            if (value == "." || value == "") return null;
+
             if (double.TryParse(value, out double doubleValue))
                 return doubleValue;
+
             throw new UserErrorException($"{value} is not a valid number.");
         }
     }

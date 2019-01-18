@@ -211,7 +211,7 @@ namespace UnitTests.SAUtils.NsaWriters
         [Fact]
         public void WrongRefAllele_ThrowUserException()
         {
-            var customItem = new CustomItem(_chrom1, 100, new List<string> {"A", "T"}, null);
+            var customItem = new CustomItem(_chrom1, 100, "A", "T", null, null);
 
             Assert.Throws<UserErrorException>(() => WriteCustomSaItem(customItem));
         }

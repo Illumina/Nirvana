@@ -293,30 +293,28 @@ namespace SAUtils.Custom
 
             string refAllele = splits[2].ToUpper();
 
-            var values = new string[_numAnnotationColumns];
+            var annotationValues = new string[_numAnnotationColumns];
             for (var i = 0; i < _numAnnotationColumns; i++)
             {
-                values[i] = splits[i + _numRequiredColumns];
+                annotationValues[i] = splits[i + _numRequiredColumns];
             }
 
-            List<string> itemValues;
             if (_endColumnIndex != -1 && splits[_endColumnIndex] != ".")
             {
-                itemValues = new List<string> { splits[1], splits[_endColumnIndex] };
+                var jsonStringValues = new List<string> { splits[1], splits[_endColumnIndex] };
 
                 if (!int.TryParse(splits[_endColumnIndex], out var end))
                     throw new UserErrorException($"END is neither a . or an int number at: {line}.");
 
-                itemValues.AddRange(values);
-                _intervals.Add(new CustomInterval(chrom, position, end, itemValues, IntervalJsonSchema));
+                jsonStringValues.AddRange(annotationValues);
+                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues, IntervalJsonSchema));
                 return null;
             }
 
             string altAllele = splits[_altColumnIndex];
             ValidateNucleotideSequence(altAllele);
-            itemValues = new List<string> { refAllele, altAllele };
-            itemValues.AddRange(values);
-            return new CustomItem(chrom, position, itemValues, JsonSchema);
+
+            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues, JsonSchema);
         }
 
         private void CheckAnnotationSorted(IChromosome chrom, int position, string line)
