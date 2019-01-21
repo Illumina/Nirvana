@@ -92,35 +92,44 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
-                foreach (INsaReader nsaReader in _nsaReaders)
-                {
-                    var variant = annotatedVariant.Variant;
-                    var annotations = nsaReader.GetAnnotation(variant.Chromosome, variant.Start);
-                    if (annotations == null) continue;
-
-                    if (nsaReader.IsPositional)
-                    {
-                        AddPositionalAnnotation(annotations, annotatedVariant, nsaReader);
-                        continue;
-                    }
-
-                    if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, annotations, annotatedVariant, variant);
-
-                    else AddNonAlleleSpecificAnnotations(annotations, variant, annotatedVariant, nsaReader);
-
-                }
+                AddSmallAnnotations(annotatedVariant);
                 
                 //check for interval annotations that applies to all variants
                 if(_nsiReaders ==null) continue;
-                foreach (INsiReader nsiReader in _nsiReaders)
-                {
-                   if (nsiReader.ReportFor == ReportFor.StructuralVariants ||
-                        nsiReader.ReportFor == ReportFor.None) continue;
+                AddLargeAnnotationsToSmallVariants(annotatedVariant);
+            }
+        }
 
-                    var variant = annotatedVariant.Variant;
-                    var annotations = nsiReader.GetAnnotation(variant);
-                    if(annotations !=null ) AddPositionalAnnotation(annotations, annotatedVariant, nsiReader);
+        private void AddLargeAnnotationsToSmallVariants(IAnnotatedVariant annotatedVariant)
+        {
+            foreach (INsiReader nsiReader in _nsiReaders)
+            {
+                if (nsiReader.ReportFor == ReportFor.StructuralVariants ||
+                    nsiReader.ReportFor == ReportFor.None) continue;
+
+                var variant = annotatedVariant.Variant;
+                var annotations = nsiReader.GetAnnotation(variant);
+                if (annotations != null) AddPositionalAnnotation(annotations, annotatedVariant, nsiReader);
+            }
+        }
+
+        private void AddSmallAnnotations(IAnnotatedVariant annotatedVariant)
+        {
+            foreach (INsaReader nsaReader in _nsaReaders)
+            {
+                var variant = annotatedVariant.Variant;
+                var annotations = nsaReader.GetAnnotation(variant.Chromosome, variant.Start);
+                if (annotations == null) continue;
+
+                if (nsaReader.IsPositional)
+                {
+                    AddPositionalAnnotation(annotations, annotatedVariant, nsaReader);
+                    continue;
                 }
+
+                if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, annotations, annotatedVariant, variant);
+
+                else AddNonAlleleSpecificAnnotations(annotations, variant, annotatedVariant, nsaReader);
             }
         }
 

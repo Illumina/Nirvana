@@ -8,6 +8,7 @@ namespace Vcf
 
         public void FastForward(StreamReader reader)
         {
+            //stupid sonarQube requires a comment here
         }
 
         public string GetNextLine(StreamReader reader) => reader.ReadLine();
