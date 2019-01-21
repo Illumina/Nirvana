@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using ErrorHandling.Exceptions;
 using Genome;
@@ -19,7 +20,7 @@ namespace SAUtils.Custom
         private string[] _tags;
         internal CustomAnnotationCategories[] Categories;
         internal string[] Descriptions;
-        internal CustomAnnotationType[] Types;
+        internal JsonDataType[] Types;
 
         private int _numRequiredColumns;
         private int _numAnnotationColumns;
@@ -27,14 +28,15 @@ namespace SAUtils.Custom
         private int _endColumnIndex = -1;
         private readonly HashSet<GenomeAssembly> _allowedGenomeAssemblies = new HashSet<GenomeAssembly>{GenomeAssembly.GRCh37, GenomeAssembly.GRCh38};
         private readonly List<CustomInterval> _intervals;
+        private (IChromosome Chromesome, int Position) _previousPosition = (null, 0);
 
         private const string DataType = "array";
-        private readonly Dictionary<string, string> _predefinedTypeAnnotation = new Dictionary<string, string>()
+        private readonly Dictionary<string, JsonDataType> _predefinedTypeAnnotation = new Dictionary<string, JsonDataType>()
         {
-            {"refAllele", "string"},
-            {"altAllele", "string"},
-            {"start", "number"},
-            {"end", "number"}
+            {"refAllele", JsonDataType.String},
+            {"altAllele", JsonDataType.String},
+            {"start", JsonDataType.Number},
+            {"end", JsonDataType.Number}
         };
         internal readonly List<string> JsonKeys = new List<string> {"refAllele", "altAllele"};
         internal readonly List<string> IntervalJsonKeys = new List<string> {"start", "end"};
@@ -74,57 +76,80 @@ namespace SAUtils.Custom
 
         internal void ParseTitle()
         {
-            var line = ReadlineAndCheckPrefix("#title");
+            string line = ReadlineAndCheckPrefix("#title", "first");
+            string firstCol = line.OptimizedSplit('\t')[0];
+            (_, string jsonTag) = firstCol.OptimizedKeyValue();
 
-            var splits = line.OptimizedSplit('=');
-            var value = splits[1].Trim();
+            if (jsonTag == null)
+                throw new UserErrorException("Please provide the title in the format: #title=titleValue.");
 
-            if (CheckJsonTagConflict(value))
-                throw new UserErrorException($"{value} is a reserved supplementary annotation tag in Nirvana. Please use a different value.");
-            JsonTag = value;
+            if (CheckJsonTagConflict(jsonTag))
+                throw new UserErrorException($"{jsonTag} is a reserved supplementary annotation tag in Nirvana. Please use a different value.");
+            JsonTag = jsonTag;
         }
 
         internal void ParseGenomeAssembly()
         {
-            var line = ReadlineAndCheckPrefix("#assembly");
-            var splits = line.OptimizedSplit('=');
+            string line = ReadlineAndCheckPrefix("#assembly", "second");
+            string firstCol = line.OptimizedSplit('\t')[0];
+            (_, string assemblyString) = firstCol.OptimizedKeyValue();
 
-            Assembly = GenomeAssemblyHelper.Convert(splits[1].Trim());
+            if (assemblyString == null)
+                throw new UserErrorException("Please provide the genome assembly in the format: #assembly=genomeAssemlby.");
+
+            Assembly = GenomeAssemblyHelper.Convert(assemblyString);
             if (!_allowedGenomeAssemblies.Contains(Assembly))
-                throw new UserErrorException("Only GRCh37 and GRCh38 are accepted.");        
+                throw new UserErrorException("Only GRCh37 and GRCh38 are accepted for genome assembly.");        
         }
 
-        private void ParseTags()
+        internal void ParseTags()
         {
-            var line = ReadlineAndCheckPrefix("#CHROM");
+            var line = ReadlineAndCheckPrefix("#CHROM", "third");
 
             _tags = line.OptimizedSplit('\t');
+            if (_tags.Length < 4)
+                throw new UserErrorException("At least 4 columns required. Please note that the columns should be separated by tab.");
 
+            CheckPosAndRefColumns();
             CheckAltAndEndColumns();
 
             for (int i = _numRequiredColumns; i < _tags.Length; i++)
             {
+                if (_tags[i].IsWhiteSpace()) 
+                    throw new UserErrorException($"Please provide a name for column {i+1} at the third row.");
+
                 JsonKeys.Add(_tags[i]);
                 IntervalJsonKeys.Add(_tags[i]);
             }
         }
 
+        private void CheckPosAndRefColumns()
+        {
+            if (_tags[1] != "POS" || _tags[2] != "REF")
+                throw new UserErrorException("The 2nd and 3rd columns must be POS and REF, respectively.");
+        }
+
         private void CheckAltAndEndColumns()
         {
             _numRequiredColumns = 4;
+
             if (_tags[3] == "ALT")
             {
                 _altColumnIndex = 3;
 
-                if (_tags[4] == "END")
+                if (_tags.Length > 4 && _tags[4] == "END")
                 {
                     _endColumnIndex = 4;
                     _numRequiredColumns = 5;
                 }
             }
-            else
+            else if (_tags[3] == "END")
             {
                 _endColumnIndex = 3;
+            }
+            else
+            {
+                throw new UserErrorException("Please provide at least one of the ALT and END columns.The END column should come after the ALT column if both are present.");
             }
 
             _numAnnotationColumns = _tags.Length - _numRequiredColumns;
@@ -132,25 +157,25 @@ namespace SAUtils.Custom
 
         private void ParseCategories()
         {
-            var line = ReadlineAndCheckPrefix("#categories");
+            var line = ReadlineAndCheckPrefix("#categories", "fourth");
             var splits = line.OptimizedSplit('\t');
-            if (splits.Length != _tags.Length) throw new UserErrorException("#categories row must have the same number of columns as the #CHROM row");
+            if (splits.Length != _tags.Length) throw new UserErrorException("#categories row must have the same number of columns as the #CHROM row.");
 
             Categories = new CustomAnnotationCategories[_numAnnotationColumns];
-            for (int i = 0; i < _numAnnotationColumns; i++)
+            for (var i = 0; i < _numAnnotationColumns; i++)
             {
-                switch (splits[i + _numRequiredColumns])
+                switch (splits[i + _numRequiredColumns].ToLower())
                 {
-                    case "AlleleCount":
+                    case "allelecount":
                         Categories[i] = CustomAnnotationCategories.AlleleCount;
                         break;
-                    case "AlleleNumber":
+                    case "allelenumber":
                         Categories[i] = CustomAnnotationCategories.AlleleNumber;
                         break;
-                    case "AlleleFrequency":
+                    case "allelefrequency":
                         Categories[i] = CustomAnnotationCategories.AlleleFrequency;
                         break;
-                    case "Prediction":
+                    case "prediction":
                         Categories[i] = CustomAnnotationCategories.Prediction;
                         break;
                     default:
@@ -162,7 +187,7 @@ namespace SAUtils.Custom
 
         private void ParseDescriptions()
         {
-            var line = ReadlineAndCheckPrefix("#descriptions");
+            var line = ReadlineAndCheckPrefix("#descriptions", "fifth");
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length) throw new UserErrorException("#descriptions row must have the same number of columns as the #CHROM row");
 
@@ -174,25 +199,25 @@ namespace SAUtils.Custom
             }
         }
 
-        private void ParseTypes()
+        internal void ParseTypes()
         {
-            var line = ReadlineAndCheckPrefix("#type");
+            var line = ReadlineAndCheckPrefix("#type", "sixth");
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length) throw new UserErrorException("#types row must have the same number of columns as the #CHROM row");
 
-            Types = new CustomAnnotationType[_numAnnotationColumns];
+            Types = new JsonDataType[_numAnnotationColumns];
             for (int i = 0; i < _numAnnotationColumns; i++)
             {
-                switch (splits[i + _numRequiredColumns])
+                switch (splits[i + _numRequiredColumns].ToLower())
                 {
                     case "bool":
-                        Types[i] = CustomAnnotationType.Bool;
+                        Types[i] = JsonDataType.Bool;
                         break;
                     case "string":
-                        Types[i] = CustomAnnotationType.String;
+                        Types[i] = JsonDataType.String;
                         break;
                     case "number":
-                        Types[i] = CustomAnnotationType.Number;
+                        Types[i] = JsonDataType.Number;
                         break;
                     default:
                         throw new UserErrorException("Invalid value for type column. Valid values are bool, string, number.");
@@ -208,7 +233,6 @@ namespace SAUtils.Custom
                 while ((line = _reader.ReadLine()) != null)
                 {
                     if (line.IsWhiteSpace()) continue;
-
                     var item = ExtractItems(line);
                     if (item == null) continue;
                     yield return item;
@@ -233,17 +257,16 @@ namespace SAUtils.Custom
 
         private void AddHeaderAnnotation()
         {
-            for (int i = 0;  i < _numAnnotationColumns; i++)
+            for (var i = 0;  i < _numAnnotationColumns; i++)
             {
                 var annotation = new SaJsonKeyAnnotation
 
                 {
-                    Type = Types[i].ToJsonTypeString(),
-                    Category = Categories[i] == CustomAnnotationCategories.Unknown ? null : Categories[i].ToString(),
+                    Type = Types[i],
+                    Category = Categories[i],
                     Description = Descriptions[i]
                 };
     
-
                 JsonSchema?.AddAnnotation(_tags[i + _numRequiredColumns], annotation);
                 IntervalJsonSchema?.AddAnnotation(_tags[i + _numRequiredColumns], annotation);
             }
@@ -256,42 +279,65 @@ namespace SAUtils.Custom
                 throw new UserErrorException($"Column number mismatch!! Header has {_tags.Length} columns but line contains {splits.Length}");
 
             string chromosome = splits[0];
-            if (!_refChromDict.ContainsKey(chromosome)) return null;
 
-            var chrom = _refChromDict[chromosome];
-            int position = int.Parse(splits[1]);
-            string refAllele = splits[2];
-
-            var values = new string[_numAnnotationColumns];
-
-            for (var i = 0; i < _numAnnotationColumns; i++)
+            if (!_refChromDict.TryGetValue(chromosome, out var chrom))
             {
-                values[i] = splits[i + _numRequiredColumns];      
+                Console.WriteLine($"Annotation on {chromosome} is skipped.");
+                return null;
             }
 
+            if (!int.TryParse(splits[1], out var position))
+                throw new UserErrorException($"POS is not an int number at: {line}.");
 
-            List<string> itemValues;
+            CheckAnnotationSorted(chrom, position, line);
+
+            string refAllele = splits[2].ToUpper();
+
+            var annotationValues = new string[_numAnnotationColumns];
+            for (var i = 0; i < _numAnnotationColumns; i++)
+            {
+                annotationValues[i] = splits[i + _numRequiredColumns];
+            }
+
             if (_endColumnIndex != -1 && splits[_endColumnIndex] != ".")
             {
-                itemValues = new List<string> { splits[1], splits[_endColumnIndex] };
-                itemValues.AddRange(values);
-                _intervals.Add(new CustomInterval(chrom, itemValues, IntervalJsonSchema));
+                var jsonStringValues = new List<string> { splits[1], splits[_endColumnIndex] };
+
+                if (!int.TryParse(splits[_endColumnIndex], out var end))
+                    throw new UserErrorException($"END is neither a . or an int number at: {line}.");
+
+                jsonStringValues.AddRange(annotationValues);
+                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues, IntervalJsonSchema));
                 return null;
             }
 
             string altAllele = splits[_altColumnIndex];
-            itemValues = new List<string> {refAllele, altAllele};
-            itemValues.AddRange(values);
-            return new CustomItem(chrom, position, itemValues, JsonSchema);
+            ValidateNucleotideSequence(altAllele);
+
+            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues, JsonSchema);
+        }
+
+        private void CheckAnnotationSorted(IChromosome chrom, int position, string line)
+        {
+            if (chrom != _previousPosition.Chromesome)
+            {
+                _previousPosition = (chrom, position);
+            }
+            else
+            {
+                if (position < _previousPosition.Position)
+                    throw new UserErrorException($"Annotation is not sorted at {line}");
+                _previousPosition.Position = position;
+            }
         }
 
         public List<CustomInterval> GetCustomIntervals() => _intervals.Count > 0 ? _intervals : null;
 
-        internal string ReadlineAndCheckPrefix(string prefix)
+        internal string ReadlineAndCheckPrefix(string prefix, string rowNumber)
         {
-            var line = _reader.ReadLine();
+            string line = _reader.ReadLine();
             if (line != null && !line.StartsWith(prefix))
-                throw new UserErrorException($"TSV file is required to have {prefix}");
+                throw new UserErrorException($"The TSV file is required to start with {prefix} in the {rowNumber} row.");
 
             return line;
         }
@@ -316,6 +362,16 @@ namespace SAUtils.Custom
                    || value.Equals(SaCommon.PhylopTag)
                    || value.Equals(SaCommon.RefMinorTag)
                    || value.Equals(SaCommon.TopMedTag);
+        }
+
+        internal static void ValidateNucleotideSequence(string sequence)
+        {
+            var validNucleotides = new []{ 'a', 'c', 'g', 't', 'n'};
+            foreach (char nucleotide in sequence.ToLower())
+            {
+                if (!validNucleotides.Contains(nucleotide))
+                    throw new UserErrorException($"Invalid nucleotides in sequence {sequence}.");
+            }
         }
 
         public void Dispose()

@@ -1,17 +1,18 @@
 ﻿using System.Collections.Generic;
+using VariantAnnotation.SA;
 
 namespace SAUtils
 {
     public sealed class SaJsonKeyAnnotation
     {
-        public string Type;
-        public string Category;
+        public JsonDataType Type;
+        public CustomAnnotationCategories Category;
         public string Description;
 
         public IEnumerable<(string, string)> GetDefinedAnnotations()
         {
-            if (Type != null) yield return ("type", Type);
-            if (Category != null) yield return ("category", Category);
+            yield return ("type", Type.ToTypeString());
+            if (Category != CustomAnnotationCategories.Unknown) yield return ("category", Category.ToString());
             if (Description != null) yield return ("description", Description);
         }
     }

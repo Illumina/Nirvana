@@ -78,52 +78,58 @@ namespace Nirvana
             var nsaReaders = new List<INsaReader>();
             var nsiReaders = new List<INsiReader>();
 
-            if (dataAndIndexFiles != null)
-                foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
-                {
-                    if (dataFile.EndsWith(SaCommon.SaFileSuffix))
-                        nsaReaders.Add(GetNsaReader(PersistentStreamUtils.GetReadStream(dataFile),
-                            PersistentStreamUtils.GetReadStream(indexFile)));
-                    if (dataFile.EndsWith(SaCommon.SiFileSuffix))
-                        nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
-                }
+            if (dataAndIndexFiles != null) GetSaReaders(dataAndIndexFiles, nsaReaders, nsiReaders);
 
-            if (annotationsInS3 != null)
-                foreach (var annotation in annotationsInS3)
-                {
-                    if (annotation.path.EndsWith(SaCommon.SaFileSuffix))
-                        nsaReaders.Add(GetNsaReader(PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0),
-                            PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path + SaCommon.IndexSufix, 0)));
-                    else
-                    {
-                        nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0)));
-                    }
-                }
+            if (annotationsInS3 != null) GetSaReadersFromS3(s3Client, annotationsInS3, nsaReaders, nsiReaders);
 
             if (nsaReaders.Count > 0 || nsiReaders.Count > 0)
                 return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());
             return null;
         }
 
+        private static void GetSaReadersFromS3(AmazonS3Client s3Client, List<S3Path> annotationsInS3, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
+        {
+            foreach (var annotation in annotationsInS3)
+            {
+                if (annotation.path.EndsWith(SaCommon.SaFileSuffix))
+                    nsaReaders.Add(GetNsaReader(
+                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0),
+                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName,
+                            annotation.path + SaCommon.IndexSufix, 0)));
+                else
+                {
+                    nsiReaders.Add(GetNsiReader(
+                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0)));
+                }
+            }
+        }
+
+        private static void GetSaReaders(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
+        {
+            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
+            {
+                if (dataFile.EndsWith(SaCommon.SaFileSuffix))
+                    nsaReaders.Add(
+                        GetNsaReader(PersistentStreamUtils.GetReadStream(dataFile),
+                        PersistentStreamUtils.GetReadStream(indexFile))
+                        );
+                if (dataFile.EndsWith(SaCommon.SiFileSuffix))
+                    nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
+            }
+        }
+
         public static IList<(string dataFile, string indexFile)> GetSaDataAndIndexPaths(string saDirectoryPath)
         {
-            var paths = new List<(string, string)>();
             if (Directory.Exists(saDirectoryPath))
-            {
-                foreach (var filePath in Directory.GetFiles(saDirectoryPath))
-                {
-                    if (filePath.EndsWith(SaCommon.SaFileSuffix) || filePath.EndsWith(SaCommon.PhylopFileSuffix) || filePath.EndsWith(SaCommon.RefMinorFileSuffix))
-                        paths.Add((filePath, filePath + SaCommon.IndexSufix));
-
-                    if (filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
-                        paths.Add((filePath, null));
-                    //skip files with all other extensions
-                }
-                
-                return paths;
-            }
+                return GetLocalSaPaths(saDirectoryPath);
 
             //if this is the saManifest url
+            return GetSaPathsFromManifest(saDirectoryPath);
+        }
+
+        private static IList<(string dataFile, string indexFile)> GetSaPathsFromManifest(string saDirectoryPath)
+        {
+            var paths = new List<(string, string)>();
             using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(saDirectoryPath)))
             {
                 string line;
@@ -131,11 +137,28 @@ namespace Nirvana
                 {
                     if (line.EndsWith(SaCommon.SiFileSuffix) || line.EndsWith(SaCommon.NgaFileSuffix))
                         paths.Add((line, null));
-                    else paths.Add((line, line+SaCommon.IndexSufix));
+                    else paths.Add((line, line + SaCommon.IndexSufix));
                 }
             }
 
-            return paths;
+            return paths.Count > 0 ? paths : null;
+        }
+
+        private static List<(string, string)> GetLocalSaPaths(string saDirectoryPath)
+        {
+            var paths = new List<(string, string)>();
+            foreach (var filePath in Directory.GetFiles(saDirectoryPath))
+            {
+                if (filePath.EndsWith(SaCommon.SaFileSuffix) || filePath.EndsWith(SaCommon.PhylopFileSuffix) ||
+                    filePath.EndsWith(SaCommon.RefMinorFileSuffix))
+                    paths.Add((filePath, filePath + SaCommon.IndexSufix));
+
+                if (filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
+                    paths.Add((filePath, null));
+                //skip files with all other extensions
+            }
+
+            return paths.Count>0? paths:null;
         }
 
         public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path,

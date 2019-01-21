@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ErrorHandling.Exceptions;
 using OptimizedCore;
-using VariantAnnotation.Interface;
 using VariantAnnotation.IO;
+using VariantAnnotation.SA;
 
 namespace SAUtils
 {
-    public sealed class SaJsonSchema : ISaJsonSchema
+    public sealed class SaJsonSchema
     {
         private const string SchemaVersion = "http://json-schema.org/draft-06/schema#";
 
@@ -48,8 +49,8 @@ namespace SAUtils
         private void AddDefaultType() => _jsonObject.AddStringValue("type", "object");
 
         public void Count(string key) => KeyCounts[key]++;
-        public string GetJsonType(string key) => _keyAnnotation[key].Type;
-        private string GetCategory(string key) => _keyAnnotation[key].Category;
+        public JsonDataType GetJsonType(string key) => _keyAnnotation[key].Type;
+        private CustomAnnotationCategories GetCategory(string key) => _keyAnnotation[key].Category;
 
         public void AddAnnotation(string key, SaJsonKeyAnnotation annotation)
         {
@@ -72,7 +73,7 @@ namespace SAUtils
                 int counts = KeyCounts[key];
                 if (counts == 0) continue;
                 // boolean is always considered as optional
-                if (counts == TotalItems && GetJsonType(key) != "boolean") requiredKeys.Add(key);
+                if (counts == TotalItems && GetJsonType(key) != JsonDataType.Bool) requiredKeys.Add(key);
 
                 OutputKeyAnnotation(key);
             }
@@ -90,24 +91,25 @@ namespace SAUtils
 
             foreach (string key in Keys)
             {
-                string intendedType = GetJsonType(key);
+                var intendedType = GetJsonType(key);
                 switch (intendedType)
                 {
-                    case "string":
+                    case JsonDataType.String:
                         if (key == "refAllele" || key == "altAllele")
                             actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, VariantAnnotation.Utilities.BaseFormatting.EmptyToDash(value)), key));
                         else
                             actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, value), key));
                         break;
-                    case "boolean":
-                        actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddBoolValue(key, value == "true"), key));
+                    case JsonDataType.Bool:
+                        actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddBoolValue(key, CheckAndGetBoolFromString(value)), key));
                         break;
-                    case "number":
+                    case JsonDataType.Number:
                         actions.Add((jsonObject, value) =>
                         {
-                            string keyCategory = GetCategory(key);
-                            CountKeyIfAdded(keyCategory == "AlleleFrequency"
-                                ? jsonObject.AddDoubleValue(key, double.Parse(value), "0.######") 
+                            var doubleValue = CheckAndGetNullableDoubleFromString(value);
+                            CustomAnnotationCategories keyCategory = GetCategory(key);
+                            CountKeyIfAdded(keyCategory == CustomAnnotationCategories.AlleleFrequency
+                                ? jsonObject.AddDoubleValue(key, doubleValue, "0.######") 
                                 : jsonObject.AddStringValue(key, value, false), key);
                         });
                         break;
@@ -157,6 +159,31 @@ namespace SAUtils
             }
 
             _jsonObject.EndObject();
+        }
+
+        internal static bool CheckAndGetBoolFromString(string value)
+        {
+            switch (value.ToLower())
+            {
+                case "true":
+                    return true;
+                case "false":
+                case "":
+                case ".":
+                    return false;
+                default:
+                    throw new UserErrorException($"{value} is not a valid boolean.");               
+            }
+        }
+
+        internal static double? CheckAndGetNullableDoubleFromString(string value)
+        {
+            if (value == "." || value == "") return null;
+
+            if (double.TryParse(value, out double doubleValue))
+                return doubleValue;
+
+            throw new UserErrorException($"{value} is not a valid number.");
         }
     }
 }

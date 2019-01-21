@@ -138,9 +138,7 @@ namespace SAUtils
                     _memWriter.WriteOptAscii(saItem.AltAllele);
                     _memWriter.Write(saItem.GetJsonString());
                 }
-
             }
-
 
             int numBytes = (int)_memStream.Position;
             if (!_block.HasSpace(numBytes)) Flush(saItems[0].Chromosome.Index);
