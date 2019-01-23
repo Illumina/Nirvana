@@ -123,6 +123,11 @@
       "commandName": "Project",
       "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\custom_SA\\AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd E:\\Nirvana_resources\\test_runs\\custom_SA\\  -o custom",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\custom_SA\\"
+    },
+    "RR_na12878_chr22": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\temp --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-chr22-GRCh37.vcf.gz --out chr22_tm",
+      "workingDirectory": "c:\\Development\\TestDatasets"
     }
   }
 }

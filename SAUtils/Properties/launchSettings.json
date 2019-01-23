@@ -64,6 +64,16 @@
       "commandName": "Project",
       "commandLineArgs": "Custom --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in Test.tsv --out .",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_CA"
+    },
+    "RR_topmed_remap": {
+      "commandName": "Project",
+      "commandLineArgs": "remapWithDbsnp --src Topmed_with_dbsnp.chr22.vcf.gz --des c:\\Development\\ExternalDataSources\\dbSNP\\150\\GRCh37\\chr22.vcf.gz",
+      "workingDirectory": "C:\\Development\\ExternalDataSources\\TopMed"
+    },
+    "RR_build_topmed": {
+      "commandName": "Project",
+      "commandLineArgs": "Topmed --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in Topmed_grch37.vcf.gz --out c:\\Development\\SupplementaryDatabase\\temp",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\TopMed"
     }
   }
 }

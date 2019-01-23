@@ -76,7 +76,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                     items.Add(item);
             }
 
-            SuppDataUtilities.RemoveConflictingAlleles(items);
+            items = SuppDataUtilities.RemoveConflictingAlleles(items);
 
             //two if the items were removed as conflicting items
             Assert.Equal(3,items.Count);
