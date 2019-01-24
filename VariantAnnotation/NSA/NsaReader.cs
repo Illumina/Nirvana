@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
@@ -59,8 +60,6 @@ namespace VariantAnnotation.NSA
         {
             if (positions == null || positions.Count == 0) return;
 
-            int readCount = 0;
-
             _annotations = new AnnotationItem[positions.Count];
             _annotationsCount = 0;
             (long start, _, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
@@ -69,8 +68,7 @@ namespace VariantAnnotation.NSA
 
             for (int i = 0; i < positions.Count && blockCount >0; blockCount--)
             {
-                readCount+= _block.Read(_reader);
-                //if (positions[i] < _block.FirstPosition || _block.LastPosition < positions[i]) continue;
+                _block.Read(_reader);
                 
                 foreach ((int position, byte[] data) annotation in _block.GetAnnotations())
                 {

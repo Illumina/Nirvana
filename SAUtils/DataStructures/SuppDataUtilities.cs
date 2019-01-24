@@ -27,22 +27,31 @@ namespace SAUtils.DataStructures
 
         }
 
-        public static void RemoveConflictingAlleles(List<ISupplementaryDataItem> saItems)
+        public static List<ISupplementaryDataItem> RemoveConflictingAlleles(List<ISupplementaryDataItem> saItems)
         {
-            var allelesSet = new HashSet<(string, string)>();
-            var conflictSet = new HashSet<(string, string)>();
+            var nonDuplicateSet  = new Dictionary<string, ISupplementaryDataItem>();
+            var conflictSet = new List<string>();
+
             foreach (var saItem in saItems)
             {
-                var alleleTuple = (saItem.RefAllele, saItem.AltAllele);
+                var refAlt = saItem.RefAllele+'-'+saItem.AltAllele;
 
-                if (allelesSet.Contains(alleleTuple))
-                    conflictSet.Add(alleleTuple);
-
-                allelesSet.Add(alleleTuple);
+                if (nonDuplicateSet.TryGetValue(refAlt, out var dupItem))
+                {
+                    if (saItem.GetJsonString() != dupItem.GetJsonString())
+                        conflictSet.Add(refAlt);
+                }
+                else nonDuplicateSet.Add(refAlt, saItem);
             }
 
-            saItems.RemoveAll(x => conflictSet.Contains((x.RefAllele, x.AltAllele)));
+            var values = nonDuplicateSet.Values.ToList();
 
+            if (conflictSet.Count > 0)
+            {
+                values.RemoveAll(x => conflictSet.Contains(x.RefAllele + '-' + x.AltAllele));
+            }
+
+            return values;
         }
 
         public static ISupplementaryDataItem GetPositionalAnnotation(IList<ISupplementaryDataItem> saItems)

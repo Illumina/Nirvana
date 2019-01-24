@@ -117,7 +117,6 @@ namespace SAUtils
         private void WritePosition(List<ISupplementaryDataItem> saItems)
         {
             int position = saItems[0].Position;
-
             _memStream.Position = 0;
             if (_isPositional)
             {
@@ -129,7 +128,8 @@ namespace SAUtils
             {
                 // any data source that is reported by allele and is not an array (e.g. allele frequencies) need this filtering step
                 if (_index.MatchByAllele && !_index.IsArray)
-                    SuppDataUtilities.RemoveConflictingAlleles(saItems);
+                    saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems);
+
                 _memWriter.WriteOpt(saItems.Count);
 
                 foreach (ISupplementaryDataItem saItem in saItems)
