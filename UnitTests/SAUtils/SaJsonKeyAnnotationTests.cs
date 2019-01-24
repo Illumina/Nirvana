@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using SAUtils;
+using VariantAnnotation.SA;
 using Xunit;
 
 namespace UnitTests.SAUtils
@@ -10,7 +11,7 @@ namespace UnitTests.SAUtils
         public void GetDefinedAnnotations_AsExpected()
         {
             var keyAnnotation =
-                new SaJsonKeyAnnotation {Type = "number", Description = "No category defined"};
+                new SaJsonKeyAnnotation {Type = JsonDataType.Number, Description = "No category defined"};
 
             var definedAnnotations = keyAnnotation.GetDefinedAnnotations().ToArray();
             
@@ -19,13 +20,13 @@ namespace UnitTests.SAUtils
         }
 
         [Fact]
-        public void GetDefinedAnnotations_EmptyOutput_WhenEveryThingIsNull()
+        public void GetDefinedAnnotations_OnlyTypeDefinedAsString_WhenEveryThingIsNull()
         {
             var keyAnnotation = new SaJsonKeyAnnotation();
-            var definedAnnotations = keyAnnotation.GetDefinedAnnotations();
+            var definedAnnotations = keyAnnotation.GetDefinedAnnotations().ToArray();
 
-            Assert.Empty(definedAnnotations);
+            Assert.Single(definedAnnotations);
+            Assert.Equal(("type", "string"), definedAnnotations[0]);
         }
-
     }
 }

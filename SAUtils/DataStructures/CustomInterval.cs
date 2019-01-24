@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Genome;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.SA;
 using Variants;
 
@@ -14,17 +13,17 @@ namespace SAUtils.DataStructures
         public VariantType VariantType { get; }
 
         private readonly List<string> _values;
-        private readonly ISaJsonSchema _jsonSchema;
+        private readonly SaJsonSchema _jsonSchema;
 
 
         /// <summary>
         /// constructor
         /// </summary>
-        public CustomInterval(IChromosome chromosome, List<string> values, ISaJsonSchema jsonSchema)
+        public CustomInterval(IChromosome chromosome, int start, int end, List<string> values, SaJsonSchema jsonSchema)
         {
             Chromosome      = chromosome;
-            Start           = int.Parse(values[0]);
-            End             = int.Parse(values[1]);
+            Start           = start;
+            End             = end;
             VariantType     = VariantType.structural_alteration;
             _values         = values;
             _jsonSchema     = jsonSchema;

@@ -63,7 +63,7 @@ namespace SAUtils.Custom
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             
             List<CustomInterval> intervals;
-            ISaJsonSchema intervalJsonSchema;
+            SaJsonSchema intervalJsonSchema;
             string jsonTag;
             DataSourceVersion version;
             string outputPrefix = GetOutputPrefix(_inputFile);
@@ -82,8 +82,8 @@ namespace SAUtils.Custom
                                 SaCommon.SchemaVersion,
                                 false// is positional
                                 ))
-            using (var jsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
-            using (var schemaWriter = new StreamWriter(jsonSchemaStream))
+            using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 jsonTag = customReader.JsonTag;
                 nsaWriter.Write(customReader.GetItems(), true);
@@ -97,8 +97,8 @@ namespace SAUtils.Custom
 
             using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix)))
             using (var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsiStream), version, referenceProvider.Assembly, jsonTag, ReportFor.AllVariants, SaCommon.SchemaVersion))
-            using (var jsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))
-            using (var schemaWriter = new StreamWriter(jsonSchemaStream))
+            using (var siJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var schemaWriter = new StreamWriter(siJsonSchemaStream))
             {
                 nsiWriter.Write(intervals);
                 schemaWriter.Write(intervalJsonSchema);

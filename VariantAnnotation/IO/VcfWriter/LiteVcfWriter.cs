@@ -36,31 +36,9 @@ namespace VariantAnnotation.IO.VcfWriter
 
         #region IDisposable
 
-        private bool _isDisposed;
-
         public void Dispose()
         {
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// protected implementation of Dispose pattern. 
-        /// </summary>
-        private void Dispose(bool disposing)
-        {
-            lock (this)
-            {
-                if (_isDisposed) return;
-
-                if (disposing)
-                {
-                    // Free any other managed objects here. 
-                    _writer.Dispose();
-                }
-
-                // Free any unmanaged objects here. 
-                _isDisposed = true;
-            }
+            _writer?.Dispose();
         }
 
         #endregion
