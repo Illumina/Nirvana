@@ -66,24 +66,33 @@ namespace VariantAnnotation.NSA
             if (start == -1) return;
             _reader.BaseStream.Position = start;
 
-            for (int i = 0; i < positions.Count && blockCount >0; blockCount--)
+            var posIndex = 0;
+            while (blockCount > 0 && posIndex < positions.Count)
             {
                 _block.Read(_reader);
-                
-                foreach ((int position, byte[] data) annotation in _block.GetAnnotations())
-                {
-                    if (annotation.position < positions[i]) continue;
-
-                    while (i < positions.Count && positions[i] < annotation.position) i++;
-                    if (i >= positions.Count) break;
-
-                    var position = positions[i];
-
-                    if (position != annotation.position) continue;
-
-                    _annotations[_annotationsCount++] = new AnnotationItem(position, annotation.data);
-                }
+                posIndex = GetAnnotationsFrom(_block, positions, posIndex);
+                blockCount--;
             }
+            
+        }
+
+        private int GetAnnotationsFrom(NsaBlock block, List<int> positions, int i)
+        {
+            foreach ((int position, byte[] data) annotation in _block.GetAnnotations())
+            {
+                if (annotation.position < positions[i]) continue;
+
+                while (i < positions.Count && positions[i] < annotation.position) i++;
+                if (i >= positions.Count) break;
+
+                var position = positions[i];
+
+                if (position != annotation.position) continue;
+
+                _annotations[_annotationsCount++] = new AnnotationItem(position, annotation.data);
+            }
+
+            return i;
         }
 
         private IEnumerable<(string refAllele, string altAllele, string jsonString)> ExtractAnnotations(byte[] data)
