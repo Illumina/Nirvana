@@ -128,6 +128,11 @@
       "commandName": "Project",
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\temp --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-chr22-GRCh37.vcf.gz --out chr22_tm",
       "workingDirectory": "c:\\Development\\TestDatasets"
+    },
+    "SK TITIN_OOM": {
+      "commandName": "Project",
+      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\temp\\dragen-joint.hard-filtered.vcf.gz -o TITIN_OOM",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_OOM_2019"
     }
   }
 }
