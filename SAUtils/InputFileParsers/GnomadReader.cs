@@ -45,16 +45,12 @@ namespace SAUtils.InputFileParsers
 	    private int[] _hcSas;
 
         private int? _totalDepth;
-	    private bool _hasFailedFilters;
-
 
 		public GnomadReader(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict) 
 		{
-			_reader = streamReader;
+			_reader       = streamReader;
 		    _refChromDict = refChromDict;
 		}
-
-        
 
 		private void Clear()
 		{
@@ -89,7 +85,6 @@ namespace SAUtils.InputFileParsers
 		    _hcSas = null;
 
             _totalDepth = null;
-		    _hasFailedFilters = false;
 		}
 
 		/// <summary>
@@ -97,7 +92,7 @@ namespace SAUtils.InputFileParsers
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-		public IEnumerable<GnomadItem> GetGnomadItems()
+		public IEnumerable<GnomadItem> GetItems()
 		{
 			using (_reader)
 			{
@@ -105,7 +100,7 @@ namespace SAUtils.InputFileParsers
 				while ((line = _reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (string.IsNullOrWhiteSpace(line)) continue;
+					if (line.IsWhiteSpace()) continue;
 					// Skip comments.
 					if (line.OptimizedStartsWith('#')) continue;
 					var gnomadItemsList = ExtractItems(line);
@@ -143,7 +138,8 @@ namespace SAUtils.InputFileParsers
 		    var filters    = splitLine[VcfCommon.FilterIndex];
 			var infoFields = splitLine[VcfCommon.InfoIndex];
 
-		    _hasFailedFilters = !(filters.Equals("PASS") || filters.Equals("."));
+		    var hasFailedFilters = !(filters.Equals("PASS") || filters.Equals("."));
+
             // parses the info fields and extract frequencies, coverage, num samples.
 		    try
 		    {
@@ -176,7 +172,7 @@ namespace SAUtils.InputFileParsers
 			        GetCount(_acSas, i),
 					GetCount(_hcAll, i), GetCount(_hcAfr, i), GetCount(_hcAmr, i), GetCount(_hcEas, i), GetCount(_hcFin, i),
 					GetCount(_hcNfe, i), GetCount(_hcOth, i), GetCount(_hcAsj, i), GetCount(_hcSas, i),
-                    _hasFailedFilters)
+				    hasFailedFilters)
 					);
 			}
 			return gnomadItemsList;

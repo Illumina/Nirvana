@@ -20,7 +20,7 @@ namespace Phantom.PositionCollections
         public AlleleSet AlleleSet { get; private set; }
         public Dictionary<AlleleBlock, List<SampleHaplotype>> AlleleBlockToSampleHaplotype { get; private set; }
         private HashSet<int>[] _allelesWithUnsupportedTypes;
-        private string[,][] _sampleInfo;
+        private SampleInfo _sampleInfo;
         public TagInfo<string> GqInfo;
         public TagInfo<string> PsInfo;
         public TagInfo<Genotype> GtInfo;
@@ -54,7 +54,7 @@ namespace Phantom.PositionCollections
             return positionSet;
         }
 
-        private static string[,][] GetSampleInfo(PositionSet positionSet)
+        private static SampleInfo GetSampleInfo(PositionSet positionSet)
         {
             var sampleInfo = new string[positionSet._numPositions, positionSet.NumSamples][];
             for (var i = 0; i < positionSet._numPositions; i++)
@@ -65,7 +65,7 @@ namespace Phantom.PositionCollections
                     sampleInfo[i, sampleIndex] = positionSet.SimplePositions[i].VcfFields[sampleColIndex].OptimizedSplit(':');
                 }
             }
-            return sampleInfo;
+            return new SampleInfo(sampleInfo);
         }
 
         private static AlleleSet GenerateAlleleSet(PositionSet positionSet)
@@ -207,10 +207,10 @@ namespace Phantom.PositionCollections
             Values = values;
         }
 
-        public static TagInfo<T> GetTagInfo(string[,][] positionSetSampleInfo, int[] tagIndexes, Func<int, string[], string> tagExtractionMethod, Func<string, T> tagProcessingMethod)
+        public static TagInfo<T> GetTagInfo(SampleInfo positionSetSampleInfo, int[] tagIndexes, Func<int, string[], string> tagExtractionMethod, Func<string, T> tagProcessingMethod)
         {
-            int numPositions = positionSetSampleInfo.GetLength(0);
-            int numSamples = positionSetSampleInfo.GetLength(1);
+            int numPositions = positionSetSampleInfo.NumPositions;
+            int numSamples = positionSetSampleInfo.NumSamples;
             if (numPositions != tagIndexes.Length) throw new InvalidDataException($"The inconsistent numbers of positions: {numPositions} in sample info array, {tagIndexes.Length} in GQ index array");
             var tagInfo = new T[numSamples][];
             for (int sampleIndex = 0; sampleIndex < numSamples; sampleIndex++)
@@ -218,7 +218,7 @@ namespace Phantom.PositionCollections
                 tagInfo[sampleIndex] = new T[numPositions];
                 for (var i = 0; i < numPositions; i++)
                 {
-                    tagInfo[sampleIndex][i] = tagProcessingMethod(tagExtractionMethod(tagIndexes[i], positionSetSampleInfo[i, sampleIndex]));
+                    tagInfo[sampleIndex][i] = tagProcessingMethod(tagExtractionMethod(tagIndexes[i], positionSetSampleInfo.Values[i, sampleIndex]));
                 }
             }
             return new TagInfo<T>(tagInfo);

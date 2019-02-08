@@ -13,14 +13,24 @@ namespace UnitTests.TestUtilities
     public static class AnnotationUtilities
 	{
         internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
-            string vcfLine, bool enableVerboseTranscripts, IDictionary<string, IChromosome> refNameToChromosome)
+            string vcfLine)
         {
-            var refMinorProvider = ProviderUtilities.GetRefMinorProvider(refNameToChromosome, saPaths);
-            var annotatorAndRef = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
+            List<(string dataFile, string indexFile)> dataAndIndexPaths = null;
+            if(saPaths!=null)
+            {
+                dataAndIndexPaths = new List<(string dataFile, string indexFile)>();
+                foreach (var saPath in saPaths)
+                {
+                    dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saPath));
+                }
+            }
 
-            var annotator      = annotatorAndRef.Annotator;
-            var refNames       = annotatorAndRef.RefNames;
-            var variantFactory = new VariantFactory(refNames, enableVerboseTranscripts);
+            var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
+            var annotatorAndRef   = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
+
+            var annotator         = annotatorAndRef.Annotator;
+            var refNames          = annotatorAndRef.RefNames;
+            var variantFactory    = new VariantFactory(refNames);
 
             var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
             var annotatedPosition = annotator.Annotate(position);
@@ -36,12 +46,23 @@ namespace UnitTests.TestUtilities
 
         private static (Annotator Annotator, IDictionary<string, IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
         {
-            var sequenceFilePath             = cacheFilePrefix + ".bases";
-            var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
-            var refNames                     = sequenceProvider.RefNameToChromosome;
-            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
-            var saProvider                   = ProviderUtilities.GetSaProvider(saPaths);
-            var conservationProvider         = ProviderUtilities.GetConservationProvider(saPaths);
+            List<(string dataFile, string indexFile)> dataAndIndexPaths = null;
+            if (saPaths != null)
+            {
+                dataAndIndexPaths = new List<(string dataFile, string indexFile)>();
+                foreach (var saPath in saPaths)
+                {
+                    dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saPath));
+                }
+
+            }
+
+            var sequenceFilePath                 = cacheFilePrefix + ".bases";
+            var sequenceProvider                 = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
+            var refNames                         = sequenceProvider.RefNameToChromosome;
+            var transcriptAnnotationProvider     = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
+            var saProvider                       = ProviderUtilities.GetNsaProvider(dataAndIndexPaths, null, null);
+            var conservationProvider             = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);
             return (annotator,refNames);

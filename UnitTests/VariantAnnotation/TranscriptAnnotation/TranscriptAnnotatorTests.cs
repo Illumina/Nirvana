@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Genome;
+﻿using Genome;
 using Intervals;
 using Moq;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -12,77 +11,79 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
     public sealed class TranscriptAnnotatorTests
     {
         [Fact]
-        public void NonOverlap_transcript_get_no_annotation()
+        public void DecideAnnotationStatus_NoOverlap_ReturnNoAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 101),
-                new Interval(5102, 6100), new AnnotationBehavior(true, false, false, true, false, false), new Interval(5102, 6100));
+                new Interval(5102, 6100), new AnnotationBehavior(true, false, false, true, false));
 
             Assert.Equal(TranscriptAnnotationFactory.Status.NoAnnotation, observedStatus);
         }
 
         [Fact]
-        public void When_reducedTranscriptAnnotation_and_gene_is_completely_overlapped_with_variant_get_SvCompleteOverlapAnnotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false, false), new Interval(102, 305));
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.SvCompleteOverlapAnnotation, observedStatus);
-        }
-
-        [Fact]
-        public void When_reducedTranscriptAnnotation_and_transcript_completely_overlapped_variant_but_gene_partial_overlap_get_reducedAnnotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false, false), new Interval(102, 503));
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.ReducedAnnotation, observedStatus);
-        }
-        [Fact]
-        public void When_not_reducedTranscriptAnnotation_completely_overlapped_variant_get_full_annotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), new AnnotationBehavior(false, true, false, false, false, false), new Interval(102, 305));
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
-        }
-
-        [Fact]
-        public void When_reducedTranscriptAnnotation_partially_overlapped_variant_and_gene_partial_overlapped_get_reduced_annotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 200),
-                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false, false), new Interval(102, 305));
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.ReducedAnnotation, observedStatus);
-        }
-
-        [Fact]
-        public void When_not_reducedTranscriptAnnotation_partially_overlapped_variant_get_full_annotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 105),
-                new Interval(102, 305), new AnnotationBehavior(false, true, false, false, false, false), new Interval(102, 305));
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
-        }
-
-        [Fact]
-        public void When_needFlankingTranscript_flankingTranscript_get_flankingAnnotation()
+        public void DecideAnnotationStatus_Flanking_ReturnFlankingAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 100),
-                new Interval(102, 305), new AnnotationBehavior(false, true, false, true, false, false), new Interval(102, 305));
+                new Interval(102, 305), new AnnotationBehavior(false, true, false, true, false));
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FlankingAnnotation, observedStatus);
         }
 
         [Fact]
-        public void Annotate_return_null_when_no_flanking_over_transcript()
+        public void DecideAnnotationStatus_Reduced_TranscriptCompleteOverlap_ReturnSvCompleteOverlapAnnotation()
         {
-            var variant = new Mock<IVariant>();
+            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
+                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false));
+
+            Assert.Equal(TranscriptAnnotationFactory.Status.CompleteOverlapAnnotation, observedStatus);
+        }
+
+        // the only thing that matters now is overlap w.r.t. the transcript (not gene)
+        [Fact]
+        public void DecideAnnotationStatus_Reduced_TranscriptCompleteOverlap_GenePartialOverlap_ReturnSvCompleteOverlapAnnotation()
+        {
+            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
+                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false));
+
+            Assert.Equal(TranscriptAnnotationFactory.Status.CompleteOverlapAnnotation, observedStatus);
+        }
+
+        [Fact]
+        public void DecideAnnotationStatus_Reduced_TranscriptPartialOverlap_ReturnReducedAnnotation()
+        {
+            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 200),
+                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false));
+
+            Assert.Equal(TranscriptAnnotationFactory.Status.ReducedAnnotation, observedStatus);
+        }
+
+        [Fact]
+        public void DecideAnnotationStatus_Full_PartialOverlap_ReturnFullAnnotation()
+        {
+            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 105),
+                new Interval(102, 305), new AnnotationBehavior(false, true, false, false, false));
+
+            Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
+        }
+
+        [Fact]
+        public void DecideAnnotationStatus_Full_CompleteOverlap_ReturnFullAnnotation()
+        {
+            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
+                new Interval(102, 305), new AnnotationBehavior(false, true, false, false, false));
+
+            Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
+        }
+
+        [Fact]
+        public void GetAnnotatedTranscripts_ReturnEmptyList()
+        {
+            var variant     = new Mock<IVariant>();
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
             var transcripts = new[] { transcript1.Object, transcript2.Object };
 
-            variant.SetupGet(x => x.Behavior).Returns(new AnnotationBehavior(true, false, false, true, false, false));
+            variant.SetupGet(x => x.Behavior).Returns(new AnnotationBehavior(true, false, false, true, false));
             variant.SetupGet(x => x.Start).Returns(123456);
             variant.SetupGet(x => x.End).Returns(123456);
 
@@ -99,9 +100,10 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript2.SetupGet(x => x.Gene.End).Returns(129489);
 
             var compressedSequence = new Mock<ISequence>();
-            var observedAnnotatedTranscripts = new List<IAnnotatedTranscript>();
 
-            TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts, compressedSequence.Object, observedAnnotatedTranscripts, null, null, null, null);
+            var observedAnnotatedTranscripts =
+                TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts,
+                    compressedSequence.Object, null, null);
 
             Assert.Empty(observedAnnotatedTranscripts);
         }

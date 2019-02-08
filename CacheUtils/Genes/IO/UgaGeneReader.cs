@@ -59,6 +59,7 @@ namespace CacheUtils.Genes.IO
 
             var grch37 = new Interval(start37, end37);
             var grch38 = new Interval(start38, end38);
+
             return new UgaGene(chromosome, grch37, grch38, onReverseStrand, entrezGeneId, ensemblId, symbol, hgncId);
         }
     }

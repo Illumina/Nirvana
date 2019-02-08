@@ -25,11 +25,11 @@ namespace Jasix.DataStructures
         public JasixChrIndex(ExtendedBinaryReader reader) : this("")
         {
             ReferenceSequence = reader.ReadAsciiString();
-            var count = reader.ReadOptInt32();
+            int count = reader.ReadOptInt32();
             for (var i = 0; i < count; i++)
                 _nodes.Add(new JasixNode(reader));
 
-            var intervalCount = reader.ReadOptInt32();
+            int intervalCount = reader.ReadOptInt32();
             if (intervalCount == 0) return;
 
             for (var i = 0; i < intervalCount; i++)
@@ -40,9 +40,9 @@ namespace Jasix.DataStructures
 
         private static Interval<long> ReadInterval(ExtendedBinaryReader reader)
         {
-            var begin    = reader.ReadOptInt32();
-            var end      = reader.ReadOptInt32();
-            var position = reader.ReadOptInt64();
+            int begin    = reader.ReadOptInt32();
+            int end      = reader.ReadOptInt32();
+            long position = reader.ReadOptInt64();
 
             return new Interval<long>(begin, end, position);
         }
@@ -117,7 +117,7 @@ namespace Jasix.DataStructures
 
 	    private JasixNode FindFirstOverlappingNode(JasixNode searchNode)
 	    {
-		    var index = _nodes.BinarySearch(searchNode);
+		    int index = _nodes.BinarySearch(searchNode);
 
 		    if (index < 0)
 			    index = ~index;

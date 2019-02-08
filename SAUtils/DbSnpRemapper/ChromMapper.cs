@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Compression.Utilities;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
@@ -14,6 +15,8 @@ namespace SAUtils.DbSnpRemapper
         private readonly Dictionary<string, StreamWriter> _writers;
         private readonly StreamWriter _leftoverWriter;
         private int _leftoverCount;
+        private Dictionary<long, (int position, string refAllele, string[] altAlleles)> _destinationVariants;
+        private int _alleleMismatchCount;
         
         public ChromMapper(StreamReader srcReader, StreamReader destReader, StreamWriter leftoverWriter)
         {
@@ -21,7 +24,9 @@ namespace SAUtils.DbSnpRemapper
             _destReader = destReader;
             _writers = new Dictionary<string, StreamWriter>();
             _leftoverWriter = leftoverWriter; 
+            _destinationVariants = new Dictionary<long, (int position, string refAllele, string[] altAlleles)>();
         }
+
 
         public Dictionary<string, StreamWriter> Map()
         {
@@ -43,12 +48,12 @@ namespace SAUtils.DbSnpRemapper
 
                 // dictionary of leftover rsIds from previous chromosomes
                 
-                var destRsidLocations = new Dictionary<long, int>();
+                //var destRsidLocations = new Dictionary<long, int>();
                 while (destLine != null && srcLine!=null)
                 {
-                    destRsidLocations.Clear();
-                    destLine = GetNextChromDestinations(destLine, destRsidLocations);
-                    srcLine = ProcessNextChromSource(srcLine, destRsidLocations);
+                    _destinationVariants.Clear();
+                    destLine = GetNextChromDestinations(destLine);
+                    srcLine = ProcessNextChromSource(srcLine);
                 }                
             }
 
@@ -57,7 +62,7 @@ namespace SAUtils.DbSnpRemapper
             return _writers;
         }
 
-        private string ProcessNextChromSource(string line, IDictionary<long, int> destRsidLocations)
+        private string ProcessNextChromSource(string line)
         {
             //extracting current chrom info from first line provided
             var currentChrom = line.Split('\t', 2)[VcfCommon.ChromIndex];
@@ -65,24 +70,40 @@ namespace SAUtils.DbSnpRemapper
             var leftoverCount=0;
             do
             {
-                var splits = line.Split('\t', 4);
+                var splits = line.Split('\t', VcfCommon.InfoIndex);
                 var chrom = splits[VcfCommon.ChromIndex];
                 if (chrom != currentChrom) break;
-
+                var refAllele = splits[VcfCommon.RefIndex];
+                var altAlleles = splits[VcfCommon.AltIndex].Split(',');
+                
                 var rsIds = Utilities.GetRsids(splits[VcfCommon.IdIndex]);
 
                 if (rsIds == null) continue;
-
+                
                 var foundInDest = false;
+                var hasAlleleMismatch = false;
                 foreach (var rsId in rsIds)
                 {
-                    if (! destRsidLocations.TryGetValue(rsId, out var location)) continue;
-                    WriteRemappedEntry(chrom, location, line);
-                    destRsidLocations[rsId] = destRsidLocations[rsId] >= 0 ? -destRsidLocations[rsId] : destRsidLocations[rsId]; //flipping the sign to indicate it has been mapped
+                    if(rsId== 5992058)
+                        Console.WriteLine("bug");
+                    if (! _destinationVariants.TryGetValue(rsId, out var variant)) continue;
+                    if (//variant.position < 0 || 
+                        refAllele != variant.refAllele ||
+                        ! Utilities.HasCommonAlleles(altAlleles, variant.altAlleles))
+                    {
+                        _alleleMismatchCount++;
+                        hasAlleleMismatch = true;
+                        continue;
+                    }
+
+                    WriteRemappedEntry(chrom, variant.position, line);
+                    //flipping the sign to indicate it has been mapped
+                    //_destinationVariants[rsId] = (-variant.position, variant.refAllele, variant.altAlleles);
+
                     foundInDest = true;
                 }
 
-                if (foundInDest) continue;
+                if (foundInDest || hasAlleleMismatch) continue;
 
                 _leftoverWriter.WriteLine(line);
                 leftoverCount++;
@@ -91,11 +112,12 @@ namespace SAUtils.DbSnpRemapper
 
             
             Console.WriteLine($"Leftover count for {currentChrom}: {leftoverCount}");
+            Console.WriteLine($"Number of entries discarded due to allele mismatch: {_alleleMismatchCount}");
             _leftoverCount += leftoverCount;
             return line;
         }
 
-        private string GetNextChromDestinations(string line, IDictionary<long, int> rsIdLocations)
+        private string GetNextChromDestinations(string line)
         {
             //extracting current chrom info from first line provided
             var currentChrom = line.Split('\t', 2)[VcfCommon.ChromIndex];
@@ -103,10 +125,12 @@ namespace SAUtils.DbSnpRemapper
 
             do
             {
-                var splits = line.Split('\t', 4);
+                var splits = line.Split('\t', VcfCommon.InfoIndex);
                 var chrom = splits[VcfCommon.ChromIndex];
                 if (chrom != currentChrom) break;
 
+                var refAllele = splits[VcfCommon.RefIndex];
+                var altAlleles = splits[VcfCommon.AltIndex].Split(',');
                 var position = int.Parse(splits[VcfCommon.PosIndex]);
                 var rsIds = Utilities.GetRsids(splits[VcfCommon.IdIndex]);
 
@@ -114,13 +138,13 @@ namespace SAUtils.DbSnpRemapper
 
                 foreach (var rsId in rsIds)
                 {
-                   rsIdLocations.Add(rsId, position);
+                   _destinationVariants.Add(rsId, (position, refAllele, altAlleles));
                 }
 
             } while ((line = _destReader.ReadLine()) != null);
 
             
-            Console.WriteLine($"{rsIdLocations.Count} found.");
+            Console.WriteLine($"{_destinationVariants.Count} rsIds found.");
 
             return line;
         }

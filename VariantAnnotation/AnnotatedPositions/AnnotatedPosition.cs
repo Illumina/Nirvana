@@ -2,8 +2,8 @@
 using System.Linq;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 using Variants;
 
@@ -14,7 +14,7 @@ namespace VariantAnnotation.AnnotatedPositions
         public IPosition Position { get; }
         public string CytogeneticBand { get; set; }
         public IAnnotatedVariant[] AnnotatedVariants { get; }
-        public IList<IAnnotatedSupplementaryInterval> SupplementaryIntervals { get; } = new List<IAnnotatedSupplementaryInterval>();
+        public IList<ISupplementaryAnnotation> SupplementaryIntervals { get; } = new List<ISupplementaryAnnotation>();
 
         public AnnotatedPosition(IPosition position, IAnnotatedVariant[] annotatedVariants)
         {
@@ -66,7 +66,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
 			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
 
-			if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
+            if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
                 AddSuppIntervalToJsonObject(jsonObject);
 
 			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
@@ -88,19 +88,9 @@ namespace VariantAnnotation.AnnotatedPositions
 
         private void AddSuppIntervalToJsonObject(JsonObject jsonObject)
         {
-            var saDict = new Dictionary<string, List<string>>();
             foreach (var si in SupplementaryIntervals)
             {
-                if (!saDict.ContainsKey(si.SupplementaryInterval.KeyName))
-                {
-                    saDict[si.SupplementaryInterval.KeyName] = new List<string>();
-                }
-                saDict[si.SupplementaryInterval.KeyName].Add(si.ToString());
-            }
-
-            foreach (var kvp in saDict)
-            {
-                jsonObject.AddStringValues(kvp.Key, kvp.Value.ToArray(), false);
+                jsonObject.AddStringValue(si.JsonKey, si.GetJsonString(), false);
             }
         }
     }

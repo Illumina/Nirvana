@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Compression.FileHandling;
-using IO;
 using Jasix;
 using Jasix.DataStructures;
 using OptimizedCore;
-using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -18,34 +17,47 @@ namespace VariantAnnotation.IO
         private bool _firstEntry;
         private bool _positionFieldClosed;
 
-        
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
-        
-        public JsonWriter(StreamWriter writer, string jasixFileName, string annotator, string creationTime, string vepDataVersion,
+
+        private JsonWriter(Stream jsonStream, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
+            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames) : this(GetProperWriter(jsonStream), indexStream, annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames)
+        {
+        }
+
+        public JsonWriter(Stream jsonStream, Stream indexStream, IAnnotationResources annotationResources, string creationTime, string[] sampleNames) : this(jsonStream, indexStream, annotationResources.AnnotatorVersionTag, creationTime, annotationResources.VepDataVersion, annotationResources.DataSourceVersions, annotationResources.SequenceProvider.Assembly.ToString(), sampleNames)
+        {
+        }
+
+        private static StreamWriter GetProperWriter(Stream jsonStream) => jsonStream is BlockGZipStream
+            ? new BgzipTextWriter((BlockGZipStream)jsonStream)
+            : new StreamWriter(jsonStream);
+
+        public JsonWriter(StreamWriter writer, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
             List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
         {
-            _writer         = writer;
-            _writer.NewLine = "\n";
-            _firstEntry     = true;
+            _writer              = writer;
+            _writer.NewLine      = "\n";
+            _firstEntry          = true;
             _positionFieldClosed = false;
 
             _bgzipTextWriter = writer as BgzipTextWriter;
-            
+
             _jasixIndexCreator = _bgzipTextWriter != null
-                ? new OnTheFlyIndexCreator(FileUtilities.GetCreateStream(jasixFileName))
+                ? new OnTheFlyIndexCreator(indexStream)
                 : null;
 
             WriteHeader(annotator, creationTime, genomeAssembly, JsonCommon.SchemaVersion, vepDataVersion,
                 dataSourceVersions, sampleNames);
         }
 
+
         private void WriteHeader(string annotator, string creationTime, string genomeAssembly, int schemaVersion,
-            string vepDataVersion, List<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
+            string vepDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
         {
             _jasixIndexCreator?.BeginSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position);
 
-            var sb = StringBuilderCache.Acquire();
+            var sb         = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             sb.Append($"{{\"{JasixCommons.HeaderSectionTag}\":{{");
@@ -61,14 +73,15 @@ namespace VariantAnnotation.IO
             sb.Append($"}},\"{JasixCommons.PositionsSectionTag}\":[\n");
 
             _writer.Write(StringBuilderCache.GetStringAndRelease(sb));
-            _writer.Flush();//closing the block
-            _jasixIndexCreator?.EndSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position-1);
+            _writer.Flush();
+            _jasixIndexCreator?.EndSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position - 1);
         }
 
         public void Dispose()
         {
             WriteFooter();
             _jasixIndexCreator?.Dispose();
+            _writer.Flush();
             _writer.Dispose();
         }
 
@@ -83,41 +96,41 @@ namespace VariantAnnotation.IO
             _writer.Write(entry);
         }
 
-        public void WriteAnnotatedGenes(IEnumerable<IAnnotatedGene> annotatedGenes)
+        public void WriteAnnotatedGenes(IEnumerable<string> annotatedGenes)
         {
             _positionFieldClosed = true;
-            _writer.Flush();//closing the last block for positions section
+            _writer.Flush();
             _jasixIndexCreator?.EndSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position - 1);
 
-            _writer.WriteLine();
-            _writer.Write($"],\"{JasixCommons.GenesSectionTag}\":[\n");
-            _writer.Flush();//creating a tiny block for the genes section label
+            _writer.Write("\n]");
+
+            if (annotatedGenes == null) return;
+            _writer.Write($",\"{JasixCommons.GenesSectionTag}\":[\n");
+            _writer.Flush();
 
             _jasixIndexCreator?.BeginSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position);
-            var sb = StringBuilderCache.Acquire();
+
+            var sb             = StringBuilderCache.Acquire();
             var firstGeneEntry = true;
-            foreach (IAnnotatedGene annotatedGene in annotatedGenes)
+
+            foreach (string jsonString in annotatedGenes)
             {
-                sb.Clear();
-                annotatedGene.SerializeJson(sb);
-                if (!firstGeneEntry) _writer.WriteLine(",");
+                if (!firstGeneEntry) sb.Append(",\n");
+                sb.Append(jsonString);
                 firstGeneEntry = false;
-                _writer.Write(sb.ToString());
             }
 
-            _writer.Flush();//closing the last block of genes section
+            _writer.Write(sb.ToString());
+            _writer.Flush();
             _jasixIndexCreator?.EndSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position - 1);
 
             StringBuilderCache.GetStringAndRelease(sb);
             _writer.WriteLine();
             _writer.Write("]");
         }
-        /// <summary>
-        /// write the footer
-        /// </summary>
+
         private void WriteFooter()
         {
-            
             if (!_positionFieldClosed)
             {
                 _writer.WriteLine();
@@ -125,7 +138,5 @@ namespace VariantAnnotation.IO
             }
             _writer.WriteLine("}");
         }
-
-       
     }
 }

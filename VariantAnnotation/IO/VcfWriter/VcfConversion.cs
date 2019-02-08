@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using OptimizedCore;
@@ -113,8 +113,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
             ExtractCsqs(annotatedPosition, csqs);
 
-            if (csqs.Count != 0)
-                if (infoField.Length > 0) sb.Append(";");
+            if (csqs.Count != 0 && infoField.Length > 0) sb.Append(";");
 
             // append CSQ tags using delegate from annotator
             sb.Append(GetCsqtAndCsqrVcfInfo(csqs));
@@ -129,23 +128,13 @@ namespace VariantAnnotation.IO.VcfWriter
         {
             var alleleFreq1000G = new VcfInfoKeyValue("AF1000G");
             var ancestralAllele = new VcfPositionalInfo("AA");
-            var phyloP          = new VcfPositionalInfo("phyloP");
+            var phyloP = new VcfPositionalInfo("phyloP");
 
             var suppAnnotationSources = new Dictionary<string, VcfInfoKeyValue>();
             var isSaArrayInfo = new Dictionary<string, bool>();
             int numInputAltAlleles = annotatedPosition.Position.AltAlleles.Length;
 
-            foreach (var alternateAllele in annotatedPosition.AnnotatedVariants)
-            {
-                foreach (var sa in alternateAllele.SupplementaryAnnotations)
-                {
-                    if (!suppAnnotationSources.ContainsKey(sa.SaDataSource.KeyName))
-                    {
-                        suppAnnotationSources[sa.SaDataSource.KeyName] = new VcfInfoKeyValue(sa.SaDataSource.VcfkeyName);
-                        isSaArrayInfo[sa.SaDataSource.KeyName] = sa.SaDataSource.IsArray;
-                    }
-                }
-            }
+            UpdateSaAnnoInfo(annotatedPosition, suppAnnotationSources, isSaArrayInfo);
 
             foreach (var kvp in suppAnnotationSources)
             {
@@ -169,38 +158,7 @@ namespace VariantAnnotation.IO.VcfWriter
 
                 phyloP.AddValue(annotatedVariant.PhylopScore?.ToString(CultureInfo.InvariantCulture));
 
-                foreach (var sa in annotatedVariant.SupplementaryAnnotations)
-                {
-                    if (!sa.SaDataSource.MatchByAllele && !sa.IsAlleleSpecific && sa.SaDataSource.KeyName != GlobalAlleleKeyName) continue;
-                    if (sa.SaDataSource.KeyName == DbSnpKeyName) continue;
-                    if (sa.SaDataSource.KeyName == RefMinorKeyName) continue;
-
-                    foreach (string vcfAnnotation in sa.GetVcfStrings())
-                    {
-                        if (string.IsNullOrEmpty(vcfAnnotation)) continue;
-
-                        if (sa.SaDataSource.KeyName == OneKgKeyName)
-                        {
-                            var contents = vcfAnnotation.OptimizedSplit(';');
-                            string freq = contents[0];
-                            string ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
-
-                            alleleFreq1000G.Add(freq, genotypeIndex);
-                            ancestralAllele.AddValue(ancestryAllele);
-                            continue;
-                        }
-
-                        if (sa.SaDataSource.IsArray && sa.IsAlleleSpecific)
-                        {
-                            suppAnnotationSources[sa.SaDataSource.KeyName].Add(
-                                genotypeIndex.ToString(CultureInfo.InvariantCulture) + '|' + vcfAnnotation);
-                        }
-                        else if (!sa.SaDataSource.IsArray)
-                        {
-                            suppAnnotationSources[sa.SaDataSource.KeyName].Add(vcfAnnotation, genotypeIndex);
-                        }
-                    }
-                }
+                ProcessSaAnnotations(alleleFreq1000G, ancestralAllele, suppAnnotationSources, annotatedVariant, genotypeIndex);
             }
 
             foreach (var value in suppAnnotationSources.Values) infoEntries.Add(value.GetString());
@@ -208,6 +166,62 @@ namespace VariantAnnotation.IO.VcfWriter
             infoEntries.Add(ancestralAllele.GetString());
             infoEntries.Add(alleleFreq1000G.GetString());
             infoEntries.Add(phyloP.GetString());
+        }
+
+        private static void ProcessSaAnnotations(VcfInfoKeyValue alleleFreq1000G, VcfPositionalInfo ancestralAllele, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, IAnnotatedVariant annotatedVariant, int genotypeIndex)
+        {
+            foreach (var sa in annotatedVariant.SupplementaryAnnotations)
+            {
+                if (!sa.SaDataSource.MatchByAllele && !sa.IsAlleleSpecific && sa.SaDataSource.KeyName != GlobalAlleleKeyName) continue;
+                if (sa.SaDataSource.KeyName == DbSnpKeyName) continue;
+                if (sa.SaDataSource.KeyName == RefMinorKeyName) continue;
+
+                ProcessVcfAnnotations(alleleFreq1000G, ancestralAllele, suppAnnotationSources, genotypeIndex, sa);
+            }
+        }
+
+        private static void ProcessVcfAnnotations(VcfInfoKeyValue alleleFreq1000G, VcfPositionalInfo ancestralAllele, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, int genotypeIndex, IAnnotatedSaDataSource sa)
+        {
+            foreach (string vcfAnnotation in sa.GetVcfStrings())
+            {
+                if (string.IsNullOrEmpty(vcfAnnotation)) continue;
+
+                if (sa.SaDataSource.KeyName == OneKgKeyName)
+                {
+                    var contents = vcfAnnotation.OptimizedSplit(';');
+                    string freq = contents[0];
+                    string ancestryAllele = string.IsNullOrEmpty(contents[1]) ? null : contents[1];
+
+                    alleleFreq1000G.Add(freq, genotypeIndex);
+                    ancestralAllele.AddValue(ancestryAllele);
+                    continue;
+                }
+
+                if (sa.SaDataSource.IsArray && sa.IsAlleleSpecific)
+                {
+                    suppAnnotationSources[sa.SaDataSource.KeyName].Add(
+                        genotypeIndex.ToString(CultureInfo.InvariantCulture) + '|' + vcfAnnotation);
+                }
+                else if (!sa.SaDataSource.IsArray)
+                {
+                    suppAnnotationSources[sa.SaDataSource.KeyName].Add(vcfAnnotation, genotypeIndex);
+                }
+            }
+        }
+
+        private static void UpdateSaAnnoInfo(IAnnotatedPosition annotatedPosition, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, Dictionary<string, bool> isSaArrayInfo)
+        {
+            foreach (var alternateAllele in annotatedPosition.AnnotatedVariants)
+            {
+                foreach (var sa in alternateAllele.SupplementaryAnnotations)
+                {
+                    if (!suppAnnotationSources.ContainsKey(sa.SaDataSource.KeyName))
+                    {
+                        suppAnnotationSources[sa.SaDataSource.KeyName] = new VcfInfoKeyValue(sa.SaDataSource.VcfkeyName);
+                        isSaArrayInfo[sa.SaDataSource.KeyName] = sa.SaDataSource.IsArray;
+                    }
+                }
+            }
         }
 
         private static int[] GetInputGenotypeIndex(string[] positionAltAlleles, IAnnotatedVariant[] annotatedPositionAnnotatedVariants)
@@ -229,7 +243,7 @@ namespace VariantAnnotation.IO.VcfWriter
             }
 
             if (annotatedVarIndex < numAnnotatedVar)
-                throw new Exception($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
+                throw new InvalidDataException($"There are unannotated variants! Input alternative alleles: {string.Join(",", positionAltAlleles)}; annotated alleles: {string.Join(",", annotatedPositionAnnotatedVariants.Select(x => x.Variant.AltAllele))}");
             return inputGenotypeIndex;
         }
 
@@ -306,7 +320,7 @@ namespace VariantAnnotation.IO.VcfWriter
                 var jsonVariant = unifiedJson.AnnotatedVariants[i];
 
                 csqs.AddRange(
-                    jsonVariant.EnsemblTranscripts.Where(x => x.Transcript.IsCanonical)
+                    jsonVariant.Transcripts.Where(x => x.Transcript.IsCanonical)
                         .Select(transcript => new CsqEntry
                         {
                             Allele      = genotypeIndex.ToString(),
@@ -315,17 +329,6 @@ namespace VariantAnnotation.IO.VcfWriter
                             Symbol      = transcript.Transcript.Gene.Symbol,
                             Consequence = transcript.Consequences == null ? null : string.Join("&", transcript.Consequences.Select(ConsequenceUtil.GetConsequence))
                         }));
-
-                csqs.AddRange(from transcript in jsonVariant.RefSeqTranscripts
-                              where transcript.Transcript.IsCanonical
-                              select new CsqEntry
-                              {
-                                  Allele      = genotypeIndex.ToString(),
-                                  Feature     = transcript.Transcript.Id.WithVersion,
-                                  FeatureType = CsqCommon.TranscriptFeatureType,
-                                  Symbol      = transcript.Transcript.Gene.Symbol,
-                                  Consequence = transcript.Consequences == null ? null : string.Join("&", transcript.Consequences.Select(ConsequenceUtil.GetConsequence))
-                              });
 
                 csqs.AddRange(jsonVariant.RegulatoryRegions.Select(regulatoryRegion => new CsqEntry
                 {

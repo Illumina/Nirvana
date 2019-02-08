@@ -36,6 +36,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Genome", "Genome\Genome.csproj", "{3B5C30A5-FBBC-4247-BE62-2B64960213FD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IO", "IO\IO.csproj", "{654069F3-3B86-4325-823F-BC78946A26FF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{82CA75B3-37DF-40DA-AA1B-70888CF3ED05} = {82CA75B3-37DF-40DA-AA1B-70888CF3ED05}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tabix", "Tabix\Tabix.csproj", "{F337E3F6-72AA-44B4-B11F-D69EE14B6152}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cloud", "Cloud\Cloud.csproj", "{E93914C8-2599-46BE-BE18-6229E53F581B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +118,14 @@ Global
 		{654069F3-3B86-4325-823F-BC78946A26FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{654069F3-3B86-4325-823F-BC78946A26FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{654069F3-3B86-4325-823F-BC78946A26FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F337E3F6-72AA-44B4-B11F-D69EE14B6152}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E93914C8-2599-46BE-BE18-6229E53F581B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E93914C8-2599-46BE-BE18-6229E53F581B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E93914C8-2599-46BE-BE18-6229E53F581B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E93914C8-2599-46BE-BE18-6229E53F581B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

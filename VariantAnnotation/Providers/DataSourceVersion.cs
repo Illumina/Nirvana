@@ -55,9 +55,10 @@ namespace VariantAnnotation.Providers
             if (ReleaseDateTicks != 0) jsonObject.AddStringValue("releaseDate", GetReleaseDate());
             sb.Append(JsonObject.CloseBrace);
         }
+        
+        
     }
-
-    internal sealed class DataSourceVersionComparer : EqualityComparer<IDataSourceVersion>
+    public sealed class DataSourceVersionComparer : EqualityComparer<IDataSourceVersion>
     {
         public override bool Equals(IDataSourceVersion x, IDataSourceVersion y)
         {
@@ -67,14 +68,14 @@ namespace VariantAnnotation.Providers
                    x.ReleaseDateTicks == y.ReleaseDateTicks;
         }
 
-        public override int GetHashCode(IDataSourceVersion x)
+        public override int GetHashCode(IDataSourceVersion obj)
         {
             unchecked
             {
-                var hashCode = x.Name.GetHashCode();
-                if (x.Description != null) hashCode = (hashCode * 397) ^ x.Description.GetHashCode();
-                if (x.Version != null) hashCode = (hashCode * 397) ^ x.Version.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.ReleaseDateTicks.GetHashCode();
+                var hashCode = obj.Name.GetHashCode();
+                if (obj.Description != null) hashCode = (hashCode * 397) ^ obj.Description.GetHashCode();
+                if (obj.Version != null) hashCode = (hashCode * 397) ^ obj.Version.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.ReleaseDateTicks.GetHashCode();
                 return hashCode;
             }
         }

@@ -26,17 +26,9 @@ namespace SAUtils.InputFileParsers
         /// <summary>
         /// constructor
         /// </summary>
-        private DataSourceVersionReader(string fileName)
+        public DataSourceVersionReader(Stream fileStream)
         {
-            _reader = new StreamReader(FileUtilities.GetReadStream(fileName));
-        }
-
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public DataSourceVersionReader(Stream stream)
-        {
-            _reader = new StreamReader(stream);
+            _reader = new StreamReader(fileStream);
         }
 
         public static DataSourceVersion GetSourceVersion(string versionFileName)
@@ -47,7 +39,14 @@ namespace SAUtils.InputFileParsers
                 throw new FileNotFoundException(versionFileName);
             }
 
-            using (var versionReader = new DataSourceVersionReader(versionFileName))
+            var fileStream = FileUtilities.GetReadStream(versionFileName);
+
+            return GetSourceVersion(fileStream);
+        }
+
+        public static DataSourceVersion GetSourceVersion(Stream versionFileStream)
+        {
+            using (var versionReader = new DataSourceVersionReader(versionFileStream))
             {
                 var version = versionReader.GetVersion();
                 return version;

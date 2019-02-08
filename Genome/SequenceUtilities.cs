@@ -36,7 +36,7 @@ namespace Genome
 			// sanity check
 			if (bases == null) return null;
 
-			var numBases = bases.Length;
+			int numBases = bases.Length;
 			var reverseChars = new char[numBases];
 
 			for (var i = 0; i < numBases; ++i)
@@ -61,9 +61,9 @@ namespace Genome
 		/// </summary>
 		public static string GetSubSubstring(int seqStart, int seqEnd, bool seqOnReverseStrand, int subStart, int subEnd, ISequence cs)
 		{
-			var start = seqOnReverseStrand ? seqEnd - subEnd : seqStart + subStart;
+			int start = seqOnReverseStrand ? seqEnd - subEnd : seqStart + subStart;
 
-			var precedingBases = cs.Substring(start - 1, subEnd - subStart + 1);
+			string precedingBases = cs.Substring(start - 1, subEnd - subStart + 1);
 			if (seqOnReverseStrand) precedingBases = GetReverseComplement(precedingBases);
 
 			return precedingBases;

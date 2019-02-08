@@ -12,23 +12,20 @@ namespace Phantom.CodonInformation
     public sealed class CodonInfoProvider : ICodonInfoProvider
     {
         private readonly IntervalForest<ICodingBlock> _commonIntervalForest;
-        private Graph<ICodingBlock>[] _codingBlockGraphs;
+        // ReSharper disable once NotAccessedField.Local
 
-        private CodonInfoProvider(IntervalForest<ICodingBlock> commonIntervalForest, Graph<ICodingBlock>[] codingBlockGraphs)
+        private CodonInfoProvider(IntervalForest<ICodingBlock> commonIntervalForest)
         {
             _commonIntervalForest = commonIntervalForest;
-            _codingBlockGraphs = codingBlockGraphs;
         }
 
         public static CodonInfoProvider CreateCodonInfoProvider(IntervalArray<ITranscript>[] transcriptIntervalArrays)
         {
-            var numChromosomes = transcriptIntervalArrays.Length;
+            int numChromosomes = transcriptIntervalArrays.Length;
             var commonIntervalArrays = new IntervalArray<ICodingBlock>[numChromosomes];
-            var codingBlockGraphs = new Graph<ICodingBlock>[numChromosomes];
 
-            for (int chrIndex = 0; chrIndex < numChromosomes; chrIndex++)
+            for (var chrIndex = 0; chrIndex < numChromosomes; chrIndex++)
             {
-                codingBlockGraphs[chrIndex] = new Graph<ICodingBlock>(true);
                 var transcriptIntervalArray = transcriptIntervalArrays[chrIndex];
                 if (transcriptIntervalArray == null) continue;
                 var geneCdsIntervals = GetPhasedCdsIntervals(transcriptIntervalArray);
@@ -38,15 +35,14 @@ namespace Phantom.CodonInformation
                 {
                     var transcriptToCodingBlocks =
                         GetTranscriptToCodingBlocks(transcriptIntervals, gene.OnReverseStrand);
-                    codingBlockGraphs[chrIndex].MergeGraph(GetCodingGraph(transcriptToCodingBlocks));
                     intervalsWithPhase.AddRange(GetIntervalsWithPhase(transcriptToCodingBlocks));
                 }
                 commonIntervalArrays[chrIndex] = new IntervalArray<ICodingBlock>(intervalsWithPhase.OrderBy(x => x.Begin).ToArray());
             }
-            return new CodonInfoProvider(new IntervalForest<ICodingBlock>(commonIntervalArrays), codingBlockGraphs);
+            return new CodonInfoProvider(new IntervalForest<ICodingBlock>(commonIntervalArrays));
         }
 
-        private static ICollection<Interval<ICodingBlock>> GetIntervalsWithPhase(CodingBlock[][] transcriptToCodingBlocks)
+        private static IEnumerable<Interval<ICodingBlock>> GetIntervalsWithPhase(CodingBlock[][] transcriptToCodingBlocks)
         {
             var uniqCodingBlocks = new HashSet<Interval<ICodingBlock>>();
             foreach (var codingBlocks in transcriptToCodingBlocks)
@@ -63,7 +59,7 @@ namespace Phantom.CodonInformation
             var functionBlockRanges = GetFunctionBlockDistances(chrInterval);
             if (functionBlockRanges == null) return -1;
             int longestRange = functionBlockRanges[0];
-            for (int i = 1; i < functionBlockRanges.Length; i++)
+            for (var i = 1; i < functionBlockRanges.Length; i++)
             {
                 if (functionBlockRanges[i] > longestRange) longestRange = functionBlockRanges[i];
             }
@@ -75,7 +71,7 @@ namespace Phantom.CodonInformation
             var overlappingCodingBlocks = GetOverlappingCodingBlocks(chrInterval);
             if (overlappingCodingBlocks == null) return null;
             var functionBlockRanges = new int[overlappingCodingBlocks.Length];
-            for (int i = 0; i < overlappingCodingBlocks.Length; i++)
+            for (var i = 0; i < overlappingCodingBlocks.Length; i++)
             {
                 var overlappingCodingBlock = overlappingCodingBlocks[i];
                 functionBlockRanges[i] = GetFunctionBlockRange(chrInterval, overlappingCodingBlock);
@@ -87,9 +83,9 @@ namespace Phantom.CodonInformation
             _commonIntervalForest.GetAllOverlappingValues(chrInterval.Chromosome.Index, chrInterval.Start,
                 chrInterval.End);
 
-        private int GetFunctionBlockRange(IInterval interval, ICodingBlock overlappingCodingBlock)
+        private static int GetFunctionBlockRange(IInterval interval, ICodingBlock overlappingCodingBlock)
         {
-            //todo: only check codon boundary in the same exon for now
+            // only check codon boundary in the same exon for now
             return GetCodonRange(interval.Start, overlappingCodingBlock);
         }
 
@@ -140,7 +136,7 @@ namespace Phantom.CodonInformation
 
         internal static CodingBlock[][] GetTranscriptToCodingBlocks(List<PhasedIntervalArray> transcriptIntervals, bool onReverseStrand)
         {
-            var transcriptToCommonIntervals = IntervalPartitioner.GetCommonIntervals(transcriptIntervals.Select(x => x.IntervalArray).ToArray());
+            var transcriptToCommonIntervals = IntervalPartitioner.GetCommonIntervals(new TranscriptIntervalsInGene(transcriptIntervals.Select(x => x.IntervalArray).ToArray()));
             var startPhases = transcriptIntervals.Select(x => x.StartPhase).ToArray();
             var codingBlockArrays = new CodingBlock[transcriptToCommonIntervals.Length][];
             if (onReverseStrand)
@@ -148,12 +144,12 @@ namespace Phantom.CodonInformation
                 startPhases = GetStartPhaseForReverseTranscripts(transcriptToCommonIntervals, startPhases);
             }
 
-            for (int transcriptId = 0; transcriptId < transcriptToCommonIntervals.Length; transcriptId++)
+            for (var transcriptId = 0; transcriptId < transcriptToCommonIntervals.Length; transcriptId++)
             {
                 byte currentPhase = startPhases[transcriptId];
                 var commonIntervals = transcriptToCommonIntervals[transcriptId];
                 codingBlockArrays[transcriptId] = new CodingBlock[commonIntervals.Count];
-                for (int intervalId = 0; intervalId < commonIntervals.Count; intervalId++)
+                for (var intervalId = 0; intervalId < commonIntervals.Count; intervalId++)
                 {
                     var interval = commonIntervals[intervalId];
                     var codingBlock = new CodingBlock(interval.Start, interval.End,
@@ -165,10 +161,10 @@ namespace Phantom.CodonInformation
             return codingBlockArrays;
         }
 
-        private static byte[] GetStartPhaseForReverseTranscripts(List<IInterval>[] transcriptToIntervals, byte[] startPhases)
+        private static byte[] GetStartPhaseForReverseTranscripts(IReadOnlyList<List<IInterval>> transcriptToIntervals, byte[] startPhases)
         {
-            var startPhasesFromEndOfReverseTranscripts = new byte[transcriptToIntervals.Length];
-            for (int i = 0; i < transcriptToIntervals.Length; i++)
+            var startPhasesFromEndOfReverseTranscripts = new byte[transcriptToIntervals.Count];
+            for (var i = 0; i < transcriptToIntervals.Count; i++)
             {
                 int totalLength = GetTotalIntervalLength(transcriptToIntervals[i]);
                 startPhasesFromEndOfReverseTranscripts[i] = (byte)(2 - (startPhases[i] + totalLength % 3 + 2) % 3);
@@ -176,9 +172,9 @@ namespace Phantom.CodonInformation
             return startPhasesFromEndOfReverseTranscripts;
         }
 
-        private static int GetTotalIntervalLength(List<IInterval> transcriptToInterval)
+        private static int GetTotalIntervalLength(IEnumerable<IInterval> transcriptToInterval)
         {
-            int totalLength = 0;
+            var totalLength = 0;
             foreach (var interval in transcriptToInterval)
             {
                 totalLength += interval.End - interval.Start + 1;
@@ -187,7 +183,6 @@ namespace Phantom.CodonInformation
         }
 
         private static byte UpdateStartPhase(IInterval interval, byte currentStartPhase) => (byte)((interval.End - interval.Start + 1 + currentStartPhase) % 3);
-
 
         private static IInterval[] ConstructCdsIntervalsFromTranscript(ITranscript transcript)
         {
@@ -201,7 +196,7 @@ namespace Phantom.CodonInformation
 
             foreach (var exonRegion in exonRegions) // assume the exon regions are ordered
             {
-                var exonCodingRegion = exonRegion.Intersect(codingRegion);
+                var exonCodingRegion = exonRegion.Intersects(codingRegion);
                 if (exonCodingRegion.Start == -1) continue;
                 cdsIntervals.Add(new Interval(exonCodingRegion.Start, exonCodingRegion.End));
             }

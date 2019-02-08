@@ -33,10 +33,13 @@
         // general (210 - 219)
         UserError = 210,
 
-        // file (220 - 239)
+        // file (220 - 229)
         InvalidFileFormat         = 220,
         FileNotSorted             = 221,
         MissingCompressionLibrary = 223,
+
+        // services (230 - 239)
+        AnnotationLambdasFailed   = 230,
 
         // functionality (240 - 259)
         Compression = 240

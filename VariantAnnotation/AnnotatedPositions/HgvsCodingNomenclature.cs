@@ -103,7 +103,7 @@ namespace VariantAnnotation.AnnotatedPositions
             // deletion/insertion
             if (refLength != 0) return GenomicChange.DelIns;
 
-            // If this is an insertion, we should check if the preceeding reference nucleotides
+            // If this is an insertion, we should check if the preceding reference nucleotides
             // match the insertion. In that case it should be annotated as a multiplication.
             bool isGenomicDuplicate = HgvsUtilities.IsDuplicateWithinInterval(refSequence, variant, interval, onReverseStrand);
 

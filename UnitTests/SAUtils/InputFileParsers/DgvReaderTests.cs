@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using Compression.Utilities;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.DGV;
@@ -20,7 +20,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         };
 
 
-        private static readonly FileInfo TestDgvFile = new FileInfo(Resources.TopPath("testDgvParser.txt"));
+        private static readonly string TestDgvFile = Resources.TopPath("testDgvParser.txt");
 
         private static IEnumerable<DgvItem> CreateTruthDgvItemSequence()
         {
@@ -41,8 +41,11 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void TestDbSnpReader()
         {
-            var dgvReader = new DgvReader(TestDgvFile, RefChromDict);
-            Assert.True(dgvReader.GetDgvItems().SequenceEqual(CreateTruthDgvItemSequence()));
+            using (var dgvReader = new DgvReader(GZipUtilities.GetAppropriateStreamReader(TestDgvFile), RefChromDict))
+            {
+                Assert.True(dgvReader.GetItems().SequenceEqual(CreateTruthDgvItemSequence()));
+            }
+            
         }
     }
 }

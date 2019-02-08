@@ -8,6 +8,7 @@ using ErrorHandling;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.RegulatoryGFF
 {

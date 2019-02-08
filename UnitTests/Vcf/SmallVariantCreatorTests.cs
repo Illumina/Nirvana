@@ -19,7 +19,6 @@ namespace UnitTests.Vcf
             Assert.True(variant.Behavior.NeedSaPosition);
             Assert.False(variant.Behavior.NeedSaInterval);
             Assert.False(variant.Behavior.ReducedTranscriptAnnotation);
-            Assert.False(variant.Behavior.ReportOverlappingGenes);
             Assert.False(variant.Behavior.StructuralVariantConsequence);
             Assert.Equal("1",variant.Chromosome.EnsemblName);
             Assert.Equal(101,variant.Start);

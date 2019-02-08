@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -10,20 +12,45 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
         public List<ConsequenceTag> GetConsequences() => _consequences;
 
         private readonly IVariantEffect _variantEffect;
-
         private readonly IFeatureVariantEffects _featureEffect;
 
+        private readonly ImmutableArray<(Func<bool>, ConsequenceTag)> _tier3Consequences;
 
         public Consequences(IVariantEffect variantEffect = null, IFeatureVariantEffects featureEffect = null)
         {
-            _consequences = new List<ConsequenceTag>();
+            _consequences  = new List<ConsequenceTag>();
             _variantEffect = variantEffect;
             _featureEffect = featureEffect;
+
+            _tier3Consequences = new List<(Func<bool>, ConsequenceTag)>
+            {
+                (() => _variantEffect.IsSpliceDonorVariant(),                     ConsequenceTag.splice_donor_variant),
+                (() => _variantEffect.IsSpliceAcceptorVariant(),                  ConsequenceTag.splice_acceptor_variant),
+                (() => _variantEffect.IsStopGained(),                             ConsequenceTag.stop_gained),
+                (() => _variantEffect.IsFrameshiftVariant(),                      ConsequenceTag.frameshift_variant),
+                (() => _variantEffect.IsStopLost(),                               ConsequenceTag.stop_lost),
+                (() => _variantEffect.IsStartLost(),                              ConsequenceTag.start_lost),
+                (() => _variantEffect.IsInframeInsertion(),                       ConsequenceTag.inframe_insertion),
+                (() => _variantEffect.IsInframeDeletion(),                        ConsequenceTag.inframe_deletion),
+                (() => _variantEffect.IsMissenseVariant(),                        ConsequenceTag.missense_variant),
+                (() => _variantEffect.IsProteinAlteringVariant(),                 ConsequenceTag.protein_altering_variant),
+                (() => _variantEffect.IsSpliceRegionVariant(),                    ConsequenceTag.splice_region_variant),
+                (() => _variantEffect.IsIncompleteTerminalCodonVariant(),         ConsequenceTag.incomplete_terminal_codon_variant),
+                (() => _variantEffect.IsStartRetained(),                          ConsequenceTag.start_retained_variant),
+                (() => _variantEffect.IsStopRetained(),                           ConsequenceTag.stop_retained_variant),
+                (() => _variantEffect.IsSynonymousVariant(),                      ConsequenceTag.synonymous_variant),
+                (() => _variantEffect.IsCodingSequenceVariant(),                  ConsequenceTag.coding_sequence_variant),
+                (() => _variantEffect.IsFivePrimeUtrVariant(),                    ConsequenceTag.five_prime_UTR_variant),
+                (() => _variantEffect.IsThreePrimeUtrVariant(),                   ConsequenceTag.three_prime_UTR_variant),
+                (() => _variantEffect.IsNonCodingTranscriptExonVariant(),         ConsequenceTag.non_coding_transcript_exon_variant),
+                (() => _variantEffect.IsWithinIntron(),                           ConsequenceTag.intron_variant),
+                (() => _variantEffect.IsNonsenseMediatedDecayTranscriptVariant(), ConsequenceTag.NMD_transcript_variant),
+                (() => _variantEffect.IsNonCodingTranscriptVariant(),             ConsequenceTag.non_coding_transcript_variant),
+                (() => _featureEffect.Elongation(),                               ConsequenceTag.feature_elongation),
+                (() => _featureEffect.Truncation(),                               ConsequenceTag.transcript_truncation)
+            }.ToImmutableArray();
         }
 
-        /// <summary>
-        /// determines the flanking variant's functional consequence
-        /// </summary>
         public void DetermineFlankingVariantEffects(bool isDownstreamVariant)
         {
             _consequences.Add(isDownstreamVariant
@@ -31,10 +58,6 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
                 : ConsequenceTag.upstream_gene_variant);
         }
 
-
-        /// <summary>
-        /// determines the variant's functional consequence
-        /// </summary>
         public void DetermineSmallVariantEffects()
         {
             GetTier1Types();
@@ -56,6 +79,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
         private void DetermineRepeatExpansionEffect(VariantType variantType)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (variantType)
             {
                 case VariantType.short_tandem_repeat_variation:
@@ -72,6 +96,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
         private void DetermineCopyNumberEffect(VariantType variantType)
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (variantType)
             {
                 case VariantType.copy_number_gain:
@@ -95,9 +120,6 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             if (_featureEffect.Truncation()) _consequences.Add(ConsequenceTag.transcript_truncation);
         }
 
-        /// <summary>
-        /// populates the consequences list with tier 1 consequences if found (NOTE: Tests are done in rank order)
-        /// </summary>
         private void GetTier1Types()
         {
             // TranscriptAblation
@@ -105,93 +127,20 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
             // TranscriptAmplification
             if (_featureEffect.Amplification()) _consequences.Add(ConsequenceTag.transcript_amplification);
-
         }
 
-        /// <summary>
-        /// populates the consequences list with tier 2 consequences if found (NOTE: Tests are done in rank order)
-        /// </summary>
         private void GetTier2Types()
         {
             // MatureMirnaVariant
             if (_variantEffect.IsMatureMirnaVariant()) _consequences.Add(ConsequenceTag.mature_miRNA_variant);
         }
 
-
-        /// <summary>
-        /// populates the consequences list with tier 3 consequences if found (NOTE: Tests are done in rank order)
-        /// </summary>
         private void GetTier3Types()
         {
-            // SpliceDonorVariant
-            if (_variantEffect.IsSpliceDonorVariant()) _consequences.Add(ConsequenceTag.splice_donor_variant);
-
-            // SpliceAcceptorVariant
-            if (_variantEffect.IsSpliceAcceptorVariant()) _consequences.Add(ConsequenceTag.splice_acceptor_variant);
-
-            // StopGained
-            if (_variantEffect.IsStopGained()) _consequences.Add(ConsequenceTag.stop_gained);
-
-            // FrameshiftVariant
-            if (_variantEffect.IsFrameshiftVariant()) _consequences.Add(ConsequenceTag.frameshift_variant);
-
-            // StopLost
-            if (_variantEffect.IsStopLost()) _consequences.Add(ConsequenceTag.stop_lost);
-            if (_variantEffect.IsStartLost()) _consequences.Add(ConsequenceTag.start_lost);
-
-            // InframeInsertion
-            if (_variantEffect.IsInframeInsertion()) _consequences.Add(ConsequenceTag.inframe_insertion);
-
-            // InframeDeletion
-            if (_variantEffect.IsInframeDeletion()) _consequences.Add(ConsequenceTag.inframe_deletion);
-
-            // MissenseVariant
-            if (_variantEffect.IsMissenseVariant()) _consequences.Add(ConsequenceTag.missense_variant);
-
-            // ProteinAlteringVariant
-            if (_variantEffect.IsProteinAlteringVariant()) _consequences.Add(ConsequenceTag.protein_altering_variant);
-
-            // SpliceRegionVariant
-            if (_variantEffect.IsSpliceRegionVariant()) _consequences.Add(ConsequenceTag.splice_region_variant);
-
-            // IncompleteTerminalCodonVariant
-            if (_variantEffect.IsIncompleteTerminalCodonVariant()) _consequences.Add(ConsequenceTag.incomplete_terminal_codon_variant);
-
-            // StartRetainedVariant
-            if (_variantEffect.IsStartRetained()) _consequences.Add(ConsequenceTag.start_retained_variant);
-
-            // StopRetainedVariant
-            if (_variantEffect.IsStopRetained()) _consequences.Add(ConsequenceTag.stop_retained_variant);
-
-            // SynonymousVariant
-            if (_variantEffect.IsSynonymousVariant()) _consequences.Add(ConsequenceTag.synonymous_variant);
-
-            // CodingSequenceVariant
-            if (_variantEffect.IsCodingSequenceVariant()) _consequences.Add(ConsequenceTag.coding_sequence_variant);
-
-            // FivePrimeUtrVariant
-            if (_variantEffect.IsFivePrimeUtrVariant()) _consequences.Add(ConsequenceTag.five_prime_UTR_variant);
-
-            // ThreePrimeUtrVariant
-            if (_variantEffect.IsThreePrimeUtrVariant()) _consequences.Add(ConsequenceTag.three_prime_UTR_variant);
-
-            // NonCodingTranscriptExonVariant
-            if (_variantEffect.IsNonCodingTranscriptExonVariant()) _consequences.Add(ConsequenceTag.non_coding_transcript_exon_variant);
-
-            // IntronVariant
-            if (_variantEffect.IsWithinIntron()) _consequences.Add(ConsequenceTag.intron_variant);
-
-            // NonsenseMediatedDecayTranscriptVariant
-            if (_variantEffect.IsNonsenseMediatedDecayTranscriptVariant()) _consequences.Add(ConsequenceTag.NMD_transcript_variant);
-
-            // NonCodingTranscriptVariant
-            if (_variantEffect.IsNonCodingTranscriptVariant()) _consequences.Add(ConsequenceTag.non_coding_transcript_variant);
-
-            // FeatureElongation
-            if (_featureEffect.Elongation()) _consequences.Add(ConsequenceTag.feature_elongation);
-
-            // TranscriptTruncation
-            if (_featureEffect.Truncation()) _consequences.Add(ConsequenceTag.transcript_truncation);
+            foreach ((var consequenceTest, ConsequenceTag consequenceTag) in _tier3Consequences)
+            {
+                if (consequenceTest()) _consequences.Add(consequenceTag);
+            }
         }
 
         public void DetermineRegulatoryVariantEffects()
@@ -206,6 +155,4 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             _consequences.Add(ConsequenceTag.regulatory_region_variant);
         }
     }
-
-
 }

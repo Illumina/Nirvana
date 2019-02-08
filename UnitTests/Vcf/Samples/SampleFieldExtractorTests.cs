@@ -52,6 +52,8 @@ namespace UnitTests.Vcf.Samples
         [InlineData("GT:AU:CU:GU:TU:AD", "1/1:10,11:20,21:30,31:40,41:11,13", new[] { 20, 40 })]
         [InlineData("GT:AD", "1/1:11,13", new[] { 11, 13 })]
         [InlineData("GT:AU:CU:GU:TU:AD", "1/1:.:20,21:30,31:40,41:11,13", new[] { 11, 13 })]
+        [InlineData("GT:AU:CU:GU:TU:AD", "1/1:.", null)]//null when all fields are dropped after GT
+        [InlineData("GT:AU:CU:GU:TU:AD", "1/1", null)]//null when all fields are dropped after GT
         [InlineData("AD", ".", null)]
         [InlineData("AD", "", null)]
         public void AlleleDepths(string formatCol, string sampleCol, int[] expectedAlleleDepths)
@@ -94,6 +96,7 @@ namespace UnitTests.Vcf.Samples
         [InlineData("GT:TIR:TAR", "1/1:18,19:37,38", null)]
         [InlineData("GT:NR:NV", "1/1:10:7", null)]
         [InlineData("GT:TIR:TAR:AD", "1/1:.:37,38:11,13,17", new[] { 11, 13, 17 })]
+        [InlineData("GT:TIR:TAR:AD", "1/1:.:37,38", null)]//null when no values for AD for multi-allelic site
         public void AlleleDepthsMultiAllelic(string formatCol, string sampleCol, int[] expectedAlleleDepths)
         {
             string vcfLine = $"chr1\t5592503\t.\tC\tT,A\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
@@ -154,6 +157,7 @@ namespace UnitTests.Vcf.Samples
         [InlineData("GT:GQ:GQX:DP:DPF:AD", "1/1:208:47:70:3:0,70", 47)]
         [InlineData("GT:GQ:DP:DPF:AD", "1/1:208:70:3:0,70", 208)]
         [InlineData("GT:GQ:DP:DPF:AD", "1/1:.:70:3:0,70", null)]
+        [InlineData("GT:DP:DPF:AD:GQ", "1/1:70:3", null)]//dropped fields without '.'
         [InlineData("GQ", ".", null)]
         [InlineData("GQX", "", null)]
         [InlineData("GQX", "./.", null)]
@@ -179,6 +183,7 @@ namespace UnitTests.Vcf.Samples
         [InlineData("GT:DPI:DP:DPF:AD", "1/1:17:70:3:0,70", 17)]
         [InlineData("GT:DP:DPF:AD", "1/1:70:3:0,70", 70)]
         [InlineData("GT:AU:CU:GU:TU:DPF:AD", "1/1:.:20,21:30,31:40,41:3:0,70", null)]
+        [InlineData("GT:AU:CU:GU:TU:DPF:AD", "1/1:.:20,21:30,31:40,41:3", null)]//dropping AD completely
         [InlineData("GT:DP:DPF:AD", "1/1:.:3:0,70", null)]
         [InlineData("DP", ".", null)]
         [InlineData("DPI", "", null)]
@@ -199,6 +204,7 @@ namespace UnitTests.Vcf.Samples
 
         [Theory]
         [InlineData("GT:NR:NV", "1/1:10:7", null)]
+        [InlineData("GT:NR:NV", "1/1", null)]//drop everything after GT
         public void TotalDepthMultiAllelic(string formatCol, string sampleCol, int? expectedTotalDepth)
         {
             string vcfLine = $"chr1\t5592503\t.\tC\tT,A\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
@@ -264,6 +270,7 @@ namespace UnitTests.Vcf.Samples
         [InlineData("C", "T,A", "GT:GQ:GQX:DP:DPF:AD:VF", "1/1:208:47:70:3:0,70:0.75")] // multiple alleles (VF)
         [InlineData("C", "T,A", "GT:NR:NV", "1/1:10:7")]                                // multiple alleles (NR/NV)
         [InlineData("CG", "T", "GT:AU:CU:GU:TU", "1/1:10,11:20,21:30,31:40,41")]        // multiple ref bases (AC)
+        [InlineData("CG", "T", "GT:AU:CU:GU:TU", "1/1")]                                // dropping all fields after GT
         [InlineData("C", ".", "DP:AU:CU:GU:TU", "19:0,0:14,14:0,0:5,6")]                // ref minor (AC)
         [InlineData("C", ".", "DP:AU:CU:GU:TU", "75:0,0:72,77:0,0:0,2")]                // ref minor (AC)
         public void VariantFrequency_ReturnNull(string refAllele, string altAllele, string formatCol, string sampleCol)
@@ -277,6 +284,43 @@ namespace UnitTests.Vcf.Samples
             Assert.Single(samples);
             var sample = samples[0];
             Assert.Null(sample.VariantFrequencies);
+        }
+
+        [Theory]
+        [InlineData("GT:GQ:GQX:DP:DPF:AD:VF", "1/1:208:47:70:3:70", "VF")]
+        [InlineData("GT:GQ:GQX:DP:DPF:AD:VF", "1/1:208:47:70:3", "AD")]
+        [InlineData("GT:DP:DPF:AD:VF:GQ:GQX", "1/1:70:3:208:47", "GQ")]
+        [InlineData("GT:DP:DPF:AD:VF:GQ:GQX", "1/1:70:3:208:47", "GQX")]
+        [InlineData("GT:AD:VF:FT", "1/1:47:70", "FT")]
+        public void Leftout_fields_return_null(string formatCol, string sampleCol, string missingField)
+        {
+            var vcfLine = $"chr1\t5592503\t.\tA\tC\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
+            var vcfColumns = vcfLine.Split('\t');
+
+            var extractor = new SampleFieldExtractor(vcfColumns);
+            var samples = extractor.ExtractSamples();
+
+            Assert.Single(samples);
+            var sample = samples[0];
+
+            switch (missingField)
+            {
+                case "VF":
+                    Assert.Null(sample.VariantFrequencies);
+                    break;
+                case "AD":
+                    Assert.Null(sample.AlleleDepths);
+                    break;
+                case "FT":
+                    Assert.False(sample.FailedFilter);
+                    break;
+                case "GQ":
+                case "GQX":
+                    Assert.Null(sample.GenotypeQuality);
+                    break;
+
+            }
+
         }
 
         [Fact]
@@ -397,6 +441,38 @@ namespace UnitTests.Vcf.Samples
 
             var sample = samples[0];
             Assert.Equal(20, sample.DeNovoQuality);
+        }
+
+        [Fact]
+        public void DeNovoQualityInUnspecifiedTrailingField_ShouldBeNull()
+        {
+            const string vcfLine =
+                "chr1\t15045\t.\tC\tT\t53.28\tPASS\t.\tGT:AD:AF:DP:GQ:FT:PL:GL:GP:PP:DQ:DN\t./.:0,0:0.000:0:0:LowDepth;LowGQ:.:.";
+            var vcfColumns = vcfLine.Split('\t');
+
+            var extractor = new SampleFieldExtractor(vcfColumns);
+            var samples   = extractor.ExtractSamples();
+
+            Assert.Single(samples);
+
+            var sample = samples[0];
+            Assert.Null(sample.DeNovoQuality);
+        }
+
+        [Fact]
+        public void DeNovoQualityInDroppedTrailingField_ShouldBeNull()
+        {
+            const string vcfLine =
+                "chr1\t15045\t.\tC\tT\t53.28\tPASS\t.\tGT:AD:AF:DP:GQ:FT:PL:GL:GP:PP:DQ:DN\t./.:0,0:0.000:0:0:LowDepth;LowGQ";
+            var vcfColumns = vcfLine.Split('\t');
+
+            var extractor = new SampleFieldExtractor(vcfColumns);
+            var samples = extractor.ExtractSamples();
+
+            Assert.Single(samples);
+
+            var sample = samples[0];
+            Assert.Null(sample.DeNovoQuality);
         }
 
         [Fact]

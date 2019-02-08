@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.IO
@@ -10,13 +11,14 @@ namespace VariantAnnotation.IO
     {
         private readonly StringBuilder _sb;
         private bool _needsComma;
+        private int _nestedLevel;
 
-        public const char Comma          = ',';
-        private const char DoubleQuote   = '\"';
-        private const char OpenBracket   = '[';
-        private const char CloseBracket  = ']';
-        public const char OpenBrace      = '{';
-        public const char CloseBrace     = '}';
+        public const char Comma = ',';
+        private const char DoubleQuote = '\"';
+        public const char OpenBracket = '[';
+        public const char CloseBracket = ']';
+        public const char OpenBrace = '{';
+        public const char CloseBrace = '}';
         private const string ColonString = "\":";
 
         public JsonObject(StringBuilder sb) => _sb = sb;
@@ -28,63 +30,86 @@ namespace VariantAnnotation.IO
             _sb.Append(ColonString);
         }
 
-        public void AddBoolValue(string description, bool b, bool outputFalse = false)
+        public void StartObjectWithKey(string objectKey)
+        {
+            if (_needsComma) _sb.Append(Comma);
+
+            _sb.Append(DoubleQuote);
+            _sb.Append(objectKey);
+            _sb.Append(ColonString);
+            _sb.Append(OpenBrace);
+
+            _needsComma = false;
+            _nestedLevel++;
+        }
+
+        public bool AddBoolValue(string description, bool b, bool outputFalse = false)
         {
             // we do not want to print out false flags by default.
-            if (!b && !outputFalse) return;
+            if (!b && !outputFalse) return false;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
 
             _sb.Append(b ? "true" : "false");
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddIntValue(string description, int? i)
+        public bool AddIntValue(string description, int? i)
         {
-            if (i == null) return;
+            if (i == null) return false;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
 
             _sb.Append(i);
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddIntValues(string description, int[] values)
+        public bool AddIntValues(string description, int[] values)
         {
-            if (values == null || values.Length == 0) return;
+            if (values == null || values.Length == 0) return false;
 
             // removing '.'s from the list of values
             var valueList = values.Select(value => value.ToString()).ToList();
 
             AddStringValues(description, valueList, false);
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddDoubleValue(string description, double? d, string format = "0.####")
+        public bool AddDoubleValue(string description, double? d, string format = "0.####")
         {
-            if (d == null) return;
+            if (d == null) return false;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
             _sb.Append(d.Value.ToString(format));
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddDoubleValues(string description, double[] values, string format = "0.####")
+        public bool AddDoubleValues(string description, double[] values, string format = "0.####")
         {
-            if (values == null || values.Length == 0) return;
+            if (values == null || values.Length == 0) return false;
 
             var valueList = values.Select(value => value.ToString(format)).ToList();
 
             AddStringValues(description, valueList, false);
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddStringValue(string description, string s, bool useQuote = true)
+        public bool AddStringValue(string description, string s, bool useQuote = true)
         {
-            if (string.IsNullOrEmpty(s) || s == ".") return;
+            if (string.IsNullOrEmpty(s) || s == ".") return false;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
@@ -93,45 +118,43 @@ namespace VariantAnnotation.IO
             _sb.Append(s);
             if (useQuote) _sb.Append(DoubleQuote);
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddStringValues(string description, IEnumerable<string> values, bool useQuote = true)
+        public bool AddStringValues(string description, IEnumerable<string> values, bool useQuote = true)
         {
-            if (values == null) return;
-            var index = 0;
+            if (values == null) return false;
 
-            foreach (var value in values)
+            var validEntries = new List<string>();
+            foreach (string value in values) if (value != ".") validEntries.Add(value);
+
+            if (validEntries.Count == 0) return false;
+
+            if (_needsComma) _sb.Append(Comma);
+            AddKey(description);
+            _sb.Append(OpenBracket);
+
+            var needsComma = false;
+
+            foreach (string value in validEntries)
             {
-                if (value == ".") continue;
-
-                if (index == 0)
-                {
-                    if (_needsComma) _sb.Append(Comma);
-                    AddKey(description);
-                    _sb.Append(OpenBracket);
-
-                    if (useQuote) _sb.Append(DoubleQuote);
-                    _sb.Append(value);
-                    if (useQuote) _sb.Append(DoubleQuote);
-                }
-                else
-                {
-                    _sb.Append(Comma);
-                    if (useQuote) _sb.Append(DoubleQuote);
-                    _sb.Append(value);
-                    if (useQuote) _sb.Append(DoubleQuote);
-                }
-                index++;
+                if (needsComma) _sb.Append(Comma);
+                if (useQuote) _sb.Append(DoubleQuote);
+                _sb.Append(value);
+                if (useQuote) _sb.Append(DoubleQuote);
+                needsComma = true;
             }
 
-            if (index > 0)
-                _sb.Append(CloseBracket);
+            _sb.Append(CloseBracket);
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddObjectValues<T>(string description, IEnumerable<T> values, bool seperatedByNewLine = false) where T : IJsonSerializer
+        public bool AddObjectValues<T>(string description, IEnumerable<T> values) where T : IJsonSerializer
         {
-            if (values == null) return;
+            if (values == null) return false;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
@@ -144,39 +167,32 @@ namespace VariantAnnotation.IO
                 // comma handling
                 if (needsComma) _sb.Append(Comma);
                 else needsComma = true;
-                if (seperatedByNewLine) _sb.Append("\n");
                 value.SerializeJson(_sb);
             }
-            if (seperatedByNewLine) _sb.Append("\n");
+            
             _sb.Append(CloseBracket);
             _needsComma = true;
+
+            return true;
         }
 
-        public void AddGroupedObjectValues<T>(string description, string[] groupDescriptions, params IList<T>[] groups) where T : IJsonSerializer
+        public void StartObject()
         {
-            if (groupDescriptions == null) return;
-
-            if (groups.Length != groupDescriptions.Length)
-                throw new ArgumentException(
-                    $"The count ({groupDescriptions.Length}) of descriptions does not match the count ({groups.Length}) of groups");
-
-            if (_needsComma) _sb.Append(Comma);
-            AddKey(description);
             _sb.Append(OpenBrace);
+            _needsComma = false;
+            _nestedLevel++;
+        }
 
-            var i = 0;
-            Reset();
-            foreach (var group in groups)
-            {
-                i++;
-                if (group == null || !group.Any()) continue;
-                AddObjectValues(groupDescriptions[i - 1], group);
-            }
-
+        public void EndObject()
+        {
             _sb.Append(CloseBrace);
             _needsComma = true;
+            _nestedLevel--;
         }
 
-        private void Reset(bool needsComma = false) => _needsComma = needsComma;
+        public void EndAllObjects()
+        {
+            _sb.Append(CloseBrace, _nestedLevel);
+        }
     }
 }

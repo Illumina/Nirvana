@@ -530,7 +530,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.non_coding_transcript_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            // TODO: Isn't IsWithinTranscript always true? and not within mature miRNA is always true
+            // NOTE: Isn't IsWithinTranscript always true? and not within mature miRNA is always true
             // For Ensembl transcript, miRNA may be a valid attribute. We have their location and we would like to check if the variant overlaps with the miRNA
             var result = !_preCache.HasExonOverlap && _transcript.Translation == null && !_preCache.OverlapWithMicroRna;
 

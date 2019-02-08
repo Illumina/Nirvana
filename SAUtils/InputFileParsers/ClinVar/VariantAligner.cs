@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Genome;
-using SAUtils.InputFileParsers.MitoMAP;
+using SAUtils.CreateMitoMapDb;
 using Variants;
 
 namespace SAUtils.InputFileParsers.ClinVar

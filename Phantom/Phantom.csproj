@@ -1,12 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <DebugType>Full</DebugType>
   </PropertyGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <LangVersion>default</LangVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.1-beta1" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\Genome\Genome.csproj" />
@@ -14,4 +17,7 @@
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />
   </ItemGroup>
+
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+
 </Project>

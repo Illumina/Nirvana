@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using Genome;
@@ -12,14 +11,12 @@ namespace SAUtils.InputFileParsers.OneKGen
 {
     public sealed class OneKGenReader 
     {
-        private readonly FileInfo _oneKGenFile;
+        private readonly string _fileName;
         private readonly IDictionary<string,IChromosome> _refNameDictionary;
 
         private  string _ancestralAllele;
 	    private  string _svType;
 	    private  int _svEnd;
-        private  string _refAllele;
-		private  string[] _altAlleles;
 
 	    private int? _allAlleleNumber;
 	    private int? _afrAlleleNumber;
@@ -35,35 +32,14 @@ namespace SAUtils.InputFileParsers.OneKGen
 		private int[] _easAlleleCounts;
 		private int[] _sasAlleleCounts;
 
-
-
-
-		// grch38 liftover related fields
-#pragma warning disable 414
-		private  string _minorAllele;
-	    private  double _minorAlleleFreq;
-	    private  int _minorAlleleCount;
-#pragma warning disable 169
-	    private bool _hasSymbolicAllele;
-#pragma warning restore 169
-#pragma warning restore 414
-
         // empty constructor for onekg reader for unit tests.
-        internal OneKGenReader(IDictionary<string, IChromosome> refNameDict)
-        {
-            _refNameDictionary = refNameDict;
-        }
+        internal OneKGenReader(IDictionary<string, IChromosome> refNameDict) => _refNameDictionary = refNameDict;
 
-	    public OneKGenReader(FileInfo oneKGenFile, IDictionary<string, IChromosome> refNameDict) : this(refNameDict)
-        {
-            _oneKGenFile = oneKGenFile;
-        }
+        public OneKGenReader(string oneKGenFile, IDictionary<string, IChromosome> refNameDict) : this(refNameDict) => _fileName = oneKGenFile;
 
         private void Clear()
 	    {
 		    _ancestralAllele = null;
-		    _refAllele = null;
-		    _altAlleles = null;
 
 			_allAlleleNumber = null;
 			_afrAlleleNumber = null;
@@ -82,23 +58,17 @@ namespace SAUtils.InputFileParsers.OneKGen
 			// SV fields
 			_svEnd  = -1;
 			_svType = null;
-
-	        // grch38 fields
-			_minorAlleleCount = 0;
-			_minorAlleleFreq  = 0;
-			_minorAllele      = null;
-
 	    }
 
-	    public IEnumerable<OneKGenItem> GetOneKGenItems()
+	    public IEnumerable<OneKGenItem> GetItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_oneKGenFile.FullName))
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
+                    if (line.IsWhiteSpace()) continue;
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
                     var oneKGenItemsList = ExtractItems(line);
@@ -122,14 +92,14 @@ namespace SAUtils.InputFileParsers.OneKGen
             var chromosomeName  = splitLine[VcfCommon.ChromIndex];
             if (!_refNameDictionary.ContainsKey(chromosomeName)) return null;
             var chromosome = _refNameDictionary[chromosomeName];
-			var position    = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
-            var rsId        = splitLine[VcfCommon.IdIndex];
-            _refAllele      = splitLine[VcfCommon.RefIndex];
-			_altAlleles     = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
-			var infoFields  = splitLine[VcfCommon.InfoIndex];
+            var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
+            var rsId       = splitLine[VcfCommon.IdIndex];
+            var refAllele  = splitLine[VcfCommon.RefIndex];
+            var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
+            var infoFields = splitLine[VcfCommon.InfoIndex];
 
-			// parses the info fields and extract frequencies, ancestral allele, allele counts, etc.
-			var hasSymbolicAllele = _altAlleles.Any(x => x.OptimizedStartsWith('<') && x.OptimizedEndsWith('>'));
+            // parses the info fields and extract frequencies, ancestral allele, allele counts, etc.
+            var hasSymbolicAllele = altAlleles.Any(x => x.OptimizedStartsWith('<') && x.OptimizedEndsWith('>'));
 	        if (hasSymbolicAllele) return null;
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
@@ -137,15 +107,15 @@ namespace SAUtils.InputFileParsers.OneKGen
 
 			var okgItemsList = new List<OneKGenItem>();
 	        
-			for (var i = 0; i < _altAlleles.Length; i++)
+			for (var i = 0; i < altAlleles.Length; i++)
 			{
 				okgItemsList.Add(new OneKGenItem(
 					chromosome,
 					position,
 					rsId,
-					_refAllele,
-					_altAlleles[i],
-					_ancestralAllele,
+					refAllele,
+					altAlleles[i],
+                    _ancestralAllele,
 					GetAlleleCount(_allAlleleCounts, i),
 					GetAlleleCount(_afrAlleleCounts,i),
 					GetAlleleCount(_amrAlleleCounts,i),
@@ -163,8 +133,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 					));
 			}
 			
-			return okgItemsList;
-           
+			return okgItemsList;           
         }
 
 	    private static int? GetAlleleCount(int[] alleleCounts, int i)
@@ -205,18 +174,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 						_svEnd = Convert.ToInt32(value);
 					break;
 				case "CIEND":
-					/*if (hasSymbolicAllele)
-					{
-						var endBoundaries = value.OptimizedSplit(',');
-						Tuple.Create(Convert.ToInt32(endBoundaries[0]), Convert.ToInt32(endBoundaries[1]));
-					}
-					break;*/
 				case "CIPOS":
-					/*if (hasSymbolicAllele)
-					{
-						var beginBoundaries = value.OptimizedSplit(',');
-						Tuple.Create(Convert.ToInt32(beginBoundaries[0]), Convert.ToInt32(beginBoundaries[1]));
-					}*/
 					break;
 				case "AN":
 					_allAlleleNumber = Convert.ToInt32(value);
@@ -254,9 +212,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 				case "SAS_AC":
 					_sasAlleleCounts = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
-
 			}
-
 		}
 
 		private static string GetAncestralAllele(string value)
@@ -271,7 +227,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 		{
 			c = char.ToUpper(c);
 			return c == 'A' || c == 'C' || c == 'G' || c == 'T' || c == 'N';
-		}
-		
+		}		
     }
 }

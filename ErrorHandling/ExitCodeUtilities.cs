@@ -9,6 +9,8 @@ namespace ErrorHandling
 	{
 		private static readonly Dictionary<Type, ExitCodes> ExceptionsToExitCodes;
 		private static readonly HashSet<Type> UserFriendlyExceptions;
+	    private const string UserError = "User Error";
+	    public const string NirvanaError = "Error";
 	    public const string VcfLine = "VcfLine";
 
 		// constructor
@@ -48,7 +50,10 @@ namespace ErrorHandling
 			};
 		}
 
-	    internal static ExitCodes GetExitCode(Type exceptionType)
+	    public static string GetErrorCategory(Exception exception) =>
+	        UserFriendlyExceptions.Contains(exception.GetType()) ? UserError : NirvanaError;
+
+        public static ExitCodes GetExitCode(Type exceptionType)
 	    {
             if (!ExceptionsToExitCodes.TryGetValue(exceptionType, out ExitCodes exitCode)) exitCode = ExitCodes.InvalidFunction;
             return exitCode;
@@ -56,6 +61,7 @@ namespace ErrorHandling
 
 		/// <summary>
 		/// Displays the details behind the exception
+		/// Throw exceptions that are not user friendly if needed
 		/// </summary>
 		public static ExitCodes ShowException(Exception e)
 		{
@@ -91,5 +97,5 @@ namespace ErrorHandling
 
 		    return GetExitCode(exceptionType);
 		}
-	}
+    }
 }

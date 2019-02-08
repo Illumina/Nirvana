@@ -4,10 +4,29 @@ namespace VariantAnnotation.Logger
 {
     public sealed class NullLogger : ILogger
     {
-        public void WriteLine()         { }
-        public void WriteLine(string s) { }
-        public void Write(string s)     { }
-        public void SetBold()           { }
-        public void ResetColor()        { }
+        public void WriteLine()
+        {
+            // no output desired
+        }
+
+        public void WriteLine(string s)
+        {
+            // no output desired
+        }
+
+        public void Write(string s)
+        {
+            // no output desired
+        }
+
+        public void SetBold()
+        {
+            // no output desired
+        }
+
+        public void ResetColor()
+        {
+            // no output desired
+        }
     }
 }

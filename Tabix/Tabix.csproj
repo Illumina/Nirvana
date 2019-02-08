@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <ItemGroup>
+    <ProjectReference Include="..\Compression\Compression.csproj" />
+    <ProjectReference Include="..\Genome\Genome.csproj" />
+  </ItemGroup>
+</Project>

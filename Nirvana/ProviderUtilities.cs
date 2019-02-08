@@ -1,68 +1,180 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
+using Amazon.S3;
+using Cloud;
 using IO;
 using VariantAnnotation;
 using CommandLine.Utilities;
-using Genome;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.SA;
+using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 
 namespace Nirvana
 {
     public static class ProviderUtilities
     {
-        public static IAnnotator GetAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider, IAnnotationProvider saProviders, IAnnotationProvider conservationProvider, IGeneAnnotationProvider geneAnnotationProviders, IEnumerable<IPlugin> plugins = null)
+        public static IAnnotator GetAnnotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider,
+            IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,
+            IGeneAnnotationProvider geneAnnotationProviders, IEnumerable<IPlugin> plugins = null)
         {
-            return new Annotator(taProvider, sequenceProvider, saProviders, conservationProvider, geneAnnotationProviders, plugins);
+            return new Annotator(taProvider, sequenceProvider, saProviders, conservationProvider,
+                geneAnnotationProviders, plugins);
         }
 
         public static ISequenceProvider GetSequenceProvider(string compressedReferencePath)
         {
-            return new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedReferencePath));
+             return new ReferenceSequenceProvider(PersistentStreamUtils.GetReadStream(compressedReferencePath));
         }
 
-        public static IAnnotationProvider GetConservationProvider(IEnumerable<string> dirPaths)
+        public static IAnnotationProvider GetConservationProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
         {
-            if (dirPaths == null) return null;
-            dirPaths = dirPaths.ToList();
-            return dirPaths.All(x => Directory.GetFiles(x, "*.npd").Length == 0) ? null : new ConservationScoreProvider(dirPaths);
+            if (dataAndIndexFiles == null) return null;
+
+            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
+            {
+                if (dataFile.EndsWith(SaCommon.PhylopFileSuffix))
+                    return new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(dataFile), PersistentStreamUtils.GetReadStream(indexFile));
+            }
+
+            return null;
         }
 
-        public static IAnnotationProvider GetSaProvider(List<string> supplementaryAnnotationDirectories)
+        public static IRefMinorProvider GetRefMinorProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
         {
-            if (supplementaryAnnotationDirectories == null || supplementaryAnnotationDirectories.Count == 0)
-                return null;
-            return new SupplementaryAnnotationProvider(supplementaryAnnotationDirectories);
+            if (dataAndIndexFiles == null) return null;
+
+            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
+            {
+                if (dataFile.EndsWith(SaCommon.RefMinorFileSuffix))
+                    return new RefMinorProvider(PersistentStreamUtils.GetReadStream(dataFile), PersistentStreamUtils.GetReadStream(indexFile));
+            }
+
+            return null;
         }
 
-        public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path, ISequenceProvider sequenceProvider)
+        public static IGeneAnnotationProvider GetGeneAnnotationProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
         {
+            if (dataAndIndexFiles == null) return null;
+            var ngaFiles = new List<string>();
+            foreach ((string dataFile, string _) in dataAndIndexFiles)
+            {
+                if (dataFile.EndsWith(SaCommon.NgaFileSuffix))
+                    ngaFiles.Add(dataFile);
+            }
+            return ngaFiles.Count > 0? new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(ngaFiles)): null;
+        }
+
+        public static IAnnotationProvider GetNsaProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, AmazonS3Client s3Client, List<S3Path> annotationsInS3)
+        {
+            if (dataAndIndexFiles == null && annotationsInS3 == null) return null;
+
+            var nsaReaders = new List<INsaReader>();
+            var nsiReaders = new List<INsiReader>();
+
+            if (dataAndIndexFiles != null) GetSaReaders(dataAndIndexFiles, nsaReaders, nsiReaders);
+
+            if (annotationsInS3 != null) GetSaReadersFromS3(s3Client, annotationsInS3, nsaReaders, nsiReaders);
+
+            if (nsaReaders.Count > 0 || nsiReaders.Count > 0)
+                return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());
+            return null;
+        }
+
+        private static void GetSaReadersFromS3(AmazonS3Client s3Client, List<S3Path> annotationsInS3, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
+        {
+            foreach (var annotation in annotationsInS3)
+            {
+                if (annotation.path.EndsWith(SaCommon.SaFileSuffix))
+                    nsaReaders.Add(GetNsaReader(
+                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0),
+                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName,
+                            annotation.path + SaCommon.IndexSufix, 0)));
+                else
+                {
+                    nsiReaders.Add(GetNsiReader(
+                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0)));
+                }
+            }
+        }
+
+        private static void GetSaReaders(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
+        {
+            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
+            {
+                if (dataFile.EndsWith(SaCommon.SaFileSuffix))
+                    nsaReaders.Add(
+                        GetNsaReader(PersistentStreamUtils.GetReadStream(dataFile),
+                        PersistentStreamUtils.GetReadStream(indexFile))
+                        );
+                if (dataFile.EndsWith(SaCommon.SiFileSuffix))
+                    nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
+            }
+        }
+
+        public static IList<(string dataFile, string indexFile)> GetSaDataAndIndexPaths(string saDirectoryPath)
+        {
+            if (Directory.Exists(saDirectoryPath))
+                return GetLocalSaPaths(saDirectoryPath);
+
+            //if this is the saManifest url
+            return GetSaPathsFromManifest(saDirectoryPath);
+        }
+
+        private static IList<(string dataFile, string indexFile)> GetSaPathsFromManifest(string saDirectoryPath)
+        {
+            var paths = new List<(string, string)>();
+            using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(saDirectoryPath)))
+            {
+                string line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.EndsWith(SaCommon.SiFileSuffix) || line.EndsWith(SaCommon.NgaFileSuffix))
+                        paths.Add((line, null));
+                    else paths.Add((line, line + SaCommon.IndexSufix));
+                }
+            }
+
+            return paths.Count > 0 ? paths : null;
+        }
+
+        private static List<(string, string)> GetLocalSaPaths(string saDirectoryPath)
+        {
+            var paths = new List<(string, string)>();
+            foreach (var filePath in Directory.GetFiles(saDirectoryPath))
+            {
+                if (filePath.EndsWith(SaCommon.SaFileSuffix) || filePath.EndsWith(SaCommon.PhylopFileSuffix) ||
+                    filePath.EndsWith(SaCommon.RefMinorFileSuffix))
+                    paths.Add((filePath, filePath + SaCommon.IndexSufix));
+
+                if (filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
+                    paths.Add((filePath, null));
+                //skip files with all other extensions
+            }
+
+            return paths.Count>0? paths:null;
+        }
+
+        public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path,
+            ISequenceProvider sequenceProvider)
+         {
             var benchmark = new Benchmark();
             var provider = new TranscriptAnnotationProvider(path, sequenceProvider);
             var wallTimeSpan = benchmark.GetElapsedTime();
             Console.WriteLine("Cache Time: {0} ms", wallTimeSpan.TotalMilliseconds);
-			return provider;
+            return provider;
         }
 
-        public static IRefMinorProvider GetRefMinorProvider(IDictionary<string, IChromosome> refNameToChromosome, List<string> supplementaryAnnotationDirectories)
-        {
-            return supplementaryAnnotationDirectories == null || supplementaryAnnotationDirectories.Count == 0
-                ? null
-                : new RefMinorProvider(refNameToChromosome, supplementaryAnnotationDirectories);
-        }
+        
+        private static NsaReader GetNsaReader(Stream dataStream, Stream indexStream) =>
+            new NsaReader(new ExtendedBinaryReader(dataStream), indexStream);
 
-        public static IGeneAnnotationProvider GetGeneAnnotationProvider(IEnumerable<string> supplementaryAnnotationDirectories)
-        {
-            var reader = SaReaderUtils.GetGeneAnnotationDatabaseReader(supplementaryAnnotationDirectories.ToList());
-            if (reader == null) return null;
-            var geneAnnotationProvider = new GeneAnnotationProvider(reader);
-            return geneAnnotationProvider;
-        }
+        private static NsiReader GetNsiReader(Stream stream) => new NsiReader(stream);
     }
 }

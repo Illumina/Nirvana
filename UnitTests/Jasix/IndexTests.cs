@@ -148,7 +148,7 @@ namespace UnitTests.Jasix
             var stream = ResourceUtilities.GetReadStream(Resources.TopPath("TinyAnnotated.json"));
 
             var lineCount = 0;
-            using (var jasixReader = new BgzipTextReader(stream))
+            using (var jasixReader = new StreamReader(stream))
             {
                 while (jasixReader.ReadLine() != null)
                 {
@@ -196,15 +196,6 @@ namespace UnitTests.Jasix
 
             Assert.Equal(0, index.GetSectionBegin(section));
             Assert.Equal(100, index.GetSectionEnd(section));
-        }
-
-        [Fact]
-        public void EndSection_before_beginning_throws_exception()
-        {
-            var index = new JasixIndex();
-            const string section = "section1";
-
-            Assert.Throws<UserErrorException>(()=>index.EndSection(section, 100));
         }
 
         [Fact]

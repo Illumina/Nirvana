@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OneKGen;
 using UnitTests.TestUtilities;
-using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -76,23 +74,12 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
-        public void MultiAltAlleleAncesterTest()
-        {
-            var oneKGenItems = _oneKGenReader.ExtractItems(VcfLine2);
-
-            Assert.Equal(2, oneKGenItems.Count);
-            Assert.Contains("\"ancestralAllele\":\"g\"", oneKGenItems[0].GetJsonString());
-            Assert.Contains("\"ancestralAllele\":\"g\"", oneKGenItems[1].GetJsonString());
-        }
-
-        [Fact]
         public void PrioritizingSymbolicAllele4Svs()
         {
             const string vcfLine =
                 "X	101155257	rs373174489	GTGCAAAAGCTCTTTAGTTTAATTAGGTCTCAGCTATTTATCTTTGTTCTTAT	G	100	PASS	AN=3775;AC=1723;AF=0.456424;AA=;EAS_AN=764;EAS_AC=90;EAS_AF=0.1178;EUR_AN=766;EUR_AC=439;EUR_AF=0.5731;AFR_AN=1003;AFR_AC=839;AFR_AF=0.8365;AMR_AN=524;AMR_AC=180;AMR_AF=0.3435;SAS_AN=718;SAS_AC=175;SAS_AF=0.2437";
 
             var oneKItems = _oneKGenReader.ExtractItems(vcfLine);
-            Assert.False(oneKItems[0].IsInterval);
             var json1 = oneKItems[0].GetJsonString();
             Assert.Equal("0.456424", GetAlleleFrequency(json1, "allAf"));
             Assert.Equal("0.836491", GetAlleleFrequency(json1, "afrAf"));
@@ -116,38 +103,36 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
+        public void MissingSubPopulationFrequencies()
+        {
+            var vcfLine =
+                "1\t10616\trs376342519\tCCGCCGTTGCAAAGGCGCGCCG\tC\t100\tPASS\tAN=5008;AC=4973;AF=0.993011;AA=;EAS_AN=1008;EAS_AC=999;EAS_AF=0.9911;EUR_AN=1006;EUR_AC=1000;EUR_AF=0.994;AFR_AN=1322;AFR_AC=1308;AFR_AF=0.9894;AMR_AN=694;AMR_AC=691;AMR_AF=0.9957;SAS_AN=978;SAS_AC=975;SAS_AF=0.9969";
+
+            var items = _oneKGenReader.ExtractItems(vcfLine).ToList();
+
+            Assert.Single(items);
+            Assert.Equal("\"allAf\":0.993011,\"afrAf\":0.98941,\"amrAf\":0.995677,\"easAf\":0.991071,\"eurAf\":0.994036,\"sasAf\":0.996933,\"allAn\":5008,\"afrAn\":1322,\"amrAn\":694,\"easAn\":1008,\"eurAn\":1006,\"sasAn\":978,\"allAc\":4973,\"afrAc\":1308,\"amrAc\":691,\"easAc\":999,\"eurAc\":1000,\"sasAc\":975", items[0].GetJsonString());
+
+        }
+
+        [Fact]
         public void OnekGenSvReader()
         {
-            var inputFileInfo = new FileInfo(Resources.InputFiles("1000G_SVs.tsv"));
+            var inputFile = Resources.InputFiles("1000G_SVs.tsv");
 
-            var svReader = new OneKGenSvReader(inputFileInfo, _refChromDict);
+            var svReader = new OneKGenSvReader(inputFile, _refChromDict);
 
-            var svItemList = svReader.GetOneKGenSvItems().ToList();
+            var svItemList = svReader.GetItems().ToList();
 
-            var si = svItemList[0].GetSupplementaryInterval();
 
-            Assert.Equal("esv3584976", si.StringValues["id"]);
-            Assert.Equal(668631, si.Start);
-            Assert.Equal(850204, si.End);
-            Assert.Equal(VariantType.copy_number_gain, si.VariantType);
-            Assert.Equal(0.02396, si.PopulationFrequencies["variantFreqAll"]);
-            Assert.Equal(2504, si.IntValues["sampleSize"]);
-
+            Assert.Equal("\"chromosome\":\"1\",\"begin\":668631,\"end\":850204,\"variantType\":\"copy_number_gain\",\"id\":\"esv3584976\",\"variantFreqAll\":0.02396,\"variantFreqAfr\":0.00303,\"variantFreqEas\":0.11111,\"variantFreqEur\":0.00199,\"variantFreqSas\":0.00204,\"sampleSize\":2504,\"sampleSizeAfr\":661,\"sampleSizeAmr\":347,\"sampleSizeEas\":504,\"sampleSizeEur\":503,\"sampleSizeSas\":489,\"observedGains\":60", svItemList[0].GetJsonString());
+            
             //checking out the next item that should be a copy number variant (both loss and gain)
-            si = svItemList[1].GetSupplementaryInterval();
-
-            Assert.Equal("esv3584977;esv3584978", si.StringValues["id"]);
-            Assert.Equal(713045, si.Start);
-            Assert.Equal(755966, si.End);
-            Assert.Equal(VariantType.copy_number_variation, si.VariantType);
-
+            Assert.Equal("\"chromosome\":\"1\",\"begin\":713045,\"end\":755966,\"variantType\":\"copy_number_variation\",\"id\":\"esv3584977;esv3584978\",\"variantFreqAll\":0.08187,\"variantFreqAfr\":0.06051,\"variantFreqAmr\":0.05476,\"variantFreqEas\":0.11905,\"variantFreqEur\":0.08549,\"variantFreqSas\":0.08793,\"sampleSize\":2504,\"sampleSizeAfr\":661,\"sampleSizeAmr\":347,\"sampleSizeEas\":504,\"sampleSizeEur\":503,\"sampleSizeSas\":489,\"observedGains\":202,\"observedLosses\":3", svItemList[1].GetJsonString());
+            
             //next one is a del (copy_number_loss)
-            si = svItemList[2].GetSupplementaryInterval();
-
-            Assert.Equal("esv3584979", si.StringValues["id"]);
-            Assert.Equal(738571, si.Start);
-            Assert.Equal(742020, si.End);
-            Assert.Equal(VariantType.copy_number_loss, si.VariantType);
+            Assert.Equal("\"chromosome\":\"1\",\"begin\":738571,\"end\":742020,\"variantType\":\"copy_number_loss\",\"id\":\"esv3584979\",\"variantFreqAll\":0.0004,\"variantFreqEas\":0.00198,\"sampleSize\":2504,\"sampleSizeAfr\":661,\"sampleSizeAmr\":347,\"sampleSizeEas\":504,\"sampleSizeEur\":503,\"sampleSizeSas\":489,\"observedLosses\":1", svItemList[2].GetJsonString());
+            
         }
     }
 }

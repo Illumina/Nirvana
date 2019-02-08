@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Phantom.Graph;
-using Phantom.PositionCollections;
 
 namespace Phantom.PositionCollections
 {
@@ -17,7 +16,7 @@ namespace Phantom.PositionCollections
             var mergedBlocksToSampleHaplotype = new Dictionary<AlleleBlock, List<SampleHaplotype>>();
             var seedBlocks = new LinkedList<AlleleBlock>();
 
-            foreach (var (_, alleleBlocks) in connectedComponentToAlleles.ToArray().OrderBy(x => x.Key))
+            foreach (var (_, alleleBlocks) in connectedComponentToAlleles.OrderBy(x => x.Key))
             {
                 var blockProcessMethod = CheckAlleleBlocks(alleleBlocks, seedBlocks);
                 foreach (var alleleBlock in alleleBlocks)
@@ -40,7 +39,7 @@ namespace Phantom.PositionCollections
            return mergedBlocksToSampleHaplotype;
         }
 
-        private static Func<AlleleBlock, AlleleBlock> CheckAlleleBlocks(List<AlleleBlock> alleleBlocks, LinkedList<AlleleBlock> seedBlocks)
+        private static Func<AlleleBlock, AlleleBlock> CheckAlleleBlocks(IReadOnlyList<AlleleBlock> alleleBlocks, LinkedList<AlleleBlock> seedBlocks)
         {
             var seedBlock = seedBlocks.First;
             while (seedBlock != null) 

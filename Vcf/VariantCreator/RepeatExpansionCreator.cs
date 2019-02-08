@@ -5,33 +5,40 @@ using Variants;
 
 namespace Vcf.VariantCreator
 {
-	public static class RepeatExpansionCreator
-	{
-		private static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, false, true);
-		public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
-		{
-			start++;//for the padding base
-			if (infoData.RefRepeatCount == 0) return null;
+    public static class RepeatExpansionCreator
+    {
+        private static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, true);
 
-		    (int number, bool foundError) = altAllele.Trim('<', '>').Substring(3).OptimizedParseInt32();
-		    if (foundError) return null;
+        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
+        {
+            start++;//for the padding base
+            if (infoData.RefRepeatCount == 0) return null;
 
-            int repeatCount = number;
+            (int repeatCount, bool foundError) = altAllele.Trim('<', '>').Substring(3).OptimizedParseInt32();
+            if (foundError) return null;
 
-			var svType = repeatCount == infoData.RefRepeatCount ? VariantType.short_tandem_repeat_variation: 
-				repeatCount > infoData.RefRepeatCount
-					? VariantType.short_tandem_repeat_expansion
-					: VariantType.short_tandem_repeat_contraction;
-			
-			int end    = infoData.End ?? 0;
-			string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
+            if (infoData.RefRepeatCount != null)
+            {
+                var svType = GetRepeatExpansionType(infoData.RefRepeatCount.Value, repeatCount);
 
-			return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null, null, RepeatExpansionBehavior);
-		}
+                int end = infoData.End ?? 0;
+                string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
 
-		private static string GetVid(string ensemblName, int start, int end, string repeatUnit, int repeatCount)
-		{
-			return $"{ensemblName}:{start}:{end}:{repeatUnit}:{repeatCount}";
-		}
-	}
+                return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
+                    null, RepeatExpansionBehavior);
+            }
+            return null;
+        }
+
+        private static VariantType GetRepeatExpansionType(int refRepeatCount, int repeatCount)
+        {
+            if (refRepeatCount == repeatCount) return VariantType.short_tandem_repeat_variation;
+            return repeatCount > refRepeatCount ? VariantType.short_tandem_repeat_expansion : VariantType.short_tandem_repeat_contraction;
+        }
+
+        private static string GetVid(string ensemblName, int start, int end, string repeatUnit, int repeatCount)
+        {
+            return $"{ensemblName}:{start}:{end}:{repeatUnit}:{repeatCount}";
+        }
+    }
 }

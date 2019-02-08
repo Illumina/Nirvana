@@ -1,13 +1,19 @@
 ﻿using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
+
 // ReSharper disable NonReadonlyMemberInGetHashCode
 
 namespace SAUtils.DataStructures
 {
-    public sealed class GnomadItem : SupplementaryDataItem
+    public sealed class GnomadItem : ISupplementaryDataItem
     {
         #region members
+        public IChromosome Chromosome { get; }
+        public int Position { get; set; }
+        public string RefAllele { get; set; }
+        public string AltAllele { get; set; }
 
         private int? AllAlleleCount { get; set; }
         private int? AfrAlleleCount { get; set; }
@@ -56,9 +62,9 @@ namespace SAUtils.DataStructures
             bool hasFailedFilters)
         {
             Chromosome = chromosome;
-            Start = position;
-            ReferenceAllele = refAllele;
-            AlternateAllele = alternateAllele;
+            Position = position;
+            RefAllele = refAllele;
+            AltAllele = alternateAllele;
 
             if (depth!=null && allAlleleNumber!=null)
                 Coverage = ComputingUtilities.GetCoverage(depth.Value, allAlleleNumber.Value);
@@ -100,63 +106,63 @@ namespace SAUtils.DataStructures
 
         private void RemoveAlleleNumberZero()
         {
-            if (AllAlleleNumber == null || AllAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AllAlleleNumber ))
             {
                 AllAlleleNumber = null;
                 AllAlleleCount = null;
                 AllHomCount = null;
             }
 
-            if (AfrAlleleNumber == null || AfrAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AfrAlleleNumber ))
             {
                 AfrAlleleNumber = null;
                 AfrAlleleCount = null;
                 AfrHomCount = null;
             }
 
-            if (AmrAlleleNumber == null || AmrAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AmrAlleleNumber))
             {
                 AmrAlleleNumber = null;
                 AmrAlleleCount = null;
                 AmrHomCount = null;
             }
 
-            if (EasAlleleNumber == null || EasAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(EasAlleleNumber ))
             {
                 EasAlleleNumber = null;
                 EasAlleleCount = null;
                 EasHomCount = null;
             }
 
-            if (FinAlleleNumber == null || FinAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(FinAlleleNumber ))
             {
                 FinAlleleNumber = null;
                 FinAlleleCount = null;
                 FinHomCount = null;
             }
 
-            if (NfeAlleleNumber == null || NfeAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(NfeAlleleNumber ))
             {
                 NfeAlleleNumber = null;
                 NfeAlleleCount = null;
                 NfeHomCount = null;
             }
 
-            if (OthAlleleNumber == null || OthAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(OthAlleleNumber ))
             {
                 OthAlleleNumber = null;
                 OthAlleleCount = null;
                 OthHomCount = null;
             }
 
-            if (AsjAlleleNumber == null || AsjAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(AsjAlleleNumber ))
             {
                 AsjAlleleNumber = null;
                 AsjAlleleCount = null;
                 AsjHomCount = null;
             }
 
-            if (SasAlleleNumber == null || SasAlleleNumber.Value == 0)
+            if (SaUtilsCommon.IsNumberNullOrZero(SasAlleleNumber ))
             {
                 SasAlleleNumber = null;
                 SasAlleleCount = null;
@@ -165,31 +171,7 @@ namespace SAUtils.DataStructures
         }
 
 
-
-
-        // note that for an GnomadItem, the chromosome, position and alt allele should uniquely identify it. If not, there is an error in the data source.
-        public override bool Equals(object other)
-        {
-            if (!(other is GnomadItem otherItem)) return false;
-
-            // Return true if the fields match:
-            return Equals(Chromosome, otherItem.Chromosome)
-                && Start == otherItem.Start
-                && AlternateAllele.Equals(otherItem.AlternateAllele)
-                ;
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Start.GetHashCode() ^ Chromosome.GetHashCode();
-                hashCode = (hashCode * 397) ^ (AlternateAllele?.GetHashCode() ?? 0);
-
-                return hashCode;
-            }
-        }
-
+        
 		public string GetJsonString()
 		{
 			var sb = StringBuilderCache.Acquire();
@@ -245,9 +227,6 @@ namespace SAUtils.DataStructures
 		    return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
-        public override SupplementaryIntervalItem GetSupplementaryInterval()
-        {
-            return null;
-        }
+        
     }
 }

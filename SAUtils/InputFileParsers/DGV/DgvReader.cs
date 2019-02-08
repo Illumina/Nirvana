@@ -1,25 +1,25 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 
 namespace SAUtils.InputFileParsers.DGV
 {
-    public sealed class DgvReader
+    public sealed class DgvReader: IDisposable
     {
         #region members
 
-        private readonly FileInfo _dgvFileInfo;
+        private readonly StreamReader _reader;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
         #endregion
 
         // constructor
-        public DgvReader(FileInfo dgvFileInfo, IDictionary<string, IChromosome> refChromDict)
+        public DgvReader(StreamReader reader, IDictionary<string, IChromosome> refChromDict)
         {
-            _dgvFileInfo = dgvFileInfo;
+            _reader = reader;
             _refChromDict = refChromDict;
         }
 
@@ -31,19 +31,20 @@ namespace SAUtils.InputFileParsers.DGV
             var cols = line.OptimizedSplit('\t');
             if (cols.Length < 8) return null;
 
-            var id = cols[0];
-            var chromosomeName = cols[1];
+            string id = cols[0];
+            string chromosomeName = cols[1];
+
             if (!refChromDict.ContainsKey(chromosomeName)) return null;
 
             var chromosome = refChromDict[chromosomeName];
 
-            var start = int.Parse(cols[2]);
-            var end = int.Parse(cols[3]);
-            var variantType = cols[4];
-            var variantSubType = cols[5];
-            var sampleSize = int.Parse(cols[14]);
-            var observedGains = cols[15] == "" ? 0 : int.Parse(cols[15]);
-            var observedLosses = cols[16] == "" ? 0 : int.Parse(cols[16]);
+            int start = int.Parse(cols[2]);
+            int end = int.Parse(cols[3]);
+            string variantType = cols[4];
+            string variantSubType = cols[5];
+            int sampleSize = int.Parse(cols[14]);
+            int observedGains = cols[15] == "" ? 0 : int.Parse(cols[15]);
+            int observedLosses = cols[16] == "" ? 0 : int.Parse(cols[16]);
 
             var seqAltType = SaParseUtilities.GetSequenceAlterationType(variantType, variantSubType);
 
@@ -52,9 +53,9 @@ namespace SAUtils.InputFileParsers.DGV
 
 
 
-        public IEnumerable<DgvItem> GetDgvItems()
+        public IEnumerable<DgvItem> GetItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_dgvFileInfo.FullName))
+            using (var reader = _reader)
             {
                 while (true)
                 {
@@ -63,7 +64,7 @@ namespace SAUtils.InputFileParsers.DGV
                     if (line == null) break;
 
                     // skip header and empty lines
-                    if (string.IsNullOrWhiteSpace(line) || IsDgvHeader(line)) continue;
+                    if (line.IsWhiteSpace() || IsDgvHeader(line)) continue;
                     var dgvItem = ExtractDgvItem(line, _refChromDict);
                     if (dgvItem == null) continue;
                     yield return dgvItem;
@@ -74,6 +75,11 @@ namespace SAUtils.InputFileParsers.DGV
         private static bool IsDgvHeader(string line)
         {
             return line.StartsWith("variantaccession");
+        }
+
+        public void Dispose()
+        {
+            _reader?.Dispose();
         }
     }
 }

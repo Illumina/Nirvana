@@ -44,7 +44,7 @@ namespace UnitTests.Compression.FileHandling
             }
         }
 
-        private static string GetRandomString(int length)
+        internal static string GetRandomString(int length)
         {
             const string chars = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
             return new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());

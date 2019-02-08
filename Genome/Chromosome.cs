@@ -1,6 +1,8 @@
-﻿namespace Genome
+﻿using System;
+
+namespace Genome
 {
-    public sealed class Chromosome : IChromosome
+    public sealed class Chromosome : IChromosome, IComparable<IChromosome>
     {
         public string UcscName { get; }
         public string EnsemblName { get; }
@@ -18,5 +20,12 @@
         public bool Equals(IChromosome other) => Index == other.Index;
 
         public override int GetHashCode() => Index.GetHashCode();
+
+        public int CompareTo(IChromosome other)
+        {
+            if (ReferenceEquals(this, other)) return 0;
+            if (ReferenceEquals(null, other)) return 1;
+            return Index.CompareTo(other.Index);
+        }
     }
 }

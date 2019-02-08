@@ -22,7 +22,6 @@ namespace IO
         private readonly byte[] _buffer;
         private char[] _charBuffer = new char[MinBufferSize];
 
-        private readonly bool _fixedBuffer;
         private bool _foundEof;
 
         private int _bufferLen;
@@ -33,7 +32,7 @@ namespace IO
         public BufferedBinaryReader(Stream stream, bool leaveOpen = false, int bufferSize = BufferSize)
         {
             if (stream == null)  throw new ArgumentNullException(nameof(stream));
-            if (!stream.CanRead) throw new ArgumentException();
+            if (!stream.CanRead) throw new ArgumentException("A non-readable stream was supplied.", nameof(stream));
             if (bufferSize <= 0) throw new ArgumentOutOfRangeException(nameof(bufferSize));
 
             _stream    = stream;
@@ -43,28 +42,15 @@ namespace IO
             FillBuffer();
         }
 
-        // this is used when processing SA read blocks
-        public BufferedBinaryReader(byte[] buffer)
-        {
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
-            if (buffer.Length == 0) throw new InvalidDataException("Expected a non-zero length buffer.");
-
-            _buffer      = buffer;
-            _bufferLen   = buffer.Length;
-            _fixedBuffer = true;
-        }
-
         private void FillBuffer()
         {
-            if (_fixedBuffer) return;
-
             int numRemainingBytes = _bufferLen - _bufferPos;
             if (numRemainingBytes > 0) Buffer.BlockCopy(_buffer, _bufferPos, _buffer, 0, numRemainingBytes);
 
             _bufferPos = 0;
             _bufferLen = numRemainingBytes;
 
-            int numBytesRead = _stream.ForcedRead(_buffer, numRemainingBytes, _buffer.Length - numRemainingBytes);
+            int numBytesRead = _stream.Read(_buffer, numRemainingBytes, _buffer.Length - numRemainingBytes);
             _bufferLen       = numRemainingBytes + numBytesRead;
 
             if (_bufferPos == 0 && _bufferLen == 0) _foundEof = true;

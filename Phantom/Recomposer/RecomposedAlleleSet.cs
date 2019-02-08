@@ -20,7 +20,7 @@ namespace Phantom.Recomposer
             RecomposedAlleles = new Dictionary<VariantSite, VariantInfo>();
         }
 
-        public List<string[]> GetRecomposedVcfRecords()
+        public IEnumerable<string[]> GetRecomposedVcfRecords()
         {
             var vcfRecords = new List<string[]>();
             foreach (var variantSite in RecomposedAlleles.Keys.OrderBy(x => x))
@@ -51,7 +51,7 @@ namespace Phantom.Recomposer
                     }
                 }
                 string altAlleleColumn = string.Join(",", altAlleleList);
-                vcfRecords.Add(GetVcfFields(variantSite, altAlleleColumn, varInfo.Qual, varInfo.Filter, sampleGenotypes, varInfo.SampleGqs, varInfo.SamplePhaseSets));
+                vcfRecords.Add(GetVcfFields(variantSite, varInfo, altAlleleColumn, sampleGenotypes));
             }
 
             return vcfRecords;
@@ -73,7 +73,7 @@ namespace Phantom.Recomposer
             sampleGenotype[sampleAlleleAlleleIndex] = currentGenotypeIndex;
         }
 
-        private string[] GetVcfFields(VariantSite varSite, string altAlleleColumn, string qual, string filter, List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, string variantId = VariantId, string info = InfoTag)
+        private string[] GetVcfFields(VariantSite varSite, VariantInfo variantInfo, string altAlleleColumn, List<int>[] sampleGenoTypes, string variantId = VariantId, string info = InfoTag)
         {
             var vcfFields = new List<string>
             {
@@ -82,31 +82,23 @@ namespace Phantom.Recomposer
                 variantId,
                 varSite.RefAllele,
                 altAlleleColumn,
-                qual,
-                filter,
+                variantInfo.Qual,
+                variantInfo.GetMnvFilterTag(),
                 info
             };
 
-            AddFormatAndSampleColumns(sampleGenoTypes, sampleGqs, samplePhasesets, ref vcfFields);
+            AddFormatAndSampleColumns(sampleGenoTypes, variantInfo, ref vcfFields);
             return vcfFields.ToArray();
         }
 
-        private static void AddFormatAndSampleColumns(List<int>[] sampleGenoTypes, string[] sampleGqs, string[] samplePhasesets, ref List<string> vcfFields)
+        private static void AddFormatAndSampleColumns(List<int>[] sampleGenoTypes, VariantInfo variantInfo, ref List<string> vcfFields)
         {
             var formatTags = "GT";
             var hasGq = false;
             var hasPs = false;
             int numSamples = sampleGenoTypes.Length;
 
-            var sampleGenotypeStrings = new string[numSamples];
-            for (var index = 0; index < numSamples; index++)
-            {
-                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
-                if (sampleGenotypeStrings[index] == ".") continue;
-
-                if (sampleGqs[index] != ".") hasGq = true;
-                if (samplePhasesets[index] != ".") hasPs = true;
-            }
+            string[] sampleGenotypeStrings = GetSampleGenotypeStrings(sampleGenoTypes, variantInfo, ref hasGq, ref hasPs, numSamples);
 
             int numFields = 1;
 
@@ -134,18 +126,33 @@ namespace Phantom.Recomposer
                     var fieldIndex = 1;
                     if (hasGq)
                     {
-                        nonMissingFields[fieldIndex] = sampleGqs[index];
+                        nonMissingFields[fieldIndex] = variantInfo.SampleGqs[index];
                         fieldIndex++;
                     }
                     if (hasPs)
                     {
-                        nonMissingFields[fieldIndex] = samplePhasesets[index];
+                        nonMissingFields[fieldIndex] = variantInfo.SamplePhaseSets[index];
                     }
 
                     var sampleColumnStr = string.Join(":", TrimTrailingMissValues(nonMissingFields));
                     vcfFields.Add(sampleColumnStr);
                 }
             }
+        }
+
+        private static string[] GetSampleGenotypeStrings(IReadOnlyList<List<int>> sampleGenoTypes, VariantInfo variantInfo, ref bool hasGq, ref bool hasPs, int numSamples)
+        {
+            var sampleGenotypeStrings = new string[numSamples];
+            for (var index = 0; index < numSamples; index++)
+            {
+                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
+                if (sampleGenotypeStrings[index] == ".") continue;
+
+                if (variantInfo.SampleGqs[index] != ".") hasGq = true;
+                if (variantInfo.SamplePhaseSets[index] != ".") hasPs = true;
+            }
+
+            return sampleGenotypeStrings;
         }
 
         private static string[] TrimTrailingMissValues(string[] values)
@@ -159,6 +166,6 @@ namespace Phantom.Recomposer
             return new ArraySegment<string>(values, 0, indexLastRemainedValue + 1).ToArray();
         }
 
-        private static string GetGenotype(List<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
+        private static string GetGenotype(IReadOnlyCollection<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
     }
 }

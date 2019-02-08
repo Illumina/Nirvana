@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.SA;
 
 namespace VariantAnnotation.Interface.AnnotatedPositions
 {
@@ -9,7 +9,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 		IPosition Position { get; }
 		string CytogeneticBand { get; set; }
 		IAnnotatedVariant[] AnnotatedVariants { get; }
-		IList<IAnnotatedSupplementaryInterval> SupplementaryIntervals { get; }
+		IList<ISupplementaryAnnotation> SupplementaryIntervals { get; }
 	    string GetJsonString();
     }
 }

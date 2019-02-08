@@ -12,28 +12,23 @@ namespace Phantom.Recomposer
     public sealed class Recomposer : IRecomposer
     {
         private readonly PositionProcessor _positionProcessor;
-        private readonly ISequenceProvider _sequenceProvider;
 
-        private Recomposer(PositionProcessor positionProcessor, ISequenceProvider sequenceProvider)
-        {
-            _positionProcessor = positionProcessor;
-            _sequenceProvider = sequenceProvider;
-        }
+        private Recomposer(PositionProcessor positionProcessor) => _positionProcessor = positionProcessor;
 
         public static IRecomposer Create(ISequenceProvider sequenceProvider,
             string inputCachePrefix)
         {
-            var transcriptIntervalArrays = ReadWriteUtilities.ReadCache(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(inputCachePrefix)), sequenceProvider.RefIndexToChromosome);
-            var (geneIntervalForest, _) = ReadWriteUtilities.GetIntervalAndTranscriptsForeachGene(transcriptIntervalArrays);
-            var codonInfoProvider = CodonInfoProvider.CreateCodonInfoProvider(transcriptIntervalArrays);
-            var variantGenerator = new VariantGenerator(sequenceProvider);
-            var positionBuffer = new PositionBuffer(codonInfoProvider, geneIntervalForest);
-            return new Recomposer(new PositionProcessor(positionBuffer, codonInfoProvider, variantGenerator), sequenceProvider);
+            var transcriptIntervalArrays = ReadWriteUtilities.ReadCache(PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(inputCachePrefix)), sequenceProvider.RefIndexToChromosome);
+            var (geneIntervalForest, _)  = ReadWriteUtilities.GetIntervalAndTranscriptsForeachGene(transcriptIntervalArrays);
+            var codonInfoProvider        = CodonInfoProvider.CreateCodonInfoProvider(transcriptIntervalArrays);
+            var variantGenerator         = new VariantGenerator(sequenceProvider);
+            var positionBuffer           = new PositionBuffer(codonInfoProvider, geneIntervalForest);
+            return new Recomposer(new PositionProcessor(positionBuffer, variantGenerator));
         }
 
-        public IEnumerable<ISimplePosition> ProcessSimplePosition(ISimplePosition simplePosition)
-        {
-            return simplePosition == null ? _positionProcessor.ProcessBufferedPositions() : _positionProcessor.Process(simplePosition);
-        }
+        public IEnumerable<ISimplePosition> ProcessSimplePosition(ISimplePosition simplePosition) =>
+            simplePosition == null
+                ? _positionProcessor.ProcessBufferedPositions()
+                : _positionProcessor.Process(simplePosition);
     }
 }

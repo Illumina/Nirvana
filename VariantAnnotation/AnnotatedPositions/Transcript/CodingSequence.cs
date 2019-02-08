@@ -1,4 +1,6 @@
-﻿using Genome;
+﻿using System.Text;
+using Genome;
+using Intervals;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
@@ -32,19 +34,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             foreach (var region in _regions)
             {
-                if (region.Type != TranscriptRegionType.Exon) continue;
-
                 // handle exons that are entirely in the UTR
-                if (region.End < _codingRegion.Start || region.Start > _codingRegion.End) continue;
-
-                int tempBegin = region.Start;
-                int tempEnd   = region.End;
-
-                // trim the first and last exons
-                if (_codingRegion.Start >= tempBegin && _codingRegion.Start <= tempEnd) tempBegin = _codingRegion.Start;
-                if (_codingRegion.End   >= tempBegin && _codingRegion.End   <= tempEnd) tempEnd   = _codingRegion.End;
-
-                sb.Append(_compressedSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
+                if (region.Type != TranscriptRegionType.Exon || region.End < _codingRegion.Start || region.Start > _codingRegion.End) continue;
+                AddCodingRegion(region, sb);
             }
 
             // account for the exon phase (reverse orientation)
@@ -52,6 +44,18 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             var s = StringBuilderCache.GetStringAndRelease(sb);
             return _geneOnReverseStrand ? SequenceUtilities.GetReverseComplement(s) : s;
+        }
+
+        private void AddCodingRegion(IInterval region, StringBuilder sb)
+        {
+            int tempBegin = region.Start;
+            int tempEnd   = region.End;
+
+            // trim the first and last exons
+            if (_codingRegion.Start >= tempBegin && _codingRegion.Start <= tempEnd) tempBegin = _codingRegion.Start;
+            if (_codingRegion.End   >= tempBegin && _codingRegion.End   <= tempEnd) tempEnd   = _codingRegion.End;
+
+            sb.Append(_compressedSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
         }
 
         public int Length => _codingRegion.Length;

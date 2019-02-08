@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -37,7 +36,7 @@ namespace SAUtils.InputFileParsers.ClinVar
     {
         #region members
 
-        private readonly FileInfo _clinVarXmlFileInfo;
+        private readonly string _fileName;
 		private readonly VariantAligner _aligner;
         private readonly ISequenceProvider _sequenceProvider;
         private readonly IDictionary<string, IChromosome> _refChromDict;
@@ -85,11 +84,11 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
 		// constructor
-        public ClinVarXmlReader(FileInfo clinVarXmlFileInfo, ISequenceProvider sequenceProvider)
+        public ClinVarXmlReader(string filename, ISequenceProvider sequenceProvider)
         {
             _sequenceProvider = sequenceProvider;
             _aligner = new VariantAligner(_sequenceProvider.Sequence);
-            _clinVarXmlFileInfo = clinVarXmlFileInfo;
+            _fileName = filename;
             _refChromDict = sequenceProvider.RefNameToChromosome;
         }
 
@@ -103,13 +102,12 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 		    var clinVarItems = new List<ClinVarItem>();
 
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_clinVarXmlFileInfo.FullName))
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
 			using (var xmlReader = XmlReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true}))
 			{
 				//skipping the top level element to go down to its elementren
 			    xmlReader.ReadToDescendant(ClinVarSetTag);
 
-			    //var benchmark = new Benchmark();
                 do
 				{
 					var subTreeReader = xmlReader.ReadSubtree();
@@ -153,36 +151,26 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 if (!ValidateRefAllele(item)) continue;
 
-                string refAllele= item.ReferenceAllele, altAllele= item.AlternateAllele;
-                if (string.IsNullOrEmpty(item.ReferenceAllele) && item.VariantType == "Deletion")
+                string refAllele= item.RefAllele, altAllele= item.AltAllele;
+                if (string.IsNullOrEmpty(item.RefAllele) && item.VariantType == "Deletion")
                     refAllele = GetReferenceAllele(item, _sequenceProvider.Sequence);
 
-                if (string.IsNullOrEmpty(item.ReferenceAllele) && item.VariantType == "Indel" && !string.IsNullOrEmpty(item.AlternateAllele))
+                if (string.IsNullOrEmpty(item.RefAllele) && item.VariantType == "Indel" && !string.IsNullOrEmpty(item.AltAllele))
                     refAllele = GetReferenceAllele(item, _sequenceProvider.Sequence);
 
-                if (string.IsNullOrEmpty(item.AlternateAllele) && item.VariantType == "Duplication")
+                if (string.IsNullOrEmpty(item.AltAllele) && item.VariantType == "Duplication")
                     altAllele = GetAltAllele(item, _sequenceProvider.Sequence);
 
                 if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele)) continue;
 
                 int start;
-                (start, refAllele, altAllele) = LeftShift(item.Start, refAllele, altAllele);
+                (start, refAllele, altAllele) = LeftShift(item.Position, refAllele, altAllele);
                 shiftedItems.Add(new ClinVarItem(item.Chromosome,
                     start,
                     item.Stop,
-                    item.AlleleOrigins,
-                    altAllele,
-                    item.VariantType,
-                    item.Id,
-                    item.ReviewStatus,
-                    item.MedGenIDs,
-                    item.OmimIDs,
-                    item.OrphanetIDs,
-                    item.Phenotypes,
                     refAllele,
-                    item.Significance,
-                    item.PubmedIds,
-                    item.LastUpdatedDate));
+                    altAllele,
+                    item.AlleleOrigins, item.VariantType, item.Id, item.ReviewStatus, item.MedGenIDs, item.OmimIDs, item.OrphanetIDs, item.Phenotypes, item.Significance, item.PubmedIds, item.LastUpdatedDate));
             }
 
             shiftedItems.Sort();
@@ -191,85 +179,96 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private const string RefAssertionTag = "ReferenceClinVarAssertion";
         private const string ClinVarAssertionTag = "ClinVarAssertion";
+        private const int MaxVariantLength = 1000;
         private List<ClinVarItem> ExtractClinVarItems(XElement xElement)
 		{
             ClearClinvarFields();
 
 			if (xElement == null || xElement.IsEmpty) return null;
 
-			foreach (var element in xElement.Elements(RefAssertionTag))
-			    ParseRefClinVarAssertion(element);
+			ParseAssertions(xElement);
 
-		    foreach (var element in xElement.Elements(ClinVarAssertionTag))
-                ParseClinvarAssertion(element);
-		    
-
-			
 		    var clinvarList = new List<ClinVarItem>();
 
             foreach (var variant in _variantList)
-		    {
-		        if (variant.Chromosome == null) continue;
+            {
+                if (IsInvalidVariant(variant)) continue;
 
-		        if ((variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
-		            && string.IsNullOrEmpty(variant.AltAllele)) continue;
+                var extendedOmimIds = GetOmimIds(variant);
 
-                var extendedOmimIds = new HashSet<string>(_omimIDs);
-
-		        foreach (var omimId in variant.AllelicOmimIds)
-		        {
-		            extendedOmimIds.Add(omimId);
-                }
-
-		        var reviewStatEnum = ReviewStatusEnum.no_assertion;
+                var reviewStatEnum = ReviewStatus.no_assertion;
 		        if (ClinVarItem.ReviewStatusNameMapping.ContainsKey(_reviewStatus))
 		            reviewStatEnum = ClinVarItem.ReviewStatusNameMapping[_reviewStatus];
 
                 clinvarList.Add(
-		            new ClinVarItem(variant.Chromosome,
-		                variant.Start,
+                    new ClinVarItem(variant.Chromosome,
+                        variant.Start,
                         variant.Stop,
-		                _alleleOrigins.Any()? _alleleOrigins: null,
-		                variant.AltAllele ,
-                        variant.VariantType,
-		                _id,
-		                reviewStatEnum,
-		                _medGenIDs.Any()?_medGenIDs: null,
-		                extendedOmimIds.Any()?extendedOmimIds:null,
-		                _orphanetIDs.Any()?_orphanetIDs:null,
-		                _prefPhenotypes.Any() ? _prefPhenotypes: _altPhenotypes,
-		                variant.ReferenceAllele ,
-		                _significance,
-		                _pubMedIds.Any()? _pubMedIds.OrderBy(x=>x): null,
-		                _lastUpdatedDate));
+                        variant.ReferenceAllele,
+                        variant.AltAllele,
+                        _alleleOrigins.Count > 0 ? _alleleOrigins : null, 
+                        variant.VariantType, 
+                        _id, 
+                        reviewStatEnum, 
+                        _medGenIDs.Count > 0 ? _medGenIDs : null, 
+                        extendedOmimIds.Count > 0 ? extendedOmimIds : null, 
+                        _orphanetIDs.Count > 0 ? _orphanetIDs : null, 
+                        _prefPhenotypes.Count > 0 ? _prefPhenotypes : _altPhenotypes, 
+                        _significance, 
+                        _pubMedIds.Count > 0 ? _pubMedIds.OrderBy(x => x) : null, _lastUpdatedDate));
             }
 
 			return clinvarList.Count > 0 ? clinvarList: null;
 		}
 
-	    private bool ValidateRefAllele(ClinVarItem clinvarVariant)
-	    {
-	        if (string.IsNullOrEmpty(clinvarVariant.ReferenceAllele) || clinvarVariant.ReferenceAllele == "-") return true;
+        private HashSet<string> GetOmimIds(ClinvarVariant variant)
+        {
+            var extendedOmimIds = new HashSet<string>(_omimIDs);
 
-		    var refAllele = clinvarVariant.ReferenceAllele;
+            foreach (var omimId in variant.AllelicOmimIds)
+            {
+                extendedOmimIds.Add(omimId);
+            }
+
+            return extendedOmimIds;
+        }
+
+        private void ParseAssertions(XElement xElement)
+        {
+            foreach (var element in xElement.Elements(RefAssertionTag))
+                ParseRefClinVarAssertion(element);
+
+            foreach (var element in xElement.Elements(ClinVarAssertionTag))
+                ParseClinvarAssertion(element);
+        }
+
+        private bool IsInvalidVariant(ClinvarVariant variant)
+        {
+            return variant.Chromosome == null
+                   || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
+                   && string.IsNullOrEmpty(variant.AltAllele);
+            
+        }
+
+        private bool ValidateRefAllele(ClinVarItem clinvarVariant)
+	    {
+	        if (string.IsNullOrEmpty(clinvarVariant.RefAllele) || clinvarVariant.RefAllele == "-") return true;
+
+		    string refAllele = clinvarVariant.RefAllele;
 		    if (string.IsNullOrEmpty(refAllele)) return true;
 
-	        var refLength = clinvarVariant.Stop - clinvarVariant.Start + 1;
-	        return refLength == refAllele.Length && _sequenceProvider.Sequence.Validate(clinvarVariant.Start, clinvarVariant.Stop, refAllele);
-
-	        //var stop = clinvarVariant.Start + refAllele.Length - 1;
-            //return _sequenceProvider.Sequence.Validate(clinvarVariant.Start, stop, refAllele);
-
+	        int refLength = clinvarVariant.Stop - clinvarVariant.Position + 1;
+	        return refLength == refAllele.Length && _sequenceProvider.Sequence.Validate(clinvarVariant.Position, clinvarVariant.Stop, refAllele);
         }
 
         private static string GetReferenceAllele(ClinVarItem variant, ISequence compressedSequence)
         {
-            return variant == null ? null : compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
+            return variant == null ? null : compressedSequence.Substring(variant.Position - 1, variant.Stop - variant.Position + 1);
         }
 
         private static string GetAltAllele(ClinVarItem variant, ISequence compressedSequence)
         {
-            return variant == null ? null : compressedSequence.Substring(variant.Start - 1, variant.Stop - variant.Start + 1);
+            return variant == null ? null : compressedSequence.Substring(variant.Position - 1, variant.Stop - variant.Position + 1);
         }
 
         private (int Start, string RefAllele, string AltAllele) LeftShift(int start, string refAllele, string altAllele)
@@ -394,7 +393,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
             if (db == null) return;
 
-			var id = xElement.Attribute(IdTag)?.Value.Trim(' '); // Trimming is necessary here, don't turn it off.
+			string id = xElement.Attribute(IdTag)?.Value.Trim(' '); // Trimming is necessary here, don't turn it off.
 
 			switch (db.Value)
 			{
@@ -436,7 +435,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 			    if (source.Value != PubmedIdTag) continue;
 
-			    var pubmedId = element.Value.TrimEnd('.');
+			    string pubmedId = element.Value.TrimEnd('.');
 			    if (long.TryParse(pubmedId, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
 			        _pubMedIds.Add(l);
 			    else Console.WriteLine($"WARNING:unexpected pubmedID {pubmedId}.");
@@ -512,7 +511,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         
         private void AddIupacVariants(ClinvarVariant variant, List<ClinvarVariant> variantList)
 		{
-			foreach (var altAllele in _iupacBases[variant.AltAllele[0]])
+			foreach (char altAllele in _iupacBases[variant.AltAllele[0]])
 			{
 			    variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop, variant.ReferenceAllele, altAllele.ToString()));
 			}
@@ -541,18 +540,19 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
         {
-		    if (xElement == null ) return null;//|| xElement.IsEmpty) return null;
+		    if (xElement == null ) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
 
 			if (genomeAssembly.ToString()!= xElement.Attribute(AssemblyTag)?.Value
                 && genomeAssembly != GenomeAssembly.Unknown) return null;
 
             var chromosome      = refChromDict.ContainsKey(xElement.Attribute(ChrTag)?.Value) ? refChromDict[xElement.Attribute(ChrTag)?.Value] : null;
-            var start           = Convert.ToInt32(xElement.Attribute(StartTag)?.Value);
-		    var stop            = Convert.ToInt32(xElement.Attribute(StopTag)?.Value);
-		    var referenceAllele = xElement.Attribute(RefAlleleTag)?.Value;
-		    var altAllele       = xElement.Attribute(AltAlleleTag)?.Value;
+            int start           = Convert.ToInt32(xElement.Attribute(StartTag)?.Value);
+		    int stop            = Convert.ToInt32(xElement.Attribute(StopTag)?.Value);
+		    string referenceAllele = xElement.Attribute(RefAlleleTag)?.Value;
+		    string altAllele       = xElement.Attribute(AltAlleleTag)?.Value;
 
+            if (stop - start + 1 > MaxVariantLength) return null;
             AdjustVariant(ref start,ref stop, ref referenceAllele, ref altAllele);
 		    
             return new ClinvarVariant(chromosome, start, stop, referenceAllele, altAllele);
@@ -560,13 +560,19 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		private static void AdjustVariant(ref int start, ref int stop, ref string referenceAllele, ref string altAllele)
 		{
-            if (referenceAllele == "-" && !string.IsNullOrEmpty(altAllele) && stop == start + 1)
-            {
-				referenceAllele = "";
-				start++;
-			}
+   //         if (referenceAllele == "-" && !string.IsNullOrEmpty(altAllele) && stop == start + 1)
+   //         {
+			//	referenceAllele = "";
+			//	start++;
+			//}
 
-			if (altAllele == "-")
+		    if (referenceAllele == "-")
+		    {
+		        referenceAllele = "";
+		        start++;
+		    }
+
+            if (altAllele == "-")
 				altAllele = "";
 		}
 

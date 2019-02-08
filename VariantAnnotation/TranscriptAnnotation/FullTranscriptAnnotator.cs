@@ -42,7 +42,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             return new AnnotatedTranscript(transcript, leftAnnotation.RefAminoAcids, leftAnnotation.AltAminoAcids,
                 leftAnnotation.RefCodons, leftAnnotation.AltCodons, leftAnnotation.Position, hgvsCoding, hgvsProtein,
-                predictionScores.Sift, predictionScores.PolyPhen, consequences, null);
+                predictionScores.Sift, predictionScores.PolyPhen, consequences, null, false);
         }
 
         private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
@@ -60,10 +60,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var transcriptRefAllele = HgvsUtilities.GetTranscriptAllele(variant.RefAllele, onReverseStrand);
             var transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
 
-            var codingSequence = transcript.Translation == null
-                ? null
-                : new CodingSequence(refSequence, transcript.Translation.CodingRegion, transcript.TranscriptRegions,
-                    transcript.Gene.OnReverseStrand, transcript.StartExonPhase);
+            var codingSequence = GetCodingSequence(transcript, refSequence);
 
             var codons = Codons.GetCodons(transcriptRefAllele, transcriptAltAllele, position.CdsStart, position.CdsEnd,
                 position.ProteinStart, position.ProteinEnd, codingSequence);
@@ -84,6 +81,15 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             return (variantEffect, position, aa.Reference, aa.Alternate, codons.Reference, codons.Alternate,
                 transcriptAltAllele);
+        }
+
+        private static ISequence GetCodingSequence(ITranscript transcript, ISequence refSequence)
+        {
+            if (transcript.Translation == null) return null;
+
+            return transcript.CodingSequence ?? (transcript.CodingSequence = new CodingSequence(refSequence,
+                       transcript.Translation.CodingRegion, transcript.TranscriptRegions,
+                       transcript.Gene.OnReverseStrand, transcript.StartExonPhase));
         }
 
         private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, ITranscriptRegion startRegion,

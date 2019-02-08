@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using CommandLine.Utilities;
 using Genome;
-using SAUtils.DataStructures;
-using SAUtils.TsvWriters;
-using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.ExtractCosmicSvs
@@ -29,29 +25,29 @@ namespace SAUtils.ExtractCosmicSvs
             _refNameToChorm  = refNameToChromosome;
         }
 
-        public void CreateTsv()
-        {
-            var benchMark = new Benchmark();
-            const string dataSource = "COSMIC";
+        //public void CreateTsv()
+        //{
+        //    var benchMark = new Benchmark();
+        //    const string dataSource = "COSMIC";
 
-            if (_cnvStream != null)
-            {
-                using (var writer = new IntervalTsvWriter(_outputDirectory, _version,
-                    _genomeAssembly.ToString(), SaTsvCommon.CosmicSvSchemaVersion, InterimSaCommon.CosmicCnvTag, ReportFor.StructuralVariants))
-                using (var cnvReader = new CosmicCnvReader(_cnvStream, _refNameToChorm, _genomeAssembly))
-                {
-                    foreach (var cnvEntry in cnvReader.GetEntries())
-                    {
-                        writer.AddEntry(cnvEntry.Chromosome.EnsemblName, cnvEntry.Start, cnvEntry.End, cnvEntry.GetJsonString());
-                    }
-                }
+        //    if (_cnvStream != null)
+        //    {
+        //        using (var writer = new IntervalTsvWriter(_outputDirectory, _version,
+        //            _genomeAssembly.ToString(), SaTsvCommon.CosmicSvSchemaVersion, DataSourceTags.CosmicCnvTag, ReportFor.StructuralVariants))
+        //        using (var cnvReader = new CosmicCnvReader(_cnvStream, _refNameToChorm, _genomeAssembly))
+        //        {
+        //            foreach (var cnvEntry in cnvReader.GetEntries())
+        //            {
+        //                writer.AddEntry(cnvEntry.Chromosome.EnsemblName, cnvEntry.Start, cnvEntry.End, cnvEntry.GetJsonString());
+        //            }
+        //        }
 
-            }
+        //    }
 
 
-            var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
-            TsvWriterUtilities.WriteCompleteInfo(dataSource, _version.Version, timeSpan);
-        }
+        //    var timeSpan = Benchmark.ToHumanReadable(benchMark.GetElapsedTime());
+        //    TsvWriterUtilities.WriteCompleteInfo(dataSource, _version.Version, timeSpan);
+        //}
 
         public void Dispose()
         {

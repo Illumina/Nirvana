@@ -55,7 +55,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private IVariant[] GetVariants()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false, false);
+            var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
             variant.SetupGet(x => x.Chromosome).Returns(_chromosome);
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);

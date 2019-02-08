@@ -13,27 +13,23 @@ namespace Phantom.Graph
             _isDirected = isDirected;
         }
 
-        public bool TryAddVertex(T vertex)
+        public void TryAddVertex(T vertex)
         {
-            if (HasVertex(vertex)) return false;
-
+            if (HasVertex(vertex)) return;
             _vertexToNeighbors[vertex] = new LinkedList<T>();
-            return true;
         }
 
-        private void SetVertexAndNeighbors(T vertex, LinkedList<T> neighbors) => _vertexToNeighbors[vertex] = neighbors;
-
-        public void AddEdge(T oneVertex, T otherVertex)
+        public void AddEdge(T sourceVertex, T targetVertex)
         {
-            AddVertexAndNeighbor(oneVertex, otherVertex);
+            AddVertexAndNeighbor(sourceVertex, targetVertex);
             if (!_isDirected)
             {
-                AddVertexAndNeighbor(otherVertex, oneVertex);
+                AddVertexAndNeighbor(targetVertex, sourceVertex);
             }
             // Try add the other vertex to the graph if directed  
             else
             {
-                TryAddVertex(otherVertex);
+                TryAddVertex(targetVertex);
             }
         }
 
@@ -51,39 +47,11 @@ namespace Phantom.Graph
             }
         }
 
-        public void MergeDuplicatedEdges()
-        {
-            foreach (var vertex in GetVertices())
-            {
-                var uniqNeighbors = new LinkedList<T>(GetNeighbors(vertex).ToHashSet());
-                SetVertexAndNeighbors(vertex, uniqNeighbors);
-            }
-        }
-
         public IEnumerable<T> GetVertices() => _vertexToNeighbors.Keys;
 
         public LinkedList<T> GetNeighbors(T vertex) => _vertexToNeighbors[vertex];
 
         private bool HasVertex(T vertex) => _vertexToNeighbors.ContainsKey(vertex);
-
-        public Graph<T> CreateGraphFromLinkedVertices(IReadOnlyList<T> vertices)
-        {
-            var graph = new Graph<T>(true);
-            int numVertices = vertices.Count;
-            switch (numVertices)
-            {
-                case 0:
-                    return graph;
-                case 1:
-                    graph.TryAddVertex(vertices[0]);
-                    return graph;
-            }
-            for (int i = 1; i < numVertices; i++)
-            {
-                graph.AddEdge(vertices[i - 1], vertices[1]);
-            }
-            return graph;
-        }
 
         public void MergeGraph(IGraph<T> other)
         {
@@ -118,15 +86,13 @@ namespace Phantom.Graph
             return vertexToComponent;
         }
 
-        private void FindComponentMembers(T vertex, int componentIndex, Dictionary<T, int> vertexToComponent)
+        private void FindComponentMembers(T vertex, int componentIndex, IDictionary<T, int> vertexToComponent)
         {
             foreach (var neighbor in GetNeighbors(vertex))
             {
-                if (!vertexToComponent.ContainsKey(neighbor))
-                {
-                    vertexToComponent[neighbor] = componentIndex;
-                    FindComponentMembers(neighbor, componentIndex, vertexToComponent);
-                }
+                if (vertexToComponent.ContainsKey(neighbor)) continue;
+                vertexToComponent[neighbor] = componentIndex;
+                FindComponentMembers(neighbor, componentIndex, vertexToComponent);
             }
         }
 

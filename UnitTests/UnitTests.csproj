@@ -1,28 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
-    <PackageReference Include="Moq" Version="4.8.2" />
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="Moq" Version="4.10.0" />
+    <PackageReference Include="xunit" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\Intervals\Intervals.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
     <ProjectReference Include="..\Jasix\Jasix.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
     <ProjectReference Include="..\Phantom\Phantom.csproj" />
     <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
+    <ProjectReference Include="..\Tabix\Tabix.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />
+    <ProjectReference Include="..\Cloud\Cloud.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />

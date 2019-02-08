@@ -60,7 +60,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private static CompactId GetCompactId(string s, int prefixLen, IdType idType, byte version)
         {
             var (id, _) = FormatUtilities.SplitVersion(s);
-            var num     = int.Parse(id.Substring(prefixLen));
+            int num     = int.Parse(id.Substring(prefixLen));
             return new CompactId(idType, version, ToInfo(num, id.Length - prefixLen));
         }
 
@@ -94,6 +94,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private string GetPrefix()
         {
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_id)
             {
                 case IdType.EnsemblGene:

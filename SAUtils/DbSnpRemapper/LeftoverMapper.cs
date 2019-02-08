@@ -12,6 +12,7 @@ namespace SAUtils.DbSnpRemapper
         private readonly StreamReader _leftoverReader;
         private readonly StreamReader _destReader;
         private readonly Dictionary<string, StreamWriter> _writers;
+
         public LeftoverMapper(StreamReader leftoverReader, StreamReader destReader, Dictionary<string, StreamWriter> writers)
         {
             _leftoverReader = leftoverReader;
@@ -98,7 +99,6 @@ namespace SAUtils.DbSnpRemapper
                 chromName = "chr" + chromName;
             if (!_writers.ContainsKey(chromName))
             {
-                //throw new InvalidDataException("Unrecognized chromosome name:"+chromName);
                 Console.WriteLine($"Warning!! {chromName} was not present in source but is in destination");
                 _writers.Add(chromName, GZipUtilities.GetStreamWriter(chromName+".vcf.gz"));
             }

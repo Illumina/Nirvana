@@ -4,7 +4,6 @@ using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -57,7 +56,7 @@ namespace VariantAnnotation
             return assemblies.First().Key;
         }
 
-        private static void AddAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
+        private static void AddAssembly(IDictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
         {
             if (provider == null) return;
             if (assemblies.TryGetValue(provider.Assembly, out var assemblyList)) assemblyList.Add(provider.Name);
@@ -86,7 +85,6 @@ namespace VariantAnnotation
         public IAnnotatedPosition Annotate(IPosition position)
         {
             if (position == null) return null;
-
             var annotatedVariants = GetAnnotatedVariants(position.Variants);
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 
@@ -105,46 +103,61 @@ namespace VariantAnnotation
             return annotatedPosition;
         }
 
-        internal void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
+        private void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
         {
             if (_geneAnnotationProvider == null) return;
 
             foreach (var variant in annotatedPosition.AnnotatedVariants)
             {
-                if (variant.OverlappingGenes != null)
-                {
-                    foreach (var gene in variant.OverlappingGenes)
-                    {
-                        _affectedGenes.Add(gene);
-                    }
-                }
-
-                foreach (var ensemblTranscript in variant.EnsemblTranscripts)
-                {
-                    if (!ensemblTranscript.Consequences.Contains(ConsequenceTag.downstream_gene_variant) &&
-                        !ensemblTranscript.Consequences.Contains(ConsequenceTag.upstream_gene_variant))
-                        _affectedGenes.Add(ensemblTranscript.Transcript.Gene.Symbol);
-                }
-
-                foreach (var refSeqTranscript in variant.RefSeqTranscripts)
-                {
-                    if (!refSeqTranscript.Consequences.Contains(ConsequenceTag.downstream_gene_variant) &&
-                        !refSeqTranscript.Consequences.Contains(ConsequenceTag.upstream_gene_variant))
-                        _affectedGenes.Add(refSeqTranscript.Transcript.Gene.Symbol);
-                }
+                AddGenesFromTranscripts(variant.Transcripts);
             }
+        }
+
+        private void AddGenesFromTranscripts(IList<IAnnotatedTranscript> transcripts)
+        {
+            foreach (var transcript in transcripts)
+            {
+                if (IsFlankingTranscript(transcript)) continue;
+                _affectedGenes.Add(transcript.Transcript.Gene.Symbol);
+            }
+        }
+
+        private static bool IsFlankingTranscript(IAnnotatedTranscript transcript)
+        {
+            if (transcript.Consequences == null) return false;
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var consequence in transcript.Consequences)
+            {
+                if (consequence == ConsequenceTag.downstream_gene_variant ||
+                    consequence == ConsequenceTag.upstream_gene_variant) return true;
+            }
+
+            return false;
         }
 
         internal static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
         {
             if (variants?[0].Behavior == null) return null;
-            var numVariants = variants.Length;
+            int numVariants = variants.Length;
             var annotatedVariants = new IAnnotatedVariant[numVariants];
             for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(variants[i]);
             return annotatedVariants;
         }
 
-        public IList<IAnnotatedGene> GetAnnotatedGenes() => GeneAnnotator.Annotate(_affectedGenes, _geneAnnotationProvider);
+        public IEnumerable<string> GetGeneAnnotations()
+        {
+            var geneAnnotations = new List<string>();
+
+            foreach (var gene in _affectedGenes.OrderBy(x => x))
+            {
+                var annotation = _geneAnnotationProvider.Annotate(gene);
+                if (string.IsNullOrEmpty(annotation)) continue;
+                geneAnnotations.Add(annotation);
+            }
+
+            return geneAnnotations.Count > 0 ? geneAnnotations : null;
+        }
 
         public void EnableMitochondrialAnnotation() => _annotateMito = true;
     }

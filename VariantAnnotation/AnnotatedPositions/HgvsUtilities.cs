@@ -147,7 +147,8 @@ namespace VariantAnnotation.AnnotatedPositions
             if (po.Position == -1) return null;
 
             var cdnaCoord = GetCdnaCoord(po.Position, po.Offset, codingRegionStart, codingRegionEnd);
-            var value     = cdnaCoord.HasNoPosition ? "*" + po.Offset : cdnaCoord.CdnaCoord + (po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0"));
+            string offset = po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0");
+            string value  = cdnaCoord.HasNoPosition ? "*" + po.Offset : cdnaCoord.CdnaCoord + offset;
 
             return new PositionOffset(po.Position, po.Offset, value, cdnaCoord.HasStopCodonNotation);
         }
@@ -248,6 +249,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
             // format rest of string according to type
             // note: inversion and multiple are never assigned as genomic changes
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (type)
             {
                 case GenomicChange.Deletion:
@@ -263,8 +265,8 @@ namespace VariantAnnotation.AnnotatedPositions
                     sb.Append(start + referenceBases + '>' + alternateBases);
                     break;
                 case GenomicChange.DelIns:
-                    sb.Append(coordinates + "del" + referenceBases + "ins" + alternateBases); //TODO: change to delins, now use del--ins-- to reduce anavarin differences
-                    //sb.Append(coordinates + "delins" + alternateBases);
+                    // NOTE: change to delins, now use del--ins-- to reduce anavarin differences
+                    sb.Append(coordinates + "del" + referenceBases + "ins" + alternateBases); 
                     break;
                 case GenomicChange.Insertion:
                     sb.Append(coordinates + "ins" + alternateBases);

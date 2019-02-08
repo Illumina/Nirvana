@@ -124,10 +124,10 @@ namespace Jasix
         {
             if (!File.Exists(indexFileName))
                 throw new UserErrorException("No index file found,please generate index file first.");
-            var indexFileCreateTime = File.GetCreationTime(indexFileName);
-            var fileCreateTime = File.GetCreationTime(_inputJson);
-            if (fileCreateTime > indexFileCreateTime)
-                throw new UserErrorException("Index file is older than the input file, please re-generate the index.");
+            //var indexFileCreateTime = File.GetCreationTime(indexFileName).Ticks;
+            //var fileCreateTime = File.GetCreationTime(_inputJson).Ticks;
+            //if (fileCreateTime > indexFileCreateTime - 1000) // adding a 100ms buffer
+            //    throw new UserErrorException("Index file is older than the input file, please re-generate the index.");
         }
         
     }

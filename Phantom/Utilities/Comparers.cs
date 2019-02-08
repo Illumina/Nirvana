@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace Phantom.Utilities
@@ -18,58 +17,23 @@ namespace Phantom.Utilities
                    x.HgncId == y.HgncId;
         }
 
-        public override int GetHashCode(IGene x)
+        public override int GetHashCode(IGene obj)
         {
-            var entrezGeneId = x.EntrezGeneId.WithVersion;
-            var ensemblId = x.EnsemblId.WithVersion;
+            var entrezGeneId = obj.EntrezGeneId.WithVersion;
+            var ensemblId = obj.EnsemblId.WithVersion;
 
             unchecked
             {
-                var hashCode = x.Start;
-                hashCode = (hashCode * 397) ^ x.End;
-                hashCode = (hashCode * 397) ^ x.Chromosome.Index;
-                hashCode = (hashCode * 397) ^ x.OnReverseStrand.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.Symbol.GetHashCode();
+                var hashCode = obj.Start;
+                hashCode = (hashCode * 397) ^ obj.End;
+                hashCode = (hashCode * 397) ^ obj.Chromosome.Index;
+                hashCode = (hashCode * 397) ^ obj.OnReverseStrand.GetHashCode();
+                hashCode = (hashCode * 397) ^ obj.Symbol.GetHashCode();
                 if (entrezGeneId != null) hashCode = (hashCode * 397) ^ entrezGeneId.GetHashCode();
                 if (ensemblId != null) hashCode = (hashCode * 397) ^ ensemblId.GetHashCode();
-                hashCode = (hashCode * 397) ^ x.HgncId;
+                hashCode = (hashCode * 397) ^ obj.HgncId;
                 return hashCode;
             }
         }
     }
-
-    internal sealed class ListComparer<T> : IEqualityComparer<List<T>>
-    {
-        public bool Equals(List<T> x, List<T> y)
-        {
-            return x.SequenceEqual(y);
-        }
-        public int GetHashCode(List<T> obj)
-        {
-            int hashCode = 0;
-            foreach (T t in obj)
-            {
-                if (t != null) hashCode = (hashCode * 397) ^ t.GetHashCode();
-            }
-            return hashCode;
-        }
-    }
-
-    internal sealed class ArrayComparer<T> : IEqualityComparer<T[]>
-    {
-        public bool Equals(T[] x, T[] y)
-        {
-            return x.SequenceEqual(y);
-        }
-        public int GetHashCode(T[] obj)
-        {
-            int hashCode = 0;
-            foreach (T t in obj)
-            {
-                if (t != null) hashCode = (hashCode * 397) ^ t.GetHashCode();
-            }
-            return hashCode;
-        }
-    }
-
 }

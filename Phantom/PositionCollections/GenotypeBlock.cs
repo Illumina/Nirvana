@@ -41,29 +41,40 @@ namespace Phantom.PositionCollections
                 int alleleIndex = Genotypes[gtIndex].AlleleIndexes[haplotypeIndex];
                 if (alleleIndex == 0)
                 {
-                    // check leading ref positions
-                    if (gtIndex == 0 || alleleBreaks[gtIndex - 1] && gtIndex < numBreaks)
-                    {
-                        alleleBreaks[gtIndex] = true;
-                    }
-                    // check tailing ref positions 
-                    else if (gtIndex == numBreaks)
-                    {
-                        MakeBreakAndCheckTailingRefPositions(gtIndex - 1, haplotypeIndex, alleleBreaks);
-                    }
+                    ProcessRefAllele(haplotypeIndex, numBreaks, alleleBreaks, gtIndex);
                 }
                 else
                 {
-                    if (gtIndex > 0)
-                    {
-                        bool outOfRange = lastNonRefPosition != -1 && starts[PosIndex + gtIndex] > functionBlockRanges[lastNonRefPosition];
-                        if (outOfRange)
-                            MakeBreakAndCheckTailingRefPositions(gtIndex - 1, haplotypeIndex, alleleBreaks);
-                    }
-                    lastNonRefPosition = PosIndex + gtIndex;
+                    lastNonRefPosition = ProcessNonRefAllele(haplotypeIndex, starts, functionBlockRanges, alleleBreaks, lastNonRefPosition, gtIndex);
                 }
             }
             return alleleBreaks;
+        }
+
+        private int ProcessNonRefAllele(int haplotypeIndex, int[] starts, IReadOnlyList<int> functionBlockRanges, bool[] alleleBreaks, int lastNonRefPosition, int gtIndex)
+        {
+            if (gtIndex > 0)
+            {
+                bool outOfRange = lastNonRefPosition != -1 && starts[PosIndex + gtIndex] > functionBlockRanges[lastNonRefPosition];
+                if (outOfRange)
+                    MakeBreakAndCheckTailingRefPositions(gtIndex - 1, haplotypeIndex, alleleBreaks);
+            }
+            lastNonRefPosition = PosIndex + gtIndex;
+            return lastNonRefPosition;
+        }
+
+        private void ProcessRefAllele(int haplotypeIndex, int numBreaks, bool[] alleleBreaks, int gtIndex)
+        {
+            // check leading ref positions
+            if (gtIndex == 0 || alleleBreaks[gtIndex - 1] && gtIndex < numBreaks)
+            {
+                alleleBreaks[gtIndex] = true;
+            }
+            // check tailing ref positions 
+            else if (gtIndex == numBreaks)
+            {
+                MakeBreakAndCheckTailingRefPositions(gtIndex - 1, haplotypeIndex, alleleBreaks);
+            }
         }
 
         private void MakeBreakAndCheckTailingRefPositions(int breakIndex, int haplotypeIndex, bool[] alleleBreaks)
@@ -78,7 +89,7 @@ namespace Phantom.PositionCollections
             }
         }
 
-        private List<GenotypeBlock> GetGenotypeBlocks(bool[] finalBreaks)
+        private IEnumerable<GenotypeBlock> GetGenotypeBlocks(bool[] finalBreaks)
         {
             var subGenotypeBlocks = new List<GenotypeBlock>();
             int subBlockStart = 0;

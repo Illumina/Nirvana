@@ -152,21 +152,12 @@ namespace Jasix
 
 			string line;
 			while ((line = _jsonReader.ReadLine()) != null && !line.OptimizedStartsWith(']'))
-				//The array of positions entry end with "]," Going past it will cause the json parser to crash
+				//The array of positions entry end with "]," Going past it will cause the json deserializer to crash
 			{
 				line = line.TrimEnd(',');
                 if (string.IsNullOrEmpty(line)) continue;
 			    
-				JsonSchema jsonEntry;
-				try
-				{
-					jsonEntry = JsonConvert.DeserializeObject<JsonSchema>(line);
-				}
-				catch (Exception)
-				{
-					Console.WriteLine($"Error in line:\n{line}");
-					throw;
-				}
+				JsonSchema jsonEntry = ParseJsonEntry(line);
 
 			    string jsonChrom = _jasixIndex.GetIndexChromName(jsonEntry.chromosome);
 				if (jsonChrom != query.Chr) break;
@@ -180,7 +171,20 @@ namespace Jasix
 			}
 		}
 
+	    private static JsonSchema ParseJsonEntry(string line)
+	    {
+	        JsonSchema jsonEntry;
+	        try
+	        {
+	            jsonEntry = JsonConvert.DeserializeObject<JsonSchema>(line);
+	        }
+	        catch (Exception)
+	        {
+	            Console.WriteLine($"Error in line:\n{line}");
+	            throw;
+	        }
 
-	    
+	        return jsonEntry;
+	    }
 	}
 }

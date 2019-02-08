@@ -1,6 +1,6 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Compression.Utilities;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
@@ -8,24 +8,24 @@ using Variants;
 
 namespace SAUtils.InputFileParsers.ClinGen
 {
-    public sealed class ClinGenReader 
+    public sealed class ClinGenReader : IDisposable
     {
         #region members
 
-        private readonly FileInfo _clinGenFileInfo;
+        private readonly StreamReader _reader;
         private readonly IDictionary<string, IChromosome> _refNameDict;
 
         #endregion
         
-        public ClinGenReader(FileInfo clinGenFileInfo, IDictionary<string, IChromosome> refNameDict)
+        public ClinGenReader(StreamReader reader, IDictionary<string, IChromosome> refNameDict)
         {
-            _clinGenFileInfo = clinGenFileInfo;
+            _reader = reader;
             _refNameDict = refNameDict;
         }
 
-        public IEnumerable<ClinGenItem> GetClinGenItems()
+        public IEnumerable<ClinGenItem> GetItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_clinGenFileInfo.FullName))
+            using (var reader = _reader)
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -36,7 +36,8 @@ namespace SAUtils.InputFileParsers.ClinGen
                     string id        = cols[0];
                     string ucscChrom = cols[1];
                     if(!_refNameDict.ContainsKey(ucscChrom)) continue;
-                    var chrom     = _refNameDict[ucscChrom];
+
+                    var chrom              = _refNameDict[ucscChrom];
                     int start              = int.Parse(cols[2]);
                     int end                = int.Parse(cols[3]);
                     int observedGains      = int.Parse(cols[4]);
@@ -91,6 +92,11 @@ namespace SAUtils.InputFileParsers.ClinGen
         private static bool IsClinGenHeader(string line)
         {
             return line.OptimizedStartsWith('#');
+        }
+
+        public void Dispose()
+        {
+            _reader?.Dispose();
         }
     }
 }

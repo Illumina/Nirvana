@@ -1,29 +1,79 @@
 {
   "profiles": {
-    "SAUtils": {
-      "commandName": "Project",
-      "commandLineArgs": "createTSV --dir c:\\Development\\IntermediateTsvs\\test --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\rCRS"
-    },
     "OMIM_SK": {
       "commandName": "Project",
       "commandLineArgs": "createOMIM --gi ..\\gene_info_2016-10-17 --gi ..\\gene_info_2011-08-28 --hgnc ..\\hgnc_complete_set_2016-10-17.txt --mim mim2gene.txt --in genemap2.txt --out test",
       "workingDirectory": "E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15"
     },
-    "RR_sautils": {
-      "commandName": "Project",
-      "commandLineArgs": "  createSA --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --dir C:\\Development\\IntermediateTsvs\\test1 --out c:\\Development\\SupplementaryDatabase\\test",
-      "workingDirectory": "c:\\Development"
-    },
-    "MITOMAP": {
-      "commandName": "Project",
-      "commandLineArgs": "createTSV --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsRNA --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\MutationsCodingControl --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsCoding --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\PolymorphismsControl  --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\InsertionsSimple --mitoVar E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2018-02-28\\DeletionsSingle  --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_MitoMap\\"
-    },
     "RR_omim": {
       "commandName": "Project",
-      "commandLineArgs": " createomimtsv --in ExternalDataSources\\OMIM\\20180213\\genemap2.txt --mim ExternalDataSources\\OMIM\\20180213\\mim2gene.txt --uga Cache\\26\\UGA.tsv.gz --ref References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out SupplementaryDatabase\\test",
-      "workingDirectory": "c:\\Development"
+      "commandLineArgs": " omim --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --gm2 genemap2.txt --m2g mim2gene.txt --uga c:\\Development\\Cache\\26\\UGA.tsv.gz",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\OMIM\\20180213"
+    },
+    "RR_gnomad": {
+      "commandName": "Project",
+      "commandLineArgs": " Gnomad --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in . --type genome",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\gnomAD\\GRCh38"
+    },
+    "RR_clingen": {
+      "commandName": "Project",
+      "commandLineArgs": " makeClinGenDb --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test --in ClinGen_GRCh37_unified_sorted.tsv.gz",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\ClinGen\\2016-04-14_UCSC\\GRCh37"
+    },
+    "RR_clinvar": {
+      "commandName": "Project",
+      "commandLineArgs": " Clinvar --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVarFullRelease_2018-02.xml.gz --out c:\\Development\\SupplementaryDatabase\\temp",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\ClinVar\\20180129"
+    },
+    "RR_cosmic": {
+      "commandName": "Project",
+      "commandLineArgs": " Cosmic --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in AllCosmicMutations.vcf.gz --tsv AllMutationStudies.tsv.gz --out c:\\Development\\SupplementaryDatabase\\temp",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\COSMIC\\v84\\GRCh37\\mergedFiles"
+    },
+    "RR_refMinor": {
+      "commandName": "Project",
+      "commandLineArgs": "refMinor --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test --in refMinorBug.vcf",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\1000Gen\\GRCh38"
+    },
+    "RR_phylop": {
+      "commandName": "Project",
+      "commandLineArgs": "PhyloP --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in grch37.phyloP46Way.wigFix.gz",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\PhyloP"
+    },
+    "RR_custom": {
+      "commandName": "Project",
+      "commandLineArgs": " custom  --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in IcslFrequencies.tsv.gz",
+      "workingDirectory": "C:\\Development\\ExternalDataSources\\ICSL\\GRCh37"
+    },
+    "RR_globalAllele": {
+      "commandName": "Project",
+      "commandLineArgs": " globalMinor --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in All_20170403.vcf.gz --out c:\\Development\\SupplementaryDatabase\\temp",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\dbSNP\\150\\GRCh37"
+    },
+    "RR_dgv": {
+      "commandName": "Project",
+      "commandLineArgs": " Dgv --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test --in GRCh37_hg19_variants_2016-05-15_sorted.txt.gz",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\DGV\\2016-05-15\\GRCh37"
+    },
+    "RR_onekg": {
+      "commandName": "Project",
+      "commandLineArgs": " OneKgen --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test\\GRCh38 --in ALL_1000Genome_GRCh38_snvRes_5_23_2016_remove_conflicting_entries.removeExtraField.vcf.gz",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\1000Gen\\GRCh38"
+    },
+    "SK_JsonSchema": {
+      "commandName": "Project",
+      "commandLineArgs": "Custom --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in Test.tsv --out .",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_CA"
+    },
+    "RR_topmed_remap": {
+      "commandName": "Project",
+      "commandLineArgs": "remapWithDbsnp --src Topmed_with_dbsnp.chr22.vcf.gz --des c:\\Development\\ExternalDataSources\\dbSNP\\150\\GRCh37\\chr22.vcf.gz",
+      "workingDirectory": "C:\\Development\\ExternalDataSources\\TopMed"
+    },
+    "RR_build_topmed": {
+      "commandName": "Project",
+      "commandLineArgs": "Topmed --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in Topmed_grch37.vcf.gz --out c:\\Development\\SupplementaryDatabase\\temp",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\TopMed"
     }
   }
 }

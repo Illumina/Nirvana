@@ -67,5 +67,48 @@ namespace UnitTests.OptimizedCore
             bool expectedResult = s.EndsWith(leadingChar);
             Assert.Equal(expectedResult, observedResult);
         }
+
+        [Theory]
+        [InlineData("", true)]
+        [InlineData("c\tr", false)]
+        [InlineData("\n", true)]
+        [InlineData("<CNV>", false)]
+        public void IsWhiteSpace(string s, bool expectedResult)
+        {
+            bool observedResult = s.IsWhiteSpace();
+            Assert.Equal(expectedResult, observedResult);
+        }
+
+        [Theory]
+        [InlineData("ada.vcf", ".vcf", "ada")]
+        [InlineData("bob.gvcf", ".gvcf", "bob")]
+        [InlineData("cathy.vcf.gz", ".vcf.gz", "cathy")]
+        public void TrimEnd_AsExpected(string s, string trimString, string expectedResult)
+        {
+            string observedResult = s.TrimEnd(trimString);
+            Assert.Equal(expectedResult, observedResult);
+        }
+
+        [Theory]
+        [InlineData("ada.vcf", ".vcf", "ada")]
+        [InlineData("bob.genome.vcf", ".genome", "bob")]
+        [InlineData("cathy.vcf.gz", ".vcf", "cathy")]
+        [InlineData("cathy.gz", ".vcf", "cathy.gz")]
+        public void TrimEndFromFirst_AsExpected(string s, string trimString, string expectedResult)
+        {
+            string observedResult = s.TrimEndFromFirst(trimString);
+            Assert.Equal(expectedResult, observedResult);
+        }
+
+        [Theory]
+        [InlineData("/ada.vcf", "/", "ada.vcf")]
+        [InlineData("/tmp/bob.genome.vcf", "/", "bob.genome.vcf")]
+        [InlineData("http://test/cathy.vcf.gz", "/", "cathy.vcf.gz")]
+        [InlineData("cathy.vcf.gz", "/", "cathy.vcf.gz")]
+        public void TrimStartToLast_AsExpected(string s, string trimString, string expectedResult)
+        {
+            string observedResult = s.TrimStartToLast(trimString);
+            Assert.Equal(expectedResult, observedResult);
+        }
     }
 }

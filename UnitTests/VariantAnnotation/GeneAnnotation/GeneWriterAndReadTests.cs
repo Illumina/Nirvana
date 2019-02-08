@@ -2,7 +2,6 @@
 using System.Text;
 using IO;
 using Xunit;
-using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.GeneAnnotation;
 
 namespace UnitTests.VariantAnnotation.GeneAnnotation
@@ -12,9 +11,9 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
         [Fact]
         public void Write_and_read_return_the_same_info()
         {
-            var expectedGeneAnnotation = new GeneAnnotationSource("omim", new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true);
+            var expectedGeneAnnotation = new global::VariantAnnotation.GeneAnnotation.GeneAnnotation("omim", new[] { "{\"mimNumber\":103950,\"description\":\"Alpha-2-macroglobulin\",\"phenotypes\":[{\"mimNumber\":614036,\"phenotype\":\"Alpha-2-macroglobulin deficiency\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"Autosomal dominant\"]}", "{\"mimNumber\":104300,\"phenotype\":\"Alzheimer disease, susceptibility to\",\"mapping\":\"molecular basis of the disorder is known\",\"inheritances\":[\"Autosomal dominant\"],\"comments\":\"contribute to susceptibility to multifactorial disorders or to susceptibility to infection\"}]}" }, true);
 
-            IGeneAnnotationSource observedGeneAnnotation;
+            IGeneAnnotation observedGeneAnnotation;
 
             using (var ms = new MemoryStream())
             {
@@ -27,7 +26,7 @@ namespace UnitTests.VariantAnnotation.GeneAnnotation
 
                 using (var reader = new ExtendedBinaryReader(ms))
                 {
-                    observedGeneAnnotation = GeneAnnotationSource.Read(reader);
+                    observedGeneAnnotation = global::VariantAnnotation.GeneAnnotation.GeneAnnotation.Read(reader);
                 }
             }
 

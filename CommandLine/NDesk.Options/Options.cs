@@ -175,33 +175,27 @@ namespace CommandLine.NDesk.Options
         {
             var type = '\0';
             var seps = new List<string>();
+
             for (var i = 0; i < Names.Length; ++i)
             {
                 string name = Names[i];
-                if (name.Length == 0)
-                    throw new ArgumentException("Empty option names are not supported.", nameof(name));
+                if (name.Length == 0) throw new InvalidDataException($"Empty option names are not supported: {nameof(name)}");
 
                 int end = name.IndexOfAny(NameTerminator);
-                if (end == -1)
-                    continue;
+                if (end == -1) continue;
+
                 Names[i] = name.Substring(0, end);
-                if (type == '\0' || type == name[end])
-                    type = name[end];
-                else
-                    throw new ArgumentException(
-                        string.Format("Conflicting option types: '{0}' vs. '{1}'.", type, name[end]),
-                        nameof(type));
+
+                if (type == '\0' || type == name[end]) type = name[end];
+                else throw new InvalidDataException($"Conflicting option types: '{type}' vs. '{name[end]}'.");
+
                 AddSeparators(name, end, seps);
             }
 
-            if (type == '\0')
-                return OptionValueType.None;
+            if (type == '\0') return OptionValueType.None;
 
-            if (MaxValueCount <= 1 && seps.Count != 0)
-                throw new ArgumentException(
-                    string.Format("Cannot provide key/value separators for Options taking {0} value(s).", MaxValueCount),
-                    nameof(MaxValueCount));
-            if (MaxValueCount <= 1) return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
+            if (MaxValueCount <= 1 && seps.Count != 0) throw new InvalidDataException($"Cannot provide key/value separators for Options taking {MaxValueCount} value(s).");
+            if (MaxValueCount <= 1) return GetOptionValueType(type);
 
             switch (seps.Count)
             {
@@ -216,8 +210,11 @@ namespace CommandLine.NDesk.Options
                     break;
             }
 
-            return type == '=' ? OptionValueType.Required : OptionValueType.Optional;
+            return GetOptionValueType(type);
         }
+
+        private static OptionValueType GetOptionValueType(char type) =>
+            type == '=' ? OptionValueType.Required : OptionValueType.Optional;
 
         private static void AddSeparators(string name, int end, ICollection<string> seps)
         {
@@ -489,9 +486,10 @@ namespace CommandLine.NDesk.Options
 
         private bool ParseBool(string option, string n, OptionContext c)
         {
-            string rn;
-            if (n.Length < 1 || n[n.Length - 1] != '+' && n[n.Length - 1] != '-' ||
-                !Contains(rn = n.Substring(0, n.Length - 1))) return false;
+            if (n.Length < 1 || n[n.Length - 1] != '+' && n[n.Length - 1] != '-') return false;
+
+            string rn = n.Substring(0, n.Length - 1);
+            if (!Contains(rn)) return false;
 
             var p = this[rn];
             string v = n[n.Length - 1] == '+' ? option : null;
@@ -664,50 +662,61 @@ namespace CommandLine.NDesk.Options
 
         private static string GetDescription(string description)
         {
-            if (description == null)
-                return string.Empty;
+            if (description == null) return string.Empty;
+
             StringBuilder sb = StringBuilderCache.Acquire(description.Length);
-            int start = -1;
-            for (var i = 0; i < description.Length; ++i)
+            int start        = -1;
+
+            for (var position = 0; position < description.Length; ++position)
             {
-                switch (description[i])
-                {
-                    case '{':
-                        if (i == start)
-                        {
-                            sb.Append('{');
-                            start = -1;
-                        }
-                        else if (start < 0)
-                            start = i + 1;
-                        break;
-                    case '}':
-                        if (start < 0)
-                        {
-                            if (i + 1 == description.Length || description[i + 1] != '}')
-                                throw new InvalidOperationException("Invalid option description: " + description);
-                            ++i;
-                            sb.Append("}");
-                        }
-                        else
-                        {
-                            sb.Append(description.Substring(start, i - start));
-                            start = -1;
-                        }
-                        break;
-                    case ':':
-                        if (start < 0)
-                            goto default;
-                        start = i + 1;
-                        break;
-                    default:
-                        if (start < 0)
-                            sb.Append(description[i]);
-                        break;
-                }
+                position = ParseDescription(description, position, sb, ref start);
             }
 
             return StringBuilderCache.GetStringAndRelease(sb);
+        }
+
+        private static int ParseDescription(string description, int position, StringBuilder sb, ref int start)
+        {
+            switch (description[position])
+            {
+                case '{':
+                    if (position == start)
+                    {
+                        sb.Append('{');
+                        start = -1;
+                        break;
+                    }
+                    if (start < 0) start = position + 1;
+                    break;
+
+                case '}':
+                    if (start < 0)
+                    {
+                        if (position + 1 == description.Length || description[position + 1] != '}')
+                            throw new InvalidOperationException("Invalid option description: " + description);
+                        ++position;
+                        sb.Append("}");
+                        break;
+                    }
+                    sb.Append(description.Substring(start, position - start));
+                    start = -1;
+                    break;
+
+                case ':':
+                    if (start < 0)
+                    {
+                        sb.Append(description[position]);
+                        break;
+                    }
+                    start = position + 1;
+                    break;
+
+                default:
+                    if (start < 0) sb.Append(description[position]);
+                    break;
+            }
+
+            return position;
         }
 
         private static IEnumerable<string> GetLines(string description)

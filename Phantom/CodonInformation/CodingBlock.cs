@@ -10,11 +10,10 @@ namespace Phantom.CodonInformation
 
         public CodingBlock(int start, int end, byte startPhase)
         {
-            Start = start;
-            End = end;
+            Start      = start;
+            End        = end;
             StartPhase = startPhase;
         }
-
 
         public bool Equals(CodingBlock other) =>
             Start == other.Start && End == other.End && StartPhase == other.StartPhase;
@@ -23,7 +22,7 @@ namespace Phantom.CodonInformation
         {
             unchecked
             {
-                var hashCode = Start;
+                int hashCode = Start;
                 hashCode = (hashCode * 1201) ^ End;
                 hashCode = (hashCode * 1201) ^ StartPhase;
                 return hashCode;

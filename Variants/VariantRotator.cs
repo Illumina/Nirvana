@@ -19,17 +19,17 @@ namespace Variants
                 return simpleVariant;
             // if variant is before the transcript start, do not perform 3 prime shift
             
-            var rotatingBases = GetRotatingBases(simpleVariant, onReverseStrand);
+            string rotatingBases = GetRotatingBases(simpleVariant, onReverseStrand);
 
-            var downStreamSeq = GetDownstreamSeq(simpleVariant, rotateRegion, refSequence, onReverseStrand, rotatingBases);
+            string downStreamSeq = GetDownstreamSeq(simpleVariant, rotateRegion, refSequence, onReverseStrand, rotatingBases);
 
-            var combinedSequence = rotatingBases + downStreamSeq;
+            string combinedSequence = rotatingBases + downStreamSeq;
 
             int shiftStart, shiftEnd;
             var hasShifted = false;
 
-            // TODO: probably a VEP bug, just use it for consistency
-            var numBases = rotatingBases.Length;
+            // probably a VEP bug, just use it for consistency
+            int numBases = rotatingBases.Length;
 
             for (shiftStart = 0, shiftEnd = numBases; shiftEnd < combinedSequence.Length; shiftStart++, shiftEnd++)
             {
@@ -40,9 +40,9 @@ namespace Variants
             if (!hasShifted) return simpleVariant;
 
             // create a new alternative allele
-            var rotatedSequence = combinedSequence.Substring(shiftStart, numBases);
-            var rotatedStart    = simpleVariant.Start + shiftStart;
-            var rotatedEnd      = simpleVariant.End + shiftStart;
+            string rotatedSequence = combinedSequence.Substring(shiftStart, numBases);
+            int rotatedStart       = simpleVariant.Start + shiftStart;
+            int rotatedEnd         = simpleVariant.End + shiftStart;
 
             if (onReverseStrand)
             {
@@ -51,8 +51,8 @@ namespace Variants
                 rotatedEnd      = simpleVariant.End - shiftStart;
             }
             
-            var rotatedRefAllele = simpleVariant.RefAllele;
-            var rotatedAltAllele = simpleVariant.AltAllele;
+            string rotatedRefAllele = simpleVariant.RefAllele;
+            string rotatedAltAllele = simpleVariant.AltAllele;
 
             if (simpleVariant.Type == VariantType.insertion) rotatedAltAllele = rotatedSequence;
             else rotatedRefAllele = rotatedSequence;
@@ -64,8 +64,8 @@ namespace Variants
         private static string GetDownstreamSeq(IInterval simpleVariant, IInterval rotateRegion,
             ISequence refSequence, bool onReverseStrand, string rotatingBases)
         {
-            var basesToEnd = onReverseStrand ? simpleVariant.Start - rotateRegion.Start : rotateRegion.End - simpleVariant.End;
-            var downStreamLength =
+            int basesToEnd = onReverseStrand ? simpleVariant.Start - rotateRegion.Start : rotateRegion.End - simpleVariant.End;
+            int downStreamLength =
                 Math.Min(basesToEnd,
                     Math.Max(rotatingBases.Length,
                         MaxDownstreamLength)); // for large rotatingBases, we need to factor in its length but still make sure that we do not go past the end of transcript
@@ -79,7 +79,7 @@ namespace Variants
 
         private static string GetRotatingBases(ISimpleVariant simpleVariant, bool onReverseStrand)
         {
-            var rotatingBases = simpleVariant.Type == VariantType.insertion ? simpleVariant.AltAllele : simpleVariant.RefAllele;
+            string rotatingBases = simpleVariant.Type == VariantType.insertion ? simpleVariant.AltAllele : simpleVariant.RefAllele;
             rotatingBases = onReverseStrand ? SequenceUtilities.GetReverseComplement(rotatingBases) : rotatingBases;
             return rotatingBases;
         }

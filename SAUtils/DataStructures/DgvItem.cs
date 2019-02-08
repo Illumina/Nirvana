@@ -1,25 +1,30 @@
-﻿using System.Collections.Generic;
-using Genome;
+﻿using Genome;
+using OptimizedCore;
+using VariantAnnotation.Interface.SA;
+using VariantAnnotation.IO;
 using Variants;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class DgvItem : SupplementaryDataItem
+    public sealed class DgvItem : ISuppIntervalItem
     {
-        private string Id { get; }
+        public IChromosome Chromosome { get; }
+        public int Start { get; }
+        public int End { get; }
 
-        private int ObservedGains { get; }
+        public string Id { get; }
 
-        private int ObservedLosses { get; }
+        public int ObservedGains { get; }
 
-        private int SampleSize { get; }
+        public int ObservedLosses { get; }
 
-        private VariantType VariantType { get; }
+        public int SampleSize { get; }
 
-        private double? VariantFreqAll { get; }
+        public VariantType VariantType { get; }
 
-        private int End { get; }
+        public double? VariantFreqAll { get; }
 
+        
         public DgvItem(string id, IChromosome chromosome, int start, int end, int sampleSize, int observedGains, int observedLosses,
             VariantType variantType)
         {
@@ -31,7 +36,6 @@ namespace SAUtils.DataStructures
             ObservedGains  = observedGains;
             ObservedLosses = observedLosses;
             VariantType    = variantType;
-            IsInterval     = true;
 
             if (SampleSize != 0 && ObservedLosses + ObservedGains != 0)
             {
@@ -40,35 +44,30 @@ namespace SAUtils.DataStructures
             }
         }
 
-
-
-        public override SupplementaryIntervalItem GetSupplementaryInterval()
+        public string GetJsonString()
         {
-            if (!IsInterval) return null;
+            var sb = StringBuilderCache.Acquire();
+            var jsonObject = new JsonObject(sb);
 
-            var intValues    = new Dictionary<string, int>();
-            var doubleValues = new Dictionary<string, double>();
-            var freqValues   = new Dictionary<string, double>();
-            var stringValues = new Dictionary<string, string>();
-            var boolValues   = new List<string>();
+            jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
+            jsonObject.AddIntValue("begin", Start);
+            jsonObject.AddIntValue("end", End);
+            jsonObject.AddStringValue("variantType", VariantType.ToString());
 
-            var suppInterval = new SupplementaryIntervalItem(Chromosome, Start, End, VariantType,
-                "dgv", intValues, doubleValues, freqValues, stringValues, boolValues);
+            jsonObject.AddStringValue("id", Id);
+            jsonObject.AddIntValue("sampleSize", SampleSize);
+            if (ObservedGains != 0) jsonObject.AddIntValue("observedGains", ObservedGains);
+            if (ObservedLosses != 0) jsonObject.AddIntValue("observedLosses", ObservedLosses);
+            jsonObject.AddDoubleValue("variantFreqAll", VariantFreqAll, "0.#####");
 
-            if (Id             != null) suppInterval.AddStringValue("id", Id);
-            if (SampleSize     != 0)    suppInterval.AddIntValue("sampleSize", SampleSize);
-            if (ObservedGains  != 0)    suppInterval.AddIntValue("observedGains", ObservedGains);
-            if (ObservedLosses != 0)    suppInterval.AddIntValue("observedLosses", ObservedLosses);
-            if (VariantFreqAll != null) suppInterval.AddFrequencyValue("variantFreqAll", VariantFreqAll.Value);
-
-            return suppInterval;
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        public override bool Equals(object other)
+        public override bool Equals(object obj)
         {
             // If parameter is null return false.
 
-            if (!(other is DgvItem otherItem)) return false;
+            if (!(obj is DgvItem otherItem)) return false;
 
             // Return true if the fields match:
             return Equals(Chromosome, otherItem.Chromosome)
@@ -99,5 +98,7 @@ namespace SAUtils.DataStructures
                 return hashCode;
             }
         }
+
+     
     }
 }

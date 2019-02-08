@@ -29,29 +29,15 @@ namespace SAUtils.ExtractCosmicSvs
         private int _chromStartStopIndex        = -1;
         private int _studyIdIndex               = -1;
 
+        private static readonly char[] ChromosomeDelimiters = {':', '.'};
 
         //CNV_ID  ID_GENE gene_name       ID_SAMPLE       ID_TUMOUR       Primary site    Site subtype 1  Site subtype 2  Site subtype 3  Primary histology       Histology subtype 1     Histology subtype 2     Histology subtype 3     SAMPLE_NAME     TOTAL_CN        MINOR_ALLELE    MUT_TYPE        ID_STUDY        GRCh    Chromosome:G_Start..G_Stop
 
-        private const string CnvIdTag                 = "CNV_ID";
-        private const string PrimarySiteTag           = "Primary site";
-        private const string SiteSubtypeOneTag        = "Site subtype 1";
-        private const string SiteSubtypeTwoTag        = "Site subtype 2";
-        private const string SiteSubtypeThreeTag      = "Site subtype 3";
-        private const string PrimaryHistologyTag      = "Primary histology";
-        private const string HistologySubtypeOneTag   = "Histology subtype 1";
-        private const string HistologySubtypeTwoTag   = "Histology subtype 2";
-        private const string HistologySubtypeThreeTag = "Histology subtype 3";
-        private const string TotalCopyNumberTag       = "TOTAL_CN";
-        private const string CnvTypeTag               = "MUT_TYPE";
-        private const string AssemblyTag              = "GRCh";
-        private const string ChromStartStopTag        = "Chromosome:G_Start..G_Stop";
-        private const string StudyIdTag               = "ID_STUDY";
-
         public CosmicCnvReader(Stream cnvStream, IDictionary<string, IChromosome> refNameToChorm, GenomeAssembly assembly)
         {
-            _reader = FileUtilities.GetStreamReader(cnvStream);
+            _reader     = FileUtilities.GetStreamReader(cnvStream);
             _refToChrom = refNameToChorm; 
-            _assembly = assembly;
+            _assembly   = assembly;
         }
 
         public IEnumerable<CosmicCnvItem> GetEntries()
@@ -59,10 +45,11 @@ namespace SAUtils.ExtractCosmicSvs
             var cnvDictionary = new Dictionary<int, CosmicCnvItem>();
             string line;
             var isFirstLine = true;
+
             while ((line = _reader.ReadLine()) != null)
             {
                 // Skip empty lines.
-                if (string.IsNullOrWhiteSpace(line)) continue;
+                if (line.IsWhiteSpace()) continue;
                 // Skip comments.
                 if (isFirstLine)
                 {
@@ -84,8 +71,7 @@ namespace SAUtils.ExtractCosmicSvs
                     Console.WriteLine(e);
                     Console.WriteLine(line);
                     throw;
-                }
-                
+                }                
             }
 
             Console.WriteLine($"Found {cnvDictionary.Count} unique cosmic cnvs");
@@ -116,48 +102,46 @@ namespace SAUtils.ExtractCosmicSvs
             {
                 switch (columns[i])
                 {
-                    case CnvIdTag:
+                    case "CNV_ID":
                         _idIndex = i;
                         break;
-                    case PrimarySiteTag:
+                    case "Primary site":
                         _primarySiteIndex = i;
                         break;
-                    case SiteSubtypeOneTag:
+                    case "Site subtype 1":
                         _siteSubtypeOneIndex = i;
                         break;
-                    case SiteSubtypeTwoTag:
+                    case "Site subtype 2":
                         _siteSubtypeTwoIndex = i;
                         break;
-                    case SiteSubtypeThreeTag:
+                    case "Site subtype 3":
                         _siteSubtypeThreeIndex = i;
                         break;
-
-                    case PrimaryHistologyTag:
+                    case "Primary histology":
                         _primaryHistologyIndex = i;
                         break;
-                    case HistologySubtypeOneTag:
+                    case "Histology subtype 1":
                         _histologySubtypeOneIndex = i;
                         break;
-                    case HistologySubtypeTwoTag:
+                    case "Histology subtype 2":
                         _histologySubtypeTwoIndex = i;
                         break;
-                    case HistologySubtypeThreeTag:
+                    case "Histology subtype 3":
                         _histologySubtypeThreeIndex = i;
                         break;
-
-                    case TotalCopyNumberTag:
+                    case "TOTAL_CN":
                         _copyNumberIndex = i;
                         break;
-                    case CnvTypeTag:
+                    case "MUT_TYPE":
                         _cnvTypeIndex = i;
                         break;
-                    case AssemblyTag:
+                    case "GRCh":
                         _assemblyIndex = i;
                         break;
-                    case ChromStartStopTag:
+                    case "Chromosome:G_Start..G_Stop":
                         _chromStartStopIndex = i;
                         break;
-                    case StudyIdTag:
+                    case "ID_STUDY":
                         _studyIdIndex = i;
                         break;
                 }
@@ -169,14 +153,12 @@ namespace SAUtils.ExtractCosmicSvs
                 throw new InvalidDataException("Column for some histology(ies) could not be detected");
             if (_copyNumberIndex == -1 || _assemblyIndex == -1 || _chromStartStopIndex == -1 || _cnvTypeIndex == -1)
                 throw new InvalidDataException("Column for some CNV details could not be detected");
-            if (_studyIdIndex ==-1)
+            if (_studyIdIndex == -1)
                 throw new InvalidDataException("No study Id column detected");
-
         }
 
         private CosmicCnvItem ExtractCosmicCnv(string line)
-        {
-            
+        {            
             var splits = line.OptimizedSplit('\t');
 
             if (splits.Length == 1) return null;
@@ -223,24 +205,19 @@ namespace SAUtils.ExtractCosmicSvs
 
         private static (string, int, int) GetChromStartStop(string chromPos)
         {
-            //17:18358950..18464587 Chromosome:G_Start..G_Stop
-            var splits = chromPos.Split(':', '.');
-            var chrom = splits[0];
+            // 17:18358950..18464587 Chromosome:G_Start..G_Stop
+            var splits   = chromPos.Split(ChromosomeDelimiters);
+            string chrom = splits[0];
             if (chrom == "25") chrom = "MT";
             return (chrom, int.Parse(splits[1]), int.Parse(splits[3]));
         }
 
-        
-        private static void TryAddValue(Dictionary<string, int> cancerTypes, string type)
+        private static void TryAddValue(IDictionary<string, int> cancerTypes, string type)
         {
             if (string.IsNullOrEmpty(type) || type == "NS") return;
-
-            cancerTypes[type]=1;//we don't care about overriding the old count since this is for one study. So counts should not add up
+            cancerTypes[type] = 1; // we don't care about overriding the old count since this is for one study. So counts should not add up
         }
 
-        public void Dispose()
-        {
-            _reader?.Dispose();
-        }
+        public void Dispose() => _reader?.Dispose();
     }
 }

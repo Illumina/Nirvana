@@ -32,6 +32,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public IRnaEdit[] RnaEdits { get; }
         public bool CdsStartNotFound { get; }
         public bool CdsEndNotFound { get; }
+        public ISequence CodingSequence { get; set; }
 
         public Transcript(IChromosome chromosome, int start, int end, ICompactId id, ITranslation translation,
             BioType bioType, IGene gene, int totalExonLength, byte startExonPhase, bool isCanonical,
@@ -173,7 +174,7 @@ namespace VariantAnnotation.Caches.DataStructures
             return items;
         }
 
-        private static void WriteIndices<T>(IExtendedBinaryWriter writer, T[] items, Dictionary<T, int> indices)
+        private static void WriteIndices<T>(IExtendedBinaryWriter writer, T[] items, IReadOnlyDictionary<T, int> indices)
         {
             writer.WriteOpt(items.Length);
             foreach (var item in items) writer.WriteOpt(GetIndex(item, indices));

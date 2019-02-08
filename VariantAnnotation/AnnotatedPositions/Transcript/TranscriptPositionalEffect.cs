@@ -33,8 +33,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             {
                 if (region.Type != TranscriptRegionType.Intron) continue;
 
-                // TODO: we should sort our introns so that we can end early
-
                 // skip this one if variant is out of range : the range is set to 3 instead of the original old:
                 // all of the checking occured in the region between start-3 to end+3, if we set to 8, we can made mistakes when
                 // checking IsWithinIntron when we have a small exon
@@ -47,37 +45,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
                 var isFrameshiftIntron = region.End - region.Start <= 12;
 
-                if (isFrameshiftIntron)
+                if (isFrameshiftIntron && variant.Overlaps(region.Start, region.End))
                 {
-                    if (variant.Overlaps(region.Start, region.End))
-                    {
-                        IsWithinFrameshiftIntron = true;
-                        continue;
-                    }
+                    IsWithinFrameshiftIntron = true;
+                    continue;
                 }
 
-                if (variant.Overlaps(region.Start, region.Start + 1))
-                {
-                    IsStartSpliceSite = true;
-                }
-
-                if (variant.Overlaps(region.End - 1, region.End))
-                {
-                    IsEndSpliceSite = true;
-                }
-
-                // we need to special case insertions between the donor and acceptor sites
-
-                //make sure the size of intron is larger than 4
-                if (region.Start <= region.End - 4)
-                {
-                    if (variant.Overlaps(region.Start + 2, region.End - 2) ||
-                        isInsertion && (variant.Start == region.Start + 2
-                                        || variant.End == region.End - 2))
-                    {
-                        IsWithinIntron = true;
-                    }
-                }
+                CheckSpliceSiteOverlap(variant, region);
+                CheckIntronOverlap(variant, isInsertion, region);
 
                 // the definition of splice_region (SO:0001630) is "within 1-3 bases of the
                 // exon or 3-8 bases of the intron." We also need to special case insertions
@@ -92,6 +67,32 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                                             variant.End == region.End ||
                                             variant.Start == region.Start + 2 ||
                                             variant.End == region.End - 2);
+            }
+        }
+
+        private void CheckSpliceSiteOverlap(IInterval variant, ITranscriptRegion region)
+        {
+            if (variant.Overlaps(region.Start, region.Start + 1))
+            {
+                IsStartSpliceSite = true;
+            }
+
+            if (variant.Overlaps(region.End - 1, region.End))
+            {
+                IsEndSpliceSite = true;
+            }
+        }
+
+        private void CheckIntronOverlap(IInterval variant, bool isInsertion, ITranscriptRegion region)
+        {
+            // we need to special case insertions between the donor and acceptor sites
+            // make sure the size of intron is larger than 4
+            if (region.Start <= region.End - 4 && (variant.Overlaps(region.Start + 2, region.End - 2) ||
+                                                   isInsertion &&
+                                                   (variant.Start == region.Start + 2 ||
+                                                    variant.End == region.End - 2)))
+            {
+                IsWithinIntron = true;
             }
         }
 

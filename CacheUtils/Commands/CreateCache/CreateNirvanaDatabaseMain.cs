@@ -5,7 +5,6 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using CacheUtils.Genes.Utilities;
-using CacheUtils.Helpers;
 using CacheUtils.IntermediateIO;
 using CacheUtils.PredictionCache;
 using CacheUtils.TranscriptCache;
@@ -20,6 +19,7 @@ using VariantAnnotation.Interface;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
+using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.CreateCache
 {

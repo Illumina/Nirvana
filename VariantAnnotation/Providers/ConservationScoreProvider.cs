@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
@@ -9,39 +11,32 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ConservationScoreProvider : IAnnotationProvider
     {
-		private readonly PhylopReader _phylopReader;
-		private string _currentUcscReferenceName;
+        private readonly NpdReader _phylopReader;
 
+        public string Name { get; }
+        public GenomeAssembly Assembly => _phylopReader.Assembly;
+        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
-		public string Name { get; }
-		public GenomeAssembly Assembly { get; }
-		public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
-
-		public ConservationScoreProvider(IEnumerable<string> dirPaths)
-		{
-            Name                      = "Conservation score provider";
-            _phylopReader             = new PhylopReader(dirPaths);
-            Assembly                  = _phylopReader.GenomeAssembly;
-            DataSourceVersions        = _phylopReader.DataSourceVersions;
-            _currentUcscReferenceName = "";
+        public ConservationScoreProvider(Stream dbStream, Stream indexStream)
+        {
+            _phylopReader = new NpdReader(dbStream, indexStream);
+            Name = "Conservation score provider";
+            DataSourceVersions = new[] { _phylopReader.Version };
         }
 
-		public void Annotate(IAnnotatedPosition annotatedPosition)
-		{
-			if (_currentUcscReferenceName != annotatedPosition.Position.Chromosome.UcscName)
-				LoadChromosome(annotatedPosition.Position.Chromosome);
+        public void Annotate(IAnnotatedPosition annotatedPosition)
+        {
+            foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
+            {
+                if (annotatedVariant.Variant.Type != VariantType.SNV) continue;
+                annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome, annotatedVariant.Variant.Start);
+            }
+        }
 
-			foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
-			{
-				if (annotatedVariant.Variant.Type != VariantType.SNV) continue;
-				annotatedVariant.PhylopScore = _phylopReader.GetScore(annotatedVariant.Variant.Start);
-			}
-		}
+        public void PreLoad(IChromosome chromosome, List<int> positions)
+        {
+            throw new NotImplementedException();
+        }
 
-		private void LoadChromosome(IChromosome chromosome)
-		{
-			_currentUcscReferenceName = chromosome.UcscName;
-			_phylopReader.LoadChromosome(chromosome.UcscName);
-		}
-	}
+    }
 }

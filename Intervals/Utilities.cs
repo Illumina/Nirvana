@@ -19,7 +19,7 @@ namespace Intervals
         /// <summary>
         /// get the intersection of the two intervals
         /// </summary>
-        public static (int Start, int End) Intersect(int firstStart, int firstEnd, int secondStart, int secondEnd) =>
+        public static (int Start, int End) Intersects(int firstStart, int firstEnd, int secondStart, int secondEnd) =>
             Overlaps(firstStart, firstEnd, secondStart, secondEnd)
                 ? (Math.Max(firstStart, secondStart), Math.Min(firstEnd, secondEnd))
                 : (-1, -1);

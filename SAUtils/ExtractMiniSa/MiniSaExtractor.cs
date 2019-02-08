@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Genome;
 using Intervals;
 using IO;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
-using VariantAnnotation.SA;
 
 namespace SAUtils.ExtractMiniSa
 {
@@ -30,8 +28,8 @@ namespace SAUtils.ExtractMiniSa
 
             var refChromDict = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
 
-            string referenceName = GetReferenceName(saPath, refChromDict);
-            _miniSaPath = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
+            //string referenceName = GetReferenceName(saPath, refChromDict);
+            //_miniSaPath = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);
 
             Console.WriteLine($"MiniSA output to: {_miniSaPath}");
         }
@@ -46,59 +44,59 @@ namespace SAUtils.ExtractMiniSa
             return miniSaPath;
         }
 
-        private static string GetReferenceName(string saPath, IDictionary<string, IChromosome> refChromDict)
-        {
-            ISupplementaryAnnotationHeader header;
+        //private static string GetReferenceName(string saPath, IDictionary<string, IChromosome> refChromDict)
+        //{
+        //    ISupplementaryAnnotationHeader header;
 
-            using (var stream = FileUtilities.GetReadStream(saPath))
-            using (var reader = new ExtendedBinaryReader(stream))
-            {
-                header = SaReader.GetHeader(reader);
-            }
+        //    using (var stream = FileUtilities.GetReadStream(saPath))
+        //    using (var reader = new ExtendedBinaryReader(stream))
+        //    {
+        //        header = SaReader.GetHeader(reader);
+        //    }
 
-            return refChromDict[header.ReferenceSequenceName].UcscName;
-        }
+        //    return refChromDict[header.ReferenceSequenceName].UcscName;
+        //}
 
-        private static SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
-            List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
-            List<ISupplementaryInterval> allVariantIntervals,List<(int,string)> globalMajorAlleleInRefMinors)
-        {
-            var stream    = FileUtilities.GetCreateStream(saPath);
-            var idxStream = FileUtilities.GetCreateStream(saPath + ".idx");
-            return new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantIntervals,globalMajorAlleleInRefMinors);
-        }
+        //private static SaWriter GetSaWriter(string saPath, ISupplementaryAnnotationHeader header,
+        //    List<ISupplementaryInterval> smallVariantIntervals, List<ISupplementaryInterval> svIntervals,
+        //    List<ISupplementaryInterval> allVariantIntervals,List<(int,string)> globalMajorAlleleInRefMinors)
+        //{
+        //    var stream    = FileUtilities.GetCreateStream(saPath);
+        //    var idxStream = FileUtilities.GetCreateStream(saPath + ".idx");
+        //    return new SaWriter(stream, idxStream, header, smallVariantIntervals, svIntervals, allVariantIntervals,globalMajorAlleleInRefMinors);
+        //}
 
-        private static SaReader GetSaReader(string saPath)
-        {
-            var stream    = FileUtilities.GetReadStream(saPath);
-            var idxStream = FileUtilities.GetReadStream(saPath + ".idx");
-            return new SaReader(stream, idxStream);
-        }
+        //private static SaReader GetSaReader(string saPath)
+        //{
+        //    var stream    = FileUtilities.GetReadStream(saPath);
+        //    var idxStream = FileUtilities.GetReadStream(saPath + ".idx");
+        //    return new SaReader(stream, idxStream);
+        //}
 
         public int Extract()
         {
             var count = 0;
 
-            using (var reader = GetSaReader(_saPath))
-            {
-                var smallVariantIntervals = GetIntervals("small variants", reader.SmallVariantIntervals);
-                var svIntervals           = GetIntervals("SVs",            reader.SvIntervals);
-                var allVariantIntervals   = GetIntervals("all variants",   reader.AllVariantIntervals);
-                var globalMajorAlleles = GetGlobaleMajorAlleleAndRefMinors(reader.GlobalMajorAlleleInRefMinors);
+            //using (var reader = GetSaReader(_saPath))
+            //{
+            //    var smallVariantIntervals = GetIntervals("small variants", reader.SmallVariantIntervals);
+            //    var svIntervals           = GetIntervals("SVs",            reader.SvIntervals);
+            //    var allVariantIntervals   = GetIntervals("all variants",   reader.AllVariantIntervals);
+            //    var globalMajorAlleles = GetGlobaleMajorAlleleAndRefMinors(reader.GlobalMajorAlleleInRefMinors);
 
-                using (var writer = GetSaWriter(_miniSaPath, reader.Header, smallVariantIntervals, svIntervals,
-                        allVariantIntervals,globalMajorAlleles))
-                {
-                    for (int position = _begin; position <= _end; position++)
-                    {
-                        var saPosition = reader.GetAnnotation(position);
-                        if (saPosition == null) continue;
+            //    using (var writer = GetSaWriter(_miniSaPath, reader.Header, smallVariantIntervals, svIntervals,
+            //            allVariantIntervals,globalMajorAlleles))
+            //    {
+            //        for (int position = _begin; position <= _end; position++)
+            //        {
+            //            var saPosition = reader.GetAnnotation(position);
+            //            if (saPosition == null) continue;
 
-                        writer.Write(saPosition, position);
-                        count++;
-                    }
-                }
-            }
+            //            writer.Write(saPosition, position);
+            //            count++;
+            //        }
+            //    }
+            //}
 
             return count;
         }

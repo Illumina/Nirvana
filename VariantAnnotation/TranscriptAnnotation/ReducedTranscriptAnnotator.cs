@@ -10,15 +10,17 @@ namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class ReducedTranscriptAnnotator
     {
-        public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant variant,
-            ITranscript[] geneFusionCandidates)
+        public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant variant, ITranscript[] geneFusionCandidates)
         {
             var annotation   = AnnotateTranscript(transcript, variant, geneFusionCandidates);
             var consequences = GetConsequences(transcript, variant, annotation.GeneFusion != null);
 
             return new AnnotatedTranscript(transcript, null, null, null, null, annotation.Position, null, null, null,
-                null, consequences, annotation.GeneFusion);
+                null, consequences, annotation.GeneFusion, false);
         }
+
+        public static IAnnotatedTranscript GetCompleteOverlapTranscript(ITranscript transcript) =>
+            new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null, null, null, true);
 
         private static (IMappedPosition Position, IGeneFusionAnnotation GeneFusion)
             AnnotateTranscript(ITranscript transcript, IVariant variant, ITranscript[] geneFusionCandidates)

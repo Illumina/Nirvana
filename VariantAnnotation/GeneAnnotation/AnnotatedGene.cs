@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.IO;
 
@@ -8,11 +7,10 @@ namespace VariantAnnotation.GeneAnnotation
 {
     public sealed class AnnotatedGene:IAnnotatedGene
     {
-        private const string NullGene = "nullGene";
         public string GeneName { get; }
-        public IGeneAnnotationSource[] Annotations { get; }
+        public IGeneAnnotation[] Annotations { get; }
 
-        public AnnotatedGene(string geneName, IGeneAnnotationSource[] annotations)
+        public AnnotatedGene(string geneName, IGeneAnnotation[] annotations)
         {
             GeneName = geneName;
             Annotations = annotations;
@@ -39,34 +37,6 @@ namespace VariantAnnotation.GeneAnnotation
             sb.Append(JsonObject.CloseBrace);
         }
 
-        public void Write(IExtendedBinaryWriter writer)
-        {
-            writer.Write(GeneName);
-            writer.WriteOpt(Annotations.Length);
-            foreach (IGeneAnnotationSource geneSource in Annotations) geneSource.Write(writer);
-        }
-
-        public static IAnnotatedGene Read(ExtendedBinaryReader reader)
-        {
-            var geneName = reader.ReadAsciiString();
-            var annotationLength = reader.ReadOptInt32();
-            var annotations = new IGeneAnnotationSource[annotationLength];
-            for (int i = 0; i < annotationLength; i++)
-            {
-                annotations[i] = GeneAnnotationSource.Read(reader);
-            }
-
-            return geneName == NullGene ? null : new AnnotatedGene(geneName, annotations);
-        }
-
-        public int CompareTo(IAnnotatedGene other)
-        {
-            return string.Compare(GeneName, other.GeneName, StringComparison.Ordinal);
-        }
-
-        public static IAnnotatedGene CreateEmptyGene()
-        {
-            return new AnnotatedGene(NullGene, new IGeneAnnotationSource[0]);
-        }
+        public int CompareTo(IAnnotatedGene other) => string.Compare(GeneName, other.GeneName, StringComparison.Ordinal);
     }
 }

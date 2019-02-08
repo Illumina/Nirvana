@@ -1,30 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class CosmicItem : SupplementaryDataItem, IEquatable<CosmicItem>
+    public sealed class CosmicItem : ISupplementaryDataItem
     {
-        #region members
+        public IChromosome Chromosome { get; }
+        public int Position { get; set; }
+        public string RefAllele { get; set; }
+        public string AltAllele { get; set; }
 
         public string Id { get; }
         private string Gene { get; }
         private int? SampleCount { get; }
-
-
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        private string IsAlleleSpecific { get; set; }
-
-        public HashSet<CosmicStudy> Studies { get; private set; }
-
-        #endregion
+        public HashSet<CosmicStudy> Studies { get; }
 
         public CosmicItem(
             IChromosome chromosome,
-            int start,
+            int position,
             string id,
             string refAllele,
             string altAllele,
@@ -32,10 +30,10 @@ namespace SAUtils.DataStructures
             HashSet<CosmicStudy> studies, int? sampleCount)
         {
             Chromosome      = chromosome;
-            Start           = start;
+            Position        = position;
             Id              = id;
-            ReferenceAllele = refAllele;
-            AlternateAllele = altAllele;
+            RefAllele = refAllele;
+            AltAllele = altAllele;
             Gene            = gene;
             Studies         = studies;
             SampleCount     = sampleCount;
@@ -61,55 +59,19 @@ namespace SAUtils.DataStructures
 
             public bool Equals(CosmicStudy other)
             {
-                return Id.Equals(other?.Id);
+                if (other == null) return false;
+                return Id.Equals(other.Id)
+                    && Histologies.SequenceEqual(other.Histologies)
+                    && Sites.SequenceEqual(other.Sites);
             }
 
             public override int GetHashCode()
             {
                 var hashCode = Id?.GetHashCode() ?? 0;
+                //hashCode ^= Histologies.GetHashCode() ^ Sites.GetHashCode();
                 return hashCode;
             }
         }
-
-
-
-        public override SupplementaryIntervalItem GetSupplementaryInterval()
-        {
-            throw new NotImplementedException();
-        }
-
-
-        public bool Equals(CosmicItem otherItem)
-        {
-            // If parameter is null return false.
-            if (otherItem == null) return false;
-
-            // Return true if the fields match:
-            return Equals(Chromosome, otherItem.Chromosome) &&
-                   Start == otherItem.Start &&
-                   string.Equals(Id, otherItem.Id) &&
-                   string.Equals(ReferenceAllele, otherItem.ReferenceAllele) &&
-                   string.Equals(AlternateAllele, otherItem.AlternateAllele) &&
-                   string.Equals(Gene, otherItem.Gene);
-        }
-
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                var hashCode = Chromosome?.GetHashCode() ?? 0;
-                hashCode = (hashCode * 397) ^ Start;
-                hashCode = (hashCode * 397) ^ (Id?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (ReferenceAllele?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (AlternateAllele?.GetHashCode() ?? 0);
-                hashCode = (hashCode * 397) ^ (Gene?.GetHashCode() ?? 0);
-
-                return hashCode;
-            }
-        }
-
-
-
 
         public string GetJsonString()
         {
@@ -118,15 +80,13 @@ namespace SAUtils.DataStructures
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("id", Id);
-            jsonObject.AddStringValue("isAlleleSpecific", IsAlleleSpecific, false);
-            jsonObject.AddStringValue("refAllele", string.IsNullOrEmpty(ReferenceAllele) ? "-" : ReferenceAllele);
-            jsonObject.AddStringValue("altAllele",
-                SaUtilsCommon.ReverseSaReducedAllele(AlternateAllele));
+            jsonObject.AddStringValue("refAllele", string.IsNullOrEmpty(RefAllele) ? "-" : RefAllele);
+            jsonObject.AddStringValue("altAllele", SaUtilsCommon.ReverseSaReducedAllele(AltAllele));
             jsonObject.AddStringValue("gene", Gene);
             jsonObject.AddIntValue("sampleCount", SampleCount);
 
-            jsonObject.AddStringValues("cancerTypes", GetJsonStrings(GetCancerTypeCounts()), false);
-            jsonObject.AddStringValues("tissues", GetJsonStrings(GetTissueCounts()), false);
+            jsonObject.AddStringValue("cancerTypesAndCounts", GetJsonStringFromDict("cancerType",GetCancerTypeCounts()), false);
+            jsonObject.AddStringValue("cancerSitesAndCounts", GetJsonStringFromDict("cancerSite",GetTissueCounts()), false);
 
             return StringBuilderCache.GetStringAndRelease(sb);
         }
@@ -172,27 +132,33 @@ namespace SAUtils.DataStructures
             return cancerTypeCounts;
         }
 
-        private static IEnumerable<string> GetJsonStrings(IDictionary<string, int> dictionary)
+        private static string GetJsonStringFromDict(string dataType, IDictionary<string, int> dictionary)
         {
-            if (dictionary == null) yield break;
+            if (dictionary == null) return null;
+
+            var sb = StringBuilderCache.Acquire();
+            sb.Append(JsonObject.OpenBracket);
+
+            bool isFirstItem = true;
             foreach (var kvp in dictionary)
             {
-                yield return $"{{\"{kvp.Key.Replace('_', ' ')}\":{kvp.Value}}}";
+                if (!isFirstItem)
+                    sb.Append(JsonObject.Comma);
+
+                sb.Append(JsonObject.OpenBrace);
+                sb.Append($"\"{dataType}\":\"{kvp.Key}\",");
+                sb.Append($"\"count\":{kvp.Value}");
+                sb.Append(JsonObject.CloseBrace);
+                
+                isFirstItem = false;
             }
+
+            sb.Append(JsonObject.CloseBracket);
+
+            return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        public void MergeStudies(CosmicItem otherItem)
-        {
-            if (Studies == null)
-                Studies = otherItem.Studies;
-            else
-            {
-                foreach (var study in otherItem.Studies)
-                {
-                    Studies.Add(study);
-                }
-            }
-        }
+       
     }
 }
 

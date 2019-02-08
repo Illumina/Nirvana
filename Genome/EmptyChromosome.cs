@@ -13,7 +13,7 @@
             Index       = ushort.MaxValue;
         }
 
-        public bool Equals(IChromosome other) => UcscName == other.UcscName;
+        public bool Equals(IChromosome other) => UcscName == other.UcscName && Index == other.Index;
 
         public override int GetHashCode() => UcscName.GetHashCode();
     }
