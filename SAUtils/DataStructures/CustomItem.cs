@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ErrorHandling.Exceptions;
 using Genome;
 using VariantAnnotation.Interface.SA;
 
@@ -13,8 +14,9 @@ namespace SAUtils.DataStructures
 
         private readonly string[] _values;
         private readonly SaJsonSchema _jsonSchema;
+        private readonly string _inputLine;
 
-        public CustomItem(IChromosome chromosome, int start, string refAllele, string altAllele, string[] values, SaJsonSchema jsonSchema)
+        public CustomItem(IChromosome chromosome, int start, string refAllele, string altAllele, string[] values, SaJsonSchema jsonSchema, string inputLine)
         {
             Chromosome = chromosome;
             Position = start;
@@ -22,13 +24,21 @@ namespace SAUtils.DataStructures
             AltAllele = altAllele;
             _values = values;
             _jsonSchema = jsonSchema;
+            _inputLine = inputLine;
         }
 
         public string GetJsonString()
         {
             var allValues = new List<string> { RefAllele, AltAllele };
             allValues.AddRange(_values);
-            return _jsonSchema.GetJsonString(allValues);
+            try
+            {
+                return _jsonSchema.GetJsonString(allValues);
+            }
+            catch (UserErrorException e)
+            {
+                throw new UserErrorException(e.Message + $"\nInput line: {_inputLine}");
+            }
         }
     }
 }

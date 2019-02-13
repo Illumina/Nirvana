@@ -29,6 +29,7 @@ namespace SAUtils.Custom
         private readonly HashSet<GenomeAssembly> _allowedGenomeAssemblies = new HashSet<GenomeAssembly>{GenomeAssembly.GRCh37, GenomeAssembly.GRCh38};
         private readonly List<CustomInterval> _intervals;
         private (IChromosome Chromesome, int Position) _previousPosition = (null, 0);
+        private Action<string, string>[] _annotationValidators;
 
         private const string DataType = "array";
         private readonly Dictionary<string, JsonDataType> _predefinedTypeAnnotation = new Dictionary<string, JsonDataType>()
@@ -153,6 +154,8 @@ namespace SAUtils.Custom
             }
 
             _numAnnotationColumns = _tags.Length - _numRequiredColumns;
+            _annotationValidators = Enumerable.Repeat<Action<string, string>>(
+                    (a, b) => { }, _numAnnotationColumns).ToArray();
         }
 
         private void ParseCategories()
@@ -177,6 +180,7 @@ namespace SAUtils.Custom
                         break;
                     case "prediction":
                         Categories[i] = CustomAnnotationCategories.Prediction;
+                        _annotationValidators[i] = AllowedValues.ValidatePredictionValue;
                         break;
                     default:
                         Categories[i] = CustomAnnotationCategories.Unknown;
@@ -276,7 +280,7 @@ namespace SAUtils.Custom
         {
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length)
-                throw new UserErrorException($"Column number mismatch!! Header has {_tags.Length} columns but line contains {splits.Length}");
+                throw new UserErrorException($"Column number mismatch!! Header has {_tags.Length} columns but {line} contains {splits.Length}");
 
             string chromosome = splits[0];
 
@@ -297,25 +301,29 @@ namespace SAUtils.Custom
             for (var i = 0; i < _numAnnotationColumns; i++)
             {
                 annotationValues[i] = splits[i + _numRequiredColumns];
+                _annotationValidators[i](annotationValues[i], line);
             }
 
-            if (_endColumnIndex != -1 && splits[_endColumnIndex] != ".")
+            if (IsInterval(splits))
             {
                 var jsonStringValues = new List<string> { splits[1], splits[_endColumnIndex] };
 
                 if (!int.TryParse(splits[_endColumnIndex], out var end))
-                    throw new UserErrorException($"END is neither a . or an int number at: {line}.");
+                    throw new UserErrorException($"END is not an integer.\nInput line: {line}.");
 
                 jsonStringValues.AddRange(annotationValues);
-                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues, IntervalJsonSchema));
+                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues, IntervalJsonSchema, line));
                 return null;
             }
 
             string altAllele = splits[_altColumnIndex];
-            ValidateNucleotideSequence(altAllele);
+            if (!IsValidNucleotideSequence(altAllele))
+                throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
-            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues, JsonSchema);
+            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues, JsonSchema, line);
         }
+
+        private bool IsInterval(string[] splits) => _endColumnIndex != -1 && !AllowedValues.IsEmptyValue(splits[_endColumnIndex]);
 
         private void CheckAnnotationSorted(IChromosome chrom, int position, string line)
         {
@@ -364,14 +372,15 @@ namespace SAUtils.Custom
                    || value.Equals(SaCommon.TopMedTag);
         }
 
-        internal static void ValidateNucleotideSequence(string sequence)
+        internal static bool IsValidNucleotideSequence(string sequence)
         {
             var validNucleotides = new []{ 'a', 'c', 'g', 't', 'n'};
             foreach (char nucleotide in sequence.ToLower())
             {
-                if (!validNucleotides.Contains(nucleotide))
-                    throw new UserErrorException($"Invalid nucleotides in sequence {sequence}.");
+                if (!validNucleotides.Contains(nucleotide)) return false;
             }
+
+            return true;
         }
 
         public void Dispose()

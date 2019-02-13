@@ -31,13 +31,7 @@ namespace Nirvana
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line.StartsWith('#')) continue;
-                    var splits = line.Split('\t', 6);
-
-                    string chrom = splits[VcfCommon.ChromIndex];
-
-                    if (!refNameToChrom.TryGetValue(chrom, out var iChrom)) continue;
-                    if (annotationRange != null && chromToAnnotate != iChrom) continue;
+                    if (! ReachedAnnotationRange(annotationRange, refNameToChrom, line, chromToAnnotate, out var splits, out IChromosome iChrom)) continue;
 
                     int position = int.Parse(splits[VcfCommon.PosIndex]);
                     if (position > endPosition) break;
@@ -57,6 +51,15 @@ namespace Nirvana
                 }
             }
 
+            int count = SortPositionsAndGetCount(chromPositions);
+
+            Console.WriteLine($"{count} positions found in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
+
+            return chromPositions.ToImmutableDictionary();
+        }
+
+        private static int SortPositionsAndGetCount(Dictionary<IChromosome, List<int>> chromPositions)
+        {
             var count = 0;
             foreach (var positions in chromPositions.Values)
             {
@@ -64,9 +67,22 @@ namespace Nirvana
                 count += positions.Count;
             }
 
-            Console.WriteLine($"{count} positions found in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
+            return count;
+        }
 
-            return chromPositions.ToImmutableDictionary();
+        private static bool ReachedAnnotationRange(AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom, string line,
+            IChromosome chromToAnnotate, out string[] splits, out IChromosome iChrom)
+        {
+            splits = null;
+            iChrom = null;
+            if (line.StartsWith('#')) return false;
+            splits = line.Split('\t', 6);
+
+            string chrom = splits[VcfCommon.ChromIndex];
+
+            if (!refNameToChrom.TryGetValue(chrom, out iChrom)) return false;
+            if (annotationRange != null && chromToAnnotate != iChrom) return false;
+            return true;
         }
     }
 }

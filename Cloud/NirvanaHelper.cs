@@ -7,7 +7,6 @@ namespace Cloud
 {
     public static class NirvanaHelper
     {
-        public const int AnnotationTimeOut                        = 295_000;
         private const string UrlBaseEnvironmentVariableName       = "NirvanaDataUrlBase";
 
         public static readonly string S3Url                       = GetDataUrlBase();
@@ -19,6 +18,8 @@ namespace Cloud
         public const string JsonSuffix                            = ".json.gz";
         public const string JsonIndexSuffix                       = ".jsi";
         public const string TabixSuffix                           = ".tbi";
+
+        public const string SuccessMessage                        = "Success";
 
         private static string GetDataUrlBase()
         {

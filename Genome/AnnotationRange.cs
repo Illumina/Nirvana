@@ -1,4 +1,5 @@
-﻿namespace Genome
+﻿// ReSharper disable InconsistentNaming
+namespace Genome
 {
     public sealed class AnnotationRange
     {

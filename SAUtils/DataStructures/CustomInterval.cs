@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ErrorHandling.Exceptions;
 using Genome;
 using VariantAnnotation.Interface.SA;
 using Variants;
@@ -14,12 +15,12 @@ namespace SAUtils.DataStructures
 
         private readonly List<string> _values;
         private readonly SaJsonSchema _jsonSchema;
-
+        private readonly string _inputLine;
 
         /// <summary>
         /// constructor
         /// </summary>
-        public CustomInterval(IChromosome chromosome, int start, int end, List<string> values, SaJsonSchema jsonSchema)
+        public CustomInterval(IChromosome chromosome, int start, int end, List<string> values, SaJsonSchema jsonSchema, string inputLine)
         {
             Chromosome      = chromosome;
             Start           = start;
@@ -27,9 +28,20 @@ namespace SAUtils.DataStructures
             VariantType     = VariantType.structural_alteration;
             _values         = values;
             _jsonSchema     = jsonSchema;
+            _inputLine      = inputLine;
         }
 
-        public string GetJsonString() => _jsonSchema.GetJsonString(_values);
+        public string GetJsonString()
+        {
+            try
+            {
+                return _jsonSchema.GetJsonString(_values);
+            }
+            catch (UserErrorException e)
+            {
+                throw new UserErrorException(e.Message + $"\nInput line: {_inputLine}");
+            }
+        }
 
-	}
+    }
 }

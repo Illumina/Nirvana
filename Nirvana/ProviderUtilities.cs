@@ -71,7 +71,7 @@ namespace Nirvana
             return ngaFiles.Count > 0? new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(ngaFiles)): null;
         }
 
-        public static IAnnotationProvider GetNsaProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, AmazonS3Client s3Client, List<S3Path> annotationsInS3)
+        public static IAnnotationProvider GetNsaProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, IS3Client s3Client, List<S3Path> annotationsInS3)
         {
             if (dataAndIndexFiles == null && annotationsInS3 == null) return null;
 
@@ -82,12 +82,14 @@ namespace Nirvana
 
             if (annotationsInS3 != null) GetSaReadersFromS3(s3Client, annotationsInS3, nsaReaders, nsiReaders);
 
-            if (nsaReaders.Count > 0 || nsiReaders.Count > 0)
-                return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());
-            return null;
+            if (nsaReaders.Count <= 0 && nsiReaders.Count <= 0) return null;
+
+            nsaReaders.Sort((a, b) => string.Compare(a.JsonKey, b.JsonKey, StringComparison.Ordinal));
+            nsiReaders.Sort((a, b) => string.Compare(a.JsonKey, b.JsonKey, StringComparison.Ordinal));
+            return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());
         }
 
-        private static void GetSaReadersFromS3(AmazonS3Client s3Client, List<S3Path> annotationsInS3, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
+        private static void GetSaReadersFromS3(IS3Client s3Client, List<S3Path> annotationsInS3, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
         {
             foreach (var annotation in annotationsInS3)
             {
@@ -118,14 +120,7 @@ namespace Nirvana
             }
         }
 
-        public static IList<(string dataFile, string indexFile)> GetSaDataAndIndexPaths(string saDirectoryPath)
-        {
-            if (Directory.Exists(saDirectoryPath))
-                return GetLocalSaPaths(saDirectoryPath);
-
-            //if this is the saManifest url
-            return GetSaPathsFromManifest(saDirectoryPath);
-        }
+        public static IList<(string dataFile, string indexFile)> GetSaDataAndIndexPaths(string saDirectoryPath) => ConnectUtilities.IsHttpLocation(saDirectoryPath) ? GetSaPathsFromManifest(saDirectoryPath) : GetLocalSaPaths(saDirectoryPath);
 
         private static IList<(string dataFile, string indexFile)> GetSaPathsFromManifest(string saDirectoryPath)
         {

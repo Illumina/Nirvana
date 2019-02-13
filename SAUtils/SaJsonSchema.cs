@@ -139,7 +139,7 @@ namespace SAUtils
             if (_jsonStringGenerationAction == null) _jsonStringGenerationAction = GetJsonStringGenerationAction();
 
             if (values.Count != Keys.Count)
-                throw new Exception("Please provide one and only one value for each JSON key.");
+                throw new UserErrorException("Please provide one and only one value for each JSON key.");
 
             var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using Amazon.S3;
 using Cloud;
 using CommandLine.Utilities;
 using Genome;
+using IO;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Phantom;
@@ -38,7 +40,7 @@ namespace Nirvana
         public bool OutputGvcf { get; }
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, AmazonS3Client s3Client, List<S3Path> annotationsInS3,
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, IS3Client s3Client, List<S3Path> annotationsInS3,
             string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition,
             bool forceMitochondrialAnnotation)
         {
@@ -47,7 +49,7 @@ namespace Nirvana
             //read VCF to get positions for all variants
             //_variantPositions = vcfStream == null ? null : PreLoadUtilities.GetPositions(vcfStream, SequenceProvider.RefNameToChromosome);
             //preload annotation providers
-            var dataAndIndexPaths = new List<(string dataFile, string indexFile)>();
+            var dataAndIndexPaths = new List<(string DataFile, string IndexFile)>();
 
             foreach (var saDirectoryPath in saDirectoryPaths)
             {
@@ -100,7 +102,7 @@ namespace Nirvana
 
         public void PreLoad(IChromosome chromosome)
         {
-            if (!_variantPositions.TryGetValue(chromosome, out var positions)) return;
+            if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
 
             SaProvider?.PreLoad(chromosome, positions);
         }

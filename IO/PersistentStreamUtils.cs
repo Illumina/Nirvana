@@ -12,7 +12,7 @@ namespace IO
         public static Stream GetReadStream(string location, long position=0)
         {
             if (string.IsNullOrEmpty(location)) return null;
-            if (IsHttpLocation(location))
+            if (ConnectUtilities.IsHttpLocation(location))
             {
                 var connector = ConnectUtilities.GetHttpConnectFunc(location);
                 var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
@@ -21,7 +21,7 @@ namespace IO
             return File.Exists(location) ? FileUtilities.GetReadStream(location) : null;
         }
 
-        public static Stream GetS3ReadStream(AmazonS3Client s3Client, string bucketName, string fileName, long position)
+        public static Stream GetS3ReadStream(IS3Client s3Client, string bucketName, string fileName, long position)
         {
             var connector = ConnectUtilities.GetS3ConnectFunc(bucketName, fileName, s3Client);
             var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
@@ -50,8 +50,5 @@ namespace IO
                 yield return GetReadStream(location);
             }
         }
-
-        private static bool IsHttpLocation(string path) => path.StartsWith("http", true, CultureInfo.InvariantCulture);
-
     }
 }

@@ -287,15 +287,10 @@ namespace UnitTests.SAUtils.CustomAnnotations
         }
 
         [Fact]
-        public void ValidateNucleotideSequence_ValidSequence_Pass()
+        public void IsValidNucleotideSequence_IsValidSequence_Pass()
         {
-            CustomAnnotationsParser.ValidateNucleotideSequence("actgnACTGN");
-        }
-
-        [Fact]
-        public void ValidateNucleotideSequence_InvalidSequence_ThrowException()
-        {
-            Assert.Throws<UserErrorException>(() => CustomAnnotationsParser.ValidateNucleotideSequence("AC-GT"));
+           Assert.True(CustomAnnotationsParser.IsValidNucleotideSequence("actgnACTGN"));
+           Assert.False(CustomAnnotationsParser.IsValidNucleotideSequence("AC-GT"));
         }
     }
 }

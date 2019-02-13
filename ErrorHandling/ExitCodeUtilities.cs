@@ -53,7 +53,7 @@ namespace ErrorHandling
 	    public static string GetErrorCategory(Exception exception) =>
 	        UserFriendlyExceptions.Contains(exception.GetType()) ? UserError : NirvanaError;
 
-        public static ExitCodes GetExitCode(Type exceptionType)
+	    public static ExitCodes GetExitCode(Type exceptionType)
 	    {
             if (!ExceptionsToExitCodes.TryGetValue(exceptionType, out ExitCodes exitCode)) exitCode = ExitCodes.InvalidFunction;
             return exitCode;
@@ -69,7 +69,7 @@ namespace ErrorHandling
 			Console.Write("\nERROR: ");
 			Console.ResetColor();
 
-            while (e.InnerException != null) e = e.InnerException;
+		    e = ExceptionUtilities.GetInnermostException(e);
 
             Console.WriteLine("{0}", e.Message);
 

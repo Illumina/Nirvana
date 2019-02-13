@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using Amazon.S3;
@@ -8,7 +9,7 @@ namespace IO
 {
     public static class ConnectUtilities
     {
-        public static Func<long, Stream> GetS3ConnectFunc(string bucketName, string path, AmazonS3Client client)
+        public static Func<long, Stream> GetS3ConnectFunc(string bucketName, string path, IS3Client client)
         {
             var s3Client = client;
 
@@ -67,5 +68,6 @@ namespace IO
             return null;
         }
 
+        public static bool IsHttpLocation(string path) => path.StartsWith("http", true, CultureInfo.InvariantCulture);
     }
 }

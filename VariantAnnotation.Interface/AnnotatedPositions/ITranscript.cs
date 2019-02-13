@@ -27,6 +27,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 
         bool CdsStartNotFound { get; }
         bool CdsEndNotFound { get; }
+        ISequence CodingSequence { get; set; }
 
         void Write(IExtendedBinaryWriter writer, Dictionary<IGene, int> geneIndices,
             Dictionary<ITranscriptRegion, int> transcriptRegionIndices, Dictionary<IInterval, int> microRnaIndices,

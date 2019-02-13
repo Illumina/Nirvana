@@ -98,7 +98,7 @@ namespace VariantAnnotation.Providers
 
             AddRegulatoryRegions(annotatedPosition);
             AddTranscripts(annotatedPosition);
-        }
+        }      
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
