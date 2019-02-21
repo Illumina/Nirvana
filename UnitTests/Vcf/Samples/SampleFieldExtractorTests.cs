@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using VariantAnnotation.IO;
 using Vcf.Sample;
 using Xunit;
 
@@ -441,6 +442,23 @@ namespace UnitTests.Vcf.Samples
 
             var sample = samples[0];
             Assert.Equal(20, sample.DeNovoQuality);
+        }
+
+        [Fact]
+        public void DeNovoQuality_twoDecimalPrecision()
+        {
+            const string vcfLine = "chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\tGT:DQ\t0/1:0.267";
+            var vcfColumns = vcfLine.Split('\t');
+
+            var extractor = new SampleFieldExtractor(vcfColumns);
+            var samples = extractor.ExtractSamples();
+
+            Assert.Single(samples);
+
+            var sample = samples[0];
+            Assert.Equal(0.267, sample.DeNovoQuality);
+            var jsonOutput = sample.GetJsonString();
+            Assert.Contains("\"deNovoQuality\":0.27", jsonOutput);
         }
 
         [Fact]
