@@ -16,16 +16,17 @@ namespace VariantAnnotation.IO
         private readonly StreamWriter _writer;
         private bool _firstEntry;
         private bool _positionFieldClosed;
+        private bool _leaveOpen;
 
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
 
         private JsonWriter(Stream jsonStream, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
-            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames) : this(GetProperWriter(jsonStream), indexStream, annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames)
+            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames, bool leaveOpen) : this(GetProperWriter(jsonStream), indexStream, annotator, creationTime, vepDataVersion, dataSourceVersions, genomeAssembly, sampleNames, leaveOpen)
         {
         }
 
-        public JsonWriter(Stream jsonStream, Stream indexStream, IAnnotationResources annotationResources, string creationTime, string[] sampleNames) : this(jsonStream, indexStream, annotationResources.AnnotatorVersionTag, creationTime, annotationResources.VepDataVersion, annotationResources.DataSourceVersions, annotationResources.SequenceProvider.Assembly.ToString(), sampleNames)
+        public JsonWriter(Stream jsonStream, Stream indexStream, IAnnotationResources annotationResources, string creationTime, string[] sampleNames, bool leaveOpen) : this(jsonStream, indexStream, annotationResources.AnnotatorVersionTag, creationTime, annotationResources.VepDataVersion, annotationResources.DataSourceVersions, annotationResources.SequenceProvider.Assembly.ToString(), sampleNames, leaveOpen)
         {
         }
 
@@ -34,12 +35,13 @@ namespace VariantAnnotation.IO
             : new StreamWriter(jsonStream);
 
         public JsonWriter(StreamWriter writer, Stream indexStream, string annotator, string creationTime, string vepDataVersion,
-            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames)
+            List<IDataSourceVersion> dataSourceVersions, string genomeAssembly, string[] sampleNames, bool leaveOpen)
         {
             _writer              = writer;
             _writer.NewLine      = "\n";
             _firstEntry          = true;
             _positionFieldClosed = false;
+            _leaveOpen           = leaveOpen;
 
             _bgzipTextWriter = writer as BgzipTextWriter;
 
@@ -80,9 +82,10 @@ namespace VariantAnnotation.IO
         public void Dispose()
         {
             WriteFooter();
-            _jasixIndexCreator?.Dispose();
             _writer.Flush();
+            if (_leaveOpen) return;
             _writer.Dispose();
+            _jasixIndexCreator?.Dispose();
         }
 
         public void WriteJsonEntry(IPosition position, string entry)

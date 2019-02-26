@@ -40,7 +40,7 @@ namespace Nirvana
             using (var outputVcfStream = !_vcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".vcf.gz"))
             using (var outputGvcfStream = !_gvcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".genome.vcf.gz"))
                 return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, outputVcfStream,
-                    outputGvcfStream, annotationResources, new NullVcfFilter());
+                    outputGvcfStream, annotationResources, new NullVcfFilter(), false);
         }
 
         private static AnnotationResources GetAnnotationResources()

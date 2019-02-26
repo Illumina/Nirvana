@@ -9,7 +9,7 @@ namespace Vcf.VariantCreator
     {
         private const string TandemDuplicationAltAllele = "<DUP:TANDEM>";
 
-        private static readonly AnnotationBehavior StructuralVariantBehavior =
+        public static readonly AnnotationBehavior StructuralVariantBehavior =
             new AnnotationBehavior(false, true, true, false, true);
 
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele,

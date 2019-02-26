@@ -190,7 +190,7 @@ namespace Vcf.VariantCreator
             }
         }
 
-        private enum VariantCategory
+        public enum VariantCategory
         {
             Reference,
             SmallVariant,

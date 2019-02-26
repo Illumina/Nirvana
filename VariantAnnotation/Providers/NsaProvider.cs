@@ -69,7 +69,6 @@ namespace VariantAnnotation.Providers
 
         private void GetStructuralVariantAnnotations(IAnnotatedPosition annotatedPosition)
         {
-            //if (annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval != true)) return;
             var needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
             var needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
 

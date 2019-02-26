@@ -38,11 +38,11 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (IsShortTandemRepeat())
             {
-                jsonObject.AddStringValue("repeatUnit",  Position.InfoData.RepeatUnit);
-                jsonObject.AddIntValue("refRepeatCount", Position.InfoData.RefRepeatCount);
+                jsonObject.AddStringValue("repeatUnit",  Position.InfoData?.RepeatUnit);
+                jsonObject.AddIntValue("refRepeatCount", Position.InfoData?.RefRepeatCount);
             }
 
-            if (AnnotatedVariants.Any(IsStructVariant)) jsonObject.AddIntValue("svEnd", Position.InfoData.End);
+            if (AnnotatedVariants.Any(IsStructVariant)) jsonObject.AddIntValue("svEnd", Position.InfoData?.End);
 
             jsonObject.AddStringValue("refAllele", Position.RefAllele);
             jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
@@ -51,15 +51,15 @@ namespace VariantAnnotation.AnnotatedPositions
 
             jsonObject.AddStringValues("filters", Position.Filters);
 
-            jsonObject.AddIntValues("ciPos",   Position.InfoData.CiPos);
-            jsonObject.AddIntValues("ciEnd",   Position.InfoData.CiEnd);
-            jsonObject.AddIntValue("svLength", Position.InfoData.SvLength);
+            jsonObject.AddIntValues("ciPos",   Position.InfoData?.CiPos);
+            jsonObject.AddIntValues("ciEnd",   Position.InfoData?.CiEnd);
+            jsonObject.AddIntValue("svLength", Position.InfoData?.SvLength);
 
-            jsonObject.AddDoubleValue("strandBias",             Position.InfoData.StrandBias,JsonCommon.FrequencyRoundingFormat);
-            jsonObject.AddIntValue("jointSomaticNormalQuality", Position.InfoData.JointSomaticNormalQuality);
-            jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData.RecalibratedQuality);
-            jsonObject.AddIntValue("copyNumber",                Position.InfoData.CopyNumber);
-            jsonObject.AddBoolValue("colocalizedWithCnv",       Position.InfoData.ColocalizedWithCnv);
+            jsonObject.AddDoubleValue("strandBias",             Position.InfoData?.StrandBias,JsonCommon.FrequencyRoundingFormat);
+            jsonObject.AddIntValue("jointSomaticNormalQuality", Position.InfoData?.JointSomaticNormalQuality);
+            jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData?.RecalibratedQuality);
+            jsonObject.AddIntValue("copyNumber",                Position.InfoData?.CopyNumber);
+            jsonObject.AddBoolValue("colocalizedWithCnv",       Position.InfoData?.ColocalizedWithCnv ?? false);
 
 	        
 			jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);

@@ -5,8 +5,10 @@ namespace VariantAnnotation.Interface.IO
 {
     public static class VcfCommon
     {
-        public const string ChromosomeHeader          = "#CHROM";
-        public const string GatkNonRefAllele          = "<NON_REF>";
+        public const string ChromosomeHeader                 = "#CHROM";
+        public const string GatkNonRefAllele                 = "<NON_REF>";
+        public const string MissingValue                     = ".";
+
         public const int MinNumColumnsSampleGenotypes = 10;
 
         // define the column names
@@ -25,6 +27,6 @@ namespace VariantAnnotation.Interface.IO
             new HashSet<string> {"<*>", "*", "<M>", GatkNonRefAllele}.ToImmutableHashSet();
 
         public static readonly ImmutableHashSet<string> ReferenceAltAllele =
-            new HashSet<string> {".", GatkNonRefAllele}.ToImmutableHashSet();
+            new HashSet<string> {MissingValue, GatkNonRefAllele}.ToImmutableHashSet();
     }
 }

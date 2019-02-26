@@ -7,7 +7,7 @@ namespace Vcf.VariantCreator
 {
 	public static class CnvCreator
 	{
-		private static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true);
+		public static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true);
 	    private const string CnvTag = "<CNV>";
 
 		public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)

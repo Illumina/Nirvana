@@ -34,7 +34,7 @@ namespace UnitTests.VariantAnnotation.IO
             using (var ms = new MemoryStream())
             {
                 using (var streamWriter = new StreamWriter(ms, Encoding.ASCII, 1024, true))
-                using (var writer       = new JsonWriter(streamWriter, null, "nirvana", "time", "vep", dataSourceVersions, "hg19", sampleNames))
+                using (var writer       = new JsonWriter(streamWriter, null, "nirvana", "time", "vep", dataSourceVersions, "hg19", sampleNames, false))
                 {
                     writer.WriteJsonEntry(position1.Object, "{\"test\":\"good\"}");
                     writer.WriteJsonEntry(position2.Object, "{\"crash\":\"bad\"}");

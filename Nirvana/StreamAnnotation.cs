@@ -21,7 +21,7 @@ namespace Nirvana
     public static class StreamAnnotation
     {
         public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream, Stream outputJsonIndexStream,
-            Stream outputVcfStream, Stream outputGvcfStream, AnnotationResources annotationResources, IVcfFilter vcfFilter)
+            Stream outputVcfStream, Stream outputGvcfStream, AnnotationResources annotationResources, IVcfFilter vcfFilter, bool leaveOutputStreamOpen)
         {
 
             var logger = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
@@ -29,7 +29,7 @@ namespace Nirvana
             var vcfConversion = new VcfConversion();
 
             using (var vcfReader = Create(headerStream, inputVcfStream, annotationResources, vcfFilter))
-            using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames()))
+            using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), leaveOutputStreamOpen))
             using (var vcfWriter = annotationResources.OutputVcf
                 ? new LiteVcfWriter(new StreamWriter(outputVcfStream), vcfReader.GetHeaderLines(), annotationResources)
                 : null)
@@ -56,7 +56,7 @@ namespace Nirvana
                         var annotatedPosition = position.Variants != null ? annotationResources.Annotator.Annotate(position) : null;
                         string json = annotatedPosition?.GetJsonString();
 
-                        if (json != null) WriteOutput(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json, vcfConversion);
+                        if (json != null) WriteAnnotatedPosition(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json, vcfConversion);
                         else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
                        
                         metrics.Increment();
@@ -77,7 +77,7 @@ namespace Nirvana
             return ExitCodes.Success;
         }
 
-        private static void WriteOutput(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput, VcfConversion vcfConversion)
+        public static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput, VcfConversion vcfConversion)
         {
             jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
 
