@@ -11,35 +11,36 @@ namespace Phantom.CodonInformation
 {
     public sealed class CodonInfoProvider : ICodonInfoProvider
     {
-        private readonly IntervalForest<ICodingBlock> _commonIntervalForest;
+        private IntervalArray<ICodingBlock> _commonCodingBlockArray;
+        private int _currentChrIndex = -1;
+        private readonly IntervalArray<ITranscript>[] _transcriptIntervalArrays;
         // ReSharper disable once NotAccessedField.Local
 
-        private CodonInfoProvider(IntervalForest<ICodingBlock> commonIntervalForest)
+        public CodonInfoProvider(IntervalArray<ITranscript>[] transcriptIntervalArrays)
         {
-            _commonIntervalForest = commonIntervalForest;
+            _transcriptIntervalArrays = transcriptIntervalArrays;
         }
 
-        public static CodonInfoProvider CreateCodonInfoProvider(IntervalArray<ITranscript>[] transcriptIntervalArrays)
+        private void UpdateCodingBlockArray(int chrIndex)
         {
-            int numChromosomes = transcriptIntervalArrays.Length;
-            var commonIntervalArrays = new IntervalArray<ICodingBlock>[numChromosomes];
+            if (chrIndex == _currentChrIndex) return;
+            _currentChrIndex = chrIndex;
+            _commonCodingBlockArray = null;
 
-            for (var chrIndex = 0; chrIndex < numChromosomes; chrIndex++)
+            if (chrIndex >= _transcriptIntervalArrays.Length) return;
+            var transcriptIntervalArray = _transcriptIntervalArrays[chrIndex];
+            if (transcriptIntervalArray == null) return;
+
+            var geneCdsIntervals = GetPhasedCdsIntervals(transcriptIntervalArray);
+            var intervalsWithPhase = new List<Interval<ICodingBlock>>();
+
+            foreach (var (gene, transcriptIntervals) in geneCdsIntervals)
             {
-                var transcriptIntervalArray = transcriptIntervalArrays[chrIndex];
-                if (transcriptIntervalArray == null) continue;
-                var geneCdsIntervals = GetPhasedCdsIntervals(transcriptIntervalArray);
-                var intervalsWithPhase = new List<Interval<ICodingBlock>>();
-
-                foreach (var (gene, transcriptIntervals) in geneCdsIntervals)
-                {
-                    var transcriptToCodingBlocks =
-                        GetTranscriptToCodingBlocks(transcriptIntervals, gene.OnReverseStrand);
-                    intervalsWithPhase.AddRange(GetIntervalsWithPhase(transcriptToCodingBlocks));
-                }
-                commonIntervalArrays[chrIndex] = new IntervalArray<ICodingBlock>(intervalsWithPhase.OrderBy(x => x.Begin).ToArray());
+                var transcriptToCodingBlocks =
+                    GetTranscriptToCodingBlocks(transcriptIntervals, gene.OnReverseStrand);
+                intervalsWithPhase.AddRange(GetIntervalsWithPhase(transcriptToCodingBlocks));
             }
-            return new CodonInfoProvider(new IntervalForest<ICodingBlock>(commonIntervalArrays));
+            _commonCodingBlockArray = new IntervalArray<ICodingBlock>(intervalsWithPhase.OrderBy(x => x.Begin).ToArray());
         }
 
         private static IEnumerable<Interval<ICodingBlock>> GetIntervalsWithPhase(CodingBlock[][] transcriptToCodingBlocks)
@@ -79,10 +80,12 @@ namespace Phantom.CodonInformation
             return functionBlockRanges;
         }
 
-        private ICodingBlock[] GetOverlappingCodingBlocks(IChromosomeInterval chrInterval) =>
-            _commonIntervalForest.GetAllOverlappingValues(chrInterval.Chromosome.Index, chrInterval.Start,
-                chrInterval.End);
-
+        private ICodingBlock[] GetOverlappingCodingBlocks(IChromosomeInterval chrInterval)
+        {
+            UpdateCodingBlockArray(chrInterval.Chromosome.Index);
+            return _commonCodingBlockArray?.GetAllOverlappingValues(chrInterval.Start, chrInterval.End);
+        }
+            
         private static int GetFunctionBlockRange(IInterval interval, ICodingBlock overlappingCodingBlock)
         {
             // only check codon boundary in the same exon for now

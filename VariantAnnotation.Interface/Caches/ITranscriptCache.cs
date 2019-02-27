@@ -1,4 +1,5 @@
 ﻿using Genome;
+using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Intervals;
 using VariantAnnotation.Interface.Providers;

@@ -1,19 +1,17 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Genome;
 using Intervals;
+using Phantom.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.IO.Caches;
 
-namespace Phantom.Utilities
+namespace Phantom.CodonInformation
 {
-    public static class ReadWriteUtilities
+    public static class GeneInfoGenerator
     {
         private static readonly IntervalArray<IGene> EmptyIntervalArray = new IntervalArray<IGene>(new Interval<IGene>[0]);
 
         // ReSharper disable once UnusedTupleComponentInReturnValue
-        public static (IntervalForest<IGene>, Dictionary<IGene, List<ITranscript>>) GetIntervalAndTranscriptsForeachGene(IntervalArray<ITranscript>[] transcriptIntervalArrays)
+        public static (IntervalForest<IGene>, Dictionary<IGene, List<ITranscript>>) GetGeneIntervalAndTranscripts(IntervalArray<ITranscript>[] transcriptIntervalArrays)
         {
             int numChromesomes     = transcriptIntervalArrays.Length;
             var geneIntervalArrays = new IntervalArray<IGene>[numChromesomes];
@@ -48,15 +46,5 @@ namespace Phantom.Utilities
         }
 
         private static Interval<IGene> GetGeneInterval(IGene gene) => new Interval<IGene>(gene.Start, gene.End, gene);
-
-        public static IntervalArray<ITranscript>[] ReadCache(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
-        {
-            IntervalArray<ITranscript>[] transcriptIntervalArrays;
-            using (var reader = new TranscriptCacheReader(stream))
-            {
-                transcriptIntervalArrays = reader.Read(refIndexToChromosome).TranscriptIntervalArrays;
-            }
-            return transcriptIntervalArrays;
-        }
     }
 }

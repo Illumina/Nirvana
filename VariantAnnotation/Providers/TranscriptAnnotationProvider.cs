@@ -27,6 +27,7 @@ namespace VariantAnnotation.Providers
         public string Name { get; }
         public GenomeAssembly Assembly { get; }
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
+        public IntervalArray<ITranscript>[] TranscriptIntervalArrays { get; }
         public ushort VepVersion { get; }
 
         private readonly PredictionCacheReader _siftReader;
@@ -41,7 +42,7 @@ namespace VariantAnnotation.Providers
             _sequence = sequenceProvider.Sequence;
 
             var transcriptStream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix));
-            (_transcriptCache, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
+            (_transcriptCache, TranscriptIntervalArrays, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
 
             Assembly = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
@@ -54,20 +55,22 @@ namespace VariantAnnotation.Providers
             _polyphenReader = new PredictionCacheReader(polyphenStream, PredictionCacheReader.PolyphenDescriptions);
         }
 
-        private static (TranscriptCache cache, ushort vepVersion) InitiateCache(Stream stream,
+        private static (TranscriptCache Cache, IntervalArray<ITranscript>[] TranscriptIntervalArrays, ushort VepVersion) InitiateCache(Stream stream,
             IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refAssembly)
         {
             TranscriptCache cache;
             ushort vepVersion;
+            TranscriptCacheData cacheData;
 
             using (var reader = new TranscriptCacheReader(stream))
             {
                 vepVersion = reader.Header.Custom.VepVersion;
                 CheckHeaderVersion(reader.Header, refAssembly);
-                cache = reader.Read(refIndexToChromosome).GetCache();
+                cacheData = reader.Read(refIndexToChromosome);
+                cache = cacheData.GetCache();
             }
 
-            return (cache, vepVersion);
+            return (cache, cacheData.TranscriptIntervalArrays, vepVersion);
         }
 
         private static void CheckHeaderVersion(Header header, GenomeAssembly refAssembly)

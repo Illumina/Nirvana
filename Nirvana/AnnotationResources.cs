@@ -68,7 +68,7 @@ namespace Nirvana
 
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
-                : Phantom.Recomposer.Recomposer.Create(SequenceProvider, inputCachePrefix);
+                : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider);
             DataSourceVersions = GetDataSourceVersions(Plugins, TranscriptAnnotationProvider, SaProvider,
                 GeneAnnotationProvider, ConservationProvider).ToList();
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." +
