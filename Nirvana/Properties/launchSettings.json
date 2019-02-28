@@ -47,8 +47,8 @@
     },
     "SK Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\temp\\dragen-joint.hard-filtered.vcf.gz -o test --disable-recomposition",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_performance"
+      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:/Nirvana_temp/Dragen_v3.2-Dragen-Pedigree-WG-hg38.chrM.vcf.gz --sd ./sd_0227 -o test --disable-recomposition",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_mitomap_regression_020719"
     },
     "SK Pedigree": {
       "commandName": "Project",

@@ -49,11 +49,10 @@ namespace SAUtils.DataStructures
         private readonly string _scorePercentile;
         private readonly int? _intervalEnd;
         private readonly VariantType? _variantType;
-        private static readonly Chromosome ChromM = new Chromosome("chrM", "MT", 24);
 
-        public MitoMapItem(int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType, ISequenceProvider sequenceProvider)
+        public MitoMapItem(IChromosome chromosome, int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType, ISequenceProvider sequenceProvider)
         {
-            Chromosome = ChromM;
+            Chromosome = chromosome;
             Position = posi;
             if (sequenceProvider == null)
             {
@@ -156,7 +155,7 @@ namespace SAUtils.DataStructures
             var isInterval = mitoMapItem1.IsInterval;
             var intervalEnd = mitoMapItem1._intervalEnd ?? mitoMapItem2._intervalEnd;
             var variantType = mitoMapItem1._variantType ?? mitoMapItem2._variantType;
-            return new MitoMapItem(mitoMapItem1.Position, mitoMapItem1.RefAllele, mitoMapItem1.AltAllele,
+            return new MitoMapItem(mitoMapItem1.Chromosome, mitoMapItem1.Position, mitoMapItem1.RefAllele, mitoMapItem1.AltAllele,
                 diseases, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile, isInterval,
                 intervalEnd, variantType, null);
         }
@@ -177,7 +176,7 @@ namespace SAUtils.DataStructures
         {
             if (_intervalEnd == null || _variantType == null) throw new InvalidDataException($"Not an interval at {Position}:{GetJsonString()}");
 
-            return new MitoMapSvItem(Position, _intervalEnd.Value, _variantType.Value, GetJsonString());
+            return new MitoMapSvItem(Chromosome, Position, _intervalEnd.Value, _variantType.Value, GetJsonString());
         }
     }
 }

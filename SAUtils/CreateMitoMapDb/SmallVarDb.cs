@@ -62,7 +62,8 @@ namespace SAUtils.CreateMitoMapDb
             if (rootDirectory == null) return ExitCodes.PathNotFound;
             var version = DataSourceVersionReader.GetSourceVersion(Path.Combine(rootDirectory.ToString(), "mitoMapVar"));
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            sequenceProvider.LoadChromosome(new Chromosome("chrM", "MT", 24));
+            var chrom = sequenceProvider.RefNameToChromosome["chrM"];
+            sequenceProvider.LoadChromosome(chrom);
             var mitoMapVarReaders = MitoMapFileNames.Select(mitoMapFileName => new MitoMapVariantReader(new FileInfo(mitoMapFileName), sequenceProvider)).ToList();
             var mergedMitoMapVarItems = MitoMapVariantReader.MergeAndSort(mitoMapVarReaders);
 

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using Genome;
 using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
@@ -19,6 +20,7 @@ namespace SAUtils.CreateMitoMapDb
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly VariantAligner _variantAligner;
+        private readonly IChromosome _chromosome;
 
 
         private readonly Dictionary<string, int[]> _mitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
@@ -54,6 +56,7 @@ namespace SAUtils.CreateMitoMapDb
             _mitoMapFileInfo = mitoMapFileInfo;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
+            _chromosome = sequenceProvider.RefNameToChromosome["chrM"];
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
         }
 
@@ -125,7 +128,7 @@ namespace SAUtils.CreateMitoMapDb
             if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}. Provided size is used.");
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
             var leftAlignResults = GetLeftAlignedVariant(start, refSequence, "");
-            var mitoMapItem = new MitoMapItem(leftAlignResults.RefPosition, leftAlignResults.RefAllele, "-", null, null, null, "", "", "", false, null, null, _sequenceProvider);
+            var mitoMapItem = new MitoMapItem(_chromosome, leftAlignResults.RefPosition, leftAlignResults.RefAllele, "-", null, null, null, "", "", "", false, null, null, _sequenceProvider);
             return new List<MitoMapItem> { mitoMapItem };
         }
 
@@ -156,7 +159,7 @@ namespace SAUtils.CreateMitoMapDb
             if (!firstNumberMatch.Success) throw new InvalidDataException($"Failed to extract variant position from {info[3]}");
             var position = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
             var leftAlgnResults = GetLeftAlignedVariant(position, "", altAllele); // insertion
-            return new List<MitoMapItem>{new MitoMapItem(leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null, _sequenceProvider) };
+            return new List<MitoMapItem>{new MitoMapItem(_chromosome, leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null, _sequenceProvider) };
         }
 
         private List<MitoMapItem> ExtractVariantItem(List<string> info, int[] fields)
@@ -191,14 +194,14 @@ namespace SAUtils.CreateMitoMapDb
                 foreach (var altAllele in GetAltAlleles(rawAltAllele))
                 {
                     var thisLeftAlignResults = GetLeftAlignedVariant(position, refAllele, altAllele);
-                    mitoMapVarItems.Add(new MitoMapItem(thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, _sequenceProvider));
+                    mitoMapVarItems.Add(new MitoMapItem(_chromosome, thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, _sequenceProvider));
                 }
                 if (mitoMapVarItems.Count > 1) Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {position}");
                 return mitoMapVarItems;         
             }
 
             var leftAlignResults = GetLeftAlignedVariant(position, refAllele, rawAltAllele);
-            mitoMapVarItems.Add(new MitoMapItem(leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
+            mitoMapVarItems.Add(new MitoMapItem(_chromosome, leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
                     heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, _sequenceProvider));
 
             return mitoMapVarItems;
