@@ -34,7 +34,7 @@ namespace Nirvana
             var annotationResources = GetAnnotationResources();
 
             string jasixFileName = _outputFileName == "-" ? null : _outputFileName + ".json.gz" + JasixCommons.FileExt;
-            using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream((_vcfPath)))
+            using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
             using (var outputJsonStream = _outputFileName == "-" ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName))
             using (var outputVcfStream = !_vcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".vcf.gz"))

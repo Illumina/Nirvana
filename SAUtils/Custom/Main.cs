@@ -7,7 +7,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
@@ -112,18 +111,13 @@ namespace SAUtils.Custom
             var fileName = GetInputFileName(inputFilePath);
             if (fileName.EndsWith(".tsv"))
                 return fileName.Substring(0, fileName.Length - 4);
-            if (fileName.EndsWith(".tsv.gz"))
-                return fileName.Substring(0, fileName.Length - 7);
-
-            return fileName;
+            return fileName.EndsWith(".tsv.gz") ? fileName.Substring(0, fileName.Length - 7) : fileName;
         }
 
         private static string GetInputFileName(string inputFilePath)
         {
             var fileNameIndex = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
-            if (fileNameIndex < 0) return inputFilePath;
-            return inputFilePath.Substring(fileNameIndex + 1);
-
+            return fileNameIndex < 0 ? inputFilePath : inputFilePath.Substring(fileNameIndex + 1);
         }
     }
 

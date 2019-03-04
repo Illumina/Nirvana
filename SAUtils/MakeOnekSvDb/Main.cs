@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.InputFileParsers;
@@ -59,12 +60,13 @@ namespace SAUtils.MakeOnekSvDb
         private static ExitCodes ProgramExecution()
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            var oneKGenSvReader = new OneKGenSvReader(_inputFileName, referenceProvider.RefNameToChromosome);
             var version = DataSourceVersionReader.GetSourceVersion(_inputFileName + ".version");
 
 
-            string outFileName = $"{version.Name}_{version.Version}";
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
+            string outFileName = $"{version.Name}_{version.Version}".Replace(' ','_');
+            using(var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileName))
+            using(var oneKGenSvReader = new OneKGenSvReader(reader, referenceProvider.RefNameToChromosome))
+            using(var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
             using(var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsaStream), version, referenceProvider.Assembly,
                 SaCommon.OnekSvTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {

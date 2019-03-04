@@ -184,7 +184,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 throw new InvalidDataException("Column for primary histology could not be detected");
         }
 
-        const int MaxVariantLength= 1000;
+        private const int MaxVariantLength= 1000;
         internal List<CosmicItem> ExtractCosmicItems(string vcfLine)
         {
             var splitLine = vcfLine.Split(new[] { '\t' }, 8);

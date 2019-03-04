@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
-using Compression.FileHandling;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
@@ -43,8 +42,8 @@ namespace SAUtils.CreateDbsnpDb
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
-                .HasRequiredParameter(_inputFile, "dbSNP VCFfile", "--in")
-                .CheckInputFilenameExists(_inputFile, "dbSNP VCFfile", "--in")
+                .HasRequiredParameter(_inputFile, "dbSNP VCF file", "--in")
+                .CheckInputFilenameExists(_inputFile, "dbSNP VCF file", "--in")
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()

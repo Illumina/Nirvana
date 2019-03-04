@@ -6,6 +6,7 @@ using ErrorHandling.Exceptions;
 using OptimizedCore;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils
 {
@@ -96,7 +97,7 @@ namespace SAUtils
                 {
                     case JsonDataType.String:
                         if (key == "refAllele" || key == "altAllele")
-                            actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, VariantAnnotation.Utilities.BaseFormatting.EmptyToDash(value)), key));
+                            actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, BaseFormatting.EmptyToDash(value)), key));
                         else
                             actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, value), key));
                         break;

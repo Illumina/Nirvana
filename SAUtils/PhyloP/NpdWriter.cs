@@ -67,14 +67,14 @@ namespace SAUtils.PhyloP
                     _chromName = item.Chromosome.EnsemblName;
                 }
 
-                if (! _scoreMap.TryGetValue(item.Score, out var code))
+                if (! _scoreMap.TryGetValue(item.Score, out byte _))
                 {
                     _scoreMap.Add(item.Score, _nextScoreCode++);
                     if (_nextScoreCode==byte.MaxValue)
                         throw new ArgumentOutOfRangeException($"No of distinct scores exceeded expected value of {_nextScoreCode}!!");
                 }
 
-                _memStream.Position = (item.Position - 1);
+                _memStream.Position = item.Position - 1;
 
                 _memWriter.Write(_scoreMap[item.Score]);
                 

@@ -44,7 +44,7 @@ namespace SAUtils.InputFileParsers
             return GetSourceVersion(fileStream);
         }
 
-        public static DataSourceVersion GetSourceVersion(Stream versionFileStream)
+        private static DataSourceVersion GetSourceVersion(Stream versionFileStream)
         {
             using (var versionReader = new DataSourceVersionReader(versionFileStream))
             {

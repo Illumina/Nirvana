@@ -24,10 +24,10 @@ namespace SAUtils.DataStructures
         public int Start { get; }
         public int End { get; }
         public IChromosome Chromosome { get; }
-        
 
-        public string Id { get; }
-        public VariantType VariantType { get; }
+
+        private string Id { get; }
+        private VariantType VariantType { get; }
         private ClinicalInterpretation ClinicalInterpretation { get; }
         private IEnumerable<string> Phenotypes => _phenotypes;
 	    private readonly HashSet<string> _phenotypes;

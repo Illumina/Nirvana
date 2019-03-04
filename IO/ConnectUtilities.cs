@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Net;
-using Amazon.S3;
 using Amazon.S3.Model;
 
 namespace IO

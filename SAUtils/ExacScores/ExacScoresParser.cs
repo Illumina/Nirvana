@@ -49,7 +49,7 @@ namespace SAUtils.ExacScores
                 else
                 {
                     var geneAnnotation = GetGeneAndScores(line);
-                    geneAnnotations.Add(geneAnnotation.GeneSymbol, new List<ISuppGeneItem>(){geneAnnotation});
+                    geneAnnotations.Add(geneAnnotation.GeneSymbol, new List<ISuppGeneItem> {geneAnnotation});
                 }
 
             }

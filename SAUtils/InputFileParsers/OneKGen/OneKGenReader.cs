@@ -15,10 +15,8 @@ namespace SAUtils.InputFileParsers.OneKGen
         private readonly IDictionary<string,IChromosome> _refNameDictionary;
 
         private  string _ancestralAllele;
-	    private  string _svType;
-	    private  int _svEnd;
 
-	    private int? _allAlleleNumber;
+        private int? _allAlleleNumber;
 	    private int? _afrAlleleNumber;
 	    private int? _amrAlleleNumber;
 	    private int? _eurAlleleNumber;
@@ -56,8 +54,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 			_sasAlleleCounts = null;
 
 			// SV fields
-			_svEnd  = -1;
-			_svType = null;
 	    }
 
 	    public IEnumerable<OneKGenItem> GetItems()
@@ -84,7 +80,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 
         internal List<OneKGenItem> ExtractItems(string vcfline)
         {
-            var splitLine = vcfline.Split(new[]{'\t'}, 9);// we don't care about the many fields after info field
+            var splitLine = vcfline.OptimizedSplit('\t');// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;
 
 			Clear();
@@ -112,7 +108,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 				okgItemsList.Add(new OneKGenItem(
 					chromosome,
 					position,
-					rsId,
 					refAllele,
 					altAlleles[i],
                     _ancestralAllele,
@@ -127,9 +122,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 					_amrAlleleNumber,
 					_eurAlleleNumber,
 					_easAlleleNumber,
-					_sasAlleleNumber,
-					_svType,
-					_svEnd
+					_sasAlleleNumber
 					));
 			}
 			
@@ -167,12 +160,16 @@ namespace SAUtils.InputFileParsers.OneKGen
 				// the following are for SVs
 				case "SVTYPE":
 					if (hasSymbolicAllele)
-						_svType = value;// for SVs there is only one value in SVTYPE
-					break;
+					{
+					}
+
+				    break;
 				case "END":
 					if (hasSymbolicAllele)
-						_svEnd = Convert.ToInt32(value);
-					break;
+					{
+					}
+
+				    break;
 				case "CIEND":
 				case "CIPOS":
 					break;

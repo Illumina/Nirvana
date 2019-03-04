@@ -11,14 +11,14 @@ namespace SAUtils.DataStructures
     {
         public string GeneSymbol { get; }
         private readonly string _description;
-        public readonly int MimNumber;
+        private readonly int _mimNumber;
         private readonly List<Phenotype> _phenotypes;
 
         public OmimItem(string geneSymbol, string description, int mimNumber, List<Phenotype> phenotypes)
         {
             GeneSymbol    = geneSymbol;
             _description  = description;
-            MimNumber     = mimNumber;
+            _mimNumber     = mimNumber;
             _phenotypes   = phenotypes;
         }
 
@@ -29,7 +29,7 @@ namespace SAUtils.DataStructures
 
             sb.Append(JsonObject.OpenBrace);
 
-            jsonObject.AddIntValue("mimNumber", MimNumber);
+            jsonObject.AddIntValue("mimNumber", _mimNumber);
             jsonObject.AddStringValue("description", _description?.Replace(@"\'", @"'"));
             if (_phenotypes.Count > 0) jsonObject.AddObjectValues("phenotypes", _phenotypes);
             sb.Append(JsonObject.CloseBrace);

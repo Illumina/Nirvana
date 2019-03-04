@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Compression.Utilities;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
@@ -15,7 +14,7 @@ namespace SAUtils.DbSnpRemapper
         private readonly Dictionary<string, StreamWriter> _writers;
         private readonly StreamWriter _leftoverWriter;
         private int _leftoverCount;
-        private Dictionary<long, (int position, string refAllele, string[] altAlleles)> _destinationVariants;
+        private readonly Dictionary<long, (int position, string refAllele, string[] altAlleles)> _destinationVariants;
         private int _alleleMismatchCount;
         
         public ChromMapper(StreamReader srcReader, StreamReader destReader, StreamWriter leftoverWriter)

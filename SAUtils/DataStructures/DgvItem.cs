@@ -12,17 +12,17 @@ namespace SAUtils.DataStructures
         public int Start { get; }
         public int End { get; }
 
-        public string Id { get; }
+        private string Id { get; }
 
-        public int ObservedGains { get; }
+        private int ObservedGains { get; }
 
-        public int ObservedLosses { get; }
+        private int ObservedLosses { get; }
 
-        public int SampleSize { get; }
+        private int SampleSize { get; }
 
-        public VariantType VariantType { get; }
+        private VariantType VariantType { get; }
 
-        public double? VariantFreqAll { get; }
+        private double? VariantFreqAll { get; }
 
         
         public DgvItem(string id, IChromosome chromosome, int start, int end, int sampleSize, int observedGains, int observedLosses,
@@ -37,11 +37,9 @@ namespace SAUtils.DataStructures
             ObservedLosses = observedLosses;
             VariantType    = variantType;
 
-            if (SampleSize != 0 && ObservedLosses + ObservedGains != 0)
-            {
-                VariantFreqAll = (ObservedLosses + ObservedGains) / (double)SampleSize;
-                VariantFreqAll = VariantFreqAll > 1.0 ? 1.0 : VariantFreqAll;
-            }
+            if (SampleSize == 0 || ObservedLosses + ObservedGains == 0) return;
+            VariantFreqAll = (ObservedLosses + ObservedGains) / (double)SampleSize;
+            VariantFreqAll = VariantFreqAll > 1.0 ? 1.0 : VariantFreqAll;
         }
 
         public string GetJsonString()

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OneKGen;
-using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -94,7 +94,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void HashCode()
         {
             var chr1 = new Chromosome("chr1", "1", 0);
-            var onekItem = new OneKGenItem(chr1, 100, "rs1001", "A", "C", "a", null, null, null, null, null, null, null, null, null, null, null, null, null, 0, null, null, null, null, null, 100, 0, 0);
+            var onekItem = new OneKGenItem((IChromosome) chr1, (int) 100, (string) "A", (string) "C", (string) "a", (int?) null, (int?) null, (int?) null, (int?) null, (int?) null, (int?) null, (int?) null, (int?) 0, (int?) null, (int?) null, (int?) null, (int?) null);
 
             var onekHash = new HashSet<OneKGenItem> { onekItem };
 
@@ -115,24 +115,45 @@ namespace UnitTests.SAUtils.InputFileParsers
 
         }
 
+        private Stream GetOneKgSvStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##vcfFormat=4.2");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            writer.WriteLine("1\t668630\tesv3584976\tG\t<CN2>\t100\tPASS\tAC=64;AF=0.0127796;AN=5008;CIEND=-150,150;CIPOS=-150,150;CS=DUP_delly;END=850204;NS=2504;SVTYPE=DUP;IMPRECISE;DP=22135;EAS_AF=0.0595;AMR_AF=0;AFR_AF=0.0015;EUR_AF=0.001;SAS_AF=0.001;VT=SV;EX_TARGET");
+            writer.WriteLine("1\t713044\tesv3584977;esv3584978\tC\t<CN0>,<CN2>\t100\tPASS\tAC=3,206;AF=0.000599042,0.0411342;AN=5008;CS=DUP_gs;END=755966;NS=2504;SVTYPE=CNV;DP=20698;EAS_AF=0.001,0.0615;AMR_AF=0.0014,0.0259;AFR_AF=0,0.0303;EUR_AF=0.001,0.0417;SAS_AF=0,0.045;VT=SV;EX_TARGET");
+            writer.WriteLine("1\t738570\tesv3584979\tG\t<CN0>\t100\tPASS\tAC=1;AF=0.000199681;AN=5008;CIEND=0,354;CIPOS=-348,0;CS=DEL_union;END=742020;NS=2504;SVTYPE=DEL;DP=19859;EAS_AF=0.001;AMR_AF=0;AFR_AF=0;EUR_AF=0;SAS_AF=0;VT=SV;EX_TARGET");
+            writer.WriteLine("1\t645710\tesv3584975\tA\t<INS:ME:ALU>\t100\tPASS\tAC=35;AF=0.00698882;AN=5008;CS=ALU_umary;MEINFO=AluYa4_5,1,223,-;NS=2504;SVLEN=222;SVTYPE=ALU;TSD=null;DP=12290;EAS_AF=0.0069;AMR_AF=0.0072;AFR_AF=0;EUR_AF=0.0189;SAS_AF=0.0041;VT=SV");
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+
         [Fact]
         public void OnekGenSvReader()
         {
-            var inputFile = Resources.InputFiles("1000G_SVs.tsv");
+            using (var reader = new StreamReader(GetOneKgSvStream()))
+            {
+                var svReader = new OneKGenSvReader(reader, _refChromDict);
 
-            var svReader = new OneKGenSvReader(inputFile, _refChromDict);
+                var svItemList = svReader.GetItems().ToList();
 
-            var svItemList = svReader.GetItems().ToList();
+                Assert.Equal(4, svItemList.Count);
+
+                Assert.Equal("\"chromosome\":\"1\",\"begin\":668631,\"end\":850204,\"variantType\":\"copy_number_gain\",\"id\":\"esv3584976\",\"allAn\":5008,\"allAc\":64,\"allAf\":0.01278,\"afrAf\":0.0015,\"amrAf\":0,\"eurAf\":0.001,\"easAf\":0.0595,\"sasAf\":0.001", svItemList[0].GetJsonString());
+
+                Assert.Equal("\"chromosome\":\"1\",\"begin\":713045,\"end\":755966,\"variantType\":\"copy_number_variation\",\"id\":\"esv3584977;esv3584978\",\"allAn\":5008,\"allAc\":209,\"allAf\":0.041733,\"afrAf\":0.0303,\"amrAf\":0.0273,\"eurAf\":0.0427,\"easAf\":0.0625,\"sasAf\":0.045", svItemList[1].GetJsonString());
+
+                Assert.Equal("\"chromosome\":\"1\",\"begin\":738571,\"end\":742020,\"variantType\":\"copy_number_loss\",\"id\":\"esv3584979\",\"allAn\":5008,\"allAc\":1,\"allAf\":0.0002,\"afrAf\":0,\"amrAf\":0,\"eurAf\":0,\"easAf\":0.001,\"sasAf\":0", svItemList[2].GetJsonString());
+
+                Assert.Equal("\"chromosome\":\"1\",\"begin\":645711,\"end\":645932,\"variantType\":\"mobile_element_insertion\",\"id\":\"esv3584975\",\"allAn\":5008,\"allAc\":35,\"allAf\":0.006989,\"afrAf\":0,\"amrAf\":0.0072,\"eurAf\":0.0189,\"easAf\":0.0069,\"sasAf\":0.0041", svItemList[3].GetJsonString());
 
 
-            Assert.Equal("\"chromosome\":\"1\",\"begin\":668631,\"end\":850204,\"variantType\":\"copy_number_gain\",\"id\":\"esv3584976\",\"variantFreqAll\":0.02396,\"variantFreqAfr\":0.00303,\"variantFreqEas\":0.11111,\"variantFreqEur\":0.00199,\"variantFreqSas\":0.00204,\"sampleSize\":2504,\"sampleSizeAfr\":661,\"sampleSizeAmr\":347,\"sampleSizeEas\":504,\"sampleSizeEur\":503,\"sampleSizeSas\":489,\"observedGains\":60", svItemList[0].GetJsonString());
-            
-            //checking out the next item that should be a copy number variant (both loss and gain)
-            Assert.Equal("\"chromosome\":\"1\",\"begin\":713045,\"end\":755966,\"variantType\":\"copy_number_variation\",\"id\":\"esv3584977;esv3584978\",\"variantFreqAll\":0.08187,\"variantFreqAfr\":0.06051,\"variantFreqAmr\":0.05476,\"variantFreqEas\":0.11905,\"variantFreqEur\":0.08549,\"variantFreqSas\":0.08793,\"sampleSize\":2504,\"sampleSizeAfr\":661,\"sampleSizeAmr\":347,\"sampleSizeEas\":504,\"sampleSizeEur\":503,\"sampleSizeSas\":489,\"observedGains\":202,\"observedLosses\":3", svItemList[1].GetJsonString());
-            
-            //next one is a del (copy_number_loss)
-            Assert.Equal("\"chromosome\":\"1\",\"begin\":738571,\"end\":742020,\"variantType\":\"copy_number_loss\",\"id\":\"esv3584979\",\"variantFreqAll\":0.0004,\"variantFreqEas\":0.00198,\"sampleSize\":2504,\"sampleSizeAfr\":661,\"sampleSizeAmr\":347,\"sampleSizeEas\":504,\"sampleSizeEur\":503,\"sampleSizeSas\":489,\"observedLosses\":1", svItemList[2].GetJsonString());
-            
+            }
+
         }
     }
 }

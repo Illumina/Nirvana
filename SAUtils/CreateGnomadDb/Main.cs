@@ -9,8 +9,8 @@ using ErrorHandling;
 using ErrorHandling.Exceptions;
 using Genome;
 using IO;
-using VariantAnnotation.Interface.SA;
 using SAUtils.InputFileParsers;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -76,7 +76,7 @@ namespace SAUtils.CreateGnomadDb
 
             var inputFiles = Directory.GetFiles(_inputDirectory, "*.vcf.bgz");
             if (inputFiles.Length == 0)
-                throw new UserErrorException("input directory does not conatin any .vcf.bgz files");
+                throw new UserErrorException("input directory does not contain any .vcf.bgz files");
 
             var versionFiles = Directory.GetFiles(_inputDirectory, "*.version");
             if (versionFiles.Length != 1)

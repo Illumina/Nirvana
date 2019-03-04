@@ -67,7 +67,7 @@ namespace SAUtils
             return sequenceAlterationType;
         }
 
-        public static VariantType GetSequenceAlteration(string svType, int observedGains, int observedLosses)
+        public static VariantType GetSequenceAlteration(string svType)
         {
             VariantType sequenceAlterationType;
 
@@ -80,18 +80,7 @@ namespace SAUtils
                     sequenceAlterationType = VariantType.copy_number_gain;
                     break;
                 case "CNV":
-                    if (observedGains == 0 && observedLosses > 0)
-                    {
-                        sequenceAlterationType = VariantType.copy_number_loss;
-                    }
-                    else if (observedGains > 0 && observedLosses == 0)
-                    {
-                        sequenceAlterationType = VariantType.copy_number_gain;
-                    }
-                    else
-                    {
-                        sequenceAlterationType = VariantType.copy_number_variation;
-                    }
+                    sequenceAlterationType = VariantType.copy_number_variation;
                     break;
                 case "INS":
                     sequenceAlterationType = VariantType.insertion;

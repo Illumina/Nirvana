@@ -32,7 +32,7 @@ namespace SAUtils.Custom
         private Action<string, string>[] _annotationValidators;
 
         private const string DataType = "array";
-        private readonly Dictionary<string, JsonDataType> _predefinedTypeAnnotation = new Dictionary<string, JsonDataType>()
+        private readonly Dictionary<string, JsonDataType> _predefinedTypeAnnotation = new Dictionary<string, JsonDataType>
         {
             {"refAllele", JsonDataType.String},
             {"altAllele", JsonDataType.String},
@@ -134,23 +134,25 @@ namespace SAUtils.Custom
         {
             _numRequiredColumns = 4;
 
-            if (_tags[3] == "ALT")
+            switch (_tags[3])
             {
-                _altColumnIndex = 3;
-
-                if (_tags.Length > 4 && _tags[4] == "END")
+                case "ALT":
                 {
-                    _endColumnIndex = 4;
-                    _numRequiredColumns = 5;
+                    _altColumnIndex = 3;
+
+                    if (_tags.Length > 4 && _tags[4] == "END")
+                    {
+                        _endColumnIndex = 4;
+                        _numRequiredColumns = 5;
+                    }
+
+                    break;
                 }
-            }
-            else if (_tags[3] == "END")
-            {
-                _endColumnIndex = 3;
-            }
-            else
-            {
-                throw new UserErrorException("Please provide at least one of the ALT and END columns.The END column should come after the ALT column if both are present.");
+                case "END":
+                    _endColumnIndex = 3;
+                    break;
+                default:
+                    throw new UserErrorException("Please provide at least one of the ALT and END columns.The END column should come after the ALT column if both are present.");
             }
 
             _numAnnotationColumns = _tags.Length - _numRequiredColumns;

@@ -222,12 +222,9 @@ namespace SAUtils.CreateMitoMapDb
             if (string.IsNullOrEmpty(mitomapDiseaseString)) return false;
             var altNotationPattern1 = new Regex("alternate notation$");
             var altNotationMatch = altNotationPattern1.Match(mitomapDiseaseString);
-            if (altNotationMatch.Success)
-            {
-                Console.WriteLine($"Alternate notation found: {mitomapDiseaseString}. This record is skipped.");
-                return true;
-            }
-            return false;
+            if (!altNotationMatch.Success) return false;
+            Console.WriteLine($"Alternate notation found: {mitomapDiseaseString}. This record is skipped.");
+            return true;
         }
 
         private static string GetDiseaseInfo(List<string> info, int fieldIndex)

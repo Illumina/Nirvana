@@ -35,6 +35,7 @@ namespace VariantAnnotation.NSA
         {
             var sortedItems = siItems.OrderBy(x => x.Chromosome.Index).ThenBy(x => x.Start).ThenBy(x => x.End).ToList();
 
+            Console.WriteLine($"Writing {sortedItems.Count} intervals to database...");
             _memWriter.WriteOpt(sortedItems.Count);
             foreach (ISuppIntervalItem item in sortedItems)
             {

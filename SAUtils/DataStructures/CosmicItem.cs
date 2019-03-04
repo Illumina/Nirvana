@@ -15,7 +15,7 @@ namespace SAUtils.DataStructures
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
 
-        public string Id { get; }
+        private string Id { get; }
         private string Gene { get; }
         private int? SampleCount { get; }
         public HashSet<CosmicStudy> Studies { get; }

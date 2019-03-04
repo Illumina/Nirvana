@@ -11,7 +11,7 @@ namespace SAUtils.InputFileParsers
     public sealed class PhylopParser : IDisposable
     {
         private readonly Stream _stream;
-        private GenomeAssembly _assembly;
+        private readonly GenomeAssembly _assembly;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
         public PhylopParser(Stream stream, GenomeAssembly assembly, IDictionary<string, IChromosome> refChromDict)

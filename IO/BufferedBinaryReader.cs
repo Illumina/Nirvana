@@ -130,7 +130,7 @@ namespace IO
                 var lo = (uint)(pBuffer[0] | pBuffer[1] << 8 | pBuffer[2] << 16 | pBuffer[3] << 24);
                 var hi = (uint)(pBuffer[4] | pBuffer[5] << 8 | pBuffer[6] << 16 | pBuffer[7] << 24);
                 ulong tmpBuffer = (ulong)hi << 32 | lo;
-                value = *((double*)&tmpBuffer);
+                value = *(double*)&tmpBuffer;
                 _bufferPos += DoubleLen;
             }
 

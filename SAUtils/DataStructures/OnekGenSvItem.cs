@@ -8,54 +8,40 @@ namespace SAUtils.DataStructures
 {
     public sealed class OnekGenSvItem: ISuppIntervalItem
     {
-        public OnekGenSvItem(IChromosome chromosome, int start, int end, VariantType variantType, string id, string afrFrequency, string allFrequency, string amrFrequency, string easFrequency, string eurFrequency, string sasFrequency, int allAlleleNumber, int afrAlleleNumber, int amrAlleleNumber, int eurAlleleNumber, int easAlleleNumber, int sasAlleleNumber, int observedGains, int observedLosses)
-        {
-            Chromosome = chromosome;
-            Start      = start;
-            End        = end;
-            Id         = id;
-            VariantType = variantType;
-
-            AfrFrequency    = afrFrequency;
-            AllFrequency    = allFrequency;
-            AmrFrequency    = amrFrequency;
-            EasFrequency    = easFrequency;
-            EurFrequency    = eurFrequency;
-            SasFrequency    = sasFrequency;
-            AllAlleleNumber = allAlleleNumber;
-            AfrAlleleNumber = afrAlleleNumber;
-            AmrAlleleNumber = amrAlleleNumber;
-            EurAlleleNumber = eurAlleleNumber;
-            EasAlleleNumber = easAlleleNumber;
-            SasAlleleNumber = sasAlleleNumber;
-            ObservedGains   = observedGains;
-            ObservedLosses  = observedLosses;
-        }
-
         public int Start { get; }
         public int End { get; }
         public IChromosome Chromosome { get; }
-        public VariantType VariantType { get; }
+        private VariantType VariantType { get; }
 
-        private string Id { get; }
-        private string AfrFrequency { get; }
-        private string AllFrequency { get; }
-        private string AmrFrequency { get; }
-        private string EasFrequency { get; }
-        private string EurFrequency { get; }
-        private string SasFrequency { get; }
+        private readonly int? _allAlleleNumber;
+        private readonly int? _allAlleleCount;
+        private readonly double? _allAlleleFrequency;
+        private readonly double? _afrAlleleFrequency;
+        private readonly double? _amrAlleleFrequency;
+        private readonly double? _easAlleleFrequency;
+        private readonly double? _eurAlleleFrequency;
+        private readonly double? _sasAlleleFrequency;
 
-        private int? AllAlleleNumber { get; }
-        private int? AfrAlleleNumber { get; }
-        private int? AmrAlleleNumber { get; }
-        private int? EurAlleleNumber { get; }
-        private int? EasAlleleNumber { get; }
-        private int? SasAlleleNumber { get; }
+        public OnekGenSvItem(IChromosome chromosome, int start, int end, VariantType variantType, string id, int? allAlleleNumber, int? allAlleleCount, double? allAlleleFrequency, double? afrAlleleFrequency, double? amrAlleleFrequency, double? easAlleleFrequency, double? eurAlleleFrequency, double? sasAlleleFrequency)
+        {
+            Chromosome = chromosome;
+            Start = start;
+            End = end;
+            VariantType = variantType;
+            Id = id;
+            _allAlleleNumber = allAlleleNumber;
+            _allAlleleCount = allAlleleCount;
+            _allAlleleFrequency = allAlleleFrequency;
+            _afrAlleleFrequency = afrAlleleFrequency;
+            _amrAlleleFrequency = amrAlleleFrequency;
+            _easAlleleFrequency = easAlleleFrequency;
+            _eurAlleleFrequency = eurAlleleFrequency;
+            _sasAlleleFrequency = sasAlleleFrequency;
+        }
 
-        private int ObservedGains { get; }
-        private int ObservedLosses { get; }
         
-
+        private string Id { get; }
+        
         public string GetJsonString()
         {
             var sb = StringBuilderCache.Acquire();
@@ -67,22 +53,14 @@ namespace SAUtils.DataStructures
             jsonObject.AddStringValue("variantType", VariantType.ToString());
 
             jsonObject.AddStringValue("id", Id);
-            jsonObject.AddStringValue("variantFreqAll", AllFrequency, false);
-            jsonObject.AddStringValue("variantFreqAfr", AfrFrequency, false);
-            jsonObject.AddStringValue("variantFreqAmr", AmrFrequency, false);
-            jsonObject.AddStringValue("variantFreqEas", EasFrequency, false);
-            jsonObject.AddStringValue("variantFreqEur", EurFrequency, false);
-            jsonObject.AddStringValue("variantFreqSas", SasFrequency, false);
-
-            jsonObject.AddIntValue("sampleSize", AllAlleleNumber);
-            jsonObject.AddIntValue("sampleSizeAfr", AfrAlleleNumber);
-            jsonObject.AddIntValue("sampleSizeAmr", AmrAlleleNumber);
-            jsonObject.AddIntValue("sampleSizeEas", EasAlleleNumber);
-            jsonObject.AddIntValue("sampleSizeEur", EurAlleleNumber);
-            jsonObject.AddIntValue("sampleSizeSas", SasAlleleNumber);
-
-            if (ObservedGains != 0) jsonObject.AddIntValue("observedGains", ObservedGains);
-            if (ObservedLosses != 0) jsonObject.AddIntValue("observedLosses", ObservedLosses);
+            jsonObject.AddIntValue("allAn", _allAlleleNumber);
+            jsonObject.AddIntValue("allAc", _allAlleleCount);
+            jsonObject.AddDoubleValue("allAf", _allAlleleFrequency, "0.######");
+            jsonObject.AddDoubleValue("afrAf", _afrAlleleFrequency, "0.######");
+            jsonObject.AddDoubleValue("amrAf", _amrAlleleFrequency, "0.######");
+            jsonObject.AddDoubleValue("eurAf", _eurAlleleFrequency, "0.######");
+            jsonObject.AddDoubleValue("easAf", _easAlleleFrequency, "0.######");
+            jsonObject.AddDoubleValue("sasAf", _sasAlleleFrequency, "0.######");
 
             return StringBuilderCache.GetStringAndRelease(sb);
         }

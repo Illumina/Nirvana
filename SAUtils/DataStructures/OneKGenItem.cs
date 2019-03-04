@@ -12,15 +12,7 @@ namespace SAUtils.DataStructures
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
 
-        private string Id { get; }
         private string AncestralAllele { get; }
-
-        private string AfrFreq { get; }
-        private string AllFreq { get; }
-        private string AmrFreq { get; }
-        private string EasFreq { get; }
-        private string EurFreq { get; }
-        private string SasFreq { get; }
 
         private int? AllAlleleNumber { get; }
         private int? AfrAlleleNumber { get; }
@@ -36,14 +28,8 @@ namespace SAUtils.DataStructures
         private int? EasAlleleCount { get; }
         private int? SasAlleleCount { get; }
 
-        private string SvType { get; }
-        private int SvEnd { get; }
-        private int ObservedGains { get; }
-        private int ObservedLosses { get; }
-
         public OneKGenItem(IChromosome chromosome,
             int position,
-            string id,
             string refAllele,
             string alternateAllele,
             string ancestralAllele,
@@ -58,14 +44,11 @@ namespace SAUtils.DataStructures
             int? amrAlleleNumber,
             int? eurAlleleNumber,
             int? easAlleleNumber,
-            int? sasAlleleNumber,
-            string svType,
-            int svEnd
+            int? sasAlleleNumber
             )
         {
             Chromosome = chromosome;
             Position = position;
-            Id = id;
             RefAllele = refAllele;
             AltAllele = alternateAllele;
             AncestralAllele = ancestralAllele;
@@ -83,52 +66,6 @@ namespace SAUtils.DataStructures
             EurAlleleNumber = eurAlleleNumber;
             EasAlleleNumber = easAlleleNumber;
             SasAlleleNumber = sasAlleleNumber;
-
-            SvType = svType;
-            SvEnd = svEnd;
-
-        }
-
-        public OneKGenItem(IChromosome chromosome,
-            int position,
-            string id,
-            string refAllele,
-            string alternateAllele,
-            string ancestralAllele,
-            string afrFreq,
-            string allFreq,
-            string amrFreq,
-            string easFreq,
-            string eurFreq,
-            string sasFreq,
-            int? allAlleleCount,
-            int? afrAlleleCount,
-            int? amrAlleleCount,
-            int? eurAlleleCount,
-            int? easAlleleCount,
-            int? sasAlleleCount,
-            int? allAlleleNumber,
-            int? afrAlleleNumber,
-            int? amrAlleleNumber,
-            int? eurAlleleNumber,
-            int? easAlleleNumber,
-            int? sasAlleleNumber,
-            string svType,
-            int svEnd, int observedGains, int observedLosses)
-            : this(
-                chromosome, position, id, refAllele, alternateAllele, ancestralAllele, allAlleleCount, afrAlleleCount, amrAlleleCount, eurAlleleCount, easAlleleCount, sasAlleleCount,
-                allAlleleNumber, afrAlleleNumber, amrAlleleNumber, eurAlleleNumber, easAlleleNumber, sasAlleleNumber, svType,
-                svEnd)
-        {
-            ObservedGains = observedGains;
-            ObservedLosses = observedLosses;
-
-            AfrFreq = afrFreq;
-            AllFreq = allFreq;
-            AmrFreq = amrFreq;
-            EasFreq = easFreq;
-            EurFreq = eurFreq;
-            SasFreq = sasFreq;
         }
 
         
