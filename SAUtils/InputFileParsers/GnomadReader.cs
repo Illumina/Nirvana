@@ -216,35 +216,35 @@ namespace SAUtils.InputFileParsers
 					_acAll = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_AFR":
+				case "AC_afr":
 					_acAfr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_AMR":
+				case "AC_amr":
 					_acAmr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_EAS":
+				case "AC_eas":
 					_acEas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_FIN":
+				case "AC_fin":
 					_acFin = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_NFE":
+				case "AC_nfe":
 					_acNfe = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_OTH":
+				case "AC_oth":
 					_acOth = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_ASJ":
+				case "AC_asj":
 					_acAsj = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-			    case "AC_SAS":
+			    case "AC_sas":
 			        _acSas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 			        break;
 
@@ -252,71 +252,71 @@ namespace SAUtils.InputFileParsers
 			        _anAll = Convert.ToInt32(value);
 			        break;
 
-				case "AN_AFR":
+				case "AN_afr":
 					_anAfr = Convert.ToInt32(value);
 					break;
 
-				case "AN_AMR":
+				case "AN_amr":
 					_anAmr = Convert.ToInt32(value);
 					break;
 
-				case "AN_EAS":
+				case "AN_eas":
 					_anEas = Convert.ToInt32(value);
 					break;
 
-				case "AN_FIN":
+				case "AN_fin":
 					_anFin = Convert.ToInt32(value);
 					break;
 
-				case "AN_NFE":
+				case "AN_nfe":
 					_anNfe = Convert.ToInt32(value);
 					break;
 
-				case "AN_OTH":
+				case "AN_oth":
 					_anOth = Convert.ToInt32(value);
 					break;
 
-				case "AN_ASJ":
+				case "AN_asj":
 					_anAsj = Convert.ToInt32(value);
 					break;
 
-			    case "AN_SAS":
+			    case "AN_sas":
 			        _anSas = Convert.ToInt32(value);
 			        break;
 
-			    case "Hom":
+			    case "nhomalt":
 			        _hcAll = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_AFR":
+			    case "nhomalt_afr":
 			        _hcAfr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_AMR":
+			    case "nhomalt_amr":
 			        _hcAmr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_EAS":
+			    case "nhomalt_eas":
 			        _hcEas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_FIN":
+			    case "nhomalt_fin":
 			        _hcFin = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_NFE":
+			    case "nhomalt_nfe":
 			        _hcNfe = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_OTH":
+			    case "nhomalt_oth":
 			        _hcOth = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_ASJ":
+			    case "nhomalt_asj":
 			        _hcAsj = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "Hom_SAS":
+			    case "nhomalt_sas":
 			        _hcSas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
