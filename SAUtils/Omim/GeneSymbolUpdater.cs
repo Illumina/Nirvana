@@ -18,6 +18,7 @@ namespace SAUtils.Omim
         private int _numGeneSymbolsUpdated;
         private int _numGeneSymbolsNotInCache;
         private int _numResolvedGeneSymbolConflicts;
+        private int _numUnresolvedGeneSymbolConflicts;
 
         public GeneSymbolUpdater(Dictionary<string, string> entrezGeneIdToSymbol,
             Dictionary<string, string> ensemblGeneIdToSymbol)
@@ -52,7 +53,12 @@ namespace SAUtils.Omim
             if (_geneSymbols.Count > 1)
             {
                 newGeneSymbol = ResolveGeneSymbolConflict(oldGeneSymbol, ensemblSymbol, entrezGeneSymbol);
-                if (newGeneSymbol == null) throw new InvalidDataException($"Unable to resolve gene symbol conflict for {oldGeneSymbol}: Ensembl: [{ensemblGeneId}]: {ensemblSymbol}, Entrez Gene: [{entrezGeneId}]: {entrezGeneSymbol}");
+                if (newGeneSymbol == null)
+                {
+                    Console.WriteLine($"Unable to resolve gene symbol conflict for {oldGeneSymbol}: Ensembl: [{ensemblGeneId}]: {ensemblSymbol}, Entrez Gene: [{entrezGeneId}]: {entrezGeneSymbol}");
+                    _numUnresolvedGeneSymbolConflicts++;
+                    return null;
+                }
                 _numResolvedGeneSymbolConflicts++;
             }
 
@@ -74,7 +80,11 @@ namespace SAUtils.Omim
             AddSymbol(symbolCounts, entrezGeneSymbol);
 
             var mostFrequentSymbol = symbolCounts.OrderByDescending(x => x.Value).First();
-            if (mostFrequentSymbol.Value == 1) throw new InvalidDataException($"Found unique gene symbols when trying to resolve the gene symbol conflict. Entrez Gene {entrezGeneSymbol}");
+            if (mostFrequentSymbol.Value == 1)
+            {
+                //Console.WriteLine($"Found unique gene symbols when trying to resolve the gene symbol conflict. Entrez Gene {entrezGeneSymbol}");
+                return null;
+            }
 
             return mostFrequentSymbol.Key;
         }
@@ -98,11 +108,12 @@ namespace SAUtils.Omim
             Console.ResetColor();
 
             Console.WriteLine("============================================");
-            Console.WriteLine($"# of gene symbols already up-to-date: {_numGeneSymbolsUpToDate:N0}");
-            Console.WriteLine($"# of gene symbols updated:            {_numGeneSymbolsUpdated:N0}");
-            Console.WriteLine($"# of genes where both IDs are null:   {_numGenesWhereBothIdsAreNull:N0}");
-            Console.WriteLine($"# of gene symbols not in cache:       {_numGeneSymbolsNotInCache:N0}");
-            Console.WriteLine($"# of resolved gene symbol conflicts:  {_numResolvedGeneSymbolConflicts:N0}");
+            Console.WriteLine($"# of gene symbols already up-to-date:   {_numGeneSymbolsUpToDate:N0}");
+            Console.WriteLine($"# of gene symbols updated:              {_numGeneSymbolsUpdated:N0}");
+            Console.WriteLine($"# of genes where both IDs are null:     {_numGenesWhereBothIdsAreNull:N0}");
+            Console.WriteLine($"# of gene symbols not in cache:         {_numGeneSymbolsNotInCache:N0}");
+            Console.WriteLine($"# of resolved gene symbol conflicts:    {_numResolvedGeneSymbolConflicts:N0}");
+            Console.WriteLine($"# of unresolved gene symbol conflicts:  {_numUnresolvedGeneSymbolConflicts:N0}");
         }
 
         public void WriteUpdatedGeneSymbols(StreamWriter writer)

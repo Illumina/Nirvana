@@ -8,7 +8,7 @@
     "RR_omim": {
       "commandName": "Project",
       "commandLineArgs": " omim --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --gm2 genemap2.txt --m2g mim2gene.txt --uga c:\\Development\\Cache\\26\\UGA.tsv.gz",
-      "workingDirectory": "c:\\Development\\ExternalDataSources\\OMIM\\20180213"
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\OMIM\\2019-02-25"
     },
     "RR_gnomad": {
       "commandName": "Project",

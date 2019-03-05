@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Net;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -88,6 +89,13 @@ namespace SAUtils.Omim
                 ngaWriter.Write(OmimUtilities.GetGeneToOmimEntries(omimItems));
             }
 
+
+            geneSymbolUpdater.DisplayStatistics();
+            using (var writer =new StreamWriter(FileUtilities.GetCreateStream("UpdatedGeneSymbols.txt")))
+            {
+                geneSymbolUpdater.WriteUpdatedGeneSymbols(writer);
+            }
+            
             return ExitCodes.Success;
         }
 
