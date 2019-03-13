@@ -71,24 +71,21 @@ namespace SAUtils
                     _refProvider.LoadChromosome(saItem.Chromosome);
                 }
 
+                // the items come in sorted order of the pre-trimmed position. 
+                // So when writing out, we have to make sure that we do not write past this position. 
+                // Once a position has been seen in the stream, we can safely write all positions before that.
+                var writeToPos = saItem.Position;
+
                 // trim the alleles before checking against the reference to prevent 1KG errors (NIR-3637)
                 saItem.Trim();
 
-                if (!_skipIncorrectRefEntries)
+                string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
+                if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
                 {
-                    string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
-                    if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
-                    {
-                        throw new UserErrorException($"The provided reference allele {saItem.RefAllele} at {saItem.Chromosome.UcscName}:{saItem.Position} is different from {refSequence} in the reference genome sequence.");
-                     
-                    }
-                }                               
-                
-                //the items come in sorted order of the pre-trimmed position. 
-                //So when writing out, we have to make sure that we do not write past this position. 
-                //Once a position has been seen in the stream, we can safely write all positions before that.
-                var writeToPos = saItem.Position;
-                
+                    if (_skipIncorrectRefEntries) continue;
+                    throw new UserErrorException($"The provided reference allele {saItem.RefAllele} at {saItem.Chromosome.UcscName}:{saItem.Position} is different from {refSequence} in the reference genome sequence.");
+                }
+
                 itemsMinHeap.Add(saItem);
                 WriteUptoPosition(itemsMinHeap, writeToPos);
             }
