@@ -79,13 +79,14 @@ namespace SAUtils.Custom
                                 false,  // match by allele
                                 true, // is array
                                 SaCommon.SchemaVersion,
-                                false// is positional
+                                false,// is positional
+                                false // skip incorrect ref base
                                 ))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 jsonTag = customReader.JsonTag;
-                nsaWriter.Write(customReader.GetItems(), true);
+                nsaWriter.Write(customReader.GetItems());
                 schemaWriter.Write(customReader.JsonSchema);
 
                 intervalJsonSchema = customReader.IntervalJsonSchema;

@@ -27,7 +27,7 @@ namespace CommandLine.Utilities
             return attr?.Copyright.Replace("©", "(c)") ?? $"(c) {DateTime.Now.Year} Illumina, Inc.";
         }
 
-        private static string GetVersion(Assembly entryAssembly)
+        public static string GetVersion(Assembly entryAssembly)
         {
             var attr = GetAssemblyAttributes<AssemblyFileVersionAttribute>(entryAssembly);
             return attr?.Version;

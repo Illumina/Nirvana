@@ -8,8 +8,10 @@ using Genome;
 using IO;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Plugins;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
@@ -33,7 +35,7 @@ namespace Nirvana
         public List<IDataSourceVersion> DataSourceVersions { get; }
         public string VepDataVersion { get; }
         public long InputStartVirtualPosition { get; set; }
-        public string AnnotatorVersionTag { get; } = "Nirvana " + CommandLineUtilities.Version;
+        public string AnnotatorVersionTag { get; set; } = "Nirvana " + CommandLineUtilities.Version;
         public bool OutputVcf { get; }
         public bool OutputGvcf { get; }
         public bool ForceMitochondrialAnnotation { get; }
@@ -84,6 +86,14 @@ namespace Nirvana
             if (plugins != null) foreach (var provider in plugins) if (provider.DataSourceVersions != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
             foreach (var provider in providers) if (provider != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
             return dataSourceVersions.ToHashSet(new DataSourceVersionComparer());
+        }
+
+        public void SingleVariantProLoad(IPosition position)
+        {
+            var chromToPositions = new Dictionary<IChromosome, List<int>>();
+            PreLoadUtilities.UpdateChromToPositions(chromToPositions, position.Chromosome, position.Start, position.RefAllele, position.VcfFields[VcfCommon.AltIndex]);
+            _variantPositions = chromToPositions.ToImmutableDictionary();
+            PreLoad(position.Chromosome);
         }
 
         public void GetVariantPositions(Stream vcfStream, AnnotationRange annotationRange)

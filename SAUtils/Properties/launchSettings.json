@@ -37,8 +37,8 @@
     },
     "RR_phylop": {
       "commandName": "Project",
-      "commandLineArgs": "PhyloP --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in grch37.phyloP46Way.wigFix.gz",
-      "workingDirectory": "c:\\Development\\ExternalDataSources\\PhyloP"
+      "commandLineArgs": "PhyloP --ref c:\\development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\development\\SupplementaryDatabase\\test --in chr10.phyloP46way.wigFix.gz",
+      "workingDirectory": "c:\\development\\ExternalDataSources\\phyloP\\GRCh37"
     },
     "RR_custom": {
       "commandName": "Project",

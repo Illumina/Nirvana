@@ -51,7 +51,7 @@ namespace UnitTests.SAUtils
                     Assert.Equal(-2.1, phylopReader.GetAnnotation(Chrom1, 182));// some negative value
 
                     //chrom 2
-                    Assert.Equal(0.1, phylopReader.GetAnnotation(Chrom2, 100));//first position of first block
+                    Assert.Null(phylopReader.GetAnnotation(Chrom2, 400));//values past the last phylop positions should return null
                 }
             }
             

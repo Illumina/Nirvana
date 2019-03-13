@@ -31,7 +31,7 @@ namespace Nirvana
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (! ReachedAnnotationRange(annotationRange, refNameToChrom, line, chromToAnnotate, out var splits, out IChromosome iChrom)) continue;
+                    if (!ReachedAnnotationRange(annotationRange, refNameToChrom, line, chromToAnnotate, out var splits, out IChromosome iChrom)) continue;
 
                     int position = int.Parse(splits[VcfCommon.PosIndex]);
                     if (position > endPosition) break;
@@ -39,15 +39,7 @@ namespace Nirvana
                     string refAllele = splits[VcfCommon.RefIndex];
                     string altAllele = splits[VcfCommon.AltIndex];
 
-                    if (!chromPositions.ContainsKey(iChrom)) chromPositions.Add(iChrom, new List<int>(16 *1024));
-
-                    foreach (string allele in altAllele.OptimizedSplit(','))
-                    {
-                        if (allele.OptimizedStartsWith('<')) continue;
-                        
-                        (int trimPos, string _, string _) = BiDirectionalTrimmer.Trim(position, refAllele,allele);
-                        chromPositions[iChrom].Add(trimPos);
-                    }
+                    UpdateChromToPositions(chromPositions, iChrom, position, refAllele, altAllele);
                 }
             }
 
@@ -56,6 +48,18 @@ namespace Nirvana
             Console.WriteLine($"{count} positions found in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
             return chromPositions.ToImmutableDictionary();
+        }
+
+        public static void UpdateChromToPositions(Dictionary<IChromosome, List<int>> chromPositions, IChromosome chromosome, int position, string refAllele, string altAllele)
+        {
+            if (!chromPositions.ContainsKey(chromosome)) chromPositions.Add(chromosome, new List<int>(16 * 1024));
+            foreach (string allele in altAllele.OptimizedSplit(','))
+            {
+                if (allele.OptimizedStartsWith('<')) continue;
+
+                (int trimPos, string _, string _) = BiDirectionalTrimmer.Trim(position, refAllele, allele);
+                chromPositions[chromosome].Add(trimPos);
+            }
         }
 
         private static int SortPositionsAndGetCount(Dictionary<IChromosome, List<int>> chromPositions)

@@ -62,7 +62,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
                 {
                     var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetSequenceProvider(), "clinvar",
-                        false, true, SaCommon.SchemaVersion, false, 1024);
+                        false, true, SaCommon.SchemaVersion, false, true, 1024);
                     saWriter.Write(GetClinvarItems());
                 }
 
@@ -110,7 +110,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
                 using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
                 {
-                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetSequenceProvider(), "clinvar", false, true, SaCommon.SchemaVersion, false, 1024);
+                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetSequenceProvider(), "clinvar", false, true, SaCommon.SchemaVersion, false, true, 1024);
                     saWriter.Write(GetClinvarItems());
                 }
 
@@ -176,7 +176,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
                 using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
                 {
-                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetAllASequenceProvider(), "dbsnp", true, true, SaCommon.SchemaVersion, false, 1024);
+                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetAllASequenceProvider(), "dbsnp", true, true, SaCommon.SchemaVersion, false, true, 1024);
                     saWriter.Write(GetDbsnpItems(1000));
                 }
 
@@ -225,9 +225,9 @@ namespace UnitTests.SAUtils.NsaWriters
                 new ExtendedBinaryWriter(indexStream),
                 new DataSourceVersion("customeSa", "test", DateTime.Now.Ticks),
                 GetSequenceProvider(),
-                "customeSa", false, true, SaCommon.SchemaVersion, false))
+                "customeSa", false, true, SaCommon.SchemaVersion, false, false))
             {
-                saWriter.Write(new[] { customItem }, true);
+                saWriter.Write(new[] { customItem });
             }
         }
     }

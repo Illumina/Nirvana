@@ -26,15 +26,17 @@ namespace SAUtils
         private readonly NsaBlock _block;
         private readonly ChunkedIndex _index;
         private readonly bool _isPositional;
+        private readonly bool _skipIncorrectRefEntries;
         private readonly ISequenceProvider _refProvider;
 
 
         //todo: filter chromIndex=ushort.Max
-        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, int blockSize = SaCommon.DefaultBlockSize)
+        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, int blockSize = SaCommon.DefaultBlockSize)
         {
-            _stream = writer.BaseStream;
-            _writer = writer;
-            _isPositional = isPositional;
+            _stream            = writer.BaseStream;
+            _writer            = writer;
+            _isPositional      = isPositional;
+            _skipIncorrectRefEntries = skipIncorrectRefEntries;
             _block = new NsaBlock(new Zstandard(), blockSize);
             _refProvider = refProvider;
 
@@ -44,7 +46,7 @@ namespace SAUtils
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
 
-        public void Write(IEnumerable<ISupplementaryDataItem> saItems, bool throwIfIncorrectRef = false)
+        public void Write(IEnumerable<ISupplementaryDataItem> saItems)
         {
             var itemsMinHeap = new MinHeap<ISupplementaryDataItem>(SuppDataUtilities.CompareTo);
             var chromIndex = ushort.MaxValue;
@@ -69,23 +71,28 @@ namespace SAUtils
                     _refProvider.LoadChromosome(saItem.Chromosome);
                 }
 
-                string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
-                if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
+                // trim the alleles before checking against the reference to prevent 1KG errors (NIR-3637)
+                saItem.Trim();
+
+                if (!_skipIncorrectRefEntries)
                 {
-                    if (throwIfIncorrectRef)
+                    string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
+                    if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
+                    {
                         throw new UserErrorException($"The provided reference allele {saItem.RefAllele} at {saItem.Chromosome.UcscName}:{saItem.Position} is different from {refSequence} in the reference genome sequence.");
-                    continue;
-                }
+                     
+                    }
+                }                               
+                
                 //the items come in sorted order of the pre-trimmed position. 
                 //So when writing out, we have to make sure that we do not write past this position. 
                 //Once a position has been seen in the stream, we can safely write all positions before that.
                 var writeToPos = saItem.Position;
-
-                saItem.Trim();
+                
                 itemsMinHeap.Add(saItem);
                 WriteUptoPosition(itemsMinHeap, writeToPos);
-
             }
+
             //flushing out the remaining items in buffer
             WriteUptoPosition(itemsMinHeap, int.MaxValue);
             Flush(chromIndex);

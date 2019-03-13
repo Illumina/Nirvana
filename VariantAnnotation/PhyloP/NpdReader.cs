@@ -47,24 +47,24 @@ namespace VariantAnnotation.PhyloP
         }
 
         private IChromosome _chromosome;
-
+        private int _lastPhylopPosition;
         private void PreLoad(IChromosome chrom)
         {
             _chromosome = chrom;
-
             (long startLocation, int numBytes) = _index.GetFileRange(chrom.Index);
             if (startLocation == -1) return;
             _reader.BaseStream.Position = startLocation;
             var buffer = _reader.ReadBytes(numBytes);
 
-            _zstd.Decompress(buffer, buffer.Length, _scores, _scores.Length);
-
+            _lastPhylopPosition = _zstd.Decompress(buffer, buffer.Length, _scores, _scores.Length);
+            
         }
 
         public double? GetAnnotation(IChromosome chromosome, int position)
         {
             if (_chromosome==null || chromosome.Index != _chromosome.Index) PreLoad(chromosome);
 
+            if (position >= _lastPhylopPosition) return null;
             var scoreCode = _scores[position - 1];
             if (scoreCode == 0) return null;
             return _scoreMap[scoreCode];

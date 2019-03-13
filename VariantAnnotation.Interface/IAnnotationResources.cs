@@ -2,6 +2,7 @@
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Plugins;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.Interface
@@ -19,10 +20,11 @@ namespace VariantAnnotation.Interface
         IRecomposer Recomposer { get; }
         List<IDataSourceVersion> DataSourceVersions { get; }
         string VepDataVersion { get; }
-        string AnnotatorVersionTag { get; }
+        string AnnotatorVersionTag { get; set; }
         bool OutputVcf { get; }
         bool OutputGvcf { get; }
         bool ForceMitochondrialAnnotation { get; }
         long InputStartVirtualPosition { get; }
+        void SingleVariantProLoad(IPosition position);
     }
 }
