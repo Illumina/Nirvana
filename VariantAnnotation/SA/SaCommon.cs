@@ -3,7 +3,7 @@
     public static class SaCommon
     {
         public const int DefaultBlockSize      = 8 * 1024 * 1024;
-        public const ushort DataVersion        = 48;
+        public const ushort DataVersion        = 49;
         public const ushort SchemaVersion      = 22;
 
         public const double RefMinorThreshold  = 0.95;
