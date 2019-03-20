@@ -21,7 +21,7 @@ namespace Nirvana
     public static class StreamAnnotation
     {
         public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream, Stream outputJsonIndexStream,
-            Stream outputVcfStream, Stream outputGvcfStream, AnnotationResources annotationResources, IVcfFilter vcfFilter, bool leaveOutputStreamOpen)
+            Stream outputVcfStream, Stream outputGvcfStream, AnnotationResources annotationResources, IVcfFilter vcfFilter)
         {
 
             var logger = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
@@ -29,7 +29,7 @@ namespace Nirvana
             var vcfConversion = new VcfConversion();
 
             using (var vcfReader = Create(headerStream, inputVcfStream, annotationResources, vcfFilter))
-            using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), leaveOutputStreamOpen))
+            using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             using (var vcfWriter = annotationResources.OutputVcf
                 ? new LiteVcfWriter(new StreamWriter(outputVcfStream), vcfReader.GetHeaderLines(), annotationResources)
                 : null)

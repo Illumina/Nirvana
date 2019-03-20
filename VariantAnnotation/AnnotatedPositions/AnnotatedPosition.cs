@@ -67,7 +67,9 @@ namespace VariantAnnotation.AnnotatedPositions
 			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
 
             if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
+            {
                 AddSuppIntervalToJsonObject(jsonObject);
+            }
 
 			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
 
@@ -90,7 +92,7 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             foreach (var si in SupplementaryIntervals)
             {
-                jsonObject.AddStringValue(si.JsonKey, si.GetJsonString(), false);
+                jsonObject.AddObjectValue(si.JsonKey, si);
             }
         }
     }

@@ -6,6 +6,7 @@ using ErrorHandling.Exceptions;
 using OptimizedCore;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.Schema
 {

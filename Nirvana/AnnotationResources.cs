@@ -88,7 +88,7 @@ namespace Nirvana
             return dataSourceVersions.ToHashSet(new DataSourceVersionComparer());
         }
 
-        public void SingleVariantProLoad(IPosition position)
+        public void SingleVariantPreLoad(IPosition position)
         {
             var chromToPositions = new Dictionary<IChromosome, List<int>>();
             PreLoadUtilities.UpdateChromToPositions(chromToPositions, position.Chromosome, position.Start, position.RefAllele, position.VcfFields[VcfCommon.AltIndex]);

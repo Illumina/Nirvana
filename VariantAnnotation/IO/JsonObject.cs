@@ -150,6 +150,20 @@ namespace VariantAnnotation.IO
             return true;
         }
 
+        public bool AddObjectValue<T>(string description, T value) where T : IJsonSerializer
+        {
+            if (value == null) return false;
+
+            if (_needsComma) _sb.Append(Comma);
+            AddKey(description);
+            
+            value.SerializeJson(_sb);
+
+            _needsComma = true;
+
+            return true;
+        }
+
         public bool AddObjectValues<T>(string description, IEnumerable<T> values) where T : IJsonSerializer
         {
             if (values == null) return false;

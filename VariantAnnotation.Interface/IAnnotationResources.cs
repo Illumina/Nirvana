@@ -25,6 +25,6 @@ namespace VariantAnnotation.Interface
         bool OutputGvcf { get; }
         bool ForceMitochondrialAnnotation { get; }
         long InputStartVirtualPosition { get; }
-        void SingleVariantProLoad(IPosition position);
+        void SingleVariantPreLoad(IPosition position);
     }
 }

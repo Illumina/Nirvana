@@ -40,6 +40,7 @@ namespace SAUtils.Custom
             {"start", SaJsonValueType.Number},
             {"end", SaJsonValueType.Number}
         };
+
         internal readonly List<string> JsonKeys = new List<string> {"refAllele", "altAllele"};
         internal readonly List<string> IntervalJsonKeys = new List<string> {"start", "end"};
 

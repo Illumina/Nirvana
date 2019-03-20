@@ -52,7 +52,7 @@ namespace VariantAnnotation.AnnotatedPositions
             
             foreach (ISupplementaryAnnotation saItem in SaList)
             {
-                jsonObject.AddStringValue(saItem.JsonKey, saItem.GetJsonString(), false);
+                jsonObject.AddObjectValue(saItem.JsonKey, saItem);
             }
 
             foreach (var pluginData in PluginDataSet)

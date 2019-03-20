@@ -4,7 +4,6 @@ using System.Linq;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
-using Genome;
 using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Providers;

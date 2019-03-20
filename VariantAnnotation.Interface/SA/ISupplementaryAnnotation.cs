@@ -1,9 +1,9 @@
-﻿namespace VariantAnnotation.Interface.SA
+﻿using VariantAnnotation.Interface.IO;
+
+namespace VariantAnnotation.Interface.SA
 {
-    public interface ISupplementaryAnnotation
+    public interface ISupplementaryAnnotation:IJsonSerializer
     {
         string JsonKey { get; }
-        string GetJsonString();
-
     }
 }

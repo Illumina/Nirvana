@@ -75,7 +75,6 @@ namespace SAUtils
                 // So when writing out, we have to make sure that we do not write past this position. 
                 // Once a position has been seen in the stream, we can safely write all positions before that.
                 var writeToPos = saItem.Position;
-
                 // trim the alleles before checking against the reference to prevent 1KG errors (NIR-3637)
                 saItem.Trim();
 

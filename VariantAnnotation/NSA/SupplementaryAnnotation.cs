@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Text;
 using ErrorHandling.Exceptions;
 using VariantAnnotation.Interface.SA;
 
@@ -29,16 +29,40 @@ namespace VariantAnnotation.NSA
                 throw new UserErrorException("ERROR: No json string provided for a supplementary annotation of non-array type!!");
         }
 
-        public string GetJsonString()
+        public void SerializeJson(StringBuilder sb)
         {
-            if (_isPositional) return _jsonString;
-            return !_isArray ? $"{{{_jsonString}}}" : $"[{string.Join(',',_jsonStrings.Select(FormatJsonArrayString))}]";
+            if (_isPositional)
+            {
+                sb.Append(_jsonString);
+                return;
+            }
+
+            if (!_isArray)
+            {
+                sb.Append('{');
+                sb.Append(_jsonString);
+                sb.Append('}');
+            }
+            else
+            {
+                sb.Append('[');
+                var firstString = true;
+                foreach (var jsonString in _jsonStrings)
+                {
+                    if (!firstString) sb.Append(',');
+                    if (!jsonString.StartsWith("\"rs"))
+                    {
+                        sb.Append('{');
+                        sb.Append(jsonString);
+                        sb.Append('}');
+                    }
+                    else sb.Append(jsonString);
+                    firstString = false;
+                }
+                sb.Append(']');
+            }
         }
 
-        private string FormatJsonArrayString(string x)
-        {
-            return x.StartsWith("\"rs") ? x : "{" + x + "}";
-        }
-
+        
     }
 }

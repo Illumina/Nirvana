@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
