@@ -61,7 +61,7 @@ namespace SAUtils.DataStructures
 
         public string[] OrphanetIds => Values[ClinVarCommon.OrphanetIdsIndex];
 
-        public string Significance => Values[ClinVarCommon.SignificanceIndex][0];
+        public string[] Significance => Values[ClinVarCommon.SignificanceIndex];
 
         public string LastUpdateDate => Values[ClinVarCommon.LastUpdateDateIndex][0];
 

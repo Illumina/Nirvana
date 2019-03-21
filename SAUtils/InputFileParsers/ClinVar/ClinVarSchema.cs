@@ -38,7 +38,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             SaJsonValueType.StringArray,
             SaJsonValueType.StringArray,
             SaJsonValueType.StringArray,
-            SaJsonValueType.String,
+            SaJsonValueType.StringArray,
             SaJsonValueType.String,
             SaJsonValueType.StringArray,
             SaJsonValueType.Bool

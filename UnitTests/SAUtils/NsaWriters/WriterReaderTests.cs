@@ -115,13 +115,13 @@ namespace UnitTests.SAUtils.NsaWriters
                     Assert.Equal("T", annotations[0].refAllele);
                     Assert.Equal("A", annotations[0].altAllele);
                     Assert.Equal(
-                        "\"id\":\"RCV0001\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"A\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":\"significance\",\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
+                        "\"id\":\"RCV0001\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"A\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
                         annotations[0].annotation);
 
                     Assert.Equal("T", annotations[1].refAllele);
                     Assert.Equal("", annotations[1].altAllele);
                     Assert.Equal(
-                        "\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":\"significance\",\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
+                        "\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
                         annotations[1].annotation);
 
                     saReader.PreLoad(_chrom2, new List<int> { 200, 205 });
@@ -161,11 +161,11 @@ namespace UnitTests.SAUtils.NsaWriters
 
                     Assert.Equal("T", annotations[0].refAllele);
                     Assert.Equal("A", annotations[0].altAllele);
-                    Assert.Equal("\"id\":\"RCV0001\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"A\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":\"significance\",\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[0].annotation);
+                    Assert.Equal("\"id\":\"RCV0001\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"A\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[0].annotation);
 
                     Assert.Equal("T", annotations[1].refAllele);
                     Assert.Equal("", annotations[1].altAllele);
-                    Assert.Equal("\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":\"significance\",\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[1].annotation);
+                    Assert.Equal("\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[1].annotation);
 
                     saReader.PreLoad(_chrom2, new List<int> { 200, 205 });
                     var (refAllele, altAllele, annotation) = saReader.GetAnnotation(_chrom2, 200).First();

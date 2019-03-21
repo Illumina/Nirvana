@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-  <ClinVarSet ID="15810505">
+  <ClinVarSet ID="35945062">
     <RecordStatus>current</RecordStatus>
     <Title>NM_007262.4(PARK7):c.[-24+75_-24+92dup;487G&gt;A] AND Parkinson disease 7</Title>
-    <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-12-06" ID="64987">
-      <ClinVarAccession Acc="RCV000007484" Version="1" Type="RCV" DateUpdated="2016-12-06" />
+    <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2018-12-23" ID="64987">
+      <ClinVarAccession Acc="RCV000007484" Version="2" Type="RCV" DateUpdated="2018-12-24" />
       <RecordStatus>current</RecordStatus>
-      <ClinicalSignificance DateLastEvaluated="2012-10-08">
+      <ClinicalSignificance DateLastEvaluated="2005-11-01">
         <ReviewStatus>no assertion criteria provided</ReviewStatus>
         <Description>Pathogenic</Description>
       </ClinicalSignificance>
@@ -21,23 +21,18 @@
         <Method>
           <MethodType>literature only</MethodType>
         </Method>
-        <ObservedData ID="15237553">
+        <ObservedData ID="34800677">
           <Attribute Type="Description">In 3 affected sibs from a consanguineous southern Italian family with early-onset parkinsonism (606324), Annesi et al. (2005) identified double homozygosity for mutations in the DJ1 gene. One was a 3385G-A transition in exon 7, resulting in a glu163-to-lys (E163K) substitution, and the other was an 18-bp duplication (168-185dup) in the promoter region. Age at disease onset was 36, 35, and 24 years, respectively. Severe amyotrophic lateral sclerosis and cognitive impairment were prominent in 1 sib, while the other 2 had prominent parkinsonism and behavioral abnormalities.</Attribute>
           <Citation Type="general">
             <ID Source="PubMed">16240358</ID>
           </Citation>
         </ObservedData>
       </ObservedIn>
-      <MeasureSet Type="Haplotype" ID="60700">
+      <MeasureSet Type="Haplotype" ID="446717">
         <Measure Type="single nucleotide variant" ID="22107">
           <Name>
             <ElementValue Type="Preferred">NM_007262.4(PARK7):c.487G&gt;A (p.Glu163Lys)</ElementValue>
           </Name>
-          <AttributeSet>
-            <Attribute Type="AlleleFrequency">0.00003(A)</Attribute>
-            <XRef DB="dbSNP" ID="74315354" />
-            <XRef DB="Exome Aggregation Consortium (ExAC)" ID="rs74315354" />
-          </AttributeSet>
           <AttributeSet>
             <Attribute Change="c.487G&gt;A" Accession="NM_007262" Version="4" Type="HGVS, coding, RefSeq">NM_007262.4:c.487G&gt;A</Attribute>
           </AttributeSet>
@@ -70,9 +65,13 @@
             <Attribute Type="ProteinChange3LetterCode">GLU163LYS</Attribute>
             <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM" />
           </AttributeSet>
+          <AlleleFrequencyList>
+            <AlleleFrequency Value="0.00002" Source="Exome Aggregation Consortium (ExAC)" />
+            <AlleleFrequency Value="0.00001" Source="The Genome Aggregation Database (gnomAD), exomes" />
+          </AlleleFrequencyList>
           <CytogeneticLocation>1p36.23</CytogeneticLocation>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7984971" stop="7984971" display_start="7984971" display_stop="7984971" variantLength="1" referenceAllele="G" alternateAllele="A" />
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8045031" stop="8045031" display_start="8045031" display_stop="8045031" variantLength="1" referenceAllele="G" alternateAllele="A" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7984971" stop="7984971" display_start="7984971" display_stop="7984971" variantLength="1" referenceAllele="G" alternateAllele="A" positionVCF="7984971" referenceAlleleVCF="G" alternateAlleleVCF="A" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8045031" stop="8045031" display_start="8045031" display_stop="8045031" variantLength="1" referenceAllele="G" alternateAllele="A" positionVCF="8045031" referenceAlleleVCF="G" alternateAlleleVCF="A" />
           <MeasureRelationship Type="within single gene">
             <Name>
               <ElementValue Type="Preferred">Parkinsonism associated deglycase</ElementValue>
@@ -80,7 +79,7 @@
             <Symbol>
               <ElementValue Type="Preferred">PARK7</ElementValue>
             </Symbol>
-            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961654" stop="7985282" display_start="7961654" display_stop="7985282" Strand="+" />
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961654" stop="7985282" display_start="7961654" display_stop="7985282" Strand="+" />
             <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021713" stop="8045341" display_start="8021713" display_stop="8045341" variantLength="23629" Strand="+" />
             <XRef ID="11315" DB="Gene" />
             <XRef Type="MIM" ID="602533" DB="OMIM" />
@@ -98,10 +97,7 @@
             <Attribute Change="c.-24+75_-24+92dup" Accession="NM_007262" Version="4" Type="HGVS, coding, RefSeq">NM_007262.4:c.-24+75_-24+92dup</Attribute>
           </AttributeSet>
           <AttributeSet>
-            <Attribute Change="g.5215_5232dup" Accession="NG_008271" Version="1" Type="HGVS, genomic">NG_008271.1:g.5215_5232dup</Attribute>
-          </AttributeSet>
-          <AttributeSet>
-            <Attribute Change="g.5215_5232dup18" Accession="NG_008271" Version="1" Type="HGVS, genomic, RefSeqGene">NG_008271.1:g.5215_5232dup18</Attribute>
+            <Attribute Change="g.5215_5232dup" Accession="NG_008271" Version="1" Type="HGVS, genomic, RefSeqGene">NG_008271.1:g.5215_5232dup</Attribute>
           </AttributeSet>
           <AttributeSet>
             <Attribute Change="g.7961868_7961885dup18" Accession="NC_000001" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000001.11:g.7961868_7961885dup18</Attribute>
@@ -114,9 +110,13 @@
             <XRef ID="SO:0001627" DB="Sequence Ontology" />
             <XRef ID="NM_007262.4:c.-24+75_-24+92dup" DB="RefSeq" />
           </AttributeSet>
+          <AlleleFrequencyList>
+            <AlleleFrequency Value="0.09285" Source="1000 Genomes Project" />
+          </AlleleFrequencyList>
+          <GlobalMinorAlleleFrequency Value="0.09285" Source="1000 Genomes Project" MinorAllele="GTGCTGGACGGTGTCCC" />
           <CytogeneticLocation>1p36.23</CytogeneticLocation>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961868" stop="7961885" display_start="7961868" display_stop="7961885" variantLength="18" />
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021928" stop="8021945" display_start="8021928" display_stop="8021945" variantLength="18" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961868" stop="7961885" display_start="7961868" display_stop="7961885" variantLength="18" positionVCF="7961850" referenceAlleleVCF="G" alternateAlleleVCF="GGTGCTGGACGGTGTCCCT" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021928" stop="8021945" display_start="8021928" display_stop="8021945" variantLength="18" positionVCF="8021910" referenceAlleleVCF="G" alternateAlleleVCF="GGTGCTGGACGGTGTCCCT" />
           <MeasureRelationship Type="within single gene">
             <Name>
               <ElementValue Type="Preferred">Parkinsonism associated deglycase</ElementValue>
@@ -124,7 +124,7 @@
             <Symbol>
               <ElementValue Type="Preferred">PARK7</ElementValue>
             </Symbol>
-            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961654" stop="7985282" display_start="7961654" display_stop="7985282" Strand="+" />
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="7961654" stop="7985282" display_start="7961654" display_stop="7985282" Strand="+" />
             <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="8021713" stop="8045341" display_start="8021713" display_stop="8045341" variantLength="23629" Strand="+" />
             <XRef ID="11315" DB="Gene" />
             <XRef Type="MIM" ID="602533" DB="OMIM" />
@@ -134,13 +134,14 @@
             <ID Source="PubMed">16240358</ID>
           </Citation>
           <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM" />
-          <XRef Type="rs" ID="864309640" DB="dbSNP" />
+          <XRef Type="rs" ID="200968609" DB="dbSNP" />
         </Measure>
         <Name>
           <ElementValue Type="Preferred">NM_007262.4(PARK7):c.[-24+75_-24+92dup;487G&gt;A]</ElementValue>
         </Name>
         <Name>
           <ElementValue Type="Alternate">PARK7, GLU163LYS AND 18-BP DUP</ElementValue>
+          <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM" />
         </Name>
         <AttributeSet>
           <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.[5215_5232dup;28318G&gt;A]">NG_008271.1:g.[5215_5232dup;28318G&gt;A]</Attribute>
@@ -148,6 +149,7 @@
         <AttributeSet>
           <Attribute Type="HGVS, coding, RefSeq" Change="c.[-24+75_-24+92dup;487G&gt;A]">NM_007262.4:c.[-24+75_-24+92dup;487G&gt;A]</Attribute>
         </AttributeSet>
+        <XRef ID="CA030604" DB="ClinGen" />
         <XRef Type="Allelic variant" ID="602533.0006" DB="OMIM" />
       </MeasureSet>
       <TraitSet Type="Disease" ID="1946">
@@ -174,20 +176,12 @@
             <Attribute Type="public definition">Parkinsonism refers to all clinical states characterized by tremor, muscle rigidity, slowed movement (bradykinesia) and often postural instability. Parkinson disease is the primary and most common form of parkinsonism. Psychiatric manifestations, which include depression and visual hallucinations, are common but not uniformly present. Dementia eventually occurs in at least 20% of cases. The most common sporadic form of Parkinson disease manifests around age 60; however, young-onset and even juvenile presentations are seen.</Attribute>
             <XRef ID="NBK1223" DB="GeneReviews" />
           </AttributeSet>
-          <AttributeSet>
-            <Attribute Type="age of onset">Adult</Attribute>
-            <XRef ID="2828" DB="Orphanet" />
-          </AttributeSet>
-          <AttributeSet>
-            <Attribute Type="prevalence">1-5 / 10 000</Attribute>
-            <XRef ID="2828" DB="Orphanet" />
-          </AttributeSet>
-          <AttributeSet>
-            <Attribute Type="MalaCard linkname">parkinson_disease_7_autosomal_recessive_early_onset</Attribute>
-          </AttributeSet>
           <Citation Type="review" Abbrev="GeneReviews">
             <ID Source="PubMed">20301402</ID>
             <ID Source="BookShelf">NBK1223</ID>
+          </Citation>
+          <Citation Type="Recommendation" Abbrev="EFNS/MDS-ES, 2013">
+            <ID Source="PubMed">23279440</ID>
           </Citation>
           <XRef ID="C1853445" DB="MedGen" />
           <XRef ID="2828" DB="Orphanet" />
@@ -196,10 +190,10 @@
       </TraitSet>
     </ReferenceClinVarAssertion>
     <ClinVarAssertion ID="27684">
-      <ClinVarSubmissionID localKey="602533.0006_PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET" submitter="OMIM" submitterDate="2012-10-08" title="PARK7, GLU163LYS AND 18-BP DUP _PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET" />
-      <ClinVarAccession Acc="SCV000027684" Version="1" Type="SCV" OrgID="3" DateUpdated="2016-10-05" />
+      <ClinVarSubmissionID localKey="602533.0006_PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET" submitter="OMIM" submitterDate="2017-12-08" title="PARK7, GLU163LYS AND 18-BP DUP_PARKINSON DISEASE 7, AUTOSOMAL RECESSIVE EARLY-ONSET" />
+      <ClinVarAccession Acc="SCV000027684" Version="2" Type="SCV" OrgID="3" OrganizationCategory="resource" OrgType="primary" DateUpdated="2017-12-11" />
       <RecordStatus>current</RecordStatus>
-      <ClinicalSignificance DateLastEvaluated="2012-10-08">
+      <ClinicalSignificance DateLastEvaluated="2005-11-01">
         <ReviewStatus>no assertion criteria provided</ReviewStatus>
         <Description>Pathogenic</Description>
       </ClinicalSignificance>

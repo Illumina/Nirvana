@@ -1,394 +1,324 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ReleaseSet Dated="2016-08-30" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.36.xsd">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-<ClinVarSet ID="13206024">
-  <RecordStatus>current</RecordStatus>
-  <Title>NM_000059.3(BRCA2):c.4965C&gt;R (p.Tyr1655Ter) AND Breast-ovarian cancer, familial 2</Title>
-  <ReferenceClinVarAssertion DateCreated="2014-03-30" DateLastUpdated="2016-08-29" ID="266511">
-    <ClinVarAccession Acc="RCV000113363" Version="1" Type="RCV" DateUpdated="2016-08-29"/>
+  <ClinVarSet ID="37150301">
     <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2013-05-21">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Ethnicity>Caucasian Non Hispanic</Ethnicity>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>yes</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>clinical testing</MethodType>
-      </Method>
-      <ObservedData ID="12747929">
-        <Attribute integerValue="1" Type="VariantAlleles"/>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant" ID="126056">
-      <Measure Type="single nucleotide variant" ID="131594">
+    <Title>NM_000059.3(BRCA2):c.4965C&gt;R (p.Tyr1655Ter) AND Breast-ovarian cancer, familial 2</Title>
+    <ReferenceClinVarAssertion DateCreated="2014-03-30" DateLastUpdated="2019-01-25" ID="266511">
+      <ClinVarAccession Acc="RCV000113363" Version="1" Type="RCV" DateUpdated="2019-01-25" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2013-05-21">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Ethnicity>Caucasian Non Hispanic</Ethnicity>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>yes</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>clinical testing</MethodType>
+        </Method>
+        <ObservedData ID="36193743">
+          <Attribute integerValue="1" Type="VariantAlleles" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="126056">
+        <Measure Type="single nucleotide variant" ID="131594">
+          <Name>
+            <ElementValue Type="Preferred">NM_000059.3(BRCA2):c.4965C&gt;R (p.Tyr1655Ter)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.4965C&gt;R" Accession="LRG_293t1" Type="HGVS, coding, LRG">LRG_293t1:c.4965C&gt;R</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.4965C&gt;R" Accession="NM_000059" Version="3" Type="HGVS, coding, RefSeq">NM_000059.3:c.4965C&gt;R</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.28841C&gt;R" Accession="LRG_293" Type="HGVS, genomic, LRG">LRG_293:g.28841C&gt;R</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.28841C&gt;R" Accession="NG_012772" Version="3" Type="HGVS, genomic, RefSeqGene">NG_012772.3:g.28841C&gt;R</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.32339320C&gt;R" Accession="NC_000013" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000013.11:g.32339320C&gt;R</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="HGVS, non-validated">U43746.1:n.5193CtoG/A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Tyr1655Ter" Accession="LRG_293p1" Type="HGVS, protein">LRG_293p1:p.Tyr1655Ter</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Tyr1655Ter" Accession="NP_000050" Version="2" Type="HGVS, protein, RefSeq">NP_000050.2:p.Tyr1655Ter</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="Location">U43746.1:exon 11</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange1LetterCode">Y1655X</Attribute>
+          </AttributeSet>
+          <CytogeneticLocation>13q13.1</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="13" Accession="NC_000013.11" start="32339320" stop="32339320" display_start="32339320" display_stop="32339320" variantLength="1" referenceAllele="C" alternateAllele="R" positionVCF="32339320" referenceAlleleVCF="C" alternateAlleleVCF="R" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="13" Accession="NC_000013.10" start="32913457" stop="32913457" display_start="32913457" display_stop="32913457" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">BRCA2 DNA repair associated</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">BRCA2</ElementValue>
+            </Symbol>
+            <AttributeSet>
+              <Attribute dateValue="2012-07-06" Type="Haploinsufficiency">Sufficient evidence for dosage pathogenicity</Attribute>
+              <Citation>
+                <URL>https://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=BRCA2</URL>
+              </Citation>
+            </AttributeSet>
+            <AttributeSet>
+              <Attribute dateValue="2012-07-06" Type="Triplosensitivity">No evidence available</Attribute>
+              <Citation>
+                <URL>https://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=BRCA2</URL>
+              </Citation>
+            </AttributeSet>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="13" Accession="NC_000013.11" start="32315480" stop="32399672" display_start="32315480" display_stop="32399672" Strand="+" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="13" Accession="NC_000013.10" start="32889616" stop="32973808" display_start="32889616" display_stop="32973808" variantLength="84193" Strand="+" />
+            <XRef ID="675" DB="Gene" />
+            <XRef Type="MIM" ID="600185" DB="OMIM" />
+            <XRef ID="HGNC:1101" DB="HGNC" />
+            <Comment DataSource="NCBI curation" Type="public">This gene is cited in the ACMG recommendations of 2013 (PubMed 23788249) for reporting incidental findings in exons.</Comment>
+            <Comment DataSource="NCBI curation" Type="public">This gene is cited in the ACMG recommendations of 2016 (PubMed 27854360) for reporting incidental findings in exons.</Comment>
+          </MeasureRelationship>
+          <XRef Type="rs" ID="80358721" DB="dbSNP" />
+        </Measure>
         <Name>
           <ElementValue Type="Preferred">NM_000059.3(BRCA2):c.4965C&gt;R (p.Tyr1655Ter)</ElementValue>
         </Name>
-        <AttributeSet>
-          <Attribute Change="c.4965C&gt;R" Accession="LRG_293t1" Type="HGVS, coding, LRG">LRG_293t1:c.4965C&gt;R</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="c.4965C&gt;R" Accession="NM_000059" Version="3" Type="HGVS, coding, RefSeq">NM_000059.3:c.4965C&gt;R</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="g.28841C&gt;R" Accession="LRG_293" Type="HGVS, genomic, LRG">LRG_293:g.28841C&gt;R</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="g.28841C&gt;R" Accession="NG_012772" Version="3" Type="HGVS, genomic, RefSeqGene">NG_012772.3:g.28841C&gt;R</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="g.32339320C&gt;R" Accession="NC_000013" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000013.11:g.32339320C&gt;R</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, non-validated">U43746.1:n.5193CtoG/A</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="p.Tyr1655Ter" Accession="LRG_293p1" Type="HGVS, protein">LRG_293p1:p.Tyr1655Ter</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="p.Tyr1655Ter" Accession="NP_000050" Version="2" Type="HGVS, protein, RefSeq">NP_000050.2:p.Tyr1655Ter</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="Location">U43746.1:exon 11</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="ProteinChange1LetterCode">Y1655X</Attribute>
-        </AttributeSet>
-        <CytogeneticLocation>13q13.1</CytogeneticLocation>
-        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="13" Accession="NC_000013.11" start="32339320" stop="32339320" display_start="32339320" display_stop="32339320" variantLength="1" referenceAllele="C" alternateAllele="R"/>
-        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="13" Accession="NC_000013.10" start="32913457" stop="32913457" display_start="32913457" display_stop="32913457" variantLength="1" referenceAllele="C" alternateAllele="R"/>
-        <MeasureRelationship Type="variant in gene">
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="2560">
+        <Trait ID="636" Type="Disease">
           <Name>
-            <ElementValue Type="Preferred">BRCA2, DNA repair associated</ElementValue>
+            <ElementValue Type="Preferred">Breast-ovarian cancer, familial 2</ElementValue>
+            <XRef ID="Breast-ovarian+cancer%2C+familial+2/7866" DB="Genetic Alliance" />
+          </Name>
+          <Name>
+            <ElementValue Type="Alternate">BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 2</ElementValue>
+            <XRef Type="MIM" ID="612555" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0001" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0002" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0003" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0004" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0005" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0006" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0007" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0008" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0009" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0010" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0011" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0012" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0014" DB="OMIM" />
+            <XRef Type="Allelic variant" ID="600185.0016" DB="OMIM" />
+          </Name>
+          <Name>
+            <ElementValue Type="Alternate">BREAST CANCER, FAMILIAL, SUSCEPTIBILITY TO, 2</ElementValue>
+            <XRef ID="612555" DB="OMIM" />
+          </Name>
+          <Name>
+            <ElementValue Type="Alternate">Breast cancer, familial 2</ElementValue>
           </Name>
           <Symbol>
-            <ElementValue Type="Preferred">BRCA2</ElementValue>
+            <ElementValue Type="Preferred">BROVCA2</ElementValue>
+            <XRef Type="MIM" ID="612555" DB="OMIM" />
+          </Symbol>
+          <Symbol>
+            <ElementValue Type="Alternate">HBOC</ElementValue>
+            <XRef ID="GTR000501744" DB="Genetic Testing Registry (GTR)" />
+          </Symbol>
+          <Symbol>
+            <ElementValue Type="Alternate">BRCA2</ElementValue>
+            <XRef ID="GTR000501818" DB="Genetic Testing Registry (GTR)" />
           </Symbol>
           <AttributeSet>
-            <Attribute dateValue="2012-07-06" Type="Haploinsufficiency">Sufficient evidence for dosage pathogenicity</Attribute>
-            <Citation>
-              <URL>https://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=BRCA2</URL>
-            </Citation>
+            <Attribute Type="public definition">BRCA1- and BRCA2-associated hereditary breast and ovarian cancer syndrome (HBOC) is characterized by an increased risk for female and male breast cancer, ovarian cancer (includes fallopian tube and primary peritoneal cancers), and to a lesser extent other cancers such as prostate cancer, pancreatic cancer, and melanoma primarily in individuals with a BRCA2 pathogenic variant. The exact cancer risks differ slightly depending on whether HBOC is caused by a BRCA1 or BRCA2 pathogenic variant.</Attribute>
+            <XRef ID="NBK1247" DB="GeneReviews" />
           </AttributeSet>
           <AttributeSet>
-            <Attribute dateValue="2012-07-06" Type="Triplosensitivity">No evidence available</Attribute>
-            <Citation>
-              <URL>https://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=BRCA2</URL>
-            </Citation>
+            <Attribute Type="disease mechanism" integerValue="273">loss of function</Attribute>
+            <XRef ID="GTR000017874" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000021468" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000320777" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000325401" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000326160" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000330054" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000501744" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000501748" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000501818" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000505644" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000507653" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000507764" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000507864" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000507913" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000507930" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509001" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509002" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509348" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509349" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509450" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509451" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509692" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509980" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509984" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000509985" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000512644" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000512645" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000512816" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000519030" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520069" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520071" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520072" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520394" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520410" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520865" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520866" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520867" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520869" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520870" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520871" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000520872" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000522159" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000522160" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000522162" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000522243" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000527942" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000528915" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000528916" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000530120" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000530202" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000530707" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000531275" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000531340" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000551447" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000552245" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000552304" DB="Genetic Testing Registry (GTR)" />
+            <XRef ID="GTR000562228" DB="Genetic Testing Registry (GTR)" />
           </AttributeSet>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="13" Accession="NC_000013.11" start="32315480" stop="32399672" display_start="32315480" display_stop="32399672" Strand="+"/>
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="13" Accession="NC_000013.10" start="32889616" stop="32973808" display_start="32889616" display_stop="32973808" variantLength="84193" Strand="+"/>
-          <XRef ID="675" DB="Gene"/>
-          <XRef Type="MIM" ID="600185" DB="OMIM"/>
-          <XRef ID="HGNC:1101" DB="HGNC"/>
-          <Comment DataSource="NCBI curation" Type="public">This gene is cited in the ACMG recommendations of 2013 (PubMed 23788249) for reporting incidental findings in exons.</Comment>
-        </MeasureRelationship>
-        <XRef Type="rs" ID="80358721" DB="dbSNP"/>
-      </Measure>
-      <Name>
-        <ElementValue Type="Preferred">NM_000059.3(BRCA2):c.4965C&gt;R (p.Tyr1655Ter)</ElementValue>
-      </Name>
-    </MeasureSet>
-    <TraitSet Type="Disease" ID="2560">
-      <Trait ID="636" Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">Breast-ovarian cancer, familial 2</ElementValue>
-          <XRef ID="Breast-ovarian+cancer%2C+familial+2/7866" DB="Genetic Alliance"/>
-        </Name>
-        <Name>
-          <ElementValue Type="Alternate">BREAST-OVARIAN CANCER, FAMILIAL, SUSCEPTIBILITY TO, 2</ElementValue>
-          <XRef Type="MIM" ID="612555" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0001" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0002" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0003" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0004" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0005" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0006" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0007" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0008" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0009" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0010" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0011" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0012" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0014" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="600185.0016" DB="OMIM"/>
-        </Name>
-        <Name>
-          <ElementValue Type="Alternate">BREAST CANCER, FAMILIAL, SUSCEPTIBILITY TO, 2</ElementValue>
-          <XRef ID="612555" DB="OMIM"/>
-        </Name>
-        <Name>
-          <ElementValue Type="Alternate">Breast cancer, familial 2</ElementValue>
-        </Name>
-        <Symbol>
-          <ElementValue Type="Preferred">BROVCA2</ElementValue>
-          <XRef Type="MIM" ID="612555" DB="OMIM"/>
-        </Symbol>
-        <Symbol>
-          <ElementValue Type="Alternate">HBOC</ElementValue>
-          <XRef ID="GTR000501744" DB="Genetic Testing Registry (GTR)"/>
-        </Symbol>
-        <Symbol>
-          <ElementValue Type="Alternate">BRCA2</ElementValue>
-          <XRef ID="GTR000501818" DB="Genetic Testing Registry (GTR)"/>
-        </Symbol>
-        <AttributeSet>
-          <Attribute Type="public definition">Hereditary breast and ovarian cancer syndrome (HBOC), caused by a germline pathogenic variant in BRCA1 or BRCA2, is characterized by an increased risk for breast cancer, ovarian cancer, prostate cancer, and pancreatic cancer. The lifetime risk for these cancers in individuals with a pathogenic variant in BRCA1 or BRCA2: 40%-80% for breast cancer. 11%-40% for ovarian cancer. 1%-10% for male breast cancer. Up to 39% for prostate cancer. 1%-7% for pancreatic cancer. Individuals with BRCA2 pathogenic variants may also be at an increased risk for melanoma. Prognosis for BRCA1/2-related cancer depends on the stage at which the cancer is diagnosed; however, studies on survival have revealed conflicting results for individuals with germline BRCA1 or BRCA2 pathogenic variants when compared to controls.</Attribute>
-          <XRef ID="NBK1247" DB="GeneReviews"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="ModeOfInheritance" integerValue="262">Autosomal dominant inheritance</Attribute>
-          <XRef ID="GTR000017874" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000021468" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000320777" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000325401" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000326160" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000330054" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000501744" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000501748" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000501818" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000505644" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507653" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507764" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507864" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507913" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507930" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509001" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509002" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509348" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509349" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509450" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509451" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509692" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509980" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509984" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509985" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000512644" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000512645" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000512816" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000519030" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520069" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520071" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520072" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520117" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520118" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520119" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520122" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520394" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520410" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520865" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520866" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520867" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520869" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520870" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520871" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520872" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522159" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522160" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522162" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522243" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000527942" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000528915" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000528916" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000530120" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000530202" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000531275" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000551447" DB="Genetic Testing Registry (GTR)"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="age of onset">All ages</Attribute>
-          <XRef ID="145" DB="Orphanet"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="disease mechanism" integerValue="273">loss of function</Attribute>
-          <XRef ID="GTR000017874" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000021468" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000320777" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000325401" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000326160" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000330054" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000501744" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000501748" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000501818" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000505644" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507653" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507764" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507864" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507913" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000507930" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509001" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509002" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509348" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509349" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509450" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509451" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509692" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509980" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509984" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000509985" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000512644" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000512645" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000512816" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000519030" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520069" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520071" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520072" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520394" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520410" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520865" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520866" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520867" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520869" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520870" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520871" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000520872" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522159" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522160" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522162" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000522243" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000527942" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000528915" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000528916" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000530120" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000530202" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000531275" DB="Genetic Testing Registry (GTR)"/>
-          <XRef ID="GTR000551447" DB="Genetic Testing Registry (GTR)"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="prevalence">1-9 / 100 000</Attribute>
-          <XRef ID="145" DB="Orphanet"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="prevalence">Hereditary breast and ovarian cancer (HBOC) resulting from mutations in BRCA1 and BRCA2 is the most common form of both hereditary breast and ovarian cancers and occurs in all ethnic and racial populations. The overall prevalence of BRCA1/2 mutations is estimated to be from 1:400 to 1:800 [Ford et al 1994, Claus et al 1996, Whittemore et al 1997], but varies depending on ethnicity.</Attribute>
-          <Citation Type="general">
-            <URL>http://www.ncbi.nlm.nih.gov/books/NBK1247</URL>
+          <AttributeSet>
+            <Attribute Type="keyword">Neoplasm</Attribute>
+          </AttributeSet>
+          <Citation Type="review" Abbrev="GeneReviews">
+            <ID Source="PubMed">20301425</ID>
+            <ID Source="BookShelf">NBK1247</ID>
           </Citation>
-          <Citation Type="general">
-            <CitationText>[Ford et al 1994, Claus et al 1996, Whittemore et al 1997]</CitationText>
+          <Citation Type="practice guideline" Abbrev="ACS, 2007">
+            <ID Source="PubMed">17392385</ID>
           </Citation>
-          <XRef ID="GTR000021468" DB="Genetic Testing Registry (GTR)"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="keyword">Hereditary cancer syndrome</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="Genetics Home Reference (GHR) links">ovarian cancer</Attribute>
-          <XRef ID="ovarian-cancer" DB="Genetics Home Reference"/>
-        </AttributeSet>
-        <Citation Type="review" Abbrev="GeneReviews">
-          <ID Source="PubMed">20301425</ID>
-          <ID Source="BookShelf">NBK1247</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="ACS, 2007">
-          <ID Source="PubMed">17392385</ID>
-        </Citation>
-        <Citation Type="Position Statement" Abbrev="ASCO, 2010">
-          <ID Source="PubMed">20065170</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="NSGC, 2004">
-          <ID Source="PubMed">15604628</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="NSGC, 2007">
-          <ID Source="PubMed">17508274</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="ACOG, 2009">
-          <ID Source="PubMed">19305347</ID>
-        </Citation>
-        <Citation Type="Recommendation" Abbrev="ACMG, 2013">
-          <ID Source="PubMed">23788249</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="NCCN, 2013">
-          <URL>http://www.nccn.org/professionals/physician_gls/pdf/genetics_screening.pdf</URL>
-          <CitationText>National Comprehensive Cancer Network practice guidelines in oncology. Genetic/Familial High-Risk Assessment: Breast and Ovarian</CitationText>
-        </Citation>
-        <Citation Type="Suggested Reading" Abbrev="Phillips et al., 2013">
-          <ID Source="PubMed">23918944</ID>
-        </Citation>
-        <Citation Type="Suggested Reading" Abbrev="Domchek et al., 2010">
-          <ID Source="pmc">2948529</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="ASCO, 2014">
-          <ID Source="PubMed">24493721</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="USPSTF, 2014">
-          <ID Source="PubMed">24366376</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="CAPS, 2013">
-          <ID Source="pmc">3585492</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="NSGC, 2013">
-          <ID Source="PubMed">23188549</ID>
-        </Citation>
-        <Citation Type="practice guideline" Abbrev="ACMG/NSGC, 2015">
-          <ID Source="PubMed">25394175</ID>
-        </Citation>
-        <Citation Type="Recommendation" Abbrev="USPSTF, 2014">
-          <ID Source="PubMed">24366402</ID>
-        </Citation>
-        <Citation Type="Recommendation" Abbrev="USPSTF, 2013">
-          <ID Source="PubMed">24432435</ID>
-        </Citation>
-        <Citation Type="Recommendation" Abbrev="ACMG, 2015">
-          <ID Source="PubMed">25356965</ID>
-        </Citation>
-        <XRef ID="C2675520" DB="MedGen"/>
-        <XRef ID="145" DB="Orphanet"/>
-        <XRef Type="MIM" ID="612555" DB="OMIM"/>
-      </Trait>
-    </TraitSet>
-  </ReferenceClinVarAssertion>
-  <ClinVarAssertion ID="263413">
-    <ClinVarSubmissionID localKey="U43746.1:n.5193CtoG/A|MedGen:C2675520" submitter="Breast Cancer Information Core (BIC) (BRCA2)" submitterDate="2014-03-28"/>
-    <ClinVarAccession Acc="SCV000146515" Version="1" Type="SCV" OrgID="504197" DateUpdated="2016-08-12"/>
-    <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2013-05-21">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Ethnicity>Caucasian Non Hispanic</Ethnicity>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>yes</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>clinical testing</MethodType>
-      </Method>
-      <ObservedData>
-        <Attribute Type="VariantAlleles" integerValue="1"/>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant">
-      <Measure Type="Variation">
-        <Name>
-          <ElementValue Type="Alternate">Y1655X</ElementValue>
-        </Name>
-        <AttributeSet>
-          <Attribute Type="Location">U43746.1:exon 11</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS">U43746.1:n.5193CtoG/A</Attribute>
-        </AttributeSet>
-        <XRef DB="dbSNP" ID="80358721" Type="rsNumber"/>
-      </Measure>
-    </MeasureSet>
-    <TraitSet Type="Disease">
-      <Trait Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">Breast-ovarian cancer, familial 2</ElementValue>
-        </Name>
-        <XRef DB="MedGen" ID="C2675520" Type="CUI"/>
-      </Trait>
-    </TraitSet>
-  </ClinVarAssertion>
-</ClinVarSet>
+          <Citation Type="Position Statement" Abbrev="ASCO, 2010">
+            <ID Source="PubMed">20065170</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="NSGC, 2004">
+            <ID Source="PubMed">15604628</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="NSGC, 2007">
+            <ID Source="PubMed">17508274</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="ACOG, 2009">
+            <ID Source="PubMed">19305347</ID>
+          </Citation>
+          <Citation Type="Recommendation" Abbrev="ACMG, 2013">
+            <ID Source="PubMed">23788249</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="NCCN, 2013">
+            <URL>http://www.nccn.org/professionals/physician_gls/pdf/genetics_screening.pdf</URL>
+            <CitationText>National Comprehensive Cancer Network practice guidelines in oncology. Genetic/Familial High-Risk Assessment: Breast and Ovarian</CitationText>
+          </Citation>
+          <Citation Type="Suggested Reading" Abbrev="Phillips et al., 2013">
+            <ID Source="PubMed">23918944</ID>
+          </Citation>
+          <Citation Type="Suggested Reading" Abbrev="Domchek et al., 2010">
+            <ID Source="pmc">2948529</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="ASCO, 2014">
+            <ID Source="PubMed">24493721</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="USPSTF, 2014">
+            <ID Source="PubMed">24366376</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="CAPS, 2013">
+            <ID Source="pmc">3585492</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="NSGC, 2013">
+            <ID Source="PubMed">23188549</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="ACMG/NSGC, 2015">
+            <ID Source="PubMed">25394175</ID>
+          </Citation>
+          <Citation Type="Recommendation" Abbrev="USPSTF, 2014">
+            <ID Source="PubMed">24366402</ID>
+          </Citation>
+          <Citation Type="Recommendation" Abbrev="USPSTF, 2013">
+            <ID Source="PubMed">24432435</ID>
+          </Citation>
+          <Citation Type="Recommendation" Abbrev="ACMG, 2015">
+            <ID Source="PubMed">25356965</ID>
+          </Citation>
+          <Citation Type="Recommendation" Abbrev="ACMG, 2016">
+            <ID Source="PubMed">27854360</ID>
+            <ID Source="DOI">10.1038/gim.2016.190</ID>
+          </Citation>
+          <XRef ID="C2675520" DB="MedGen" />
+          <XRef ID="145" DB="Orphanet" />
+          <XRef Type="MIM" ID="612555" DB="OMIM" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="263413">
+      <ClinVarSubmissionID localKey="U43746.1:n.5193CtoG/A|MedGen:C2675520" submitter="Breast Cancer Information Core (BIC) (BRCA2)" submitterDate="2014-03-28" />
+      <ClinVarAccession Acc="SCV000146515" OrgType="primary" OrganizationCategory="locus-specific database (LSDB)" Version="1" Type="SCV" OrgID="504197" DateUpdated="2016-10-05" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2013-05-21">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Ethnicity>Caucasian Non Hispanic</Ethnicity>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>yes</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>clinical testing</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="VariantAlleles" integerValue="1" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Alternate">Y1655X</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="Location">U43746.1:exon 11</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="HGVS">U43746.1:n.5193CtoG/A</Attribute>
+          </AttributeSet>
+          <XRef DB="dbSNP" ID="80358721" Type="rsNumber" />
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Breast-ovarian cancer, familial 2</ElementValue>
+          </Name>
+          <XRef DB="MedGen" ID="C2675520" Type="CUI" />
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
 </ReleaseSet>

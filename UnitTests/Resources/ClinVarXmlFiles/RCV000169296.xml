@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="37040581">
+    <RecordStatus>current</RecordStatus>
+    <Title>NM_000520.5(HEXA):c.986+3A&gt;G AND Tay-Sachs disease</Title>
+    <ReferenceClinVarAssertion DateCreated="2015-03-29" DateLastUpdated="2019-01-17" ID="399359">
+      <ClinVarAccession Acc="RCV000169296" Version="2" Type="RCV" DateUpdated="2019-01-22" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2016-10-13">
+        <ReviewStatus>criteria provided, multiple submitters, no conflicts</ReviewStatus>
+        <Description>Pathogenic/Likely pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <AttributeSet>
+        <Attribute Type="ModeOfInheritance" integerValue="263">Autosomal recessive inheritance</Attribute>
+        <XRef ID="28566" DB="Counsyl" />
+      </AttributeSet>
+      <ObservedIn>
+        <Sample>
+          <Origin>maternal</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+          <NumberTested>1</NumberTested>
+        </Sample>
+        <Method>
+          <MethodType>research</MethodType>
+        </Method>
+        <ObservedData ID="36029864">
+          <Attribute integerValue="1" Type="VariantAlleles" />
+        </ObservedData>
+        <ObservedData ID="36029864">
+          <Attribute Type="SampleLocalID">15:72641417:T:00364C</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <ObservedIn>
+        <Sample>
+          <Origin>unknown</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+          <NumberTested>1</NumberTested>
+        </Sample>
+        <Method>
+          <MethodType>research</MethodType>
+        </Method>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="36029865">
+          <Attribute integerValue="1" Type="VariantAlleles" />
+        </ObservedData>
+        <ObservedData ID="36029865">
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+        <ObservedData ID="36029865">
+          <Attribute Type="SampleLocalID">15:72641417:T:00364M</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="188929">
+        <Measure Type="single nucleotide variant" ID="186936">
+          <Name>
+            <ElementValue Type="Preferred">NM_000520.5(HEXA):c.986+3A&gt;G</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.986+3A&gt;G" Accession="NM_000520" Version="5" Type="HGVS, coding, RefSeq">NM_000520.5:c.986+3A&gt;G</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.32104A&gt;G" Accession="NG_009017" Version="1" Type="HGVS, genomic, RefSeqGene">NG_009017.1:g.32104A&gt;G</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.72349076T&gt;C" Accession="NC_000015" Version="10" Type="HGVS, genomic, top level" integerValue="38">NC_000015.10:g.72349076T&gt;C</Attribute>
+            <XRef ID="28566" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.72641417T&gt;C" Accession="NC_000015" Version="9" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000015.9:g.72641417T&gt;C</Attribute>
+            <XRef ID="37" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.986+3A&gt;G" Accession="NM_000520" Version="4" Type="HGVS, previous">NM_000520.4:c.986+3A&gt;G</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">intron variant</Attribute>
+            <XRef ID="SO:0001627" DB="Sequence Ontology" />
+            <XRef ID="NM_000520.5:c.986+3A&gt;G" DB="RefSeq" />
+          </AttributeSet>
+          <AlleleFrequencyList>
+            <AlleleFrequency Value="0.00008" Source="NHLBI Exome Sequencing Project (ESP) Exome Variant Server" />
+            <AlleleFrequency Value="0.00020" Source="1000 Genomes Project" />
+            <AlleleFrequency Value="0.00002" Source="Exome Aggregation Consortium (ExAC)" />
+            <AlleleFrequency Value="0.00001" Source="The Genome Aggregation Database (gnomAD), exomes" />
+            <AlleleFrequency Value="0.00004" Source="Trans-Omics for Precision Medicine (TOPMed)" />
+          </AlleleFrequencyList>
+          <GlobalMinorAlleleFrequency Value="0.00020" Source="1000 Genomes Project" MinorAllele="C" />
+          <CytogeneticLocation>15q23</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="15" Accession="NC_000015.10" start="72349076" stop="72349076" display_start="72349076" display_stop="72349076" variantLength="1" referenceAllele="T" alternateAllele="C" positionVCF="72349076" referenceAlleleVCF="T" alternateAlleleVCF="C" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="15" Accession="NC_000015.9" start="72641417" stop="72641417" display_start="72641417" display_stop="72641417" variantLength="1" referenceAllele="T" alternateAllele="C" positionVCF="72641417" referenceAlleleVCF="T" alternateAlleleVCF="C" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">hexosaminidase subunit alpha</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">HEXA</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="15" Accession="NC_000015.10" start="72343435" stop="72376473" display_start="72343435" display_stop="72376473" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="15" Accession="NC_000015.9" start="72635777" stop="72668519" display_start="72635777" display_stop="72668519" variantLength="32743" Strand="-" />
+            <XRef ID="3073" DB="Gene" />
+            <XRef Type="MIM" ID="606869" DB="OMIM" />
+            <XRef ID="HGNC:4878" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef Type="rs" ID="200926928" DB="dbSNP" />
+        </Measure>
+        <Name>
+          <ElementValue Type="Preferred">NM_000520.5(HEXA):c.986+3A&gt;G</ElementValue>
+        </Name>
+        <XRef ID="CA274144" DB="ClinGen" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="1067">
+        <Trait ID="6027" Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Tay-Sachs disease</ElementValue>
+            <XRef ID="Tay+Sachs+disease/7008" DB="Genetic Alliance" />
+            <XRef ID="tay-sachs-disease" DB="Genetics Home Reference" />
+            <XRef ID="111385000" DB="SNOMED CT" />
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">TSD</ElementValue>
+            <XRef Type="MIM" ID="272800" DB="OMIM" />
+            <XRef ID="7737" DB="Office of Rare Diseases" />
+          </Symbol>
+          <AttributeSet>
+            <Attribute Type="public definition">Hexosaminidase A deficiency results in a group of neurodegenerative disorders caused by intralysosomal storage of the specific glycosphingolipid, GM2 ganglioside. The prototype hexosaminidase A deficiency is Tay-Sachs disease, also known as the acute infantile variant. Tay-Sachs disease is characterized by progressive weakness, loss of motor skills, decreased attentiveness, and increased startle response beginning between ages three and six months with progressive evidence of neurodegeneration including: seizures, blindness, spasticity, eventual total incapacitation, and death, usually before age four years. The juvenile (subacute), chronic, and adult-onset variants of hexosaminidase A deficiency have later onsets, slower progression, and more variable neurologic findings, including: progressive dystonia, spinocerebellar degeneration, motor neuron disease, and, in some individuals with adult-onset disease, a bipolar form of psychosis.</Attribute>
+            <XRef ID="NBK1218" DB="GeneReviews" />
+          </AttributeSet>
+          <Citation Type="review" Abbrev="GeneReviews">
+            <ID Source="PubMed">20301397</ID>
+            <ID Source="BookShelf">NBK1218</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="ACMG, 2008">
+            <ID Source="PubMed">18197057</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="ACOG, 2009">
+            <ID Source="PubMed">19888064</ID>
+          </Citation>
+          <XRef ID="C0039373" DB="MedGen" />
+          <XRef ID="845" DB="Orphanet" />
+          <XRef Type="MIM" ID="272800" DB="OMIM" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="397371" SubmissionName="Counsyl_2015_03_01">
+      <ClinVarSubmissionID localKey="NM_000520.4(HEXA):c.986+3A&gt;G" localKeyIsSubmitted="1" submitter="Counsyl" submitterDate="2015-03-11" />
+      <ClinVarAccession Acc="SCV000220615" Version="1" Type="SCV" OrgID="320494" OrganizationCategory="laboratory" OrgType="primary" DateUpdated="2019-01-03" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2014-08-21">
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Likely pathogenic</Description>
+        <Citation>
+          <ID Source="PubMed">23035047</ID>
+        </Citation>
+        <Citation>
+          <ID Source="PubMed">7551830</ID>
+        </Citation>
+        <Citation>
+          <ID Source="PubMed">24518553</ID>
+        </Citation>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="Counsyl" ID="28566" />
+      <AttributeSet>
+        <Attribute Type="ModeOfInheritance">Autosomal recessive inheritance</Attribute>
+      </AttributeSet>
+      <AttributeSet>
+        <Attribute Type="AssertionMethod">Counsyl Autosomal and X-linked Recessive Disease Classification criteria (2015)</Attribute>
+        <Citation Type="general">
+          <URL>https://submit.ncbi.nlm.nih.gov/ft/byid/4yisoce9/mdi-5618_320494_counsyl_autosomal_and_x-linked_recessive_disease_classification_criteria_(2015).pdf</URL>
+          <CitationText>Counsyl Autosomal and X-linked Recessive Disease Classification criteria (2015)</CitationText>
+        </Citation>
+      </AttributeSet>
+      <ObservedIn>
+        <Sample>
+          <Origin>unknown</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <AttributeSet>
+            <Attribute Type="HGVS">NM_000520.4:c.986+3A&gt;G</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">HEXA</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Tay-Sachs disease</ElementValue>
+          </Name>
+          <XRef DB="OMIM" ID="272800" Type="MIM" />
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+    <ClinVarAssertion ID="1139226" SubmissionName="SUB2844653">
+      <ClinVarSubmissionID localKey="15:72641417:T" localKeyIsSubmitted="1" submittedAssembly="GRCh37" submitter="HudsonAlpha Institute for Biotechnology" submitterDate="2017-07-06" />
+      <ClinVarAccession Acc="SCV000584096" OrgType="primary" OrganizationCategory="laboratory" Version="1" Type="SCV" OrgID="505530" DateUpdated="2017-07-29" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2016-10-13">
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="HudsonAlpha Institute for Biotechnology" ID="15:72641417" />
+      <AttributeSet>
+        <Attribute Type="AssertionMethod">HA_assertions_20150911</Attribute>
+        <Citation Type="general">
+          <URL>https://submit.ncbi.nlm.nih.gov/ft/byid/suocabs5/ha_assertions_20150911.pdf</URL>
+          <CitationText>HA_assertions_20150911.pdf</CitationText>
+        </Citation>
+      </AttributeSet>
+      <ObservedIn>
+        <Sample>
+          <Origin>unknown</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+          <NumberTested>1</NumberTested>
+        </Sample>
+        <Method>
+          <MethodType>research</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="VariantAlleles" integerValue="1" />
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="SampleLocalID">15:72641417:T:00364M</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <ObservedIn>
+        <Sample>
+          <Origin>maternal</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+          <NumberTested>1</NumberTested>
+        </Sample>
+        <Method>
+          <MethodType>research</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="VariantAlleles" integerValue="1" />
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="SampleLocalID">15:72641417:T:00364C</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <SequenceLocation Assembly="GRCh37" Chr="15" alternateAllele="C" referenceAllele="T" start="72641417" stop="72641417" variantLength="1" />
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">HEXA</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <XRef DB="OMIM" ID="272800" Type="MIM" />
+        </Trait>
+      </TraitSet>
+      <StudyName>CSER-HudsonAlpha</StudyName>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
+</ReleaseSet>

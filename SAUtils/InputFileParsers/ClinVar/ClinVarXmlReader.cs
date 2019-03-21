@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -20,6 +21,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string ClinVarAssertionTag = "ClinVarAssertion";
         private const string ReviewStatusTag = "ReviewStatus";
         private const string DescriptionTag = "Description";
+        private const string ExplanationTag = "Explanation";
         private const int MaxVariantLength = 1000;
 
         private readonly Dictionary<char, char[]> _iupacBases = new Dictionary<char, char[]>
@@ -60,7 +62,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		private string _id;
 		private HashSet<string> _prefPhenotypes;
 		private HashSet<string> _altPhenotypes;
-		private string _significance;
+		private string[] _significances;
 
 		private HashSet<string> _medGenIDs;
 		private HashSet<string> _omimIDs;
@@ -79,7 +81,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			_variantList.Clear();
 			_reviewStatus      = null;
 			_alleleOrigins     = new HashSet<string>();
-			_significance      = null;
+			_significances      = null;
 			_prefPhenotypes    = new HashSet<string>();
 			_altPhenotypes     = new HashSet<string>();
 			_id                = null;
@@ -235,7 +237,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             values[MedGenIdsIndex] = _medGenIDs.Count > 0 ? _medGenIDs.ToArray() : null;
             values[OmimIdsIndex] = extendedOmimIds.Length > 0 ? extendedOmimIds : null;
             values[OrphanetIdsIndex] = _orphanetIDs.Count > 0 ? _orphanetIDs.ToArray() : null;
-            values[SignificanceIndex] = new[] {_significance};
+            values[SignificanceIndex] = _significances;
             values[LastUpdateDateIndex] = new[] { new DateTime(_lastUpdatedDate).ToString("yyyy-MM-dd")};
             values[PubMedIdsIndex] = _pubMedIds.Count > 0 ? _pubMedIds.OrderBy(long.Parse).ToArray() : null;
             return values;
@@ -577,7 +579,53 @@ namespace SAUtils.InputFileParsers.ClinVar
 			if (xElement == null || xElement.IsEmpty) return;
 
 		    _reviewStatus = xElement.Element(ReviewStatusTag)?.Value;
-		    _significance = xElement.Element(DescriptionTag)?.Value.ToLower();
-		}
+            var description = xElement.Element(DescriptionTag)?.Value;
+            var explanation = xElement.Element(ExplanationTag)?.Value;
+
+            _significances = GetSignificances(description, explanation);
+
+            ValidateSignificance(_significances);
+        }
+
+        private void ValidateSignificance(string[] significances)
+        {
+            foreach (var significance in significances)
+            {
+                if (!_validPathogenicity.Contains(significance)) 
+                    throw new InvalidDataException($"Invalid pathogenicity found in {_id}. Observed: {significance}");
+            }
+        }
+
+        private string[] GetSignificances(string description, string explanation)
+        {
+            if(string.IsNullOrEmpty(explanation)) return description?.ToLower().Split('/', ',').Select(x=>x.Trim()).ToArray();
+            //<Explanation DataSource="ClinVar" Type="public">Pathogenic(1);Uncertain significance(1)</Explanation>
+            var sigList=new List<string>();
+            foreach (var significance in explanation.ToLower().Split('/',';'))
+            {
+                var openParenthesisIndex = significance.IndexOf('(');
+                sigList.Add(openParenthesisIndex < 0 ? significance : significance.Substring(0, openParenthesisIndex));
+            }
+
+            return sigList.ToArray();
+        }
+
+        private readonly HashSet<string> _validPathogenicity = new HashSet<string>()
+        {
+            "uncertain significance",
+            "not provided",
+            "benign",
+            "likely benign",
+            "likely pathogenic",
+            "pathogenic",
+            "drug response",
+            "histocompatibility",
+            "association",
+            "risk factor",
+            "protective",
+            "affects",
+            "conflicting data from submitters",
+            "other"
+        };
     }
 }

@@ -1,182 +1,152 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<ReleaseSet Dated="2016-08-30" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.36.xsd">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-<ClinVarSet ID="13262247">
-  <RecordStatus>current</RecordStatus>
-  <Title>NM_153818.1(PEX10):c.927_928insG (p.His310Alafs) AND Peroxisome biogenesis disorder 6A</Title>
-  <ReferenceClinVarAssertion DateCreated="2015-06-26" DateLastUpdated="2016-08-26" ID="427602">
-    <ClinVarAccession Acc="RCV000179026" Version="1" Type="RCV" DateUpdated="2016-08-29"/>
+  <ClinVarSet ID="37919542">
     <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2015-02-04">
-      <ReviewStatus>criteria provided, single submitter</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>unknown</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>clinical testing</MethodType>
-      </Method>
-      <ObservedData ID="11311129">
-        <Attribute integerValue="1" Type="VariantAlleles"/>
-      </ObservedData>
-      <ObservedData ID="11311129">
-        <Attribute integerValue="0" Type="Homozygote"/>
-      </ObservedData>
-      <ObservedData ID="11311129">
-        <Attribute integerValue="0" Type="Hemizygote"/>
-      </ObservedData>
-      <ObservedData ID="11311129">
-        <Attribute integerValue="1" Type="SingleHeterozygote"/>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant" ID="197886">
-      <Measure Type="Insertion" ID="195047">
+    <Title>NM_153818.1(PEX10):c.927_928insG (p.His310Alafs) AND not provided</Title>
+    <ReferenceClinVarAssertion DateCreated="2015-06-26" DateLastUpdated="2019-01-31" ID="427602">
+      <ClinVarAccession Acc="RCV000179026" Version="1" Type="RCV" DateUpdated="2019-01-31" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2015-02-04">
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>clinical testing</MethodType>
+        </Method>
+        <ObservedData ID="36793999">
+          <Attribute integerValue="1" Type="VariantAlleles" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="197886">
+        <Measure Type="Insertion" ID="195047">
+          <Name>
+            <ElementValue Type="Preferred">NM_153818.1(PEX10):c.927_928insG (p.His310Alafs)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.927_928insG" Accession="NM_153818" Version="1" Type="HGVS, coding, RefSeq">NM_153818.1:c.927_928insG</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.11043_11044insG" Accession="NG_008342" Version="1" Type="HGVS, genomic, RefSeqGene">NG_008342.1:g.11043_11044insG</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.2406528_2406529insC" Accession="NC_000001" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000001.11:g.2406528_2406529insC</Attribute>
+            <XRef ID="38" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.2337967_2337968insC" Accession="NC_000001" Version="10" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000001.10:g.2337967_2337968insC</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.His310Alafs" Accession="NP_722540" Version="1" Type="HGVS, protein, RefSeq">NP_722540.1:p.His310Alafs</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="Location">NM_153818.1:exon 5</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+            <XRef ID="SO:0001589" DB="Sequence Ontology" />
+            <XRef ID="NM_153818.1:c.927_928insG" DB="RefSeq" />
+          </AttributeSet>
+          <CytogeneticLocation>1p36.32</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="2406528" stop="2406529" display_start="2406528" display_stop="2406529" variantLength="1" referenceAllele="-" alternateAllele="C" positionVCF="2406528" referenceAlleleVCF="G" alternateAlleleVCF="GC" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="2337967" stop="2337968" display_start="2337967" display_stop="2337968" variantLength="1" referenceAllele="-" alternateAllele="C" positionVCF="2337967" referenceAlleleVCF="G" alternateAlleleVCF="GC" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">peroxisomal biogenesis factor 10</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">PEX10</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="2404802" stop="2412574" display_start="2404802" display_stop="2412574" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="2336240" stop="2344009" display_start="2336240" display_stop="2344009" variantLength="7770" Strand="-" />
+            <XRef ID="5192" DB="Gene" />
+            <XRef Type="MIM" ID="602859" DB="OMIM" />
+            <XRef ID="HGNC:8851" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef Type="rs" ID="797044762" DB="dbSNP" />
+        </Measure>
         <Name>
           <ElementValue Type="Preferred">NM_153818.1(PEX10):c.927_928insG (p.His310Alafs)</ElementValue>
         </Name>
-        <AttributeSet>
-          <Attribute Change="c.927_928insG" Accession="NM_153818" Version="1" Type="HGVS, coding, RefSeq">NM_153818.1:c.927_928insG</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="g.11043_11044insG" Accession="NG_008342" Version="1" Type="HGVS, genomic, RefSeqGene">NG_008342.1:g.11043_11044insG</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="g.2406528_2406529insC" Accession="NC_000001" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000001.11:g.2406528_2406529insC</Attribute>
-          <XRef ID="38" DB="ClinVar"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="g.2337967_2337968insC" Accession="NC_000001" Version="10" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000001.10:g.2337967_2337968insC</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Change="p.His310Alafs" Accession="NP_722540" Version="1" Type="HGVS, protein, RefSeq">NP_722540.1:p.His310Alafs</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="Location">NM_153818.1:Ex5</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
-          <XRef ID="SO:0001589" DB="Sequence Ontology"/>
-          <XRef ID="NM_153818.1:c.927_928insG" DB="RefSeq"/>
-        </AttributeSet>
-        <CytogeneticLocation>1p36.32</CytogeneticLocation>
-        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="2406528" stop="2406529" display_start="2406528" display_stop="2406529" variantLength="1" referenceAllele="-" alternateAllele="C"/>
-        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="2337967" stop="2337968" display_start="2337967" display_stop="2337968" variantLength="2" referenceAllele="-" alternateAllele="C"/>
-        <MeasureRelationship Type="variant in gene">
+        <XRef ID="CA203141" DB="ClinGen" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="9460">
+        <Trait ID="17556" Type="Disease">
           <Name>
-            <ElementValue Type="Preferred">peroxisomal biogenesis factor 10</ElementValue>
+            <ElementValue Type="Preferred">not provided</ElementValue>
+            <XRef ID="13DG0619" DB="Developmental Genetics Unit,King Faisal Specialist Hospital &amp; Research Centre" />
           </Name>
-          <Symbol>
-            <ElementValue Type="Preferred">PEX10</ElementValue>
-          </Symbol>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="2404802" stop="2412622" display_start="2404802" display_stop="2412622" Strand="-"/>
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="2336240" stop="2344009" display_start="2336240" display_stop="2344009" variantLength="7770" Strand="-"/>
-          <XRef ID="5192" DB="Gene"/>
-          <XRef Type="MIM" ID="602859" DB="OMIM"/>
-          <XRef ID="HGNC:8851" DB="HGNC"/>
-        </MeasureRelationship>
-        <XRef Type="rs" ID="797044762" DB="dbSNP"/>
-      </Measure>
-      <Name>
-        <ElementValue Type="Preferred">NM_153818.1(PEX10):c.927_928insG (p.His310Alafs)</ElementValue>
-      </Name>
-    </MeasureSet>
-    <TraitSet Type="Disease" ID="8954">
-      <Trait ID="17434" Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">Peroxisome biogenesis disorder 6A</ElementValue>
-        </Name>
-        <Name>
-          <ElementValue Type="Alternate">PEROXISOME BIOGENESIS DISORDER 6A (ZELLWEGER)</ElementValue>
-          <XRef Type="MIM" ID="614870" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="602859.0001" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="602859.0004" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="602859.0005" DB="OMIM"/>
-          <XRef Type="Allelic variant" ID="602859.0006" DB="OMIM"/>
-        </Name>
-        <Symbol>
-          <ElementValue Type="Preferred">PBD6A</ElementValue>
-          <XRef ID="GTR000522761" DB="Genetic Testing Registry (GTR)"/>
-          <XRef Type="MIM" ID="614870" DB="OMIM"/>
-        </Symbol>
-        <AttributeSet>
-          <Attribute Type="public definition">Zellweger syndrome (ZS) is an autosomal recessive multiple congenital anomaly syndrome resulting from disordered peroxisome biogenesis. Affected children present in the newborn period with profound hypotonia, seizures, and inability to feed. Characteristic craniofacial anomalies, eye abnormalities, neuronal migration defects, hepatomegaly, and chondrodysplasia punctata are present. Children with this condition do not show any significant development and usually die in the first year of life (summary by Steinberg et al., 2006).&#13;For a complete phenotypic description and a discussion of genetic heterogeneity of Zellweger syndrome, see 214100.&#13;Individuals with PBDs of complementation group 7 (CG7, equivalent to CGB) have mutations in the PEX10 gene. For information on the history of PBD complementation groups, see 214100.</Attribute>
-          <XRef Type="MIM" ID="614870" DB="OMIM"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="age of onset">Neonatal</Attribute>
-          <XRef ID="912" DB="Orphanet"/>
-        </AttributeSet>
-        <XRef ID="C3553947" DB="MedGen"/>
-        <XRef ID="912" DB="Orphanet"/>
-        <XRef Type="MIM" ID="614870" DB="OMIM"/>
-      </Trait>
-    </TraitSet>
-  </ReferenceClinVarAssertion>
-  <ClinVarAssertion ID="419538" SubmissionName="EGL003">
-    <ClinVarSubmissionID localKey="26683_104445" localKeyIsSubmitted="1" submitter="Emory Genetics Laboratory,Emory University" submitterDate="2015-06-09"/>
-    <ClinVarAccession Acc="SCV000231215" Version="1" Type="SCV" OrgID="500060" DateUpdated="2016-05-16"/>
-    <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2015-02-04">
-      <ReviewStatus>criteria provided, single submitter</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ExternalID DB="Emory Genetics Laboratory" ID="26683" URL="http://geneticslab.emory.edu/emvclass/emvclass.php?approved_symbol=PEX10"/>
-    <AttributeSet>
-      <Attribute Type="AssertionMethod">EGL Classification Definitions</Attribute>
+          <AttributeSet>
+            <Attribute Type="public definition">The term 'not provided' is registered in MedGen to support identification of submissions to ClinVar for which no condition was named when assessing the variant. 'not provided' differs from 'not specified', which is used when a variant is asserted to be benign, likely benign, or of uncertain significance for conditions that have not been specified.</Attribute>
+          </AttributeSet>
+          <XRef ID="CN517202" DB="MedGen" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="419538" SubmissionName="SUB4534263">
+      <ClinVarSubmissionID localKey="26683_000000" localKeyIsSubmitted="1" submittedAssembly="GRCh37" submitter="EGL Genetic Diagnostics,Eurofins Clinical Diagnostics" submitterDate="2018-09-19" />
+      <ClinVarAccession Acc="SCV000231215" Version="5" Type="SCV" OrgID="500060" OrganizationCategory="laboratory" OrgType="primary" DateUpdated="2018-12-15" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2015-02-04">
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="EGL Genetic Diagnostics" ID="26683" />
+      <AttributeSet>
+        <Attribute Type="AssertionMethod">EGL_Classification_Definitions_2015</Attribute>
+        <Citation>
+          <URL>https://submit.ncbi.nlm.nih.gov/ft/byid/dn5yhybg/egl_classification_definitions_2015.pdf</URL>
+        </Citation>
+      </AttributeSet>
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+          <Gender>mixed</Gender>
+        </Sample>
+        <Method>
+          <MethodType>clinical testing</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="VariantAlleles" integerValue="1" />
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="SingleHeterozygote" integerValue="1" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Insertion">
+          <AttributeSet>
+            <Attribute Type="Location">NM_153818.1:Ex5</Attribute>
+          </AttributeSet>
+          <SequenceLocation Assembly="GRCh37" Chr="1" alternateAllele="C" referenceAllele="-" start="2337967" stop="2337968" variantLength="2" />
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">PEX10</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">not provided</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
       <Citation>
-        <URL>http://geneticslab.emory.edu/emvclass/EGLClassificationDefinitions.php</URL>
+        <URL>http://www.egl-eurofins.com/emvclass/emvclass.php?approved_symbol=PEX10</URL>
       </Citation>
-    </AttributeSet>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>unknown</AffectedStatus>
-        <Gender>mixed</Gender>
-      </Sample>
-      <Method>
-        <MethodType>clinical testing</MethodType>
-      </Method>
-      <ObservedData>
-        <Attribute Type="VariantAlleles" integerValue="1"/>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Homozygote" integerValue="0"/>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Hemizygote" integerValue="0"/>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="SingleHeterozygote" integerValue="1"/>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant">
-      <Measure Type="Insertion">
-        <AttributeSet>
-          <Attribute Type="Location">NM_153818.1:Ex5</Attribute>
-        </AttributeSet>
-        <SequenceLocation Assembly="GRCh37" Chr="1" alternateAllele="C" referenceAllele="-" start="2337967" stop="2337968" variantLength="2"/>
-        <MeasureRelationship Type="variant in gene">
-          <Symbol>
-            <ElementValue Type="Preferred">PEX10</ElementValue>
-          </Symbol>
-        </MeasureRelationship>
-      </Measure>
-    </MeasureSet>
-    <TraitSet Type="Disease">
-      <Trait Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">Peroxisome biogenesis disorder 6A</ElementValue>
-        </Name>
-        <XRef DB="OMIM" ID="614870" Type="MIM"/>
-      </Trait>
-    </TraitSet>
-  </ClinVarAssertion>
-</ClinVarSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
 </ReleaseSet>
