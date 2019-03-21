@@ -32,7 +32,7 @@ namespace SAUtils.Custom
         private (IChromosome Chromesome, int Position) _previousPosition = (null, 0);
         private Action<string, string>[] _annotationValidators;
 
-        private JsonDataType[] _rootTypes = new []{JsonDataType.Array, JsonDataType.Object};
+        private readonly SaJsonValueType _primaryType = SaJsonValueType.ObjectArray;
         private readonly Dictionary<string, SaJsonValueType> _predefinedTypeAnnotation = new Dictionary<string, SaJsonValueType>
         {
             {"refAllele", SaJsonValueType.String},
@@ -250,8 +250,8 @@ namespace SAUtils.Custom
 
         private void InitiateSchema()
         {
-            if (_altColumnIndex != -1) JsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, _rootTypes, JsonKeys);
-            if (_endColumnIndex != -1) IntervalJsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, _rootTypes, IntervalJsonKeys);
+            if (_altColumnIndex != -1) JsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, _primaryType, JsonKeys);
+            if (_endColumnIndex != -1) IntervalJsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, _primaryType, IntervalJsonKeys);
         }
 
         private void AddPredefinedTypeAnnotation()

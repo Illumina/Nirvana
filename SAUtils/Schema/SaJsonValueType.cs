@@ -12,6 +12,7 @@ namespace SAUtils.Schema
         public static readonly SaJsonValueType Bool = Create(JsonDataType.Bool);
         public static readonly SaJsonValueType String = Create(JsonDataType.String);
         public static readonly SaJsonValueType StringArray = Create(JsonDataType.Array, JsonDataType.String);
+        public static readonly SaJsonValueType ObjectArray = Create(JsonDataType.Array, JsonDataType.Object);
 
         private SaJsonValueType(params JsonDataType[] dataTypes)
         {

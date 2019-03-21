@@ -8,5 +8,6 @@ namespace SAUtils
         public SaJsonValueType ValueType;
         public CustomAnnotationCategories Category;
         public string Description;
+        public SaJsonSchema SubSchema;
     }
 }

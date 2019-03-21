@@ -7,6 +7,7 @@ using CacheUtils.Genes.IO;
 using Compression.Utilities;
 using OptimizedCore;
 using SAUtils.DataStructures;
+using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Sequence;
 
@@ -14,19 +15,19 @@ namespace SAUtils
 {
     public static class OmimUtilities
     {
-        public static List<OmimItem.Phenotype> Parse(string line)
+        public static List<OmimItem.Phenotype> ParsePhenotype(string line, SaJsonSchema schema)
         {
             var phenotypes = new List<OmimItem.Phenotype>();
 
             if (string.IsNullOrEmpty(line)) return phenotypes;
 
             var infos = line.OptimizedSplit(';');
-            phenotypes.AddRange(infos.Select(ExtractPhenotype));
+            phenotypes.AddRange(infos.Select(x => ExtractPhenotype(x, schema)));
 
             return phenotypes;
         }
 
-        private static OmimItem.Phenotype ExtractPhenotype(string info)
+        private static OmimItem.Phenotype ExtractPhenotype(string info, SaJsonSchema schema)
         {
             info = info.Trim(' ').Replace(@"\\'", "'");
 
@@ -42,7 +43,7 @@ namespace SAUtils
 
             var inheritance = string.IsNullOrEmpty(match.Groups[4].Value) ? null : match.Groups[4].ToString();
             var inheritances = ExtractInheritances(inheritance);
-            return new OmimItem.Phenotype(mimNumber, phenotype, mapping, comments, inheritances);
+            return new OmimItem.Phenotype(mimNumber, phenotype, mapping, comments, inheritances, schema);
         }
 
         private static HashSet<string> ExtractInheritances(string inheritance)
@@ -111,12 +112,14 @@ namespace SAUtils
             return dict;
         }
 
-        public static Dictionary<string, List<ISuppGeneItem>> GetGeneToOmimEntries(IEnumerable<OmimItem> omimItems)
+        public static Dictionary<string, List<ISuppGeneItem>> GetGeneToOmimEntriesAndSchema(IEnumerable<OmimItem> omimItems)
         {
             var geneToOmimEntries = new Dictionary<string, List<ISuppGeneItem>>();
+            SaJsonSchema jsonSchema = null;
 
             foreach (var item in omimItems)
             {
+                if (jsonSchema == null) jsonSchema = item.JsonSchema;
                 if (item.GeneSymbol == null) continue;
 
                 if (geneToOmimEntries.TryGetValue(item.GeneSymbol, out var mimList))

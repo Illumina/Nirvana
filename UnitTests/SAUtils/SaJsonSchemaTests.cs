@@ -16,7 +16,7 @@ namespace UnitTests.SAUtils
         public void Create_InitialJsonObject_AsExpected()
         {
             var sb = new StringBuilder();
-            SaJsonSchema.Create(sb, "test", new []{JsonDataType.Array, JsonDataType.Object}, new List<string>());
+            SaJsonSchema.Create(sb, "test", SaJsonValueType.ObjectArray, new List<string>());
             const string expectedJsonString = "{\"$schema\":\"" + SchemaVersion + "\",\"type\":\"object\",\"properties\":{\"test\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{";
             Assert.Equal(expectedJsonString, sb.ToString());
         }
@@ -34,7 +34,7 @@ namespace UnitTests.SAUtils
         [Fact]
         public void ToString_AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", new[] { JsonDataType.Array, JsonDataType.Object }, new List<string> { "name", "phone", "employed" });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "name", "phone", "employed" });
             jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.String });
             jsonSchema.AddAnnotation("phone", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "phone number"});
             jsonSchema.AddAnnotation("employed", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Bool });
@@ -45,7 +45,7 @@ namespace UnitTests.SAUtils
 
             const string expectedJsonSchemaString = "{\"$schema\":\"" + SchemaVersion + "\",\"type\":\"object\",\"properties\":{\"test\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{"
                                                   + "\"name\":{\"type\":\"string\"},\"phone\":{\"type\":\"number\",\"description\":\"phone number\"}},"
-                                                  + "\"required\":[\"name\"]}}}}";
+                                                  + "\"required\":[\"name\"],\"additionalProperties\":false}}}}";
 
             Assert.Equal(expectedJsonSchemaString, jsonSchema.ToString());
             // make sure the returned string is the same when ToString method is called more than once
@@ -55,7 +55,7 @@ namespace UnitTests.SAUtils
         [Fact]
         public void GetJsonString_AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", new[] { JsonDataType.Array, JsonDataType.Object }, new List<string> { "name", "phone", "employed" });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "name", "phone", "employed" });
             jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.String });
             jsonSchema.AddAnnotation("phone", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "phone number" });
             jsonSchema.AddAnnotation("employed", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Bool});
@@ -67,7 +67,7 @@ namespace UnitTests.SAUtils
         [Fact]
         public void GetJsonString_DoubleValueHandling_AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", new[] { JsonDataType.Array, JsonDataType.Object }, new List<string> { "allAf", "doubleValue1", "doubleValue2"});
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "allAf", "doubleValue1", "doubleValue2"});
             jsonSchema.AddAnnotation("allAf", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Category = CustomAnnotationCategories.AlleleFrequency});
             jsonSchema.AddAnnotation("doubleValue1", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "A double value" });
             jsonSchema.AddAnnotation("doubleValue2", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "Another double value" });
@@ -114,7 +114,7 @@ namespace UnitTests.SAUtils
         [Fact]
         public void GetJsonString__AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", new[] { JsonDataType.Array, JsonDataType.Object }, new List<string> { "allAf", "doubleValue1", "doubleValue2" });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "allAf", "doubleValue1", "doubleValue2" });
             jsonSchema.AddAnnotation("allAf", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Category = CustomAnnotationCategories.AlleleFrequency });
             jsonSchema.AddAnnotation("doubleValue1", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "A double value" });
             jsonSchema.AddAnnotation("doubleValue2", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "Another double value" });

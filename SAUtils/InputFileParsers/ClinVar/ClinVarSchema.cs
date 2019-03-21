@@ -9,9 +9,9 @@ namespace SAUtils.InputFileParsers.ClinVar
     public static class ClinVarSchema
     {
         private static SaJsonSchema _jsonSchema;
-        private static readonly JsonDataType[] RootTypes = { JsonDataType.Array, JsonDataType.Object };
-        private static readonly List<string> JsonKeys = new List<string>
-        {
+        private static readonly SaJsonValueType PrimaryValueType = SaJsonValueType.ObjectArray;
+
+        private static readonly string[] JsonKeys = {
             "id",
             "reviewStatus",
             "alleleOrigins",
@@ -48,7 +48,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         {
             if (_jsonSchema != null) return _jsonSchema;
 
-            _jsonSchema = SaJsonSchema.Create(new StringBuilder(), SaCommon.ClinvarTag, RootTypes, JsonKeys);
+            _jsonSchema = SaJsonSchema.Create(new StringBuilder(), SaCommon.ClinvarTag, PrimaryValueType, JsonKeys);
             _jsonSchema.SetNonSaKeys(new []{"isAlleleSpecific"});
 
             foreach((string key, var valueType) in JsonKeys.Zip(ValueTypes, (a, b) => (a, b))) 

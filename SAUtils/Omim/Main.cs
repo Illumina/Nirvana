@@ -1,13 +1,13 @@
 ﻿using System.IO;
 using System.Linq;
-using System.Net;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.InputFileParsers;
-using SAUtils.InputFileParsers.SAUtils.CreateOmimTsv;
+using SAUtils.InputFileParsers.OMIM;
+using SAUtils.InputFileParsers.OMIM.SAUtils.CreateOmimTsv;
 using VariantAnnotation.SA;
 
 namespace SAUtils.Omim
@@ -79,16 +79,20 @@ namespace SAUtils.Omim
             //create universal gene archive
             var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = OmimUtilities.ParseUniversalGeneArchive(_inputReferencePath, _universalGeneArchivePath);
             var geneSymbolUpdater = new GeneSymbolUpdater(entrezGeneIdToSymbol, ensemblGeneIdToSymbol);
+            var omimSchema = OmimSchema.Get();
 
-            using (var geneMapParser = new OmimParser(GZipUtilities.GetAppropriateStreamReader(_geneMap2File), geneSymbolUpdater))
-            using (var map2GeneParser = new OmimParser(GZipUtilities.GetAppropriateStreamReader(_map2GenesFile), geneSymbolUpdater))
+            using (var geneMapParser = new OmimParser(GZipUtilities.GetAppropriateStreamReader(_geneMap2File), geneSymbolUpdater, omimSchema))
+            using (var map2GeneParser = new OmimParser(GZipUtilities.GetAppropriateStreamReader(_map2GenesFile), geneSymbolUpdater, omimSchema))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
             using (var ngaWriter = new NgaWriter(nsaStream, version, SaCommon.OmimTag, SaCommon.SchemaVersion, true))
+            using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 var omimItems = geneMapParser.GetItems().Concat(map2GeneParser.GetItems());
-                ngaWriter.Write(OmimUtilities.GetGeneToOmimEntries(omimItems));
+                var geneToItems = OmimUtilities.GetGeneToOmimEntriesAndSchema(omimItems);
+                ngaWriter.Write(geneToItems);
+                schemaWriter.Write(omimSchema);
             }
-
 
             geneSymbolUpdater.DisplayStatistics();
             using (var writer =new StreamWriter(FileUtilities.GetCreateStream("UpdatedGeneSymbols.txt")))

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SAUtils.InputFileParsers.SAUtils.CreateOmimTsv;
+using SAUtils.InputFileParsers.OMIM.SAUtils.CreateOmimTsv;
 using SAUtils.Omim;
 using Xunit;
+using SAUtils.InputFileParsers.OMIM;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
@@ -49,7 +50,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetItems()
         {
-            using (var reader = new OmimParser(new StreamReader(GetGeneMap2Stream()), GetGeneSymbolUpdater()))
+            using (var reader = new OmimParser(new StreamReader(GetGeneMap2Stream()), GetGeneSymbolUpdater(), OmimSchema.Get()))
             {
                 var items = reader.GetItems().ToList();
 

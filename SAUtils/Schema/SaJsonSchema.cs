@@ -6,7 +6,6 @@ using ErrorHandling.Exceptions;
 using OptimizedCore;
 using VariantAnnotation.IO;
 using VariantAnnotation.SA;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.Schema
 {
@@ -14,11 +13,12 @@ namespace SAUtils.Schema
     {
         private const string SchemaVersion = "http://json-schema.org/draft-06/schema#";
 
-        public int TotalItems { private get; set; }
+        public int TotalItems { get; set; }
+
         private readonly StringBuilder _sb;
         private readonly JsonObject _jsonObject;
         private readonly Dictionary<string, SaJsonKeyAnnotation> _keyAnnotation = new Dictionary<string, SaJsonKeyAnnotation>();
-        private List<string> Keys { get; set; } = new List<string>();
+        private IEnumerable<string> Keys { get; set; } 
         // Keys not used to generate the NSA file, but in the Nirvana JSON output
         private string[] NonSaKeys { get; set; } = {};
         internal readonly Dictionary<string, int> KeyCounts = new Dictionary<string, int>();
@@ -31,15 +31,21 @@ namespace SAUtils.Schema
             _jsonObject = new JsonObject(sb);
         }
 
-        public static SaJsonSchema Create(StringBuilder sb, string jsonTag, JsonDataType[] rootTypes, List<string> jsonKeys)
+        public static SaJsonSchema Create(StringBuilder sb, string jsonTag, SaJsonValueType primaryType, IEnumerable<string> jsonKeys)
         {
             var jsonSchema = new SaJsonSchema(sb) {Keys = jsonKeys};
-            jsonSchema._jsonObject.StartObject();
-            jsonSchema.AddSchemaVersion();
-            // SA json is an object
-            jsonSchema.AddJsonDataType(JsonDataType.Object);
-            jsonSchema._jsonObject.StartObjectWithKey(jsonTag);
-            jsonSchema.AddJsonDataTypes(rootTypes);
+
+            // The root level schema for a SA
+            if (jsonTag != null)
+            {
+                jsonSchema._jsonObject.StartObject();
+                jsonSchema.AddSchemaVersion();
+                // SA json is an object
+                jsonSchema.AddJsonDataType(JsonDataType.Object, null);
+                jsonSchema._jsonObject.StartObjectWithKey(jsonTag);
+            }
+
+            jsonSchema.AddJsonValueType(primaryType, null);
             return jsonSchema;
         }
 
@@ -48,23 +54,24 @@ namespace SAUtils.Schema
             NonSaKeys = nonSaKeys;
         }
 
-        private void AddJsonDataTypes(IEnumerable<JsonDataType> jsonTypes)
+        private void AddJsonValueType(SaJsonValueType jsonValueType, SaJsonSchema objectSchema)
         {
-            foreach (var dataType in jsonTypes)
+            foreach (var dataType in jsonValueType.JsonDataTypes)
             {
-                AddJsonDataType(dataType);
+                AddJsonDataType(dataType, objectSchema);
             }
         }
 
-        private void AddJsonDataType(JsonDataType jsonType)
+        private void AddJsonDataType(JsonDataType jsonType, SaJsonSchema objectSchema)
         {
             _jsonObject.AddStringValue("type", jsonType.ToTypeString());
             if (jsonType.IsComplexType()) _jsonObject.StartObjectWithKey(jsonType.GetSchemaKey());
+
+            if (jsonType == JsonDataType.Object) _sb.Append(objectSchema);
         }
 
         private void AddSchemaVersion() => _jsonObject.AddStringValue("$schema", SchemaVersion);
 
-        private void Count(string key) => KeyCounts[key]++;
         private SaJsonValueType GetJsonType(string key) => _keyAnnotation[key].ValueType;
         private CustomAnnotationCategories GetCategory(string key) => _keyAnnotation[key].Category;
 
@@ -95,10 +102,21 @@ namespace SAUtils.Schema
             }
 
             _jsonObject.EndObject();
-            _jsonObject.AddStringValues("required", requiredKeys);
-            _jsonObject.EndAllObjects();
+            OutputRequiredKeys(requiredKeys);
+            DisallowExtraProperites();
 
+            _jsonObject.EndAllObjects();
             _finalized = true;
+        }
+
+        private void OutputRequiredKeys(IReadOnlyCollection<string> requiredKeys)
+        {
+            if (requiredKeys.Count > 0) _jsonObject.AddStringValues("required", requiredKeys);
+        }
+
+        private void DisallowExtraProperites()
+        {
+            _jsonObject.AddStringValue("additionalProperties", "false", false);
         }
 
         private Action<JsonObject, List<string[]>> GetJsonStringGenerationAction()
@@ -154,9 +172,9 @@ namespace SAUtils.Schema
         }
 
 
-        private void CountKeyIfAdded(bool keyAdded, string key)
+        public void CountKeyIfAdded(bool keyAdded, string key)
         {
-            if (keyAdded) Count(key);
+            if (keyAdded) KeyCounts[key]++;
         }
 
         public string GetJsonString(List<string[]> values)
@@ -179,9 +197,8 @@ namespace SAUtils.Schema
             _jsonObject.StartObjectWithKey(key);
 
             var annotation = _keyAnnotation[key];
-            var jsonDataTypes = annotation.ValueType.JsonDataTypes;
-            AddJsonDataTypes(jsonDataTypes);
-            int numComplexTypes = jsonDataTypes.Count(x => x.IsComplexType());
+            AddJsonValueType(annotation.ValueType, annotation.SubSchema);
+            int numComplexTypes = annotation.ValueType.JsonDataTypes.Count(x => x.IsComplexType());
             while (numComplexTypes > 0)
             {
                 _jsonObject.EndObject();
@@ -219,6 +236,14 @@ namespace SAUtils.Schema
                 return doubleValue;
 
             throw new UserErrorException($"{value} is not a valid number.");
+        }
+
+        public SaJsonSchema GetSubSchema(string key)
+        {
+            if (!_keyAnnotation.TryGetValue(key, out var annotation))
+                throw new KeyNotFoundException($"{key} is not JSON key.");
+
+            return annotation.SubSchema;
         }
     }
 }
