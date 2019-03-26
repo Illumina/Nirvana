@@ -8,7 +8,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 {
     public static class ClinVarSchema
     {
-        private static SaJsonSchema _jsonSchema;
         private static readonly SaJsonValueType PrimaryValueType = SaJsonValueType.ObjectArray;
 
         private static readonly string[] JsonKeys = {
@@ -46,15 +45,13 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         public static SaJsonSchema Get()
         {
-            if (_jsonSchema != null) return _jsonSchema;
-
-            _jsonSchema = SaJsonSchema.Create(new StringBuilder(), SaCommon.ClinvarTag, PrimaryValueType, JsonKeys);
-            _jsonSchema.SetNonSaKeys(new []{"isAlleleSpecific"});
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), SaCommon.ClinvarTag, PrimaryValueType, JsonKeys);
+            jsonSchema.SetNonSaKeys(new []{"isAlleleSpecific"});
 
             foreach((string key, var valueType) in JsonKeys.Zip(ValueTypes, (a, b) => (a, b))) 
-                _jsonSchema.AddAnnotation(key, new SaJsonKeyAnnotation{ValueType = valueType });
+                jsonSchema.AddAnnotation(key, new SaJsonKeyAnnotation{ValueType = valueType });
 
-            return _jsonSchema;
+            return jsonSchema;
         }
     }
 }
