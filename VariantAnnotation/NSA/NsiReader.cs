@@ -76,18 +76,20 @@ namespace VariantAnnotation.NSA
             var jsonStrings = new List<string>();
             foreach (var interval in overlappingSvs)
             {
-                var reciprocalOverlap = SuppIntervalUtilities.GetReciprocalOverlap(
+                var (reciprocalOverlap, annotationOverlap) = SuppIntervalUtilities.GetOverlapFractions(
                     new ChromosomeInterval(variant.Chromosome, interval.Begin, interval.End), variant);
-                jsonStrings.Add(AddOverlapToAnnotation(interval.Value, reciprocalOverlap));
+                jsonStrings.Add(AddOverlapToAnnotation(interval.Value, reciprocalOverlap, annotationOverlap));
             }
 
             return jsonStrings;
         }
 
-        private string AddOverlapToAnnotation(string jsonString, double? rOverlap)
+        private string AddOverlapToAnnotation(string jsonString, double? reciprocalOverlap, double? annotationOverlap)
         {
-            if (rOverlap != null)
-                jsonString+=JsonObject.Comma + "\"reciprocalOverlap\":" + rOverlap.Value.ToString("0.#####");
+            if (reciprocalOverlap != null)
+                jsonString+=JsonObject.Comma + "\"reciprocalOverlap\":" + reciprocalOverlap.Value.ToString("0.#####");
+            if (annotationOverlap != null)
+                jsonString += JsonObject.Comma + "\"annotationOverlap\":" + annotationOverlap.Value.ToString("0.#####");
             return jsonString;
         }
     }
