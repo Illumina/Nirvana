@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
@@ -19,6 +20,8 @@ namespace VariantAnnotation.Providers
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
         private readonly INsaReader[] _nsaReaders;
         private readonly INsiReader[] _nsiReaders;
+        private static readonly ImmutableHashSet<GenomeAssembly> AssembliesIgnoredInConsistancyCheck =
+            new HashSet<GenomeAssembly> { GenomeAssembly.Unknown, GenomeAssembly.rCRS }.ToImmutableHashSet();
 
         public NsaProvider(INsaReader[] nsaReaders, INsiReader[] nsiReaders)
         {
@@ -38,7 +41,7 @@ namespace VariantAnnotation.Providers
                 DataSourceVersions = DataSourceVersions?.Concat(_nsiReaders.Select(x => x.Version)) ?? _nsiReaders.Select(x => x.Version);
             }
 
-            var distinctAssemblies = assemblies?.Where(x => GenomeAssemblyHelper.AutosomeAndAllosomeAssemblies.Contains(x)).Distinct().ToArray();
+            var distinctAssemblies = assemblies?.Where(x => !AssembliesIgnoredInConsistancyCheck.Contains(x)).Distinct().ToArray();
             if (distinctAssemblies == null || distinctAssemblies.Length > 1)
             {
                 if (_nsaReaders != null)
@@ -51,7 +54,7 @@ namespace VariantAnnotation.Providers
                     {
                         Console.WriteLine(nsiReader.Version + "\tAssembly:" + nsiReader.Assembly);
                     }
-                throw new UserErrorException("Multilpe genome assemblies detected in Supplementary annotation directory");
+                throw new UserErrorException("Multilpe genome assembly detected in Supplementary annotation directory");
             }
 
             Assembly = distinctAssemblies[0];

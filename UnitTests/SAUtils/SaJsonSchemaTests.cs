@@ -2,7 +2,6 @@
 using System.Text;
 using ErrorHandling.Exceptions;
 using SAUtils;
-using SAUtils.Schema;
 using VariantAnnotation.SA;
 using Xunit;
 
@@ -16,7 +15,7 @@ namespace UnitTests.SAUtils
         public void Create_InitialJsonObject_AsExpected()
         {
             var sb = new StringBuilder();
-            SaJsonSchema.Create(sb, "test", SaJsonValueType.ObjectArray, new List<string>());
+            SaJsonSchema.Create(sb, "test", "array", new List<string>());
             const string expectedJsonString = "{\"$schema\":\"" + SchemaVersion + "\",\"type\":\"object\",\"properties\":{\"test\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{";
             Assert.Equal(expectedJsonString, sb.ToString());
         }
@@ -26,7 +25,7 @@ namespace UnitTests.SAUtils
         {
             var sb = new StringBuilder();
             var jsonSchema = new SaJsonSchema(sb);
-            jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.String });
+            jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { Type = JsonDataType.String });
             jsonSchema.OutputKeyAnnotation("name");
             Assert.Equal("\"name\":{\"type\":\"string\"}", sb.ToString());
         }
@@ -34,10 +33,10 @@ namespace UnitTests.SAUtils
         [Fact]
         public void ToString_AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "name", "phone", "employed" });
-            jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.String });
-            jsonSchema.AddAnnotation("phone", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "phone number"});
-            jsonSchema.AddAnnotation("employed", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Bool });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", "array", new List<string> { "name", "phone", "employed" });
+            jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { Type = JsonDataType.String });
+            jsonSchema.AddAnnotation("phone", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Description = "phone number"});
+            jsonSchema.AddAnnotation("employed", new SaJsonKeyAnnotation { Type =JsonDataType.Bool });
             jsonSchema.TotalItems = 100;
             jsonSchema.KeyCounts["name"] = 100;
             jsonSchema.KeyCounts["phone"] = 50;
@@ -45,7 +44,7 @@ namespace UnitTests.SAUtils
 
             const string expectedJsonSchemaString = "{\"$schema\":\"" + SchemaVersion + "\",\"type\":\"object\",\"properties\":{\"test\":{\"type\":\"array\",\"items\":{\"type\":\"object\",\"properties\":{"
                                                   + "\"name\":{\"type\":\"string\"},\"phone\":{\"type\":\"number\",\"description\":\"phone number\"}},"
-                                                  + "\"required\":[\"name\"],\"additionalProperties\":false}}}}";
+                                                  + "\"required\":[\"name\"]}}}}";
 
             Assert.Equal(expectedJsonSchemaString, jsonSchema.ToString());
             // make sure the returned string is the same when ToString method is called more than once
@@ -55,11 +54,11 @@ namespace UnitTests.SAUtils
         [Fact]
         public void GetJsonString_AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "name", "phone", "employed" });
-            jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.String });
-            jsonSchema.AddAnnotation("phone", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "phone number" });
-            jsonSchema.AddAnnotation("employed", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Bool});
-            var jsonString = jsonSchema.GetJsonString(new List<string[]> { new[] {"Ada"}, new[] {"123456"}, new [] {"true"} });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", "array", new List<string> { "name", "phone", "employed" });
+            jsonSchema.AddAnnotation("name", new SaJsonKeyAnnotation { Type = JsonDataType.String });
+            jsonSchema.AddAnnotation("phone", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Description = "phone number" });
+            jsonSchema.AddAnnotation("employed", new SaJsonKeyAnnotation { Type = JsonDataType.Bool });
+            var jsonString = jsonSchema.GetJsonString(new List<string> { "Ada", "123456", "true" });
             
             Assert.Equal("\"name\":\"Ada\",\"phone\":123456,\"employed\":true", jsonString);
         }
@@ -67,11 +66,11 @@ namespace UnitTests.SAUtils
         [Fact]
         public void GetJsonString_DoubleValueHandling_AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "allAf", "doubleValue1", "doubleValue2"});
-            jsonSchema.AddAnnotation("allAf", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Category = CustomAnnotationCategories.AlleleFrequency});
-            jsonSchema.AddAnnotation("doubleValue1", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "A double value" });
-            jsonSchema.AddAnnotation("doubleValue2", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "Another double value" });
-            var jsonString = jsonSchema.GetJsonString(new List<string[]> { new[] { "0.12345678" }, new[] { "0.12" }, new[] { "0.12345678" } });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", "array", new List<string> { "allAf", "doubleValue1", "doubleValue2"});
+            jsonSchema.AddAnnotation("allAf", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Category = CustomAnnotationCategories.AlleleFrequency});
+            jsonSchema.AddAnnotation("doubleValue1", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Description = "A double value" });
+            jsonSchema.AddAnnotation("doubleValue2", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Description = "Another double value" });
+            var jsonString = jsonSchema.GetJsonString(new List<string> { "0.12345678", "0.12", "0.12345678" });
 
             Assert.Equal("\"allAf\":0.123457,\"doubleValue1\":0.12,\"doubleValue2\":0.12345678", jsonString);
         }
@@ -114,11 +113,11 @@ namespace UnitTests.SAUtils
         [Fact]
         public void GetJsonString__AsExpected()
         {
-            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", SaJsonValueType.ObjectArray, new List<string> { "allAf", "doubleValue1", "doubleValue2" });
-            jsonSchema.AddAnnotation("allAf", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Category = CustomAnnotationCategories.AlleleFrequency });
-            jsonSchema.AddAnnotation("doubleValue1", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "A double value" });
-            jsonSchema.AddAnnotation("doubleValue2", new SaJsonKeyAnnotation { ValueType = SaJsonValueType.Number, Description = "Another double value" });
-            var jsonString = jsonSchema.GetJsonString(new List<string[]> { new []{"0.12345678"}, new []{"0.12"}, new []{"0.12345678"} });
+            var jsonSchema = SaJsonSchema.Create(new StringBuilder(), "test", "array", new List<string> { "allAf", "doubleValue1", "doubleValue2" });
+            jsonSchema.AddAnnotation("allAf", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Category = CustomAnnotationCategories.AlleleFrequency });
+            jsonSchema.AddAnnotation("doubleValue1", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Description = "A double value" });
+            jsonSchema.AddAnnotation("doubleValue2", new SaJsonKeyAnnotation { Type = JsonDataType.Number, Description = "Another double value" });
+            var jsonString = jsonSchema.GetJsonString(new List<string> { "0.12345678", "0.12", "0.12345678" });
 
             Assert.Equal("\"allAf\":0.123457,\"doubleValue1\":0.12,\"doubleValue2\":0.12345678", jsonString);
         }
