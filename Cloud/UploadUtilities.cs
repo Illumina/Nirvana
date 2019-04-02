@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Security.Cryptography;
 using Amazon.S3.Model;
 using IO;
@@ -8,32 +7,23 @@ namespace Cloud
 {
     public static class UploadUtilities
     {
-        public static void Upload(IS3Client s3Client, string bucketName, string s3Path, string localFilePath)
+        public static void DecryptUpload(this IS3Client s3Client, string bucketName, string key, string filePath, AesCryptoServiceProvider aes, FileMetadata metadata)
         {
-            var putRequest = GetPutObjectRequest(bucketName, s3Path, localFilePath);
-
-            s3Client.PutObjectAsync(putRequest).Wait();
-        }
-
-        internal static PutObjectRequest GetPutObjectRequest(string bucketName, string s3Path, string localFilePath)
-        {
-            string inputFileMd5 = GetMd5Base64(localFilePath);
-
-            return new PutObjectRequest
+            using (var fileStream   = FileUtilities.GetReadStream(filePath))
+            using (var cryptoStream = new CryptoStream(fileStream, aes.CreateDecryptor(), CryptoStreamMode.Read))
+            using (var lengthStream = new LengthStream(cryptoStream, metadata.Length))
             {
-                BucketName = bucketName,
-                Key = s3Path.TrimStart('/'),
-                FilePath = localFilePath,
-                MD5Digest = inputFileMd5
-            };
-        }
+                string md5String = Convert.ToBase64String(metadata.MD5);
 
-        internal static string GetMd5Base64(string filePath)
-        {
-            using (var md5 = MD5.Create())
-            using (var stream = File.OpenRead(filePath))
-            {
-                return Convert.ToBase64String(md5.ComputeHash(stream));
+                var request = new PutObjectRequest
+                {
+                    BucketName  = bucketName,
+                    Key         = key,
+                    InputStream = lengthStream,
+                    MD5Digest   = md5String
+                };
+
+                s3Client.PutObjectAsync(request).Wait();
             }
         }
     }

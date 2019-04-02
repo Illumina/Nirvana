@@ -1,4 +1,6 @@
-﻿using Amazon.S3.Model;
+﻿using System.IO;
+using System.Security.Cryptography;
+using Amazon.S3.Model;
 using Cloud;
 using IO;
 using Moq;
@@ -9,39 +11,43 @@ namespace UnitTests.Cloud
 {
     public sealed class UploadUtilitiesTests
     {
-        private readonly string _localFilePath = Resources.TopPath("Mother_chr22.genome.vcf.gz.tbi");
+        private readonly FileMetadata _metadata = new FileMetadata(new byte[] { 0, 1, 2, 3, 4, 5, 6 }, 1);
+        private readonly string _filePath       = Resources.TopPath("clinvar.dict");
 
-        [Fact]
-        public void GetMd5Base64_AsExpected()
-        {
-            string md5 = UploadUtilities.GetMd5Base64(_localFilePath);
-
-            Assert.Equal("5R0SGqGHoTONijCK+Qb3PQ==", md5);
-        }
-
-        [Fact]
-        public void GetPutObjectRequest_AsExpected()
-        {
-            const string bucketName = "Test";
-
-            var putRequest = UploadUtilities.GetPutObjectRequest(bucketName, "/path/to/file.json.gz", _localFilePath);
-
-            Assert.Equal(bucketName, putRequest.BucketName);
-            Assert.Equal("path/to/file.json.gz", putRequest.Key);
-            Assert.Equal(_localFilePath, putRequest.FilePath);
-            Assert.Equal("5R0SGqGHoTONijCK+Qb3PQ==", putRequest.MD5Digest);
-        }
-
-        [Fact]
-        public void Upload_AsExpected()
+        private static Mock<IS3Client> GetS3ClientMock()
         {
             var s3ClientMock = new Mock<IS3Client>();
-
             s3ClientMock.Setup(x => x.PutObjectAsync(It.IsAny<PutObjectRequest>())).ReturnsAsync(new PutObjectResponse());
+            return s3ClientMock;
+        }
 
-            UploadUtilities.Upload(s3ClientMock.Object, "bucket", "/path/to/file.json.gz", _localFilePath);
+        [Fact]
+        public void DecryptUpload_AsExpected()
+        {
+            Mock<IS3Client> s3ClientMock = GetS3ClientMock();
+
+            using (var aes = new AesCryptoServiceProvider())
+            {
+                var s3Client = s3ClientMock.Object;
+                s3Client.DecryptUpload("bucket", "bob.json.gz", _filePath, aes, _metadata);
+            }
 
             s3ClientMock.Verify(x => x.PutObjectAsync(It.IsAny<PutObjectRequest>()), Times.Once);
+        }
+
+        [Fact]
+        public void DecryptUpload_FileNotFound()
+        {
+            Assert.Throws<FileNotFoundException>(delegate
+            {
+                Mock<IS3Client> s3ClientMock = GetS3ClientMock();
+
+                using (var aes = new AesCryptoServiceProvider())
+                {
+                    var s3Client = s3ClientMock.Object;
+                    s3Client.DecryptUpload("bucket", "bob.json.gz", "bob123", aes, _metadata);
+                }
+            });
         }
     }
 }
