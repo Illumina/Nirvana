@@ -7,7 +7,6 @@ using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
-using SAUtils.Schema;
 using VariantAnnotation.SA;
 
 namespace SAUtils.Custom
@@ -21,7 +20,7 @@ namespace SAUtils.Custom
         private string[] _tags;
         internal CustomAnnotationCategories[] Categories;
         internal string[] Descriptions;
-        internal SaJsonValueType[] ValueTypes;
+        internal JsonDataType[] Types;
 
         private int _numRequiredColumns;
         private int _numAnnotationColumns;
@@ -32,15 +31,14 @@ namespace SAUtils.Custom
         private (IChromosome Chromesome, int Position) _previousPosition = (null, 0);
         private Action<string, string>[] _annotationValidators;
 
-        private readonly SaJsonValueType _primaryType = SaJsonValueType.ObjectArray;
-        private readonly Dictionary<string, SaJsonValueType> _predefinedTypeAnnotation = new Dictionary<string, SaJsonValueType>
+        private const string DataType = "array";
+        private readonly Dictionary<string, JsonDataType> _predefinedTypeAnnotation = new Dictionary<string, JsonDataType>
         {
-            {"refAllele", SaJsonValueType.String},
-            {"altAllele", SaJsonValueType.String},
-            {"start", SaJsonValueType.Number},
-            {"end", SaJsonValueType.Number}
+            {"refAllele", JsonDataType.String},
+            {"altAllele", JsonDataType.String},
+            {"start", JsonDataType.Number},
+            {"end", JsonDataType.Number}
         };
-
         internal readonly List<string> JsonKeys = new List<string> {"refAllele", "altAllele"};
         internal readonly List<string> IntervalJsonKeys = new List<string> {"start", "end"};
 
@@ -213,19 +211,19 @@ namespace SAUtils.Custom
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length) throw new UserErrorException("#types row must have the same number of columns as the #CHROM row");
 
-            ValueTypes = new SaJsonValueType[_numAnnotationColumns];
+            Types = new JsonDataType[_numAnnotationColumns];
             for (int i = 0; i < _numAnnotationColumns; i++)
             {
                 switch (splits[i + _numRequiredColumns].ToLower())
                 {
                     case "bool":
-                        ValueTypes[i] = SaJsonValueType.Bool;
+                        Types[i] = JsonDataType.Bool;
                         break;
                     case "string":
-                        ValueTypes[i] = SaJsonValueType.String;
+                        Types[i] = JsonDataType.String;
                         break;
                     case "number":
-                        ValueTypes[i] = SaJsonValueType.Number;
+                        Types[i] = JsonDataType.Number;
                         break;
                     default:
                         throw new UserErrorException("Invalid value for type column. Valid values are bool, string, number.");
@@ -250,16 +248,16 @@ namespace SAUtils.Custom
 
         private void InitiateSchema()
         {
-            if (_altColumnIndex != -1) JsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, _primaryType, JsonKeys);
-            if (_endColumnIndex != -1) IntervalJsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, _primaryType, IntervalJsonKeys);
+            if (_altColumnIndex != -1) JsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, DataType, JsonKeys);
+            if (_endColumnIndex != -1) IntervalJsonSchema = SaJsonSchema.Create(new StringBuilder(), JsonTag, DataType, IntervalJsonKeys);
         }
 
         private void AddPredefinedTypeAnnotation()
         {
             foreach (var (jsonKey, valueType) in _predefinedTypeAnnotation)
             {
-                JsonSchema?.AddAnnotation(jsonKey, new SaJsonKeyAnnotation {ValueType=valueType});
-                IntervalJsonSchema?.AddAnnotation(jsonKey, new SaJsonKeyAnnotation { ValueType = valueType });
+                JsonSchema?.AddAnnotation(jsonKey, new SaJsonKeyAnnotation {Type=valueType});
+                IntervalJsonSchema?.AddAnnotation(jsonKey, new SaJsonKeyAnnotation { Type = valueType });
             }
         }
 
@@ -270,7 +268,7 @@ namespace SAUtils.Custom
                 var annotation = new SaJsonKeyAnnotation
 
                 {
-                    ValueType = ValueTypes[i],
+                    Type = Types[i],
                     Category = Categories[i],
                     Description = Descriptions[i]
                 };
@@ -316,7 +314,7 @@ namespace SAUtils.Custom
                     throw new UserErrorException($"END is not an integer.\nInput line: {line}.");
 
                 jsonStringValues.AddRange(annotationValues);
-                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues.Select(x => new []{x}).ToList(), IntervalJsonSchema, line));
+                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues, IntervalJsonSchema, line));
                 return null;
             }
 
@@ -324,7 +322,7 @@ namespace SAUtils.Custom
             if (!IsValidNucleotideSequence(altAllele))
                 throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
-            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues.Select(x => new[] {x}).ToArray(), JsonSchema, line);
+            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues, JsonSchema, line);
         }
 
         private bool IsInterval(string[] splits) => _endColumnIndex != -1 && !AllowedValues.IsEmptyValue(splits[_endColumnIndex]);

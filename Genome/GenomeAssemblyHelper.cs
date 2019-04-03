@@ -1,14 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
-using ErrorHandling.Exceptions;
+﻿using ErrorHandling.Exceptions;
 
 namespace Genome
 {
     public static class GenomeAssemblyHelper
     {
-        public static readonly ImmutableHashSet<GenomeAssembly> AutosomeAndAllosomeAssemblies =
-            new HashSet<GenomeAssembly> { GenomeAssembly.GRCh37, GenomeAssembly.GRCh38, GenomeAssembly.hg19 }.ToImmutableHashSet();
-
         public static GenomeAssembly Convert(string genomeAssembly)
         {
             GenomeAssembly ret;

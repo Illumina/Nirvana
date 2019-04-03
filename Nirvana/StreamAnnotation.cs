@@ -2,9 +2,7 @@
 using System.IO;
 using Compression.FileHandling;
 using ErrorHandling;
-using ErrorHandling.Exceptions;
 using Genome;
-using IO;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -30,7 +28,7 @@ namespace Nirvana
             var metrics = new PerformanceMetrics(logger);
             var vcfConversion = new VcfConversion();
 
-            using (var vcfReader = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter))
+            using (var vcfReader = Create(headerStream, inputVcfStream, annotationResources, vcfFilter))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             using (var vcfWriter = annotationResources.OutputVcf
                 ? new LiteVcfWriter(new StreamWriter(outputVcfStream), vcfReader.GetHeaderLines(), annotationResources)
@@ -41,8 +39,10 @@ namespace Nirvana
             {
                 try
                 {
-                    CheckGenomeAssembly(annotationResources, vcfReader);
-                    SetMitochondrialAnnotationBehavior(annotationResources, vcfReader);
+                    if (vcfReader.IsRcrsMitochondrion && annotationResources.Annotator.Assembly == GenomeAssembly.GRCh37
+                        || annotationResources.Annotator.Assembly == GenomeAssembly.GRCh38
+                        || annotationResources.ForceMitochondrialAnnotation)
+                        annotationResources.Annotator.EnableMitochondrialAnnotation();
 
                     int previousChromIndex = -1;
                     IPosition position;
@@ -52,17 +52,18 @@ namespace Nirvana
                         if (previousChromIndex != position.Chromosome.Index)
                             annotationResources.PreLoad(position.Chromosome);
                         previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
-
+                        
                         var annotatedPosition = position.Variants != null ? annotationResources.Annotator.Annotate(position) : null;
                         string json = annotatedPosition?.GetJsonString();
 
-                        GenerateOutput(vcfConversion, jsonWriter, vcfWriter, gvcfWriter, position, annotatedPosition, json);
-
+                        if (json != null) WriteAnnotatedPosition(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json, vcfConversion);
+                        else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
+                       
                         metrics.Increment();
                     }
 
                     jsonWriter.WriteAnnotatedGenes(annotationResources.Annotator.GetGeneAnnotations());
-
+                    
                 }
                 catch (Exception e)
                 {
@@ -76,43 +77,6 @@ namespace Nirvana
             return ExitCodes.Success;
         }
 
-        private static void CheckGenomeAssembly(AnnotationResources annotationResources, VcfReader vcfReader)
-        {
-            if (vcfReader.InferredGenomeAssembly != GenomeAssembly.Unknown && vcfReader.InferredGenomeAssembly != annotationResources.Annotator.Assembly)
-                throw new UserErrorException($"{vcfReader.InferredGenomeAssembly} is used in the input VCF, whereas {annotationResources.Annotator.Assembly} is specified for annotation.");
-        }
-
-        private static void SetMitochondrialAnnotationBehavior(AnnotationResources annotationResources, VcfReader vcfReader)
-        {
-            if (vcfReader.IsRcrsMitochondrion && annotationResources.Annotator.Assembly == GenomeAssembly.GRCh37
-                || annotationResources.Annotator.Assembly == GenomeAssembly.GRCh38
-                || annotationResources.ForceMitochondrialAnnotation)
-                annotationResources.Annotator.EnableMitochondrialAnnotation();
-        }
-
-        private static void GenerateOutput(VcfConversion vcfConversion, JsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, IPosition position, IAnnotatedPosition annotatedPosition, string json)
-        {
-            if (json != null) WriteAnnotatedPosition(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json, vcfConversion);
-            else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
-        }
-
-        private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter)
-        {
-            var vcfReader = FileUtilities.GetStreamReader(vcfStream);
-
-            StreamReader headerReader;
-            if (headerStream == null)
-                headerReader = vcfReader;
-            else
-            {
-                headerReader = FileUtilities.GetStreamReader(headerStream);
-                vcfStream.Position = Tabix.VirtualPosition.From(annotationResources.InputStartVirtualPosition).BlockOffset;
-            }
-
-            return Create(headerReader, vcfReader, annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter);
-        }
-
         public static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput, VcfConversion vcfConversion)
         {
             jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
@@ -123,6 +87,7 @@ namespace Nirvana
             vcfWriter?.Write(vcfLine);
             gvcfWriter?.Write(vcfLine);
         }
+
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome,
             PerformanceMetrics metrics)

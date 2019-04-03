@@ -1,49 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Compression.Utilities;
 using Genome;
 using SAUtils.DataStructures;
-using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Utilities;
-using static SAUtils.InputFileParsers.ClinVar.ClinVarCommon;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-    public sealed class ClinVarXmlReader 
+    public sealed class ClinvarVariant
+	{
+		public readonly IChromosome Chromosome;
+		public int Start { get; }
+		public readonly int Stop;
+		public readonly string ReferenceAllele;
+		public readonly string AltAllele;
+		public string VariantType;
+	    public readonly List<string> AllelicOmimIds;
+
+		public ClinvarVariant(IChromosome chr, int start, int stop, string refAllele, string altAllele, List<string> allilicOmimIds =null)
+		{
+			Chromosome      = chr;
+			Start           = start;
+			Stop            = stop;
+			ReferenceAllele = refAllele ?? "";
+			AltAllele       = altAllele ?? "";
+            AllelicOmimIds  = allilicOmimIds ?? new List<string>();
+		}
+
+	}
+
+	public sealed class ClinVarXmlReader 
     {
         #region members
-        private const string RefAssertionTag = "ReferenceClinVarAssertion";
-        private const string ClinVarAssertionTag = "ClinVarAssertion";
-        private const string ReviewStatusTag = "ReviewStatus";
-        private const string DescriptionTag = "Description";
-        private const string ExplanationTag = "Explanation";
-        private const int MaxVariantLength = 1000;
-
-        private readonly Dictionary<char, char[]> _iupacBases = new Dictionary<char, char[]>
-        {
-            ['R'] = new[] { 'A', 'G' },
-            ['Y'] = new[] { 'C', 'T' },
-            ['S'] = new[] { 'G', 'C' },
-            ['W'] = new[] { 'A', 'T' },
-            ['K'] = new[] { 'G', 'T' },
-            ['M'] = new[] { 'A', 'C' },
-            ['B'] = new[] { 'C', 'G', 'T' },
-            ['D'] = new[] { 'A', 'G', 'T' },
-            ['H'] = new[] { 'A', 'C', 'T' },
-            ['V'] = new[] { 'A', 'C', 'G' }
-        };
-
-        private const string ChrTag = "Chr";
-        private const string StopTag = "display_stop";
-        private const string StartTag = "display_start";
-        private const string AssemblyTag = "Assembly";
-        private const string RefAlleleTag = "referenceAllele";
-        private const string AltAlleleTag = "alternateAllele";
 
         private readonly string _fileName;
 		private readonly VariantAligner _aligner;
@@ -51,6 +42,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
         private string _lastClinvarAccession;
+
         #endregion
 
         
@@ -62,26 +54,24 @@ namespace SAUtils.InputFileParsers.ClinVar
 		private string _id;
 		private HashSet<string> _prefPhenotypes;
 		private HashSet<string> _altPhenotypes;
-		private string[] _significances;
+		private string _significance;
 
 		private HashSet<string> _medGenIDs;
 		private HashSet<string> _omimIDs;
         private HashSet<string> _allilicOmimIDs;
 		private HashSet<string> _orphanetIDs;
 
-        private HashSet<string> _pubMedIds= new HashSet<string>();
+        private HashSet<long> _pubMedIds= new HashSet<long>();
 		private long _lastUpdatedDate;
 
-        public SaJsonSchema JsonSchema { get; } = ClinVarSchema.Get();
-
-        #endregion
+		#endregion
 
         private void ClearClinvarFields()
 		{
 			_variantList.Clear();
 			_reviewStatus      = null;
 			_alleleOrigins     = new HashSet<string>();
-			_significances      = null;
+			_significance      = null;
 			_prefPhenotypes    = new HashSet<string>();
 			_altPhenotypes     = new HashSet<string>();
 			_id                = null;
@@ -89,7 +79,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			_omimIDs           = new HashSet<string>();
             _allilicOmimIDs    = new HashSet<string>();
             _orphanetIDs       = new HashSet<string>();
-			_pubMedIds         = new HashSet<string>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
+			_pubMedIds         = new HashSet<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
 			_lastUpdatedDate   = long.MinValue;
 		}
 
@@ -135,11 +125,12 @@ namespace SAUtils.InputFileParsers.ClinVar
 				    if (extractedItems == null) continue;
 				    clinVarItems.AddRange(extractedItems);
 
+
                 } while (xmlReader.ReadToNextSibling(ClinVarSetTag));
 			}
 		    clinVarItems.Sort();
 
-		    var validItems = GetValidItems(clinVarItems);
+		    var validItems = GetValidVariants(clinVarItems);
 
 		    var count = 0;
 		    foreach (var clinVarItem in validItems.Distinct())
@@ -151,7 +142,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         }
 
-        private List<ClinVarItem> GetValidItems(List<ClinVarItem> clinVarItems)
+        private List<ClinVarItem> GetValidVariants(List<ClinVarItem> clinVarItems)
         {
             var shiftedItems = new List<ClinVarItem>();
             foreach (var item in clinVarItems)
@@ -179,18 +170,16 @@ namespace SAUtils.InputFileParsers.ClinVar
                     item.Stop,
                     refAllele,
                     altAllele,
-                    item.VariantType,
-                    item.Values,
-                    JsonSchema));
+                    item.AlleleOrigins, item.VariantType, item.Id, item.ReviewStatus, item.MedGenIDs, item.OmimIDs, item.OrphanetIDs, item.Phenotypes, item.Significance, item.PubmedIds, item.LastUpdatedDate));
             }
 
             shiftedItems.Sort();
             return shiftedItems;
         }
 
-
-        
-
+        private const string RefAssertionTag = "ReferenceClinVarAssertion";
+        private const string ClinVarAssertionTag = "ClinVarAssertion";
+        private const int MaxVariantLength = 1000;
         private List<ClinVarItem> ExtractClinVarItems(XElement xElement)
 		{
             ClearClinvarFields();
@@ -207,41 +196,30 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 var extendedOmimIds = GetOmimIds(variant);
 
-                var reviewStatusString = ReviewStatusMapping.FormatReviewStatus(_reviewStatus);
+                var reviewStatEnum = ReviewStatus.no_assertion;
+		        if (ClinVarItem.ReviewStatusNameMapping.ContainsKey(_reviewStatus))
+		            reviewStatEnum = ClinVarItem.ReviewStatusNameMapping[_reviewStatus];
 
-                clinvarList.Add(GetClinVarItem(variant, reviewStatusString, extendedOmimIds.ToArray()));
+                clinvarList.Add(
+                    new ClinVarItem(variant.Chromosome,
+                        variant.Start,
+                        variant.Stop,
+                        variant.ReferenceAllele,
+                        variant.AltAllele,
+                        _alleleOrigins.Count > 0 ? _alleleOrigins : null, 
+                        variant.VariantType, 
+                        _id, 
+                        reviewStatEnum, 
+                        _medGenIDs.Count > 0 ? _medGenIDs : null, 
+                        extendedOmimIds.Count > 0 ? extendedOmimIds : null, 
+                        _orphanetIDs.Count > 0 ? _orphanetIDs : null, 
+                        _prefPhenotypes.Count > 0 ? _prefPhenotypes : _altPhenotypes, 
+                        _significance, 
+                        _pubMedIds.Count > 0 ? _pubMedIds.OrderBy(x => x) : null, _lastUpdatedDate));
             }
 
 			return clinvarList.Count > 0 ? clinvarList: null;
 		}
-
-        private ClinVarItem GetClinVarItem(ClinvarVariant variant, string reviewStatusString, string[] extendedOmimIds)
-        {
-            return new ClinVarItem(variant.Chromosome,
-                variant.Start,
-                variant.Stop,
-                variant.ReferenceAllele,
-                variant.AltAllele,
-                variant.VariantType,
-                GetValues(reviewStatusString, extendedOmimIds),
-                JsonSchema);
-        }
-
-        private string[][] GetValues(string reviewStatusString, string[] extendedOmimIds)
-        {
-            var values = new string[PubMedIdsIndex+1][];
-            values[IdIndex] = new[] { _id };
-            values[ReviewStatusIndex] = new[] { reviewStatusString };
-            values[AlleleOriginsIndex] = _alleleOrigins.Count > 0 ? _alleleOrigins.ToArray() : null;
-            values[PhenotypesIndex] = _prefPhenotypes.Count > 0 ? _prefPhenotypes.ToArray() : _altPhenotypes.ToArray();
-            values[MedGenIdsIndex] = _medGenIDs.Count > 0 ? _medGenIDs.ToArray() : null;
-            values[OmimIdsIndex] = extendedOmimIds.Length > 0 ? extendedOmimIds : null;
-            values[OrphanetIdsIndex] = _orphanetIDs.Count > 0 ? _orphanetIDs.ToArray() : null;
-            values[SignificanceIndex] = _significances;
-            values[LastUpdateDateIndex] = new[] { new DateTime(_lastUpdatedDate).ToString("yyyy-MM-dd")};
-            values[PubMedIdsIndex] = _pubMedIds.Count > 0 ? _pubMedIds.OrderBy(long.Parse).ToArray() : null;
-            return values;
-        }
 
         private HashSet<string> GetOmimIds(ClinvarVariant variant)
         {
@@ -458,9 +436,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 			    if (source.Value != PubmedIdTag) continue;
 
 			    string pubmedId = element.Value.TrimEnd('.');
-			    //pubmed ids with more than 8 digits are bad
-                if (pubmedId.Length <= 8 && long.TryParse(pubmedId, out _))
-			        _pubMedIds.Add(pubmedId);
+			    if (long.TryParse(pubmedId, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
+			        _pubMedIds.Add(l);
 			    else Console.WriteLine($"WARNING:unexpected pubmedID {pubmedId}.");
                 
     		}
@@ -540,7 +517,26 @@ namespace SAUtils.InputFileParsers.ClinVar
 			}
 		}
 
+        private readonly Dictionary<char, char[]> _iupacBases = new Dictionary<char, char[]>
+        {
+			['R'] = new[] {'A','G'},
+			['Y'] = new[] { 'C', 'T' },
+			['S'] = new[] { 'G', 'C' },
+			['W'] = new[] { 'A', 'T' },
+			['K'] = new[] { 'G', 'T' },
+			['M'] = new[] { 'A', 'C' },
+			['B'] = new[] { 'C', 'G', 'T' },
+			['D'] = new[] { 'A', 'G', 'T' },
+			['H'] = new[] { 'A', 'C', 'T' },
+			['V'] = new[] { 'A', 'C', 'G' }
+		};
 
+        private const string ChrTag       = "Chr";
+        private const string StopTag      = "display_stop";
+        private const string StartTag     = "display_start";
+        private const string AssemblyTag  = "Assembly";
+        private const string RefAlleleTag = "referenceAllele";
+        private const string AltAlleleTag = "alternateAllele";
 
         private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
         {
@@ -564,6 +560,12 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		private static void AdjustVariant(ref int start, ref int stop, ref string referenceAllele, ref string altAllele)
 		{
+   //         if (referenceAllele == "-" && !string.IsNullOrEmpty(altAllele) && stop == start + 1)
+   //         {
+			//	referenceAllele = "";
+			//	start++;
+			//}
+
 		    if (referenceAllele == "-")
 		    {
 		        referenceAllele = "";
@@ -574,58 +576,15 @@ namespace SAUtils.InputFileParsers.ClinVar
 				altAllele = "";
 		}
 
+        private const string ReviewStatusTag = "ReviewStatus";
+        private const string DescriptionTag = "Description";
+
         private void GetClinicalSignificance(XElement xElement)
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
 		    _reviewStatus = xElement.Element(ReviewStatusTag)?.Value;
-            var description = xElement.Element(DescriptionTag)?.Value;
-            var explanation = xElement.Element(ExplanationTag)?.Value;
-
-            _significances = GetSignificances(description, explanation);
-
-            ValidateSignificance(_significances);
-        }
-
-        private void ValidateSignificance(string[] significances)
-        {
-            foreach (var significance in significances)
-            {
-                if (!_validPathogenicity.Contains(significance)) 
-                    throw new InvalidDataException($"Invalid pathogenicity found in {_id}. Observed: {significance}");
-            }
-        }
-
-        private string[] GetSignificances(string description, string explanation)
-        {
-            if(string.IsNullOrEmpty(explanation)) return description?.ToLower().Split('/', ',').Select(x=>x.Trim()).ToArray();
-            //<Explanation DataSource="ClinVar" Type="public">Pathogenic(1);Uncertain significance(1)</Explanation>
-            var sigList=new List<string>();
-            foreach (var significance in explanation.ToLower().Split('/',';'))
-            {
-                var openParenthesisIndex = significance.IndexOf('(');
-                sigList.Add(openParenthesisIndex < 0 ? significance : significance.Substring(0, openParenthesisIndex));
-            }
-
-            return sigList.ToArray();
-        }
-
-        private readonly HashSet<string> _validPathogenicity = new HashSet<string>()
-        {
-            "uncertain significance",
-            "not provided",
-            "benign",
-            "likely benign",
-            "likely pathogenic",
-            "pathogenic",
-            "drug response",
-            "histocompatibility",
-            "association",
-            "risk factor",
-            "protective",
-            "affects",
-            "conflicting data from submitters",
-            "other"
-        };
+		    _significance = xElement.Element(DescriptionTag)?.Value.ToLower();
+		}
     }
 }

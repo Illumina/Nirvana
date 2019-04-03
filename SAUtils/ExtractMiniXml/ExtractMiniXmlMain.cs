@@ -7,12 +7,12 @@ namespace SAUtils.ExtractMiniXml
     public static class ExtractMiniXmlMain
 	{
 	    private  static string _inputXmlFile;
-	    private  static string _rcvIds;
+	    private  static string _rcvId;
 	    private  static string _outputDir;
 
 	    private static ExitCodes ProgramExecution()
         {
-	        var extractor = new XmlExtractor(_inputXmlFile, _rcvIds, _outputDir);
+	        var extractor = new XmlExtractor(_inputXmlFile, _rcvId, _outputDir);
 	        extractor.Extract();
 
             return ExitCodes.Success;
@@ -29,7 +29,7 @@ namespace SAUtils.ExtractMiniXml
 				{
 					"r|rcv=",
 					"RCV ID",
-					v => _rcvIds = v
+					v => _rcvId = v
 				},
 				{
 					"o|out=",
@@ -44,8 +44,7 @@ namespace SAUtils.ExtractMiniXml
 	            .Parse()
 	            .CheckInputFilenameExists(_inputXmlFile, "input XML file", "--in")
 	            .HasRequiredParameter(_outputDir, "output directory", "--out")
-                .HasRequiredParameter(_rcvIds, "comma separated list of RCV ids or folder containing RCV files to update", "--rcv")
-                .SkipBanner()
+			    .SkipBanner()
                 .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
 	            .ShowErrors()
 	            .Execute(ProgramExecution);

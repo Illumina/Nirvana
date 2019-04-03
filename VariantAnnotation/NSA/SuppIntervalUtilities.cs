@@ -1,27 +1,23 @@
 ﻿using System;
 using Genome;
 using Variants;
-using static Intervals.Utilities;
 
 namespace VariantAnnotation.NSA
 {
     public static class SuppIntervalUtilities
     {
-        public static (double? ReciprocalOverlap, double? AnnotationOverlap) GetOverlapFractions( IChromosomeInterval saInterval, ISimpleVariant variant)
+        public static double? GetReciprocalOverlap( IChromosomeInterval saInterval, IVariant variant)
         {
-            if (saInterval.Chromosome.Index != variant.Chromosome.Index) return (null, null);
+            if (saInterval.Chromosome.Index != variant.Chromosome.Index) return null;
             //skip for insertions
-            if (saInterval.Start >= saInterval.End || variant.Type == VariantType.insertion) return (null, null);
+            if (saInterval.Start >= saInterval.End || variant.Type == VariantType.insertion) return null;
             //skip for break-ends
-            if (variant.Type == VariantType.translocation_breakend) return (null, null);
+            if (variant.Type == VariantType.translocation_breakend) return null;
 
-            if (!Overlaps(saInterval.Start, saInterval.End, variant.Start, variant.End)) return (null, null);
-
-            var overlapSize = (double) (Math.Min(saInterval.End, variant.End) - Math.Max(saInterval.Start, variant.Start) + 1);
-            int annoSize = saInterval.End - saInterval.Start + 1;
-            int varSize = variant.End - variant.Start + 1;
-            int maxSize = Math.Max(annoSize, varSize);
-            return (overlapSize / maxSize, overlapSize / annoSize);
+            int overlapStart = Math.Max(saInterval.Start, variant.Start);
+            int overlapEnd   = Math.Min(saInterval.End, variant.End);
+            int maxLen       = Math.Max(variant.End - variant.Start + 1, saInterval.End - saInterval.Start + 1);
+            return Math.Max(0, (overlapEnd - overlapStart + 1) * 1.0 / maxLen);
         }
     }
 }
