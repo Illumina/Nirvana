@@ -79,7 +79,7 @@ namespace Nirvana
         private static void CheckGenomeAssembly(AnnotationResources annotationResources, VcfReader vcfReader)
         {
             if (vcfReader.InferredGenomeAssembly != GenomeAssembly.Unknown && vcfReader.InferredGenomeAssembly != annotationResources.Annotator.Assembly)
-                throw new UserErrorException($"{vcfReader.InferredGenomeAssembly} is used in the input VCF, whereas {annotationResources.Annotator.Assembly} is specified for annotation.");
+                throw new UserErrorException($"A mismatch between genome assemblies was found. The input VCF uses {vcfReader.InferredGenomeAssembly} whereas annotation was configured for {annotationResources.Annotator.Assembly}.");
         }
 
         private static void SetMitochondrialAnnotationBehavior(AnnotationResources annotationResources, VcfReader vcfReader)
