@@ -1,125 +1,143 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-<ClinVarSet ID="10310844">
-  <RecordStatus>current</RecordStatus>
-  <Title>LIPA, IVS8, G-A, +1 AND Wolman disease</Title>
-  <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-02-17" ID="57604">
-    <ClinVarAccession Acc="RCV000000101" Version="2" Type="RCV" DateUpdated="2016-02-17"/>
+  <ClinVarSet ID="37890517">
     <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="1996-04-01">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>not provided</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>literature only</MethodType>
-      </Method>
-      <ObservedData ID="9727445">
-        <Attribute Type="Description">In 2 sibs with Wolman disease (278000) from a consanguineous family, Aslanidis et al. (1996) detected homozygosity for a G-to-A mutation at simplePosition +1 of the splice donor site following exon 8 of the LIPA gene. Both children died within the first year of life. The parents, who were heterozygous for the mutation, had reduced enzymatic activity, while no enzymatic activity was detectable in fibroblasts from the affected children. Although the same donor splice site is involved as in the mutation reported in CESD (934G-A, 613497.0002), the nucleotide at simplePosition +1 was changed in the Wolman disease mutation while the nucleotide at simplePosition -1 was changed in the CESD mutation. Both mutations result in deletion of the same 24 amino acids (exon 8), but the effects are dramatically different: the -1 mutation allowed some correct splicing (3% of total LIPA RNA), but the +1 splice site mutation, which affects one of the invariable nucleotides of the splice consensus sequences, permits no correct splicing. Aslanidis et al. (1996) suggested that the residual activity in CESD patients compared to Wolman patients may result either from a partially active enzyme with the internal deletion of 24 amino acids (skipping of exon 8) or from the production of low amounts of the full size of the protein due to inefficient exon exclusion from the mutated allele.</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">8617513</ID>
-        </Citation>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant" ID="81">
-      <Measure Type="single nucleotide variant" ID="15120">
-        <Name>
-          <ElementValue Type="Preferred">LIPA, IVS8, G-A, +1</ElementValue>
-        </Name>
-        <AttributeSet>
-          <Attribute Type="nucleotide change">IVS8, G-A, +1</Attribute>
-          <XRef Type="Allelic variant" ID="613497.0005" DB="OMIM"/>
-        </AttributeSet>
-        <CytogeneticLocation>10q23.31</CytogeneticLocation>
-        <MeasureRelationship Type="variant in gene">
+    <Title>NM_000235.4(LIPA):c.894+1G&gt;A AND Wolman disease</Title>
+    <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2019-01-30" ID="57604">
+      <ClinVarAccession Acc="RCV000000101" Version="3" Type="RCV" DateUpdated="2019-01-30" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="1996-04-01">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="36756702">
+          <Attribute Type="Description">In 2 sibs with Wolman disease (278000) from a consanguineous family, Aslanidis et al. (1996) detected homozygosity for a G-to-A mutation at position +1 of the splice donor site following exon 8 of the LIPA gene. Both children died within the first year of life. The parents, who were heterozygous for the mutation, had reduced enzymatic activity, while no enzymatic activity was detectable in fibroblasts from the affected children. Although the same donor splice site is involved as in the mutation reported in CESD (934G-A, 613497.0002), the nucleotide at position +1 was changed in the Wolman disease mutation while the nucleotide at position -1 was changed in the CESD mutation. Both mutations result in deletion of the same 24 amino acids (exon 8), but the effects are dramatically different: the -1 mutation allowed some correct splicing (3% of total LIPA RNA), but the +1 splice site mutation, which affects one of the invariable nucleotides of the splice consensus sequences, permits no correct splicing. Aslanidis et al. (1996) suggested that the residual activity in CESD patients compared to Wolman patients may result either from a partially active enzyme with the internal deletion of 24 amino acids (skipping of exon 8) or from the production of low amounts of the full size of the protein due to inefficient exon exclusion from the mutated allele.</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">8617513</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="81">
+        <Measure Type="single nucleotide variant" ID="15120">
           <Name>
-            <ElementValue Type="Preferred">lipase A, lysosomal acid type</ElementValue>
+            <ElementValue Type="Preferred">NM_000235.4(LIPA):c.894+1G&gt;A</ElementValue>
           </Name>
-          <Symbol>
-            <ElementValue Type="Preferred">LIPA</ElementValue>
-          </Symbol>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="89213568" stop="89252038" display_start="89213568" display_stop="89252038" variantLength="38471" Strand="-"/>
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="90973325" stop="91011659" display_start="90973325" display_stop="91011659" variantLength="38335" Strand="-"/>
-          <XRef ID="3988" DB="Gene"/>
-          <XRef Type="MIM" ID="613497" DB="OMIM"/>
-          <XRef ID="HGNC:6617" DB="HGNC"/>
-        </MeasureRelationship>
-        <XRef Type="Allelic variant" ID="613497.0005" DB="OMIM"/>
-      </Measure>
-      <Name>
-        <ElementValue Type="Preferred">LIPA, IVS8, G-A, +1</ElementValue>
-      </Name>
-    </MeasureSet>
-    <TraitSet Type="Disease" ID="40">
-      <Trait ID="9048" Type="Disease">
+          <AttributeSet>
+            <Attribute Change="c.894+1G&gt;A" Accession="NM_000235" Version="4" Type="HGVS, coding, RefSeq">NM_000235.4:c.894+1G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.34394G&gt;A" Accession="NG_008194" Version="1" Type="HGVS, genomic, RefSeqGene">NG_008194.1:g.34394G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.89222510C&gt;T" Accession="NC_000010" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000010.11:g.89222510C&gt;T</Attribute>
+            <XRef ID="38" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.90982267C&gt;T" Accession="NC_000010" Version="10" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000010.10:g.90982267C&gt;T</Attribute>
+            <XRef ID="37" DB="ClinVar" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.894+1G&gt;A" Accession="NM_000235" Version="3" Type="HGVS, previous">NM_000235.3:c.894+1G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="nucleotide change">IVS8, G-A, +1</Attribute>
+            <XRef Type="Allelic variant" ID="613497.0005" DB="OMIM" />
+          </AttributeSet>
+          <CytogeneticLocation>10q23.31</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="89222510" stop="89222510" display_start="89222510" display_stop="89222510" variantLength="1" referenceAllele="C" alternateAllele="T" positionVCF="89222510" referenceAlleleVCF="C" alternateAlleleVCF="T" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="90982267" stop="90982267" display_start="90982267" display_stop="90982267" variantLength="1" referenceAllele="C" alternateAllele="T" positionVCF="90982267" referenceAlleleVCF="C" alternateAlleleVCF="T" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">lipase A, lysosomal acid type</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">LIPA</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="89213569" stop="89252039" display_start="89213569" display_stop="89252039" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="90973325" stop="91011659" display_start="90973325" display_stop="91011659" variantLength="38335" Strand="-" />
+            <XRef ID="3988" DB="Gene" />
+            <XRef Type="MIM" ID="613497" DB="OMIM" />
+            <XRef ID="HGNC:6617" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef Type="Allelic variant" ID="613497.0005" DB="OMIM" />
+          <Comment DataSource="ClinGen" Type="public">ClinGen staff contributed the HGVS expression for this variant.</Comment>
+        </Measure>
         <Name>
-          <ElementValue Type="Preferred">Wolman disease</ElementValue>
-          <XRef ID="7899" DB="Office of Rare Diseases"/>
+          <ElementValue Type="Preferred">NM_000235.4(LIPA):c.894+1G&gt;A</ElementValue>
         </Name>
-        <Symbol>
-          <ElementValue Type="Alternate">CESD</ElementValue>
-          <XRef ID="7899" DB="Office of Rare Diseases"/>
-        </Symbol>
-      </Trait>
-    </TraitSet>
-  </ReferenceClinVarAssertion>
-  <ClinVarAssertion ID="20244">
-    <ClinVarSubmissionID localKey="613497.0005_WOLMAN DISEASE" submitter="OMIM" submitterDate="2012-07-18" title="LIPA, IVS8, G-A, +1 _WOLMAN DISEASE"/>
-    <ClinVarAccession Acc="SCV000020244" Version="1" Type="SCV" OrgID="3" DateUpdated="2015-10-11"/>
-    <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="1996-04-01">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ExternalID DB="OMIM" ID="613497.0005" Type="Allelic variant"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species>human</Species>
-        <AffectedStatus>not provided</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>literature only</MethodType>
-      </Method>
-      <ObservedData>
-        <Attribute Type="Description">In 2 sibs with Wolman disease (278000) from a consanguineous family, Aslanidis et al. (1996) detected homozygosity for a G-to-A mutation at simplePosition +1 of the splice donor site following exon 8 of the LIPA gene. Both children died within the first year of life. The parents, who were heterozygous for the mutation, had reduced enzymatic activity, while no enzymatic activity was detectable in fibroblasts from the affected children. Although the same donor splice site is involved as in the mutation reported in CESD (934G-A, 613497.0002), the nucleotide at simplePosition +1 was changed in the Wolman disease mutation while the nucleotide at simplePosition -1 was changed in the CESD mutation. Both mutations result in deletion of the same 24 amino acids (exon 8), but the effects are dramatically different: the -1 mutation allowed some correct splicing (3% of total LIPA RNA), but the +1 splice site mutation, which affects one of the invariable nucleotides of the splice consensus sequences, permits no correct splicing. Aslanidis et al. (1996) suggested that the residual activity in CESD patients compared to Wolman patients may result either from a partially active enzyme with the internal deletion of 24 amino acids (skipping of exon 8) or from the production of low amounts of the full size of the protein due to inefficient exon exclusion from the mutated allele.</Attribute>
-        <Citation>
-          <ID Source="PubMed">8617513</ID>
-        </Citation>
-        <XRef DB="OMIM" ID="278000" Type="MIM"/>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant">
-      <Measure Type="Variation">
-        <Name>
-          <ElementValue Type="Preferred">LIPA, IVS8, G-A, +1</ElementValue>
-        </Name>
-        <AttributeSet>
-          <Attribute Type="NonHGVS">IVS8, G-A, +1</Attribute>
-        </AttributeSet>
-        <MeasureRelationship Type="variant in gene">
-          <Symbol>
-            <ElementValue Type="Preferred">LIPA</ElementValue>
-          </Symbol>
-        </MeasureRelationship>
-        <XRef DB="OMIM" ID="613497.0005" Type="Allelic variant"/>
-      </Measure>
-    </MeasureSet>
-    <TraitSet Type="Disease">
-      <Trait Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">WOLMAN DISEASE</ElementValue>
-        </Name>
-      </Trait>
-    </TraitSet>
-  </ClinVarAssertion>
-</ClinVarSet>
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="40">
+        <Trait ID="9048" Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Wolman disease</ElementValue>
+            <XRef ID="7899" DB="Office of Rare Diseases" />
+          </Name>
+          <XRef ID="CN438428" DB="MedGen" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="20244">
+      <ClinVarSubmissionID localKey="613497.0005_WOLMAN DISEASE" submitter="OMIM" submitterDate="2017-12-22" title="LIPA, IVS8, G-A, +1_WOLMAN DISEASE" />
+      <ClinVarAccession Acc="SCV000020244" Version="2" Type="SCV" OrgID="3" OrganizationCategory="resource" OrgType="primary" DateUpdated="2017-12-26" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="1996-04-01">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="OMIM" ID="613497.0005" Type="Allelic variant" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species>human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">In 2 sibs with Wolman disease (278000) from a consanguineous family, Aslanidis et al. (1996) detected homozygosity for a G-to-A mutation at position +1 of the splice donor site following exon 8 of the LIPA gene. Both children died within the first year of life. The parents, who were heterozygous for the mutation, had reduced enzymatic activity, while no enzymatic activity was detectable in fibroblasts from the affected children. Although the same donor splice site is involved as in the mutation reported in CESD (934G-A, 613497.0002), the nucleotide at position +1 was changed in the Wolman disease mutation while the nucleotide at position -1 was changed in the CESD mutation. Both mutations result in deletion of the same 24 amino acids (exon 8), but the effects are dramatically different: the -1 mutation allowed some correct splicing (3% of total LIPA RNA), but the +1 splice site mutation, which affects one of the invariable nucleotides of the splice consensus sequences, permits no correct splicing. Aslanidis et al. (1996) suggested that the residual activity in CESD patients compared to Wolman patients may result either from a partially active enzyme with the internal deletion of 24 amino acids (skipping of exon 8) or from the production of low amounts of the full size of the protein due to inefficient exon exclusion from the mutated allele.</Attribute>
+          <Citation>
+            <ID Source="PubMed">8617513</ID>
+          </Citation>
+          <XRef DB="OMIM" ID="278000" Type="MIM" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Preferred">LIPA, IVS8, G-A, +1</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="NonHGVS">IVS8, G-A, +1</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">LIPA</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+          <XRef DB="OMIM" ID="613497.0005" Type="Allelic variant" />
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">WOLMAN DISEASE</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
 </ReleaseSet>

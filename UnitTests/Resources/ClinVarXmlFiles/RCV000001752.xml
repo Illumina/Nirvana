@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="31710484">
+    <RecordStatus>current</RecordStatus>
+    <Title>NM_000528.3(MAN2B1):c.215A&gt;T (p.His72Leu) AND Deficiency of alpha-mannosidase</Title>
+    <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2018-07-21" ID="59255">
+      <ClinVarAccession Acc="RCV000001752" Version="3" Type="RCV" DateUpdated="2018-07-21" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2012-06-07">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Conflicting interpretations of pathogenicity</Description>
+        <Explanation DataSource="ClinVar" Type="public">Pathogenic(1);Uncertain significance(1)</Explanation>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>yes</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="30256824">
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="30257059">
+          <Attribute Type="Description">In 2 sibs with alpha-mannosidosis (MANSA; 248500), born of consanguineous parents, Nilssen et al. (1997) identified a homozygous 212A-T transversion in exon 2 of the MANB gene, resulting in a his71-to-leu (H71L) substitution. Residue his71 is conserved among lysosomal alpha-mannosidases from several species. The sibs were thought to be mildly affected and residual acidic alpha-mannosidase activity of 20% of normal was detected in the patient's fibroblasts, according to the report of this family by Bach et al. (1978). Nevertheless, the patients showed vacuolated leukocytes and fibroblasts consistent with the disease phenotype. The authors suggested that mutant mannosidase enzymes, even though containing residual activity upon testing at the appropriate pH, may be mislocalized to nonlysosomal compartments and therefore functionally inactive.</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">724292</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">9158146</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="30257059">
+          <Attribute Type="Description">Gotoda et al. (1998) identified the same mutation, which they designated HIS72LEU in keeping with the codon numbering system of Wakamatsu et al. (1997). The patient, represented by cell line GM2051, was one of the patients reported by Nilssen et al. (1997).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">9158146</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">9370301</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">9758606</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="1684">
+        <Measure Type="single nucleotide variant" ID="16723">
+          <Name>
+            <ElementValue Type="Preferred">NM_000528.3(MAN2B1):c.215A&gt;T (p.His72Leu)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.215A&gt;T" Accession="NM_000528" Version="3" Type="HGVS, coding, RefSeq">NM_000528.3:c.215A&gt;T</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.6028A&gt;T" Accession="NG_008318" Version="1" Type="HGVS, genomic, RefSeqGene">NG_008318.1:g.6028A&gt;T</Attribute>
+            <Citation Type="general">
+              <ID Source="PubMed">9158146</ID>
+            </Citation>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.12665750T&gt;A" Accession="NC_000019" Version="10" Type="HGVS, genomic, top level" integerValue="38">NC_000019.10:g.12665750T&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.12776564T&gt;A" Accession="NC_000019" Version="9" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000019.9:g.12776564T&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.His72Leu" Accession="O00754" Type="HGVS, protein">O00754:p.His72Leu</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.His72Leu" Accession="NP_000519" Version="2" Type="HGVS, protein, RefSeq">NP_000519.2:p.His72Leu</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">missense variant</Attribute>
+            <XRef ID="SO:0001583" DB="Sequence Ontology" />
+            <XRef ID="NM_000528.3:c.215A&gt;T" DB="RefSeq" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange1LetterCode">H71L</Attribute>
+            <XRef Type="Allelic variant" ID="609458.0001" DB="OMIM" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange1LetterCode">H72L</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange3LetterCode">HIS71LEU</Attribute>
+            <XRef Type="Allelic variant" ID="609458.0001" DB="OMIM" />
+          </AttributeSet>
+          <CytogeneticLocation>19p13.13</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="19" Accession="NC_000019.10" start="12665750" stop="12665750" display_start="12665750" display_stop="12665750" variantLength="1" referenceAllele="T" alternateAllele="A" positionVCF="12665750" referenceAlleleVCF="T" alternateAlleleVCF="A" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="19" Accession="NC_000019.9" start="12776564" stop="12776564" display_start="12776564" display_stop="12776564" variantLength="1" referenceAllele="T" alternateAllele="A" positionVCF="12776564" referenceAlleleVCF="T" alternateAlleleVCF="A" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">mannosidase alpha class 2B member 1</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">MAN2B1</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="19" Accession="NC_000019.10" start="12646508" stop="12666777" display_start="12646508" display_stop="12666777" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="19" Accession="NC_000019.9" start="12757321" stop="12777590" display_start="12757321" display_stop="12777590" variantLength="20270" Strand="-" />
+            <XRef ID="4125" DB="Gene" />
+            <XRef Type="MIM" ID="609458" DB="OMIM" />
+            <XRef ID="HGNC:6826" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef ID="O00754#VAR_003338" DB="UniProtKB" />
+          <XRef Type="Allelic variant" ID="609458.0001" DB="OMIM" />
+          <XRef Type="rs" ID="387906261" DB="dbSNP" />
+        </Measure>
+        <Name>
+          <ElementValue Type="Preferred">NM_000528.3(MAN2B1):c.215A&gt;T (p.His72Leu)</ElementValue>
+        </Name>
+        <XRef ID="CA339900" DB="ClinGen" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="428">
+        <Trait ID="2728" Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Deficiency of alpha-mannosidase</ElementValue>
+            <XRef ID="Alpha-Mannosidosis+Type+1/332" DB="Genetic Alliance" />
+            <XRef ID="124466001" DB="SNOMED CT" />
+          </Name>
+          <Name>
+            <ElementValue Type="Alternate">Alpha-Mannosidosis</ElementValue>
+            <XRef ID="NBK1396" DB="GeneReviews" />
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">MANSA</ElementValue>
+            <XRef Type="MIM" ID="248500" DB="OMIM" />
+          </Symbol>
+          <AttributeSet>
+            <Attribute Type="public definition">Alpha-mannosidosis encompasses a continuum of clinical findings from mild to severe. Clinical subtypes include the following: A mild form recognized after age ten years with absence of skeletal abnormalities, myopathy, and slow progression (type 1). A moderate form recognized before age ten years with presence of skeletal abnormalities, myopathy, and slow progression (type 2). A severe form manifesting as prenatal loss or early death from progressive central nervous system involvement (type 3). Individuals with a milder phenotype have mild-to-moderate intellectual disability, impaired hearing, characteristic coarse features, clinical or radiographic skeletal abnormalities, immunodeficiency, and primary central nervous system disease, mainly cerebellar involvement causing ataxia. Periods of psychiatric symptoms are common. Associated medical problems can include corneal opacities, hepatosplenomegaly, aseptic destructive arthritis, and metabolic myopathy. Alpha-mannosidosis is insidiously progressive; some individuals may live into the sixth decade.</Attribute>
+            <XRef ID="NBK1396" DB="GeneReviews" />
+          </AttributeSet>
+          <Citation Type="review" Abbrev="GeneReviews">
+            <ID Source="PubMed">20301570</ID>
+            <ID Source="BookShelf">NBK1396</ID>
+          </Citation>
+          <Citation Type="Translational/Evidence-based" Abbrev="EuroGentest, 2011">
+            <ID Source="PubMed">21368911</ID>
+          </Citation>
+          <XRef ID="C0024748" DB="MedGen" />
+          <XRef ID="61" DB="Orphanet" />
+          <XRef Type="MIM" ID="248500" DB="OMIM" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="21908">
+      <ClinVarSubmissionID localKey="609458.0001_ALPHA-MANNOSIDOSIS" submitter="OMIM" submitterDate="2013-04-04" title="MAN2B1, HIS71LEU_ALPHA-MANNOSIDOSIS" />
+      <ClinVarAccession Acc="SCV000021908" OrgType="primary" OrganizationCategory="resource" Version="1" Type="SCV" OrgID="3" DateUpdated="2017-04-07" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="1998-10-01">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="OMIM" ID="609458.0001" Type="Allelic variant" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species>human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">In 2 sibs with alpha-mannosidosis (MANSA; 248500), born of consanguineous parents, Nilssen et al. (1997) identified a homozygous 212A-T transversion in exon 2 of the MANB gene, resulting in a his71-to-leu (H71L) substitution. Residue his71 is conserved among lysosomal alpha-mannosidases from several species. The sibs were thought to be mildly affected and residual acidic alpha-mannosidase activity of 20% of normal was detected in the patient's fibroblasts, according to the report of this family by Bach et al. (1978). Nevertheless, the patients showed vacuolated leukocytes and fibroblasts consistent with the disease phenotype. The authors suggested that mutant mannosidase enzymes, even though containing residual activity upon testing at the appropriate pH, may be mislocalized to nonlysosomal compartments and therefore functionally inactive.</Attribute>
+          <Citation>
+            <ID Source="PubMed">9158146</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">724292</ID>
+          </Citation>
+          <XRef DB="OMIM" ID="248500" Type="MIM" />
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Gotoda et al. (1998) identified the same mutation, which they designated HIS72LEU in keeping with the codon numbering system of Wakamatsu et al. (1997). The patient, represented by cell line GM2051, was one of the patients reported by Nilssen et al. (1997).</Attribute>
+          <Citation>
+            <ID Source="PubMed">9758606</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">9370301</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">9158146</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Preferred">MAN2B1, HIS71LEU</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="NonHGVS">HIS71LEU</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">MAN2B1</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+          <XRef DB="OMIM" ID="609458.0001" Type="Allelic variant" />
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">ALPHA-MANNOSIDOSIS</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+    <ClinVarAssertion ID="453008">
+      <ClinVarSubmissionID localKey="NM_000528.3:c.215A&gt;T|OMIM:248500" submitter="ClinVar Staff, National Center for Biotechnology Information (NCBI)" submitterDate="2015-08-25" />
+      <ClinVarAccession Acc="SCV000243988" OrgType="primary" OrganizationCategory="resource" Version="1" Type="SCV" OrgID="500139" DateUpdated="2017-04-05" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2012-06-07">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Uncertain significance</Description>
+        <Citation>
+          <ID Source="PubMed">9758606</ID>
+        </Citation>
+        <Citation>
+          <URL>http://web.expasy.org/variant_pages/VAR_003338.html</URL>
+        </Citation>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>yes</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Alternate">p.His72Leu</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="HGVS">NM_000528.3:c.215A&gt;T</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">MAN2B1</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Deficiency of alpha-mannosidase</ElementValue>
+          </Name>
+          <XRef DB="OMIM" ID="248500" Type="MIM" />
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
+</ReleaseSet>

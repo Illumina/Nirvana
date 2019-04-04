@@ -1,207 +1,236 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-
-  <ClinVarSet ID="10326956">
-  <RecordStatus>current</RecordStatus>
-  <Title>NM_000518.4(HBB):c.126_129delCTTT (p.Phe42fs) AND beta^0^ Thalassemia</Title>
-  <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-02-17" ID="74176">
-    <ClinVarAccession Acc="RCV000016673" Version="25" Type="RCV" DateUpdated="2016-02-17"/>
+  <ClinVarSet ID="35948760">
     <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2002-09-28">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>not provided</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>literature only</MethodType>
-      </Method>
-      <ObservedData ID="9744028">
-        <Attribute Type="Description">Frameshift, -4, codons 41/42, TTCTTT to TT, was found in an Asian Indian with beta-zero-thalassemia (613985) by Kazazian et al. (1984) and in Chinese by Kimura et al. (1983).</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">6714226</ID>
-        </Citation>
-        <Citation Type="general">
-          <ID Source="PubMed">6826539</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9744028">
-        <Attribute Type="Description">Lau et al. (1997) found that the deletion of CTTT at codons 41/42 accounted for 40% of all beta-thalassemia alleles in Hong Kong. Chiu et al. (2002) designed allele-specific primers and a fluorescent probe for detection of this mutation in the HBB gene from maternal plasma by real-time PCR. Using this method, they showed that beta-thalassemia major could be excluded from fetal inheritance by demonstrating absence of inheritance of the paternally transmitted mutation. By studying circulating fetal DNA in the maternal plasma for this mutation, Chiu et al. (2002) added beta-thalassemia to the list of disorders that could be prenatally diagnosed using this noninvasive method, which had previously demonstrated usefulness in diagnosing sex-linked diseases (Costa et al., 2002) and fetal rhesus D status (Lo et al., 1998).</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">12000828</ID>
-        </Citation>
-        <Citation Type="general">
-          <ID Source="PubMed">12383672</ID>
-        </Citation>
-        <Citation Type="general">
-          <ID Source="PubMed">9113933</ID>
-        </Citation>
-        <Citation Type="general">
-          <ID Source="PubMed">9845707</ID>
-        </Citation>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant" ID="15417">
-      <Measure Type="Deletion" ID="30456">
+    <Title>NM_000518.4(HBB):c.126_129delCTTT (p.Phe42fs) AND beta^0^ Thalassemia</Title>
+    <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2018-12-23" ID="74176">
+      <ClinVarAccession Acc="RCV000016673" Version="29" Type="RCV" DateUpdated="2018-12-24" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2002-09-28">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="34805707">
+          <Attribute Type="Description">Frameshift, -4, codons 41/42, TTCTTT to TT, was found in an Asian Indian with beta-zero-thalassemia (613985) by Kazazian et al. (1984) and in Chinese by Kimura et al. (1983).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">6826539</ID>
+          </Citation>
+          <Citation Type="general">
+            <CitationText>Kazazian, H. H., Jr. Personal Communication. 1982. Baltimore, Md.</CitationText>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34805707">
+          <Attribute Type="Description">Lau et al. (1997) found that the deletion of CTTT at codons 41/42 accounted for 40% of all beta-thalassemia alleles in Hong Kong. Chiu et al. (2002) designed allele-specific primers and a fluorescent probe for detection of this mutation in the HBB gene from maternal plasma by real-time PCR. Using this method, they showed that beta-thalassemia major could be excluded from fetal inheritance by demonstrating absence of inheritance of the paternally transmitted mutation. By studying circulating fetal DNA in the maternal plasma for this mutation, Chiu et al. (2002) added beta-thalassemia to the list of disorders that could be prenatally diagnosed using this noninvasive method, which had previously demonstrated usefulness in diagnosing sex-linked diseases (Costa et al., 2002) and fetal rhesus D status (Lo et al., 1998).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">12000828</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">12383672</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">9113933</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">9845707</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="15417">
+        <Measure Type="Deletion" ID="30456">
+          <Name>
+            <ElementValue Type="Preferred">NM_000518.4(HBB):c.126_129delCTTT (p.Phe42fs)</ElementValue>
+          </Name>
+          <Name>
+            <ElementValue Type="Alternate">41/42-TTCT</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.124_127delTTCT" Accession="NM_000518" Version="4" Type="HGVS, coding">NM_000518.4:c.124_127delTTCT</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.126_129del" Accession="NM_000518" Version="4" Type="HGVS, coding">NM_000518.4:c.126_129del</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.126_129delCTTT" Accession="NM_000518" Version="4" Type="HGVS, coding, RefSeq">NM_000518.4:c.126_129delCTTT</Attribute>
+            <XRef ID="GTR000500319" DB="Genetic Testing Registry (GTR)" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.70848_70851delTTCT" Accession="NG_000007" Version="3" Type="HGVS, genomic">NG_000007.3:g.70848_70851delTTCT</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.70850_70853delCTTT" Accession="NG_000007" Version="3" Type="HGVS, genomic, RefSeqGene">NG_000007.3:g.70850_70853delCTTT</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.5226763_5226766delAAAG" Accession="NC_000011" Version="10" Type="HGVS, genomic, top level" integerValue="38">NC_000011.10:g.5226763_5226766delAAAG</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.5226765_5226768delAGAA" Accession="NC_000011" Version="10" Type="HGVS, genomic, top level, other" integerValue="38">NC_000011.10:g.5226765_5226768delAGAA</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.5247993_5247996delAAAG" Accession="NC_000011" Version="9" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000011.9:g.5247993_5247996delAAAG</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="HGVS, legacy">HBB:c.126_129delCTTT</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="HGVS, protein">p.Phe42Leufs*19</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="HGVS, protein">p.Phe42LeufsTer17</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Phe42_Phe43delinsLeufs" Accession="NP_000509" Version="1" Type="HGVS, protein">NP_000509.1:p.Phe42_Phe43delinsLeufs</Attribute>
+            <XRef Type="rs" ID="80356821" DB="dbSNP" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Phe42fs" Accession="NP_000509" Version="1" Type="HGVS, protein">NP_000509.1:p.Phe42fs</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Phe42Leufs" Accession="NP_000509" Version="1" Type="HGVS, protein, RefSeq">NP_000509.1:p.Phe42Leufs</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+            <XRef ID="SO:0001589" DB="Sequence Ontology" />
+            <XRef ID="NM_000518.4:c.126_129delCTTT" DB="RefSeq" />
+          </AttributeSet>
+          <GlobalMinorAlleleFrequency Value="0.00100" Source="1000 Genomes Project" MinorAllele="AA" />
+          <CytogeneticLocation>11p15.4</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="5226763" stop="5226766" display_start="5226763" display_stop="5226766" variantLength="4" referenceAllele="AAAG" alternateAllele="-" positionVCF="5226762" referenceAlleleVCF="CAAAG" alternateAlleleVCF="C" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="5247993" stop="5247996" display_start="5247993" display_stop="5247996" variantLength="4" referenceAllele="AAAG" alternateAllele="-" positionVCF="5247992" referenceAlleleVCF="CAAAG" alternateAlleleVCF="C" />
+          <MeasureRelationship Type="within multiple genes by overlap">
+            <Name>
+              <ElementValue Type="Preferred">HBB recombination region</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">LOC106099062</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="5226570" stop="5228834" display_start="5226570" display_stop="5228834" Strand="+" />
+            <XRef ID="106099062" DB="Gene" />
+          </MeasureRelationship>
+          <MeasureRelationship Type="within multiple genes by overlap">
+            <Name>
+              <ElementValue Type="Preferred">hemoglobin subunit beta</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">HBB</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="5225466" stop="5227071" display_start="5225466" display_stop="5227071" Strand="-" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="5246695" stop="5248300" display_start="5246695" display_stop="5248300" variantLength="1606" Strand="-" />
+            <XRef ID="3043" DB="Gene" />
+            <XRef Type="MIM" ID="141900" DB="OMIM" />
+            <XRef ID="HGNC:4827" DB="HGNC" />
+          </MeasureRelationship>
+          <MeasureRelationship Type="within multiple genes by overlap">
+            <Name>
+              <ElementValue Type="Preferred">origin of replication at HBB</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">LOC107133510</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="5222166" stop="5229620" display_start="5222166" display_stop="5229620" Strand="+" />
+            <XRef ID="107133510" DB="Gene" />
+          </MeasureRelationship>
+          <XRef ID="849" DB="HBVAR" />
+          <XRef Type="Allelic variant" ID="141900.0326" DB="OMIM" />
+          <XRef Type="rs" ID="80356821" DB="dbSNP" />
+        </Measure>
         <Name>
           <ElementValue Type="Preferred">NM_000518.4(HBB):c.126_129delCTTT (p.Phe42fs)</ElementValue>
         </Name>
-        <AttributeSet>
-          <Attribute Type="GlobalMinorAlleleFrequency">0.0010(-)</Attribute>
-          <XRef DB="dbSNP" ID="281864900"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, coding" Change="c.124_127delTTCT">NM_000518.4:c.124_127delTTCT</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, coding" Change="c.126_129delCTTT">HBB:c.126_129delCTTT</Attribute>
-          <XRef ID="849" DB="HBVAR"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, coding, RefSeq" Change="c.126_129delCTTT">NM_000518.4:c.126_129delCTTT</Attribute>
-          <XRef ID="GTR000500319" DB="Genetic Testing Registry (GTR)"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic" Change="g.70848_70851delTTCT">NG_000007.3:g.70848_70851delTTCT</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.70850_70853delCTTT">NG_000007.3:g.70850_70853delCTTT</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, top level" Change="g.5226763_5226766delAAAG" integerValue="38">NC_000011.10:g.5226763_5226766delAAAG</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, top level, other" Change="g.5226765_5226768delAGAA" integerValue="38">NC_000011.10:g.5226765_5226768delAGAA</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, top level, previous" Change="g.5247993_5247996delAAAG" integerValue="37">NC_000011.9:g.5247993_5247996delAAAG</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, protein" Change="p.Phe42_Phe43delinsLeufs">NP_000509.1:p.Phe42_Phe43delinsLeufs</Attribute>
-          <XRef Type="rs" ID="80356821" DB="dbSNP"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, protein" Change="p.Phe42fs">NP_000509.1:p.Phe42fs</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, protein, RefSeq" Change="p.Phe42Leufs">NP_000509.1:p.Phe42Leufs</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
-          <XRef ID="SO:0001589" DB="Sequence Ontology"/>
-          <XRef ID="NM_000518.4:c.126_129delCTTT" DB="RefSeq"/>
-        </AttributeSet>
-        <CytogeneticLocation>11p15.4</CytogeneticLocation>
-        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="5226763" stop="5226766" display_start="5226763" display_stop="5226766" variantLength="4" referenceAllele="AAAG" alternateAllele="-"/>
-        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="5247993" stop="5247996" display_start="5247993" display_stop="5247996" variantLength="4" referenceAllele="AAAG" alternateAllele="-"/>
-        <MeasureRelationship Type="variant in gene">
+        <XRef ID="CA125284" DB="ClinGen" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="4683">
+        <Trait ID="11956" Type="Disease">
           <Name>
-            <ElementValue Type="Preferred">hemoglobin subunit beta</ElementValue>
+            <ElementValue Type="Preferred">beta^0^ Thalassemia</ElementValue>
+            <XRef ID="86715000" DB="SNOMED CT" />
           </Name>
-          <Symbol>
-            <ElementValue Type="Preferred">HBB</ElementValue>
-          </Symbol>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="11" Accession="NC_000011.10" start="5225465" stop="5227070" display_start="5225465" display_stop="5227070" variantLength="1606" Strand="-"/>
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="11" Accession="NC_000011.9" start="5246695" stop="5248300" display_start="5246695" display_stop="5248300" variantLength="1606" Strand="-"/>
-          <XRef ID="3043" DB="Gene"/>
-          <XRef Type="MIM" ID="141900" DB="OMIM"/>
-          <XRef ID="HGNC:4827" DB="HGNC"/>
-        </MeasureRelationship>
-        <XRef Type="Allelic variant" ID="141900.0326" DB="OMIM"/>
-        <XRef Type="rs" ID="281864900" DB="dbSNP"/>
-        <XRef Type="rs" ID="80356821" DB="dbSNP"/>
-      </Measure>
-      <Name>
-        <ElementValue Type="Preferred">NM_000518.4(HBB):c.126_129delCTTT (p.Phe42fs)</ElementValue>
-      </Name>
-    </MeasureSet>
-    <TraitSet Type="Disease" ID="4683">
-      <Trait ID="11956" Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">beta^0^ Thalassemia</ElementValue>
-          <XRef ID="86715000" DB="SNOMED CT"/>
-        </Name>
-        <Name>
-          <ElementValue Type="Alternate">Beta-zero-thalassemia</ElementValue>
-        </Name>
-        <XRef ID="C0271980" DB="MedGen"/>
-      </Trait>
-    </TraitSet>
-  </ReferenceClinVarAssertion>
-  <ClinVarAssertion ID="36943">
-    <ClinVarSubmissionID localKey="141900.0326_BETA-ZERO-THALASSEMIA" submitter="OMIM" submitterDate="2013-03-14" title="HBB, 4-BP DEL, 41/42CTTT_BETA-ZERO-THALASSEMIA"/>
-    <ClinVarAccession Acc="SCV000036943" Version="1" Type="SCV" OrgID="3" DateUpdated="2015-10-11"/>
-    <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2002-09-28">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>Pathogenic</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ExternalID DB="OMIM" ID="141900.0326" Type="Allelic variant"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species>human</Species>
-        <AffectedStatus>not provided</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>literature only</MethodType>
-      </Method>
-      <ObservedData>
-        <Attribute Type="Description">Frameshift, -4, codons 41/42, TTCTTT to TT, was found in an Asian Indian with beta-zero-thalassemia (613985) by Kazazian et al. (1984) and in Chinese by Kimura et al. (1983).</Attribute>
-        <Citation>
-          <ID Source="PubMed">6714226</ID>
-        </Citation>
-        <Citation>
-          <ID Source="PubMed">6826539</ID>
-        </Citation>
-        <XRef DB="OMIM" ID="613985" Type="MIM"/>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">Lau et al. (1997) found that the deletion of CTTT at codons 41/42 accounted for 40% of all beta-thalassemia alleles in Hong Kong. Chiu et al. (2002) designed allele-specific primers and a fluorescent probe for detection of this mutation in the HBB gene from maternal plasma by real-time PCR. Using this method, they showed that beta-thalassemia major could be excluded from fetal inheritance by demonstrating absence of inheritance of the paternally transmitted mutation. By studying circulating fetal DNA in the maternal plasma for this mutation, Chiu et al. (2002) added beta-thalassemia to the list of disorders that could be prenatally diagnosed using this noninvasive method, which had previously demonstrated usefulness in diagnosing sex-linked diseases (Costa et al., 2002) and fetal rhesus D status (Lo et al., 1998).</Attribute>
-        <Citation>
-          <ID Source="PubMed">9113933</ID>
-        </Citation>
-        <Citation>
-          <ID Source="PubMed">12383672</ID>
-        </Citation>
-        <Citation>
-          <ID Source="PubMed">12000828</ID>
-        </Citation>
-        <Citation>
-          <ID Source="PubMed">9845707</ID>
-        </Citation>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant">
-      <Measure Type="Variation">
-        <Name>
-          <ElementValue Type="Preferred">HBB, 4-BP DEL, 41/42CTTT</ElementValue>
-        </Name>
-        <AttributeSet>
-          <Attribute Type="NonHGVS">4-BP DEL, 41/42CTTT</Attribute>
-        </AttributeSet>
-        <MeasureRelationship Type="variant in gene">
-          <Symbol>
-            <ElementValue Type="Preferred">HBB</ElementValue>
-          </Symbol>
-        </MeasureRelationship>
-        <XRef DB="OMIM" ID="141900.0326" Type="Allelic variant"/>
-      </Measure>
-    </MeasureSet>
-    <TraitSet Type="Disease">
-      <Trait Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">BETA-ZERO-THALASSEMIA</ElementValue>
-        </Name>
-      </Trait>
-    </TraitSet>
-  </ClinVarAssertion>
-</ClinVarSet>
+          <Name>
+            <ElementValue Type="Alternate">Beta-zero-thalassemia</ElementValue>
+          </Name>
+          <XRef ID="C0271980" DB="MedGen" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="36943">
+      <ClinVarSubmissionID localKey="141900.0326_BETA-ZERO-THALASSEMIA" submitter="OMIM" submitterDate="2017-12-12" title="HBB, 4-BP DEL, 41/42CTTT_BETA-ZERO-THALASSEMIA" />
+      <ClinVarAccession Acc="SCV000036943" Version="3" Type="SCV" OrgID="3" OrganizationCategory="resource" OrgType="primary" DateUpdated="2018-05-09" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2002-09-28">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>Pathogenic</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="OMIM" ID="141900.0326" Type="Allelic variant" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species>human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">Frameshift, -4, codons 41/42, TTCTTT to TT, was found in an Asian Indian with beta-zero-thalassemia (613985) by Kazazian et al. (1984) and in Chinese by Kimura et al. (1983).</Attribute>
+          <Citation>
+            <CitationText>Kazazian, H. H., Jr. Personal Communication. 1982. Baltimore, Md.</CitationText>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">6826539</ID>
+          </Citation>
+          <XRef DB="OMIM" ID="613985" Type="MIM" />
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Lau et al. (1997) found that the deletion of CTTT at codons 41/42 accounted for 40% of all beta-thalassemia alleles in Hong Kong. Chiu et al. (2002) designed allele-specific primers and a fluorescent probe for detection of this mutation in the HBB gene from maternal plasma by real-time PCR. Using this method, they showed that beta-thalassemia major could be excluded from fetal inheritance by demonstrating absence of inheritance of the paternally transmitted mutation. By studying circulating fetal DNA in the maternal plasma for this mutation, Chiu et al. (2002) added beta-thalassemia to the list of disorders that could be prenatally diagnosed using this noninvasive method, which had previously demonstrated usefulness in diagnosing sex-linked diseases (Costa et al., 2002) and fetal rhesus D status (Lo et al., 1998).</Attribute>
+          <Citation>
+            <ID Source="PubMed">9113933</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">12383672</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">12000828</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">9845707</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Preferred">HBB, 4-BP DEL, 41/42CTTT</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="NonHGVS">4-BP DEL, 41/42CTTT</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">HBB</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+          <XRef DB="OMIM" ID="141900.0326" Type="Allelic variant" />
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">BETA-ZERO-THALASSEMIA</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
 </ReleaseSet>

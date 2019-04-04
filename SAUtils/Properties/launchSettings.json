@@ -84,6 +84,11 @@
       "commandName": "Project",
       "commandLineArgs": " mitomapVarDb --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2019-02-25\\MutationsRNA --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2019-02-25\\MutationsCodingControl --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2019-02-25\\PolymorphismsCoding --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2019-02-25\\PolymorphismsControl  --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2019-02-25\\InsertionsSimple --in E:\\Nirvana_resources\\Nirvana\\Development\\ExternalDataSources\\MitoMAP\\2019-02-25\\DeletionsSingle --ref E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out .",
       "workingDirectory": "E:\\Nirvana_resources\\gen_data\\gen_MitoMap\\"
+    },
+    "RR_extractXml": {
+      "commandName": "Project",
+      "commandLineArgs": " extractminiXML -i ClinVarFullRelease_2019-02.xml.gz -r c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\ -o c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\",
+      "workingDirectory": "c:\\development\\ExternalDataSources\\ClinVar\\20190206"
     }
   }
 }

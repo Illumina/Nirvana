@@ -8,7 +8,6 @@ using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
-    [Collection("ChromosomeRenamer")]
     public sealed class MergedCosmicReaderTests
     {
         private readonly IDictionary<string, IChromosome> _refChromDict;
