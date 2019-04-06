@@ -22,7 +22,7 @@ namespace SAUtils.InputFileParsers.OMIM
             jsonSchema.SetNonSaKeys(new[] { "isAlleleSpecific" });
 
             foreach ((string key, var valueType) in SchemaDescription)
-                jsonSchema.AddAnnotation(key, new SaJsonKeyAnnotation { ValueType = valueType});
+                jsonSchema.AddAnnotation(key, SaJsonKeyAnnotation.CreateFromProperties(valueType, 0, null));
 
             return jsonSchema;
         }

@@ -18,9 +18,9 @@ namespace SAUtils.Schema
         private readonly StringBuilder _sb;
         private readonly JsonObject _jsonObject;
         private readonly Dictionary<string, SaJsonKeyAnnotation> _keyAnnotation = new Dictionary<string, SaJsonKeyAnnotation>();
-        private IEnumerable<string> Keys { get; set; } 
+        private IEnumerable<string> Keys { get; set; }
         // Keys not used to generate the NSA file, but in the Nirvana JSON output
-        private string[] NonSaKeys { get; set; } = {};
+        private string[] NonSaKeys { get; set; } = { };
         internal readonly Dictionary<string, int> KeyCounts = new Dictionary<string, int>();
         private Action<JsonObject, List<string[]>> _jsonStringGenerationAction;
         private bool _finalized;
@@ -33,7 +33,7 @@ namespace SAUtils.Schema
 
         public static SaJsonSchema Create(StringBuilder sb, string jsonTag, SaJsonValueType primaryType, IEnumerable<string> jsonKeys)
         {
-            var jsonSchema = new SaJsonSchema(sb) {Keys = jsonKeys};
+            var jsonSchema = new SaJsonSchema(sb) { Keys = jsonKeys };
 
             // The root level schema for a SA
             if (jsonTag != null)
@@ -41,11 +41,11 @@ namespace SAUtils.Schema
                 jsonSchema._jsonObject.StartObject();
                 jsonSchema.AddSchemaVersion();
                 // SA json is an object
-                jsonSchema.AddJsonDataType(JsonDataType.Object, null);
+                jsonSchema.AddJsonDataType(JsonDataType.Object);
                 jsonSchema._jsonObject.StartObjectWithKey(jsonTag);
             }
 
-            jsonSchema.AddJsonValueType(primaryType, null);
+            jsonSchema.AddValueTypes(primaryType);
             return jsonSchema;
         }
 
@@ -54,26 +54,54 @@ namespace SAUtils.Schema
             NonSaKeys = nonSaKeys;
         }
 
-        private void AddJsonValueType(SaJsonValueType jsonValueType, SaJsonSchema objectSchema)
+        private void AddAnnotation(SaJsonKeyAnnotation annotation)
         {
-            foreach (var dataType in jsonValueType.JsonDataTypes)
+            if (annotation.Properties != null)
             {
-                AddJsonDataType(dataType, objectSchema);
+                AddAnnotationProperties(annotation);
+            }
+            else
+            {
+                _sb.Append(annotation.Schema);
+                _jsonObject.EndObject();
             }
         }
 
-        private void AddJsonDataType(JsonDataType jsonType, SaJsonSchema objectSchema)
+        private void AddAnnotationProperties(SaJsonKeyAnnotation annotation)
+        {
+            AddValueTypes(annotation.Properties.ValueType);
+            int numComplexTypes = annotation.Properties.ValueType.JsonDataTypes.Count(x => x.IsComplexType());
+            while (numComplexTypes > 0)
+            {
+                _jsonObject.EndObject();
+                numComplexTypes--;
+            }
+            if (annotation.Properties.Category != CustomAnnotationCategories.Unknown)
+                _jsonObject.AddStringValue("category", annotation.Properties.Category.ToString());
+            if (annotation.Properties.Description != null)
+                _jsonObject.AddStringValue("description", annotation.Properties.Description);
+        }
+
+        private void AddValueTypes(SaJsonValueType jsonValueType)
+        {
+            foreach (var dataType in jsonValueType.JsonDataTypes)
+            {
+                AddJsonDataType(dataType);
+            }
+
+        }
+
+        private void AddJsonDataType(JsonDataType jsonType)
         {
             _jsonObject.AddStringValue("type", jsonType.ToTypeString());
-            if (jsonType.IsComplexType()) _jsonObject.StartObjectWithKey(jsonType.GetSchemaKey());
 
-            if (jsonType == JsonDataType.Object) _sb.Append(objectSchema);
+            if (jsonType.IsComplexType()) _jsonObject.StartObjectWithKey(jsonType.GetSchemaKey());
         }
 
         private void AddSchemaVersion() => _jsonObject.AddStringValue("$schema", SchemaVersion);
 
-        private SaJsonValueType GetJsonType(string key) => _keyAnnotation[key].ValueType;
-        private CustomAnnotationCategories GetCategory(string key) => _keyAnnotation[key].Category;
+        private SaJsonValueType GetJsonType(string key) => _keyAnnotation[key].Properties?.ValueType;
+        private CustomAnnotationCategories GetCategory(string key) => _keyAnnotation[key].Properties?.Category ?? 0;
 
         public void AddAnnotation(string key, SaJsonKeyAnnotation annotation)
         {
@@ -130,7 +158,7 @@ namespace SAUtils.Schema
 
                 if (intendedType.Equals(SaJsonValueType.String))
                 {
-                        actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, value[0]), key));
+                    actions.Add((jsonObject, value) => CountKeyIfAdded(jsonObject.AddStringValue(key, value[0]), key));
                 }
 
                 else if (intendedType.Equals(SaJsonValueType.Bool))
@@ -161,7 +189,8 @@ namespace SAUtils.Schema
                 }
             }
 
-            return (jsonObject, strings) => {
+            return (jsonObject, strings) =>
+            {
                 foreach (var (action, str) in actions.Zip(strings, (a, b) => (a, b)))
                 {
                     action(jsonObject, str);
@@ -188,27 +217,16 @@ namespace SAUtils.Schema
             var jsonObject = new JsonObject(sb);
 
             _jsonStringGenerationAction(jsonObject, values);
-            
+
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
         internal void OutputKeyAnnotation(string key)
-        { 
+        {
             _jsonObject.StartObjectWithKey(key);
 
             var annotation = _keyAnnotation[key];
-            AddJsonValueType(annotation.ValueType, annotation.SubSchema);
-            int numComplexTypes = annotation.ValueType.JsonDataTypes.Count(x => x.IsComplexType());
-            while (numComplexTypes > 0)
-            {
-                _jsonObject.EndObject();
-                numComplexTypes--;
-            }
-
-            if (annotation.Category != CustomAnnotationCategories.Unknown)
-                _jsonObject.AddStringValue("category", annotation.Category.ToString());
-            if (annotation.Description != null)
-                _jsonObject.AddStringValue("description", annotation.Description);
+            AddAnnotation(annotation);
 
             _jsonObject.EndObject();
         }
@@ -224,7 +242,7 @@ namespace SAUtils.Schema
                 case ".":
                     return false;
                 default:
-                    throw new UserErrorException($"{value} is not a valid boolean.");               
+                    throw new UserErrorException($"{value} is not a valid boolean.");
             }
         }
 
@@ -243,7 +261,7 @@ namespace SAUtils.Schema
             if (!_keyAnnotation.TryGetValue(key, out var annotation))
                 throw new KeyNotFoundException($"{key} is not JSON key.");
 
-            return annotation.SubSchema;
+            return annotation.Schema;
         }
     }
 }
