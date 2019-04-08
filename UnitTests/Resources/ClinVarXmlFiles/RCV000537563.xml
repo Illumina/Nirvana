@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-  <ClinVarSet ID="25579457">
+  <ClinVarSet ID="37507770">
     <RecordStatus>current</RecordStatus>
-    <Title>NM_005214.4(CTLA4):c.75G&gt;C (p.Leu25=) AND not provided</Title>
-    <ReferenceClinVarAssertion DateCreated="2017-12-26" DateLastUpdated="2018-01-24" ID="1272309">
-      <ClinVarAccession Acc="RCV000537563" Version="1" Type="RCV" DateUpdated="2018-01-24" />
+    <Title>NM_005214.5(CTLA4):c.75G&gt;C (p.Leu25=) AND Autoimmune lymphoproliferatiVe syndrome, type V</Title>
+    <ReferenceClinVarAssertion DateCreated="2017-12-26" DateLastUpdated="2019-01-26" ID="1272309">
+      <ClinVarAccession Acc="RCV000537563" Version="2" Type="RCV" DateUpdated="2019-01-26" />
       <RecordStatus>current</RecordStatus>
-      <ClinicalSignificance DateLastEvaluated="2017-08-04">
+      <ClinicalSignificance DateLastEvaluated="2018-01-08">
         <ReviewStatus>criteria provided, single submitter</ReviewStatus>
         <Description>Benign</Description>
       </ClinicalSignificance>
@@ -21,17 +21,23 @@
         <Method>
           <MethodType>clinical testing</MethodType>
         </Method>
-        <ObservedData ID="24296830">
+        <ObservedData ID="36455651">
           <Attribute Type="Description">not provided</Attribute>
         </ObservedData>
       </ObservedIn>
       <MeasureSet Type="Variant" ID="475280">
         <Measure Type="single nucleotide variant" ID="450403">
           <Name>
-            <ElementValue Type="Preferred">NM_005214.4(CTLA4):c.75G&gt;C (p.Leu25=)</ElementValue>
+            <ElementValue Type="Preferred">NM_005214.5(CTLA4):c.75G&gt;C (p.Leu25=)</ElementValue>
           </Name>
           <AttributeSet>
-            <Attribute Change="c.75G&gt;C" Accession="NM_005214" Version="4" Type="HGVS, coding, RefSeq">NM_005214.4:c.75G&gt;C</Attribute>
+            <Attribute Change="c.75G&gt;C" Accession="LRG_1220t1" Type="HGVS, coding, LRG">LRG_1220t1:c.75G&gt;C</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="c.75G&gt;C" Accession="NM_005214" Version="5" Type="HGVS, coding, RefSeq">NM_005214.5:c.75G&gt;C</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.5232G&gt;C" Accession="LRG_1220" Type="HGVS, genomic, LRG">LRG_1220:g.5232G&gt;C</Attribute>
           </AttributeSet>
           <AttributeSet>
             <Attribute Change="g.5232G&gt;C" Accession="NG_011502" Version="1" Type="HGVS, genomic, RefSeqGene">NG_011502.1:g.5232G&gt;C</Attribute>
@@ -44,15 +50,30 @@
             <XRef ID="37" DB="ClinVar" />
           </AttributeSet>
           <AttributeSet>
+            <Attribute Change="c.75G&gt;C" Accession="NM_005214" Version="4" Type="HGVS, previous">NM_005214.4:c.75G&gt;C</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Leu25=" Accession="LRG_1220p1" Type="HGVS, protein">LRG_1220p1:p.Leu25=</Attribute>
+          </AttributeSet>
+          <AttributeSet>
             <Attribute Change="p.Leu25=" Accession="NP_005205" Version="2" Type="HGVS, protein, RefSeq">NP_005205.2:p.Leu25=</Attribute>
           </AttributeSet>
           <AttributeSet>
             <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
             <XRef ID="SO:0001819" DB="Sequence Ontology" />
-            <XRef ID="NM_005214.4:c.75G&gt;C" DB="RefSeq" />
+            <XRef ID="NM_005214.5:c.75G&gt;C" DB="RefSeq" />
           </AttributeSet>
+          <AlleleFrequencyList>
+            <AlleleFrequency Value="0.00938" Source="NHLBI Exome Sequencing Project (ESP) Exome Variant Server" />
+            <AlleleFrequency Value="0.00639" Source="1000 Genomes Project" />
+            <AlleleFrequency Value="0.00227" Source="Exome Aggregation Consortium (ExAC)" />
+            <AlleleFrequency Value="0.00681" Source="The Genome Aggregation Database (gnomAD)" />
+            <AlleleFrequency Value="0.00187" Source="The Genome Aggregation Database (gnomAD), exomes" />
+            <AlleleFrequency Value="0.00762" Source="Trans-Omics for Precision Medicine (TOPMed)" />
+          </AlleleFrequencyList>
+          <GlobalMinorAlleleFrequency Value="0.00639" Source="1000 Genomes Project" MinorAllele="C" />
           <CytogeneticLocation>2q33.2</CytogeneticLocation>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="2" Accession="NC_000002.12" start="203868017" stop="203868017" display_start="203868017" display_stop="203868017" variantLength="1" referenceAllele="G" alternateAllele="C" positionVCF="203868017" referenceAlleleVCF="G" alternateAlleleVCF="C" />
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="2" Accession="NC_000002.12" start="203868017" stop="203868017" display_start="203868017" display_stop="203868017" variantLength="1" referenceAllele="G" alternateAllele="C" positionVCF="203868017" referenceAlleleVCF="G" alternateAlleleVCF="C" />
           <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="2" Accession="NC_000002.11" start="204732740" stop="204732740" display_start="204732740" display_stop="204732740" variantLength="1" referenceAllele="G" alternateAllele="C" positionVCF="204732740" referenceAlleleVCF="G" alternateAlleleVCF="C" />
           <MeasureRelationship Type="within single gene">
             <Name>
@@ -61,7 +82,7 @@
             <Symbol>
               <ElementValue Type="Preferred">CTLA4</ElementValue>
             </Symbol>
-            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.33" AssemblyStatus="current" Chr="2" Accession="NC_000002.12" start="203867788" stop="203873960" display_start="203867788" display_stop="203873960" Strand="+" />
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="2" Accession="NC_000002.12" start="203867788" stop="203873960" display_start="203867788" display_stop="203873960" Strand="+" />
             <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="2" Accession="NC_000002.11" start="204732510" stop="204738682" display_start="204732510" display_stop="204738682" variantLength="6173" Strand="+" />
             <XRef ID="1493" DB="Gene" />
             <XRef Type="MIM" ID="123890" DB="OMIM" />
@@ -70,17 +91,18 @@
           <XRef Type="rs" ID="16840275" DB="dbSNP" />
         </Measure>
         <Name>
-          <ElementValue Type="Preferred">NM_005214.4(CTLA4):c.75G&gt;C (p.Leu25=)</ElementValue>
+          <ElementValue Type="Preferred">NM_005214.5(CTLA4):c.75G&gt;C (p.Leu25=)</ElementValue>
         </Name>
+        <XRef ID="CA2067039" DB="ClinGen" />
       </MeasureSet>
       <TraitSet Type="Disease" ID="20169">
         <Trait ID="32315" Type="Disease">
           <Name>
-            <ElementValue Type="Alternate">CTLA4 HAPLOINSUFFICIENCY WITH AUTOIMMUNE INFILTRATION</ElementValue>
-            <XRef Type="MIM" ID="616100" DB="OMIM" />
+            <ElementValue Type="Preferred">Autoimmune lymphoproliferatiVe syndrome, type V</ElementValue>
           </Name>
           <Name>
-            <ElementValue Type="Alternate">Autoimmune lymphoproliferatiVe syndrome, type V</ElementValue>
+            <ElementValue Type="Alternate">CTLA4 HAPLOINSUFFICIENCY WITH AUTOIMMUNE INFILTRATION</ElementValue>
+            <XRef Type="MIM" ID="616100" DB="OMIM" />
           </Name>
           <Symbol>
             <ElementValue Type="Preferred">ALPS5</ElementValue>
@@ -96,18 +118,18 @@
         </Trait>
       </TraitSet>
     </ReferenceClinVarAssertion>
-    <ClinVarAssertion ID="1253669" SubmissionName="SUB3109251">
-      <ClinVarSubmissionID localKey="2012081|MedGen:C4015214" submittedAssembly="GRCh37" submitter="Invitae" submitterDate="2017-10-05" />
-      <ClinVarAccession Acc="SCV000655460" Version="1" Type="SCV" OrgID="500031" OrganizationCategory="laboratory" OrgType="primary" DateUpdated="2017-12-27" />
+    <ClinVarAssertion ID="1253669" SubmissionName="SUB3864685">
+      <ClinVarSubmissionID localKey="2012081|MedGen:C4015214" submittedAssembly="GRCh37" submitter="Invitae" submitterDate="2018-04-02" />
+      <ClinVarAccession Acc="SCV000655460" Version="2" Type="SCV" OrgID="500031" OrganizationCategory="laboratory" OrgType="primary" DateUpdated="2019-01-26" />
       <RecordStatus>current</RecordStatus>
-      <ClinicalSignificance DateLastEvaluated="2017-08-04">
+      <ClinicalSignificance DateLastEvaluated="2018-01-08">
         <ReviewStatus>criteria provided, single submitter</ReviewStatus>
         <Description>Benign</Description>
       </ClinicalSignificance>
       <Assertion Type="variation to disease" />
       <ExternalID DB="Invitae" ID="2012081" />
       <AttributeSet>
-        <Attribute Type="AssertionMethod">Invitae Variant Classification Sherloc (09022015)</Attribute>
+        <Attribute Type="AssertionMethod">Nykamp K et al. (Genet Med 2017)</Attribute>
         <Citation>
           <ID Source="PubMed">28492532</ID>
         </Citation>

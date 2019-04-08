@@ -1,254 +1,260 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-<ClinVarSet ID="10313941">
-  <RecordStatus>current</RecordStatus>
-  <Title>NM_144701.2(IL23R):c.1142G&gt;A (p.Arg381Gln) AND Inflammatory bowel disease 17, protection against</Title>
-  <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2016-02-17" ID="60757">
-    <ClinVarAccession Acc="RCV000003254" Version="3" Type="RCV" DateUpdated="2016-02-17"/>
+  <ClinVarSet ID="35943093">
     <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2010-04-01">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>protective</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species TaxonomyId="9606">human</Species>
-        <AffectedStatus>not provided</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>literature only</MethodType>
-      </Method>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">Association with Inflammatory Bowel Disease</Attribute>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">Using a large-scale genomewide association study, Duerr et al. (2006) identified an uncommon coding mutation in the IL23R gene, a 1142G-A transition, resulting in an arg381-to-glu (R381Q) substitution (rs11209026), that confers strong protection against Crohn disease (see 612261). This SNP was identified in 1 cohort and replicated in 2 others. The gln381 allele was found in 7% of non-Jewish controls and 1.9% of non-Jewish patients with ileal Crohn disease.</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">17068223</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">Libioulle et al. (2007) performed a genomewide association study with more than 300,000 SNPs in 547 Caucasian patients with Crohn disease from Belgium and 928 controls and found the strongest association (p less than 10(-9)) with markers of the IL23R gene, including rs11209026, which corresponds to the R381Q substitution. The association with R381Q was replicated in 1,255 additional Caucasian CD patients and 550 controls (combined p = 2.2 x 10(-18)).</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">17447842</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">Raelson et al. (2007) analyzed the IL23R region in 477 parent-proband trios with Crohn disease from the Quebec Founder Population and 2 independent German samples involving 521 affected-child trios, 752 cases, and 828 independent controls. The authors found that the R381Q SNP did not occur consistently in all risk and protective haplotypes, and concluded that it is highly unlikely that R381Q fully explains the functional role of this gene in CD etiology.</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">17804789</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">In a Caucasian German IBD cohort that included 833 CD patients, 456 patients with ulcerative colitis (UC), and 1,381 unrelated controls, Glas et al. (2007) confirmed the association between rs11209026 and protection against CD (OR, 0.43; p = 8.04 x 10(-8)) and also found a significant association with protection from UC (OR, 0.70; p = 0.00361).</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">17786191</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">In a study involving 1,841 ulcerative colitis cases and 1,470 controls, Fisher et al. (2008) found the strongest signal at rs11209026 (p = 8.0 x 10(-8); OR, 0.53), with evidence that additional independent IL23R variants also contribute to ulcerative colitis risk.</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">18438406</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">McGovern et al. (2010) combined new data from 2 genomewide association studies of ulcerative colitis involving 266,047 SNPs and performed a metaanalysis with previously published data (Silverberg et al., 2009), thus bringing together a discovery set of 2,693 European UC patients and 6,791 controls; the top results from the metaanalysis were then independently replicated with 2,009 additional European UC cases and 1,580 controls. McGovern et al. (2010) confirmed association with UC at rs11209026 (combined p = 1.9 x 10(-13)).</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">19122664</ID>
-        </Citation>
-        <Citation Type="general">
-          <ID Source="PubMed">20228799</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">Association with Psoriasis</Attribute>
-      </ObservedData>
-      <ObservedData ID="9731819">
-        <Attribute Type="Description">Capon et al. (2007) reported a significant association between the R381Q variant and protection against psoriasis (PSORS7; 605606) among 318 British patients with the disorder. The findings were replicated in a second group of 519 British patients. Together, the association yielded an odds ratio of 0.49 (p = 0.00014), with the gln381 allele offering protection from the disease. Capon et al. (2007) noted that the arg381 residue is highly conserved among higher vertebrates and is located within the binding domain for JAK2 kinase, which is the first mediator of the IL23R signaling cascade (Parham et al., 2002).</Attribute>
-        <Citation Type="general">
-          <ID Source="PubMed">12023369</ID>
-        </Citation>
-        <Citation Type="general">
-          <ID Source="PubMed">17587057</ID>
-        </Citation>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant" ID="3108">
-      <Measure Type="single nucleotide variant" ID="18147">
+    <Title>NM_144701.2(IL23R):c.1142G&gt;A (p.Arg381Gln) AND Inflammatory bowel disease 17, protection against</Title>
+    <ReferenceClinVarAssertion DateCreated="2012-08-13" DateLastUpdated="2018-12-23" ID="60757">
+      <ClinVarAccession Acc="RCV000003254" Version="5" Type="RCV" DateUpdated="2018-12-24" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2010-04-01">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>protective</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">Inflammatory Bowel Disease</Attribute>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">Using a large-scale genomewide association study, Duerr et al. (2006) identified an uncommon coding mutation in the IL23R gene, a 1142G-A transition, resulting in an arg381-to-glu (R381Q) substitution (rs11209026), that confers strong protection against Crohn disease (see 612261). This SNP was identified in 1 cohort and replicated in 2 others. The gln381 allele was found in 7% of non-Jewish controls and 1.9% of non-Jewish patients with ileal Crohn disease.</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">17068223</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">Libioulle et al. (2007) performed a genomewide association study with more than 300,000 SNPs in 547 Caucasian patients with Crohn disease from Belgium and 928 controls and found the strongest association (p less than 10(-9)) with markers of the IL23R gene, including rs11209026, which corresponds to the R381Q substitution. The association with R381Q was replicated in 1,255 additional Caucasian CD patients and 550 controls (combined p = 2.2 x 10(-18)).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">17447842</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">Raelson et al. (2007) analyzed the IL23R region in 477 parent-proband trios with Crohn disease from the Quebec Founder Population and 2 independent German samples involving 521 affected-child trios, 752 cases, and 828 independent controls. The authors found that the R381Q SNP did not occur consistently in all risk and protective haplotypes, and concluded that it is highly unlikely that R381Q fully explains the functional role of this gene in CD etiology.</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">17804789</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">In a Caucasian German IBD cohort that included 833 CD patients, 456 patients with ulcerative colitis (UC), and 1,381 unrelated controls, Glas et al. (2007) confirmed the association between rs11209026 and protection against CD (OR, 0.43; p = 8.04 x 10(-8)) and also found a significant association with protection from UC (OR, 0.70; p = 0.00361).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">17786191</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">In a study involving 1,841 ulcerative colitis cases and 1,470 controls, Fisher et al. (2008) found the strongest signal at rs11209026 (p = 8.0 x 10(-8); OR, 0.53), with evidence that additional independent IL23R variants also contribute to ulcerative colitis risk.</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">18438406</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">McGovern et al. (2010) combined new data from 2 genomewide association studies of ulcerative colitis involving 266,047 SNPs and performed a metaanalysis with previously published data (Silverberg et al., 2009), thus bringing together a discovery set of 2,693 European UC patients and 6,791 controls; the top results from the metaanalysis were then independently replicated with 2,009 additional European UC cases and 1,580 controls. McGovern et al. (2010) confirmed association with UC at rs11209026 (combined p = 1.9 x 10(-13)).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">19122664</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">20228799</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">Psoriasis</Attribute>
+        </ObservedData>
+        <ObservedData ID="34797633">
+          <Attribute Type="Description">Capon et al. (2007) reported a significant association between the R381Q variant and protection against psoriasis (PSORS7; 605606) among 318 British patients with the disorder. The findings were replicated in a second group of 519 British patients. Together, the association yielded an odds ratio of 0.49 (p = 0.00014), with the gln381 allele offering protection from the disease. Capon et al. (2007) noted that the arg381 residue is highly conserved among higher vertebrates and is located within the binding domain for JAK2 kinase, which is the first mediator of the IL23R signaling cascade (Parham et al., 2002).</Attribute>
+          <Citation Type="general">
+            <ID Source="PubMed">12023369</ID>
+          </Citation>
+          <Citation Type="general">
+            <ID Source="PubMed">17587057</ID>
+          </Citation>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="3108">
+        <Measure Type="single nucleotide variant" ID="18147">
+          <Name>
+            <ElementValue Type="Preferred">NM_144701.2(IL23R):c.1142G&gt;A (p.Arg381Gln)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Change="c.1142G&gt;A" Accession="NM_144701" Version="2" Type="HGVS, coding, RefSeq">NM_144701.2:c.1142G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.78790G&gt;A" Accession="NG_011498" Version="1" Type="HGVS, genomic, RefSeqGene">NG_011498.1:g.78790G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.67240275G&gt;A" Accession="NC_000001" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000001.11:g.67240275G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="g.67705958G&gt;A" Accession="NC_000001" Version="10" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000001.10:g.67705958G&gt;A</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Arg381Gln" Accession="Q5VWK5" Type="HGVS, protein">Q5VWK5:p.Arg381Gln</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Change="p.Arg381Gln" Accession="NP_653302" Version="2" Type="HGVS, protein, RefSeq">NP_653302.2:p.Arg381Gln</Attribute>
+            <XRef Type="rs" ID="11209026" DB="dbSNP" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">missense variant</Attribute>
+            <XRef ID="SO:0001583" DB="Sequence Ontology" />
+            <XRef ID="NM_144701.2:c.1142G&gt;A" DB="RefSeq" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange1LetterCode">R381Q</Attribute>
+            <XRef Type="Allelic variant" ID="607562.0001" DB="OMIM" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange3LetterCode">ARG381GLN</Attribute>
+            <XRef Type="Allelic variant" ID="607562.0001" DB="OMIM" />
+          </AttributeSet>
+          <AlleleFrequencyList>
+            <AlleleFrequency Value="0.02276" Source="1000 Genomes Project" />
+            <AlleleFrequency Value="0.04221" Source="Exome Aggregation Consortium (ExAC)" />
+            <AlleleFrequency Value="0.04462" Source="The Genome Aggregation Database (gnomAD)" />
+            <AlleleFrequency Value="0.04232" Source="The Genome Aggregation Database (gnomAD), exomes" />
+            <AlleleFrequency Value="0.04453" Source="Trans-Omics for Precision Medicine (TOPMed)" />
+          </AlleleFrequencyList>
+          <GlobalMinorAlleleFrequency Value="0.02276" Source="1000 Genomes Project" MinorAllele="A" />
+          <CytogeneticLocation>1p31.3</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="67240275" stop="67240275" display_start="67240275" display_stop="67240275" variantLength="1" referenceAllele="G" alternateAllele="A" positionVCF="67240275" referenceAlleleVCF="G" alternateAlleleVCF="A" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="67705958" stop="67705958" display_start="67705958" display_stop="67705958" variantLength="1" referenceAllele="G" alternateAllele="A" positionVCF="67705958" referenceAlleleVCF="G" alternateAlleleVCF="A" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">interleukin 23 receptor</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">IL23R</ElementValue>
+            </Symbol>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="67138639" stop="67259979" display_start="67138639" display_stop="67259979" Strand="+" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="67632168" stop="67725661" display_start="67632168" display_stop="67725661" variantLength="93494" Strand="+" />
+            <XRef ID="149233" DB="Gene" />
+            <XRef Type="MIM" ID="607562" DB="OMIM" />
+            <XRef ID="HGNC:19100" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef ID="Q5VWK5#VAR_029754" DB="UniProtKB" />
+          <XRef Type="Allelic variant" ID="607562.0001" DB="OMIM" />
+          <XRef Type="rs" ID="11209026" DB="dbSNP" />
+        </Measure>
         <Name>
           <ElementValue Type="Preferred">NM_144701.2(IL23R):c.1142G&gt;A (p.Arg381Gln)</ElementValue>
         </Name>
-        <AttributeSet>
-          <Attribute Type="AlleleFrequency">0.046908643494</Attribute>
-          <XRef DB="dbSNP" ID="11209026"/>
-          <XRef DB="NHLBI GO Exome Sequencing Project (ESP)" ID="ESP6500SI-V2" URL="http://evs.gs.washington.edu/EVS/"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="GlobalMinorAlleleFrequency">0.0228(A)</Attribute>
-          <XRef DB="dbSNP" ID="11209026"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, coding, RefSeq" Change="c.1142G&gt;A">NM_144701.2:c.1142G&gt;A</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, RefSeqGene" Change="g.78790G&gt;A">NG_011498.1:g.78790G&gt;A</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, top level" Change="g.67240275G&gt;A" integerValue="38">NC_000001.11:g.67240275G&gt;A</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, genomic, top level, previous" Change="g.67705958G&gt;A" integerValue="37">NC_000001.10:g.67705958G&gt;A</Attribute>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="HGVS, protein, RefSeq" Change="p.Arg381Gln">NP_653302.2:p.Arg381Gln</Attribute>
-          <XRef Type="rs" ID="11209026" DB="dbSNP"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="MolecularConsequence">missense variant</Attribute>
-          <XRef ID="SO:0001583" DB="Sequence Ontology"/>
-          <XRef ID="NM_144701.2:c.1142G&gt;A" DB="RefSeq"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="ProteinChange1LetterCode">R381Q</Attribute>
-          <XRef Type="Allelic variant" ID="607562.0001" DB="OMIM"/>
-        </AttributeSet>
-        <AttributeSet>
-          <Attribute Type="ProteinChange3LetterCode">ARG381GLN</Attribute>
-          <XRef Type="Allelic variant" ID="607562.0001" DB="OMIM"/>
-        </AttributeSet>
-        <CytogeneticLocation>1p31.3</CytogeneticLocation>
-        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="67240275" stop="67240275" display_start="67240275" display_stop="67240275" variantLength="1" referenceAllele="G" alternateAllele="A"/>
-        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="67705958" stop="67705958" display_start="67705958" display_stop="67705958" variantLength="1" referenceAllele="G" alternateAllele="A"/>
-        <MeasureRelationship Type="variant in gene">
+        <XRef ID="CA116015" DB="ClinGen" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="793">
+        <Trait ID="9850" Type="Disease">
           <Name>
-            <ElementValue Type="Preferred">interleukin 23 receptor</ElementValue>
+            <ElementValue Type="Preferred">Inflammatory bowel disease 17, protection against</ElementValue>
           </Name>
-          <Symbol>
-            <ElementValue Type="Preferred">IL23R</ElementValue>
-          </Symbol>
-          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.28" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="67138639" stop="67259978" display_start="67138639" display_stop="67259978" variantLength="121073" Strand="+"/>
-          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="67632168" stop="67725661" display_start="67632168" display_stop="67725661" variantLength="93494" Strand="+"/>
-          <XRef ID="149233" DB="Gene"/>
-          <XRef Type="MIM" ID="607562" DB="OMIM"/>
-          <XRef ID="HGNC:19100" DB="HGNC"/>
-        </MeasureRelationship>
-        <XRef Type="Allelic variant" ID="607562.0001" DB="OMIM"/>
-        <XRef Type="rs" ID="11209026" DB="dbSNP"/>
-      </Measure>
-      <Name>
-        <ElementValue Type="Preferred">NM_144701.2(IL23R):c.1142G&gt;A (p.Arg381Gln)</ElementValue>
-      </Name>
-    </MeasureSet>
-    <TraitSet Type="Disease" ID="793">
-      <Trait ID="9850" Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">Inflammatory bowel disease 17, protection against</ElementValue>
-        </Name>
-      </Trait>
-    </TraitSet>
-  </ReferenceClinVarAssertion>
-  <ClinVarAssertion ID="23412">
-    <ClinVarSubmissionID localKey="607562.0001_INFLAMMATORY BOWEL DISEASE 17, PROTECTION AGAINST" submitter="OMIM" submitterDate="2013-05-07" title="IL23R, ARG381GLN_INFLAMMATORY BOWEL DISEASE 17, PROTECTION AGAINST"/>
-    <ClinVarAccession Acc="SCV000023412" Version="2" Type="SCV" OrgID="3" DateUpdated="2015-10-11"/>
-    <RecordStatus>current</RecordStatus>
-    <ClinicalSignificance DateLastEvaluated="2010-04-01">
-      <ReviewStatus>no assertion criteria provided</ReviewStatus>
-      <Description>protective</Description>
-    </ClinicalSignificance>
-    <Assertion Type="variation to disease"/>
-    <ExternalID DB="OMIM" ID="607562.0001" Type="Allelic variant"/>
-    <ObservedIn>
-      <Sample>
-        <Origin>germline</Origin>
-        <Species>human</Species>
-        <AffectedStatus>not provided</AffectedStatus>
-      </Sample>
-      <Method>
-        <MethodType>literature only</MethodType>
-      </Method>
-      <ObservedData>
-        <Attribute Type="Description">Association with Inflammatory Bowel Disease</Attribute>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">Using a large-scale genomewide association study, Duerr et al. (2006) identified an uncommon coding mutation in the IL23R gene, a 1142G-A transition, resulting in an arg381-to-glu (R381Q) substitution (rs11209026), that confers strong protection against Crohn disease (see 612261). This SNP was identified in 1 cohort and replicated in 2 others. The gln381 allele was found in 7% of non-Jewish controls and 1.9% of non-Jewish patients with ileal Crohn disease.</Attribute>
-        <Citation>
-          <ID Source="PubMed">17068223</ID>
-        </Citation>
-        <XRef DB="OMIM" ID="612261" Type="MIM"/>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">Libioulle et al. (2007) performed a genomewide association study with more than 300,000 SNPs in 547 Caucasian patients with Crohn disease from Belgium and 928 controls and found the strongest association (p less than 10(-9)) with markers of the IL23R gene, including rs11209026, which corresponds to the R381Q substitution. The association with R381Q was replicated in 1,255 additional Caucasian CD patients and 550 controls (combined p = 2.2 x 10(-18)).</Attribute>
-        <Citation>
-          <ID Source="PubMed">17447842</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">Raelson et al. (2007) analyzed the IL23R region in 477 parent-proband trios with Crohn disease from the Quebec Founder Population and 2 independent German samples involving 521 affected-child trios, 752 cases, and 828 independent controls. The authors found that the R381Q SNP did not occur consistently in all risk and protective haplotypes, and concluded that it is highly unlikely that R381Q fully explains the functional role of this gene in CD etiology.</Attribute>
-        <Citation>
-          <ID Source="PubMed">17804789</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">In a Caucasian German IBD cohort that included 833 CD patients, 456 patients with ulcerative colitis (UC), and 1,381 unrelated controls, Glas et al. (2007) confirmed the association between rs11209026 and protection against CD (OR, 0.43; p = 8.04 x 10(-8)) and also found a significant association with protection from UC (OR, 0.70; p = 0.00361).</Attribute>
-        <Citation>
-          <ID Source="PubMed">17786191</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">In a study involving 1,841 ulcerative colitis cases and 1,470 controls, Fisher et al. (2008) found the strongest signal at rs11209026 (p = 8.0 x 10(-8); OR, 0.53), with evidence that additional independent IL23R variants also contribute to ulcerative colitis risk.</Attribute>
-        <Citation>
-          <ID Source="PubMed">18438406</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">McGovern et al. (2010) combined new data from 2 genomewide association studies of ulcerative colitis involving 266,047 SNPs and performed a metaanalysis with previously published data (Silverberg et al., 2009), thus bringing together a discovery set of 2,693 European UC patients and 6,791 controls; the top results from the metaanalysis were then independently replicated with 2,009 additional European UC cases and 1,580 controls. McGovern et al. (2010) confirmed association with UC at rs11209026 (combined p = 1.9 x 10(-13)).</Attribute>
-        <Citation>
-          <ID Source="PubMed">20228799</ID>
-        </Citation>
-        <Citation>
-          <ID Source="PubMed">19122664</ID>
-        </Citation>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">Association with Psoriasis</Attribute>
-      </ObservedData>
-      <ObservedData>
-        <Attribute Type="Description">Capon et al. (2007) reported a significant association between the R381Q variant and protection against psoriasis (PSORS7; 605606) among 318 British patients with the disorder. The findings were replicated in a second group of 519 British patients. Together, the association yielded an odds ratio of 0.49 (p = 0.00014), with the gln381 allele offering protection from the disease. Capon et al. (2007) noted that the arg381 residue is highly conserved among higher vertebrates and is located within the binding domain for JAK2 kinase, which is the first mediator of the IL23R signaling cascade (Parham et al., 2002).</Attribute>
-        <Citation>
-          <ID Source="PubMed">17587057</ID>
-        </Citation>
-        <Citation>
-          <ID Source="PubMed">12023369</ID>
-        </Citation>
-        <XRef DB="OMIM" ID="605606" Type="MIM"/>
-      </ObservedData>
-    </ObservedIn>
-    <MeasureSet Type="Variant">
-      <Measure Type="Variation">
-        <Name>
-          <ElementValue Type="Preferred">IL23R, ARG381GLN</ElementValue>
-        </Name>
-        <AttributeSet>
-          <Attribute Type="NonHGVS">ARG381GLN</Attribute>
-        </AttributeSet>
-        <MeasureRelationship Type="variant in gene">
-          <Symbol>
-            <ElementValue Type="Preferred">IL23R</ElementValue>
-          </Symbol>
-        </MeasureRelationship>
-        <XRef DB="OMIM" ID="607562.0001" Type="Allelic variant"/>
-      </Measure>
-    </MeasureSet>
-    <TraitSet Type="Disease">
-      <Trait Type="Disease">
-        <Name>
-          <ElementValue Type="Preferred">INFLAMMATORY BOWEL DISEASE 17, PROTECTION AGAINST</ElementValue>
-        </Name>
-      </Trait>
-    </TraitSet>
-  </ClinVarAssertion>
-</ClinVarSet>
+          <XRef ID="C4017090" DB="MedGen" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="23412">
+      <ClinVarSubmissionID localKey="607562.0001_INFLAMMATORY BOWEL DISEASE 17, PROTECTION AGAINST" submitter="OMIM" submitterDate="2016-07-20" title="IL23R, ARG381GLN_INFLAMMATORY BOWEL DISEASE 17, PROTECTION AGAINST" />
+      <ClinVarAccession Acc="SCV000023412" Version="4" Type="SCV" OrgID="3" OrganizationCategory="resource" OrgType="primary" DateUpdated="2018-12-15" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2010-04-01">
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Description>protective</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ExternalID DB="OMIM" ID="607562.0001" Type="Allelic variant" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species>human</Species>
+          <AffectedStatus>not provided</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>literature only</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">Inflammatory Bowel Disease</Attribute>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Using a large-scale genomewide association study, Duerr et al. (2006) identified an uncommon coding mutation in the IL23R gene, a 1142G-A transition, resulting in an arg381-to-glu (R381Q) substitution (rs11209026), that confers strong protection against Crohn disease (see 612261). This SNP was identified in 1 cohort and replicated in 2 others. The gln381 allele was found in 7% of non-Jewish controls and 1.9% of non-Jewish patients with ileal Crohn disease.</Attribute>
+          <Citation>
+            <ID Source="PubMed">17068223</ID>
+          </Citation>
+          <XRef DB="OMIM" ID="612261" Type="MIM" />
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Libioulle et al. (2007) performed a genomewide association study with more than 300,000 SNPs in 547 Caucasian patients with Crohn disease from Belgium and 928 controls and found the strongest association (p less than 10(-9)) with markers of the IL23R gene, including rs11209026, which corresponds to the R381Q substitution. The association with R381Q was replicated in 1,255 additional Caucasian CD patients and 550 controls (combined p = 2.2 x 10(-18)).</Attribute>
+          <Citation>
+            <ID Source="PubMed">17447842</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Raelson et al. (2007) analyzed the IL23R region in 477 parent-proband trios with Crohn disease from the Quebec Founder Population and 2 independent German samples involving 521 affected-child trios, 752 cases, and 828 independent controls. The authors found that the R381Q SNP did not occur consistently in all risk and protective haplotypes, and concluded that it is highly unlikely that R381Q fully explains the functional role of this gene in CD etiology.</Attribute>
+          <Citation>
+            <ID Source="PubMed">17804789</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">In a Caucasian German IBD cohort that included 833 CD patients, 456 patients with ulcerative colitis (UC), and 1,381 unrelated controls, Glas et al. (2007) confirmed the association between rs11209026 and protection against CD (OR, 0.43; p = 8.04 x 10(-8)) and also found a significant association with protection from UC (OR, 0.70; p = 0.00361).</Attribute>
+          <Citation>
+            <ID Source="PubMed">17786191</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">In a study involving 1,841 ulcerative colitis cases and 1,470 controls, Fisher et al. (2008) found the strongest signal at rs11209026 (p = 8.0 x 10(-8); OR, 0.53), with evidence that additional independent IL23R variants also contribute to ulcerative colitis risk.</Attribute>
+          <Citation>
+            <ID Source="PubMed">18438406</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">McGovern et al. (2010) combined new data from 2 genomewide association studies of ulcerative colitis involving 266,047 SNPs and performed a metaanalysis with previously published data (Silverberg et al., 2009), thus bringing together a discovery set of 2,693 European UC patients and 6,791 controls; the top results from the metaanalysis were then independently replicated with 2,009 additional European UC cases and 1,580 controls. McGovern et al. (2010) confirmed association with UC at rs11209026 (combined p = 1.9 x 10(-13)).</Attribute>
+          <Citation>
+            <ID Source="PubMed">20228799</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">19122664</ID>
+          </Citation>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Psoriasis</Attribute>
+        </ObservedData>
+        <ObservedData>
+          <Attribute Type="Description">Capon et al. (2007) reported a significant association between the R381Q variant and protection against psoriasis (PSORS7; 605606) among 318 British patients with the disorder. The findings were replicated in a second group of 519 British patients. Together, the association yielded an odds ratio of 0.49 (p = 0.00014), with the gln381 allele offering protection from the disease. Capon et al. (2007) noted that the arg381 residue is highly conserved among higher vertebrates and is located within the binding domain for JAK2 kinase, which is the first mediator of the IL23R signaling cascade (Parham et al., 2002).</Attribute>
+          <Citation>
+            <ID Source="PubMed">17587057</ID>
+          </Citation>
+          <Citation>
+            <ID Source="PubMed">12023369</ID>
+          </Citation>
+          <XRef DB="OMIM" ID="605606" Type="MIM" />
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <Name>
+            <ElementValue Type="Preferred">IL23R, ARG381GLN</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Type="NonHGVS">ARG381GLN</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">IL23R</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+          <XRef DB="OMIM" ID="607562.0001" Type="Allelic variant" />
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">INFLAMMATORY BOWEL DISEASE 17, PROTECTION AGAINST</ElementValue>
+          </Name>
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
 </ReleaseSet>

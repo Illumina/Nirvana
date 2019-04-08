@@ -4,6 +4,7 @@ using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
 using SAUtils.Custom;
+using SAUtils.Schema;
 using VariantAnnotation.SA;
 using Xunit;
 
@@ -169,8 +170,12 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 var expectedDescriptions = new[] { "ALL", "ALL", "ALL", null, null, null };
                 var expectedTypes = new[]
                 {
-                    JsonDataType.Number, JsonDataType.Number, JsonDataType.Number,
-                    JsonDataType.Bool, JsonDataType.String, JsonDataType.String
+                    SaJsonValueType.Number,
+                    SaJsonValueType.Number,
+                    SaJsonValueType.Number,
+                    SaJsonValueType.Bool,
+                    SaJsonValueType.String,
+                    SaJsonValueType.String
                 };
 
                 Assert.Equal("IcslAlleleFrequencies", custParser.JsonTag);
@@ -179,7 +184,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.True(expectedIntervalJsonKeys.SequenceEqual(custParser.IntervalJsonKeys));
                 Assert.True(expectedCategories.SequenceEqual(custParser.Categories));
                 Assert.True(expectedDescriptions.SequenceEqual(custParser.Descriptions));
-                Assert.True(expectedTypes.SequenceEqual(custParser.Types));
+                Assert.Equal(expectedTypes, custParser.ValueTypes);
             }
         }
 

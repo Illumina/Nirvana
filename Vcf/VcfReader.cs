@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
-using IO;
 using OptimizedCore;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
@@ -18,13 +17,14 @@ namespace Vcf
     {
         private readonly StreamReader _headerReader;
         private readonly StreamReader _reader;
-        private readonly IRecomposer _recomposer;
+        private IRecomposer _recomposer;
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly IVcfFilter _vcfFilter;
         public bool IsRcrsMitochondrion { get; private set; }
         public string VcfLine { get; private set; }
+        public GenomeAssembly InferredGenomeAssembly { get; private set; } = GenomeAssembly.Unknown;
 
         private string[] _sampleNames;
         private List<string> _headerLines;
@@ -54,114 +54,82 @@ namespace Vcf
 
         public string[] GetSampleNames() => _sampleNames;
 
-        private VcfReader(StreamReader headerReader, StreamReader vcfReader, IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter)
+        private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, IDictionary<string, IChromosome> refNameToChromosome,
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter)
         {
             _headerReader = headerReader;
-            _reader = vcfReader;
+            _reader = vcfLineReader;
             _variantFactory = new VariantFactory(refNameToChromosome);
             _refMinorProvider = refMinorProvider;
             _vcfFilter = vcfFilter;
             _refNameToChromosome = refNameToChromosome;
-            bool hasSampleColumn = ParseHeader();
-            _recomposer = hasSampleColumn ? recomposer : new NullRecomposer();
         }
 
-        [Obsolete("We should not have multiple constructors")]
-        private VcfReader(StreamReader headerReader, StreamReader vcfReader, IAnnotationResources annotationResources, IVcfFilter vcfFilter) : this (headerReader, vcfReader,
-            annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider,
-            annotationResources.Recomposer, vcfFilter)
-        { }
-
-        [Obsolete("We should not have multiple constructors")]
-        public static VcfReader Create(Stream stream, IDictionary<string, IChromosome> refNameToChromosome,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer,
-            IVcfFilter vcfFilter)
+        public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, IDictionary<string, IChromosome> refNameToChromosome,
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter)
         {
-            var reader = FileUtilities.GetStreamReader(stream);
-            return new VcfReader(reader, reader, refNameToChromosome,
-                refMinorProvider, recomposer, vcfFilter);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, refNameToChromosome, refMinorProvider, vcfFilter);
+            vcfReader.ParseHeader();
+            vcfReader.SetRecomposer(recomposer);
+            return vcfReader;
         }
 
-        [Obsolete("We should not have multiple constructors")]
-        private static VcfReader Create(Stream stream, IAnnotationResources annotationResources, IVcfFilter vcfFilter)
-        {
-            var reader = FileUtilities.GetStreamReader(stream);
-            return new VcfReader(reader, reader, annotationResources, vcfFilter);
-        }
+        private void SetRecomposer(IRecomposer recomposer) => _recomposer = _sampleNames == null ? new NullRecomposer() : recomposer;
 
-        [Obsolete("We should not have multiple constructors")]
-        public static VcfReader Create(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter)
+        private void ParseHeader()
         {
-            if (headerStream == null) return Create(vcfStream, annotationResources, vcfFilter);
-
-            vcfStream.Position = Tabix.VirtualPosition.From(annotationResources.InputStartVirtualPosition).BlockOffset;
-            return new VcfReader(FileUtilities.GetStreamReader(headerStream),
-                    FileUtilities.GetStreamReader(vcfStream),
-                    annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider,
-                    annotationResources.Recomposer, vcfFilter);
-        }
-
-        private bool ParseHeader()
-        {
-            string line;
             _headerLines = new List<string>();
-            bool hasSampleColumn;
 
-            while (true)
+            string line;
+            while ((line = _headerReader.ReadLine()) != null)
             {
-                // grab the next line - stop if we have reached the main header or read the entire file
-                line = _headerReader.ReadLine();
-                if (line == null || line.StartsWith(VcfCommon.ChromosomeHeader))
-                {
-                    hasSampleColumn = HasSampleColumn(line);
-                    break;
-                }
-
-                bool duplicateTag = FoundNirvanaHeaderLine(line);
-                if (duplicateTag) continue;
-
-                if (line.StartsWith("##contig=<ID") && line.Contains("M") && line.Contains("length=16569>")) IsRcrsMitochondrion = true;
-
+                if (IsNirvanaHeaderLine(line)) continue;
+                CheckContigId(line);
                 _headerLines.Add(line);
+                if (line.StartsWith(VcfCommon.ChromosomeHeader)) break;
             }
 
-            CheckValidVcfHeader();
-
-            if (line == null || !line.StartsWith(VcfCommon.ChromosomeHeader))
-            {
-                throw new FormatException($"Could not find the vcf header (starts with {VcfCommon.ChromosomeHeader}). Is this a valid vcf file?");
-            }
-
-            _headerLines.Add(line);
-
+            ValidateVcfHeader();
             _sampleNames = ExtractSampleNames(line);
-
             _vcfFilter.FastForward(_reader);
-
-            return hasSampleColumn;
         }
 
-        private void CheckValidVcfHeader()
+        internal void CheckContigId(string line)
         {
-            if (_headerLines.Count == 0 || !_headerLines[0].StartsWith("##fileformat=VCFv")) 
-                throw new UserErrorException("Please provide a valid VCF file.");
+            var chromAndLengthInfo = GetChromAndLengthInfo(line);
+            if (chromAndLengthInfo == null) return;
+
+            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out IChromosome chromosome)) return;
+            if (!int.TryParse(chromAndLengthInfo[1], out int length)) return;
+
+            var assemblyThisChrom = ContigInfo.GetGenomeAssembly(chromosome, length);
+
+            if (assemblyThisChrom == GenomeAssembly.rCRS)
+            {
+                IsRcrsMitochondrion = true;
+                return;
+            }
+
+            if (!GenomeAssemblyHelper.AutosomeAndAllosomeAssemblies.Contains(assemblyThisChrom)) return;
+
+            if (InferredGenomeAssembly == GenomeAssembly.Unknown) InferredGenomeAssembly = assemblyThisChrom;
+
+            if (InferredGenomeAssembly != assemblyThisChrom)
+                throw new UserErrorException($"Inconsistent genome assemblies inferred:\ncurrent line \"{line}\" indicates {assemblyThisChrom}, whereas the lines above it indicate {InferredGenomeAssembly}.");
         }
 
-        private bool FoundNirvanaHeaderLine(string s)
+        internal static string[] GetChromAndLengthInfo(string line) => !line.StartsWith("##contig=<ID=") ? null : line.TrimEnd('>').Substring(13).Split(",length=");
+
+        private void ValidateVcfHeader()
         {
-            foreach(string infoTag in _nirvanaInfoTags)
-                if (s.StartsWith(infoTag))
-                    return true;
-            return false;
+            if (_headerLines.Count == 0 || !_headerLines[0].StartsWith("##fileformat=VCFv"))
+                throw new UserErrorException("Please provide a valid VCF file with proper fileformat field.");
+
+            if (!_headerLines[_headerLines.Count - 1].StartsWith(VcfCommon.ChromosomeHeader))
+                throw new UserErrorException($"Could not find the vcf header line starting with {VcfCommon.ChromosomeHeader}. Is this a valid vcf file?");
         }
 
-        private static bool HasSampleColumn(string line)
-        {
-            var vcfHeaderFields = line?.Trim().OptimizedSplit('\t');
-            return vcfHeaderFields?.Length >= VcfCommon.MinNumColumnsSampleGenotypes;
-        }
+        private bool IsNirvanaHeaderLine(string s) => _nirvanaInfoTags.Any(s.StartsWith);
 
         private static string[] ExtractSampleNames(string line)
         {
@@ -174,7 +142,7 @@ namespace Vcf
             for (var i = 0; i < numSamples; i++) samples[i] = cols[VcfCommon.GenotypeIndex + i];
             return samples;
         }
-
+        
         public IEnumerable<string> GetHeaderLines() => _headerLines;
 
         private ISimplePosition GetNextSimplePosition()
@@ -191,7 +159,7 @@ namespace Vcf
                 }
                 if (VcfLine == null) break;
             }
-            return _queuedPositions.Count == 0 ? null: _queuedPositions.Dequeue();
+            return _queuedPositions.Count == 0 ? null : _queuedPositions.Dequeue();
         }
 
         public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _variantFactory);

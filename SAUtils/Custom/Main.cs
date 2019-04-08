@@ -7,6 +7,7 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.DataStructures;
+using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;

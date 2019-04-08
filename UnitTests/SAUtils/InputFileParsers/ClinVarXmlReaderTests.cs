@@ -12,7 +12,6 @@ using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
-    [Collection("ChromosomeRenamer")]
     public sealed class ClinVarXmlReaderTests
     {
         private readonly Dictionary<string, IChromosome> _refNameToChromosome;
@@ -49,27 +48,18 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             Assert.True(reader.GetItems().Any());
 
-            foreach (var clinVarItem in reader.GetItems())
-            {
-                Assert.Equal("RCV000077146.3", clinVarItem.Id);
-
-                switch (clinVarItem.Id)
-                {
-                    case "RCV000077146.3":
-                        Assert.Equal("17", clinVarItem.Chromosome.EnsemblName);
-                        Assert.Equal(41234419, clinVarItem.Position);
-                        Assert.Equal("A", clinVarItem.RefAllele);
-                        Assert.Equal("C", clinVarItem.AltAllele);
-                        Assert.Equal(ClinVarXmlReader.ParseDate("2016-07-31"), clinVarItem.LastUpdatedDate);
-                        Assert.True(clinVarItem.AlleleOrigins.SequenceEqual(new List<string> { "germline" }));
-                        Assert.Equal("C2676676", clinVarItem.MedGenIDs.First());
-                        Assert.Equal("145", clinVarItem.OrphanetIDs.First());
-                        Assert.Equal("604370", clinVarItem.OmimIDs.First());
-                        Assert.Equal("Breast-ovarian cancer, familial 1", clinVarItem.Phenotypes.First());
-                        Assert.Null(clinVarItem.PubmedIds);
-                        break;
-                }
-            }
+            var clinVarItem = reader.GetItems().First();
+            Assert.Equal("RCV000077146.3", clinVarItem.Id);
+            Assert.Equal("17", clinVarItem.Chromosome.EnsemblName);
+            Assert.Equal(41234419, clinVarItem.Position);
+            Assert.Equal("A", clinVarItem.RefAllele);
+            Assert.Equal("C", clinVarItem.AltAllele);
+            Assert.Equal("2019-01-25", clinVarItem.LastUpdateDate);
+            Assert.Equal(clinVarItem.AlleleOrigins, new List<string> { "germline" });
+            Assert.Equal("C2676676", clinVarItem.MedGenIds.First());
+            Assert.Equal("145", clinVarItem.OrphanetIds.First());
+            Assert.Equal("604370", clinVarItem.OmimIds.First());
+            Assert.Equal("Breast-ovarian cancer, familial 1", clinVarItem.Phenotypes.First());
         }
 
         [Fact]
@@ -83,7 +73,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var clinVarItem = clinVarItems[0];
             Assert.Equal("RCV000001373.3", clinVarItem.Id);
 
-            var omimIds = clinVarItem.OmimIDs.ToArray();
+            var omimIds = clinVarItem.OmimIds;
             Assert.Single(omimIds);
             Assert.Equal("610206.0007", omimIds[0]);
         }
@@ -230,8 +220,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(
-                    clinVarItem.PubmedIds.SequenceEqual(new List<long> { 12114475, 18836774, 22357542, 24033266 }));
+                Assert.Equal( new List<long> { 12114475, 18836774, 22357542, 24033266 }, clinVarItem.PubMedIds.Select(long.Parse));
             }
         }
 
@@ -245,9 +234,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(
-                    clinVarItem.PubmedIds.SequenceEqual(
-                        new List<long> { 6714226, 6826539, 9113933, 9845707, 12000828, 12383672 }));
+                Assert.Equal(new List<long> { 6826539, 9113933, 9845707, 12000828, 12383672 }, clinVarItem.PubMedIds.Select(long.Parse));
             }
         }
 
@@ -261,8 +248,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(
-                    clinVarItem.PubmedIds.SequenceEqual(new List<long> { 17285735, 17877814, 22848293, 24033266 }));
+                Assert.Equal( new List<long> { 17285735, 17877814, 22848293, 24033266 }, clinVarItem.PubMedIds.Select(long.Parse));
             }
         }
 
@@ -276,7 +262,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.PubmedIds.SequenceEqual(new List<long> { 8099202 }));
+                Assert.Equal( new List<long> { 7595167, 8099202, 8612479 }, clinVarItem.PubMedIds.Select(long.Parse));
             }
         }
 
@@ -290,7 +276,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Null(clinVarItem.PubmedIds);
+                Assert.Null(clinVarItem.PubMedIds);
             }
         }
 
@@ -305,14 +291,15 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.PubmedIds.SequenceEqual(new List<long> { 24728327 }));
+                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> { 24728327 });
             }
         }
 
         [Fact]
         public void MultiScvPubmed()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 6), 15589553, "G");
+            var sequenceProvider =
+                GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 6), 15589553, "G");
 
             //extracting from SCV record
             var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000194003.xml"), sequenceProvider);
@@ -321,17 +308,15 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.PubmedIds.SequenceEqual(new List<long> { 25741868, 26092869 }));
+                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> {25741868, 26092869});
             }
         }
 
         [Fact]
-        public void NoClinVarItem()
+        public void NoClinVarItem_due_to_ref_mismatch()
         {
-            var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.Setup(x => x.RefNameToChromosome).Returns(_refNameToChromosome);
-
-            var sequenceProvider = mockProvider.Object;
+            var sequenceProvider =
+                GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr10", "10", 10), 90982267, "A");
 
             var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000000101.xml"), sequenceProvider);
 
@@ -368,7 +353,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             foreach (var clinVarItem in reader.GetItems())
             {
                 var expectedPhenotypes = new List<string> { "Single ventricle", "small Atrial septal defect" };
-                Assert.True(expectedPhenotypes.SequenceEqual(clinVarItem.Phenotypes));
+                Assert.Equal(expectedPhenotypes, clinVarItem.Phenotypes);
             }
         }
 
@@ -383,7 +368,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             foreach (var clinVarItem in reader.GetItems())
             {
                 var expectedOrigins = new List<string> { "germline", "maternal", "unknown" };
-                Assert.True(expectedOrigins.SequenceEqual(clinVarItem.AlleleOrigins));
+                Assert.Equal(expectedOrigins, clinVarItem.AlleleOrigins);
             }
         }
 
@@ -397,7 +382,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.PubmedIds.SequenceEqual(new List<long>
+                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long>
                 {
                     12023369,
                     17068223,
@@ -408,7 +393,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                     18438406,
                     19122664,
                     20228799
-                }));
+                });
             }
         }
 
@@ -423,16 +408,16 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal("RCV000032548.5", clinVarItem.Id);
+                Assert.Equal("RCV000032548.8", clinVarItem.Id);
 
                 switch (clinVarItem.Id)
                 {
-                    case "RCV000032548.5":
+                    case "RCV000032548.8":
                         Assert.Equal("4", clinVarItem.Chromosome.EnsemblName);
                         Assert.Equal(187122303, clinVarItem.Position);
                         Assert.Equal(17, clinVarItem.RefAllele.Length);
                         Assert.Equal("GC", clinVarItem.AltAllele);
-                        Assert.Equal(ClinVarXmlReader.ParseDate("2016-08-29"), clinVarItem.LastUpdatedDate);
+                        Assert.Equal("2018-12-28", clinVarItem.LastUpdateDate);
                         break;
                 }
             }
@@ -452,7 +437,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.PubmedIds.SequenceEqual(new List<long> { 23806086, 24088041, 25736269 }));
+                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> { 23806086, 24088041, 25736269 });
             }
         }
 
@@ -468,7 +453,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(2, clinVarItem.AlleleOrigins.Count());
+                Assert.Equal(2, clinVarItem.AlleleOrigins.Length);
                 Assert.NotEqual(clinVarItem.AlleleOrigins.First(), clinVarItem.AlleleOrigins.Last());
 
                 foreach (var origin in clinVarItem.AlleleOrigins)
@@ -576,7 +561,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void IupacBases()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 1), 32913457, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr13", "13", 1), 32339320, "C");
 
             var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000113363.xml"), sequenceProvider);
 
@@ -585,8 +570,9 @@ namespace UnitTests.SAUtils.InputFileParsers
             foreach (var clinVarItem in reader.GetItems())
             {
                 altAlleles.Add(clinVarItem.AltAllele);
+                Assert.Equal(new[] {"pathogenic"}, clinVarItem.Significance);
             }
-
+            
             Assert.Equal(2, altAlleles.Count);
         }
 
@@ -601,7 +587,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Single(clinVarItem.OmimIDs);
+                Assert.Single(clinVarItem.OmimIds);
             }
         }
 
@@ -616,8 +602,8 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Single(clinVarItem.OmimIDs);
-                Assert.Equal("609060", clinVarItem.OmimIDs.FirstOrDefault());
+                Assert.Single(clinVarItem.OmimIds);
+                Assert.Equal("609060", clinVarItem.OmimIds.FirstOrDefault());
             }
         }
 
@@ -646,9 +632,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(
-                    clinVarItem.PubmedIds.SequenceEqual(
-                        new List<long> { 16329078, 16372351, 19213030, 21438134, 25741868 }));
+                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> { 16329078, 16372351, 19213030, 21438134, 25741868 });
             }
         }
 
@@ -662,7 +646,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.OmimIDs.SequenceEqual(new List<string> { "601462", "610285.0001" }));
+                Assert.Equal(clinVarItem.OmimIds, new List<string> { "601462", "610285.0001" });
             }
         }
 
@@ -676,7 +660,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.OmimIDs.SequenceEqual(new List<string> { "209900" }));
+                Assert.Equal(clinVarItem.OmimIds, new List<string> { "209900" });
             }
         }
 
@@ -690,7 +674,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.True(clinVarItem.OmimIDs.SequenceEqual(new List<string> { "213300" }));
+                Assert.Equal(clinVarItem.OmimIds, new List<string> { "213300" });
             }
         }
 
@@ -715,8 +699,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Single(clinvarItems);
 
             var clinvarItem = clinvarItems[0];
-            Assert.Single(clinvarItem.OmimIDs);
-            Assert.Equal("612800.0003", clinvarItem.OmimIDs.First());
+            Assert.Single(clinvarItem.OmimIds);
+            Assert.Equal("612800.0003", clinvarItem.OmimIds.First());
         }
 
         [Fact]
@@ -731,8 +715,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Single(clinvarItems);
 
             var clinvarItem = clinvarItems[0];
-            Assert.Single(clinvarItem.OmimIDs);
-            Assert.Equal("612800.0002", clinvarItem.OmimIDs.First());
+            Assert.Single(clinvarItem.OmimIds);
+            Assert.Equal("612800.0002", clinvarItem.OmimIds.First());
         }
 
         [Fact]
@@ -747,8 +731,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Single(clinvarItems);
 
             var clinvarItem = clinvarItems[0];
-            Assert.Single(clinvarItem.OmimIDs);
-            Assert.Equal("216550", clinvarItem.OmimIDs.First());
+            Assert.Single(clinvarItem.OmimIds);
+            Assert.Equal("216550", clinvarItem.OmimIds.First());
         }
 
         [Fact]
@@ -765,7 +749,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in clinvarItems)
             {
-                Assert.Equal(2, clinVarItem.OmimIDs.Count());
+                Assert.Equal(2, clinVarItem.OmimIds.Count());
             }
         }
 
@@ -783,7 +767,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in clinvarItems)
             {
-                Assert.Equal(2, clinVarItem.OmimIDs.Count());
+                Assert.Equal(2, clinVarItem.OmimIds.Count());
             }
         }
 
@@ -852,7 +836,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(2, clinvarItems[0].Phenotypes.Count());
+            Assert.Single(clinvarItems[0].Phenotypes);
         }
 
         [Fact]
@@ -864,6 +848,28 @@ namespace UnitTests.SAUtils.InputFileParsers
             var clinvarItems = reader.GetItems().ToList();
 
             Assert.Equal("",clinvarItems[0].RefAllele);
+        }
+
+        [Fact]
+        public void Multiple_significance()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr15", "15", 15), 72349076, "T");
+            var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000169296.xml"), sequenceProvider);
+
+            var clinvarItems = reader.GetItems().ToList();
+
+            Assert.Equal(new[]{ "pathogenic", "likely pathogenic" }, clinvarItems[0].Significance);
+        }
+
+        [Fact]
+        public void Multiple_significance_from_explanation()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr19", "19", 19), 12665750, "T");
+            var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000001752.xml"), sequenceProvider);
+
+            var clinvarItems = reader.GetItems().ToList();
+
+            Assert.Equal(new[] { "pathogenic", "uncertain significance" }, clinvarItems[0].Significance);
         }
     }
 }
