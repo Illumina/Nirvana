@@ -97,7 +97,7 @@ namespace Vcf
         internal void CheckContigId(string line)
         {
             var chromAndLengthInfo = GetChromAndLengthInfo(line);
-            if (chromAndLengthInfo == null) return;
+            if (chromAndLengthInfo.Length == 0) return;
 
             if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out IChromosome chromosome)) return;
             if (!int.TryParse(chromAndLengthInfo[1], out int length)) return;
@@ -118,7 +118,13 @@ namespace Vcf
                 throw new UserErrorException($"Inconsistent genome assemblies inferred:\ncurrent line \"{line}\" indicates {assemblyThisChrom}, whereas the lines above it indicate {InferredGenomeAssembly}.");
         }
 
-        internal static string[] GetChromAndLengthInfo(string line) => !line.StartsWith("##contig=<ID=") ? null : line.TrimEnd('>').Substring(13).Split(",length=");
+        internal static string[] GetChromAndLengthInfo(string line)
+        {
+            if (!line.StartsWith("##contig=<ID=")) return Array.Empty<string>();
+            if (!line.Contains(",length=")) return Array.Empty<string>();
+            var chromAndLength = line.TrimEnd('>').Substring(13).Split(",length=");
+            return chromAndLength.Length == 2 ? chromAndLength : Array.Empty<string>();
+        }
 
         private void ValidateVcfHeader()
         {
