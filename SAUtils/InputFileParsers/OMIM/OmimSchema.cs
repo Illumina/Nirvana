@@ -12,7 +12,7 @@ namespace SAUtils.InputFileParsers.OMIM
         private static readonly (string JsonKey, SaJsonValueType ValueType, SaJsonSchema subSchema)[] SchemaDescription = {
             ("mimNumber", SaJsonValueType.Number, null),
             ("description", SaJsonValueType.String, null),
-            ("phenotypes", SaJsonValueType.ObjectArray, OmimPhenotypeSchema.Get())
+            ("phenotypes", null, OmimPhenotypeSchema.Get())
         };
 
         public static SaJsonSchema Get()
@@ -21,7 +21,13 @@ namespace SAUtils.InputFileParsers.OMIM
             jsonSchema.SetNonSaKeys(new[] { "isAlleleSpecific" });
 
             foreach ((string key, var valueType, var subSchema) in SchemaDescription)
-                jsonSchema.AddAnnotation(key, new SaJsonKeyAnnotation { ValueType = valueType, SubSchema = subSchema});
+            {
+                var keyAnnotation = valueType == null
+                    ? SaJsonKeyAnnotation.CreateFromSubSchema(subSchema)
+                    : SaJsonKeyAnnotation.CreateFromProperties(valueType, 0, null);
+
+                jsonSchema.AddAnnotation(key, keyAnnotation);
+            }
 
             return jsonSchema;
         }

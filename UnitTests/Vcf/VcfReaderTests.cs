@@ -106,9 +106,21 @@ namespace UnitTests.Vcf
         }
 
         [Fact]
-        public void GetChromAndLengthInfo_ReturnNull_NoProperPrefix()
+        public void GetChromAndLengthInfo_ReturnEmptyArray_NoProperPrefix()
         {
-            Assert.Null(VcfReader.GetChromAndLengthInfo("##fileformat=VCFv"));
+            Assert.Empty(VcfReader.GetChromAndLengthInfo("##fileformat=VCFv"));
+        }
+
+        [Fact]
+        public void GetChromAndLengthInfo_ReturnEmptyArray_NoChromInfo()
+        {
+            Assert.Empty(VcfReader.GetChromAndLengthInfo("##contig=<ID>"));
+        }
+
+        [Fact]
+        public void GetChromAndLengthInfo_ReturnEmptyArray_NoLengthInfo()
+        {
+            Assert.Empty(VcfReader.GetChromAndLengthInfo("##contig=<ID=chr1>"));
         }
 
         [Theory]

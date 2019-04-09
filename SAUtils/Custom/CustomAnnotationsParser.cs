@@ -12,7 +12,7 @@ using VariantAnnotation.SA;
 
 namespace SAUtils.Custom
 {
-    public sealed class CustomAnnotationsParser:IDisposable
+    public sealed class CustomAnnotationsParser : IDisposable
     {
         private readonly StreamReader _reader;
         private readonly IDictionary<string, IChromosome> _refChromDict;
@@ -27,7 +27,7 @@ namespace SAUtils.Custom
         private int _numAnnotationColumns;
         private int _altColumnIndex = -1;
         private int _endColumnIndex = -1;
-        private readonly HashSet<GenomeAssembly> _allowedGenomeAssemblies = new HashSet<GenomeAssembly>{GenomeAssembly.GRCh37, GenomeAssembly.GRCh38};
+        private readonly HashSet<GenomeAssembly> _allowedGenomeAssemblies = new HashSet<GenomeAssembly> { GenomeAssembly.GRCh37, GenomeAssembly.GRCh38 };
         private readonly List<CustomInterval> _intervals;
         private (IChromosome Chromesome, int Position) _previousPosition = (null, 0);
         private Action<string, string>[] _annotationValidators;
@@ -41,8 +41,8 @@ namespace SAUtils.Custom
             {"end", SaJsonValueType.Number}
         };
 
-        internal readonly List<string> JsonKeys = new List<string> {"refAllele", "altAllele"};
-        internal readonly List<string> IntervalJsonKeys = new List<string> {"start", "end"};
+        internal readonly List<string> JsonKeys = new List<string> { "refAllele", "altAllele" };
+        internal readonly List<string> IntervalJsonKeys = new List<string> { "start", "end" };
 
         public SaJsonSchema JsonSchema;
         public SaJsonSchema IntervalJsonSchema;
@@ -102,7 +102,7 @@ namespace SAUtils.Custom
 
             Assembly = GenomeAssemblyHelper.Convert(assemblyString);
             if (!_allowedGenomeAssemblies.Contains(Assembly))
-                throw new UserErrorException("Only GRCh37 and GRCh38 are accepted for genome assembly.");        
+                throw new UserErrorException("Only GRCh37 and GRCh38 are accepted for genome assembly.");
         }
 
         internal void ParseTags()
@@ -118,8 +118,8 @@ namespace SAUtils.Custom
 
             for (int i = _numRequiredColumns; i < _tags.Length; i++)
             {
-                if (_tags[i].IsWhiteSpace()) 
-                    throw new UserErrorException($"Please provide a name for column {i+1} at the third row.");
+                if (_tags[i].IsWhiteSpace())
+                    throw new UserErrorException($"Please provide a name for column {i + 1} at the third row.");
 
                 JsonKeys.Add(_tags[i]);
                 IntervalJsonKeys.Add(_tags[i]);
@@ -139,17 +139,17 @@ namespace SAUtils.Custom
             switch (_tags[3])
             {
                 case "ALT":
-                {
-                    _altColumnIndex = 3;
-
-                    if (_tags.Length > 4 && _tags[4] == "END")
                     {
-                        _endColumnIndex = 4;
-                        _numRequiredColumns = 5;
-                    }
+                        _altColumnIndex = 3;
 
-                    break;
-                }
+                        if (_tags.Length > 4 && _tags[4] == "END")
+                        {
+                            _endColumnIndex = 4;
+                            _numRequiredColumns = 5;
+                        }
+
+                        break;
+                    }
                 case "END":
                     _endColumnIndex = 3;
                     break;
@@ -236,7 +236,7 @@ namespace SAUtils.Custom
         public IEnumerable<CustomItem> GetItems()
         {
             using (_reader)
-            {       
+            {
                 string line;
                 while ((line = _reader.ReadLine()) != null)
                 {
@@ -258,23 +258,17 @@ namespace SAUtils.Custom
         {
             foreach (var (jsonKey, valueType) in _predefinedTypeAnnotation)
             {
-                JsonSchema?.AddAnnotation(jsonKey, new SaJsonKeyAnnotation {ValueType=valueType});
-                IntervalJsonSchema?.AddAnnotation(jsonKey, new SaJsonKeyAnnotation { ValueType = valueType });
+                JsonSchema?.AddAnnotation(jsonKey, SaJsonKeyAnnotation.CreateFromProperties(valueType, 0, null));
+                IntervalJsonSchema?.AddAnnotation(jsonKey, SaJsonKeyAnnotation.CreateFromProperties(valueType, 0, null));
             }
         }
 
         private void AddHeaderAnnotation()
         {
-            for (var i = 0;  i < _numAnnotationColumns; i++)
+            for (var i = 0; i < _numAnnotationColumns; i++)
             {
-                var annotation = new SaJsonKeyAnnotation
+                var annotation = SaJsonKeyAnnotation.CreateFromProperties(ValueTypes[i], Categories[i], Descriptions[i]);
 
-                {
-                    ValueType = ValueTypes[i],
-                    Category = Categories[i],
-                    Description = Descriptions[i]
-                };
-    
                 JsonSchema?.AddAnnotation(_tags[i + _numRequiredColumns], annotation);
                 IntervalJsonSchema?.AddAnnotation(_tags[i + _numRequiredColumns], annotation);
             }
@@ -316,7 +310,7 @@ namespace SAUtils.Custom
                     throw new UserErrorException($"END is not an integer.\nInput line: {line}.");
 
                 jsonStringValues.AddRange(annotationValues);
-                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues.Select(x => new []{x}).ToList(), IntervalJsonSchema, line));
+                _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues.Select(x => new[] { x }).ToList(), IntervalJsonSchema, line));
                 return null;
             }
 
@@ -324,7 +318,7 @@ namespace SAUtils.Custom
             if (!IsValidNucleotideSequence(altAllele))
                 throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
-            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues.Select(x => new[] {x}).ToArray(), JsonSchema, line);
+            return new CustomItem(chrom, position, refAllele, altAllele, annotationValues.Select(x => new[] { x }).ToArray(), JsonSchema, line);
         }
 
         private bool IsInterval(string[] splits) => _endColumnIndex != -1 && !AllowedValues.IsEmptyValue(splits[_endColumnIndex]);
@@ -378,7 +372,7 @@ namespace SAUtils.Custom
 
         internal static bool IsValidNucleotideSequence(string sequence)
         {
-            var validNucleotides = new []{ 'a', 'c', 'g', 't', 'n'};
+            var validNucleotides = new[] { 'a', 'c', 'g', 't', 'n' };
             foreach (char nucleotide in sequence.ToLower())
             {
                 if (!validNucleotides.Contains(nucleotide)) return false;

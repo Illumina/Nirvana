@@ -8,9 +8,6 @@ namespace ErrorHandling
 	public static class ExitCodeUtilities
 	{
 		private static readonly Dictionary<Type, ExitCodes> ExceptionsToExitCodes;
-		private static readonly HashSet<Type> UserFriendlyExceptions;
-	    private const string UserError = "User Error";
-	    public const string NirvanaError = "Error";
 	    public const string VcfLine = "VcfLine";
 
 		// constructor
@@ -36,24 +33,9 @@ namespace ErrorHandling
 				{ typeof(MissingCompressionLibraryException), ExitCodes.MissingCompressionLibrary },
 			    { typeof(CompressionException),               ExitCodes.Compression }
             };
-
-			// define which exceptions should not include a full stack trace
-			UserFriendlyExceptions = new HashSet<Type>
-			{
-				typeof(UserErrorException),
-				typeof(FileNotSortedException),
-				typeof(UnauthorizedAccessException),
-				typeof(InvalidFileFormatException),
-				typeof(ProcessLockedFileException),
-				typeof(OutOfMemoryException),
-				typeof(MissingCompressionLibraryException)
-			};
 		}
 
-	    public static string GetErrorCategory(Exception exception) =>
-	        UserFriendlyExceptions.Contains(exception.GetType()) ? UserError : NirvanaError;
-
-	    public static ExitCodes GetExitCode(Type exceptionType)
+	    internal static ExitCodes GetExitCode(Type exceptionType)
 	    {
             if (!ExceptionsToExitCodes.TryGetValue(exceptionType, out ExitCodes exitCode)) exitCode = ExitCodes.InvalidFunction;
             return exitCode;
@@ -76,7 +58,7 @@ namespace ErrorHandling
 			var exceptionType = e.GetType();
 
 		    // ReSharper disable once InvertIf
-			if (!UserFriendlyExceptions.Contains(exceptionType))
+			if (!ExceptionUtilities.UserFriendlyExceptions.Contains(exceptionType))
 			{
 				// print the stack trace
 				Console.ForegroundColor = ConsoleColor.Red;
