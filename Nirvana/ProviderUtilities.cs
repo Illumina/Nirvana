@@ -123,6 +123,8 @@ namespace Nirvana
 
         private static IList<(string dataFile, string indexFile)> GetSaPathsFromManifest(string saDirectoryPath)
         {
+            var baseUrl = NirvanaHelper.S3Url;
+            
             var paths = new List<(string, string)>();
             using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(saDirectoryPath)))
             {
@@ -130,8 +132,8 @@ namespace Nirvana
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (line.EndsWith(SaCommon.SiFileSuffix) || line.EndsWith(SaCommon.NgaFileSuffix))
-                        paths.Add((line, null));
-                    else paths.Add((line, line + SaCommon.IndexSufix));
+                        paths.Add((baseUrl + line, null));
+                    else paths.Add((baseUrl + line, baseUrl + line + SaCommon.IndexSufix));
                 }
             }
 
