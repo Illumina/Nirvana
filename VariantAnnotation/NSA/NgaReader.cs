@@ -51,8 +51,6 @@ namespace VariantAnnotation.NSA
             for (var i = 0; i < geneCount; i++)
             {
                 var geneSymbol = _reader.ReadAsciiString();
-                if (geneSymbol==null)
-                    Console.WriteLine("bug");
                 var annoCount = _reader.ReadOptInt32();
                 _geneAnnotations.Add(geneSymbol, new List<string>(annoCount));
 

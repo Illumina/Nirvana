@@ -53,6 +53,11 @@ namespace Nirvana
                             annotationResources.PreLoad(position.Chromosome);
                         previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);
 
+                        if (position.Chromosome.EnsemblName == "22")
+                        {
+                            Console.WriteLine("");
+                        }
+
                         var annotatedPosition = position.Variants != null ? annotationResources.Annotator.Annotate(position) : null;
                         string json = annotatedPosition?.GetJsonString();
 

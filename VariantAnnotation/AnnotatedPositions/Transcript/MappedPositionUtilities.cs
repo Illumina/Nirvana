@@ -30,7 +30,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdnaStart, cdnaEnd);
         }
 
-        private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition, bool onReverseStrand)
+        private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition,  bool onReverseStrand)
         {
             if (region == null || region.Type != TranscriptRegionType.Exon) return -1;
 
@@ -106,7 +106,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdsPosition + 2) / 3;
         }
 
-        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, int cdnaStart,
+        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, IRnaEdit[] rnaEdits, int cdnaStart,
             int cdnaEnd, byte startExonPhase, bool isInsertion)
         {
             var cdsStart = GetCdsPosition(codingRegion, cdnaStart, startExonPhase);

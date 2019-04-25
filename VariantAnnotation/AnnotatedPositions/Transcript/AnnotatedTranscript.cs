@@ -54,8 +54,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddStringValue("transcript", Transcript.Id.WithVersion);
             jsonObject.AddStringValue("source", Transcript.Source.ToString());
             if (!CompleteOverlap) jsonObject.AddStringValue("bioType", GetBioType(Transcript.BioType));
-            jsonObject.AddStringValue("codons", GetAlleleString(ReferenceCodons, AlternateCodons));
-            jsonObject.AddStringValue("aminoAcids", GetAlleleString(ReferenceAminoAcids, AlternateAminoAcids));
+            jsonObject.AddStringValue("codons", GetCodonString(ReferenceCodons, AlternateCodons));
+            jsonObject.AddStringValue("aminoAcids", GetAminoAcidString(ReferenceAminoAcids, AlternateAminoAcids));
 
             if (MappedPosition != null)
             {
@@ -103,9 +103,17 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             ? "3prime_overlapping_ncRNA"
             : bioType.ToString();
 
-        private static string GetAlleleString(string a, string b)
+        private static string GetAminoAcidString(string a, string b)
         {
             if (a == b) return a;
+            a = string.IsNullOrEmpty(a) ? "-" : a;
+            b = string.IsNullOrEmpty(b) ? "-" : b;
+            return $"{a}/{b}";
+        }
+
+        private static string GetCodonString(string a, string b)
+        {
+            if (a == b && string.IsNullOrEmpty(a)) return a;
             a = string.IsNullOrEmpty(a) ? "-" : a;
             b = string.IsNullOrEmpty(b) ? "-" : b;
             return $"{a}/{b}";

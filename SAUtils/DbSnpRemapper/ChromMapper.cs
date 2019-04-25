@@ -83,8 +83,6 @@ namespace SAUtils.DbSnpRemapper
                 var hasAlleleMismatch = false;
                 foreach (var rsId in rsIds)
                 {
-                    if(rsId== 5992058)
-                        Console.WriteLine("bug");
                     if (! _destinationVariants.TryGetValue(rsId, out var variant)) continue;
                     if (//variant.position < 0 || 
                         refAllele != variant.refAllele ||

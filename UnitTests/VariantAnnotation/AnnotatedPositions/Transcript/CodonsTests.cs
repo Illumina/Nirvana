@@ -12,7 +12,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void Assign_WhenIntervalsNull_ReturnNull()
         {
             var sequence = new SimpleSequence("AAA");
-            var codons = Codons.GetCodons("A", "G", -1, -1, -1, -1, sequence);
+            var codons = Codons.GetCodons("G", -1, -1, -1, -1, sequence);
 
             Assert.Equal("", codons.Reference);
             Assert.Equal("", codons.Alternate);
@@ -24,8 +24,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var sequence = new Mock<ISequence>();
             sequence.SetupGet(x => x.Length).Returns(89);
             sequence.Setup(x => x.Substring(87, 1)).Returns("t");
+            sequence.Setup(x => x.Substring(88, 1)).Returns("C");
 
-            var codons = Codons.GetCodons("C", "T", 89, 89, 30, 30, sequence.Object);
+            var codons = Codons.GetCodons("T", 89, 89, 30, 30, sequence.Object);
 
             Assert.Equal("tC", codons.Reference);
             Assert.Equal("tT", codons.Alternate);
@@ -37,8 +38,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var sequence = new Mock<ISequence>();
             sequence.SetupGet(x => x.Length).Returns(100);
             sequence.Setup(x => x.Substring(21, 2)).Returns("CA");
+            sequence.Setup(x => x.Substring(23, 1)).Returns("A");
 
-            var codons = Codons.GetCodons("A", "G", 24, 24, 8, 8, sequence.Object);
+            var codons = Codons.GetCodons("G", 24, 24, 8, 8, sequence.Object);
 
             Assert.Equal("caA", codons.Reference);
             Assert.Equal("caG", codons.Alternate);
@@ -51,8 +53,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             sequence.SetupGet(x => x.Length).Returns(100);
             sequence.Setup(x => x.Substring(21, 2)).Returns("CA");
             sequence.Setup(x => x.Substring(28, 2)).Returns("GG");
+            sequence.Setup(x => x.Substring(23, 5)).Returns("GTGCT");
 
-            var codons = Codons.GetCodons("GTGCT", "ACCGA", 24, 28, 8, 10, sequence.Object);
+            var codons = Codons.GetCodons("ACCGA", 24, 28, 8, 10, sequence.Object);
 
             Assert.Equal("caGTGCTgg", codons.Reference);
             Assert.Equal("caACCGAgg", codons.Alternate);

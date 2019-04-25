@@ -5,30 +5,28 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public static class Codons
     {
-        public static (string Reference, string Alternate) GetCodons(string transcriptReferenceAllele, string transcriptAlternateAllele,
+        public static (string Reference, string Alternate) GetCodons(string transcriptAlternateAllele,
             int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, ISequence codingSequence)
         {
             if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return ("", "");
 
+            var transcriptReferenceAllele = cdsEnd >= cdsStart ? codingSequence.Substring(cdsStart - 1, cdsEnd - cdsStart + 1) : "";
+
             int aminoAcidStart = proteinBegin * 3 - 2;
             int aminoAcidEnd   = proteinEnd * 3;
 
+            int prefixStartIndex = aminoAcidStart - 1;
             int prefixLen = cdsStart - aminoAcidStart;
-            int suffixLen = aminoAcidEnd - cdsEnd;
 
-            int start1 = aminoAcidStart - 1;
-            int start2 = aminoAcidEnd - suffixLen;
+            int suffixStartIndex = cdsEnd;
+            int suffixLen = Math.Min(aminoAcidEnd, codingSequence.Length) - cdsEnd;
 
-            int maxSuffixLen = codingSequence.Length - start2;
-
-            if (suffixLen > maxSuffixLen) suffixLen = maxSuffixLen;
-
-            string prefix = start1 + prefixLen < codingSequence.Length
-                ? codingSequence.Substring(start1, prefixLen).ToLower()
+            string prefix = prefixStartIndex + prefixLen < codingSequence.Length
+                ? codingSequence.Substring(prefixStartIndex, prefixLen).ToLower()
                 : "AAA";
 
             string suffix = suffixLen > 0
-                ? codingSequence.Substring(start2, suffixLen).ToLower()
+                ? codingSequence.Substring(suffixStartIndex, suffixLen).ToLower()
                 : "";
 
             var refCodons = GetCodon(transcriptReferenceAllele, prefix, suffix);

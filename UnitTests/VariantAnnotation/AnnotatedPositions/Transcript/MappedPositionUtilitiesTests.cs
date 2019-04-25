@@ -18,6 +18,120 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         private const int ReverseVariantStart = 313886;
         private const int ReverseVariantEnd   = 313900;
 
+        // NM_033517.1, SHANK3
+        private ITranscriptRegion[] _regionsNm33517 =
+        {
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 51113070, 51113132, 1, 63),
+            new TranscriptRegion(TranscriptRegionType.Intron, 1, 51113133, 51113475, 63, 64),
+            new TranscriptRegion(TranscriptRegionType.Exon, 2, 51113476, 51113679, 64, 267),
+            new TranscriptRegion(TranscriptRegionType.Intron, 2, 51113680, 51115049, 267, 268),
+            new TranscriptRegion(TranscriptRegionType.Exon, 3, 51115050, 51115121, 268, 339),
+            new TranscriptRegion(TranscriptRegionType.Intron, 3, 51115122, 51117012, 339, 340),
+            new TranscriptRegion(TranscriptRegionType.Exon, 4, 51117013, 51117121, 340, 448),
+            new TranscriptRegion(TranscriptRegionType.Intron, 4, 51117122, 51117196, 448, 449),
+            new TranscriptRegion(TranscriptRegionType.Exon, 5, 51117197, 51117348, 449, 600),
+            new TranscriptRegion(TranscriptRegionType.Intron, 5, 51117349, 51117446, 600, 601),
+            new TranscriptRegion(TranscriptRegionType.Exon, 6, 51117447, 51117614, 601, 768),
+            new TranscriptRegion(TranscriptRegionType.Intron, 6, 51117615, 51117739, 768, 769),
+            new TranscriptRegion(TranscriptRegionType.Exon, 7, 51117740, 51117856, 769, 885),
+            new TranscriptRegion(TranscriptRegionType.Intron, 7, 51117857, 51121767, 885, 886),
+            new TranscriptRegion(TranscriptRegionType.Exon, 8, 51121768, 51121845, 886, 963),
+            new TranscriptRegion(TranscriptRegionType.Intron, 8, 51121846, 51123012, 963, 964),
+            new TranscriptRegion(TranscriptRegionType.Exon, 9, 51123013, 51123079, 964, 1030),
+            new TranscriptRegion(TranscriptRegionType.Intron, 9, 51123080, 51133202, 1030, 1031),
+            new TranscriptRegion(TranscriptRegionType.Exon, 10, 51133203, 51133474, 1031, 1302),
+            new TranscriptRegion(TranscriptRegionType.Intron, 10, 51133475, 51135984, 1302, 1342),
+            new TranscriptRegion(TranscriptRegionType.Exon, 11, 51135985, 51135989, 1342, 1346),
+            new TranscriptRegion(TranscriptRegionType.Gap, 11, 51135990, 51135991, 1346, 1347),
+            new TranscriptRegion(TranscriptRegionType.Exon, 11, 51135992, 51136143, 1347, 1498),
+            new TranscriptRegion(TranscriptRegionType.Intron, 11, 51136144, 51137117, 1498, 1499),
+            new TranscriptRegion(TranscriptRegionType.Exon, 12, 51137118, 51137231, 1499, 1612),
+            new TranscriptRegion(TranscriptRegionType.Intron, 12, 51137232, 51142287, 1612, 1613),
+            new TranscriptRegion(TranscriptRegionType.Exon, 13, 51142288, 51142363, 1613, 1688),
+            new TranscriptRegion(TranscriptRegionType.Intron, 13, 51142364, 51142593, 1688, 1689),
+            new TranscriptRegion(TranscriptRegionType.Exon, 14, 51142594, 51142676, 1689, 1771),
+            new TranscriptRegion(TranscriptRegionType.Intron, 14, 51142677, 51143165, 1771, 1772),
+            new TranscriptRegion(TranscriptRegionType.Exon, 15, 51143166, 51143290, 1772, 1896),
+            new TranscriptRegion(TranscriptRegionType.Intron, 15, 51143291, 51143391, 1896, 1897),
+            new TranscriptRegion(TranscriptRegionType.Exon, 16, 51143392, 51143524, 1897, 2029),
+            new TranscriptRegion(TranscriptRegionType.Intron, 16, 51143525, 51144499, 2029, 2030),
+            new TranscriptRegion(TranscriptRegionType.Exon, 17, 51144500, 51144580, 2030, 2110),
+            new TranscriptRegion(TranscriptRegionType.Intron, 17, 51144581, 51150042, 2110, 2111),
+            new TranscriptRegion(TranscriptRegionType.Exon, 18, 51150043, 51150066, 2111, 2134),
+            new TranscriptRegion(TranscriptRegionType.Intron, 18, 51150067, 51153344, 2134, 2135),
+            new TranscriptRegion(TranscriptRegionType.Exon, 19, 51153345, 51153475, 2135, 2265),
+            new TranscriptRegion(TranscriptRegionType.Intron, 19, 51153476, 51154096, 2265, 2266),
+            new TranscriptRegion(TranscriptRegionType.Exon, 20, 51154097, 51154181, 2266, 2350),
+            new TranscriptRegion(TranscriptRegionType.Intron, 20, 51154182, 51158611, 2350, 2351),
+            new TranscriptRegion(TranscriptRegionType.Exon, 21, 51158612, 51160865, 2351, 4604),
+            new TranscriptRegion(TranscriptRegionType.Intron, 21, 51160866, 51169148, 4604, 4605),
+            new TranscriptRegion(TranscriptRegionType.Exon, 22, 51169149, 51171640, 4605, 7096)
+        };
+
+        private IRnaEdit[] _editsNm33517 =
+        {
+            new RnaEdit(1303, 1302, "AGCCCGAGCGGGCCCGGCGGCCCCGGCCCCGCGCCCGGC"),
+            new RnaEdit(1304, 1304, "C"),
+            new RnaEdit(1308, 1309, ""),
+            new RnaEdit(7060, 7059, "AAAAAAAAAAAAAAAAA")
+        };
+
+        // NM_019119.4
+        private ITranscriptRegion[] _regionsNm19119 = 
+        {
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 140566701, 140568035, 1, 1335),
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 140568036, 140571111, 1337, 4412)
+        };
+
+        private IRnaEdit[] _editsNm19119 =
+        {
+            new RnaEdit(908, 908, "T"),
+            new RnaEdit(1336, 1335, "A"),
+            new RnaEdit(2096, 2096, "G")
+        };
+
+        // NM_000682.6
+        private readonly ITranscriptRegion[] _regionsNm682 =
+        {
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 96778623, 96780986, 1008, 3371),
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 96780987, 96781984, 1, 998)
+        };
+
+        private readonly IRnaEdit[] _editsNm682 =
+        {
+            new RnaEdit(999, 998, "AGAGGAGGA")
+        };
+
+        // NM_033089.6
+        private ITranscriptRegion[] _regionsNm33089 =
+        {
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 278204, 278687, 1, 484),
+            new TranscriptRegion(TranscriptRegionType.Gap, 1, 278688, 278690, 484, 485),
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 278691, 280965, 485, 2759)
+        };
+
+        private IRnaEdit[] _editsNm33089 =
+        {
+            new RnaEdit(485, 487, ""),
+            new RnaEdit(2763, 2762, "AAAAAAAAAAAAAA")
+        };
+
+        // NM_001317107.1
+        private ITranscriptRegion[] _regionsNm1317107 =
+        {
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 22138125, 22138561, 670, 1106),
+            new TranscriptRegion(TranscriptRegionType.Gap, 1, 22138562, 22138563, 669, 670),
+            new TranscriptRegion(TranscriptRegionType.Exon, 1, 22138564, 22139232, 1, 669)
+        };
+
+        private IRnaEdit[] _editsNm1317107 =
+        {
+            new RnaEdit(905, 905, "T"),
+            new RnaEdit(796, 796, "C"),
+            new RnaEdit(679, 679, "A"),
+            new RnaEdit(670, 671, "")
+        };
+
         public MappedPositionUtilitiesTests()
         {
             _forwardTranscriptRegions = new ITranscriptRegion[]
@@ -42,6 +156,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new TranscriptRegion(TranscriptRegionType.Intron, 1, 313893, 314242, 116, 117),
                 new TranscriptRegion(TranscriptRegionType.Exon, 1,   314243, 314358, 1, 116)
             };
+          
         }
 
         [Fact]
@@ -87,6 +202,39 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 
             Assert.Equal(123, observed.CdnaStart);
             Assert.Equal(-1, observed.CdnaEnd);
+        }
+
+        [Fact]
+        public void GetCdnaPosition_Snv_AfterOutFrameRnaEditDeletion()
+        {
+            // NM_001317107.1
+            var variant = new Interval(22138550, 22138550);
+            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm1317107[0], _regionsNm1317107[0], variant, true, false);
+
+            Assert.Equal(681, observed.CdnaStart);
+        }
+
+        [Fact]
+        public void GetCdnaPosition_Snv_AfterInframeRnaEditInsertion()
+        {
+            // NM_000682.6
+            var variant = new Interval(96780984, 96780984);
+            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm682[0], _regionsNm682[0], variant, true, false);
+
+            Assert.Equal(1010, observed.CdnaStart);
+        }
+        //new TranscriptRegion(TranscriptRegionType.Exon, 11, 51135985, 51135989, 1342, 1346),
+        //new TranscriptRegion(TranscriptRegionType.Gap, 11, 51135990, 51135991, 1346, 1347),
+        //new TranscriptRegion(TranscriptRegionType.Exon, 11, 51135992, 51136143, 1347, 1498),
+
+        [Fact]
+        public void GetCdnaPosition_Snv_AfterOutframeRnaEditInsertion()
+        {
+            // NM_033517.1
+            var variant = new Interval(51135986, 51135986);
+            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm33517[20], _regionsNm33517[20], variant, false, false);
+
+            Assert.Equal(1343, observed.CdnaStart);
         }
 
         [Fact]
@@ -201,10 +349,43 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(78001559, 78024355, 262, 495, 234);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 486, 485, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 486, 485, startExonPhase, true);
 
             Assert.Equal(225, cdsStart);
             Assert.Equal(224, cdsEnd);
+        }
+
+        [Fact]
+        public void GetCdsPosition_Snv_AfterOutFrameRnaEditDeletion()
+        {
+            // NM_001317107.1
+            var codingRegion = new CodingRegion(22138201, 22139150, 83, 1030, 948);
+            const byte startExonPhase = 0;
+            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, _editsNm1317107, 681, 681, startExonPhase, false);
+
+            Assert.Equal(599, cdsStart);
+        }
+
+        [Fact]
+        public void GetCdsPosition_Snv_AfterInframeRnaEditInsertion()
+        {
+            // NM_000682.6
+            var codingRegion = new CodingRegion(96780545, 96781888, 97, 1449, 1344);
+            const byte startExonPhase = 0;
+            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, _editsNm682, 1010, 1010, startExonPhase, false);
+
+            Assert.Equal(914, cdsStart);
+        }
+
+        [Fact]
+        public void GetCdsPosition_Snv_AfterOutframeRnaEditInsertion()
+        {
+            // NM_033517.1
+            var codingRegion = new CodingRegion(51113070, 51169740, 1, 5196, 5157);
+            const byte startExonPhase = 0;
+            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, _editsNm33517, 1343, 1343, startExonPhase, false);
+
+            Assert.Equal(1343, cdsStart);
         }
 
         [Fact]
@@ -213,7 +394,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(6413107, 6415837, 1, 953, 953);
             const byte startExonPhase = 1;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 29, 28, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 29, 28, startExonPhase, true);
 
             Assert.Equal(30, cdsStart);
             Assert.Equal(29, cdsEnd);
@@ -224,7 +405,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         {
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(null, -1, 123, startExonPhase, false);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(null, null, -1, 123, startExonPhase, false);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -237,7 +418,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(6643999, 6647336, 667, 1674, 1008);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 1675, 1674, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 1675, 1674, startExonPhase, true);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -250,7 +431,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(103113259, 103629803, 161, 10543, 10383);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 161, 160, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 161, 160, startExonPhase, true);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -263,7 +444,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(37480320, 37543667, 556, 3228, 2673);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 3229, 3228, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 3229, 3228, startExonPhase, true);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -276,7 +457,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(179308070, 179315170, 617, 942, 326);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 95, 648, startExonPhase, false);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 95, 648, startExonPhase, false);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(32, cdsEnd);
