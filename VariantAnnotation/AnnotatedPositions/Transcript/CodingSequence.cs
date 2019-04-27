@@ -76,7 +76,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 //if the edits are in utr regions, we can skip them
                 var cdsEditStart = rnaEdit.Start - codingStart + editOffset;
 
-                if (sb.Length < cdsEditStart) continue;
+                if (sb.Length <= cdsEditStart) continue;
                 
                 switch (rnaEdit.Type)
                 {

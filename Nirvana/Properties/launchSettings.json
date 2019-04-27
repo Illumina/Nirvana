@@ -164,10 +164,9 @@
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh38\\RefSeq --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in Dragen_v3.2-Dragen-Pedigree-RnaEdits-hg38-RefSeq-VEP91.vcf.gz --out rnaEdit",
       "workingDirectory": "c:\\development\\TestDatasets"
     },
-    "SK Nirvana fail": {
+    "RNAEdit fail test": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\nirvana-fail.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o fail",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\"
+      "commandLineArgs": "-c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\test_runs\\test_RNA_edit\\tsCEPH_chr11.vcf.gz -o out_range --disable-recomposition"
     }
   }
 }
