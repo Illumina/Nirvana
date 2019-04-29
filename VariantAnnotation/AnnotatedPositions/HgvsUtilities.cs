@@ -139,6 +139,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
         public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int position, int regionIndex)
         {
+            
             if (!transcript.Overlaps(position, position)) return null;
 
             var region            = transcript.TranscriptRegions[regionIndex];

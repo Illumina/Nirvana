@@ -14,6 +14,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private readonly ITranscript _forwardTranscript;
         private readonly ITranscript _reverseTranscript;
         private static readonly IChromosome Chromosome = new Chromosome("chr1", "1", 0);
+        private static readonly IChromosome chrX = new Chromosome("chrX", "X", 24);
 
         public HgvsCodingNomenclatureTests()
         {
@@ -48,6 +49,24 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             return transcript.Object;
         }
 
+        private static ITranscript GetForwardTranscriptWithoutUtr()
+        {
+            //ENST00000579622.1  chrX:70361035-70361156, non-coding, forward strand, no utr
+            var regions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 1, 70361035,70361156, 1, 122)
+            };
+
+            var transcript = new Mock<ITranscript>();
+            transcript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000579622", 1));
+            transcript.SetupGet(x => x.Chromosome).Returns(chrX);
+            transcript.SetupGet(x => x.Start).Returns(70361035);
+            transcript.SetupGet(x => x.End).Returns(70361156);
+            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
+            transcript.SetupGet(x => x.TranscriptRegions).Returns(regions);
+            transcript.SetupGet(x => x.TotalExonLength).Returns(122);
+            return transcript.Object;
+        }
         internal static ITranscript GetReverseTranscript()
         {
             // get info from "ENST00000423372.3
@@ -228,6 +247,30 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript, variant, null, 0, 1);
 
             Assert.Equal("ENST00000423372.3:c.*909+2_*910delACAACCCACGAT", observedHgvsc);
+        }
+
+        [Fact]
+        public void GetHgvscAnnotation_insertion_at_last_position()
+        {
+            var sequence = new Mock<ISequence>();
+            sequence.Setup(x => x.Substring(70361157-12, 12)).Returns("TATATATATATA");
+
+            var variant = new SimpleVariant(chrX, 70361157, 70361156, "", "ACACCAGCAGCA", VariantType.insertion);//right shifted variant
+            var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(GetForwardTranscriptWithoutUtr(), variant, sequence.Object, 0, 0);
+
+            Assert.Equal("ENST00000579622.1:n.122_123insACACCAGCAGCA", observedHgvsc);
+        }
+
+        [Fact]
+        public void GetHgvscAnnotation_duplication_at_last_position()
+        {
+            var sequence = new Mock<ISequence>();
+            sequence.Setup(x => x.Substring(70361156 - 4, 4)).Returns("ACAC");
+
+            var variant = new SimpleVariant(chrX, 70361157, 70361156, "", "ACAC", VariantType.insertion);//right shifted variant
+            var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(GetForwardTranscriptWithoutUtr(), variant, sequence.Object, 0, 0);
+
+            Assert.Equal("ENST00000579622.1:n.119_122dupACAC", observedHgvsc);
         }
     }
 }

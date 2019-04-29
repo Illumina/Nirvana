@@ -30,6 +30,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
 
+            
             var hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
 
