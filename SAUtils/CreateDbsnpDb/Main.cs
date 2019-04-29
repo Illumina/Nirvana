@@ -60,7 +60,7 @@ namespace SAUtils.CreateDbsnpDb
             var version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             
             string outFileName = $"{version.Name}_{version.Version}";
-            using (var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider.RefNameToChromosome))
+            using (var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
             {

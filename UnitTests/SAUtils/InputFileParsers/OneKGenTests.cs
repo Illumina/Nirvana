@@ -5,16 +5,15 @@ using System.Text.RegularExpressions;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OneKGen;
+using UnitTests.TestDataStructures;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class OneKGenTests
     {
-        private const string VcfLine1 = "1	10352	rs555500075	T	TA	100	PAS	AC=2191;AF=0.4375;AN=5008;NS=2504;DP=88915;EAS_AF=0.4306;AMR_AF=0.4107;AFR_AF=0.4788;EUR_AF=0.4264;SAS_AF=0.4192;AA=|||unknown(NO_COVERAGE); VT=INDEL;EAS_AN=1008;EAS_AC=434;EUR_AN=1006;EUR_AC=429;AFR_AN=1322;AFR_AC=633;AMR_AN=694;AMR_AC=285;SAS_AN=978;SAS_AC=410";
-        private const string VcfLine2 = "1	15274	rs62636497	A	G,T	100	PASS	AC=1739,3210;AF=0.347244,0.640974;AN=5008;NS=2504;DP=23255;EAS_AF=0.4812,0.5188;AMR_AF=0.2752,0.7205;AFR_AF=0.323,0.6369;EUR_AF=0.2922,0.7078;SAS_AF=0.3497,0.6472;AA=g|||;VT=SNP;MULTI_ALLELIC;EAS_AN=1008;EAS_AC=485,523;EUR_AN=1006;EUR_AC=294,712;AFR_AN=1322;AFR_AC=427,842;AMR_AN=694;AMR_AC=191,500;SAS_AN=978;SAS_AC=342,633";
-
-        private readonly OneKGenReader _oneKGenReader;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
         public OneKGenTests()
@@ -25,7 +24,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 {"4",new Chromosome("chr4", "4", 3) },
                 {"X",new Chromosome("chrX", "X", 22) }
             };
-            _oneKGenReader = new OneKGenReader(_refChromDict);
+            
         }
 
         private static string GetAlleleFrequency(string jsonString, string description)
@@ -37,7 +36,10 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void AlleleFrequencyTest()
         {
-            var oneKItem = _oneKGenReader.ExtractItems(VcfLine1)[0].GetJsonString();
+            const string vcfLine =
+                "1	10352	rs555500075	T	TA	100	PAS	AC=2191;AF=0.4375;AN=5008;NS=2504;DP=88915;EAS_AF=0.4306;AMR_AF=0.4107;AFR_AF=0.4788;EUR_AF=0.4264;SAS_AF=0.4192;AA=|||unknown(NO_COVERAGE); VT=INDEL;EAS_AN=1008;EAS_AC=434;EUR_AN=1006;EUR_AC=429;AFR_AN=1322;AFR_AC=633;AMR_AN=694;AMR_AC=285;SAS_AN=978;SAS_AC=410";
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10352,"T",'C', _refChromDict));
+            var oneKItem = oneKGenReader.ExtractItems(vcfLine).First().GetJsonString();
 
             Assert.Equal("0.4375", GetAlleleFrequency(oneKItem, "allAf"));
             Assert.Equal("0.47882", GetAlleleFrequency(oneKItem, "afrAf"));
@@ -51,7 +53,11 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void MultiAltAlleleTest()
         {
-            var oneKGenItems = _oneKGenReader.ExtractItems(VcfLine2);
+            const string vcfLine =
+                "1	15274	rs62636497	A	G,T	100	PASS	AC=1739,3210;AF=0.347244,0.640974;AN=5008;NS=2504;DP=23255;EAS_AF=0.4812,0.5188;AMR_AF=0.2752,0.7205;AFR_AF=0.323,0.6369;EUR_AF=0.2922,0.7078;SAS_AF=0.3497,0.6472;AA=g|||;VT=SNP;MULTI_ALLELIC;EAS_AN=1008;EAS_AC=485,523;EUR_AN=1006;EUR_AC=294,712;AFR_AN=1322;AFR_AC=427,842;AMR_AN=694;AMR_AC=191,500;SAS_AN=978;SAS_AC=342,633";
+
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(15274, "A", 'C', _refChromDict));
+            var oneKGenItems = oneKGenReader.ExtractItems(vcfLine).ToList();
 
             Assert.Equal(2, oneKGenItems.Count);
 
@@ -79,8 +85,9 @@ namespace UnitTests.SAUtils.InputFileParsers
             const string vcfLine =
                 "X	101155257	rs373174489	GTGCAAAAGCTCTTTAGTTTAATTAGGTCTCAGCTATTTATCTTTGTTCTTAT	G	100	PASS	AN=3775;AC=1723;AF=0.456424;AA=;EAS_AN=764;EAS_AC=90;EAS_AF=0.1178;EUR_AN=766;EUR_AC=439;EUR_AF=0.5731;AFR_AN=1003;AFR_AC=839;AFR_AF=0.8365;AMR_AN=524;AMR_AC=180;AMR_AF=0.3435;SAS_AN=718;SAS_AC=175;SAS_AF=0.2437";
 
-            var oneKItems = _oneKGenReader.ExtractItems(vcfLine);
-            var json1 = oneKItems[0].GetJsonString();
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(101155257, "GTGCAAAAGCTCTTTAGTTTAATTAGGTCTCAGCTATTTATCTTTGTTCTTAT", 'C', _refChromDict));
+            var oneKItems = oneKGenReader.ExtractItems(vcfLine);
+            var json1 = oneKItems.First().GetJsonString();
             Assert.Equal("0.456424", GetAlleleFrequency(json1, "allAf"));
             Assert.Equal("0.836491", GetAlleleFrequency(json1, "afrAf"));
             Assert.Equal("0.343511", GetAlleleFrequency(json1, "amrAf"));
@@ -91,24 +98,13 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
-        public void HashCode()
-        {
-            var chr1 = new Chromosome("chr1", "1", 0);
-            var onekItem = new OneKGenItem((IChromosome) chr1, (int) 100, (string) "A", (string) "C", (string) "a", (int?) null, (int?) null, (int?) null, (int?) null, (int?) null, (int?) null, (int?) null, (int?) 0, (int?) null, (int?) null, (int?) null, (int?) null);
-
-            var onekHash = new HashSet<OneKGenItem> { onekItem };
-
-            Assert.Single(onekHash);
-            Assert.Contains(onekItem, onekHash);
-        }
-
-        [Fact]
         public void MissingSubPopulationFrequencies()
         {
             var vcfLine =
                 "1\t10616\trs376342519\tCCGCCGTTGCAAAGGCGCGCCG\tC\t100\tPASS\tAN=5008;AC=4973;AF=0.993011;AA=;EAS_AN=1008;EAS_AC=999;EAS_AF=0.9911;EUR_AN=1006;EUR_AC=1000;EUR_AF=0.994;AFR_AN=1322;AFR_AC=1308;AFR_AF=0.9894;AMR_AN=694;AMR_AC=691;AMR_AF=0.9957;SAS_AN=978;SAS_AC=975;SAS_AF=0.9969";
 
-            var items = _oneKGenReader.ExtractItems(vcfLine).ToList();
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10616, "CCGCCGTTGCAAAGGCGCGCCG", 'C', _refChromDict));
+            var items = oneKGenReader.ExtractItems(vcfLine).ToList();
 
             Assert.Single(items);
             Assert.Equal("\"allAf\":0.993011,\"afrAf\":0.98941,\"amrAf\":0.995677,\"easAf\":0.991071,\"eurAf\":0.994036,\"sasAf\":0.996933,\"allAn\":5008,\"afrAn\":1322,\"amrAn\":694,\"easAn\":1008,\"eurAn\":1006,\"sasAn\":978,\"allAc\":4973,\"afrAc\":1308,\"amrAc\":691,\"easAc\":999,\"eurAc\":1000,\"sasAc\":975", items[0].GetJsonString());

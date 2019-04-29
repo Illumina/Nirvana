@@ -5,6 +5,7 @@ using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using Moq;
+using UnitTests.SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Vcf;
@@ -45,9 +46,9 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##Some comments", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
-
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
             var reader = FileUtilities.GetStreamReader(_ms);
-            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, null, null, null, new NullVcfFilter()));
+            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()));
         }
 
         [Fact]
@@ -55,9 +56,9 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920" };
             AddLines(headers);
-
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
             var reader = FileUtilities.GetStreamReader(_ms);
-            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, null, null, null, new NullVcfFilter()));
+            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()));
         }
 
         [Fact]
@@ -66,8 +67,10 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16" };
             AddLines(headers);
             IEnumerable<string> observedHeaders;
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
+
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, null, null, null, new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
             {
                 observedHeaders = vcfReader.GetHeaderLines();
             }
@@ -81,8 +84,10 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "##dataSource=ClinVar,version:unknown,release date:2016-09-01", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
             IEnumerable<string> observedHeaders;
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
+
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, null, null, null, new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
             {
                 observedHeaders = vcfReader.GetHeaderLines();
             }
@@ -96,8 +101,10 @@ namespace UnitTests.Vcf
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
             AddLines(headers);
             string[] samples;
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
+
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, null, null, null, new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
             {
                 samples = vcfReader.GetSampleNames();
             }
@@ -130,9 +137,10 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", contigLine, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT" };
             AddLines(headers);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-                Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, _refNameToChromosome, null, null, new NullVcfFilter()));
+                Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()));
         }
 
         [Theory]
@@ -142,9 +150,10 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", contigLine, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT" };
             AddLines(headers);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, _refNameToChromosome, null, null, new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
             {
                 Assert.Equal(GenomeAssembly.Unknown, vcfReader.InferredGenomeAssembly);
             }
@@ -157,9 +166,9 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", contigLine, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT" };
             AddLines(headers);
-
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, _refNameToChromosome, null, null, new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
             {
                 Assert.Equal(GenomeAssembly.Unknown, vcfReader.InferredGenomeAssembly);
                 Assert.True(vcfReader.IsRcrsMitochondrion);
@@ -173,9 +182,10 @@ namespace UnitTests.Vcf
         {
             var headers = new[] { "##fileformat=VCFv4.1", contigLine, "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT" };
             AddLines(headers);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, _refNameToChromosome, null, null, new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
             {
                 Assert.Equal(GenomeAssembly.Unknown, vcfReader.InferredGenomeAssembly);
                 Assert.False(vcfReader.IsRcrsMitochondrion);
@@ -210,10 +220,10 @@ namespace UnitTests.Vcf
             //refMinorProvider.Setup(x => x.GetGlobalMajorAllele(chromosome, 13133)).Returns(null);
 
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
-
+            var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', refNameToChromosome);
             IPosition observedResult;
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, refNameToChromosome, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter()))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter()))
             {
                 observedResult = vcfReader.GetNextPosition();
             }

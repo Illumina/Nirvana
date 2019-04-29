@@ -1,4 +1,7 @@
-﻿using Genome;
+﻿using System.Collections.Generic;
+using Genome;
+using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.Providers;
 
 namespace UnitTests.TestDataStructures
 {
@@ -20,6 +23,38 @@ namespace UnitTests.TestDataStructures
                 || offset < _zeroBasedStartOffset)
                 return "";
             return _sequence.Substring(offset - _zeroBasedStartOffset, length);
+        }
+    }
+
+    public sealed class SimpleSequenceProvider : ISequenceProvider
+    {
+        public string Name { get; }
+        public GenomeAssembly Assembly { get; }
+        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
+        public void Annotate(IAnnotatedPosition annotatedPosition)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void PreLoad(IChromosome chromosome, List<int> positions)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ISequence Sequence { get; }
+        public IDictionary<string, IChromosome> RefNameToChromosome { get; }
+        public IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
+        public void LoadChromosome(IChromosome chromosome)
+        {
+            
+        }
+
+        public SimpleSequenceProvider(GenomeAssembly assembly, ISequence sequence,
+            IDictionary<string, IChromosome> refNameToChromosome)
+        {
+            Assembly = assembly;
+            Sequence = sequence;
+            RefNameToChromosome = refNameToChromosome;
         }
     }
 }

@@ -57,7 +57,7 @@ namespace SAUtils.CreateTopMedDb
         private static ExitCodes ProgramExecution()
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            var topMedReader      = new TopMedReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome);
+            var topMedReader      = new TopMedReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider);
             var version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             
             string outFileName = $"{version.Name}_{version.Version}";

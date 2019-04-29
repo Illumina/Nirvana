@@ -5,6 +5,8 @@ using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers.TOPMed
 {
@@ -12,15 +14,17 @@ namespace SAUtils.InputFileParsers.TOPMed
     {
         private readonly StreamReader _reader;
         private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly ISequenceProvider _sequenceProvider;
 
         private int? _alleleNum;
         private int? _alleleCount;
         private int? _homCount;
 
-        public TopMedReader(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict)
+        public TopMedReader(StreamReader streamReader, ISequenceProvider sequenceProvider)
         {
             _reader       = streamReader;
-            _refChromDict = refChromDict;
+            _sequenceProvider = sequenceProvider;
+            _refChromDict = sequenceProvider.RefNameToChromosome;
         }
 
         private void Clear()
@@ -77,8 +81,10 @@ namespace SAUtils.InputFileParsers.TOPMed
             ParseInfoField(infoFields);
 
             if (_alleleNum == 0) return null;
+            var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
+                altAllele, _sequenceProvider.Sequence);
 
-            return new TopMedItem(chrom, position, refAllele, altAllele, _alleleNum, _alleleCount, _homCount,
+            return new TopMedItem(chrom, shiftedPos, shiftedRef, shiftedAlt, _alleleNum, _alleleCount, _homCount,
                 failedFilter);
         }
 

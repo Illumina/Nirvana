@@ -10,6 +10,7 @@ using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Utilities;
+using Variants;
 using static SAUtils.InputFileParsers.ClinVar.ClinVarCommon;
 
 namespace SAUtils.InputFileParsers.ClinVar
@@ -46,8 +47,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string AltAlleleTag = "alternateAllele";
 
         private readonly string _fileName;
-		private readonly VariantAligner _aligner;
-        private readonly ISequenceProvider _sequenceProvider;
+		private readonly ISequenceProvider _sequenceProvider;
         private readonly IDictionary<string, IChromosome> _refChromDict;
 
         private string _lastClinvarAccession;
@@ -97,7 +97,6 @@ namespace SAUtils.InputFileParsers.ClinVar
         public ClinVarXmlReader(string filename, ISequenceProvider sequenceProvider)
         {
             _sequenceProvider = sequenceProvider;
-            _aligner = new VariantAligner(_sequenceProvider.Sequence);
             _fileName = filename;
             _refChromDict = sequenceProvider.RefNameToChromosome;
         }
@@ -173,7 +172,8 @@ namespace SAUtils.InputFileParsers.ClinVar
                 if (string.IsNullOrEmpty(refAllele) && string.IsNullOrEmpty(altAllele)) continue;
 
                 int start;
-                (start, refAllele, altAllele) = LeftShift(item.Position, refAllele, altAllele);
+                (start, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(item.Position, refAllele, altAllele, _sequenceProvider.Sequence);
+                
                 shiftedItems.Add(new ClinVarItem(item.Chromosome,
                     start,
                     item.Stop,
@@ -297,7 +297,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			if (refAllele == null || altAllele == null) return (start, refAllele, altAllele);
 
-			return _aligner.LeftAlign(start, refAllele, altAllele);
+			return VariantUtils.TrimAndLeftAlign(start, refAllele, altAllele, _sequenceProvider.Sequence);
 		}
 
 		internal static long ParseDate(string s)
@@ -324,7 +324,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             _lastUpdatedDate      = ParseDate(xElement.Attribute(UpdateDateTag)?.Value);
 		    _lastClinvarAccession = xElement.Element(ClinVarAccessionTag)?.Attribute(AccessionTag)?.Value;
             _id                   =  _lastClinvarAccession + "." + xElement.Element(ClinVarAccessionTag)?.Attribute(VersionTag)?.Value;
-
+            
             GetClinicalSignificance(xElement.Element(ClinicalSignificanceTag));
             ParseGenotypeSet(xElement.Element(GenotypeSetTag));
 		    ParseMeasureSet(xElement.Element(MeasureSetTag));

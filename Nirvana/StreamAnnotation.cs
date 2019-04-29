@@ -110,7 +110,7 @@ namespace Nirvana
                 vcfStream.Position = Tabix.VirtualPosition.From(annotationResources.InputStartVirtualPosition).BlockOffset;
             }
 
-            return Create(headerReader, vcfReader, annotationResources.SequenceProvider.RefNameToChromosome, annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter);
+            return Create(headerReader, vcfReader, annotationResources.SequenceProvider, annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter);
         }
 
         public static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput, VcfConversion vcfConversion)

@@ -22,7 +22,6 @@ namespace VariantAnnotation.TranscriptAnnotation
             var rightShiftedVariant = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
 
-            
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
             var rightAnnotation = ReferenceEquals(leftShiftedVariant, rightShiftedVariant)

@@ -7,6 +7,8 @@ using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers.DbSnp
 {
@@ -14,12 +16,12 @@ namespace SAUtils.InputFileParsers.DbSnp
     {
         // Key in VCF info field of the allele frequencies subfield.
 	    private readonly Stream _stream;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly ISequenceProvider _sequenceProvider;
 
-        public DbSnpReader(Stream stream, IDictionary<string, IChromosome> refChromDict)
+        public DbSnpReader(Stream stream, ISequenceProvider sequenceProvider)
         {
-            _stream = stream;
-            _refChromDict = refChromDict;
+            _stream           = stream;
+            _sequenceProvider = sequenceProvider;
         }
 	    
 	    public IEnumerable<DbSnpItem> GetItems()
@@ -33,9 +35,8 @@ namespace SAUtils.InputFileParsers.DbSnp
                     if (line.IsWhiteSpace()) continue;
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
-                    var dbSnpItems = ExtractItem(line);
-	                if (dbSnpItems == null || dbSnpItems.Count == 0) continue;
-	                foreach (var dbSnpItem in dbSnpItems)
+                    
+	                foreach (var dbSnpItem in ExtractItem(line))
 	                {
 						yield return dbSnpItem;
 	                }
@@ -47,24 +48,30 @@ namespace SAUtils.InputFileParsers.DbSnp
         /// <summary>
         /// Extracts a dbSNP item from the specified VCF line.
         /// </summary>
-        /// <param name="vcfline"></param>
+        /// <param name="vcfLine"></param>
         /// <returns></returns>
-        public List<DbSnpItem> ExtractItem(string vcfline)
+        public IEnumerable<DbSnpItem> ExtractItem(string vcfLine)
         {
-            var splitLine = vcfline.Split('\t',6);
-            if (splitLine.Length < 5) return null;
+            var splitLine = vcfLine.Split('\t',6);
+            if (splitLine.Length < 5) yield break;
 
             var chromosomeName = splitLine[VcfCommon.ChromIndex];
-            if (!_refChromDict.ContainsKey(chromosomeName)) return null;
+            if (!_sequenceProvider.RefNameToChromosome.ContainsKey(chromosomeName)) yield break;
 
-            var chromosome = _refChromDict[chromosomeName];
-
+            var chromosome = _sequenceProvider.RefNameToChromosome[chromosomeName];
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);
 			var dbSnpId    = Convert.ToInt64(splitLine[VcfCommon.IdIndex].Substring(2));
 			var refAllele  = splitLine[VcfCommon.RefIndex];
 			var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
-			
-	        return altAlleles.Select(altAllele => new DbSnpItem(chromosome, position, dbSnpId, refAllele, altAllele)).ToList();
+
+            foreach (var altAllele in altAlleles)
+            {
+                var (shiftedPos, shiftedRef, shiftedAlt) =
+                    VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, _sequenceProvider.Sequence);
+
+                yield return new DbSnpItem(chromosome, shiftedPos, dbSnpId, shiftedRef, shiftedAlt);
+            }
+	        
         }
 
         public void Dispose()

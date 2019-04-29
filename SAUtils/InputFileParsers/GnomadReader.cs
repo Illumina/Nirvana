@@ -6,13 +6,16 @@ using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers
 {
 	public sealed class GnomadReader 
 	{
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly ISequenceProvider _sequenceProvider;
 
         private int[] _acAll;
 		private int[] _acAfr;
@@ -46,10 +49,10 @@ namespace SAUtils.InputFileParsers
 
         private int? _totalDepth;
 
-		public GnomadReader(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict) 
+		public GnomadReader(StreamReader streamReader, ISequenceProvider sequenceProvider) 
 		{
 			_reader       = streamReader;
-		    _refChromDict = refChromDict;
+		    _sequenceProvider = sequenceProvider;
 		}
 
 		private void Clear()
@@ -129,9 +132,9 @@ namespace SAUtils.InputFileParsers
 			Clear();
 
 			var chromosome = splitLine[VcfCommon.ChromIndex];
-			if (!_refChromDict.ContainsKey(chromosome)) return null;
+			if (!_sequenceProvider.RefNameToChromosome.ContainsKey(chromosome)) return null;
 
-		    var chrom      = _refChromDict[chromosome];
+		    var chrom      = _sequenceProvider.RefNameToChromosome[chromosome];
 			var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
 			var refAllele  = splitLine[VcfCommon.RefIndex];
 			var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
@@ -159,12 +162,15 @@ namespace SAUtils.InputFileParsers
 
 			
 			for (int i = 0; i < altAlleles.Length; i++)
-			{
+            {
+                var (alignedPos, alignedRef, alignedAlt) =
+                    VariantUtils.TrimAndLeftAlign(position, refAllele, altAlleles[i], _sequenceProvider.Sequence);
+
 				gnomadItemsList.Add(new GnomadItem(
 					chrom,
-					position,
-					refAllele,
-					altAlleles[i],
+					alignedPos,
+					alignedRef,
+					alignedAlt,
                     _totalDepth,
 					_anAll, _anAfr,_anAmr,_anEas,_anFin,_anNfe,_anOth, _anAsj, _anSas,
 					GetCount(_acAll, i), GetCount(_acAfr, i), GetCount(_acAmr, i), GetCount(_acEas, i), 

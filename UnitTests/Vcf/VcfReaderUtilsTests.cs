@@ -2,6 +2,7 @@
 using System.Linq;
 using Genome;
 using Moq;
+using UnitTests.SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation;
 using VariantAnnotation.Interface.Providers;
@@ -21,12 +22,13 @@ namespace UnitTests.Vcf
 
             var chromosome          = new Chromosome("chr1", "1", 0);
             var refMinorProvider    = new Mock<IRefMinorProvider>();
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
-            var variantFactory      = new VariantFactory(refNameToChromosome);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A',
+                new Dictionary<string, IChromosome>() {["chr1"] = chromosome});
+            var variantFactory      = new VariantFactory(seqProvider);
 
-            var position1 = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, variantFactory, refNameToChromosome);
-            var position2 = AnnotationUtilities.ParseVcfLine(vcfLine2, refMinorProvider.Object, variantFactory, refNameToChromosome);
-            var position3 = AnnotationUtilities.ParseVcfLine(vcfLine3, refMinorProvider.Object, variantFactory, refNameToChromosome);
+            var position1 = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, variantFactory, seqProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.ParseVcfLine(vcfLine2, refMinorProvider.Object, variantFactory, seqProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.ParseVcfLine(vcfLine3, refMinorProvider.Object, variantFactory, seqProvider.RefNameToChromosome);
 
             var annotatedVariants1 = Annotator.GetAnnotatedVariants(position1.Variants);
             var annotatedVariants2 = Annotator.GetAnnotatedVariants(position2.Variants);
@@ -53,9 +55,11 @@ namespace UnitTests.Vcf
 
             var chromosome = new Chromosome("chr1", "1", 0);
             var refMinorProvider = new Mock<IRefMinorProvider>();
-            //refMinorProvider.Setup(x => x.IsReferenceMinor(chromosome, 13133)).Returns(false);
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
-            var variantFactory = new VariantFactory(refNameToChromosome);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A',
+                new Dictionary<string, IChromosome>() { ["chr1"] = chromosome });
+            var refNameToChromosome = seqProvider.RefNameToChromosome;
+
+            var variantFactory = new VariantFactory(seqProvider);
 
             var position1 = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, variantFactory, refNameToChromosome);
             var position2 = AnnotationUtilities.ParseVcfLine(vcfLine2, refMinorProvider.Object, variantFactory, refNameToChromosome);
@@ -88,8 +92,12 @@ namespace UnitTests.Vcf
 
             var chromosome          = new Chromosome("chr1", "1", 0);
             var refMinorProvider    = new Mock<IRefMinorProvider>();
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
-            var variantFactory      = new VariantFactory(refNameToChromosome);
+            var seqProvider         = ParserTestUtils.GetSequenceProvider(8021910, "GGTGCTGGACGGTGTCCCT", 'A',
+                new Dictionary<string, IChromosome>() { ["chr1"] = chromosome });
+            var refNameToChromosome = seqProvider.RefNameToChromosome;
+
+            var variantFactory = new VariantFactory(seqProvider);
+
             var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, variantFactory, refNameToChromosome);
 
             var annotatedVariants1 = Annotator.GetAnnotatedVariants(position1.Variants);
@@ -110,8 +118,12 @@ namespace UnitTests.Vcf
             var chromosome           = new Chromosome("chr1", "1", 0);
             var refMinorProvider     = new Mock<IRefMinorProvider>();
             refMinorProvider.Setup(x => x.GetGlobalMajorAllele(chromosome, 10628385)).Returns("T");
-            var refNameToChromosome  = new Dictionary<string, IChromosome> { ["1"] = chromosome };
-            var variantFactory       = new VariantFactory(refNameToChromosome);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10628385, "C", 'A',
+                new Dictionary<string, IChromosome>() { ["1"] = chromosome });
+            var refNameToChromosome = seqProvider.RefNameToChromosome;
+
+            var variantFactory = new VariantFactory(seqProvider);
+
 
             var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, variantFactory, refNameToChromosome);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);
@@ -132,8 +144,11 @@ namespace UnitTests.Vcf
 
             var chromosome          = new Chromosome("chr1", "1", 0);
             var refMinorProvider    = new Mock<IRefMinorProvider>();
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["1"] = chromosome };
-            var variantFactory      = new VariantFactory(refNameToChromosome);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10005, "C", 'A',
+                new Dictionary<string, IChromosome>() { ["1"] = chromosome });
+            var refNameToChromosome = seqProvider.RefNameToChromosome;
+
+            var variantFactory = new VariantFactory(seqProvider);
 
             var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, variantFactory, refNameToChromosome);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);

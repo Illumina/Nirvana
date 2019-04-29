@@ -32,7 +32,6 @@ namespace VariantAnnotation.Providers
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
         {
-            LoadChromosome(annotatedPosition.Position.Chromosome);
             if (annotatedPosition.AnnotatedVariants == null) return;
 
             annotatedPosition.CytogeneticBand = _cytogeneticBands.GetCytogeneticBand(annotatedPosition.Position.Chromosome, annotatedPosition.Position.Start,

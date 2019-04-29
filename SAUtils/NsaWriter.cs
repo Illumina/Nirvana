@@ -11,6 +11,7 @@ using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Variants;
 
 namespace SAUtils
 {
@@ -75,9 +76,7 @@ namespace SAUtils
                 // So when writing out, we have to make sure that we do not write past this position. 
                 // Once a position has been seen in the stream, we can safely write all positions before that.
                 var writeToPos = saItem.Position;
-                // trim the alleles before checking against the reference to prevent 1KG errors (NIR-3637)
-                saItem.Trim();
-
+                
                 string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
                 if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
                 {
@@ -86,7 +85,8 @@ namespace SAUtils
                 }
 
                 itemsMinHeap.Add(saItem);
-                WriteUptoPosition(itemsMinHeap, writeToPos);
+                // in order to allow room for left shifted variants, we hold off on removing them from the heap
+                WriteUptoPosition(itemsMinHeap, writeToPos- VariantUtils.MaxUpstreamLength);
             }
 
             //flushing out the remaining items in buffer
@@ -99,6 +99,7 @@ namespace SAUtils
 
         private void WriteUptoPosition(MinHeap<ISupplementaryDataItem> itemsHeap, int position)
         {
+            if (position < 1) return;
             if (itemsHeap.Count() == 0) return;
             var bufferMin = itemsHeap.GetMin();
 

@@ -4,7 +4,10 @@ using System.Linq;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers;
+using UnitTests.TestDataStructures;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
+using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -14,12 +17,12 @@ namespace UnitTests.SAUtils.InputFileParsers
         private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
         private static readonly IChromosome Chrom22 = new Chromosome("chr22", "22", 22);
 
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
+        private static readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
         {
             { "1", Chrom1},
             { "22", Chrom22}
         };
-
+        
         private Stream GetGnomadStream()
         {
             var stream = new MemoryStream();
@@ -40,7 +43,13 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetItems_test()
         {
-            var gnomadReader = new GnomadReader(new StreamReader(GetGnomadStream()), _chromDict);
+            var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TGTGTTGTTATTCTGTGTGCAT", 10114 - VariantUtils.MaxUpstreamLength);
+
+            var refNameToChrom = new Dictionary<string, IChromosome>() { { "1", Chrom1 } };
+
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+
+            var gnomadReader = new GnomadReader(new StreamReader(GetGnomadStream()), sequenceProvider);
 
             var items = gnomadReader.GetItems().ToList();
 
@@ -66,12 +75,18 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void IdentifyConflictingItems()
         {
-            var gnomadReader = new GnomadReader(new StreamReader(GetConflictingItemsStream()), _chromDict);
+            var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TAAGCCAGCCAGCCAGCCAAGCTGGCCAAGCCAGACAGGCAGCCAAGCCAACCAAGACACCCAGGCAGCCAAGCCAGC", 16558315 - VariantUtils.MaxUpstreamLength);
+
+            var refNameToChrom = new Dictionary<string, IChromosome>() { { "22", Chrom22 } };
+
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+
+            var gnomadReader = new GnomadReader(new StreamReader(GetConflictingItemsStream()), sequenceProvider);
 
             var items = new List<ISupplementaryDataItem>();
             foreach (GnomadItem item in gnomadReader.GetItems())
             {
-                item.Trim();
+                //item.Trim();
                 if (item.Position== 16558315)
                     items.Add(item);
             }
@@ -80,6 +95,39 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             //two if the items were removed as conflicting items
             Assert.Equal(3,items.Count);
+        }
+
+        private Stream GetShiftingItemsStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##gnomAD");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            writer.WriteLine("6\t157100396\trs572236007\tGCGC\tGCGCCGC,G,GCGCCGCCGC\t584951.32\tPASS\tAC=1218,2,16;AF=5.55505e-02,9.12159e-05,7.29727e-04;AN=21926;BaseQRankSum=-1.09000e-01;ClippingRankSum=0.00000e+00;DP=300864;FS=0.00000e+00;InbreedingCoeff=1.17500e-01;MQ=6.00000e+01;MQRankSum=5.00000e-02;QD=2.04400e+01;ReadPosRankSum=-3.20000e-02;SOR=6.96000e-01;VQSLOD=1.36000e+00;VQSR_culprit=FS;GQ_HIST_ALT=2|51|6|22|28|15|24|50|9|10|13|14|14|30|30|40|21|2|7|1303,0|0|0|0|0|0|0|1|0|0|2|0|2|0|1|1|0|0|0|0,0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|1|0|0|0|18;DP_HIST_ALT=118|405|463|353|224|88|27|9|4|0|0|0|0|0|0|0|0|0|0|0,1|3|3|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0|0,0|3|3|5|4|3|0|1|0|0|0|0|0|0|0|0|0|0|0|0;AB_HIST_ALT=0|0|2|2|15|66|110|105|196|124|306|173|171|111|49|51|27|13|4|0,0|0|0|1|3|0|1|0|1|0|0|0|0|1|0|0|0|0|0|0,0|0|0|0|0|0|1|0|2|3|3|3|5|2|0|0|0|0|0|0;GQ_HIST_ALL=884|807|422|735|789|518|941|1060|612|1106|1091|578|1371|377|750|327|591|92|328|1739;DP_HIST_ALL=1331|2305|2891|3184|2842|1490|781|244|45|4|1|0|0|0|0|0|0|0|0|0;AB_HIST_ALL=0|0|2|3|18|66|112|105|199|127|309|175|176|115|49|51|27|13|4|0;AC_Male=661,1,6;AC_Female=557,1,10;AN_Male=12450;AN_Female=9476;AF_Male=5.30924e-02,8.03213e-05,4.81928e-04;AF_Female=5.87801e-02,1.05530e-04,1.05530e-03;GC_Male=5587,601,30,1,0,0,6,0,0,0;GC_Female=4205,487,35,1,0,0,10,0,0,0;GC_raw=13401,1525,166,7,0,0,19,0,0,0;AC_raw=1857,7,19;AN_raw=30236;GC=9792,1088,65,2,0,0,16,0,0,0;AF_raw=6.14169e-02,2.31512e-04,6.28390e-04;Hom_AFR=0,0,0;Hom_AMR=1,0,0;Hom_ASJ=0,0,0;Hom_EAS=0,0,0;Hom_FIN=5,0,0;Hom_NFE=56,0,0;Hom_OTH=3,0,0;Hom=65,0,0;Hom_raw=166,0,0;AC_AFR=123,0,15;AC_AMR=8,0,0;AC_ASJ=6,0,0;AC_EAS=0,0,0;AC_FIN=69,0,0;AC_NFE=979,2,1;AC_OTH=33,0,0;AN_AFR=7512;AN_AMR=376;AN_ASJ=206;AN_EAS=1556;AN_FIN=694;AN_NFE=11022;AN_OTH=560;AF_AFR=1.63738e-02,0.00000e+00,1.99681e-03;AF_AMR=2.12766e-02,0.00000e+00,0.00000e+00;AF_ASJ=2.91262e-02,0.00000e+00,0.00000e+00;AF_EAS=0.00000e+00,0.00000e+00,0.00000e+00;AF_FIN=9.94236e-02,0.00000e+00,0.00000e+00;AF_NFE=8.88224e-02,1.81455e-04,9.07276e-05;AF_OTH=5.89286e-02,0.00000e+00,0.00000e+00;POPMAX=FIN,NFE,AFR;AC_POPMAX=69,2,15;AN_POPMAX=694,11022,7512;AF_POPMAX=9.94236e-02,1.81455e-04,1.99681e-03;DP_MEDIAN=13,7,17;DREF_MEDIAN=1.00000e-25,5.31547e-07,3.16228e-39;GQ_MEDIAN=99,60,99;AB_MEDIAN=5.00000e-01,2.77778e-01,5.71429e-01;AS_RF=7.69554e-01,3.84245e-02,8.79158e-01;AS_FilterStatus=PASS,RF,PASS;CSQ=CGCCGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000275248|protein_coding|1/20||ENST00000275248.4:c.1171_1176dupCCGCCG|ENSP00000275248.4:p.Pro391_Pro392dup|1314-1315|1162-1163|388|P/PPP|ccg/cCGCCGCcg|rs766249098|3||1||insertion|1|HGNC|18040|||||ENSP00000275248||G3XAA0|UPI0000231CAD|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656&hmmpanther:PTHR12656:SF11|14|||||||||||||||||||||||||||||,CGCCGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000346085|protein_coding|1/20||ENST00000346085.5:c.1345_1350dupCCGCCG|ENSP00000344546.4:p.Pro449_Pro450dup|1337-1338|1336-1337|446|P/PPP|ccg/cCGCCGCcg|rs766249098|3||1||insertion|1|HGNC|18040|YES|||CCDS55072.1|ENSP00000344546|Q8NFD5||UPI000058E4B2|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656:SF11&hmmpanther:PTHR12656|14|||||||||||||||||||||||||||||,CGCCGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000350026|protein_coding|1/19||ENST00000350026.5:c.1345_1350dupCCGCCG|ENSP00000055163.7:p.Pro449_Pro450dup|1337-1338|1336-1337|446|P/PPP|ccg/cCGCCGCcg|rs766249098|3||1||insertion|1|HGNC|18040||||CCDS5251.2|ENSP00000055163|Q8NFD5||UPI000058E2EA|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656&hmmpanther:PTHR12656:SF11|14|||||||||||||||||||||||||||||,CGCCGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000367148|protein_coding|1/20||ENST00000367148.1:c.1345_1350dupCCGCCG|ENSP00000356116.1:p.Pro449_Pro450dup|1336-1337|1336-1337|446|P/PPP|ccg/cCGCCGCcg|rs766249098|3||1||insertion|1|HGNC|18040|||||ENSP00000356116|Q8NFD5|G3XAA0|UPI000058E4B3|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656:SF11&hmmpanther:PTHR12656|14|||||||||||||||||||||||||||||,CGCCGC|upstream_gene_variant|MODIFIER|ARID1B|ENSG00000049618|Transcript|ENST00000414678|protein_coding||||||||||rs766249098|3|167|1|cds_start_NF|insertion|1|HGNC|18040|||||ENSP00000412835||H0Y7H8|UPI0001D3BCFD|1|||||||||||||||||||||||||||||||||,CGCCGC|upstream_gene_variant|MODIFIER|RP11-230C9.2|ENSG00000271551|Transcript|ENST00000603191|lincRNA||||||||||rs766249098|3|2188|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,CGCCGC|upstream_gene_variant|MODIFIER|RP11-230C9.4|ENSG00000271265|Transcript|ENST00000604082|lincRNA||||||||||rs766249098|3|4603|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,CGCCGC|downstream_gene_variant|MODIFIER|RP11-230C9.3|ENSG00000270487|Transcript|ENST00000604792|antisense||||||||||rs766249098|3|1061|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,CGCCGC|downstream_gene_variant|MODIFIER|MIR4466|ENSG00000271899|Transcript|ENST00000606121|miRNA||||||||||rs766249098|3|412|-1||insertion|1|HGNC|41726|YES|||||||||||||||||||||||||||||||||||||||||,-|inframe_deletion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000275248|protein_coding|1/20||ENST00000275248.4:c.1174_1176delCCG|ENSP00000275248.4:p.Pro392del|1312-1314|1160-1162|387-388|AP/A|gCGCcg/gcg|rs766249098|2||1||insertion|1|HGNC|18040|||||ENSP00000275248||G3XAA0|UPI0000231CAD|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656&hmmpanther:PTHR12656:SF11|14|||||||||||||||||||||||||||||,-|inframe_deletion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000346085|protein_coding|1/20||ENST00000346085.5:c.1348_1350delCCG|ENSP00000344546.4:p.Pro450del|1335-1337|1334-1336|445-446|AP/A|gCGCcg/gcg|rs766249098|2||1||insertion|1|HGNC|18040|YES|||CCDS55072.1|ENSP00000344546|Q8NFD5||UPI000058E4B2|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656:SF11&hmmpanther:PTHR12656|14|||||||||||||||||||||||||||||,-|inframe_deletion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000350026|protein_coding|1/19||ENST00000350026.5:c.1348_1350delCCG|ENSP00000055163.7:p.Pro450del|1335-1337|1334-1336|445-446|AP/A|gCGCcg/gcg|rs766249098|2||1||insertion|1|HGNC|18040||||CCDS5251.2|ENSP00000055163|Q8NFD5||UPI000058E2EA|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656&hmmpanther:PTHR12656:SF11|14|||||||||||||||||||||||||||||,-|inframe_deletion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000367148|protein_coding|1/20||ENST00000367148.1:c.1348_1350delCCG|ENSP00000356116.1:p.Pro450del|1334-1336|1334-1336|445-446|AP/A|gCGCcg/gcg|rs766249098|2||1||insertion|1|HGNC|18040|||||ENSP00000356116|Q8NFD5|G3XAA0|UPI000058E4B3|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656:SF11&hmmpanther:PTHR12656|14|||||||||||||||||||||||||||||,-|upstream_gene_variant|MODIFIER|ARID1B|ENSG00000049618|Transcript|ENST00000414678|protein_coding||||||||||rs766249098|2|168|1|cds_start_NF|insertion|1|HGNC|18040|||||ENSP00000412835||H0Y7H8|UPI0001D3BCFD|1|||||||||||||||||||||||||||||||||,-|upstream_gene_variant|MODIFIER|RP11-230C9.2|ENSG00000271551|Transcript|ENST00000603191|lincRNA||||||||||rs766249098|2|2186|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,-|upstream_gene_variant|MODIFIER|RP11-230C9.4|ENSG00000271265|Transcript|ENST00000604082|lincRNA||||||||||rs766249098|2|4601|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,-|downstream_gene_variant|MODIFIER|RP11-230C9.3|ENSG00000270487|Transcript|ENST00000604792|antisense||||||||||rs766249098|2|1062|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,-|downstream_gene_variant|MODIFIER|MIR4466|ENSG00000271899|Transcript|ENST00000606121|miRNA||||||||||rs766249098|2|413|-1||insertion|1|HGNC|41726|YES|||||||||||||||||||||||||||||||||||||||||,CGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000275248|protein_coding|1/20||ENST00000275248.4:c.1174_1176dupCCG|ENSP00000275248.4:p.Pro392dup|1314-1315|1162-1163|388|P/PP|ccg/cCGCcg|rs766249098|1||1||insertion|1|HGNC|18040|||||ENSP00000275248||G3XAA0|UPI0000231CAD|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656&hmmpanther:PTHR12656:SF11|14|||||||||||||||||||||||||||||,CGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000346085|protein_coding|1/20||ENST00000346085.5:c.1348_1350dupCCG|ENSP00000344546.4:p.Pro450dup|1337-1338|1336-1337|446|P/PP|ccg/cCGCcg|rs766249098|1||1||insertion|1|HGNC|18040|YES|||CCDS55072.1|ENSP00000344546|Q8NFD5||UPI000058E4B2|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656:SF11&hmmpanther:PTHR12656|14|||||||||||||||||||||||||||||,CGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000350026|protein_coding|1/19||ENST00000350026.5:c.1348_1350dupCCG|ENSP00000055163.7:p.Pro450dup|1337-1338|1336-1337|446|P/PP|ccg/cCGCcg|rs766249098|1||1||insertion|1|HGNC|18040||||CCDS5251.2|ENSP00000055163|Q8NFD5||UPI000058E2EA|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656&hmmpanther:PTHR12656:SF11|14|||||||||||||||||||||||||||||,CGC|inframe_insertion|MODERATE|ARID1B|ENSG00000049618|Transcript|ENST00000367148|protein_coding|1/20||ENST00000367148.1:c.1348_1350dupCCG|ENSP00000356116.1:p.Pro450dup|1336-1337|1336-1337|446|P/PP|ccg/cCGCcg|rs766249098|1||1||insertion|1|HGNC|18040|||||ENSP00000356116|Q8NFD5|G3XAA0|UPI000058E4B3|1|||Low_complexity_(Seg):seg&hmmpanther:PTHR12656:SF11&hmmpanther:PTHR12656|14|||||||||||||||||||||||||||||,CGC|upstream_gene_variant|MODIFIER|ARID1B|ENSG00000049618|Transcript|ENST00000414678|protein_coding||||||||||rs766249098|1|167|1|cds_start_NF|insertion|1|HGNC|18040|||||ENSP00000412835||H0Y7H8|UPI0001D3BCFD|1|||||||||||||||||||||||||||||||||,CGC|upstream_gene_variant|MODIFIER|RP11-230C9.2|ENSG00000271551|Transcript|ENST00000603191|lincRNA||||||||||rs766249098|1|2188|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,CGC|upstream_gene_variant|MODIFIER|RP11-230C9.4|ENSG00000271265|Transcript|ENST00000604082|lincRNA||||||||||rs766249098|1|4603|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,CGC|downstream_gene_variant|MODIFIER|RP11-230C9.3|ENSG00000270487|Transcript|ENST00000604792|antisense||||||||||rs766249098|1|1061|-1||insertion|1|Clone_based_vega_gene||YES|||||||||||||||||||||||||||||||||||||||||,CGC|downstream_gene_variant|MODIFIER|MIR4466|ENSG00000271899|Transcript|ENST00000606121|miRNA||||||||||rs766249098|1|412|-1||insertion|1|HGNC|41726|YES|||||||||||||||||||||||||||||||||||||||||,CGCCGC|regulatory_region_variant|MODIFIER|||RegulatoryFeature|ENSR00001231649|promoter||||||||||rs766249098|3||||insertion|1||||||||||||||||||||||||||||||||||||||||||||,-|regulatory_region_variant|MODIFIER|||RegulatoryFeature|ENSR00001231649|promoter||||||||||rs766249098|2||||insertion|1||||||||||||||||||||||||||||||||||||||||||||,CGC|regulatory_region_variant|MODIFIER|||RegulatoryFeature|ENSR00001231649|promoter||||||||||rs766249098|1||||insertion|1||||||||||||||||||||||||||||||||||||||||||||,CGCCGC|TF_binding_site_variant|MODIFIER|||MotifFeature|MA0162.2|||||||||||rs766249098|3||1||insertion|1|||||||||||||||||||||||||||||||||||||Egr1:MA0162.2|5|N|||||,CGCCGC|TF_binding_site_variant|MODIFIER|||MotifFeature|MA0162.2|||||||||||rs766249098|3||1||insertion|1|||||||||||||||||||||||||||||||||||||Egr1:MA0162.2|2|N|||||,CGC|TF_binding_site_variant|MODIFIER|||MotifFeature|MA0162.2|||||||||||rs766249098|1||1||insertion|1|||||||||||||||||||||||||||||||||||||Egr1:MA0162.2|5|N|||||,CGC|TF_binding_site_variant|MODIFIER|||MotifFeature|MA0162.2|||||||||||rs766249098|1||1||insertion|1|||||||||||||||||||||||||||||||||||||Egr1:MA0162.2|2|N|||||,-|TF_binding_site_variant|MODIFIER|||MotifFeature|MA0162.2|||||||||||rs766249098|2||1||insertion|1|||||||||||||||||||||||||||||||||||||Egr1:MA0162.2|2|N|||||,-|TF_binding_site_variant|MODIFIER|||MotifFeature|MA0162.2|||||||||||rs766249098|2||1||insertion|1|||||||||||||||||||||||||||||||||||||Egr1:MA0162.2|-1|N|||||;GC_AFR=3618,123,0,0,0,0,15,0,0,0;GC_AMR=181,6,1,0,0,0,0,0,0,0;GC_ASJ=97,6,0,0,0,0,0,0,0,0;GC_EAS=778,0,0,0,0,0,0,0,0,0;GC_FIN=283,59,5,0,0,0,0,0,0,0;GC_NFE=4585,867,56,2,0,0,1,0,0,0;GC_OTH=250,27,3,0,0,0,0,0,0,0;Hom_Male=30,0,0;Hom_Female=35,0,0\n");
+
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+
+        [Fact]
+        public void LeftShiftingItems()
+        {
+            var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "GCGCGC", 157100394 -1 - VariantUtils.MaxUpstreamLength);
+
+            var refNameToChrom = new Dictionary<string, IChromosome>() { { "6", new Chromosome("chr6","6",6)} };
+
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+
+            var gnomadReader = new GnomadReader(new StreamReader(GetShiftingItemsStream()), sequenceProvider);
+
+            var items = gnomadReader.GetItems().ToList();
+            Assert.Equal(3, items.Count);
+            Assert.Equal(157100397, items[0].Position);
+            Assert.Equal(157100397, items[1].Position);
+            Assert.Equal(157100397, items[2].Position);
         }
     }
 }
