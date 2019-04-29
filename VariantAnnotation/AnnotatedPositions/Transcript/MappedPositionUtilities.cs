@@ -85,19 +85,19 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return onReverseStrand ? region.CdnaStart : region.CdnaEnd;
         }
 
-        public static (int Start, int End) GetCoveredCdsPositions(int coveredCdnaStart, int coveredCdnaEnd,
+        public static (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) GetCoveredCdsAndProteinPositions(int coveredCdnaStart, int coveredCdnaEnd,
             byte startExonPhase, ICodingRegion codingRegion)
         {
             if (codingRegion == null || 
                 coveredCdnaEnd < codingRegion.CdnaStart || 
                 coveredCdnaStart > codingRegion.CdnaEnd ||
-                coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1);
+                coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1, -1, -1);
 
             int beginOffset = startExonPhase - codingRegion.CdnaStart + 1;
             var start = coveredCdnaStart + beginOffset;
             var end   = coveredCdnaEnd + beginOffset;
 
-            return (start, end);
+            return (start, end, GetProteinPosition(start), GetProteinPosition(end));
         }
 
         public static int GetProteinPosition(int cdsPosition)

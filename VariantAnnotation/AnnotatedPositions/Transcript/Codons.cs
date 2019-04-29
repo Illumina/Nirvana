@@ -10,6 +10,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         {
             if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return ("", "");
 
+            if (cdsStart < 1) cdsStart = 1;
+            if (cdsEnd > codingSequence.Length) cdsEnd = codingSequence.Length;
+
             var transcriptReferenceAllele = cdsEnd >= cdsStart ? codingSequence.Substring(cdsStart - 1, cdsEnd - cdsStart + 1) : "";
 
             int aminoAcidStart = proteinBegin * 3 - 2;

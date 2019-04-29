@@ -139,7 +139,7 @@
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in chr9-10.vcf.gz --out chr9-10.50",
       "workingDirectory": "c:\\development\\TestDatasets"
     },
-    "SK Nirvana fail": {
+    "SK_Nirvana_fail": {
       "commandName": "Project",
       "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\nirvana-fail.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o fail",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\"
@@ -169,9 +169,24 @@
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in Dragen_v3.2-DragenSV-Germline-chr1-GRCh37.vcf.gz --out svLeftShift",
       "workingDirectory": "c:\\development\\TestDatasets"
     },
+    "RR_dragen3.2_SV": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in Dragen_v3.2-DragenSV-Germline-chr1-GRCh37.vcf.gz --out svLeftShift",
+      "workingDirectory": "c:\\development\\TestDatasets"
+    },
     "RNAEdit fail test": {
       "commandName": "Project",
       "commandLineArgs": "-c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\test_runs\\test_RNA_edit\\tsCEPH_chr11.vcf.gz -o out_range --disable-recomposition"
+    },
+    "SK Del over stop": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_stop_lose\\del_over_stop.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o stop_lose",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_stop_lose"
+    },
+    "SK Nirvana fail": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\nirvana-fail.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o fail",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\"
     }
   }
 }

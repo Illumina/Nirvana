@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Amazon.S3.Model;
+﻿using System.Collections.Generic;
 using Genome;
 using Intervals;
 using VariantAnnotation.Algorithms;
@@ -67,19 +65,31 @@ namespace VariantAnnotation.TranscriptAnnotation
             var coveredCdna = transcript.TranscriptRegions.GetCoveredCdnaPositions(position.CdnaStart, start.Index,
                 position.CdnaEnd, end.Index, onReverseStrand);
 
-            var coveredCds = MappedPositionUtilities.GetCoveredCdsPositions(coveredCdna.Start, coveredCdna.End,
-                transcript.StartExonPhase, transcript.Translation?.CodingRegion);
-
             var aa = aminoAcids.Translate(codons.Reference, codons.Alternate);
 
+            var coveredPositions = MappedPositionUtilities.GetCoveredCdsAndProteinPositions(coveredCdna.Start, coveredCdna.End,
+                transcript.StartExonPhase, transcript.Translation?.CodingRegion);
+
+            // only generate the covered version of ref & alt alleles when CDS start/end is -1
+            var coveredAa = position.CdsStart == -1 || position.CdsEnd == -1
+                ? GetCoveredAa(aminoAcids, transcriptAltAllele, coveredPositions, codingSequence)
+                : aa;
+
             var positionalEffect = GetPositionalEffect(transcript, variant, position, aa.Reference, aa.Alternate,
-                coveredCdna.Start, coveredCdna.End, coveredCds.Start, coveredCds.End);
+                coveredCdna.Start, coveredCdna.End, coveredPositions.CdsStart, coveredPositions.CdsEnd);
 
             var variantEffect = new VariantEffect(positionalEffect, variant, transcript, aa.Reference, aa.Alternate,
-                codons.Reference, codons.Alternate, position.ProteinStart);
+                codons.Reference, codons.Alternate, position.ProteinStart, coveredAa.Reference, coveredAa.Alternate);
 
             return (variantEffect, position, aa.Reference, aa.Alternate, codons.Reference, codons.Alternate,
                 transcriptAltAllele);
+        }
+
+        private static (string Reference, string Alternate) GetCoveredAa(AminoAcids aminoAcids, string transcriptAltAllele, (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) coveredPositions, ISequence codingSequence)
+        {
+            (string reference, string alternate) = Codons.GetCodons(transcriptAltAllele, coveredPositions.CdsStart,
+                coveredPositions.CdsEnd, coveredPositions.ProteinStart, coveredPositions.ProteinEnd, codingSequence);
+            return aminoAcids.Translate(reference, alternate);
         }
 
         private static ISequence GetCodingSequence(ITranscript transcript, ISequence refSequence)
