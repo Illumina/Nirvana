@@ -10,19 +10,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         {
             if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return ("", "");
 
+            // current implementation of GetCoveredCdsAndProteinPositions may return negative cdsStart and cdsEnd beyond the CDS region
             if (cdsStart < 1) cdsStart = 1;
             if (cdsEnd > codingSequence.Length) cdsEnd = codingSequence.Length;
 
-            var transcriptReferenceAllele = cdsEnd >= cdsStart ? codingSequence.Substring(cdsStart - 1, cdsEnd - cdsStart + 1) : "";
+            int aminoAcidStart = Math.Max(proteinBegin * 3 - 2, 1);
+            int aminoAcidEnd = Math.Min(proteinEnd * 3, codingSequence.Length);
 
-            int aminoAcidStart = proteinBegin * 3 - 2;
-            int aminoAcidEnd   = proteinEnd * 3;
+            var transcriptReferenceAllele = cdsEnd >= cdsStart ? codingSequence.Substring(cdsStart - 1, cdsEnd - cdsStart + 1) : "";
 
             int prefixStartIndex = aminoAcidStart - 1;
             int prefixLen = cdsStart - aminoAcidStart;
 
             int suffixStartIndex = cdsEnd;
-            int suffixLen = Math.Min(aminoAcidEnd, codingSequence.Length) - cdsEnd;
+            int suffixLen = aminoAcidEnd - cdsEnd;
 
             string prefix = prefixStartIndex + prefixLen < codingSequence.Length
                 ? codingSequence.Substring(prefixStartIndex, prefixLen).ToLower()

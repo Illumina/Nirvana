@@ -77,5 +77,23 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var observedResult = Codons.IsTriplet(len);
             Assert.Equal(expectedResult, observedResult);
         }
+
+        [Theory]
+        [InlineData(-33, 4, -11, 2, "ACGTca")]
+        [InlineData(95, 101, 32, 34, "gGCTGA")]
+        public void GetCodons_OutOfRangeIndexes_Adjusted(int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, string expectedRefCodons)
+        {
+            var sequence = new Mock<ISequence>();
+            sequence.SetupGet(x => x.Length).Returns(99);
+            sequence.Setup(x => x.Substring(0, 0)).Returns("");
+            sequence.Setup(x => x.Substring(0, 4)).Returns("ACGT");
+            sequence.Setup(x => x.Substring(4, 2)).Returns("CA");
+            sequence.Setup(x => x.Substring(94, 5)).Returns("GCTGA");
+            sequence.Setup(x => x.Substring(93, 1)).Returns("G");
+
+            var codons = Codons.GetCodons("", cdsStart, cdsEnd, proteinBegin, proteinEnd, sequence.Object);
+
+            Assert.Equal(expectedRefCodons, codons.Reference);
+        }
     }
 }
