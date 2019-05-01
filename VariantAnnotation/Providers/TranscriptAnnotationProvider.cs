@@ -19,8 +19,6 @@ namespace VariantAnnotation.Providers
 {
     public sealed class TranscriptAnnotationProvider : ITranscriptAnnotationProvider
     {
-        private const int MaxSvLengthForRegulatoryRegionAnnotation = 50000;
-
         private readonly ITranscriptCache _transcriptCache;
         private readonly ISequence _sequence;
 
@@ -96,17 +94,35 @@ namespace VariantAnnotation.Providers
         {
             if (annotatedPosition.AnnotatedVariants == null || annotatedPosition.AnnotatedVariants.Length == 0) return;
 
-            var refIndex = annotatedPosition.Position.Chromosome.Index;
+            ushort refIndex = annotatedPosition.Position.Chromosome.Index;
             LoadPredictionCaches(refIndex);
 
-            AddRegulatoryRegions(annotatedPosition);
-            AddTranscripts(annotatedPosition);
-        }      
-
-        public void PreLoad(IChromosome chromosome, List<int> positions)
-        {
-            throw new System.NotImplementedException();
+            AddRegulatoryRegions(annotatedPosition.AnnotatedVariants, _transcriptCache.RegulatoryIntervalForest);
+            AddTranscripts(annotatedPosition.AnnotatedVariants, _transcriptCache.TranscriptIntervalForest);
         }
+
+        private void AddTranscripts(IAnnotatedVariant[] annotatedVariants, IIntervalForest<ITranscript> transcriptIntervalForest)
+        {
+            foreach (var annotatedVariant in annotatedVariants)
+            {
+                var variant = annotatedVariant.Variant;
+
+                ITranscript[] geneFusionCandidates = GetGeneFusionCandidates(variant.BreakEnds, transcriptIntervalForest);
+                ITranscript[] transcripts          = transcriptIntervalForest.GetAllFlankingValues(variant);
+                if (transcripts == null) continue;
+
+                IList<IAnnotatedTranscript> annotatedTranscripts =
+                    TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant, transcripts, _sequence, _siftCache,
+                        _polyphenCache, geneFusionCandidates);
+
+                if (annotatedTranscripts.Count == 0) continue;
+
+                foreach (var annotatedTranscript in annotatedTranscripts)
+                    annotatedVariant.Transcripts.Add(annotatedTranscript);
+            }
+        }
+
+        public void PreLoad(IChromosome chromosome, List<int> positions) => throw new System.NotImplementedException();
 
         private void LoadPredictionCaches(ushort refIndex)
         {
@@ -130,26 +146,7 @@ namespace VariantAnnotation.Providers
             _currentRefIndex = ushort.MaxValue;
         }
 
-        private void AddTranscripts(IAnnotatedPosition annotatedPosition)
-        {
-            var overlappingTranscripts = _transcriptCache.GetOverlappingTranscripts(annotatedPosition.Position);
-            if (overlappingTranscripts == null) return;
-
-            foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
-            {
-                var geneFusionCandidates = GetGeneFusionCandidates(annotatedVariant.Variant.BreakEnds);
-
-                var annotatedTranscripts = TranscriptAnnotationFactory.GetAnnotatedTranscripts(annotatedVariant.Variant,
-                    overlappingTranscripts, _sequence, _siftCache, _polyphenCache, geneFusionCandidates);
-
-                if (annotatedTranscripts.Count == 0) continue;
-
-                foreach (var annotatedTranscript in annotatedTranscripts)
-                    annotatedVariant.Transcripts.Add(annotatedTranscript);
-            }
-        }
-
-        private ITranscript[] GetGeneFusionCandidates(IBreakEnd[] breakEnds)
+        private static ITranscript[] GetGeneFusionCandidates(IBreakEnd[] breakEnds, IIntervalForest<ITranscript> transcriptIntervalForest)
         {
             if (breakEnds == null || breakEnds.Length == 0) return null;
 
@@ -157,8 +154,8 @@ namespace VariantAnnotation.Providers
 
             foreach (var breakEnd in breakEnds)
             {
-                var transcripts = _transcriptCache.GetOverlappingTranscripts(breakEnd.Piece2.Chromosome,
-                    breakEnd.Piece2.Position, breakEnd.Piece2.Position);
+                ITranscript[] transcripts = transcriptIntervalForest.GetAllOverlappingValues(
+                    breakEnd.Piece2.Chromosome.Index, breakEnd.Piece2.Position, breakEnd.Piece2.Position);
                 if (transcripts == null) continue;
 
                 foreach (var transcript in transcripts) geneFusionCandidates.Add(transcript);
@@ -167,34 +164,34 @@ namespace VariantAnnotation.Providers
             return geneFusionCandidates.ToArray();
         }
 
-        private void AddRegulatoryRegions(IAnnotatedPosition annotatedPosition)
+        private static void AddRegulatoryRegions(IAnnotatedVariant[] annotatedVariants, IIntervalForest<IRegulatoryRegion> regulatoryIntervalForest)
         {
-            var overlappingRegulatoryRegions = _transcriptCache.GetOverlappingRegulatoryRegions(annotatedPosition.Position);
-
-            if (overlappingRegulatoryRegions == null) return;
-
-            foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
+            foreach (var annotatedVariant in annotatedVariants)
             {
                 // In case of insertions, the base(s) are assumed to be inserted at the end position
-
                 // if this is an insertion just before the beginning of the regulatory element, this takes care of it
-                var variant = annotatedVariant.Variant;
-                var variantEnd = variant.End;
-                var variantBegin = variant.Type == VariantType.insertion ? variant.End : variant.Start;
+                var variant      = annotatedVariant.Variant;
+                int variantBegin = variant.Type == VariantType.insertion ? variant.End : variant.Start;
 
-                // disable regulatory region for SV larger than 50kb
-                if (variantEnd - variantBegin + 1 > MaxSvLengthForRegulatoryRegionAnnotation) continue;
+                if (SkipLargeVariants(variantBegin, variant.End)) continue;
 
-                foreach (var regulatoryRegion in overlappingRegulatoryRegions)
+                IRegulatoryRegion[] regulatoryRegions =
+                    regulatoryIntervalForest.GetAllOverlappingValues(variant.Chromosome.Index, variantBegin,
+                        variant.End);
+                if (regulatoryRegions == null) continue;
+
+                foreach (var regulatoryRegion in regulatoryRegions)
                 {
-                    if (!variant.Overlaps(regulatoryRegion)) continue;
-
                     // if the insertion is at the end, its past the feature and therefore not overlapping
-                    if (variant.Type == VariantType.insertion && variantEnd == regulatoryRegion.End) continue;
+                    if (variant.Type == VariantType.insertion && variant.End == regulatoryRegion.End) continue;
 
                     annotatedVariant.RegulatoryRegions.Add(RegulatoryRegionAnnotator.Annotate(variant, regulatoryRegion));
                 }
             }
         }
+
+        private const int MaxSvLengthForRegulatoryRegionAnnotation = 50000;
+
+        private static bool SkipLargeVariants(int begin, int end) => end - begin + 1 > MaxSvLengthForRegulatoryRegionAnnotation;
     }
 }

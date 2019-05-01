@@ -6,6 +6,8 @@ using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers
 {
@@ -13,13 +15,15 @@ namespace SAUtils.InputFileParsers
     {
         private readonly StreamReader _streamReader;
         private readonly IDictionary<string, IChromosome> _refNameDictionary;
+        private readonly ISequenceProvider _sequenceProvider;
 
         private string _ancestralAllele;
 
-        public AncestralAlleleReader(StreamReader streamReader, IDictionary<string, IChromosome> refNameDict)
+        public AncestralAlleleReader(StreamReader streamReader, ISequenceProvider sequenceProvider)
         {
             _streamReader = streamReader;
-            _refNameDictionary = refNameDict;
+            _sequenceProvider = sequenceProvider;
+            _refNameDictionary = sequenceProvider.RefNameToChromosome;
         }
 
         private void Clear()
@@ -49,9 +53,9 @@ namespace SAUtils.InputFileParsers
             }
         }
 
-        private List<AncestralAlleleItem> ExtractItems(string vcfline)
+        private List<AncestralAlleleItem> ExtractItems(string vcfLine)
         {
-            var splitLine = vcfline.Split(new[] { '\t' }, 9);// we don't care about the many fields after info field
+            var splitLine = vcfLine.Split(new[] { '\t' }, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;
 
             Clear();
@@ -75,7 +79,9 @@ namespace SAUtils.InputFileParsers
 
             foreach (string altAllele in altAlleles)
             {
-                ancestralAlleleItems.Add(new AncestralAlleleItem(chromosome, position, refAllele, altAllele, _ancestralAllele));
+                var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
+                    altAllele, _sequenceProvider.Sequence);
+                ancestralAlleleItems.Add(new AncestralAlleleItem(chromosome, shiftedPos, shiftedRef, shiftedAlt, _ancestralAllele));
             }
 
             return ancestralAlleleItems;

@@ -22,8 +22,8 @@
     },
     "RR_clinvar": {
       "commandName": "Project",
-      "commandLineArgs": " Clinvar --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVarFullRelease_2018-02.xml.gz --out c:\\Development\\SupplementaryDatabase\\temp",
-      "workingDirectory": "c:\\Development\\ExternalDataSources\\ClinVar\\20180129"
+      "commandLineArgs": " Clinvar --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVarFullRelease_2019-02.xml.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "c:\\Development\\ExternalDataSources\\ClinVar\\20190206"
     },
     "RR_cosmic": {
       "commandName": "Project",

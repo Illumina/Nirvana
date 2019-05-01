@@ -54,21 +54,21 @@ namespace Vcf
 
         public string[] GetSampleNames() => _sampleNames;
 
-        private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, IDictionary<string, IChromosome> refNameToChromosome,
+        private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
             IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter)
         {
             _headerReader = headerReader;
             _reader = vcfLineReader;
-            _variantFactory = new VariantFactory(refNameToChromosome);
+            _variantFactory = new VariantFactory(sequenceProvider);
             _refMinorProvider = refMinorProvider;
             _vcfFilter = vcfFilter;
-            _refNameToChromosome = refNameToChromosome;
+            _refNameToChromosome = sequenceProvider.RefNameToChromosome;
         }
 
-        public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, IDictionary<string, IChromosome> refNameToChromosome,
+        public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
             IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter)
         {
-            var vcfReader = new VcfReader(headerReader, vcfLineReader, refNameToChromosome, refMinorProvider, vcfFilter);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter);
             vcfReader.ParseHeader();
             vcfReader.SetRecomposer(recomposer);
             return vcfReader;

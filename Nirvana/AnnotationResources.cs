@@ -91,7 +91,7 @@ namespace Nirvana
         public void SingleVariantPreLoad(IPosition position)
         {
             var chromToPositions = new Dictionary<IChromosome, List<int>>();
-            PreLoadUtilities.UpdateChromToPositions(chromToPositions, position.Chromosome, position.Start, position.RefAllele, position.VcfFields[VcfCommon.AltIndex]);
+            PreLoadUtilities.UpdateChromToPositions(chromToPositions, position.Chromosome, position.Start, position.RefAllele, position.VcfFields[VcfCommon.AltIndex], SequenceProvider.Sequence);
             _variantPositions = chromToPositions.ToImmutableDictionary();
             PreLoad(position.Chromosome);
         }
@@ -105,13 +105,14 @@ namespace Nirvana
             }
 
             vcfStream.Position = Tabix.VirtualPosition.From(InputStartVirtualPosition).BlockOffset;
-            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, annotationRange, SequenceProvider.RefNameToChromosome).ToImmutableDictionary();
+            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, annotationRange, SequenceProvider).ToImmutableDictionary();
         }
 
         public void PreLoad(IChromosome chromosome)
         {
-            if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
+            SequenceProvider.LoadChromosome(chromosome);
 
+            if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
             SaProvider?.PreLoad(chromosome, positions);
         }
     }

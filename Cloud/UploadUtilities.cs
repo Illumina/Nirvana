@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Threading;
 using Amazon.S3.Model;
@@ -46,7 +45,7 @@ namespace Cloud
 
             catch (Exception exception)
             {
-                Logger.LogLine($"Excpetion: {exception.Message}.");
+                Logger.LogLine($"Exception: {exception.Message}.");
                 return false;
             }
         }

@@ -146,5 +146,36 @@ namespace UnitTests.Variants
 
         private static ISimpleVariant GetInsertion() =>
             new SimpleVariant(Chromosome, 966397, 966396, "", "TG", VariantType.insertion);
+
+        [Theory]
+        [InlineData(519, "TG", 515, "TG")]
+        [InlineData(511, "ATT", 509, "TTA")]
+        [InlineData(508, "GTT", 504, "TGT")]
+        public void Left_align_deletions(int position, string refAllele, int rotatedPos, string rotatedRef)
+        {
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+
+            var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, refAllele, "", reference);
+
+            Assert.Equal(rotatedPos, rotatedVariant.start);
+            Assert.Equal(rotatedRef, rotatedVariant.refAllele);
+        }
+
+        [Theory]
+        [InlineData(519, "TG", 515, "TG")]
+        [InlineData(511, "ATT", 509, "TTA")]
+        [InlineData(508, "GTT", 504, "TGT")]
+        public void Left_align_insertion(int position, string altAllele, int rotatedPos, string rotatedAlt)
+        {
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+
+            var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, "", altAllele, reference);
+
+            Assert.Equal(rotatedPos, rotatedVariant.start);
+            Assert.Equal(rotatedAlt, rotatedVariant.altAllele);
+        }
+
     }
+
+
 }

@@ -30,7 +30,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdnaStart, cdnaEnd);
         }
 
-        private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition, bool onReverseStrand)
+        private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition,  bool onReverseStrand)
         {
             if (region == null || region.Type != TranscriptRegionType.Exon) return -1;
 
@@ -85,19 +85,19 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return onReverseStrand ? region.CdnaStart : region.CdnaEnd;
         }
 
-        public static (int Start, int End) GetCoveredCdsPositions(int coveredCdnaStart, int coveredCdnaEnd,
+        public static (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) GetCoveredCdsAndProteinPositions(int coveredCdnaStart, int coveredCdnaEnd,
             byte startExonPhase, ICodingRegion codingRegion)
         {
             if (codingRegion == null || 
                 coveredCdnaEnd < codingRegion.CdnaStart || 
                 coveredCdnaStart > codingRegion.CdnaEnd ||
-                coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1);
+                coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1, -1, -1);
 
             int beginOffset = startExonPhase - codingRegion.CdnaStart + 1;
             var start = coveredCdnaStart + beginOffset;
             var end   = coveredCdnaEnd + beginOffset;
 
-            return (start, end);
+            return (start, end, GetProteinPosition(start), GetProteinPosition(end));
         }
 
         public static int GetProteinPosition(int cdsPosition)
@@ -106,7 +106,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdsPosition + 2) / 3;
         }
 
-        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, int cdnaStart,
+        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, IRnaEdit[] rnaEdits, int cdnaStart,
             int cdnaEnd, byte startExonPhase, bool isInsertion)
         {
             var cdsStart = GetCdsPosition(codingRegion, cdnaStart, startExonPhase);

@@ -6,18 +6,20 @@ using CommandLine.Utilities;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
 using Variants;
 
 namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static ImmutableDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom)
+        public static IDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, AnnotationRange annotationRange, ISequenceProvider sequenceProvider)
         {
             var benchmark = new Benchmark();
             Console.Write("Scanning positions required for SA pre-loading....");
             var chromPositions = new Dictionary<IChromosome, List<int>>();
 
+            var refNameToChrom = sequenceProvider.RefNameToChromosome;
             IChromosome chromToAnnotate = null;
             int endPosition = int.MaxValue;
             if (annotationRange != null)
@@ -38,8 +40,8 @@ namespace Nirvana
 
                     string refAllele = splits[VcfCommon.RefIndex];
                     string altAllele = splits[VcfCommon.AltIndex];
-
-                    UpdateChromToPositions(chromPositions, iChrom, position, refAllele, altAllele);
+                    sequenceProvider.LoadChromosome(iChrom);
+                    UpdateChromToPositions(chromPositions, iChrom, position, refAllele, altAllele, sequenceProvider.Sequence);
                 }
             }
 
@@ -47,18 +49,19 @@ namespace Nirvana
 
             Console.WriteLine($"{count} positions found in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
-            return chromPositions.ToImmutableDictionary();
+            return chromPositions;
         }
 
-        public static void UpdateChromToPositions(Dictionary<IChromosome, List<int>> chromPositions, IChromosome chromosome, int position, string refAllele, string altAllele)
+        public static void UpdateChromToPositions(Dictionary<IChromosome, List<int>> chromPositions, IChromosome chromosome, int position, string refAllele, string altAllele, ISequence refSequence)
         {
             if (!chromPositions.ContainsKey(chromosome)) chromPositions.Add(chromosome, new List<int>(16 * 1024));
             foreach (string allele in altAllele.OptimizedSplit(','))
             {
-                if (allele.OptimizedStartsWith('<')) continue;
+                if (allele.OptimizedStartsWith('<') || allele.Contains('[') || altAllele.Contains(']')) continue;
 
-                (int trimPos, string _, string _) = BiDirectionalTrimmer.Trim(position, refAllele, allele);
-                chromPositions[chromosome].Add(trimPos);
+                (int shiftedPos, string _, string _) =
+                    VariantUtils.TrimAndLeftAlign(position, refAllele, allele, refSequence);
+                chromPositions[chromosome].Add(shiftedPos);
             }
         }
 

@@ -6,6 +6,7 @@ using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
 using Variants;
 
 namespace Vcf.VariantCreator
@@ -13,9 +14,14 @@ namespace Vcf.VariantCreator
     public sealed class VariantFactory
     {
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly ISequenceProvider _sequenceProvider;
         private const string StrPrefix = "<STR";
 
-        public VariantFactory(IDictionary<string, IChromosome> refNameToChromosome) => _refNameToChromosome = refNameToChromosome;
+        public VariantFactory(ISequenceProvider sequenceProvider)
+        {
+            _sequenceProvider = sequenceProvider;
+            _refNameToChromosome = sequenceProvider.RefNameToChromosome;
+        }
 
         private static VariantCategory GetVariantCategory(string firstAltAllele, bool isReference, bool isSymbolicAllele, VariantType svType)
         {
@@ -47,10 +53,15 @@ namespace Vcf.VariantCreator
 
             var variants = new IVariant[informativeAltAlleles.Count];
 
+            _sequenceProvider.LoadChromosome(chromosome);
+
             for (var i = 0; i < informativeAltAlleles.Count; i++)
             {
                 bool isDecomposedVar = isDecomposed[i];
-                variants[i] = GetVariant(chromosome, start, end, refAllele, informativeAltAlleles[i], infoData, variantCategory, isDecomposedVar, isRecomposed, null);
+                (int shiftedStart, string shiftedRef, string shiftedAlt) =
+                    VariantUtils.TrimAndLeftAlign(start, refAllele, informativeAltAlleles[i], _sequenceProvider.Sequence);
+
+                variants[i] = GetVariant(chromosome, shiftedStart, end - (start- shiftedStart), shiftedRef, shiftedAlt, infoData, variantCategory, isDecomposedVar, isRecomposed, null);
             }
 
             return variants;

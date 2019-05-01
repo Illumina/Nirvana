@@ -2,6 +2,8 @@
 using System.IO;
 using Genome;
 using Nirvana;
+using UnitTests.SAUtils.InputFileParsers;
+using UnitTests.TestDataStructures;
 using Xunit;
 
 namespace UnitTests.Nirvana
@@ -40,7 +42,8 @@ namespace UnitTests.Nirvana
         [Fact]
         public void GetAllPositions()
         {
-            var positions = PreLoadUtilities.GetPositions(GetVcfStream(), null, _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var positions = PreLoadUtilities.GetPositions(GetVcfStream(), null, seqProvider);
 
             Assert.Equal(2, positions.Count);
             Assert.Equal(4, positions[Chrom1].Count);
@@ -56,7 +59,8 @@ namespace UnitTests.Nirvana
                 start = 10019,
                 end = 10290
             };
-            var positions = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var positions = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, seqProvider );
 
             Assert.Single(positions);
             Assert.Equal(3, positions[Chrom1].Count);

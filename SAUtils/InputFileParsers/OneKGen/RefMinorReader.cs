@@ -6,6 +6,8 @@ using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
@@ -13,14 +15,16 @@ namespace SAUtils.InputFileParsers.OneKGen
     {
         private readonly StreamReader _reader;
         private readonly IDictionary<string, IChromosome> _refNameDictionary;
+        private readonly ISequenceProvider _sequenceProvider;
 
         private int? _allAlleleNumber;
         private int[] _allAlleleCounts;
         
-        public RefMinorReader(StreamReader reader, IDictionary<string, IChromosome> refNameDict)
+        public RefMinorReader(StreamReader reader, ISequenceProvider sequenceProvider)
         {
             _reader = reader;
-            _refNameDictionary = refNameDict;
+            _sequenceProvider = sequenceProvider;
+            _refNameDictionary = sequenceProvider.RefNameToChromosome;
         }
 
         private void Clear()
@@ -51,9 +55,9 @@ namespace SAUtils.InputFileParsers.OneKGen
             }
         }
 
-        private List<AlleleFrequencyItem> ExtractItems(string vcfline)
+        private List<AlleleFrequencyItem> ExtractItems(string vcfLine)
         {
-            var splitLine = vcfline.Split(new[] { '\t' }, 9);// we don't care about the many fields after info field
+            var splitLine = vcfLine.Split(new[] { '\t' }, 9);// we don't care about the many fields after info field
             if (splitLine.Length < 8) return null;
 
             Clear();
@@ -79,7 +83,11 @@ namespace SAUtils.InputFileParsers.OneKGen
                 if (alleleCount == null || alleleCount==0) continue;
 
                 var frequency = 1.0* alleleCount.Value/ _allAlleleNumber.Value ;
-                items.Add(new AlleleFrequencyItem(chromosome, position,refAllele, altAlleles[i], frequency));
+
+                var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
+                    altAlleles[i], _sequenceProvider.Sequence);
+
+                items.Add(new AlleleFrequencyItem(chromosome, shiftedPos,shiftedRef, shiftedAlt, frequency));
             }
 
             return items.Count>0? items: null;

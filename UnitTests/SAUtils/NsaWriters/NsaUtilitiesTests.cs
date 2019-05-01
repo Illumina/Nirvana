@@ -4,6 +4,7 @@ using System.Linq;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.TOPMed;
+using UnitTests.SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.SA;
 using Xunit;
 
@@ -36,7 +37,8 @@ namespace UnitTests.SAUtils.NsaWriters
         [Fact]
         public void RemoveConflictingAlleles_does_not_remove_duplicates()
         {
-            var topMedReader = new TopMedReader(new StreamReader(GetDupItemsStream()), _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(70220313, "TGCC", 'A', _chromDict);
+            var topMedReader = new TopMedReader(new StreamReader(GetDupItemsStream()), seqProvider);
 
             var items = topMedReader.GetItems().ToList();
             var saItems = new List<ISupplementaryDataItem>(items);

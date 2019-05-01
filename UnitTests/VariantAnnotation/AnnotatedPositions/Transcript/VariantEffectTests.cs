@@ -28,7 +28,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns("C");
 
             var variantEffect = new VariantEffect(positionalEffect, variant.Object, transcript.Object, "", "", "", "",
-                null);
+                null, "", "");
 
             var gene = new Mock<IGene>();
             transcript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -57,7 +57,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns("C");
 
             var variantEffect = new VariantEffect(positionalEffect, variant.Object, transcript.Object, "", "", "", "",
-                null);
+                null, "", "");
 
             var gene = new Mock<IGene>();
             transcript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -80,7 +80,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns(altAllele);
 
             var variantEffect = new VariantEffect(null, variant.Object, transcript.Object, refAminoAcids, altAminoAcids , "", "",
-                proteinBegin);
+                proteinBegin, refAminoAcids, altAminoAcids);
 
             if (isStartRetained) Assert.True(variantEffect.IsStartRetained());
             else Assert.False(variantEffect.IsStartRetained());
@@ -110,7 +110,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             variant.SetupGet(x => x.RefAllele).Returns("C");
 
             var variantEffect = new VariantEffect(positionalEffect, variant.Object, transcript.Object, "", "", "", "",
-                null);
+                null, "", "");
 
             var gene = new Mock<IGene>();
             transcript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -122,6 +122,26 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             Assert.Equal(expectedResult, variantEffect.IsFivePrimeUtrVariant());
         }
 
+        [Fact]
+        public void IsStopLost_DeletionOverStopCodon_ReturnTrue()
+        {
+            var positionalEffect = new TranscriptPositionalEffect
+            {
+                BeforeCoding = false,
+                AfterCoding = true,
+                WithinCdna = true
+            };
+
+            var variant = new Mock<ISimpleVariant>();
+            variant.SetupGet(x => x.AltAllele).Returns("ATAGCCC");
+            variant.SetupGet(x => x.RefAllele).Returns("A");
+
+            var variantEffect = new VariantEffect(positionalEffect, variant.Object, null, "", "", "", "",
+                null, "*", "X");
+
+            Assert.True(variantEffect.IsStopLost());
+
+        }
 
         //[Theory]
         //public void IsFrameShiftVariant(bool isCoding,bool isIncompleteTerminalCodonVariant,bool hasFrameShift,bool isStopRetained,bool isTrucatedByStop,bool expected)
@@ -137,9 +157,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         //    cache.Add(ConsequenceTag.incomplete_terminal_codon_variant,isIncompleteTerminalCodonVariant);
         //    cache.Add(ConsequenceTag.stop_retained_variant, isStopRetained);
         //    //cache.Add();
-
-
-
         //}
 
 

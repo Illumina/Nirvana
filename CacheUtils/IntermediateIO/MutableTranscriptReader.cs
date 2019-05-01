@@ -81,7 +81,7 @@ namespace CacheUtils.IntermediateIO
             if (mt.CodingRegion == null) return;
 
             var codingSequence = new CodingSequence(_sequence, mt.CodingRegion, mt.TranscriptRegions,
-                mt.Gene.OnReverseStrand, mt.NewStartExonPhase);
+                mt.Gene.OnReverseStrand, mt.NewStartExonPhase, mt.RnaEdits);
 
             mt.CdsLength = codingSequence.GetCodingSequence().Length;
 

@@ -1,18 +1,23 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Compression.Utilities;
 using Genome;
+using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
-    public sealed class OneKGenReader 
+    public sealed class OneKGenReader :IDisposable
     {
-        private readonly string _fileName;
+        private readonly Stream _stream;
         private readonly IDictionary<string,IChromosome> _refNameDictionary;
+        private readonly ISequenceProvider _sequenceProvider;
 
         private  string _ancestralAllele;
 
@@ -31,9 +36,12 @@ namespace SAUtils.InputFileParsers.OneKGen
 		private int[] _sasAlleleCounts;
 
         // empty constructor for onekg reader for unit tests.
-        internal OneKGenReader(IDictionary<string, IChromosome> refNameDict) => _refNameDictionary = refNameDict;
-
-        public OneKGenReader(string oneKGenFile, IDictionary<string, IChromosome> refNameDict) : this(refNameDict) => _fileName = oneKGenFile;
+        public OneKGenReader(Stream stream, ISequenceProvider sequenceProvider) 
+        {
+            _stream = stream;
+            _sequenceProvider = sequenceProvider;
+            _refNameDictionary = sequenceProvider.RefNameToChromosome;
+        }
 
         private void Clear()
 	    {
@@ -58,7 +66,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 
 	    public IEnumerable<OneKGenItem> GetItems()
         {
-            using (var reader = GZipUtilities.GetAppropriateStreamReader(_fileName))
+            using (var reader = FileUtilities.GetStreamReader(_stream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
@@ -67,9 +75,8 @@ namespace SAUtils.InputFileParsers.OneKGen
                     if (line.IsWhiteSpace()) continue;
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
-                    var oneKGenItemsList = ExtractItems(line);
-	                if (oneKGenItemsList == null) continue;
-	                foreach (var oneKGenItem in oneKGenItemsList)
+                    
+	                foreach (var oneKGenItem in ExtractItems(line))
 	                {
 						yield return oneKGenItem;
 	                }
@@ -78,15 +85,15 @@ namespace SAUtils.InputFileParsers.OneKGen
             }
         }
 
-        internal List<OneKGenItem> ExtractItems(string vcfline)
+        internal IEnumerable<OneKGenItem> ExtractItems(string vcfLine)
         {
-            var splitLine = vcfline.OptimizedSplit('\t');// we don't care about the many fields after info field
-            if (splitLine.Length < 8) return null;
+            var splitLine = vcfLine.OptimizedSplit('\t');// we don't care about the many fields after info field
+            if (splitLine.Length < 8) yield break;
 
-			Clear();
+            Clear();
 			
             var chromosomeName  = splitLine[VcfCommon.ChromIndex];
-            if (!_refNameDictionary.ContainsKey(chromosomeName)) return null;
+            if (!_refNameDictionary.ContainsKey(chromosomeName)) yield break;
             var chromosome = _refNameDictionary[chromosomeName];
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
             var rsId       = splitLine[VcfCommon.IdIndex];
@@ -96,20 +103,21 @@ namespace SAUtils.InputFileParsers.OneKGen
 
             // parses the info fields and extract frequencies, ancestral allele, allele counts, etc.
             var hasSymbolicAllele = altAlleles.Any(x => x.OptimizedStartsWith('<') && x.OptimizedEndsWith('>'));
-	        if (hasSymbolicAllele) return null;
+	        if (hasSymbolicAllele) yield break;
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalse
 			ParseInfoField(infoFields, hasSymbolicAllele);
 
-			var okgItemsList = new List<OneKGenItem>();
-	        
-			for (var i = 0; i < altAlleles.Length; i++)
-			{
-				okgItemsList.Add(new OneKGenItem(
+	        for (var i = 0; i < altAlleles.Length; i++)
+            {
+                var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
+                    altAlleles[i], _sequenceProvider.Sequence);
+
+                yield return new OneKGenItem(
 					chromosome,
-					position,
-					refAllele,
-					altAlleles[i],
+					shiftedPos,
+					shiftedRef,
+					shiftedAlt,
                     _ancestralAllele,
 					GetAlleleCount(_allAlleleCounts, i),
 					GetAlleleCount(_afrAlleleCounts,i),
@@ -123,10 +131,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 					_eurAlleleNumber,
 					_easAlleleNumber,
 					_sasAlleleNumber
-					));
+					);
+
+                
 			}
 			
-			return okgItemsList;           
         }
 
 	    private static int? GetAlleleCount(int[] alleleCounts, int i)
@@ -224,6 +233,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 		{
 			c = char.ToUpper(c);
 			return c == 'A' || c == 'C' || c == 'G' || c == 'T' || c == 'N';
-		}		
+		}
+
+        public void Dispose()
+        {
+            _stream?.Dispose();
+        }
     }
 }

@@ -132,11 +132,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         [Fact]
-        public void DetermineIntronicEffect_IsWithinFrameshiftIntron()
+        public void DetermineIntronicEffect_IsWithinFrameshiftIntron_NotInSpliceSite()
         {
             var positionalEffect = new TranscriptPositionalEffect();
-            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, new Interval(702, 705), VariantType.deletion);
+            positionalEffect.DetermineIntronicEffect(_otherTranscriptRegions, new Interval(701, 709), VariantType.deletion);
             Assert.True(positionalEffect.IsWithinFrameshiftIntron);
+            Assert.False(positionalEffect.IsStartSpliceSite);
+            Assert.False(positionalEffect.IsEndSpliceSite);
         }
 
         [Fact]

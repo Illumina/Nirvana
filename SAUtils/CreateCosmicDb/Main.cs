@@ -64,7 +64,7 @@ namespace SAUtils.CreateCosmicDb
         private static ExitCodes ProgramExecution()
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            var cosmicReader = new MergedCosmicReader(_vcfFile, _tsvFile, referenceProvider.RefNameToChromosome);
+            var cosmicReader = new MergedCosmicReader(_vcfFile, _tsvFile, referenceProvider);
             var version = DataSourceVersionReader.GetSourceVersion(_vcfFile + ".version");
 
             string outFileName = $"{version.Name}_{version.Version}";

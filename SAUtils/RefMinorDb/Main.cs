@@ -61,7 +61,7 @@ namespace SAUtils.RefMinorDb
             var version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             string outFileName = $"{version.Name}_{version.Version}_{SaCommon.RefMinorTag}".Replace(' ','_');
 
-            using (var refMinorReader = new RefMinorReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
+            using (var refMinorReader = new RefMinorReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.RefMinorFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.RefMinorFileSuffix + SaCommon.IndexSufix)))
             using (var writer = new RefMinorDbWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.SchemaVersion))

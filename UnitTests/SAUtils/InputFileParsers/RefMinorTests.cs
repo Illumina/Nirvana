@@ -43,7 +43,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetItems()
         {
-            using (var reader = new RefMinorReader(new StreamReader(GetStream()), _chromDict))
+            using (var reader = new RefMinorReader(new StreamReader(GetStream()), GetSequenceProvider()))
             {
                 var items = reader.GetItems().ToList();
 
@@ -56,6 +56,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var seqProvider = new Mock<ISequenceProvider>();
             seqProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
+            seqProvider.SetupGet(x => x.RefNameToChromosome).Returns(_chromDict);
             seqProvider.Setup(x => x.Sequence.Substring(15274 -1, 1)).Returns("A");
             seqProvider.Setup(x => x.Sequence.Substring(241369-1, 1)).Returns("C");
 
@@ -67,7 +68,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void LoopBack()
         {
             var version = new DataSourceVersion("onekgen", "v0.3", DateTime.Now.Ticks);
-            using (var reader = new RefMinorReader(new StreamReader(GetStream()), _chromDict))
+            using (var reader = new RefMinorReader(new StreamReader(GetStream()), GetSequenceProvider()))
             using (var stream = new MemoryStream())
             using (var indexStream = new MemoryStream())
             using (var writer = new RefMinorDbWriter(new ExtendedBinaryWriter(stream), new ExtendedBinaryWriter(indexStream), version, GetSequenceProvider(), SaCommon.SchemaVersion))

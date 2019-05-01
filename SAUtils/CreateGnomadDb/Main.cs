@@ -10,6 +10,7 @@ using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using SAUtils.InputFileParsers;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
@@ -75,6 +76,8 @@ namespace SAUtils.CreateGnomadDb
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
 
             var inputFiles = Directory.GetFiles(_inputDirectory, "*.vcf.bgz");
+            if (inputFiles.Length==0) inputFiles = Directory.GetFiles(_inputDirectory, "*.vcf.gz");
+
             if (inputFiles.Length == 0)
                 throw new UserErrorException("input directory does not contain any .vcf.bgz files");
 
@@ -93,21 +96,21 @@ namespace SAUtils.CreateGnomadDb
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
             using (var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, jsonTag, true, false, SaCommon.SchemaVersion, false))
             {
-                nsaWriter.Write(GetItems(inputFiles, referenceProvider.RefNameToChromosome));
+                nsaWriter.Write(GetItems(inputFiles, referenceProvider));
             }
 
             return ExitCodes.Success;
         }
 
         private IEnumerable<ISupplementaryDataItem> GetItems(IEnumerable<string> filePaths,
-            IDictionary<string, IChromosome> refNameToChromosome)
+            ISequenceProvider referenceProvider)
         {
             IEnumerable<ISupplementaryDataItem> items = null;
 
             foreach (string filePath in filePaths)
             {
                 var fileStreamReader = GZipUtilities.GetAppropriateStreamReader(filePath);
-                var reader = new GnomadReader(fileStreamReader, refNameToChromosome);
+                var reader = new GnomadReader(fileStreamReader, referenceProvider);
                 items = items == null ? reader.GetItems() : items.Concat(reader.GetItems());
             }
 

@@ -26,13 +26,10 @@ namespace UnitTests.TestUtilities
             }
 
             var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
-            var annotatorAndRef   = GetAnnotatorAndReferenceDict(cacheFilePrefix, saPaths);
+            var (annotator, sequenceProvider)   = GetAnnotatorAndSequenceProvider(cacheFilePrefix, saPaths);
 
-            var annotator         = annotatorAndRef.Annotator;
-            var refNames          = annotatorAndRef.RefNames;
-            var variantFactory    = new VariantFactory(refNames);
-
-            var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, refNames);
+            var variantFactory    = new VariantFactory(sequenceProvider);
+            var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, sequenceProvider.RefNameToChromosome);
             var annotatedPosition = annotator.Annotate(position);
 
             return annotatedPosition;
@@ -44,7 +41,7 @@ namespace UnitTests.TestUtilities
 	        return Position.ToPosition(simplePosition, refMinorProvider, variantFactory);
 	    }
 
-        private static (Annotator Annotator, IDictionary<string, IChromosome> RefNames) GetAnnotatorAndReferenceDict(string cacheFilePrefix, List<string> saPaths)
+        private static (Annotator Annotator, ISequenceProvider SequenceProvider) GetAnnotatorAndSequenceProvider(string cacheFilePrefix, List<string> saPaths)
         {
             List<(string dataFile, string indexFile)> dataAndIndexPaths = null;
             if (saPaths != null)
@@ -59,13 +56,12 @@ namespace UnitTests.TestUtilities
 
             var sequenceFilePath                 = cacheFilePrefix + ".bases";
             var sequenceProvider                 = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
-            var refNames                         = sequenceProvider.RefNameToChromosome;
             var transcriptAnnotationProvider     = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
             var saProvider                       = ProviderUtilities.GetNsaProvider(dataAndIndexPaths, null, null);
             var conservationProvider             = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);
-            return (annotator,refNames);
+            return (annotator,sequenceProvider);
         }
     }
 }

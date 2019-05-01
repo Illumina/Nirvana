@@ -7,6 +7,8 @@ using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.InputFileParsers.Cosmic
 {
@@ -33,13 +35,15 @@ namespace SAUtils.InputFileParsers.Cosmic
         private const string StudyIdTag = "ID_STUDY";
 
         private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly ISequenceProvider _sequenceProvider;
         private readonly Dictionary<string, HashSet<CosmicItem.CosmicStudy>> _studies;
 
-        public MergedCosmicReader(string vcfFile, string tsvFile, IDictionary<string, IChromosome> refChromDict)
+        public MergedCosmicReader(string vcfFile, string tsvFile, ISequenceProvider sequenceProvider)
         {
             _vcfFileReader = GZipUtilities.GetAppropriateStreamReader(vcfFile);
-            _tsvFileReader = GZipUtilities.GetAppropriateStreamReader(tsvFile); 
-            _refChromDict  = refChromDict;
+            _tsvFileReader = GZipUtilities.GetAppropriateStreamReader(tsvFile);
+            _sequenceProvider = sequenceProvider;
+            _refChromDict  = _sequenceProvider.RefNameToChromosome;
             _studies       = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
         }
         
@@ -209,10 +213,13 @@ namespace SAUtils.InputFileParsers.Cosmic
 
             foreach (string altAllele in altAlleles)
             {
+                var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
+                    altAllele, _sequenceProvider.Sequence);
+
                 cosmicItems.Add(_studies.TryGetValue(cosmicId, out var studies)
-                    ? new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, studies,
+                    ? new CosmicItem(chromosome, shiftedPos, cosmicId, shiftedRef, shiftedAlt, _geneName, studies,
                         _sampleCount)
-                    : new CosmicItem(chromosome, position, cosmicId, refAllele, altAllele, _geneName, null,
+                    : new CosmicItem(chromosome, shiftedPos, cosmicId, shiftedRef, shiftedAlt, _geneName, null,
                         _sampleCount));
             }
 

@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System;
+using Genome;
 using Intervals;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -11,7 +12,6 @@ namespace VariantAnnotation.AnnotatedPositions
         public static string GetHgvscAnnotation(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,
             int regionStart, int regionEnd)
         {
-            
             // sanity check: don't try to handle odd characters, make sure this is not a reference allele, 
             //               and make sure that we have protein coordinates
             if (variant.Type == VariantType.reference || SequenceUtilities.HasNonCanonicalBase(variant.AltAllele)) return null;
@@ -44,13 +44,13 @@ namespace VariantAnnotation.AnnotatedPositions
                 endPositionOffset = tmp;
             }
 
+            if (startPositionOffset == null && variant.Type == VariantType.insertion)
+            {
+                startPositionOffset= new PositionOffset( endPositionOffset.Position+1, endPositionOffset.Offset, $"{endPositionOffset.Position + 1}", endPositionOffset.HasStopCodonNotation);
+            }
+
             // sanity check: make sure we have coordinates
             if (startPositionOffset == null || endPositionOffset == null) return null;
-
-            int transcriptLen = transcript.End - transcript.Start + 1;
-
-            //_hgvs notation past the transcript
-            if (startPositionOffset.Position > transcriptLen || endPositionOffset.Position > transcriptLen) return null;
 
             var hgvsNotation = new HgvscNotation(refAllele, altAllele, transcript.Id.WithVersion, genomicChange,
                 startPositionOffset, endPositionOffset, transcript.Translation != null);

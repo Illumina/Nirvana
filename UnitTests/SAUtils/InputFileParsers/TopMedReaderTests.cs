@@ -3,6 +3,8 @@ using System.IO;
 using System.Linq;
 using Genome;
 using SAUtils.InputFileParsers.TOPMed;
+using UnitTests.TestDataStructures;
+using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -38,7 +40,10 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetItems_test()
         {
-            var gnomadReader = new TopMedReader(new StreamReader(GetStream()), _chromDict);
+            var sequence = new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "A" +new string('T', 10146- 10128) + "AC" +new string('T', 10177- 10146-1)+"A", 10128 - 1 - VariantUtils.MaxUpstreamLength);
+
+            var seqProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, _chromDict);
+            var gnomadReader = new TopMedReader(new StreamReader(GetStream()), seqProvider);
 
             var items = gnomadReader.GetItems().ToList();
 

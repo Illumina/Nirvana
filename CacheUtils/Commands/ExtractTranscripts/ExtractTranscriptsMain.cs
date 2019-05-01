@@ -149,7 +149,10 @@ namespace CacheUtils.Commands.ExtractTranscripts
             ITranscriptCache cache, IChromosomeInterval interval, int numRefSeqs)
         {
             logger.Write("- retrieving regulatory regions... ");
-            var regulatoryRegions = cache.GetOverlappingRegulatoryRegions(interval);
+            var regulatoryIntervalForest = cache.RegulatoryIntervalForest;
+            var regulatoryRegions =
+                regulatoryIntervalForest.GetAllOverlappingValues(interval.Chromosome.Index, interval.Start,
+                    interval.End);
             logger.WriteLine($"found {regulatoryRegions.Length} regulatory regions.");
             return regulatoryRegions.ToIntervalArrays(numRefSeqs);
         }
