@@ -88,24 +88,7 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
-                AddSmallAnnotations(annotatedVariant);
-                
-                //check for interval annotations that applies to all variants
-                if(_nsiReaders ==null) continue;
-                AddLargeAnnotationsToSmallVariants(annotatedVariant);
-            }
-        }
-
-        private void AddLargeAnnotationsToSmallVariants(IAnnotatedVariant annotatedVariant)
-        {
-            foreach (INsiReader nsiReader in _nsiReaders)
-            {
-                if (nsiReader.ReportFor == ReportFor.StructuralVariants ||
-                    nsiReader.ReportFor == ReportFor.None) continue;
-
-                var variant = annotatedVariant.Variant;
-                var annotations = nsiReader.GetAnnotation(variant);
-                if (annotations != null) AddPositionalAnnotation(annotations, annotatedVariant, nsiReader);
+                AddSmallAnnotations(annotatedVariant);              
             }
         }
 
@@ -127,11 +110,6 @@ namespace VariantAnnotation.Providers
 
                 else AddNonAlleleSpecificAnnotations(annotations, variant, annotatedVariant, nsaReader);
             }
-        }
-
-        private void AddPositionalAnnotation(IEnumerable<string> annotations, IAnnotatedVariant annotatedVariant, INsiReader nsiReader)
-        {
-            annotatedVariant.SaList.Add(new SupplementaryAnnotation(nsiReader.JsonKey, true, true, null, annotations));
         }
 
         private static void AddPositionalAnnotation(IEnumerable<(string refAllele, string altAllele, string annotation)> annotations, IAnnotatedVariant annotatedVariant,

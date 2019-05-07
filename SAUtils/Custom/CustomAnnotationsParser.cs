@@ -8,14 +8,16 @@ using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
+using Variants;
 
 namespace SAUtils.Custom
 {
     public sealed class CustomAnnotationsParser : IDisposable
     {
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly ISequenceProvider _sequenceProvider;
         public string JsonTag;
         public GenomeAssembly Assembly;
         private string[] _tags;
@@ -48,16 +50,16 @@ namespace SAUtils.Custom
         public SaJsonSchema IntervalJsonSchema;
 
 
-        internal CustomAnnotationsParser(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict)
+        internal CustomAnnotationsParser(StreamReader streamReader, ISequenceProvider sequenceProvider)
         {
             _reader = streamReader;
-            _refChromDict = refChromDict;
+            _sequenceProvider = sequenceProvider;
             _intervals = new List<CustomInterval>();
         }
 
-        public static CustomAnnotationsParser Create(StreamReader streamReader, IDictionary<string, IChromosome> refChromDict)
+        public static CustomAnnotationsParser Create(StreamReader streamReader, ISequenceProvider sequenceProvider)
         {
-            var parser = new CustomAnnotationsParser(streamReader, refChromDict);
+            var parser = new CustomAnnotationsParser(streamReader, sequenceProvider);
 
             parser.ParseHeaderLines();
             parser.InitiateSchema();
@@ -274,7 +276,7 @@ namespace SAUtils.Custom
             }
         }
 
-        private CustomItem ExtractItems(string line)
+        internal CustomItem ExtractItems(string line)
         {
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length)
@@ -282,11 +284,13 @@ namespace SAUtils.Custom
 
             string chromosome = splits[0];
 
-            if (!_refChromDict.TryGetValue(chromosome, out var chrom))
+            if (!_sequenceProvider.RefNameToChromosome.TryGetValue(chromosome, out var chrom))
             {
                 Console.WriteLine($"Annotation on {chromosome} is skipped.");
                 return null;
             }
+
+            _sequenceProvider.LoadChromosome(chrom);
 
             if (!int.TryParse(splits[1], out var position))
                 throw new UserErrorException($"POS is not an int number at: {line}.");
@@ -318,6 +322,7 @@ namespace SAUtils.Custom
             if (!IsValidNucleotideSequence(altAllele))
                 throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
+            (position, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, _sequenceProvider.Sequence);
             return new CustomItem(chrom, position, refAllele, altAllele, annotationValues.Select(x => new[] { x }).ToArray(), JsonSchema, line);
         }
 

@@ -3,8 +3,11 @@ using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
+using Moq;
 using SAUtils.Custom;
 using SAUtils.Schema;
+using UnitTests.Intervals;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
 using Xunit;
 
@@ -12,11 +15,15 @@ namespace UnitTests.SAUtils.CustomAnnotations
 {
     public sealed class ParserTests
     {
-        private readonly Dictionary<string, IChromosome> _refChromDict = new Dictionary<string, IChromosome>()
+        private static readonly Dictionary<string, IChromosome> RefChromDict = new Dictionary<string, IChromosome>()
         {
             {"chr1", new Chromosome("chr1", "1", 0) },
             {"chr2", new Chromosome("chr2", "2", 1) }
         };
+
+        private static readonly ISequence Sequence = GetMockedSequence();
+
+        private static readonly ISequenceProvider SequenceProvider = GetMockedSequenceProvider();
 
         private static StreamReader GetReadStream(string text)
         {
@@ -35,7 +42,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseTitle_Conflict_JsonTag()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title=topmed"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title=topmed"), SequenceProvider))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseTitle());
             }
@@ -44,7 +51,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseTitle_IncorrectFormat()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title:customSA"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title:customSA"), SequenceProvider))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseTitle());
             }
@@ -53,7 +60,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseGenomeAssembly_UnsupportedAssembly_ThrowException()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly=hg19"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly=hg19"), SequenceProvider))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseGenomeAssembly());
             }
@@ -62,7 +69,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseGenomeAssembly_IncorrectFormat_ThrowException()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly-GRCh38"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly-GRCh38"), SequenceProvider))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseGenomeAssembly());
             }
@@ -71,7 +78,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ReadlineAndCheckPrefix_InvalidPrefix_ThrowException()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("invalidPrefix=someValue"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("invalidPrefix=someValue"), SequenceProvider))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ReadlineAndCheckPrefix("expectedPrefix", "anyRow"));
             }
@@ -81,13 +88,13 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void CheckPosAndRefColumns_InvalidPosOrRef_ThrowException()
         {
             const string tagLine = "#CHROM\t\tREF\tALT\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), null))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
 
             const string tagLine2 = "#CHROM\tPOS\tREFERENCE\tALT\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine2), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine2), null))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
@@ -97,7 +104,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void ParseTags_NoAltAndEnd_ThrowException()
         {
             const string tagLine = "#CHROM\tPOS\tREF\tNote\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), null))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
@@ -107,7 +114,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void ParseTags_LessThanFourColumn_ThrowException()
         {
             const string tagLine = "#CHROM\tPOS\tREF\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), null))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
@@ -121,7 +128,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             string tagAndTypeLines = "#CHROM\tPOS\tREF\tALT\tValue\n" +
                                      $"#type\t.\t.\t.\t{type}";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), null))
             {
                 caParser.ParseTags();
                 caParser.ParseTypes();
@@ -136,7 +143,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             string tagAndTypeLines = "#CHROM\tPOS\tREF\tALT\tValue\n" +
                                      $"#type\t.\t.\t.\t{type}";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), null))
             {
                 caParser.ParseTags();
                 Assert.Throws<UserErrorException>(() => caParser.ParseTypes());
@@ -154,7 +161,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                        "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring";
 
 
-            using (var custParser = new CustomAnnotationsParser(GetReadStream(headerLines), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream(headerLines), null))
             {
                 custParser.ParseHeaderLines();
                 var expectedJsonKeys = new[]
@@ -198,7 +205,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                        "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\n" +
                                        "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring";
 
-            using (var custParser = new CustomAnnotationsParser(GetReadStream(invalidHeaderLines), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream(invalidHeaderLines), null))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseHeaderLines());
             }
@@ -216,7 +223,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t14783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\n" +
                                 "chr2\t10302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
                                 "chr2\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
-            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);
@@ -238,7 +245,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926";
-            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(3, items.Length);
@@ -261,7 +268,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t3302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926";
-            using (var caParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var caParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
                 Assert.Throws<UserErrorException>(() => caParser.GetItems().ToArray());
             }
@@ -280,7 +287,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
 
-            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);
@@ -296,6 +303,41 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
            Assert.True(CustomAnnotationsParser.IsValidNucleotideSequence("actgnACTGN"));
            Assert.False(CustomAnnotationsParser.IsValidNucleotideSequence("AC-GT"));
+        }
+
+        [Fact]
+        public void ExtractItems_TrimmedAndLeftShifted()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n" +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            using (var parser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                var item = parser.ExtractItems("chr1\t12783\tA\tATA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t");
+                Assert.Equal(12782, item.Position);
+                Assert.Equal("", item.RefAllele);
+                Assert.Equal("TA", item.AltAllele);
+            }
+        }
+
+        private static ISequenceProvider GetMockedSequenceProvider()
+        {
+            var seqProviderMock = new Mock<ISequenceProvider>();
+            seqProviderMock.SetupGet(x => x.RefNameToChromosome).Returns(RefChromDict);
+            seqProviderMock.SetupGet(x => x.Sequence).Returns(Sequence);
+
+            return seqProviderMock.Object;
+        }
+
+        private static ISequence GetMockedSequence()
+        {
+            var sequenceMock = new Mock<ISequence>();
+            sequenceMock.Setup(x => x.Substring(It.IsAny<int>(), It.IsAny<int>())).Returns("ACGTA");
+            return sequenceMock.Object;
         }
     }
 }
