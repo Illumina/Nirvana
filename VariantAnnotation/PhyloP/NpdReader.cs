@@ -52,7 +52,11 @@ namespace VariantAnnotation.PhyloP
         {
             _chromosome = chrom;
             (long startLocation, int numBytes) = _index.GetFileRange(chrom.Index);
-            if (startLocation == -1) return;
+            if (startLocation == -1)
+            {
+                _lastPhylopPosition = -1;
+                return;
+            }
             _reader.BaseStream.Position = startLocation;
             var buffer = _reader.ReadBytes(numBytes);
 
