@@ -24,8 +24,6 @@ namespace Nirvana
         private static string _outputFileName;
         private static string _pluginDirectory;
 
-        private static bool _vcf;
-        private static bool _gvcf;
         private static bool _forceMitochondrialAnnotation;
         private static bool _disableRecomposition;
 
@@ -37,15 +35,12 @@ namespace Nirvana
             using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
             using (var outputJsonStream = _outputFileName == "-" ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName))
-            using (var outputVcfStream = !_vcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".vcf.gz"))
-            using (var outputGvcfStream = !_gvcf ? null : _outputFileName == "-" ? Console.OpenStandardOutput() : GZipUtilities.GetWriteStream(_outputFileName + ".genome.vcf.gz"))
-                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, outputVcfStream,
-                    outputGvcfStream, annotationResources, new NullVcfFilter());
+                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter());
         }
 
         private static AnnotationResources GetAnnotationResources()
         {            
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, null, _pluginDirectory, _vcf, _gvcf, _disableRecomposition, _forceMitochondrialAnnotation);
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, null, _pluginDirectory, _disableRecomposition, _forceMitochondrialAnnotation);
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 
             using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(
@@ -75,16 +70,6 @@ namespace Nirvana
                     "plugin|p=",
                     "plugin {directory}",
                     v => _pluginDirectory = v
-                },
-                {
-                    "gvcf",
-                    "enables genome vcf output",
-                    v => _gvcf = v != null
-                },
-                {
-                    "vcf",
-                    "enables vcf output",
-                    v => _vcf = v != null
                 },
                 {
                     "out|o=",
@@ -123,11 +108,6 @@ namespace Nirvana
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.PolyPhenPath(_inputCachePrefix), "PolyPhen cache", "--cache")
                 .HasRequiredParameter(_outputFileName, "output file stub", "--out")
-                .Enable(_outputFileName == "-", () =>
-                {
-                    _vcf  = false;
-                    _gvcf = false;
-                })
                 .DisableOutput(_outputFileName == "-")
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Annotates a set of variants", "-i <vcf path> -c <cache prefix> --sd <sa dir> -r <ref path> -o <base output filename>")

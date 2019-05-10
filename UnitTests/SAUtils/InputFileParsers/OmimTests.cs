@@ -10,7 +10,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class OmimTests
     {
-        private Stream GetGeneMap2Stream()
+        private static Stream GetGeneMap2Stream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -27,16 +27,16 @@ namespace UnitTests.SAUtils.InputFileParsers
             return stream;
         }
 
-        private GeneSymbolUpdater GetGeneSymbolUpdater()
+        private static GeneSymbolUpdater GetGeneSymbolUpdater()
         {
-            var entrezGeneIdToSymbol = new Dictionary<string, string>()
+            var entrezGeneIdToSymbol = new Dictionary<string, string>
             {
                 { "entrez123", "ALPQTL2"},
                 { "entrez234", "AD7CNTP" },
                 { "entrez345", "BCC1"},
                 { "entrez456", "CMM, MLM, DNS"}
             };
-            var ensemblGeneIdToSymbol = new Dictionary<string, string>()
+            var ensemblGeneIdToSymbol = new Dictionary<string, string>
             {
                 { "ensembl123", "ALPQTL2"},
                 { "ensembl234", "AD7CNTP" },

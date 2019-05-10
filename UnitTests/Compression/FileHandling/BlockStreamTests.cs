@@ -24,8 +24,8 @@ namespace UnitTests.Compression.FileHandling
         private const string SmallString              = "Testing 123";
         private const string FinalString              = "Squeamish Ossifrage";
 
-        private static readonly Random Random = new Random(10);
-        private static readonly QuickLZ Qlz   = new QuickLZ();
+        private static readonly Random Random  = new Random(10);
+        private static readonly Zstandard Zstd = new Zstandard(1);
 
         [Fact]
         public void BlockStream_EndToEnd()
@@ -38,13 +38,13 @@ namespace UnitTests.Compression.FileHandling
 
             using (var ms = new MemoryStream())
             {                
-                WriteBlockStream(Qlz, header, customHeader, ms, expectedString);
+                WriteBlockStream(Zstd, header, customHeader, ms, expectedString);
                 ms.Position = 0;
-                ReadFromBlockStream(Qlz, ms, expectedString);
+                ReadFromBlockStream(Zstd, ms, expectedString);
             }
         }
 
-        internal static string GetRandomString(int length)
+        private static string GetRandomString(int length)
         {
             const string chars = " !\"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~";
             return new string(Enumerable.Repeat(chars, length).Select(s => s[Random.Next(s.Length)]).ToArray());
@@ -146,7 +146,7 @@ namespace UnitTests.Compression.FileHandling
         {
             Assert.Throws<ArgumentNullException>(delegate
             {
-                using (new BlockStream(Qlz, null, CompressionMode.Decompress))
+                using (new BlockStream(Zstd, null, CompressionMode.Decompress))
                 {
                 }
             });
@@ -158,7 +158,7 @@ namespace UnitTests.Compression.FileHandling
             using (var ms = new MemoryStream())
             {
                 // ReSharper disable AccessToDisposedClosure
-                using (var writer = new BlockStream(Qlz, ms, CompressionMode.Compress, true))
+                using (var writer = new BlockStream(Zstd, ms, CompressionMode.Compress, true))
                 {
                     Assert.Throws<NotSupportedException>(delegate
                     {
@@ -186,7 +186,7 @@ namespace UnitTests.Compression.FileHandling
                 Assert.Throws<ArgumentException>(delegate
                 {
                     // ReSharper disable once AccessToDisposedClosure
-                    using (new BlockStream(Qlz, writeStream, CompressionMode.Decompress))
+                    using (new BlockStream(Zstd, writeStream, CompressionMode.Decompress))
                     {
                     }
                 });
@@ -197,7 +197,7 @@ namespace UnitTests.Compression.FileHandling
                 Assert.Throws<ArgumentException>(delegate
                 {
                     // ReSharper disable once AccessToDisposedClosure
-                    using (new BlockStream(Qlz, readStream, CompressionMode.Compress))
+                    using (new BlockStream(Zstd, readStream, CompressionMode.Compress))
                     {
                     }
                 });
@@ -210,7 +210,7 @@ namespace UnitTests.Compression.FileHandling
             string randomPath = RandomPath.GetRandomPath();
 
             using (var writeStream = new FileStream(randomPath, FileMode.Create, FileAccess.Write))
-            using (var blockStream = new BlockStream(Qlz, writeStream, CompressionMode.Compress))
+            using (var blockStream = new BlockStream(Zstd, writeStream, CompressionMode.Compress))
             {
                 Assert.False(blockStream.CanRead);
                 Assert.True(blockStream.CanWrite);
@@ -223,7 +223,7 @@ namespace UnitTests.Compression.FileHandling
         {
             using (var ms = new MemoryStream())
             {
-                using (var blockStream = new BlockStream(Qlz, ms, CompressionMode.Compress))
+                using (var blockStream = new BlockStream(Zstd, ms, CompressionMode.Compress))
                 {
                     var buffer = new byte[10];
 
@@ -244,14 +244,14 @@ namespace UnitTests.Compression.FileHandling
                 var writeBuffer = GetRandomBytes(100);
                 var readBuffer  = new byte[60];
 
-                using (var blockStream = new BlockStream(Qlz, ms, CompressionMode.Compress, true))
+                using (var blockStream = new BlockStream(Zstd, ms, CompressionMode.Compress, true))
                 {
                     blockStream.Write(writeBuffer, 0, writeBuffer.Length);
                 }
 
                 ms.Position = 0;
 
-                using (var blockStream = new BlockStream(Qlz, ms, CompressionMode.Decompress))
+                using (var blockStream = new BlockStream(Zstd, ms, CompressionMode.Decompress))
                 {
                     int numBytesRead = blockStream.Read(readBuffer, 0, readBuffer.Length);
                     Assert.Equal(readBuffer.Length, numBytesRead);
@@ -270,7 +270,7 @@ namespace UnitTests.Compression.FileHandling
         {
             using (var ms = new MemoryStream())
             {
-                var blockStream = new BlockStream(Qlz, ms, CompressionMode.Compress);
+                var blockStream = new BlockStream(Zstd, ms, CompressionMode.Compress);
                 blockStream.Dispose();
                 blockStream.Dispose();
             }

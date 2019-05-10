@@ -4,7 +4,7 @@ using SAUtils.Custom;
 
 namespace UnitTests.SAUtils.CustomAnnotations
 {
-    public class AllowedValuesTests
+    public sealed class AllowedValuesTests
     {
         [Fact]
         public void IsEmptyValue_AsExpected()

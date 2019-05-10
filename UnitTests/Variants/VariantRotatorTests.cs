@@ -153,7 +153,7 @@ namespace UnitTests.Variants
         [InlineData(508, "GTT", 504, "TGT")]
         public void Left_align_deletions(int position, string refAllele, int rotatedPos, string rotatedRef)
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, refAllele, "", reference);
 
@@ -167,7 +167,7 @@ namespace UnitTests.Variants
         [InlineData(508, "GTT", 504, "TGT")]
         public void Left_align_insertion(int position, string altAllele, int rotatedPos, string rotatedAlt)
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, "", altAllele, reference);
 
@@ -178,7 +178,7 @@ namespace UnitTests.Variants
         [Fact]
         public void Left_align_multiple_padding_bases()
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(501, "AT", "ATT", reference);
 

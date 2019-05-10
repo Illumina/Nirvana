@@ -1,9 +1,8 @@
 ﻿namespace Intervals
 {
-	public interface IIntervalSearch<T>
+	public interface IIntervalSearch<out T>
 	{
-	    bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval);
-		T[] GetAllOverlappingValues(int begin, int end);
+        T[] GetAllOverlappingValues(int begin, int end);
 	}
 
 	public struct Interval<T>
@@ -37,7 +36,5 @@
 		{
 			return End >= intervalBegin && Begin <= intervalEnd;
 		}
-
-		public bool Contains(int position) => position >= Begin && position <= End;
-	}
+    }
 }

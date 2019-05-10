@@ -14,7 +14,7 @@ namespace VariantAnnotation.NSA
         private readonly GenomeAssembly _assembly;
         public readonly int SchemaVersion;
 
-        public RefMinorIndex(ExtendedBinaryWriter writer, GenomeAssembly assembly, DataSourceVersion version, int schemaVersion)
+        public RefMinorIndex(ExtendedBinaryWriter writer, GenomeAssembly assembly, IDataSourceVersion version, int schemaVersion)
         {
             _writer      = writer;
             _chromBlocks = new Dictionary<ushort, (long location, int numBytes, int count)>();

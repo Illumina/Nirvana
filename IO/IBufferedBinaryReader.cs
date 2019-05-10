@@ -15,7 +15,6 @@ namespace IO
         short ReadInt16();
         int ReadInt32();
         long ReadInt64();
-        T[] ReadOptArray<T>(Func<T> readOptFunc);
         int ReadOptInt32();
         long ReadOptInt64();
         ushort ReadOptUInt16();

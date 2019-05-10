@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -20,14 +21,14 @@ namespace Jasix.DataStructures
 
             var regexPos = new Regex(@"^(\w+)(?::(\d+)(?:-(\d+))?)?$", RegexOptions.Compiled);
 
-            var trimmedPos = position.Trim(' ');
+            string trimmedPos = position.Trim(' ');
             var match = regexPos.Match(trimmedPos);
             if (!match.Success)
                 throw new UserErrorException($"region {trimmedPos} is not valid, please specify a valid region, e.g., chr1, 1, 1:1234 or 1:1234-4567");
-            var chromosome = match.Groups[1].ToString();
+            string chromosome = match.Groups[1].ToString();
             if (!match.Groups[2].Success && !match.Groups[3].Success) return (chromosome, 1, int.MaxValue);
 
-            var start = Convert.ToInt32(match.Groups[2].ToString());
+            int start = Convert.ToInt32(match.Groups[2].ToString());
 
             int end = match.Groups[3].Success ? Convert.ToInt32(match.Groups[3].ToString()) : start;
 
@@ -59,7 +60,7 @@ namespace Jasix.DataStructures
         public static int GetJsonEntryEnd(JsonSchema jsonEntry)
         {
             if (jsonEntry.svEnd > 0) return jsonEntry.svEnd;
-            var altAlleles = jsonEntry.altAlleles;
+            IList<string> altAlleles = jsonEntry.altAlleles;
             int altAlleleOffset = altAlleles != null && altAlleles.All(IsNucleotideAllele) && altAlleles.Any(x => x.Length > 1) ? 1 : 0;
 
             return Math.Max(jsonEntry.refAllele.Length - 1, altAlleleOffset) + jsonEntry.position;

@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Genome;
 using SAUtils.InputFileParsers.Cosmic;
-using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Providers;
-using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

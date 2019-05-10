@@ -8,7 +8,7 @@ namespace UnitTests.IO
 {
     public sealed class PersistentStreamTests
     {
-        private IMockConnector GetMockConnector()
+        private static IMockConnector GetMockConnector()
         {
             var buffer = new byte[ushort.MaxValue];
             var random = new Random();
@@ -43,7 +43,7 @@ namespace UnitTests.IO
 
         }
 
-        private IMockConnector Connecter_returns_null_streams()
+        private static IMockConnector Connecter_returns_null_streams()
         {
             var buffer = new byte[ushort.MaxValue];
             var random = new Random();
@@ -69,7 +69,7 @@ namespace UnitTests.IO
             Assert.NotEqual(0, pStream.Read(new byte[100], 0, 100));
         }
 
-        private IMockConnector Connecter_throws_exception()
+        private static IMockConnector Connecter_throws_exception()
         {
             var buffer = new byte[ushort.MaxValue];
             var random = new Random();

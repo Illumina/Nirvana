@@ -15,12 +15,11 @@ namespace UnitTests.SAUtils
 {
     public sealed class NsaProviderTests
     {
-        readonly Chromosome _chrom1 = new Chromosome("chr1", "1", 0);
-        readonly Chromosome _chrom2 = new Chromosome("chr2", "2", 1);
+        private readonly Chromosome _chrom1 = new Chromosome("chr1", "1", 0);
 
         private IAnnotationProvider GetDbSnpProvider()
         {
-            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>()
+            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {
                 ("A", "T", "\"rs100\""),
                 ("A", "C", "\"rs101\"")
@@ -33,7 +32,7 @@ namespace UnitTests.SAUtils
             dbsnpReader.SetupGet(x => x.JsonKey).Returns("dbSnp");
             dbsnpReader.SetupGet(x => x.Version)
                 .Returns(new DataSourceVersion("dbsnp", "v1", DateTime.Now.Ticks, "dummy db snp"));
-            dbsnpReader.SetupSequence(x => x.GetAnnotation(_chrom1, 100)).Returns(chrom1Pos100Annotations);
+            dbsnpReader.SetupSequence(x => x.GetAnnotation(100)).Returns(chrom1Pos100Annotations);
 
             var provider = new NsaProvider(new[] {dbsnpReader.Object}, null);
 
@@ -42,7 +41,7 @@ namespace UnitTests.SAUtils
 
         private IAnnotationProvider GetClinVarProvider()
         {
-            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>()
+            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {
                 ("A", "T", "RCV00001"),
                 ("A", "C", "RCV00002")
@@ -55,14 +54,14 @@ namespace UnitTests.SAUtils
             clinvarReader.SetupGet(x => x.JsonKey).Returns("clinvar");
             clinvarReader.SetupGet(x => x.Version)
                 .Returns(new DataSourceVersion("clinvar", "v1", DateTime.Now.Ticks, "dummy clinvar data"));
-            clinvarReader.SetupSequence(x => x.GetAnnotation(_chrom1, 100)).Returns(chrom1Pos100Annotations);
+            clinvarReader.SetupSequence(x => x.GetAnnotation(100)).Returns(chrom1Pos100Annotations);
 
             var provider = new NsaProvider(new[] { clinvarReader.Object }, null);
 
             return provider;
         }
 
-        private IAnnotatedPosition GetPosition(IChromosome chrom, int start, string refAllele, string[] altAlleles)
+        private static IAnnotatedPosition GetPosition(IChromosome chrom, int start, string refAllele, string[] altAlleles)
         {
             var position = new Mock<IAnnotatedPosition>();
             var annotatedVariants = new List<IAnnotatedVariant>();

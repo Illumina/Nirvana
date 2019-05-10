@@ -21,51 +21,6 @@ namespace UnitTests.CommandLine.Builders
         }
 
         [Fact]
-        public void CheckEachDirectoryContainsFiles_ContainsFiles_SuccessExitCode()
-        {
-            string tempDir = Path.GetTempPath();
-
-            const string suffix = ".txt";
-            string randomPath = RandomPath.GetRandomPath() + suffix;
-            File.Create(randomPath);
-
-            var ops = new OptionSet { { "id=", "id", v => { } } };
-
-            var exitCode = Execute(new ConsoleAppBuilder(new[] { "--id", tempDir }, ops)
-                .Parse()
-                .CheckEachDirectoryContainsFiles(new[] { tempDir }, "test", "--id", $"*{suffix}"));
-
-            Assert.Equal(ExitCodes.Success, exitCode);
-        }
-
-        [Fact]
-        public void CheckEachDirectoryContainsFiles_MissingFiles_FileNotFoundExitCode()
-        {
-            string tempDir = Path.GetTempPath();
-            const string suffix = ".anavrin";
-
-            var ops = new OptionSet { { "id=", "id", v => { } } };
-
-            var exitCode = Execute(new ConsoleAppBuilder(new[] { "--id", tempDir }, ops)
-                .Parse()
-                .CheckEachDirectoryContainsFiles(new[] { tempDir }, "test", "--id", $"*{suffix}"));
-
-            Assert.Equal(ExitCodes.FileNotFound, exitCode);
-        }
-
-        [Fact]
-        public void CheckEachDirectoryContainsFiles_MissingArguments_MissingCommandLineExitCode()
-        {
-            var ops = new OptionSet { { "id=", "id", v => { } } };
-
-            var exitCode = Execute(new ConsoleAppBuilder(null, ops)
-                .Parse()
-                .CheckEachDirectoryContainsFiles(null, "test", "--id", null));
-
-            Assert.Equal(ExitCodes.MissingCommandLineOption, exitCode);
-        }
-
-        [Fact]
         public void CheckInputFilenameExists_FileExists_SuccessExitCode()
         {
             string randomPath = RandomPath.GetRandomPath();
@@ -170,7 +125,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredParameter_Exists_SuccessExitCode()
         {
-            string observedString       = default(string);
+            string observedString       = default;
             const string expectedString = "foo";
 
             var ops = new OptionSet { { "test=", "test", v => observedString = v } };
@@ -186,7 +141,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredDate_Exists_SuccessExitCode()
         {
-            string observedDate = default(string);
+            string observedDate = default;
             const string expectedDate = "2018-03-14";
 
             var ops = new OptionSet { { "date=", "date", v => observedDate = v } };
@@ -202,7 +157,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredDate_Exists_BadFormat()
         {
-            string observedDate = default(string);
+            string observedDate = default;
             var ops = new OptionSet { { "date=", "date", v => observedDate = v } };
 
             var validator = new ConsoleAppBuilder(new[] { "--date", "garbage" }, ops)
@@ -215,7 +170,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredDate_DoesNotExist_MissingCommandLineExitCode()
         {
-            string observedDate = default(string);
+            string observedDate = default;
 
             var ops = new OptionSet { { "date=", "date", v => observedDate = v } };
 
@@ -224,33 +179,6 @@ namespace UnitTests.CommandLine.Builders
                 .HasRequiredDate(observedDate, "date", "--date"));
 
             Assert.Equal(ExitCodes.MissingCommandLineOption, exitCode);
-        }
-
-        [Fact]
-        public void CheckNonZero_True()
-        {
-            const string expectedDate = "2018-03-14";
-            var ops = new OptionSet { { "date=", "date", v => { } } };
-
-            var validator = new ConsoleAppBuilder(new[] { "--date", expectedDate }, ops)
-                .Parse()
-                .CheckNonZero(3, "date");
-
-            Assert.Equal(ExitCodes.Success, validator.Data.ExitCode);
-            Assert.Empty(validator.Data.Errors);
-        }
-
-        [Fact]
-        public void CheckNonZero_False()
-        {
-            var ops = new OptionSet { { "date=", "date", v => { } } };
-
-            var validator = new ConsoleAppBuilder(new[] { "--date", "2018-03-14" }, ops)
-                .Parse()
-                .CheckNonZero(0, "date");
-
-            Assert.NotEqual(ExitCodes.Success, validator.Data.ExitCode);
-            Assert.True(validator.Data.Errors.Count > 0);
         }
 
         [Fact]
@@ -282,8 +210,8 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredParameter_DoesNotExist_MissingCommandLineExitCode()
         {
-            string testString           = default(string);
-            const string expectedString = default(string);
+            string testString           = default;
+            const string expectedString = default;
 
             var ops = new OptionSet
             {
@@ -302,7 +230,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredParameter_MissingArguments_MissingCommandLineExitCode()
         {
-            string observedString = default(string);
+            string observedString = default;
             var ops = new OptionSet { { "test=", "test", v => observedString = v } };
 
             var exitCode = Execute(new ConsoleAppBuilder(null, ops)
@@ -310,32 +238,6 @@ namespace UnitTests.CommandLine.Builders
                 .HasRequiredParameter(observedString, "test", "--test"));
 
             Assert.Equal(ExitCodes.MissingCommandLineOption, exitCode);
-        }
-
-        [Fact]
-        public void Enable_True_ExecuteMethod()
-        {
-            var observedFlag = false;
-            var ops = new OptionSet { { "test=", "test", v => { } } };
-
-            Execute(new ConsoleAppBuilder(new[] { "--test", "test" }, ops)
-                .Parse()
-                .Enable(true, () => { observedFlag = true; }));
-
-            Assert.True(observedFlag);
-        }
-
-        [Fact]
-        public void Enable_False_SkipMethod()
-        {
-            var observedFlag = false;
-            var ops = new OptionSet { { "test=", "test", v => { } } };
-
-            Execute(new ConsoleAppBuilder(new[] { "--test", "test" }, ops)
-                .Parse()
-                .Enable(false, () => { observedFlag = true; }));
-
-            Assert.False(observedFlag);
         }
     }
 }

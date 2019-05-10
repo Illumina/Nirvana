@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -12,5 +14,5 @@
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
   </ItemGroup>
-
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
 </Project>

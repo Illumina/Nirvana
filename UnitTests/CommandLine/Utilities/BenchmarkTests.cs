@@ -29,10 +29,8 @@ namespace UnitTests.CommandLine.Utilities
         {
             var benchmark            = new Benchmark();
             // perform some work
-            var elapsedIterationTime = benchmark.GetElapsedIterationTime(100, "phantoms", out double _);
-
-            Assert.NotNull(elapsedIterationTime);
-            Assert.EndsWith(" phantoms/s)", elapsedIterationTime);
+            benchmark.GetElapsedIterationTime(100, out double unitsPerSecond);
+            Assert.True(unitsPerSecond>0);
         }
     }
 }

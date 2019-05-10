@@ -7,7 +7,6 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
-using Genome;
 using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.Providers;
@@ -102,7 +101,7 @@ namespace SAUtils.CreateGnomadDb
             return ExitCodes.Success;
         }
 
-        private IEnumerable<ISupplementaryDataItem> GetItems(IEnumerable<string> filePaths,
+        private static IEnumerable<ISupplementaryDataItem> GetItems(IEnumerable<string> filePaths,
             ISequenceProvider referenceProvider)
         {
             IEnumerable<ISupplementaryDataItem> items = null;

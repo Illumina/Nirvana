@@ -19,12 +19,12 @@ namespace UnitTests.SAUtils.InputFileParsers
     {
         private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
 
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
+        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
         {
-            { "1", Chrom1},
+            { "1", Chrom1}
         };
 
-        private Stream GetStream()
+        private static Stream GetStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);

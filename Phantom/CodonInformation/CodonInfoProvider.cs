@@ -5,7 +5,6 @@ using Genome;
 using Intervals;
 using Phantom.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using Phantom.Graph;
 
 namespace Phantom.CodonInformation
 {
@@ -121,20 +120,6 @@ namespace Phantom.CodonInformation
                 }
             }
             return geneToCodingIntervals;
-        }
-
-        private static Graph<ICodingBlock> GetCodingGraph(CodingBlock[][] transcriptToCodingBlocks)
-        {
-            var codingGraph = new Graph<ICodingBlock>(true);
-            foreach (var codingBlocks in transcriptToCodingBlocks)
-            {
-                codingGraph.TryAddVertex(codingBlocks[0]);
-                for (var i = 1; i < codingBlocks.Length; i++)
-                {
-                    codingGraph.AddEdge(codingBlocks[i - 1], codingBlocks[i]);
-                }
-            }
-            return codingGraph;
         }
 
         internal static CodingBlock[][] GetTranscriptToCodingBlocks(List<PhasedIntervalArray> transcriptIntervals, bool onReverseStrand)

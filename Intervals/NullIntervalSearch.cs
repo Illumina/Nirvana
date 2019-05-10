@@ -23,12 +23,6 @@
 			return null;
 		}
 
-		public bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval)
-		{
-			interval = IntervalArray<T>.EmptyInterval;
-			return false;
-		}
-
-		#endregion
+        #endregion
 	}
 }

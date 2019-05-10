@@ -68,52 +68,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             new TranscriptRegion(TranscriptRegionType.Exon, 22, 51169149, 51171640, 4605, 7096)
         };
 
-        private IRnaEdit[] _editsNm33517 =
-        {
-            new RnaEdit(1303, 1302, "AGCCCGAGCGGGCCCGGCGGCCCCGGCCCCGCGCCCGGC"),
-            new RnaEdit(1304, 1304, "C"),
-            new RnaEdit(1308, 1309, ""),
-            new RnaEdit(7060, 7059, "AAAAAAAAAAAAAAAAA")
-        };
-
-        // NM_019119.4
-        private ITranscriptRegion[] _regionsNm19119 = 
-        {
-            new TranscriptRegion(TranscriptRegionType.Exon, 1, 140566701, 140568035, 1, 1335),
-            new TranscriptRegion(TranscriptRegionType.Exon, 1, 140568036, 140571111, 1337, 4412)
-        };
-
-        private IRnaEdit[] _editsNm19119 =
-        {
-            new RnaEdit(908, 908, "T"),
-            new RnaEdit(1336, 1335, "A"),
-            new RnaEdit(2096, 2096, "G")
-        };
-
         // NM_000682.6
         private readonly ITranscriptRegion[] _regionsNm682 =
         {
             new TranscriptRegion(TranscriptRegionType.Exon, 1, 96778623, 96780986, 1008, 3371),
             new TranscriptRegion(TranscriptRegionType.Exon, 1, 96780987, 96781984, 1, 998)
-        };
-
-        private readonly IRnaEdit[] _editsNm682 =
-        {
-            new RnaEdit(999, 998, "AGAGGAGGA")
-        };
-
-        // NM_033089.6
-        private ITranscriptRegion[] _regionsNm33089 =
-        {
-            new TranscriptRegion(TranscriptRegionType.Exon, 1, 278204, 278687, 1, 484),
-            new TranscriptRegion(TranscriptRegionType.Gap, 1, 278688, 278690, 484, 485),
-            new TranscriptRegion(TranscriptRegionType.Exon, 1, 278691, 280965, 485, 2759)
-        };
-
-        private IRnaEdit[] _editsNm33089 =
-        {
-            new RnaEdit(485, 487, ""),
-            new RnaEdit(2763, 2762, "AAAAAAAAAAAAAA")
         };
 
         // NM_001317107.1
@@ -122,14 +81,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             new TranscriptRegion(TranscriptRegionType.Exon, 1, 22138125, 22138561, 670, 1106),
             new TranscriptRegion(TranscriptRegionType.Gap, 1, 22138562, 22138563, 669, 670),
             new TranscriptRegion(TranscriptRegionType.Exon, 1, 22138564, 22139232, 1, 669)
-        };
-
-        private IRnaEdit[] _editsNm1317107 =
-        {
-            new RnaEdit(905, 905, "T"),
-            new RnaEdit(796, 796, "C"),
-            new RnaEdit(679, 679, "A"),
-            new RnaEdit(670, 671, "")
         };
 
         public MappedPositionUtilitiesTests()
@@ -349,7 +300,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(78001559, 78024355, 262, 495, 234);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 486, 485, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 486, 485, startExonPhase, true);
 
             Assert.Equal(225, cdsStart);
             Assert.Equal(224, cdsEnd);
@@ -361,7 +312,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             // NM_001317107.1
             var codingRegion = new CodingRegion(22138201, 22139150, 83, 1030, 948);
             const byte startExonPhase = 0;
-            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, _editsNm1317107, 681, 681, startExonPhase, false);
+            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, 681, 681, startExonPhase, false);
 
             Assert.Equal(599, cdsStart);
         }
@@ -372,7 +323,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             // NM_000682.6
             var codingRegion = new CodingRegion(96780545, 96781888, 97, 1449, 1344);
             const byte startExonPhase = 0;
-            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, _editsNm682, 1010, 1010, startExonPhase, false);
+            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, 1010, 1010, startExonPhase, false);
 
             Assert.Equal(914, cdsStart);
         }
@@ -383,7 +334,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             // NM_033517.1
             var codingRegion = new CodingRegion(51113070, 51169740, 1, 5196, 5157);
             const byte startExonPhase = 0;
-            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, _editsNm33517, 1343, 1343, startExonPhase, false);
+            (int cdsStart, _) = MappedPositionUtilities.GetCdsPositions(codingRegion, 1343, 1343, startExonPhase, false);
 
             Assert.Equal(1343, cdsStart);
         }
@@ -394,7 +345,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(6413107, 6415837, 1, 953, 953);
             const byte startExonPhase = 1;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 29, 28, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 29, 28, startExonPhase, true);
 
             Assert.Equal(30, cdsStart);
             Assert.Equal(29, cdsEnd);
@@ -405,7 +356,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         {
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(null, null, -1, 123, startExonPhase, false);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(null, -1, 123, startExonPhase, false);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -418,7 +369,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(6643999, 6647336, 667, 1674, 1008);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 1675, 1674, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 1675, 1674, startExonPhase, true);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -431,7 +382,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(103113259, 103629803, 161, 10543, 10383);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 161, 160, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 161, 160, startExonPhase, true);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -444,7 +395,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(37480320, 37543667, 556, 3228, 2673);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 3229, 3228, startExonPhase, true);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 3229, 3228, startExonPhase, true);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(-1, cdsEnd);
@@ -457,7 +408,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var codingRegion = new CodingRegion(179308070, 179315170, 617, 942, 326);
             const byte startExonPhase = 0;
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, null, 95, 648, startExonPhase, false);
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, 95, 648, startExonPhase, false);
 
             Assert.Equal(-1, cdsStart);
             Assert.Equal(32, cdsEnd);

@@ -25,15 +25,5 @@ namespace UnitTests.Intervals
             var intervalSearch = new NullIntervalSearch<string>();
             Assert.Null(intervalSearch.GetAllOverlappingValues(1, 2));
         }
-
-        [Fact]
-        public void GetFirstOverlappingInterval_IIntervalSearch()
-        {
-            var intervalSearch = new NullIntervalSearch<string>();
-            var observedResult = intervalSearch.GetFirstOverlappingInterval(1, 2, out Interval<string> observedValue);
-            Assert.False(observedResult);
-            Assert.Equal(IntervalArray<string>.EmptyInterval.Begin, observedValue.Begin);
-            Assert.Equal(IntervalArray<string>.EmptyInterval.End, observedValue.End);
-        }
     }
 }

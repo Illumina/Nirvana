@@ -7,7 +7,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class ExacGeneScoreTests
     {
-        private Stream GetStream()
+        private static Stream GetStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);

@@ -13,7 +13,6 @@ namespace VariantAnnotation.AnnotatedPositions
         public string HgvsgNotation { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; } = new List<IAnnotatedRegulatoryRegion>();
         public IList<IAnnotatedTranscript> Transcripts { get; } = new List<IAnnotatedTranscript>();
-        public IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; } = new List<IAnnotatedSaDataSource>();
         public IList<ISupplementaryAnnotation> SaList { get; } = new List<ISupplementaryAnnotation>();
         public double? PhylopScore { get; set; }
         public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();

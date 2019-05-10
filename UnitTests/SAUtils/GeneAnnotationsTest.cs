@@ -14,26 +14,27 @@ namespace UnitTests.SAUtils
 {
     public sealed class GeneAnnotationsTest
     {
-        private Dictionary<string, List<ISuppGeneItem>> GetGeneAnnotations()
+        private static Dictionary<string, List<ISuppGeneItem>> GetGeneAnnotations()
         {
             var omimJsonSchema = OmimSchema.Get();
-            return new Dictionary<string, List<ISuppGeneItem>>()
+            return new Dictionary<string, List<ISuppGeneItem>>
             {
-                { "gene1", new List<ISuppGeneItem>(){
+                { "gene1", new List<ISuppGeneItem>
+                    {
                     new OmimItem("gene1", "describing gene1", 123,
-                        new List<OmimItem.Phenotype>()
+                        new List<OmimItem.Phenotype>
                         {
-                            new OmimItem.Phenotype(1, "disease 1", OmimItem.Mapping.mapping_of_the_wildtype_gene, OmimItem.Comments.unconfirmed_or_possibly_spurious_mapping, new HashSet<string>(){"autosomal recessive"}, omimJsonSchema.GetSubSchema("phenotypes"))
-                        }, omimJsonSchema), 
+                            new OmimItem.Phenotype(1, "disease 1", OmimItem.Mapping.mapping_of_the_wildtype_gene, OmimItem.Comments.unconfirmed_or_possibly_spurious_mapping, new HashSet<string> {"autosomal recessive"}, omimJsonSchema.GetSubSchema("phenotypes"))
+                        }, omimJsonSchema) 
                     }
                 },
                 {
-                    "gene2", new List<ISuppGeneItem>()
+                    "gene2", new List<ISuppGeneItem>
                     {
                         new OmimItem("gene2", "gene 2 description", 124,
-                            new List<OmimItem.Phenotype>()
+                            new List<OmimItem.Phenotype>
                             {
-                                new OmimItem.Phenotype( 2, "disease 2", OmimItem.Mapping.chromosome_deletion_or_duplication_syndrome, OmimItem.Comments.nondiseases, new HashSet<string>(){"whatever", "never-ever"}, omimJsonSchema.GetSubSchema("phenotypes"))
+                                new OmimItem.Phenotype( 2, "disease 2", OmimItem.Mapping.chromosome_deletion_or_duplication_syndrome, OmimItem.Comments.nondiseases, new HashSet<string> {"whatever", "never-ever"}, omimJsonSchema.GetSubSchema("phenotypes"))
                             }, omimJsonSchema)
 
                     }

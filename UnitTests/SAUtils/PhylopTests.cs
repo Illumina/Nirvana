@@ -18,7 +18,7 @@ namespace UnitTests.SAUtils
         private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
         private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 2);
 
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
+        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
         {
             { "chr1", Chrom1},
             { "chr2", Chrom2}

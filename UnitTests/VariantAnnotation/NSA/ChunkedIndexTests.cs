@@ -23,34 +23,28 @@ namespace UnitTests.VariantAnnotation.NSA
             index.Add(0, 2100, 4000, 112778, 58746);
             index.Add(0, 4100, 7000, 171525, 658794);
 
-            (long start, long end, int chunkCount) = index.GetFileRange(0, 150, 2120);
+            (long start, int chunkCount) = index.GetFileRange(0, 150, 2120);
             Assert.Equal(23457, start);
-            Assert.Equal(171524, end);
             Assert.Equal(2, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 50, 98);
+            (start, chunkCount) = index.GetFileRange(0, 50, 98);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 150, 2010);
+            (start, chunkCount) = index.GetFileRange(0, 150, 2010);
             Assert.Equal(23457, start);
-            Assert.Equal(112777, end);
             Assert.Equal(1, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 2010, 4050);
+            (start, chunkCount) = index.GetFileRange(0, 2010, 4050);
             Assert.Equal(112778, start);
-            Assert.Equal(171524, end);
             Assert.Equal(1, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 4010, 4050);
+            (start, chunkCount) = index.GetFileRange(0, 4010, 4050);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 7010, 7050);
+            (start, chunkCount) = index.GetFileRange(0, 7010, 7050);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
         }
 
@@ -70,67 +64,54 @@ namespace UnitTests.VariantAnnotation.NSA
             index.Add(1, 2100, 4000, 112778, 58746);
             index.Add(1, 4100, 7000, 171525, 658794);
 
-            (long start, long end, int chunkCount) = index.GetFileRange(0, 150, 2120);
+            (long start, int chunkCount) = index.GetFileRange(0, 150, 2120);
             Assert.Equal(23457, start);
-            Assert.Equal(171524, end);
             Assert.Equal(2, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 50, 98);
+            (start, chunkCount) = index.GetFileRange(0, 50, 98);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 150, 2010);
+            (start, chunkCount) = index.GetFileRange(0, 150, 2010);
             Assert.Equal(23457, start);
-            Assert.Equal(112777, end);
             Assert.Equal(1, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 2010, 4050);
+            (start, chunkCount) = index.GetFileRange(0, 2010, 4050);
             Assert.Equal(112778, start);
-            Assert.Equal(171524, end);
             Assert.Equal(1, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 4010, 4050);
+            (start, chunkCount) = index.GetFileRange(0, 4010, 4050);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 7010, 7050);
+            (start, chunkCount) = index.GetFileRange(0, 7010, 7050);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
             //chr2
-            (start, end, chunkCount) =  index.GetFileRange(0, 150, 2120);
+            (start, chunkCount) =  index.GetFileRange(0, 150, 2120);
             Assert.Equal(23457, start);
-            Assert.Equal(171524, end);
             Assert.Equal(2, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 50, 98);
+            (start, chunkCount) = index.GetFileRange(0, 50, 98);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 150, 2010);
+            (start, chunkCount) = index.GetFileRange(0, 150, 2010);
             Assert.Equal(23457, start);
-            Assert.Equal(112777, end);
             Assert.Equal(1, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 2010, 4050);
+            (start, chunkCount) = index.GetFileRange(0, 2010, 4050);
             Assert.Equal(112778, start);
-            Assert.Equal(171524, end);
             Assert.Equal(1, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 4010, 4050);
+            (start, chunkCount) = index.GetFileRange(0, 4010, 4050);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
 
-            (start, end, chunkCount) = index.GetFileRange(0, 7010, 7050);
+            (start, chunkCount) = index.GetFileRange(0, 7010, 7050);
             Assert.Equal(-1, start);
-            Assert.Equal(-1, end);
             Assert.Equal(0, chunkCount);
-
         }
     }
 }

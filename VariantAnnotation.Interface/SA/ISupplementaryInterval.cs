@@ -1,18 +1,5 @@
-﻿using System.IO;
-using Intervals;
-
-namespace VariantAnnotation.Interface.SA
+﻿namespace VariantAnnotation.Interface.SA
 {
-    public interface ISupplementaryInterval : IInterval
-    {
-        string KeyName { get; }
-        string ReferenceName { get; }
-        string JsonString { get; }
-        ReportFor ReportingFor { get; }
-        void Write(BinaryWriter writer);
-        double? GetReciprocalOverlap(IInterval variant);
-    }
-
     public enum ReportFor
     {
         None,

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Intervals;
 using IO;
-using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.ExtractMiniSa
@@ -112,24 +110,24 @@ namespace SAUtils.ExtractMiniSa
             return overlappedRefMinors;
         }
 
-        private List<ISupplementaryInterval> GetIntervals(string description,
-            IEnumerable<Interval<ISupplementaryInterval>> intervals)
-        {
-            var miniIntervals  = new List<ISupplementaryInterval>();
-            var targetInterval = new Interval(_begin, _end);
+        //private List<ISupplementaryInterval> GetIntervals(string description,
+        //    IEnumerable<Interval<ISupplementaryInterval>> intervals)
+        //{
+        //    var miniIntervals  = new List<ISupplementaryInterval>();
+        //    var targetInterval = new Interval(_begin, _end);
 
-            var allIntervals = intervals;
+        //    var allIntervals = intervals;
 
-            if (allIntervals != null)
-            {
-                foreach (var interval in allIntervals)
-                {
-                    if (targetInterval.Overlaps(interval.Begin, interval.End)) miniIntervals.Add(interval.Value);
-                }
-            }
+        //    if (allIntervals != null)
+        //    {
+        //        foreach (var interval in allIntervals)
+        //        {
+        //            if (targetInterval.Overlaps(interval.Begin, interval.End)) miniIntervals.Add(interval.Value);
+        //        }
+        //    }
 
-            Console.WriteLine($"Found {miniIntervals.Count} supplementary intervals for {description}.");
-            return miniIntervals;
-        }
+        //    Console.WriteLine($"Found {miniIntervals.Count} supplementary intervals for {description}.");
+        //    return miniIntervals;
+        //}
     }
 }

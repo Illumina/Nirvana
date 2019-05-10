@@ -24,8 +24,7 @@ namespace Genome
         public int CompareTo(IChromosome other)
         {
             if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
-            return Index.CompareTo(other.Index);
+            return ReferenceEquals(null, other) ? 1 : Index.CompareTo(other.Index);
         }
     }
 }

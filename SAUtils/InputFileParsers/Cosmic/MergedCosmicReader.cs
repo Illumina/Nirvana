@@ -67,7 +67,8 @@ namespace SAUtils.InputFileParsers.Cosmic
                 while ((line = _vcfFileReader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (line.IsWhiteSpace()) continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
                     var cosmicItems = ExtractCosmicItems(line);

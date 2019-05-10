@@ -72,17 +72,7 @@ namespace IO
 			throw new FormatException("Unable to read the 7-bit encoded long");
 		}
 
-		public T[] ReadOptArray<T>(Func<T> readOptFunc)
-		{
-			int count = ReadOptInt32();
-			if (count == 0) return null;
-
-			var values = new T[count];
-			for (var i = 0; i < count; i++) values[i] = readOptFunc();
-			return values;
-		}
-
-		/// <summary>
+        /// <summary>
 		/// returns an ASCII string from the binary reader
 		/// </summary>
 		public string ReadAsciiString()

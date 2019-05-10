@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Text;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;

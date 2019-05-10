@@ -51,7 +51,7 @@ namespace VariantAnnotation.Providers
                     {
                         Console.WriteLine(nsiReader.Version + "\tAssembly:" + nsiReader.Assembly);
                     }
-                throw new UserErrorException("Multilpe genome assemblies detected in Supplementary annotation directory");
+                throw new UserErrorException("Multiple genome assemblies detected in Supplementary annotation directory");
             }
 
             Assembly = distinctAssemblies[0];
@@ -66,8 +66,8 @@ namespace VariantAnnotation.Providers
 
         private void GetStructuralVariantAnnotations(IAnnotatedPosition annotatedPosition)
         {
-            var needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
-            var needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
+            bool needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
+            bool needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
 
             foreach (INsiReader nsiReader in _nsiReaders)
             {
@@ -88,7 +88,7 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
-                AddSmallAnnotations(annotatedVariant);              
+                AddSmallAnnotations(annotatedVariant);
             }
         }
 
@@ -97,7 +97,7 @@ namespace VariantAnnotation.Providers
             foreach (INsaReader nsaReader in _nsaReaders)
             {
                 var variant = annotatedVariant.Variant;
-                var annotations = nsaReader.GetAnnotation(variant.Chromosome, variant.Start);
+                var annotations = nsaReader.GetAnnotation(variant.Start);
                 if (annotations == null) continue;
 
                 if (nsaReader.IsPositional)
@@ -116,7 +116,7 @@ namespace VariantAnnotation.Providers
             INsaReader nsaReader)
         {
             //e.g. ancestral allele, global minor allele
-            var jsonString = annotations.First().annotation;
+            string jsonString = annotations.First().annotation;
             annotatedVariant.SaList.Add(new SupplementaryAnnotation(nsaReader.JsonKey, nsaReader.IsArray,
                 nsaReader.IsPositional, jsonString, null));
         }
@@ -174,9 +174,7 @@ namespace VariantAnnotation.Providers
             }
 
             var totalTime = benchmark.GetElapsedTime();
-            //var rate = totalBytes * 1.0 / (totalTime.TotalSeconds * 1_000_000);// MB/sec
-            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");//. Data rate {rate:#.##} MB/sec");
-            //Console.WriteLine($"No of http stream sources created {HttpStreamSource.Count}");
+            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");
         }
     }
 }

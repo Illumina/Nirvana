@@ -27,7 +27,7 @@ namespace UnitTests.IO
             }
 
             byte[] expectedMd5 = StringToByteArray("9e107d9d372bb6826bd81d3542a419d6");
-            var expectedLength = 43;
+            const int expectedLength = 43;
 
             Assert.Equal(expectedMd5, observed.MD5);
             Assert.Equal(expectedLength, observed.Length);

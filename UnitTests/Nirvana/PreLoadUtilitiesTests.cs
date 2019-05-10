@@ -3,23 +3,22 @@ using System.IO;
 using Genome;
 using Nirvana;
 using UnitTests.SAUtils.InputFileParsers;
-using UnitTests.TestDataStructures;
 using Xunit;
 
 namespace UnitTests.Nirvana
 {
-    public class PreLoadUtilitiesTests
+    public sealed class PreLoadUtilitiesTests
     {
         private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
         private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 2);
 
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
+        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
         {
             { "1", Chrom1},
             { "2", Chrom2}
         };
 
-        private Stream GetVcfStream()
+        private static Stream GetVcfStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -53,7 +52,7 @@ namespace UnitTests.Nirvana
         [Fact]
         public void GetPositions_inRange()
         {
-            var annotationRange = new AnnotationRange()
+            var annotationRange = new AnnotationRange
             {
                 chromosome = "1",
                 start = 10019,

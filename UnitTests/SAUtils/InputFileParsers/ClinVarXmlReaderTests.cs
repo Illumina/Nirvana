@@ -14,20 +14,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class ClinVarXmlReaderTests
     {
-        private readonly Dictionary<string, IChromosome> _refNameToChromosome;
-
-        public ClinVarXmlReaderTests()
-        {
-            _refNameToChromosome = new Dictionary<string, IChromosome>
-            {
-                {"17", new Chromosome("chr17", "17", 16)},
-                {"1", new Chromosome("chr1", "1", 0)},
-                {"2", new Chromosome("chr2", "2", 1)},
-                {"22", new Chromosome("chr22", "2", 21)},
-                {"10", new Chromosome("chr10", "10", 9)}
-            };
-        }
-
         private static ISequenceProvider GetSequenceProvider(GenomeAssembly assembly, IChromosome chromosome, int start, string refSequence)
         {
             var seqProvider = new Mock<ISequenceProvider>();

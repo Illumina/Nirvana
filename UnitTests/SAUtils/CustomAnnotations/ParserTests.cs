@@ -6,7 +6,6 @@ using Genome;
 using Moq;
 using SAUtils.Custom;
 using SAUtils.Schema;
-using UnitTests.Intervals;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
 using Xunit;
@@ -15,7 +14,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
 {
     public sealed class ParserTests
     {
-        private static readonly Dictionary<string, IChromosome> RefChromDict = new Dictionary<string, IChromosome>()
+        private static readonly Dictionary<string, IChromosome> RefChromDict = new Dictionary<string, IChromosome>
         {
             {"chr1", new Chromosome("chr1", "1", 0) },
             {"chr2", new Chromosome("chr2", "2", 1) }

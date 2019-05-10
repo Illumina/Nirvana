@@ -10,8 +10,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         string HgvsgNotation { get; set; }
         IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get;  }
 	    IList<IAnnotatedTranscript> Transcripts { get; }
-	    IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; }
-	    IList<ISupplementaryAnnotation> SaList { get; }
+        IList<ISupplementaryAnnotation> SaList { get; }
 		double? PhylopScore { get; set; }
 
 	    IList<IPluginData> PluginDataSet { get; }

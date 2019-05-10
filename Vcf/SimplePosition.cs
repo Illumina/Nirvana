@@ -27,7 +27,6 @@ namespace Vcf
 
         public static SimplePosition GetSimplePosition(string[] vcfFields, IVcfFilter vcfFilter, IDictionary<string, IChromosome> refNameToChromosome, bool isRecomposed = false)
         {
-
             var simplePosition = new SimplePosition(
                 ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]),
                 int.Parse(vcfFields[VcfCommon.PosIndex]),
@@ -46,7 +45,5 @@ namespace Vcf
         public static SimplePosition GetSimplePosition(string vcfLine, IVcfFilter vcfFilter,
             IDictionary<string, IChromosome> refNameToChromosome) => vcfLine == null ? null :
             GetSimplePosition(vcfLine.OptimizedSplit('\t'), vcfFilter, refNameToChromosome);
-
-        public static SimplePosition GetSimplePosition(string vcfLine, IDictionary<string, IChromosome> refNameToChromosome) => GetSimplePosition(vcfLine, new NullVcfFilter(), refNameToChromosome);
     }
 }

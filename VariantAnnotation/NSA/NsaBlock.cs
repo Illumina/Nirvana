@@ -27,7 +27,7 @@ namespace VariantAnnotation.NSA
             _compressedBlock = new byte[compressedBlockSize];
         }
 
-        public int Read(ExtendedBinaryReader reader)
+        public void Read(ExtendedBinaryReader reader)
         {
             _compressedLength = reader.ReadOptInt32();
             _firstPosition = reader.ReadOptInt32();
@@ -37,8 +37,6 @@ namespace VariantAnnotation.NSA
 
             _uncompressedLength = _compressionAlgorithm.Decompress(_compressedBlock, _compressedLength,
                 _uncompressedBlock, _uncompressedBlock.Length);
-
-            return _uncompressedLength;
         }
 
 

@@ -12,25 +12,6 @@ namespace UnitTests.Compression.Utilities
         private const string ExpectedString = "charlie";
 
         [Fact]
-        public void GetAppropriateBinaryReader_Handle_BlockGZipFile()
-        {
-            string randomPath = RandomPath.GetRandomPath();
-
-            using (var writer = GZipUtilities.GetBinaryWriter(randomPath))
-            {
-                writer.Write(ExpectedString);
-            }
-
-            string observedString;
-            using (var reader = GZipUtilities.GetAppropriateBinaryReader(randomPath))
-            {
-                observedString = reader.ReadString();
-            }
-
-            Assert.Equal(ExpectedString, observedString);
-        }
-
-        [Fact]
         public void GetAppropriateReadStream_Handle_TextFile()
         {
             string randomPath = RandomPath.GetRandomPath();

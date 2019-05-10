@@ -84,7 +84,7 @@ namespace VariantAnnotation.NSA
             return jsonStrings;
         }
 
-        private string AddOverlapToAnnotation(string jsonString, double? reciprocalOverlap, double? annotationOverlap)
+        private static string AddOverlapToAnnotation(string jsonString, double? reciprocalOverlap, double? annotationOverlap)
         {
             if (reciprocalOverlap != null)
                 jsonString+=JsonObject.Comma + "\"reciprocalOverlap\":" + reciprocalOverlap.Value.ToString("0.#####");

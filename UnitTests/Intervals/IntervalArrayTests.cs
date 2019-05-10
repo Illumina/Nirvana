@@ -33,20 +33,6 @@ namespace UnitTests.Intervals
         }
 
         [Theory]
-        [InlineData(6, 9, true, "mary")]
-        [InlineData(8, 10, true, "jane")]
-        [InlineData(11, 50, true, "bob")]
-        [InlineData(21, 23, false, null)]
-        public void GetFirstOverlappingInterval(int begin, int end, bool expectedResult, string expectedValue)
-        {
-            var observedResult =
-                _intervalArray.GetFirstOverlappingInterval(begin, end, out Interval<string> observedValue);
-
-            Assert.Equal(expectedResult, observedResult);
-            if (expectedResult) Assert.Equal(expectedValue, observedValue.Value);
-        }
-
-        [Theory]
         [InlineData(6, 9, new[] { "mary", "jane" })]
         [InlineData(8, 10, new[] { "jane", "bob" })]
         [InlineData(11, 50, new[] { "bob" })]

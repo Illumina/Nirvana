@@ -21,8 +21,6 @@ namespace VariantAnnotation.Interface
         List<IDataSourceVersion> DataSourceVersions { get; }
         string VepDataVersion { get; }
         string AnnotatorVersionTag { get; set; }
-        bool OutputVcf { get; }
-        bool OutputGvcf { get; }
         bool ForceMitochondrialAnnotation { get; }
         long InputStartVirtualPosition { get; }
         void SingleVariantPreLoad(IPosition position);

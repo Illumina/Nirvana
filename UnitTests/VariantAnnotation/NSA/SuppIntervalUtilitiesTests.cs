@@ -5,7 +5,7 @@ using Xunit;
 
 namespace UnitTests.VariantAnnotation.NSA
 {
-    public class SuppIntervalUtilitiesTests
+    public sealed class SuppIntervalUtilitiesTests
     {
         private static readonly Chromosome Chr1 = new Chromosome("chr1", "1", 0);
         private static readonly Chromosome Chr2 = new Chromosome("chr2", "2", 1);

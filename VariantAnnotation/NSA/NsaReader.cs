@@ -61,7 +61,7 @@ namespace VariantAnnotation.NSA
 
             _annotations = new AnnotationItem[positions.Count];
             _annotationsCount = 0;
-            (long start, _, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
+            (long start, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
             if (start == -1) return;
             _reader.BaseStream.Position = start;
 
@@ -117,7 +117,7 @@ namespace VariantAnnotation.NSA
             }
         }
 
-        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position)
+        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position)
         {
             if (_annotations == null) return null;
             var index = BinarySearch(position);

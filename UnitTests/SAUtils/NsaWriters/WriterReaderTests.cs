@@ -15,7 +15,6 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.NsaWriters
@@ -78,7 +77,7 @@ namespace UnitTests.SAUtils.NsaWriters
             var sequence = new SimpleSequence(new string('A', 99)+"TAGTCGGTTAA" + new string('A', 89)+"GCCCAT");
             
             //return seqProvider.Object;
-            var refNameToChrom = new Dictionary<string, IChromosome>()
+            var refNameToChrom = new Dictionary<string, IChromosome>
             {
                 { "1", _chrom1},
                 {"2", _chrom2 }
@@ -111,19 +110,19 @@ namespace UnitTests.SAUtils.NsaWriters
                     Assert.Equal(GenomeAssembly.GRCh37, saReader.Assembly);
                     Assert.Equal(version.ToString(), saReader.Version.ToString());
                     saReader.PreLoad(_chrom1, new List<int> { 100, 101, 106 });
-                    var annotations = saReader.GetAnnotation(_chrom1, 100).ToList();
+                    var annotations = saReader.GetAnnotation(100).ToList();
 
                     Assert.Equal("T", annotations[0].refAllele);
                     Assert.Equal("A", annotations[0].altAllele);
                     Assert.Equal("\"id\":\"RCV0001\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"A\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[0].annotation);
 
-                    annotations = saReader.GetAnnotation(_chrom1, 101).ToList();
+                    annotations = saReader.GetAnnotation(101).ToList();
                     Assert.Equal("A", annotations[0].refAllele);
                     Assert.Equal("", annotations[0].altAllele);
                     Assert.Equal("\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"A\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[0].annotation);
 
                     saReader.PreLoad(_chrom2, new List<int> { 200, 205 });
-                    var (refAllele, altAllele, annotation) = saReader.GetAnnotation(_chrom2, 200).First();
+                    var (refAllele, altAllele, annotation) = saReader.GetAnnotation(200).First();
                     Assert.Equal("G", refAllele);
                     Assert.Equal("A", altAllele);
                     Assert.NotNull(annotation);
@@ -145,7 +144,7 @@ namespace UnitTests.SAUtils.NsaWriters
             return items;
         }
 
-        private ISequenceProvider GetAllASequenceProvider()
+        private static ISequenceProvider GetAllASequenceProvider()
         {
             var seqProvider = new Mock<ISequenceProvider>();
             seqProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
@@ -177,16 +176,16 @@ namespace UnitTests.SAUtils.NsaWriters
                     var saReader = new NsaReader(extReader, indexStream, 1024);
                     saReader.PreLoad(_chrom1, GetPositions(50, 1000));
 
-                    Assert.Null(saReader.GetAnnotation(_chrom1, 90));//before any SA existed
-                    Assert.NotNull(saReader.GetAnnotation(_chrom1, 100));//first entry of first block
-                    Assert.NotNull(saReader.GetAnnotation(_chrom1, 480));//last query of first block
-                    Assert.Null(saReader.GetAnnotation(_chrom1, 488));//between first and second block
-                    Assert.NotNull(saReader.GetAnnotation(_chrom1, 490));//first entry of second block
+                    Assert.Null(saReader.GetAnnotation(90));//before any SA existed
+                    Assert.NotNull(saReader.GetAnnotation(100));//first entry of first block
+                    Assert.NotNull(saReader.GetAnnotation(480));//last query of first block
+                    Assert.Null(saReader.GetAnnotation(488));//between first and second block
+                    Assert.NotNull(saReader.GetAnnotation(490));//first entry of second block
                 }
             }
         }
 
-        private List<int> GetPositions(int start, int count)
+        private static List<int> GetPositions(int start, int count)
         {
             var positions = new List<int>();
             for (var i = 0; i < count; i++, start+=2)

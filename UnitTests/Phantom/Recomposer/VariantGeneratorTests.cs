@@ -5,9 +5,9 @@ using Moq;
 using Phantom.PositionCollections;
 using Phantom.Recomposer;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using Vcf;
 using Xunit;
 
 namespace UnitTests.Phantom.Recomposer
@@ -54,9 +54,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:789	0|2:456", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS	1|1:301	1|2:789	1|2:456", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:PS	.	1|0:789	0/1:.", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:789	0|2:456", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS	1|1:301	1|2:789	1|2:456", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:PS	.	1|0:789	0/1:.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -76,8 +76,8 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	1	.	C	A	.	PASS	.	GT:PS	1|0:1584593	1|1:.	0|1:.", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	2	.	A	C	.	PASS	.	GT:PS	0|1:1584593	0/0:.	0/0:.", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	1	.	C	A	.	PASS	.	GT:PS	1|0:1584593	1|1:.	0|1:.", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	C	.	PASS	.	GT:PS	0|1:1584593	0/0:.	0/0:.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 3, 4 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -95,9 +95,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/0", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	0/0", sequenceProvider.RefNameToChromosome);
 
             var functionBlockRanges = new List<int> { 4, 6, 6 };
 
@@ -117,9 +117,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/0", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	0/0", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	0/0", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 6 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -138,9 +138,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	.	.	GT:PS	1|1:301	1|2:.	1|2:456", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	FailedForSomeReason	.	GT:PS	.	1|0:.	0/1:456", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	.	.	GT:PS	1|1:301	1|2:.	1|2:456", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	FailedForSomeReason	.	GT:PS	.	1|0:.	0/1:456", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -160,9 +160,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	FailedForSomeReason	.	GT	0|0	0/1	0|0", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	1|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A	.	FailedForSomeReason	.	GT	0|0	0/1	0|0", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	1|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 6, 8, 10 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -181,9 +181,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	FailedForSomeReason	.	GT	0|0	0|1", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A	.	FailedForSomeReason	.	GT	0|0	0|1", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 6, 8, 10 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -202,9 +202,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	45	PASS	.	GT:PS	1|1:301	1|2:.	1|2:456", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	30.1	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS	0|1:123	2/2:.	0|2:456", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	45	PASS	.	GT:PS	1|1:301	1|2:.	1|2:456", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	30.1	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -224,9 +224,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ	0|1:123:.	2/2:.:14.2	0|2:456:.", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ	1|1:301:.	1|2:.:18	1|2:456:15.6", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ	0|1:123:.	2/2:.:14.2	0|2:456:.", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ	1|1:301:.	1|2:.:18	1|2:456:15.6", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -246,9 +246,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ	0|1:123	2/2:.:14.2	./.", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ	./.	1|2:.:18	1|2:456:15.6", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	./.	1|0	./.", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ	0|1:123	2/2:.:14.2	./.", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ	./.	1|2:.:18	1|2:456:15.6", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	./.	1|0	./.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -267,9 +267,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:GQ:PS	0|1:.:123	2/2	1|1:17:456", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:GQ:PS	./.	1|2	1|2:15.6:456", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:GQ:PS	./.	1|0	1|1:13:456", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:GQ:PS	0|1:.:123	2/2	1|1:17:456", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:GQ:PS	./.	1|2	1|2:15.6:456", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:GQ:PS	./.	1|0	1|1:13:456", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -288,10 +288,10 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAACT"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0|0	0|1	0|0", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	1|1	1|1	1|1", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	1|1	1|1	1|1	1|1", sequenceProvider.RefNameToChromosome);
-            var position4 = SimplePosition.GetSimplePosition("chr1	8	.	A	G	.	PASS	.	GT	0|1	0|1	0|0	0|0", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	0|1	0|0	0|1	0|0", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A	.	PASS	.	GT	1|1	1|1	1|1	1|1", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	1|1	1|1	1|1	1|1", sequenceProvider.RefNameToChromosome);
+            var position4 = AnnotationUtilities.GetSimplePosition("chr1	8	.	A	G	.	PASS	.	GT	0|1	0|1	0|0	0|0", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8, 10 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -310,9 +310,9 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ:GQX	0|1:123:.:12.1	2/2:.:14.2:.	0|2:456:.:10.1", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ:GQX	1|1:301:.	1|2:.:18:.	1|2:456:15.6:.", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:GQX	.	1|0:.	0/1:.", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ:GQX	0|1:123:.:12.1	2/2:.:14.2:.	0|2:456:.:10.1", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ:GQX	1|1:301:.	1|2:.:18:.	1|2:456:15.6:.", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:GQX	.	1|0:.	0/1:.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
             var recomposer = new VariantGenerator(sequenceProvider);
@@ -332,11 +332,11 @@ namespace UnitTests.Phantom.Recomposer
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
-            var position1 = SimplePosition.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
-            var position2 = SimplePosition.GetSimplePosition("chr1	3	.	G	A,G	45	PASS	.	GT:PS	1|1:2	1|2:2	1|2:2", sequenceProvider.RefNameToChromosome);
-            var position3 = SimplePosition.GetSimplePosition("chr1	4	.	C	A	45	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
-            var position4 = SimplePosition.GetSimplePosition("chr1	5	.	T	A,G	45	PASS	.	GT:PS	1|1:4	1|2:2	1|2:4", sequenceProvider.RefNameToChromosome);
-            var position5 = SimplePosition.GetSimplePosition("chr1	6	.	G	C	30	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
+            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("chr1	3	.	G	A,G	45	PASS	.	GT:PS	1|1:2	1|2:2	1|2:2", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A	45	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
+            var position4 = AnnotationUtilities.GetSimplePosition("chr1	5	.	T	A,G	45	PASS	.	GT:PS	1|1:4	1|2:2	1|2:4", sequenceProvider.RefNameToChromosome);
+            var position5 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	30	PASS	.	GT	1/1	1/1	1/1", sequenceProvider.RefNameToChromosome);
 
             var functionBlockRanges = new List<int> { 4, 5, 6, 7, 8 };
 

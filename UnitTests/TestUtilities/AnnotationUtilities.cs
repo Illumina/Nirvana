@@ -37,9 +37,13 @@ namespace UnitTests.TestUtilities
 
 	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, VariantFactory variantFactory, IDictionary<string, IChromosome> refNameToChromosome)
 	    {
-	        var simplePosition = SimplePosition.GetSimplePosition(vcfLine, refNameToChromosome);
+	        var simplePosition = GetSimplePosition(vcfLine, refNameToChromosome);
 	        return Position.ToPosition(simplePosition, refMinorProvider, variantFactory);
 	    }
+
+        internal static SimplePosition GetSimplePosition(string vcfLine,
+            IDictionary<string, IChromosome> refNameToChromosome) =>
+            SimplePosition.GetSimplePosition(vcfLine, new NullVcfFilter(), refNameToChromosome);
 
         private static (Annotator Annotator, ISequenceProvider SequenceProvider) GetAnnotatorAndSequenceProvider(string cacheFilePrefix, List<string> saPaths)
         {

@@ -120,7 +120,7 @@ namespace SAUtils.Custom
 
             for (int i = _numRequiredColumns; i < _tags.Length; i++)
             {
-                if (_tags[i].IsWhiteSpace())
+                if (string.IsNullOrWhiteSpace(_tags[i]))
                     throw new UserErrorException($"Please provide a name for column {i + 1} at the third row.");
 
                 JsonKeys.Add(_tags[i]);
@@ -242,7 +242,7 @@ namespace SAUtils.Custom
                 string line;
                 while ((line = _reader.ReadLine()) != null)
                 {
-                    if (line.IsWhiteSpace()) continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
                     var item = ExtractItems(line);
                     if (item == null) continue;
                     yield return item;

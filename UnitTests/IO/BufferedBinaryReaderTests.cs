@@ -135,14 +135,6 @@ namespace UnitTests.IO
         }
 
         [Fact]
-        public void ReadOptArray()
-        {
-            var expectedValues = new[] { "Huey", "Duey", "Louie" };
-            var observedValues = GetObservedValue(writer => writer.WriteOptArray(expectedValues, writer.WriteOptAscii), reader => reader.ReadOptArray(reader.ReadAsciiString));
-            Assert.Equal(expectedValues, observedValues);
-        }
-
-        [Fact]
         public void Reset()
         {
             const string s = "The quick brown fox jumped over the lazy dog.";
