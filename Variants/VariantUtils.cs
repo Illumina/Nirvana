@@ -15,19 +15,21 @@ namespace Variants
         public static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele, string altAllele, ISequence refSequence, int maxUpstreamLength = MaxUpstreamLength)
         {
             if (IsStructuralVariant(altAllele)) return (start, refAllele, altAllele);
+            //we have to check this before the trimming since it depends on the padding base
+            bool isLeftShiftPossible = IsLeftShiftPossible(refAllele, altAllele);
 
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
 
             // alignment only makes sense for insertion and deletion
             if (!(altAllele.Length == 0 || refAllele.Length == 0)) return (start, refAllele, altAllele);
+            if(! isLeftShiftPossible) return (start, refAllele, altAllele);
 
-            if (refSequence == null)
-                return (start, refAllele, altAllele);
+            //base checking to make sure we can safely left shift
+            if (IfRefBaseMismatched(start, refAllele, refSequence)) return (start, refAllele, altAllele);
 
             //adjust the max upstream length when you are near the beginning of the chrom
             if (maxUpstreamLength >= start) maxUpstreamLength = start - 1;
-            var upstreamSeq = start >= maxUpstreamLength? refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength):
-                refSequence.Substring(0, start);
+            var upstreamSeq = refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength);
             
             // compressed seq is 0 based
             var combinedSeq = upstreamSeq;
@@ -57,6 +59,22 @@ namespace Variants
             }
             var newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
             return (start, "", newAltAllele);
+        }
+
+        private static bool IfRefBaseMismatched(int start, string refAllele, ISequence refSequence)
+        {
+            return refSequence != null && !string.IsNullOrEmpty(refAllele) && refAllele != refSequence.Substring(start - 1, refAllele.Length);
+        }
+
+        // we have a padding base we can check if its possible to left shift at all
+        public static bool IsLeftShiftPossible(string refAllele, string altAllele)
+        {
+            if (refAllele == altAllele) return false;
+            if (string.IsNullOrEmpty(refAllele) || string.IsNullOrEmpty(altAllele)) return true;
+            if (refAllele.Length == 1) return refAllele[0] == altAllele[altAllele.Length - 1];
+            if (altAllele.Length == 1) return altAllele[0] == refAllele[refAllele.Length - 1];
+
+            return true;
         }
 
         private static bool IsStructuralVariant(string altAllele)
