@@ -1,6 +1,7 @@
 ﻿using Genome;
 using Intervals;
 using Moq;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.TranscriptAnnotation;
 using Variants;
@@ -87,15 +88,15 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             variant.SetupGet(x => x.Start).Returns(123456);
             variant.SetupGet(x => x.End).Returns(123456);
 
+            transcript1.SetupGet(x => x.Id).Returns(CompactId.Convert("NR_046018.2"));
             transcript1.SetupGet(x => x.Start).Returns(108455);
             transcript1.SetupGet(x => x.End).Returns(118455);
-
             transcript1.SetupGet(x => x.Gene.Start).Returns(108455);
             transcript1.SetupGet(x => x.Gene.End).Returns(118455);
 
+            transcript2.SetupGet(x => x.Id).Returns(CompactId.Convert("NR_106918.1"));
             transcript2.SetupGet(x => x.Start).Returns(128460);
             transcript2.SetupGet(x => x.End).Returns(129489);
-
             transcript2.SetupGet(x => x.Gene.Start).Returns(128460);
             transcript2.SetupGet(x => x.Gene.End).Returns(129489);
 

@@ -302,28 +302,6 @@ namespace UnitTests.Phantom.Recomposer
         }
 
         [Fact]
-        public void VariantGenerator_GqxOverrideGqWhenAvailable()
-        {
-            var mockSequenceProvider = new Mock<ISequenceProvider>();
-            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
-            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
-            var sequenceProvider = mockSequenceProvider.Object;
-
-            var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T,G	.	PASS	.	GT:PS:GQ:GQX	0|1:123:.:12.1	2/2:.:14.2:.	0|2:456:.:10.1", sequenceProvider.RefNameToChromosome);
-            var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	A,G	.	PASS	.	GT:PS:GQ:GQX	1|1:301:.	1|2:.:18:.	1|2:456:15.6:.", sequenceProvider.RefNameToChromosome);
-            var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:GQX	.	1|0:.	0/1:.", sequenceProvider.RefNameToChromosome);
-            var functionBlockRanges = new List<int> { 4, 6, 8 };
-
-            var recomposer = new VariantGenerator(sequenceProvider);
-            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
-
-            Assert.Equal(2, recomposedPositions.Count);
-            Assert.Equal("chr1	2	.	AGC	AGA,GGG,TGA	.	PASS	RECOMPOSED	GT:GQ:PS	1|3:12.1:123	.	1|2:10.1:456", string.Join("\t", recomposedPositions[0].VcfFields));
-            Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:GQ	.	1|2:14.2	.", string.Join("\t", recomposedPositions[1].VcfFields));
-        }
-
-        [Fact]
         public void VariantGenerator_HomozygousSitesAndPhasedSites_Recomposed()
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();

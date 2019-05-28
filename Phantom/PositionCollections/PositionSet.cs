@@ -41,12 +41,10 @@ namespace Phantom.PositionCollections
             positionSet._allelesWithUnsupportedTypes = GetAllelesWithUnsupportedTypes(positionSet);
             positionSet._sampleInfo = GetSampleInfo(positionSet);
 
-            var phaseSetAndGqIndexes = positionSet.GetSampleTagIndexes(new[] { "GT", "PS", "GQ", "GQX" });
+            var phaseSetAndGqIndexes = positionSet.GetSampleTagIndexes(new[] { "GT", "PS", "GQ" });
             positionSet.GtInfo = TagInfo<Genotype>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[0], ExtractSampleValue, Genotype.GetGenotype);
             positionSet.PsInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[1], ExtractSampleValue, x => x);
             positionSet.GqInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[2], ExtractSampleValue, x => x);
-            var gqxInfo = TagInfo<string>.GetTagInfo(positionSet._sampleInfo, phaseSetAndGqIndexes[3], ExtractSampleValue, x => x);
-            positionSet.GqInfo.Update(gqxInfo);
 
             var genotypeToSampleIndex = GetGenotypeToSampleIndex(positionSet);
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSampleIndex, positionSet._allelesWithUnsupportedTypes, positionSet.AlleleSet.Starts, positionSet.FunctionBlockRanges, out var alleleBlockGraph);

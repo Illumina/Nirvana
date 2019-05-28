@@ -8,6 +8,7 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Variants;
+using Vcf.Sample;
 
 namespace Vcf.VariantCreator
 {
@@ -16,6 +17,8 @@ namespace Vcf.VariantCreator
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly ISequenceProvider _sequenceProvider;
         private const string StrPrefix = "<STR";
+
+        public readonly FormatIndices FormatIndices = new FormatIndices();
 
         public VariantFactory(ISequenceProvider sequenceProvider)
         {
@@ -92,7 +95,7 @@ namespace Vcf.VariantCreator
                 case VariantCategory.SV:
                     var svBreakEnds = infoData.SvType == VariantType.translocation_breakend ?
                         GetTranslocationBreakends(chromosome, refAllele, altAllele, start)
-                        : GetSvBreakEnds(chromosome.EnsemblName, start, infoData.SvType, infoData.End, infoData.IsInv3, infoData.IsInv5);
+                        : GetSvBreakEnds(chromosome.EnsemblName, start, infoData.SvType, infoData.End);
                     return StructuralVariantCreator.Create(chromosome, start, refAllele, altAllele, svBreakEnds, infoData);
                 case VariantCategory.CNV:
                     return CnvCreator.Create(chromosome, start, refAllele, altAllele, infoData);
@@ -105,11 +108,11 @@ namespace Vcf.VariantCreator
 
         internal IBreakEnd[] GetTranslocationBreakends(IChromosome chromosome1, string refAllele, string altAllele, int position1)
         {
-            var breakendInfo = ParseBreakendAltAllele(refAllele, altAllele);
-            return new IBreakEnd[] { new BreakEnd(chromosome1, breakendInfo.Chromosome2, position1, breakendInfo.Position2, breakendInfo.IsSuffix1, breakendInfo.IsSuffix2) };
+            (IChromosome chromosome2, int position2, bool isSuffix1, bool isSuffix2) = ParseBreakendAltAllele(refAllele, altAllele);
+            return new IBreakEnd[] { new BreakEnd(chromosome1, chromosome2, position1, position2, isSuffix1, isSuffix2) };
         }
 
-        internal IBreakEnd[] GetSvBreakEnds(string ensemblName, int start, VariantType svType, int? svEnd, bool isInv3, bool isInv5)
+        internal IBreakEnd[] GetSvBreakEnds(string ensemblName, int start, VariantType svType, int? svEnd)
         {
             if (svEnd == null) return null;
 
@@ -132,19 +135,6 @@ namespace Vcf.VariantCreator
                     break;
 
                 case VariantType.inversion:
-                    if (isInv3)
-                    {
-                        breakEnds[0] = new BreakEnd(chromosome, chromosome, start, end, false, false);
-                        breakEnds[1] = new BreakEnd(chromosome, chromosome, end, start, false, false);
-                        break;
-                    }
-                    if (isInv5)
-                    {
-                        breakEnds[0] = new BreakEnd(chromosome, chromosome, start + 1, end + 1, true, true);
-                        breakEnds[1] = new BreakEnd(chromosome, chromosome, end + 1, start + 1, true, true);
-                        break;
-                    }
-
                     breakEnds[0] = new BreakEnd(chromosome, chromosome, start, end, false, false);
                     breakEnds[1] = new BreakEnd(chromosome, chromosome, end + 1, start + 1, true, true);
                     break;

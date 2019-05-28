@@ -61,11 +61,11 @@ namespace Vcf
             
             if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
 
-            var infoData   = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
-            int end        = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
-            var quality    = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
-            var filters    = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
-            var samples    = new SampleFieldExtractor(vcfFields, infoData.Depth).ExtractSamples();
+            var infoData = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            int end      = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
+            var quality  = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            var filters  = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
+            var samples  = vcfFields.ToSamples(variantFactory.FormatIndices, altAlleles.Length, vcfFields[VcfCommon.AltIndex].Contains("STR"));
 
             var variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,

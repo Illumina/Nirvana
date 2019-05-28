@@ -5,161 +5,99 @@ namespace Vcf.Sample
     public sealed class FormatIndices
     {
         // ReSharper disable InconsistentNaming
-        internal int? AU;
-        internal int? CU;
-        internal int? GU;
-        internal int? TU;
-        internal int? TAR;
-        internal int? TIR;
-        internal int? FT;
-        internal int? GT;
-        internal int? GQ;
-        internal int? GQX;
-        internal int? DP;
-        internal int? DPI;
         internal int? AD;
-        internal int? VF;
-        internal int? MCC;
-        internal int? CN;
-        internal int? CI;
-        internal int? NR;
-        internal int? NV;
-        internal int? DQ;
-        internal int? PR;
-        internal int? SR;
-
-        // SMN1
-        internal int? MAD;
-        internal int? SCH;
-        internal int? PLG;
-        internal int? PCN;
-        internal int? DCS;
-        internal int? DID;
-        internal int? DST;
-        internal int? PCH;
-        internal int? CHC;        
-
-        // PEPE
         internal int? AQ;
+        internal int? CN;
+        internal int? DN;
+        internal int? DP;
+        internal int? DST;
+        internal int? FT;
+        internal int? GQ;
+        internal int? GT;
         internal int? LQ;
+        internal int? PR;
+        internal int? REPCN;
+        internal int? SR;
+        internal int? VF;
         // ReSharper restore InconsistentNaming
 
-        internal static FormatIndices Extract(string formatColumn)
+        internal int NumColumns;
+
+        private void Clear()
         {
-            // sanity check: make sure we have a format column
-            if (formatColumn == null) return null;
+            AD    = null;
+            AQ    = null;
+            CN    = null;
+            DN    = null;
+            DP    = null;
+            DST   = null;
+            FT    = null;
+            GQ    = null;
+            GT    = null;
+            LQ    = null;
+            PR    = null;
+            REPCN = null;
+            SR    = null;
+            VF    = null;
+        }
 
-            var formatIndices = new FormatIndices();
-            var formatCols    = formatColumn.OptimizedSplit(':');
+        internal void Set(string formatColumn)
+        {
+            Clear();
 
-            for (var index = 0; index < formatCols.Length; index++)
+            if (formatColumn == null) return;
+
+            var formatCols = formatColumn.OptimizedSplit(':');
+            NumColumns = formatCols.Length;
+
+            for (var index = 0; index < NumColumns; index++)
             {
-                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (formatCols[index])
                 {
-                    case "AU":
-                        formatIndices.AU = index;
-                        break;
-                    case "CU":
-                        formatIndices.CU = index;
-                        break;
-                    case "GU":
-                        formatIndices.GU = index;
-                        break;
-                    case "TU":
-                        formatIndices.TU = index;
-                        break;
-                    case "TAR":
-                        formatIndices.TAR = index;
-                        break;
-                    case "TIR":
-                        formatIndices.TIR = index;
-                        break;
-                    case "FT":
-                        formatIndices.FT = index;
-                        break;
-                    case "GT":
-                        formatIndices.GT = index;
-                        break;
-                    case "GQ":
-                        formatIndices.GQ = index;
-                        break;
-                    case "GQX":
-                        formatIndices.GQX = index;
-                        break;
-                    case "DP":
-                        formatIndices.DP = index;
-                        break;
-                    case "DPI":
-                        formatIndices.DPI = index;
-                        break;
                     case "AD":
-                        formatIndices.AD = index;
-                        break;
-                    case "VF":
-                        formatIndices.VF = index;
-                        break;
-                    case "MCC":
-                        formatIndices.MCC = index;
-                        break;
-                    case "CN":
-                        formatIndices.CN = index;
-                        break;
-                    case "CI":
-                        formatIndices.CI = index;
-                        break;
-                    case "NR":
-                        formatIndices.NR = index;
-                        break;
-                    case "NV":
-                        formatIndices.NV = index;
-                        break;
-                    case "DQ":
-                        formatIndices.DQ = index;
-                        break;
-                    case "PR":
-                        formatIndices.PR = index;
-                        break;
-                    case "SR":
-                        formatIndices.SR = index;
-                        break;
-                    case "MAD":
-                        formatIndices.MAD = index;
-                        break;
-                    case "SCH":
-                        formatIndices.SCH = index;
-                        break;
-                    case "PLG":
-                        formatIndices.PLG = index;
-                        break;
-                    case "PCN":
-                        formatIndices.PCN = index;
-                        break;
-                    case "DCS":
-                        formatIndices.DCS = index;
-                        break;
-                    case "DID":
-                        formatIndices.DID = index;
-                        break;
-                    case "DST":
-                        formatIndices.DST = index;
-                        break;
-                    case "PCH":
-                        formatIndices.PCH = index;
-                        break;
-                    case "CHC":
-                        formatIndices.CHC = index;
+                        AD = index;
                         break;
                     case "AQ":
-                        formatIndices.AQ = index;
+                        AQ = index;
+                        break;
+                    case "CN":
+                        CN = index;
+                        break;
+                    case "DN":
+                        DN = index;
+                        break;
+                    case "DP":
+                        DP = index;
+                        break;
+                    case "DST":
+                        DST = index;
+                        break;
+                    case "FT":
+                        FT = index;
+                        break;
+                    case "GQ":
+                        GQ = index;
+                        break;
+                    case "GT":
+                        GT = index;
                         break;
                     case "LQ":
-                        formatIndices.LQ = index;
+                        LQ = index;
+                        break;
+                    case "PR":
+                        PR = index;
+                        break;
+                    case "REPCN":
+                        REPCN = index;
+                        break;
+                    case "SR":
+                        SR = index;
+                        break;
+                    case "VF":
+                        VF = index;
                         break;
                 }
             }
-
-            return formatIndices;
         }
     }
 }

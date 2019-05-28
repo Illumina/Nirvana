@@ -4,82 +4,60 @@ namespace Vcf.Sample
 {
     public sealed class Sample : ISample
     {
-        public double[] VariantFrequencies { get; }
-        public int? TotalDepth { get; }
         public int[] AlleleDepths { get; }
+        public float? ArtifactAdjustedQualityScore { get; } // PEPE
+        public int? CopyNumber { get; }
+        public string[] DiseaseAffectedStatuses { get; } // SMN1
+        public bool FailedFilter { get; }
         public string Genotype { get; }
         public int? GenotypeQuality { get; }
-        public bool FailedFilter { get; }
-        public int? CopyNumber { get; }
-        public bool IsLossOfHeterozygosity { get; }
-        public double? DeNovoQuality { get; }
-        public int[] SplitReadCounts { get; }
-        public int[] PairEndReadCounts { get; }
-	    public string RepeatNumbers { get; }
-	    public string RepeatNumberSpans { get; }
-
-        // SMN1
-        public int[] MpileupAlleleDepths { get; }
-        public string SilentCarrierHaplotype { get; }
-        public int[] ParalogousEntrezGeneIds { get; }
-        public int[] ParalogousGeneCopyNumbers { get; }
-        public string[] DiseaseClassificationSources { get; }
-        public string[] DiseaseIds { get; }
-        public string[] DiseaseAffectedStatus { get; }
-        public int[] ProteinAlteringVariantPositions { get; }
-        public bool IsCompoundHetCompatible { get; }
-
-        // PEPE
-        public float? ArtifactAdjustedQualityScore { get; }
-        public float? LikelihoodRatioQualityScore { get; }
-
+        public bool IsDeNovo { get; }
         public bool IsEmpty { get; }
+        public float? LikelihoodRatioQualityScore { get; } // PEPE
+        public int[] PairedEndReadCounts { get; } // Manta
+        public int[] RepeatUnitCounts { get; } // ExpansionHunter
+        public int[] SplitReadCounts { get; } // Manta
+        public int? TotalDepth { get; }
+        public double[] VariantFrequencies { get; }
 
-        public static readonly Sample EmptySample = new Sample(null, null, null, null, null, false, null, false, null,
-            null, null, null, null, null, null, null, null, null, null, null, null, false, null, null);
+        public static readonly Sample EmptySample =
+            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null);
 
-        public Sample(string genotype, int? genotypeQuality, double[] variantFrequencies, int? totalDepth,
-            int[] alleleDepths, bool failedFilter, int? copyNumber, bool isLossOfHeterozygosity, double? deNovoQuality,
-            int[] splitReadCounts, int[] pairEndReadCounts, string repeatNumbers, string repeatNumberSpan,
-            int[] mpileupAlleleDepths, string silentCarrierHaplotype, int[] paralagousEntrezGeneIds,
-            int[] paralogousGeneCopyNumbers, string[] diseaseClassificationSources, string[] diseaseIds,
-            string[] diseaseAffectedStatus, int[] proteinAlteringVariantPositions, bool isCompoundHetCompatible,
-            float? artifactAdjustedQualityScore, float? likelihoodRatioQualityScore)
+        public Sample(int[] alleleDepths, float? artifactAdjustedQualityScore, int? copyNumber,
+            string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo,
+            float? likelihoodRatioQualityScore, int[] pairedEndReadCounts, int[] repeatUnitCounts,
+            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies)
         {
-            Genotype                        = genotype;
-            GenotypeQuality                 = genotypeQuality;
-            VariantFrequencies              = variantFrequencies;
-            TotalDepth                      = totalDepth;
-            AlleleDepths                    = alleleDepths;
-            FailedFilter                    = failedFilter;
-            CopyNumber                      = copyNumber;
-            IsLossOfHeterozygosity          = isLossOfHeterozygosity;
-            DeNovoQuality                   = deNovoQuality;
-            SplitReadCounts                 = splitReadCounts;
-            PairEndReadCounts               = pairEndReadCounts;
-            RepeatNumbers                   = repeatNumbers;
-            RepeatNumberSpans               = repeatNumberSpan;
-            MpileupAlleleDepths             = mpileupAlleleDepths;
-            SilentCarrierHaplotype          = silentCarrierHaplotype;
-            ParalogousEntrezGeneIds         = paralagousEntrezGeneIds;
-            ParalogousGeneCopyNumbers       = paralogousGeneCopyNumbers;
-            DiseaseClassificationSources    = diseaseClassificationSources;
-            DiseaseIds                      = diseaseIds;
-            DiseaseAffectedStatus           = diseaseAffectedStatus;
-            ProteinAlteringVariantPositions = proteinAlteringVariantPositions;
-            IsCompoundHetCompatible         = isCompoundHetCompatible;
-            ArtifactAdjustedQualityScore    = artifactAdjustedQualityScore;
-            LikelihoodRatioQualityScore     = likelihoodRatioQualityScore;
+            AlleleDepths                 = alleleDepths;
+            ArtifactAdjustedQualityScore = artifactAdjustedQualityScore;
+            CopyNumber                   = copyNumber;
+            DiseaseAffectedStatuses      = diseaseAffectedStatuses;
+            FailedFilter                 = failedFilter;
+            Genotype                     = genotype;
+            GenotypeQuality              = genotypeQuality;
+            IsDeNovo                     = isDeNovo;
+            LikelihoodRatioQualityScore  = likelihoodRatioQualityScore;
+            PairedEndReadCounts          = pairedEndReadCounts;
+            RepeatUnitCounts             = repeatUnitCounts;
+            SplitReadCounts              = splitReadCounts;
+            TotalDepth                   = totalDepth;
+            VariantFrequencies           = variantFrequencies;
 
-            IsEmpty = Genotype == null && GenotypeQuality == null && VariantFrequencies == null && TotalDepth == null &&
-                      AlleleDepths == null && !FailedFilter && CopyNumber == null && !IsLossOfHeterozygosity &&
-                      DeNovoQuality == null && SplitReadCounts == null && PairEndReadCounts == null &&
-                      RepeatNumbers == null && RepeatNumberSpans == null && MpileupAlleleDepths == null &&
-                      SilentCarrierHaplotype == null && ParalogousEntrezGeneIds == null &&
-                      ParalogousGeneCopyNumbers == null && DiseaseClassificationSources == null && DiseaseIds == null &&
-                      DiseaseAffectedStatus == null && ProteinAlteringVariantPositions == null &&
-                      !IsCompoundHetCompatible && ArtifactAdjustedQualityScore == null &&
-                      LikelihoodRatioQualityScore == null;
+
+            IsEmpty = AlleleDepths                 == null &&
+                      ArtifactAdjustedQualityScore == null &&
+                      CopyNumber                   == null &&
+                      DiseaseAffectedStatuses      == null &&
+                      Genotype                     == null &&
+                      GenotypeQuality              == null &&
+                      LikelihoodRatioQualityScore  == null &&
+                      PairedEndReadCounts          == null &&
+                      RepeatUnitCounts             == null &&
+                      SplitReadCounts              == null &&
+                      TotalDepth                   == null &&
+                      VariantFrequencies           == null &&
+                      !FailedFilter                        &&
+                      !IsDeNovo;
         }
     }
 }

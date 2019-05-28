@@ -105,6 +105,8 @@ namespace Phantom.CodonInformation
             foreach (var transcriptInterval in transcriptIntervalArray.Array)
             {
                 var transcript = transcriptInterval.Value;
+                if (transcript.Id.IsPredictedTranscript()) continue;
+
                 var gene = transcript.Gene;
                 byte startPhase = transcript.StartExonPhase;
                 var codingIntervals = ConstructCdsIntervalsFromTranscript(transcript);

@@ -2,35 +2,20 @@
 {
     public interface ISample
     {
-        double[] VariantFrequencies { get; }
-        int? TotalDepth { get; }
         int[] AlleleDepths { get; }
+        float? ArtifactAdjustedQualityScore { get; } // PEPE
+        int? CopyNumber { get; }
+        string[] DiseaseAffectedStatuses { get; } // SMN1
+        bool FailedFilter { get; }
         string Genotype { get; }
         int? GenotypeQuality { get; }
-        bool FailedFilter { get; }
-        int? CopyNumber { get; }
-        bool IsLossOfHeterozygosity { get; }
-        double? DeNovoQuality { get; }
-        int[] SplitReadCounts { get; }
-        int[] PairEndReadCounts { get; }
-		string RepeatNumbers { get; }
-		string RepeatNumberSpans { get; }
-
-        // SMN1
-        int[] MpileupAlleleDepths { get; }
-        string SilentCarrierHaplotype { get; }
-        int[] ParalogousEntrezGeneIds { get; }
-        int[] ParalogousGeneCopyNumbers { get; }
-        string[] DiseaseClassificationSources { get; }
-        string[] DiseaseIds { get; }
-        string[] DiseaseAffectedStatus { get; }
-        int[] ProteinAlteringVariantPositions { get; }
-        bool IsCompoundHetCompatible { get; }
-
-        // PEPE
-        float? ArtifactAdjustedQualityScore { get; }
-        float? LikelihoodRatioQualityScore { get; }
-
+        bool IsDeNovo { get; }
         bool IsEmpty { get; }
+        float? LikelihoodRatioQualityScore { get; } // PEPE
+        int[] PairedEndReadCounts { get; } // Manta
+        int[] RepeatUnitCounts { get; } // ExpansionHunter
+        int[] SplitReadCounts { get; } // Manta
+        int? TotalDepth { get; }
+        double[] VariantFrequencies { get; }
     }
 }

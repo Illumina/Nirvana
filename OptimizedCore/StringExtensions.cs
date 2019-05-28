@@ -4,7 +4,7 @@ namespace OptimizedCore
 {
     public static class StringExtensions
     {
-        public static unsafe string[] OptimizedSplit(this string s, char delimiter)
+        public static unsafe string[] OptimizedSplit(this string s, char delimiter, int numColumns = -1)
         {
             var numReplaces = 0;
             int sLen        = s.Length;
@@ -23,7 +23,10 @@ namespace OptimizedCore
             var startIndex = 0;
             var colIndex   = 0;
 
-            var columns = new string[numReplaces + 1];
+            int numDelimitedColumns = numReplaces + 1;
+            if (numColumns < numDelimitedColumns) numColumns = numDelimitedColumns;
+
+            var columns = new string[numColumns];
             for (var index = 0; index < numReplaces && startIndex < sLen; ++index)
             {
                 columns[colIndex++] = s.Substring(startIndex, sepList[index] - startIndex);
