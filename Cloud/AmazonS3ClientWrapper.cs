@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Amazon.S3.Util;
 using IO;
 
 namespace Cloud
@@ -23,5 +24,9 @@ namespace Cloud
         {
             return _s3Client.PutObjectAsync(putRequest);
         }
+
+        public bool DoesBucketExist(string bucketName) => AmazonS3Util.DoesS3BucketExistAsync(_s3Client, bucketName).Result;
+
+        public string GetPreSignedUrl(GetPreSignedUrlRequest request) => _s3Client.GetPreSignedURL(request);
     }
 }

@@ -5,7 +5,6 @@ using System.Linq;
 using Cloud;
 using CommandLine.Utilities;
 using Genome;
-using IO;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
@@ -38,9 +37,7 @@ namespace Nirvana
         public string AnnotatorVersionTag { get; set; } = "Nirvana " + CommandLineUtilities.Version;
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, IS3Client s3Client, List<S3Path> annotationsInS3,
-            string pluginDirectory, bool disableRecomposition,
-            bool forceMitochondrialAnnotation)
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations, string pluginDirectory, bool disableRecomposition, bool forceMitochondrialAnnotation)
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
             
@@ -51,8 +48,10 @@ namespace Nirvana
                 dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saDirectoryPath));
             }
 
+            if (customAnnotations != null) dataAndIndexPaths.AddRange(customAnnotations.Select(x => x.ToDataAndIndexFiles()));
+
             TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths, s3Client, annotationsInS3);
+            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
             ConservationProvider         = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
             RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
             GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(dataAndIndexPaths);

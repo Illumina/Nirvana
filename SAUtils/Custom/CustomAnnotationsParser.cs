@@ -17,7 +17,7 @@ namespace SAUtils.Custom
     public sealed class CustomAnnotationsParser : IDisposable
     {
         private readonly StreamReader _reader;
-        private readonly ISequenceProvider _sequenceProvider;
+        public ISequenceProvider SequenceProvider { get; set; }
         public string JsonTag;
         public GenomeAssembly Assembly;
         private string[] _tags;
@@ -53,11 +53,11 @@ namespace SAUtils.Custom
         internal CustomAnnotationsParser(StreamReader streamReader, ISequenceProvider sequenceProvider)
         {
             _reader = streamReader;
-            _sequenceProvider = sequenceProvider;
+            SequenceProvider = sequenceProvider;
             _intervals = new List<CustomInterval>();
         }
 
-        public static CustomAnnotationsParser Create(StreamReader streamReader, ISequenceProvider sequenceProvider)
+        public static CustomAnnotationsParser Create(StreamReader streamReader, ISequenceProvider sequenceProvider = null)
         {
             var parser = new CustomAnnotationsParser(streamReader, sequenceProvider);
 
@@ -237,6 +237,10 @@ namespace SAUtils.Custom
 
         public IEnumerable<CustomItem> GetItems()
         {
+            if (SequenceProvider == null)
+            {
+                throw new Exception("Sequence provider is null.");
+            }
             using (_reader)
             {
                 string line;
@@ -284,13 +288,13 @@ namespace SAUtils.Custom
 
             string chromosome = splits[0];
 
-            if (!_sequenceProvider.RefNameToChromosome.TryGetValue(chromosome, out var chrom))
+            if (!SequenceProvider.RefNameToChromosome.TryGetValue(chromosome, out var chrom))
             {
                 Console.WriteLine($"Annotation on {chromosome} is skipped.");
                 return null;
             }
 
-            _sequenceProvider.LoadChromosome(chrom);
+            SequenceProvider.LoadChromosome(chrom);
 
             if (!int.TryParse(splits[1], out var position))
                 throw new UserErrorException($"POS is not an int number at: {line}.");
@@ -322,7 +326,7 @@ namespace SAUtils.Custom
             if (!IsValidNucleotideSequence(altAllele))
                 throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
-            (position, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, _sequenceProvider.Sequence);
+            (position, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, SequenceProvider.Sequence);
             return new CustomItem(chrom, position, refAllele, altAllele, annotationValues.Select(x => new[] { x }).ToArray(), JsonSchema, line);
         }
 

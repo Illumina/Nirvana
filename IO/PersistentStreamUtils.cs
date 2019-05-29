@@ -12,13 +12,12 @@ namespace IO
         public static Stream GetReadStream(string location, long position = 0)
         {
             if (string.IsNullOrEmpty(location)) return null;
-            if (ConnectUtilities.IsHttpLocation(location))
-            {
-                var connector = ConnectUtilities.GetHttpConnectFunc(location);
-                var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
-                return new PersistentStream(stream, connector, position);
-            }
-            return File.Exists(location) ? FileUtilities.GetReadStream(location) : null;
+            if (!ConnectUtilities.IsHttpLocation(location))
+                return File.Exists(location) ? FileUtilities.GetReadStream(location) : null;
+
+            var connector = ConnectUtilities.GetHttpConnectFunc(location);
+            var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
+            return new PersistentStream(stream, connector, position);
         }
 
         public static Stream GetS3ReadStream(IS3Client s3Client, string bucketName, string fileName, long position)

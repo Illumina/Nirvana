@@ -43,7 +43,8 @@ namespace Compression.Utilities
             return newStream;
         }
 
-        // used in custom annotation lambda
+        //todo: can have just one method for both file and http streams
+        //used in custom annotation lambda
         public static Stream GetAppropriateStream(PersistentStream pStream)
         {
             var header = GetHeader(pStream);

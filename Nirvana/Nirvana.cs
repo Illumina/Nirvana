@@ -40,7 +40,7 @@ namespace Nirvana
 
         private static AnnotationResources GetAnnotationResources()
         {            
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, null, _pluginDirectory, _disableRecomposition, _forceMitochondrialAnnotation);
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, _pluginDirectory, _disableRecomposition, _forceMitochondrialAnnotation);
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 
             using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(
