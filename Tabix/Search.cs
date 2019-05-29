@@ -9,7 +9,7 @@ namespace Tabix
         /// </summary>
         public static long GetOffset(this Index index, IChromosome chromosome, int begin)
         {
-            if (chromosome.IsEmpty() || !index.RefIndexToTabixIndex.TryGetValue(chromosome.Index, out ushort tabixIndex)) return 0;
+            if (chromosome.IsEmpty() || !index.RefIndexToTabixIndex.TryGetValue(chromosome.Index, out ushort tabixIndex)) return -1;
 
             // N.B. tabix assumes begin is 0-based and end is 1-based
             int end = begin;
@@ -25,17 +25,13 @@ namespace Tabix
 
             int bin = BinUtilities.ConvertPositionToBin(begin);
 
-            long offset;
             if (refSeq.IdToChunks.TryGetValue(bin, out var chunks))
-            {
-                offset = GetMinOverlapOffset(chunks, minOffset, maxOffset);
-            }
-            else
-            {
-                offset = (long)refSeq.LinearFileOffsets[begin >> Constants.MinShift];
-            }
+                return GetMinOverlapOffset(chunks, minOffset, maxOffset);
 
-            return offset;
+            int linearIndex = begin >> Constants.MinShift;
+            if (linearIndex >= refSeq.LinearFileOffsets.Length) return -1;
+
+            return (long)refSeq.LinearFileOffsets[linearIndex];
         }
 
         internal static long GetMinOverlapOffset(Interval[] chunks, ulong minOffset, ulong maxOffset)

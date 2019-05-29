@@ -209,13 +209,13 @@ namespace UnitTests.Tabix
         }
 
         [Fact]
-        public void GetOffset_UnknownChromosome_ReturnZero()
+        public void GetOffset_UnknownChromosome_ReturnMinusOne()
         {
             var chrUn = new Chromosome("chrUn", "unk", ushort.MaxValue);
             var index = new Index(Constants.VcfFormat, 0, 0, 0, '#', 0, null, _refIndexToTabixIndex);
 
             long observedResult = index.GetOffset(chrUn, 26699126);
-            Assert.Equal(0, observedResult);
+            Assert.Equal(-1, observedResult);
         }
 
         [Fact]
