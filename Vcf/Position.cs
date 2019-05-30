@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System.Collections.Generic;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
@@ -25,6 +26,8 @@ namespace Vcf
         public string[] VcfFields { get; }
         public bool[] IsDecomposed { get; }
         public bool IsRecomposed { get; }
+        public string[] Vids { get; }
+        public List<string>[] LinkedVids { get; }
 
         public Position(IChromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
             double? quality, string[] filters, IVariant[] variants, ISample[] samples, IInfoData infoData,
@@ -69,7 +72,7 @@ namespace Vcf
 
             var variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
-                simplePosition.IsRecomposed, globalMajorAllele);
+                simplePosition.IsRecomposed, simplePosition.LinkedVids, globalMajorAllele);
 
             return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
                 altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,

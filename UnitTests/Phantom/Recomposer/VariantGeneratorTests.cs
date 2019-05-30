@@ -28,11 +28,10 @@ namespace UnitTests.Phantom.Recomposer
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSample, indexOfUnsupportedVars, starts, functionBlockRanges, out var alleleBlockGraph);
             var mergedAlleleBlockToSampleHaplotype =
                 AlleleBlockMerger.Merge(alleleBlockToSampleHaplotype, alleleBlockGraph).ToArray();
-            var alleleSet = new AlleleSet(null, starts, alleles);
+            var alleleSet = new AlleleSet(new Chromosome("chr1", "1", 1), starts, alleles);
             var alleleBlocks = mergedAlleleBlockToSampleHaplotype.Select(x => x.Key).ToArray();
-            var decomposedPositionIndex = new HashSet<(int, int)>();
-            var result1 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[0], alleleSet, refSequence, starts[0], decomposedPositionIndex);
-            var result2 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[1], alleleSet, refSequence, starts[0], decomposedPositionIndex);
+            var result1 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[0], alleleSet, refSequence, starts[0], null);
+            var result2 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[1], alleleSet, refSequence, starts[0], null);
 
             var expectedVarPosIndexes1 = new List<int> { 0, 1 };
             var expectedVarPosIndexes2 = new List<int> { 0, 1, 2 };
@@ -65,6 +64,31 @@ namespace UnitTests.Phantom.Recomposer
             Assert.Equal(2, recomposedPositions.Count);
             Assert.Equal("chr1	2	.	AGC	AGA,GGG,TGA	.	PASS	RECOMPOSED	GT:PS	1|3:123	.	1|2:456", string.Join("\t", recomposedPositions[0].VcfFields));
             Assert.Equal("chr1	2	.	AGCTG	GGATC,GGGTG	.	PASS	RECOMPOSED	GT:PS	.	1|2:789	.", string.Join("\t", recomposedPositions[1].VcfFields));
+
+            //Check LinkedVids
+            //SNVs
+            Assert.Equal(2, position1.LinkedVids.Length);
+            Assert.Equal(new List<string> { "1:2:4:TGA" }, position1.LinkedVids[0]);
+            position1.LinkedVids[1].Sort();
+            Assert.Equal(new List<string> { "1:2:4:GGG", "1:2:6:GGATC", "1:2:6:GGGTG"}, position1.LinkedVids[1]);
+            Assert.Equal(2, position2.LinkedVids.Length);
+
+            position2.LinkedVids[0].Sort();
+            Assert.Equal(new List<string> { "1:2:4:AGA", "1:2:4:TGA", "1:2:6:GGATC" }, position2.LinkedVids[0]);
+            position2.LinkedVids[1].Sort();
+            Assert.Equal(new List<string> { "1:2:4:GGG", "1:2:6:GGGTG" }, position2.LinkedVids[1]);
+
+            Assert.Single(position3.LinkedVids);
+            Assert.Equal(new List<string> { "1:2:6:GGATC" }, position3.LinkedVids[0]);
+
+            //MNVs
+            Assert.Equal(3, recomposedPositions[0].LinkedVids.Length);
+            Assert.Equal(new List<string> {"1:4:A"}, recomposedPositions[0].LinkedVids[0]);
+            Assert.Equal(new List<string> { "1:2:G", "1:4:G" }, recomposedPositions[0].LinkedVids[1]);
+            Assert.Equal(new List<string> { "1:2:T", "1:4:A" }, recomposedPositions[0].LinkedVids[2]);
+            Assert.Equal(2, recomposedPositions[1].LinkedVids.Length);
+            Assert.Equal(new List<string> { "1:2:G", "1:4:A", "1:6:C" }, recomposedPositions[1].LinkedVids[0]);
+            Assert.Equal(new List<string> { "1:2:G", "1:4:G" }, recomposedPositions[1].LinkedVids[1]);
         }
 
         [Fact]

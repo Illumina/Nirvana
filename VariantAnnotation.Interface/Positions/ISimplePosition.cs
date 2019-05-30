@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System.Collections.Generic;
+using Genome;
 
 namespace VariantAnnotation.Interface.Positions
 {
@@ -9,5 +10,7 @@ namespace VariantAnnotation.Interface.Positions
         string[] VcfFields { get; }
         bool[] IsDecomposed { get; }
         bool IsRecomposed { get; }
+        string[] Vids { get; }
+        List<string>[] LinkedVids { get; }
     }
 }

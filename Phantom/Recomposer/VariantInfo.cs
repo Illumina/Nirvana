@@ -12,7 +12,7 @@ namespace Phantom.Recomposer
         private readonly List<bool>[] _sampleFilterFailed;
         public readonly string[] SampleGqs;
         public readonly string[] SamplePhaseSets;
-        public readonly Dictionary<string, List<SampleHaplotype>> AltAlleleToSample = new Dictionary<string, List<SampleHaplotype>>();
+        public readonly Dictionary<string, (List<SampleHaplotype> SampleHaplotypes, List<string> LinkedVids)> AltAlleleToSample = new Dictionary<string, (List<SampleHaplotype>, List<string>)>();
 
 
         public VariantInfo(string qual, string[] positionFilters, string[] sampleGqs, string[] samplePhaseSets, List<bool>[] sampleFilterFailed)
@@ -24,9 +24,9 @@ namespace Phantom.Recomposer
             _sampleFilterFailed = sampleFilterFailed;
         }
 
-        public void AddAllele(string altAllele, List<SampleHaplotype> sampleAlleles)
+        public void AddAllele(string altAllele, List<SampleHaplotype> sampleAlleles, List<string> LinkedVids)
         {
-            AltAlleleToSample.Add(altAllele, sampleAlleles);
+            AltAlleleToSample.Add(altAllele, (sampleAlleles, LinkedVids));
         }
 
         public void UpdateSampleFilters(IEnumerable<int> variantPosIndexes, List<SampleHaplotype> sampleHaplotypes)

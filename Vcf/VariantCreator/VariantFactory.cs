@@ -42,56 +42,42 @@ namespace Vcf.VariantCreator
             !VcfCommon.NonInformativeAltAllele.Contains(altAllele);
 
         public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
-            string[] altAlleles, IInfoData infoData, bool[] isDecomposed, bool isRecomposed, string globalMajorAllele)
+            string[] altAlleles, IInfoData infoData, bool[] isDecomposed, bool isRecomposed, List<string>[] linkedVids, string globalMajorAllele)
         {
             string firstAltAllele = altAlleles[0];
             bool isReference      = globalMajorAllele != null;
             bool isSymbolicAllele = IsSymbolicAllele(firstAltAllele);
             var variantCategory   = GetVariantCategory(firstAltAllele, isReference, isSymbolicAllele, infoData.SvType);
 
-            if (isReference) return new[] { GetVariant(chromosome, start, end, refAllele, firstAltAllele, infoData, variantCategory, isDecomposed[0], isRecomposed, globalMajorAllele) };
-
-            var informativeAltAlleles = GetInformativeAltAlleles(altAlleles);
-            if (informativeAltAlleles.Count == 0) return null;
-
-            var variants = new IVariant[informativeAltAlleles.Count];
+            if (isReference) return new[] { GetVariant(chromosome, start, end, refAllele, firstAltAllele, infoData, variantCategory, isDecomposed[0], isRecomposed, linkedVids?[0]?.ToArray(), globalMajorAllele) };
 
             _sequenceProvider.LoadChromosome(chromosome);
-
-            for (var i = 0; i < informativeAltAlleles.Count; i++)
+            var variants = new List<IVariant>();
+            for (var i = 0; i < altAlleles.Length; i++)
             {
+                if (IsNonInformativeAltAllele(altAlleles[i])) continue;
+
                 bool isDecomposedVar = isDecomposed[i];
                 (int shiftedStart, string shiftedRef, string shiftedAlt) =
-                    VariantUtils.TrimAndLeftAlign(start, refAllele, informativeAltAlleles[i], _sequenceProvider.Sequence);
+                    VariantUtils.TrimAndLeftAlign(start, refAllele, altAlleles[i], _sequenceProvider.Sequence);
 
-                variants[i] = GetVariant(chromosome, shiftedStart, end - (start- shiftedStart), shiftedRef, shiftedAlt, infoData, variantCategory, isDecomposedVar, isRecomposed, null);
+                variants.Add(GetVariant(chromosome, shiftedStart, end - (start- shiftedStart), shiftedRef, shiftedAlt, infoData, variantCategory, isDecomposedVar, isRecomposed, linkedVids?[i]?.ToArray(), null));
             }
 
-            return variants;
+            return variants.Count == 0 ? null : variants.ToArray();
         }
 
-        private static List<string> GetInformativeAltAlleles(string[] altAlleles)
-        {
-            var informativeAltAlleles = new List<string>(altAlleles.Length);
-
-            foreach (string altAllele in altAlleles)
-            {
-                if (VcfCommon.NonInformativeAltAllele.Contains(altAllele)) continue;
-                informativeAltAlleles.Add(altAllele);
-            }
-
-            return informativeAltAlleles;
-        }
+        private static bool IsNonInformativeAltAllele(string altAllele) => VcfCommon.NonInformativeAltAllele.Contains(altAllele);
 
         private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
-            IInfoData infoData, VariantCategory category, bool isDecomposedVar, bool isRecomposed, string globalMajorAllele)
+            IInfoData infoData, VariantCategory category, bool isDecomposedVar, bool isRecomposed, string[] linkedVids, string globalMajorAllele)
         {
             switch (category)
             {
                 case VariantCategory.Reference:
                     return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, globalMajorAllele);
                 case VariantCategory.SmallVariant:
-                    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele, isDecomposedVar, isRecomposed);
+                    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele, isDecomposedVar, isRecomposed, linkedVids);
                 case VariantCategory.SV:
                     var svBreakEnds = infoData.SvType == VariantType.translocation_breakend ?
                         GetTranslocationBreakends(chromosome, refAllele, altAllele, start)

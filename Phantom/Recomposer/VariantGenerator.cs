@@ -6,7 +6,9 @@ using Phantom.PositionCollections;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using Variants;
 using Vcf;
+using Vcf.VariantCreator;
 
 namespace Phantom.Recomposer
 {
@@ -32,10 +34,10 @@ namespace Phantom.Recomposer
             if (regionEnd > _sequenceProvider.Sequence.Length) regionEnd = _sequenceProvider.Sequence.Length;
             string totalRefSequence = _sequenceProvider.Sequence.Substring(regionStart - 1, regionEnd - regionStart); // VCF positions are 1-based
             var recomposedAlleleSet = new RecomposedAlleleSet(positionSet.ChrName, numSamples);
-            var decomposedPosVarIndex = new HashSet<(int PosIndex, int VarIndex)>();
+
             foreach (var (alleleIndexBlock, sampleAlleles) in alleleIndexBlockToSampleIndex)
             {
-                (int start, _, string refAllele, string altAllele, var varPosIndexesInAlleleBlock) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet, totalRefSequence, regionStart, decomposedPosVarIndex);
+                (int start, _, string refAllele, string altAllele, var varPosIndexesInAlleleBlock, List<string> decomposedVids) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet, totalRefSequence, regionStart, simplePositions);
                 var variantSite = new VariantSite(start, refAllele);
 
                 if (!recomposedAlleleSet.RecomposedAlleles.TryGetValue(variantSite, out var variantInfo))
@@ -43,15 +45,11 @@ namespace Phantom.Recomposer
                     variantInfo = GetVariantInfo(positionSet, alleleIndexBlock);
                     recomposedAlleleSet.RecomposedAlleles[variantSite] = variantInfo;
                 }
-                variantInfo.AddAllele(altAllele, sampleAlleles);
+                variantInfo.AddAllele(altAllele, sampleAlleles, decomposedVids);
                 variantInfo.UpdateSampleFilters(varPosIndexesInAlleleBlock, sampleAlleles);
             }
-            // Set decomposed tag to positions used for recomposition
-            foreach (var indexTuple in decomposedPosVarIndex)
-            {
-                simplePositions[indexTuple.PosIndex].IsDecomposed[indexTuple.VarIndex] = true;
-            }
-            return recomposedAlleleSet.GetRecomposedVcfRecords().Select(x => SimplePosition.GetSimplePosition(x, new NullVcfFilter(), _sequenceProvider.RefNameToChromosome, true));
+            
+            return recomposedAlleleSet.GetRecomposedPositions(_sequenceProvider.RefNameToChromosome);
         }
 
         private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleBlock alleleBlock)
@@ -76,7 +74,7 @@ namespace Phantom.Recomposer
                 var psTagsThisSample =
                     new ArraySegment<string>(positionSet.PsInfo.Values[i], startIndex, numPositions);
                 var isHomozygous = new ArraySegment<bool>(positionSet.GtInfo.Values[i].Select(x => x.IsHomozygous).ToArray(), startIndex, numPositions);
-                psValues[i] = GetPhaseSetForRecomposedVarint(psTagsThisSample, isHomozygous);
+                psValues[i] = GetPhaseSetForRecomposedVariant(psTagsThisSample, isHomozygous);
             }
 
             var sampleFilters = new List<bool>[numSamples];
@@ -104,16 +102,16 @@ namespace Phantom.Recomposer
             return currentString;
         }
 
-        private static string GetPhaseSetForRecomposedVarint(IEnumerable<string> psTagsThisSample, IEnumerable<bool> isHomozygous)
+        private static string GetPhaseSetForRecomposedVariant(IEnumerable<string> psTagsThisSample, IEnumerable<bool> isHomozygous)
         {
-            foreach ((string psTag, bool homozygousity) in psTagsThisSample.Zip(isHomozygous, (a, b) => new Tuple<string, bool>(a, b)))
+            foreach ((string psTag, bool homozygosity) in psTagsThisSample.Zip(isHomozygous, (a, b) => new Tuple<string, bool>(a, b)))
             {
-                if (!homozygousity) return psTag;
+                if (!homozygosity) return psTag;
             }
             return ".";
         }
 
-        internal static (int Start, int End, string Ref, string Alt, List<int> VarPosIndexesInAlleleBlock) GetPositionsAndRefAltAlleles(AlleleBlock alleleBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, HashSet<(int, int)> decomposedPosVarIndex)
+        internal static (int Start, int End, string Ref, string Alt, List<int> VarPosIndexesInAlleleBlock, List<string> decomposedVids) GetPositionsAndRefAltAlleles(AlleleBlock alleleBlock, AlleleSet alleleSet, string totalRefSequence, int regionStart, List<ISimplePosition> simplePositions)
         {
             int numPositions = alleleBlock.AlleleIndexes.Length;
             int firstPositionIndex = alleleBlock.PositionIndex;
@@ -126,19 +124,18 @@ namespace Phantom.Recomposer
             var refSequence = totalRefSequence.Substring(blockStart - regionStart, blockRefLength);
 
             int refSequenceStart = 0;
-            var altSequenceSegsegments = new LinkedList<string>();
+            var altSequenceSegments = new LinkedList<string>();
             var variantPosIndexesInAlleleBlock = new List<int>();
+            var vidListsNeedUpdate = new List<List<string>>();
+            var decomposedVids = new List<string>();
             for (int positionIndex = firstPositionIndex; positionIndex <= lastPositionIndex; positionIndex++)
             {
                 int indexInBlock = positionIndex - firstPositionIndex;
                 int alleleIndex = alleleBlock.AlleleIndexes[indexInBlock];
+                //only non-reference alleles considered
                 if (alleleIndex == 0) continue;
 
                 variantPosIndexesInAlleleBlock.Add(positionIndex - firstPositionIndex);
-                //only mark positions with non-reference alleles being recomposed as "decomposed"
-                // alleleIndex is 1-based for altAlleles
-                decomposedPosVarIndex.Add((positionIndex, alleleIndex - 1));
-
                 string refAllele = alleleSet.VariantArrays[positionIndex][0];
                 string altAllele = alleleSet.VariantArrays[positionIndex][alleleIndex];
                 int positionOnRefSequence = alleleSet.Starts[positionIndex] - blockStart;
@@ -151,12 +148,34 @@ namespace Phantom.Recomposer
                 }
 
                 string refSequenceBefore = refSequence.Substring(refSequenceStart, refRegionBetweenTwoAltAlleles);
-                altSequenceSegsegments.AddLast(refSequenceBefore);
-                altSequenceSegsegments.AddLast(altAllele);
+                altSequenceSegments.AddLast(refSequenceBefore);
+                altSequenceSegments.AddLast(altAllele);
                 refSequenceStart = positionOnRefSequence + refAllele.Length;
+
+                if (simplePositions == null) continue;
+                var thisPosition = simplePositions[positionIndex];
+                // alleleIndex is 1-based for altAlleles
+                int varIndex = alleleIndex - 1;
+
+                //Only SNVs get recomposed for now
+                if (thisPosition.Vids[varIndex] == null)
+                {
+                    thisPosition.Vids[varIndex] = SmallVariantCreator.GetVid(alleleSet.Chromosome.EnsemblName,
+                        thisPosition.Start, thisPosition.End, thisPosition.AltAlleles[varIndex], VariantType.SNV);
+                    thisPosition.IsDecomposed[varIndex] = true;
+                }
+                decomposedVids.Add(thisPosition.Vids[varIndex]);
+
+                if (thisPosition.LinkedVids[varIndex] == null)
+                    thisPosition.LinkedVids[varIndex] = new List<string>();
+                vidListsNeedUpdate.Add(thisPosition.LinkedVids[varIndex]);
             }
-            altSequenceSegsegments.AddLast(refSequence.Substring(refSequenceStart));
-            return (blockStart, blockStart + blockRefLength - 1, refSequence, string.Concat(altSequenceSegsegments), variantPosIndexesInAlleleBlock);
+            altSequenceSegments.AddLast(refSequence.Substring(refSequenceStart));
+            var recomposedAllele = string.Concat(altSequenceSegments);
+            var blockRefEnd = blockStart + blockRefLength - 1;
+            var recomposedVariantId = SmallVariantCreator.GetVid(alleleSet.Chromosome.EnsemblName, blockStart, blockRefEnd, recomposedAllele, VariantType.MNV);
+            vidListsNeedUpdate.ForEach(x => x.Add(recomposedVariantId));
+            return (blockStart, blockRefEnd, refSequence, recomposedAllele, variantPosIndexesInAlleleBlock, decomposedVids);
         }
     }
 

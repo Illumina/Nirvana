@@ -86,23 +86,6 @@ namespace Nirvana
             return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());
         }
 
-        private static void GetSaReadersFromS3(IS3Client s3Client, List<S3Path> annotationsInS3, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
-        {
-            foreach (var annotation in annotationsInS3)
-            {
-                if (annotation.path.EndsWith(SaCommon.SaFileSuffix))
-                    nsaReaders.Add(GetNsaReader(
-                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0),
-                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName,
-                            annotation.path + SaCommon.IndexSufix, 0)));
-                else
-                {
-                    nsiReaders.Add(GetNsiReader(
-                        PersistentStreamUtils.GetS3ReadStream(s3Client, annotation.bucketName, annotation.path, 0)));
-                }
-            }
-        }
-
         private static void GetSaReaders(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
         {
             foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
@@ -165,7 +148,6 @@ namespace Nirvana
             return provider;
         }
 
-        
         private static NsaReader GetNsaReader(Stream dataStream, Stream indexStream) =>
             new NsaReader(new ExtendedBinaryReader(dataStream), indexStream);
 
