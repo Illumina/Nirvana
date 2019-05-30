@@ -154,6 +154,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string headerLines = "#title=IcslAlleleFrequencies\n" +
                                        "#assembly=GRCh38\n" +
+                                       "#matchVariantsBy=allele\n" +
                                        "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
                                        "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
                                        "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
@@ -215,18 +216,19 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string text = "#title=IcslAlleleFrequencies\n" +
                                 "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
                                 "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n" +
-                                "chr1\t14783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\n" +
+                                "chr1\t14783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\n" +
                                 "chr2\t10302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
                                 "chr2\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
             using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);
-                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUSS\"", items[0].GetJsonString());
+                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUS\"", items[0].GetJsonString());
                 Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421", items[1].GetJsonString());
             }
         }
@@ -236,11 +238,12 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string text = "#title=IcslAlleleFrequencies\n" +
                                 "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\n" +
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\t.\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n" +
                                 "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\n" +
-                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\t1.000\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\n" +
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926";
@@ -248,9 +251,52 @@ namespace UnitTests.SAUtils.CustomAnnotations
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(3, items.Length);
-                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUSS\",\"anyNumber\":1.000", items[0].GetJsonString());
+                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUS\",\"anyNumber\":1.000", items[0].GetJsonString());
                 Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"anyNumber\":3", items[1].GetJsonString());
                 Assert.Equal("\"refAllele\":\"T\",\"altAllele\":\"C\",\"allAc\":10,\"allAn\":1000,\"allAf\":0.01,\"anyNumber\":100.1234567", items[2].GetJsonString());
+            }
+        }
+
+        [Fact]
+        public void GetItems_ExtractCustomFilters()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\tcustomFilter\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\t.\tFilter\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\t.\n" +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\tstring\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\tgood variant\n" +
+                                "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\tbad variant\n" +
+                                "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\tugly variant\n" +
+                                "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926\tvery ugly variant";
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                var items = custParser.GetItems().ToArray();
+                Assert.Equal(3, items.Length);
+                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUS\",\"anyNumber\":1.000,\"customFilter\":\"good variant\"", items[0].GetJsonString());
+                Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"anyNumber\":3,\"customFilter\":\"bad variant\"", items[1].GetJsonString());
+                Assert.Equal("\"refAllele\":\"T\",\"altAllele\":\"C\",\"allAc\":10,\"allAn\":1000,\"allAf\":0.01,\"anyNumber\":100.1234567,\"customFilter\":\"ugly variant\"", items[2].GetJsonString());
+            }
+        }
+
+        [Fact]
+        public void GetItems_ExtractCustomFilters_failsOnLargeText()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\tcustomFilter\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\t.\tFilter\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\t.\n" +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\tstring\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\tthe good variant, the bad variant and the ugly variant\n";
+                                
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                Assert.Throws<UserErrorException>(()=>custParser.GetItems().ToArray());
+                
             }
         }
 
@@ -259,11 +305,12 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string text = "#title=IcslAlleleFrequencies\n" +
                                 "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\n" +
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\t.\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n" +
                                 "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\n" +
-                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\t1.000\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\n" +
                                 "chr1\t3302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926";
@@ -278,11 +325,12 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string text = "#title=IcslAlleleFrequencies\n" +
                                 "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
                                 "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n" +
-                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\n" +
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
 
@@ -309,6 +357,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string text = "#title=IcslAlleleFrequencies\n" +
                                 "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n"+
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
@@ -316,7 +365,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
 
             using (var parser = CustomAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
-                var item = parser.ExtractItems("chr1\t12783\tA\tATA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t");
+                var item = parser.ExtractItems("chr1\t12783\tA\tATA\t.\t20\t125568\t0.000159\ttrue\tVUS\t");
                 Assert.Equal(12782, item.Position);
                 Assert.Equal("", item.RefAllele);
                 Assert.Equal("TA", item.AltAllele);

@@ -97,7 +97,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
                 using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
                 {
-                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetSequenceProvider(), "clinvar", false, true, SaCommon.SchemaVersion, false, true, 1024);
+                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetSequenceProvider(), "clinvar", false, true, SaCommon.SchemaVersion, false, true, false, 1024);
                     saWriter.Write(GetClinvarItems());
                 }
 
@@ -164,7 +164,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
                 using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
                 {
-                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetAllASequenceProvider(), "dbsnp", true, true, SaCommon.SchemaVersion, false, true, 1024);
+                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetAllASequenceProvider(), "dbsnp", true, true, SaCommon.SchemaVersion, false, true, false, 1024);
                     saWriter.Write(GetDbsnpItems(1000));
                 }
 

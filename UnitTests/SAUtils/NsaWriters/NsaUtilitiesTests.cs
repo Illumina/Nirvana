@@ -42,7 +42,7 @@ namespace UnitTests.SAUtils.NsaWriters
 
             var items = topMedReader.GetItems().ToList();
             var saItems = new List<ISupplementaryDataItem>(items);
-            saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems);
+            saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems, false);
             Assert.Single(saItems);
 
         }

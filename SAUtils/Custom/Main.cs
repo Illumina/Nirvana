@@ -77,11 +77,12 @@ namespace SAUtils.Custom
                                 version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks),
                                 referenceProvider,
                                 customReader.JsonTag,
-                                false,  // match by allele
-                                true, // is array
+                                customReader.MatchByAllele,  // match by allele
+                                customReader.IsArray, // is array
                                 SaCommon.SchemaVersion,
                                 false,// is positional
-                                false // skip incorrect ref base
+                                false, // skip incorrect ref base
+                                true // throw error on conflicting entries
                                 ))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))

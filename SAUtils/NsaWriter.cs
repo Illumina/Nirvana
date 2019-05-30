@@ -28,16 +28,18 @@ namespace SAUtils
         private readonly ChunkedIndex _index;
         private readonly bool _isPositional;
         private readonly bool _skipIncorrectRefEntries;
+        private readonly bool _throwErrorOnConflicts;
         private readonly ISequenceProvider _refProvider;
 
 
         //todo: filter chromIndex=ushort.Max
-        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, int blockSize = SaCommon.DefaultBlockSize)
+        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, bool throwErrorOnConflicts = false, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream            = writer.BaseStream;
             _writer            = writer;
             _isPositional      = isPositional;
             _skipIncorrectRefEntries = skipIncorrectRefEntries;
+            _throwErrorOnConflicts = throwErrorOnConflicts;
             _block = new NsaBlock(new Zstandard(), blockSize);
             _refProvider = refProvider;
 
@@ -132,7 +134,7 @@ namespace SAUtils
             {
                 // any data source that is reported by allele and is not an array (e.g. allele frequencies) need this filtering step
                 if (_index.MatchByAllele && !_index.IsArray)
-                    saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems);
+                    saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems, _throwErrorOnConflicts);
 
                 _memWriter.WriteOpt(saItems.Count);
 

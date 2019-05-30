@@ -21,7 +21,6 @@ namespace UnitTests.SAUtils.CustomAnnotations
             AllowedValues.ValidatePredictionValue(".", "");
             AllowedValues.ValidatePredictionValue("P", "");
             AllowedValues.ValidatePredictionValue("Likely Benign", "");
-            AllowedValues.ValidatePredictionValue("VUSS", "");
             AllowedValues.ValidatePredictionValue("Vus", "");
         }
 
