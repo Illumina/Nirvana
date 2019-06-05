@@ -197,5 +197,11 @@ namespace VariantAnnotation.Providers
         private const int MaxSvLengthForRegulatoryRegionAnnotation = 50000;
 
         private static bool SkipLargeVariants(int begin, int end) => end - begin + 1 > MaxSvLengthForRegulatoryRegionAnnotation;
+
+        public void Dispose()
+        {
+            _siftReader?.Dispose();
+            _polyphenReader?.Dispose();
+        }
     }
 }

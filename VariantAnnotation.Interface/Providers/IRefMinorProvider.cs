@@ -1,8 +1,9 @@
-﻿using Genome;
+﻿using System;
+using Genome;
 
 namespace VariantAnnotation.Interface.Providers
 {
-    public interface IRefMinorProvider
+    public interface IRefMinorProvider:IDisposable
     {
         string GetGlobalMajorAllele(IChromosome chromosome, int pos);
     }

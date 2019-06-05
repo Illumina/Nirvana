@@ -107,5 +107,15 @@ namespace Nirvana
             if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
             SaProvider?.PreLoad(chromosome, positions);
         }
+
+        public void Dispose()
+        {
+            SequenceProvider?.Dispose();
+            TranscriptAnnotationProvider?.Dispose();
+            SaProvider?.Dispose();
+            ConservationProvider?.Dispose();
+            RefMinorProvider?.Dispose();
+            GeneAnnotationProvider?.Dispose();
+        }
     }
 }

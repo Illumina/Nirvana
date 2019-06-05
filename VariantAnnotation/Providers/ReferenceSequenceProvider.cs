@@ -57,5 +57,10 @@ namespace VariantAnnotation.Providers
             _sequenceReader.GetCompressedSequence(chromosome);
             _currentChromosome = chromosome;
         }
+
+        public void Dispose()
+        {
+            _sequenceReader?.Dispose();
+        }
     }
 }

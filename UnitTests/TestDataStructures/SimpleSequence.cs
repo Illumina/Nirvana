@@ -56,5 +56,10 @@ namespace UnitTests.TestDataStructures
             Sequence = sequence;
             RefNameToChromosome = refNameToChromosome;
         }
+
+        public void Dispose()
+        {
+            
+        }
     }
 }

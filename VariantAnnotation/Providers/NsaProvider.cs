@@ -176,5 +176,20 @@ namespace VariantAnnotation.Providers
             var totalTime = benchmark.GetElapsedTime();
             Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");
         }
+
+        public void Dispose()
+        {
+            if(_nsaReaders!=null)
+                foreach (var nsaReader in _nsaReaders)
+                {
+                    nsaReader.Dispose();
+                }
+
+            if(_nsiReaders != null)
+                foreach (var nsiReader in _nsiReaders)
+                {
+                    nsiReader.Dispose();
+                }
+        }
     }
 }

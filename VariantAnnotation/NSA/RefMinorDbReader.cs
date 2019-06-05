@@ -14,11 +14,14 @@ namespace VariantAnnotation.NSA
         private readonly RefMinorIndex _index;
 
         private readonly Dictionary<int, string> _annotations;
+        private readonly Stream _dbStream, _indexStream;
 
-        public RefMinorDbReader(ExtendedBinaryReader reader, ExtendedBinaryReader indexStream)
+        public RefMinorDbReader(Stream dbStream, Stream indexStream)
         {
-            _reader      = reader;
-            _index       = new RefMinorIndex(indexStream);
+            _dbStream = dbStream;
+            _indexStream = indexStream;
+            _reader      = new ExtendedBinaryReader(dbStream);
+            _index       = new RefMinorIndex(new ExtendedBinaryReader(indexStream));
             _annotations = new Dictionary<int, string>();
 
             if (_index.SchemaVersion != SaCommon.SchemaVersion)
@@ -63,6 +66,8 @@ namespace VariantAnnotation.NSA
 
         public void Dispose()
         {
+            _dbStream?.Dispose();
+            _indexStream?.Dispose();
             _reader?.Dispose();
         }
     }

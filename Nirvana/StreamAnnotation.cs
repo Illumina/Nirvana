@@ -24,6 +24,7 @@ namespace Nirvana
             var logger = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
             var metrics = new PerformanceMetrics(logger);
 
+            using(annotationResources)
             using (var vcfReader = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {

@@ -104,9 +104,8 @@ namespace UnitTests.SAUtils.NsaWriters
                 saStream.Position = 0;
                 indexStream.Position = 0;
 
-                using (var extReader = new ExtendedBinaryReader(saStream))
+                using (var saReader = new NsaReader(saStream, indexStream, 1024))
                 {
-                    var saReader = new NsaReader(extReader, indexStream, 1024);
                     Assert.Equal(GenomeAssembly.GRCh37, saReader.Assembly);
                     Assert.Equal(version.ToString(), saReader.Version.ToString());
                     saReader.PreLoad(_chrom1, new List<int> { 100, 101, 106 });
@@ -171,9 +170,8 @@ namespace UnitTests.SAUtils.NsaWriters
                 saStream.Position = 0;
                 indexStream.Position = 0;
 
-                using (var extReader = new ExtendedBinaryReader(saStream))
+                using (var saReader = new NsaReader(saStream, indexStream, 1024))
                 {
-                    var saReader = new NsaReader(extReader, indexStream, 1024);
                     saReader.PreLoad(_chrom1, GetPositions(50, 1000));
 
                     Assert.Null(saReader.GetAnnotation(90));//before any SA existed

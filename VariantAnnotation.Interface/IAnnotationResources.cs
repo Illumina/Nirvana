@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Plugins;
@@ -7,7 +8,7 @@ using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.Interface
 {
-    public interface IAnnotationResources
+    public interface IAnnotationResources:IDisposable
     {
         ISequenceProvider SequenceProvider { get; }
         ITranscriptAnnotationProvider TranscriptAnnotationProvider { get; }

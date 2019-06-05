@@ -78,8 +78,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 stream.Position = 0;
                 indexStream.Position = 0;
 
-                using (var dbReader = new RefMinorDbReader(new ExtendedBinaryReader(stream),
-                    new ExtendedBinaryReader(indexStream)))
+                using (var dbReader = new RefMinorDbReader(stream,indexStream))
                 {
                     Assert.Equal("T", dbReader.GetGlobalMajorAllele(Chrom1, 15274));
                     Assert.Null(dbReader.GetGlobalMajorAllele(Chrom1, 1524));

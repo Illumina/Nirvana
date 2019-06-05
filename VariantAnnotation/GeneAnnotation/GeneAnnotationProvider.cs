@@ -46,6 +46,15 @@ namespace VariantAnnotation.GeneAnnotation
             Name        = "Gene annotation provider";
             _ngaReaders = new List<NgaReader>();
             foreach (var dbStream in dbStreams) _ngaReaders.Add(new NgaReader(dbStream));
-        }        
+        }
+
+        public void Dispose()
+        {
+            if(_ngaReaders != null)
+                foreach (var ngaReader in _ngaReaders)
+                {
+                    ngaReader.Dispose();
+                }
+        }
     }
 }

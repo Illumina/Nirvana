@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Genome;
 using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.Interface.SA
 {
-    public interface INsaReader
+    public interface INsaReader:IDisposable
     {
         GenomeAssembly Assembly { get; }
         IDataSourceVersion Version { get; }

@@ -92,11 +92,11 @@ namespace Nirvana
             {
                 if (dataFile.TrimStartToLast("/").Contains(SaCommon.SaFileSuffix))
                     nsaReaders.Add(
-                        GetNsaReader(PersistentStreamUtils.GetReadStream(dataFile),
+                        new NsaReader(PersistentStreamUtils.GetReadStream(dataFile),
                         PersistentStreamUtils.GetReadStream(indexFile))
                         );
                 if (dataFile.TrimStartToLast("/").Contains(SaCommon.SiFileSuffix))
-                    nsiReaders.Add(GetNsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
+                    nsiReaders.Add(new NsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
             }
         }
 
@@ -148,10 +148,6 @@ namespace Nirvana
             return provider;
         }
 
-        private static NsaReader GetNsaReader(Stream dataStream, Stream indexStream) =>
-            new NsaReader(new ExtendedBinaryReader(dataStream), indexStream);
-
-        private static NsiReader GetNsiReader(Stream stream) => new NsiReader(stream);
 
         private static string TrimStartToLast(this string s, string value)
         {
