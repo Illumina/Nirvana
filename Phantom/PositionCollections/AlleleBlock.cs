@@ -30,9 +30,9 @@ namespace Phantom.PositionCollections
                 var genotypeArray = genotypeBlock.Genotypes.ToArray();
                 int startIndexInBlock = genotypeBlock.PosIndex;
                 int ploidy = GetMaxPloidy(genotypeArray);
-                var currentSubBlockStart = -1;
+                int currentSubBlockStart = -1;
 
-                for (int i = 0; i < genotypeArray.Length; i++)
+                for (var i = 0; i < genotypeArray.Length; i++)
                 {
                     int indexInBlock = i + startIndexInBlock;
                     var genotype = genotypeArray[i];

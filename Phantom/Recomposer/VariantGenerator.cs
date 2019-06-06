@@ -48,7 +48,7 @@ namespace Phantom.Recomposer
                 variantInfo.AddAllele(altAllele, sampleAlleles, decomposedVids);
                 variantInfo.UpdateSampleFilters(varPosIndexesInAlleleBlock, sampleAlleles);
             }
-            
+
             return recomposedAlleleSet.GetRecomposedPositions(_sequenceProvider.RefNameToChromosome);
         }
 
@@ -77,13 +77,20 @@ namespace Phantom.Recomposer
                 psValues[i] = GetPhaseSetForRecomposedVariant(psTagsThisSample, isHomozygous);
             }
 
+            var homoReferenceSamplePloidy = new int?[numSamples];
+            for (var i = 0; i < numSamples; i++)
+            {
+                if (Genotype.IsAllHomozygousReference(positionSet.GtInfo.Values[i], startIndex, numPositions))
+                    homoReferenceSamplePloidy[i] = positionSet.GtInfo.Values[i][startIndex].AlleleIndexes.Length;
+            }
+
             var sampleFilters = new List<bool>[numSamples];
             for (var i = 0; i < numSamples; i++)
             {
                 sampleFilters[i] = new List<bool>();
             }
 
-            return new VariantInfo(qual, filters, gqValues, psValues, sampleFilters);
+            return new VariantInfo(qual, filters, gqValues, psValues, homoReferenceSamplePloidy, sampleFilters);
         }
 
         private static string GetStringWithMinValueOrDot(IEnumerable<string> strings)
@@ -177,19 +184,5 @@ namespace Phantom.Recomposer
             vidListsNeedUpdate.ForEach(x => x.Add(recomposedVariantId));
             return (blockStart, blockRefEnd, refSequence, recomposedAllele, variantPosIndexesInAlleleBlock, decomposedVids);
         }
-    }
-
-    public struct VariantSite : IComparable<VariantSite>
-    {
-        public readonly int Start;
-        public readonly string RefAllele;
-
-        public VariantSite(int start, string refAllele)
-        {
-            Start = start;
-            RefAllele = refAllele;
-        }
-
-        public int CompareTo(VariantSite other) => Start != other.Start ? Start.CompareTo(other.Start) : string.Compare(RefAllele, other.RefAllele, StringComparison.Ordinal);
     }
 }

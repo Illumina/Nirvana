@@ -122,7 +122,8 @@ namespace Phantom.Recomposer
 
             for (var index = 0; index < numSamples; index++)
             {
-                var sampleGenotypeStr = sampleGenotypeStrings[index];
+                string sampleGenotypeStr = sampleGenotypeStrings[index];
+
                 if (sampleGenotypeStr == null || sampleGenotypeStr == ".") vcfFields.Add(".");
                 else
                 {
@@ -150,7 +151,8 @@ namespace Phantom.Recomposer
             var sampleGenotypeStrings = new string[numSamples];
             for (var index = 0; index < numSamples; index++)
             {
-                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
+                var homoReferenceSamplePloidy = variantInfo.HomoReferenceSamplePloidies[index];
+                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index], homoReferenceSamplePloidy);
                 if (sampleGenotypeStrings[index] == ".") continue;
 
                 if (variantInfo.SampleGqs[index] != ".") hasGq = true;
@@ -171,6 +173,11 @@ namespace Phantom.Recomposer
             return new ArraySegment<string>(values, 0, indexLastRemainedValue + 1).ToArray();
         }
 
-        private static string GetGenotype(IReadOnlyCollection<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
+        private static string GetGenotype(IReadOnlyCollection<int> sampleGenotype, int? homoReferenceSamplePloidy)
+        {
+            if (sampleGenotype.Count != 0) return string.Join("|", sampleGenotype);
+
+            return homoReferenceSamplePloidy != null ? string.Join("|", Enumerable.Repeat("0", homoReferenceSamplePloidy.Value)) : ".";
+        }
     }
 }

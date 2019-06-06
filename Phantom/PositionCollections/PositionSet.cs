@@ -70,7 +70,7 @@ namespace Phantom.PositionCollections
         {
             var alleleArrays = new string[positionSet._numPositions][];
             var starts = positionSet.SimplePositions.Select(x => x.Start).ToArray();
-            for (int index = 0; index < positionSet._numPositions; index++)
+            for (var index = 0; index < positionSet._numPositions; index++)
             {
                 var position = positionSet.SimplePositions[index];
                 alleleArrays[index] = new string[position.AltAlleles.Length + 1];
@@ -82,10 +82,10 @@ namespace Phantom.PositionCollections
 
         internal int[][] GetSampleTagIndexes(string[] tagsToExtract)
         {
-            int numTagsToExtact = tagsToExtract.Length;
-            var indexes = new int[numTagsToExtact][];
+            int numTagsToExtract = tagsToExtract.Length;
+            var indexes = new int[numTagsToExtract][];
             var tagIndexDict = new Dictionary<string, int>();
-            for (int tagIndex = 0; tagIndex < numTagsToExtact; tagIndex++)
+            for (int tagIndex = 0; tagIndex < numTagsToExtract; tagIndex++)
             {
                 tagIndexDict[tagsToExtract[tagIndex]] = tagIndex;
                 indexes[tagIndex] = Enumerable.Repeat(-1, _numPositions).ToArray();
@@ -102,7 +102,7 @@ namespace Phantom.PositionCollections
                         indexes[tagIndex][i] = j;
                         numTagsExtracted++;
                     }
-                    if (numTagsExtracted == numTagsToExtact) break;
+                    if (numTagsExtracted == numTagsToExtract) break;
                 }
             }
             return indexes;
@@ -116,10 +116,10 @@ namespace Phantom.PositionCollections
             for (int sampleIndex = 0; sampleIndex < positionSet.NumSamples; sampleIndex++)
             {
                 var genotypesAndStartIndexes = GetGenotypeBlocks(positionSet, sampleIndex);
-                foreach (var genotypeAndSartIndex in genotypesAndStartIndexes)
+                foreach (var genotypeAndStartIndex in genotypesAndStartIndexes)
                 {
-                    if (genotypeToSample.ContainsKey(genotypeAndSartIndex)) genotypeToSample[genotypeAndSartIndex].Add(sampleIndex);
-                    else genotypeToSample[genotypeAndSartIndex] = new List<int> { sampleIndex };
+                    if (genotypeToSample.ContainsKey(genotypeAndStartIndex)) genotypeToSample[genotypeAndStartIndex].Add(sampleIndex);
+                    else genotypeToSample[genotypeAndStartIndex] = new List<int> { sampleIndex };
                 }
             }
             return genotypeToSample;
@@ -127,7 +127,7 @@ namespace Phantom.PositionCollections
 
 
         // GenotypeBlocks can be shared by multiple samples
-        // We mainly utilize phase set informaiton at this step to avoid duplicated calculation
+        // We mainly utilize phase set information at this step to avoid duplicated calculation
         // These GenotypeBlocks could be further segmented when more details considered
         private static IEnumerable<GenotypeBlock> GetGenotypeBlocks(PositionSet positionSet, int sampleIndex)
         {
@@ -211,7 +211,7 @@ namespace Phantom.PositionCollections
             int numSamples = positionSetSampleInfo.NumSamples;
             if (numPositions != tagIndexes.Length) throw new InvalidDataException($"The inconsistent numbers of positions: {numPositions} in sample info array, {tagIndexes.Length} in GQ index array");
             var tagInfo = new T[numSamples][];
-            for (int sampleIndex = 0; sampleIndex < numSamples; sampleIndex++)
+            for (var sampleIndex = 0; sampleIndex < numSamples; sampleIndex++)
             {
                 tagInfo[sampleIndex] = new T[numPositions];
                 for (var i = 0; i < numPositions; i++)
