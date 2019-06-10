@@ -16,6 +16,7 @@ namespace VariantAnnotation.NSA
 {
     public sealed class NsiReader : INsiReader
     {
+        private readonly Stream _stream;
         public GenomeAssembly Assembly { get; }
         public IDataSourceVersion Version { get; }
         public string JsonKey { get; }
@@ -25,6 +26,7 @@ namespace VariantAnnotation.NSA
         private const int MaxStreamLength = 10 * 1048576;
         public NsiReader(Stream stream)
         {
+            _stream = stream;
             var compressData = new byte[MaxStreamLength];
             int length = stream.Read(compressData, 0, MaxStreamLength);
             //uncompress
@@ -84,13 +86,18 @@ namespace VariantAnnotation.NSA
             return jsonStrings;
         }
 
-        private string AddOverlapToAnnotation(string jsonString, double? reciprocalOverlap, double? annotationOverlap)
+        private static string AddOverlapToAnnotation(string jsonString, double? reciprocalOverlap, double? annotationOverlap)
         {
             if (reciprocalOverlap != null)
                 jsonString+=JsonObject.Comma + "\"reciprocalOverlap\":" + reciprocalOverlap.Value.ToString("0.#####");
             if (annotationOverlap != null)
                 jsonString += JsonObject.Comma + "\"annotationOverlap\":" + annotationOverlap.Value.ToString("0.#####");
             return jsonString;
+        }
+
+        public void Dispose()
+        {
+            _stream?.Dispose();
         }
     }
 }

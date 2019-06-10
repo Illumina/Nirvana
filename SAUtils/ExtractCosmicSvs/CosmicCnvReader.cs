@@ -49,7 +49,8 @@ namespace SAUtils.ExtractCosmicSvs
             while ((line = _reader.ReadLine()) != null)
             {
                 // Skip empty lines.
-                if (line.IsWhiteSpace()) continue;
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
                 // Skip comments.
                 if (isFirstLine)
                 {

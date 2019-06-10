@@ -254,7 +254,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new RnaEdit(284, 284, "C"),
                 new RnaEdit(294, 294, "C"),
                 new RnaEdit(420, 421, "CA"),
-                new RnaEdit(670, 671, "CT"),
+                new RnaEdit(670, 671, "CT")
             };
             const byte startExonPhase = 0;
 
@@ -356,7 +356,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new RnaEdit(104, 104, "A"),
                 new RnaEdit(49, 49, "A"),
                 new RnaEdit(10, 10, "G"),
-                new RnaEdit(4, 4, "G"),
+                new RnaEdit(4, 4, "G")
 
             };
             const byte startExonPhase = 0;

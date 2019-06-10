@@ -9,7 +9,6 @@ using Genome;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Utilities;
 using Variants;
 using static SAUtils.InputFileParsers.ClinVar.ClinVarCommon;
 
@@ -264,7 +263,7 @@ namespace SAUtils.InputFileParsers.ClinVar
                 ParseClinvarAssertion(element);
         }
 
-        private bool IsInvalidVariant(ClinvarVariant variant)
+        private static bool IsInvalidVariant(ClinvarVariant variant)
         {
             return variant.Chromosome == null
                    || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
@@ -293,14 +292,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             return variant == null ? null : compressedSequence.Substring(variant.Position - 1, variant.Stop - variant.Position + 1);
         }
 
-        private (int Start, string RefAllele, string AltAllele) LeftShift(int start, string refAllele, string altAllele)
-		{
-			if (refAllele == null || altAllele == null) return (start, refAllele, altAllele);
-
-			return VariantUtils.TrimAndLeftAlign(start, refAllele, altAllele, _sequenceProvider.Sequence);
-		}
-
-		internal static long ParseDate(string s)
+        internal static long ParseDate(string s)
 		{
 			if (string.IsNullOrEmpty(s) || s == "-") return long.MinValue;
 			//Jun 29, 2010
@@ -557,12 +549,12 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    string altAllele       = xElement.Attribute(AltAlleleTag)?.Value;
 
             if (stop - start + 1 > MaxVariantLength) return null;
-            AdjustVariant(ref start,ref stop, ref referenceAllele, ref altAllele);
+            AdjustVariant(ref start, ref referenceAllele, ref altAllele);
 		    
             return new ClinvarVariant(chromosome, start, stop, referenceAllele, altAllele);
 		}
 
-		private static void AdjustVariant(ref int start, ref int stop, ref string referenceAllele, ref string altAllele)
+		private static void AdjustVariant(ref int start, ref string referenceAllele, ref string altAllele)
 		{
 		    if (referenceAllele == "-")
 		    {
@@ -596,7 +588,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             }
         }
 
-        private string[] GetSignificances(string description, string explanation)
+        private static string[] GetSignificances(string description, string explanation)
         {
             if(string.IsNullOrEmpty(explanation)) return description?.ToLower().Split('/', ',').Select(x=>x.Trim()).ToArray();
             //<Explanation DataSource="ClinVar" Type="public">Pathogenic(1);Uncertain significance(1)</Explanation>
@@ -610,7 +602,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             return sigList.ToArray();
         }
 
-        private readonly HashSet<string> _validPathogenicity = new HashSet<string>()
+        private readonly HashSet<string> _validPathogenicity = new HashSet<string>
         {
             "uncertain significance",
             "not provided",

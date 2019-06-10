@@ -51,7 +51,7 @@ namespace VariantAnnotation.Providers
                     {
                         Console.WriteLine(nsiReader.Version + "\tAssembly:" + nsiReader.Assembly);
                     }
-                throw new UserErrorException("Multilpe genome assemblies detected in Supplementary annotation directory");
+                throw new UserErrorException("Multiple genome assemblies detected in Supplementary annotation directory");
             }
 
             Assembly = distinctAssemblies[0];
@@ -66,8 +66,8 @@ namespace VariantAnnotation.Providers
 
         private void GetStructuralVariantAnnotations(IAnnotatedPosition annotatedPosition)
         {
-            var needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
-            var needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
+            bool needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
+            bool needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
 
             foreach (INsiReader nsiReader in _nsiReaders)
             {
@@ -89,23 +89,6 @@ namespace VariantAnnotation.Providers
             {
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
                 AddSmallAnnotations(annotatedVariant);
-                
-                //check for interval annotations that applies to all variants
-                if(_nsiReaders ==null) continue;
-                AddLargeAnnotationsToSmallVariants(annotatedVariant);
-            }
-        }
-
-        private void AddLargeAnnotationsToSmallVariants(IAnnotatedVariant annotatedVariant)
-        {
-            foreach (INsiReader nsiReader in _nsiReaders)
-            {
-                if (nsiReader.ReportFor == ReportFor.StructuralVariants ||
-                    nsiReader.ReportFor == ReportFor.None) continue;
-
-                var variant = annotatedVariant.Variant;
-                var annotations = nsiReader.GetAnnotation(variant);
-                if (annotations != null) AddPositionalAnnotation(annotations, annotatedVariant, nsiReader);
             }
         }
 
@@ -114,7 +97,7 @@ namespace VariantAnnotation.Providers
             foreach (INsaReader nsaReader in _nsaReaders)
             {
                 var variant = annotatedVariant.Variant;
-                var annotations = nsaReader.GetAnnotation(variant.Chromosome, variant.Start);
+                var annotations = nsaReader.GetAnnotation(variant.Start);
                 if (annotations == null) continue;
 
                 if (nsaReader.IsPositional)
@@ -129,16 +112,11 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        private void AddPositionalAnnotation(IEnumerable<string> annotations, IAnnotatedVariant annotatedVariant, INsiReader nsiReader)
-        {
-            annotatedVariant.SaList.Add(new SupplementaryAnnotation(nsiReader.JsonKey, true, true, null, annotations));
-        }
-
         private static void AddPositionalAnnotation(IEnumerable<(string refAllele, string altAllele, string annotation)> annotations, IAnnotatedVariant annotatedVariant,
             INsaReader nsaReader)
         {
             //e.g. ancestral allele, global minor allele
-            var jsonString = annotations.First().annotation;
+            string jsonString = annotations.First().annotation;
             annotatedVariant.SaList.Add(new SupplementaryAnnotation(nsaReader.JsonKey, nsaReader.IsArray,
                 nsaReader.IsPositional, jsonString, null));
         }
@@ -196,9 +174,22 @@ namespace VariantAnnotation.Providers
             }
 
             var totalTime = benchmark.GetElapsedTime();
-            //var rate = totalBytes * 1.0 / (totalTime.TotalSeconds * 1_000_000);// MB/sec
-            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");//. Data rate {rate:#.##} MB/sec");
-            //Console.WriteLine($"No of http stream sources created {HttpStreamSource.Count}");
+            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");
+        }
+
+        public void Dispose()
+        {
+            if(_nsaReaders!=null)
+                foreach (var nsaReader in _nsaReaders)
+                {
+                    nsaReader.Dispose();
+                }
+
+            if(_nsiReaders != null)
+                foreach (var nsiReader in _nsiReaders)
+                {
+                    nsiReader.Dispose();
+                }
         }
     }
 }

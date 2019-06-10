@@ -13,7 +13,7 @@ namespace UnitTests.Compression.DataStructures
     {
         private static readonly byte[] ExpectedDecompressedBytes;
         private static readonly int NumExpectedUncompressedBytes;
-        private static readonly QuickLZ Qlz = new QuickLZ();
+        private static readonly Zstandard Zstd = new Zstandard(1);
 
         static BlockTests()
         {
@@ -38,10 +38,10 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void QuickLzBlock()
         {
-            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out var copyLength);
+            var ms = GetBlockStream(Zstd, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out var copyLength);
             ms.Seek(0, SeekOrigin.Begin);
 
-            var readBlock = new Block(Qlz);
+            var readBlock = new Block(Zstd);
             readBlock.Read(ms);
 
             var observedDecompressedBytes = new byte[NumExpectedUncompressedBytes];
@@ -56,7 +56,7 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void BlockZeroLengthCopy()
         {
-            var writeBlock = new Block(Qlz);
+            var writeBlock = new Block(Zstd);
             const int expectedCopyLength = 0;
 
             Assert.Equal(expectedCopyLength, writeBlock.CopyTo(ExpectedDecompressedBytes, 0, 0));
@@ -66,10 +66,10 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void BlockWrongSize()
         {
-            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out _);
+            var ms = GetBlockStream(Zstd, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out _);
             ms.Seek(0, SeekOrigin.Begin);
 
-            var readBlock = new Block(Qlz);
+            var readBlock = new Block(Zstd);
 
             using (var updatedMs = new MemoryStream())
             {
@@ -95,10 +95,10 @@ namespace UnitTests.Compression.DataStructures
         [Fact]
         public void BlockTruncation()
         {
-            var ms = GetBlockStream(Qlz, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out _);
+            var ms = GetBlockStream(Zstd, ExpectedDecompressedBytes, NumExpectedUncompressedBytes, out _);
             ms.Seek(0, SeekOrigin.Begin);
 
-            var readBlock = new Block(Qlz);
+            var readBlock = new Block(Zstd);
 
             using (var truncatedMs = new MemoryStream())
             {
@@ -115,10 +115,10 @@ namespace UnitTests.Compression.DataStructures
             const int bufferSize = 10000;
             var buffer = BlockStreamTests.GetRandomBytes(bufferSize);
 
-            var ms = GetBlockStream(Qlz, buffer, bufferSize, out _);
+            var ms = GetBlockStream(Zstd, buffer, bufferSize, out _);
             ms.Seek(0, SeekOrigin.Begin);
 
-            var readBlock = new Block(Qlz);
+            var readBlock = new Block(Zstd);
 
             using (var truncatedMs = new MemoryStream())
             {

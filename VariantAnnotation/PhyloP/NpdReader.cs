@@ -24,8 +24,13 @@ namespace VariantAnnotation.PhyloP
         public GenomeAssembly Assembly { get; }
         public IDataSourceVersion Version { get; }
 
+        private readonly Stream _dbStream;
+        private readonly Stream _indexStream;
+
         public NpdReader(Stream dbStream, Stream indexStream)
         {
+            _dbStream = dbStream;
+            _indexStream = indexStream;
             _reader = new ExtendedBinaryReader(dbStream);
 
             _index   = new NpdIndex(new ExtendedBinaryReader(indexStream));
@@ -52,7 +57,11 @@ namespace VariantAnnotation.PhyloP
         {
             _chromosome = chrom;
             (long startLocation, int numBytes) = _index.GetFileRange(chrom.Index);
-            if (startLocation == -1) return;
+            if (startLocation == -1)
+            {
+                _lastPhylopPosition = -1;
+                return;
+            }
             _reader.BaseStream.Position = startLocation;
             var buffer = _reader.ReadBytes(numBytes);
 
@@ -73,6 +82,8 @@ namespace VariantAnnotation.PhyloP
         public void Dispose()
         {
             _reader?.Dispose();
+            _dbStream?.Dispose();
+            _indexStream?.Dispose();
         }
     }
 }

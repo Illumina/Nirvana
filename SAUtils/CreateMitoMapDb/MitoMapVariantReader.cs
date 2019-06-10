@@ -309,7 +309,7 @@ namespace SAUtils.CreateMitoMapDb
         }
 
         // C-C(2-8)
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C_C_2_8(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C_C_2_8(string alleleString)
         {
             var regex = new Regex(@"(?<ref>[ACGTacgtNn])[_|-](?<alt>[ACGTacgtNn])\((?<min>\d+)-(?<max>\d+)\)");
             var match = regex.Match(alleleString);
@@ -329,7 +329,7 @@ namespace SAUtils.CreateMitoMapDb
         }
 
         //A-Cor CC
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_A_C_or_CC(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_A_C_or_CC(string alleleString)
         {
             var regex = new Regex(@"(?<ref>[ACGTacgtNn]+)[_|-](?<alt1>[ACGTacgtNn]+) ?or ?(?<alt2>[ACGTacgtNn]+)");
             var match = regex.Match(alleleString);
@@ -354,7 +354,7 @@ namespace SAUtils.CreateMitoMapDb
         }
 
         // C9537insC
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C9537insC(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_C9537insC(string alleleString)
         {
             var regex = new Regex(@"(?<ref>[ACGTacgtNn])(?<position>\d+)ins(?<extra>[ACGTacgtNn]+)");
             var match = regex.Match(alleleString);

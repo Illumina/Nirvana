@@ -5,9 +5,8 @@ namespace Intervals
 	public sealed class IntervalArray<T> : IIntervalSearch<T>
     {
 		public readonly Interval<T>[] Array;
-		public static readonly Interval<T> EmptyInterval = new Interval<T>(-1, -1, default(T));
 
-		public IntervalArray(Interval<T>[] array)
+        public IntervalArray(Interval<T>[] array)
 		{
 			Array = array;
 			SetMaxIntervals();
@@ -21,20 +20,7 @@ namespace Intervals
 			return GetFirstIndexAny(begin, end) >= 0;
 		}
 
-		public bool GetFirstOverlappingInterval(int begin, int end, out Interval<T> interval)
-		{
-			var firstIndex = GetFirstIndex(begin, end);
-			if (firstIndex == -1)
-			{
-				interval = EmptyInterval;
-				return false;
-			}
-
-			interval = Array[firstIndex];
-			return true;
-		}
-
-		/// <summary>
+        /// <summary>
 		/// returns values for all intervals that overlap the specified interval
 		/// </summary>
 		public T[] GetAllOverlappingValues(int begin, int end)

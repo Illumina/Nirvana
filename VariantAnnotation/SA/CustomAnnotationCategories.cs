@@ -6,6 +6,7 @@
         AlleleCount,
         AlleleNumber,
         AlleleFrequency,
-        Prediction
+        Prediction,
+        Filter
     }
 }

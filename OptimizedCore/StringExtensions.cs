@@ -4,7 +4,7 @@ namespace OptimizedCore
 {
     public static class StringExtensions
     {
-        public static unsafe string[] OptimizedSplit(this string s, char delimiter)
+        public static unsafe string[] OptimizedSplit(this string s, char delimiter, int numColumns = -1)
         {
             var numReplaces = 0;
             int sLen        = s.Length;
@@ -23,7 +23,10 @@ namespace OptimizedCore
             var startIndex = 0;
             var colIndex   = 0;
 
-            var columns = new string[numReplaces + 1];
+            int numDelimitedColumns = numReplaces + 1;
+            if (numColumns < numDelimitedColumns) numColumns = numDelimitedColumns;
+
+            var columns = new string[numColumns];
             for (var index = 0; index < numReplaces && startIndex < sLen; ++index)
             {
                 columns[colIndex++] = s.Substring(startIndex, sepList[index] - startIndex);
@@ -95,28 +98,5 @@ namespace OptimizedCore
         public static bool OptimizedStartsWith(this string s, char ch) => s.Length > 0 && s[0] == ch;
 
         public static bool OptimizedEndsWith(this string s, char ch) => s.Length > 0 && s[s.Length - 1] == ch;
-
-        public static bool IsWhiteSpace(this string s)
-        {
-            foreach (char c in s) if (!char.IsWhiteSpace(c)) return false;
-            return true;
-        }
-
-        public static string TrimEnd(this string s, string value) => 
-            !s.EndsWith(value) 
-            ? s 
-            : s.Remove(s.Length - value.Length);
-
-        public static string TrimEndFromFirst(this string s, string value)
-        {
-            int extPos = s.IndexOf(value, StringComparison.Ordinal);
-            return extPos == -1 ? s : s.Substring(0, extPos);
-        }
-
-        public static string TrimStartToLast(this string s, string value)
-        {
-            int extPos = s.LastIndexOf(value, StringComparison.Ordinal);
-            return extPos == -1 ? s : s.Substring(extPos + value.Length);
-        }
     }
 }

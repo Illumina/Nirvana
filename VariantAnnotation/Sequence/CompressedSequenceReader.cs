@@ -9,6 +9,8 @@ using Intervals;
 using IO;
 
 namespace VariantAnnotation.Sequence
+
+
 {
     public sealed class CompressedSequenceReader : IDisposable
     {

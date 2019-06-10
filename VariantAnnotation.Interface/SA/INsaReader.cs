@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Genome;
 using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.Interface.SA
 {
-    public interface INsaReader
+    public interface INsaReader:IDisposable
     {
         GenomeAssembly Assembly { get; }
         IDataSourceVersion Version { get; }
@@ -13,7 +14,7 @@ namespace VariantAnnotation.Interface.SA
         bool IsArray { get; }
         bool IsPositional { get; }
 
-        IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position);
+        IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position);
         void PreLoad(IChromosome chrom, List<int> positions);
     }
 }

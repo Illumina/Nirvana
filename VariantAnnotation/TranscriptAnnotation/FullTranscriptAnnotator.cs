@@ -53,7 +53,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var end   = MappedPositionUtilities.FindRegion(transcript.TranscriptRegions, variant.End);
 
             var position = GetMappedPosition(transcript.TranscriptRegions, start.Region, start.Index, end.Region,
-                end.Index, variant, onReverseStrand, transcript.Translation?.CodingRegion, transcript.RnaEdits, transcript.StartExonPhase,
+                end.Index, variant, onReverseStrand, transcript.Translation?.CodingRegion, transcript.StartExonPhase,
                 variant.Type == VariantType.insertion);
 
             var transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
@@ -103,12 +103,12 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, ITranscriptRegion startRegion,
             int startIndex, ITranscriptRegion endRegion, int endIndex, IInterval variant, bool onReverseStrand,
-            ICodingRegion codingRegion, IRnaEdit[] rnaEdits, byte startExonPhase, bool isInsertion)
+            ICodingRegion codingRegion, byte startExonPhase, bool isInsertion)
         {
             var (cdnaStart, cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(startRegion, endRegion, variant, onReverseStrand, isInsertion);
             if (onReverseStrand) Swap.Int(ref cdnaStart, ref cdnaEnd);
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, rnaEdits, cdnaStart, cdnaEnd,
+            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, cdnaStart, cdnaEnd,
                 startExonPhase, isInsertion);
 
             var proteinStart = MappedPositionUtilities.GetProteinPosition(cdsStart);

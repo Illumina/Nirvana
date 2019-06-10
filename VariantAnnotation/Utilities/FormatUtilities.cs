@@ -1,12 +1,8 @@
-﻿using VariantAnnotation.Interface.AnnotatedPositions;
-
-namespace VariantAnnotation.Utilities
+﻿namespace VariantAnnotation.Utilities
 {
 	public static class FormatUtilities
 	{
-		public static string CombineIdAndVersion(ICompactId id, byte version) => id + "." + version;
-
-		public static (string Id, byte Version) SplitVersion(string s)
+        public static (string Id, byte Version) SplitVersion(string s)
 		{
 		    if (s == null) return (null, 0);
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using ErrorHandling.Exceptions;
 using VariantAnnotation.Interface.SA;
 using Variants;
 
@@ -21,25 +22,29 @@ namespace SAUtils.DataStructures
 
             var newAlleles = BiDirectionalTrimmer.Trim(saItem.Position, saItem.RefAllele, saItem.AltAllele);
 
-            saItem.Position        = newAlleles.Start;
+            saItem.Position  = newAlleles.Start;
             saItem.RefAllele = newAlleles.RefAllele;
             saItem.AltAllele = newAlleles.AltAllele;
 
         }
 
-        public static List<ISupplementaryDataItem> RemoveConflictingAlleles(List<ISupplementaryDataItem> saItems)
+        public static List<ISupplementaryDataItem> RemoveConflictingAlleles(List<ISupplementaryDataItem> saItems, bool throwErrorOnConflicts)
         {
             var nonDuplicateSet  = new Dictionary<string, ISupplementaryDataItem>();
             var conflictSet = new List<string>();
 
             foreach (var saItem in saItems)
             {
-                var refAlt = saItem.RefAllele+'-'+saItem.AltAllele;
+                var refAlt = saItem.RefAllele+'>'+saItem.AltAllele;
 
                 if (nonDuplicateSet.TryGetValue(refAlt, out var dupItem))
                 {
                     if (saItem.GetJsonString() != dupItem.GetJsonString())
+                    {
+                        if(throwErrorOnConflicts)
+                            throw new UserErrorException($"Conflicting entries for items at {saItem.Chromosome.UcscName}:{saItem.Position} for alleles {saItem.RefAllele} > {saItem.AltAllele}");
                         conflictSet.Add(refAlt);
+                    }
                 }
                 else nonDuplicateSet.Add(refAlt, saItem);
             }
@@ -48,7 +53,7 @@ namespace SAUtils.DataStructures
 
             if (conflictSet.Count > 0)
             {
-                values.RemoveAll(x => conflictSet.Contains(x.RefAllele + '-' + x.AltAllele));
+                values.RemoveAll(x => conflictSet.Contains(x.RefAllele + '>' + x.AltAllele));
             }
 
             return values;

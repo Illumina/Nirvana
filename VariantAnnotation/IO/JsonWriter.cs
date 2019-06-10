@@ -16,7 +16,7 @@ namespace VariantAnnotation.IO
         private readonly StreamWriter _writer;
         private bool _firstEntry;
         private bool _positionFieldClosed;
-        private bool _leaveOpen;
+        private readonly bool _leaveOpen;
 
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;

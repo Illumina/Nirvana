@@ -19,9 +19,7 @@ namespace Compression.Utilities
         }
 
         public static StreamReader GetAppropriateStreamReader(string filePath) => FileUtilities.GetStreamReader(GetAppropriateReadStream(filePath));
-        public static BinaryReader GetAppropriateBinaryReader(string filePath) => new BinaryReader(GetAppropriateReadStream(filePath));
         public static StreamWriter GetStreamWriter(string filePath) => new StreamWriter(GetWriteStream(filePath));
-        public static BinaryWriter GetBinaryWriter(string filePath) => new BinaryWriter(GetWriteStream(filePath));
         public static Stream GetWriteStream(string filePath) => new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
 
         private static Stream GetAppropriateStream(Stream stream, CompressionAlgorithm compressionAlgorithm)
@@ -44,6 +42,8 @@ namespace Compression.Utilities
 
             return newStream;
         }
+
+        //todo: can have just one method for both file and http streams
         //used in custom annotation lambda
         public static Stream GetAppropriateStream(PersistentStream pStream)
         {

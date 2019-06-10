@@ -62,7 +62,7 @@ namespace Jasix.DataStructures
 	        writer.WriteOpt(_largeVariants.Count);
 	        if (_largeVariants.Count == 0) return;
 
-	        foreach (var interval in _largeVariants.OrderBy(x => x.Begin).ThenBy(x => x.End))
+	        foreach (Interval<long> interval in _largeVariants.OrderBy(x => x.Begin).ThenBy(x => x.End))
 	        {
 		        WriteInterval(interval, writer);
 	        }
@@ -83,7 +83,7 @@ namespace Jasix.DataStructures
 			if (Utilities.IsLargeVariant(begin,end))
             {
                 _largeVariants.Add(new Interval<long>(begin, end, filePosition));
-                end = begin;// large variants will be recorded as snvs so that we can query for all entries from a given position
+                end = begin;// large variants will be recorded as SNVs so that we can query for all entries from a given position
             }
 
 			if (_currentNode == null)
@@ -143,7 +143,7 @@ namespace Jasix.DataStructures
 
 	    public long[] FindLargeVariants(int begin, int end)
         {
-            var positions = _intervalArray?.GetAllOverlappingValues(begin, end);
+            long[] positions = _intervalArray?.GetAllOverlappingValues(begin, end);
 
             if (positions == null || positions.Length == 0) return null;
             return positions;

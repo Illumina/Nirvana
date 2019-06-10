@@ -38,5 +38,9 @@ namespace VariantAnnotation.Providers
             throw new NotImplementedException();
         }
 
+        public void Dispose()
+        {
+            _phylopReader?.Dispose();
+        }
     }
 }

@@ -81,14 +81,14 @@ namespace Jasix
                 }
 
                 line = line.TrimEnd(',');
-                var chrPos = GetChromPosition(line);
+                (string chr, int position, int end) = GetChromPosition(line);
 
-                CheckSorting(chrPos.chr, chrPos.position, previousChr, previousPos);
+                CheckSorting(chr, position, previousChr, previousPos);
 
-                index.Add(chrPos.chr, chrPos.position, chrPos.end, linePosition);
+                index.Add(chr, position, end, linePosition);
                 linePosition = _reader.Position;
-                previousChr = chrPos.chr;
-                previousPos = chrPos.position;
+                previousChr = chr;
+                previousPos = position;
             }
 
             return line;

@@ -32,7 +32,7 @@ namespace SAUtils.InputFileParsers
                 while ((line = reader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (line.IsWhiteSpace()) continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
 
                     if (double.TryParse(line, out double score))
                     {

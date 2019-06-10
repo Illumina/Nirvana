@@ -1,5 +1,4 @@
-﻿using System;
-using IO;
+﻿using IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 

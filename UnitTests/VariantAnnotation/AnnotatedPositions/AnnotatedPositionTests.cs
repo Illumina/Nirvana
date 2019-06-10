@@ -72,7 +72,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var vcfFields = new string[8];
             vcfFields[0] = originalChromosomeName;
 
-            var infoData = new InfoData(null, null, VariantType.unknown, null, null, null, null, null, false, null, null, false, false, null,null, null);
+            var infoData = new InfoData(null, null, null, null, null, null, null, null, VariantType.unknown);
 
             return new Position(_chromosome, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);

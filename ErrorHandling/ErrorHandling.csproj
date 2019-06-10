@@ -2,7 +2,10 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
-    <DebugType>Full</DebugType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.102.7" />
+  </ItemGroup>
 </Project>

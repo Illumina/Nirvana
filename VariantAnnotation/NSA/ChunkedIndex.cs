@@ -98,16 +98,13 @@ namespace VariantAnnotation.NSA
                     for (var j = 0; j < chunkCount; j++)
                         _chromChunks[chromIndex].Add(new Chunk(memReader));
                 }
-
             }
-            
         }
 
-        
-        public (long startFilePosition, long endFilePosition, int chunkCount) GetFileRange(ushort chromIndex, int start, int end)
+        public (long startFilePosition, int chunkCount) GetFileRange(ushort chromIndex, int start, int end)
         {
             //create a static empty entry.
-            if (_chromChunks == null || !_chromChunks.TryGetValue(chromIndex, out var chunks)) return (-1, -1,0);
+            if (_chromChunks == null || !_chromChunks.TryGetValue(chromIndex, out var chunks)) return (-1, 0);
 
             long startFilePosition = -1;
             long endFilePosition = -1;
@@ -116,21 +113,21 @@ namespace VariantAnnotation.NSA
             int endChunkIndex = BinarySearch(chunks, end);
 
             if (startChunkIndex < 0) startChunkIndex = ~startChunkIndex;
-            if (startChunkIndex == chunks.Count) return (-1, -1,0); //start lands after the last chunk=> nothing to return
+            if (startChunkIndex == chunks.Count) return (-1, 0); //start lands after the last chunk=> nothing to return
             if (startChunkIndex < chunks.Count)
                 startFilePosition = chunks[startChunkIndex].FilePosition;
 
-            if (endChunkIndex < 0) endChunkIndex = ~endChunkIndex -1;//if end lands on a gap, return the the chunk to the left of end
-            if (endChunkIndex < 0) return (-1, -1, 0);//end lands before the first chunk => nothing to return;
+            if (endChunkIndex < 0) endChunkIndex = ~endChunkIndex - 1; //if end lands on a gap, return the the chunk to the left of end
+            if (endChunkIndex < 0) return (-1, 0); //end lands before the first chunk => nothing to return
             if (endChunkIndex < chunks.Count)
                 endFilePosition = chunks[endChunkIndex].FilePosition + chunks[endChunkIndex].Length;
 
-            if (endFilePosition < startFilePosition) return (-1, -1, 0); //both begin and end landed on the same gap.
+            if (endFilePosition < startFilePosition) return (-1, 0); //both begin and end landed on the same gap.
 
-            return (startFilePosition, endFilePosition, endChunkIndex- startChunkIndex+1);
+            return (startFilePosition, endChunkIndex - startChunkIndex + 1);
         }
 
-        private int BinarySearch(List<Chunk> chunks, int position)
+        private static int BinarySearch(List<Chunk> chunks, int position)
         {
             var begin = 0;
             int end = chunks.Count - 1;

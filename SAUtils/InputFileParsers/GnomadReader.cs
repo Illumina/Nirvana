@@ -2,12 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Providers;
 using Variants;
 
 namespace SAUtils.InputFileParsers
@@ -103,7 +101,8 @@ namespace SAUtils.InputFileParsers
 				while ((line = _reader.ReadLine()) != null)
 				{
 					// Skip empty lines.
-					if (line.IsWhiteSpace()) continue;
+					if (string.IsNullOrWhiteSpace(line)) continue;
+
 					// Skip comments.
 					if (line.OptimizedStartsWith('#')) continue;
 					var gnomadItemsList = ExtractItems(line);

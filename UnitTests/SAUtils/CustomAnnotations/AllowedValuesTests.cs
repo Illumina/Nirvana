@@ -4,7 +4,7 @@ using SAUtils.Custom;
 
 namespace UnitTests.SAUtils.CustomAnnotations
 {
-    public class AllowedValuesTests
+    public sealed class AllowedValuesTests
     {
         [Fact]
         public void IsEmptyValue_AsExpected()
@@ -21,7 +21,6 @@ namespace UnitTests.SAUtils.CustomAnnotations
             AllowedValues.ValidatePredictionValue(".", "");
             AllowedValues.ValidatePredictionValue("P", "");
             AllowedValues.ValidatePredictionValue("Likely Benign", "");
-            AllowedValues.ValidatePredictionValue("VUSS", "");
             AllowedValues.ValidatePredictionValue("Vus", "");
         }
 

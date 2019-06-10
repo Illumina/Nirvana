@@ -5,9 +5,9 @@ namespace VariantAnnotation.Interface.IO
 {
     public static class VcfCommon
     {
-        public const string ChromosomeHeader                 = "#CHROM";
-        public const string GatkNonRefAllele                 = "<NON_REF>";
-        public const string MissingValue                     = ".";
+        public const string ChromosomeHeader = "#CHROM";
+        public const string GatkNonRefAllele = "<NON_REF>";
+        private const string MissingValue    = ".";
 
         public const int MinNumColumnsSampleGenotypes = 10;
 

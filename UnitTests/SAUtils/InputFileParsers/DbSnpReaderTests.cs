@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
-using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.DbSnp;
 using UnitTests.TestDataStructures;
-using VariantAnnotation.Interface.Providers;
 using Variants;
 using Xunit;
 
@@ -105,7 +103,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal("T", dbSnpEntry.AltAllele);            
         }
 
-        private Stream GetStream()
+        private static Stream GetStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);

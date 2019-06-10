@@ -59,27 +59,6 @@ namespace UnitTests.Phantom.Graph
         }
 
         [Fact]
-        public void MergeGraph()
-        {
-            var expectedNeighbors = new LinkedList<int>();
-            expectedNeighbors.AddLast(10);
-            expectedNeighbors.AddLast(30);
-
-            var graph = new Graph<int>(false);
-            graph.TryAddVertex(10);
-            graph.AddEdge(10, 20);
-
-            var graph2 = new Graph<int>(false);
-            graph2.TryAddVertex(20);
-            graph2.AddEdge(20, 30);
-
-            graph.MergeGraph(graph2);
-
-            var observedNeighbors = graph.GetNeighbors(20);
-            Assert.Equal(expectedNeighbors, observedNeighbors);
-        }
-
-        [Fact]
         public void FindAllConnectedComponents()
         {
             var graph = new Graph<int>(false);

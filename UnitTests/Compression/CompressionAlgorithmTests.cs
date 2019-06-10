@@ -61,7 +61,6 @@ namespace UnitTests.Compression
         }
 
         [Theory]
-        [InlineData(CompressionAlgorithms.QuickLz)]
         [InlineData(CompressionAlgorithms.Zlib)]
         [InlineData(CompressionAlgorithms.Zstandard)]
         public void RoundTrip(CompressionAlgorithms ca)
@@ -104,8 +103,6 @@ namespace UnitTests.Compression
         {
             switch (ca)
             {
-                case CompressionAlgorithms.QuickLz:
-                    return new QuickLZ();
                 case CompressionAlgorithms.Zlib:
                     return new Zlib();
                 case CompressionAlgorithms.Zstandard:
@@ -118,7 +115,6 @@ namespace UnitTests.Compression
 
     public enum CompressionAlgorithms
     {
-        QuickLz,
         Zlib,
         Zstandard
     }

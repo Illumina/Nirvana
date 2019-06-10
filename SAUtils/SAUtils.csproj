@@ -3,17 +3,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
-    <DebugType>Full</DebugType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
-  <ItemGroup>
-    <Compile Remove="InputFileParsers\EVS\**" />
-    <Compile Remove="InputFileParsers\IntermediateAnnotation\**" />
-    <EmbeddedResource Remove="InputFileParsers\EVS\**" />
-    <EmbeddedResource Remove="InputFileParsers\IntermediateAnnotation\**" />
-    <None Remove="InputFileParsers\EVS\**" />
-    <None Remove="InputFileParsers\IntermediateAnnotation\**" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />

@@ -82,10 +82,10 @@ namespace Jasix.DataStructures
 			}
 
             writer.WriteOpt(_synonymToChrName.Count);
-		    foreach (var pair in _synonymToChrName)
+		    foreach ((string key, string value) in _synonymToChrName)
 		    {
-		        writer.Write(pair.Key);
-		        writer.Write(pair.Value);
+		        writer.Write(key);
+		        writer.Write(value);
             }
 
             writer.WriteOpt(_sectionRanges.Count);

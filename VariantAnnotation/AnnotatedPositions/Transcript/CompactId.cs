@@ -55,6 +55,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return Empty;
         }
 
+        public bool IsPredictedTranscript() =>
+            _id == IdType.RefSeqPredictedMessengerRNA || _id == IdType.RefSeqPredictedNonCodingRNA;
+
         private static uint ToInfo(int num, int len) => (uint)(num << 4 | (len & LengthMask));
 
         private static CompactId GetCompactId(string s, int prefixLen, IdType idType, byte version)

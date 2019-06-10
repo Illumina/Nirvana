@@ -106,7 +106,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdsPosition + 2) / 3;
         }
 
-        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, IRnaEdit[] rnaEdits, int cdnaStart,
+        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, int cdnaStart,
             int cdnaEnd, byte startExonPhase, bool isInsertion)
         {
             var cdsStart = GetCdsPosition(codingRegion, cdnaStart, startExonPhase);

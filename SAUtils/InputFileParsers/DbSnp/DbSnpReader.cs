@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Genome;
 using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
@@ -32,7 +30,8 @@ namespace SAUtils.InputFileParsers.DbSnp
                 while ((line = reader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (line.IsWhiteSpace()) continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
                     

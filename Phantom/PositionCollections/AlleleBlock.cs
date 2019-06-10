@@ -30,9 +30,9 @@ namespace Phantom.PositionCollections
                 var genotypeArray = genotypeBlock.Genotypes.ToArray();
                 int startIndexInBlock = genotypeBlock.PosIndex;
                 int ploidy = GetMaxPloidy(genotypeArray);
-                var currentSubBlockStart = -1;
+                int currentSubBlockStart = -1;
 
-                for (int i = 0; i < genotypeArray.Length; i++)
+                for (var i = 0; i < genotypeArray.Length; i++)
                 {
                     int indexInBlock = i + startIndexInBlock;
                     var genotype = genotypeArray[i];
@@ -142,16 +142,6 @@ namespace Phantom.PositionCollections
         }
 
         internal static int GetMaxPloidy(IEnumerable<Genotype> genotypes) => genotypes.Select(x => x.AlleleIndexes.Length).Max();
-
-        internal static void TrimTrailingRefAlleles(List<int>[] blocks)
-        {
-            if (blocks.Length == 0) return;
-            for (int index = blocks[0].Count - 1; index >= 0; index--)
-            {
-                if (blocks.Any(x => x[index] != 0)) break;
-                foreach (var block in blocks) block.RemoveAt(index);
-            }
-        }
 
         private static bool HasReducedPloidy(int[] genotypeIndexes, int blockPloidy) => genotypeIndexes.Length < blockPloidy;
 

@@ -5,7 +5,6 @@ using System.Linq;
 using Cloud;
 using CommandLine.Utilities;
 using Genome;
-using IO;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
@@ -36,28 +35,23 @@ namespace Nirvana
         public string VepDataVersion { get; }
         public long InputStartVirtualPosition { get; set; }
         public string AnnotatorVersionTag { get; set; } = "Nirvana " + CommandLineUtilities.Version;
-        public bool OutputVcf { get; }
-        public bool OutputGvcf { get; }
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, IS3Client s3Client, List<S3Path> annotationsInS3,
-            string pluginDirectory, bool outputVcf, bool outputGvcf, bool disableRecomposition,
-            bool forceMitochondrialAnnotation)
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations, string pluginDirectory, bool disableRecomposition, bool forceMitochondrialAnnotation)
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
             
-            //read VCF to get positions for all variants
-            //_variantPositions = vcfStream == null ? null : PreLoadUtilities.GetPositions(vcfStream, SequenceProvider.RefNameToChromosome);
-            //preload annotation providers
             var dataAndIndexPaths = new List<(string DataFile, string IndexFile)>();
 
-            foreach (var saDirectoryPath in saDirectoryPaths)
+            foreach (string saDirectoryPath in saDirectoryPaths)
             {
                 dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saDirectoryPath));
             }
 
+            if (customAnnotations != null) dataAndIndexPaths.AddRange(customAnnotations.Select(x => x.ToDataAndIndexFiles()));
+
             TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths, s3Client, annotationsInS3);
+            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
             ConservationProvider         = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
             RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
             GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(dataAndIndexPaths);
@@ -74,8 +68,6 @@ namespace Nirvana
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." +
                              SaCommon.DataVersion;
 
-            OutputVcf                    = outputVcf;
-            OutputGvcf                   = outputGvcf;
             ForceMitochondrialAnnotation = forceMitochondrialAnnotation;
         }
 
@@ -114,6 +106,16 @@ namespace Nirvana
 
             if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
             SaProvider?.PreLoad(chromosome, positions);
+        }
+
+        public void Dispose()
+        {
+            SequenceProvider?.Dispose();
+            TranscriptAnnotationProvider?.Dispose();
+            SaProvider?.Dispose();
+            ConservationProvider?.Dispose();
+            RefMinorProvider?.Dispose();
+            GeneAnnotationProvider?.Dispose();
         }
     }
 }

@@ -11,7 +11,7 @@ namespace UnitTests.Phantom.Recomposer
         public void GetMnvFilterTag_SampleWithFailedMnv_MakredAsFailed()
         {
             var sampleFilterFailed = new[] { new List<bool> { true, false }};
-            var variantInfo = new VariantInfo(null, null, null, null, sampleFilterFailed);
+            var variantInfo = new VariantInfo(null, null, null, null, null, sampleFilterFailed);
 
             Assert.Equal(VariantInfo.FailedFilterTag, variantInfo.GetMnvFilterTag());
         }
@@ -20,7 +20,7 @@ namespace UnitTests.Phantom.Recomposer
         public void GetMnvFilterTag_PassedSampleOverrideFailedSample()
         {
             var sampleFilterFailed = new[] { new List<bool> { true, false }, new List<bool> { false, false } };
-            var variantInfo = new VariantInfo(null, null, null, null, sampleFilterFailed);
+            var variantInfo = new VariantInfo(null, null, null, null, null, sampleFilterFailed);
 
             Assert.Equal("PASS", variantInfo.GetMnvFilterTag());
         }
@@ -30,7 +30,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var positionFilters = new[] { "PASS", "FAILED", "." };
             var sampleFilterFailed = new[] { new List<bool>(), new List<bool>() };
-            var variantInfo = new VariantInfo(null, positionFilters, null, null, sampleFilterFailed);
+            var variantInfo = new VariantInfo(null, positionFilters, null, null, null, sampleFilterFailed);
 
             variantInfo.UpdateSampleFilters(new[] { 0, 2 }, new List<SampleHaplotype> { new SampleHaplotype(0, 0), new SampleHaplotype(1, 1) });
             variantInfo.UpdateSampleFilters(new[] { 0, 1, 2 }, new List<SampleHaplotype> { new SampleHaplotype(0, 1) });

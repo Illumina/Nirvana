@@ -108,7 +108,8 @@ namespace Jasix
 		internal IEnumerable<string> ReadJsonLinesExtendingInto((string Chr, int Start, int End) query)
 		{
 			// query for large variants like chr1:100-99 returns all overlapping large variants that start before 100
-			var locations = _jasixIndex.LargeVariantPositions(query.Chr, query.Start, query.Start - 1);
+            (string chr, int start, _) = query;
+            long[] locations = _jasixIndex.LargeVariantPositions(chr, start, start - 1);
 
 			if (locations == null || locations.Length == 0) yield break;
 
@@ -144,7 +145,8 @@ namespace Jasix
 
         internal IEnumerable<string> ReadOverlappingJsonLines((string Chr, int Start, int End) query)
 		{
-			long position = _jasixIndex.GetFirstVariantPosition(query.Chr, query.Start, query.End);
+            (string chr, int start, int end) = query;
+            long position = _jasixIndex.GetFirstVariantPosition(chr, start, end);
 
 			if (position == -1) yield break;
 
@@ -160,13 +162,13 @@ namespace Jasix
 				JsonSchema jsonEntry = ParseJsonEntry(line);
 
 			    string jsonChrom = _jasixIndex.GetIndexChromName(jsonEntry.chromosome);
-				if (jsonChrom != query.Chr) break;
+				if (jsonChrom != chr) break;
 
-				if (jsonEntry.Start > query.End) break;
+				if (jsonEntry.Start > end) break;
 
-				if (!jsonEntry.Overlaps(query.Start, query.End)) continue;
+				if (!jsonEntry.Overlaps(start, end)) continue;
 				// if there is an SV that starts before the query start that is printed by the large variant printer
-				if (Utilities.IsLargeVariant(jsonEntry.Start, jsonEntry.End) && jsonEntry.Start < query.Start) continue;
+				if (Utilities.IsLargeVariant(jsonEntry.Start, jsonEntry.End) && jsonEntry.Start < start) continue;
 				yield return line;
 			}
 		}

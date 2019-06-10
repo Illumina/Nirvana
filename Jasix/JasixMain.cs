@@ -110,7 +110,7 @@ namespace Jasix
 
                 if (Queries == null)
                 {
-                    Console.WriteLine("Plese specify query region(s)");
+                    Console.WriteLine("Please specify query region(s)");
                     return ExitCodes.BadArguments;
                 }
                 

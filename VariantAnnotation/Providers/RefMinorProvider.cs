@@ -12,9 +12,14 @@ namespace VariantAnnotation.Providers
 
         public RefMinorProvider(Stream dbStream, Stream indexStream)
         {
-            _reader = new RefMinorDbReader(new ExtendedBinaryReader(dbStream), new ExtendedBinaryReader(indexStream));
+            _reader = new RefMinorDbReader(dbStream, indexStream);
         }
 
         public string GetGlobalMajorAllele(IChromosome chromosome, int pos) => _reader.GetGlobalMajorAllele(chromosome, pos);
+
+        public void Dispose()
+        {
+            _reader?.Dispose();
+        }
     }
 }

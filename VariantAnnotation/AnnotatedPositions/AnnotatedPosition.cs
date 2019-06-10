@@ -57,9 +57,6 @@ namespace VariantAnnotation.AnnotatedPositions
 
             jsonObject.AddDoubleValue("strandBias",             Position.InfoData?.StrandBias,JsonCommon.FrequencyRoundingFormat);
             jsonObject.AddIntValue("jointSomaticNormalQuality", Position.InfoData?.JointSomaticNormalQuality);
-            jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData?.RecalibratedQuality);
-            jsonObject.AddIntValue("copyNumber",                Position.InfoData?.CopyNumber);
-            jsonObject.AddBoolValue("colocalizedWithCnv",       Position.InfoData?.ColocalizedWithCnv ?? false);
 
 	        
 			jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);

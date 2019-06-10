@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Compression.Utilities;
 using Genome;
 using IO;
 using OptimizedCore;
@@ -72,7 +71,8 @@ namespace SAUtils.InputFileParsers.OneKGen
                 while ((line = reader.ReadLine()) != null)
                 {
                     // Skip empty lines.
-                    if (line.IsWhiteSpace()) continue;
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
                     // Skip comments.
                     if (line.OptimizedStartsWith('#')) continue;
                     
@@ -96,7 +96,6 @@ namespace SAUtils.InputFileParsers.OneKGen
             if (!_refNameDictionary.ContainsKey(chromosomeName)) yield break;
             var chromosome = _refNameDictionary[chromosomeName];
             var position   = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
-            var rsId       = splitLine[VcfCommon.IdIndex];
             var refAllele  = splitLine[VcfCommon.RefIndex];
             var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
             var infoFields = splitLine[VcfCommon.InfoIndex];

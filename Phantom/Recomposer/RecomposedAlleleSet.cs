@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Genome;
+using Vcf;
 
 namespace Phantom.Recomposer
 {
@@ -20,19 +22,19 @@ namespace Phantom.Recomposer
             RecomposedAlleles = new Dictionary<VariantSite, VariantInfo>();
         }
 
-        public IEnumerable<string[]> GetRecomposedVcfRecords()
+        public IEnumerable<SimplePosition> GetRecomposedPositions(IDictionary<string, IChromosome> refNameToChromosome)
         {
-            var vcfRecords = new List<string[]>();
             foreach (var variantSite in RecomposedAlleles.Keys.OrderBy(x => x))
             {
                 var varInfo = RecomposedAlleles[variantSite];
                 var altAlleleList = new List<string>();
-                int genotypeIndex = 1; // genotype index of alt allele
+                var genotypeIndex = 1; // genotype index of alt allele
                 var sampleGenotypes = new List<int>[_numSamples];
-                for (int i = 0; i < _numSamples; i++) sampleGenotypes[i] = new List<int>();
-                foreach (var altAllele in varInfo.AltAlleleToSample.Keys.OrderBy(x => x))
+                for (var i = 0; i < _numSamples; i++) sampleGenotypes[i] = new List<int>();
+                List<List<string>> allLinkedVids = new List<List<string>>();
+                foreach (string altAllele in varInfo.AltAlleleToSample.Keys.OrderBy(x => x))
                 {
-                    var sampleAlleles = varInfo.AltAlleleToSample[altAllele];
+                    var (sampleAlleles, linkedVids) = varInfo.AltAlleleToSample[altAllele];
                     int currentGenotypeIndex;
                     if (altAllele == variantSite.RefAllele)
                     {
@@ -43,6 +45,7 @@ namespace Phantom.Recomposer
                         currentGenotypeIndex = genotypeIndex;
                         genotypeIndex++;
                         altAlleleList.Add(altAllele);
+                        allLinkedVids.Add(linkedVids);
                     }
                     foreach (var sampleAllele in sampleAlleles)
                     {
@@ -51,10 +54,12 @@ namespace Phantom.Recomposer
                     }
                 }
                 string altAlleleColumn = string.Join(",", altAlleleList);
-                vcfRecords.Add(GetVcfFields(variantSite, varInfo, altAlleleColumn, sampleGenotypes));
-            }
+                var vcfFields = GetVcfFields(variantSite, varInfo, altAlleleColumn, sampleGenotypes);
+                var position = SimplePosition.GetSimplePosition(vcfFields, new NullVcfFilter(), refNameToChromosome, true);
+                for (var i = 0; i < allLinkedVids.Count; i++) position.LinkedVids[i] = allLinkedVids[i];
 
-            return vcfRecords;
+                yield return position;
+            }
         }
 
         private static void SetGenotypeWithAlleleIndex(List<int> sampleGenotype, byte sampleAlleleAlleleIndex, int currentGenotypeIndex)
@@ -117,7 +122,8 @@ namespace Phantom.Recomposer
 
             for (var index = 0; index < numSamples; index++)
             {
-                var sampleGenotypeStr = sampleGenotypeStrings[index];
+                string sampleGenotypeStr = sampleGenotypeStrings[index];
+
                 if (sampleGenotypeStr == null || sampleGenotypeStr == ".") vcfFields.Add(".");
                 else
                 {
@@ -145,7 +151,8 @@ namespace Phantom.Recomposer
             var sampleGenotypeStrings = new string[numSamples];
             for (var index = 0; index < numSamples; index++)
             {
-                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index]);
+                var homoReferenceSamplePloidy = variantInfo.HomoReferenceSamplePloidies[index];
+                sampleGenotypeStrings[index] = GetGenotype(sampleGenoTypes[index], homoReferenceSamplePloidy);
                 if (sampleGenotypeStrings[index] == ".") continue;
 
                 if (variantInfo.SampleGqs[index] != ".") hasGq = true;
@@ -166,6 +173,11 @@ namespace Phantom.Recomposer
             return new ArraySegment<string>(values, 0, indexLastRemainedValue + 1).ToArray();
         }
 
-        private static string GetGenotype(IReadOnlyCollection<int> sampleGenotype) => sampleGenotype.Count == 0 ? "." : string.Join("|", sampleGenotype);
+        private static string GetGenotype(IReadOnlyCollection<int> sampleGenotype, int? homoReferenceSamplePloidy)
+        {
+            if (sampleGenotype.Count != 0) return string.Join("|", sampleGenotype);
+
+            return homoReferenceSamplePloidy != null ? string.Join("|", Enumerable.Repeat("0", homoReferenceSamplePloidy.Value)) : ".";
+        }
     }
 }

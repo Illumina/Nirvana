@@ -3,11 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Genome;
-using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OneKGen;
-using UnitTests.TestDataStructures;
-using VariantAnnotation.Interface.Providers;
-using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -111,7 +107,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
         }
 
-        private Stream GetOneKgSvStream()
+        private static Stream GetOneKgSvStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);

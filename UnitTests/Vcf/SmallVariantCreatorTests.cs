@@ -13,7 +13,7 @@ namespace UnitTests.Vcf
         {
             var chrom = new Mock<IChromosome>();
             chrom.Setup(x => x.EnsemblName).Returns("1");
-	        var variant = SmallVariantCreator.Create(chrom.Object, 100, "A", "ACG", false, false);
+	        var variant = SmallVariantCreator.Create(chrom.Object, 100, "A", "ACG", false, false, null);
 			Assert.False(variant.IsRefMinor);
             Assert.True(variant.Behavior.NeedFlankingTranscript);
             Assert.True(variant.Behavior.NeedSaPosition);
@@ -43,7 +43,7 @@ namespace UnitTests.Vcf
         {
             var chrom = new Mock<IChromosome>();
             chrom.Setup(x => x.EnsemblName).Returns("1");
-	        var variant = SmallVariantCreator.Create(chrom.Object, 100, refAllele, altAllele, false, false);
+	        var variant = SmallVariantCreator.Create(chrom.Object, 100, refAllele, altAllele, false, false, null);
 			Assert.Equal(expId, variant.VariantId);
         }
     }

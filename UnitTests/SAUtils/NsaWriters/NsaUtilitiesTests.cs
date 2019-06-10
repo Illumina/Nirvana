@@ -14,12 +14,12 @@ namespace UnitTests.SAUtils.NsaWriters
     {
         private static readonly IChromosome Chrom5 = new Chromosome("chr5", "5", 4);
 
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
+        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
         {
             { "chr5", Chrom5}
         };
 
-        private Stream GetDupItemsStream()
+        private static Stream GetDupItemsStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -42,7 +42,7 @@ namespace UnitTests.SAUtils.NsaWriters
 
             var items = topMedReader.GetItems().ToList();
             var saItems = new List<ISupplementaryDataItem>(items);
-            saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems);
+            saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems, false);
             Assert.Single(saItems);
 
         }

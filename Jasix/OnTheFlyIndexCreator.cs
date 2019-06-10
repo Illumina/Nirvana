@@ -25,7 +25,7 @@ namespace Jasix
         {
             string chromName = position.Chromosome.EnsemblName;
             int start        = position.Start;
-            var end          = position.InfoData?.End;
+            int? end          = position.InfoData?.End;
 
             if (chromName == _lastChromName && start < _lastPosition)
             {
@@ -37,7 +37,7 @@ namespace Jasix
 
             if (end == null)
             {
-                var altAlleles = position.AltAlleles;
+                string[] altAlleles = position.AltAlleles;
                 int altAlleleOffset = altAlleles != null && altAlleles.All(Utilities.IsNucleotideAllele) && altAlleles.Any(x => x.Length > 1) ? 1 : 0;
 
                 end = Math.Max(position.RefAllele.Length - 1, altAlleleOffset) + start;

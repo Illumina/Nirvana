@@ -53,22 +53,6 @@ namespace Phantom.Graph
 
         private bool HasVertex(T vertex) => _vertexToNeighbors.ContainsKey(vertex);
 
-        public void MergeGraph(IGraph<T> other)
-        {
-            // check the existence of the vertices only once
-            foreach (var vertex in other.GetVertices())
-            {
-                TryAddVertex(vertex);
-            }
-            foreach (var vertex in other.GetVertices())
-            {
-                foreach (var neighbor in other.GetNeighbors(vertex))
-                {
-                    _vertexToNeighbors[vertex].AddLast(neighbor);
-                }
-            }
-        }
-
         public Dictionary<T, int> FindAllConnectedComponents()
         {
             var vertexToComponent = new Dictionary<T, int>();

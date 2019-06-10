@@ -70,7 +70,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             }
         }
 
-        private void CheckSpliceSiteOverlap(IInterval variant, ITranscriptRegion region)
+        private void CheckSpliceSiteOverlap(IInterval variant, IInterval region)
         {
             if (variant.Overlaps(region.Start, region.Start + 1))
             {
@@ -83,7 +83,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             }
         }
 
-        private void CheckIntronOverlap(IInterval variant, bool isInsertion, ITranscriptRegion region)
+        private void CheckIntronOverlap(IInterval variant, bool isInsertion, IInterval region)
         {
             // we need to special case insertions between the donor and acceptor sites
             // make sure the size of intron is larger than 4

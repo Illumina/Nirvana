@@ -4,72 +4,67 @@ using VariantAnnotation.Interface.Positions;
 
 namespace Vcf.Sample
 {
-    public sealed class SampleFieldExtractor
+    internal static class SampleFieldExtractor
     {
-        private readonly string[] _vcfColumns;
-        private FormatIndices _formatIndices;
-        private readonly int? _infoDepth;
-
-        internal SampleFieldExtractor(string[] vcfColumns, int? depth = null)
+        internal static ISample[] ToSamples(this string[] vcfColumns, FormatIndices formatIndices, int numAltAlleles, bool isRepeatExpansion)
         {
-            _vcfColumns = vcfColumns;
-            _infoDepth  = depth;
-        }
+            if (vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
 
-        internal ISample[] ExtractSamples()
-        {
-            // sanity check: make sure we have enough columns
-            if (_vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
+            int numSamples = vcfColumns.Length - VcfCommon.MinNumColumnsSampleGenotypes + 1;
+            var samples    = new ISample[numSamples];
 
-            int nSamples = _vcfColumns.Length - VcfCommon.MinNumColumnsSampleGenotypes + 1;
-            var samples = new ISample[nSamples];
+            formatIndices.Set(vcfColumns[VcfCommon.FormatIndex]);
 
-            // extract the indices for each genotype field
-            _formatIndices = FormatIndices.Extract(_vcfColumns[VcfCommon.FormatIndex]);
-
-            // add each sample
-            for (int index = VcfCommon.GenotypeIndex; index < _vcfColumns.Length; index++)
+            for (int index = VcfCommon.GenotypeIndex; index < vcfColumns.Length; index++)
             {
-                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(_vcfColumns[index]);
+                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, numAltAlleles, isRepeatExpansion);
             }
 
             return samples;
         }
 
-        private ISample ExtractSample(string sampleColumn)
+        internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, int numAltAlleles, bool isRepeatExpansion)
         {
             // sanity check: make sure we have a format column
-            if (_formatIndices == null || string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;
+            if (string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;
 
-            var sampleColumns = sampleColumn.OptimizedSplit(':');
-
-            // handle missing sample columns
+            string[] sampleColumns = sampleColumn.OptimizedSplit(':', formatIndices.NumColumns);
             if (sampleColumns.Length == 1 && sampleColumns[0] == ".") return Sample.EmptySample;
 
-            var sampleFields = new IntermediateSampleFields(_vcfColumns, _formatIndices, sampleColumns);
+            sampleColumns.NormalizeNulls();
 
-            var alleleDepths  = AlleleDepths.GetAlleleDepths(sampleFields);
-            bool failedFilter = FailedFilter.GetFailedFilter(sampleFields);
-            string genotype   = Genotype.GetGenotype(sampleFields);
+            int[] alleleDepths                  = sampleColumns.GetString(formatIndices.AD).GetIntegers();
+            float? artifactAdjustedQualityScore = sampleColumns.GetString(formatIndices.AQ).GetFloat();
+            int? copyNumber                     = sampleColumns.GetString(formatIndices.CN).GetInteger();
+            string[] diseaseAffectedStatuses    = sampleColumns.GetString(formatIndices.DST).GetStrings();
+            bool failedFilter                   = sampleColumns.GetString(formatIndices.FT).GetFailedFilter();
+            string genotype                     = sampleColumns.GetString(formatIndices.GT);
+            int? genotypeQuality                = sampleColumns.GetString(formatIndices.GQ).GetInteger();
+            bool isDeNovo                       = sampleColumns.GetString(formatIndices.DN).IsDeNovo();
+            float? likelihoodRatioQualityScore  = sampleColumns.GetString(formatIndices.LQ).GetFloat();
+            int[] pairedEndReadCounts           = sampleColumns.GetString(formatIndices.PR).GetIntegers();
+            int[] repeatUnitCounts              = sampleColumns.GetString(formatIndices.REPCN).GetIntegers('/');
+            int[] splitReadCounts               = sampleColumns.GetString(formatIndices.SR).GetIntegers();
+            int? totalDepth                     = sampleColumns.GetString(formatIndices.DP).GetInteger();
+            double? variantFrequency            = sampleColumns.GetString(formatIndices.VF).GetDouble();
 
-            var genotypeQuality    = GenotypeQuality.GetGenotypeQuality(sampleFields);
-            var totalDepth         = TotalDepth.GetTotalDepth(_infoDepth, sampleFields);
-            var variantFrequencies = VariantFrequency.GetVariantFrequencies(sampleFields);
-            var splitReadCounts    = ReadCounts.GetSplitReadCounts(sampleFields);
-            var pairEndReadCounts  = ReadCounts.GetPairEndReadCounts(sampleFields);
+            double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, numAltAlleles);
 
-            bool isLossOfHeterozygosity = sampleFields.MajorChromosomeCount != null &&
-                                          sampleFields.CopyNumber != null &&
-                                          sampleFields.MajorChromosomeCount.Value == sampleFields.CopyNumber.Value &&
-                                          sampleFields.CopyNumber.Value > 1;
-
-            var sample = new Sample(genotype, genotypeQuality, variantFrequencies, totalDepth, alleleDepths, failedFilter,
-                sampleFields.CopyNumber, isLossOfHeterozygosity, sampleFields.DenovoQuality, splitReadCounts,
-                pairEndReadCounts, sampleFields.RepeatNumber, sampleFields.RepeatNumberSpan, sampleFields.MAD,
-                sampleFields.SCH, sampleFields.PLG, sampleFields.PCN, sampleFields.DCS, sampleFields.DID,
-                sampleFields.DST, sampleFields.PCH, sampleFields.CHC, sampleFields.AQ, sampleFields.LQ);
+            var sample = new Sample(alleleDepths, artifactAdjustedQualityScore, copyNumber, diseaseAffectedStatuses,
+                failedFilter, genotype, genotypeQuality, isDeNovo, likelihoodRatioQualityScore, pairedEndReadCounts,
+                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies);
 
             return sample;
+        }
+
+        internal static void NormalizeNulls(this string[] cols)
+        {
+            for (var i = 0; i < cols.Length; i++)
+            {
+                string col = cols[i];
+                if (col == null) continue;
+                if (col.Length == 0 || col == ".") cols[i] = null;
+            }
         }
     }
 }

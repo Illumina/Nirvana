@@ -24,6 +24,7 @@ namespace VariantAnnotation.NSA
 
     public sealed class NsaReader :INsaReader
     {
+        private readonly Stream _stream;
         private readonly ExtendedBinaryReader _reader;
         public GenomeAssembly Assembly { get; }
         private readonly ChunkedIndex _index;
@@ -39,9 +40,10 @@ namespace VariantAnnotation.NSA
         private AnnotationItem[] _annotations;
         private int _annotationsCount;
 
-        public NsaReader(ExtendedBinaryReader reader, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
+        public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
-            _reader = reader;
+            _stream = dataStream;
+            _reader = new ExtendedBinaryReader(_stream);
             _block  = new NsaBlock(new Zstandard(), blockSize);
 
             _index         = new ChunkedIndex(indexStream);
@@ -61,7 +63,7 @@ namespace VariantAnnotation.NSA
 
             _annotations = new AnnotationItem[positions.Count];
             _annotationsCount = 0;
-            (long start, _, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
+            (long start, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
             if (start == -1) return;
             _reader.BaseStream.Position = start;
 
@@ -117,7 +119,7 @@ namespace VariantAnnotation.NSA
             }
         }
 
-        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position)
+        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position)
         {
             if (_annotations == null) return null;
             var index = BinarySearch(position);
@@ -142,5 +144,9 @@ namespace VariantAnnotation.NSA
             return ~begin;
         }
 
+        public void Dispose()
+        {
+            _stream?.Dispose();
+        }
     }
 }

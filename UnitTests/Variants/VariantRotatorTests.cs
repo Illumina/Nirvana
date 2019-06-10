@@ -153,7 +153,7 @@ namespace UnitTests.Variants
         [InlineData(508, "GTT", 504, "TGT")]
         public void Left_align_deletions(int position, string refAllele, int rotatedPos, string rotatedRef)
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, refAllele, "", reference);
 
@@ -167,12 +167,36 @@ namespace UnitTests.Variants
         [InlineData(508, "GTT", 504, "TGT")]
         public void Left_align_insertion(int position, string altAllele, int rotatedPos, string rotatedAlt)
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT", 0);
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, "", altAllele, reference);
 
             Assert.Equal(rotatedPos, rotatedVariant.start);
             Assert.Equal(rotatedAlt, rotatedVariant.altAllele);
+        }
+
+        [Fact]
+        public void Left_align_multiple_padding_bases()
+        {
+            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
+
+            var rotatedVariant = VariantUtils.TrimAndLeftAlign(501, "AT", "ATT", reference);
+
+            Assert.Equal(502, rotatedVariant.start);
+            Assert.Equal("T", rotatedVariant.altAllele);
+        }
+        [Theory]
+        [InlineData("TC", "T", false)]
+        [InlineData("T", "TC", false)]
+        [InlineData("T", "TCT", true)]
+        [InlineData("TCT", "T", true)]
+        [InlineData("TCT", "TA", true)] // no conclusion for indels
+        [InlineData("TC", "AT", true)]//no conclusion for mnvs
+        [InlineData("T", "A", false)]
+        [InlineData("T", "T", false)]
+        public void CanNotLeftRotate(string refAllele, string altAllele, bool result)
+        {
+            Assert.Equal(result, VariantUtils.IsLeftShiftPossible(refAllele, altAllele));
         }
 
     }

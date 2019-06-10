@@ -13,7 +13,6 @@ namespace VariantAnnotation.AnnotatedPositions
         public string HgvsgNotation { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; } = new List<IAnnotatedRegulatoryRegion>();
         public IList<IAnnotatedTranscript> Transcripts { get; } = new List<IAnnotatedTranscript>();
-        public IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; } = new List<IAnnotatedSaDataSource>();
         public IList<ISupplementaryAnnotation> SaList { get; } = new List<ISupplementaryAnnotation>();
         public double? PhylopScore { get; set; }
         public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
@@ -44,6 +43,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddStringValue("variantType", variantType.ToString());
             jsonObject.AddBoolValue("isDecomposedVariant", Variant.IsDecomposed);
             if (variantType.ToString() != "SNV") jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
+            jsonObject.AddStringValues("linkedVids", Variant.LinkedVids);
             jsonObject.AddStringValue("hgvsg", HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);

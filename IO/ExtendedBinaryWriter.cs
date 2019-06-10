@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 
 namespace IO
@@ -74,18 +73,6 @@ namespace IO
 
             // write the ASCII bytes
             Write(Encoding.ASCII.GetBytes(s));
-        }
-
-        public void WriteOptArray<T>(T[] values, Action<T> writeOptAction)
-        {
-            if (values == null)
-            {
-                WriteOpt(0);
-                return;
-            }
-
-            WriteOpt(values.Length);
-            foreach (var v in values) writeOptAction(v);
         }
     }
 }

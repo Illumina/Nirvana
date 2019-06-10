@@ -2,6 +2,7 @@
 using System.Security.Cryptography;
 using System.Threading;
 using Amazon.S3.Model;
+using ErrorHandling.Exceptions;
 using IO;
 
 namespace Cloud
@@ -45,6 +46,10 @@ namespace Cloud
 
             catch (Exception exception)
             {
+                var processedException = ExceptionUtilities.ProcessAmazonS3Exception(exception, null);
+
+                if (processedException is UserErrorException) throw processedException;
+
                 Logger.LogLine($"Exception: {exception.Message}.");
                 return false;
             }

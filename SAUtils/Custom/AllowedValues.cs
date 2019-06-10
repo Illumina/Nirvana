@@ -13,7 +13,6 @@ namespace SAUtils.Custom
             "p",
             "likely pathogenic",
             "lp",
-            "vuss",
             "vus",
             "likely benign",
             "lb",
@@ -28,5 +27,11 @@ namespace SAUtils.Custom
         }
 
         public static bool IsEmptyValue(string value) => EmptyValues.Contains(value);
+
+        public static void ValidateFilterValue(string value, string line)
+        {
+            if(!string.IsNullOrEmpty(value) && value.Length>20)
+                throw  new UserErrorException($"\"{value}\" exceeds the allowed length for filters (20 characters).\nInput line:{line}");
+        }
     }
 }

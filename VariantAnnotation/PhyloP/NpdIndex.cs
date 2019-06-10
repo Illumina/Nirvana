@@ -20,7 +20,7 @@ namespace VariantAnnotation.PhyloP
 
         public const int MaxChromLength = 250_000_000;
 
-        public NpdIndex(Stream stream, GenomeAssembly assembly, DataSourceVersion version, string jsonKey, int schemaVersion)
+        public NpdIndex(Stream stream, GenomeAssembly assembly, IDataSourceVersion version, string jsonKey, int schemaVersion)
         {
             _writer       = new ExtendedBinaryWriter(stream);
             Assembly      = assembly;

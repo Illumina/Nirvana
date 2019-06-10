@@ -11,7 +11,7 @@ namespace Vcf.VariantCreator
     {
         public static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
 
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed)
+        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed, string[] linkedVids)
         {
             if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant can't be both decomposed and recomposed");
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
@@ -20,10 +20,10 @@ namespace Vcf.VariantCreator
             var variantType = GetVariantType(refAllele, altAllele);
             string vid      = GetVid(chromosome.EnsemblName, start, end, altAllele, variantType);
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, null, null, SmallVariantBehavior);
+            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, linkedVids, null, SmallVariantBehavior);
         }
 
-        private static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
+        public static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
         {
             string referenceName = ensemblName;
 

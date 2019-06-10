@@ -347,7 +347,7 @@ namespace UnitTests.Compression.FileHandling
             }
         }
 
-        internal static byte[] GrabBytes(Stream s)
+        private static byte[] GrabBytes(Stream s)
         {
             byte[] buffer;
 

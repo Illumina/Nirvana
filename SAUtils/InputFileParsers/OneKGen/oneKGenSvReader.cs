@@ -42,10 +42,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 		    string line;
 		    while ((line = _reader.ReadLine()) != null)
 		    {
-		        // Skip empty lines.
-		        if (line.IsWhiteSpace()) continue;
-		        // Skip comments.
-		        if (line.OptimizedStartsWith('#')) continue;
+                // Skip empty lines.
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
+                // Skip comments.
+                if (line.OptimizedStartsWith('#')) continue;
 		        var oneKSvGenItem = ExtractOneKGenSvItem(line);
 		        if (oneKSvGenItem == null) continue;
 		        yield return oneKSvGenItem;

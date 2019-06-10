@@ -8,22 +8,6 @@ namespace CommandLine.Builders
 {
     public static class ValidationExtensions
     {
-        public static IConsoleAppValidator Enable(this IConsoleAppValidator validator, bool condition, Action method)
-        {
-            if (condition) method();
-            return validator;
-        }
-
-        public static IConsoleAppValidator CheckNonZero(this IConsoleAppValidator validator, int num, string description)
-        {
-            if (num == 0)
-            {
-                validator.Data.AddError($"At least one {description} should be provided.",
-                    ExitCodes.MissingCommandLineOption);
-            }
-            return validator;
-        }
-
         public static IConsoleAppValidator CheckEachFilenameExists(this IConsoleAppValidator validator,
             IEnumerable<string> filePaths, string description, string commandLineOption, bool isRequired = true)
         {
@@ -99,33 +83,12 @@ namespace CommandLine.Builders
             return validator;
         }
 
-        public static IConsoleAppValidator CheckEachDirectoryContainsFiles(this IConsoleAppValidator validator,
-            IEnumerable<string> directories, string description, string commandLineOption, string searchPattern)
-        {
-            if (validator.SkipValidation) return validator;
-
-            foreach (string directoryPath in directories)
-            {
-                //todo: temp code to test http
-                if (directoryPath.StartsWith("http")) continue;
-
-                var files = Directory.Exists(directoryPath) ? Directory.GetFiles(directoryPath, searchPattern) : null;
-                if (files != null && files.Length != 0) continue;
-
-                validator.Data.AddError(
-                    $"The {description} directory ({directoryPath}) does not contain the required files ({searchPattern}). Please use the {commandLineOption} parameter.",
-                    ExitCodes.FileNotFound);
-            }
-
-            return validator;
-        }
-
         public static IConsoleAppValidator HasRequiredParameter<T>(this IConsoleAppValidator validator,
             T parameterValue, string description, string commandLineOption)
         {
             if (validator.SkipValidation) return validator;
 
-            if (EqualityComparer<T>.Default.Equals(parameterValue, default(T)))
+            if (EqualityComparer<T>.Default.Equals(parameterValue, default))
             {
                 validator.Data.AddError($"The {description} was not specified. Please use the {commandLineOption} parameter.",
                     ExitCodes.MissingCommandLineOption);

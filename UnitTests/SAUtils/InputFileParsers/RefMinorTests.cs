@@ -19,12 +19,12 @@ namespace UnitTests.SAUtils.InputFileParsers
     {
         private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
 
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
+        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
         {
-            { "1", Chrom1},
+            { "1", Chrom1}
         };
 
-        private Stream GetStream()
+        private static Stream GetStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -78,8 +78,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 stream.Position = 0;
                 indexStream.Position = 0;
 
-                using (var dbReader = new RefMinorDbReader(new ExtendedBinaryReader(stream),
-                    new ExtendedBinaryReader(indexStream)))
+                using (var dbReader = new RefMinorDbReader(stream,indexStream))
                 {
                     Assert.Equal("T", dbReader.GetGlobalMajorAllele(Chrom1, 15274));
                     Assert.Null(dbReader.GetGlobalMajorAllele(Chrom1, 1524));

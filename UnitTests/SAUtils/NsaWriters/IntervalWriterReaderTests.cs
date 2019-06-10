@@ -16,7 +16,7 @@ namespace UnitTests.SAUtils.NsaWriters
 {
     public sealed class IntervalWriterReaderTests
     {
-        private IEnumerable<ClinGenItem> GetClinGenItems()
+        private static IEnumerable<ClinGenItem> GetClinGenItems()
         {
             var chrom1 = new Chromosome("chr1", "1", 0);
             var chrom2 = new Chromosome("chr2", "2", 1);

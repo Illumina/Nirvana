@@ -68,7 +68,7 @@ namespace SAUtils.Custom
             DataSourceVersion version;
             string outputPrefix = GetOutputPrefix(_inputFile);
 
-            using (var customReader = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
+            using (var customReader = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))            
             using (var nsaWriter = new NsaWriter(
@@ -77,11 +77,12 @@ namespace SAUtils.Custom
                                 version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks),
                                 referenceProvider,
                                 customReader.JsonTag,
-                                false,  // match by allele
-                                true, // is array
+                                customReader.MatchByAllele,  // match by allele
+                                customReader.IsArray, // is array
                                 SaCommon.SchemaVersion,
                                 false,// is positional
-                                false // skip incorrect ref base
+                                false, // skip incorrect ref base
+                                true // throw error on conflicting entries
                                 ))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))

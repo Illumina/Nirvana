@@ -60,7 +60,7 @@ namespace SAUtils.ExtractMiniXml
 
 		}
 
-        private string DetectRcv(List<string> rcvs, string rcvContents)
+        private static string DetectRcv(List<string> rcvs, string rcvContents)
         {
             foreach (var rcv in rcvs)
             {
@@ -74,7 +74,7 @@ namespace SAUtils.ExtractMiniXml
             return null;
         }
 
-        private void WriteToFile(string fileName, string targetedContent)
+        private static void WriteToFile(string fileName, string targetedContent)
         {
             using (var writer = new StreamWriter(FileUtilities.GetCreateStream(fileName)))
             {
@@ -85,7 +85,7 @@ namespace SAUtils.ExtractMiniXml
             }
         }
 
-        private List<string> ExtractRcvIds(string rcvIds)
+        private static List<string> ExtractRcvIds(string rcvIds)
         {
             var ids= new List<string>();
             if (Directory.Exists(rcvIds))

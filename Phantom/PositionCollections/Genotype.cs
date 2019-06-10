@@ -31,6 +31,17 @@ namespace Phantom.PositionCollections
             return new Genotype(gtIndexes, separator == '|');
         }
 
+        public static bool IsAllHomozygousReference(Genotype[] gtInfo, int startIndex, int numPositions)
+        {
+            for (int i = startIndex; i < startIndex + numPositions; i++)
+            {
+                if (!gtInfo[i].IsHomozygousReference()) return false;
+            }
+            return true;
+        }
+
+        private bool IsHomozygousReference() => IsHomozygous && AlleleIndexes[0] == 0;
+
         private bool GetHomozygosity()
         {
             for (var i = 1; i < AlleleIndexes.Length; i++)
@@ -51,7 +62,7 @@ namespace Phantom.PositionCollections
         }
 
         // used for recomposition purpose
-        // for simiplicity, 0/1 and 1/0 are considered different, as neither of them would be recomposed
+        // for simplicity, 0/1 and 1/0 are considered different, as neither of them would be recomposed
         public bool Equals(Genotype other) => AlleleIndexes.SequenceEqual(other.AlleleIndexes) &&
                                               (IsPhased == other.IsPhased || IsHomozygous && other.IsHomozygous);
 

@@ -17,26 +17,6 @@ namespace UnitTests.Phantom.PositionCollections
         }
 
         [Fact]
-        public void TrimTaillingRefAlleles_RefIsTrimmed()
-        {
-            var blocks = new[]
-            {
-                new List<int> {1, 2, 1, 0, 1, 0, 0},
-                new List<int> {0, 2, 1, 0, 1, 1, 0}
-            };
-
-            var expected = new[]
-            {
-                new List<int> {1, 2, 1, 0, 1, 0},
-                new List<int> {0, 2, 1, 0, 1, 1}
-            };
-
-            AlleleBlock.TrimTrailingRefAlleles(blocks);
-            Assert.Equal(expected, blocks);
-        }
-
-
-        [Fact]
         public void GetAlleleBlockToSampleHaplotype_AsExpected()
         {
             var genotypeBlock1 = new GenotypeBlock(new[] { "1|2", "1/1", "0|1", "./1" }.Select(Genotype.GetGenotype).ToArray());

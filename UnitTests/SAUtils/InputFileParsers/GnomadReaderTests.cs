@@ -5,7 +5,6 @@ using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers;
 using UnitTests.TestDataStructures;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using Variants;
 using Xunit;
@@ -17,13 +16,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
         private static readonly IChromosome Chrom22 = new Chromosome("chr22", "22", 22);
 
-        private static readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
-        {
-            { "1", Chrom1},
-            { "22", Chrom22}
-        };
-        
-        private Stream GetGnomadStream()
+        private static Stream GetGnomadStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -45,7 +38,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TGTGTTGTTATTCTGTGTGCAT", 10114 - VariantUtils.MaxUpstreamLength);
 
-            var refNameToChrom = new Dictionary<string, IChromosome>() { { "1", Chrom1 } };
+            var refNameToChrom = new Dictionary<string, IChromosome> { { "1", Chrom1 } };
 
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
 
@@ -56,7 +49,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal(2, items.Count);
             Assert.Equal("\"coverage\":218,\"failedFilter\":true,\"allAf\":0,\"allAn\":8734,\"allAc\":0,\"allHc\":0,\"afrAf\":0,\"afrAn\":2168,\"afrAc\":0,\"afrHc\":0,\"amrAf\":0,\"amrAn\":324,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":438,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":1296,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":4054,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":100,\"asjAc\":0,\"asjHc\":0,\"othAf\":0,\"othAn\":354,\"othAc\":0,\"othHc\":0", items[0].GetJsonString());
         }
-        private Stream GetConflictingItemsStream()
+
+        private static Stream GetConflictingItemsStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -77,7 +71,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TAAGCCAGCCAGCCAGCCAAGCTGGCCAAGCCAGACAGGCAGCCAAGCCAACCAAGACACCCAGGCAGCCAAGCCAGC", 16558315 - VariantUtils.MaxUpstreamLength);
 
-            var refNameToChrom = new Dictionary<string, IChromosome>() { { "22", Chrom22 } };
+            var refNameToChrom = new Dictionary<string, IChromosome> { { "22", Chrom22 } };
 
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
 
@@ -91,13 +85,13 @@ namespace UnitTests.SAUtils.InputFileParsers
                     items.Add(item);
             }
 
-            items = SuppDataUtilities.RemoveConflictingAlleles(items);
+            items = SuppDataUtilities.RemoveConflictingAlleles(items, false);
 
             //two if the items were removed as conflicting items
             Assert.Equal(3,items.Count);
         }
 
-        private Stream GetShiftingItemsStream()
+        private static Stream GetShiftingItemsStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -117,7 +111,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "GCGCGC", 157100394 -1 - VariantUtils.MaxUpstreamLength);
 
-            var refNameToChrom = new Dictionary<string, IChromosome>() { { "6", new Chromosome("chr6","6",6)} };
+            var refNameToChrom = new Dictionary<string, IChromosome> { { "6", new Chromosome("chr6","6",6)} };
 
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
 

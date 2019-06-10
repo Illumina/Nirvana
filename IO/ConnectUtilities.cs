@@ -3,6 +3,7 @@ using System.Globalization;
 using System.IO;
 using System.Net;
 using Amazon.S3.Model;
+using ErrorHandling.Exceptions;
 
 namespace IO
 {
@@ -33,7 +34,8 @@ namespace IO
                 if (position < 0) position = 0;
 
                 request.AddRange(position);
-                return ((HttpWebResponse)request.GetResponse()).GetResponseStream();
+
+                return request.TryGetResponse(url).GetResponseStream();
             };
         }
 
@@ -58,10 +60,11 @@ namespace IO
                 }
                 catch (Exception e)
                 {
+                    if (e is UserErrorException) throw;
+
                     Console.WriteLine($"EXCEPTION: {e.Message}");
                     if (retryCount == 0) throw;
                 }
-                
             }
 
             return null;

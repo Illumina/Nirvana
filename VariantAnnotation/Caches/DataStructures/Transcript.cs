@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Amazon.S3.Model;
 using Genome;
 using Intervals;
 using IO;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using Variants;
 
 namespace VariantAnnotation.Caches.DataStructures
 {

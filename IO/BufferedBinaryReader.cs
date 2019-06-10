@@ -181,16 +181,6 @@ namespace IO
             return value;
         }
 
-        public T[] ReadOptArray<T>(Func<T> readOptFunc)
-        {
-            int count = ReadOptInt32();
-            if (count == 0) return null;
-
-            var values = new T[count];
-            for (var i = 0; i < count; i++) values[i] = readOptFunc();
-            return values;
-        }
-
         public int ReadOptInt32()
         {
             if (_bufferPos > _bufferLen - 5) FillBuffer();

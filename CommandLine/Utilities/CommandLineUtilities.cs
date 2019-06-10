@@ -49,7 +49,7 @@ namespace CommandLine.Utilities
         {
             var attrs = entryAssembly.GetCustomAttributes(typeof(T)) as T[];
             // ReSharper disable once PossibleNullReferenceException
-            return attrs.Length == 0 ? default(T) : attrs[0];
+            return attrs.Length == 0 ? default : attrs[0];
         }
 
         /// <summary>

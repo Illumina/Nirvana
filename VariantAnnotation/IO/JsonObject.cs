@@ -68,17 +68,15 @@ namespace VariantAnnotation.IO
             return true;
         }
 
-        public bool AddIntValues(string description, int[] values)
+        public void AddIntValues(string description, int[] values)
         {
-            if (values == null || values.Length == 0) return false;
+            if (values == null || values.Length == 0) return;
 
             // removing '.'s from the list of values
             var valueList = values.Select(value => value.ToString()).ToList();
 
             AddStringValues(description, valueList, false);
             _needsComma = true;
-
-            return true;
         }
 
         public bool AddDoubleValue(string description, double? d, string format = "0.####")
@@ -93,16 +91,14 @@ namespace VariantAnnotation.IO
             return true;
         }
 
-        public bool AddDoubleValues(string description, double[] values, string format = "0.####")
+        public void AddDoubleValues(string description, double[] values, string format = "0.####")
         {
-            if (values == null || values.Length == 0) return false;
+            if (values == null || values.Length == 0) return;
 
             var valueList = values.Select(value => value.ToString(format)).ToList();
 
             AddStringValues(description, valueList, false);
             _needsComma = true;
-
-            return true;
         }
 
         public bool AddStringValue(string description, string s, bool useQuote = true)
@@ -150,9 +146,9 @@ namespace VariantAnnotation.IO
             return true;
         }
 
-        public bool AddObjectValue<T>(string description, T value) where T : IJsonSerializer
+        public void AddObjectValue<T>(string description, T value) where T : IJsonSerializer
         {
-            if (value == null) return false;
+            if (value == null) return;
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
@@ -160,8 +156,6 @@ namespace VariantAnnotation.IO
             value.SerializeJson(_sb);
 
             _needsComma = true;
-
-            return true;
         }
 
         public bool AddObjectValues<T>(string description, IEnumerable<T> values) where T : IJsonSerializer

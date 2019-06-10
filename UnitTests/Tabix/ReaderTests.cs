@@ -16,7 +16,7 @@ namespace UnitTests.Tabix
         {
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr17"] = new Chromosome("chr17", "17", 16) };
 
-            using (var indexReader = GZipUtilities.GetAppropriateBinaryReader(Resources.TopPath("AU144A_BadVariant.vcf.gz.tbi")))
+            using (var indexReader = new BinaryReader(GZipUtilities.GetAppropriateReadStream(Resources.TopPath("AU144A_BadVariant.vcf.gz.tbi"))))
             {
                 Index index = Reader.Read(indexReader, refNameToChromosome);
 

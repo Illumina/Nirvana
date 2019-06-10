@@ -1,5 +1,4 @@
-﻿using System;
-using Genome;
+﻿using Genome;
 using Intervals;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;

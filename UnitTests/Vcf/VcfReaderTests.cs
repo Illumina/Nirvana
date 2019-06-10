@@ -25,7 +25,7 @@ namespace UnitTests.Vcf
             {"chrX", new Chromosome("chrX", "X", 22)},
             {"X", new Chromosome("chrX", "X", 22)},
             {"chrM", new Chromosome("chrM", "MT", 24)},
-            {"MT", new Chromosome("chrM", "MT", 24)},
+            {"MT", new Chromosome("chrM", "MT", 24)}
         };
 
         private void AddLines(string[] lines)

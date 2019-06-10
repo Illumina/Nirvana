@@ -54,19 +54,5 @@ namespace Genome
 		{
 		    return !string.IsNullOrEmpty(bases) && bases.Any(c => !CanonicalBases.Contains(c));
 		}
-
-		/// <summary>
-		/// returns the correct start value when retrieving a substring of a substring
-		/// where the top level might be reverse complemented
-		/// </summary>
-		public static string GetSubSubstring(int seqStart, int seqEnd, bool seqOnReverseStrand, int subStart, int subEnd, ISequence cs)
-		{
-			int start = seqOnReverseStrand ? seqEnd - subEnd : seqStart + subStart;
-
-			string precedingBases = cs.Substring(start - 1, subEnd - subStart + 1);
-			if (seqOnReverseStrand) precedingBases = GetReverseComplement(precedingBases);
-
-			return precedingBases;
-		}
-	}
+    }
 }
