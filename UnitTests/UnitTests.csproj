@@ -18,6 +18,7 @@
     <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
+    <ProjectReference Include="..\Downloader\Downloader.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\Intervals\Intervals.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />

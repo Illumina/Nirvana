@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Downloader": {
+      "commandName": "Project",
+      "commandLineArgs": "--ga both --out Output",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    }
+  }
+}

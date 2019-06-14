@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.FileExtensions" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
+    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+    <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Downloader.appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

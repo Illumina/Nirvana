@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29001.49
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation.Interface", "VariantAnnotation.Interface\VariantAnnotation.Interface.csproj", "{248C8736-3A76-4F45-A131-A776BD3257C9}"
 EndProject
@@ -43,6 +43,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tabix", "Tabix\Tabix.csproj", "{F337E3F6-72AA-44B4-B11F-D69EE14B6152}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cloud", "Cloud\Cloud.csproj", "{E93914C8-2599-46BE-BE18-6229E53F581B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloader", "Downloader\Downloader.csproj", "{5B81B762-8A86-466A-A947-AC2CA53EE40D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,10 @@ Global
 		{E93914C8-2599-46BE-BE18-6229E53F581B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E93914C8-2599-46BE-BE18-6229E53F581B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E93914C8-2599-46BE-BE18-6229E53F581B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,9 @@
+{
+  "DataSource": {
+    "HostName": "d24njugtyo9gfs.cloudfront.net",
+    "CacheDirectory": "ab0cf104f39708eabd07b8cb67e149ba-Cache",
+    "ReferencesDirectory": "d95867deadfe690e40f42068d6b59df8-References",
+    "ManifestGRCh37": "DRAGEN_3.4_GRCh37.txt",
+    "ManifestGRCh38": "DRAGEN_3.4_GRCh38.txt"
+  }
+}
