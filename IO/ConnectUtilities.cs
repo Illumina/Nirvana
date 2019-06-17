@@ -60,10 +60,9 @@ namespace IO
                 }
                 catch (Exception e)
                 {
-                    if (e is UserErrorException) throw;
+                    Logger.LogLine($"EXCEPTION: {e.Message}");
 
-                    Console.WriteLine($"EXCEPTION: {e.Message}");
-                    if (retryCount == 0) throw;
+                    if (e is UserErrorException || retryCount == 0) throw;
                 }
             }
 

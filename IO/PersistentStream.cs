@@ -85,12 +85,12 @@ namespace IO
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"EXCEPTION: {e.Message}");
+                    Logger.LogLine($"EXCEPTION: {e.Message}");
                     if (numRetries == MaxRetryAttempts) throw;
 
                     _stream?.Dispose();
                     Thread.Sleep(NumRetryMilliseconds);
-                    _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, _position, MaxRetryAttempts-numRetries);
+                    _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, _position, MaxRetryAttempts);
 
                     numRetries++;                    
                 }

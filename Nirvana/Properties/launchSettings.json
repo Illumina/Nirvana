@@ -42,7 +42,7 @@
     },
     "SK bugfix": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_bugfix\\test.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o test -sd CA_data/sa/",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_bugfix\\test.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o test -sd CA_data/sa/",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_bugfix"
     },
     "SK Nirvana": {
