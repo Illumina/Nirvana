@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Genome;
-using IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
 

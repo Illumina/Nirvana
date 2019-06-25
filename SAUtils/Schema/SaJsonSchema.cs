@@ -170,6 +170,7 @@ namespace SAUtils.Schema
                 {
                     actions.Add((jsonObject, value) =>
                     {
+                        if (value[0] == null) return;
                         var doubleValue = CheckAndGetNullableDoubleFromString(value[0]);
                         CustomAnnotationCategories keyCategory = GetCategory(key);
                         CountKeyIfAdded(keyCategory == CustomAnnotationCategories.AlleleFrequency

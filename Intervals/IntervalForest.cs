@@ -29,7 +29,7 @@ namespace Intervals
 		public T[] GetAllOverlappingValues(ushort refIndex, int begin, int end)
 		{
 			if (refIndex > _maxIndex) return null;
-			var intervalArray = _intervalArrays[refIndex];
+            var intervalArray = _intervalArrays[refIndex];
 		    return intervalArray?.GetAllOverlappingValues(begin, end);
 		}
 	}

@@ -14,9 +14,9 @@ namespace SAUtils.ExacScores
         public ExacScoreItem(string gene, double pLi, double pRec, double pNull)
         {
             GeneSymbol = gene;
-            _pLi = pLi;
-            _pRec = pRec;
-            _pNull = pNull;
+            _pLi       = pLi;
+            _pRec      = pRec;
+            _pNull     = pNull;
         }
 
         

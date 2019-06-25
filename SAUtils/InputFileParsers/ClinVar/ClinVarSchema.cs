@@ -12,6 +12,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private static readonly string[] JsonKeys = {
             "id",
+            "variationId",
             "reviewStatus",
             "alleleOrigins",
             "refAllele",
@@ -29,6 +30,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private static readonly List<SaJsonValueType> ValueTypes = new List<SaJsonValueType>
         {
             SaJsonValueType.String,
+            SaJsonValueType.Number,
             SaJsonValueType.String,
             SaJsonValueType.StringArray,
             SaJsonValueType.String,  

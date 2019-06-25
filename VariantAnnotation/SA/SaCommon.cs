@@ -3,7 +3,7 @@
     public static class SaCommon
     {
         public const int DefaultBlockSize      = 8 * 1024 * 1024;
-        public const ushort DataVersion        = 51;
+        public const ushort DataVersion        = 52;
         public const ushort SchemaVersion      = 22;
 
         public const double RefMinorThreshold  = 0.95;
@@ -34,5 +34,7 @@
         public const string PhylopTag          = "phylopScore";
         public const string OmimTag            = "omim";
         public const string ExacScoreTag       = "exac";
+        public const string DosageSensitivityTag = "clingenDosageSensitivityMap";
+        public const string SpliceAiTag        = "spliceAI";
     }
 }

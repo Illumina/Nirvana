@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
@@ -40,7 +41,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal(41234419, clinVarItem.Position);
             Assert.Equal("A", clinVarItem.RefAllele);
             Assert.Equal("C", clinVarItem.AltAllele);
-            Assert.Equal("2019-01-25", clinVarItem.LastUpdateDate);
+            Assert.Equal("2019-01-25", new DateTime(clinVarItem.LastUpdatedDate).ToString("yyyy-MM-dd"));
             Assert.Equal(clinVarItem.AlleleOrigins, new List<string> { "germline" });
             Assert.Equal("C2676676", clinVarItem.MedGenIds.First());
             Assert.Equal("145", clinVarItem.OrphanetIds.First());
@@ -61,7 +62,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var omimIds = clinVarItem.OmimIds;
             Assert.Single(omimIds);
-            Assert.Equal("610206.0007", omimIds[0]);
+            Assert.Equal("610206.0007", omimIds.First());
         }
 
         [Fact]
@@ -206,7 +207,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal( new List<long> { 12114475, 18836774, 22357542, 24033266 }, clinVarItem.PubMedIds.Select(long.Parse));
+                Assert.Equal( new List<long> { 12114475, 18836774, 22357542, 24033266 }, clinVarItem.PubmedIds);
             }
         }
 
@@ -220,7 +221,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(new List<long> { 6826539, 9113933, 9845707, 12000828, 12383672 }, clinVarItem.PubMedIds.Select(long.Parse));
+                Assert.Equal(new List<long> { 6826539, 9113933, 9845707, 12000828, 12383672 }, clinVarItem.PubmedIds);
             }
         }
 
@@ -234,7 +235,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal( new List<long> { 17285735, 17877814, 22848293, 24033266 }, clinVarItem.PubMedIds.Select(long.Parse));
+                Assert.Equal( new List<long> { 17285735, 17877814, 22848293, 24033266 }, clinVarItem.PubmedIds);
             }
         }
 
@@ -248,7 +249,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal( new List<long> { 7595167, 8099202, 8612479 }, clinVarItem.PubMedIds.Select(long.Parse));
+                Assert.Equal( new List<long> { 7595167, 8099202, 8612479 }, clinVarItem.PubmedIds);
             }
         }
 
@@ -262,7 +263,9 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Null(clinVarItem.PubMedIds);
+                Assert.Equal(699, clinVarItem.VariationId);
+                Assert.Null(clinVarItem.PubmedIds);
+                Assert.Contains("\"variationId\":699", clinVarItem.GetJsonString());
             }
         }
 
@@ -277,7 +280,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.True(reader.GetItems().Any());
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> { 24728327 });
+                Assert.Equal(clinVarItem.PubmedIds, new List<long> { 24728327 });
             }
         }
 
@@ -294,7 +297,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> {25741868, 26092869});
+                Assert.Equal(clinVarItem.PubmedIds, new List<long> {25741868, 26092869});
             }
         }
 
@@ -368,7 +371,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long>
+                Assert.Equal(clinVarItem.PubmedIds, new List<long>
                 {
                     12023369,
                     17068223,
@@ -403,7 +406,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                         Assert.Equal(187122303, clinVarItem.Position);
                         Assert.Equal(17, clinVarItem.RefAllele.Length);
                         Assert.Equal("GC", clinVarItem.AltAllele);
-                        Assert.Equal("2018-12-28", clinVarItem.LastUpdateDate);
+                        Assert.Equal("2018-12-28", new DateTime(clinVarItem.LastUpdatedDate).ToString("yyyy-MM-dd"));
                         break;
                 }
             }
@@ -423,7 +426,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> { 23806086, 24088041, 25736269 });
+                Assert.Equal(clinVarItem.PubmedIds, new List<long> { 23806086, 24088041, 25736269 });
             }
         }
 
@@ -439,7 +442,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(2, clinVarItem.AlleleOrigins.Length);
+                Assert.Equal(2, clinVarItem.AlleleOrigins.Count());
                 Assert.NotEqual(clinVarItem.AlleleOrigins.First(), clinVarItem.AlleleOrigins.Last());
 
                 foreach (var origin in clinVarItem.AlleleOrigins)
@@ -556,7 +559,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             foreach (var clinVarItem in reader.GetItems())
             {
                 altAlleles.Add(clinVarItem.AltAllele);
-                Assert.Equal(new[] {"pathogenic"}, clinVarItem.Significance);
+                Assert.Equal(new[] {"pathogenic"}, clinVarItem.Significances);
             }
             
             Assert.Equal(2, altAlleles.Count);
@@ -618,7 +621,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in reader.GetItems())
             {
-                Assert.Equal(clinVarItem.PubMedIds.Select(long.Parse), new List<long> { 16329078, 16372351, 19213030, 21438134, 25741868 });
+                Assert.Equal(clinVarItem.PubmedIds, new List<long> { 16329078, 16372351, 19213030, 21438134, 25741868 });
             }
         }
 
@@ -844,7 +847,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(new[]{ "pathogenic", "likely pathogenic" }, clinvarItems[0].Significance);
+            Assert.Equal(new[]{ "pathogenic", "likely pathogenic" }, clinvarItems[0].Significances);
         }
 
         [Fact]
@@ -855,7 +858,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var clinvarItems = reader.GetItems().ToList();
 
-            Assert.Equal(new[] { "pathogenic", "uncertain significance" }, clinvarItems[0].Significance);
+            Assert.Equal(new[] { "pathogenic", "uncertain significance" }, clinvarItems[0].Significances);
         }
     }
 }

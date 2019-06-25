@@ -18,11 +18,11 @@ namespace SAUtils.DataStructures
 			string refAllele,
 			string alternateAllele)
 		{
-			Chromosome      = chromosome;
-			Position           = position;
-			RsId            = rsId;
-			RefAllele = refAllele;
-			AltAllele = alternateAllele;
+			Chromosome = chromosome;
+			Position   = position;
+			RsId       = rsId;
+			RefAllele  = refAllele;
+			AltAllele  = alternateAllele;
 			
 		}
 

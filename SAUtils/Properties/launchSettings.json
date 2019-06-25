@@ -2,7 +2,7 @@
   "profiles": {
     "OMIM_SK": {
       "commandName": "Project",
-      "commandLineArgs": "createOMIM --gi ..\\gene_info_2016-10-17 --gi ..\\gene_info_2011-08-28 --hgnc ..\\hgnc_complete_set_2016-10-17.txt --mim mim2gene.txt --in genemap2.txt --out test",
+      "commandLineArgs": "SpliceAi --ref %Ref% --cache C:\\development\\Cache\\26\\GRCh37\\Both --in exome_spliceai_scores.vcf.gz --out %OutDir%",
       "workingDirectory": "E:\\Nirvana_resources\\ExternalDataSources\\OMIM\\2017-08-15"
     },
     "RR_omim": {
@@ -89,6 +89,11 @@
       "commandName": "Project",
       "commandLineArgs": " extractminiXML -i ClinVarFullRelease_2019-02.xml.gz -r c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\ -o c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\",
       "workingDirectory": "c:\\development\\ExternalDataSources\\ClinVar\\20190206"
+    },
+    "RR_spliceAI": {
+      "commandName": "Project",
+      "commandLineArgs": "SpliceAi --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --cache C:\\development\\Cache\\26\\GRCh38\\Both --in spliceai_scores.exome.hg38.vcf.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\GRCh38"
     }
   }
 }

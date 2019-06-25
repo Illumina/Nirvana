@@ -67,7 +67,7 @@
     },
     "RR_mother": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in C:\\Development\\TestDatasets\\Mother.vcf.gz --out C:\\Development\\TestDatasets\\mom",
+      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\52\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in Mother.vcf.gz --out mom",
       "workingDirectory": "C:\\Development\\TestDatasets"
     },
     "SK streaming": {

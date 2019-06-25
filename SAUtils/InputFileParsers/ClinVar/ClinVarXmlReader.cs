@@ -10,7 +10,6 @@ using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
 using Variants;
-using static SAUtils.InputFileParsers.ClinVar.ClinVarCommon;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
@@ -68,7 +67,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private HashSet<string> _allilicOmimIDs;
 		private HashSet<string> _orphanetIDs;
 
-        private HashSet<string> _pubMedIds= new HashSet<string>();
+        private HashSet<long> _pubMedIds= new HashSet<long>();
 		private long _lastUpdatedDate;
 
         public SaJsonSchema JsonSchema { get; } = ClinVarSchema.Get();
@@ -88,7 +87,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 			_omimIDs           = new HashSet<string>();
             _allilicOmimIDs    = new HashSet<string>();
             _orphanetIDs       = new HashSet<string>();
-			_pubMedIds         = new HashSet<string>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
+			_pubMedIds         = new HashSet<long>();//we need a new pubmed hash since otherwise, pubmedid hashes of different items interfere. 
 			_lastUpdatedDate   = long.MinValue;
 		}
 
@@ -178,9 +177,8 @@ namespace SAUtils.InputFileParsers.ClinVar
                     item.Stop,
                     refAllele,
                     altAllele,
-                    item.VariantType,
-                    item.Values,
-                    JsonSchema));
+                    item.JsonSchema,
+                    item.AlleleOrigins, item.VariantType, item.Id,item.VariationId, item.ReviewStatus, item.MedGenIds, item.OmimIds, item.OrphanetIds, item.Phenotypes, item.Significances, item.PubmedIds, item.LastUpdatedDate));
             }
 
             shiftedItems.Sort();
@@ -206,42 +204,36 @@ namespace SAUtils.InputFileParsers.ClinVar
 
                 var extendedOmimIds = GetOmimIds(variant);
 
-                var reviewStatusString = ReviewStatusMapping.FormatReviewStatus(_reviewStatus);
+                var reviewStatEnum = ReviewStatus.no_assertion;
+                if (ClinVarItem.ReviewStatusNameMapping.ContainsKey(_reviewStatus))
+                    reviewStatEnum = ClinVarItem.ReviewStatusNameMapping[_reviewStatus];
 
-                clinvarList.Add(GetClinVarItem(variant, reviewStatusString, extendedOmimIds.ToArray()));
+                clinvarList.Add(
+                    new ClinVarItem(variant.Chromosome,
+                        variant.Start,
+                        variant.Stop,
+                        variant.ReferenceAllele,
+                        variant.AltAllele,
+                        JsonSchema,
+                        _alleleOrigins.Count > 0 ? _alleleOrigins : null,
+                        variant.VariantType,
+                        _id,
+                        variant.VariantId,
+                        reviewStatEnum,
+                        _medGenIDs.Count > 0 ? _medGenIDs : null,
+                        extendedOmimIds.Count > 0 ? extendedOmimIds : null,
+                        _orphanetIDs.Count > 0 ? _orphanetIDs : null,
+                        _prefPhenotypes.Count > 0 ? _prefPhenotypes : _altPhenotypes,
+                        _significances,
+                        _pubMedIds.Count > 0 ? _pubMedIds.OrderBy(x => x) : null, 
+                        _lastUpdatedDate));
             }
 
 			return clinvarList.Count > 0 ? clinvarList: null;
 		}
 
-        private ClinVarItem GetClinVarItem(ClinvarVariant variant, string reviewStatusString, string[] extendedOmimIds)
-        {
-            return new ClinVarItem(variant.Chromosome,
-                variant.Start,
-                variant.Stop,
-                variant.ReferenceAllele,
-                variant.AltAllele,
-                variant.VariantType,
-                GetValues(reviewStatusString, extendedOmimIds),
-                JsonSchema);
-        }
-
-        private string[][] GetValues(string reviewStatusString, string[] extendedOmimIds)
-        {
-            var values = new string[PubMedIdsIndex+1][];
-            values[IdIndex] = new[] { _id };
-            values[ReviewStatusIndex] = new[] { reviewStatusString };
-            values[AlleleOriginsIndex] = _alleleOrigins.Count > 0 ? _alleleOrigins.ToArray() : null;
-            values[PhenotypesIndex] = _prefPhenotypes.Count > 0 ? _prefPhenotypes.ToArray() : _altPhenotypes.ToArray();
-            values[MedGenIdsIndex] = _medGenIDs.Count > 0 ? _medGenIDs.ToArray() : null;
-            values[OmimIdsIndex] = extendedOmimIds.Length > 0 ? extendedOmimIds : null;
-            values[OrphanetIdsIndex] = _orphanetIDs.Count > 0 ? _orphanetIDs.ToArray() : null;
-            values[SignificanceIndex] = _significances;
-            values[LastUpdateDateIndex] = new[] { new DateTime(_lastUpdatedDate).ToString("yyyy-MM-dd")};
-            values[PubMedIdsIndex] = _pubMedIds.Count > 0 ? _pubMedIds.OrderBy(long.Parse).ToArray() : null;
-            return values;
-        }
-
+        
+        
         private HashSet<string> GetOmimIds(ClinvarVariant variant)
         {
             var extendedOmimIds = new HashSet<string>(_omimIDs);
@@ -450,10 +442,10 @@ namespace SAUtils.InputFileParsers.ClinVar
 			    if (source.Value != PubmedIdTag) continue;
 
 			    string pubmedId = element.Value.TrimEnd('.');
-			    //pubmed ids with more than 8 digits are bad
-                if (pubmedId.Length <= 8 && long.TryParse(pubmedId, out _))
-			        _pubMedIds.Add(pubmedId);
-			    else Console.WriteLine($"WARNING:unexpected pubmedID {pubmedId}.");
+                //pubmed ids with more than 8 digits are bad
+                if (long.TryParse(pubmedId, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
+                    _pubMedIds.Add(l);
+                else Console.WriteLine($"WARNING:unexpected pubmedID {pubmedId}.");
                 
     		}
 		}
@@ -474,33 +466,33 @@ namespace SAUtils.InputFileParsers.ClinVar
         private void ParseMeasureSet(XElement xElement)
 		{
 			if (xElement == null || xElement.IsEmpty) return;
-
-		    foreach (var element in xElement.Elements(MeasureTag))
+            var variantId = xElement.Attribute(IdTag) == null ? (int?)null : int.Parse(xElement.Attribute(IdTag)?.Value);
+            foreach (var element in xElement.Elements(MeasureTag))
 		    {
-		        ParseMeasure(element);
+		        ParseMeasure(element, variantId);
             }
             
 		}
 
 
         private const string SeqLocationTag = "SequenceLocation";
-        private void ParseMeasure(XElement xElement)
+        private void ParseMeasure(XElement xElement, int? variantId)
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
             _allilicOmimIDs.Clear();
 
 			//the variant type is available in the attributes
-            string varType = xElement.Attribute(TypeTag)?.Value;
-
-			var variantList = new List<ClinvarVariant>();
+            var varType = xElement.Attribute(TypeTag)?.Value;
+            
+            var variantList = new List<ClinvarVariant>();
 
 		    foreach (var element in xElement.Elements(XrefTag))
                 ParseXref(element);
 
 		    foreach (var element in xElement.Elements(SeqLocationTag))
             {
-		        var variant = GetClinvarVariant(element, _sequenceProvider.Assembly, _refChromDict);
+		        var variant = GetClinvarVariant(element, _sequenceProvider.Assembly, _refChromDict, variantId);
 
 		        if (variant == null) continue;
 
@@ -528,13 +520,13 @@ namespace SAUtils.InputFileParsers.ClinVar
 		{
 			foreach (char altAllele in _iupacBases[variant.AltAllele[0]])
 			{
-			    variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop, variant.ReferenceAllele, altAllele.ToString()));
+			    variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop,variant.VariantId, variant.ReferenceAllele, altAllele.ToString()));
 			}
 		}
 
 
 
-        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict, int? variantId)
         {
 		    if (xElement == null ) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />
@@ -551,7 +543,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             if (stop - start + 1 > MaxVariantLength) return null;
             AdjustVariant(ref start, ref referenceAllele, ref altAllele);
 		    
-            return new ClinvarVariant(chromosome, start, stop, referenceAllele, altAllele);
+            return new ClinvarVariant(chromosome, start, stop, variantId, referenceAllele, altAllele);
 		}
 
 		private static void AdjustVariant(ref int start, ref string referenceAllele, ref string altAllele)

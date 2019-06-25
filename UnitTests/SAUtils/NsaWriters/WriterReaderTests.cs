@@ -24,49 +24,20 @@ namespace UnitTests.SAUtils.NsaWriters
         private readonly IChromosome _chrom1 = new Chromosome("chr1", "1", 0);
         private readonly IChromosome _chrom2 = new Chromosome("chr2", "2", 1);
 
-        private static ClinVarItem GetClinVarItem(IChromosome chromosome,
-            int position,
-            int stop,
-            string referenceAllele,
-            string altAllele,
-            IEnumerable<string> alleleOrigins,
-            string variantType,
-            string id,
-            string reviewStatus,
-            IEnumerable<string> medGenIds,
-            IEnumerable<string> omimIds,
-            IEnumerable<string> orphanetIds,
-            IEnumerable<string> phenotypes,
-            string significance,
-            IEnumerable<long> pubMedIds,
-            long lastUpdatedDate = long.MinValue)
-        {
-            string[][] values = {
-                new[] {id},
-                new[] {ReviewStatusMapping.FormatReviewStatus(reviewStatus)},
-                alleleOrigins.ToArray(),
-                phenotypes.ToArray(),
-                medGenIds.ToArray(),
-                omimIds.ToArray(),
-                orphanetIds.ToArray(),
-                new[] {significance},
-                new[] {new DateTime(lastUpdatedDate).ToString("yyyy-MM-dd")},
-                pubMedIds.OrderBy(x => x).Select(x => x.ToString()).ToArray()
-            };
-            
-            return new ClinVarItem(chromosome, position, stop, referenceAllele, altAllele, variantType, values, ClinVarSchema.Get());
-        } 
-
         private IEnumerable<ClinVarItem> GetClinvarItems()
         {
             var clinvarItems = new List<ClinVarItem>
             {
-                GetClinVarItem(_chrom1, 100, 100, "T", "A", new[] {"origin1"}, "SNV", "RCV0001", "", new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"}, new[] {"phenotype1"}, "significance", new[] {10024875684920}, 658794146787),
-                GetClinVarItem(_chrom1, 101, 101, "A", "", new[] {"origin1"}, "del", "RCV00011", "no_assertion", new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"}, new[] {"phenotype1"}, "significance", new[] {10024875684920}, 658794146787),
-                GetClinVarItem(_chrom1, 106, 106, "C", "", new[] {"origin5"}, "del", "RCV0005", "classified by multiple submitters", new[] {"medgen5"}, new[] {"omim5"}, new[] {"orpha5"}, new[] {"phenotype5"}, "significance5", new[] {10024255684920}, 658794187787),
-                GetClinVarItem(_chrom2, 200, 200, "G", "A",
-                    new[] {"origin21"}, "SNV", "RCV20001", "criteria provided, multiple submitters, no conflicts", new[] {"medgen20"}, new[] {"omim20"}, new[] {"orpha20"}, new[] {"phenotype20"}, "significance20", new[] {10024875684480}, 669794146787),
-                GetClinVarItem(_chrom2, 205, 205, "T", "C", new[] {"origin25"}, "ins", "RCV20005", "reviewed by expert panel", new[] {"medgen25"}, new[] {"omim25"}, new[] {"orpha25"}, new[] {"phenotype25"}, "significance25", new[] {10024255684925}, 658794187287)
+                new ClinVarItem(_chrom1, 100, 100, "T", "A", ClinVarSchema.Get(), new[] {"origin1"}, "SNV", "RCV0001",null, ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"}, new[] {"phenotype1"}, new []{"significance"}, new[] {10024875684920}, 658794146787),
+
+                new ClinVarItem(_chrom1, 101, 101, "A", "", ClinVarSchema.Get(),new[] {"origin1"}, "del", "RCV00011", 101 ,ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"}, new[] {"phenotype1"}, new []{"significance"}, new[] {10024875684920}, 658794146787),
+
+                new ClinVarItem(_chrom1, 106, 106, "C", "",ClinVarSchema.Get(), new[] {"origin5"}, "del", "RCV0005", null, ReviewStatus.multiple_submitters, new[] {"medgen5"}, new[] {"omim5"}, new[] {"orpha5"}, new[] {"phenotype5"}, new []{"significance5"}, new[] {10024255684920}, 658794187787),
+
+                new ClinVarItem(_chrom2, 200, 200, "G", "A", ClinVarSchema.Get(),
+                    new[] {"origin21"}, "SNV", "RCV20001",null, ReviewStatus.multiple_submitters_no_conflict, new[] {"medgen20"}, new[] {"omim20"}, new[] {"orpha20"}, new[] {"phenotype20"}, new []{"significance20"}, new[] {10024875684480}, 669794146787),
+
+                new ClinVarItem(_chrom2, 205, 205, "T", "C",  ClinVarSchema.Get(), new[] {"origin25"}, "ins", "RCV20005", null, ReviewStatus.expert_panel, new[] {"medgen25"}, new[] {"omim25"}, new[] {"orpha25"}, new[] {"phenotype25"}, new []{"significance25"}, new[] {10024255684925}, 658794187287)
             };
 
             return clinvarItems;
@@ -118,7 +89,7 @@ namespace UnitTests.SAUtils.NsaWriters
                     annotations = saReader.GetAnnotation(101).ToList();
                     Assert.Equal("A", annotations[0].refAllele);
                     Assert.Equal("", annotations[0].altAllele);
-                    Assert.Equal("\"id\":\"RCV00011\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"A\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[0].annotation);
+                    Assert.Equal("\"id\":\"RCV00011\",\"variationId\":101,\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"A\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]", annotations[0].annotation);
 
                     saReader.PreLoad(_chrom2, new List<int> { 200, 205 });
                     var (refAllele, altAllele, annotation) = saReader.GetAnnotation(200).First();
