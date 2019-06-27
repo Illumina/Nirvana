@@ -20,7 +20,7 @@ namespace Vcf
         {
             string line;
              while ((line = reader.ReadLine()) != null)
-            {
+             {
                 if (line.StartsWith('#')) continue;
 
                 var fields = line.OptimizedSplit('\t');
@@ -32,7 +32,7 @@ namespace Vcf
 
                 BufferedLine = line;
                 return;
-            }
+             }
         }
 
         public string GetNextLine(StreamReader reader)

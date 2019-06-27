@@ -7,8 +7,6 @@ namespace Vcf.VariantCreator
 {
     public static class RepeatExpansionCreator
     {
-        public static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, true);
-
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
         {
             start++;//for the padding base
@@ -25,7 +23,7 @@ namespace Vcf.VariantCreator
                 string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
 
                 return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
-                    null, RepeatExpansionBehavior);
+                    null, AnnotationBehavior.RepeatExpansionBehavior);
             }
             return null;
         }

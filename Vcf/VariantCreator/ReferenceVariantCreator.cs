@@ -6,8 +6,6 @@ namespace Vcf.VariantCreator
 {
     public static class ReferenceVariantCreator
     {
-        private static readonly AnnotationBehavior RefVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
-
         private static string GetVid(string ensemblName, int start, int end, string refAllele, VariantType variantType)
         {
             string referenceName = ensemblName;
@@ -36,7 +34,7 @@ namespace Vcf.VariantCreator
 
             return isRefMinor
                 ? new Variant(chromosome, start, end, refMinorGlobalMajorAllele, refallele, variantType, vid,
-                    true, false, false, null, null, RefVariantBehavior)
+                    true, false, false, null, null, AnnotationBehavior.RefVariantBehavior)
                 : new Variant(chromosome, start, end, refallele, altAllele, variantType, vid, false, false, false, null,
                     null, null);
         }

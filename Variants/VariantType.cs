@@ -33,7 +33,8 @@
         copy_number_gain      = 32,
 
         // misc
-        reference = 42
+        reference = 42,
+        non_informative_allele = 43
     }
     // ReSharper restore InconsistentNaming
 }

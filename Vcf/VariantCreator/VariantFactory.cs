@@ -38,8 +38,7 @@ namespace Vcf.VariantCreator
         private static bool IsBreakend(string altAllele) => altAllele.Contains("[") || altAllele.Contains("]");
 
         private static bool IsSymbolicAllele(string altAllele) =>
-            altAllele.OptimizedStartsWith('<') && altAllele.OptimizedEndsWith('>') &&
-            !VcfCommon.NonInformativeAltAllele.Contains(altAllele);
+            altAllele.OptimizedStartsWith('<') && altAllele.OptimizedEndsWith('>') && !VcfCommon.IsNonInformativeAltAllele(altAllele);
 
         public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
             string[] altAlleles, IInfoData infoData, bool[] isDecomposed, bool isRecomposed, List<string>[] linkedVids, string globalMajorAllele)
@@ -55,8 +54,6 @@ namespace Vcf.VariantCreator
             var variants = new List<IVariant>();
             for (var i = 0; i < altAlleles.Length; i++)
             {
-                if (IsNonInformativeAltAllele(altAlleles[i])) continue;
-
                 bool isDecomposedVar = isDecomposed[i];
                 (int shiftedStart, string shiftedRef, string shiftedAlt) =
                     VariantUtils.TrimAndLeftAlign(start, refAllele, altAlleles[i], _sequenceProvider.Sequence);
@@ -66,8 +63,6 @@ namespace Vcf.VariantCreator
 
             return variants.Count == 0 ? null : variants.ToArray();
         }
-
-        private static bool IsNonInformativeAltAllele(string altAllele) => VcfCommon.NonInformativeAltAllele.Contains(altAllele);
 
         private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
             IInfoData infoData, VariantCategory category, bool isDecomposedVar, bool isRecomposed, string[] linkedVids, string globalMajorAllele)

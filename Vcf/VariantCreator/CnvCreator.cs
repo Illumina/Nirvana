@@ -6,8 +6,6 @@ namespace Vcf.VariantCreator
 {
     public static class CnvCreator
     {
-        private static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true);
-
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
         {
             start++;
@@ -40,7 +38,7 @@ namespace Vcf.VariantCreator
             string altAllele, VariantType variantType, string vid)
         {
             return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
-                null, null, CnvBehavior);
+                null, null, AnnotationBehavior.CnvBehavior);
         }
     }
 }

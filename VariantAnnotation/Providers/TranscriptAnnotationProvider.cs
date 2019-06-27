@@ -106,6 +106,7 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedVariants)
             {
                 var variant = annotatedVariant.Variant;
+                if (variant.Behavior.Equals(AnnotationBehavior.MinimalAnnotationBehavior)) continue;
 
                 ITranscript[] geneFusionCandidates = GetGeneFusionCandidates(variant.BreakEnds, transcriptIntervalForest);
                 ITranscript[] transcripts          = transcriptIntervalForest.GetAllFlankingValues(variant);

@@ -28,5 +28,7 @@ namespace VariantAnnotation.Interface.IO
 
         public static readonly ImmutableHashSet<string> ReferenceAltAllele =
             new HashSet<string> {MissingValue, GatkNonRefAllele}.ToImmutableHashSet();
+
+        public static bool IsNonInformativeAltAllele(string altAllele) => NonInformativeAltAllele.Contains(altAllele);
     }
 }

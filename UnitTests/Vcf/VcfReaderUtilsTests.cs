@@ -14,7 +14,7 @@ namespace UnitTests.Vcf
     public sealed class VcfReaderUtilsTests
     {
         [Fact]
-        public void ParseVcfLine_line_with_only_non_informative_alleles_position_unchanged_but_variants_ignored()
+        public void ParseVcfLine_NonInformativeAlleles_Alone_NotFiltered()
         {
             const string vcfLine1 = "chr1	13133	.	T	<*>	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
             const string vcfLine2 = "chr1	13133	.	T	*	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
@@ -39,14 +39,14 @@ namespace UnitTests.Vcf
             Assert.Equal("*", position2.AltAlleles[0]);
             Assert.Equal("<M>", position3.AltAlleles[0]);
 
-            // Variants are null
-            Assert.Null(annotatedVariants1);
-            Assert.Null(annotatedVariants2);
-            Assert.Null(annotatedVariants3);
+            // Variants not filtered
+            Assert.Equal("<*>", annotatedVariants1[0].Variant.AltAllele);
+            Assert.Equal("*", annotatedVariants2[0].Variant.AltAllele);
+            Assert.Equal("<M>", annotatedVariants3[0].Variant.AltAllele);
         }
 
         [Fact]
-        public void ParseVcfLine_non_informative_alleles_or_NonRef_filtered_only_in_variants()
+        public void ParseVcfLine_NonInformativeAlleles_WithNormalAllele_NotFiltered()
         {
             const string vcfLine1 = "chr1	13133	.	T	<*>,G	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
             const string vcfLine2 = "chr1	13133	.	T	*,C	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
@@ -78,10 +78,10 @@ namespace UnitTests.Vcf
             Assert.Equal(new[] { "A", "<NON_REF>" }, position4.AltAlleles);
 
             // Variants
-            Assert.Equal(new[] { "G" }, annotatedVariants1.Select(x => x.Variant.AltAllele).ToArray());
-            Assert.Equal(new[] { "C" }, annotatedVariants2.Select(x => x.Variant.AltAllele).ToArray());
-            Assert.Equal(new[] { "A" }, annotatedVariants3.Select(x => x.Variant.AltAllele).ToArray());
-            Assert.Equal(new[] { "A" }, annotatedVariants4.Select(x => x.Variant.AltAllele).ToArray());
+            Assert.Equal(new[] { "<*>", "G" }, annotatedVariants1.Select(x => x.Variant.AltAllele).ToArray());
+            Assert.Equal(new[] { "*", "C" }, annotatedVariants2.Select(x => x.Variant.AltAllele).ToArray());
+            Assert.Equal(new[] { "<M>", "A" }, annotatedVariants3.Select(x => x.Variant.AltAllele).ToArray());
+            Assert.Equal(new[] { "A", "<NON_REF>" }, annotatedVariants4.Select(x => x.Variant.AltAllele).ToArray());
         }
 
 

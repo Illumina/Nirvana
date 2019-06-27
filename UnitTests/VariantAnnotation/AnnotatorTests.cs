@@ -111,6 +111,9 @@ namespace UnitTests.VariantAnnotation
             Assert.NotNull(annotatedPosition.CytogeneticBand);
         }
 
+
+
+
         [Fact]
         public void Annotate_null_position()
         {
@@ -153,8 +156,7 @@ namespace UnitTests.VariantAnnotation
         //    var annotatedGenes = annotator.GetGeneAnnotations();
         //    Assert.Equal(1, annotatedGenes.Count);
         //}
-
-
+        
         [Fact]
         public void CheckAssemblyConsistancy_consistant()
         {

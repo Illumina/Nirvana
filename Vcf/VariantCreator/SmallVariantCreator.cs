@@ -3,14 +3,13 @@ using System.Security.Cryptography;
 using System.Text;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface.IO;
 using Variants;
 
 namespace Vcf.VariantCreator
 {
     public static class SmallVariantCreator
     {
-        public static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
-
         public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed, string[] linkedVids)
         {
             if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant can't be both decomposed and recomposed");
@@ -20,7 +19,10 @@ namespace Vcf.VariantCreator
             var variantType = GetVariantType(refAllele, altAllele);
             string vid      = GetVid(chromosome.EnsemblName, start, end, altAllele, variantType);
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, linkedVids, null, SmallVariantBehavior);
+            var annotationBehavior = variantType == VariantType.non_informative_allele
+                ? AnnotationBehavior.MinimalAnnotationBehavior
+                : AnnotationBehavior.SmallVariantBehavior; 
+            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, isDecomposedVar, isRecomposed, linkedVids, null, annotationBehavior);
         }
 
         public static string GetVid(string ensemblName, int start, int end, string altAllele, VariantType type)
@@ -39,6 +41,8 @@ namespace Vcf.VariantCreator
                 case VariantType.MNV:
                 case VariantType.indel:
                     return $"{referenceName}:{start}:{end}:{GetInsertedAltAllele(altAllele)}";
+                case VariantType.non_informative_allele:
+                    return $"{referenceName}:{start}:*";
                 default:
                     return null;
             }
@@ -59,6 +63,8 @@ namespace Vcf.VariantCreator
 
         public static VariantType GetVariantType(string refAllele, string altAllele)
         {
+            if (VcfCommon.IsNonInformativeAltAllele(altAllele)) return VariantType.non_informative_allele;
+
             int referenceAlleleLen = refAllele.Length;
             int alternateAlleleLen = altAllele.Length;
 
