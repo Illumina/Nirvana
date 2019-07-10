@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using Cloud;
+using System.Linq;
 using IO;
 using VariantAnnotation;
 using CommandLine.Utilities;
@@ -13,7 +12,6 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
-using VariantAnnotation.SA;
 
 namespace Nirvana
 {
@@ -32,110 +30,32 @@ namespace Nirvana
              return new ReferenceSequenceProvider(PersistentStreamUtils.GetReadStream(compressedReferencePath));
         }
 
-        public static IAnnotationProvider GetConservationProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
+        public static IAnnotationProvider GetConservationProvider(AnnotationFiles files) =>
+            files == null || files.RefMinorFile == default
+                ? null
+                : new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(files.ConservationFile.Npd),
+                    PersistentStreamUtils.GetReadStream(files.ConservationFile.Idx));
+
+        public static IRefMinorProvider GetRefMinorProvider(AnnotationFiles files) =>
+            files == null || files.RefMinorFile == default ? null : 
+                new RefMinorProvider(PersistentStreamUtils.GetReadStream(files.RefMinorFile.Rma), 
+                    PersistentStreamUtils.GetReadStream(files.RefMinorFile.Idx));
+
+        public static IGeneAnnotationProvider GetGeneAnnotationProvider(AnnotationFiles files) => files?.NsiFiles == null ? null : new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(files.NgaFiles));
+
+        public static IAnnotationProvider GetNsaProvider(AnnotationFiles files)
         {
-            if (dataAndIndexFiles == null) return null;
+            if (files == null) return null;
 
-            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
-            {
-                if (dataFile.EndsWith(SaCommon.PhylopFileSuffix))
-                    return new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(dataFile), PersistentStreamUtils.GetReadStream(indexFile));
-            }
+            var nsaReaders = files.NsaFiles?.Select(x => new NsaReader(PersistentStreamUtils.GetReadStream(x.Nsa), PersistentStreamUtils.GetReadStream(x.Idx)))
+                                            .OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray() ?? new INsaReader[] { };
+     
+            var nsiReaders = files.NsiFiles?.Select(x => new NsiReader(PersistentStreamUtils.GetReadStream(x)))
+                                            .OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray() ?? new INsiReader[] { };
 
-            return null;
-        }
-
-        public static IRefMinorProvider GetRefMinorProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
-        {
-            if (dataAndIndexFiles == null) return null;
-
-            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
-            {
-                if (dataFile.EndsWith(SaCommon.RefMinorFileSuffix))
-                    return new RefMinorProvider(PersistentStreamUtils.GetReadStream(dataFile), PersistentStreamUtils.GetReadStream(indexFile));
-            }
-
-            return null;
-        }
-
-        public static IGeneAnnotationProvider GetGeneAnnotationProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
-        {
-            if (dataAndIndexFiles == null) return null;
-            var ngaFiles = new List<string>();
-            foreach ((string dataFile, string _) in dataAndIndexFiles)
-            {
-                if (dataFile.EndsWith(SaCommon.NgaFileSuffix))
-                    ngaFiles.Add(dataFile);
-            }
-            return ngaFiles.Count > 0? new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(ngaFiles)): null;
-        }
-
-        public static IAnnotationProvider GetNsaProvider(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles)
-        {
-            if (dataAndIndexFiles == null) return null;
-
-            var nsaReaders = new List<INsaReader>();
-            var nsiReaders = new List<INsiReader>();
-
-            GetSaReaders(dataAndIndexFiles, nsaReaders, nsiReaders);
-
-            if (nsaReaders.Count <= 0 && nsiReaders.Count <= 0) return null;
-
-            nsaReaders.Sort((a, b) => string.Compare(a.JsonKey, b.JsonKey, StringComparison.Ordinal));
-            nsiReaders.Sort((a, b) => string.Compare(a.JsonKey, b.JsonKey, StringComparison.Ordinal));
-            return new NsaProvider(nsaReaders.ToArray(), nsiReaders.ToArray());
-        }
-
-        private static void GetSaReaders(IEnumerable<(string dataFile, string indexFile)> dataAndIndexFiles, List<INsaReader> nsaReaders, List<INsiReader> nsiReaders)
-        {
-            foreach ((string dataFile, string indexFile) in dataAndIndexFiles)
-            {
-                if (dataFile.TrimStartToLast("/").Contains(SaCommon.SaFileSuffix))
-                    nsaReaders.Add(
-                        new NsaReader(PersistentStreamUtils.GetReadStream(dataFile),
-                        PersistentStreamUtils.GetReadStream(indexFile))
-                        );
-                if (dataFile.TrimStartToLast("/").Contains(SaCommon.SiFileSuffix))
-                    nsiReaders.Add(new NsiReader(PersistentStreamUtils.GetReadStream(dataFile)));
-            }
-        }
-
-        public static IList<(string dataFile, string indexFile)> GetSaDataAndIndexPaths(string saDirectoryPath) => ConnectUtilities.IsHttpLocation(saDirectoryPath) ? GetSaPathsFromManifest(saDirectoryPath) : GetLocalSaPaths(saDirectoryPath);
-
-        private static IList<(string dataFile, string indexFile)> GetSaPathsFromManifest(string saDirectoryPath)
-        {
-            var baseUrl = NirvanaHelper.S3Url;
+            if (nsaReaders.Length == 0 && nsiReaders.Length == 0) return null;
             
-            var paths = new List<(string, string)>();
-            using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(saDirectoryPath)))
-            {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.EndsWith(SaCommon.SiFileSuffix) || line.EndsWith(SaCommon.NgaFileSuffix))
-                        paths.Add((baseUrl + line, null));
-                    else paths.Add((baseUrl + line, baseUrl + line + SaCommon.IndexSufix));
-                }
-            }
-
-            return paths.Count > 0 ? paths : null;
-        }
-
-        private static List<(string, string)> GetLocalSaPaths(string saDirectoryPath)
-        {
-            var paths = new List<(string, string)>();
-            foreach (var filePath in Directory.GetFiles(saDirectoryPath))
-            {
-                if (filePath.EndsWith(SaCommon.SaFileSuffix) || filePath.EndsWith(SaCommon.PhylopFileSuffix) ||
-                    filePath.EndsWith(SaCommon.RefMinorFileSuffix))
-                    paths.Add((filePath, filePath + SaCommon.IndexSufix));
-
-                if (filePath.EndsWith(SaCommon.SiFileSuffix) || filePath.EndsWith(SaCommon.NgaFileSuffix))
-                    paths.Add((filePath, null));
-                //skip files with all other extensions
-            }
-
-            return paths.Count>0? paths:null;
+            return new NsaProvider(nsaReaders, nsiReaders);
         }
 
         public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path,
@@ -146,13 +66,6 @@ namespace Nirvana
             var wallTimeSpan = benchmark.GetElapsedTime();
             Console.WriteLine("Cache Time: {0} ms", wallTimeSpan.TotalMilliseconds);
             return provider;
-        }
-
-
-        private static string TrimStartToLast(this string s, string value)
-        {
-            int extPos = s.LastIndexOf(value, StringComparison.Ordinal);
-            return extPos == -1 ? s : s.Substring(extPos + value.Length);
         }
     }
 }

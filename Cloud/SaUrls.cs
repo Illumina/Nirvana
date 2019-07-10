@@ -1,6 +1,5 @@
 ﻿// ReSharper disable InconsistentNaming
 
-using System.Text;
 using ErrorHandling.Exceptions;
 using IO;
 
@@ -8,9 +7,9 @@ namespace Cloud
 {
     public class SaUrls
     {
-        public string nsaUrl;
-        public string idxUrl;
-        public string nsiUrl;
+        public string nsaUrl { get; private set; }
+        public string idxUrl { get; private set; }
+        public string nsiUrl { get; private set; }
 
         public void Validate()
         {
@@ -24,7 +23,7 @@ namespace Cloud
                 return;
             }
             if (idxUrl != null) throw new UserErrorException($"Index file {idxUrl} should not be provided when NSA file is not provided.");
-            if (nsiUrl == null) throw new UserErrorException("No SA file is provided.");
+            if (nsiUrl == null) throw new UserErrorException("No custom annotation file is provided.");
 
             HttpUtilities.ValidateUrl(nsiUrl);
         }
@@ -34,6 +33,6 @@ namespace Cloud
             return nsaUrl == null ? $"{{\"nsiUrl\":\"{nsiUrl}\"}}" : $"{{\"nsaUrl\":\"{nsaUrl}\", \"idxUrl\":\"{idxUrl}\"}}";
         }
 
-        public (string DataFile, string IndexFile) ToDataAndIndexFiles() => nsaUrl == null ? (nsiUrl, null) : (nsaUrl, idxUrl);
+        public bool IsNsa() => nsaUrl != null;
     }
 }

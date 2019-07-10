@@ -15,17 +15,10 @@ namespace UnitTests.TestUtilities
         internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
             string vcfLine)
         {
-            List<(string dataFile, string indexFile)> dataAndIndexPaths = null;
-            if(saPaths!=null)
-            {
-                dataAndIndexPaths = new List<(string dataFile, string indexFile)>();
-                foreach (var saPath in saPaths)
-                {
-                    dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saPath));
-                }
-            }
+            var annotationFiles = new AnnotationFiles();
+            saPaths?.ForEach(x => annotationFiles.AddFiles(x));
 
-            var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
+            var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             var (annotator, sequenceProvider)   = GetAnnotatorAndSequenceProvider(cacheFilePrefix, saPaths);
 
             var variantFactory    = new VariantFactory(sequenceProvider);
@@ -47,22 +40,15 @@ namespace UnitTests.TestUtilities
 
         private static (Annotator Annotator, ISequenceProvider SequenceProvider) GetAnnotatorAndSequenceProvider(string cacheFilePrefix, List<string> saPaths)
         {
-            List<(string dataFile, string indexFile)> dataAndIndexPaths = null;
-            if (saPaths != null)
-            {
-                dataAndIndexPaths = new List<(string dataFile, string indexFile)>();
-                foreach (var saPath in saPaths)
-                {
-                    dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saPath));
-                }
 
-            }
+            var annotationFiles = new AnnotationFiles();
+            saPaths?.ForEach(x => annotationFiles.AddFiles(x));
 
             var sequenceFilePath                 = cacheFilePrefix + ".bases";
             var sequenceProvider                 = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
             var transcriptAnnotationProvider     = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
-            var saProvider                       = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
-            var conservationProvider             = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
+            var saProvider                       = ProviderUtilities.GetNsaProvider(annotationFiles);
+            var conservationProvider             = ProviderUtilities.GetConservationProvider(annotationFiles);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);
             return (annotator,sequenceProvider);

@@ -41,20 +41,15 @@ namespace Nirvana
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
             
-            var dataAndIndexPaths = new List<(string DataFile, string IndexFile)>();
-
-            foreach (string saDirectoryPath in saDirectoryPaths)
-            {
-                dataAndIndexPaths.AddRange(ProviderUtilities.GetSaDataAndIndexPaths(saDirectoryPath));
-            }
-
-            if (customAnnotations != null) dataAndIndexPaths.AddRange(customAnnotations.Select(x => x.ToDataAndIndexFiles()));
+            var annotationFiles = new AnnotationFiles();
+            saDirectoryPaths?.ForEach(x => annotationFiles.AddFiles(x));
+            customAnnotations?.ForEach(x => annotationFiles.AddFiles(x));
 
             TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
-            SaProvider                   = ProviderUtilities.GetNsaProvider(dataAndIndexPaths);
-            ConservationProvider         = ProviderUtilities.GetConservationProvider(dataAndIndexPaths);
-            RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
-            GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(dataAndIndexPaths);
+            SaProvider                   = ProviderUtilities.GetNsaProvider(annotationFiles);
+            ConservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
+            RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(annotationFiles);
+            GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
             Plugins                      = PluginUtilities.LoadPlugins(pluginDirectory);
 
             Annotator = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
