@@ -10,11 +10,11 @@ namespace Variants
         public readonly bool NeedFlankingTranscript;
         public readonly bool StructuralVariantConsequence;
 
-        public static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
+        public static readonly AnnotationBehavior SmallVariantBehavior      = new AnnotationBehavior(true, false, false, true, false);
         public static readonly AnnotationBehavior MinimalAnnotationBehavior = new AnnotationBehavior(false, false, false, false, false);
-        public static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true);
-        public static readonly AnnotationBehavior RefVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
-        public static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, true);
+        public static readonly AnnotationBehavior CnvBehavior               = new AnnotationBehavior(false, true, true, false, true);
+        public static readonly AnnotationBehavior RefVariantBehavior        = new AnnotationBehavior(true, false, false, true, false);
+        public static readonly AnnotationBehavior RepeatExpansionBehavior   = new AnnotationBehavior(false, false, true, false, true);
         public static readonly AnnotationBehavior StructuralVariantBehavior = new AnnotationBehavior(false, true, true, false, true);
 
         public AnnotationBehavior(bool needSaPosition, bool needSaInterval, bool reducedTranscriptAnnotation,
@@ -28,9 +28,10 @@ namespace Variants
         }
 
         public bool Equals(AnnotationBehavior other) =>
-            NeedSaPosition == other.NeedSaPosition && NeedSaInterval == other.NeedSaInterval &&
-            ReducedTranscriptAnnotation == other.ReducedTranscriptAnnotation &&
-            NeedFlankingTranscript == other.NeedFlankingTranscript &&
+            NeedSaPosition               == other.NeedSaPosition              &&
+            NeedSaInterval               == other.NeedSaInterval              &&
+            ReducedTranscriptAnnotation  == other.ReducedTranscriptAnnotation &&
+            NeedFlankingTranscript       == other.NeedFlankingTranscript      &&
             StructuralVariantConsequence == other.StructuralVariantConsequence;
     }
 }

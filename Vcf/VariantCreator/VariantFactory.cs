@@ -54,6 +54,9 @@ namespace Vcf.VariantCreator
             var variants = new List<IVariant>();
             for (var i = 0; i < altAlleles.Length; i++)
             {
+#if (!NI_ALLELE)
+                if (VcfCommon.IsNonInformativeAltAllele(altAlleles[i])) continue;
+#endif
                 bool isDecomposedVar = isDecomposed[i];
                 (int shiftedStart, string shiftedRef, string shiftedAlt) =
                     VariantUtils.TrimAndLeftAlign(start, refAllele, altAlleles[i], _sequenceProvider.Sequence);

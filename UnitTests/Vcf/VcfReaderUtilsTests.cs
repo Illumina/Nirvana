@@ -13,6 +13,7 @@ namespace UnitTests.Vcf
 {
     public sealed class VcfReaderUtilsTests
     {
+#if (NI_ALLELE)
         [Fact]
         public void ParseVcfLine_NonInformativeAlleles_Alone_NotFiltered()
         {
@@ -83,7 +84,7 @@ namespace UnitTests.Vcf
             Assert.Equal(new[] { "<M>", "A" }, annotatedVariants3.Select(x => x.Variant.AltAllele).ToArray());
             Assert.Equal(new[] { "A", "<NON_REF>" }, annotatedVariants4.Select(x => x.Variant.AltAllele).ToArray());
         }
-
+#endif
 
         [Fact]
         public void Test_crash_caused_by_variant_trimming ()
