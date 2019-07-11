@@ -6,6 +6,7 @@ using SAUtils.dbVar;
 using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
+using SAUtils.GnomadGeneScores;
 using SAUtils.ProcessSpliceNetTsv;
 using SAUtils.SpliceAi;
 using VariantAnnotation.Interface;
@@ -32,8 +33,9 @@ namespace SAUtils
                 ["Omim"]               = new TopLevelOption("create OMIM database", Omim.Main.Run),
                 ["ExacScores"]         = new TopLevelOption("create ExAC gene scores database", ExacScores.Main.Run),
                 ["extractMiniSA"]      = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
-                ["extractMiniXml"]     = new TopLevelOption("extracts mini SA", ExtractMiniXmlMain.Run),
+                ["extractMiniXml"]     = new TopLevelOption("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
                 ["Gnomad"]             = new TopLevelOption("create gnomAD database", CreateGnomadDb.Main.Run),
+                ["GnomadGeneScores"]   = new TopLevelOption("create gnomAD gene scores database", GnomadGenesMain.Run),
                 ["TopMed"]             = new TopLevelOption("create TOPMed database", CreateTopMedDb.Main.Run),
                 ["PhyloP"]             = new TopLevelOption("create PhyloP database", PhyloP.Main.Run),
                 ["CosmicSv"]           = new TopLevelOption("create COSMIC SV tsv files", ExtractCosmicSvsMain.Run),

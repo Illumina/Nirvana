@@ -38,7 +38,7 @@ namespace SAUtils.ExacScores
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .CheckInputFilenameExists(_inputFile, "input TSV file", "--in")
                 .SkipBanner()
-                .ShowHelpMenu("Creates a gene annotation database from OMIM data", commandLineExample)
+                .ShowHelpMenu("Creates a gene annotation database from ExAC data", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 
