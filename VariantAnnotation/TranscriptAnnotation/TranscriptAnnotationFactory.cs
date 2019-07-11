@@ -54,6 +54,9 @@ namespace VariantAnnotation.TranscriptAnnotation
                 case Status.CompleteOverlapAnnotation:
                     annotatedTranscript = ReducedTranscriptAnnotator.GetCompleteOverlapTranscript(transcript);
                     break;
+                case Status.RohAnnotation:
+                    annotatedTranscript = RohTranscriptAnnotator.GetAnnotatedTranscript(transcript);
+                    break;
                 case Status.FullAnnotation:
                     var acidsProvider = variant.Chromosome.UcscName == "chrM"
                         ? MitoAminoAcidsProvider
@@ -76,11 +79,11 @@ namespace VariantAnnotation.TranscriptAnnotation
                 if (overlapsTranscript) return Status.FullAnnotation;
                 if (behavior.NeedFlankingTranscript && variant.Overlaps(transcript, OverlapBehavior.FlankingLength)) return Status.FlankingAnnotation;
             }
-            else
+            else if (overlapsTranscript)
             {
                 // handle large variants
-                if (variant.Contains(transcript)) return Status.CompleteOverlapAnnotation;
-                if (overlapsTranscript) return Status.ReducedAnnotation;
+                if (behavior.CanonicalTranscriptOnly) return Status.RohAnnotation;
+                return variant.Contains(transcript) ? Status.CompleteOverlapAnnotation : Status.ReducedAnnotation;
             }
 
             return Status.NoAnnotation;
@@ -92,7 +95,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             CompleteOverlapAnnotation,
             FlankingAnnotation,
             ReducedAnnotation,
-            FullAnnotation
+            FullAnnotation,
+            RohAnnotation
         }
     }
 }

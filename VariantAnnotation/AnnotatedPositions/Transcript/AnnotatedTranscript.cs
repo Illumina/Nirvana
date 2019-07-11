@@ -23,12 +23,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public IEnumerable<ConsequenceTag> Consequences { get; }
         public IGeneFusionAnnotation GeneFusionAnnotation { get; }
         public IList<IPluginData> PluginData { get; }
-        public bool CompleteOverlap { get; }
+        public bool? CompleteOverlap { get; }
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPosition mappedPosition, string hgvsCoding,
             string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
-            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation, bool completeOverlap)
+            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation, bool? completeOverlap)
         {
             Transcript           = transcript;
             ReferenceAminoAcids  = referenceAminoAcids;
@@ -53,7 +53,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             sb.Append(JsonObject.OpenBrace);
             jsonObject.AddStringValue("transcript", Transcript.Id.WithVersion);
             jsonObject.AddStringValue("source", Transcript.Source.ToString());
-            if (!CompleteOverlap) jsonObject.AddStringValue("bioType", GetBioType(Transcript.BioType));
+            if (CompleteOverlap.HasValue && !CompleteOverlap.Value) jsonObject.AddStringValue("bioType", GetBioType(Transcript.BioType));
             jsonObject.AddStringValue("codons", GetCodonString(ReferenceCodons, AlternateCodons));
             jsonObject.AddStringValue("aminoAcids", GetAminoAcidString(ReferenceAminoAcids, AlternateAminoAcids));
 
@@ -70,7 +70,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 ? Transcript.Gene.EnsemblId.ToString()
                 : Transcript.Gene.EntrezGeneId.ToString();
 
-            if (!CompleteOverlap) jsonObject.AddStringValue("geneId", geneId);
+            if (CompleteOverlap.HasValue &&!CompleteOverlap.Value) jsonObject.AddStringValue("geneId", geneId);
             jsonObject.AddStringValue("hgnc", Transcript.Gene.Symbol);
             jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
             jsonObject.AddStringValue("hgvsc", HgvsCoding);
@@ -82,7 +82,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("polyPhenScore", PolyPhen?.Score);
 
             jsonObject.AddStringValue("polyPhenPrediction", PolyPhen?.Prediction);
-            if (!CompleteOverlap && Transcript.Translation != null) jsonObject.AddStringValue("proteinId", Transcript.Translation.ProteinId.WithVersion);
+            if (CompleteOverlap.HasValue && !CompleteOverlap.Value && Transcript.Translation != null) jsonObject.AddStringValue("proteinId", Transcript.Translation.ProteinId.WithVersion);
 
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
@@ -94,7 +94,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                     jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
                 }
 
-            jsonObject.AddBoolValue("completeOverlap", CompleteOverlap);
+            if (CompleteOverlap.HasValue) jsonObject.AddBoolValue("completeOverlap", CompleteOverlap.Value);
 
             sb.Append(JsonObject.CloseBrace);
         }

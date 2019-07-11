@@ -9,6 +9,7 @@ namespace Variants
         public readonly bool ReducedTranscriptAnnotation;
         public readonly bool NeedFlankingTranscript;
         public readonly bool StructuralVariantConsequence;
+        public readonly bool CanonicalTranscriptOnly;
 
         public static readonly AnnotationBehavior SmallVariantBehavior      = new AnnotationBehavior(true, false, false, true, false);
         public static readonly AnnotationBehavior MinimalAnnotationBehavior = new AnnotationBehavior(false, false, false, false, false);
@@ -16,15 +17,19 @@ namespace Variants
         public static readonly AnnotationBehavior RefVariantBehavior        = new AnnotationBehavior(true, false, false, true, false);
         public static readonly AnnotationBehavior RepeatExpansionBehavior   = new AnnotationBehavior(false, false, true, false, true);
         public static readonly AnnotationBehavior StructuralVariantBehavior = new AnnotationBehavior(false, true, true, false, true);
+        public static readonly AnnotationBehavior RohBehavior = new AnnotationBehavior(false, false, true, false, true, true);
+
 
         public AnnotationBehavior(bool needSaPosition, bool needSaInterval, bool reducedTranscriptAnnotation,
-            bool needFlankingTranscript, bool structuralVariantConsequence)
+            bool needFlankingTranscript, bool structuralVariantConsequence, 
+            bool canonicalTranscriptOnly = false)
         {
             NeedSaPosition               = needSaPosition;
             NeedSaInterval               = needSaInterval;
             ReducedTranscriptAnnotation  = reducedTranscriptAnnotation;
             NeedFlankingTranscript       = needFlankingTranscript;
             StructuralVariantConsequence = structuralVariantConsequence;
+            CanonicalTranscriptOnly      = canonicalTranscriptOnly;
         }
 
         public bool Equals(AnnotationBehavior other) =>

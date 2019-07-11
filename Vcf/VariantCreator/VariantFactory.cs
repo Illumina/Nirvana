@@ -17,6 +17,7 @@ namespace Vcf.VariantCreator
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly ISequenceProvider _sequenceProvider;
         private const string StrPrefix = "<STR";
+        private const string RohAltAllele = "<ROH>";
 
         public readonly FormatIndices FormatIndices = new FormatIndices();
 
@@ -29,6 +30,7 @@ namespace Vcf.VariantCreator
         private static VariantCategory GetVariantCategory(string firstAltAllele, bool isReference, bool isSymbolicAllele, VariantType svType)
         {
             if (isReference)                          return VariantCategory.Reference;
+            if (firstAltAllele == RohAltAllele)       return VariantCategory.ROH; 
             if (IsBreakend(firstAltAllele))           return VariantCategory.SV;
             if (!isSymbolicAllele)                    return VariantCategory.SmallVariant;
             if (firstAltAllele.StartsWith(StrPrefix)) return VariantCategory.RepeatExpansion;
@@ -74,15 +76,22 @@ namespace Vcf.VariantCreator
             {
                 case VariantCategory.Reference:
                     return ReferenceVariantCreator.Create(chromosome, start, end, refAllele, altAllele, globalMajorAllele);
+
                 case VariantCategory.SmallVariant:
                     return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele, isDecomposedVar, isRecomposed, linkedVids);
+
+                case VariantCategory.ROH:
+                    return RohVariantCreator.Create(chromosome, start, refAllele, altAllele, infoData);
+
                 case VariantCategory.SV:
                     var svBreakEnds = infoData.SvType == VariantType.translocation_breakend ?
                         GetTranslocationBreakends(chromosome, refAllele, altAllele, start)
                         : GetSvBreakEnds(chromosome.EnsemblName, start, infoData.SvType, infoData.End);
                     return StructuralVariantCreator.Create(chromosome, start, refAllele, altAllele, svBreakEnds, infoData);
+
                 case VariantCategory.CNV:
                     return CnvCreator.Create(chromosome, start, refAllele, altAllele, infoData);
+
                 case VariantCategory.RepeatExpansion:
                     return RepeatExpansionCreator.Create(chromosome, start, refAllele, altAllele, infoData);
                 default:
@@ -181,7 +190,8 @@ namespace Vcf.VariantCreator
             SmallVariant,
             SV,
             CNV,
-            RepeatExpansion
+            RepeatExpansion,
+            ROH
         }
     }
 }

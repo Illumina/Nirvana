@@ -171,6 +171,7 @@ namespace VariantAnnotation.Providers
 
         private static void AddRegulatoryRegions(IAnnotatedVariant[] annotatedVariants, IIntervalForest<IRegulatoryRegion> regulatoryIntervalForest)
         {
+            if (annotatedVariants[0].Variant.Behavior.Equals(AnnotationBehavior.RohBehavior)) return;
             foreach (var annotatedVariant in annotatedVariants)
             {
                 // In case of insertions, the base(s) are assumed to be inserted at the end position

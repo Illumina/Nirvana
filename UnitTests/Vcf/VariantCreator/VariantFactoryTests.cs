@@ -112,5 +112,19 @@ namespace UnitTests.Vcf.VariantCreator
 
             Assert.Equal(VariantType.tandem_duplication, variants[0].Type);
         }
+        //1   4000000 .   N   <ROH> .   ROHLC   SVTYPE=ROH;END=4001000  GT  .   .   1
+        [Fact]
+        public void GetVariant_ROH()
+        {
+            var infoData = new InfoData(null, null, 4001000, null, null, null, null, 1000, VariantType.run_of_homozygosity);
+            var chromosome1 = new Chromosome("chr1", "1", 0);
+            var variantFactory = new VariantFactory(_sequenceProvider);
+
+            var variants = variantFactory.CreateVariants(chromosome1, 400_0000, 400_1000, "N", new []{"<ROH>"}, infoData, new []{false}, false, null, null);
+
+            Assert.True(variants[0].Behavior.CanonicalTranscriptOnly);
+            Assert.False(variants[0].Behavior.NeedFlankingTranscript);
+            Assert.Equal(VariantType.run_of_homozygosity, variants[0].Type);
+        }
     }
 }

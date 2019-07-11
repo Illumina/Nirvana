@@ -76,6 +76,15 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         }
 
         [Fact]
+        public void DecideAnnotationStatus_ROH_Return_RohAnnotation()
+        {
+            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
+                new Interval(102, 305), AnnotationBehavior.RohBehavior);
+
+            Assert.Equal(TranscriptAnnotationFactory.Status.RohAnnotation, observedStatus);
+        }
+
+        [Fact]
         public void GetAnnotatedTranscripts_ReturnEmptyList()
         {
             var variant     = new Mock<IVariant>();
@@ -107,6 +116,36 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
                     compressedSequence.Object, null, null);
 
             Assert.Empty(observedAnnotatedTranscripts);
+        }
+
+        [Fact]
+        public void GetAnnotatedTranscripts_RohAnnotation_ReturnsCanonicalOnly()
+        {
+            var variant = new Mock<IVariant>();
+            var transcript1 = new Mock<ITranscript>();
+            var transcript2 = new Mock<ITranscript>();
+
+            var transcripts = new[] { transcript1.Object, transcript2.Object };
+
+            variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.RohBehavior);
+            variant.SetupGet(x => x.Start).Returns(10000);
+            variant.SetupGet(x => x.End).Returns(20000);
+
+            transcript1.SetupGet(x => x.Id).Returns(CompactId.Convert("NM_123.1"));
+            transcript1.SetupGet(x => x.Start).Returns(11000);
+            transcript1.SetupGet(x => x.End).Returns(15000);
+            transcript1.SetupGet(x => x.IsCanonical).Returns(true);
+
+            transcript2.SetupGet(x => x.Id).Returns(CompactId.Convert("NM_456.2"));
+            transcript2.SetupGet(x => x.Start).Returns(11000);
+            transcript2.SetupGet(x => x.End).Returns(15000);
+            transcript2.SetupGet(x => x.IsCanonical).Returns(false);
+
+            var observedAnnotatedTranscripts =
+                TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts, null, null, null);
+
+            Assert.Single(observedAnnotatedTranscripts);
+            Assert.Equal("NM_123", observedAnnotatedTranscripts[0].Transcript.Id.WithVersion);
         }
     }
 }

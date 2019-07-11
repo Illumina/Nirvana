@@ -32,6 +32,8 @@
         copy_number_loss      = 31,
         copy_number_gain      = 32,
 
+        // non variants
+        run_of_homozygosity = 33,
         // misc
         reference = 42,
         non_informative_allele = 43
