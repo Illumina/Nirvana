@@ -7,9 +7,9 @@ namespace Cloud
 {
     public class SaUrls
     {
-        public string nsaUrl { get; private set; }
-        public string idxUrl { get; private set; }
-        public string nsiUrl { get; private set; }
+        public string nsaUrl;
+        public string idxUrl;
+        public string nsiUrl;
 
         public void Validate()
         {
