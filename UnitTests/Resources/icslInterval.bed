@@ -1,8 +1,0 @@
-##fileformat=BED
-##IAE_TOP=<TYPE=IcslIntervals>
-##IAE_INFO=<INFO=GENE,Type=String,JSON=gene,Index=0>
-##IAE_INFO=<INFO=SCORE,Type=Double,JSON=score,Index=1>
-##IAE_INFO=<INFO=EXAC_SCORE,Type=Double,JSON=exacScore,Index=2>
-##IAE_INFO=<INFO=ASSESMENT,Type=String,JSON=assesment,Index=3>
-chr1	69090	70008	OR4F5;0.0;3.60208899915;Some_evidence_of_constraint
-chr1	861120	879582	SAMD11;0.997960686608;-3.7861959419;Minimal_evidence_of_constraint

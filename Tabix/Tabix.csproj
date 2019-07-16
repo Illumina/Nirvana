@@ -8,5 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\Genome\Genome.csproj" />
+    <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
   </ItemGroup>
 </Project>

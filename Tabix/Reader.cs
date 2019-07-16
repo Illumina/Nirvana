@@ -26,18 +26,20 @@ namespace Tabix
 
             var referenceSequenceNames = GetReferenceSequenceNames(concatenatedNames, numReferenceSequences);
             var referenceSequences     = new ReferenceSequence[numReferenceSequences];
-            var refIndexToTabixIndex   = new Dictionary<ushort, ushort>(numReferenceSequences);
+            var refNameToTabixIndex    = new Dictionary<string, ushort>(numReferenceSequences);
 
             for (ushort i = 0; i < numReferenceSequences; i++)
             {
                 string chromosomeName = referenceSequenceNames[i];
-                var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, chromosomeName);
+                var chromosome        = ReferenceNameUtilities.GetChromosome(refNameToChromosome, chromosomeName);
+
                 referenceSequences[i] = ReadReferenceSequence(reader, chromosome);
-                refIndexToTabixIndex[chromosome.Index] = i;
+                refNameToTabixIndex[chromosome.UcscName]    = i;
+                refNameToTabixIndex[chromosome.EnsemblName] = i;
             }
 
             return new Index(format, sequenceNameIndex, sequenceBeginIndex, sequenceEndIndex, commentChar,
-                numLinesToSkip, referenceSequences, refIndexToTabixIndex);
+                numLinesToSkip, referenceSequences, refNameToTabixIndex);
         }
 
         public static Index GetTabixIndex(Stream tabixStream, IDictionary<string, IChromosome> refNameToChromosome)

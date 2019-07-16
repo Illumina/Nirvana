@@ -12,19 +12,19 @@ namespace Tabix
         public readonly int NumLinesToSkip;
         public readonly ReferenceSequence[] ReferenceSequences;
 
-        internal readonly Dictionary<ushort, ushort> RefIndexToTabixIndex;
+        internal readonly Dictionary<string, ushort> RefNameToTabixIndex;
 
         public Index(int format, int sequenceNameIndex, int beginIndex, int endIndex, char commentChar,
-            int numLinesToSkip, ReferenceSequence[] referenceSequences, Dictionary<ushort, ushort> refIndexToTabixIndex)
+            int numLinesToSkip, ReferenceSequence[] referenceSequences, Dictionary<string, ushort> refNameToTabixIndex)
         {
-            Format               = format;
-            SequenceNameIndex    = sequenceNameIndex;
-            BeginIndex           = beginIndex;
-            EndIndex             = endIndex;
-            CommentChar          = commentChar;
-            NumLinesToSkip       = numLinesToSkip;
-            ReferenceSequences   = referenceSequences;
-            RefIndexToTabixIndex = refIndexToTabixIndex;
+            Format              = format;
+            SequenceNameIndex   = sequenceNameIndex;
+            BeginIndex          = beginIndex;
+            EndIndex            = endIndex;
+            CommentChar         = commentChar;
+            NumLinesToSkip      = numLinesToSkip;
+            ReferenceSequences  = referenceSequences;
+            RefNameToTabixIndex = refNameToTabixIndex;
         }
     }
 }

@@ -1,88 +1,66 @@
-﻿using Genome;
+﻿using System.Collections.Generic;
+using System.IO;
+using Compression.FileHandling;
+using Genome;
 
 namespace Tabix
 {
-    public static class Search
+    public sealed class Search
     {
-        /// <summary>
-        /// This method returns the minimum offset for all variants that start from the begin position (Nirvana behavior)
-        /// </summary>
-        public static long GetOffset(this Index index, IChromosome chromosome, int begin)
+        private readonly Index _index;
+        private readonly Stream _vcfStream;
+
+        public Search(Index index, Stream vcfStream)
         {
-            if (chromosome.IsEmpty() || !index.RefIndexToTabixIndex.TryGetValue(chromosome.Index, out ushort tabixIndex)) return -1;
-
-            // N.B. tabix assumes begin is 0-based and end is 1-based
-            int end = begin;
-            begin--;
-
-            if (begin < 0) begin = 0;
-
-            var refSeq = index.ReferenceSequences[tabixIndex];
-            if (begin == 0) return (long)refSeq.LinearFileOffsets[0];
-
-            ulong minOffset = GetMinOffset(refSeq, begin);
-            ulong maxOffset = GetMaxOffset(refSeq, end);
-
-            int bin = BinUtilities.ConvertPositionToBin(begin);
-
-            if (refSeq.IdToChunks.TryGetValue(bin, out var chunks))
-                return GetMinOverlapOffset(chunks, minOffset, maxOffset);
-
-            int linearIndex = begin >> Constants.MinShift;
-            if (linearIndex >= refSeq.LinearFileOffsets.Length) return -1;
-
-            return (long)refSeq.LinearFileOffsets[linearIndex];
+            _index     = index;
+            _vcfStream = vcfStream;
         }
 
-        internal static long GetMinOverlapOffset(Interval[] chunks, ulong minOffset, ulong maxOffset)
+        public bool HasVariants(string chromosomeName, int begin, int end)
         {
-            if (chunks == null) return 0;
+            var refSeq = _index.GetTabixReferenceSequence(chromosomeName);
+            if (refSeq == null) return false;
 
-            ulong minOverlapOffset = ulong.MaxValue;
+            int adjBegin = SearchUtilities.AdjustBegin(begin);
 
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var chunk in chunks)
+            int beginBin = BinUtilities.ConvertPositionToBin(adjBegin);
+            int endBin   = BinUtilities.ConvertPositionToBin(end);
+
+            int binDiff = endBin - beginBin;
+
+            // we can use the tabix index to investigate if any of the internal bins have variants
+            if (binDiff > 2)
             {
-                if (chunk.End > minOffset && chunk.Begin < maxOffset && chunk.Begin < minOverlapOffset)
-                    minOverlapOffset = chunk.Begin;
+                bool hasInternalVariants = HasVariantsInAnyBins(refSeq.IdToChunks, beginBin + 1, endBin - 1);
+                if (hasInternalVariants) return true;
             }
 
-            return (long)minOverlapOffset;
+            // finally we have to check the remaining (edge) bins
+            var block = new BgzfBlock();
+
+            refSeq.IdToChunks.TryGetValue(beginBin, out var beginChunks);
+            refSeq.IdToChunks.TryGetValue(endBin, out var endChunks);
+
+            return HasVariantsInBin(refSeq.Chromosome, begin, end, block, beginChunks) || 
+                   HasVariantsInBin(refSeq.Chromosome, begin, end, block, endChunks);
         }
 
-        internal static ulong GetMinOffset(ReferenceSequence refSeq, int begin)
+        internal static bool HasVariantsInAnyBins(Dictionary<int, Interval[]> idToChunks, int beginBin,
+            int endBin)
         {
-            int bin = BinUtilities.FirstBin(Constants.NumLevels) + (begin >> Constants.MinShift);
-
-            do
-            {
-                if (refSeq.IdToChunks.ContainsKey(bin)) break;
-
-                int firstBin = (BinUtilities.ParentBin(bin) << 3) + 1;
-
-                if (bin > firstBin) bin--;
-                else bin = BinUtilities.ParentBin(bin);
-
-            } while (bin != 0);
-
-            int bottomBin = BinUtilities.BottomBin(bin);
-
-            return refSeq.LinearFileOffsets[bottomBin];
+            for (int bin = beginBin; bin <= endBin; bin++) if (idToChunks.ContainsKey(bin)) return true;
+            return false;
         }
 
-        internal static ulong GetMaxOffset(ReferenceSequence refSeq, int end)
+        private bool HasVariantsInBin(IChromosome chromosome, int begin, int end, BgzfBlock block, Interval[] intervals)
         {
-            int bin = BinUtilities.FirstBin(Constants.NumLevels) + ((end - 1) >> Constants.MinShift) + 1;
+            if (intervals == null) return false;
+            (long minVirtualOffset, long maxVirtualOffset) = SearchUtilities.GetMinMaxVirtualFileOffset(intervals);
 
-            while (true)
-            {
-                while (bin % 8 == 1) bin = BinUtilities.ParentBin(bin);
+            long minOffset = VirtualPosition.From(minVirtualOffset).FileOffset;
+            long maxOffset = VirtualPosition.From(maxVirtualOffset).FileOffset;
 
-                if (bin == 0) return ulong.MaxValue;
-                if (refSeq.IdToChunks.TryGetValue(bin, out var chunks) && chunks.Length > 0) return chunks[0].Begin;
-
-                bin++;
-            }
+            return BgzfBlockVcfReader.FindVariantsInBlocks(_vcfStream, minOffset, maxOffset, block, chromosome, begin, end);
         }
     }
 }

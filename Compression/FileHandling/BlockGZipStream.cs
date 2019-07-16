@@ -120,7 +120,7 @@ namespace Compression.FileHandling
 			_blockAddress = _stream.Position;	
         }
 
-        private static bool HasValidHeader(int numHeaderBytes, IReadOnlyList<byte> header)
+        public static bool HasValidHeader(int numHeaderBytes, IReadOnlyList<byte> header)
         {
             if (numHeaderBytes != BlockGZipFormatCommon.BlockHeaderLength) return false;
 

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Compression.Utilities;
 using Genome;
+using IO;
 using Tabix;
 using UnitTests.TestUtilities;
 using Xunit;
@@ -16,9 +16,9 @@ namespace UnitTests.Tabix
         {
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr17"] = new Chromosome("chr17", "17", 16) };
 
-            using (var indexReader = new BinaryReader(GZipUtilities.GetAppropriateReadStream(Resources.TopPath("AU144A_BadVariant.vcf.gz.tbi"))))
+            using (var stream = FileUtilities.GetReadStream(Resources.TopPath("miniHEXA_minimal.vcf.gz.tbi")))
             {
-                Index index = Reader.Read(indexReader, refNameToChromosome);
+                var index = Reader.GetTabixIndex(stream, refNameToChromosome);
 
                 Assert.Equal(1, index.BeginIndex);
                 Assert.Equal('#', index.CommentChar);
@@ -30,19 +30,19 @@ namespace UnitTests.Tabix
                 Assert.Single(index.ReferenceSequences);
 
                 var refSeq = index.ReferenceSequences[0];
-                Assert.Equal("chr17", refSeq.Chromosome.UcscName);
-                Assert.Equal(4028, refSeq.LinearFileOffsets.Length);
-                Assert.Equal((ulong)6051, refSeq.LinearFileOffsets[4027]);
+                Assert.Equal("chr15", refSeq.Chromosome.UcscName);
+                Assert.Equal(4675, refSeq.LinearFileOffsets.Length);
+                Assert.Equal((ulong)4587, refSeq.LinearFileOffsets[4370]);
 
-                Assert.Single(refSeq.IdToChunks);
+                Assert.Equal(306, refSeq.IdToChunks.Count);
 
-                var chunks = refSeq.IdToChunks[8708];
+                var chunks = refSeq.IdToChunks[9062];
                 Assert.NotNull(chunks);
                 Assert.Single(chunks);
 
                 var chunk = chunks[0];
-                Assert.Equal((ulong)6051, chunk.Begin);
-                Assert.Equal((ulong)122880000, chunk.End);
+                Assert.Equal((ulong)61269, chunk.Begin);
+                Assert.Equal((ulong)991626923, chunk.End);
             }
         }
 
