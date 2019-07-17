@@ -30,6 +30,7 @@ namespace SAUtils
         private readonly bool _skipIncorrectRefEntries;
         private readonly bool _throwErrorOnConflicts;
         private readonly ISequenceProvider _refProvider;
+        private int _count;
 
 
         //todo: filter chromIndex=ushort.Max
@@ -49,12 +50,12 @@ namespace SAUtils
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
 
-        public void Write(IEnumerable<ISupplementaryDataItem> saItems)
+        public int Write(IEnumerable<ISupplementaryDataItem> saItems)
         {
             var itemsMinHeap = new MinHeap<ISupplementaryDataItem>(SuppDataUtilities.CompareTo);
             var chromIndex = ushort.MaxValue;
             var currentEnsemblName = "";
-
+            _count = 0;
             var benchmark = new Benchmark();
 
             foreach (var saItem in saItems)
@@ -97,6 +98,7 @@ namespace SAUtils
             Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
 
             _index.Write();
+            return _count;
         }
 
         private void WriteUptoPosition(MinHeap<ISupplementaryDataItem> itemsHeap, int position)
@@ -112,7 +114,11 @@ namespace SAUtils
                 while (itemsHeap.Count() > 0 && SuppDataUtilities.CompareTo(bufferMin, itemsHeap.GetMin()) == 0)
                     itemsAtMinPosition.Add(itemsHeap.ExtractMin());
 
-                if (itemsAtMinPosition.Count > 0) WritePosition(itemsAtMinPosition);
+                if (itemsAtMinPosition.Count > 0)
+                {
+                    _count += itemsAtMinPosition.Count;
+                    WritePosition(itemsAtMinPosition);
+                }
                 if (itemsHeap.Count() == 0) break;
 
                 bufferMin = itemsHeap.GetMin();

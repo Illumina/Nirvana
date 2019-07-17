@@ -31,7 +31,7 @@ namespace VariantAnnotation.NSA
 
         }
 
-        public void Write(IEnumerable<ISuppIntervalItem> siItems)
+        public int Write(IEnumerable<ISuppIntervalItem> siItems)
         {
             var sortedItems = siItems.OrderBy(x => x.Chromosome.Index).ThenBy(x => x.Start).ThenBy(x => x.End).ToList();
 
@@ -56,6 +56,7 @@ namespace VariantAnnotation.NSA
 
             _writer.Write(compressedBytes, 0, compressSize);
             _writer.Flush();
+            return sortedItems.Count;
         }
 
         public void Dispose()
