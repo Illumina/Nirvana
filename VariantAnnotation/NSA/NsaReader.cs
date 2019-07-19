@@ -37,9 +37,8 @@ namespace VariantAnnotation.NSA
         public bool IsArray { get; }
         public bool IsPositional { get; }
 
-        private AnnotationItem[] _annotations;
-        private int _annotationsCount;
-
+        private readonly List<AnnotationItem> _annotations;
+        
         public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream = dataStream;
@@ -55,43 +54,45 @@ namespace VariantAnnotation.NSA
             IsPositional   = _index.IsPositional;
 
             if (_index.SchemaVersion != SaCommon.SchemaVersion) throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion} for {JsonKey}");
+
+            _annotations = new List<AnnotationItem>(64*1024);
         }
 
         public void PreLoad(IChromosome chrom, List<int> positions)
         {
             if (positions == null || positions.Count == 0) return;
 
-            _annotations = new AnnotationItem[positions.Count];
-            _annotationsCount = 0;
-            (long start, int blockCount) = _index.GetFileRange(chrom.Index, positions[0], positions[positions.Count-1]);
-            if (start == -1) return;
-            _reader.BaseStream.Position = start;
-
-            var posIndex = 0;
-            while (blockCount > 0 && posIndex < positions.Count)
+            _annotations.Clear();
+            for (var i=0; i < positions.Count; i++)
             {
+                int position = positions[i];
+                long fileLocation = _index.GetFileLocation(chrom.Index, position);
+                if (fileLocation == -1) continue;
+                _reader.BaseStream.Position = fileLocation;
                 _block.Read(_reader);
-                posIndex = GetAnnotationsFrom(positions, posIndex);
-                blockCount--;
-            }            
+                int lastLoadedPositionIndex = LoadAnnotations(positions, i);
+                //if there were any positions in the block, the index will move ahead.
+                // we need to decrease it by 1 since the loop will increment it.
+                if (lastLoadedPositionIndex > i) i = lastLoadedPositionIndex - 1;
+            }
+                     
         }
 
-        private int GetAnnotationsFrom(List<int> positions, int i)
+        private int LoadAnnotations(List<int> positions, int i)
         {
-            foreach ((int position, byte[] data) annotation in _block.GetAnnotations())
+            foreach (var annotation in _block.GetAnnotations())
             {
                 if (annotation.position < positions[i]) continue;
 
                 while (i < positions.Count && positions[i] < annotation.position) i++;
                 if (i >= positions.Count) break;
 
-                var position = positions[i];
+                int position = positions[i];
 
                 if (position != annotation.position) continue;
 
-                _annotations[_annotationsCount++] = new AnnotationItem(position, annotation.data);
+                _annotations.Add(new AnnotationItem(position, annotation.data));
             }
-
             return i;
         }
 
@@ -105,7 +106,7 @@ namespace VariantAnnotation.NSA
                     return new List<(string, string, string)> { (null, null, positionalAnno) };
                 }
 
-                var count = reader.ReadOptInt32();
+                int count = reader.ReadOptInt32();
                 var annotations = new (string, string, string)[count];
                 for (var i = 0; i < count; i++)
                 {
@@ -121,15 +122,14 @@ namespace VariantAnnotation.NSA
 
         public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position)
         {
-            if (_annotations == null) return null;
-            var index = BinarySearch(position);
+            int index = BinarySearch(position);
             return index < 0 ? null : ExtractAnnotations(_annotations[index].Data);
         }
 
         private int BinarySearch(int position)
         {
             var begin = 0;
-            int end = _annotationsCount - 1;
+            int end = _annotations.Count - 1;
 
             while (begin <= end)
             {

@@ -101,6 +101,14 @@ namespace VariantAnnotation.NSA
             }
         }
 
+        public long GetFileLocation(ushort chromIndex, int start)
+        {
+            if (_chromChunks == null || !_chromChunks.TryGetValue(chromIndex, out var chunks)) return -1;
+            var index = BinarySearch(chunks, start);
+
+            if (index < 0) return -1;
+            return chunks[index].FilePosition;
+        }
         public (long startFilePosition, int chunkCount) GetFileRange(ushort chromIndex, int start, int end)
         {
             //create a static empty entry.
