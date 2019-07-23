@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.102.14" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.103.4" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.36" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
+    <ProjectReference Include="..\Tabix\Tabix.csproj" />
+    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
   </ItemGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
 </Project>

@@ -182,6 +182,13 @@
       "commandName": "Project",
       "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in CephFather_SMN1_caller-Smn1-Germline-chr5-GRCh37.vcf.gz --out ceph",
       "workingDirectory": "c:\\development\\TestDatasets"
+    },
+    "SK preloading fix": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\temp\\ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd https://ilmn-nirvana.s3-us-west-2.amazonaws.com/latest_relative_SA_GRCh37.txt -o Shankar_preloading --disable-recomposition ",
+      "environmentVariables": {
+        "NirvanaDataUrlBase": "https://ilmn-nirvana.s3-us-west-2.amazonaws.com/"
+      }
     }
   }
 }

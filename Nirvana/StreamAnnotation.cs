@@ -19,7 +19,7 @@ namespace Nirvana
     public static class StreamAnnotation
     {
         public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
-            Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter)
+            Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter, bool ignoreEmptyChromosome = false)
         {
             var logger = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
             var metrics = new PerformanceMetrics(logger);
@@ -38,6 +38,7 @@ namespace Nirvana
 
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
+                        if (ignoreEmptyChromosome && position.Chromosome.IsEmpty()) continue;
                         if (previousChromIndex != position.Chromosome.Index)
                             annotationResources.PreLoad(position.Chromosome);
                         previousChromIndex = UpdatePerformanceMetrics(previousChromIndex, position.Chromosome, metrics);

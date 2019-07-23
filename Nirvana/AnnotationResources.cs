@@ -83,7 +83,7 @@ namespace Nirvana
             PreLoad(position.Chromosome);
         }
 
-        public void GetVariantPositions(Stream vcfStream, AnnotationRange annotationRange)
+        public void GetVariantPositions(Stream vcfStream, GenomicRange genomicRange)
         {
             if (vcfStream == null)
             {
@@ -92,7 +92,7 @@ namespace Nirvana
             }
 
             vcfStream.Position = Tabix.VirtualPosition.From(InputStartVirtualPosition).BlockOffset;
-            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, annotationRange, SequenceProvider).ToImmutableDictionary();
+            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, genomicRange, SequenceProvider).ToImmutableDictionary();
         }
 
         public void PreLoad(IChromosome chromosome)

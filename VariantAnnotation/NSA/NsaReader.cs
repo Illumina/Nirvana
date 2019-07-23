@@ -22,7 +22,7 @@ namespace VariantAnnotation.NSA
         }
     }
 
-    public sealed class NsaReader :INsaReader
+    public sealed class NsaReader : INsaReader
     {
         private readonly Stream _stream;
         private readonly ExtendedBinaryReader _reader;
@@ -38,24 +38,24 @@ namespace VariantAnnotation.NSA
         public bool IsPositional { get; }
 
         private readonly List<AnnotationItem> _annotations;
-        
+
         public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream = dataStream;
             _reader = new ExtendedBinaryReader(_stream);
-            _block  = new NsaBlock(new Zstandard(), blockSize);
+            _block = new NsaBlock(new Zstandard(), blockSize);
 
-            _index         = new ChunkedIndex(indexStream);
-            Assembly       = _index.Assembly;
-            Version        = _index.Version;
-            JsonKey        = _index.JsonKey;
-            MatchByAllele  = _index.MatchByAllele;
-            IsArray        = _index.IsArray;
-            IsPositional   = _index.IsPositional;
+            _index = new ChunkedIndex(indexStream);
+            Assembly = _index.Assembly;
+            Version = _index.Version;
+            JsonKey = _index.JsonKey;
+            MatchByAllele = _index.MatchByAllele;
+            IsArray = _index.IsArray;
+            IsPositional = _index.IsPositional;
 
             if (_index.SchemaVersion != SaCommon.SchemaVersion) throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion} for {JsonKey}");
 
-            _annotations = new List<AnnotationItem>(64*1024);
+            _annotations = new List<AnnotationItem>(64 * 1024);
         }
 
         public void PreLoad(IChromosome chrom, List<int> positions)
@@ -63,7 +63,7 @@ namespace VariantAnnotation.NSA
             if (positions == null || positions.Count == 0) return;
 
             _annotations.Clear();
-            for (var i=0; i < positions.Count; i++)
+            for (var i = 0; i < positions.Count; i++)
             {
                 int position = positions[i];
                 long fileLocation = _index.GetFileLocation(chrom.Index, position);
@@ -75,7 +75,7 @@ namespace VariantAnnotation.NSA
                 // we need to decrease it by 1 since the loop will increment it.
                 if (lastLoadedPositionIndex > i) i = lastLoadedPositionIndex - 1;
             }
-                     
+
         }
 
         private int LoadAnnotations(List<int> positions, int i)

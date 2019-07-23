@@ -9,8 +9,8 @@ namespace UnitTests.Nirvana
 {
     public sealed class PreLoadUtilitiesTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-        private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 2);
+        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 0);
+        private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 1);
 
         private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
         {
@@ -52,12 +52,8 @@ namespace UnitTests.Nirvana
         [Fact]
         public void GetPositions_inRange()
         {
-            var annotationRange = new AnnotationRange
-            {
-                chromosome = "1",
-                start = 10019,
-                end = 10290
-            };
+            var chromosome = new Chromosome("chr1", "1", 0);
+            var annotationRange = new GenomicRange(new GenomicPosition(chromosome, 10019), new GenomicPosition(chromosome, 10290));
             var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
             var positions = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, seqProvider );
 

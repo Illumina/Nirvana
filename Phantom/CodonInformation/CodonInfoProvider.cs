@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Genome;
 using Intervals;
-using Phantom.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Utilities;
 
 namespace Phantom.CodonInformation
 {

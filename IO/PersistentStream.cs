@@ -51,7 +51,6 @@ namespace IO
             _position = position;
         }
 
-        
         public override int Read(byte[] buffer, int offset, int count)
         {
             var numBytesRead = 0;

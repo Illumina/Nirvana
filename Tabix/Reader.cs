@@ -87,12 +87,15 @@ namespace Tabix
 
             int numLinearFileOffsets = reader.ReadInt32();
             var linearFileOffsets    = new ulong[numLinearFileOffsets];
+            int firstNonZero = -1;
 
             for (var i = 0; i < numLinearFileOffsets; i++)
             {
                 linearFileOffsets[i] = reader.ReadUInt64();
+                if (firstNonZero == -1 && linearFileOffsets[i] != 0) firstNonZero = i;
             }
 
+            for (var i = 0; i < firstNonZero; i++) linearFileOffsets[i] = linearFileOffsets[firstNonZero];
             return new ReferenceSequence(chromosome, idToChunks, linearFileOffsets);
         }
 

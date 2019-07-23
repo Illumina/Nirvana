@@ -3,17 +3,17 @@ using Genome;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Utilities;
 using Xunit;
-using pu = Phantom.Utilities;
 
-namespace UnitTests.Phantom.Utilities
+namespace UnitTests.VariantAnnotation.Utilities
 {
     public sealed class GeneComparerTests
     {
         private readonly IGene _geneA;
         private readonly IGene _geneB;
         private readonly IGene _geneC;
-        private readonly pu.GeneComparer _geneComparer;
+        private readonly GeneComparer _geneComparer;
 
         public GeneComparerTests()
         {
@@ -21,7 +21,7 @@ namespace UnitTests.Phantom.Utilities
             _geneA         = new Gene(chromosome, 100, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
             _geneB         = new Gene(chromosome, 100, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
             _geneC         = new Gene(chromosome, 101, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
-            _geneComparer  = new pu.GeneComparer();
+            _geneComparer  = new GeneComparer();
         }
 
         [Fact]

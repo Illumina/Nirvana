@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Phantom.CodonInformation;
+using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -15,7 +16,7 @@ namespace Phantom.Recomposer
         public static IRecomposer Create(ISequenceProvider sequenceProvider, ITranscriptAnnotationProvider taProvider)
         {
             var transcriptIntervalArrays = taProvider.TranscriptIntervalArrays;
-            var (geneIntervalForest, _)  = GeneInfoGenerator.GetGeneIntervalAndTranscripts(transcriptIntervalArrays);
+            var geneIntervalForest       = GeneForestGenerator.GetGeneForest(transcriptIntervalArrays);
             var codonInfoProvider        = new CodonInfoProvider(transcriptIntervalArrays);
             var variantGenerator         = new VariantGenerator(sequenceProvider);
             var positionBuffer           = new PositionBuffer(codonInfoProvider, geneIntervalForest);

@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using ErrorHandling.Exceptions;
-using Genome;
 
-namespace Vcf
+namespace Genome
 {
     public static class ContigInfo
     {

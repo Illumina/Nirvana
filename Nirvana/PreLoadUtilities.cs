@@ -12,30 +12,24 @@ namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static IDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, AnnotationRange annotationRange, ISequenceProvider sequenceProvider)
+        public static IDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, GenomicRange genomicRange, ISequenceProvider sequenceProvider)
         {
             var benchmark = new Benchmark();
             Console.Write("Scanning positions required for SA pre-loading....");
             var chromPositions = new Dictionary<IChromosome, List<int>>();
-
+            var rangeChecker = new GenomicRangeChecker(genomicRange);
             var refNameToChrom = sequenceProvider.RefNameToChromosome;
-            IChromosome chromToAnnotate = null;
-            int endPosition = int.MaxValue;
-            if (annotationRange != null)
-            {
-                chromToAnnotate = ReferenceNameUtilities.GetChromosome(refNameToChrom, annotationRange.chromosome);
-                endPosition = annotationRange.end;
-            }
 
             using (var reader = new StreamReader(vcfStream))
             {
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (!ReachedAnnotationRange(annotationRange, refNameToChrom, line, chromToAnnotate, out var splits, out IChromosome iChrom)) continue;
+                    if (!NeedProcessThisLine(refNameToChrom, line, out var splits, out IChromosome iChrom)) continue;
 
                     int position = int.Parse(splits[VcfCommon.PosIndex]);
-                    if (position > endPosition) break;
+
+                    if (rangeChecker.OutOfRange(iChrom, position)) break;
 
                     string refAllele = splits[VcfCommon.RefIndex];
                     string altAllele = splits[VcfCommon.AltIndex];
@@ -76,19 +70,15 @@ namespace Nirvana
             return count;
         }
 
-        private static bool ReachedAnnotationRange(AnnotationRange annotationRange, IDictionary<string, IChromosome> refNameToChrom, string line,
-            IChromosome chromToAnnotate, out string[] splits, out IChromosome iChrom)
+        private static bool NeedProcessThisLine(IDictionary<string, IChromosome> refNameToChrom, string line, out string[] splits, out IChromosome iChrom)
         {
             splits = null;
             iChrom = null;
             if (line.StartsWith('#')) return false;
             splits = line.Split('\t', 6);
-
             string chrom = splits[VcfCommon.ChromIndex];
 
-            if (!refNameToChrom.TryGetValue(chrom, out iChrom)) return false;
-            if (annotationRange != null && chromToAnnotate != iChrom) return false;
-            return true;
+            return refNameToChrom.TryGetValue(chrom, out iChrom);
         }
     }
 }

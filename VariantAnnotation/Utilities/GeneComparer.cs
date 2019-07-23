@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
-namespace Phantom.Utilities
+namespace VariantAnnotation.Utilities
 {
-    internal sealed class GeneComparer : EqualityComparer<IGene>
+    public sealed class GeneComparer : EqualityComparer<IGene>
     {
         public override bool Equals(IGene x, IGene y)
         {

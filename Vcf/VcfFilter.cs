@@ -7,14 +7,15 @@ namespace Vcf
 {
     public sealed class VcfFilter : IVcfFilter
     {
-        private readonly IChromosomeInterval _annotationInterval;
+        private readonly GenomicRange _genomicRange;
+        private readonly GenomicRangeChecker _genomicRangeChecker;
         internal string BufferedLine;
 
-        public VcfFilter(IChromosomeInterval annotationInterval)
+        public VcfFilter(GenomicRange genomicRange)
         {
-            _annotationInterval = annotationInterval;
+            _genomicRange = genomicRange;
+            _genomicRangeChecker = new GenomicRangeChecker(genomicRange);
         }
-
 
         public void FastForward(StreamReader reader)
         {
@@ -25,10 +26,10 @@ namespace Vcf
 
                 var fields = line.OptimizedSplit('\t');
                 string chrName = fields[VcfCommon.ChromIndex];
-                if (chrName != _annotationInterval.Chromosome.EnsemblName && chrName != _annotationInterval.Chromosome.UcscName) continue;
+                if (chrName != _genomicRange.Start.Chromosome.UcscName && chrName != _genomicRange.Start.Chromosome.EnsemblName) continue;
 
-                int position = int.Parse(line.OptimizedSplit('\t')[VcfCommon.PosIndex]);
-                if (position < _annotationInterval.Start) continue;
+                int position = int.Parse(fields[VcfCommon.PosIndex]);
+                if (position < _genomicRange.Start.Position) continue;
 
                 BufferedLine = line;
                 return;
@@ -47,6 +48,6 @@ namespace Vcf
             return bufferedLine;
         }
 
-        public bool PassedTheEnd(IChromosome chromosome, int position) => position > _annotationInterval.End || !_annotationInterval.Chromosome.Equals(chromosome);
+        public bool PassedTheEnd(IChromosome chromosome, int position) => _genomicRangeChecker.OutOfRange(chromosome, position);
     }
 }
