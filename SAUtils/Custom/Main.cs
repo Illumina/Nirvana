@@ -5,6 +5,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
@@ -67,10 +68,14 @@ namespace SAUtils.Custom
             string jsonTag;
             DataSourceVersion version;
             string outputPrefix = GetOutputPrefix(_inputFile);
+            var nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
+            var nsaIndexFileName  = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix);
+            var nsaSchemaFileName = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix);
+            var nsaItemsCount     = 0;
 
             using (var customReader = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
-            using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))            
+            using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
+            using (var indexStream = FileUtilities.GetCreateStream(nsaIndexFileName))            
             using (var nsaWriter = new NsaWriter(
                                 new ExtendedBinaryWriter(nsaStream),
                                 new ExtendedBinaryWriter(indexStream),
@@ -84,16 +89,26 @@ namespace SAUtils.Custom
                                 false, // skip incorrect ref base
                                 true // throw error on conflicting entries
                                 ))
-            using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 jsonTag = customReader.JsonTag;
-                nsaWriter.Write(customReader.GetItems());
+                nsaItemsCount = nsaWriter.Write(customReader.GetItems());
                 schemaWriter.Write(customReader.JsonSchema);
 
                 intervalJsonSchema = customReader.IntervalJsonSchema;
                 intervals = customReader.GetCustomIntervals();
             }
+
+            if (nsaItemsCount == 0)
+            {
+                if (File.Exists(nsaFileName)) File.Delete(nsaFileName);
+                if (File.Exists(nsaIndexFileName)) File.Delete(nsaIndexFileName);
+                if (File.Exists(nsaSchemaFileName)) File.Delete(nsaSchemaFileName);
+            }
+
+            if (nsaItemsCount == 0 && intervals == null)
+                throw new UserErrorException("The provided TSV has no valid custom annotation entries.");
 
             if (intervals == null) return ExitCodes.Success;
 
