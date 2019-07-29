@@ -38,7 +38,7 @@ namespace VariantAnnotation.NSA
         public bool IsPositional { get; }
 
         private readonly List<AnnotationItem> _annotations;
-
+        
         public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream = dataStream;
@@ -68,7 +68,10 @@ namespace VariantAnnotation.NSA
                 int position = positions[i];
                 long fileLocation = _index.GetFileLocation(chrom.Index, position);
                 if (fileLocation == -1) continue;
-                _reader.BaseStream.Position = fileLocation;
+
+                //only reconnect if necessary
+                if (_reader.BaseStream.Position != fileLocation)
+                    _reader.BaseStream.Position = fileLocation;
                 _block.Read(_reader);
                 int lastLoadedPositionIndex = LoadAnnotations(positions, i);
                 //if there were any positions in the block, the index will move ahead.
