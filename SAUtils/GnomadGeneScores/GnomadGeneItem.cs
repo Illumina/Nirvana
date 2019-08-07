@@ -34,7 +34,7 @@ namespace SAUtils.GnomadGeneScores
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddDoubleValue("pLI", _pLI, "0.00e0");
+            jsonObject.AddDoubleValue("pLi", _pLI, "0.00e0");
             jsonObject.AddDoubleValue("pRec", _pRec, "0.00e0");
             jsonObject.AddDoubleValue("pNull", _pNull, "0.00e0");
             jsonObject.AddDoubleValue("synZ", _synZ, "0.00e0");

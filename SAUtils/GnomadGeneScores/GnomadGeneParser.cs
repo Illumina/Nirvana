@@ -83,29 +83,33 @@ namespace SAUtils.GnomadGeneScores
                 Console.WriteLine($"GeneId to symbol not found in cache for: {geneId}, using provided name in file: {gene}");
             }
 
-            var pLi   = cols[_pliIndex]   == "NA" ? null : (double?)double.Parse(cols[_pliIndex]);
-            var pRec  = cols[_precIndex]  == "NA" ? null : (double?)double.Parse(cols[_precIndex]);
-            var pNull = cols[_pnullIndex] == "NA" ? null : (double?)double.Parse(cols[_pnullIndex]);
-            var synZ  = cols[_synZIndex]  == "NA" ? null : (double?)double.Parse(cols[_synZIndex]);
-            var misZ  = cols[_misZIndex]  == "NA" ? null : (double?)double.Parse(cols[_misZIndex]);
-            var loeuf = cols[_loeufIndex] == "NA" ? null : (double?)double.Parse(cols[_loeufIndex]);
+            var pLi   = GetScore(cols[_pliIndex]);
+            var pRec  = GetScore(cols[_precIndex]);
+            var pNull = GetScore(cols[_pnullIndex]);
+            var synZ  = GetScore(cols[_synZIndex]);
+            var misZ  = GetScore(cols[_misZIndex]);
+            var loeuf = GetScore(cols[_loeufIndex]);
 
             return new GnomadGeneItem(gene, pLi, pRec, pNull, synZ, misZ, loeuf);
-
         }
 
+        private double? GetScore(string score)
+        {
+            if (score == "NA" || score == "NaN") return null;
+            return double.Parse(score);
+        }
         private bool GetColumnIndices(string line)
         {
             var cols = line.OptimizedSplit('\t');
 
-            _geneIndex = Array.IndexOf(cols, GeneTag);
+            _geneIndex   = Array.IndexOf(cols, GeneTag);
             _geneIdIndex = Array.IndexOf(cols, GeneIdTag);
-            _pliIndex   = Array.IndexOf(cols, PliTag);
-            _pnullIndex = Array.IndexOf(cols, PnullTag);
-            _precIndex  = Array.IndexOf(cols, PrecTag);
-            _synZIndex  = Array.IndexOf(cols, SynZTag);
-            _misZIndex  = Array.IndexOf(cols, MisZTag);
-            _loeufIndex = Array.IndexOf(cols, LoeufTag);
+            _pliIndex    = Array.IndexOf(cols, PliTag);
+            _pnullIndex  = Array.IndexOf(cols, PnullTag);
+            _precIndex   = Array.IndexOf(cols, PrecTag);
+            _synZIndex   = Array.IndexOf(cols, SynZTag);
+            _misZIndex   = Array.IndexOf(cols, MisZTag);
+            _loeufIndex  = Array.IndexOf(cols, LoeufTag);
 
             if (_geneIdIndex < 0)
             {
