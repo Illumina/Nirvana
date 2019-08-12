@@ -37,6 +37,7 @@ namespace Variants
             NeedSaInterval               == other.NeedSaInterval              &&
             ReducedTranscriptAnnotation  == other.ReducedTranscriptAnnotation &&
             NeedFlankingTranscript       == other.NeedFlankingTranscript      &&
-            StructuralVariantConsequence == other.StructuralVariantConsequence;
+            StructuralVariantConsequence == other.StructuralVariantConsequence &&
+            CanonicalTranscriptOnly      == other.CanonicalTranscriptOnly;
     }
 }
