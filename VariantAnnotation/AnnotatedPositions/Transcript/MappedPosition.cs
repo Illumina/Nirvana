@@ -8,8 +8,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public int CdnaEnd { get; }
         public int CdsStart { get; }
         public int CdsEnd { get; }
-        public int ProteinStart { get; }
-        public int ProteinEnd { get; }
+        public int ProteinStart { get; set; }
+        public int ProteinEnd { get; set; }
         public int ExonStart { get; }
         public int ExonEnd { get; }
         public int IntronStart { get; }

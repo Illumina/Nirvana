@@ -66,6 +66,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 position.CdnaEnd, end.Index, onReverseStrand);
 
             var aa = aminoAcids.Translate(codons.Reference, codons.Alternate);
+            aa = TryTrimAminoAcidsAndUpdateProteinPositions(aa, position);
 
             var coveredPositions = MappedPositionUtilities.GetCoveredCdsAndProteinPositions(coveredCdna.Start, coveredCdna.End,
                 transcript.StartExonPhase, transcript.Translation?.CodingRegion);
@@ -84,6 +85,19 @@ namespace VariantAnnotation.TranscriptAnnotation
             return (variantEffect, position, aa.Reference, aa.Alternate, codons.Reference, codons.Alternate,
                 transcriptAltAllele);
         }
+
+        internal static (string Reference, string Alternate) TryTrimAminoAcidsAndUpdateProteinPositions((string Reference, string Alternate) aa, IMappedPosition position)
+        {
+            (int newStart, string newReference, string newAlternate) = BiDirectionalTrimmer.Trim(position.ProteinStart, aa.Reference, aa.Alternate);
+
+            if (string.IsNullOrEmpty(newReference)) return aa;
+
+            position.ProteinStart = newStart;
+            position.ProteinEnd = newStart + newReference.Length - 1;
+
+            return (newReference, newAlternate);
+        }
+
 
         private static (string Reference, string Alternate) GetCoveredAa(AminoAcids aminoAcids, string transcriptAltAllele, (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) coveredPositions, ISequence codingSequence)
         {

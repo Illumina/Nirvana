@@ -6,8 +6,8 @@
         int CdnaEnd { get; }
         int CdsStart { get; }
         int CdsEnd { get; }
-        int ProteinStart { get; }
-        int ProteinEnd { get; }
+        int ProteinStart { get; set; }
+        int ProteinEnd { get; set; }
         int ExonStart { get; }
         int ExonEnd { get; }
         int IntronStart { get; }

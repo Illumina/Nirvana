@@ -8,7 +8,7 @@ using Xunit;
 
 namespace UnitTests.VariantAnnotation.TranscriptAnnotation
 {
-    public sealed class TranscriptAnnotatorTests
+    public sealed class TranscriptAnnotationFactoryTests
     {
         [Fact]
         public void DecideAnnotationStatus_NoOverlap_ReturnNoAnnotation()
