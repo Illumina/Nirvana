@@ -3,7 +3,7 @@ using System.Text;
 using SAUtils.Schema;
 using VariantAnnotation.SA;
 
-namespace SAUtils.InputFileParsers.OMIM
+namespace SAUtils.Omim
 {
     public static class OmimSchema
     {
@@ -11,6 +11,7 @@ namespace SAUtils.InputFileParsers.OMIM
 
         private static readonly (string JsonKey, SaJsonValueType ValueType, SaJsonSchema subSchema)[] SchemaDescription = {
             ("mimNumber", SaJsonValueType.Number, null),
+            ("geneName", SaJsonValueType.String, null),
             ("description", SaJsonValueType.String, null),
             ("phenotypes", null, OmimPhenotypeSchema.Get())
         };

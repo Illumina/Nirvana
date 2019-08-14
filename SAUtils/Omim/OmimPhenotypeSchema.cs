@@ -2,7 +2,7 @@
 using System.Text;
 using SAUtils.Schema;
 
-namespace SAUtils.InputFileParsers.OMIM
+namespace SAUtils.Omim
 {
     public static class OmimPhenotypeSchema
     {

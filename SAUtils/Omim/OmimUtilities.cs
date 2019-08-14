@@ -1,49 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using Compression.Utilities;
 using OptimizedCore;
 using SAUtils.DataStructures;
+using SAUtils.Omim.EntryApiResponse;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Sequence;
 
-namespace SAUtils
+namespace SAUtils.Omim
 {
     public static class OmimUtilities
     {
-        public static List<OmimItem.Phenotype> ParsePhenotype(string line, SaJsonSchema schema)
+        public static OmimItem.Phenotype GetPhenotype(PhenotypeMap phenotypeMap, SaJsonSchema jsonSchema)
         {
-            var phenotypes = new List<OmimItem.Phenotype>();
+            var phenotypeItem = phenotypeMap.phenotypeMap;
 
-            if (string.IsNullOrEmpty(line)) return phenotypes;
-
-            var infos = line.OptimizedSplit(';');
-            phenotypes.AddRange(infos.Select(x => ExtractPhenotype(x, schema)));
-
-            return phenotypes;
-        }
-
-        private static OmimItem.Phenotype ExtractPhenotype(string info, SaJsonSchema schema)
-        {
-            info = info.Trim(' ').Replace(@"\\'", "'");
-
-            if (string.IsNullOrWhiteSpace(info) || string.IsNullOrEmpty(info)) return null;
-
-            var phenotypeRegex = new Regex(@"^(.+?)(?:,\s(\d{6}))?\s\((\d)\)(?:,\s)?(.*)?$");
-            var match = phenotypeRegex.Match(info);
-            var phenotypeGroup = match.Groups[1].ToString();
-            ParsePhenotypeMapping(phenotypeGroup, out var phenotype, out var comments);
-
-            var mimNumber = string.IsNullOrEmpty(match.Groups[2].Value) ? 0 : Convert.ToInt32(match.Groups[2].Value);
-            var mapping = (OmimItem.Mapping)Convert.ToInt16(match.Groups[3].Value);
-
-            var inheritance = string.IsNullOrEmpty(match.Groups[4].Value) ? null : match.Groups[4].ToString();
-            var inheritances = ExtractInheritances(inheritance);
-            return new OmimItem.Phenotype(mimNumber, phenotype, mapping, comments, inheritances, schema);
+            var (phenotype, _) = ExtractPhenotypeAndComments(phenotypeItem.phenotype);
+            //Don't output any comments for now
+            return new OmimItem.Phenotype(phenotypeItem.phenotypeMimNumber, phenotype, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, OmimItem.Comments.unknown, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
         }
 
         private static HashSet<string> ExtractInheritances(string inheritance)
@@ -51,7 +29,7 @@ namespace SAUtils
             var inheritances = new HashSet<string>();
             if (string.IsNullOrEmpty(inheritance)) return inheritances;
 
-            foreach (var content in inheritance.OptimizedSplit(','))
+            foreach (var content in inheritance.OptimizedSplit(';'))
             {
                 var trimmedContent = content.Trim(' ');
                 inheritances.Add(trimmedContent);
@@ -60,28 +38,37 @@ namespace SAUtils
             return inheritances;
         }
 
-        private static void ParsePhenotypeMapping(string phenotypeGroup, out string phenotype, out OmimItem.Comments comments)
+        internal static (string Phenotype, OmimItem.Comments Comments) ExtractPhenotypeAndComments(string phenotypeString)
         {
-            phenotypeGroup = phenotypeGroup.Trim(' ');
-            phenotype = phenotypeGroup.TrimStart('?', '{', '[').TrimEnd('}', ']');
-            comments = OmimItem.Comments.unknown;
+            phenotypeString = phenotypeString.Trim(' ').Trim(',').Replace(@"\\'", "'");
+            string phenotype = Regex.Replace(
+                            Regex.Replace(
+                            Regex.Replace(phenotypeString,
+                            @"(^\?|\[|\]|{|})", ""),
+                            @" \(\d\) ", " "),
+                            @"^\?", "");
 
-            if (phenotypeGroup.Substring(0, 2).Contains("?"))
+            var comments = OmimItem.Comments.unknown;
+
+            if (phenotypeString.Substring(0, 2).Contains("?"))
             {
                 comments = OmimItem.Comments.unconfirmed_or_possibly_spurious_mapping;
             }
             else
             {
-                if (phenotypeGroup.OptimizedStartsWith('{'))
+                if (phenotypeString.OptimizedStartsWith('{'))
                 {
                     comments = OmimItem.Comments.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
                 }
-                else if (phenotypeGroup.OptimizedStartsWith('['))
+                else if (phenotypeString.OptimizedStartsWith('['))
                 {
                     comments = OmimItem.Comments.nondiseases;
                 }
             }
+
+            return (phenotype, comments);
         }
+
         public static (Dictionary<string, string> EntrezGeneIdToSymbol, Dictionary<string, string> EnsemblIdToSymbol) ParseUniversalGeneArchive(string inputReferencePath, string universalGeneArchivePath)
         {
             var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(inputReferencePath);
@@ -98,6 +85,7 @@ namespace SAUtils
             var ensemblIdToSymbol = genes.GetGeneIdToSymbol(x => x.EnsemblId);
             return (entrezGeneIdToSymbol, ensemblIdToSymbol);
         }
+
         private static Dictionary<string, string> GetGeneIdToSymbol(this UgaGene[] genes,
             Func<UgaGene, string> geneIdFunc)
         {
@@ -124,7 +112,7 @@ namespace SAUtils
 
                 if (geneToOmimEntries.TryGetValue(item.GeneSymbol, out var mimList))
                 {
-                    if (!item.IsEmpty()) mimList.Add(item);
+                    mimList.Add(item);
                 }
                 else
                 {
@@ -133,6 +121,15 @@ namespace SAUtils
             }
 
             return geneToOmimEntries;
+        }
+
+        public static string RemoveLinksInText(string text)
+        {
+           if (text == null) return null;
+           // remove links enclosed by parentheses with only numbers, e.g. ({12345})
+           text = Regex.Replace(Regex.Replace(text, @"((and|see|;|(e\.g\.)?,) )*{\d+}", ""), @" ?\(\)", "");
+           // remove format control characters
+           return Regex.Replace(text, @"{(\d+:)?(.+?)}", "$2");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using Newtonsoft.Json;
 using OptimizedCore;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.IO;
@@ -11,18 +12,20 @@ namespace SAUtils.DataStructures
     public sealed class OmimItem:ISuppGeneItem
     {
         public string GeneSymbol { get; }
+        private readonly string _geneName;
         private readonly string _description;
         private readonly int _mimNumber;
         private readonly List<Phenotype> _phenotypes;
         public SaJsonSchema JsonSchema { get; }
 
-        public OmimItem(string geneSymbol, string description, int mimNumber, List<Phenotype> phenotypes, SaJsonSchema jsonSchema)
+        public OmimItem(string geneSymbol, string geneName, string description, int mimNumber, List<Phenotype> phenotypes, SaJsonSchema jsonSchema)
         {
-            GeneSymbol    = geneSymbol;
-            _description  = description;
+            GeneSymbol     = geneSymbol;
+            _geneName      = geneName;
+            _description   = description;
             _mimNumber     = mimNumber;
-            _phenotypes   = phenotypes;
-            JsonSchema = jsonSchema;
+            _phenotypes    = phenotypes;
+            JsonSchema     = jsonSchema;
         }
 
         public string GetJsonString()
@@ -33,7 +36,9 @@ namespace SAUtils.DataStructures
             sb.Append(JsonObject.OpenBrace);
             JsonSchema.TotalItems++;
             JsonSchema.CountKeyIfAdded(jsonObject.AddIntValue("mimNumber", _mimNumber), "mimNumber");
-            JsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("description", _description), "description");
+            JsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("geneName", string.IsNullOrEmpty(_geneName) ? null : JsonConvert.SerializeObject(_geneName), false), "geneName");
+            //Serialized string has the double quote at the beginning and the end
+            JsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("description", string.IsNullOrEmpty(_description) ? null : JsonConvert.SerializeObject(_description), false), "description");
             if (_phenotypes.Count > 0)
                 JsonSchema.CountKeyIfAdded(jsonObject.AddObjectValues("phenotypes", _phenotypes), "phenotypes");
             sb.Append(JsonObject.CloseBrace);
@@ -41,7 +46,6 @@ namespace SAUtils.DataStructures
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        
         public sealed class Phenotype : IJsonSerializer
         {
             private readonly int _mimNumber;
@@ -103,11 +107,5 @@ namespace SAUtils.DataStructures
             unconfirmed_or_possibly_spurious_mapping
             // ReSharper restore InconsistentNaming
         }
-
-        public bool IsEmpty()
-        {
-            return (_phenotypes == null || _phenotypes.Count==0) && string.IsNullOrEmpty(_description);
-        }
-
     }
 }

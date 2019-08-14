@@ -23,9 +23,9 @@ namespace VariantAnnotation.NSA
         public NgaReader(Stream stream)
         {
             _nsaStream = stream;
-            // read the whole file. Currently they are well under 1MB
-            var compressedBytes = new byte[1024 * 1024];
-            var decompressedBytes = new byte[4 * 1024 * 1024];
+            // read the whole file. Currently they are well under 2MB
+            var compressedBytes = new byte[2 * 1024 * 1024];
+            var decompressedBytes = new byte[20 * 1024 * 1024];
             var compressedSize = _nsaStream.Read(compressedBytes, 0, compressedBytes.Length);
 
             var zstd = new Zstandard();

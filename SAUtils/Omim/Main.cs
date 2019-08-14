@@ -1,39 +1,30 @@
 ﻿using System.IO;
-using System.Linq;
+using System.IO.Compression;
+using Amazon.Runtime;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
-using Compression.Utilities;
 using ErrorHandling;
 using IO;
-using SAUtils.InputFileParsers;
-using SAUtils.InputFileParsers.OMIM;
-using SAUtils.InputFileParsers.OMIM.SAUtils.CreateOmimTsv;
 using VariantAnnotation.SA;
+using static System.Environment;
 
 namespace SAUtils.Omim
 {
     public static class Main
     {
-        private static string _geneMap2File;
-        private static string _map2GenesFile;
+        private static string _apiKey;
         private static string _universalGeneArchivePath;
         private static string _outputDirectory;
         private static string _inputReferencePath;
+
+        private const string OmimDumpFileBaseName = "OMIM_dump_";
+        private const string OmimDumpFileSuffix = ".zip";
+        private const string OmimApiKeyEnvironmentVariableName = "OmimApiKey";
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
             var ops = new OptionSet
             {
-                {
-                    "gm2|g=",
-                    "genemap2 tsv file",
-                    v => _geneMap2File = v
-                },
-                {
-                    "m2g|m=",
-                    "map2Genes tsv file",
-                    v => _map2GenesFile = v
-                },
                 {
                     "uga|u=",
                     "universal gene archive {path}",
@@ -55,9 +46,6 @@ namespace SAUtils.Omim
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-                .CheckInputFilenameExists(_map2GenesFile, "Map2Genes file", "--m2g")
-                .HasRequiredParameter(_geneMap2File, "genemap2 file", "--gm2")
-                .CheckInputFilenameExists(_geneMap2File, "OneKGenSv VCFfile", "--in")
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .CheckInputFilenameExists(_inputReferencePath, "compressed reference", "--ref")
@@ -72,23 +60,25 @@ namespace SAUtils.Omim
 
         private static ExitCodes ProgramExecution()
         {
-            var version = DataSourceVersionReader.GetSourceVersion(_geneMap2File + ".version");
+            _apiKey = GetEnvironmentVariable(OmimApiKeyEnvironmentVariableName);
+            if (_apiKey == null) throw new InvalidDataException("Please set the OMIM API key as the environment variable \"OmimApiKey\".");
 
+            var version = OmimVersion.GetVersion();
             string outFileName = $"{version.Name}_{version.Version}";
+            string dumpFilePath = Path.Combine(_outputDirectory, OmimDumpFileBaseName + version.Version + OmimDumpFileSuffix);
 
-            //create universal gene archive
             var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = OmimUtilities.ParseUniversalGeneArchive(_inputReferencePath, _universalGeneArchivePath);
             var geneSymbolUpdater = new GeneSymbolUpdater(entrezGeneIdToSymbol, ensemblGeneIdToSymbol);
+
             var omimSchema = OmimSchema.Get();
 
-            using (var geneMapParser = new OmimParser(GZipUtilities.GetAppropriateStreamReader(_geneMap2File), geneSymbolUpdater, omimSchema))
-            using (var map2GeneParser = new OmimParser(GZipUtilities.GetAppropriateStreamReader(_map2GenesFile), geneSymbolUpdater, omimSchema))
+            using (var omimParser = new OmimParser(geneSymbolUpdater, omimSchema, _apiKey, dumpFilePath))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
             using (var ngaWriter = new NgaWriter(nsaStream, version, SaCommon.OmimTag, SaCommon.SchemaVersion, true))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
-                var omimItems = geneMapParser.GetItems().Concat(map2GeneParser.GetItems());
+                var omimItems = omimParser.GetItems();
                 var geneToItems = OmimUtilities.GetGeneToOmimEntriesAndSchema(omimItems);
                 ngaWriter.Write(geneToItems);
                 schemaWriter.Write(omimSchema);
@@ -102,8 +92,5 @@ namespace SAUtils.Omim
             
             return ExitCodes.Success;
         }
-
-        
-
     }
 }
