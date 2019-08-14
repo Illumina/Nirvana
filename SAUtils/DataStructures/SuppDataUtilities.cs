@@ -147,5 +147,6 @@ namespace SAUtils.DataStructures
             return maxFreqAlleles[0];
 
         }
+        
     }
 }

@@ -92,13 +92,18 @@
     },
     "RR_spliceAI": {
       "commandName": "Project",
-      "commandLineArgs": "SpliceAi --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --cache C:\\development\\Cache\\26\\GRCh38\\Both --in spliceai_scores.exome.hg38.vcf.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "commandLineArgs": "SpliceAi --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --cache C:\\development\\Cache\\26\\GRCh38\\Both --gene C:\\development\\ExternalDataSources\\SpliceAI\\human_gene_info.gz --in spliceai_scores.exome.hg38.vcf.gz --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\GRCh38"
     },
     "RR_gnomadGenes": {
       "commandName": "Project",
       "commandLineArgs": "GnomadGeneScores --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cache C:\\development\\Cache\\26\\GRCh37\\Both --in gnomad.v2.1.1.lof_metrics.by_gene.txt --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "C:\\development\\ExternalDataSources\\gnomAD\\2.1\\LoF_metrics"
+    },
+    "RR_spliceAi_37": {
+      "commandName": "Project",
+      "commandLineArgs": "SpliceAi --ref  c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cache c:\\Development\\Cache\\26\\GRCh37\\Both --gene C:\\development\\ExternalDataSources\\SpliceAI\\human_gene_info.gz --in exome_spliceai_scores.vcf.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\GRCh37"
     }
   }
 }

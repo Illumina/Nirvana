@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using Amazon.S3.Model;
 using Genome;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
