@@ -29,7 +29,7 @@ namespace Tabix
             int binDiff = endBin - beginBin;
 
             // we can use the tabix index to investigate if any of the internal bins have variants
-            if (binDiff > 2)
+            if (binDiff >= 2)
             {
                 bool hasInternalVariants = HasVariantsInAnyBins(refSeq.IdToChunks, beginBin + 1, endBin - 1);
                 if (hasInternalVariants) return true;
