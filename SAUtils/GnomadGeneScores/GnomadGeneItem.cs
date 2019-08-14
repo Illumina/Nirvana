@@ -48,6 +48,23 @@ namespace SAUtils.GnomadGeneScores
 
         public int CompareTo(GnomadGeneItem other)
         {
+            if (_loeuf == other._loeuf)
+            {
+                //pick entry with lowest pLI value
+                if (_pLI == other._pLI)
+                {
+                    //pick the entry with the max absolute value of synZ + misZ
+                    var abs1 = Math.Abs(_synZ ?? 0 + _misZ ?? 0);
+                    var abs2 = Math.Abs(other._synZ ?? 0 + other._misZ ?? 0);
+
+                    return abs2.CompareTo(abs1);// inverse compare since we want the greater value to be taken
+                }
+
+                if (_pLI == null) return 1;
+                if (other._pLI == null) return -1;
+
+                return _pLI.Value.CompareTo(other._pLI.Value);
+            }
             if (_loeuf == null) return 1;
             if (other._loeuf == null) return -1;
 
