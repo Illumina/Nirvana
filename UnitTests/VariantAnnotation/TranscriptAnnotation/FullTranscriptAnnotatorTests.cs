@@ -1,7 +1,4 @@
-﻿using Moq;
-using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.TranscriptAnnotation;
+﻿using VariantAnnotation.TranscriptAnnotation;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.TranscriptAnnotation
@@ -27,20 +24,12 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         [InlineData("Q", "*VRX", 96, 96, "Q", "*VRX", 96, 96)]
         public void TryTrimAminoAcidsAndUpdateProteinPositions_AsExpected(string reference, string alt, int start, int end, string newReference, string newAlt, int newStart, int newEnd)
         {
+            var trimmedAa = FullTranscriptAnnotator.TryTrimAminoAcidsAndUpdateProteinPositions(new SequenceChange(reference, alt), start, end);
 
-            var mappedPositionMock = new Mock<IMappedPosition>();
-            mappedPositionMock.SetupProperty(x => x.ProteinStart);
-            mappedPositionMock.SetupProperty(x => x.ProteinEnd);
-            var mappedPosition = mappedPositionMock.Object;
-            mappedPosition.ProteinStart = start;
-            mappedPosition.ProteinEnd = end;
-
-            var trimmedAa = FullTranscriptAnnotator.TryTrimAminoAcidsAndUpdateProteinPositions((reference, alt), mappedPosition);
-
-            Assert.Equal(newReference, trimmedAa.Reference);
-            Assert.Equal(newAlt, trimmedAa.Alternate);
-            Assert.Equal(newStart, mappedPosition.ProteinStart);
-            Assert.Equal(newEnd, mappedPosition.ProteinEnd);
+            Assert.Equal(newReference, trimmedAa.AaChange.Reference);
+            Assert.Equal(newAlt, trimmedAa.AaChange.Alternate);
+            Assert.Equal(newStart, trimmedAa.ProteinStart);
+            Assert.Equal(newEnd, trimmedAa.ProteinEnd);
         }
     }
 }
