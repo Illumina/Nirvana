@@ -1,5 +1,5 @@
-﻿using Genome;
-using Moq;
+﻿using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -15,14 +15,12 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         [Fact]
         public void ComputeGeneFusions_ReturnNull_NoFusions()
         {
-            var chromosome    = new Chromosome("chr1", "1", 0);
-            var chromosome2   = new Chromosome("chr6", "6", 5);
             var transcriptId  = CompactId.Convert("ENST00000491426", 2);
             var transcriptId2 = CompactId.Convert("ENST00000313382", 9);
 
             var breakEnds = new IBreakEnd[]
             {
-                new BreakEnd(chromosome, chromosome2, 31410878, 42248252, true, false)
+                new BreakEnd(ChromosomeUtilities.Chr1, ChromosomeUtilities.Chr6, 31410878, 42248252, true, false)
             };
 
             var transcriptRegions = new ITranscriptRegion[]
@@ -36,7 +34,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             };
 
             var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Chromosome).Returns(chromosome);
+            transcript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             transcript.SetupGet(x => x.Gene.Symbol).Returns("PDE4DIP");
             transcript.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(144890975, 144904679, 1, 287, 287));
@@ -47,7 +45,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript.SetupGet(x => x.TranscriptRegions).Returns(transcriptRegions);
 
             var transcript2 = new Mock<ITranscript>();
-            transcript2.SetupGet(x => x.Chromosome).Returns(chromosome2);
+            transcript2.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr6);
             transcript2.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             transcript2.SetupGet(x => x.Gene.Symbol).Returns("PDE4DIP");
             transcript2.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(144852458, 145039609, 394, 7116, 6723));
@@ -66,14 +64,13 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         [Fact]
         public void ComputeGeneFusions_ReturnOneGeneFusion()
         {
-            var chromosome    = new Chromosome("chr1", "1", 0);
             var transcriptId  = CompactId.Convert("ENST00000367819", 2);
             var transcriptId2 = CompactId.Convert("ENST00000367818", 3);
 
             var breakEnds = new IBreakEnd[]
             {
-                new BreakEnd(chromosome, chromosome, 168512199, 168548478, false, false),
-                new BreakEnd(chromosome, chromosome, 168548478, 168512199, false, false)
+                new BreakEnd(ChromosomeUtilities.Chr1, ChromosomeUtilities.Chr1, 168512199, 168548478, false, false),
+                new BreakEnd(ChromosomeUtilities.Chr1, ChromosomeUtilities.Chr1, 168548478, 168512199, false, false)
             };
 
             var transcriptRegions = new ITranscriptRegion[]
@@ -95,7 +92,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             };
 
             var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Chromosome).Returns(chromosome);
+            transcript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
             transcript.SetupGet(x => x.Gene.Symbol).Returns("XCL2");
             transcript.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(168510190, 168513202, 34, 378, 345));
@@ -106,7 +103,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript.SetupGet(x => x.TranscriptRegions).Returns(transcriptRegions);
 
             var transcript2 = new Mock<ITranscript>();
-            transcript2.SetupGet(x => x.Chromosome).Returns(chromosome);
+            transcript2.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             transcript2.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
             transcript2.SetupGet(x => x.Gene.Symbol).Returns("XCL1");
             transcript2.SetupGet(x => x.Translation.CodingRegion).Returns(new CodingRegion(168545876, 168550458, 166, 510, 345));

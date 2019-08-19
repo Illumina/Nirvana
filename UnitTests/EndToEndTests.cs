@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Genome;
 using UnitTests.TestUtilities;
 using Xunit;
 
@@ -13,14 +12,11 @@ namespace UnitTests
     {
         private readonly string _cacheFilePrefix;
         private readonly List<string> _saDirs;
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
 
         public EndToEndTests()
         {
             _cacheFilePrefix = Resources.EndToEnd37("chr12_7018490_7086889_Both");
             _saDirs          = new List<string> { Resources.EndToEnd37("") };
-
-            _refNameToChromosome = new Dictionary<string, IChromosome> { ["chr12"] = new Chromosome("chr12", "12", 11) };
         }
 
         [Fact]

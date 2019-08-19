@@ -1,4 +1,5 @@
 ﻿using Genome;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Genome
@@ -8,13 +9,12 @@ namespace UnitTests.Genome
         [Fact]
         public void ChromosomeInterval_Setup()
         {
-            var expectedChromosome = new Chromosome("chr1", "1", 0);
-            var expectedStart      = 100;
-            var expectedEnd        = 200;
+            var expectedStart = 100;
+            var expectedEnd   = 200;
 
-            var observedInterval = new ChromosomeInterval(expectedChromosome, 100, 200);
+            var observedInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 100, 200);
 
-            Assert.Equal(expectedChromosome, observedInterval.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, observedInterval.Chromosome);
             Assert.Equal(expectedStart, observedInterval.Start);
             Assert.Equal(expectedEnd, observedInterval.End);
         }

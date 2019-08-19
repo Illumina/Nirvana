@@ -4,13 +4,19 @@
     {
         public string UcscName { get; }
         public string EnsemblName { get; }
+        public string RefSeqAccession { get; }
+        public string GenBankAccession { get; }
+        public int Length { get; }
         public ushort Index { get; }
 
         public EmptyChromosome(string chromosomeName)
         {
-            UcscName    = chromosomeName;
-            EnsemblName = chromosomeName;
-            Index       = ushort.MaxValue;
+            UcscName         = chromosomeName;
+            EnsemblName      = chromosomeName;
+            RefSeqAccession  = chromosomeName;
+            GenBankAccession = chromosomeName;
+            Length           = 0;
+            Index            = ushort.MaxValue;
         }
 
         public bool Equals(IChromosome other) => UcscName == other.UcscName && Index == other.Index;

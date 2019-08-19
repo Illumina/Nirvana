@@ -10,6 +10,7 @@ namespace UnitTests.TestDataStructures
         private readonly string _sequence;
         private readonly int _zeroBasedStartOffset;
         public int Length => _zeroBasedStartOffset + _sequence.Length;
+        public Band[] CytogeneticBands => null;
 
         public SimpleSequence(string s, int zeroBasedStartOffset = 0)
         {

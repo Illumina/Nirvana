@@ -2,6 +2,7 @@
 using Intervals;
 using Moq;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using Variants;
 using Xunit;
@@ -10,7 +11,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class TranscriptUtilitiesTests
     {
-        private static readonly IChromosome Chromosome = new Chromosome("chr21", "short", 21);
         private readonly ISequence _refSequence = new SimpleSequence("ACTTCGGGC", 12340);
 
         [Fact]
@@ -63,7 +63,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         private static Mock<ISimpleVariant> GenSimpleDeletionMock()
         {
             var simpleVar = new Mock<ISimpleVariant>();
-            simpleVar.SetupGet(x => x.Chromosome).Returns(Chromosome);
+            simpleVar.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr21);
             simpleVar.SetupGet(x => x.Start).Returns(12345);
             simpleVar.SetupGet(x => x.End).Returns(12348);
             simpleVar.SetupGet(x => x.RefAllele).Returns("CTG");
@@ -75,7 +75,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         private static Mock<ISimpleVariant> GenSimpleInsertionMock()
         {
             var simpleVar = new Mock<ISimpleVariant>();
-            simpleVar.SetupGet(x => x.Chromosome).Returns(Chromosome);
+            simpleVar.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr21);
             simpleVar.SetupGet(x => x.Start).Returns(12346);
             simpleVar.SetupGet(x => x.End).Returns(12345);
             simpleVar.SetupGet(x => x.RefAllele).Returns("");

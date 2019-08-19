@@ -1,10 +1,10 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
 using SAUtils.Custom;
 using SAUtils.Schema;
+using UnitTests.TestUtilities;
 using VariantAnnotation.SA;
 using Xunit;
 
@@ -12,12 +12,6 @@ namespace UnitTests.SAUtils.CustomAnnotations
 {
     public sealed class ParserTests
     {
-        private readonly Dictionary<string, IChromosome> _refChromDict = new Dictionary<string, IChromosome>()
-        {
-            {"chr1", new Chromosome("chr1", "1", 0) },
-            {"chr2", new Chromosome("chr2", "2", 1) }
-        };
-
         private static StreamReader GetReadStream(string text)
         {
             byte[] data;
@@ -35,7 +29,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseTitle_Conflict_JsonTag()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title=topmed"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title=topmed"), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseTitle());
             }
@@ -44,7 +38,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseTitle_IncorrectFormat()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title:customSA"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#title:customSA"), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseTitle());
             }
@@ -53,7 +47,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseGenomeAssembly_UnsupportedAssembly_ThrowException()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly=hg19"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly=hg19"), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseGenomeAssembly());
             }
@@ -62,7 +56,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseGenomeAssembly_IncorrectFormat_ThrowException()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly-GRCh38"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("#assembly-GRCh38"), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseGenomeAssembly());
             }
@@ -71,7 +65,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ReadlineAndCheckPrefix_InvalidPrefix_ThrowException()
         {
-            using (var custParser = new CustomAnnotationsParser(GetReadStream("invalidPrefix=someValue"), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream("invalidPrefix=someValue"), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ReadlineAndCheckPrefix("expectedPrefix", "anyRow"));
             }
@@ -81,13 +75,13 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void CheckPosAndRefColumns_InvalidPosOrRef_ThrowException()
         {
             const string tagLine = "#CHROM\t\tREF\tALT\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
 
             const string tagLine2 = "#CHROM\tPOS\tREFERENCE\tALT\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine2), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine2), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
@@ -97,7 +91,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void ParseTags_NoAltAndEnd_ThrowException()
         {
             const string tagLine = "#CHROM\tPOS\tREF\tNote\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
@@ -107,7 +101,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         public void ParseTags_LessThanFourColumn_ThrowException()
         {
             const string tagLine = "#CHROM\tPOS\tREF\n";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagLine), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => caParser.ParseTags());
             }
@@ -121,7 +115,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             string tagAndTypeLines = "#CHROM\tPOS\tREF\tALT\tValue\n" +
                                      $"#type\t.\t.\t.\t{type}";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), ChromosomeUtilities.RefNameToChromosome))
             {
                 caParser.ParseTags();
                 caParser.ParseTypes();
@@ -136,7 +130,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             string tagAndTypeLines = "#CHROM\tPOS\tREF\tALT\tValue\n" +
                                      $"#type\t.\t.\t.\t{type}";
-            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), _refChromDict))
+            using (var caParser = new CustomAnnotationsParser(GetReadStream(tagAndTypeLines), ChromosomeUtilities.RefNameToChromosome))
             {
                 caParser.ParseTags();
                 Assert.Throws<UserErrorException>(() => caParser.ParseTypes());
@@ -154,7 +148,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                        "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring";
 
 
-            using (var custParser = new CustomAnnotationsParser(GetReadStream(headerLines), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream(headerLines), ChromosomeUtilities.RefNameToChromosome))
             {
                 custParser.ParseHeaderLines();
                 var expectedJsonKeys = new[]
@@ -198,7 +192,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                        "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\n" +
                                        "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring";
 
-            using (var custParser = new CustomAnnotationsParser(GetReadStream(invalidHeaderLines), _refChromDict))
+            using (var custParser = new CustomAnnotationsParser(GetReadStream(invalidHeaderLines), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => custParser.ParseHeaderLines());
             }
@@ -216,7 +210,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t14783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUSS\t\n" +
                                 "chr2\t10302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
                                 "chr2\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
-            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), ChromosomeUtilities.RefNameToChromosome))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);
@@ -238,7 +232,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926";
-            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), ChromosomeUtilities.RefNameToChromosome))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(3, items.Length);
@@ -261,7 +255,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t3302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926";
-            using (var caParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var caParser = CustomAnnotationsParser.Create(GetReadStream(text), ChromosomeUtilities.RefNameToChromosome))
             {
                 Assert.Throws<UserErrorException>(() => caParser.GetItems().ToArray());
             }
@@ -280,7 +274,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t";
 
-            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), _refChromDict))
+            using (var custParser = CustomAnnotationsParser.Create(GetReadStream(text), ChromosomeUtilities.RefNameToChromosome))
             {
                 var items = custParser.GetItems().ToArray();
                 Assert.Equal(2, items.Length);

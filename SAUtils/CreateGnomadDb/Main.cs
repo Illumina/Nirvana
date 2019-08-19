@@ -7,7 +7,6 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
-using Genome;
 using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.Providers;

@@ -8,7 +8,7 @@
         public MaskedEntry(int begin, int end)
         {
             Begin = begin;
-            End = end;
+            End   = end;
         }
     }
 }

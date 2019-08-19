@@ -4,8 +4,8 @@ using CacheUtils.DataDumperImport.DataStructures;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.Import;
 using CacheUtils.DataDumperImport.IO;
-using Genome;
 using Intervals;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Xunit;
 
@@ -630,11 +630,10 @@ namespace UnitTests.CacheUtils.DataDumperImport.Import
         [Fact]
         public void Parse_Nominal()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var mutableTranscript = ImportTranscript.Parse(_transcriptNode, chromosome, Source.Ensembl);
+            var mutableTranscript = ImportTranscript.Parse(_transcriptNode, ChromosomeUtilities.Chr1, Source.Ensembl);
             Assert.NotNull(mutableTranscript);
 
-            Assert.Equal(chromosome.Index, mutableTranscript.Chromosome.Index);
+            Assert.Equal(ChromosomeUtilities.Chr1.Index, mutableTranscript.Chromosome.Index);
             Assert.Equal(49808176, mutableTranscript.Start);
             Assert.Equal(50051152, mutableTranscript.End);
             Assert.Equal("ENST00000414287", mutableTranscript.Id);
@@ -647,7 +646,7 @@ namespace UnitTests.CacheUtils.DataDumperImport.Import
             Assert.Equal("ENSG00000188511", mutableTranscript.Gene.GeneId);
             Assert.Equal("C22orf34", mutableTranscript.Gene.Symbol);
             Assert.Equal(28010, mutableTranscript.Gene.HgncId);
-            Assert.Equal(chromosome.Index, mutableTranscript.Gene.Chromosome.Index);
+            Assert.Equal(ChromosomeUtilities.Chr1.Index, mutableTranscript.Gene.Chromosome.Index);
             Assert.True(mutableTranscript.Gene.OnReverseStrand);
             Assert.Equal(GeneSymbolSource.HGNC, mutableTranscript.Gene.SymbolSource);
             Assert.Equal(5, mutableTranscript.Exons.Length);

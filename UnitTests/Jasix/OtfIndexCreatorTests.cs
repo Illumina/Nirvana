@@ -1,8 +1,8 @@
 ﻿using System.IO;
-using Genome;
 using Jasix;
 using Jasix.DataStructures;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
 using Xunit;
 
@@ -13,9 +13,8 @@ namespace UnitTests.Jasix
         [Fact]
         public void Add_one_chrom()
         {
-            var chrom1 = new Chromosome("chr1", "1", 0);
             var position1 = new Mock<IPosition>();
-            position1.SetupGet(x => x.Chromosome).Returns(chrom1);
+            position1.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             position1.SetupGet(x => x.Start).Returns(100);
             position1.SetupGet(x => x.RefAllele).Returns("A");
             position1.SetupGet(x => x.AltAlleles).Returns(new []{"C"});

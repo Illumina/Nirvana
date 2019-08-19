@@ -1,24 +1,14 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using Genome;
 using Nirvana;
 using UnitTests.SAUtils.InputFileParsers;
-using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Nirvana
 {
-    public class PreLoadUtilitiesTests
+    public sealed class PreLoadUtilitiesTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-        private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 2);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
-        {
-            { "1", Chrom1},
-            { "2", Chrom2}
-        };
-
         private Stream GetVcfStream()
         {
             var stream = new MemoryStream();
@@ -42,28 +32,28 @@ namespace UnitTests.Nirvana
         [Fact]
         public void GetAllPositions()
         {
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var positions = PreLoadUtilities.GetPositions(GetVcfStream(), null, seqProvider);
 
             Assert.Equal(2, positions.Count);
-            Assert.Equal(4, positions[Chrom1].Count);
-            Assert.Equal(4, positions[Chrom2].Count);
+            Assert.Equal(4, positions[ChromosomeUtilities.Chr1].Count);
+            Assert.Equal(4, positions[ChromosomeUtilities.Chr2].Count);
         }
 
         [Fact]
         public void GetPositions_inRange()
         {
-            var annotationRange = new AnnotationRange()
+            var annotationRange = new AnnotationRange
             {
                 chromosome = "1",
                 start = 10019,
                 end = 10290
             };
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var positions = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, seqProvider );
 
             Assert.Single(positions);
-            Assert.Equal(3, positions[Chrom1].Count);
+            Assert.Equal(3, positions[ChromosomeUtilities.Chr1].Count);
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Genome;
 using SAUtils.InputFileParsers;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using Variants;
 using Xunit;
 
@@ -11,14 +11,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class AlleleReaderTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
-        {
-            { "1", Chrom1}
-        };
-
         private Stream GetAncestralAlleleStream()
         {
             var stream = new MemoryStream();
@@ -41,7 +33,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "G" + new string('T', 13289 - 13284) + "C" + new string('T', 13313 - 13289) + "T", 13284 - 1 - VariantUtils.MaxUpstreamLength);
 
-            var seqProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, _chromDict);
+            var seqProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new AncestralAlleleReader(new StreamReader(GetAncestralAlleleStream()), seqProvider);
 
             var items = reader.GetItems().ToList();

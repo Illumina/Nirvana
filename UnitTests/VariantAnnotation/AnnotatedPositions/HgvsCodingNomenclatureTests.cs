@@ -1,5 +1,6 @@
 ﻿using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
@@ -13,8 +14,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
     {
         private readonly ITranscript _forwardTranscript;
         private readonly ITranscript _reverseTranscript;
-        private static readonly IChromosome Chromosome = new Chromosome("chr1", "1", 0);
-        private static readonly IChromosome chrX = new Chromosome("chrX", "X", 24);
 
         public HgvsCodingNomenclatureTests()
         {
@@ -39,7 +38,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938", 4));
-            transcript.SetupGet(x => x.Chromosome).Returns(Chromosome);
+            transcript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             transcript.SetupGet(x => x.Start).Returns(1260147);
             transcript.SetupGet(x => x.End).Returns(1264277);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
@@ -59,7 +58,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000579622", 1));
-            transcript.SetupGet(x => x.Chromosome).Returns(chrX);
+            transcript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.ChrX);
             transcript.SetupGet(x => x.Start).Returns(70361035);
             transcript.SetupGet(x => x.End).Returns(70361156);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
@@ -82,7 +81,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000423372", 3));
-            transcript.SetupGet(x => x.Chromosome).Returns(Chromosome);
+            transcript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             transcript.SetupGet(x => x.Start).Returns(134901);
             transcript.SetupGet(x => x.End).Returns(139379);
             transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
@@ -95,7 +94,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_substitution_in_3UTR()
         {
-            var variant       = new SimpleVariant(Chromosome, 1260247, 1260247, "A", "G", VariantType.SNV);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1260247, 1260247, "A", "G", VariantType.SNV);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, 0, 0);
 
             Assert.Equal("ENST00000343938.4:c.-311A>G", observedHgvsc);
@@ -104,7 +103,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_substitution_in_intron_before_TSS()
         {
-            var variant       = new SimpleVariant(Chromosome, 1262210, 1262210, "C", "G", VariantType.SNV);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262210, 1262210, "C", "G", VariantType.SNV);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, 1, 1);
 
             Assert.Equal("ENST00000343938.4:c.-75-6C>G", observedHgvsc);
@@ -116,7 +115,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var sequence = new Mock<ISequence>();
             sequence.Setup(x => x.Substring(1262627, 1)).Returns("A");
 
-            var variant       = new SimpleVariant(Chromosome, 1262629, 1262628, "", "G", VariantType.insertion);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262629, 1262628, "", "G", VariantType.insertion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, sequence.Object, 4, 4);
 
             Assert.Equal("ENST00000343938.4:c.130_131insG", observedHgvsc);
@@ -128,7 +127,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var sequence = new Mock<ISequence>();
             sequence.Setup(x => x.Substring(1262627, 1)).Returns("A");
 
-            var variant       = new SimpleVariant(Chromosome, 1263159, 1263158, "", "G", VariantType.insertion);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1263159, 1263158, "", "G", VariantType.insertion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, sequence.Object, 4, 4);
 
             Assert.Equal("ENST00000343938.4:c.*15_*16insG", observedHgvsc);
@@ -140,7 +139,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var sequence = new Mock<ISequence>();
             sequence.Setup(x => x.Substring(1262626, 2)).Returns("TA");
 
-            var variant       = new SimpleVariant(Chromosome, 1262629, 1262628, "", "TA", VariantType.insertion);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262629, 1262628, "", "TA", VariantType.insertion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, sequence.Object, 4, 4);
 
             Assert.Equal("ENST00000343938.4:c.129_130dupTA", observedHgvsc);
@@ -180,7 +179,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_Deletion_start_before_transcript()
         {
-            var variant       = new SimpleVariant(Chromosome, 1260144, 1260148, "ATGTC", "", VariantType.deletion);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1260144, 1260148, "ATGTC", "", VariantType.deletion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, -1, 0);
 
             Assert.Null(observedHgvsc);
@@ -189,7 +188,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_Delin_start_from_Exon_end_in_intron()
         {
-            var variant       = new SimpleVariant(Chromosome, 1262410, 1262414, "ATGTC", "TG", VariantType.indel);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262410, 1262414, "ATGTC", "TG", VariantType.indel);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, 2, 3);
 
             Assert.Equal("ENST00000343938.4:c.120_122+2delATGTCinsTG", observedHgvsc);
@@ -198,7 +197,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_inversion_start_from_Exon_end_in_intron()
         {
-            var variant       = new SimpleVariant(Chromosome, 1262410, 1262414, "ATGTC", "GACAT", VariantType.MNV);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262410, 1262414, "ATGTC", "GACAT", VariantType.MNV);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, 2, 3);
 
             Assert.Equal("ENST00000343938.4:c.120_122+2invATGTC", observedHgvsc);
@@ -207,7 +206,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_Deletion_end_after_transcript()
         {
-            var variant       = new SimpleVariant(Chromosome, 1260143, 1260148, "ATGTC", "", VariantType.deletion);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1260143, 1260148, "ATGTC", "", VariantType.deletion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, -1, 0);
 
             Assert.Null(observedHgvsc);
@@ -216,7 +215,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_Reference_no_hgvsc()
         {
-            var variant       = new SimpleVariant(Chromosome, 1260138, 1260138, "A", "A", VariantType.reference);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1260138, 1260138, "A", "A", VariantType.reference);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, -1, -1);
 
             Assert.Null(observedHgvsc);
@@ -225,7 +224,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_substitution_in_intron_of_reverse_gene()
         {
-            var variant       = new SimpleVariant(Chromosome, 136000, 136000, "A", "G", VariantType.SNV);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 136000, 136000, "A", "G", VariantType.SNV);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript, variant, null, 1, 1);
 
             Assert.Equal("ENST00000423372.3:c.*910-198T>C", observedHgvsc);
@@ -234,7 +233,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_substitution_after_stopCodon_of_reverse_gene()
         {
-            var variant       = new SimpleVariant(Chromosome, 138529, 138529, "A", "G", VariantType.SNV);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 138529, 138529, "A", "G", VariantType.SNV);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript, variant, null, 2, -1);
 
             Assert.Equal("ENST00000423372.3:c.*1T>C", observedHgvsc);
@@ -243,7 +242,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvscAnnotation_deletion_of_reverse_gene()
         {
-            var variant       = new SimpleVariant(Chromosome, 135802, 137619, "ATCGTGGGTTGT", "", VariantType.deletion);
+            var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 135802, 137619, "ATCGTGGGTTGT", "", VariantType.deletion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_reverseTranscript, variant, null, 0, 1);
 
             Assert.Equal("ENST00000423372.3:c.*909+2_*910delACAACCCACGAT", observedHgvsc);
@@ -255,7 +254,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var sequence = new Mock<ISequence>();
             sequence.Setup(x => x.Substring(70361157-12, 12)).Returns("TATATATATATA");
 
-            var variant = new SimpleVariant(chrX, 70361157, 70361156, "", "ACACCAGCAGCA", VariantType.insertion);//right shifted variant
+            var variant = new SimpleVariant(ChromosomeUtilities.ChrX, 70361157, 70361156, "", "ACACCAGCAGCA", VariantType.insertion);//right shifted variant
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(GetForwardTranscriptWithoutUtr(), variant, sequence.Object, 0, 0);
 
             Assert.Equal("ENST00000579622.1:n.122_123insACACCAGCAGCA", observedHgvsc);
@@ -267,7 +266,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var sequence = new Mock<ISequence>();
             sequence.Setup(x => x.Substring(70361156 - 4, 4)).Returns("ACAC");
 
-            var variant = new SimpleVariant(chrX, 70361157, 70361156, "", "ACAC", VariantType.insertion);//right shifted variant
+            var variant = new SimpleVariant(ChromosomeUtilities.ChrX, 70361157, 70361156, "", "ACAC", VariantType.insertion);//right shifted variant
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(GetForwardTranscriptWithoutUtr(), variant, sequence.Object, 0, 0);
 
             Assert.Equal("ENST00000579622.1:n.119_122dupACAC", observedHgvsc);

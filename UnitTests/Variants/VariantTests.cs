@@ -1,4 +1,4 @@
-﻿using Genome;
+﻿using UnitTests.TestUtilities;
 using Variants;
 using Vcf;
 using Xunit;
@@ -10,7 +10,6 @@ namespace UnitTests.Variants
         [Fact]
         public void Variant_Set()
         {
-            var expectedChromosome         = new Chromosome("chr1", "1", 0);
             const int expectedStart        = 100;
             const int expectedEnd          = 102;
             const string expectedRef       = "AT";
@@ -21,14 +20,14 @@ namespace UnitTests.Variants
             const bool expectedDecomposed  = false;
             const bool expectedRecomposed  = true;
             var expectedLinkedVids         = new[] { "1:102:T:G" };
-            var expectedBreakEnds          = new IBreakEnd[] { new BreakEnd(expectedChromosome, expectedChromosome, 100, 200, false, false) };
+            var expectedBreakEnds          = new IBreakEnd[] { new BreakEnd(ChromosomeUtilities.Chr1, ChromosomeUtilities.Chr1, 100, 200, false, false) };
             var expectedBehavior           = new AnnotationBehavior(false, false, false, false, true);
 
-            var variant                    = new Variant(expectedChromosome, expectedStart, expectedEnd, expectedRef, expectedAlt,
+            var variant                    = new Variant(ChromosomeUtilities.Chr1, expectedStart, expectedEnd, expectedRef, expectedAlt,
                 expectedType, expectedVid, expectedRefMinor, expectedDecomposed, expectedRecomposed, expectedLinkedVids,
                 expectedBreakEnds, expectedBehavior);
 
-            Assert.Equal(expectedChromosome, variant.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, variant.Chromosome);
             Assert.Equal(expectedStart,      variant.Start);
             Assert.Equal(expectedEnd,        variant.End);
             Assert.Equal(expectedRef,        variant.RefAllele);

@@ -9,7 +9,6 @@ using Genome;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Utilities;
 using Variants;
 using static SAUtils.InputFileParsers.ClinVar.ClinVarCommon;
 
@@ -610,7 +609,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             return sigList.ToArray();
         }
 
-        private readonly HashSet<string> _validPathogenicity = new HashSet<string>()
+        private readonly HashSet<string> _validPathogenicity = new HashSet<string>
         {
             "uncertain significance",
             "not provided",

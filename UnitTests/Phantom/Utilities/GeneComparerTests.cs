@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -17,10 +17,9 @@ namespace UnitTests.Phantom.Utilities
 
         public GeneComparerTests()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            _geneA         = new Gene(chromosome, 100, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
-            _geneB         = new Gene(chromosome, 100, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
-            _geneC         = new Gene(chromosome, 101, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
+            _geneA         = new Gene(ChromosomeUtilities.Chr1, 100, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
+            _geneB         = new Gene(ChromosomeUtilities.Chr1, 100, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
+            _geneC         = new Gene(ChromosomeUtilities.Chr1, 101, 200, false, "PAX", 123, CompactId.Convert("NM_123"), CompactId.Convert("ENST0000123"));
             _geneComparer  = new pu.GeneComparer();
         }
 

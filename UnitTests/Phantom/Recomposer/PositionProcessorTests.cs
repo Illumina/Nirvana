@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Genome;
 using Moq;
 using Phantom.Recomposer;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Vcf;
@@ -87,9 +87,7 @@ namespace UnitTests.Phantom.Recomposer
         public void GenerateOutput_NothingRecomposed_ReturnOriginalVcfFieldList()
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
-            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) }
-                });
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
             var variantGenerator = new VariantGenerator(sequenceProvider);
@@ -115,9 +113,7 @@ namespace UnitTests.Phantom.Recomposer
         public void GenerateOutput_Return_OriginalAndRecomposed_VcfFieldList()
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
-            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) }
-                });
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
             var variantGenerator = new VariantGenerator(sequenceProvider);

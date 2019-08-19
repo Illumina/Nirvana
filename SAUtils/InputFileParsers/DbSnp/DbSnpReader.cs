@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Genome;
 using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;

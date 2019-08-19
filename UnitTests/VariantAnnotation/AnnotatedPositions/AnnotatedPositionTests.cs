@@ -1,5 +1,5 @@
-﻿using Genome;
-using Moq;
+﻿using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
@@ -13,13 +13,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 {
     public sealed class AnnotatedPositionTests
     {
-        private readonly IChromosome _chromosome;
-
-        public AnnotatedPositionTests()
-        {
-            _chromosome = new Chromosome("chr1", "1", 0);
-        }
-
         [Fact]
         public void GetJsonString_DifferentOriginalChromosomeName()
         {
@@ -57,7 +50,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
-            variant.SetupGet(x => x.Chromosome).Returns(_chromosome);
+            variant.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);
             variant.SetupGet(x => x.Start).Returns(949523);
             variant.SetupGet(x => x.End).Returns(949523);
@@ -74,7 +67,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var infoData = new InfoData(null, null, VariantType.unknown, null, null, null, null, null, false, null, null, false, false, null,null, null);
 
-            return new Position(_chromosome, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
+            return new Position(ChromosomeUtilities.Chr1, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);
         }
     }

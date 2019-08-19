@@ -23,6 +23,7 @@ namespace VariantAnnotation.NSA
         private readonly Dictionary<ushort, IntervalArray<string>> _intervalArrays;
 
         private const int MaxStreamLength = 10 * 1048576;
+
         public NsiReader(Stream stream)
         {
             var compressData = new byte[MaxStreamLength];

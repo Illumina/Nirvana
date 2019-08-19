@@ -6,6 +6,7 @@ using CacheUtils.TranscriptCache;
 using Genome;
 using Intervals;
 using IO;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -18,23 +19,11 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 {
     public sealed class TranscriptCacheReaderTests
     {
-        private readonly Dictionary<ushort, IChromosome> _refIndexToChromosome;
         private readonly TranscriptCacheData _expectedCacheData;
         private readonly CacheHeader _expectedHeader;
 
         public TranscriptCacheReaderTests()
         {
-            var chr1 = new Chromosome("chr1", "1", 0);
-            var chr2 = new Chromosome("chr2", "2", 1);
-            var chr3 = new Chromosome("chr3", "3", 2);
-
-            _refIndexToChromosome = new Dictionary<ushort, IChromosome>
-            {
-                [chr1.Index] = chr1,
-                [chr2.Index] = chr2,
-                [chr3.Index] = chr3
-            };
-
             const GenomeAssembly genomeAssembly = GenomeAssembly.GRCh38;
 
             var baseHeader   = new Header("test", 2, 3, Source.BothRefSeqAndEnsembl, 4, genomeAssembly);
@@ -55,15 +44,15 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             var peptideSeqs = new[] { "MASE*" };
 
             var genes = new IGene[1];
-            genes[0] = new Gene(chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
+            genes[0] = new Gene(ChromosomeUtilities.Chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
                 CompactId.Convert("ENSG00000141510"));
 
             var regulatoryRegions = new IRegulatoryRegion[2];
-            regulatoryRegions[0] = new RegulatoryRegion(chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
-            regulatoryRegions[1] = new RegulatoryRegion(chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[0] = new RegulatoryRegion(ChromosomeUtilities.Chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[1] = new RegulatoryRegion(ChromosomeUtilities.Chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
             var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(3);
 
-            var transcripts = GetTranscripts(chr3, genes, transcriptRegions, mirnas);
+            var transcripts = GetTranscripts(ChromosomeUtilities.Chr3, genes, transcriptRegions, mirnas);
             var transcriptIntervalArrays = transcripts.ToIntervalArrays(3);
 
             _expectedCacheData = new TranscriptCacheData(_expectedHeader, genes, transcriptRegions, mirnas, peptideSeqs,
@@ -86,7 +75,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
                 using (var reader = new TranscriptCacheReader(ms))
                 {
-                    observedCache = reader.Read(_refIndexToChromosome);
+                    observedCache = reader.Read(ChromosomeUtilities.RefIndexToChromosome);
                 }
             }
 

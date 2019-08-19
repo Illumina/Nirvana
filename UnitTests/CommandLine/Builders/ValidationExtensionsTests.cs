@@ -170,7 +170,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredParameter_Exists_SuccessExitCode()
         {
-            string observedString       = default(string);
+            string observedString       = default;
             const string expectedString = "foo";
 
             var ops = new OptionSet { { "test=", "test", v => observedString = v } };
@@ -186,7 +186,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredDate_Exists_SuccessExitCode()
         {
-            string observedDate = default(string);
+            string observedDate = default;
             const string expectedDate = "2018-03-14";
 
             var ops = new OptionSet { { "date=", "date", v => observedDate = v } };
@@ -202,7 +202,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredDate_Exists_BadFormat()
         {
-            string observedDate = default(string);
+            string observedDate = default;
             var ops = new OptionSet { { "date=", "date", v => observedDate = v } };
 
             var validator = new ConsoleAppBuilder(new[] { "--date", "garbage" }, ops)
@@ -215,7 +215,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredDate_DoesNotExist_MissingCommandLineExitCode()
         {
-            string observedDate = default(string);
+            string observedDate = default;
 
             var ops = new OptionSet { { "date=", "date", v => observedDate = v } };
 
@@ -282,8 +282,8 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredParameter_DoesNotExist_MissingCommandLineExitCode()
         {
-            string testString           = default(string);
-            const string expectedString = default(string);
+            string testString           = default;
+            const string expectedString = default;
 
             var ops = new OptionSet
             {
@@ -302,7 +302,7 @@ namespace UnitTests.CommandLine.Builders
         [Fact]
         public void HasRequiredParameter_MissingArguments_MissingCommandLineExitCode()
         {
-            string observedString = default(string);
+            string observedString = default;
             var ops = new OptionSet { { "test=", "test", v => observedString = v } };
 
             var exitCode = Execute(new ConsoleAppBuilder(null, ops)

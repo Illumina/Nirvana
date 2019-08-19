@@ -1,6 +1,6 @@
-﻿using Genome;
-using Intervals;
+﻿using Intervals;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -17,7 +17,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 
         public TranscriptPositionalEffectTests()
         {
-            var chromosome  = new Chromosome("chr1", "1", 0);
             const int start = 874655;
             const int end   = 879639;
 
@@ -59,7 +58,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             gene.SetupGet(x => x.OnReverseStrand).Returns(false);
 
             _forwardTranscript = new Mock<ITranscript>();
-            _forwardTranscript.SetupGet(x => x.Chromosome).Returns(chromosome);
+            _forwardTranscript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             _forwardTranscript.SetupGet(x => x.Start).Returns(start);
             _forwardTranscript.SetupGet(x => x.End).Returns(end);
             _forwardTranscript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -68,7 +67,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             _forwardTranscript.SetupGet(x => x.TotalExonLength).Returns(1731);
 
             _reverseTranscript = new Mock<ITranscript>();
-            _reverseTranscript.SetupGet(x => x.Chromosome).Returns(chromosome);
+            _reverseTranscript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             _reverseTranscript.SetupGet(x => x.Start).Returns(3477259);
             _reverseTranscript.SetupGet(x => x.Start).Returns(3477354);
             _reverseTranscript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);

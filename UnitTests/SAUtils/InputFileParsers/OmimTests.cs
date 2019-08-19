@@ -29,14 +29,14 @@ namespace UnitTests.SAUtils.InputFileParsers
 
         private GeneSymbolUpdater GetGeneSymbolUpdater()
         {
-            var entrezGeneIdToSymbol = new Dictionary<string, string>()
+            var entrezGeneIdToSymbol = new Dictionary<string, string>
             {
                 { "entrez123", "ALPQTL2"},
                 { "entrez234", "AD7CNTP" },
                 { "entrez345", "BCC1"},
                 { "entrez456", "CMM, MLM, DNS"}
             };
-            var ensemblGeneIdToSymbol = new Dictionary<string, string>()
+            var ensemblGeneIdToSymbol = new Dictionary<string, string>
             {
                 { "ensembl123", "ALPQTL2"},
                 { "ensembl234", "AD7CNTP" },

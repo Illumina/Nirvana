@@ -1,8 +1,6 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Compression.Utilities;
-using Genome;
 using Tabix;
 using UnitTests.TestUtilities;
 using Xunit;
@@ -14,11 +12,9 @@ namespace UnitTests.Tabix
         [Fact]
         public void Read_Nominal()
         {
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr17"] = new Chromosome("chr17", "17", 16) };
-
             using (var indexReader = GZipUtilities.GetAppropriateBinaryReader(Resources.TopPath("AU144A_BadVariant.vcf.gz.tbi")))
             {
-                Index index = Reader.Read(indexReader, refNameToChromosome);
+                Index index = Reader.Read(indexReader, ChromosomeUtilities.RefNameToChromosome);
 
                 Assert.Equal(1, index.BeginIndex);
                 Assert.Equal('#', index.CommentChar);

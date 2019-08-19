@@ -25,8 +25,8 @@ namespace UnitTests.TestUtilities
                 }
             }
 
-            var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
-            var (annotator, sequenceProvider)   = GetAnnotatorAndSequenceProvider(cacheFilePrefix, saPaths);
+            var refMinorProvider = ProviderUtilities.GetRefMinorProvider(dataAndIndexPaths);
+            var (annotator, sequenceProvider) = GetAnnotatorAndSequenceProvider(cacheFilePrefix, saPaths);
 
             var variantFactory    = new VariantFactory(sequenceProvider);
             var position          = ParseVcfLine(vcfLine, refMinorProvider, variantFactory, sequenceProvider.RefNameToChromosome);

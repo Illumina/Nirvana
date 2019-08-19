@@ -3,7 +3,7 @@ using System.Text;
 using CacheUtils.DataDumperImport.DataStructures.Import;
 using CacheUtils.DataDumperImport.Import;
 using CacheUtils.DataDumperImport.IO;
-using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Caches;
 using Xunit;
 
@@ -170,11 +170,10 @@ namespace UnitTests.CacheUtils.DataDumperImport.Import
         [Fact]
         public void Parse_Nominal()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var regulatoryRegion = ImportRegulatoryFeature.Parse(_regulatoryFeatureNode, chromosome);
+            var regulatoryRegion = ImportRegulatoryFeature.Parse(_regulatoryFeatureNode, ChromosomeUtilities.Chr1);
             Assert.NotNull(regulatoryRegion);
 
-            Assert.Equal(chromosome.Index, regulatoryRegion.Chromosome.Index);
+            Assert.Equal(ChromosomeUtilities.Chr1.Index, regulatoryRegion.Chromosome.Index);
             Assert.Equal(50555633, regulatoryRegion.Start);
             Assert.Equal(50555915, regulatoryRegion.End);
             Assert.Equal("ENSR00000394520", regulatoryRegion.Id.WithoutVersion);

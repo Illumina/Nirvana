@@ -1,6 +1,7 @@
 ﻿using ErrorHandling.Exceptions;
 using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
@@ -17,7 +18,7 @@ namespace UnitTests.VariantAnnotation
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
-            variant.SetupGet(x => x.Chromosome).Returns(new Chromosome("chr1", "1", 0));
+            variant.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);
             variant.SetupGet(x => x.Start).Returns(949523);
             variant.SetupGet(x => x.End).Returns(949523);
@@ -31,7 +32,7 @@ namespace UnitTests.VariantAnnotation
         {
             var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
-            variant.SetupGet(x => x.Chromosome).Returns(new Chromosome("chrM", "MT", 0));
+            variant.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.ChrM);
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);
             variant.SetupGet(x => x.Start).Returns(9495);
             variant.SetupGet(x => x.End).Returns(9495);
@@ -46,7 +47,7 @@ namespace UnitTests.VariantAnnotation
         {
             var position = new Mock<IPosition>();
             position.SetupGet(x => x.Variants).Returns(GetMitoVariants);
-            position.SetupGet(x => x.Chromosome).Returns(new Chromosome("chr1", "1", 0));
+            position.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
 
             var csProvider = new Mock<IAnnotationProvider>();
             csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
@@ -69,7 +70,7 @@ namespace UnitTests.VariantAnnotation
         {
             var position = new Mock<IPosition>();
             position.SetupGet(x => x.Variants).Returns(GetVariants);
-            position.SetupGet(x => x.Chromosome).Returns(new Chromosome("chrM", "MT", 0));
+            position.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.ChrM);
 
             var csProvider = new Mock<IAnnotationProvider>();
             csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
@@ -92,7 +93,7 @@ namespace UnitTests.VariantAnnotation
         {
             var position = new Mock<IPosition>();
             position.SetupGet(x => x.Variants).Returns(GetVariants);
-            position.SetupGet(x => x.Chromosome).Returns(new Chromosome("chrM", "MT", 0));
+            position.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.ChrM);
 
             var csProvider = new Mock<IAnnotationProvider>();
             csProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);

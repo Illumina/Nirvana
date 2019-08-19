@@ -1,6 +1,4 @@
-﻿using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Text;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
@@ -116,6 +114,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         public int Length => _codingRegion.Length;
+        public Band[] CytogeneticBands => null;
 
         public string Substring(int offset, int length)
         {

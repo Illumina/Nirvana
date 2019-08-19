@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.DbSnp;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;
 using Xunit;
 
@@ -11,15 +10,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class GlobalMinorReaderTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-        private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 2);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>()
-        {
-            { "1", Chrom1},
-            { "2", Chrom2}
-        };
-
         private Stream GetStream()
         {
             var stream = new MemoryStream();
@@ -38,7 +28,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetItems_test()
         {
-            var reader = new GlobalMinorReader(GetStream(), _chromDict);
+            var reader = new GlobalMinorReader(GetStream(), ChromosomeUtilities.RefNameToChromosome);
 
             var items = reader.GetItems().Cast<ISupplementaryDataItem>().ToList();
 

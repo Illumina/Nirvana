@@ -125,7 +125,7 @@ namespace CommandLine.Builders
         {
             if (validator.SkipValidation) return validator;
 
-            if (EqualityComparer<T>.Default.Equals(parameterValue, default(T)))
+            if (EqualityComparer<T>.Default.Equals(parameterValue, default))
             {
                 validator.Data.AddError($"The {description} was not specified. Please use the {commandLineOption} parameter.",
                     ExitCodes.MissingCommandLineOption);

@@ -10,9 +10,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
 using Compression.FileHandling;
-using Compression.Utilities;
 using ErrorHandling;
-using Genome;
 using IO;
 using Microsoft.Extensions.Configuration;
 using VariantAnnotation.Interface;
@@ -66,26 +64,16 @@ namespace CacheUtils.Commands.UniversalGeneArchive
             logger.Write("- loading datastores... ");
             var loadBenchmark = new Benchmark();
 
-            var dicts = GetSequenceDictionaries(filePaths.GRCh38.ReferencePath, ExternalFiles.AssemblyFile37.FilePath, ExternalFiles.AssemblyFile38.FilePath);
+            var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(filePaths.GRCh38.ReferencePath);
 
             var geneInfoData = GeneInfoData.Create(ExternalFiles.GeneInfoFile.FilePath);
-            var dataStore37  = AssemblyDataStore.Create("GRCh37", logger, filePaths.GRCh37, dicts.RefNameToChromosome, dicts.Accession37, true);
-            var dataStore38  = AssemblyDataStore.Create("GRCh38", logger, filePaths.GRCh38, dicts.RefNameToChromosome, dicts.Accession38, false);
-            var hgnc         = Hgnc.Create(ExternalFiles.HgncFile.FilePath, dicts.RefNameToChromosome);
+            var dataStore37  = AssemblyDataStore.Create("GRCh37", logger, filePaths.GRCh37, refNameToChromosome, true);
+            var dataStore38  = AssemblyDataStore.Create("GRCh38", logger, filePaths.GRCh38, refNameToChromosome, false);
+            var hgnc         = Hgnc.Create(ExternalFiles.HgncFile.FilePath, refNameToChromosome);
 
             logger.WriteLine($"{Benchmark.ToHumanReadable(loadBenchmark.GetElapsedTime())}");
 
             return (geneInfoData, dataStore37, dataStore38, hgnc);
-        }
-
-        private static (IDictionary<string, IChromosome> RefNameToChromosome, IDictionary<string, IChromosome>
-            Accession37, IDictionary<string, IChromosome> Accession38) GetSequenceDictionaries(string referencePath,
-                string assemblyInfo37Path, string assemblyInfo38Path)
-        {
-            var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(referencePath);
-            var accession37Dict = AssemblyReader.GetAccessionToChromosome(GZipUtilities.GetAppropriateStreamReader(assemblyInfo37Path), refNameToChromosome);
-            var accession38Dict = AssemblyReader.GetAccessionToChromosome(GZipUtilities.GetAppropriateStreamReader(assemblyInfo38Path), refNameToChromosome);
-            return (refNameToChromosome, accession37Dict, accession38Dict);
         }
 
         private static UgaGene[] CombineGenomeAssemblies(ILogger logger, Dictionary<ushort, List<UgaGene>> genesByRef37, Dictionary<ushort, List<UgaGene>> genesByRef38)

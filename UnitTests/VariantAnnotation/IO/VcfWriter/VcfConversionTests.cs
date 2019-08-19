@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -19,11 +19,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void No_dbsnp_id()
         {
             var vcfFields = "chr1	101	.	A	T	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new []{false}, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new []{false}, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -38,11 +37,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void Original_dbsnp_rsid_get_removed()
         {
             var vcfFields = "chr1	101	rs123	A	T	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[]{ false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[]{ false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -57,11 +55,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void Original_dbsnp_nonrsid_get_kept()
         {
             var vcfFields = "chr1	101	sa123	A	T	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
@@ -119,11 +116,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void Phylop_positional()
         {
             var vcfFields = "chr1	101	sa123	A	T	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant) {PhylopScore = -0.567};
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
@@ -140,11 +136,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void RefMinor_tag_is_added_to_info_field()
         {
             var vcfFields = "chr1	101	sa123	A	.	.	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
@@ -160,11 +155,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
         public void original_updated_info_is_added_to_info_field()
         {
             var vcfFields = "chr1	101	sa123	A	.	.	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "Test=abc", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", ".", VariantType.reference, null, true, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
 
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
@@ -245,11 +239,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
 
 
             var vcfFields = "chr1	101	sa123	A	T	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "T" }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", "T", VariantType.SNV, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             annotatedVariant.Transcripts.Add(mockedTranscript1.Object);
             annotatedVariant.Transcripts.Add(mockedTranscript2.Object);
@@ -272,11 +265,10 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
             mockedRegulatory.SetupGet(x => x.RegulatoryRegion.Id).Returns(CompactId.Convert("ENSR12345"));
 
             var vcfFields = "chr1	101	sa123	A	.	.	.	.	.".Split("\t");
-            var chrom = new Chromosome("chr1", "1", 0);
             var inforData = new InfoData(null, null, VariantType.SNV, null, null, null, null, null, false, null, null,
                 false, false, "Test=abc", null, null);
-            var position = new Position(chrom, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
-            var variant = new Variant(chrom, 101, 101, "A", ".", VariantType.reference, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
+            var position = new Position(ChromosomeUtilities.Chr1, 101, 101, "A", new[] { "." }, 100, null, null, null, inforData, vcfFields, new[] { false }, false);
+            var variant = new Variant(ChromosomeUtilities.Chr1, 101, 101, "A", ".", VariantType.reference, null, false, false, false, null, null, new AnnotationBehavior(true, false, false, true, false));
             var annotatedVariant = new AnnotatedVariant(variant);
             annotatedVariant.RegulatoryRegions.Add(mockedRegulatory.Object);
 

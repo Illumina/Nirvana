@@ -1,32 +1,14 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Genome;
-using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OneKGen;
-using UnitTests.TestDataStructures;
-using VariantAnnotation.Interface.Providers;
-using Variants;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class OneKGenTests
     {
-        private readonly IDictionary<string, IChromosome> _refChromDict;
-
-        public OneKGenTests()
-        {
-            _refChromDict = new Dictionary<string, IChromosome>
-            {
-                {"1",new Chromosome("chr1", "1",0) },
-                {"4",new Chromosome("chr4", "4", 3) },
-                {"X",new Chromosome("chrX", "X", 22) }
-            };
-            
-        }
-
         private static string GetAlleleFrequency(string jsonString, string description)
         {
             var regexMatch = Regex.Match(jsonString, $"\"{description}\":([0|1]\\.?\\d+)?");
@@ -38,7 +20,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             const string vcfLine =
                 "1	10352	rs555500075	T	TA	100	PAS	AC=2191;AF=0.4375;AN=5008;NS=2504;DP=88915;EAS_AF=0.4306;AMR_AF=0.4107;AFR_AF=0.4788;EUR_AF=0.4264;SAS_AF=0.4192;AA=|||unknown(NO_COVERAGE); VT=INDEL;EAS_AN=1008;EAS_AC=434;EUR_AN=1006;EUR_AC=429;AFR_AN=1322;AFR_AC=633;AMR_AN=694;AMR_AC=285;SAS_AN=978;SAS_AC=410";
-            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10352,"T",'C', _refChromDict));
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10352,"T",'C', ChromosomeUtilities.RefNameToChromosome));
             var oneKItem = oneKGenReader.ExtractItems(vcfLine).First().GetJsonString();
 
             Assert.Equal("0.4375", GetAlleleFrequency(oneKItem, "allAf"));
@@ -56,7 +38,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             const string vcfLine =
                 "1	15274	rs62636497	A	G,T	100	PASS	AC=1739,3210;AF=0.347244,0.640974;AN=5008;NS=2504;DP=23255;EAS_AF=0.4812,0.5188;AMR_AF=0.2752,0.7205;AFR_AF=0.323,0.6369;EUR_AF=0.2922,0.7078;SAS_AF=0.3497,0.6472;AA=g|||;VT=SNP;MULTI_ALLELIC;EAS_AN=1008;EAS_AC=485,523;EUR_AN=1006;EUR_AC=294,712;AFR_AN=1322;AFR_AC=427,842;AMR_AN=694;AMR_AC=191,500;SAS_AN=978;SAS_AC=342,633";
 
-            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(15274, "A", 'C', _refChromDict));
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(15274, "A", 'C', ChromosomeUtilities.RefNameToChromosome));
             var oneKGenItems = oneKGenReader.ExtractItems(vcfLine).ToList();
 
             Assert.Equal(2, oneKGenItems.Count);
@@ -85,7 +67,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             const string vcfLine =
                 "X	101155257	rs373174489	GTGCAAAAGCTCTTTAGTTTAATTAGGTCTCAGCTATTTATCTTTGTTCTTAT	G	100	PASS	AN=3775;AC=1723;AF=0.456424;AA=;EAS_AN=764;EAS_AC=90;EAS_AF=0.1178;EUR_AN=766;EUR_AC=439;EUR_AF=0.5731;AFR_AN=1003;AFR_AC=839;AFR_AF=0.8365;AMR_AN=524;AMR_AC=180;AMR_AF=0.3435;SAS_AN=718;SAS_AC=175;SAS_AF=0.2437";
 
-            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(101155257, "GTGCAAAAGCTCTTTAGTTTAATTAGGTCTCAGCTATTTATCTTTGTTCTTAT", 'C', _refChromDict));
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(101155257, "GTGCAAAAGCTCTTTAGTTTAATTAGGTCTCAGCTATTTATCTTTGTTCTTAT", 'C', ChromosomeUtilities.RefNameToChromosome));
             var oneKItems = oneKGenReader.ExtractItems(vcfLine);
             var json1 = oneKItems.First().GetJsonString();
             Assert.Equal("0.456424", GetAlleleFrequency(json1, "allAf"));
@@ -103,7 +85,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var vcfLine =
                 "1\t10616\trs376342519\tCCGCCGTTGCAAAGGCGCGCCG\tC\t100\tPASS\tAN=5008;AC=4973;AF=0.993011;AA=;EAS_AN=1008;EAS_AC=999;EAS_AF=0.9911;EUR_AN=1006;EUR_AC=1000;EUR_AF=0.994;AFR_AN=1322;AFR_AC=1308;AFR_AF=0.9894;AMR_AN=694;AMR_AC=691;AMR_AF=0.9957;SAS_AN=978;SAS_AC=975;SAS_AF=0.9969";
 
-            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10616, "CCGCCGTTGCAAAGGCGCGCCG", 'C', _refChromDict));
+            var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10616, "CCGCCGTTGCAAAGGCGCGCCG", 'C', ChromosomeUtilities.RefNameToChromosome));
             var items = oneKGenReader.ExtractItems(vcfLine).ToList();
 
             Assert.Single(items);
@@ -133,7 +115,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             using (var reader = new StreamReader(GetOneKgSvStream()))
             {
-                var svReader = new OneKGenSvReader(reader, _refChromDict);
+                var svReader = new OneKGenSvReader(reader, ChromosomeUtilities.RefNameToChromosome);
 
                 var svItemList = svReader.GetItems().ToList();
 

@@ -1,6 +1,6 @@
-﻿using Genome;
-using Moq;
+﻿using Moq;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -17,7 +17,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public static ITranscript GetMockedTranscriptOnForwardStrand()
         {
             var mockedTranscript = new Mock<ITranscript>(); //get info from ENST00000343938.4
-            var chromosome       = new Chromosome("chr1", "1", 0);
             const int start      = 1260147;
             const int end        = 1264277;
 
@@ -41,7 +40,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             mockedTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938", 4));
             mockedTranscript.SetupGet(x => x.Source).Returns(Source.Ensembl);
-            mockedTranscript.SetupGet(x => x.Chromosome).Returns(chromosome);
+            mockedTranscript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             mockedTranscript.SetupGet(x => x.Start).Returns(start);
             mockedTranscript.SetupGet(x => x.End).Returns(end);
             mockedTranscript.SetupGet(x => x.Gene).Returns(gene.Object);
@@ -55,8 +54,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_substitution()
         {
-            var chromosome  = new Chromosome("chr1", "1", 0);
-            var variant     = new Variant(chromosome, 1262295, 1262295, "A", "C", VariantType.SNV, "1:1262295:A>C", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262295, 1262295, "A", "C", VariantType.SNV, "1:1262295:A>C", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -70,8 +68,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_insertion()
         {
-            var chromosome  = new Chromosome("chr1", "1", 0);
-            var variant     = new Variant(chromosome, 1262297, 1262296, "", "TTC", VariantType.insertion, "1:1262295:T>TTTC", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262297, 1262296, "", "TTC", VariantType.insertion, "1:1262295:T>TTTC", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -85,8 +82,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_duplication_right_shifted()
         {
-            var chromosome  = new Chromosome("chr1", "1", 0);
-            var variant     = new Variant(chromosome, 1262297, 1262296, "", "GAC", VariantType.insertion, "1:1262295:T>GAC", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262297, 1262296, "", "GAC", VariantType.insertion, "1:1262295:T>GAC", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -100,8 +96,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_deletion()
         {
-            var chromosome  = new Chromosome("chr1", "1", 0);
-            var variant     = new Variant(chromosome, 1262300, 1262302, "TCG", "", VariantType.deletion, "1:1262300:1262302", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262302, "TCG", "", VariantType.deletion, "1:1262300:1262302", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -115,8 +110,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_delIns()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var variant = new Variant(chromosome, 1262300, 1262305, "TCGGAG", "GAGACA", VariantType.indel, "1:1262300:1262305", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262305, "TCGGAG", "GAGACA", VariantType.indel, "1:1262300:1262305", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
@@ -130,8 +124,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_no_change()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var variant = new Variant(chromosome, 1262300, 1262302, "TCG", "AGT", VariantType.indel, "1:1262300:1262302", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262302, "TCG", "AGT", VariantType.indel, "1:1262300:1262302", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -145,8 +138,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_frameshift()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var variant = new Variant(chromosome, 1262300, 1262301, "TC", "", VariantType.deletion, "1:1262300:1262301", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262301, "TC", "", VariantType.deletion, "1:1262300:1262301", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -160,8 +152,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_frameshift_stop_gain()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var variant = new Variant(chromosome, 1262313, 1262312, "", "GA", VariantType.insertion, "1:1262333:1262332", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant = new Variant(ChromosomeUtilities.Chr1, 1262313, 1262312, "", "GA", VariantType.insertion, "1:1262333:1262332", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -175,8 +166,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_extension()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var variant = new Variant(chromosome, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
+            var variant = new Variant(ChromosomeUtilities.Chr1, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, null, new AnnotationBehavior(false, false, false, false, false));
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 

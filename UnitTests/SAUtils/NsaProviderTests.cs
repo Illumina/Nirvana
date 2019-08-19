@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
@@ -15,12 +16,9 @@ namespace UnitTests.SAUtils
 {
     public sealed class NsaProviderTests
     {
-        readonly Chromosome _chrom1 = new Chromosome("chr1", "1", 0);
-        readonly Chromosome _chrom2 = new Chromosome("chr2", "2", 1);
-
         private IAnnotationProvider GetDbSnpProvider()
         {
-            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>()
+            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {
                 ("A", "T", "\"rs100\""),
                 ("A", "C", "\"rs101\"")
@@ -33,7 +31,7 @@ namespace UnitTests.SAUtils
             dbsnpReader.SetupGet(x => x.JsonKey).Returns("dbSnp");
             dbsnpReader.SetupGet(x => x.Version)
                 .Returns(new DataSourceVersion("dbsnp", "v1", DateTime.Now.Ticks, "dummy db snp"));
-            dbsnpReader.SetupSequence(x => x.GetAnnotation(_chrom1, 100)).Returns(chrom1Pos100Annotations);
+            dbsnpReader.SetupSequence(x => x.GetAnnotation(ChromosomeUtilities.Chr1, 100)).Returns(chrom1Pos100Annotations);
 
             var provider = new NsaProvider(new[] {dbsnpReader.Object}, null);
 
@@ -42,7 +40,7 @@ namespace UnitTests.SAUtils
 
         private IAnnotationProvider GetClinVarProvider()
         {
-            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>()
+            var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {
                 ("A", "T", "RCV00001"),
                 ("A", "C", "RCV00002")
@@ -55,7 +53,7 @@ namespace UnitTests.SAUtils
             clinvarReader.SetupGet(x => x.JsonKey).Returns("clinvar");
             clinvarReader.SetupGet(x => x.Version)
                 .Returns(new DataSourceVersion("clinvar", "v1", DateTime.Now.Ticks, "dummy clinvar data"));
-            clinvarReader.SetupSequence(x => x.GetAnnotation(_chrom1, 100)).Returns(chrom1Pos100Annotations);
+            clinvarReader.SetupSequence(x => x.GetAnnotation(ChromosomeUtilities.Chr1, 100)).Returns(chrom1Pos100Annotations);
 
             var provider = new NsaProvider(new[] { clinvarReader.Object }, null);
 
@@ -85,7 +83,7 @@ namespace UnitTests.SAUtils
         public void Annotate_alleleSpecific()
         {
             var provider = GetDbSnpProvider();
-            var position = GetPosition(_chrom1, 100, "A", new []{"T"});
+            var position = GetPosition(ChromosomeUtilities.Chr1, 100, "A", new []{"T"});
 
             provider.Annotate(position);
             var jsonString = position.AnnotatedVariants[0].GetJsonString("chr1");
@@ -96,12 +94,11 @@ namespace UnitTests.SAUtils
         public void Annotate_notAlleleSpecific_isArray()
         {
             var provider = GetClinVarProvider();
-            var position = GetPosition(_chrom1, 100, "A", new[] { "T" });
+            var position = GetPosition(ChromosomeUtilities.Chr1, 100, "A", new[] { "T" });
 
             provider.Annotate(position);
             var jsonString = position.AnnotatedVariants[0].GetJsonString("chr1");
             Assert.Equal("{\"chromosome\":\"chr1\",\"begin\":100,\"end\":100,\"refAllele\":\"A\",\"altAllele\":\"T\",\"variantType\":\"SNV\",\"clinvar\":[{RCV00001,\"isAlleleSpecific\":true},{RCV00002}]}", jsonString);
         }
-
     }
 }

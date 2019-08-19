@@ -4,6 +4,7 @@ using System.Text;
 using Genome;
 using Intervals;
 using IO;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -16,7 +17,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void Transcript_EndToEnd()
         {
-            IChromosome expectedChromosome      = new Chromosome("chrBob", "Bob", 1);
+            IChromosome expectedChromosome      = ChromosomeUtilities.Chr1;
             const int expectedStart             = int.MaxValue;
             const int expectedEnd               = int.MinValue;
             const string expectedId             = "ENST00000540021";

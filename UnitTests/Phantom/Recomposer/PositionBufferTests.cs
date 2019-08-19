@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Genome;
 using Intervals;
 using Moq;
 using Phantom.CodonInformation;
 using Phantom.Recomposer;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
@@ -84,7 +84,7 @@ namespace UnitTests.Phantom.Recomposer
             var positionBuffer = new PositionBuffer(_codonInfoProviderMock.Object, _geneIntervalForestMock.Object);
             var position = GetMockedIPositionOnChr1(99, 99);
             positionBuffer.AddPosition(position);
-            Assert.Equal(new Chromosome("chr1", "1", 0), positionBuffer.CurrentChromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, positionBuffer.CurrentChromosome);
         }
 
         [Fact]
@@ -168,8 +168,7 @@ namespace UnitTests.Phantom.Recomposer
         private static IPosition GetMockedIPositionOnChr1(int start, int end, string altAllele="A", string formatCol = "GT")
         {
             var positionMock = new Mock<IPosition>();
-            var chromosome = new Chromosome("chr1", "1", 0);
-            positionMock.SetupGet(x => x.Chromosome).Returns(chromosome);
+            positionMock.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             positionMock.SetupGet(x => x.Start).Returns(start);
             positionMock.SetupGet(x => x.End).Returns(end);
             var vcfFields = new string[VcfCommon.MinNumColumnsSampleGenotypes];

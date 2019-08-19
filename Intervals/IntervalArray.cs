@@ -5,7 +5,7 @@ namespace Intervals
 	public sealed class IntervalArray<T> : IIntervalSearch<T>
     {
 		public readonly Interval<T>[] Array;
-		public static readonly Interval<T> EmptyInterval = new Interval<T>(-1, -1, default(T));
+		public static readonly Interval<T> EmptyInterval = new Interval<T>(-1, -1, default);
 
 		public IntervalArray(Interval<T>[] array)
 		{

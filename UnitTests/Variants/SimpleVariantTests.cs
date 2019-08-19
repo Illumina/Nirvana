@@ -1,4 +1,4 @@
-﻿using Genome;
+﻿using UnitTests.TestUtilities;
 using Variants;
 using Xunit;
 
@@ -9,16 +9,15 @@ namespace UnitTests.Variants
         [Fact]
         public void SimpleVariant_Set()
         {
-            var expectedChromosome         = new Chromosome("chr1", "1", 0);
             const int expectedStart        = 100;
             const int expectedEnd          = 102;
             const string expectedRef       = "AT";
             const string expectedAlt       = "";
             const VariantType expectedType = VariantType.deletion;
 
-            var variant = new SimpleVariant(expectedChromosome, expectedStart, expectedEnd, expectedRef, expectedAlt, expectedType);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr1, expectedStart, expectedEnd, expectedRef, expectedAlt, expectedType);
 
-            Assert.Equal(expectedChromosome, variant.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, variant.Chromosome);
             Assert.Equal(expectedStart,      variant.Start);
             Assert.Equal(expectedEnd,        variant.End);
             Assert.Equal(expectedRef,        variant.RefAllele);

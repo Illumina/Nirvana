@@ -1,36 +1,17 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
-using Genome;
 using SAUtils.InputFileParsers.Cosmic;
-using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.Providers;
-using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class MergedCosmicReaderTests
     {
-        private readonly IDictionary<string, IChromosome> _refChromDict;
-
-        /// <summary>
-        /// constructor
-        /// </summary>
-        public MergedCosmicReaderTests()
-        {
-            _refChromDict = new Dictionary<string, IChromosome>
-            {
-                {"1",new Chromosome("chr1", "1",0) },
-                {"3",new Chromosome("chr3", "3", 2) },
-                {"17",new Chromosome("chr17", "17", 16) }
-            };
-        }
         [Fact]
         public void TwoStudyCosmicCoding()
         {
-            var seqProvider = ParserTestUtils.GetSequenceProvider(35416, "A", 'C', _refChromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(35416, "A", 'C', ChromosomeUtilities.RefNameToChromosome);
             var cosmicReader = new MergedCosmicReader(Resources.TopPath("cosm5428243.vcf"), Resources.TopPath("cosm5428243.tsv"), seqProvider);
 
             var cosmicItem = cosmicReader.GetItems().ToList()[0];
@@ -51,7 +32,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void IndelWithNoLeadingBase()
         {
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10188320, "GGTACTGAC", 'A', _refChromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10188320, "GGTACTGAC", 'A', ChromosomeUtilities.RefNameToChromosome);
             //the files provided are just for the sake of construction. The main aim is to test the VCF line parsing capabilities
             var cosmicReader = new MergedCosmicReader(Resources.TopPath("cosm5428243.vcf"), Resources.TopPath("cosm5428243.tsv"), seqProvider);
 
@@ -75,7 +56,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void CosmicAltAllele()
         {
-            var seqProvider = ParserTestUtils.GetSequenceProvider(6928019, "C", 'A', _refChromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(6928019, "C", 'A', ChromosomeUtilities.RefNameToChromosome);
             var cosmicReader = new MergedCosmicReader(Resources.TopPath("COSM983708.vcf"), Resources.TopPath("COSM983708.tsv"), seqProvider);
             var items = cosmicReader.GetItems().ToList();
 
@@ -87,7 +68,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void CosmicAlleleSpecificIndel()
         {
             //10188320
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10188320, "G", 'A', _refChromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10188320, "G", 'A', ChromosomeUtilities.RefNameToChromosome);
             var cosmicReader = new MergedCosmicReader(Resources.TopPath("COSM18152.vcf"), Resources.TopPath("COSM18152.tsv"), seqProvider);
             var items = cosmicReader.GetItems();
 

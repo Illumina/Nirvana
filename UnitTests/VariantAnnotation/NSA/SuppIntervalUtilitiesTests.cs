@@ -1,15 +1,13 @@
 ﻿using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.NSA;
 using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.NSA
 {
-    public class SuppIntervalUtilitiesTests
+    public sealed class SuppIntervalUtilitiesTests
     {
-        private static readonly Chromosome Chr1 = new Chromosome("chr1", "1", 0);
-        private static readonly Chromosome Chr2 = new Chromosome("chr2", "2", 1);
-
         [Theory]
         [InlineData(1, 100, 51, 200, 0.33333, 0.33333)]
         [InlineData(1, 300, 51, 200, 0.5, 1)]
@@ -17,8 +15,8 @@ namespace UnitTests.VariantAnnotation.NSA
         [InlineData(1, 100, 100, 299, 0.005, 0.005)]
         public void GetOverlapFractions_NotNull_AsExpected(int varStart, int varEnd, int saStart, int saEnd, double expectedReciprocalOverlap, double expecedAnnotationOverlap)
         {
-            var saInterval = new ChromosomeInterval(Chr1, saStart, saEnd);
-            var variant = new SimpleVariant(Chr1, varStart, varEnd, null, null, VariantType.deletion);
+            var saInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, saStart, saEnd);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr1, varStart, varEnd, null, null, VariantType.deletion);
             var (reciprocalOverlap, annotationOverlap) = SuppIntervalUtilities.GetOverlapFractions(saInterval, variant);
 
             Assert.NotNull(reciprocalOverlap);
@@ -30,8 +28,8 @@ namespace UnitTests.VariantAnnotation.NSA
         [Fact]
         public void GetOverlapFractions_ReturnNulls_DifferentChroms()
         {
-            var saInterval = new ChromosomeInterval(Chr1, 1, 2);
-            var variant = new SimpleVariant(Chr2, 1, 2, null, null, VariantType.deletion);
+            var saInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 1, 2);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr2, 1, 2, null, null, VariantType.deletion);
             var (reciprocalOverlap, annotationOverlap) = SuppIntervalUtilities.GetOverlapFractions(saInterval, variant);
 
             Assert.Null(reciprocalOverlap);
@@ -41,8 +39,8 @@ namespace UnitTests.VariantAnnotation.NSA
         [Fact]
         public void GetOverlapFractions_ReturnNulls_Insertion()
         {
-            var saInterval = new ChromosomeInterval(Chr1, 1, 2);
-            var variant = new SimpleVariant(Chr1, 1, 2, null, null, VariantType.insertion);
+            var saInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 1, 2);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr1, 1, 2, null, null, VariantType.insertion);
             var (reciprocalOverlap, annotationOverlap) = SuppIntervalUtilities.GetOverlapFractions(saInterval, variant);
 
             Assert.Null(reciprocalOverlap);
@@ -52,8 +50,8 @@ namespace UnitTests.VariantAnnotation.NSA
         [Fact]
         public void GetOverlapFractions_ReturnNulls_SaInsertion()
         {
-            var saInterval = new ChromosomeInterval(Chr1, 2, 1);
-            var variant = new SimpleVariant(Chr1, 1, 2, null, null, VariantType.deletion);
+            var saInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 2, 1);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr1, 1, 2, null, null, VariantType.deletion);
             var (reciprocalOverlap, annotationOverlap) = SuppIntervalUtilities.GetOverlapFractions(saInterval, variant);
 
             Assert.Null(reciprocalOverlap);
@@ -63,8 +61,8 @@ namespace UnitTests.VariantAnnotation.NSA
         [Fact]
         public void GetOverlapFractions_ReturnNulls_BreakEnd()
         {
-            var saInterval = new ChromosomeInterval(Chr1, 2, 1);
-            var variant = new SimpleVariant(Chr1, 1, 2, null, null, VariantType.translocation_breakend);
+            var saInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 2, 1);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr1, 1, 2, null, null, VariantType.translocation_breakend);
             var (reciprocalOverlap, annotationOverlap) = SuppIntervalUtilities.GetOverlapFractions(saInterval, variant);
 
             Assert.Null(reciprocalOverlap);

@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using Genome;
+using UnitTests.TestUtilities;
 using Vcf;
 using Xunit;
 
@@ -12,7 +13,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void FastForward_ChangeReaderStateCorrectly()
         {
-            var annotationInterval = new ChromosomeInterval(new Chromosome("chr1", "1", 0), 100, 200);
+            var annotationInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 100, 200);
 
             var vcfFileter = new VcfFilter(annotationInterval);
 
@@ -70,13 +71,13 @@ namespace UnitTests.Vcf
         [Fact]
         public void PassedTheEnd_AsExpected()
         {
-            var annotationInterval = new ChromosomeInterval(new Chromosome("chr1", "1", 0), 100, 200);
+            var annotationInterval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 100, 200);
             var vcfFilter = new VcfFilter(annotationInterval);
 
-            Assert.False(vcfFilter.PassedTheEnd(new Chromosome("chr1", "1", 0), 150));
-            Assert.False(vcfFilter.PassedTheEnd(new Chromosome("chr1", "1", 0), 200));
-            Assert.True(vcfFilter.PassedTheEnd(new Chromosome("chr1", "1", 0), 201));
-            Assert.True(vcfFilter.PassedTheEnd(new Chromosome("chr2", "2", 1), 150));
+            Assert.False(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr1, 150));
+            Assert.False(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr1, 200));
+            Assert.True(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr1, 201));
+            Assert.True(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr2, 150));
         }
     }
 }

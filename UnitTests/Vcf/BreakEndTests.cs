@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Genome;
 using UnitTests.SAUtils.InputFileParsers;
+using UnitTests.TestUtilities;
 using Variants;
 using Vcf.VariantCreator;
 using Xunit;
@@ -16,11 +17,10 @@ namespace UnitTests.Vcf
 		[InlineData("A", "A]8:100990100]", 84461562, "1:84461562:+:8:100990100:-")]
 		public void ToString_translocation_breakend(string refAllele, string altAllele, int position, string expectedVid)
 		{
-			var chromosome1 = new Chromosome("chr1", "1", 0);
-            var seqProvider = ParserTestUtils.GetSequenceProvider(position, refAllele, 'A', new Dictionary<string, IChromosome> { { "1", chromosome1 } });
+            var seqProvider = ParserTestUtils.GetSequenceProvider(position, refAllele, 'A', new Dictionary<string, IChromosome> { { "1", ChromosomeUtilities.Chr1 } });
 			var variantFactory = new VariantFactory(seqProvider);
 
-			var breakEnds = variantFactory.GetTranslocationBreakends(chromosome1, refAllele, altAllele, position);
+			var breakEnds = variantFactory.GetTranslocationBreakends(ChromosomeUtilities.Chr1, refAllele, altAllele, position);
 			Assert.NotNull(breakEnds);
 			Assert.Single(breakEnds);
 			Assert.Equal(expectedVid, breakEnds[0].ToString());
@@ -29,8 +29,7 @@ namespace UnitTests.Vcf
 		[Fact]
 		public void ToString_deletion()
 		{
-			var chromosome1 = new Chromosome("chr1", "1", 0);
-            var seqProvider = ParserTestUtils.GetSequenceProvider(1594584, "T", 'A', new Dictionary<string, IChromosome> { { "1", chromosome1 } });
+            var seqProvider = ParserTestUtils.GetSequenceProvider(1594584, "T", 'A', new Dictionary<string, IChromosome> { { "1", ChromosomeUtilities.Chr1 } });
             var variantFactory = new VariantFactory(seqProvider);
 
 			var breakEnds = variantFactory.GetSvBreakEnds("1", 1594584, VariantType.deletion, 1660503, false, false);
@@ -42,10 +41,9 @@ namespace UnitTests.Vcf
 
 
 		[Fact]
-		public void ToString_duplicatioin()
+		public void ToString_duplication()
 		{
-			var chromosome1 = new Chromosome("chr1", "1", 0);
-            var seqProvider = ParserTestUtils.GetSequenceProvider(37820921, "T", 'A', new Dictionary<string, IChromosome> { { "1", chromosome1 } });
+            var seqProvider = ParserTestUtils.GetSequenceProvider(37820921, "T", 'A', new Dictionary<string, IChromosome> { { "1", ChromosomeUtilities.Chr1 } });
             var variantFactory = new VariantFactory(seqProvider);
 
             var breakEnds = variantFactory.GetSvBreakEnds("1", 37820921, VariantType.duplication, 38404543, false, false);
@@ -58,8 +56,7 @@ namespace UnitTests.Vcf
 		[Fact]
 		public void ToString_inversion3()
 		{
-			var chromosome1 = new Chromosome("chr1", "1", 0);
-            var seqProvider = ParserTestUtils.GetSequenceProvider(63989116, "T", 'A', new Dictionary<string, IChromosome> { { "1", chromosome1 } });
+            var seqProvider = ParserTestUtils.GetSequenceProvider(63989116, "T", 'A', new Dictionary<string, IChromosome> { { "1", ChromosomeUtilities.Chr1 } });
             var variantFactory = new VariantFactory(seqProvider);
 
             var breakEnds = variantFactory.GetSvBreakEnds("1", 63989116, VariantType.inversion, 64291267, true, false);
@@ -72,8 +69,7 @@ namespace UnitTests.Vcf
 		[Fact]
 		public void ToString_inversion5()
 		{
-			var chromosome1 = new Chromosome("chr1", "1", 0);
-            var seqProvider = ParserTestUtils.GetSequenceProvider(117582031, "T", 'A', new Dictionary<string, IChromosome> { { "1", chromosome1 } });
+            var seqProvider = ParserTestUtils.GetSequenceProvider(117582031, "T", 'A', new Dictionary<string, IChromosome> { { "1", ChromosomeUtilities.Chr1 } });
             var variantFactory = new VariantFactory(seqProvider);
 
             var breakEnds = variantFactory.GetSvBreakEnds("1", 117582031, VariantType.inversion, 117595110, false, true);

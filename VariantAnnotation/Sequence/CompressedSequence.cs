@@ -13,6 +13,7 @@ namespace VariantAnnotation.Sequence
         private char[] _decompressBuffer;
 
         private IIntervalSearch<MaskedEntry> _maskedIntervalSearch;
+        public Band[] CytogeneticBands { get; private set; }
 
         private readonly char[] _convertNumberToBase;
 
@@ -32,14 +33,16 @@ namespace VariantAnnotation.Sequence
         }
 
         internal static int GetNumBufferBytes(int numBases) =>
-            (int)((double)numBases / CompressedSequenceCommon.NumBasesPerByte + 1);
+            (int)((double)numBases / ReferenceSequenceCommon.NumBasesPerByte + 1);
 
-        public void Set(int numBases, byte[] buffer, IIntervalSearch<MaskedEntry> maskedIntervalSearch, int sequenceOffset = 0)
+        public void Set(int length, int sequenceOffset, byte[] twoBitBuffer,
+            IntervalArray<MaskedEntry> maskedEntryIntervalArray, Band[] cytogeneticBands)
         {
-            Length                = numBases;
-            _buffer               = buffer;
-            _maskedIntervalSearch = maskedIntervalSearch;
+            Length                = length;
+            _buffer               = twoBitBuffer;
+            _maskedIntervalSearch = maskedEntryIntervalArray;
             _sequenceOffset       = sequenceOffset;
+            CytogeneticBands      = cytogeneticBands;
         }
 
         public string Substring(int offset, int length)
