@@ -37,17 +37,17 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [InlineData(78001724, 3)]
         public void BinarySearch_Nominal(int position, int expectedResult)
         {
-            var observedResult = _forwardTranscriptRegions.BinarySearch(position);
+            int observedResult = _forwardTranscriptRegions.BinarySearch(position);
             Assert.Equal(expectedResult, observedResult);
         }
 
         [Theory]
         [InlineData(77997791, -1)]
         [InlineData(78024417, -6)]
-        // the binarysearch method returns the bitwise complement of the next larger element
+        // the binary search method returns the bitwise complement of the next larger element
         public void BinarySearch_ReturnNegative_BeyondExons(int position, int expectedResult)
         {
-            var observedResult = _forwardTranscriptRegions.BinarySearch(position);
+            int observedResult = _forwardTranscriptRegions.BinarySearch(position);
             Assert.Equal(expectedResult, observedResult);
         }
 
@@ -60,6 +60,24 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             Assert.Equal(2, observedResults.ExonEnd);
             Assert.Equal(1, observedResults.IntronStart);
             Assert.Equal(2, observedResults.IntronEnd);
+        }
+
+        [Fact]
+        public void GetExonsAndIntrons_Reverse_Gap_NIR_3592()
+        {
+            var transcriptRegions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 19,   16606122, 16606679, 3404, 3961),
+                new TranscriptRegion(TranscriptRegionType.Gap, 19, 16606680, 16606680, 3403, 3404),
+                new TranscriptRegion(TranscriptRegionType.Exon, 19,   16606681, 16607898, 2186, 3403)
+            };
+
+            var observedResults = transcriptRegions.GetExonsAndIntrons(1, 1);
+
+            Assert.Equal(19, observedResults.ExonStart);
+            Assert.Equal(19, observedResults.ExonEnd);
+            Assert.Equal(-1, observedResults.IntronStart);
+            Assert.Equal(-1, observedResults.IntronEnd);
         }
 
         [Fact]

@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Algorithms;
+﻿using System;
+using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.Caches.DataStructures
@@ -8,11 +9,11 @@ namespace VariantAnnotation.Caches.DataStructures
         public static int BinarySearch(this ITranscriptRegion[] regions, int position)
         {
             var begin = 0;
-            var end   = regions.Length - 1;
+            int end   = regions.Length - 1;
 
             while (begin <= end)
             {
-                var index  = begin + (end - begin >> 1);
+                int index  = begin + (end - begin >> 1);
                 var region = regions[index];
 
                 if (position >= region.Start && position <= region.End) return index;
@@ -29,37 +30,39 @@ namespace VariantAnnotation.Caches.DataStructures
             int affectedStartIndex = GetAffectedRegionIndex(startIndex);
             int affectedEndIndex   = GetAffectedRegionIndex(endIndex);
 
-            var exons   = regions.FindDesiredRegionIds(TranscriptRegionType.Exon, affectedStartIndex, affectedEndIndex);
-            var introns = regions.FindDesiredRegionIds(TranscriptRegionType.Intron, affectedStartIndex, affectedEndIndex);
+            if (affectedEndIndex < affectedStartIndex) Swap.Int(ref affectedStartIndex, ref affectedEndIndex);
+
+            var exons   = regions.FindDesiredRegionIds(x => x == TranscriptRegionType.Exon || x == TranscriptRegionType.Gap, affectedStartIndex, affectedEndIndex);
+            var introns = regions.FindDesiredRegionIds(x => x == TranscriptRegionType.Intron, affectedStartIndex, affectedEndIndex);
 
             return (exons.Start, exons.End, introns.Start, introns.End);
         }
 
         private static (int Start, int End) FindDesiredRegionIds(this ITranscriptRegion[] regions,
-            TranscriptRegionType desiredType, int startIndex, int endIndex)
+            Func<TranscriptRegionType, bool> hasDesiredRegion, int startIndex, int endIndex)
         {
-            var regionStart   = FindFirst(regions, desiredType, startIndex, endIndex);
-            var newStartIndex = regionStart != -1 ? regionStart : startIndex;
-            var regionEnd     = FindLast(regions, desiredType, newStartIndex, endIndex);
+            int regionStart   = FindFirst(regions, hasDesiredRegion, startIndex, endIndex);
+            int newStartIndex = regionStart != -1 ? regionStart : startIndex;
+            int regionEnd     = FindLast(regions, hasDesiredRegion, newStartIndex, endIndex);
 
-            var startId = regionStart == -1 ? -1 : regions[regionStart].Id;
-            var endId   = regionEnd   == -1 ? -1 : regions[regionEnd].Id;
+            int startId = regionStart == -1 ? -1 : regions[regionStart].Id;
+            int endId   = regionEnd   == -1 ? -1 : regions[regionEnd].Id;
 
             if (endId < startId) Swap.Int(ref startId, ref endId);
             return (startId, endId);
         }
 
-        private static int FindFirst(ITranscriptRegion[] regions, TranscriptRegionType desiredType, int startIndex,
+        private static int FindFirst(ITranscriptRegion[] regions, Func<TranscriptRegionType, bool> hasDesiredRegion, int startIndex,
             int endIndex)
         {
-            for (int i = startIndex; i <= endIndex; i++) if (regions[i].Type == desiredType) return i;
+            for (int i = startIndex; i <= endIndex; i++) if (hasDesiredRegion(regions[i].Type)) return i;
             return -1;
         }
 
-        private static int FindLast(ITranscriptRegion[] regions, TranscriptRegionType desiredType, int startIndex,
+        private static int FindLast(ITranscriptRegion[] regions, Func<TranscriptRegionType, bool> hasDesiredRegion, int startIndex,
             int endIndex)
         {
-            for (int i = endIndex; i >= startIndex; i--) if (regions[i].Type == desiredType) return i;
+            for (int i = endIndex; i >= startIndex; i--) if (hasDesiredRegion(regions[i].Type)) return i;
             return -1;
         }
 
