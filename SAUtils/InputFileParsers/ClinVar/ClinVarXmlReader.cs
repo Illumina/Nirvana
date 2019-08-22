@@ -258,7 +258,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private static bool IsInvalidVariant(ClinvarVariant variant)
         {
             return variant.Chromosome == null
-                   || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation")
+                   || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation" || variant.VariantType == "ALU")
                    && string.IsNullOrEmpty(variant.AltAllele);
             
         }
@@ -497,6 +497,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 		        if (variant == null) continue;
 
 		        variant.VariantType = varType;
+                if (variant.AltAllele == "Alu") variant.VariantType = "ALU";
+
 		        if (variant.AltAllele != null && variant.AltAllele.Length == 1 && _iupacBases.ContainsKey(variant.AltAllele[0]))
 		            AddIupacVariants(variant, variantList);
 		        else
@@ -609,7 +611,8 @@ namespace SAUtils.InputFileParsers.ClinVar
             "protective",
             "affects",
             "conflicting data from submitters",
-            "other"
+            "other",
+            "association not found"
         };
     }
 }

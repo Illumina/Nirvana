@@ -87,8 +87,8 @@
     },
     "RR_extractXml": {
       "commandName": "Project",
-      "commandLineArgs": " extractminiXML -i ClinVarFullRelease_2019-02.xml.gz -r c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\ -o c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\",
-      "workingDirectory": "c:\\development\\ExternalDataSources\\ClinVar\\20190206"
+      "commandLineArgs": " extractminiXML -i ClinVarFullRelease_2019-08.xml.gz -r RCV000724338 -o c:\\development\\Nirvana\\UnitTests\\Resources\\ClinVarXmlFiles\\",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\ClinVar\\20190808\\"
     },
     "RR_spliceAI": {
       "commandName": "Project",

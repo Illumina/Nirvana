@@ -45,7 +45,7 @@ namespace SAUtils
             _refProvider = refProvider;
 
             _index = new ChunkedIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
-            _memBuffer = new byte[short.MaxValue * 2];
+            _memBuffer = new byte[short.MaxValue * 4];
             _memStream = new MemoryStream(_memBuffer);
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
