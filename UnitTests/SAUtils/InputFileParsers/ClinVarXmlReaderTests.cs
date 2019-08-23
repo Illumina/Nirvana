@@ -488,7 +488,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void SkipAlus()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr13", "13", 12), 32315480, "GTGG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 12), 32893302, "TAAA");
 
             var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000724338.xml"), sequenceProvider);
 

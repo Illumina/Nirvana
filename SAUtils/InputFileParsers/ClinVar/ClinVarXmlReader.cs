@@ -257,10 +257,10 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private static bool IsInvalidVariant(ClinvarVariant variant)
         {
+            if (variant.VariantType == "ALU") return true;
             return variant.Chromosome == null
-                   || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation" || variant.VariantType == "ALU")
+                   || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation" )
                    && string.IsNullOrEmpty(variant.AltAllele);
-            
         }
 
         private bool ValidateRefAllele(ClinVarItem clinvarVariant)
