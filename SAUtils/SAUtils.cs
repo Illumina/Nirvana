@@ -35,7 +35,7 @@ namespace SAUtils
                 ["ExacScores"]         = new TopLevelOption("create ExAC gene scores database", ExacScores.Main.Run),
                 ["extractMiniSA"]      = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"]     = new TopLevelOption("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
-                ["Gnomad"]             = new TopLevelOption("create gnomAD database", CreateGnomadDb.Main.Run),
+                ["Gnomad"]             = new TopLevelOption("create gnomAD database", CreateGnomadDb.GnomadMain.Run),
                 ["GnomadGeneScores"]   = new TopLevelOption("create gnomAD gene scores database", GnomadGenesMain.Run),
                 ["TopMed"]             = new TopLevelOption("create TOPMed database", CreateTopMedDb.Main.Run),
                 ["PhyloP"]             = new TopLevelOption("create PhyloP database", PhyloP.Main.Run),

@@ -12,8 +12,8 @@
     },
     "RR_gnomad": {
       "commandName": "Project",
-      "commandLineArgs": " Gnomad --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\temp --in . --type genome",
-      "workingDirectory": "c:\\Development\\ExternalDataSources\\gnomAD\\GRCh38"
+      "commandLineArgs": " Gnomad --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test --genome genome\\ --exome exome\\",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\gnomAD\\2.1\\GRCh37\\"
     },
     "RR_clingen": {
       "commandName": "Project",
