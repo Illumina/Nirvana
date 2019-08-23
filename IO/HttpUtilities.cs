@@ -1,15 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Xml.Linq;
 using System.Linq;
+using System.Threading;
 using ErrorHandling.Exceptions;
 
 namespace IO
 {
     public static class HttpUtilities
     {
-        private static readonly string[] AuthenticationErrorCodes = { "InvalidAccessKeyId", "SignatureDoesNotMatch" };
-        private static readonly string[] ResourceNotExistErrorCodes = { "NoSuchKey", "NoSuchBucket" };
+        private static readonly string[] AuthenticationErrorCodes = {"InvalidAccessKeyId", "SignatureDoesNotMatch"};
+        private static readonly string[] ResourceNotExistErrorCodes = {"NoSuchKey", "NoSuchBucket"};
 
         public static long GetLength(string url)
         {
@@ -18,19 +20,27 @@ namespace IO
             return request.TryGetResponse(url).ContentLength;
         }
 
+        // Only throw exceptions when all the three tries failed.
         public static HttpWebResponse TryGetResponse(this HttpWebRequest request, string url)
         {
-            try
+            var exceptions = new List<Exception>();
+            for (var retryCounter = 0; retryCounter < 3; retryCounter++)
             {
-                return (HttpWebResponse) request.GetResponse();
+                try
+                {
+                    if (retryCounter > 0) Thread.Sleep(2000);
+
+                    return (HttpWebResponse) request.GetResponse();
+                }
+                catch (Exception e)
+                {
+                   exceptions.Add(ProcessHttpRequestWebProtocolErrorException(e, url));
+                }
             }
-            catch (Exception e)
-            {
-                throw ProcessHttpRequestWebProtocolErrorException(e, url);
-            }
+
+            throw new AggregateException(exceptions);
         }
 
-        // When we validate a URL, it is a user error by default if any exception has been thrown. 
         public static void ValidateUrl(string url, bool isUserProvided = true)
         {
             try
@@ -47,7 +57,7 @@ namespace IO
         public static bool IsWebProtocolErrorException(Exception exception)
         {
             if (!(exception is WebException)) return false;
-            var webException = (WebException)exception;
+            var webException = (WebException) exception;
 
             return webException.Status == WebExceptionStatus.ProtocolError;
         }
@@ -56,7 +66,7 @@ namespace IO
         {
             if (!IsWebProtocolErrorException(exception)) return exception;
 
-            var webException = (WebException)exception;
+            var webException = (WebException) exception;
             (string errorCode, string errorMessage) = GetWebExceptionMessage(webException);
 
             // Expired URL is always a user error
@@ -65,7 +75,8 @@ namespace IO
 
             // Authentication error is always considered as a user error
             if (AuthenticationErrorCodes.Contains(errorCode))
-                return new UserErrorException($"Authentication error while reading from {url}. {errorMessage}. Exception: {exception.Message}");
+                return new UserErrorException(
+                    $"Authentication error while reading from {url}. {errorMessage}. Exception: {exception.Message}");
 
             // Resource not exist error is always considered as a user error
             if (ResourceNotExistErrorCodes.Contains(errorCode))
