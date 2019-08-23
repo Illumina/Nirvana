@@ -19,7 +19,6 @@ namespace VariantAnnotation.Providers
             Name             = name;
             Description      = description;
             Version          = version;
-            Description      = description;
             ReleaseDateTicks = releaseDateTicks;
         }
 
@@ -55,9 +54,8 @@ namespace VariantAnnotation.Providers
             if (ReleaseDateTicks != 0) jsonObject.AddStringValue("releaseDate", GetReleaseDate());
             sb.Append(JsonObject.CloseBrace);
         }
-        
-        
     }
+
     public sealed class DataSourceVersionComparer : EqualityComparer<IDataSourceVersion>
     {
         public override bool Equals(IDataSourceVersion x, IDataSourceVersion y)

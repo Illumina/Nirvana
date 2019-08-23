@@ -17,7 +17,7 @@ namespace SAUtils
     {
         public static int Main(string[] args)
         {
-            var ops = new Dictionary<string, TopLevelOption>
+            var ops                    = new Dictionary<string, TopLevelOption>
             {
                 ["clinvar"]            = new TopLevelOption("create ClinVar database", CreateClinvarDb.Main.Run),
                 ["cosmic"]             = new TopLevelOption("create COSMIC database", CreateCosmicDb.Main.Run),
@@ -31,6 +31,7 @@ namespace SAUtils
                 ["globalMinor"]        = new TopLevelOption("create global minor allele database", CreateGlobalAllelesDb.Main.Run),
                 ["Dgv"]                = new TopLevelOption("create DGV database", makeDgvDb.Main.Run),
                 ["Omim"]               = new TopLevelOption("create OMIM database", Omim.Main.Run),
+                ["downloadOmim"]       = new TopLevelOption("create OMIM database", Omim.Downloader.Run),
                 ["ExacScores"]         = new TopLevelOption("create ExAC gene scores database", ExacScores.Main.Run),
                 ["extractMiniSA"]      = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"]     = new TopLevelOption("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),

@@ -2,7 +2,7 @@
   "profiles": {
     "OMIM_SK": {
       "commandName": "Project",
-      "commandLineArgs": "OMIM --ref  E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --uga E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\UGA.tsv.gz --out .",
+      "commandLineArgs": "downloadOMIM --ref  E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --uga E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\UGA.tsv.gz --out .",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_omim_generation"
     },
     "RR_omim": {
