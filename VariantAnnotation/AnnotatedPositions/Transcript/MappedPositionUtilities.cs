@@ -11,7 +11,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public static (int Index, ITranscriptRegion Region) FindRegion(ITranscriptRegion[] regions,
             int variantPosition)
         {
-            var index = regions.BinarySearch(variantPosition);
+            int index  = regions.BinarySearch(variantPosition);
             var region = index < 0 ? null : regions[index];
             return (index, region);
         }
@@ -19,8 +19,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public static (int CdnaStart, int CdnaEnd) GetCdnaPositions(ITranscriptRegion startRegion,
             ITranscriptRegion endRegion, IInterval variant, bool onReverseStrand, bool isInsertion)
         {
-            var cdnaStart = GetCdnaPosition(startRegion, variant.Start, onReverseStrand);
-            var cdnaEnd   = GetCdnaPosition(endRegion, variant.End, onReverseStrand);
+            int cdnaStart = GetCdnaPosition(startRegion, variant.Start, onReverseStrand);
+            int cdnaEnd   = GetCdnaPosition(endRegion, variant.End, onReverseStrand);
 
             if (FoundExonEndpointInsertion(isInsertion, cdnaStart, cdnaEnd, startRegion, endRegion))
             {
@@ -58,10 +58,10 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (startRegion.Type != TranscriptRegionType.Exon && endRegion.Type != TranscriptRegionType.Exon)
                 return (-1, -1);
 
-            var codingEnd = onReverseStrand ? regions[0].CdnaEnd : regions[regions.Length - 1].CdnaEnd;
+            int codingEnd = onReverseStrand ? regions[0].CdnaEnd : regions[regions.Length - 1].CdnaEnd;
 
-            cdnaStart = GetCoveredCdnaPosition(cdnaStart, startRegion, startRegionIndex, onReverseStrand, codingEnd);
-            cdnaEnd   = GetCoveredCdnaPosition(cdnaEnd, endRegion, endRegionIndex, onReverseStrand, codingEnd);
+            cdnaStart = GetCoveredCdnaPosition(true, cdnaStart, startRegion, startRegionIndex, onReverseStrand, codingEnd);
+            cdnaEnd   = GetCoveredCdnaPosition(false, cdnaEnd, endRegion, endRegionIndex, onReverseStrand, codingEnd);
 
             return cdnaStart < cdnaEnd ? (cdnaStart, cdnaEnd) : (cdnaEnd, cdnaStart);
         }
@@ -72,7 +72,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return regionIndex == ~regions.Length ? regions[regions.Length - 1] : regions[regionIndex];
         }
 
-        private static int GetCoveredCdnaPosition(int cdnaPosition, ITranscriptRegion region, int regionIndex, bool onReverseStrand, int codingEnd)
+        private static int GetCoveredCdnaPosition(bool isStart, int cdnaPosition, ITranscriptRegion region, int regionIndex, bool onReverseStrand, int codingEnd)
         {
             if (cdnaPosition >= 0) return cdnaPosition;
 
@@ -83,7 +83,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (regionIndex < -1) return onReverseStrand ? 1 : codingEnd;
 
             // intron
-            return onReverseStrand ? region.CdnaStart : region.CdnaEnd;
+            return isStart ? region.CdnaEnd : region.CdnaStart;
         }
 
         public static (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) GetCoveredCdsAndProteinPositions(int coveredCdnaStart, int coveredCdnaEnd,
@@ -95,8 +95,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1, -1, -1);
 
             int beginOffset = startExonPhase - codingRegion.CdnaStart + 1;
-            var start = Math.Max(coveredCdnaStart + beginOffset, 1 + startExonPhase);
-            var end   = Math.Min(coveredCdnaEnd + beginOffset, codingRegion.Length + startExonPhase);
+            int start = Math.Max(coveredCdnaStart + beginOffset, 1 + startExonPhase);
+            int end   = Math.Min(coveredCdnaEnd + beginOffset, codingRegion.Length + startExonPhase);
 
             return (start, end, GetProteinPosition(start), GetProteinPosition(end));
         }
@@ -107,11 +107,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return (cdsPosition + 2) / 3;
         }
 
-        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, IRnaEdit[] rnaEdits, int cdnaStart,
+        public static (int CdsStart, int CdsEnd) GetCdsPositions(ICodingRegion codingRegion, int cdnaStart,
             int cdnaEnd, byte startExonPhase, bool isInsertion)
         {
-            var cdsStart = GetCdsPosition(codingRegion, cdnaStart, startExonPhase);
-            var cdsEnd   = GetCdsPosition(codingRegion, cdnaEnd, startExonPhase);
+            int cdsStart = GetCdsPosition(codingRegion, cdnaStart, startExonPhase);
+            int cdsEnd   = GetCdsPosition(codingRegion, cdnaEnd, startExonPhase);
 
             // silence CDS for insertions that occur just after the coding region
             if (isInsertion && codingRegion != null && (cdnaEnd == codingRegion.CdnaEnd || cdnaStart == codingRegion.CdnaStart))
@@ -137,7 +137,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         internal static (int CdnaStart, int CdnaEnd) FixExonEndpointInsertion(int cdnaStart, int cdnaEnd,
             bool onReverseStrand, ITranscriptRegion startRegion, ITranscriptRegion endRegion, IInterval variant)
         {
-            var (intron, exon) = startRegion.Type == TranscriptRegionType.Exon
+            (ITranscriptRegion intron, ITranscriptRegion exon) = startRegion.Type == TranscriptRegionType.Exon
                 ? (endRegion, startRegion)
                 : (startRegion, endRegion);
 
