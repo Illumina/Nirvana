@@ -578,5 +578,25 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             Assert.Equal(108, result.CdnaStart);
             Assert.Equal(107, result.CdnaEnd);
         }
+
+        [Theory]
+        [InlineData(102, 105, 0, 101, 200, 2, 5, 1, 2)]
+        [InlineData(102, 105, 2, 101, 200, 4, 7, 2, 3)]
+        [InlineData(94, 130, 0, 101, 200, 1, 30, 1, 10)]
+        [InlineData(94, 130, 2, 101, 200, 3, 32, 1, 11)]
+        [InlineData(101, 130, 0, 101, 200, 1, 30, 1, 10)]
+        [InlineData(199, 204, 0, 101, 200, 99, 100, 33, 34)]
+        [InlineData(199, 204, 2, 101, 200, 101, 102, 34, 34)]
+        [InlineData(1, 300, 0, 101, 200, 1, 100, 1, 34)]
+        [InlineData(1, 300, 2, 101, 200, 3, 102, 1, 34)]
+        public void GetCoveredCdsAndProteinPositions_AsExpected(int coveredCdnaStart, int coveredCdnaEnd, byte startExonPhase, int codingCdnaStart, int codingCdnaEnd, int expectedCdsStart, int expectedCdsEnd, int expectedProteinStart, int expectedProteinEnd)
+        {
+            var codingRegion = new CodingRegion(-1, -1, codingCdnaStart, codingCdnaEnd, codingCdnaEnd - codingCdnaStart + 1);
+            var coveredPositions= MappedPositionUtilities.GetCoveredCdsAndProteinPositions(coveredCdnaStart, coveredCdnaEnd, startExonPhase, codingRegion);
+            Assert.Equal(expectedCdsStart, coveredPositions.CdsStart);
+            Assert.Equal(expectedCdsEnd, coveredPositions.CdsEnd);
+            Assert.Equal(expectedProteinStart, coveredPositions.ProteinStart);
+            Assert.Equal(expectedProteinEnd, coveredPositions.ProteinEnd);
+        }
     }
 }

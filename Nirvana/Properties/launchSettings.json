@@ -47,7 +47,7 @@
     },
     "SK Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i E:\\Nirvana_resources\\test_runs\\test_covered_positions\\mock.vcf  -o test --disable-recomposition",
+      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\6\\Homo_sapiens.GRCh37.Nirvana.dat -i E:\\Nirvana_resources\\test_runs\\test_covered_positions\\mock.vcf  -o test --disable-recomposition",
       "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_covered_positions"
     },
     "SK Pedigree": {

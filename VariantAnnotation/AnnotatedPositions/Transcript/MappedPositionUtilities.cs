@@ -1,4 +1,5 @@
-﻿using Intervals;
+﻿using System;
+using Intervals;
 using VariantAnnotation.Algorithms;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -94,8 +95,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1, -1, -1);
 
             int beginOffset = startExonPhase - codingRegion.CdnaStart + 1;
-            var start = coveredCdnaStart + beginOffset;
-            var end   = coveredCdnaEnd + beginOffset;
+            var start = Math.Max(coveredCdnaStart + beginOffset, 1 + startExonPhase);
+            var end   = Math.Min(coveredCdnaEnd + beginOffset, codingRegion.Length + startExonPhase);
 
             return (start, end, GetProteinPosition(start), GetProteinPosition(end));
         }
