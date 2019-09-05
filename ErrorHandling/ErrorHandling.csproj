@@ -6,6 +6,6 @@
   </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.103.4" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.20" />
   </ItemGroup>
 </Project>

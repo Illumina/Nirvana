@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -9,8 +8,6 @@ using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
-using VariantAnnotation.Interface.SA;
-using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -68,52 +65,26 @@ namespace SAUtils.Custom
             string jsonTag;
             DataSourceVersion version;
             string outputPrefix = GetOutputPrefix(_inputFile);
-            var nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
-            var nsaIndexFileName  = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix);
-            var nsaSchemaFileName = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix);
-            var nsaItemsCount     = 0;
+            string nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
+            string nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
+            string nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
+            int nsaItemsCount;
 
-            using (var customReader = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
+            using (var parser = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
-            using (var indexStream = FileUtilities.GetCreateStream(nsaIndexFileName))            
-            using (var nsaWriter = new NsaWriter(
-                                new ExtendedBinaryWriter(nsaStream),
-                                new ExtendedBinaryWriter(indexStream),
-                                version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks),
-                                referenceProvider,
-                                customReader.JsonTag,
-                                customReader.MatchByAllele,  // match by allele
-                                customReader.IsArray, // is array
-                                SaCommon.SchemaVersion,
-                                false,// is positional
-                                false, // skip incorrect ref base
-                                true // throw error on conflicting entries
-                                ))
+            using (var indexStream = FileUtilities.GetCreateStream(nsaIndexFileName))       
+            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser, GetInputFileName(_inputFile), referenceProvider, out version))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
-                jsonTag = customReader.JsonTag;
-                nsaItemsCount = nsaWriter.Write(customReader.GetItems());
-                schemaWriter.Write(customReader.JsonSchema);
-
-                intervalJsonSchema = customReader.IntervalJsonSchema;
-                intervals = customReader.GetCustomIntervals();
+                (jsonTag, nsaItemsCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
+                if (intervals == null) return ExitCodes.Success;
             }
 
-            if (nsaItemsCount == 0)
-            {
-                if (File.Exists(nsaFileName)) File.Delete(nsaFileName);
-                if (File.Exists(nsaIndexFileName)) File.Delete(nsaIndexFileName);
-                if (File.Exists(nsaSchemaFileName)) File.Delete(nsaSchemaFileName);
-            }
-
-            if (nsaItemsCount == 0 && intervals == null)
-                throw new UserErrorException("The provided TSV has no valid custom annotation entries.");
-
-            if (intervals == null) return ExitCodes.Success;
-
+            if (nsaItemsCount == 0) CaUtilities.DeleteFiles(nsaFileName, nsaIndexFileName, nsaSchemaFileName);
+            
             using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix)))
-            using (var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsiStream), version, referenceProvider.Assembly, jsonTag, ReportFor.AllVariants, SaCommon.SchemaVersion))
+            using (var nsiWriter = CaUtilities.GetNsiWriter(nsiStream, version, referenceProvider.Assembly, jsonTag))
             using (var siJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(siJsonSchemaStream))
             {
@@ -126,7 +97,7 @@ namespace SAUtils.Custom
 
         private static string GetOutputPrefix(string inputFilePath)
         {
-            var fileName = GetInputFileName(inputFilePath);
+            string fileName = GetInputFileName(inputFilePath);
             if (fileName.EndsWith(".tsv"))
                 return fileName.Substring(0, fileName.Length - 4);
             return fileName.EndsWith(".tsv.gz") ? fileName.Substring(0, fileName.Length - 7) : fileName;
@@ -134,7 +105,7 @@ namespace SAUtils.Custom
 
         private static string GetInputFileName(string inputFilePath)
         {
-            var fileNameIndex = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
+            int fileNameIndex = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
             return fileNameIndex < 0 ? inputFilePath : inputFilePath.Substring(fileNameIndex + 1);
         }
     }
