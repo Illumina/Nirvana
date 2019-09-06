@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using OptimizedCore;
+using SAUtils.GeneIdentifiers;
 
 namespace SAUtils.Omim
 {

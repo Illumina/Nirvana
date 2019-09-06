@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace SAUtils.Omim
+namespace SAUtils.GeneIdentifiers
 {
     public sealed class GeneSymbolUpdater
     {
@@ -20,8 +20,7 @@ namespace SAUtils.Omim
         private int _numResolvedGeneSymbolConflicts;
         private int _numUnresolvedGeneSymbolConflicts;
 
-        public GeneSymbolUpdater(Dictionary<string, string> entrezGeneIdToSymbol,
-            Dictionary<string, string> ensemblGeneIdToSymbol)
+        public GeneSymbolUpdater(Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblGeneIdToSymbol)
         {
             _entrezGeneIdToSymbol = entrezGeneIdToSymbol;
             _ensemblGeneIdToSymbol = ensemblGeneIdToSymbol;

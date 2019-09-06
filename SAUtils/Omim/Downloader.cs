@@ -2,6 +2,7 @@
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
+using SAUtils.GeneIdentifiers;
 using static System.Environment;
 
 namespace SAUtils.Omim
@@ -55,7 +56,7 @@ namespace SAUtils.Omim
             _apiKey = GetEnvironmentVariable(OmimApiKeyEnvironmentVariableName);
             if (_apiKey == null) throw new InvalidDataException("Please set the OMIM API key as the environment variable \"OmimApiKey\".");
 
-            var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = OmimUtilities.ParseUniversalGeneArchive(_inputReferencePath, _universalGeneArchivePath);
+            var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = GeneUtilities.ParseUniversalGeneArchive(_inputReferencePath, _universalGeneArchivePath);
             var geneSymbolUpdater = new GeneSymbolUpdater(entrezGeneIdToSymbol, ensemblGeneIdToSymbol);
 
             using (var omimQuery = new OmimQuery(_apiKey, _outputDirectory))

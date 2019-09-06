@@ -16,7 +16,7 @@ namespace SAUtils.Custom
 {
     public static class CaUtilities
     {
-        public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, CustomAnnotationsParser parser, string dataVersion, ISequenceProvider referenceProvider, out DataSourceVersion version)
+        public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, VariantAnnotationsParser parser, string dataVersion, ISequenceProvider referenceProvider, out DataSourceVersion version)
         {
             return new NsaWriter(
                 new ExtendedBinaryWriter(nsaStream),
@@ -35,7 +35,13 @@ namespace SAUtils.Custom
 
         public static NsiWriter GetNsiWriter(Stream nsiStream, DataSourceVersion version, GenomeAssembly assembly, string jsonTag) => new NsiWriter(new ExtendedBinaryWriter(nsiStream), version, assembly, jsonTag, ReportFor.AllVariants, SaCommon.SchemaVersion);
 
-        public static (string JsonTag, int NsaItemsCount, SaJsonSchema IntervalJsonSchema, List<CustomInterval> Intervals) WriteSmallVariants(CustomAnnotationsParser parser, NsaWriter nsaWriter, StreamWriter schemaWriter)
+        public static NgaWriter GetNgaWriter(Stream ngaStream, GeneAnnotationsParser parser, string dataVersion)
+        {
+            var version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks);
+            return new NgaWriter(ngaStream, version, parser.JsonTag, SaCommon.SchemaVersion, false);
+        }
+
+        public static (string JsonTag, int NsaItemsCount, SaJsonSchema IntervalJsonSchema, List<CustomInterval> Intervals) WriteSmallVariants(VariantAnnotationsParser parser, NsaWriter nsaWriter, StreamWriter schemaWriter)
         {
             int nsaItemsCount = nsaWriter.Write(parser.GetItems());
             schemaWriter.Write(parser.JsonSchema);
@@ -51,6 +57,12 @@ namespace SAUtils.Custom
             {
                 if (File.Exists(filePath)) File.Delete(filePath);
             }
+        }
+
+        public static string GetInputFileName(string inputFilePath)
+        {
+            int fileNameIndex = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
+            return fileNameIndex < 0 ? inputFilePath : inputFilePath.Substring(fileNameIndex + 1);
         }
     }
 }

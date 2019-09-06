@@ -9,6 +9,7 @@ namespace Genome
             string referenceName)
         {
             if (referenceName == null) return new EmptyChromosome(string.Empty);
+
             return !refNameToChromosome.TryGetValue(referenceName, out IChromosome chromosome)
                 ? new EmptyChromosome(referenceName)
                 : chromosome;

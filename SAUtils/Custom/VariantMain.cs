@@ -4,7 +4,6 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
-using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
@@ -13,7 +12,7 @@ using VariantAnnotation.SA;
 
 namespace SAUtils.Custom
 {
-    public static class Main
+    public static class VariantMain
     {
         private static string _inputFile;
         private static string _compressedReference;
@@ -23,10 +22,10 @@ namespace SAUtils.Custom
             var ops = new OptionSet
             {
                 {
-                     "ref|r=",
-                     "compressed reference sequence file",
-                     v => _compressedReference = v
-                 },
+                    "ref|r=",
+                    "compressed reference sequence file",
+                    v => _compressedReference = v
+                },
                 {
                     "in|i=",
                     "custom TSV file path",
@@ -43,13 +42,14 @@ namespace SAUtils.Custom
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
+                .HasRequiredParameter(_compressedReference, "compressed reference sequence file name", "--ref")
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
                 .HasRequiredParameter(_inputFile, "Custom TSV file", "--in")
                 .CheckInputFilenameExists(_inputFile, "Custom TSV file", "--in")
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
-                .ShowHelpMenu("Creates a supplementary database from a custom input file", commandLineExample)
+                .ShowHelpMenu("Creates a supplementary variant annotation database from a custom input file", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 
@@ -64,16 +64,16 @@ namespace SAUtils.Custom
             SaJsonSchema intervalJsonSchema;
             string jsonTag;
             DataSourceVersion version;
-            string outputPrefix = GetOutputPrefix(_inputFile);
+            string outputPrefix      = GetOutputPrefix(_inputFile);
             string nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
             string nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
             string nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
             int nsaItemsCount;
 
-            using (var parser = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
+            using (var parser = VariantAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
             using (var indexStream = FileUtilities.GetCreateStream(nsaIndexFileName))       
-            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser, GetInputFileName(_inputFile), referenceProvider, out version))
+            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser, CaUtilities.GetInputFileName(_inputFile), referenceProvider, out version))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
@@ -97,17 +97,10 @@ namespace SAUtils.Custom
 
         private static string GetOutputPrefix(string inputFilePath)
         {
-            string fileName = GetInputFileName(inputFilePath);
+            string fileName = CaUtilities.GetInputFileName(inputFilePath);
             if (fileName.EndsWith(".tsv"))
                 return fileName.Substring(0, fileName.Length - 4);
             return fileName.EndsWith(".tsv.gz") ? fileName.Substring(0, fileName.Length - 7) : fileName;
         }
-
-        private static string GetInputFileName(string inputFilePath)
-        {
-            int fileNameIndex = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);
-            return fileNameIndex < 0 ? inputFilePath : inputFilePath.Substring(fileNameIndex + 1);
-        }
     }
-
 }

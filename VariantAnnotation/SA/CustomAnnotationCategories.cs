@@ -7,6 +7,8 @@
         AlleleNumber,
         AlleleFrequency,
         Prediction,
-        Filter
+        Filter,
+        Description,
+        Identifier
     }
 }

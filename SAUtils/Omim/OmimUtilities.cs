@@ -69,37 +69,6 @@ namespace SAUtils.Omim
             return (phenotype, comments);
         }
 
-        public static (Dictionary<string, string> EntrezGeneIdToSymbol, Dictionary<string, string> EnsemblIdToSymbol) ParseUniversalGeneArchive(string inputReferencePath, string universalGeneArchivePath)
-        {
-            var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(inputReferencePath);
-
-            UgaGene[] genes;
-
-            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(universalGeneArchivePath),
-                refNameToChromosome))
-            {
-                genes = reader.GetGenes();
-            }
-
-            var entrezGeneIdToSymbol = genes.GetGeneIdToSymbol(x => x.EntrezGeneId);
-            var ensemblIdToSymbol = genes.GetGeneIdToSymbol(x => x.EnsemblId);
-            return (entrezGeneIdToSymbol, ensemblIdToSymbol);
-        }
-
-        private static Dictionary<string, string> GetGeneIdToSymbol(this UgaGene[] genes,
-            Func<UgaGene, string> geneIdFunc)
-        {
-            var dict = new Dictionary<string, string>();
-            foreach (var gene in genes)
-            {
-                var key = geneIdFunc(gene);
-                var symbol = gene.Symbol;
-                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(symbol)) continue;
-                dict[key] = symbol;
-            }
-            return dict;
-        }
-
         public static Dictionary<string, List<ISuppGeneItem>> GetGeneToOmimEntriesAndSchema(IEnumerable<OmimItem> omimItems)
         {
             var geneToOmimEntries = new Dictionary<string, List<ISuppGeneItem>>();
