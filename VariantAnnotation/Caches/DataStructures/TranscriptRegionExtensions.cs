@@ -30,8 +30,6 @@ namespace VariantAnnotation.Caches.DataStructures
             int affectedStartIndex = GetAffectedRegionIndex(startIndex);
             int affectedEndIndex   = GetAffectedRegionIndex(endIndex);
 
-            if (affectedEndIndex < affectedStartIndex) Swap.Int(ref affectedStartIndex, ref affectedEndIndex);
-
             var exons   = regions.FindDesiredRegionIds(x => x == TranscriptRegionType.Exon || x == TranscriptRegionType.Gap, affectedStartIndex, affectedEndIndex);
             var introns = regions.FindDesiredRegionIds(x => x == TranscriptRegionType.Intron, affectedStartIndex, affectedEndIndex);
 
