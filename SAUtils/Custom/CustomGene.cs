@@ -2,6 +2,7 @@
 using ErrorHandling.Exceptions;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
+using VariantAnnotation.IO;
 
 namespace SAUtils.Custom
 {
@@ -25,7 +26,7 @@ namespace SAUtils.Custom
         {
             try
             {
-                return _jsonSchema.GetJsonString(_values);
+                return JsonObject.OpenBrace + _jsonSchema.GetJsonString(_values) + JsonObject.CloseBrace;
             }
             catch (UserErrorException e)
             {

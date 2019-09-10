@@ -8,7 +8,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.CustomAnnotations
 {
-    public class GeneAnnotationParserTests
+    public sealed class GeneAnnotationParserTests
     {
 
         private static Dictionary<string, string> entrezGeneIdToSymbol = new Dictionary<string, string>
@@ -109,6 +109,24 @@ namespace UnitTests.SAUtils.CustomAnnotations
         }
 
         [Fact]
+        public void GetItems_EmptyAnnotation_ThrowException()
+        {
+            const string lines = "#title=InternalGeneAnnotation\n" +
+                                 "#geneSymbol\tgeneId\tOMIM Description\tIs Oncogene\tphenotype\tmimNumber\tnotes\n" +
+                                 "#categories\t.\tDescription\tFilter\t\tIdentifier\t.\n" +
+                                 "#descriptions\t.\tGene description from OMIM\t\tGene phenotype\t\tFree text\n" +
+                                 "#type\t\tstring\tbool\tstring\tnumber\tstring\n" +
+                                 "Abc\t1\t\t.\t\t.\t\n" +
+                                 "Abc\tENSG2\tsome other text\tfalse\tbad\t200\ttest2\n";
+
+            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            {
+                Assert.Throws<UserErrorException>(() => parser.GetItems());
+            }
+        }
+
+
+        [Fact]
         public void GetItems_AsExpected()
         {
             const string lines = "#title=InternalGeneAnnotation\n" +
@@ -125,8 +143,8 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.Equal(2, geneSymbol2Items.Count);
                 Assert.Single(geneSymbol2Items["Gene1"]);
                 Assert.Single(geneSymbol2Items["Gene2"]);
-                Assert.Equal("\"OMIM Description\":\"some text\",\"Is Oncogene\":true,\"phenotype\":\"good\",\"mimNumber\":234,\"notes\":\"test\"", geneSymbol2Items["Gene1"][0].GetJsonString());
-                Assert.Equal("\"OMIM Description\":\"some other text\",\"phenotype\":\"bad\",\"mimNumber\":200,\"notes\":\"test2\"", geneSymbol2Items["Gene2"][0].GetJsonString());
+                Assert.Equal("{\"OMIM Description\":\"some text\",\"Is Oncogene\":true,\"phenotype\":\"good\",\"mimNumber\":234,\"notes\":\"test\"}", geneSymbol2Items["Gene1"][0].GetJsonString());
+                Assert.Equal("{\"OMIM Description\":\"some other text\",\"phenotype\":\"bad\",\"mimNumber\":200,\"notes\":\"test2\"}", geneSymbol2Items["Gene2"][0].GetJsonString());
             }
         }
 

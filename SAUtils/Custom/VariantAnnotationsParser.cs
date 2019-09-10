@@ -17,7 +17,7 @@ namespace SAUtils.Custom
     public sealed class VariantAnnotationsParser : IDisposable
     {
         private readonly StreamReader _reader;
-        private ISequenceProvider SequenceProvider { get; }
+        public ISequenceProvider SequenceProvider;
         public string JsonTag;
         public GenomeAssembly Assembly;
         public bool MatchByAllele;

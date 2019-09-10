@@ -25,12 +25,7 @@ namespace SAUtils
             _isArray       = isArray;
         }
 
-
-
-        public void Dispose()
-        {
-            _nsaStream?.Dispose();
-        }
+        public void Dispose() =>_nsaStream?.Dispose();
 
         public void Write(Dictionary<string, List<ISuppGeneItem>> geneToEntries)
         {
@@ -63,11 +58,7 @@ namespace SAUtils
 
                 writer.Write(compressedBytes, 0, compressSize);
                 Console.WriteLine("Number of gene entries written:"+ geneToEntries.Count);
-
             }
-
         }
-
-        
     }
 }

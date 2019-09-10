@@ -112,18 +112,24 @@ namespace SAUtils.Custom
                 throw new UserErrorException($"Column number mismatch!! Header has {_tags.Length} columns but {line} contains {splits.Length}");
 
             string geneId = splits[1];
-            string geneSymbol = GeneUtilities.GetGeneSymbolFromId(geneId, _entrezGeneIdToSymbol, _ensemblIdToSymbol);
-            if (geneAnnotations.ContainsKey(geneSymbol)) throw new UserErrorException($"Found the same gene {geneSymbol} in different lines. Current line is: {line}");
 
             var annotationValues = new string[_numAnnotationColumns];
+            var hasAnnotation = false;
             for (var i = 0; i < _numAnnotationColumns; i++)
             {
-                annotationValues[i] = splits[i + NumRequiredColumns];
+                string annotationValue = splits[i + NumRequiredColumns];
+                if (annotationValue != "" && annotationValue != ".") hasAnnotation = true;
+
+                annotationValues[i] = annotationValue;
                 _annotationValidators[i](annotationValues[i], line);
             }
 
-            geneAnnotations[geneSymbol] = new List<ISuppGeneItem>
-                {new CustomGene(geneSymbol, annotationValues.Select(x => new[] {x}).ToList(), JsonSchema, line)};
+            if (!hasAnnotation) throw new UserErrorException($"No annotation provided in line {line}");
+
+            string geneSymbol = GeneUtilities.GetGeneSymbolFromId(geneId, _entrezGeneIdToSymbol, _ensemblIdToSymbol);
+            if (geneAnnotations.ContainsKey(geneSymbol)) throw new UserErrorException($"Found the same gene {geneSymbol} in different lines. Current line is: {line}");
+            
+            geneAnnotations[geneSymbol] = new List<ISuppGeneItem> {new CustomGene(geneSymbol, annotationValues.Select(x => new[] {x}).ToList(), JsonSchema, line)};
         }
 
         public void Dispose() => _reader?.Dispose();

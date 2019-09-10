@@ -11,6 +11,7 @@ namespace Cloud
 
         public static readonly string S3Url                       = GetEnvironmentVariable(UrlBaseEnvironmentVariableName);
         public static readonly string S3CacheFolder               = S3Url + "ab0cf104f39708eabd07b8cb67e149ba-Cache/26/";
+        public static readonly string S3UgaPath                   = S3CacheFolder + "UGA.tsv.gz";
         public const string DefaultCacheSource                    = "Both";
         public static readonly string S3RefPrefix                 = S3Url + "d95867deadfe690e40f42068d6b59df8-References/5/Homo_sapiens.";
   
@@ -25,8 +26,7 @@ namespace Cloud
 
         public static void CleanOutput(string directory)
         {
-            Directory.GetFiles(directory, "*" + JsonSuffix).ToList().ForEach(File.Delete);
-            Directory.GetFiles(directory, "*" + JsonIndexSuffix).ToList().ForEach(File.Delete);
+            Directory.GetFiles(directory, "*").ToList().ForEach(File.Delete);
         }
 
         public static string GetEnvironmentVariable(string key)

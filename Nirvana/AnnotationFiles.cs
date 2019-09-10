@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Cloud;
 using IO;
@@ -42,10 +43,20 @@ namespace Nirvana
 
         public void AddFiles(SaUrls saUrls)
         {
-            if (saUrls.IsNsa())
-                NsaFiles.Add((saUrls.nsaUrl, saUrls.idxUrl));
-            else
-                NsiFiles.Add(saUrls.nsiUrl);
+            switch (saUrls.SaType)
+            {
+                case CustomSaType.Nsa:
+                    NsaFiles.Add((saUrls.nsaUrl, saUrls.idxUrl));
+                    break;
+                case CustomSaType.Nsi:
+                    NsiFiles.Add(saUrls.nsiUrl);
+                    break;
+                case CustomSaType.Nga:
+                    NgaFiles.Add(saUrls.ngaUrl);
+                    break;
+                default:
+                    throw new InvalidDataException("Unknown custom SA type.");
+            }
         }
 
         private static IEnumerable<string> GetFiles(string directoryOrManifestFilePath)
