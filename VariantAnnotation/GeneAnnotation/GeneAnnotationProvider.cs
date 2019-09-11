@@ -26,10 +26,10 @@ namespace VariantAnnotation.GeneAnnotation
             sb.Append(JsonObject.OpenBrace);
             jsonObject.AddStringValue("name", geneName);
 
-            bool hasAnnotation = false;
-            foreach (NgaReader ngaReader in _ngaReaders)
+            var hasAnnotation = false;
+            foreach (var ngaReader in _ngaReaders)
             {
-                var jsonString = ngaReader.GetAnnotation(geneName);
+                string jsonString = ngaReader.GetAnnotation(geneName);
                 jsonObject.AddStringValue(ngaReader.JsonKey, jsonString, false);
                 if (!string.IsNullOrEmpty(jsonString)) hasAnnotation = true;
             }
@@ -45,16 +45,15 @@ namespace VariantAnnotation.GeneAnnotation
         {
             Name        = "Gene annotation provider";
             _ngaReaders = new List<NgaReader>();
+
             foreach (var dbStream in dbStreams) _ngaReaders.Add(new NgaReader(dbStream));
         }
 
         public void Dispose()
         {
-            if(_ngaReaders != null)
-                foreach (var ngaReader in _ngaReaders)
-                {
-                    ngaReader.Dispose();
-                }
+            if (_ngaReaders == null) return;
+
+            foreach (var ngaReader in _ngaReaders) ngaReader.Dispose();
         }
     }
 }

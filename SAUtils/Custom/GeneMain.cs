@@ -20,7 +20,7 @@ namespace SAUtils.Custom
             {
                 {
                     "uga|u=",
-                    "universal gene archive {path}",
+                    "universal gene archive file path",
                     v => _universalGeneArchivePath = v
                 },
                 {
@@ -39,12 +39,9 @@ namespace SAUtils.Custom
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-                .HasRequiredParameter(_universalGeneArchivePath, "universal gene archive", "--uga")
                 .CheckInputFilenameExists(_universalGeneArchivePath, "universal gene archive", "--uga")
-                .HasRequiredParameter(_inputFile, "Custom TSV file", "--in")
-                .CheckInputFilenameExists(_inputFile, "Custom TSV file", "--in")
-                .HasRequiredParameter(_outputDirectory, "output directory", "--out")
-                .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
+                .CheckInputFilenameExists(_inputFile, "Custom gene annotation TSV", "--in")
+                .CheckDirectoryExists(_outputDirectory, "output", "--out")
                 .SkipBanner()
                 .ShowHelpMenu("Creates a supplementary gene annotation database from a custom input file", commandLineExample)
                 .ShowErrors()

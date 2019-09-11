@@ -102,7 +102,6 @@ namespace Nirvana
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .CheckInputFilenameExists(_vcfPath, "vcf", "--in", true, "-")
-                //.CheckInputFilenameExists(_vcfPath + ".tbi", "tabix index file", "--in")
                 .CheckInputFilenameExists(_refSequencePath, "reference sequence", "--ref")
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
