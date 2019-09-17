@@ -15,6 +15,7 @@ namespace VariantAnnotation.Sequence
         private IIntervalSearch<MaskedEntry> _maskedIntervalSearch;
 
         private readonly char[] _convertNumberToBase;
+        private bool _useNSequence;
 
         public CompressedSequence()
         {
@@ -34,16 +35,21 @@ namespace VariantAnnotation.Sequence
         internal static int GetNumBufferBytes(int numBases) =>
             (int)((double)numBases / CompressedSequenceCommon.NumBasesPerByte + 1);
 
+        public void EnableNSequence() => _useNSequence = true;
+
         public void Set(int numBases, byte[] buffer, IIntervalSearch<MaskedEntry> maskedIntervalSearch, int sequenceOffset = 0)
         {
             Length                = numBases;
             _buffer               = buffer;
             _maskedIntervalSearch = maskedIntervalSearch;
             _sequenceOffset       = sequenceOffset;
+            _useNSequence         = false;
         }
 
         public string Substring(int offset, int length)
         {
+            if (_useNSequence) return new string('N', length);
+
             offset -= _sequenceOffset;
 
             // handle negative offsets and lengths

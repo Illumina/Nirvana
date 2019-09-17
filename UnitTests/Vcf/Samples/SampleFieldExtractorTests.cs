@@ -24,7 +24,7 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set("GT:GQ:AD:DP:VF:NL:SB:NC:US:AQ:LQ");
-            var sample = SampleFieldExtractor.ExtractSample("0/1:5:338,1:339:0.00295:30:-7.3191:0.0314:0,0,0,1,0,0,17,1,129,21,148,22:3.366:0.000", formatIndices, 1, false);
+            var sample = SampleFieldExtractor.ExtractSample("0/1:5:338,1:339:0.00295:30:-7.3191:0.0314:0,0,0,1,0,0,17,1,129,21,148,22:3.366:0.000", formatIndices, 1);
 
             Assert.Equal("0/1",             sample.Genotype);
             Assert.Equal(5,                 sample.GenotypeQuality);
@@ -40,7 +40,7 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set("GT:SO:REPCN:REPCI:ADSP:ADFL:ADIR:LC");
-            var sample = SampleFieldExtractor.ExtractSample("1/1:SPANNING/SPANNING:15/15:15-15/15-15:22/22:23/23:0/0:38.270270", formatIndices, 1, false);
+            var sample = SampleFieldExtractor.ExtractSample("1/1:SPANNING/SPANNING:15/15:15-15/15-15:22/22:23/23:0/0:38.270270", formatIndices, 1);
 
             Assert.Equal("1/1", sample.Genotype);
             Assert.Equal(new[] { 15, 15 }, sample.RepeatUnitCounts);
@@ -50,7 +50,7 @@ namespace UnitTests.Vcf.Samples
         public void ExtractSample_EmptySampleColumn_ReturnEmptySample()
         {
             var formatIndices = new FormatIndices();
-            var sample = SampleFieldExtractor.ExtractSample(null, formatIndices, 1, false);
+            var sample = SampleFieldExtractor.ExtractSample(null, formatIndices, 1);
             Assert.True(sample.IsEmpty);
         }
 
@@ -58,7 +58,7 @@ namespace UnitTests.Vcf.Samples
         public void ExtractSample_DotInSampleColumn_ReturnEmptySample()
         {
             var formatIndices = new FormatIndices();
-            var sample = SampleFieldExtractor.ExtractSample(".", formatIndices, 1, false);
+            var sample = SampleFieldExtractor.ExtractSample(".", formatIndices, 1);
             Assert.True(sample.IsEmpty);
         }
 
@@ -91,7 +91,7 @@ namespace UnitTests.Vcf.Samples
                 "./1:.:.:.:.:1.26335:3:4:6:cnvLength:Inherited"
             };
 
-            ISample[] samples = cols.ToSamples(formatIndices, 1, false);
+            ISample[] samples = cols.ToSamples(formatIndices, 1);
 
             Assert.Equal(4, samples.Length);
 
@@ -128,7 +128,7 @@ namespace UnitTests.Vcf.Samples
                 "SVTYPE=CNV;END=125075279;REFLEN=6510"
             };
 
-            ISample[] samples = cols.ToSamples(formatIndices, 1, false);
+            ISample[] samples = cols.ToSamples(formatIndices, 1);
             Assert.Null(samples);
         }
     }

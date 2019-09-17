@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Genome;
+using VariantAnnotation.Interface.IO;
 using Vcf;
 
 namespace Phantom.Recomposer
@@ -55,7 +56,9 @@ namespace Phantom.Recomposer
                 }
                 string altAlleleColumn = string.Join(",", altAlleleList);
                 var vcfFields = GetVcfFields(variantSite, varInfo, altAlleleColumn, sampleGenotypes);
-                var position = SimplePosition.GetSimplePosition(vcfFields, new NullVcfFilter(), refNameToChromosome, true);
+
+                var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
+                var position = SimplePosition.GetSimplePosition(chromosome, variantSite.Start, vcfFields, new NullVcfFilter(), true);
                 for (var i = 0; i < allLinkedVids.Count; i++) position.LinkedVids[i] = allLinkedVids[i];
 
                 yield return position;

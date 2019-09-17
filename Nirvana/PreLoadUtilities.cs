@@ -27,7 +27,8 @@ namespace Nirvana
                 {
                     if (!NeedProcessThisLine(refNameToChrom, line, out var splits, out IChromosome iChrom)) continue;
 
-                    int position = int.Parse(splits[VcfCommon.PosIndex]);
+                    (int position, bool foundError) = splits[VcfCommon.PosIndex].OptimizedParseInt32();
+                    if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {splits[VcfCommon.PosIndex]}");
 
                     if (rangeChecker.OutOfRange(iChrom, position)) break;
 

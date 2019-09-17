@@ -48,13 +48,15 @@ namespace Vcf
             IsRecomposed = isRecomposed;
         }
 
-        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, VariantFactory variantFactory)
+        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, VariantFactory variantFactory)
         {
             if (simplePosition == null) return null;
-            
-            var vcfFields    = simplePosition.VcfFields;
-            var altAlleles   = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',');
-            bool isReference = altAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(altAlleles[0]);
+
+            sequenceProvider.LoadChromosome(simplePosition.Chromosome);
+
+            string[] vcfFields  = simplePosition.VcfFields;
+            string[] altAlleles = vcfFields[VcfCommon.AltIndex].OptimizedSplit(',');
+            bool isReference    = altAlleles.Length == 1 && VcfCommon.ReferenceAltAllele.Contains(altAlleles[0]);
 
             string globalMajorAllele = isReference
                 ? refMinorProvider?.GetGlobalMajorAllele(simplePosition.Chromosome, simplePosition.Start)
@@ -64,13 +66,13 @@ namespace Vcf
             
             if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
 
-            var infoData = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
-            int end      = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
-            var quality  = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
-            var filters  = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
-            var samples  = vcfFields.ToSamples(variantFactory.FormatIndices, altAlleles.Length, vcfFields[VcfCommon.AltIndex].Contains("STR"));
+            var infoData      = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            int end           = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
+            double? quality   = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            string[] filters  = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
+            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, altAlleles.Length);
 
-            var variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
+            IVariant[] variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed, simplePosition.LinkedVids, globalMajorAllele);
 

@@ -6,7 +6,7 @@ namespace Vcf.Sample
 {
     internal static class SampleFieldExtractor
     {
-        internal static ISample[] ToSamples(this string[] vcfColumns, FormatIndices formatIndices, int numAltAlleles, bool isRepeatExpansion)
+        internal static ISample[] ToSamples(this string[] vcfColumns, FormatIndices formatIndices, int numAltAlleles)
         {
             if (vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
 
@@ -17,13 +17,13 @@ namespace Vcf.Sample
 
             for (int index = VcfCommon.GenotypeIndex; index < vcfColumns.Length; index++)
             {
-                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, numAltAlleles, isRepeatExpansion);
+                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, numAltAlleles);
             }
 
             return samples;
         }
 
-        internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, int numAltAlleles, bool isRepeatExpansion)
+        internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, int numAltAlleles)
         {
             // sanity check: make sure we have a format column
             if (string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;

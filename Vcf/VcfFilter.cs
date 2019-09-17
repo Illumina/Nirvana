@@ -24,11 +24,13 @@ namespace Vcf
              {
                 if (line.StartsWith('#')) continue;
 
-                var fields = line.OptimizedSplit('\t');
+                string[] fields = line.OptimizedSplit('\t');
                 string chrName = fields[VcfCommon.ChromIndex];
                 if (chrName != _genomicRange.Start.Chromosome.UcscName && chrName != _genomicRange.Start.Chromosome.EnsemblName) continue;
 
-                int position = int.Parse(fields[VcfCommon.PosIndex]);
+                (int position, bool foundError) = fields[VcfCommon.PosIndex].OptimizedParseInt32();
+                if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {fields[VcfCommon.PosIndex]}");
+
                 if (position < _genomicRange.Start.Position) continue;
 
                 BufferedLine = line;

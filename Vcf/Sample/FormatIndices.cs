@@ -47,11 +47,12 @@ namespace Vcf.Sample
 
             if (formatColumn == null) return;
 
-            var formatCols = formatColumn.OptimizedSplit(':');
+            string[] formatCols = formatColumn.OptimizedSplit(':');
             NumColumns = formatCols.Length;
 
             for (var index = 0; index < NumColumns; index++)
             {
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (formatCols[index])
                 {
                     case "AD":

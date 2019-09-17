@@ -79,23 +79,6 @@ namespace UnitTests.Vcf
         }
 
         [Fact]
-        public void Duplicated_headlines_are_removed()
-        {
-            var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "##dataSource=ClinVar,version:unknown,release date:2016-09-01", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
-            AddLines(headers);
-            IEnumerable<string> observedHeaders;
-            var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', _refNameToChromosome);
-
-            using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter()))
-            {
-                observedHeaders = vcfReader.GetHeaderLines();
-            }
-
-            Assert.Equal(4, observedHeaders.Count());
-        }
-
-        [Fact]
         public void Sample_names_are_reported()
         {
             var headers = new[] { "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920", "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16	NHL-17" };
@@ -222,6 +205,7 @@ namespace UnitTests.Vcf
             var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
             var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', refNameToChromosome);
             IPosition observedResult;
+
             using (var reader = FileUtilities.GetStreamReader(_ms))
             using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter()))
             {

@@ -59,7 +59,7 @@ namespace VariantAnnotation
         private static void AddAssembly(IDictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
         {
             if (provider == null) return;
-            if (assemblies.TryGetValue(provider.Assembly, out var assemblyList)) assemblyList.Add(provider.Name);
+            if (assemblies.TryGetValue(provider.Assembly, out List<string> assemblyList)) assemblyList.Add(provider.Name);
             else assemblies[provider.Assembly] = new List<string> { provider.Name };
         }
 
@@ -67,7 +67,7 @@ namespace VariantAnnotation
         {
             var sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
-            foreach (var assembly in assemblies) sb.AppendLine($"- Using {assembly.Key}: {string.Join(", ", assembly.Value)}");
+            foreach ((GenomeAssembly genomeAssembly, List<string> dataSources) in assemblies) sb.AppendLine($"- Using {genomeAssembly}: {string.Join(", ", dataSources)}");
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
@@ -85,7 +85,7 @@ namespace VariantAnnotation
         public IAnnotatedPosition Annotate(IPosition position)
         {
             if (position == null) return null;
-            var annotatedVariants = GetAnnotatedVariants(position.Variants);
+            IAnnotatedVariant[] annotatedVariants = GetAnnotatedVariants(position.Variants);
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 
             if (annotatedPosition.AnnotatedVariants == null
@@ -149,9 +149,9 @@ namespace VariantAnnotation
         {
             var geneAnnotations = new List<string>();
 
-            foreach (var gene in _affectedGenes.OrderBy(x => x))
+            foreach (string gene in _affectedGenes.OrderBy(x => x))
             {
-                var annotation = _geneAnnotationProvider.Annotate(gene);
+                string annotation = _geneAnnotationProvider.Annotate(gene);
                 if (string.IsNullOrEmpty(annotation)) continue;
                 geneAnnotations.Add(annotation);
             }

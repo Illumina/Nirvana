@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using CacheUtils.Genes.DataStructures;
-using CacheUtils.Genes.IO;
-using Compression.Utilities;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Omim.EntryApiResponse;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils.Omim
 {

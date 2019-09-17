@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Cloud;
+﻿using Cloud;
 using ErrorHandling.Exceptions;
 using Xunit;
 

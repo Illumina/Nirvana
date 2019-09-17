@@ -32,8 +32,7 @@ namespace Cloud
         public static string GetEnvironmentVariable(string key)
         {
             string value = Environment.GetEnvironmentVariable(key);
-            if (string.IsNullOrEmpty(value)) throw new ArgumentException($"Environment variable {key} is not set.");
-
+            if (string.IsNullOrEmpty(value)) throw new InvalidDataException($"Environment variable {key} is not set.");
             return value;
         }
     }

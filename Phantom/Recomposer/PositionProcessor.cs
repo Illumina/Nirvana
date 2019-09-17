@@ -11,7 +11,7 @@ namespace Phantom.Recomposer
 
         public PositionProcessor(IPositionBuffer positionBuffer, IVariantGenerator variantGenerator)
         {
-            _positionBuffer = positionBuffer;
+            _positionBuffer   = positionBuffer;
             _variantGenerator = variantGenerator;
         }
 
@@ -21,7 +21,6 @@ namespace Phantom.Recomposer
 
         internal IEnumerable<ISimplePosition> GenerateOutput(BufferedPositions bufferedPositions)
         {
-
             if (bufferedPositions.SimplePositions.Count == 0) return new List<ISimplePosition>(); // nothing to output
 
             var recomposablePositions = bufferedPositions.GetRecomposablePositions();

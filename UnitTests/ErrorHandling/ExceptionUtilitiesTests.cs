@@ -2,8 +2,6 @@
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
-using System.Xml.Linq;
-using ErrorHandling.Exceptions;
 using Xunit;
 using static ErrorHandling.ExceptionUtilities;
 

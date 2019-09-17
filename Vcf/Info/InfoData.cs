@@ -1,5 +1,4 @@
 ﻿using VariantAnnotation.Interface.Positions;
-using Variants;
 
 namespace Vcf.Info
 {
@@ -13,10 +12,10 @@ namespace Vcf.Info
         public string RepeatUnit { get; }
         public double? StrandBias { get; }
         public int? SvLength { get; }
-        public VariantType SvType { get; }
+        public string SvType { get; }
 
         public InfoData(int[] ciEnd, int[] ciPos, int? end, int? jointSomaticNormalQuality, int? refRepeatCount,
-            string repeatUnit, double? strandBias, int? svLength, VariantType svType)
+            string repeatUnit, double? strandBias, int? svLength, string svType)
         {
             CiEnd                     = ciEnd;
             CiPos                     = ciPos;

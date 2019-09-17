@@ -6,9 +6,6 @@ namespace Vcf
 {
     public sealed class NullRecomposer : IRecomposer
     {
-        public IEnumerable<ISimplePosition> ProcessSimplePosition(ISimplePosition simplePosition)
-        {
-            return new[] {simplePosition};
-        }
+        public IEnumerable<ISimplePosition> ProcessSimplePosition(ISimplePosition simplePosition) => new[] { simplePosition };
     }
 }

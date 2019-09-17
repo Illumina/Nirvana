@@ -74,7 +74,11 @@ namespace VariantAnnotation.Sequence
         public void GetCompressedSequence(IChromosome chromosome)
         {
             var indexEntry = GetIndexEntry(chromosome.EnsemblName);
-            if (indexEntry == null) return;
+            if (indexEntry == null)
+            {
+                Sequence.EnableNSequence();
+                return;
+            }
 
             // jump to that offset
             _stream.Position = indexEntry.FileOffset;

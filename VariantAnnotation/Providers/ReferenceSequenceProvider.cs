@@ -20,13 +20,12 @@ namespace VariantAnnotation.Providers
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = null;
 
         private readonly CytogeneticBands _cytogeneticBands;
-        private IChromosome _currentChromosome;
+        private ushort _currentChromosomeIndex = 65534; // guaranteed to be updated
         private readonly CompressedSequenceReader _sequenceReader;
 
         public ReferenceSequenceProvider(Stream stream)
         {
-            _currentChromosome = new EmptyChromosome(string.Empty);
-            _sequenceReader = new CompressedSequenceReader(stream);
+            _sequenceReader   = new CompressedSequenceReader(stream);
             _cytogeneticBands = new CytogeneticBands(_sequenceReader.CytogeneticBands);
         }
 
@@ -53,14 +52,11 @@ namespace VariantAnnotation.Providers
 
         public void LoadChromosome(IChromosome chromosome)
         {
-            if (chromosome.Index == _currentChromosome.Index) return;
+            if (chromosome.Index == _currentChromosomeIndex) return;
             _sequenceReader.GetCompressedSequence(chromosome);
-            _currentChromosome = chromosome;
+            _currentChromosomeIndex = chromosome.Index;
         }
 
-        public void Dispose()
-        {
-            _sequenceReader?.Dispose();
-        }
+        public void Dispose() => _sequenceReader?.Dispose();
     }
 }

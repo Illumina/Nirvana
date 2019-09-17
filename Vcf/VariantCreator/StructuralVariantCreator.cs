@@ -1,58 +1,50 @@
-﻿using System.Collections.Generic;
-using Genome;
-using VariantAnnotation.Interface.Positions;
+﻿using Genome;
 using Variants;
 
 namespace Vcf.VariantCreator
 {
     public static class StructuralVariantCreator
     {
-        private const string TandemDuplicationAltAllele = "<DUP:TANDEM>";
-
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele,
-            IBreakEnd[] breakEnds, IInfoData infoData)
+        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string svType,
+            IBreakEnd[] breakEnds, string vid)
         {
-            var svType = infoData?.SvType ?? VariantType.unknown;
-            if (svType == VariantType.duplication && altAllele == TandemDuplicationAltAllele)
-                svType = VariantType.tandem_duplication;
+            var variantType = GetVariantType(altAllele, svType);
+            if (variantType != VariantType.translocation_breakend) start++;
 
-            if (svType != VariantType.translocation_breakend) start++;
-            int end    = infoData?.End ?? start;
-            string vid = GetVid(chromosome.EnsemblName, start, end, svType, breakEnds);
-            
-            return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
-                breakEnds, AnnotationBehavior.StructuralVariantBehavior);
+            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
+                null, breakEnds, AnnotationBehavior.StructuralVariantBehavior);
         }
-        
-        private static string GetVid(string ensemblName, int start, int end, VariantType variantType,
-            IReadOnlyList<IBreakEnd> breakEnds)
+
+        private static VariantType GetVariantType(string altAllele, string svType)
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (variantType)
+            switch (svType)
             {
-                case VariantType.insertion:
-                    return $"{ensemblName}:{start}:{end}:INS";
-
-                case VariantType.deletion:
-                    return $"{ensemblName}:{start}:{end}";
-
-                case VariantType.duplication:
-                    return $"{ensemblName}:{start}:{end}:DUP";
-
-                case VariantType.tandem_duplication:
-                    return $"{ensemblName}:{start}:{end}:TDUP";
-
-                case VariantType.translocation_breakend:
-                    return breakEnds?[0].ToString();
-
-                case VariantType.inversion:
-                    return $"{ensemblName}:{start}:{end}:Inverse";
-
-                case VariantType.mobile_element_insertion:
-                    return $"{ensemblName}:{start}:{end}:MEI";
-
+                case "DEL":
+                    return VariantType.deletion;
+                case "INS":
+                    return VariantType.insertion;
+                case "DUP":
+                    return altAllele == "<DUP:TANDEM>" ? VariantType.tandem_duplication : VariantType.duplication;
+                case "INV":
+                    return VariantType.inversion;
+                case "TDUP":
+                    return VariantType.tandem_duplication;
+                case "BND":
+                    return VariantType.translocation_breakend;
+                case "CNV":
+                    return VariantType.copy_number_variation;
+                case "STR":
+                    return VariantType.short_tandem_repeat_variation;
+                case "ALU":
+                    return VariantType.mobile_element_insertion;
+                case "LINE1":
+                    return VariantType.mobile_element_insertion;
+                case "LOH":
+                    return VariantType.copy_number_variation;
+                case "SVA":
+                    return VariantType.mobile_element_insertion;
                 default:
-                    return $"{ensemblName}:{start}:{end}";
+                    return VariantType.unknown;
             }
         }
     }

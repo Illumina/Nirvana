@@ -10,22 +10,13 @@ namespace Cloud
     {
         private readonly AmazonS3Client _s3Client;
 
-        public AmazonS3ClientWrapper(AmazonS3Client s3Client)
-        {
-            _s3Client = s3Client;
-        }
+        public AmazonS3ClientWrapper(AmazonS3Client s3Client) => _s3Client = s3Client;
 
-        public Task<GetObjectResponse> GetObjectAsync(GetObjectRequest getRequest)
-        {
-            return _s3Client.GetObjectAsync(getRequest);
-        }
+        public Task<GetObjectResponse> GetObjectAsync(GetObjectRequest getRequest) => _s3Client.GetObjectAsync(getRequest);
 
-        public Task<PutObjectResponse> PutObjectAsync(PutObjectRequest putRequest)
-        {
-            return _s3Client.PutObjectAsync(putRequest);
-        }
+        public Task<PutObjectResponse> PutObjectAsync(PutObjectRequest putRequest) => _s3Client.PutObjectAsync(putRequest);
 
-        public bool DoesBucketExist(string bucketName) => AmazonS3Util.DoesS3BucketExistAsync(_s3Client, bucketName).Result;
+        public bool DoesBucketExist(string bucketName) => AmazonS3Util.DoesS3BucketExistV2Async(_s3Client, bucketName).Result;
 
         public string GetPreSignedUrl(GetPreSignedUrlRequest request) => _s3Client.GetPreSignedURL(request);
     }

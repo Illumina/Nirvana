@@ -6,8 +6,6 @@ using VariantAnnotation.Caches;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.IO.Caches;
-using Variants;
 
 namespace SAUtils.SpliceAi
 {

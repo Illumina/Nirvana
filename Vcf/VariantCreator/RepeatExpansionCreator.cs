@@ -1,42 +1,29 @@
 ﻿using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.Positions;
 using Variants;
 
 namespace Vcf.VariantCreator
 {
     public static class RepeatExpansionCreator
     {
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
+        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, int? refRepeatCount, string vid)
         {
-            start++;//for the padding base
-            if (infoData.RefRepeatCount == 0) return null;
+            if (refRepeatCount == null || refRepeatCount == 0) return null;
 
             (int repeatCount, bool foundError) = altAllele.Trim('<', '>').Substring(3).OptimizedParseInt32();
             if (foundError) return null;
 
-            if (infoData.RefRepeatCount != null)
-            {
-                var svType = GetRepeatExpansionType(infoData.RefRepeatCount.Value, repeatCount);
+            start++;
+            var variantType = GetRepeatExpansionType(refRepeatCount, repeatCount);
 
-                int end = infoData.End ?? 0;
-                string vid = GetVid(chromosome.EnsemblName, start, end, infoData.RepeatUnit, repeatCount);
-
-                return new Variant(chromosome, start, end, refAllele, altAllele, svType, vid, false, false, false, null,
-                    null, AnnotationBehavior.RepeatExpansionBehavior);
-            }
-            return null;
+            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
+                null, null, AnnotationBehavior.RepeatExpansionBehavior);
         }
 
-        private static VariantType GetRepeatExpansionType(int refRepeatCount, int repeatCount)
+        private static VariantType GetRepeatExpansionType(int? refRepeatCount, int repeatCount)
         {
-            if (refRepeatCount == repeatCount) return VariantType.short_tandem_repeat_variation;
+            if (refRepeatCount == null || refRepeatCount == repeatCount) return VariantType.short_tandem_repeat_variation;
             return repeatCount > refRepeatCount ? VariantType.short_tandem_repeat_expansion : VariantType.short_tandem_repeat_contraction;
-        }
-
-        private static string GetVid(string ensemblName, int start, int end, string repeatUnit, int repeatCount)
-        {
-            return $"{ensemblName}:{start}:{end}:{repeatUnit}:{repeatCount}";
         }
     }
 }
