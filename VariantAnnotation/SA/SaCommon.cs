@@ -37,5 +37,6 @@
         public const string GnomadGeneScoreTag = "gnomAD";
         public const string DosageSensitivityTag = "clingenDosageSensitivityMap";
         public const string SpliceAiTag        = "spliceAI";
+        public const string PrimateAiTag       = "primateAI";
     }
 }

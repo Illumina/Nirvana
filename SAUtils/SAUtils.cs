@@ -7,6 +7,7 @@ using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GnomadGeneScores;
+using SAUtils.PrimateAi;
 using SAUtils.ProcessSpliceNetTsv;
 using SAUtils.SpliceAi;
 using VariantAnnotation.Interface;
@@ -46,6 +47,7 @@ namespace SAUtils
                 ["mitomapVarDb"]          = new TopLevelOption("create MITOMAP small variants database", SmallVarDb.Run),
                 ["mitomapSvDb"]           = new TopLevelOption("create MITOMAP structural variants database", StructVarDb.Run),
                 ["spliceAi"]              = new TopLevelOption("create SpliceAI database", SpliceAiDb.Run),
+                ["primateAi"]             = new TopLevelOption("create PrimateAI database", PrimateAiDb.Run),
                 ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run)
             };
 
