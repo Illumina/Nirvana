@@ -1,4 +1,6 @@
-﻿namespace Tabix
+﻿using System.Collections.Generic;
+
+namespace Tabix
 {
     internal static class BinUtilities
     {
@@ -16,5 +18,30 @@
         /// assumes begin is 0-based
         /// </summary>
         internal static int ConvertPositionToBin(int begin) => 4681 + (begin >> Constants.MinShift);
+
+        internal static IEnumerable<int> OverlappingBinsWithVariants(int begin, int end, Dictionary<int, Interval[]> idToChunks)
+        {
+            var overlappingBins = new List<int>();
+            if (begin >= end) return overlappingBins;
+
+            int shift = Constants.InitialShift;
+            if (end >= Constants.MaxReferenceLength) end = Constants.MaxReferenceLength;
+
+            var level = 0;
+            var levelStartBin = 0;
+
+            for (--end; level <= Constants.NumLevels; shift -= 3, levelStartBin += 1 << ((level << 1) + level), level++)
+            {
+                int beginBin = levelStartBin + (begin >> shift);
+                int endBin   = levelStartBin + (end >> shift);
+
+                for (int bin = beginBin; bin <= endBin; bin++)
+                {
+                    if (idToChunks.ContainsKey(bin)) overlappingBins.Add(bin);
+                }
+            }
+
+            return overlappingBins;
+        }
     }
 }

@@ -23,11 +23,11 @@ namespace Tabix
 
         internal static bool HasVcfPositionsOnInterval(string s, IChromosome chromosome, int start, int end)
         {
-            var rawLines = s.OptimizedSplit('\n');
+            string[] rawLines = s.OptimizedSplit('\n');
 
             foreach (string line in rawLines)
             {
-                var cols = line.Split('\t', 3);
+                string[] cols = line.Split('\t', 3);
                 if (cols.Length < 2) continue;
 
                 string chromosomeName = cols[0];

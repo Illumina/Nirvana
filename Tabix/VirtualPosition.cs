@@ -10,6 +10,7 @@
             }
         }
 
+        // ReSharper disable once UnusedMember.Global
         public static long To(long fileOffset, int blockOffset) => (fileOffset << 16) | ((long)blockOffset & 0xffff);
     }
 }

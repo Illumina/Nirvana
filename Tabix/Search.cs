@@ -23,38 +23,20 @@ namespace Tabix
 
             int adjBegin = SearchUtilities.AdjustBegin(begin);
 
-            int beginBin = BinUtilities.ConvertPositionToBin(adjBegin);
-            int endBin   = BinUtilities.ConvertPositionToBin(end);
+            IEnumerable<int> bins = BinUtilities.OverlappingBinsWithVariants(adjBegin, end, refSeq.IdToChunks);
 
-            int binDiff = endBin - beginBin;
-
-            // we can use the tabix index to investigate if any of the internal bins have variants
-            if (binDiff >= 2)
+            var block = new BgzfBlock();
+            foreach (int bin in bins)
             {
-                bool hasInternalVariants = HasVariantsInAnyBins(refSeq.IdToChunks, beginBin + 1, endBin - 1);
-                if (hasInternalVariants) return true;
+                refSeq.IdToChunks.TryGetValue(bin, out Interval[] chunks);
+                if (HasVariantsInBin(refSeq.Chromosome, begin, end, block, chunks)) return true;
             }
 
-            // finally we have to check the remaining (edge) bins
-            var block = new BgzfBlock();
-
-            refSeq.IdToChunks.TryGetValue(beginBin, out var beginChunks);
-            refSeq.IdToChunks.TryGetValue(endBin, out var endChunks);
-
-            return HasVariantsInBin(refSeq.Chromosome, begin, end, block, beginChunks) || 
-                   HasVariantsInBin(refSeq.Chromosome, begin, end, block, endChunks);
-        }
-
-        internal static bool HasVariantsInAnyBins(Dictionary<int, Interval[]> idToChunks, int beginBin,
-            int endBin)
-        {
-            for (int bin = beginBin; bin <= endBin; bin++) if (idToChunks.ContainsKey(bin)) return true;
             return false;
         }
 
         private bool HasVariantsInBin(IChromosome chromosome, int begin, int end, BgzfBlock block, Interval[] intervals)
         {
-            if (intervals == null) return false;
             (long minVirtualOffset, long maxVirtualOffset) = SearchUtilities.GetMinMaxVirtualFileOffset(intervals);
 
             long minOffset = VirtualPosition.From(minVirtualOffset).FileOffset;
