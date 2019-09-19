@@ -18,6 +18,7 @@ namespace SAUtils.SpliceAi
         private readonly Dictionary<ushort, IntervalArray<byte>> _spliceIntervals;
         private readonly HashSet<string> _unresolvedSymbols;
         public static int Count = 0;
+        public static int NoGeneCount = 0;
 
         private string _geneSymbol;
         private double _acceptorGainScore;
@@ -73,6 +74,7 @@ namespace SAUtils.SpliceAi
 
                     foreach (var spliceAiItem in previousItems)
                     {
+                        Count++;
                         yield return spliceAiItem;
                     }
                     previousItems.Clear();
@@ -83,9 +85,14 @@ namespace SAUtils.SpliceAi
             UpdateGeneSymbols(previousItems);
             foreach (var spliceAiItem in previousItems)
             {
+                Count++;
+                // if an entry doesn't overlap any Nirvana gene, we skip it.
+                if (string.IsNullOrEmpty(spliceAiItem.Hgnc)) continue;
+                
                 yield return spliceAiItem;
             }
 
+            Console.WriteLine($"Total item count: {Count}, items without overlapping Nirvana gene: {NoGeneCount} ({(100.0*NoGeneCount)/Count}%)");
             Console.WriteLine($"{_unresolvedSymbols.Count} unresolved gene symbols encountered. Symbols:");
             foreach (var symbol in _unresolvedSymbols)
             {
@@ -162,6 +169,7 @@ namespace SAUtils.SpliceAi
             var nirvanaGenes = _geneTree.GetAllOverlappingValues(chromosome.Index, position, position);
             if (nirvanaGenes == null)
             {
+                NoGeneCount++;
                 item.Hgnc = null;
                 return;
             }
