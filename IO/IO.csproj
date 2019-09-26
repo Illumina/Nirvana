@@ -11,8 +11,8 @@
   </PropertyGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.3.103.36" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.24" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.43" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.31" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
