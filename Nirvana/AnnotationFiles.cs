@@ -60,7 +60,7 @@ namespace Nirvana
 
         private static IEnumerable<string> GetFiles(string directoryOrManifestFilePath)
         {
-            if (ConnectUtilities.IsHttpLocation(directoryOrManifestFilePath))
+            if (HttpUtilities.IsUrl(directoryOrManifestFilePath))
             {
                 using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(directoryOrManifestFilePath)))
                 {
@@ -71,7 +71,6 @@ namespace Nirvana
                     }
                 }
             }
-
             else
             {
                 foreach (string file in Directory.GetFiles(directoryOrManifestFilePath))

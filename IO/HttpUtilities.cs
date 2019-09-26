@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net;
 using System.Xml.Linq;
 using System.Linq;
@@ -10,31 +11,33 @@ namespace IO
 {
     public static class HttpUtilities
     {
-        private static readonly string[] AuthenticationErrorCodes = {"InvalidAccessKeyId", "SignatureDoesNotMatch"};
-        private static readonly string[] ResourceNotExistErrorCodes = {"NoSuchKey", "NoSuchBucket"};
+        private static readonly string[] AuthenticationErrorCodes   = { "InvalidAccessKeyId", "SignatureDoesNotMatch" };
+        private static readonly string[] ResourceNotExistErrorCodes = { "NoSuchKey", "NoSuchBucket" };
 
         public static long GetLength(string url)
         {
-            var request = (HttpWebRequest) WebRequest.Create(url);
-
-            return request.TryGetResponse(url).ContentLength;
+            var request        = (HttpWebRequest)WebRequest.Create(url);
+            var response       = request.TryGetResponse(url);
+            long contentLength = response.ContentLength;
+            response.Close();
+            return contentLength;
         }
 
         // Only throw exceptions when all the three tries failed.
         public static HttpWebResponse TryGetResponse(this HttpWebRequest request, string url)
         {
             var exceptions = new List<Exception>();
+
             for (var retryCounter = 0; retryCounter < 3; retryCounter++)
             {
                 try
                 {
-                    if (retryCounter > 0) Thread.Sleep(2000);
-
-                    return (HttpWebResponse) request.GetResponse();
+                    if (retryCounter > 0) Thread.Sleep(2_000);
+                    return (HttpWebResponse)request.GetResponse();
                 }
                 catch (Exception e)
                 {
-                   exceptions.Add(ProcessHttpRequestWebProtocolErrorException(e, url));
+                    exceptions.Add(ProcessHttpRequestWebProtocolErrorException(e, url));
                 }
             }
 
@@ -45,7 +48,8 @@ namespace IO
         {
             try
             {
-                WebRequest.CreateHttp(url).TryGetResponse(url);
+                var response = WebRequest.CreateHttp(url).TryGetResponse(url);
+                response.Close();
             }
             catch (Exception exception)
             {
@@ -57,7 +61,7 @@ namespace IO
         public static bool IsWebProtocolErrorException(Exception exception)
         {
             if (!(exception is WebException)) return false;
-            var webException = (WebException) exception;
+            var webException = (WebException)exception;
 
             return webException.Status == WebExceptionStatus.ProtocolError;
         }
@@ -66,7 +70,7 @@ namespace IO
         {
             if (!IsWebProtocolErrorException(exception)) return exception;
 
-            var webException = (WebException) exception;
+            var webException = (WebException)exception;
             (string errorCode, string errorMessage) = GetWebExceptionMessage(webException);
 
             // Expired URL is always a user error
@@ -100,5 +104,7 @@ namespace IO
                 return (xElement.Element("Code")?.Value, xElement.Element("Message")?.Value);
             }
         }
+
+        public static bool IsUrl(string path) => path.StartsWith("http", true, CultureInfo.InvariantCulture);
     }
 }

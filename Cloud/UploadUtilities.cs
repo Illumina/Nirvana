@@ -46,7 +46,7 @@ namespace Cloud
 
             catch (Exception exception)
             {
-                var processedException = ExceptionUtilities.ProcessAmazonS3Exception(exception, null);
+                var processedException = AwsExceptionUtilities.TryConvertUserException(exception, null);
 
                 if (processedException is UserErrorException) throw processedException;
 

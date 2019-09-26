@@ -1,15 +1,15 @@
 ﻿using System;
+using Amazon.S3;
 using ErrorHandling.Exceptions;
 
 namespace Cloud
 {
-    public static class ExceptionUtilities
+    public static class AwsExceptionUtilities
     {
-
-        public static Exception ProcessAmazonS3Exception(Exception exception, S3Path s3Path)
+        public static Exception TryConvertUserException(Exception exception, S3Path s3Path)
         {
-            Amazon.S3.AmazonS3Exception s3Exception;
-            while ((s3Exception = exception as Amazon.S3.AmazonS3Exception) == null)
+            AmazonS3Exception s3Exception;
+            while ((s3Exception = exception as AmazonS3Exception) == null)
             {
                 if (exception.InnerException == null) return exception;
                 exception = exception.InnerException;

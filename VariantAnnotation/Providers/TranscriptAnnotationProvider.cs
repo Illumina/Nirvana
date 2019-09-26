@@ -28,6 +28,8 @@ namespace VariantAnnotation.Providers
         public IntervalArray<ITranscript>[] TranscriptIntervalArrays { get; }
         public ushort VepVersion { get; }
 
+        private readonly Stream _siftStream;
+        private readonly Stream _polyphenStream;
         private readonly PredictionCacheReader _siftReader;
         private readonly PredictionCacheReader _polyphenReader;
         private IPredictionCache _siftCache;
@@ -36,21 +38,22 @@ namespace VariantAnnotation.Providers
 
         public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider)
         {
-            Name = "Transcript annotation provider";
+            Name      = "Transcript annotation provider";
             _sequence = sequenceProvider.Sequence;
 
-            var transcriptStream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix));
-            (_transcriptCache, TranscriptIntervalArrays, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
+            using (var stream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)))
+            {
+                (_transcriptCache, TranscriptIntervalArrays, VepVersion) = InitiateCache(stream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
+            }
 
-            Assembly = _transcriptCache.Assembly;
+            Assembly           = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
+            _siftStream = PersistentStreamUtils.GetReadStream(CacheConstants.SiftPath(pathPrefix));
+            _siftReader = new PredictionCacheReader(_siftStream, PredictionCacheReader.SiftDescriptions);
 
-            var siftStream = PersistentStreamUtils.GetReadStream(CacheConstants.SiftPath(pathPrefix));
-            _siftReader = new PredictionCacheReader(siftStream, PredictionCacheReader.SiftDescriptions);
-
-            var polyphenStream = PersistentStreamUtils.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix));
-            _polyphenReader = new PredictionCacheReader(polyphenStream, PredictionCacheReader.PolyphenDescriptions);
+            _polyphenStream = PersistentStreamUtils.GetReadStream(CacheConstants.PolyPhenPath(pathPrefix));
+            _polyphenReader = new PredictionCacheReader(_polyphenStream, PredictionCacheReader.PolyphenDescriptions);
         }
 
         private static (TranscriptCache Cache, IntervalArray<ITranscript>[] TranscriptIntervalArrays, ushort VepVersion) InitiateCache(Stream stream,
@@ -204,6 +207,8 @@ namespace VariantAnnotation.Providers
         {
             _siftReader?.Dispose();
             _polyphenReader?.Dispose();
+            _siftStream?.Dispose();
+            _polyphenStream?.Dispose();
         }
     }
 }

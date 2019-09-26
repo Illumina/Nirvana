@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using Compression.FileHandling;
 using ErrorHandling.Exceptions;
 using IO;
@@ -45,19 +46,25 @@ namespace Compression.Utilities
 
         //todo: can have just one method for both file and http streams
         //used in custom annotation lambda
-        public static Stream GetAppropriateStream(PersistentStream pStream)
+        public static Stream GetAppropriateStream(Stream stream)
         {
-            var header = GetHeader(pStream);
+            byte[] header = GetHeader(stream);
             var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
-            pStream.Position = 0;
-            var appropriateStream = GetAppropriateStream(pStream, compressionAlgorithm);
+            stream.Position = 0;
+            var appropriateStream = GetAppropriateStream(stream, compressionAlgorithm);
             return appropriateStream;
         }
 
         public static Stream GetAppropriateReadStream(string filePath)
         {
-            var header = GetHeader(PersistentStreamUtils.GetReadStream(filePath));
-            var compressionAlgorithm = IdentifyCompressionAlgorithm(header);
+            CompressionAlgorithm compressionAlgorithm;
+
+            using (var headerStream = PersistentStreamUtils.GetReadStream(filePath))
+            {
+                byte[] header        = GetHeader(headerStream);
+                compressionAlgorithm = IdentifyCompressionAlgorithm(header);
+            }
+            
             var fileStream = PersistentStreamUtils.GetReadStream(filePath);
             return GetAppropriateStream(fileStream, compressionAlgorithm);
         }
@@ -68,7 +75,7 @@ namespace Compression.Utilities
 
             try
             {
-                using (var reader = new ExtendedBinaryReader(stream))
+                using (var reader = new ExtendedBinaryReader(stream, Encoding.UTF8, true))
                 {
                     header = reader.ReadBytes(NumHeaderBytes);
                 }

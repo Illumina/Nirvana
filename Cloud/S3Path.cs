@@ -61,7 +61,7 @@ namespace Cloud
             }
             catch (Exception exception)
             {
-                var processedException = ExceptionUtilities.ProcessAmazonS3Exception(exception, this);
+                var processedException = AwsExceptionUtilities.TryConvertUserException(exception, this);
                 if (processedException is UserErrorException) throw processedException;
             }
         }

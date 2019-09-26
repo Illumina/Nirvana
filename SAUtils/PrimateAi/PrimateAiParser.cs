@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using IO;
 using OptimizedCore;
-using SAUtils.SpliceAi;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.PrimateAi
 {

@@ -8,7 +8,7 @@ using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.Interface
 {
-    public interface IAnnotationResources:IDisposable
+    public interface IAnnotationResources : IDisposable
     {
         ISequenceProvider SequenceProvider { get; }
         ITranscriptAnnotationProvider TranscriptAnnotationProvider { get; }

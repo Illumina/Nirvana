@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using ErrorHandling.Exceptions;
 
-
 namespace ErrorHandling
 {
     public static class ExceptionUtilities

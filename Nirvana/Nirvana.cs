@@ -43,12 +43,11 @@ namespace Nirvana
             var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, _pluginDirectory, _disableRecomposition, _forceMitochondrialAnnotation);
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 
-            using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(
-                new PersistentStream(PersistentStreamUtils.GetReadStream(_vcfPath),
-                    ConnectUtilities.GetFileConnectFunc(_vcfPath), 0)))
+            using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(PersistentStreamUtils.GetReadStream(_vcfPath)))
             {
                 annotationResources.GetVariantPositions(preloadVcfStream, null);
             }
+
             return annotationResources;
         }
 

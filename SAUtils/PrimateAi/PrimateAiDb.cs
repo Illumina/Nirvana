@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.InputFileParsers;
-using SAUtils.SpliceAi;
 using VariantAnnotation.Caches;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;

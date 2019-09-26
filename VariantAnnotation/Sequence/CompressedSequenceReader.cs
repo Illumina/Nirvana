@@ -9,8 +9,6 @@ using Intervals;
 using IO;
 
 namespace VariantAnnotation.Sequence
-
-
 {
     public sealed class CompressedSequenceReader : IDisposable
     {
@@ -36,10 +34,10 @@ namespace VariantAnnotation.Sequence
 
         public CompressedSequenceReader(Stream stream)
         {
-            _stream = stream;
-            _reader = new ExtendedBinaryReader(stream);
-            Sequence = new CompressedSequence();
-            RefNameToChromosome = new Dictionary<string, IChromosome>();
+            _stream              = stream;
+            _reader              = new ExtendedBinaryReader(stream);
+            Sequence             = new CompressedSequence();
+            RefNameToChromosome  = new Dictionary<string, IChromosome>();
             RefIndexToChromosome = new Dictionary<ushort, IChromosome>();
 
             CheckHeaderVersion();
