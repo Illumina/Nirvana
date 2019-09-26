@@ -72,7 +72,7 @@ namespace VariantAnnotation.Sequence
         public void GetCompressedSequence(IChromosome chromosome)
         {
             var indexEntry = GetIndexEntry(chromosome.EnsemblName);
-            if (indexEntry == null)
+            if (indexEntry == null || chromosome.Index == Chromosome.UnknownReferenceIndex)
             {
                 Sequence.EnableNSequence();
                 return;
