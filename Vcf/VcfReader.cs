@@ -30,6 +30,9 @@ namespace Vcf
         private List<string> _headerLines;
         private readonly Queue<ISimplePosition> _queuedPositions = new Queue<ISimplePosition>();
 
+        private readonly HashSet<string> _observedReferenceNames = new HashSet<string>();
+        private string _currentReferenceName;
+
         public string[] GetSampleNames() => _sampleNames;
 
         private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
@@ -139,6 +142,7 @@ namespace Vcf
                 {
                     string[] vcfFields = VcfLine.OptimizedSplit('\t');
                     var chromosome = ReferenceNameUtilities.GetChromosome(_refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
+                    CheckVcfOrder(vcfFields[VcfCommon.ChromIndex]);
 
                     _sequenceProvider.LoadChromosome(chromosome);
 
@@ -155,6 +159,19 @@ namespace Vcf
             }
 
             return _queuedPositions.Count == 0 ? null : _queuedPositions.Dequeue();
+        }
+
+        private void CheckVcfOrder(string referenceName)
+        {
+            if (referenceName == _currentReferenceName) return;
+
+            if (_observedReferenceNames.Contains(referenceName))
+            {
+                throw new FileNotSortedException("The current input vcf file is not sorted. Please sort the vcf file before running variant annotation using a tool like vcf-sort in vcftools.");
+            }
+
+            _observedReferenceNames.Add(referenceName);
+            _currentReferenceName = referenceName;
         }
 
         public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _variantFactory);
