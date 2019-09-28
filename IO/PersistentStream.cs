@@ -48,10 +48,29 @@ namespace IO
         {
             if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
 
-            var request = WebRequest.CreateHttp(_url);
-            request.AddRange(position);
-            _response = (HttpWebResponse)request.GetResponse();
-            _stream   = _response.GetResponseStream();
+            int remainingAttempts = MaxRetryAttempts;
+            while (remainingAttempts > 0)
+            {
+                try
+                {
+                    var request = WebRequest.CreateHttp(_url);
+                    request.AddRange(position);
+                    _response = (HttpWebResponse)request.GetResponse();
+                    _stream = _response.GetResponseStream();
+                }
+                catch (Exception e)
+                {
+                    Log(MethodName(), e);
+                    if (remainingAttempts <= 0) throw;
+
+                    Disconnect();
+                    Thread.Sleep(NumRetryMilliseconds);
+                    continue;
+                }
+                remainingAttempts--;
+            }
+            
+            
         }
 
         private void Disconnect()
