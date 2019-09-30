@@ -48,8 +48,10 @@ namespace IO
         {
             if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
 
-            int remainingAttempts = MaxRetryAttempts;
-            while (remainingAttempts > 0)
+            var keepTrying = true;
+            var numRetries = 0;
+
+            while (keepTrying)
             {
                 try
                 {
@@ -57,17 +59,17 @@ namespace IO
                     request.AddRange(position);
                     _response = (HttpWebResponse)request.GetResponse();
                     _stream = _response.GetResponseStream();
+                    keepTrying = false;
                 }
                 catch (Exception e)
                 {
                     Log(MethodName(), e);
-                    if (remainingAttempts <= 0) throw;
+                    if (numRetries == MaxRetryAttempts) throw;
 
                     Disconnect();
                     Thread.Sleep(NumRetryMilliseconds);
-                    continue;
+                    numRetries++;
                 }
-                remainingAttempts--;
             }
             
             
