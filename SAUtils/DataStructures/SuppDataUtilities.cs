@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ErrorHandling.Exceptions;
+using SAUtils.PrimateAi;
 using VariantAnnotation.Interface.SA;
 using Variants;
 
@@ -27,7 +28,27 @@ namespace SAUtils.DataStructures
             saItem.AltAllele = newAlleles.AltAllele;
 
         }
+        public static List<ISupplementaryDataItem> DeDuplicatePrimateAiItems(List<ISupplementaryDataItem> saItems)
+        {
+            var maxScoreItems = new Dictionary<string, ISupplementaryDataItem>();
 
+            foreach (PrimateAiItem saItem in saItems)
+            {
+                var refAlt = saItem.RefAllele + '>' + saItem.AltAllele;
+
+                if (maxScoreItems.TryGetValue(refAlt, out var dupItem))
+                {
+                    var dupPrimateAiItem = (PrimateAiItem) dupItem;
+                    if (saItem.ScorePercentile >= dupPrimateAiItem.ScorePercentile)
+                    {
+                        maxScoreItems[refAlt] = saItem;
+                    }
+                }
+                else maxScoreItems.Add(refAlt, saItem);
+            }
+
+            return maxScoreItems.Values.ToList();
+        }
         public static List<ISupplementaryDataItem> RemoveConflictingAlleles(List<ISupplementaryDataItem> saItems, bool throwErrorOnConflicts)
         {
             var nonDuplicateSet  = new Dictionary<string, ISupplementaryDataItem>();
@@ -147,6 +168,7 @@ namespace SAUtils.DataStructures
             return maxFreqAlleles[0];
 
         }
-        
+
+       
     }
 }

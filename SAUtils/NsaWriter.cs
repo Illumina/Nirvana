@@ -142,6 +142,9 @@ namespace SAUtils
                 if (_index.MatchByAllele && !_index.IsArray)
                     saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems, _throwErrorOnConflicts);
 
+                if (_index.JsonKey == SaCommon.PrimateAiTag)
+                    saItems = SuppDataUtilities.DeDuplicatePrimateAiItems(saItems);
+
                 _memWriter.WriteOpt(saItems.Count);
 
                 foreach (ISupplementaryDataItem saItem in saItems)
