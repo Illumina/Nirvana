@@ -13,7 +13,7 @@ namespace IO
             if (!HttpUtilities.IsUrl(urlOrPath))
                 return File.Exists(urlOrPath) ? FileUtilities.GetReadStream(urlOrPath) : null;
 
-            return new PersistentStream(urlOrPath, position);
+            return new PersistentStream(new PersistentConnect(urlOrPath), position);
         }
 
         public static List<Stream> GetStreams(List<string> locations)

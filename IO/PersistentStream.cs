@@ -8,7 +8,7 @@ namespace IO
 {
     public sealed class PersistentStream : Stream
     {
-        private readonly string _url;
+        private readonly IConnect _connect;
         private HttpWebResponse _response;
         private Stream _stream;
         private long _position;
@@ -36,15 +36,20 @@ namespace IO
             }
         }
 
-        public PersistentStream(string url, long position)
+        public PersistentStream(IConnect connect, long position)
         {
-            _url      = url;
             _position = position;
-
-            Connect(position);
+            _connect  = connect;
+            ConnectWithRetries(_position);
         }
 
         private void Connect(long position)
+        {
+            if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
+            (_response, _stream) = _connect.Connect(position);
+        }
+
+        private void ConnectWithRetries(long position)
         {
             if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
 
@@ -55,10 +60,7 @@ namespace IO
             {
                 try
                 {
-                    var request = WebRequest.CreateHttp(_url);
-                    request.AddRange(position);
-                    _response = (HttpWebResponse)request.GetResponse();
-                    _stream = _response.GetResponseStream();
+                    Connect(position);
                     keepTrying = false;
                 }
                 catch (Exception e)
@@ -71,8 +73,6 @@ namespace IO
                     numRetries++;
                 }
             }
-            
-            
         }
 
         private void Disconnect()
@@ -118,7 +118,7 @@ namespace IO
 
                     Disconnect();
                     Thread.Sleep(NumRetryMilliseconds);
-                    Connect(_position);
+                    ConnectWithRetries(_position);
                     numRetries++;                    
                 }
             }
