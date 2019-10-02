@@ -75,6 +75,7 @@ namespace SAUtils.SpliceAi
                     foreach (var spliceAiItem in previousItems)
                     {
                         Count++;
+                        if (string.IsNullOrEmpty(spliceAiItem.Hgnc)) continue;
                         yield return spliceAiItem;
                     }
                     previousItems.Clear();
