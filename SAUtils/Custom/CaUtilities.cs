@@ -51,14 +51,6 @@ namespace SAUtils.Custom
             return (parser.JsonTag, nsaItemsCount, parser.IntervalJsonSchema, intervals);
         }
 
-        public static void DeleteFiles(params string[] filePaths)
-        {
-            foreach (string filePath in filePaths)
-            {
-                if (File.Exists(filePath)) File.Delete(filePath);
-            }
-        }
-
         public static string GetInputFileName(string inputFilePath)
         {
             int fileNameIndex = inputFilePath.LastIndexOf(Path.DirectorySeparatorChar);

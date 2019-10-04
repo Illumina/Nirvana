@@ -5,6 +5,7 @@ using Genome;
 
 namespace Tabix
 {
+    // ReSharper disable once UnusedMember.Global
     public sealed class Search
     {
         private readonly Index _index;
@@ -16,6 +17,7 @@ namespace Tabix
             _vcfStream = vcfStream;
         }
 
+        // ReSharper disable once UnusedMember.Global
         public bool HasVariants(string chromosomeName, int begin, int end)
         {
             var refSeq = _index.GetTabixReferenceSequence(chromosomeName);

@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.Positions;
 
 namespace Phantom.Recomposer
 {
-    public sealed class BufferedPositions : IBufferedPositions
+    public sealed class BufferedPositions
     {
         public List<ISimplePosition> SimplePositions { get; }
         public List<bool> Recomposable { get; }

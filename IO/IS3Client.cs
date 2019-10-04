@@ -7,7 +7,5 @@ namespace IO
     {
         Task<GetObjectResponse> GetObjectAsync(GetObjectRequest getRequest);
         Task<PutObjectResponse> PutObjectAsync(PutObjectRequest putRequest);
-        bool DoesBucketExist(string bucketName);
-        string GetPreSignedUrl(GetPreSignedUrlRequest request);
     }
 }

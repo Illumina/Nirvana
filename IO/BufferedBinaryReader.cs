@@ -6,21 +6,13 @@ namespace IO
 {
     public sealed class BufferedBinaryReader : IBufferedBinaryReader
     {
-        private const int MinBufferSize = 128;
-        private const int BufferSize    = 10_485_760;
+        private const int BufferSize = 10_485_760;
 
         private const int ShortLen  = 2;
         private const int IntLen    = 4;
-        private const int LongLen   = 8;
-        private const int DoubleLen = 8;
 
         private readonly Stream _stream;
-
-        private readonly Encoding _encoding = Encoding.UTF8;
-        private readonly Decoder _decoder   = Encoding.UTF8.GetDecoder();
-
         private readonly byte[] _buffer;
-        private char[] _charBuffer = new char[MinBufferSize];
 
         private bool _foundEof;
 
@@ -54,19 +46,6 @@ namespace IO
             _bufferLen       = numRemainingBytes + numBytesRead;
 
             if (_bufferPos == 0 && _bufferLen == 0) _foundEof = true;
-        }
-
-        public long BufferPosition
-        {
-            get => _bufferPos;
-            set => _bufferPos = (int)value;
-        }
-
-        public void Reset()
-        {
-            _bufferLen = 0;
-            _bufferPos = 0;
-            FillBuffer();
         }
 
         public string ReadAsciiString()
@@ -120,67 +99,6 @@ namespace IO
             }
         }
 
-        public unsafe double ReadDouble()
-        {
-            if (_bufferPos > _bufferLen - DoubleLen) FillBuffer();
-
-            double value;
-            fixed (byte* pBuffer = &_buffer[_bufferPos])
-            {
-                var lo = (uint)(pBuffer[0] | pBuffer[1] << 8 | pBuffer[2] << 16 | pBuffer[3] << 24);
-                var hi = (uint)(pBuffer[4] | pBuffer[5] << 8 | pBuffer[6] << 16 | pBuffer[7] << 24);
-                ulong tmpBuffer = (ulong)hi << 32 | lo;
-                value = *(double*)&tmpBuffer;
-                _bufferPos += DoubleLen;
-            }
-
-            return value;
-        }
-
-        public unsafe short ReadInt16()
-        {
-            if (_bufferPos > _bufferLen - ShortLen) FillBuffer();
-
-            short value;
-            fixed (byte* pBuffer = &_buffer[_bufferPos])
-            {
-                value = (short)(pBuffer[0] | pBuffer[1] << 8);
-                _bufferPos += ShortLen;
-            }
-
-            return value;
-        }
-
-        public unsafe int ReadInt32()
-        {
-            if (_bufferPos > _bufferLen - IntLen) FillBuffer();
-
-            int value;
-            fixed (byte* pBuffer = &_buffer[_bufferPos])
-            {
-                value = pBuffer[0] | pBuffer[1] << 8 | pBuffer[2] << 16 | pBuffer[3] << 24;
-            }
-
-            _bufferPos += IntLen;
-            return value;
-        }
-
-        public unsafe long ReadInt64()
-        {
-            if (_bufferPos > _bufferLen - LongLen) FillBuffer();
-
-            long value;
-            fixed (byte* pBuffer = &_buffer[_bufferPos])
-            {
-                var lo = (uint)(pBuffer[0] | pBuffer[1] << 8 | pBuffer[2] << 16 | pBuffer[3] << 24);
-                var hi = (uint)(pBuffer[4] | pBuffer[5] << 8 | pBuffer[6] << 16 | pBuffer[7] << 24);
-                value= (long)hi << 32 | lo;
-                _bufferPos += LongLen;
-            }
-
-            return value;
-        }
-
         public int ReadOptInt32()
         {
             if (_bufferPos > _bufferLen - 5) FillBuffer();
@@ -200,25 +118,6 @@ namespace IO
             throw new FormatException("Unable to read the 7-bit encoded integer");
         }
 
-        public long ReadOptInt64()
-        {
-            if (_bufferPos > _bufferLen - 9) FillBuffer();
-
-            long count = 0;
-            var shift  = 0;
-
-            while (shift != 70)
-            {
-                byte b = _buffer[_bufferPos++];
-                count |= (long)(b & sbyte.MaxValue) << shift;
-                shift += 7;
-
-                if ((b & 128) == 0) return count;
-            }
-
-            throw new FormatException("Unable to read the 7-bit encoded long");
-        }
-
         public ushort ReadOptUInt16()
         {
             if (_bufferPos > _bufferLen - 3) FillBuffer();
@@ -236,25 +135,6 @@ namespace IO
             }
 
             throw new FormatException("Unable to read the 7-bit encoded unsigned short");
-        }
-
-        public string ReadString()
-        {
-            int numBytes = ReadOptInt32();
-
-            if (numBytes < 0) throw new IOException();
-            if (numBytes == 0) return string.Empty;
-
-            if (_bufferPos > _bufferLen - numBytes) FillBuffer();
-
-            int maxBufferSize = _encoding.GetMaxCharCount(numBytes);
-            if (maxBufferSize > _charBuffer.Length) _charBuffer = new char[maxBufferSize];
-
-            int numChars = _decoder.GetChars(_buffer, _bufferPos, numBytes, _charBuffer, 0);
-            var value = new string(_charBuffer, 0, numChars);
-            _bufferPos += numBytes;
-
-            return value;
         }
 
         public unsafe ushort ReadUInt16()
@@ -280,22 +160,6 @@ namespace IO
             {
                 value = (uint)(pBuffer[0] | pBuffer[1] << 8 | pBuffer[2] << 16 | pBuffer[3] << 24);
                 _bufferPos += IntLen;
-            }
-
-            return value;
-        }
-
-        public unsafe ulong ReadUInt64()
-        {
-            if (_bufferPos > _bufferLen - LongLen) FillBuffer();
-
-            ulong value;
-            fixed (byte* pBuffer = &_buffer[_bufferPos])
-            {
-                var lo = (uint)(pBuffer[0] | pBuffer[1] << 8 | pBuffer[2] << 16 | pBuffer[3] << 24);
-                var hi = (uint)(pBuffer[4] | pBuffer[5] << 8 | pBuffer[6] << 16 | pBuffer[7] << 24);
-                value = (ulong)hi << 32 | lo;
-                _bufferPos += LongLen;
             }
 
             return value;

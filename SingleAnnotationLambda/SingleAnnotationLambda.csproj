@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cloud\Cloud.csproj" />
+    <ProjectReference Include="..\Compression\Compression.csproj" />
+    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\Genome\Genome.csproj" />
+    <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
+    <ProjectReference Include="..\Tabix\Tabix.csproj" />
+    <ProjectReference Include="..\Vcf\Vcf.csproj" />
+  </ItemGroup>
+  <Import Project="..\CommonAssemblyInfo.props" />
+</Project>

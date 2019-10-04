@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
-using Cloud;
+using Cloud.Messages;
 using CommandLine.Utilities;
 using Genome;
 using VariantAnnotation.Interface;

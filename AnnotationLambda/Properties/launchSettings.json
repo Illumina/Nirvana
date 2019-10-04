@@ -1,0 +1,18 @@
+{
+  "profiles": {
+    "AnnotationLambda": {
+      "commandName": "Project"
+    },
+    "RR_tabix_test": {
+      "commandName": "Project",
+      "commandLineArgs": "C:\\development\\LambdaRunners\\Annotation-testDragenSnv.json",
+      "workingDirectory": "C:\\development\\LambdaRunners"
+    },
+    "Mock Lambda Test Tool": {
+      "commandName": "Executable",
+      "commandLineArgs": "--port 5050",
+      "workingDirectory": ".\\bin\\Debug\\netcoreapp2.1",
+      "executablePath": "C:\\Users\\%USERNAME%\\.dotnet\\tools\\dotnet-lambda-test-tool-2.1.exe"
+    }
+  }
+}

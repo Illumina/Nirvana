@@ -14,7 +14,6 @@ namespace Variants
         public static readonly AnnotationBehavior SmallVariantBehavior      = new AnnotationBehavior(true, false, false, true, false);
         public static readonly AnnotationBehavior MinimalAnnotationBehavior = new AnnotationBehavior(false, false, false, false, false);
         public static readonly AnnotationBehavior CnvBehavior               = new AnnotationBehavior(false, true, true, false, true);
-        public static readonly AnnotationBehavior RefVariantBehavior        = new AnnotationBehavior(true, false, false, true, false);
         public static readonly AnnotationBehavior RepeatExpansionBehavior   = new AnnotationBehavior(false, false, true, false, true);
         public static readonly AnnotationBehavior StructuralVariantBehavior = new AnnotationBehavior(false, true, true, false, true);
         public static readonly AnnotationBehavior RohBehavior = new AnnotationBehavior(false, false, true, false, true, true);

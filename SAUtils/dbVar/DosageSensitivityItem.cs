@@ -12,7 +12,7 @@ namespace SAUtils.dbVar
         private int _hiScore;
         private int _tsScore;
 
-        public readonly Dictionary<int, string> ScoreToDescription = new Dictionary<int, string>()
+        public readonly Dictionary<int, string> ScoreToDescription = new Dictionary<int, string>
         {
             { -1, null},
             { 0, "no evidence to suggest that dosage sensitivity is associated with clinical phenotype" },
@@ -29,9 +29,9 @@ namespace SAUtils.dbVar
             _hiScore       = hiScore;
             _tsScore       = tsScore;
 
-            if (!ScoreToDescription.TryGetValue(_hiScore, out var description))
+            if (!ScoreToDescription.ContainsKey(_hiScore))
             {
-                throw new InvalidDataException($"Unexpected score ({_hiScore}, {_tsScore})observed for gene: {geneSymbol}");
+                throw new InvalidDataException($"Unexpected score ({_hiScore}, {_tsScore}) observed for gene: {geneSymbol}");
             }
         }
 

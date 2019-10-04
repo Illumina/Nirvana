@@ -175,6 +175,7 @@ namespace SAUtils.Custom
             return valueTypes;
         }
 
+        // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Global
         internal static void CheckPrefix(string line, string prefix, string rowNumber)
         {
             if (line != null && !line.StartsWith(prefix))

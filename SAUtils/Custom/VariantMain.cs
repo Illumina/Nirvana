@@ -78,8 +78,6 @@ namespace SAUtils.Custom
                 if (intervals == null) return ExitCodes.Success;
             }
 
-            if (nsaItemsCount == 0) CaUtilities.DeleteFiles(nsaFileName, nsaIndexFileName, nsaSchemaFileName);
-            
             using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix)))
             using (var nsiWriter = CaUtilities.GetNsiWriter(nsiStream, version, referenceProvider.Assembly, jsonTag))
             using (var siJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))

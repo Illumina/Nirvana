@@ -17,8 +17,8 @@ namespace SAUtils.SpliceAi
         private readonly ISequenceProvider _sequenceProvider;
         private readonly Dictionary<ushort, IntervalArray<byte>> _spliceIntervals;
         private readonly HashSet<string> _unresolvedSymbols;
-        public static int Count = 0;
-        public static int NoGeneCount = 0;
+        public static int Count;
+        public static int NoGeneCount;
 
         private string _geneSymbol;
         private double _acceptorGainScore;

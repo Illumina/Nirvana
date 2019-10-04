@@ -23,5 +23,5 @@
     <ProjectReference Include="..\Vcf\Vcf.csproj" />
     <ProjectReference Include="..\Tabix\Tabix.csproj" />
   </ItemGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

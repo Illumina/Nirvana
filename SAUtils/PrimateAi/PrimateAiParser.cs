@@ -47,8 +47,8 @@ namespace SAUtils.PrimateAi
         }
         //#CHROM  POS     REF     ALT     GeneId  ScorePercentile
         //1       69094   G A       79501   0.79
-        private int _nullGeneCount = 0;
-        private int _count = 0;
+        private int _nullGeneCount;
+        private int _count;
         private PrimateAiItem ExtractItem(string line)
         {
             var splits = line.Split('\t');

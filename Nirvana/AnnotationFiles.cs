@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Cloud;
+using Cloud.Messages;
 using IO;
 using VariantAnnotation.SA;
 

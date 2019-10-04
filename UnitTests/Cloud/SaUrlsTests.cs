@@ -1,4 +1,4 @@
-﻿using Cloud;
+﻿using Cloud.Messages;
 using ErrorHandling.Exceptions;
 using Xunit;
 

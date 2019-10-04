@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <OutputPath>bin\$(Configuration)</OutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.44" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.12" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Cloud\Cloud.csproj" />
+    <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
+  </ItemGroup>
+  <Import Project="..\CommonAssemblyInfo.props" />
+</Project>

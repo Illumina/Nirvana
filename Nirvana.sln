@@ -44,7 +44,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tabix", "Tabix\Tabix.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cloud", "Cloud\Cloud.csproj", "{E93914C8-2599-46BE-BE18-6229E53F581B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Downloader", "Downloader\Downloader.csproj", "{5B81B762-8A86-466A-A947-AC2CA53EE40D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "Downloader\Downloader.csproj", "{5B81B762-8A86-466A-A947-AC2CA53EE40D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AnnotationLambda", "AnnotationLambda\AnnotationLambda.csproj", "{374D5D10-98DF-4D18-9ECF-D20B5C19D258}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomAnnotationLambda", "CustomAnnotationLambda\CustomAnnotationLambda.csproj", "{FFC36924-DA37-41E1-8FA8-5FF54AC84CC0}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GeneAnnotationLambda", "GeneAnnotationLambda\GeneAnnotationLambda.csproj", "{9A0F21D6-D0B0-4074-BACA-5FF179E83007}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NirvanaLambda", "NirvanaLambda\NirvanaLambda.csproj", "{37EEEA52-94F8-4B27-A044-1CD6DBF2F86E}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleAnnotationLambda", "SingleAnnotationLambda\SingleAnnotationLambda.csproj", "{C9B4E16E-FF30-4CE0-A617-F833696FBE10}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -132,6 +142,26 @@ Global
 		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B81B762-8A86-466A-A947-AC2CA53EE40D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{374D5D10-98DF-4D18-9ECF-D20B5C19D258}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{374D5D10-98DF-4D18-9ECF-D20B5C19D258}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{374D5D10-98DF-4D18-9ECF-D20B5C19D258}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{374D5D10-98DF-4D18-9ECF-D20B5C19D258}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFC36924-DA37-41E1-8FA8-5FF54AC84CC0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFC36924-DA37-41E1-8FA8-5FF54AC84CC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFC36924-DA37-41E1-8FA8-5FF54AC84CC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFC36924-DA37-41E1-8FA8-5FF54AC84CC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A0F21D6-D0B0-4074-BACA-5FF179E83007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A0F21D6-D0B0-4074-BACA-5FF179E83007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A0F21D6-D0B0-4074-BACA-5FF179E83007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A0F21D6-D0B0-4074-BACA-5FF179E83007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37EEEA52-94F8-4B27-A044-1CD6DBF2F86E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37EEEA52-94F8-4B27-A044-1CD6DBF2F86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37EEEA52-94F8-4B27-A044-1CD6DBF2F86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37EEEA52-94F8-4B27-A044-1CD6DBF2F86E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C9B4E16E-FF30-4CE0-A617-F833696FBE10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C9B4E16E-FF30-4CE0-A617-F833696FBE10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C9B4E16E-FF30-4CE0-A617-F833696FBE10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C9B4E16E-FF30-4CE0-A617-F833696FBE10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

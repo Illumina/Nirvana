@@ -2,27 +2,12 @@
 using System.Collections.Generic;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.SA;
 using Variants;
 
 namespace SAUtils.CreateGnomadDb
 {
     public static class GnomadUtilities
     {
-        public static bool GetAllItemsAtCurrentPosition(Dictionary<(string refAllele, string altAllele), GnomadItem> items, IEnumerator<GnomadItem> enumerator, int position)
-        {
-            var item = enumerator.Current;
-            if (item == null) return false;
-
-            while (item != null && item.Position == position)
-            {
-                AddNonConflictingItems(item, items);
-                if (!enumerator.MoveNext()) return false;
-                item = enumerator.Current;
-            }
-            return true;
-        }
-
         public static Dictionary<(string refAllele, string altAllele), GnomadItem> GetMergedItems(Dictionary<(string refAllele, string altAllele), GnomadItem> genomeItems, Dictionary<(string refAllele, string altAllele), GnomadItem> exomeItems)
         {
             if (genomeItems == null) return exomeItems;
@@ -95,32 +80,6 @@ namespace SAUtils.CreateGnomadDb
                 item.HasFailedFilters,
                 item.DataType)
             ;
-        }
-        public static void AddNonConflictingItems(GnomadItem newItem, Dictionary<(string refAllele, string altAllele), GnomadItem> items)
-        {
-            //two entries are considered conflicting if they have the same ref and alt but different frequency information
-            // in case of conflicting entries, all entries for that variant are discarded
-            var refAllele = newItem.RefAllele;
-            var altAllele = newItem.AltAllele;
-
-            if (items.TryGetValue((refAllele, altAllele),
-                out var existingItem))
-            {
-                var nonConflictingItems = SuppDataUtilities.RemoveConflictingAlleles(
-                    new List<ISupplementaryDataItem>()
-                    {
-                        existingItem, newItem
-                    }, false);
-
-                // if the items conflicted, we remove it
-                if (nonConflictingItems == null || nonConflictingItems.Count == 0)
-                {
-                    items.Remove((refAllele, altAllele));
-                }
-                else items[(refAllele, altAllele)] = (GnomadItem)nonConflictingItems[0];
-
-            }
-            else items[(refAllele, altAllele)] = newItem;
         }
 
         public static GnomadItem MergeItems(GnomadItem item1, GnomadItem item2)

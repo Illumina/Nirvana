@@ -2,7 +2,7 @@
 
 namespace Genome
 {
-    public sealed class CytogeneticBands : ICytogeneticBands
+    public sealed class CytogeneticBands 
     {
         private readonly Band[][] _cytogeneticBands;
 

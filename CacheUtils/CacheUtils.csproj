@@ -5,7 +5,7 @@
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
   <ItemGroup>
     <Content Include="CacheUtils.dll.gene.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

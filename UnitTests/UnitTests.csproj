@@ -6,6 +6,7 @@
     <SonarQubeExclude>true</SonarQubeExclude>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.12" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="Moq" Version="4.13.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -15,25 +16,33 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AnnotationLambda\AnnotationLambda.csproj" />
     <ProjectReference Include="..\CacheUtils\CacheUtils.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
+    <ProjectReference Include="..\CustomAnnotationLambda\CustomAnnotationLambda.csproj" />
     <ProjectReference Include="..\Downloader\Downloader.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
+    <ProjectReference Include="..\GeneAnnotationLambda\GeneAnnotationLambda.csproj" />
+    <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\Intervals\Intervals.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
     <ProjectReference Include="..\Jasix\Jasix.csproj" />
+    <ProjectReference Include="..\NirvanaLambda\NirvanaLambda.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
+    <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\Phantom\Phantom.csproj" />
     <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
+    <ProjectReference Include="..\SingleAnnotationLambda\SingleAnnotationLambda.csproj" />
     <ProjectReference Include="..\Tabix\Tabix.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />
+    <ProjectReference Include="..\Variants\Variants.csproj" />
     <ProjectReference Include="..\Vcf\Vcf.csproj" />
     <ProjectReference Include="..\Cloud\Cloud.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

@@ -109,6 +109,7 @@ namespace VariantAnnotation.NSA
             if (index < 0) return -1;
             return chunks[index].FilePosition;
         }
+
         public (long startFilePosition, int chunkCount) GetFileRange(ushort chromIndex, int start, int end)
         {
             //create a static empty entry.

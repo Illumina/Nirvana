@@ -18,5 +18,5 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
   </ItemGroup>
-  <Import Project="CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

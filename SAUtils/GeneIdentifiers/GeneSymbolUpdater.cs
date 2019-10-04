@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SAUtils.GeneIdentifiers
@@ -113,12 +112,6 @@ namespace SAUtils.GeneIdentifiers
             Console.WriteLine($"# of gene symbols not in cache:         {_numGeneSymbolsNotInCache:N0}");
             Console.WriteLine($"# of resolved gene symbol conflicts:    {_numResolvedGeneSymbolConflicts:N0}");
             Console.WriteLine($"# of unresolved gene symbol conflicts:  {_numUnresolvedGeneSymbolConflicts:N0}");
-        }
-
-        public void WriteUpdatedGeneSymbols(StreamWriter writer)
-        {
-            writer.WriteLine("original\tupdated");
-            foreach (var kvp in _updatedGeneSymbols) writer.WriteLine($"{kvp.Key}\t{kvp.Value}");
         }
     }
 }

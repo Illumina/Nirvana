@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Phantom.Graph
 {
-    public sealed class Graph<T> : IGraph<T>
+    public sealed class Graph<T>
     {
         private readonly Dictionary<T, LinkedList<T>> _vertexToNeighbors = new Dictionary<T, LinkedList<T>>();
         private readonly bool _isDirected;
