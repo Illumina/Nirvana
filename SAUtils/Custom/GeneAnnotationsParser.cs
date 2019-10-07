@@ -127,6 +127,7 @@ namespace SAUtils.Custom
             if (!hasAnnotation) throw new UserErrorException($"No annotation provided in line {line}");
 
             string geneSymbol = GeneUtilities.GetGeneSymbolFromId(geneId, _entrezGeneIdToSymbol, _ensemblIdToSymbol);
+            if (geneSymbol == null) throw new UserErrorException($"Unrecognized gene ID {geneId} found in the input file:\n {line}");
             if (geneAnnotations.ContainsKey(geneSymbol)) throw new UserErrorException($"Found the same gene {geneSymbol} in different lines. Current line is: {line}");
             
             geneAnnotations[geneSymbol] = new List<ISuppGeneItem> {new CustomGene(geneSymbol, annotationValues.Select(x => new[] {x}).ToList(), JsonSchema, line)};

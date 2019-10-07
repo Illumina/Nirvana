@@ -92,6 +92,23 @@ namespace UnitTests.SAUtils.CustomAnnotations
         }
 
         [Fact]
+        public void GetItems_UnrecognizedGeneId_ThrowException()
+        {
+            const string lines = "#title=InternalGeneAnnotation\n" +
+                                 "#geneSymbol\tgeneId\tOMIM Description\tIs Oncogene\tphenotype\tmimNumber\tnotes\n" +
+                                 "#categories\t.\tDescription\tFilter\t\tIdentifier\t.\n" +
+                                 "#descriptions\t.\tGene description from OMIM\t\tGene phenotype\t\tFree text\n" +
+                                 "#type\t\tstring\tbool\tstring\tnumber\tstring\n" +
+                                 "Abc\t3\tsome text\ttrue\tgood\t234\ttest\n";
+                                 
+            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            {
+                Assert.Throws<UserErrorException>(() => parser.GetItems());
+            }
+        }
+
+
+        [Fact]
         public void GetItems_SameGene_MultipleEntries_ThrowException()
         {
             const string lines = "#title=InternalGeneAnnotation\n" +
