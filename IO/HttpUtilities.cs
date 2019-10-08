@@ -24,7 +24,7 @@ namespace IO
         }
 
         // Only throw exceptions when all the three tries failed.
-        public static HttpWebResponse TryGetResponse(this HttpWebRequest request, string url)
+        private static HttpWebResponse TryGetResponse(this HttpWebRequest request, string url)
         {
             var exceptions = new List<Exception>();
 
@@ -51,9 +51,9 @@ namespace IO
                 var response = WebRequest.CreateHttp(url).TryGetResponse(url);
                 response.Close();
             }
-            catch (Exception exception)
+            catch (Exception)
             {
-                if (isUserProvided) throw new UserErrorException(exception.Message);
+                if (isUserProvided) throw new UserErrorException($"Unable to validate the URL for {UrlUtilities.GetFileName(url)}");
                 throw;
             }
         }
@@ -70,28 +70,26 @@ namespace IO
         {
             if (!IsWebProtocolErrorException(exception)) return exception;
 
+            string urlPath = UrlUtilities.GetPath(url);
+
             var webException = (WebException)exception;
             (string errorCode, string errorMessage) = GetWebExceptionMessage(webException);
 
             // Expired URL is always a user error
-            if (errorMessage == "Request has expired")
-                return new UserErrorException($"The provided URL {url} is expired. Exception: {exception.Message}");
+            if (errorMessage == "Request has expired") return new UserErrorException($"The provided URL for {urlPath} has expired.");
 
             // Authentication error is always considered as a user error
-            if (AuthenticationErrorCodes.Contains(errorCode))
-                return new UserErrorException(
-                    $"Authentication error while reading from {url}. {errorMessage}. Exception: {exception.Message}");
+            if (AuthenticationErrorCodes.Contains(errorCode)) return new UserErrorException($"Authentication error while reading from URL for {urlPath}.");
 
             // Resource not exist error is always considered as a user error
-            if (ResourceNotExistErrorCodes.Contains(errorCode))
-                return new UserErrorException($"Invalid URL {url}. {errorMessage}. Exception: {exception.Message}");
+            if (ResourceNotExistErrorCodes.Contains(errorCode)) return new UserErrorException($"An invalid URL for {urlPath} was specified.");
 
             // Sometimes it is difficult to figure out whether the error is caused by the user or not.
             // For example, the AccessDenied error code could be triggered by either incorrect credentials provided by the user, or network congestion while reading from S3.
             // Therefore, such errors are treated as general exceptions.
             // And we don't pass through the general error to end user to avoid possible confusion.
             Logger.LogLine($"The following error occurred while reading from {url}: {errorMessage}. Exception: {exception.Message}");
-            return new WebException($"An error occurred while reading from {url}");
+            return new WebException($"An error occurred while reading from the URL for {urlPath} ({exception.GetType()})");
         }
 
         private static (string Code, string Message) GetWebExceptionMessage(WebException exception)

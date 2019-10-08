@@ -16,7 +16,6 @@ namespace Cloud
         public const string RefSuffix                      = ".Nirvana.dat";
         public const string JsonSuffix                     = ".json.gz";
         public const string JsonIndexSuffix                = ".jsi";
-        public const string TabixSuffix                    = ".tbi";
 
         public const string SuccessMessage                 = "Success";
 

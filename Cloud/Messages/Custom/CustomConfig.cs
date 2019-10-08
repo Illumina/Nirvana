@@ -2,7 +2,7 @@
 
 namespace Cloud.Messages.Custom
 {
-    public class CustomConfig
+    public sealed class CustomConfig
     {
         public string id;
         public string tsvUrl;

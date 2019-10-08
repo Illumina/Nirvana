@@ -2,7 +2,7 @@
 
 namespace Cloud.Messages.Custom
 {
-    public class CustomResult
+    public sealed class CustomResult
     {
         public string id;
         public string status;

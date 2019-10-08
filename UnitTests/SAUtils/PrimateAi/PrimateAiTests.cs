@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using Genome;
 using Moq;
-using SAUtils;
 using SAUtils.DataStructures;
 using SAUtils.PrimateAi;
 using VariantAnnotation.Interface.Providers;

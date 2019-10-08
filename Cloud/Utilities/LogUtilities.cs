@@ -14,15 +14,19 @@ namespace Cloud.Utilities
 
         public static void LogObject<T>(string title, T config)
         {
+            string json;
+
             switch (config)
             {
                 case string s:
-                    Logger.LogLine($"{title}:\n{s}");
+                    json = s;
                     break;
                 default:
-                    Logger.LogLine($"{title}:\n{JsonConvert.SerializeObject(config)}");
+                    json = JsonConvert.SerializeObject(config);
                     break;
             }
+
+            Logger.LogLine($"{title}:\n{json.Redact()}");
         }
 
         public static void Log(IEnumerable<string> environmentVariables)

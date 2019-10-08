@@ -78,7 +78,7 @@ namespace Jasix.DataStructures
         public void Add(int begin, int end, long filePosition)
         {
             if (begin > end)
-                throw new UserErrorException($"start position {begin} is greater than end position{end}");
+                throw new UserErrorException($"start position {begin} is greater than end position {end}");
 
 			if (Utilities.IsLargeVariant(begin,end))
             {

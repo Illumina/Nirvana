@@ -2,7 +2,7 @@
 
 namespace Cloud.Messages.Single
 {
-    public class SingleConfig
+    public sealed class SingleConfig
     {
         // ReSharper disable InconsistentNaming
         public string id;

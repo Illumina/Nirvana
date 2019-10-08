@@ -75,7 +75,7 @@ namespace IO
             return values;
         }
 
-        public void Read(byte[] buffer, int numBytes)
+        private void Read(byte[] buffer, int numBytes)
         {
             var offset            = 0;
             int numBytesRemaining = numBytes;

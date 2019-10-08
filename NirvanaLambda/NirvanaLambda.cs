@@ -81,7 +81,8 @@ namespace NirvanaLambda
 
         private static IEnumerable<AnnotationRange> GetAnnotationRanges(NirvanaConfig config, GenomeAssembly genomeAssembly)
         {
-            string cachePathPrefix = UrlCombine(NirvanaHelper.S3CacheFolder, genomeAssembly + "/" + NirvanaHelper.DefaultCacheSource);
+            string cachePathPrefix = NirvanaHelper.S3CacheFolder.UrlCombine(genomeAssembly.ToString())
+                .UrlCombine(NirvanaHelper.DefaultCacheSource);
 
             IntervalForest<IGene> geneIntervalForest;
             IDictionary<string, IChromosome> refNameToChromosome;
@@ -229,8 +230,6 @@ namespace NirvanaLambda
 
         internal static string GetIndexedPrefix(string inputVcfPath, int jobIndex) =>
             inputVcfPath.TrimEndFromFirst("?").TrimStartToLast("/").TrimEndFromFirst(".vcf") + "_" + jobIndex.ToString("00000");
-
-        private static string UrlCombine(string baseUrl, string relativeUrl) => baseUrl.TrimEnd('/') + '/' + relativeUrl.TrimStart('/');
 
         private static string FirstCharToLower(string input) => string.IsNullOrEmpty(input) || char.IsLower(input[0])
             ? input

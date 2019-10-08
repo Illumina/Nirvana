@@ -7,7 +7,7 @@ using IO;
 
 namespace Cloud.Messages
 {
-    public class SaUrls
+    public sealed class SaUrls
     {
         public string nsaUrl;
         public string idxUrl;
@@ -40,7 +40,7 @@ namespace Cloud.Messages
             if (_saType != default) return _saType;
 
             bool[] checkSaTypes = {nsaUrl != null, nsiUrl != null, ngaUrl != null};
-            var providedTypes = checkSaTypes.Select((x, i) => (Provided: x, SaTypeIndex: i + 1)).Where(y => y.Provided)
+            CustomSaType[] providedTypes = checkSaTypes.Select((x, i) => (Provided: x, SaTypeIndex: i + 1)).Where(y => y.Provided)
                 .Select(y => (CustomSaType) y.SaTypeIndex).ToArray();
 
             if (providedTypes.Length == 0) throw new UserErrorException("No custom annotation file provided.");

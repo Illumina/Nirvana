@@ -3,7 +3,7 @@ using IO;
 
 namespace Cloud.Messages.Gene
 {
-    public class GeneConfig
+    public sealed class GeneConfig
     {
         // ReSharper disable InconsistentNaming
         public string id;

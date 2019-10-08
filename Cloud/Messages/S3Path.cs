@@ -76,7 +76,7 @@ namespace Cloud.Messages
             throw new UserErrorException(errorMessage);
         }
 
-        public static string FormatPath(string path) => path.TrimStart(trimChar: '/');
+        public static string FormatPath(string path) => path.TrimStart('/');
 
         public IS3Client GetS3Client(TimeSpan timeOut) => new AmazonS3ClientWrapper(new AmazonS3Client(accessKey, secretKey, sessionToken, new AmazonS3Config { RegionEndpoint = RegionEndpoint.GetBySystemName(region), Timeout = timeOut }));
     }

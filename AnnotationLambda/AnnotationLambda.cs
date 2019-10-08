@@ -146,14 +146,13 @@ namespace AnnotationLambda
             if (annotationRange == null) return 0;
 
             var tabixIndex = Reader.GetTabixIndex(stream, refNameToChromosome);
-
             return tabixIndex.GetOffset(annotationRange.Start.Chromosome, annotationRange.Start.Position);
         }
 
         private static AnnotationResources GetAnnotationResources(AnnotationConfig annotationConfig)
         {
             var genomeAssembly      = GenomeAssemblyHelper.Convert(annotationConfig.genomeAssembly);
-            string cachePathPrefix  = UrlCombine(NirvanaHelper.S3CacheFolder, genomeAssembly + "/" + NirvanaHelper.DefaultCacheSource);
+            string cachePathPrefix  = NirvanaHelper.S3CacheFolder.UrlCombine(genomeAssembly.ToString()).UrlCombine(NirvanaHelper.DefaultCacheSource);
             string nirvanaS3Ref     = NirvanaHelper.GetS3RefLocation(genomeAssembly);
             string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations, genomeAssembly);
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> { saManifestUrl }, annotationConfig.customAnnotations, null, false, false);
@@ -167,8 +166,5 @@ namespace AnnotationLambda
 
             return annotationResources;
         }
-
-
-        private static string UrlCombine(string baseUrl, string relativeUrl) => baseUrl.TrimEnd('/') + '/' + relativeUrl.TrimStart('/');
     }
 }

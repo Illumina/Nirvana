@@ -3,7 +3,7 @@ using ErrorHandling.Exceptions;
 
 namespace Cloud.Messages.Single
 {
-    public class SingleVariant
+    public sealed class SingleVariant
     {
         // ReSharper disable InconsistentNaming
         public string chromosome;
@@ -18,7 +18,7 @@ namespace Cloud.Messages.Single
         public string[] sampleNames;
         // ReSharper restore InconsistentNaming
 
-        public const string VcfMissingValue = ".";
+        private const string VcfMissingValue = ".";
 
         public void Validate()
         {

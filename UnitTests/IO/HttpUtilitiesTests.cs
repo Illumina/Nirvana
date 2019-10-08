@@ -22,8 +22,8 @@ namespace UnitTests.IO
         }
 
         [Theory]
-        [InlineData("InvalidAccessKeyId", "The AWS Access Key Id you provided does not exist in our records", "https://unit.test", "Something wrong.", "Authentication error while reading from https://unit.test. The AWS Access Key Id you provided does not exist in our records. Exception: Something wrong.")]
-        [InlineData("AccessDenied", "Request has expired", "https://expired.url", "Something wrong again.", "The provided URL https://expired.url is expired. Exception: Something wrong again.")]
+        [InlineData("InvalidAccessKeyId", "The AWS Access Key Id you provided does not exist in our records", "https://unit.test/bob.vcf.gz", "Something wrong.", "Authentication error while reading from URL for bob.vcf.gz.")]
+        [InlineData("AccessDenied", "Request has expired", "https://expired.url/bob.vcf.gz", "Something wrong again.", "The provided URL for bob.vcf.gz has expired.")]
         public void ProcessHttpRequestForbiddenException_AsExpected(string errorCode, string message, string url, string exceptionMessage, string newErrorMessage)
         {
             XElement xmlMessage = new XElement("Root", new XElement("Code", errorCode), new XElement("Message", message));
