@@ -14,11 +14,7 @@ namespace UnitTests.Vcf
         {
             var variant = SmallVariantCreator.Create(Chr1, 101, "", "CG", false, false, null, null, false);
             Assert.False(variant.IsRefMinor);
-            Assert.True(variant.Behavior.NeedFlankingTranscript);
-            Assert.True(variant.Behavior.NeedSaPosition);
-            Assert.False(variant.Behavior.NeedSaInterval);
-            Assert.False(variant.Behavior.ReducedTranscriptAnnotation);
-            Assert.False(variant.Behavior.StructuralVariantConsequence);
+            Assert.Equal(AnnotationBehavior.SmallVariants, variant.Behavior);
             Assert.Equal("1", variant.Chromosome.EnsemblName);
             Assert.Equal(101, variant.Start);
             Assert.Equal(100, variant.End);

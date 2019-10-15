@@ -71,7 +71,7 @@ namespace UnitTests.SAUtils
                 int end = start + altAllele.Length - 1;
 
                 annotatedVariants.Add(new AnnotatedVariant(new Variant(chrom, start, end, refAllele, altAllele, type, null, false, false, false,
-                    null, null, AnnotationBehavior.SmallVariantBehavior)));
+                    null, null, AnnotationBehavior.SmallVariants, false)));
             }
 
             position.SetupGet(x => x.AnnotatedVariants).Returns(annotatedVariants.ToArray);

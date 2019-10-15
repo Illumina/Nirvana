@@ -12,11 +12,10 @@ namespace VariantAnnotation.AnnotatedPositions
         public IVariant Variant { get; }
         public string HgvsgNotation { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; } = new List<IAnnotatedRegulatoryRegion>();
-        public IList<IAnnotatedTranscript> Transcripts { get; } = new List<IAnnotatedTranscript>();
-        public IList<ISupplementaryAnnotation> SaList { get; } = new List<ISupplementaryAnnotation>();
+        public IList<IAnnotatedTranscript> Transcripts { get; }             = new List<IAnnotatedTranscript>();
+        public IList<ISupplementaryAnnotation> SaList { get; }              = new List<ISupplementaryAnnotation>();
+        public ISupplementaryAnnotation RepeatExpansionPhenotypes { get; set; }
         public double? PhylopScore { get; set; }
-        public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
-
         public AnnotatedVariant(IVariant variant) => Variant = variant;
 
         public string GetJsonString(string originalChromName)
@@ -32,52 +31,34 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddIntValue("begin", Variant.Start);
             jsonObject.AddIntValue("end", Variant.End);
             jsonObject.AddBoolValue("isReferenceMinorAllele", Variant.IsRefMinor);
-            jsonObject.AddBoolValue("isStructuralVariant", Variant.Behavior.StructuralVariantConsequence);
+            jsonObject.AddBoolValue("isStructuralVariant", Variant.IsStructuralVariant);
 
             jsonObject.AddStringValue("refAllele",
                 string.IsNullOrEmpty(Variant.RefAllele) ? "-" : Variant.RefAllele);
             jsonObject.AddStringValue("altAllele",
                 string.IsNullOrEmpty(Variant.AltAllele) ? "-" : Variant.AltAllele);
 
-            var variantType = GetVariantType(Variant.Type);
-            jsonObject.AddStringValue("variantType", variantType.ToString());
+            jsonObject.AddStringValue("variantType", Variant.Type.ToString());
             jsonObject.AddBoolValue("isDecomposedVariant", Variant.IsDecomposed);
-            if (variantType.ToString() != "SNV") jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
+            if (Variant.Type != VariantType.SNV) jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
             jsonObject.AddStringValues("linkedVids", Variant.LinkedVids);
             jsonObject.AddStringValue("hgvsg", HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
-            
+
             foreach (ISupplementaryAnnotation saItem in SaList)
             {
                 jsonObject.AddObjectValue(saItem.JsonKey, saItem);
             }
 
-            foreach (var pluginData in PluginDataSet)
-            {
-                jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
-            }
+            jsonObject.AddObjectValue(RepeatExpansionPhenotypes?.JsonKey, RepeatExpansionPhenotypes);
 
             if (Transcripts?.Count > 0) jsonObject.AddObjectValues("transcripts", Transcripts);
 
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);
-        }
-
-        private static VariantType GetVariantType(VariantType variantType)
-        {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (variantType)
-            {
-                case VariantType.short_tandem_repeat_variation:
-                case VariantType.short_tandem_repeat_contraction:
-                case VariantType.short_tandem_repeat_expansion:
-                    return VariantType.short_tandem_repeat_variation;
-                default:
-                    return variantType;
-            }
         }
     }
 }

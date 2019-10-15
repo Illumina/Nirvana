@@ -155,9 +155,7 @@ namespace AnnotationLambda
             string cachePathPrefix  = NirvanaHelper.S3CacheFolder.UrlCombine(genomeAssembly.ToString()).UrlCombine(NirvanaHelper.DefaultCacheSource);
             string nirvanaS3Ref     = NirvanaHelper.GetS3RefLocation(genomeAssembly);
             string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations, genomeAssembly);
-
-            string pluginDir = GetPluginDirectory(genomeAssembly);
-            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> { saManifestUrl }, annotationConfig.customAnnotations, pluginDir, false, false);
+            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> { saManifestUrl }, annotationConfig.customAnnotations, false, false);
 
             using (var tabixStream = PersistentStreamUtils.GetReadStream(annotationConfig.tabixUrl))
             {
@@ -167,27 +165,6 @@ namespace AnnotationLambda
             Logger.LogLine($"Tabix position :{annotationResources.InputStartVirtualPosition}");
 
             return annotationResources;
-        }
-
-        private static string GetPluginDirectory(GenomeAssembly genomeAssembly)
-        {
-            string pluginDir = null;
-
-            switch (genomeAssembly)
-            {
-                case GenomeAssembly.GRCh37:
-                    pluginDir = Directory.Exists("plugins_GRCh37")
-                        ? Path.Combine(Directory.GetCurrentDirectory(), "plugins_GRCh37")
-                        : null;
-                    break;
-                case GenomeAssembly.GRCh38:
-                    pluginDir = Directory.Exists("plugins_GRCh38")
-                        ? Path.Combine(Directory.GetCurrentDirectory(), "plugins_GRCh38")
-                        : null;
-                    break;
-            }
-
-            return pluginDir;
         }
     }
 }

@@ -77,7 +77,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             {
                 // handle small variants
                 if (overlapsTranscript) return Status.FullAnnotation;
-                if (behavior.NeedFlankingTranscript && variant.Overlaps(transcript, OverlapBehavior.FlankingLength)) return Status.FlankingAnnotation;
+                if (behavior.NeedFlankingTranscripts && variant.Overlaps(transcript, OverlapBehavior.FlankingLength)) return Status.FlankingAnnotation;
             }
             else if (overlapsTranscript)
             {

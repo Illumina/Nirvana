@@ -14,16 +14,8 @@ namespace Vcf.VariantCreator
             if (foundError) return null;
 
             start++;
-            var variantType = GetRepeatExpansionType(refRepeatCount, repeatCount);
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
-                null, null, AnnotationBehavior.RepeatExpansionBehavior);
-        }
-
-        private static VariantType GetRepeatExpansionType(int? refRepeatCount, int repeatCount)
-        {
-            if (refRepeatCount == null || refRepeatCount == repeatCount) return VariantType.short_tandem_repeat_variation;
-            return repeatCount > refRepeatCount ? VariantType.short_tandem_repeat_expansion : VariantType.short_tandem_repeat_contraction;
+            return new RepeatExpansion(chromosome, start, end, refAllele, altAllele, vid, repeatCount, refRepeatCount);
         }
     }
 }

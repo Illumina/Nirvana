@@ -109,7 +109,7 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedVariants)
             {
                 var variant = annotatedVariant.Variant;
-                if (variant.Behavior.Equals(AnnotationBehavior.MinimalAnnotationBehavior)) continue;
+                if (variant.Behavior.MinimalTranscriptAnnotation) continue;
 
                 ITranscript[] geneFusionCandidates = GetGeneFusionCandidates(variant.BreakEnds, transcriptIntervalForest);
                 ITranscript[] transcripts          = transcriptIntervalForest.GetAllFlankingValues(variant);
@@ -174,9 +174,10 @@ namespace VariantAnnotation.Providers
 
         private static void AddRegulatoryRegions(IAnnotatedVariant[] annotatedVariants, IIntervalForest<IRegulatoryRegion> regulatoryIntervalForest)
         {
-            if (annotatedVariants[0].Variant.Behavior.Equals(AnnotationBehavior.RohBehavior)) return;
             foreach (var annotatedVariant in annotatedVariants)
             {
+                if (!annotatedVariant.Variant.Behavior.NeedRegulatoryRegions) continue;
+
                 // In case of insertions, the base(s) are assumed to be inserted at the end position
                 // if this is an insertion just before the beginning of the regulatory element, this takes care of it
                 var variant      = annotatedVariant.Variant;

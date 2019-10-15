@@ -51,13 +51,14 @@ namespace UnitTests.TestUtilities
             var annotationFiles = new AnnotationFiles();
             saPaths?.ForEach(x => annotationFiles.AddFiles(x));
 
-            var sequenceFilePath                 = cacheFilePrefix + ".bases";
-            var sequenceProvider                 = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
-            var transcriptAnnotationProvider     = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
-            var saProvider                       = ProviderUtilities.GetNsaProvider(annotationFiles);
-            var conservationProvider             = ProviderUtilities.GetConservationProvider(annotationFiles);
+            string sequenceFilePath          = cacheFilePrefix + ".bases";
+            var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
+            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
+            var saProvider                   = ProviderUtilities.GetNsaProvider(annotationFiles);
+            var conservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
 
-            var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider, conservationProvider, null);
+            var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider,
+                conservationProvider, null, null);
             return (annotator,sequenceProvider);
         }
     }

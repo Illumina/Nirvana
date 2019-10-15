@@ -25,8 +25,8 @@ namespace VariantAnnotation.Sequence
         public readonly CompressedSequence Sequence;
         public GenomeAssembly Assembly => Sequence.Assembly;
 
-        private readonly Dictionary<string, int> _nameToIndex = new Dictionary<string, int>();
-        private readonly List<SequenceIndexEntry> _refSeqIndex = new List<SequenceIndexEntry>();
+        private readonly Dictionary<string, int> _nameToIndex         = new Dictionary<string, int>();
+        private readonly List<SequenceIndexEntry> _refSeqIndex        = new List<SequenceIndexEntry>();
         public readonly List<ReferenceMetadata> ReferenceMetadataList = new List<ReferenceMetadata>();
 
         private long _indexOffset;

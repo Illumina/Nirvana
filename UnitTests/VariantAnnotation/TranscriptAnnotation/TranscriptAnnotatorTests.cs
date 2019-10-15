@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System.Collections.Generic;
+using Genome;
 using Intervals;
 using Moq;
 using VariantAnnotation.AnnotatedPositions.Transcript;
@@ -15,7 +16,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_NoOverlap_ReturnNoAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 101),
-                new Interval(5102, 6100), new AnnotationBehavior(true, false, false, true, false));
+                new Interval(5102, 6100), AnnotationBehavior.SmallVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.NoAnnotation, observedStatus);
         }
@@ -24,7 +25,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Flanking_ReturnFlankingAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 100),
-                new Interval(102, 305), new AnnotationBehavior(false, true, false, true, false));
+                new Interval(102, 305), AnnotationBehavior.SmallVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FlankingAnnotation, observedStatus);
         }
@@ -33,7 +34,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Reduced_TranscriptCompleteOverlap_ReturnSvCompleteOverlapAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false));
+                new Interval(102, 305), AnnotationBehavior.StructuralVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.CompleteOverlapAnnotation, observedStatus);
         }
@@ -43,7 +44,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Reduced_TranscriptCompleteOverlap_GenePartialOverlap_ReturnSvCompleteOverlapAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false));
+                new Interval(102, 305), AnnotationBehavior.StructuralVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.CompleteOverlapAnnotation, observedStatus);
         }
@@ -52,7 +53,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Reduced_TranscriptPartialOverlap_ReturnReducedAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 200),
-                new Interval(102, 305), new AnnotationBehavior(false, true, true, false, false));
+                new Interval(102, 305), AnnotationBehavior.StructuralVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.ReducedAnnotation, observedStatus);
         }
@@ -61,7 +62,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Full_PartialOverlap_ReturnFullAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 105),
-                new Interval(102, 305), new AnnotationBehavior(false, true, false, false, false));
+                new Interval(102, 305), AnnotationBehavior.SmallVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
         }
@@ -70,7 +71,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Full_CompleteOverlap_ReturnFullAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), new AnnotationBehavior(false, true, false, false, false));
+                new Interval(102, 305), AnnotationBehavior.SmallVariants);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
         }
@@ -79,7 +80,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_ROH_Return_RohAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), AnnotationBehavior.RohBehavior);
+                new Interval(102, 305), AnnotationBehavior.RunsOfHomozygosity);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.RohAnnotation, observedStatus);
         }
@@ -91,9 +92,9 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
-            var transcripts = new[] { transcript1.Object, transcript2.Object };
+            ITranscript[] transcripts = new[] { transcript1.Object, transcript2.Object };
 
-            variant.SetupGet(x => x.Behavior).Returns(new AnnotationBehavior(true, false, false, true, false));
+            variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.SmallVariants);
             variant.SetupGet(x => x.Start).Returns(123456);
             variant.SetupGet(x => x.End).Returns(123456);
 
@@ -111,7 +112,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
 
             var compressedSequence = new Mock<ISequence>();
 
-            var observedAnnotatedTranscripts =
+            IList<IAnnotatedTranscript> observedAnnotatedTranscripts =
                 TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts,
                     compressedSequence.Object, null, null);
 
@@ -125,9 +126,9 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
-            var transcripts = new[] { transcript1.Object, transcript2.Object };
+            ITranscript[] transcripts = new[] { transcript1.Object, transcript2.Object };
 
-            variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.RohBehavior);
+            variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.RunsOfHomozygosity);
             variant.SetupGet(x => x.Start).Returns(10000);
             variant.SetupGet(x => x.End).Returns(20000);
 
@@ -141,7 +142,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             transcript2.SetupGet(x => x.End).Returns(15000);
             transcript2.SetupGet(x => x.IsCanonical).Returns(false);
 
-            var observedAnnotatedTranscripts =
+            IList<IAnnotatedTranscript> observedAnnotatedTranscripts =
                 TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts, null, null, null);
 
             Assert.Single(observedAnnotatedTranscripts);

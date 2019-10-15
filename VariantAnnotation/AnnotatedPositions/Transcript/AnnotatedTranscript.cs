@@ -22,7 +22,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public PredictionScore PolyPhen { get; }
         public IEnumerable<ConsequenceTag> Consequences { get; }
         public IGeneFusionAnnotation GeneFusionAnnotation { get; }
-        public IList<IPluginData> PluginData { get; }
         public bool? CompleteOverlap { get; }
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
@@ -42,7 +41,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             PolyPhen             = polyphen;
             Consequences         = consequences;
             GeneFusionAnnotation = geneFusionAnnotation;
-            PluginData           = new List<IPluginData>();
             CompleteOverlap      = completeOverlap;
         }
 
@@ -87,12 +85,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
             jsonObject.AddStringValue("siftPrediction", Sift?.Prediction);
-
-            if (PluginData != null)
-                foreach (var pluginData in PluginData)
-                {
-                    jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
-                }
 
             if (CompleteOverlap.HasValue) jsonObject.AddBoolValue("completeOverlap", CompleteOverlap.Value);
 

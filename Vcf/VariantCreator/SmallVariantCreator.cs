@@ -13,11 +13,11 @@ namespace Vcf.VariantCreator
             var variantType = GetVariantType(refAllele, altAllele);
 
             var annotationBehavior = variantType == VariantType.non_informative_allele
-                ? AnnotationBehavior.MinimalAnnotationBehavior
-                : AnnotationBehavior.SmallVariantBehavior;
+                ? AnnotationBehavior.NonInformativeAlleles
+                : AnnotationBehavior.SmallVariants;
 
             return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, isRefMinor, isDecomposed,
-                isRecomposed, linkedVids, null, annotationBehavior);
+                isRecomposed, linkedVids, null, annotationBehavior, false);
         }
 
         public static VariantType GetVariantType(string refAllele, string altAllele)

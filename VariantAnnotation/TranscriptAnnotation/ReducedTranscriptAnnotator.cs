@@ -41,12 +41,12 @@ namespace VariantAnnotation.TranscriptAnnotation
                 endIndex);
         }
 
-        private static IEnumerable<ConsequenceTag> GetConsequences(IInterval transcript, ISimpleVariant variant,
+        private static IEnumerable<ConsequenceTag> GetConsequences(IInterval transcript, IVariant variant,
             bool hasGeneFusionAnnotation)
         {
             var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant, true);
             var consequence   = new Consequences(null, featureEffect);
-            consequence.DetermineStructuralVariantEffect(variant.Type, hasGeneFusionAnnotation);
+            consequence.DetermineStructuralVariantEffect(variant, hasGeneFusionAnnotation);
             return consequence.GetConsequences();
         }
     }

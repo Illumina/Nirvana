@@ -5,11 +5,12 @@ using System.Linq;
 using Cloud.Messages;
 using CommandLine.Utilities;
 using Genome;
+using RepeatExpansions;
+using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
-using VariantAnnotation.Interface.Plugins;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
@@ -28,7 +29,6 @@ namespace Nirvana
         public IAnnotationProvider ConservationProvider { get; }
         public IRefMinorProvider RefMinorProvider { get; }
         public IGeneAnnotationProvider GeneAnnotationProvider { get; }
-        public IPlugin[] Plugins { get; }
         public IAnnotator Annotator { get; }
         public IRecomposer Recomposer { get; }
         public List<IDataSourceVersion> DataSourceVersions { get; }
@@ -37,7 +37,7 @@ namespace Nirvana
         public string AnnotatorVersionTag { get; set; } = "Nirvana " + CommandLineUtilities.Version;
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations, string pluginDirectory, bool disableRecomposition, bool forceMitochondrialAnnotation)
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations, bool disableRecomposition, bool forceMitochondrialAnnotation)
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
             
@@ -50,15 +50,17 @@ namespace Nirvana
             ConservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
             RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
-            Plugins                      = PluginUtilities.LoadPlugins(pluginDirectory);
 
-            Annotator = ProviderUtilities.GetAnnotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
-                ConservationProvider, GeneAnnotationProvider, Plugins);
+            var repeatExpansionProvider = new RepeatExpansionProvider(SequenceProvider.Assembly,
+                SequenceProvider.RefNameToChromosome, SequenceProvider.RefIndexToChromosome.Count);
 
+            Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
+                ConservationProvider, GeneAnnotationProvider, repeatExpansionProvider);
+            
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
                 : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider);
-            DataSourceVersions = GetDataSourceVersions(Plugins, TranscriptAnnotationProvider, SaProvider,
+            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider,
                 GeneAnnotationProvider, ConservationProvider).ToList();
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." +
                              SaCommon.DataVersion;
@@ -66,11 +68,9 @@ namespace Nirvana
             ForceMitochondrialAnnotation = forceMitochondrialAnnotation;
         }
 
-        private static IEnumerable<IDataSourceVersion> GetDataSourceVersions(IEnumerable<IPlugin> plugins,
-            params IProvider[] providers)
+        private static IEnumerable<IDataSourceVersion> GetDataSourceVersions(params IProvider[] providers)
         {
             var dataSourceVersions = new List<IDataSourceVersion>();
-            if (plugins != null) foreach (var provider in plugins) if (provider.DataSourceVersions != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
             foreach (var provider in providers) if (provider != null) dataSourceVersions.AddRange(provider.DataSourceVersions);
             return dataSourceVersions.ToHashSet(new DataSourceVersionComparer());
         }
@@ -99,7 +99,7 @@ namespace Nirvana
         {
             SequenceProvider.LoadChromosome(chromosome);
 
-            if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
+            if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out List<int> positions)) return;
             SaProvider?.PreLoad(chromosome, positions);
         }
 

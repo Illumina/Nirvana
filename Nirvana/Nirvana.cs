@@ -22,7 +22,6 @@ namespace Nirvana
         private static string _vcfPath;
         private static string _refSequencePath;
         private static string _outputFileName;
-        private static string _pluginDirectory;
 
         private static bool _forceMitochondrialAnnotation;
         private static bool _disableRecomposition;
@@ -40,7 +39,7 @@ namespace Nirvana
 
         private static AnnotationResources GetAnnotationResources()
         {            
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, _pluginDirectory, _disableRecomposition, _forceMitochondrialAnnotation);
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, _disableRecomposition, _forceMitochondrialAnnotation);
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 
             using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(PersistentStreamUtils.GetReadStream(_vcfPath)))
@@ -64,11 +63,6 @@ namespace Nirvana
                     "in|i=",
                     "input VCF {path}",
                     v => _vcfPath = v
-                },
-                {
-                    "plugin|p=",
-                    "plugin {directory}",
-                    v => _pluginDirectory = v
                 },
                 {
                     "out|o=",

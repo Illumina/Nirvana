@@ -12,7 +12,7 @@ namespace Vcf.VariantCreator
             if (variantType != VariantType.translocation_breakend) start++;
 
             return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
-                null, breakEnds, AnnotationBehavior.StructuralVariantBehavior);
+                null, breakEnds, AnnotationBehavior.StructuralVariants, true);
         }
 
         private static VariantType GetVariantType(string altAllele, string svType)

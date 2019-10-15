@@ -73,9 +73,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private IVariant GetRefMinorVariant()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false);
             return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
-                new[] { "bob:100:102:TAT" }, null, behavior);
+                new[] { "bob:100:102:TAT" }, null, AnnotationBehavior.SmallVariants, false);
         }
     }
 }

@@ -43,13 +43,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private static IVariant GetVariant()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false);
-
             var variant = new Mock<IVariant>();
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);
             variant.SetupGet(x => x.Start).Returns(949523);
             variant.SetupGet(x => x.End).Returns(949523);
-            variant.SetupGet(x => x.Behavior).Returns(behavior);
+            variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.SmallVariants);
             return variant.Object;
         }
     }

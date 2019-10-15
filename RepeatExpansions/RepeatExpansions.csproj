@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <Import Project="..\CommonAssemblyInfo.props" />
+  <ItemGroup>
+    <None Remove="RepeatExpansions.GRCh37.tsv" />
+    <None Remove="RepeatExpansions.GRCh38.tsv" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\RepeatExpansions.GRCh37.tsv" />
+    <EmbeddedResource Include="Resources\RepeatExpansions.GRCh38.tsv" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
+    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+  </ItemGroup>
+</Project>
