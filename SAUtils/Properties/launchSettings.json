@@ -108,6 +108,11 @@
       "commandName": "Project",
       "commandLineArgs": "PrimateAi --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cache C:\\development\\Cache\\26\\GRCh37\\Both --in PrimateAI_Percentiles_0.2_GRCh37.tsv.gz --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "C:\\development\\ExternalDataSources\\PrimateAI\\0.2\\GRCh37"
+    },
+    "RR_heteroplasmy": {
+      "commandName": "Project",
+      "commandLineArgs": "MitoHet --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in coriell_GRCh37.MT.json.bed.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "c:\\development\\ExternalDataSources\\MitoHeteroplasmy"
     }
   }
 }

@@ -7,6 +7,7 @@ using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GnomadGeneScores;
+using SAUtils.MitoHeteroplasmy;
 using SAUtils.PrimateAi;
 using SAUtils.ProcessSpliceNetTsv;
 using SAUtils.SpliceAi;
@@ -48,7 +49,8 @@ namespace SAUtils
                 ["mitomapSvDb"]           = new TopLevelOption("create MITOMAP structural variants database", StructVarDb.Run),
                 ["spliceAi"]              = new TopLevelOption("create SpliceAI database", SpliceAiDb.Run),
                 ["primateAi"]             = new TopLevelOption("create PrimateAI database", PrimateAiDb.Run),
-                ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run)
+                ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run),
+                ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run)
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)

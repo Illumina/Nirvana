@@ -10,6 +10,7 @@ using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
 using Variants;
+using Vcf.VariantCreator;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
@@ -212,8 +213,8 @@ namespace SAUtils.InputFileParsers.ClinVar
                     new ClinVarItem(variant.Chromosome,
                         variant.Start,
                         variant.Stop,
-                        variant.ReferenceAllele,
-                        variant.AltAllele,
+                        variant.RefAllele??"",// alleles cannot be null
+                        variant.AltAllele??"",
                         JsonSchema,
                         _alleleOrigins.Count > 0 ? _alleleOrigins : null,
                         variant.VariantType,
@@ -441,7 +442,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 			    if (source.Value != PubmedIdTag) continue;
 
-			    string pubmedId = element.Value.TrimEnd('.');
+			    string pubmedId = element.Value.Split('.', ',')[0];
                 //pubmed ids with more than 8 digits are bad
                 if (long.TryParse(pubmedId, out long l) && l <= 99_999_999)//pubmed ids with more than 8 digits are bad
                     _pubMedIds.Add(l);
@@ -496,7 +497,8 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		        if (variant == null) continue;
 
-		        variant.VariantType = varType;
+                variant.VariantType = varType;
+                if (varType == "Microsatellite") UpdateVariantType(variant);
                 if (variant.AltAllele == "Alu") variant.VariantType = "ALU";
 
 		        if (variant.AltAllele != null && variant.AltAllele.Length == 1 && _iupacBases.ContainsKey(variant.AltAllele[0]))
@@ -517,12 +519,42 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    
 		}
 
-        
+        private void UpdateVariantType(ClinvarVariant variant)
+        {
+            var refAllele = variant.RefAllele;
+            var altAllele = variant.AltAllele;
+
+            if (refAllele == null || altAllele == null) return;
+
+            var variantType = SmallVariantCreator.GetVariantType(refAllele, altAllele);
+            switch (variantType)
+            {
+                case VariantType.deletion:
+                    variant.VariantType = "Deletion";
+                    break;
+                case VariantType.insertion:
+                    variant.VariantType = "Insertion";
+                    break;
+                case VariantType.indel:
+                    variant.VariantType = "Indel";
+                    break;
+                case VariantType.duplication:
+                    variant.VariantType = "Duplication";
+                    break;
+                case VariantType.SNV:
+                    variant.VariantType = "SNV";
+                    break;
+                case VariantType.MNV:
+                    variant.VariantType = "MNV";
+                    break;
+
+            }
+        }
         private void AddIupacVariants(ClinvarVariant variant, List<ClinvarVariant> variantList)
 		{
 			foreach (char altAllele in _iupacBases[variant.AltAllele[0]])
 			{
-			    variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop,variant.VariantId, variant.ReferenceAllele, altAllele.ToString()));
+			    variantList.Add(new ClinvarVariant(variant.Chromosome,variant.Start, variant.Stop,variant.VariantId, variant.RefAllele, altAllele.ToString()));
 			}
 		}
 

@@ -12,7 +12,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.PrimateAi
 {
-    public class PrimateAiTests
+    public sealed class PrimateAiTests
     {
         private static readonly IChromosome Chr10 = new Chromosome("chr10", "10", 9);
         private static readonly IChromosome Chr3 = new Chromosome("chr3", "3", 2);

@@ -285,6 +285,21 @@ namespace UnitTests.SAUtils.InputFileParsers
         }
 
         [Fact]
+        public void PubmedTest7_comma_trimming()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr17", "17", 16), 41258568, "A");
+
+            //extracting from SCV record
+            var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000167792.xml"), sequenceProvider);
+
+            Assert.True(reader.GetItems().Any());
+            foreach (var clinVarItem in reader.GetItems())
+            {
+                Assert.Equal(clinVarItem.PubmedIds, new List<long> { 23239986, 28492532, 30472649 });
+            }
+        }
+
+        [Fact]
         public void MultiScvPubmed()
         {
             var sequenceProvider =
@@ -869,6 +884,17 @@ namespace UnitTests.SAUtils.InputFileParsers
             var clinvarItems = reader.GetItems().ToList();
 
             Assert.Equal(new[] { "pathogenic", "uncertain significance" }, clinvarItems[0].Significances);
+        }
+
+        [Fact]
+        public void Override_microsatellite_type()
+        {
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 3), 88929174, "GAG");
+            var reader = new ClinVarXmlReader(Resources.ClinvarXmlFiles("RCV000205418.xml"), sequenceProvider);
+
+            var clinvarItems = reader.GetItems();
+
+            Assert.Single(clinvarItems);
         }
     }
 }

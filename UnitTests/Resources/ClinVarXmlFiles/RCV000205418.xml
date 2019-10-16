@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+  <ClinVarSet ID="44423871">
+    <RecordStatus>current</RecordStatus>
+    <Title>NM_000297.4(PKD2):c.290_292AGG[5] (p.Glu102del) AND Polycystic kidney disease, autosomal dominant</Title>
+    <ReferenceClinVarAssertion DateCreated="2016-01-30" DateLastUpdated="2019-08-26" ID="489301">
+      <ClinVarAccession Acc="RCV000205418" Version="1" Type="RCV" DateUpdated="2019-08-26" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2015-08-25">
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Benign</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>clinical testing</MethodType>
+        </Method>
+        <ObservedData ID="42893384">
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant" ID="219942" Acc="VCV000219942" Version="1">
+        <Measure Type="Microsatellite" ID="221475">
+          <Name>
+            <ElementValue Type="Preferred">NM_000297.4(PKD2):c.290_292AGG[5] (p.Glu102del)</ElementValue>
+          </Name>
+          <AttributeSet>
+            <Attribute Accession="NM_000297" Version="4" Change="c.290_292AGG[5]" Type="HGVS, coding, RefSeq">NM_000297.4:c.290_292AGG[5]</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Accession="NG_008604" Version="1" Change="g.5356_5358AGG[5]" Type="HGVS, genomic, RefSeqGene">NG_008604.1:g.5356_5358AGG[5]</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Accession="NC_000004" Version="12" Change="g.88008023_88008025AGG[5]" Type="HGVS, genomic, top level" integerValue="38">NC_000004.12:g.88008023_88008025AGG[5]</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Accession="NC_000004" Version="11" Change="g.88929175_88929177AGG[5]" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000004.11:g.88929175_88929177AGG[5]</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Accession="NM_000297" Version="3" Change="c.289_291delGAG" Type="HGVS, previous">NM_000297.3:c.289_291delGAG</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Accession="NR_156488" Version="1" Change="n.377_379AGG[5]" Type="HGVS, previous">NR_156488.1:n.377_379AGG[5]</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Accession="NP_000288" Version="1" Change="p.Glu102del" Type="HGVS, protein, RefSeq">NP_000288.1:p.Glu102del</Attribute>
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="MolecularConsequence">inframe_deletion</Attribute>
+            <XRef ID="SO:0001822" DB="Sequence Ontology" />
+            <XRef ID="NM_000297.4:c.290_292AGG[5]" DB="RefSeq" />
+          </AttributeSet>
+          <AttributeSet>
+            <Attribute Type="ProteinChange1LetterCode">E102del</Attribute>
+          </AttributeSet>
+          <AlleleFrequencyList>
+            <AlleleFrequency Value="0.00739" Source="1000 Genomes Project" />
+          </AlleleFrequencyList>
+          <GlobalMinorAlleleFrequency Value="0.00739" Source="1000 Genomes Project" MinorAllele="GAGGAGGAGGAGGAGGAGGAGG" />
+          <CytogeneticLocation>4q22.1</CytogeneticLocation>
+          <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="4" Accession="NC_000004.12" start="88008022" stop="88008024" display_start="88008022" display_stop="88008024" variantLength="3" referenceAllele="GAG" alternateAllele="-" positionVCF="88008021" referenceAlleleVCF="CGAG" alternateAlleleVCF="C" />
+          <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="4" Accession="NC_000004.11" start="88929174" stop="88929176" display_start="88929174" display_stop="88929176" variantLength="3" referenceAllele="GAG" alternateAllele="-" positionVCF="88929173" referenceAlleleVCF="CGAG" alternateAlleleVCF="C" />
+          <MeasureRelationship Type="within single gene">
+            <Name>
+              <ElementValue Type="Preferred">polycystin 2, transient receptor potential cation channel</ElementValue>
+            </Name>
+            <Symbol>
+              <ElementValue Type="Preferred">PKD2</ElementValue>
+            </Symbol>
+            <AttributeSet>
+              <Attribute dateValue="2012-07-06" Type="Haploinsufficiency">Sufficient evidence for dosage pathogenicity</Attribute>
+              <Citation>
+                <URL>https://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=PKD2</URL>
+              </Citation>
+            </AttributeSet>
+            <AttributeSet>
+              <Attribute dateValue="2012-07-06" Type="Triplosensitivity">No evidence available</Attribute>
+              <Citation>
+                <URL>https://www.ncbi.nlm.nih.gov/projects/dbvar/ISCA/isca_gene.cgi?sym=PKD2</URL>
+              </Citation>
+            </AttributeSet>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="4" Accession="NC_000004.12" start="88007635" stop="88077779" display_start="88007635" display_stop="88077779" Strand="+" />
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="4" Accession="NC_000004.11" start="88928798" stop="88998930" display_start="88928798" display_stop="88998930" variantLength="70133" Strand="+" />
+            <XRef ID="5311" DB="Gene" />
+            <XRef Type="MIM" ID="173910" DB="OMIM" />
+            <XRef ID="HGNC:9009" DB="HGNC" />
+          </MeasureRelationship>
+          <XRef Type="rs" ID="750077647" DB="dbSNP" />
+        </Measure>
+        <Name>
+          <ElementValue Type="Preferred">NM_000297.4(PKD2):c.290_292AGG[5] (p.Glu102del)</ElementValue>
+        </Name>
+        <XRef ID="CA349584" DB="ClinGen" />
+      </MeasureSet>
+      <TraitSet Type="Disease" ID="13731">
+        <Trait ID="16746" Type="Disease">
+          <Name>
+            <ElementValue Type="Preferred">Polycystic kidney disease, autosomal dominant</ElementValue>
+          </Name>
+          <Symbol>
+            <ElementValue Type="Preferred">ADPKD</ElementValue>
+          </Symbol>
+          <Symbol>
+            <ElementValue Type="Alternate">PKD1</ElementValue>
+            <XRef ID="GTR000525320" DB="Genetic Testing Registry (GTR)" />
+          </Symbol>
+          <AttributeSet>
+            <Attribute Type="public definition">Autosomal dominant polycystic kidney disease (ADPKD) is generally a late-onset multisystem disorder characterized by bilateral renal cysts, liver cysts, and an increased risk of intracranial aneurysms. Other manifestations include: cysts in the pancreas, seminal vesicles, and arachnoid membrane; dilatation of the aortic root and dissection of the thoracic aorta; mitral valve prolapse; and abdominal wall hernias. Renal manifestations include hypertension, renal pain, and renal insufficiency. Approximately 50% of individuals with ADPKD have end-stage renal disease (ESRD) by age 60 years. The prevalence of liver cysts increases with age and occasionally results in clinically significant severe polycystic liver disease (PLD). Overall the prevalence of intracranial aneurysms is fivefold higher than in the general population and further increased in those with a positive family history of aneurysms or subarachnoid hemorrhage. There is substantial variability in the severity of renal disease and other extrarenal manifestations even within the same family.</Attribute>
+            <XRef ID="NBK1246" DB="GeneReviews" />
+          </AttributeSet>
+          <Citation Type="review" Abbrev="GeneReviews">
+            <ID Source="PubMed">20301424</ID>
+            <ID Source="BookShelf">NBK1246</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="AHA/ASA, 2014">
+            <ID Source="PubMed">25355838</ID>
+          </Citation>
+          <Citation Type="practice guideline" Abbrev="Spanish WG, 2014">
+            <ID Source="PubMed">25165191</ID>
+          </Citation>
+          <XRef ID="C0085413" DB="MedGen" />
+        </Trait>
+      </TraitSet>
+    </ReferenceClinVarAssertion>
+    <ClinVarAssertion ID="485087" SubmissionName="2016January">
+      <ClinVarSubmissionID localKey="NM_000297.3:c.289_291delGAG|MedGen:CN119611" submitter="Invitae" submitterDate="2016-01-06" />
+      <ClinVarAccession Acc="SCV000260120" Version="2" Type="SCV" OrgID="500031" OrganizationCategory="laboratory" OrgType="primary" DateUpdated="2019-03-31" />
+      <RecordStatus>current</RecordStatus>
+      <ClinicalSignificance DateLastEvaluated="2015-08-25">
+        <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+        <Description>Benign</Description>
+      </ClinicalSignificance>
+      <Assertion Type="variation to disease" />
+      <AttributeSet>
+        <Attribute Type="AssertionMethod">Invitae Variant Classification Sherloc (09022015)</Attribute>
+        <Citation>
+          <ID Source="PubMed">28492532</ID>
+        </Citation>
+      </AttributeSet>
+      <ObservedIn>
+        <Sample>
+          <Origin>germline</Origin>
+          <Species TaxonomyId="9606">human</Species>
+          <AffectedStatus>unknown</AffectedStatus>
+        </Sample>
+        <Method>
+          <MethodType>clinical testing</MethodType>
+        </Method>
+        <ObservedData>
+          <Attribute Type="Description">not provided</Attribute>
+        </ObservedData>
+      </ObservedIn>
+      <MeasureSet Type="Variant">
+        <Measure Type="Variation">
+          <AttributeSet>
+            <Attribute Type="HGVS">NM_000297.3:c.289_291delGAG</Attribute>
+          </AttributeSet>
+          <MeasureRelationship Type="variant in gene">
+            <Symbol>
+              <ElementValue Type="Preferred">PKD2</ElementValue>
+            </Symbol>
+          </MeasureRelationship>
+        </Measure>
+      </MeasureSet>
+      <TraitSet Type="Disease">
+        <Trait Type="Disease">
+          <XRef DB="MedGen" ID="CN119611" Type="CUI" />
+        </Trait>
+      </TraitSet>
+    </ClinVarAssertion>
+  </ClinVarSet>
+
+</ReleaseSet>
