@@ -17,6 +17,7 @@ namespace Cloud.Utilities
                 if (s3Client.TryDecryptUpload(bucketName, key, filePath, aes, metadata)) return;
 
                 Thread.Sleep(retryDelay);
+
             }
         }
 

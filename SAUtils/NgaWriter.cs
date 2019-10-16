@@ -10,28 +10,28 @@ namespace SAUtils
 {
     public sealed class NgaWriter:IDisposable
     {
-        private readonly Stream _nsaStream;
+        private readonly Stream _ngaStream;
         private readonly DataSourceVersion _version;
         private readonly string _jsonKey;
         private readonly ushort _schemaVersion;
         private readonly bool _isArray;
 
-        public NgaWriter(Stream nsaStream, DataSourceVersion version, string jsonKey, ushort schemaVersion, bool isArray)
+        public NgaWriter(Stream ngaStream, DataSourceVersion version, string jsonKey, ushort schemaVersion, bool isArray)
         {
-            _nsaStream     = nsaStream;
+            _ngaStream     = ngaStream;
             _version       = version;
             _jsonKey       = jsonKey;
             _schemaVersion = schemaVersion;
             _isArray       = isArray;
         }
 
-        public void Dispose() =>_nsaStream?.Dispose();
+        public void Dispose() =>_ngaStream?.Dispose();
 
         public void Write(Dictionary<string, List<ISuppGeneItem>> geneToEntries)
         {
             using (var memStream = new MemoryStream())
             using (var memWriter = new ExtendedBinaryWriter(memStream))
-            using (var writer = new BinaryWriter(_nsaStream))
+            using (var writer = new BinaryWriter(_ngaStream))
             {
                 _version.Write(memWriter);
                 memWriter.WriteOptAscii(_jsonKey);

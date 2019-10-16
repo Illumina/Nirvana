@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -30,11 +31,13 @@ namespace SAUtils.Custom
         private int _numAnnotationColumns;
         private Action<string, string>[] _annotationValidators;
 
+        
         internal GeneAnnotationsParser(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
         {
             _reader = reader;
             _entrezGeneIdToSymbol = entrezGeneIdToSymbol;
             _ensemblIdToSymbol = ensemblIdToSymbol;
+
         }
 
         public static GeneAnnotationsParser Create(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
@@ -88,7 +91,7 @@ namespace SAUtils.Custom
             }
         }
 
-        public Dictionary<string, List<ISuppGeneItem>> GetItems()
+        public Dictionary<string, List<ISuppGeneItem>> GetItems(bool skipGeneIdValidation=false, StreamWriter logWriter = null)
         {
             var geneAnnotations = new Dictionary<string, List<ISuppGeneItem>>();
             using (_reader)
@@ -97,15 +100,14 @@ namespace SAUtils.Custom
                 while ((line = _reader.ReadLine()) != null)
                 {
                     if (string.IsNullOrWhiteSpace(line)) continue;
-                    AddItem(line, geneAnnotations);
+                    AddItem(line, geneAnnotations, skipGeneIdValidation, logWriter);
                 }
             }
-
             if (geneAnnotations.Count == 0) throw new UserErrorException("The provided TSV has no valid custom annotation entries.");
             return geneAnnotations;
         }
 
-        private void AddItem(string line, IDictionary<string, List<ISuppGeneItem>> geneAnnotations)
+        private void AddItem(string line, IDictionary<string, List<ISuppGeneItem>> geneAnnotations, bool skipGeneIdValidation, StreamWriter logWriter)
         {
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length)
@@ -127,7 +129,14 @@ namespace SAUtils.Custom
             if (!hasAnnotation) throw new UserErrorException($"No annotation provided in line {line}");
 
             string geneSymbol = GeneUtilities.GetGeneSymbolFromId(geneId, _entrezGeneIdToSymbol, _ensemblIdToSymbol);
-            if (geneSymbol == null) throw new UserErrorException($"Unrecognized gene ID {geneId} found in the input file:\n {line}");
+            if (geneSymbol == null)
+            {
+                if(!skipGeneIdValidation)
+                    throw new UserErrorException($"Unrecognized gene ID {geneId} found in the input file:\n {line}");
+
+                logWriter?.WriteLine($"Skipping unrecognized gene ID {geneId}");
+                return;
+            }
             if (geneAnnotations.ContainsKey(geneSymbol)) throw new UserErrorException($"Found the same gene {geneSymbol} in different lines. Current line is: {line}");
             
             geneAnnotations[geneSymbol] = new List<ISuppGeneItem> {new CustomGene(geneSymbol, annotationValues.Select(x => new[] {x}).ToList(), JsonSchema, line)};

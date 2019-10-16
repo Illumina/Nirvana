@@ -7,5 +7,6 @@ namespace Cloud.Messages.Custom
         public string id;
         public string tsvUrl;
         public S3Path outputDir;
+        public bool skipGeneIdValidation;
     }
 }
