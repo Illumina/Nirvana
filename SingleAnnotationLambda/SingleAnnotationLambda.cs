@@ -54,6 +54,8 @@ namespace SingleAnnotationLambda
                 bool preloadRequired          = !string.IsNullOrEmpty(config.supplementaryAnnotations);
                 AnnotationResources annotationResources = GetAndCacheAnnotationResources(config, cacheConfiguration);
 
+                if (genomeAssembly!=GenomeAssembly.hg19) annotationResources.Annotator.EnableMitochondrialAnnotation();
+
                 (IPosition position, string[] sampleNames) = config.GetPositionAndSampleNames(annotationResources.SequenceProvider, annotationResources.RefMinorProvider);
                 if (position.Chromosome.IsEmpty()) throw new UserErrorException($"An unknown chromosome was specified ({config.variant.chromosome})");
 
