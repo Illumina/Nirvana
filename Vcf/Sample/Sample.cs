@@ -19,14 +19,17 @@ namespace Vcf.Sample
         public int[] SplitReadCounts { get; } // Manta
         public int? TotalDepth { get; }
         public double[] VariantFrequencies { get; }
+        public int? MinorHaplotypeCopyNumber { get; }
+        public double? SomaticQuality { get; }
+
 
         public static readonly Sample EmptySample =
-            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null);
+            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null, null, null);
 
         public Sample(int[] alleleDepths, float? artifactAdjustedQualityScore, int? copyNumber,
             string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo,
             float? likelihoodRatioQualityScore, int[] pairedEndReadCounts, int[] repeatUnitCounts,
-            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies)
+            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality)
         {
             AlleleDepths                 = alleleDepths;
             ArtifactAdjustedQualityScore = artifactAdjustedQualityScore;
@@ -42,7 +45,8 @@ namespace Vcf.Sample
             SplitReadCounts              = splitReadCounts;
             TotalDepth                   = totalDepth;
             VariantFrequencies           = variantFrequencies;
-
+            MinorHaplotypeCopyNumber     = minorHaplotypeCopyNumber;
+            SomaticQuality               = somaticQuality;
 
             IsEmpty = AlleleDepths                 == null &&
                       ArtifactAdjustedQualityScore == null &&
@@ -56,6 +60,8 @@ namespace Vcf.Sample
                       SplitReadCounts              == null &&
                       TotalDepth                   == null &&
                       VariantFrequencies           == null &&
+                      MinorHaplotypeCopyNumber     == null &&
+                      SomaticQuality               == null &&
                       !FailedFilter                        &&
                       !IsDeNovo;
         }

@@ -36,6 +36,32 @@ namespace UnitTests.Vcf.Samples
         }
 
         [Fact]
+        public void ExtractSample_DragenSomatic_AsExpected()
+        {
+            var formatIndices = new FormatIndices();
+            formatIndices.Set("GT:SQ:AD:AF:F1R2:F2R1:DP:SB:MB:PS");
+            var sample = SampleFieldExtractor.ExtractSample("0|1:3.96:33,8:0.195:13,6:20,2:41:17,16,4,4:13,20,4,4:534234", formatIndices, 1);
+
+            Assert.Equal("0|1", sample.Genotype);
+            Assert.Equal(3.96, sample.SomaticQuality);
+            Assert.Equal(new[] { 33, 8 }, sample.AlleleDepths);
+            Assert.Equal(41, sample.TotalDepth);
+            Assert.Equal(new[] { 8/41.0 }, sample.VariantFrequencies);
+        }
+
+        [Fact]
+        public void ExtractSample_DragenCNV_AsExpected()
+        {
+            var formatIndices = new FormatIndices();
+            formatIndices.Set("GT:CN:MCN");
+            var sample = SampleFieldExtractor.ExtractSample("0|1:3:1", formatIndices, 1);
+
+            Assert.Equal("0|1", sample.Genotype);
+            Assert.Equal(3, sample.CopyNumber);
+            Assert.Equal(1, sample.MinorHaplotypeCopyNumber);
+        }
+
+        [Fact]
         public void ExtractSample_ExpansionHunter()
         {
             var formatIndices = new FormatIndices();

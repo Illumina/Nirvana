@@ -19,6 +19,8 @@ namespace Vcf.Sample
         internal int? REPCN;
         internal int? SR;
         internal int? VF;
+        internal int? MCN;
+        internal int? SQ;
         // ReSharper restore InconsistentNaming
 
         internal int NumColumns;
@@ -39,6 +41,8 @@ namespace Vcf.Sample
             REPCN = null;
             SR    = null;
             VF    = null;
+            MCN   = null;
+            SQ    = null;
         }
 
         internal void Set(string formatColumn)
@@ -96,6 +100,12 @@ namespace Vcf.Sample
                         break;
                     case "VF":
                         VF = index;
+                        break;
+                    case "MCN":
+                        MCN = index;
+                        break;
+                    case "SQ":
+                        SQ = index;
                         break;
                 }
             }

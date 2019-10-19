@@ -47,12 +47,14 @@ namespace Vcf.Sample
             int[] splitReadCounts               = sampleColumns.GetString(formatIndices.SR).GetIntegers();
             int? totalDepth                     = sampleColumns.GetString(formatIndices.DP).GetInteger();
             double? variantFrequency            = sampleColumns.GetString(formatIndices.VF).GetDouble();
+            int? minorHaplotypeCopyNumber       = sampleColumns.GetString(formatIndices.MCN).GetInteger();
+            double? somaticQuality              = sampleColumns.GetString(formatIndices.SQ).GetDouble();
 
             double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, numAltAlleles);
 
             var sample = new Sample(alleleDepths, artifactAdjustedQualityScore, copyNumber, diseaseAffectedStatuses,
                 failedFilter, genotype, genotypeQuality, isDeNovo, likelihoodRatioQualityScore, pairedEndReadCounts,
-                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies);
+                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality);
 
             return sample;
         }

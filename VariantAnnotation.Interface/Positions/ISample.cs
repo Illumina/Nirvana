@@ -17,5 +17,7 @@
         int[] SplitReadCounts { get; } // Manta
         int? TotalDepth { get; }
         double[] VariantFrequencies { get; }
+        int? MinorHaplotypeCopyNumber { get; }
+        double? SomaticQuality { get; }
     }
 }

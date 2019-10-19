@@ -22,6 +22,8 @@ namespace Vcf.Info
             double? strandBias             = null;
             int? svLen                     = null;
             string svType                  = null;
+            double? normalLod              = null;
+            double? tumorLod               = null;
 
             foreach ((string key, string value) in infoKeyValue)
             {
@@ -56,6 +58,12 @@ namespace Vcf.Info
                         break;
                     case "SVTYPE":
                         svType = value;
+                        break;
+                    case "NLOD":
+                        normalLod = value.GetNullableValue<double>(double.TryParse);
+                        break;
+                    case "TLOD":
+                        tumorLod = value.GetNullableValue<double>(double.TryParse);
                         break;
                 }
             }
