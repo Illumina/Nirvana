@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
@@ -107,7 +108,6 @@ namespace VariantAnnotation.Providers
                     continue;
                 }
 
-                
                 if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, annotations, annotatedVariant, variant);
 
                 else AddNonAlleleSpecificAnnotations(annotations, variant, annotatedVariant, nsaReader);
@@ -186,14 +186,18 @@ namespace VariantAnnotation.Providers
             var benchmark = new Benchmark();
             Console.Write("Pre-loading SA....");
 
-            foreach (INsaReader nsaReader in _nsaReaders)
+            var preloadTasks = _nsaReaders.Select(x => DoPreload(x, chromosome, positions)).ToArray();
+            Task.WaitAll(preloadTasks);
+            foreach (var preloadTask in preloadTasks)
             {
-                nsaReader.PreLoad(chromosome, positions);
+                preloadTask.Dispose();
             }
 
             var totalTime = benchmark.GetElapsedTime();
             Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");
         }
+
+        private static Task DoPreload(INsaReader nsaReader, IChromosome chromosome, List<int> positions) => Task.Run(() => { nsaReader.PreLoad(chromosome, positions); });
 
         public void Dispose()
         {
