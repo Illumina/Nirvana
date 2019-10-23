@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;

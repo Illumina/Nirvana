@@ -151,7 +151,7 @@ namespace SAUtils.SpliceAi
             
             var isSpliceAdjacent = _spliceIntervals[chromosome.Index].OverlapsAny(position, position);
             if (!HasSignificantScore() && !isSpliceAdjacent) return null;
-
+            
             Count++;
             return new SpliceAiItem(chromosome, position, refAllele, altAllele, _geneSymbol,
                 _acceptorGainScore, _acceptorLossScore, _donorGainScore, _donorLossScore,

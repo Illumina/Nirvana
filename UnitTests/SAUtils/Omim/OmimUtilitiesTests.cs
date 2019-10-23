@@ -1,4 +1,6 @@
-﻿using SAUtils.Omim;
+﻿using System.Linq;
+using SAUtils.DataStructures;
+using SAUtils.Omim;
 using Xunit;
 
 namespace UnitTests.SAUtils.Omim
@@ -23,14 +25,19 @@ namespace UnitTests.SAUtils.Omim
         }
 
         [Theory]
-        [InlineData("[Beta-glycopyranoside tasting], (3) {Alcohol dependence, susceptibility to}", "Beta-glycopyranoside tasting, Alcohol dependence, susceptibility to")]
-        [InlineData("?Proteasome-associated autoinflammatory syndrome 3, digenic", "Proteasome-associated autoinflammatory syndrome 3, digenic")]
-        [InlineData("{?Thyroid cancer, nonmedullary, 5}", "Thyroid cancer, nonmedullary, 5")]
-        [InlineData("Methylmalonic aciduria, mut(0) type", "Methylmalonic aciduria, mut(0) type")]
-        [InlineData("{Diabetes, susceptibility to},", "Diabetes, susceptibility to")]
-        public void ExtractPhenotypeAndComments_AsExpected(string input, string phenotype)
+        [InlineData("[Beta-glycopyranoside tasting], (3) {Alcohol dependence, susceptibility to}", "Beta-glycopyranoside tasting, Alcohol dependence, susceptibility to", "2,3")]
+        [InlineData("?Proteasome-associated autoinflammatory syndrome 3, digenic", "Proteasome-associated autoinflammatory syndrome 3, digenic", "1")]
+        [InlineData("{?Thyroid cancer, nonmedullary, 5}", "Thyroid cancer, nonmedullary, 5", "3,1")]
+        [InlineData("Methylmalonic aciduria, mut(0) type", "Methylmalonic aciduria, mut(0) type", "0")]
+        [InlineData("?{Diabetes, susceptibility to},", "Diabetes, susceptibility to", "1,3")]
+        public void ExtractPhenotypeAndComments_AsExpected(string input, string expectedPhenotype, string commentsEnumString)
         {
-            Assert.Equal(phenotype, OmimUtilities.ExtractPhenotypeAndComments(input).Phenotype);
+            (string phenotype, var comments) = OmimUtilities.ExtractPhenotypeAndComments(input);
+
+            var expectedComments = commentsEnumString.Split(',').Select(x => (OmimItem.Comment) byte.Parse(x)).Where(x => x != OmimItem.Comment.unknown).ToArray();
+            
+            Assert.Equal(expectedPhenotype, phenotype);
+            Assert.Equal(expectedComments, comments);
         }
     }
 }

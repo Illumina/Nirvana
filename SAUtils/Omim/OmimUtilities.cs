@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using OptimizedCore;
 using SAUtils.DataStructures;
@@ -14,9 +15,8 @@ namespace SAUtils.Omim
         {
             var phenotypeItem = phenotypeMap.phenotypeMap;
 
-            var (phenotype, _) = ExtractPhenotypeAndComments(phenotypeItem.phenotype);
-            //Don't output any comments for now
-            return new OmimItem.Phenotype(phenotypeItem.phenotypeMimNumber, phenotype, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, OmimItem.Comments.unknown, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
+            var (phenotype, comments) = ExtractPhenotypeAndComments(phenotypeItem.phenotype);
+            return new OmimItem.Phenotype(phenotypeItem.phenotypeMimNumber, phenotype, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, comments, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
         }
 
         private static HashSet<string> ExtractInheritances(string inheritance)
@@ -24,16 +24,16 @@ namespace SAUtils.Omim
             var inheritances = new HashSet<string>();
             if (string.IsNullOrEmpty(inheritance)) return inheritances;
 
-            foreach (var content in inheritance.OptimizedSplit(';'))
+            foreach (string content in inheritance.OptimizedSplit(';'))
             {
-                var trimmedContent = content.Trim(' ');
+                string trimmedContent = content.Trim(' ');
                 inheritances.Add(trimmedContent);
             }
 
             return inheritances;
         }
 
-        internal static (string Phenotype, OmimItem.Comments Comments) ExtractPhenotypeAndComments(string phenotypeString)
+        internal static (string Phenotype, OmimItem.Comment[] Comments) ExtractPhenotypeAndComments(string phenotypeString)
         {
             phenotypeString = phenotypeString.Trim(' ').Trim(',').Replace(@"\\'", "'");
             string phenotype = Regex.Replace(
@@ -43,25 +43,26 @@ namespace SAUtils.Omim
                             @" \(\d\) ", " "),
                             @"^\?", "");
 
-            var comments = OmimItem.Comments.unknown;
-
-            if (phenotypeString.Substring(0, 2).Contains("?"))
-            {
-                comments = OmimItem.Comments.unconfirmed_or_possibly_spurious_mapping;
-            }
-            else
-            {
-                if (phenotypeString.OptimizedStartsWith('{'))
-                {
-                    comments = OmimItem.Comments.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
-                }
-                else if (phenotypeString.OptimizedStartsWith('['))
-                {
-                    comments = OmimItem.Comments.nondiseases;
-                }
-            }
+            var comments = phenotypeString.Select(GetComment)
+                                          .Where(x => x != OmimItem.Comment.unknown)
+                                          .ToArray();
 
             return (phenotype, comments);
+        }
+
+        private static OmimItem.Comment GetComment(char symbol)
+        {
+            switch (symbol)
+            {
+                case '?':
+                    return OmimItem.Comment.unconfirmed_or_possibly_spurious_mapping;
+                case '[':
+                    return OmimItem.Comment.nondiseases;
+                case '{':
+                    return OmimItem.Comment.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
+                default:
+                    return OmimItem.Comment.unknown;
+            }
         }
 
         public static Dictionary<string, List<ISuppGeneItem>> GetGeneToOmimEntriesAndSchema(IEnumerable<OmimItem> omimItems)

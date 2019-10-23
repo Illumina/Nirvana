@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using OptimizedCore;
@@ -51,11 +52,11 @@ namespace SAUtils.DataStructures
             private readonly int _mimNumber;
             private readonly string _phenotype;
             private readonly Mapping _mapping;
-            private readonly Comments _comments;
+            private readonly Comment[] _comments;
             private readonly HashSet<string> _inheritance;
             private readonly SaJsonSchema _jsonSchema;
 
-            public Phenotype(int mimNumber, string phenotype, Mapping mapping, Comments comments, HashSet<string> inheritance, SaJsonSchema schema)
+            public Phenotype(int mimNumber, string phenotype, Mapping mapping, Comment[] comments, HashSet<string> inheritance, SaJsonSchema schema)
             {
                 _mimNumber   = mimNumber;
                 _phenotype   = phenotype;
@@ -79,9 +80,9 @@ namespace SAUtils.DataStructures
                     _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("mapping", _mapping.ToString().Replace("_", " ")), "mapping");
                 if (_inheritance != null && _inheritance.Count > 0)
                     _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValues("inheritances", _inheritance), "inheritances");
-                if (_comments != Comments.unknown)
-                    _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("comments", _comments.ToString().Replace("_", " ")), "comments");
-
+                if (_comments.Length > 0)
+                    _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValues("comments", _comments.Select(x => x.ToString().Replace("_", " "))), "comments");
+                    
                 sb.Append(JsonObject.CloseBrace);
             }
             
@@ -98,13 +99,13 @@ namespace SAUtils.DataStructures
             // ReSharper restore InconsistentNaming
         }
 
-        public enum Comments : byte
+        public enum Comment : byte
         {
             // ReSharper disable InconsistentNaming
             unknown,
+            unconfirmed_or_possibly_spurious_mapping,
             nondiseases,
-            contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection,
-            unconfirmed_or_possibly_spurious_mapping
+            contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection
             // ReSharper restore InconsistentNaming
         }
     }
