@@ -72,14 +72,11 @@ namespace UnitTests.Phantom.Recomposer
             //SNVs
             Assert.Equal(2, position1.LinkedVids.Length);
             Assert.Equal(new List<string> { "1-2-AGC-TGA" }, position1.LinkedVids[0]);
-            position1.LinkedVids[1].Sort();
-            Assert.Equal(new List<string> { "1-2-AGC-GGG", "1-2-AGCTG-GGATC", "1-2-AGCTG-GGGTG" }, position1.LinkedVids[1]);
-            Assert.Equal(2, position2.LinkedVids.Length);
+            Assert.Equal(new List<string> { "1-2-AGCTG-GGATC", "1-2-AGC-GGG" }, position1.LinkedVids[1]);
 
-            position2.LinkedVids[0].Sort();
-            Assert.Equal(new List<string> { "1-2-AGC-AGA", "1-2-AGC-TGA", "1-2-AGCTG-GGATC" }, position2.LinkedVids[0]);
-            position2.LinkedVids[1].Sort();
-            Assert.Equal(new List<string> { "1-2-AGC-GGG", "1-2-AGCTG-GGGTG" }, position2.LinkedVids[1]);
+            Assert.Equal(2, position2.LinkedVids.Length);
+            Assert.Equal(new List<string> { "1-2-AGCTG-GGATC", "1-4-C-A", "1-2-AGC-TGA" }, position2.LinkedVids[0]);
+            Assert.Equal(new List<string> { "1-2-AGC-GGG" }, position2.LinkedVids[1]);
 
             Assert.Single(position3.LinkedVids);
             Assert.Equal(new List<string> { "1-2-AGCTG-GGATC" }, position3.LinkedVids[0]);

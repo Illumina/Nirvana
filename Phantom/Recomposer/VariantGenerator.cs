@@ -6,6 +6,7 @@ using Phantom.PositionCollections;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using Variants;
 using Vcf.VariantCreator;
 
 namespace Phantom.Recomposer
@@ -28,7 +29,7 @@ namespace Phantom.Recomposer
             string lastRefAllele = alleleSet.VariantArrays.Last()[0];
             int regionEnd = alleleSet.Starts.Last() + lastRefAllele.Length + 100; // make it long enough
             if (regionEnd > _sequenceProvider.Sequence.Length) regionEnd = _sequenceProvider.Sequence.Length;
-            string totalRefSequence = _sequenceProvider.Sequence.Substring(regionStart - 1,regionEnd - regionStart); // VCF positions are 1-based
+            string totalRefSequence = _sequenceProvider.Sequence.Substring(regionStart - 1, regionEnd - regionStart); // VCF positions are 1-based
             var recomposedAlleleSet = new RecomposedAlleleSet(positionSet.ChrName, numSamples);
 
             foreach (var (alleleIndexBlock, sampleAlleles) in alleleIndexBlockToSampleIndex)
@@ -49,7 +50,21 @@ namespace Phantom.Recomposer
                 variantInfo.UpdateSampleFilters(varPosIndexesInAlleleBlock, sampleAlleles);
             }
 
+            DeDuplicateLinkedVids(simplePositions);
+
             return recomposedAlleleSet.GetRecomposedPositions(_sequenceProvider.RefNameToChromosome);
+        }
+
+        private static void DeDuplicateLinkedVids(List<ISimplePosition> simplePositions)
+        {
+            foreach (var simplePosition in simplePositions)
+            {
+                for (var i = 0; i < simplePosition.LinkedVids.Length; i++)
+                {
+                    if (simplePosition.LinkedVids[i] == null) continue; // perhaps only needed because of mocked unit tests
+                    simplePosition.LinkedVids[i] = simplePosition.LinkedVids[i].Distinct().ToList();
+                }
+            }
         }
 
         private static VariantInfo GetVariantInfo(PositionSet positionSet, AlleleBlock alleleBlock)
@@ -194,8 +209,10 @@ namespace Phantom.Recomposer
             string recomposedAllele = string.Concat(altSequenceSegments);
             int blockRefEnd = blockStart + blockRefLength - 1;
 
+            // trim recomposed alleles
+            (int trimmedBlockStart, string trimmedRefSequence, string trimmedRecomposedAllele) = BiDirectionalTrimmer.Trim(blockStart, refSequence, recomposedAllele);
             string recomposedVariantId = VariantId.Create(sequence, VariantCategory.SmallVariant, null,
-                alleleSet.Chromosome, blockStart, blockRefEnd, refSequence, recomposedAllele);
+                alleleSet.Chromosome, trimmedBlockStart, trimmedBlockStart + trimmedRefSequence.Length - 1, trimmedRefSequence, trimmedRecomposedAllele);
 
             vidListsNeedUpdate.ForEach(x => x.Add(recomposedVariantId));
             return (blockStart, blockRefEnd, refSequence, recomposedAllele, variantPosIndexesInAlleleBlock,
@@ -240,7 +257,7 @@ namespace Phantom.Recomposer
         {
             var distinctAlleles = allelesToCheck.Distinct().ToArray();
             if (distinctAlleles.Length <= 1) return false;
-           
+
             Console.WriteLine($"WARNING: Conflicting alternative alleles identified at {chromName}:{position}. The following alleles are present: {string.Join(' ', distinctAlleles)}.");
             return true;
         }
