@@ -40,7 +40,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
             jsonObject.AddStringValue("variantType", Variant.Type.ToString());
             jsonObject.AddBoolValue("isDecomposedVariant", Variant.IsDecomposed);
-            if (Variant.Type != VariantType.SNV) jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
+            jsonObject.AddBoolValue("isRecomposedVariant", Variant.IsRecomposed);
             jsonObject.AddStringValues("linkedVids", Variant.LinkedVids);
             jsonObject.AddStringValue("hgvsg", HgvsgNotation);
 
