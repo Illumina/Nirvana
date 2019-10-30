@@ -222,5 +222,65 @@ namespace UnitTests.Vcf
             Assert.Equal(expectedResult.Quality, observedResult.Quality);
             Assert.Equal(expectedResult.VcfFields, observedResult.VcfFields);
         }
+
+        [Fact]
+        public void CheckSampleConsistency_oneSample()
+        {
+            const string vcfLine1 = "chr1	13133	.	T	C	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
+            const string vcfLine2 = "chr1	13133	.	T	A	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD";
+            var lines = new[]
+            {
+                "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920",
+                "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO	FORMAT	NHL-16", vcfLine1, vcfLine2
+            };
+
+            AddLines(lines);
+
+            var chromosome = new Chromosome("chr1", "1", 0);
+
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
+            var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', refNameToChromosome);
+
+            using (var reader = FileUtilities.GetStreamReader(_ms))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter()))
+            {
+                //first line is valid. So, no exception
+                Assert.NotNull(vcfReader.GetNextPosition()); 
+                // second line has invalid number of sample fields, so it will throw exception
+                Assert.Throws<UserErrorException>(()=>vcfReader.GetNextPosition());
+            }
+            
+        }
+
+        [Fact]
+        public void CheckSampleConsistency_noSample()
+        {
+            const string vcfLine1 = "chr1	13133	.	T	C	36.00	PASS	SNVSB=0.0;SNVHPOL=4";
+            const string vcfLine2 = "chr1	13133	.	T	A	36.00	PASS	SNVSB=0.0;SNVHPOL=4	GT:GQ:GQX:DP:DPF:AD	0/1:62:20:7:1:3,4";
+            var lines = new[]
+            {
+                "##fileformat=VCFv4.1", "##FILTER=<ID=PASS,Description=\"All filters passed\">", "##fileDate=20160920",
+                "#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO", vcfLine1, vcfLine2
+            };
+
+            AddLines(lines);
+
+            var chromosome = new Chromosome("chr1", "1", 0);
+
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = chromosome };
+            var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', refNameToChromosome);
+
+            using (var reader = FileUtilities.GetStreamReader(_ms))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter()))
+            {
+                //first line is valid. So, no exception
+                Assert.NotNull(vcfReader.GetNextPosition());
+                // second line has invalid number of sample fields, so it will throw exception
+                Assert.Throws<UserErrorException>(() => vcfReader.GetNextPosition());
+            }
+
+        }
     }
 }

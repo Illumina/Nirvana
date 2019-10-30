@@ -149,6 +149,11 @@ namespace Vcf
                     (int start, bool foundError) = vcfFields[VcfCommon.PosIndex].OptimizedParseInt32();
                     if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {vcfFields[VcfCommon.PosIndex]}");
 
+                    if (InconsistentSampleFields(vcfFields))
+                    {
+                        var sampleCount = _sampleNames?.Length ?? 0;
+                        throw new UserErrorException($"Inconsistent number of sample fields in line:\n{VcfLine}\nExpected number of sample fields: {sampleCount}");
+                    }
                     vcfPosition = SimplePosition.GetSimplePosition(chromosome, start, vcfFields, _vcfFilter);
                 }
 
@@ -159,6 +164,17 @@ namespace Vcf
             }
 
             return _queuedPositions.Count == 0 ? null : _queuedPositions.Dequeue();
+        }
+
+        private bool InconsistentSampleFields(string[] vcfFields)
+        {
+            var sampleCount = _sampleNames?.Length ?? 0;
+            if (sampleCount != 0)
+            {
+                return vcfFields.Length != VcfCommon.FormatIndex + 1 + sampleCount;
+            }
+
+            return vcfFields.Length != VcfCommon.InfoIndex + 1;
         }
 
         private void CheckVcfOrder(string referenceName)
