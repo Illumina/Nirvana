@@ -6,6 +6,11 @@
   </PropertyGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
   <ItemGroup>
+    <Compile Remove="Sample\NonStandard\**" />
+    <EmbeddedResource Remove="Sample\NonStandard\**" />
+    <None Remove="Sample\NonStandard\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />

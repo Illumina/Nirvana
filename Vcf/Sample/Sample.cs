@@ -21,15 +21,15 @@ namespace Vcf.Sample
         public double[] VariantFrequencies { get; }
         public int? MinorHaplotypeCopyNumber { get; }
         public double? SomaticQuality { get; }
-
+        public bool? IsLossOfHeterozygosity { get; }
 
         public static readonly Sample EmptySample =
-            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null, null, null);
+            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null, null, null, null);
 
         public Sample(int[] alleleDepths, float? artifactAdjustedQualityScore, int? copyNumber,
             string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo,
             float? likelihoodRatioQualityScore, int[] pairedEndReadCounts, int[] repeatUnitCounts,
-            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality)
+            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality, bool? isLossOfHeterozygosity)
         {
             AlleleDepths                 = alleleDepths;
             ArtifactAdjustedQualityScore = artifactAdjustedQualityScore;
@@ -45,6 +45,7 @@ namespace Vcf.Sample
             SplitReadCounts              = splitReadCounts;
             TotalDepth                   = totalDepth;
             VariantFrequencies           = variantFrequencies;
+            IsLossOfHeterozygosity       = isLossOfHeterozygosity;
             MinorHaplotypeCopyNumber     = minorHaplotypeCopyNumber;
             SomaticQuality               = somaticQuality;
 
@@ -60,6 +61,7 @@ namespace Vcf.Sample
                       SplitReadCounts              == null &&
                       TotalDepth                   == null &&
                       VariantFrequencies           == null &&
+                      IsLossOfHeterozygosity       == null &&
                       MinorHaplotypeCopyNumber     == null &&
                       SomaticQuality               == null &&
                       !FailedFilter                        &&

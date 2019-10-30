@@ -29,8 +29,10 @@ namespace VariantAnnotation.IO
             jsonObject.AddStringValues("diseaseAffectedStatuses",     sample.DiseaseAffectedStatuses);
             jsonObject.AddDoubleValue("artifactAdjustedQualityScore", sample.ArtifactAdjustedQualityScore, "0.#");
             jsonObject.AddDoubleValue("likelihoodRatioQualityScore",  sample.LikelihoodRatioQualityScore, "0.#");
+            if (sample.IsLossOfHeterozygosity.HasValue)
+                jsonObject.AddBoolValue("lossOfHeterozygosity", sample.IsLossOfHeterozygosity.Value);
             jsonObject.AddDoubleValue("somaticQuality",               sample.SomaticQuality, "0.#");
-
+            
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);
         }

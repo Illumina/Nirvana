@@ -21,6 +21,17 @@ namespace Vcf.Sample
         internal int? VF;
         internal int? MCN;
         internal int? SQ;
+
+        //legacy fields
+        internal int? TAR;
+        internal int? TIR;
+        internal int? AU;
+        internal int? CU;
+        internal int? GU;
+        internal int? TU;
+        internal int? MCC;
+        internal int? GQX;
+        internal int? DPI;
         // ReSharper restore InconsistentNaming
 
         internal int NumColumns;
@@ -43,6 +54,18 @@ namespace Vcf.Sample
             VF    = null;
             MCN   = null;
             SQ    = null;
+            
+            // legacy sample fields
+            TAR = null;
+            TIR = null;
+            AU  = null;
+            CU  = null;
+            GU  = null;
+            TU  = null;
+            MCC = null;
+            GQX = null;
+            DPI = null;
+
         }
 
         internal void Set(string formatColumn)
@@ -101,11 +124,39 @@ namespace Vcf.Sample
                     case "VF":
                         VF = index;
                         break;
-                    case "MCN":
+                        case "MCN":
                         MCN = index;
                         break;
                     case "SQ":
                         SQ = index;
+                        break;
+                    //LEGACY
+                    case "TAR":
+                        TAR = index;
+                        break;
+                    case "TIR":
+                        TIR = index;
+                        break;
+                    case "AU":
+                        AU = index;
+                        break;
+                    case "GU":
+                        GU = index;
+                        break;
+                    case "CU":
+                        CU = index;
+                        break;
+                    case "TU":
+                        TU = index;
+                        break;
+                    case "GQX":
+                        GQX = index;
+                        break;
+                    case "DPI":
+                        DPI = index;
+                        break;
+                    case "MCC":
+                        MCC = index;
                         break;
                 }
             }

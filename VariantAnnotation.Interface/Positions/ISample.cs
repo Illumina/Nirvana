@@ -19,5 +19,7 @@
         double[] VariantFrequencies { get; }
         int? MinorHaplotypeCopyNumber { get; }
         double? SomaticQuality { get; }
+        bool? IsLossOfHeterozygosity { get; }
+        
     }
 }

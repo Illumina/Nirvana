@@ -10,7 +10,7 @@ namespace UnitTests.VariantAnnotation.IO
         public void GetJsonString_Nominal()
         {
             var sample = new Sample(new[] {23, 34}, 12.345f, 3, new[] {"-", "+"}, true, "1/2", 98, true, 56.67f,
-                new[] {8, 14}, new[] {7, 4}, new[] {10, 15}, 34, new[] {0.34, 0.56}, 1, 2.3);
+                new[] {8, 14}, new[] {7, 4}, new[] {10, 15}, 34, new[] {0.34, 0.56}, 1, 2.3, null);
 
             string observedResult = sample.GetJsonString();
 
