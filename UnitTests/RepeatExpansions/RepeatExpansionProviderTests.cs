@@ -8,6 +8,7 @@ using VariantAnnotation.IO;
 using Variants;
 using Vcf;
 using Xunit;
+using Enumerable = System.Linq.Enumerable;
 
 namespace UnitTests.RepeatExpansions
 {
@@ -68,6 +69,18 @@ namespace UnitTests.RepeatExpansions
 
             var firstVariant = annotatedPosition.AnnotatedVariants[0];
             Assert.Null(firstVariant.RepeatExpansionPhenotypes);
+        }
+
+        [Fact]
+        public void Annotate_RepeatExpansion_no_refRepeatCount()
+        {
+            var variant = new RepeatExpansion(_chr3, Start, End + 1, "A", "<STR3>", null, 10, null);
+
+            var annotatedPosition = GetAnnotatedPosition(variant);
+            _provider.Annotate(annotatedPosition);
+
+            var firstVariant = annotatedPosition.AnnotatedVariants[0];
+            Assert.NotNull(firstVariant);
         }
 
         [Fact]
