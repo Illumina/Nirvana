@@ -31,7 +31,7 @@ namespace IO
             set
             {
                 Disconnect();
-                Connect(value);
+                ConnectWithRetries(value);
                 _position = value;
             }
         }
@@ -41,12 +41,6 @@ namespace IO
             _position = position;
             _connect  = connect;
             ConnectWithRetries(_position);
-        }
-
-        private void Connect(long position)
-        {
-            if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
-            (_response, _stream) = _connect.Connect(position);
         }
 
         private void ConnectWithRetries(long position)
@@ -60,7 +54,7 @@ namespace IO
             {
                 try
                 {
-                    Connect(position);
+                    (_response, _stream) = _connect.Connect(position);
                     keepTrying = false;
                 }
                 catch (Exception e)
