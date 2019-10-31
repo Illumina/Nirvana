@@ -8,7 +8,7 @@ namespace Vcf.Sample
 {
     internal static class SampleFieldExtractor
     {
-        internal static ISample[] ToSamples(this string[] vcfColumns, FormatIndices formatIndices, int numAltAlleles, int? depth = null)
+        internal static ISample[] ToSamples(this string[] vcfColumns, FormatIndices formatIndices, int numAltAlleles)
         {
             if (vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
 
@@ -17,7 +17,7 @@ namespace Vcf.Sample
 
             formatIndices.Set(vcfColumns[VcfCommon.FormatIndex]);
 
-            var legacySampleExtractor = IsLegacyVariantCaller(formatIndices) ? new LegacySampleFieldExtractor(vcfColumns, formatIndices, depth) : null;
+            var legacySampleExtractor = IsLegacyVariantCaller(formatIndices) ? new LegacySampleFieldExtractor(vcfColumns, formatIndices) : null;
 
             for (int index = VcfCommon.GenotypeIndex; index < vcfColumns.Length; index++)
             {

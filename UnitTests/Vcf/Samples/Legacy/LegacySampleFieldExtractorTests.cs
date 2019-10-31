@@ -173,7 +173,7 @@ namespace UnitTests.Vcf.Samples.Legacy
                 "chr1\t115251293\t.\tGA\tG\t100\tSB;LowVariantFreq\tDP=7882\tGT:GQ:AD:VF:NL:SB:GQX\t0/1:100:7588,294:0:20:-100.0000:100";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), 1, 7882);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), 1);
 
             var sample = samples[0];
             var observedTotalDepth = sample.TotalDepth;

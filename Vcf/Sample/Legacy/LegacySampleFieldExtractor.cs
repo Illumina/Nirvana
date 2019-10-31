@@ -1,4 +1,5 @@
 ﻿using OptimizedCore;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 
 namespace Vcf.Sample.Legacy
@@ -9,11 +10,24 @@ namespace Vcf.Sample.Legacy
         private readonly FormatIndices _formatIndices;
         private readonly int? _infoDepth;
 
-        internal LegacySampleFieldExtractor(string[] vcfColumns, FormatIndices formatIndices, int? depth = null)
+        internal LegacySampleFieldExtractor(string[] vcfColumns, FormatIndices formatIndices)
         {
             _vcfColumns = vcfColumns;
-            _infoDepth  = depth;
+            _infoDepth = GetInfoDepth(vcfColumns[VcfCommon.InfoIndex]);
             _formatIndices = formatIndices;
+        }
+
+        private int? GetInfoDepth(string infoColumn)
+        {
+            var splits = infoColumn.OptimizedSplit(';');
+            foreach (string split in splits)
+            {
+                if(!split.StartsWith("DP")) continue;
+                var depth = int.Parse(split.Split('=')[1]);
+                return depth;
+            }
+            // no DP field present
+            return null;
         }
 
         internal ISample ExtractSample(string sampleColumn)
