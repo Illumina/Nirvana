@@ -91,7 +91,7 @@ namespace CustomAnnotationLambda
 
         private static CustomResult HandleException(StringBuilder runLog, CustomResult result, Exception e, string snsTopicArn)
         {
-            ExitCodeUtilities.ShowException(e);
+            Logger.Log(e);
 
             var errorCategory = ExceptionUtilities.ExceptionToErrorCategory(e);
 

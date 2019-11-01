@@ -58,8 +58,10 @@ namespace GeneAnnotationLambda
             }
         }
 
-        private Stream HandleException(string id, string snsTopicArn, Exception e)
+        private static Stream HandleException(string id, string snsTopicArn, Exception e)
         {
+            Logger.Log(e);
+
             string snsMessage = SNS.CreateMessage(e.Message, "exception", e.StackTrace);
             SNS.SendMessage(snsTopicArn, snsMessage);
 

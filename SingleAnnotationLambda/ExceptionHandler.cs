@@ -11,8 +11,7 @@ namespace SingleAnnotationLambda
     {
         public static Stream GetStream(string id, string snsTopicArn, Exception e)
         {
-            Logger.LogLine(e.Message);
-            Logger.LogLine(e.StackTrace);
+            Logger.Log(e);
             GC.Collect();
 
             string snsMessage = SNS.CreateMessage(e.Message, "exception", e.StackTrace);

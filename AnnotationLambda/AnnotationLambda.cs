@@ -124,7 +124,7 @@ namespace AnnotationLambda
 
         private static AnnotationResult HandleException(StringBuilder runLog, AnnotationResult result, Exception e, string snsTopicArn)
         {
-            ShowException(e);
+            Logger.Log(e);
 
             result.status = e.Message;
             result.errorCategory = ExceptionUtilities.ExceptionToErrorCategory(e);
