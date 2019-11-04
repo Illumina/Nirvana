@@ -227,7 +227,7 @@ namespace Phantom.Recomposer
             int previousStart = starts[firstPositionIndex];
             var allelesToCheck = new List<string>();
 
-            int previousAlleleIndex = alleleBlock.AlleleIndexes[firstPositionIndex];
+            int previousAlleleIndex = alleleBlock.AlleleIndexes[0];
             if (previousAlleleIndex != 0 || !IsDeletionOrMnvSite(alleleSet.VariantArrays[firstPositionIndex][0]))
                 allelesToCheck.Add(alleleSet.VariantArrays[firstPositionIndex][previousAlleleIndex]);
 
