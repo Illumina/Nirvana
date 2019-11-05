@@ -1,4 +1,5 @@
-﻿using Cloud.Messages.Custom;
+﻿using Cloud;
+using Cloud.Messages.Custom;
 using ErrorHandling.Exceptions;
 using IO;
 
@@ -24,6 +25,7 @@ namespace CustomAnnotationLambda
         public static void CheckResourcesExist(this CustomConfig config)
         {
             HttpUtilities.ValidateUrl(config.tsvUrl);
+            HttpUtilities.ValidateUrl(LambdaUrlHelper.GetUgaUrl(), false);
             config.outputDir.Validate(true);
         }
     }

@@ -3,6 +3,7 @@ using System.IO;
 using Downloader;
 using Downloader.FileExtensions;
 using Genome;
+using IO;
 using VariantAnnotation.IO.Caches;
 using Xunit;
 

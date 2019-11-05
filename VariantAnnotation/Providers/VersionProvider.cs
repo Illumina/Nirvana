@@ -1,4 +1,5 @@
-﻿using VariantAnnotation.Interface.Providers;
+﻿using IO;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.SA;
 using VariantAnnotation.Sequence;

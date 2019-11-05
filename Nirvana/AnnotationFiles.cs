@@ -68,7 +68,7 @@ namespace Nirvana
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        yield return NirvanaHelper.S3Url + line;
+                        yield return LambdaUrlHelper.GetBaseUrl() + line;
                     }
                 }
             }

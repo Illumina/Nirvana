@@ -19,8 +19,8 @@ namespace SingleAnnotationLambda
 
         public static string GetCachePathPrefix(int vepVersion, GenomeAssembly genomeAssembly)
         {
-            string cacheFolder = NirvanaHelper.S3Url + "ab0cf104f39708eabd07b8cb67e149ba-Cache/26/";
-            string suffix      = $"{genomeAssembly}/{NirvanaHelper.DefaultCacheSource}";
+            string cacheFolder = LambdaUrlHelper.GetBaseUrl() + "ab0cf104f39708eabd07b8cb67e149ba-Cache/26/";
+            string suffix      = $"{genomeAssembly}/{LambdaUrlHelper.DefaultCacheSource}";
 
             return UrlCombine(vepVersion == 84 ? $"{cacheFolder}VEP84/" : cacheFolder, suffix);
         }

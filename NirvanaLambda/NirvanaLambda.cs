@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
@@ -22,6 +23,7 @@ using IO;
 using Tabix;
 using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using JsonSerializer = Amazon.Lambda.Serialization.Json.JsonSerializer;
 
@@ -53,16 +55,20 @@ namespace NirvanaLambda
                 LogUtilities.UpdateLogger(context.Logger, runLog);
                 LogUtilities.LogLambdaInfo(context, CommandLineUtilities.InformationalVersion);
                 LogUtilities.LogObject("Config", config);
-                LogUtilities.Log(new[] { NirvanaHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey, "annotation_lambda_arn" });
+                LogUtilities.Log(new[] { LambdaUrlHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey, "annotation_lambda_arn" });
 
                 LambdaUtilities.GarbageCollect();
 
                 snsTopicArn                = LambdaUtilities.GetEnvironmentVariable(LambdaUtilities.SnsTopicKey);
                 string annotationLambdaArn = LambdaUtilities.GetEnvironmentVariable(AnnotationLambdaKey);
-
+                
                 config.Validate();
 
                 var genomeAssembly = GenomeAssemblyHelper.Convert(config.genomeAssembly);
+
+                LambdaUtilities.ValidateCoreData(genomeAssembly);
+                LambdaUtilities.ValidateSupplementaryData(genomeAssembly, config.supplementaryAnnotations);
+
                 if (!_supportedAssemblies.Contains(genomeAssembly))
                     throw new UserErrorException($"Unsupported assembly: {config.genomeAssembly}");
 
@@ -79,10 +85,10 @@ namespace NirvanaLambda
             return result;
         }
 
+        
         private static IEnumerable<AnnotationRange> GetAnnotationRanges(NirvanaConfig config, GenomeAssembly genomeAssembly)
         {
-            string cachePathPrefix = NirvanaHelper.S3CacheFolder.UrlCombine(genomeAssembly.ToString())
-                .UrlCombine(NirvanaHelper.DefaultCacheSource);
+            string cachePathPrefix = LambdaUtilities.GetCachePathPrefix(genomeAssembly);
 
             IntervalForest<IGene> geneIntervalForest;
             IDictionary<string, IChromosome> refNameToChromosome;
@@ -90,7 +96,7 @@ namespace NirvanaLambda
 
             using (var tabixStream      = PersistentStreamUtils.GetReadStream(config.tabixUrl))
             using (var tabixReader      = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress)))
-            using (var referenceStream  = PersistentStreamUtils.GetReadStream(NirvanaHelper.GetS3RefLocation(genomeAssembly)))
+            using (var referenceStream  = PersistentStreamUtils.GetReadStream(LambdaUrlHelper.GetRefUrl(genomeAssembly)))
             using (var sequenceProvider = new ReferenceSequenceProvider(referenceStream))
             using (var taProvider       = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider))
             {
@@ -164,7 +170,7 @@ namespace NirvanaLambda
             return new NirvanaResult
             {
                 id      = config.id,
-                status  = NirvanaHelper.SuccessMessage,
+                status  = LambdaUrlHelper.SuccessMessage,
                 created = new FileList
                 {
                     bucketName = config.outputDir.bucketName,
@@ -187,7 +193,7 @@ namespace NirvanaLambda
 
             ErrorCategory? mostSevereError = failedJobs.Select(x => x.Item.ErrorCategory).Min();
             string errorMessage = mostSevereError == ErrorCategory.UserError 
-                ? string.Join(";", failedJobs.Where(x => x.Item.ErrorCategory == mostSevereError).Select(x => x.Item.ErrorMessage).Distinct())
+                ? String.Join(";", failedJobs.Where(x => x.Item.ErrorCategory == mostSevereError).Select(x => x.Item.ErrorMessage).Distinct())
                 : "";
 
             return (mostSevereError, errorMessage);
@@ -231,8 +237,8 @@ namespace NirvanaLambda
         internal static string GetIndexedPrefix(string inputVcfPath, int jobIndex) =>
             inputVcfPath.TrimEndFromFirst("?").TrimStartToLast("/").TrimEndFromFirst(".vcf") + "_" + jobIndex.ToString("00000");
 
-        private static string FirstCharToLower(string input) => string.IsNullOrEmpty(input) || char.IsLower(input[0])
+        private static string FirstCharToLower(string input) => String.IsNullOrEmpty(input) || Char.IsLower(input[0])
             ? input
-            : char.ToLowerInvariant(input[0]) + input.Substring(1);
+            : Char.ToLowerInvariant(input[0]) + input.Substring(1);
     }
 }

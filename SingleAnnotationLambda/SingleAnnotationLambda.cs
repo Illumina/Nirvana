@@ -41,7 +41,7 @@ namespace SingleAnnotationLambda
                 LogUtilities.UpdateLogger(context.Logger, null);
                 LogUtilities.LogLambdaInfo(context, CommandLineUtilities.InformationalVersion);
                 LogUtilities.LogObject("Config", config);
-                LogUtilities.Log(new[] { NirvanaHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
+                LogUtilities.Log(new[] { LambdaUrlHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
 
                 LambdaUtilities.GarbageCollect();
 
@@ -50,6 +50,9 @@ namespace SingleAnnotationLambda
                 config.Validate();
 
                 GenomeAssembly genomeAssembly = GenomeAssemblyHelper.Convert(config.genomeAssembly);
+                LambdaUtilities.ValidateCoreData(genomeAssembly);
+                LambdaUtilities.ValidateSupplementaryData(genomeAssembly, config.supplementaryAnnotations);
+
                 var cacheConfiguration        = new CacheConfiguration(genomeAssembly, config.supplementaryAnnotations, config.vepVersion);
                 bool preloadRequired          = !string.IsNullOrEmpty(config.supplementaryAnnotations);
                 AnnotationResources annotationResources = GetAndCacheAnnotationResources(config, cacheConfiguration);
@@ -60,7 +63,7 @@ namespace SingleAnnotationLambda
                 if (position.Chromosome.IsEmpty()) throw new UserErrorException($"An unknown chromosome was specified ({config.variant.chromosome})");
 
                 string annotationResult = GetPositionAnnotation(position, annotationResources, sampleNames, preloadRequired);
-                response = SingleResult.Create(config.id, NirvanaHelper.SuccessMessage, annotationResult);
+                response = SingleResult.Create(config.id, LambdaUrlHelper.SuccessMessage, annotationResult);
             }
             catch (Exception exception)
             {
@@ -106,7 +109,7 @@ namespace SingleAnnotationLambda
         {
             GenomeAssembly genomeAssembly = GenomeAssemblyHelper.Convert(lambdaConfig.genomeAssembly);
             string cachePathPrefix        = CacheUtilities.GetCachePathPrefix(lambdaConfig.vepVersion, genomeAssembly);
-            string nirvanaS3Ref           = NirvanaHelper.GetS3RefLocation(genomeAssembly);
+            string nirvanaS3Ref           = LambdaUrlHelper.GetRefUrl(genomeAssembly);
 
             List<string> saManifestUrls = SupplementaryAnnotationUtilities.GetManifestUrls(lambdaConfig.supplementaryAnnotations, genomeAssembly);
             string annotatorVersion     = "Nirvana " + CommandLineUtilities.GetVersion(Assembly.GetAssembly(typeof(SingleAnnotationLambda)));

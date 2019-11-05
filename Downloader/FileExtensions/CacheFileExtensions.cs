@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Genome;
+using IO;
 using VariantAnnotation.IO.Caches;
 
 namespace Downloader.FileExtensions

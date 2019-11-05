@@ -31,7 +31,7 @@ namespace CustomAnnotationLambda
                 LogUtilities.UpdateLogger(context.Logger, runLog);
                 LogUtilities.LogLambdaInfo(context, CommandLineUtilities.InformationalVersion);
                 LogUtilities.LogObject("Config", config);
-                LogUtilities.Log(new[] { NirvanaHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
+                LogUtilities.Log(new[] { LambdaUrlHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
 
                 LambdaUtilities.GarbageCollect();
                 LambdaUtilities.DeleteTempOutput();

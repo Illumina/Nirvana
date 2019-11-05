@@ -11,6 +11,7 @@ using Cloud.Notifications;
 using Cloud.Utilities;
 using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
+using Genome;
 using IO;
 using Jasix.DataStructures;
 using VariantAnnotation.GeneAnnotation;
@@ -26,8 +27,8 @@ namespace GeneAnnotationLambda
     // ReSharper disable once UnusedMember.Global
     public class GeneAnnotationLambda
     {
-        private readonly string _saPathPrefix = NirvanaHelper.S3Url;
-        private readonly string _saManifestUrl = $"{NirvanaHelper.S3Url}latest_SA_GRCh37.txt";
+        private readonly string _saPathPrefix = LambdaUrlHelper.GetBaseUrl();
+        private readonly string _saManifestUrl = $"{LambdaUrlHelper.GetBaseUrl()}latest_SA_GRCh37.txt";
 
         // ReSharper disable once UnusedMember.Global
         public Stream Run(GeneConfig config, ILambdaContext context)
@@ -40,17 +41,17 @@ namespace GeneAnnotationLambda
                 LogUtilities.UpdateLogger(context.Logger, runLog);
                 LogUtilities.LogLambdaInfo(context, CommandLineUtilities.InformationalVersion);
                 LogUtilities.LogObject("Config", config);
-                LogUtilities.Log(new[] { NirvanaHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
+                LogUtilities.Log(new[] { LambdaUrlHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
 
                 LambdaUtilities.GarbageCollect();
 
                 snsTopicArn = LambdaUtilities.GetEnvironmentVariable(LambdaUtilities.SnsTopicKey);
 
                 config.Validate();
-
+                LambdaUtilities.ValidateSupplementaryData(GenomeAssembly.GRCh37, "latest");
                 string result = GetGeneAnnotation(config, _saManifestUrl, _saPathPrefix);
                 
-                return LambdaResponse.Create(config.id, NirvanaHelper.SuccessMessage, result);
+                return LambdaResponse.Create(config.id, LambdaUrlHelper.SuccessMessage, result);
             }
             catch (Exception e)
             {

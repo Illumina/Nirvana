@@ -5,6 +5,7 @@ using System.Linq;
 using Cloud.Messages;
 using CommandLine.Utilities;
 using Genome;
+using IO;
 using RepeatExpansions;
 using VariantAnnotation;
 using VariantAnnotation.Interface;

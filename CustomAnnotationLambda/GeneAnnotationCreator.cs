@@ -22,6 +22,7 @@ namespace CustomAnnotationLambda
             string localSchemaPath = localNgaPath + SaCommon.JsonSchemaSuffix;
             string localLogPath = Path.Combine(Path.GetTempPath(), LogFileName);
             
+            HttpUtilities.ValidateUrl(LambdaUrlHelper.GetUgaUrl());
             var outputFiles = new List<string>();
             using (var aes = new AesCryptoServiceProvider())
             {
@@ -80,7 +81,7 @@ namespace CustomAnnotationLambda
 
         private static GeneAnnotationsParser GetGeneAnnotationsParserFromCustomTsvStream(PersistentStream customTsvStream)
         {
-            var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = GeneUtilities.ParseUniversalGeneArchive(null, NirvanaHelper.S3UgaPath);
+            var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = GeneUtilities.ParseUniversalGeneArchive(null, LambdaUrlHelper.GetUgaUrl());
             return GeneAnnotationsParser.Create(new StreamReader(GZipUtilities.GetAppropriateStream(customTsvStream)), entrezGeneIdToSymbol, ensemblGeneIdToSymbol);
         }
     }

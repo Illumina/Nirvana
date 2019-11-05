@@ -18,7 +18,7 @@ namespace SingleAnnotationLambda
             string outputStart = $"{{\"id\":\"{id}\",\"status\":{statusJson}";
             string output;
 
-            if (status == NirvanaHelper.SuccessMessage)
+            if (status == LambdaUrlHelper.SuccessMessage)
             {
                 if (nirvanaJson == null)  throw new NoNullAllowedException("Nirvana annotation cannot be null when the job is successful.");
                 output = outputStart + OutputBeforeNirvanaJson + nirvanaJson + OutputEnd;

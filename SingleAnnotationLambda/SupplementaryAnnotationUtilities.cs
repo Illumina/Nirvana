@@ -26,10 +26,10 @@ namespace SingleAnnotationLambda
             switch (versionTag)
             {
                 case "latest":
-                    saUrls.Add($"{NirvanaHelper.S3Url}latest_SA_{genomeAssembly}.txt");
+                    saUrls.Add($"{LambdaUrlHelper.GetBaseUrl()}latest_SA_{genomeAssembly}.txt");
                     break;
                 case "release":
-                    saUrls.Add($"{NirvanaHelper.S3Url}Zeus_SA_{genomeAssembly}.txt");
+                    saUrls.Add($"{LambdaUrlHelper.GetBaseUrl()}Zeus_SA_{genomeAssembly}.txt");
                     break;
             }
 

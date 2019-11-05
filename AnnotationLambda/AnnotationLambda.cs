@@ -38,7 +38,7 @@ namespace AnnotationLambda
                 LogUtilities.UpdateLogger(context.Logger, runLog);
                 LogUtilities.LogLambdaInfo(context, CommandLineUtilities.InformationalVersion);
                 LogUtilities.LogObject("Config", config);
-                LogUtilities.Log(new[] { NirvanaHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
+                LogUtilities.Log(new[] { LambdaUrlHelper.UrlBaseEnvironmentVariableName, LambdaUtilities.SnsTopicKey });
 
                 LambdaUtilities.GarbageCollect();
                 LambdaUtilities.DeleteTempOutput();
@@ -63,8 +63,8 @@ namespace AnnotationLambda
                     using (var aes = new AesCryptoServiceProvider())
                     {
                         FileMetadata jsonMetadata, jasixMetadata;
-                        string jsonPath = Path.GetTempPath() + NirvanaHelper.JsonSuffix;
-                        string jasixPath = jsonPath + NirvanaHelper.JsonIndexSuffix;
+                        string jsonPath = Path.GetTempPath() + LambdaUrlHelper.JsonSuffix;
+                        string jasixPath = jsonPath + LambdaUrlHelper.JsonIndexSuffix;
 
                         using (var inputVcfStream = new BlockGZipStream(PersistentStreamUtils.GetReadStream(vcfUrl, fileOffset), CompressionMode.Decompress))
                         using (var headerStream = config.annotationRange == null ? null : new BlockGZipStream(PersistentStreamUtils.GetReadStream(vcfUrl), CompressionMode.Decompress))
@@ -92,8 +92,8 @@ namespace AnnotationLambda
                             jasixMetadata = jasixMd5Stream.GetFileMetadata();
                         }
 
-                        result.filePath = S3Utilities.GetKey(config.outputDir.path, config.outputPrefix + NirvanaHelper.JsonSuffix);
-                        string jasixKey = result.filePath + NirvanaHelper.JsonIndexSuffix;
+                        result.filePath = S3Utilities.GetKey(config.outputDir.path, config.outputPrefix + LambdaUrlHelper.JsonSuffix);
+                        string jasixKey = result.filePath + LambdaUrlHelper.JsonIndexSuffix;
 
                         var s3Client = config.outputDir.GetS3Client(context.RemainingTime);
                         s3Client.DecryptUpload(config.outputDir.bucketName, jasixKey, jasixPath, aes, jasixMetadata);
@@ -152,8 +152,8 @@ namespace AnnotationLambda
         private static AnnotationResources GetAnnotationResources(AnnotationConfig annotationConfig)
         {
             var genomeAssembly      = GenomeAssemblyHelper.Convert(annotationConfig.genomeAssembly);
-            string cachePathPrefix  = NirvanaHelper.S3CacheFolder.UrlCombine(genomeAssembly.ToString()).UrlCombine(NirvanaHelper.DefaultCacheSource);
-            string nirvanaS3Ref     = NirvanaHelper.GetS3RefLocation(genomeAssembly);
+            string cachePathPrefix  = LambdaUrlHelper.GetBaseUrl().UrlCombine(genomeAssembly.ToString()).UrlCombine(LambdaUrlHelper.DefaultCacheSource);
+            string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
             string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations, genomeAssembly);
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> { saManifestUrl }, annotationConfig.customAnnotations, false, false);
 

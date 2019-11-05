@@ -54,7 +54,7 @@ namespace IO
             catch (Exception)
             {
                 if (isUserProvided) throw new UserErrorException($"Unable to validate the URL for {UrlUtilities.GetFileName(url)}");
-                throw;
+                throw new DeploymentErrorException($"Deployment issue detected. Unable to validate the URL for {url}.");
             }
         }
 
