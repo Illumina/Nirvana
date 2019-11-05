@@ -217,7 +217,7 @@ namespace NirvanaLambda
 
         private static AnnotationConfig GetAnnotationConfig(NirvanaConfig config, AnnotationRange annotationRange, int jobIndex) => new AnnotationConfig
         {
-            id                       = config.id,
+            id                       = config.id + $"_job{jobIndex}",
             genomeAssembly           = config.genomeAssembly,
             vcfUrl                   = config.vcfUrl,
             tabixUrl                 = config.tabixUrl,

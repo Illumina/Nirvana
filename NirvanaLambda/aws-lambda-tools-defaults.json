@@ -1,15 +1,15 @@
 
 {
     "region" : "us-west-2",
-    "profile" : "default",
+    "profile" : "Olympia_AWS",
     "configuration" : "Release",
     "framework"     : "netcoreapp2.1",
-    "function-name" : "Nirvana-MonoRepo",
+    "function-name" : "Nirvana-SK-test",
     "function-handler" : "NirvanaLambda::NirvanaLambda.NirvanaLambda::Run",
     "function-memory-size" : 3008,
     "function-role"        : "arn:aws:iam::670055277015:role/illumina-olympia-dev-nirvana-role",
-    "function-timeout"     : 300,
+    "function-timeout"     : 500,
     "function-runtime"     : "dotnetcore2.1",
     "tracing-mode"         : "PassThrough",
-    "environment-variables" : "\"NirvanaDataUrlBase\"=\"http://ilmn-nirvana.s3.us-west-2.amazonaws.com/\";\"SnsTopicArn\"=\"arn:aws:sns:us-west-2:670055277015:illumina-olympia-dev-nirvana-sns-topic\";\"annotation_lambda_arn\"=\"arn:aws:lambda:us-west-2:670055277015:function:Annotation-MonoRepo\""
+    "environment-variables" : "\"NirvanaDataUrlBase\"=\"http://ilmn-nirvana.s3.us-west-2.amazonaws.com/\";\"SnsTopicArn\"=\"arn:aws:sns:us-west-2:670055277015:illumina-olympia-dev-nirvana-sns-topic\";\"annotation_lambda_arn\"=\"arn:aws:lambda:us-west-2:670055277015:function:Annotation-SK-test\""
 }
