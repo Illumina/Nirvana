@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Xml.Linq;
 using System.Linq;
@@ -13,18 +14,21 @@ namespace IO
     {
         private static readonly string[] AuthenticationErrorCodes   = { "InvalidAccessKeyId", "SignatureDoesNotMatch" };
         private static readonly string[] ResourceNotExistErrorCodes = { "NoSuchKey", "NoSuchBucket" };
+        
+        private const int ConnectTimeOut = 10_000;
+        private const int ReadTimeOut = 10_000;
+
 
         public static long GetLength(string url)
         {
-            var request        = (HttpWebRequest)WebRequest.Create(url);
-            var response       = request.TryGetResponse(url);
+            var response       = TryGetResponse(url);
             long contentLength = response.ContentLength;
             response.Close();
             return contentLength;
         }
 
         // Only throw exceptions when all the three tries failed.
-        private static HttpWebResponse TryGetResponse(this HttpWebRequest request, string url)
+        private static HttpWebResponse TryGetResponse(string url)
         {
             var exceptions = new List<Exception>();
 
@@ -33,10 +37,15 @@ namespace IO
                 try
                 {
                     if (retryCounter > 0) Thread.Sleep(2_000);
-                    return (HttpWebResponse)request.GetResponse();
+
+                    var request = (HttpWebRequest) WebRequest.Create(url);
+                    request.SetProperTimeOut();
+                    return (HttpWebResponse) request.GetResponse();
                 }
                 catch (Exception e)
                 {
+                    Logger.LogLine($"TryGetResponse exception found when connecting to {url}");
+                    Logger.Log(e);
                     exceptions.Add(ProcessHttpRequestWebProtocolErrorException(e, url));
                 }
             }
@@ -44,11 +53,17 @@ namespace IO
             throw new AggregateException(exceptions);
         }
 
+        public static void SetProperTimeOut(this HttpWebRequest request)
+        {
+            request.Timeout = ConnectTimeOut;
+            request.ReadWriteTimeout = ReadTimeOut;
+        }
+
         public static void ValidateUrl(string url, bool isUserProvided = true)
         {
             try
             {
-                var response = WebRequest.CreateHttp(url).TryGetResponse(url);
+                var response = TryGetResponse(url);
                 response.Close();
             }
             catch (Exception)
