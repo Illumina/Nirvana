@@ -11,9 +11,8 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get;  }
 	    IList<IAnnotatedTranscript> Transcripts { get; }
         IList<ISupplementaryAnnotation> SaList { get; }
+        ISupplementaryAnnotation RepeatExpansionPhenotypes { get; set; }
 		double? PhylopScore { get; set; }
-
-	    IList<IPluginData> PluginDataSet { get; }
         string GetJsonString(string originalChromName);
     }	
 }

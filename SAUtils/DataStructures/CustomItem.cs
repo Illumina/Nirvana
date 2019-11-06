@@ -37,7 +37,7 @@ namespace SAUtils.DataStructures
             {
                 return _jsonSchema.GetJsonString(allValues);
             }
-            catch (UserErrorException e)
+            catch (UserErrorException e) 
             {
                 throw new UserErrorException(e.Message + $"\nInput line: {_inputLine}");
             }

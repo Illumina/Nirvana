@@ -265,10 +265,10 @@ namespace UnitTests.SAUtils.SpliceAi
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
-                Assert.Equal(3, spliceItems.Count);
+                // the third item will be skipped since hgnc is null
+                Assert.Equal(2, spliceItems.Count);
                 Assert.Equal("GENE1", spliceItems[0].Hgnc);
                 Assert.Equal("GENE8", spliceItems[1].Hgnc);
-                Assert.Null(spliceItems[2].Hgnc);
 
             }
         }

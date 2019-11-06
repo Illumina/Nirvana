@@ -13,5 +13,5 @@
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
   </ItemGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

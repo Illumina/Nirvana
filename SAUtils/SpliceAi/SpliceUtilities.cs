@@ -1,13 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Intervals;
-using OptimizedCore;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.IO.Caches;
-using Variants;
 
 namespace SAUtils.SpliceAi
 {
@@ -68,39 +64,6 @@ namespace SAUtils.SpliceAi
             }
 
             return new IntervalForest<string>(geneIntervalArrays);
-        }
-
-        //get gene boundaries from spliceAI input vcf and create an interval forest
-
-        private static (ushort chormIndex, int position, string geneName) GetGenePosition(string vcfLine, ISequenceProvider sequenceProvider)
-        {
-            var splitLine = vcfLine.Split('\t');
-            if (splitLine.Length < VcfCommon.InfoIndex + 1) return (ushort.MaxValue, -1, null);
-
-            var chromosomeName = splitLine[VcfCommon.ChromIndex];
-            if (!sequenceProvider.RefNameToChromosome.ContainsKey(chromosomeName)) return (ushort.MaxValue, -1, null);
-
-            var chromosome = sequenceProvider.RefNameToChromosome[chromosomeName];
-            var position = int.Parse(splitLine[VcfCommon.PosIndex]);
-            var geneSymbol = GetGeneSymbol(splitLine[VcfCommon.InfoIndex]);
-
-            return (chromosome.Index, position, geneSymbol);
-
-        }
-
-        private static string GetGeneSymbol(string infoFields)
-        {
-            if (infoFields == "" || infoFields == ".") return null;
-            var infoItems = infoFields.OptimizedSplit(';');
-
-            foreach (var infoItem in infoItems)
-            {
-                var (key, value) = infoItem.OptimizedKeyValue();
-                // sanity check
-                if (key == "SYMBOL") return value;
-            }
-
-            return null;
         }
     }
 }

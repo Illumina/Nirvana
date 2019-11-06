@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Cloud;
+using Cloud.Messages;
 using IO;
 using VariantAnnotation.SA;
 
@@ -42,26 +43,35 @@ namespace Nirvana
 
         public void AddFiles(SaUrls saUrls)
         {
-            if (saUrls.IsNsa())
-                NsaFiles.Add((saUrls.nsaUrl, saUrls.idxUrl));
-            else
-                NsiFiles.Add(saUrls.nsiUrl);
+            switch (saUrls.SaType)
+            {
+                case CustomSaType.Nsa:
+                    NsaFiles.Add((saUrls.nsaUrl, saUrls.idxUrl));
+                    break;
+                case CustomSaType.Nsi:
+                    NsiFiles.Add(saUrls.nsiUrl);
+                    break;
+                case CustomSaType.Nga:
+                    NgaFiles.Add(saUrls.ngaUrl);
+                    break;
+                default:
+                    throw new InvalidDataException("Unknown custom SA type.");
+            }
         }
 
         private static IEnumerable<string> GetFiles(string directoryOrManifestFilePath)
         {
-            if (ConnectUtilities.IsHttpLocation(directoryOrManifestFilePath))
+            if (HttpUtilities.IsUrl(directoryOrManifestFilePath))
             {
                 using (var reader = new StreamReader(PersistentStreamUtils.GetReadStream(directoryOrManifestFilePath)))
                 {
                     string line;
                     while ((line = reader.ReadLine()) != null)
                     {
-                        yield return NirvanaHelper.S3Url + line;
+                        yield return LambdaUrlHelper.GetBaseUrl() + line;
                     }
                 }
             }
-
             else
             {
                 foreach (string file in Directory.GetFiles(directoryOrManifestFilePath))

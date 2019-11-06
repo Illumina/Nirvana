@@ -9,6 +9,7 @@ namespace Tabix
 {
     public static class Reader
     {
+        // ReSharper disable once MemberCanBePrivate.Global
         public static Index Read(BinaryReader reader, IDictionary<string, IChromosome> refNameToChromosome)
         {
             int magic = reader.ReadInt32();
@@ -22,9 +23,9 @@ namespace Tabix
             var commentChar                 = (char)reader.ReadInt32();
             int numLinesToSkip              = reader.ReadInt32();
             int concatenatedSequenceNameLen = reader.ReadInt32();
-            var concatenatedNames           = reader.ReadBytes(concatenatedSequenceNameLen);
+            byte[] concatenatedNames           = reader.ReadBytes(concatenatedSequenceNameLen);
 
-            var referenceSequenceNames = GetReferenceSequenceNames(concatenatedNames, numReferenceSequences);
+            string[] referenceSequenceNames = GetReferenceSequenceNames(concatenatedNames, numReferenceSequences);
             var referenceSequences     = new ReferenceSequence[numReferenceSequences];
             var refNameToTabixIndex    = new Dictionary<string, ushort>(numReferenceSequences);
 
@@ -53,7 +54,7 @@ namespace Tabix
         private static string[] GetReferenceSequenceNames(byte[] concatenatedBytes, int numRefSeqs)
         {
             var refSeqNames = new string[numRefSeqs];
-            var nullIndexes = GetNullIndexes(concatenatedBytes, numRefSeqs);
+            IEnumerable<int> nullIndexes = GetNullIndexes(concatenatedBytes, numRefSeqs);
             var startIndex = 0;
 
             var index = 0;
@@ -81,7 +82,7 @@ namespace Tabix
 
             for (var i = 0; i < numBins; i++)
             {
-                (int id, var chunks) = ReadBin(reader);
+                (int id, Interval[] chunks) = ReadBin(reader);
                 idToChunks[id] = chunks;
             }
 

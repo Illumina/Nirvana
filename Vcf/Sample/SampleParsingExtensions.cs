@@ -33,8 +33,8 @@ namespace Vcf.Sample
         {
             if (s == null) return null;
 
-            var cols   = s.OptimizedSplit(delimiter);
-            var values = new int[cols.Length];
+            string[] cols = s.OptimizedSplit(delimiter);
+            var values    = new int[cols.Length];
 
             for (var i = 0; i < values.Length; i++)
             {

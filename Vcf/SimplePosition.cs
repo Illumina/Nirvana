@@ -27,27 +27,24 @@ namespace Vcf
             AltAlleles = altAlleles;
         }
 
-        public static SimplePosition GetSimplePosition(string[] vcfFields, IVcfFilter vcfFilter, IDictionary<string, IChromosome> refNameToChromosome, bool isRecomposed = false)
+        public static SimplePosition GetSimplePosition(IChromosome chromosome, int position, string[] vcfFields, IVcfFilter vcfFilter, bool isRecomposed = false)
         {
-            var simplePosition = new SimplePosition(
-                ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]),
-                int.Parse(vcfFields[VcfCommon.PosIndex]),
-                vcfFields[VcfCommon.RefIndex],
-                vcfFields[VcfCommon.AltIndex].OptimizedSplit(','));
-            
-            if (vcfFilter.PassedTheEnd(simplePosition.Chromosome, simplePosition.Start)) return null;
-            
-            simplePosition.End = vcfFields[VcfCommon.AltIndex].OptimizedStartsWith('<') || vcfFields[VcfCommon.AltIndex] == "*" ? -1 : simplePosition.Start + simplePosition.RefAllele.Length - 1;
-            simplePosition.VcfFields = vcfFields;
-            simplePosition.IsRecomposed = isRecomposed;
-            simplePosition.IsDecomposed = new bool[simplePosition.AltAlleles.Length]; // false by default
-            simplePosition.Vids = new string[simplePosition.AltAlleles.Length];
-            simplePosition.LinkedVids = new List<string>[simplePosition.AltAlleles.Length];
-            return simplePosition;
-        }
+            if (vcfFilter.PassedTheEnd(chromosome, position)) return null;
 
-        public static SimplePosition GetSimplePosition(string vcfLine, IVcfFilter vcfFilter,
-            IDictionary<string, IChromosome> refNameToChromosome) => vcfLine == null ? null :
-            GetSimplePosition(vcfLine.OptimizedSplit('\t'), vcfFilter, refNameToChromosome);
+            string refAllele      = vcfFields[VcfCommon.RefIndex];
+            string altAlleleField = vcfFields[VcfCommon.AltIndex];
+            string[] altAlleles   = altAlleleField.OptimizedSplit(',');
+            int numAltAlleles     = altAlleles.Length;
+
+            return new SimplePosition(chromosome, position, refAllele, altAlleles)
+            {
+                End          = altAlleleField.OptimizedStartsWith('<') || altAlleleField == "*" ? -1 : position + refAllele.Length - 1,
+                VcfFields    = vcfFields,
+                IsRecomposed = isRecomposed,
+                IsDecomposed = new bool[numAltAlleles],
+                Vids         = new string[numAltAlleles],
+                LinkedVids   = new List<string>[numAltAlleles]
+            };
+        }
     }
 }

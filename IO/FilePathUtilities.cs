@@ -18,6 +18,8 @@ namespace IO
             return includeSeparator ? s.Substring(0, extPos + value.Length) : s.Substring(0, extPos);
         }
 
-        public static string GetFileSuffix(this string s, bool includeDot) => ConnectUtilities.IsHttpLocation(s) ? s.TrimEndFromFirst("?").TrimStartToLast(".", includeDot) : s.TrimStartToLast(".", includeDot);
+        public static string GetFileSuffix(this string s, bool includeDot) => HttpUtilities.IsUrl(s)
+            ? s.TrimEndFromFirst("?").TrimStartToLast(".", includeDot)
+            : s.TrimStartToLast(".", includeDot);
     }
 }

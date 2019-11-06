@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
-using CacheUtils.Genes.DataStructures;
-using CacheUtils.Genes.IO;
-using Compression.Utilities;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Omim.EntryApiResponse;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils.Omim
 {
@@ -19,9 +15,8 @@ namespace SAUtils.Omim
         {
             var phenotypeItem = phenotypeMap.phenotypeMap;
 
-            var (phenotype, _) = ExtractPhenotypeAndComments(phenotypeItem.phenotype);
-            //Don't output any comments for now
-            return new OmimItem.Phenotype(phenotypeItem.phenotypeMimNumber, phenotype, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, OmimItem.Comments.unknown, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
+            var (phenotype, comments) = ExtractPhenotypeAndComments(phenotypeItem.phenotype);
+            return new OmimItem.Phenotype(phenotypeItem.phenotypeMimNumber, phenotype, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, comments, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
         }
 
         private static HashSet<string> ExtractInheritances(string inheritance)
@@ -29,16 +24,16 @@ namespace SAUtils.Omim
             var inheritances = new HashSet<string>();
             if (string.IsNullOrEmpty(inheritance)) return inheritances;
 
-            foreach (var content in inheritance.OptimizedSplit(';'))
+            foreach (string content in inheritance.OptimizedSplit(';'))
             {
-                var trimmedContent = content.Trim(' ');
+                string trimmedContent = content.Trim(' ');
                 inheritances.Add(trimmedContent);
             }
 
             return inheritances;
         }
 
-        internal static (string Phenotype, OmimItem.Comments Comments) ExtractPhenotypeAndComments(string phenotypeString)
+        internal static (string Phenotype, OmimItem.Comment[] Comments) ExtractPhenotypeAndComments(string phenotypeString)
         {
             phenotypeString = phenotypeString.Trim(' ').Trim(',').Replace(@"\\'", "'");
             string phenotype = Regex.Replace(
@@ -48,56 +43,26 @@ namespace SAUtils.Omim
                             @" \(\d\) ", " "),
                             @"^\?", "");
 
-            var comments = OmimItem.Comments.unknown;
-
-            if (phenotypeString.Substring(0, 2).Contains("?"))
-            {
-                comments = OmimItem.Comments.unconfirmed_or_possibly_spurious_mapping;
-            }
-            else
-            {
-                if (phenotypeString.OptimizedStartsWith('{'))
-                {
-                    comments = OmimItem.Comments.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
-                }
-                else if (phenotypeString.OptimizedStartsWith('['))
-                {
-                    comments = OmimItem.Comments.nondiseases;
-                }
-            }
+            var comments = phenotypeString.Select(GetComment)
+                                          .Where(x => x != OmimItem.Comment.unknown)
+                                          .ToArray();
 
             return (phenotype, comments);
         }
 
-        public static (Dictionary<string, string> EntrezGeneIdToSymbol, Dictionary<string, string> EnsemblIdToSymbol) ParseUniversalGeneArchive(string inputReferencePath, string universalGeneArchivePath)
+        private static OmimItem.Comment GetComment(char symbol)
         {
-            var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(inputReferencePath);
-
-            UgaGene[] genes;
-
-            using (var reader = new UgaGeneReader(GZipUtilities.GetAppropriateReadStream(universalGeneArchivePath),
-                refNameToChromosome))
+            switch (symbol)
             {
-                genes = reader.GetGenes();
+                case '?':
+                    return OmimItem.Comment.unconfirmed_or_possibly_spurious_mapping;
+                case '[':
+                    return OmimItem.Comment.nondiseases;
+                case '{':
+                    return OmimItem.Comment.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
+                default:
+                    return OmimItem.Comment.unknown;
             }
-
-            var entrezGeneIdToSymbol = genes.GetGeneIdToSymbol(x => x.EntrezGeneId);
-            var ensemblIdToSymbol = genes.GetGeneIdToSymbol(x => x.EnsemblId);
-            return (entrezGeneIdToSymbol, ensemblIdToSymbol);
-        }
-
-        private static Dictionary<string, string> GetGeneIdToSymbol(this UgaGene[] genes,
-            Func<UgaGene, string> geneIdFunc)
-        {
-            var dict = new Dictionary<string, string>();
-            foreach (var gene in genes)
-            {
-                var key = geneIdFunc(gene);
-                var symbol = gene.Symbol;
-                if (string.IsNullOrEmpty(key) || string.IsNullOrEmpty(symbol)) continue;
-                dict[key] = symbol;
-            }
-            return dict;
         }
 
         public static Dictionary<string, List<ISuppGeneItem>> GetGeneToOmimEntriesAndSchema(IEnumerable<OmimItem> omimItems)

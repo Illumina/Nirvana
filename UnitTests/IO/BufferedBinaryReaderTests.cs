@@ -33,22 +33,6 @@ namespace UnitTests.IO
         }
 
         [Fact]
-        public void ReadInt16()
-        {
-            const short expectedValue = short.MaxValue;
-            short observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadInt16());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
-        public void ReadInt32()
-        {
-            const int expectedValue = int.MaxValue;
-            int observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadInt32());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
         public void ReadUInt16()
         {
             const ushort expectedValue = ushort.MaxValue;
@@ -61,38 +45,6 @@ namespace UnitTests.IO
         {
             const uint expectedValue = uint.MaxValue;
             uint observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadUInt32());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
-        public void ReadInt64()
-        {
-            const long expectedValue = long.MaxValue;
-            long observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadInt64());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
-        public void ReadUInt64()
-        {
-            const ulong expectedValue = ulong.MaxValue;
-            ulong observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadUInt64());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
-        public void ReadDouble()
-        {
-            const double expectedValue = double.MaxValue;
-            double observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadDouble());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
-        public void ReadString()
-        {
-            const string expectedValue = "ひらがな";
-            string observedValue = GetObservedValue(writer => writer.Write(expectedValue), reader => reader.ReadString());
             Assert.Equal(expectedValue, observedValue);
         }
 
@@ -122,55 +74,6 @@ namespace UnitTests.IO
         {
             int observedValue = GetObservedValue(writer => writer.WriteOpt(expectedValue), reader => reader.ReadOptInt32());
             Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Theory]
-        [InlineData(long.MaxValue)]
-        [InlineData(-1)]
-        [InlineData(long.MinValue)]
-        public void ReadOptInt64_HandleExtremeIntegers(long expectedValue)
-        {
-            long observedValue = GetObservedValue(writer => writer.WriteOpt(expectedValue), reader => reader.ReadOptInt64());
-            Assert.Equal(expectedValue, observedValue);
-        }
-
-        [Fact]
-        public void Reset()
-        {
-            const string s = "The quick brown fox jumped over the lazy dog.";
-            string expectedValue = s.Substring(4);
-            string observedValue;
-            long observedBufferPosition;
-            byte observedByte;
-            
-            using (var memoryStream = new MemoryStream())
-            {
-                using (var writer = new ExtendedBinaryWriter(memoryStream, Encoding.UTF8, true))
-                {
-                    writer.Write(Encoding.ASCII.GetBytes(s));
-                }
-
-                memoryStream.Position = 0;
-
-                using (var reader = new BufferedBinaryReader(memoryStream))
-                {
-                    reader.ReadInt32();
-                    observedBufferPosition = reader.BufferPosition;
-
-                    reader.BufferPosition = 2;
-                    observedByte = reader.ReadByte();
-
-                    memoryStream.Position = 4;
-                    reader.Reset();
-
-                    var bytes = reader.ReadBytes(s.Length - 4);
-                    observedValue = Encoding.ASCII.GetString(bytes);
-                }
-            }
-
-            Assert.Equal(expectedValue, observedValue);
-            Assert.Equal((byte)'e', observedByte);
-            Assert.Equal(4, observedBufferPosition);
         }
 
         private static T GetObservedValue<T>(Action<ExtendedBinaryWriter> writeMethod, Func<BufferedBinaryReader, T> readMethod)

@@ -97,9 +97,9 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["chr1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
 
-            var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, variantFactory, refNameToChromosome);
+            var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, seqProvider, variantFactory);
 
             var annotatedVariants1 = Annotator.GetAnnotatedVariants(position1.Variants);
 
@@ -123,10 +123,10 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
 
 
-            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, variantFactory, refNameToChromosome);
+            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);
 
             Assert.Equal("C", position.RefAllele);
@@ -149,9 +149,9 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
 
-            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, variantFactory, refNameToChromosome);
+            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);
 
             Assert.Equal("C", position.RefAllele);

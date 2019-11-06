@@ -1,0 +1,5 @@
+﻿ClinGen_Dosage_Sensitivity_Map_20190507.nga
+not_exist.nsa
+gnomAD_gene_scores_2.1.nga
+another_fake_file.nsi
+OMIM_20190812.nga

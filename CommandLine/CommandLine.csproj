@@ -4,7 +4,7 @@
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />

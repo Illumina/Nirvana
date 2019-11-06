@@ -7,6 +7,12 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {
+    public enum GnomadDataType : byte
+    {
+        Unknown,
+        Genome,
+        Exome
+    }
     public sealed class GnomadItem : ISupplementaryDataItem
     {
         #region members
@@ -15,37 +21,49 @@ namespace SAUtils.DataStructures
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
 
-        private int? AllAlleleCount { get; set; }
-        private int? AfrAlleleCount { get; set; }
-        private int? AmrAlleleCount { get; set; }
-        private int? EasAlleleCount { get; set; }
-        private int? FinAlleleCount { get; set; }
-        private int? NfeAlleleCount { get; set; }
-        private int? OthAlleleCount { get; set; }
-        private int? AsjAlleleCount { get; set; }
-        private int? SasAlleleCount { get; set; }
-        private int? AllAlleleNumber { get; set; }
-        private int? AfrAlleleNumber { get; set; }
-        private int? AmrAlleleNumber { get; set; }
-        private int? EasAlleleNumber { get; set; }
-        private int? FinAlleleNumber { get; set; }
-        private int? NfeAlleleNumber { get; set; }
-        private int? OthAlleleNumber { get; set; }
-        private int? AsjAlleleNumber { get; set; }
-        private int? SasAlleleNumber { get; set; }
+        public int? AllAlleleCount { get; private set; }
+        public int? AfrAlleleCount { get; private set; }
+        public int? AmrAlleleCount { get; private set; }
+        public int? EasAlleleCount { get; private set; }
+        public int? FinAlleleCount { get; private set; }
+        public int? NfeAlleleCount { get; private set; }
+        public int? OthAlleleCount { get; private set; }
+        public int? AsjAlleleCount { get; private set; }
+        public int? SasAlleleCount { get; private set; }
+        public int? AllAlleleNumber { get; private set; }
+        public int? AfrAlleleNumber { get; private set; }
+        public int? AmrAlleleNumber { get; private set; }
+        public int? EasAlleleNumber { get; private set; }
+        public int? FinAlleleNumber { get; private set; }
+        public int? NfeAlleleNumber { get; private set; }
+        public int? OthAlleleNumber { get; private set; }
+        public int? AsjAlleleNumber { get; private set; }
+        public int? SasAlleleNumber { get; private set; }
 
-        private int? AllHomCount { get; set; }
-        private int? AfrHomCount { get; set; }
-        private int? AmrHomCount { get; set; }
-        private int? EasHomCount { get; set; }
-        private int? FinHomCount { get; set; }
-        private int? NfeHomCount { get; set; }
-        private int? OthHomCount { get; set; }
-        private int? AsjHomCount { get; set; }
-        private int? SasHomCount { get; set; }
+        public int? AllHomCount { get; private set; }
+        public int? AfrHomCount { get; private set; }
+        public int? AmrHomCount { get; private set; }
+        public int? EasHomCount { get; private set; }
+        public int? FinHomCount { get; private set; }
+        public int? NfeHomCount { get; private set; }
+        public int? OthHomCount { get; private set; }
+        public int? AsjHomCount { get; private set; }
+        public int? SasHomCount { get; private set; }
 
-        private int? Coverage { get; }
-        private bool HasFailedFilters { get; }
+        //male counts
+        public int? MaleAlleleCount { get; private set; }
+        public int? MaleAlleleNumber { get; private set; }
+        public int? MaleHomCount { get; private set; }
+
+        //female counts
+        public int? FemaleAlleleCount { get; private set; }
+        public int? FemaleAlleleNumber { get; private set; }
+        public int? FemaleHomCount { get; private set; }
+
+        public int? Depth { get; private set; }
+        public int? Coverage { get; }
+        public bool HasFailedFilters { get; }
+        public GnomadDataType DataType { get; }
 
         #endregion
 
@@ -56,17 +74,22 @@ namespace SAUtils.DataStructures
             int? depth,
             int? allAlleleNumber, int? afrAlleleNumber, int? amrAlleleNumber, int? easAlleleNumber,
             int? finAlleleNumber, int? nfeAlleleNumber, int? othAlleleNumber, int? asjAlleleNumber, int? sasAlleleNumber, 
+            int? maleAlleleNumber, int? femaleAlleleNumber,
             int? allAlleleCount, int? afrAlleleCount, int? amrAlleleCount, int? easAlleleCount, int? finAlleleCount, int? nfeAlleleCount, int? othAlleleCount, int? asjAlleleCount, int? sasAlleleCount,
+            int? maleAlleleCount, int? femaleAlleleCount,
             int? allHomCount, int? afrHomCount, int? amrHomCount, int? easHomCount,
             int? finHomCount, int? nfeHomCount, int? othHomCount, int? asjHomCount, int? sasHomCount,
-            bool hasFailedFilters)
+            int? maleHomCount, int? femaleHomCount,
+            bool hasFailedFilters,
+            GnomadDataType dataType)
         {
             Chromosome = chromosome;
             Position = position;
             RefAllele = refAllele;
             AltAllele = alternateAllele;
 
-            if (depth!=null && allAlleleNumber!=null)
+            Depth = depth;
+            if (depth!=null && allAlleleNumber!=null && allAlleleNumber.Value > 0)
                 Coverage = ComputingUtilities.GetCoverage(depth.Value, allAlleleNumber.Value);
 
             AllAlleleNumber = allAlleleNumber;
@@ -79,6 +102,10 @@ namespace SAUtils.DataStructures
             AsjAlleleNumber = asjAlleleNumber;
             SasAlleleNumber = sasAlleleNumber;
 
+            MaleAlleleNumber = maleAlleleNumber;
+            FemaleAlleleNumber = femaleAlleleNumber;
+            MaleHomCount = maleHomCount;
+
             AllAlleleCount = allAlleleCount;
             AfrAlleleCount = afrAlleleCount;
             AmrAlleleCount = amrAlleleCount;
@@ -88,6 +115,10 @@ namespace SAUtils.DataStructures
             OthAlleleCount = othAlleleCount;
             AsjAlleleCount = asjAlleleCount;
             SasAlleleCount = sasAlleleCount;
+
+            MaleAlleleCount = maleAlleleCount;
+            FemaleAlleleCount = femaleAlleleCount;
+            FemaleHomCount = femaleHomCount;
 
             AllHomCount = allHomCount;
             AfrHomCount = afrHomCount;
@@ -100,6 +131,7 @@ namespace SAUtils.DataStructures
             SasHomCount = sasHomCount;
 
             HasFailedFilters = hasFailedFilters;
+            DataType = dataType;
 
             RemoveAlleleNumberZero();
         }
@@ -111,6 +143,20 @@ namespace SAUtils.DataStructures
                 AllAlleleNumber = null;
                 AllAlleleCount = null;
                 AllHomCount = null;
+            }
+
+            if (SaUtilsCommon.IsNumberNullOrZero(MaleAlleleNumber))
+            {
+                MaleAlleleNumber = null;
+                MaleAlleleCount = null;
+                MaleHomCount = null;
+            }
+
+            if (SaUtilsCommon.IsNumberNullOrZero(FemaleAlleleNumber))
+            {
+                FemaleAlleleNumber = null;
+                FemaleAlleleCount = null;
+                FemaleHomCount = null;
             }
 
             if (SaUtilsCommon.IsNumberNullOrZero(AfrAlleleNumber ))
@@ -168,6 +214,20 @@ namespace SAUtils.DataStructures
                 SasAlleleCount = null;
                 SasHomCount = null;
             }
+
+            if (SaUtilsCommon.IsNumberNullOrZero(MaleAlleleNumber))
+            {
+                MaleAlleleNumber = null;
+                MaleAlleleCount = null;
+                MaleHomCount = null;
+            }
+
+            if (SaUtilsCommon.IsNumberNullOrZero(FemaleAlleleNumber))
+            {
+                FemaleAlleleNumber = null;
+                FemaleAlleleCount = null;
+                FemaleHomCount = null;
+            }
         }
 
 
@@ -224,9 +284,23 @@ namespace SAUtils.DataStructures
             jsonObject.AddIntValue("othAc", OthAlleleCount);
 		    jsonObject.AddIntValue("othHc", OthHomCount);
 
-		    return StringBuilderCache.GetStringAndRelease(sb);
+            jsonObject.AddStringValue("maleAf", ComputingUtilities.ComputeFrequency(MaleAlleleNumber, MaleAlleleCount), false);
+            jsonObject.AddIntValue("maleAn", MaleAlleleNumber);
+            jsonObject.AddIntValue("maleAc", MaleAlleleCount);
+            jsonObject.AddIntValue("maleHc", MaleHomCount);
+
+            jsonObject.AddStringValue("femaleAf", ComputingUtilities.ComputeFrequency(FemaleAlleleNumber, FemaleAlleleCount), false);
+            jsonObject.AddIntValue("femaleAn", FemaleAlleleNumber);
+            jsonObject.AddIntValue("femaleAc", FemaleAlleleCount);
+            jsonObject.AddIntValue("femaleHc", FemaleHomCount);
+
+            return StringBuilderCache.GetStringAndRelease(sb);
 		}
 
-        
+        public static int CompareTo(GnomadItem item, GnomadItem other)
+        {
+            if (other == null) return -1;
+            return item.Chromosome.Index == other.Chromosome.Index ? item.Position.CompareTo(other.Position) : item.Chromosome.Index.CompareTo(other.Chromosome.Index);
+        }
     }
 }

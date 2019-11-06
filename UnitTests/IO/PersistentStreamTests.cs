@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using System.Text;
 using IO;
 using Moq;
 using Xunit;
@@ -8,89 +8,80 @@ namespace UnitTests.IO
 {
     public sealed class PersistentStreamTests
     {
-        private static IMockConnector GetMockConnector()
+        private Stream GetMockStream()
         {
-            var buffer = new byte[ushort.MaxValue];
-            var random = new Random();
+            var memStream = new MemoryStream();
+            using (var writer = new StreamWriter(memStream, Encoding.Default, 4096, true))
+            {
+                writer.WriteLine("2551e067cb59c540a4da905a99ee5ff4-ClinGen/2/GRCh37/ClinGen_20160414.nsi");
+                writer.WriteLine("43321b1a4f1c73724c00223e07d5e812-1kgSv/3/GRCh37/1000_Genomes_Project_Phase_3_v5a.nsi");
+                writer.WriteLine("929439472713ec609b92b97dc22a2d42-dbSNP/4/GRCh37/dbSNP_151.nsa");
+            }
 
-            random.NextBytes(buffer);
+            memStream.Position = 0;
+            return memStream;
+        }
+        private IConnect GetWebRequest_connect_on_third()
+        {
+            var moqRequest = new Mock<IConnect>();
+
+            //Connect succeeds on 3rd attempt
+            moqRequest.SetupSequence(x => x.Connect(0))
+                .Throws(new IOException())
+                .Throws(new IOException())
+                .Returns((null,GetMockStream()));
+
+            return moqRequest.Object;
+        }
+
+        private IConnect GetWebRequest_flaky_stream()
+        {
+            var moqRequest = new Mock<IConnect>();
+
+            moqRequest.SetupSequence(x => x.Connect(0))
+                .Returns((null, null))
+                .Returns((null, GetMockStream()));
             
-            var mockConnector = new Mock<IMockConnector>();
-            mockConnector.SetupSequence(x => x.ConnectorFunc(0))
+            return moqRequest.Object;
+        }
+
+        private IConnect GetWebRequest_connect_on_seventh()
+        {
+            var moqRequest = new Mock<IConnect>();
+
+            //Connect succeeds on 3rd attempt
+            moqRequest.SetupSequence(x => x.Connect(0))
                 .Throws(new IOException())
                 .Throws(new IOException())
-                .Returns(new MemoryStream(buffer))
-                .Throws(new IOException());
-
-            return mockConnector.Object;
-        }
-
-        [Fact]
-        public void Connect_failed_due_to_too_few_retries()
-        {
-            var connector = GetMockConnector();
-
-            Assert.Throws<IOException>(() => ConnectUtilities.ConnectWithRetries(connector.ConnectorFunc, 0, 2));
-
-        }
-
-        [Fact]
-        public void Connect_success_with_enough_retries()
-        {
-            var connector = GetMockConnector();
-
-            Assert.NotNull(ConnectUtilities.ConnectWithRetries(connector.ConnectorFunc, 0, 4));
-
-        }
-
-        private static IMockConnector Connecter_returns_null_streams()
-        {
-            var buffer = new byte[ushort.MaxValue];
-            var random = new Random();
-
-            random.NextBytes(buffer);
-
-            var mockConnector = new Mock<IMockConnector>();
-            mockConnector.SetupSequence(x => x.ConnectorFunc(0))
-                .Returns((Stream)null)
-                .Returns((Stream)null)
-                .Returns(new MemoryStream(buffer))
-                .Returns((Stream)null);
-
-            return mockConnector.Object;
-        }
-
-        [Fact]
-        public void Persistent_stream_read()
-        {
-            var pStream = new PersistentStream(null, Connecter_returns_null_streams().ConnectorFunc, 0);
-
-            //since the stream is null, reading will cause an exception and reconnect will be invoked
-            Assert.NotEqual(0, pStream.Read(new byte[100], 0, 100));
-        }
-
-        private static IMockConnector Connecter_throws_exception()
-        {
-            var buffer = new byte[ushort.MaxValue];
-            var random = new Random();
-
-            random.NextBytes(buffer);
-
-            var mockConnector = new Mock<IMockConnector>();
-            mockConnector.SetupSequence(x => x.ConnectorFunc(0))
                 .Throws(new IOException())
-                .Returns(new MemoryStream(buffer));
+                .Throws(new IOException())
+                .Throws(new IOException())
+                .Throws(new IOException())
+                .Returns((null, GetMockStream()));
 
-            return mockConnector.Object;
+            return moqRequest.Object;
         }
 
         [Fact]
-        public void Persistent_stream_connection_exception()
+        public void TestFlakyConnection()
         {
-            var pStream = new PersistentStream(null, Connecter_throws_exception().ConnectorFunc, 0);
+            // pStream attempts to connect at construction time. It should succeed at the third attempt
+            var pStream = new PersistentStream(GetWebRequest_connect_on_third(),0);
+            // no exception thrown means this test succeeded
+        }
 
-            //since the stream is null, reading will cause an exception and reconnect will be invoked
-            Assert.NotEqual(0, pStream.Read(new byte[100], 0, 100));
+        [Fact]
+        public void FailToConnect()
+        {
+            Assert.Throws<IOException>(()=>new PersistentStream(GetWebRequest_connect_on_seventh(),0));
+        }
+
+        [Fact]
+        public void ReadFlakyStream()
+        {
+            var pStream = new PersistentStream(GetWebRequest_flaky_stream(),0);
+            var buffer = new byte[4096];
+            Assert.Equal(100, pStream.Read(buffer, 0, 100));
         }
     }
 }

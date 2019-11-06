@@ -139,7 +139,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             IVariantEffect variantEffect)
         {
             var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant,
-                variant.Behavior.StructuralVariantConsequence);
+                variant.IsStructuralVariant);
 
             var consequence = new Consequences(variantEffect, featureEffect);
             consequence.DetermineSmallVariantEffects();

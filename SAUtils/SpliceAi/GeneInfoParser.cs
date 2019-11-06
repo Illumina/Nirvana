@@ -43,19 +43,17 @@ namespace SAUtils.SpliceAi
                     var cols = line.OptimizedSplit('\t');
                     var latestSymbol = cols[_symbolIndex];
                     var synonyms     = cols[_synonymsIndex];
-                    var chromosome   = cols[_chromosomeIndex];
-                    var locations    = cols[_locationIndex];
 
                     if (synonyms == "-")
                     {
-                        geneSynonyms[latestSymbol] = new List<string>() {latestSymbol};
+                        geneSynonyms[latestSymbol] = new List<string> {latestSymbol};
                         continue;
                     }
                     
                     foreach (var synonym in synonyms.OptimizedSplit('|'))
                     {
                         if (!geneSynonyms.TryGetValue(synonym, out var symbols))
-                            geneSynonyms[synonym] = new List<string>(){latestSymbol};
+                            geneSynonyms[synonym] = new List<string> {latestSymbol};
                         else symbols.Add(latestSymbol);
 
                         if (geneSynonyms[synonym].Count > largestSymbolCount)

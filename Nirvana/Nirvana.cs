@@ -9,7 +9,6 @@ using ErrorHandling;
 using IO;
 using Jasix.DataStructures;
 using VariantAnnotation.Interface;
-using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using Vcf;
 
@@ -22,7 +21,6 @@ namespace Nirvana
         private static string _vcfPath;
         private static string _refSequencePath;
         private static string _outputFileName;
-        private static string _pluginDirectory;
 
         private static bool _forceMitochondrialAnnotation;
         private static bool _disableRecomposition;
@@ -40,15 +38,14 @@ namespace Nirvana
 
         private static AnnotationResources GetAnnotationResources()
         {            
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, _pluginDirectory, _disableRecomposition, _forceMitochondrialAnnotation);
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null, _disableRecomposition, _forceMitochondrialAnnotation);
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 
-            using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(
-                new PersistentStream(PersistentStreamUtils.GetReadStream(_vcfPath),
-                    ConnectUtilities.GetFileConnectFunc(_vcfPath), 0)))
+            using (var preloadVcfStream = GZipUtilities.GetAppropriateStream(PersistentStreamUtils.GetReadStream(_vcfPath)))
             {
                 annotationResources.GetVariantPositions(preloadVcfStream, null);
             }
+
             return annotationResources;
         }
 
@@ -65,11 +62,6 @@ namespace Nirvana
                     "in|i=",
                     "input VCF {path}",
                     v => _vcfPath = v
-                },
-                {
-                    "plugin|p=",
-                    "plugin {directory}",
-                    v => _pluginDirectory = v
                 },
                 {
                     "out|o=",
@@ -102,7 +94,6 @@ namespace Nirvana
                 .UseVersionProvider(new VersionProvider())
                 .Parse()
                 .CheckInputFilenameExists(_vcfPath, "vcf", "--in", true, "-")
-                //.CheckInputFilenameExists(_vcfPath + ".tbi", "tabix index file", "--in")
                 .CheckInputFilenameExists(_refSequencePath, "reference sequence", "--ref")
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")

@@ -9,5 +9,6 @@
         string[] LinkedVids { get; }
 		IBreakEnd[] BreakEnds { get; }
         AnnotationBehavior Behavior { get; }
+        bool IsStructuralVariant { get; }
     }
 }

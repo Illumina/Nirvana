@@ -12,7 +12,7 @@ namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static IDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, GenomicRange genomicRange, ISequenceProvider sequenceProvider)
+        public static IDictionary<IChromosome, List<int>> GetPositions(Stream vcfStream, GenomicRange genomicRange, ISequenceProvider sequenceProvider, IRefMinorProvider refMinorProvider)
         {
             var benchmark = new Benchmark();
             Console.Write("Scanning positions required for SA pre-loading....");
@@ -23,18 +23,34 @@ namespace Nirvana
             using (var reader = new StreamReader(vcfStream))
             {
                 string line;
+                string currentChromName="";
+                IChromosome chrom = null;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (!NeedProcessThisLine(refNameToChrom, line, out var splits, out IChromosome iChrom)) continue;
+                    if(line.StartsWith("#")) continue; //skip header lines
+                    
+                    var splits = line.OptimizedSplit('\t');
+                    string chromName = splits[VcfCommon.ChromIndex];
+                    if (chromName != currentChromName)
+                    {
+                        if (!refNameToChrom.TryGetValue(chromName, out chrom)) continue;//skip unrecognized contigs
+                        currentChromName = chromName;
+                    }
 
-                    int position = int.Parse(splits[VcfCommon.PosIndex]);
+                    (int position, bool foundError) = splits[VcfCommon.PosIndex].OptimizedParseInt32();
+                    if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {splits[VcfCommon.PosIndex]}");
 
-                    if (rangeChecker.OutOfRange(iChrom, position)) break;
+                    if (rangeChecker.OutOfRange(chrom, position)) break;
 
                     string refAllele = splits[VcfCommon.RefIndex];
                     string altAllele = splits[VcfCommon.AltIndex];
-                    sequenceProvider.LoadChromosome(iChrom);
-                    UpdateChromToPositions(chromPositions, iChrom, position, refAllele, altAllele, sequenceProvider.Sequence);
+                    //skip ref positions unless ref minor
+                    // for ref positions altAllele=='.'
+                    if(altAllele == "." && !IsRefMinor(refMinorProvider, chrom, position))
+                        continue;
+
+                    sequenceProvider.LoadChromosome(chrom);
+                    TryAddPosition(chromPositions, chrom, position, refAllele, altAllele, sequenceProvider.Sequence);
                 }
             }
 
@@ -45,9 +61,16 @@ namespace Nirvana
             return chromPositions;
         }
 
-        public static void UpdateChromToPositions(Dictionary<IChromosome, List<int>> chromPositions, IChromosome chromosome, int position, string refAllele, string altAllele, ISequence refSequence)
+        private static bool IsRefMinor(IRefMinorProvider refMinorProvider, IChromosome chrom, int position)
+        {
+            if (refMinorProvider == null) return false;
+            return !string.IsNullOrEmpty(refMinorProvider.GetGlobalMajorAllele(chrom, position));
+        }
+
+        public static bool TryAddPosition(Dictionary<IChromosome, List<int>> chromPositions, IChromosome chromosome, int position, string refAllele, string altAllele, ISequence refSequence)
         {
             if (!chromPositions.ContainsKey(chromosome)) chromPositions.Add(chromosome, new List<int>(16 * 1024));
+            var addedPosition = false;
             foreach (string allele in altAllele.OptimizedSplit(','))
             {
                 if (allele.OptimizedStartsWith('<') || allele.Contains('[') || altAllele.Contains(']')) continue;
@@ -55,7 +78,10 @@ namespace Nirvana
                 (int shiftedPos, string _, string _) =
                     VariantUtils.TrimAndLeftAlign(position, refAllele, allele, refSequence);
                 chromPositions[chromosome].Add(shiftedPos);
+                addedPosition = true;
             }
+
+            return addedPosition;
         }
 
         private static int SortPositionsAndGetCount(Dictionary<IChromosome, List<int>> chromPositions)
@@ -68,17 +94,6 @@ namespace Nirvana
             }
 
             return count;
-        }
-
-        private static bool NeedProcessThisLine(IDictionary<string, IChromosome> refNameToChrom, string line, out string[] splits, out IChromosome iChrom)
-        {
-            splits = null;
-            iChrom = null;
-            if (line.StartsWith('#')) return false;
-            splits = line.Split('\t', 6);
-            string chrom = splits[VcfCommon.ChromIndex];
-
-            return refNameToChrom.TryGetValue(chrom, out iChrom);
         }
     }
 }

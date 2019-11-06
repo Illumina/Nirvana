@@ -22,7 +22,7 @@ namespace CacheUtils.Sequence
         private long _maskedIntervalsOffset;
 
         public CompressedSequenceWriter(Stream stream, IReadOnlyCollection<ReferenceMetadata> referenceMetadataList,
-            ISerializable genomeCytobands, GenomeAssembly genomeAssembly)
+            CytogeneticBands genomeCytobands, GenomeAssembly genomeAssembly)
         {
             _stream                = stream;
             _writer                = new ExtendedBinaryWriter(_stream);
@@ -135,7 +135,7 @@ namespace CacheUtils.Sequence
             _writer.Write(_maskedIntervalsOffset);
         }
 
-        private void WriteHeader(IReadOnlyCollection<ReferenceMetadata> referenceMetadataList, ISerializable genomeCytobands, GenomeAssembly genomeAssembly)
+        private void WriteHeader(IReadOnlyCollection<ReferenceMetadata> referenceMetadataList, CytogeneticBands genomeCytobands, GenomeAssembly genomeAssembly)
         {
             _writer.Write(CompressedSequenceCommon.HeaderTag);
             _writer.Write(CompressedSequenceCommon.HeaderVersion);

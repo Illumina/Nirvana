@@ -45,7 +45,7 @@ namespace SAUtils
             _refProvider = refProvider;
 
             _index = new ChunkedIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
-            _memBuffer = new byte[short.MaxValue * 2];
+            _memBuffer = new byte[short.MaxValue * 4];
             _memStream = new MemoryStream(_memBuffer);
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
@@ -141,6 +141,9 @@ namespace SAUtils
                 // any data source that is reported by allele and is not an array (e.g. allele frequencies) need this filtering step
                 if (_index.MatchByAllele && !_index.IsArray)
                     saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems, _throwErrorOnConflicts);
+
+                if (_index.JsonKey == SaCommon.PrimateAiTag)
+                    saItems = SuppDataUtilities.DeDuplicatePrimateAiItems(saItems);
 
                 _memWriter.WriteOpt(saItems.Count);
 

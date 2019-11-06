@@ -19,6 +19,19 @@ namespace Vcf.Sample
         internal int? REPCN;
         internal int? SR;
         internal int? VF;
+        internal int? MCN;
+        internal int? SQ;
+
+        //legacy fields
+        internal int? TAR;
+        internal int? TIR;
+        internal int? AU;
+        internal int? CU;
+        internal int? GU;
+        internal int? TU;
+        internal int? MCC;
+        internal int? GQX;
+        internal int? DPI;
         // ReSharper restore InconsistentNaming
 
         internal int NumColumns;
@@ -39,6 +52,20 @@ namespace Vcf.Sample
             REPCN = null;
             SR    = null;
             VF    = null;
+            MCN   = null;
+            SQ    = null;
+            
+            // legacy sample fields
+            TAR = null;
+            TIR = null;
+            AU  = null;
+            CU  = null;
+            GU  = null;
+            TU  = null;
+            MCC = null;
+            GQX = null;
+            DPI = null;
+
         }
 
         internal void Set(string formatColumn)
@@ -47,11 +74,12 @@ namespace Vcf.Sample
 
             if (formatColumn == null) return;
 
-            var formatCols = formatColumn.OptimizedSplit(':');
+            string[] formatCols = formatColumn.OptimizedSplit(':');
             NumColumns = formatCols.Length;
 
             for (var index = 0; index < NumColumns; index++)
             {
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (formatCols[index])
                 {
                     case "AD":
@@ -95,6 +123,40 @@ namespace Vcf.Sample
                         break;
                     case "VF":
                         VF = index;
+                        break;
+                        case "MCN":
+                        MCN = index;
+                        break;
+                    case "SQ":
+                        SQ = index;
+                        break;
+                    //LEGACY
+                    case "TAR":
+                        TAR = index;
+                        break;
+                    case "TIR":
+                        TIR = index;
+                        break;
+                    case "AU":
+                        AU = index;
+                        break;
+                    case "GU":
+                        GU = index;
+                        break;
+                    case "CU":
+                        CU = index;
+                        break;
+                    case "TU":
+                        TU = index;
+                        break;
+                    case "GQX":
+                        GQX = index;
+                        break;
+                    case "DPI":
+                        DPI = index;
+                        break;
+                    case "MCC":
+                        MCC = index;
                         break;
                 }
             }

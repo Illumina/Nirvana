@@ -73,25 +73,5 @@ namespace UnitTests.Tabix
             bool observedResult = _search.HasVariants("chr18", 71589360, 76592131);
             Assert.False(observedResult);
         }
-
-        [Fact]
-        public void HasVariantsInAnyBins_NoVariants_ReturnFalse()
-        {
-            var idToChunks = new Dictionary<int, Interval[]>();
-            bool observedResults = Search.HasVariantsInAnyBins(idToChunks, 10, 15);
-            Assert.False(observedResults);
-        }
-
-        [Fact]
-        public void HasVariantsInAnyBins_Variants_ReturnTrue()
-        {
-            var idToChunks = new Dictionary<int, Interval[]>
-            {
-                [13] = new Interval[1]
-            };
-
-            bool observedResults = Search.HasVariantsInAnyBins(idToChunks, 10, 15);
-            Assert.True(observedResults);
-        }
     }
 }

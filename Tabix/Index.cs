@@ -4,12 +4,16 @@ namespace Tabix
 {
     public sealed class Index
     {
+        // ReSharper disable NotAccessedField.Global
+        // ReSharper disable MemberCanBePrivate.Global
         public readonly int Format;
         public readonly int SequenceNameIndex;
         public readonly int BeginIndex;
         public readonly int EndIndex;
         public readonly char CommentChar;
         public readonly int NumLinesToSkip;
+        // ReSharper restore MemberCanBePrivate.Global
+        // ReSharper restore NotAccessedField.Global
         public readonly ReferenceSequence[] ReferenceSequences;
 
         internal readonly Dictionary<string, ushort> RefNameToTabixIndex;

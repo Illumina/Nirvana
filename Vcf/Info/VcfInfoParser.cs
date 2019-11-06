@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using OptimizedCore;
 using VariantAnnotation.Interface.Positions;
-using Variants;
 
 namespace Vcf.Info
 {
@@ -22,7 +21,9 @@ namespace Vcf.Info
             int? jointSomaticNormalQuality = null;
             double? strandBias             = null;
             int? svLen                     = null;
-            VariantType svType             = VariantType.unknown;
+            string svType                  = null;
+            double? normalLod              = null;
+            double? tumorLod               = null;
 
             foreach ((string key, string value) in infoKeyValue)
             {
@@ -56,46 +57,19 @@ namespace Vcf.Info
                             svLen = Math.Abs(svLen.Value);
                         break;
                     case "SVTYPE":
-                        svType = GetSvType(value);
+                        svType = value;
+                        break;
+                    case "NLOD":
+                        normalLod = value.GetNullableValue<double>(double.TryParse);
+                        break;
+                    case "TLOD":
+                        tumorLod = value.GetNullableValue<double>(double.TryParse);
                         break;
                 }
             }
 
             return new InfoData(ciEnd, ciPos, end, jointSomaticNormalQuality, refRepeatCount, repeatUnit, strandBias,
                 svLen, svType);
-        }
-
-        private static VariantType GetSvType(string value)
-        {
-            switch (value)
-            {
-                case "DEL":
-                    return VariantType.deletion;
-                case "INS":
-                    return VariantType.insertion;
-                case "DUP":
-                    return VariantType.duplication;
-                case "INV":
-                    return VariantType.inversion;
-                case "TDUP":
-                    return VariantType.tandem_duplication;
-                case "BND":
-                    return VariantType.translocation_breakend;
-                case "CNV":
-                    return VariantType.copy_number_variation;
-                case "STR":
-                    return VariantType.short_tandem_repeat_variation;
-                case "ALU":
-                    return VariantType.mobile_element_insertion;
-                case "LINE1":
-                    return VariantType.mobile_element_insertion;
-                case "LOH":
-                    return VariantType.copy_number_variation;
-                case "SVA":
-                    return VariantType.mobile_element_insertion;
-                default:
-                    return VariantType.unknown;
-            }
         }
 
         private static readonly Dictionary<string, string> EmptyDictionary = new Dictionary<string, string>();

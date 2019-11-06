@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
@@ -8,6 +9,7 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
+using VariantAnnotation.SA;
 using Variants;
 
 namespace VariantAnnotation.Providers
@@ -157,10 +159,26 @@ namespace VariantAnnotation.Providers
                 foreach ((string refAllele, string altAllele, string jsonString) in annotations)
                 {
                     if (refAllele != variant.RefAllele || altAllele != variant.AltAllele) continue;
+
                     annotatedVariant.SaList.Add(new SupplementaryAnnotation(nsaReader.JsonKey, nsaReader.IsArray,
                         nsaReader.IsPositional, jsonString, null));
                     break;
                 }
+        }
+
+        private static string AddZscore(string jsonString)
+        {
+            var splits = jsonString.Split(',');
+            var meanStr = splits[0].Split(':')[1];
+            var stdevStr = splits[1].Split(':')[1];
+
+            var mean = double.Parse(meanStr);
+            var stdev = double.Parse(stdevStr);
+
+            var zscore = (0.5 - mean) / stdev;
+
+            //add to the return string
+            return jsonString + $",\"vrfZscore\":{zscore:0.######}";
         }
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
@@ -168,14 +186,18 @@ namespace VariantAnnotation.Providers
             var benchmark = new Benchmark();
             Console.Write("Pre-loading SA....");
 
-            foreach (INsaReader nsaReader in _nsaReaders)
+            var preloadTasks = _nsaReaders.Select(x => DoPreload(x, chromosome, positions)).ToArray();
+            Task.WaitAll(preloadTasks);
+            foreach (var preloadTask in preloadTasks)
             {
-                nsaReader.PreLoad(chromosome, positions);
+                preloadTask.Dispose();
             }
 
             var totalTime = benchmark.GetElapsedTime();
             Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");
         }
+
+        private static Task DoPreload(INsaReader nsaReader, IChromosome chromosome, List<int> positions) => Task.Run(() => { nsaReader.PreLoad(chromosome, positions); });
 
         public void Dispose()
         {

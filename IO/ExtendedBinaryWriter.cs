@@ -33,7 +33,7 @@ namespace IO
         /// </summary>
         public void WriteOpt(int value)
         {
-            uint num = (uint)value;
+            var num = (uint)value;
 
             while (num >= 128U)
             {
@@ -49,7 +49,7 @@ namespace IO
         /// </summary>
         public void WriteOpt(long value)
         {
-            ulong num = (ulong)value;
+            var num = (ulong)value;
 
             while (num >= 128U)
             {

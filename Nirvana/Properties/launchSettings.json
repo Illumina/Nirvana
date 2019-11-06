@@ -47,8 +47,8 @@
     },
     "SK Nirvana": {
       "commandName": "Project",
-      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\temp\\miniHEXA.vcf.gz --sd E:\\Nirvana_resources\\gen_data\\gen_Omim\\2019-08-01\\GRCh38\\ -o test --disable-recomposition",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_omim_generation"
+      "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\temp\\deletion_nonSV_vid.vcf -o test ",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_bugfix"
     },
     "SK Pedigree": {
       "commandName": "Project",

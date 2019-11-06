@@ -19,7 +19,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         private const int ReverseVariantEnd   = 313900;
 
         // NM_033517.1, SHANK3
-        private ITranscriptRegion[] _regionsNm33517 =
+        private readonly ITranscriptRegion[] _regionsNm33517 =
         {
             new TranscriptRegion(TranscriptRegionType.Exon, 1, 51113070, 51113132, 1, 63),
             new TranscriptRegion(TranscriptRegionType.Intron, 1, 51113133, 51113475, 63, 64),
@@ -76,7 +76,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         };
 
         // NM_001317107.1
-        private ITranscriptRegion[] _regionsNm1317107 =
+        private readonly ITranscriptRegion[] _regionsNm1317107 =
         {
             new TranscriptRegion(TranscriptRegionType.Exon, 1, 22138125, 22138561, 670, 1106),
             new TranscriptRegion(TranscriptRegionType.Gap, 1, 22138562, 22138563, 669, 670),
@@ -107,7 +107,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new TranscriptRegion(TranscriptRegionType.Intron, 1, 313893, 314242, 116, 117),
                 new TranscriptRegion(TranscriptRegionType.Exon, 1,   314243, 314358, 1, 116)
             };
-          
         }
 
         [Fact]
@@ -135,7 +134,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         [Fact]
-        public void GetCdnaPosition_Forward_Insertion()
+        public void GetCdnaPositions_Forward_Insertion()
         {
             var variant  = new Interval(ForwardVariantStart, ForwardVariantEnd);
             var observed = MappedPositionUtilities.GetCdnaPositions(_forwardTranscriptRegions[4],
@@ -146,7 +145,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         [Fact]
-        public void GetCdnaPosition_Reverse_Deletion()
+        public void GetCdnaPositions_Reverse_Deletion()
         {
             var variant  = new Interval(ReverseVariantStart, ReverseVariantEnd);
             var observed = MappedPositionUtilities.GetCdnaPositions(_reverseTranscriptRegions[6], _reverseTranscriptRegions[7], variant, true, false);
@@ -174,9 +173,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
 
             Assert.Equal(1010, observed.CdnaStart);
         }
-        //new TranscriptRegion(TranscriptRegionType.Exon, 11, 51135985, 51135989, 1342, 1346),
-        //new TranscriptRegion(TranscriptRegionType.Gap, 11, 51135990, 51135991, 1346, 1347),
-        //new TranscriptRegion(TranscriptRegionType.Exon, 11, 51135992, 51136143, 1347, 1498),
 
         [Fact]
         public void GetCdnaPosition_Snv_AfterOutframeRnaEditInsertion()
@@ -417,8 +413,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void GetProteinPosition_Forward_Insertion()
         {
-            var proteinStart = MappedPositionUtilities.GetProteinPosition(225);
-            var proteinEnd   = MappedPositionUtilities.GetProteinPosition(224);
+            int proteinStart = MappedPositionUtilities.GetProteinPosition(225);
+            int proteinEnd   = MappedPositionUtilities.GetProteinPosition(224);
             Assert.Equal(75, proteinStart);
             Assert.Equal(75, proteinEnd);
         }
@@ -426,8 +422,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void GetProteinPosition_Reverse_Deletion()
         {
-            var proteinStart = MappedPositionUtilities.GetProteinPosition(-1);
-            var proteinEnd   = MappedPositionUtilities.GetProteinPosition(-1);
+            int proteinStart = MappedPositionUtilities.GetProteinPosition(-1);
+            int proteinEnd   = MappedPositionUtilities.GetProteinPosition(-1);
             Assert.Equal(-1, proteinStart);
             Assert.Equal(-1, proteinEnd);
         }

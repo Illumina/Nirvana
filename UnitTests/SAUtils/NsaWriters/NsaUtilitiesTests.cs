@@ -4,7 +4,6 @@ using System.Linq;
 using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.TOPMed;
-using SAUtils.SpliceAi;
 using UnitTests.SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.SA;
 using Xunit;

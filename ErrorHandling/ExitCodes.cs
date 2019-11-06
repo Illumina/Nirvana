@@ -38,9 +38,6 @@
         FileNotSorted             = 221,
         MissingCompressionLibrary = 223,
 
-        // services (230 - 239)
-        AnnotationLambdasFailed   = 230,
-
         // functionality (240 - 259)
         Compression = 240
     }

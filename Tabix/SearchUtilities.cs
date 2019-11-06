@@ -2,6 +2,7 @@
 {
     public static class SearchUtilities
     {
+        // ReSharper disable once UnusedMember.Global
         public static long GetOffset(this Index index, string chromosomeName, int begin)
         {
             var refSeq = index.GetTabixReferenceSequence(chromosomeName);
@@ -18,7 +19,7 @@
 
             int bin = BinUtilities.ConvertPositionToBin(begin);
 
-            if (refSeq.IdToChunks.TryGetValue(bin, out var chunks))
+            if (refSeq.IdToChunks.TryGetValue(bin, out Interval[] chunks))
                 return GetMinOverlapOffset(chunks, minOffset, maxOffset);
 
             int linearIndex = begin >> Constants.MinShift;
@@ -35,6 +36,7 @@
             return begin;
         }
 
+        // ReSharper disable once ParameterTypeCanBeEnumerable.Global
         internal static long FirstNonZeroValue(this ulong[] offsets)
         {
             foreach (ulong offset in offsets)
@@ -99,7 +101,7 @@
                 while (bin % 8 == 1) bin = BinUtilities.ParentBin(bin);
 
                 if (bin == 0) return ulong.MaxValue;
-                if (refSeq.IdToChunks.TryGetValue(bin, out var chunks) && chunks.Length > 0) return chunks[0].Begin;
+                if (refSeq.IdToChunks.TryGetValue(bin, out Interval[] chunks) && chunks.Length > 0) return chunks[0].Begin;
 
                 bin++;
             }

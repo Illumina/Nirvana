@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.Positions;
 
 namespace Phantom.Recomposer
 {
-    public sealed class BufferedPositions : IBufferedPositions
+    public sealed class BufferedPositions
     {
         public List<ISimplePosition> SimplePositions { get; }
         public List<bool> Recomposable { get; }
@@ -11,22 +11,21 @@ namespace Phantom.Recomposer
 
         public BufferedPositions(List<ISimplePosition> simplePositions, List<bool> recomposable, List<int> functionBlockRanges)
         {
-            SimplePositions = simplePositions;
-            Recomposable = recomposable;
+            SimplePositions     = simplePositions;
+            Recomposable        = recomposable;
             FunctionBlockRanges = functionBlockRanges;
         }
 
         public List<ISimplePosition> GetRecomposablePositions()
         {
             var recomposablePositions = new List<ISimplePosition>();
-            for (int index = 0; index < SimplePositions.Count; index++)
+            for (var index = 0; index < SimplePositions.Count; index++)
             {
-                if (Recomposable[index])
-                    recomposablePositions.Add(SimplePositions[index]);
+                if (Recomposable[index]) recomposablePositions.Add(SimplePositions[index]);
             }
             return recomposablePositions;
         }
 
-        public  static BufferedPositions CreatEmptyBufferedPositions() => new BufferedPositions(new List<ISimplePosition>(), new List<bool>(), new List<int>());
+        public static BufferedPositions CreateEmptyBufferedPositions() => new BufferedPositions(new List<ISimplePosition>(), new List<bool>(), new List<int>());
     }
 }

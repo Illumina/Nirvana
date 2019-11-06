@@ -26,7 +26,7 @@
 
             var variantFreqs = new double[numAltAlleles];
 
-            int totalDepth = 0;
+            var totalDepth = 0;
             for (var alleleIndex = 0; alleleIndex < alleleDepths.Length; alleleIndex++)
                 totalDepth += alleleDepths[alleleIndex];
 

@@ -10,5 +10,5 @@
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\Variants\Variants.csproj" />
   </ItemGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

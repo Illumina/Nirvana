@@ -17,23 +17,25 @@ namespace Phantom.Recomposer
 
         public PositionBuffer(ICodonInfoProvider codonInfoProvider, IIntervalForest<IGene> geneIntervalForest)
         {
-            CodonInfoProvider = codonInfoProvider;
+            CodonInfoProvider  = codonInfoProvider;
             GeneIntervalForest = geneIntervalForest;
-            CurrentChromosome = new EmptyChromosome(string.Empty);
-            BufferedPositions = BufferedPositions.CreatEmptyBufferedPositions();
+            CurrentChromosome  = new EmptyChromosome(string.Empty);
+            BufferedPositions  = BufferedPositions.CreateEmptyBufferedPositions();
         }
 
         public BufferedPositions AddPosition(ISimplePosition simplePosition)
         {
             bool recomposable = IsRecomposable(simplePosition);
             bool isPositionWithinRange = !simplePosition.Chromosome.IsEmpty() && PositionWithinRange(simplePosition);
+
             if (isPositionWithinRange)
             {
                 BufferedPositions.SimplePositions.Add(simplePosition);
                 BufferedPositions.Recomposable.Add(recomposable);
                 if (recomposable) UpdateFunctionBlockRanges(simplePosition);
-                return BufferedPositions.CreatEmptyBufferedPositions();
+                return BufferedPositions.CreateEmptyBufferedPositions();
             }
+
             var copyOfBuffer = BufferedPositions;
             ResetBuffer(simplePosition, recomposable);
             return copyOfBuffer;
@@ -66,7 +68,7 @@ namespace Phantom.Recomposer
         public BufferedPositions Purge()
         {
             var copyOfBuffer = BufferedPositions;
-            BufferedPositions = BufferedPositions.CreatEmptyBufferedPositions();
+            BufferedPositions = BufferedPositions.CreateEmptyBufferedPositions();
             return copyOfBuffer;
         }
 

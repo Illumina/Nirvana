@@ -9,7 +9,7 @@ using Variants;
 
 namespace Phantom.PositionCollections
 {
-    public sealed class PositionSet : IPositionSet
+    public sealed class PositionSet
     {
         public List<ISimplePosition> SimplePositions { get; }
         private List<int> FunctionBlockRanges { get; }
@@ -220,21 +220,6 @@ namespace Phantom.PositionCollections
                 }
             }
             return new TagInfo<T>(tagInfo);
-        }
-    }
-
-    public static class TagInfoExtension
-    {
-        public static void Update(this TagInfo<string> tagInfo, TagInfo<string> newTagInfo)
-        {
-            for (var i = 0; i < tagInfo.Values.Length; i++)
-                for (var j = 0; j < tagInfo.Values[0].Length; j++)
-                {
-                    if (newTagInfo.Values[i][j] != ".")
-                    {
-                        tagInfo.Values[i][j] = newTagInfo.Values[i][j];
-                    }
-                }
         }
     }
 }

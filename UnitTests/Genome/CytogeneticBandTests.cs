@@ -32,8 +32,8 @@ namespace UnitTests.Genome
         [Fact]
         public void Serialization()
         {
-            ICytogeneticBands expectedCytogeneticBands = GetCytogeneticBands();
-            ICytogeneticBands observedCytogeneticBands;
+            CytogeneticBands expectedCytogeneticBands = GetCytogeneticBands();
+            CytogeneticBands observedCytogeneticBands;
 
             using (var ms = new MemoryStream())
             {

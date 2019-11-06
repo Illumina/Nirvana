@@ -46,7 +46,7 @@ namespace CacheUtils.Genes.IO
             if (cols.Length != 11) throw new InvalidDataException($"Expected 11 columns, but found {cols.Length} columns.");
 
             string ucscRefName   = cols[0];
-            var chromosome       = ReferenceNameUtilities.GetChromosome(_refNameToChromosome, ucscRefName);
+            var chromosome       = _refNameToChromosome == null ? new EmptyChromosome(ucscRefName) : ReferenceNameUtilities.GetChromosome(_refNameToChromosome, ucscRefName);
             string symbol        = cols[2];
             int start37          = int.Parse(cols[3]);
             int end37            = int.Parse(cols[4]);

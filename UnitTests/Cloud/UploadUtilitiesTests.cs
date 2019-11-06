@@ -3,7 +3,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Amazon.S3.Model;
-using Cloud;
+using Cloud.Utilities;
 using IO;
 using Moq;
 using UnitTests.TestUtilities;

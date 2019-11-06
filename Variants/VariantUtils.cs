@@ -13,7 +13,8 @@ namespace Variants
         public static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele, string altAllele, ISequence refSequence, int maxUpstreamLength = MaxUpstreamLength)
         {
             if (IsStructuralVariant(altAllele)) return (start, refAllele, altAllele);
-            //we have to check this before the trimming since it depends on the padding base
+
+            // we have to check this before the trimming since it depends on the padding base
             bool isLeftShiftPossible = IsLeftShiftPossible(refAllele, altAllele);
 
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
@@ -22,10 +23,10 @@ namespace Variants
             if (!(altAllele.Length == 0 || refAllele.Length == 0)) return (start, refAllele, altAllele);
             if(! isLeftShiftPossible) return (start, refAllele, altAllele);
 
-            //base checking to make sure we can safely left shift
+            // base checking to make sure we can safely left shift
             if (IfRefBaseMismatched(start, refAllele, refSequence)) return (start, refAllele, altAllele);
 
-            //adjust the max upstream length when you are near the beginning of the chrom
+            // adjust the max upstream length when you are near the beginning of the chrom
             if (maxUpstreamLength >= start) maxUpstreamLength = start - 1;
             var upstreamSeq = refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength);
             

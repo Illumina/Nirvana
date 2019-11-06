@@ -1,39 +1,33 @@
-﻿using System.IO;
-using System.IO.Compression;
-using Amazon.Runtime;
+﻿using System;
+using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 using IO;
 using VariantAnnotation.SA;
-using static System.Environment;
 
 namespace SAUtils.Omim
 {
     public static class Main
     {
-        private static string _apiKey;
-        private static string _universalGeneArchivePath;
-        private static string _outputDirectory;
-        private static string _inputReferencePath;
 
-        private const string OmimDumpFileBaseName = "OMIM_dump_";
-        private const string OmimDumpFileSuffix = ".zip";
-        private const string OmimApiKeyEnvironmentVariableName = "OmimApiKey";
+        private static string _mimToGeneFile;
+        private static string _omimJsonFile;
+        private static string _outputDirectory;
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
             var ops = new OptionSet
             {
                 {
-                    "uga|u=",
-                    "universal gene archive {path}",
-                    v => _universalGeneArchivePath = v
+                    "m2g|m=",
+                    "MimToGeneSymbol tsv file",
+                    v => _mimToGeneFile = v
                 },
                 {
-                    "ref|r=",
-                    "input reference {filename}",
-                    v => _inputReferencePath = v
+                    "json|j=",
+                    "OMIM entry json file",
+                    v => _omimJsonFile = v
                 },
                 {
                     "out|o=",
@@ -48,8 +42,8 @@ namespace SAUtils.Omim
                 .Parse()
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
-                .CheckInputFilenameExists(_inputReferencePath, "compressed reference", "--ref")
-                .CheckInputFilenameExists(_universalGeneArchivePath, "universal gene archive", "--uga")
+                .CheckInputFilenameExists(_mimToGeneFile, "MimToGeneSymbol tsv file", "--m2g")
+                .CheckInputFilenameExists(_omimJsonFile, "OMIM entry json file", "--json")
                 .SkipBanner()
                 .ShowHelpMenu("Creates a gene annotation database from OMIM data", commandLineExample)
                 .ShowErrors()
@@ -60,19 +54,11 @@ namespace SAUtils.Omim
 
         private static ExitCodes ProgramExecution()
         {
-            _apiKey = GetEnvironmentVariable(OmimApiKeyEnvironmentVariableName);
-            if (_apiKey == null) throw new InvalidDataException("Please set the OMIM API key as the environment variable \"OmimApiKey\".");
-
-            var version = OmimVersion.GetVersion();
-            string outFileName = $"{version.Name}_{version.Version}";
-            string dumpFilePath = Path.Combine(_outputDirectory, OmimDumpFileBaseName + version.Version + OmimDumpFileSuffix);
-
-            var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = OmimUtilities.ParseUniversalGeneArchive(_inputReferencePath, _universalGeneArchivePath);
-            var geneSymbolUpdater = new GeneSymbolUpdater(entrezGeneIdToSymbol, ensemblGeneIdToSymbol);
-
             var omimSchema = OmimSchema.Get();
 
-            using (var omimParser = new OmimParser(geneSymbolUpdater, omimSchema, _apiKey, dumpFilePath))
+            var omimParser = new OmimParser(_mimToGeneFile, _omimJsonFile, omimSchema);
+            var version = omimParser.GetVersion();
+            string outFileName = $"{version.Name}_{version.Version}";
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
             using (var ngaWriter = new NgaWriter(nsaStream, version, SaCommon.OmimTag, SaCommon.SchemaVersion, true))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix + SaCommon.JsonSchemaSuffix)))
@@ -84,12 +70,6 @@ namespace SAUtils.Omim
                 schemaWriter.Write(omimSchema);
             }
 
-            geneSymbolUpdater.DisplayStatistics();
-            using (var writer =new StreamWriter(FileUtilities.GetCreateStream("UpdatedGeneSymbols.txt")))
-            {
-                geneSymbolUpdater.WriteUpdatedGeneSymbols(writer);
-            }
-            
             return ExitCodes.Success;
         }
     }

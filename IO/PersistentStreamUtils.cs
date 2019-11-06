@@ -1,53 +1,28 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Amazon.S3;
-using Amazon.S3.Model;
+using System.Linq;
 
 namespace IO
 {
     public static class PersistentStreamUtils
     {
-        private const int MaxRetryCount = 5;
-
-        public static Stream GetReadStream(string location, long position = 0)
+        public static Stream GetReadStream(string urlOrPath, long position = 0)
         {
-            if (string.IsNullOrEmpty(location)) return null;
-            if (!ConnectUtilities.IsHttpLocation(location))
-                return File.Exists(location) ? FileUtilities.GetReadStream(location) : null;
+            if (string.IsNullOrEmpty(urlOrPath)) return null;
 
-            var connector = ConnectUtilities.GetHttpConnectFunc(location);
-            var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
-            return new PersistentStream(stream, connector, position);
+            if (!HttpUtilities.IsUrl(urlOrPath))
+                return File.Exists(urlOrPath) ? FileUtilities.GetReadStream(urlOrPath) : null;
+
+            return new PersistentStream(new PersistentConnect(urlOrPath), position);
         }
 
-        public static Stream GetS3ReadStream(IS3Client s3Client, string bucketName, string fileName, long position)
+        public static List<Stream> GetStreams(List<string> locations)
         {
-            var connector = ConnectUtilities.GetS3ConnectFunc(bucketName, fileName, s3Client);
-            var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
-            return new PersistentStream(stream, connector, position);
-        }
+            if (locations == null) return null;
 
-        public static long GetLength(AmazonS3Client s3Client, string bucketName, string fileName)
-        {
-            var metadataRequest = new GetObjectMetadataRequest
-            {
-                BucketName = bucketName,
-                Key = fileName.TrimStart('/')
-            };
-
-            var getMetadataResponse = s3Client.GetObjectMetadataAsync(metadataRequest).Result;
-
-            return getMetadataResponse.ContentLength;
-        }
-
-        public static IEnumerable<Stream> GetStreams(IEnumerable<string> locations)
-        {
-            if (locations == null) yield break;
-
-            foreach (string location in locations)
-            {
-                yield return GetReadStream(location);
-            }
+            var streams = new List<Stream>(locations.Count);
+            streams.AddRange(locations.Select(urlOrPath => GetReadStream(urlOrPath)));
+            return streams;
         }
     }
 }

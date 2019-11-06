@@ -9,10 +9,10 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
-  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+  <Import Project="..\CommonAssemblyInfo.props" />
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.3.103.11" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.103.4" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.103.44" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.32" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />

@@ -1,4 +1,5 @@
-﻿using Moq;
+﻿using System.Collections.Generic;
+using Moq;
 using VariantAnnotation.AnnotatedPositions.Consequence;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -17,7 +18,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         {
             var consequence = new Consequences();
             consequence.DetermineFlankingVariantEffects(isDownStreamVariant);
-            var observedConsequences = consequence.GetConsequences();
+            List<ConsequenceTag> observedConsequences = consequence.GetConsequences();
             Assert.Single(observedConsequences);
             Assert.Equal(expectedConsequence, observedConsequences[0]);
         }
@@ -32,7 +33,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var variantEffect = new Mock<IVariantEffect>();
             var consequence = new Consequences(variantEffect.Object, featureEffect.Object);
             consequence.DetermineSmallVariantEffects();
-            var observedConsequences = consequence.GetConsequences();
+            List<ConsequenceTag> observedConsequences = consequence.GetConsequences();
             Assert.Equal(2, observedConsequences.Count);
             Assert.Equal(ConsequenceTag.transcript_ablation, observedConsequences[0]);
             Assert.Equal(ConsequenceTag.transcript_amplification, observedConsequences[1]);
@@ -49,7 +50,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             variantEffect.Setup(x => x.IsMatureMirnaVariant()).Returns(true);
             var consequence = new Consequences(variantEffect.Object, featureEffect.Object);
             consequence.DetermineSmallVariantEffects();
-            var observedConsequences = consequence.GetConsequences();
+            List<ConsequenceTag> observedConsequences = consequence.GetConsequences();
             Assert.Single(observedConsequences);
             Assert.Equal(ConsequenceTag.mature_miRNA_variant, observedConsequences[0]);
         }
@@ -103,7 +104,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var consequence = new Consequences(variantEffect, featureEffect.Object);
 
             consequence.DetermineSmallVariantEffects();
-            var observedConsequence = consequence.GetConsequences();
+            List<ConsequenceTag> observedConsequence = consequence.GetConsequences();
             Assert.Equal(ConsequenceTag.splice_donor_variant, observedConsequence[0]);
             Assert.Equal(ConsequenceTag.splice_acceptor_variant, observedConsequence[1]);
             Assert.Equal(ConsequenceTag.stop_gained, observedConsequence[2]);
@@ -134,7 +135,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [InlineData(true, false)]
         [InlineData(false, true)]
         [InlineData(false, false)]
-        public void DetermineRegularoryVariantEffects(bool isAmplification, bool isAblation)
+        public void DetermineRegulatoryVariantEffects(bool isAmplification, bool isAblation)
         {
             var featureEffect = new Mock<IFeatureVariantEffects>();
             featureEffect.Setup(x => x.Ablation()).Returns(isAblation);
@@ -142,7 +143,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var consequence = new Consequences(null, featureEffect.Object);
             consequence.DetermineRegulatoryVariantEffects();
-            var observedConsequences = consequence.GetConsequences();
+            List<ConsequenceTag> observedConsequences = consequence.GetConsequences();
 
             Assert.Contains(ConsequenceTag.regulatory_region_variant, observedConsequences);
             if (isAblation)
@@ -166,24 +167,28 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         }
 
         [Theory]
-        [InlineData(true, false, false, false, new[] { ConsequenceTag.transcript_ablation })]
-        [InlineData(false, true, false, false, new[] { ConsequenceTag.transcript_amplification })]
-        [InlineData(true, false, true, false, new[] { ConsequenceTag.transcript_ablation })]
-        [InlineData(false, false, true, false, new[] { ConsequenceTag.feature_elongation })]
-        [InlineData(false, false, false, true, new[] { ConsequenceTag.transcript_truncation })]
+        [InlineData(true, false, false, false, ConsequenceTag.transcript_ablation)]
+        [InlineData(false, true, false, false, ConsequenceTag.transcript_amplification)]
+        [InlineData(true, false, true, false, ConsequenceTag.transcript_ablation)]
+        [InlineData(false, false, true, false, ConsequenceTag.feature_elongation)]
+        [InlineData(false, false, false, true, ConsequenceTag.transcript_truncation)]
         public void DetermineStructuralVariantEffect(bool isAblation, bool isAmplification, bool isElongation,
-            bool isTruncation, ConsequenceTag[] expectedConsequences)
+            bool isTruncation, ConsequenceTag expectedConsequence)
         {
+            ConsequenceTag[] expectedConsequences = { expectedConsequence };
 
-            var featureEffect = new Mock<IFeatureVariantEffects>();
-            featureEffect.Setup(x => x.Ablation()).Returns(isAblation);
-            featureEffect.Setup(x => x.Amplification()).Returns(isAmplification);
-            featureEffect.Setup(x => x.Elongation()).Returns(isElongation);
-            featureEffect.Setup(x => x.Truncation()).Returns(isTruncation);
+            var featureEffectsMock = new Mock<IFeatureVariantEffects>();
+            featureEffectsMock.Setup(x => x.Ablation()).Returns(isAblation);
+            featureEffectsMock.Setup(x => x.Amplification()).Returns(isAmplification);
+            featureEffectsMock.Setup(x => x.Elongation()).Returns(isElongation);
+            featureEffectsMock.Setup(x => x.Truncation()).Returns(isTruncation);
 
-            var consequence = new Consequences(null, featureEffect.Object);
-            consequence.DetermineStructuralVariantEffect(VariantType.unknown, false);
-            var observedConsequences = consequence.GetConsequences().ToArray();
+            var variant = new Variant(null, 0, 0, null, null, VariantType.unknown, null, false, false, false, null,
+                null, AnnotationBehavior.StructuralVariants, true);
+
+            var consequence = new Consequences(null, featureEffectsMock.Object);
+            consequence.DetermineStructuralVariantEffect(variant, false);
+            ConsequenceTag[] observedConsequences = consequence.GetConsequences().ToArray();
 
             Assert.Equal(expectedConsequences, observedConsequences);
         }

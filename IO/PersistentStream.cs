@@ -1,13 +1,16 @@
 using System;
 using System.IO;
+using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace IO
 {
     public sealed class PersistentStream : Stream
     {
+        private readonly IConnect _connect;
+        private HttpWebResponse _response;
         private Stream _stream;
-        private readonly Func<long, Stream> _connectFunc;
         private long _position;
         
         private const int MaxRetryAttempts     = 5;
@@ -25,32 +28,52 @@ namespace IO
         public override long Position
         {
             get => _position;
-            set => SetPosition(value);
+            set
+            {
+                Disconnect();
+                ConnectWithRetries(value);
+                _position = value;
+            }
         }
 
-        public PersistentStream(Stream stream, Func<long, Stream> connectFunc, long position)
+        public PersistentStream(IConnect connect, long position)
         {
-            _stream      = stream;
-            _connectFunc = connectFunc;
-            _position    = position;
+            _position = position;
+            _connect  = connect;
+            ConnectWithRetries(_position);
         }
 
-        //the final _stream needs to be disposed
-        ~PersistentStream()
-        {
-            _stream?.Dispose();
-        }
-
-        [Obsolete("should be removed ASAP")]
-        private void SetPosition(long position)
+        private void ConnectWithRetries(long position)
         {
             if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
-            _stream?.Dispose();
 
-            _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, position, MaxRetryAttempts);
-            _position = position;
+            var keepTrying = true;
+            var numRetries = 0;
+
+            while (keepTrying)
+            {
+                try
+                {
+                    (_response, _stream) = _connect.Connect(position);
+                    keepTrying = false;
+                }
+                catch (Exception e)
+                {
+                    Log(MethodName(), e);
+                    if (numRetries == MaxRetryAttempts) throw;
+
+                    Disconnect();
+                    Thread.Sleep(NumRetryMilliseconds);
+                    numRetries++;
+                }
+            }
         }
 
+        private void Disconnect()
+        {
+            _response?.Dispose();
+            _stream?.Dispose();
+        }
         public override int Read(byte[] buffer, int offset, int count)
         {
             var numBytesRead = 0;
@@ -84,18 +107,40 @@ namespace IO
                 }
                 catch (Exception e)
                 {
-                    Logger.LogLine($"EXCEPTION: {e.Message}");
+                    Log(MethodName(), e);
                     if (numRetries == MaxRetryAttempts) throw;
 
-                    _stream?.Dispose();
+                    Disconnect();
                     Thread.Sleep(NumRetryMilliseconds);
-                    _stream = ConnectUtilities.ConnectWithRetries(_connectFunc, _position, MaxRetryAttempts);
-
+                    ConnectWithRetries(_position);
                     numRetries++;                    
                 }
             }
 
             return numBytesRead;
+        }
+
+        private static void Log(string methodName, Exception e)
+        {
+            Logger.LogLine($"Retrying exception found in {methodName}");
+            Logger.Log(e);
+        }
+
+        private static string MethodName([CallerMemberName] string caller = null) => caller;
+
+        protected override void Dispose(bool disposing)
+        {
+            try
+            {
+                if (disposing) Disconnect();
+
+                _response = null;
+                _stream   = null;
+            }
+            finally
+            {
+                base.Dispose(disposing);
+            }
         }
     }
 }

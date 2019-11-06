@@ -66,31 +66,32 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             if (_consequences.Count == 0) _consequences.Add(ConsequenceTag.transcript_variant);
         }
 
-        public void DetermineStructuralVariantEffect(VariantType variantType, bool addGeneFusion)
+        public void DetermineStructuralVariantEffect(IVariant variant, bool addGeneFusion)
         {
             GetTier1Types();
             if (_consequences.Count == 0) GetStructuralTier2Types();
             if (addGeneFusion) _consequences.Add(ConsequenceTag.unidirectional_gene_fusion);
 
-            DetermineCopyNumberEffect(variantType);
-            DetermineRepeatExpansionEffect(variantType);
+            DetermineCopyNumberEffect(variant.Type);
+            DetermineRepeatExpansionEffect(variant);
             if (_consequences.Count == 0) _consequences.Add(ConsequenceTag.transcript_variant);
         }
 
-        private void DetermineRepeatExpansionEffect(VariantType variantType)
+        private void DetermineRepeatExpansionEffect(IVariant variant)
         {
-            // ReSharper disable once SwitchStatementMissingSomeCases
-            switch (variantType)
+            if (!(variant is RepeatExpansion repeatExpansion)) return;
+
+            if (repeatExpansion.RefRepeatCount == null || repeatExpansion.RefRepeatCount == repeatExpansion.RepeatCount)
             {
-                case VariantType.short_tandem_repeat_variation:
-                    _consequences.Add(ConsequenceTag.short_tandem_repeat_change);
-                    break;
-                case VariantType.short_tandem_repeat_contraction:
-                    _consequences.Add(ConsequenceTag.short_tandem_repeat_contraction);
-                    break;
-                case VariantType.short_tandem_repeat_expansion:
-                    _consequences.Add(ConsequenceTag.short_tandem_repeat_expansion);
-                    break;
+                _consequences.Add(ConsequenceTag.short_tandem_repeat_change);
+            }
+            else if (repeatExpansion.RepeatCount > repeatExpansion.RefRepeatCount)
+            {
+                _consequences.Add(ConsequenceTag.short_tandem_repeat_expansion);
+            }
+            else
+            {
+                _consequences.Add(ConsequenceTag.short_tandem_repeat_contraction);
             }
         }
 
@@ -137,7 +138,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
         private void GetTier3Types()
         {
-            foreach ((var consequenceTest, ConsequenceTag consequenceTag) in _tier3Consequences)
+            foreach ((Func<bool> consequenceTest, ConsequenceTag consequenceTag) in _tier3Consequences)
             {
                 if (consequenceTest()) _consequences.Add(consequenceTag);
             }

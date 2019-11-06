@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources;
 using Nirvana;
 using Xunit;
-using UnitTests.TestUtilities;
-using Resources = Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources;
 
 namespace UnitTests.Nirvana
 {

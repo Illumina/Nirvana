@@ -30,8 +30,8 @@ namespace Vcf
         {
             try
             {
-                var cols = s.OptimizedSplit(',');
-                var values = new int[cols.Length];
+                string[] cols = s.OptimizedSplit(',');
+                var values    = new int[cols.Length];
 
                 for (var i = 0; i < cols.Length; i++)
                 {

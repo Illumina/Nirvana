@@ -55,7 +55,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private IVariant[] GetVariants()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false);
             var variant = new Mock<IVariant>();
             variant.SetupGet(x => x.Chromosome).Returns(_chromosome);
             variant.SetupGet(x => x.Type).Returns(VariantType.SNV);
@@ -63,7 +62,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             variant.SetupGet(x => x.End).Returns(949523);
             variant.SetupGet(x => x.RefAllele).Returns("C");
             variant.SetupGet(x => x.AltAllele).Returns("T");
-            variant.SetupGet(x => x.Behavior).Returns(behavior);
+            variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.SmallVariants);
             return new[] { variant.Object };
         }
 
@@ -72,7 +71,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var vcfFields = new string[8];
             vcfFields[0] = originalChromosomeName;
 
-            var infoData = new InfoData(null, null, null, null, null, null, null, null, VariantType.unknown);
+            var infoData = new InfoData(null, null, null, null, null, null, null, null, null);
 
             return new Position(_chromosome, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);

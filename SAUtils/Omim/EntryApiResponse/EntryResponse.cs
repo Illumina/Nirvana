@@ -5,9 +5,9 @@
         public RootItem omim;
     }
 
-
     public class RootItem
     {
+        public string version;
         public Entry[] entryList;
     }
 

@@ -1,6 +1,4 @@
-﻿using Variants;
-
-namespace VariantAnnotation.Interface.Positions
+﻿namespace VariantAnnotation.Interface.Positions
 {
     public interface IInfoData
     {
@@ -12,6 +10,6 @@ namespace VariantAnnotation.Interface.Positions
         string RepeatUnit { get; }
         double? StrandBias { get; }
         int? SvLength { get; }
-        VariantType SvType { get; }
+        string SvType { get; }
     }
 }

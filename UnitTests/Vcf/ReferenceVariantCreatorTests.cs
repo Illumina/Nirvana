@@ -1,5 +1,6 @@
-﻿using Genome;
-using Moq;
+﻿using CacheUtils.TranscriptCache;
+using Genome;
+using Variants;
 using Vcf.VariantCreator;
 using Xunit;
 
@@ -7,37 +8,42 @@ namespace UnitTests.Vcf
 {
     public sealed class ReferenceVariantCreatorTests
     {
+        private static readonly ISequence Sequence = new NSequence();
+        private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
+
         [Fact]
-        public void ReferenceVariant_have_annotationBehaviorNull()
+        public void Create_SinglePosition_NoGlobalMajorAllele_ReturnNull()
         {
-            var chrom = new Mock<IChromosome>();
-            chrom.Setup(x => x.EnsemblName).Returns("1");
-	        var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 101, "A", ".", null);
-            Assert.False(variant.IsRefMinor);
-            Assert.Null(variant.Behavior);
+            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 100, "A", ".", null);
+            Assert.Null(variants);
         }
 
         [Fact]
-        public void RefMinorSite_have_correct_behavior()
+        public void Create_SinglePosition_HasGlobalMajorAllele_ReturnVariant()
         {
-            var chrom = new Mock<IChromosome>();
-            chrom.Setup(x => x.EnsemblName).Returns("1");
-            var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 100, "A", ".", "T");
-			Assert.True(variant.IsRefMinor);
-            Assert.NotNull(variant.Behavior);
-            Assert.True(variant.Behavior.NeedFlankingTranscript);
-            Assert.True(variant.Behavior.NeedSaPosition);
-            Assert.False(variant.Behavior.NeedSaInterval);
-            Assert.False(variant.Behavior.ReducedTranscriptAnnotation);
-            Assert.False(variant.Behavior.StructuralVariantConsequence);
+            var variant = GetVariant(100, 100, "A", ".", "T");
+            Assert.True(variant.IsRefMinor);
+        }
 
-	        var variant2 = ReferenceVariantCreator.Create(chrom.Object, 101, 101, "A", ".", null);
-			Assert.False(variant2.IsRefMinor);
-            Assert.Null(variant2.Behavior);
+        [Fact]
+        public void Create_MultiplePositions_NoGlobalMajorAllele_ReturnNull()
+        {
+            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", null);
+            Assert.Null(variants);
+        }
 
-	        var variant3 = ReferenceVariantCreator.Create(chrom.Object, 100, 110, "A", ".", null);
-			Assert.False(variant3.IsRefMinor);
-            Assert.Null(variant3.Behavior);
+        [Fact]
+        public void Create_MultiplePositions_HasGlobalMajorAllele_ReturnNull()
+        {
+            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", "T");
+            Assert.Null(variants);
+        }
+
+        private IVariant GetVariant(int start, int end, string refAllele, string altAllele, string globalMajorAllele)
+        {
+            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, start, end, refAllele, altAllele, globalMajorAllele);
+            Assert.Single(variants);
+            return variants[0];
         }
     }
 }

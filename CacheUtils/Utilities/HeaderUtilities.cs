@@ -1,5 +1,6 @@
 ﻿using System;
 using Genome;
+using IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
 

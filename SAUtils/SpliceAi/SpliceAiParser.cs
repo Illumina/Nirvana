@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using Genome;
 using Intervals;
 using IO;
 using OptimizedCore;
-using SAUtils.DataStructures;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
 
@@ -19,7 +17,8 @@ namespace SAUtils.SpliceAi
         private readonly ISequenceProvider _sequenceProvider;
         private readonly Dictionary<ushort, IntervalArray<byte>> _spliceIntervals;
         private readonly HashSet<string> _unresolvedSymbols;
-        public static int Count = 0;
+        public static int Count;
+        public static int NoGeneCount;
 
         private string _geneSymbol;
         private double _acceptorGainScore;
@@ -75,6 +74,8 @@ namespace SAUtils.SpliceAi
 
                     foreach (var spliceAiItem in previousItems)
                     {
+                        Count++;
+                        if (string.IsNullOrEmpty(spliceAiItem.Hgnc)) continue;
                         yield return spliceAiItem;
                     }
                     previousItems.Clear();
@@ -85,9 +86,14 @@ namespace SAUtils.SpliceAi
             UpdateGeneSymbols(previousItems);
             foreach (var spliceAiItem in previousItems)
             {
+                Count++;
+                // if an entry doesn't overlap any Nirvana gene, we skip it.
+                if (string.IsNullOrEmpty(spliceAiItem.Hgnc)) continue;
+                
                 yield return spliceAiItem;
             }
 
+            Console.WriteLine($"Total item count: {Count}, items without overlapping Nirvana gene: {NoGeneCount} ({(100.0*NoGeneCount)/Count}%)");
             Console.WriteLine($"{_unresolvedSymbols.Count} unresolved gene symbols encountered. Symbols:");
             foreach (var symbol in _unresolvedSymbols)
             {
@@ -145,7 +151,7 @@ namespace SAUtils.SpliceAi
             
             var isSpliceAdjacent = _spliceIntervals[chromosome.Index].OverlapsAny(position, position);
             if (!HasSignificantScore() && !isSpliceAdjacent) return null;
-
+            
             Count++;
             return new SpliceAiItem(chromosome, position, refAllele, altAllele, _geneSymbol,
                 _acceptorGainScore, _acceptorLossScore, _donorGainScore, _donorLossScore,
@@ -164,6 +170,7 @@ namespace SAUtils.SpliceAi
             var nirvanaGenes = _geneTree.GetAllOverlappingValues(chromosome.Index, position, position);
             if (nirvanaGenes == null)
             {
+                NoGeneCount++;
                 item.Hgnc = null;
                 return;
             }

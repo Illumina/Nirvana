@@ -104,5 +104,13 @@ namespace SAUtils
 
             return sequenceAlterationType;
         }
+
+        public static int? Add(int? x, int? y)
+        {
+            if (x == null && y == null) return null;
+            if (x == null) return y;
+            if (y == null) return x;
+            return x + y;
+        }
     }
 }

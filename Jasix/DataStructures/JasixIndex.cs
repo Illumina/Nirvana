@@ -129,7 +129,7 @@ namespace Jasix.DataStructures
 	    public void BeginSection(string section, long fileLoc)
 	    {
 	        if (_sectionRanges.ContainsKey(section)) 
-                throw new UserErrorException($"Multiple beginning for section:{section}!!");
+                throw new UserErrorException($"Multiple beginning for section: {section}!!");
 
             _sectionRanges[section] = new FileRange(fileLoc);
 	    }
@@ -141,7 +141,7 @@ namespace Jasix.DataStructures
 	        //    throw new UserErrorException($"Attempting to close section:{section} before opening it!!");
 
             if (fileRange.End!=long.MaxValue)
-                throw new UserErrorException($"Multiple closing for section{section} !!");
+                throw new UserErrorException($"Multiple closing for section {section} !!");
 
             fileRange.End = fileLoc;
 	        _sectionRanges[section] = fileRange;

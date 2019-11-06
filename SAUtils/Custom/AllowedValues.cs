@@ -6,6 +6,9 @@ namespace SAUtils.Custom
 {
     public static class AllowedValues
     {
+        private const int MaxFilterLength = 20;
+        private const int MaxIdentifierLength = 50;
+        private const int MaxDescriptionLength = 100;
         private static readonly string[] EmptyValues = {".", ""};
         private static readonly HashSet<string> PredictionValues = new HashSet<string>
         {
@@ -26,12 +29,18 @@ namespace SAUtils.Custom
                 throw new UserErrorException($"{value} is not a valid prediction value.\nInput line: {line}");
         }
 
+        public static void ValidateFilterValue(string value, string line) => CheckValueLength(value, line, MaxFilterLength);
+
+        public static void ValidateIdentifierValue(string value, string line) => CheckValueLength(value, line, MaxIdentifierLength);
+
+        public static void ValidateDescriptionValue(string value, string line) => CheckValueLength(value, line, MaxDescriptionLength);
+
         public static bool IsEmptyValue(string value) => EmptyValues.Contains(value);
 
-        public static void ValidateFilterValue(string value, string line)
+        private static void CheckValueLength(string value, string line, int maxLength)
         {
-            if(!string.IsNullOrEmpty(value) && value.Length>20)
-                throw  new UserErrorException($"\"{value}\" exceeds the allowed length for filters (20 characters).\nInput line:{line}");
+            if (!string.IsNullOrEmpty(value) && value.Length > maxLength)
+                throw new UserErrorException($"\"{value}\" exceeds the allowed length for descriptions ({maxLength} characters).\nInput line:{line}");
         }
     }
 }

@@ -22,11 +22,11 @@ namespace UnitTests.Variants
             const bool expectedRecomposed  = true;
             var expectedLinkedVids         = new[] { "1:102:T:G" };
             var expectedBreakEnds          = new IBreakEnd[] { new BreakEnd(expectedChromosome, expectedChromosome, 100, 200, false, false) };
-            var expectedBehavior           = new AnnotationBehavior(false, false, false, false, true);
+            var expectedBehavior           = AnnotationBehavior.SmallVariants;
 
             var variant                    = new Variant(expectedChromosome, expectedStart, expectedEnd, expectedRef, expectedAlt,
                 expectedType, expectedVid, expectedRefMinor, expectedDecomposed, expectedRecomposed, expectedLinkedVids,
-                expectedBreakEnds, expectedBehavior);
+                expectedBreakEnds, expectedBehavior, false);
 
             Assert.Equal(expectedChromosome, variant.Chromosome);
             Assert.Equal(expectedStart,      variant.Start);

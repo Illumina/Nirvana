@@ -14,6 +14,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
     public sealed class AnnotatedVariantTests
     {
         private readonly IChromosome _chromosome;
+        const string OriginalChromosomeName = "BoB";
 
         public AnnotatedVariantTests()
         {
@@ -26,13 +27,24 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             IVariant variant = GetRefMinorVariant();
             var annotatedVariant = new AnnotatedVariant(variant);
 
-            const string originalChromosomeName = "BoB";
-
             AddRegulatoryRegion(annotatedVariant);
             AddTranscript(annotatedVariant);
 
             const string expectedResult = "{\"vid\":\"bob:100:G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"isReferenceMinorAllele\":true,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"linkedVids\":[\"bob:100:102:TAT\"],\"regulatoryRegions\":[{\"id\":\"7157\",\"type\":\"TF_binding_site\",\"consequence\":[\"regulatory_region_amplification\"]}],\"transcripts\":[]}";
-            var observedResult = annotatedVariant.GetJsonString(originalChromosomeName);
+            var observedResult = annotatedVariant.GetJsonString(OriginalChromosomeName);
+
+            Assert.Equal(expectedResult, observedResult);
+        }
+
+        [Fact]
+        public void GetJsonString_RecomposedSnvAfterTrimming_IsRecomposedTrue()
+        {
+            IVariant variant = new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob-100-A-G", false, false, true,
+                new[] { "bob-100-A-G" }, null, AnnotationBehavior.SmallVariants, false); ;
+            var annotatedVariant = new AnnotatedVariant(variant);
+
+            const string expectedResult = "{\"vid\":\"bob-100-A-G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"isRecomposedVariant\":true,\"linkedVids\":[\"bob-100-A-G\"]}";
+            string observedResult = annotatedVariant.GetJsonString(OriginalChromosomeName);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -57,25 +69,10 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             annotatedVariant.Transcripts.Add(annotatedTranscript.Object);
         }
 
-        //private static void AddSupplementaryAnnotation(IAnnotatedVariant annotatedVariant)
-        //{
-        //    var dataSource = new SaDataSource("clinVar", "clinVar", "C", true, false, null,
-        //        new[] {"\"good\":\"result\""});
-        //    var annotatedSaDataSource = new AnnotatedSaDataSource(dataSource, "C");
-
-        //    var dataSource2 = new SaDataSource("exac", "exac", "G", true, true, null,
-        //        new[] { "\"bad\":\"temper\"", "\"brutal\":\"kangaroo\"" });
-        //    var annotatedSaDataSource2 = new AnnotatedSaDataSource(dataSource2, "G");
-
-        //    annotatedVariant.SupplementaryAnnotations.Add(annotatedSaDataSource);
-        //    annotatedVariant.SupplementaryAnnotations.Add(annotatedSaDataSource2);
-        //}
-
         private IVariant GetRefMinorVariant()
         {
-            var behavior = new AnnotationBehavior(false, false, false, false, false);
             return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
-                new[] { "bob:100:102:TAT" }, null, behavior);
+                new[] { "bob:100:102:TAT" }, null, AnnotationBehavior.SmallVariants, false);
         }
     }
 }
