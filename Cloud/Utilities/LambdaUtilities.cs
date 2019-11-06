@@ -58,7 +58,6 @@ namespace Cloud.Utilities
                 string s3BaseUrl = LambdaUrlHelper.GetBaseUrl(baseUrl);
                 while ((line = reader.ReadLine()) != null)
                 {
-                    Console.WriteLine($"{ s3BaseUrl + line}");
                     HttpUtilities.ValidateUrl(s3BaseUrl + line, false);
                 }
             }

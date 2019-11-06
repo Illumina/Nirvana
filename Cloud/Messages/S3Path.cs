@@ -36,35 +36,52 @@ namespace Cloud.Messages
                 throw new UserErrorException($"Unknown S3 Region {region}");
         }
 
+        private const int MaxRetryCount = 5;
         private void ValidateCredentials(IS3Client s3Client, bool isDirectory)
         {
-            try
+            var retryCount = MaxRetryCount;
+            while (retryCount > 0)
             {
-                if (isDirectory)
+                try
                 {
-                    var putRequest = new PutObjectRequest
+                    if (isDirectory)
                     {
-                        BucketName = bucketName,
-                        Key = path
-                    };
-                    s3Client.PutObjectAsync(putRequest).Wait();
+                        var putRequest = new PutObjectRequest
+                        {
+                            BucketName = bucketName,
+                            Key = path
+                        };
+                        s3Client.PutObjectAsync(putRequest).Wait();
+                    }
+                    else
+                    {
+                        var getRequest = new GetObjectRequest
+                        {
+                            BucketName = bucketName,
+                            Key = path,
+                            ByteRange = new ByteRange(0, 1)
+                        };
+                        s3Client.GetObjectAsync(getRequest).Wait();
+                    }
+                    // validation successful. Break and return.
+                    break;
                 }
-                else
+                catch (Exception exception)
                 {
-                    var getRequest = new GetObjectRequest
+                    var processedException = AwsExceptionUtilities.TryConvertUserException(exception, this);
+                    if (processedException is UserErrorException) throw processedException;
+
+                    if (retryCount == 0)
                     {
-                        BucketName = bucketName,
-                        Key = path,
-                        ByteRange = new ByteRange(0,1)
-                    };
-                    s3Client.GetObjectAsync(getRequest).Wait();
+                        Logger.LogLine("Max retry limit reached for validating S3 credentials.");
+                        throw;
+                    }
+                    Logger.LogLine($"Failed to validate S3 credentials\n{exception.Message}");
+
                 }
+                retryCount--;
             }
-            catch (Exception exception)
-            {
-                var processedException = AwsExceptionUtilities.TryConvertUserException(exception, this);
-                if (processedException is UserErrorException) throw processedException;
-            }
+            
         }
 
         internal static void ValidatePathFormat(string path, bool isDirectory)
