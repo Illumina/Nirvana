@@ -9,7 +9,6 @@ using ErrorHandling;
 using IO;
 using Jasix.DataStructures;
 using VariantAnnotation.Interface;
-using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using Vcf;
 

@@ -14,7 +14,6 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Vcf;
@@ -79,7 +78,7 @@ namespace Nirvana
         public void SingleVariantPreLoad(IPosition position)
         {
             var chromToPositions = new Dictionary<IChromosome, List<int>>();
-            PreLoadUtilities.UpdateChromToPositions(chromToPositions, position.Chromosome, position.Start, position.RefAllele, position.VcfFields[VcfCommon.AltIndex], SequenceProvider.Sequence);
+            PreLoadUtilities.TryAddPosition(chromToPositions, position.Chromosome, position.Start, position.RefAllele, position.VcfFields[VcfCommon.AltIndex], SequenceProvider.Sequence);
             _variantPositions = chromToPositions.ToImmutableDictionary();
             PreLoad(position.Chromosome);
         }
@@ -93,7 +92,7 @@ namespace Nirvana
             }
 
             vcfStream.Position = Tabix.VirtualPosition.From(InputStartVirtualPosition).BlockOffset;
-            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, genomicRange, SequenceProvider).ToImmutableDictionary();
+            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, genomicRange, SequenceProvider, RefMinorProvider).ToImmutableDictionary();
         }
 
         public void PreLoad(IChromosome chromosome)
