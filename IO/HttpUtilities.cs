@@ -15,10 +15,6 @@ namespace IO
         private static readonly string[] AuthenticationErrorCodes   = { "InvalidAccessKeyId", "SignatureDoesNotMatch" };
         private static readonly string[] ResourceNotExistErrorCodes = { "NoSuchKey", "NoSuchBucket" };
         
-        private const int ConnectTimeOut = 10_000;
-        private const int ReadTimeOut = 10_000;
-
-
         public static long GetLength(string url)
         {
             var response       = TryGetResponse(url);
@@ -39,7 +35,6 @@ namespace IO
                     if (retryCounter > 0) Thread.Sleep(2_000);
 
                     var request = (HttpWebRequest) WebRequest.Create(url);
-                    request.SetProperTimeOut();
                     return (HttpWebResponse) request.GetResponse();
                 }
                 catch (Exception e)
@@ -51,12 +46,6 @@ namespace IO
             }
 
             throw new AggregateException(exceptions);
-        }
-
-        public static void SetProperTimeOut(this HttpWebRequest request)
-        {
-            request.Timeout = ConnectTimeOut;
-            request.ReadWriteTimeout = ReadTimeOut;
         }
 
         public static void ValidateUrl(string url, bool isUserProvided = true)
