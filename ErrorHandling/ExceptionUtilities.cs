@@ -25,6 +25,12 @@ namespace ErrorHandling
             return e is T || HasException<T>(e.InnerException);
         }
 
+        public static bool HasErrorMessage(this Exception e, string errorMessage)
+        {
+            if (e == null) return false;
+            return e.Message  == errorMessage|| e.InnerException.HasErrorMessage(errorMessage);
+        }
+
         public static Exception GetInnermostException(Exception e)
         {
             while (e.InnerException != null) e = e.InnerException;
