@@ -45,6 +45,7 @@ namespace RepeatExpansions.IO
                         if (line == null) break;
 
                         (ushort refIndex, Interval<RepeatExpansionPhenotype> phenotypeInterval) = GetPhenotype(line, refNameToChromosome);
+                        if(refIndex == ushort.MaxValue) throw new InvalidDataException("Unknown chromosome encountered in line:\n"+line);
                         intervalLists[refIndex].Add(phenotypeInterval);
                     }
                 }

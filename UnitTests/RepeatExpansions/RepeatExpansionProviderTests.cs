@@ -24,14 +24,23 @@ namespace UnitTests.RepeatExpansions
         {
             // retire this as soon as we merge the 3.2.2 branch into develop
             var refNameToChromosome = new Dictionary<string, IChromosome>();
+            AddReference(refNameToChromosome, "1", "chr1", 0);
+            AddReference(refNameToChromosome, "2", "chr2", 1);
             AddReference(refNameToChromosome, "3", "chr3", 2);
             AddReference(refNameToChromosome, "4", "chr4", 3);
             AddReference(refNameToChromosome, "5", "chr5", 4);
+            AddReference(refNameToChromosome, "6", "chr5", 5);
             AddReference(refNameToChromosome, "9", "chr9", 8);
             AddReference(refNameToChromosome, "11", "chr11", 10);
             AddReference(refNameToChromosome, "12", "chr12", 11);
+            AddReference(refNameToChromosome, "13", "chr13", 12);
+            AddReference(refNameToChromosome, "14", "chr14", 13);
+            AddReference(refNameToChromosome, "15", "chr15", 14);
             AddReference(refNameToChromosome, "16", "chr16", 15);
+            AddReference(refNameToChromosome, "17", "chr17", 16);
+            AddReference(refNameToChromosome, "18", "chr18", 17);
             AddReference(refNameToChromosome, "19", "chr19", 18);
+            AddReference(refNameToChromosome, "20", "chr20", 19);
             AddReference(refNameToChromosome, "21", "chr21", 20);
             AddReference(refNameToChromosome, "22", "chr22", 21);
             AddReference(refNameToChromosome, "X", "chrX", 22);
@@ -100,7 +109,7 @@ namespace UnitTests.RepeatExpansions
             jsonObject.AddObjectValue(firstVariant.RepeatExpansionPhenotypes.JsonKey,
                 firstVariant.RepeatExpansionPhenotypes);
 
-            const string expectedJson = "\"repeatExpansionPhenotypes\":[{\"phenotype\":\"Spinocerebellar ataxia 7\",\"omimId\":164500,\"classifications\":[\"Normal\"],\"percentile\":3.50}]";
+            const string expectedJson = "\"repeatExpansionPhenotypes\":[{\"phenotype\":\"Spinocerebellar ataxia 7\",\"omimId\":164500,\"classifications\":[\"Normal\"],\"percentile\":6.33}]";
             string observedJson = sb.ToString();
             Assert.Equal(expectedJson, observedJson);
         }
