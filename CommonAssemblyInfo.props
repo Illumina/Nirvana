@@ -2,9 +2,9 @@
   <PropertyGroup>
     <Company>Illumina</Company>
     <Copyright>© 2019 Illumina, Inc.</Copyright>
-    <FileVersion>3.6.0</FileVersion>
-    <AssemblyVersion>3.6.0</AssemblyVersion>
-    <Version>3.6.0</Version>
+    <FileVersion>3.7.0</FileVersion>
+    <AssemblyVersion>3.7.0</AssemblyVersion>
+    <Version>3.7.0</Version>
     <Authors>Stromberg, Roy, Lajugie, Jiang, Li, and Kang</Authors>
   </PropertyGroup>
 </Project>

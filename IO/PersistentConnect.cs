@@ -14,7 +14,6 @@ namespace IO
         {
             if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
             var request = WebRequest.CreateHttp(_url);
-            request.SetProperTimeOut();
             request.AddRange(position);
             var response = (HttpWebResponse)request.GetResponse();
             var stream = response.GetResponseStream();

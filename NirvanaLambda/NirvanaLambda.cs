@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
@@ -23,7 +22,6 @@ using IO;
 using Tabix;
 using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using JsonSerializer = Amazon.Lambda.Serialization.Json.JsonSerializer;
 
@@ -193,7 +191,7 @@ namespace NirvanaLambda
 
             ErrorCategory? mostSevereError = failedJobs.Select(x => x.Item.ErrorCategory).Min();
             string errorMessage = mostSevereError == ErrorCategory.UserError 
-                ? String.Join(";", failedJobs.Where(x => x.Item.ErrorCategory == mostSevereError).Select(x => x.Item.ErrorMessage).Distinct())
+                ? string.Join(";", failedJobs.Where(x => x.Item.ErrorCategory == mostSevereError).Select(x => x.Item.ErrorMessage).Distinct())
                 : "";
 
             return (mostSevereError, errorMessage);
@@ -237,8 +235,8 @@ namespace NirvanaLambda
         internal static string GetIndexedPrefix(string inputVcfPath, int jobIndex) =>
             inputVcfPath.TrimEndFromFirst("?").TrimStartToLast("/").TrimEndFromFirst(".vcf") + "_" + jobIndex.ToString("00000");
 
-        private static string FirstCharToLower(string input) => String.IsNullOrEmpty(input) || Char.IsLower(input[0])
+        private static string FirstCharToLower(string input) => string.IsNullOrEmpty(input) || char.IsLower(input[0])
             ? input
-            : Char.ToLowerInvariant(input[0]) + input.Substring(1);
+            : char.ToLowerInvariant(input[0]) + input.Substring(1);
     }
 }

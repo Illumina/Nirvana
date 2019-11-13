@@ -16,6 +16,7 @@ namespace NirvanaLambda
         private const int MinAnnotationTime          = 5_000;
         private const int ReservedPostAnnotationTime = 10_000;
         private const int WaitBeforeRetry            = 2_000;
+        private const string UnknownErrorMessage     = "Unknown error -1";
 
         private int _numRetries;
         private double _annotationTimeOut;
@@ -37,6 +38,7 @@ namespace NirvanaLambda
             }
             catch (Exception e)
             {
+                Logger.Log(e);
                 return GetResultSummaryFromFailedInvocation(e);
             }
         }
@@ -63,6 +65,12 @@ namespace NirvanaLambda
                 catch (Exception e) when (ExceptionUtilities.HasException<TooManyRequestsException>(e))
                 {
                     Logger.LogLine($"Job {_jobIndex}: Invocation is throttled. Retry in {WaitBeforeRetry} ms.");
+                    _numRetries++;
+                    await Task.Delay(WaitBeforeRetry);
+                }
+                catch (Exception e) when (e.HasErrorMessage(UnknownErrorMessage))
+                {
+                    Logger.LogLine($"Job {_jobIndex}: {UnknownErrorMessage}. Retry in {WaitBeforeRetry} ms.");
                     _numRetries++;
                     await Task.Delay(WaitBeforeRetry);
                 }
