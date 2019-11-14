@@ -15,7 +15,7 @@
         public static readonly AnnotationBehavior NonInformativeAlleles = new AnnotationBehavior(false, true, false, false, false, false, false);
         public static readonly AnnotationBehavior StructuralVariants    = new AnnotationBehavior(false, false, false, true, true, false, true);
         public static readonly AnnotationBehavior RepeatExpansions      = new AnnotationBehavior(false, false, false, true, false, false, true);
-        public static readonly AnnotationBehavior RunsOfHomozygosity    = new AnnotationBehavior(true, false, false, true, false, false, true);
+        public static readonly AnnotationBehavior RunsOfHomozygosity    = new AnnotationBehavior(true, false, false, false, false, false, true);
 
         private AnnotationBehavior(bool canonicalTranscriptOnly, bool minimalTranscriptAnnotation,
             bool needFlankingTranscripts, bool needRegulatoryRegions, bool needSaInterval, bool needSaPosition,
