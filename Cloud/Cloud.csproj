@@ -8,17 +8,15 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.32" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.69" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.106.6" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.88" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
-    <ProjectReference Include="..\Tabix\Tabix.csproj" />
-    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
   </ItemGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

@@ -6,7 +6,7 @@
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />

@@ -7,10 +7,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.12" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.32" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.69" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.31" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.106.6" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.88" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cloud\Cloud.csproj" />
