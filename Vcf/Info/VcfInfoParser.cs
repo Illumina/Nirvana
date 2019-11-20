@@ -20,10 +20,9 @@ namespace Vcf.Info
             string repeatUnit              = null;
             int? jointSomaticNormalQuality = null;
             double? strandBias             = null;
+            double? recalibratedQuality    = null;
             int? svLen                     = null;
             string svType                  = null;
-            double? normalLod              = null;
-            double? tumorLod               = null;
 
             foreach ((string key, string value) in infoKeyValue)
             {
@@ -48,7 +47,9 @@ namespace Vcf.Info
                     case "SB":
                         strandBias = value.GetNullableValue<double>(double.TryParse);
                         break;
+                    case "QSI_NT":
                     case "SOMATICSCORE":
+                    case "QSS_NT":
                         jointSomaticNormalQuality = value.GetNullableInt();
                         break;
                     case "SVLEN":
@@ -59,17 +60,14 @@ namespace Vcf.Info
                     case "SVTYPE":
                         svType = value;
                         break;
-                    case "NLOD":
-                        normalLod = value.GetNullableValue<double>(double.TryParse);
-                        break;
-                    case "TLOD":
-                        tumorLod = value.GetNullableValue<double>(double.TryParse);
+                    case "VQSR":
+                        recalibratedQuality = value.GetNullableValue<double>(double.TryParse);
                         break;
                 }
             }
 
-            return new InfoData(ciEnd, ciPos, end, jointSomaticNormalQuality, refRepeatCount, repeatUnit, strandBias,
-                svLen, svType);
+            return new InfoData(ciEnd, ciPos, end, recalibratedQuality, jointSomaticNormalQuality, refRepeatCount,
+                repeatUnit, strandBias, svLen, svType);
         }
 
         private static readonly Dictionary<string, string> EmptyDictionary = new Dictionary<string, string>();

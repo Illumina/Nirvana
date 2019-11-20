@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using Amazon.SimpleNotificationService.Model.Internal.MarshallTransformations;
 using Genome;
 using Moq;
 using UnitTests.TestDataStructures;
