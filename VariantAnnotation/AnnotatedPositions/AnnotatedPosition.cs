@@ -57,9 +57,9 @@ namespace VariantAnnotation.AnnotatedPositions
 
             jsonObject.AddDoubleValue("strandBias",             Position.InfoData?.StrandBias,JsonCommon.FrequencyRoundingFormat);
             jsonObject.AddIntValue("jointSomaticNormalQuality", Position.InfoData?.JointSomaticNormalQuality);
+            jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData?.RecalibratedQuality);
 
-	        
-			jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
+            jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
 
 			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
 

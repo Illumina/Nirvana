@@ -7,6 +7,7 @@ namespace Vcf.Info
         public int[] CiEnd { get; }
         public int[] CiPos { get; }
         public int? End { get; }
+        public double? RecalibratedQuality { get; }
         public int? JointSomaticNormalQuality { get; }
         public int? RefRepeatCount { get; }
         public string RepeatUnit { get; }
@@ -14,12 +15,13 @@ namespace Vcf.Info
         public int? SvLength { get; }
         public string SvType { get; }
 
-        public InfoData(int[] ciEnd, int[] ciPos, int? end, int? jointSomaticNormalQuality, int? refRepeatCount,
-            string repeatUnit, double? strandBias, int? svLength, string svType)
+        public InfoData(int[] ciEnd, int[] ciPos, int? end, double? recalibratedQuality, int? jointSomaticNormalQuality,
+            int? refRepeatCount, string repeatUnit, double? strandBias, int? svLength, string svType)
         {
             CiEnd                     = ciEnd;
             CiPos                     = ciPos;
             End                       = end;
+            RecalibratedQuality       = recalibratedQuality;
             JointSomaticNormalQuality = jointSomaticNormalQuality;
             RefRepeatCount            = refRepeatCount;
             RepeatUnit                = repeatUnit;
