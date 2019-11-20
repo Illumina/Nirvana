@@ -23,7 +23,7 @@ namespace UnitTests.Vcf.VariantCreator
 
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(_chromosome1, 69391, 138730, "A", new[] { "<DEL>" }, infoData, new[] { false }, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(_chromosome1, 69391, 138730, "A", new[] { "<DEL>" }, infoData, new[] { false }, false, null, null);
             Assert.NotNull(variants);
             Assert.Equal(2, variants[0].BreakEnds.Length);
         }
@@ -32,12 +32,12 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void GetVariant_canvas_cnv()
         {
-            var infoData = new InfoData(null, null, 2581225, null, null,null,null, 2581225- 723707 +1,"CNV");
+            var infoData = new InfoData(null, null, 2581225, null, null, null, null,null, 2581225- 723707 +1,"CNV");
 
             var chromosome1 = new Chromosome("chr1", "1", 0);
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(chromosome1, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, new[] { false }, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(chromosome1, 723707, 2581225, "N", new[] { "<CNV>" }, infoData, new[] { false }, false, null, null);
             Assert.NotNull(variants);
             Assert.Null(variants[0].BreakEnds);
 
@@ -49,11 +49,11 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void GetVariant_canvas_cnx()
         {
-            var infoData       = new InfoData(new []{ -291, 291 }, new []{ -291, 291 }, 861879,null, null,null, null, 6984, "CNV");
+            var infoData       = new InfoData(new []{ -291, 291 }, new []{ -291, 291 }, 861879, null, null, null,null, null, 6984, "CNV");
             var chromosome1    = new Chromosome("chr1", "1", 0);
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(chromosome1, 854895, 861879, "N", new[] { "<CN0>", "<CN3>" }, infoData, new[] { false, false }, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(chromosome1, 854895, 861879, "N", new[] { "<CN0>", "<CN3>" }, infoData, new[] { false, false }, false, null, null);
             Assert.NotNull(variants);
             Assert.Equal(2, variants.Length);
 
@@ -68,11 +68,11 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void GetVariant_canvas_cnv_dup()
         {
-            var infoData       = new InfoData(new []{ -291, 291 }, new []{ -415, 415 }, 1476229, null, null, null,null, 13044, "CNV");
+            var infoData       = new InfoData(new []{ -291, 291 }, new []{ -415, 415 }, 1476229, null, null, null, null,null, 13044, "CNV");
             var chromosome1    = new Chromosome("chr1", "1", 0);
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(chromosome1, 1463185, 1476229, "N", new[] { "<CN0>", "<DUP>" }, infoData, new[] { false, false }, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(chromosome1, 1463185, 1476229, "N", new[] { "<CN0>", "<DUP>" }, infoData, new[] { false, false }, false, null, null);
             Assert.NotNull(variants);
             Assert.Equal(2, variants.Length);
 
@@ -87,11 +87,11 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void GetVariant_dup()
         {
-            var infoData       = new InfoData(new []{ -291, 291 }, new []{ -415, 415 }, 1476229, null, null, null, null, 13044, "DUP");
+            var infoData       = new InfoData(new []{ -291, 291 }, new []{ -415, 415 }, 1476229, null, null, null, null, null, 13044, "DUP");
             var chromosome1    = new Chromosome("chr1", "1", 0);
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(chromosome1, 1463185, 1476229, "N", new[] { "<DUP>" }, infoData, new[] { false }, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(chromosome1, 1463185, 1476229, "N", new[] { "<DUP>" }, infoData, new[] { false }, false, null, null);
             Assert.NotNull(variants);
             Assert.Single(variants);
 
@@ -103,11 +103,11 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void GetVariant_tandem_duplication()
         {
-            var infoData       = new InfoData(new []{ 0, 1 }, new[] { 0, 1 }, 38404543, null, null, null, null, 583622, "DUP");
+            var infoData       = new InfoData(new []{ 0, 1 }, new[] { 0, 1 }, 38404543, null, null, null, null, null, 583622, "DUP");
             var chromosome1    = new Chromosome("chr1", "1", 0);
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(chromosome1, 723707, 2581225, "N", new[] { "<DUP:TANDEM>" }, infoData, new[] { false }, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(chromosome1, 723707, 2581225, "N", new[] { "<DUP:TANDEM>" }, infoData, new[] { false }, false, null, null);
             Assert.NotNull(variants);
 
             Assert.Equal(VariantType.tandem_duplication, variants[0].Type);
@@ -117,11 +117,11 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void GetVariant_ROH()
         {
-            var infoData       = new InfoData(null, null, 4001000, null, null, null, null, 1000, "ROH");
+            var infoData       = new InfoData(null, null, 4001000, null, null, null, null, null, 1000, "ROH");
             var chromosome1    = new Chromosome("chr1", "1", 0);
             var variantFactory = new VariantFactory(Sequence, _sequenceProvider.RefNameToChromosome);
 
-            var variants = variantFactory.CreateVariants(chromosome1, 400_0000, 400_1000, "N", new []{"<ROH>"}, infoData, new []{false}, false, null, null);
+            IVariant[] variants = variantFactory.CreateVariants(chromosome1, 400_0000, 400_1000, "N", new []{"<ROH>"}, infoData, new []{false}, false, null, null);
 
             Assert.Equal(AnnotationBehavior.RunsOfHomozygosity, variants[0].Behavior);
             Assert.Equal(VariantType.run_of_homozygosity, variants[0].Type);
