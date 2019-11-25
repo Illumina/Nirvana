@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Cloud.Messages.Gene;
@@ -8,19 +9,22 @@ namespace UnitTests.GeneAnnotationLambda
 {
     public sealed class GeneAnnotationLambdaTests
     {
-        private readonly string _manifestPath = Resources.TopPath("manifest.txt");
+        private readonly string _manifestPath  = Resources.TopPath("manifest.txt");
         private readonly string _customNgaPath = Resources.TopPath("custom_gene.nga");
-        private readonly string _prefix = Resources.Top + Path.DirectorySeparatorChar;
+        private readonly string _prefix        = Resources.Top + Path.DirectorySeparatorChar;
 
         [Fact]
         public void GetNgaFiles_AsExpected()
         {
-            var ngaFiles = global::GeneAnnotationLambda.GeneAnnotationLambda.GetNgaFileList(_manifestPath, _prefix, new[] { _customNgaPath });
+            IEnumerable<string> ngaFiles = global::GeneAnnotationLambda.GeneAnnotationLambda.GetNgaFileList(_manifestPath, _prefix, new[] { _customNgaPath });
 
-            var expectedFiles = new[] {
-                                        "ClinGen_Dosage_Sensitivity_Map_20190507.nga", "gnomAD_gene_scores_2.1.nga",
-                                        "OMIM_20190812.nga", "custom_gene.nga"
-                                      }.Select(Resources.TopPath);
+            IEnumerable<string> expectedFiles = new[]
+            {
+                "ClinGen_Dosage_Sensitivity_Map_20190507.nga",
+                "gnomAD_gene_scores_2.1.nga",
+                "OMIM_20190812.nga",
+                "custom_gene.nga"
+            }.Select(Resources.TopPath);
 
             Assert.Equal(expectedFiles, ngaFiles);
         }

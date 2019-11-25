@@ -3,10 +3,13 @@
     public static class SaCommon
     {
         public const int DefaultBlockSize      = 8 * 1024 * 1024;
-        public const ushort DataVersion        = 55;
+        public const ushort DataVersion        = 56;
         public const ushort SchemaVersion      = 22;
 
         public const double RefMinorThreshold  = 0.95;
+
+        public const uint GuardInt        = 4041327495;
+        public const string NgaIdentifier = "NirvanaGenes";
 
         public const string IndexSufix         = ".idx";
         public const string SaFileSuffix       = ".nsa";

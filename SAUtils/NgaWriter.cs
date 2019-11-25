@@ -1,63 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using Compression.Algorithms;
+using Compression.FileHandling;
 using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 
 namespace SAUtils
 {
-    public sealed class NgaWriter:IDisposable
+    public sealed class NgaWriter : IDisposable
     {
-        private readonly Stream _ngaStream;
-        private readonly DataSourceVersion _version;
-        private readonly string _jsonKey;
-        private readonly ushort _schemaVersion;
-        private readonly bool _isArray;
+        private readonly ExtendedBinaryWriter _writer;
 
-        public NgaWriter(Stream ngaStream, DataSourceVersion version, string jsonKey, ushort schemaVersion, bool isArray)
+        public NgaWriter(Stream stream, ISerializable version, string jsonKey, ushort schemaVersion, bool isArray,
+            bool leaveOpen = false)
         {
-            _ngaStream     = ngaStream;
-            _version       = version;
-            _jsonKey       = jsonKey;
-            _schemaVersion = schemaVersion;
-            _isArray       = isArray;
+            WriteHeader(stream, version, jsonKey, schemaVersion, isArray);
+
+            var blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Compress);
+            _writer         = new ExtendedBinaryWriter(blockStream, Encoding.UTF8, leaveOpen);
         }
 
-        public void Dispose() =>_ngaStream?.Dispose();
+        private static void WriteHeader(Stream stream, ISerializable version, string jsonKey, ushort schemaVersion, bool isArray)
+        {
+            using (var writer = new ExtendedBinaryWriter(stream, Encoding.UTF8, true))
+            {
+                writer.Write(SaCommon.NgaIdentifier);
+                version.Write(writer);
+                writer.Write(jsonKey);
+                writer.Write(isArray);
+                writer.Write(schemaVersion);
+                writer.Write(SaCommon.GuardInt);
+            }
+        }
+
+        public void Dispose() => _writer.Dispose();
 
         public void Write(Dictionary<string, List<ISuppGeneItem>> geneToEntries)
         {
-            using (var memStream = new MemoryStream())
-            using (var memWriter = new ExtendedBinaryWriter(memStream))
-            using (var writer = new BinaryWriter(_ngaStream))
+            _writer.WriteOpt(geneToEntries.Count);
+
+            foreach ((string geneSymbol, List<ISuppGeneItem> entries) in geneToEntries)
             {
-                _version.Write(memWriter);
-                memWriter.WriteOptAscii(_jsonKey);
-                memWriter.Write(_isArray);
-                memWriter.WriteOpt(_schemaVersion);
+                _writer.WriteOptAscii(geneSymbol);
+                _writer.WriteOpt(entries.Count);
 
-                memWriter.WriteOpt(geneToEntries.Count);
-                foreach ((string geneSymbol, var entries) in geneToEntries)
+                foreach (ISuppGeneItem geneItem in entries)
                 {
-                    memWriter.WriteOptAscii(geneSymbol);
-                    memWriter.WriteOpt(entries.Count);
-                    foreach (ISuppGeneItem geneItem in entries)
-                    {
-                        memWriter.Write(geneItem.GetJsonString());
-                    }
+                    _writer.Write(geneItem.GetJsonString());
                 }
-
-                var uncompressedBytes = memStream.ToArray();
-                var compressedBytes = new byte[uncompressedBytes.Length + 32];
-
-                var compressor = new Zstandard();
-                var compressSize = compressor.Compress(uncompressedBytes, uncompressedBytes.Length, compressedBytes,
-                    compressedBytes.Length);
-
-                writer.Write(compressedBytes, 0, compressSize);
-                Console.WriteLine("Number of gene entries written:"+ geneToEntries.Count);
             }
         }
     }

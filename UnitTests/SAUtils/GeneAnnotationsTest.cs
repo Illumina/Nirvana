@@ -45,21 +45,26 @@ namespace UnitTests.SAUtils
         [Fact]
         public void ReadBackGeneAnnotations()
         {
-            var writeStream = new MemoryStream();
-            var version     = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks);
-            var ngaWriter   = new NgaWriter(writeStream, version, "mimo", SaCommon.SchemaVersion, true);
-            
-            ngaWriter.Write(GetGeneAnnotations());
+            NgaReader reader;
+            var version          = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks);
+            const string jsonKey = "mimo";
+            const bool isArray   = true;
 
-            var readStream = new MemoryStream(writeStream.ToArray());
-            using (var ngaReader = new NgaReader(readStream))
+            using (var ms = new MemoryStream())
             {
-                Assert.Null(ngaReader.GetAnnotation("gene3"));
-                Assert.Equal("[{\"mimNumber\":123,\"geneName\":\"gene name 1 ('minibrain', Drosophila, homolog of)\",\"description\":\"describing gene 1\\n\\\"some citation\\\"\",\"phenotypes\":[{\"phenotype\":\"disease 1\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"autosomal recessive\"],\"comments\":[\"unconfirmed or possibly spurious mapping\"]}]}]", ngaReader.GetAnnotation("gene1"));
-                Assert.Equal("[{\"mimNumber\":124,\"geneName\":\"gene name 2\",\"phenotypes\":[{\"phenotype\":\"disease 2\",\"mapping\":\"chromosome deletion or duplication syndrome\",\"inheritances\":[\"whatever\",\"never-ever\"],\"comments\":[\"nondiseases\"]}]}]", ngaReader.GetAnnotation("gene2"));
+                using (var writer = new NgaWriter(ms, version, jsonKey, SaCommon.SchemaVersion, isArray, true))
+                {
+                    writer.Write(GetGeneAnnotations());
+                }
+
+                ms.Position = 0;
+                reader = NgaReader.Read(ms);
             }
 
-            ngaWriter.Dispose();
+            Assert.NotNull(reader);
+            Assert.Null(reader.GetAnnotation("gene3"));
+            Assert.Equal("[{\"mimNumber\":123,\"geneName\":\"gene name 1 ('minibrain', Drosophila, homolog of)\",\"description\":\"describing gene 1\\n\\\"some citation\\\"\",\"phenotypes\":[{\"phenotype\":\"disease 1\",\"mapping\":\"mapping of the wildtype gene\",\"inheritances\":[\"autosomal recessive\"],\"comments\":[\"unconfirmed or possibly spurious mapping\"]}]}]", reader.GetAnnotation("gene1"));
+            Assert.Equal("[{\"mimNumber\":124,\"geneName\":\"gene name 2\",\"phenotypes\":[{\"phenotype\":\"disease 2\",\"mapping\":\"chromosome deletion or duplication syndrome\",\"inheritances\":[\"whatever\",\"never-ever\"],\"comments\":[\"nondiseases\"]}]}]", reader.GetAnnotation("gene2"));
         }
     }
 }

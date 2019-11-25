@@ -19,7 +19,7 @@ namespace Nirvana
         }
 
         public static IAnnotationProvider GetConservationProvider(AnnotationFiles files) =>
-            files == null || files.RefMinorFile == default
+            files == null || files.ConservationFile == default
                 ? null
                 : new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(files.ConservationFile.Npd),
                     PersistentStreamUtils.GetReadStream(files.ConservationFile.Idx));

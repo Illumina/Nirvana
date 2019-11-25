@@ -1,7 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using Compression.Algorithms;
+using Compression.FileHandling;
 using ErrorHandling.Exceptions;
 using IO;
 using VariantAnnotation.Interface.Providers;
@@ -10,74 +12,94 @@ using VariantAnnotation.SA;
 
 namespace VariantAnnotation.NSA
 {
-    public sealed class NgaReader:IDisposable
+    public sealed class NgaReader
     {
-        private readonly Stream _nsaStream;
-        private readonly MemoryStream _memStream;
-        private readonly ExtendedBinaryReader _reader;
         public readonly IDataSourceVersion Version;
         public readonly string JsonKey;
         private readonly bool _isArray;
-        private Dictionary<string, List<string>> _geneAnnotations;
 
-        public NgaReader(Stream stream)
+        private readonly Dictionary<string, List<string>> _geneSymbolToJsonStrings;
+
+        private NgaReader(IDataSourceVersion version, string jsonKey, bool isArray, Dictionary<string, List<string>> geneSymbolToJsonStrings)
         {
-            _nsaStream = stream;
-            // todo: read the whole file into memory now. Need redesign the nga reader and writer to be error-proof.
-            var compressedBytes = new byte[5 * 1024 * 1024];
-            var decompressedBytes = new byte[50 * 1024 * 1024];
-            var compressedSize = _nsaStream.Read(compressedBytes, 0, compressedBytes.Length);
-
-            var zstd = new Zstandard();
-            var decompressedSize= zstd.Decompress(compressedBytes, compressedSize, decompressedBytes, decompressedBytes.Length);
-
-            _memStream = new MemoryStream(decompressedBytes, 0, decompressedSize);
-            _reader = new ExtendedBinaryReader(_memStream);
-
-            Version= DataSourceVersion.Read(_reader);
-            JsonKey = _reader.ReadAsciiString();
-            _isArray = _reader.ReadBoolean();
-            ushort schemaVersion = _reader.ReadOptUInt16();
-
-            if (schemaVersion != SaCommon.SchemaVersion)
-                throw new UserErrorException($"Expected schema version: {SaCommon.SchemaVersion}, observed: {schemaVersion} for {JsonKey}");
-
+            Version                  = version;
+            JsonKey                  = jsonKey;
+            _isArray                 = isArray;
+            _geneSymbolToJsonStrings = geneSymbolToJsonStrings;
         }
 
-        private void PreLoad()
+        public static NgaReader Read(Stream stream)
         {
-            var geneCount = _reader.ReadOptInt32();
-            _geneAnnotations = new Dictionary<string, List<string>>(geneCount);
-            for (var i = 0; i < geneCount; i++)
+            (IDataSourceVersion version, string jsonKey, bool isArray) = ReadHeader(stream);
+
+            Dictionary<string, List<string>> geneSymbolToJsonStrings;
+
+            using (var blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Decompress))
+            using (var reader = new ExtendedBinaryReader(blockStream))
             {
-                var geneSymbol = _reader.ReadAsciiString();
-                var annoCount = _reader.ReadOptInt32();
-                _geneAnnotations.Add(geneSymbol, new List<string>(annoCount));
+                int geneCount = reader.ReadOptInt32();
+                geneSymbolToJsonStrings = new Dictionary<string, List<string>>(geneCount);
 
-                for (var j = 0; j < annoCount; j++)
-                    _geneAnnotations[geneSymbol].Add(_reader.ReadString());
+                for (var i = 0; i < geneCount; i++)
+                {
+                    string geneSymbol = reader.ReadAsciiString();
+                    int numEntries = reader.ReadOptInt32();
+                    var entries = new List<string>(numEntries);
 
+                    for (var j = 0; j < numEntries; j++)
+                    {
+                        entries.Add(reader.ReadString());
+                    }
+
+                    geneSymbolToJsonStrings[geneSymbol] = entries;
+                }
             }
+
+            return new NgaReader(version, jsonKey, isArray, geneSymbolToJsonStrings);
         }
 
-        public string GetAnnotation(string geneName)
+        private static (IDataSourceVersion Version, string JsonKey, bool IsArray) ReadHeader(Stream stream)
         {
-            if (_geneAnnotations==null) PreLoad();
+            IDataSourceVersion version;
+            string jsonKey;
+            bool isArray;
 
-            return _geneAnnotations.TryGetValue(geneName, out List<string> annotations) ? GetJsonString(annotations): null;
+            using (var reader = new ExtendedBinaryReader(stream, Encoding.UTF8, true))
+            {
+                string identifier    = reader.ReadString();
+
+                if (identifier != SaCommon.NgaIdentifier)
+                {
+                    throw new InvalidDataException($"Expected the NGA identifier ({SaCommon.NgaIdentifier}), but found another value: ({identifier})");
+                }
+
+                version              = DataSourceVersion.Read(reader);
+                jsonKey              = reader.ReadString();
+                isArray              = reader.ReadBoolean();
+                ushort schemaVersion = reader.ReadUInt16();
+
+                if (schemaVersion != SaCommon.SchemaVersion)
+                {
+                    throw new UserErrorException($"Expected the schema version {SaCommon.SchemaVersion}, but found another value: ({schemaVersion}) for {jsonKey}");
+                }
+
+                uint guard = reader.ReadUInt32();
+
+                if (guard != SaCommon.GuardInt)
+                {
+                    throw new InvalidDataException($"Expected a guard integer ({SaCommon.GuardInt}), but found another value: ({guard})");
+                }
+            }
+
+            return (version, jsonKey, isArray);
         }
+
+        public string GetAnnotation(string geneName) => _geneSymbolToJsonStrings.TryGetValue(geneName, out List<string> annotations) ? GetJsonString(annotations) : null;
 
         private string GetJsonString(List<string> annotations)
         {
             if (_isArray) return "[" + string.Join(',', annotations) + "]";
             return annotations[0];
-        }
-
-        public void Dispose()
-        {
-            _nsaStream?.Dispose();
-            _reader?.Dispose();
-            _memStream?.Dispose();
         }
     }
 }
