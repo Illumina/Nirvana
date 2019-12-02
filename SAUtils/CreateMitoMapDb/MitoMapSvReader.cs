@@ -21,7 +21,7 @@ namespace SAUtils.CreateMitoMapDb
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly VariantAligner _variantAligner;
         private readonly IChromosome _chromosome;
-
+        private readonly MitoMapInputDb _mitoMapInputDb;
 
         private readonly HashSet<string> _mitoMapSvDataTypes = new HashSet<string>
         {
@@ -29,13 +29,14 @@ namespace SAUtils.CreateMitoMapDb
             MitoMapDataTypes.MitoMapInsertionsSimple
         };
 
-        public MitoMapSvReader(FileInfo mitoMapFileInfo, ReferenceSequenceProvider sequenceProvider)
+        public MitoMapSvReader(FileInfo mitoMapFileInfo, MitoMapInputDb mitoMapInputDb, ReferenceSequenceProvider sequenceProvider)
         {
             _mitoMapFileInfo = mitoMapFileInfo;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
             _chromosome = sequenceProvider.RefNameToChromosome["chrM"];
             _variantAligner = new VariantAligner(sequenceProvider.Sequence);
+            _mitoMapInputDb = mitoMapInputDb;
         }
 
         private string GetDataType()
@@ -95,7 +96,8 @@ namespace SAUtils.CreateMitoMapDb
             var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
             var newStart = _variantAligner.LeftAlign(start, refSequence, "").Item1;
             if (start != newStart) Console.WriteLine($"Deletion of {size} bps. Original start start position: {start}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(_chromosome, newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.deletion, null);
+            var pubMedIds = ParsingUtilities.GetPubMedIds(info[4], _mitoMapInputDb);
+            var mitoMapItem = new MitoMapItem(_chromosome, newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.deletion, null, default, pubMedIds);
             return new List<MitoMapItem> { mitoMapItem };
 
         }
@@ -118,7 +120,8 @@ namespace SAUtils.CreateMitoMapDb
             var leftAlgnResults = _variantAligner.LeftAlign(genomeStart, refSequence, refSequence + refSequence); // duplication
             var newStart = leftAlgnResults.Item1;
             if (genomeStart != newStart) Console.WriteLine($"Duplication of {size} bps. Original start start position: {genomeStart}; new position after left-alignment {newStart}.");
-            var mitoMapItem = new MitoMapItem(_chromosome, newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.duplication, null);
+            var pubMedIds = ParsingUtilities.GetPubMedIds(info[6], _mitoMapInputDb);
+            var mitoMapItem = new MitoMapItem(_chromosome, newStart, "", "", null, null, null, "", "", "", true, newStart + size - 1, VariantType.duplication, null, default, pubMedIds);
             svItems.Add(mitoMapItem);
             return svItems;
         }

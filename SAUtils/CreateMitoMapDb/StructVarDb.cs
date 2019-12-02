@@ -19,6 +19,7 @@ namespace SAUtils.CreateMitoMapDb
         private static string _compressedReference;
         private static string _outputDirectory;
         private static readonly List<string> MitoMapFileNames = new List<string>();
+        private static string _mitoMapDatabase;
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
@@ -35,6 +36,11 @@ namespace SAUtils.CreateMitoMapDb
                     v => MitoMapFileNames.Add(v)
                 },
                 {
+                    "database|d=",
+                    "MITOMAP database",
+                    v => _mitoMapDatabase = v
+                },
+                {
                     "out|o=",
                     "output directory",
                     v => _outputDirectory = v
@@ -46,9 +52,8 @@ namespace SAUtils.CreateMitoMapDb
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
-                .HasRequiredParameter(MitoMapFileNames, "MITOMAP structural variants HTML file", "--in")
                 .CheckEachFilenameExists(MitoMapFileNames, "MITOMAP structural variants HTML file", "--in")
-                .HasRequiredParameter(_outputDirectory, "output directory", "--out")
+                .CheckInputFilenameExists(_mitoMapDatabase, "output directory", "--database")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
                 .ShowHelpMenu("Creates a supplementary database with MITOMAP structural variants annotations", commandLineExample)
@@ -65,7 +70,8 @@ namespace SAUtils.CreateMitoMapDb
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             var chrom = sequenceProvider.RefNameToChromosome["chrM"];
             sequenceProvider.LoadChromosome(chrom);
-            var mitoMapSvReaders = MitoMapFileNames.Select(mitoMapFileName => new MitoMapSvReader(new FileInfo(mitoMapFileName), sequenceProvider)).ToList();
+            MitoMapInputDb mitoMapInputDb = MitoMapDatabaseUtilities.Create(_mitoMapDatabase);
+            var mitoMapSvReaders = MitoMapFileNames.Select(mitoMapFileName => new MitoMapSvReader(new FileInfo(mitoMapFileName), mitoMapInputDb, sequenceProvider)).ToList();
             var mergedMitoMapVarItems = MitoMapSvReader.MergeAndSort(mitoMapSvReaders);
 
             string outFileName = $"{version.Name}_{version.Version}";

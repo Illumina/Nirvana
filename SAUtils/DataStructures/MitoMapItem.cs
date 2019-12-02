@@ -39,8 +39,8 @@ namespace SAUtils.DataStructures
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
-        public bool IsInterval;
-
+        
+        private readonly bool _isInterval;
         private readonly List<string> _diseases;
         private readonly bool? _homoplasmy;
         private readonly bool? _heteroplasmy;
@@ -49,8 +49,10 @@ namespace SAUtils.DataStructures
         private readonly string _scorePercentile;
         private readonly int? _intervalEnd;
         private readonly VariantType? _variantType;
+        private readonly int _numGenBankFullLengthSeqs;
+        private readonly List<string> _pubMedIds;
 
-        public MitoMapItem(IChromosome chromosome, int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType, ISequenceProvider sequenceProvider)
+        public MitoMapItem(IChromosome chromosome, int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, bool isInterval, int? intervalEnd, VariantType? variantType, ISequenceProvider sequenceProvider, int numGenBankFullLengthSeqs, List<string> pubMedIds)
         {
             Chromosome = chromosome;
             Position = posi;
@@ -63,7 +65,8 @@ namespace SAUtils.DataStructures
             {
                 (Position, RefAllele, AltAllele) = TryAddPaddingBase(refAllele, altAllele, Position, sequenceProvider);
             }
-            IsInterval = isInterval;
+
+            _isInterval = isInterval;
             _diseases = diseases;
             _homoplasmy = homoplasmy;
             _heteroplasmy = heteroplasmy;
@@ -72,6 +75,8 @@ namespace SAUtils.DataStructures
             _scorePercentile = scorePercentile;
             _intervalEnd = intervalEnd;
             _variantType = variantType;
+            _numGenBankFullLengthSeqs = numGenBankFullLengthSeqs;
+            _pubMedIds = pubMedIds;
         }
 
         private static (int, string, string) TryAddPaddingBase(string refAllele, string altAllele, int position, ISequenceProvider sequenceProvider)
@@ -100,12 +105,14 @@ namespace SAUtils.DataStructures
 
             jsonObject.AddStringValue("refAllele", RefAllele);
             jsonObject.AddStringValue("altAllele", AltAllele);
-            if (_diseases != null && _diseases.Count > 0) jsonObject.AddStringValues("diseases", _diseases.Distinct().ToList());
+            jsonObject.AddStringValues("diseases", _diseases?.Distinct());
             if (_homoplasmy.HasValue) jsonObject.AddBoolValue("hasHomoplasmy", _homoplasmy.Value, true); 
             if (_heteroplasmy.HasValue) jsonObject.AddBoolValue("hasHeteroplasmy", _heteroplasmy.Value, true);  
-            if (!string.IsNullOrEmpty(_status)) jsonObject.AddStringValue("status", _status);
-            if (!string.IsNullOrEmpty(_clinicalSignificance)) jsonObject.AddStringValue("clinicalSignificance", _clinicalSignificance);
-            if (!string.IsNullOrEmpty(_scorePercentile)) jsonObject.AddStringValue("scorePercentile", _scorePercentile, false);
+            jsonObject.AddStringValue("status", _status);
+            jsonObject.AddStringValue("clinicalSignificance", _clinicalSignificance);
+            jsonObject.AddStringValue("scorePercentile", _scorePercentile, false);
+            jsonObject.AddIntValue("numGenBankFullLengthSeqs", _numGenBankFullLengthSeqs);
+            jsonObject.AddStringValues("pubMedIds", _pubMedIds);
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
@@ -129,40 +136,47 @@ namespace SAUtils.DataStructures
 
         private static MitoMapItem Merge(MitoMapItem mitoMapItem1, MitoMapItem mitoMapItem2)
         {
-            if (HasConflict(mitoMapItem1.Chromosome, mitoMapItem2.Chromosome) || HasConflict(mitoMapItem1.Position, mitoMapItem2.Position) ||
-                HasConflict(mitoMapItem1.RefAllele, mitoMapItem2.RefAllele) || HasConflict(mitoMapItem1.AltAllele, mitoMapItem2.AltAllele) || HasConflict(mitoMapItem1._homoplasmy, mitoMapItem2._homoplasmy) || HasConflict(mitoMapItem1._heteroplasmy, mitoMapItem2._heteroplasmy) || HasConflict(mitoMapItem1._status, mitoMapItem2._status) || HasConflict(mitoMapItem1._clinicalSignificance, mitoMapItem2._clinicalSignificance) || HasConflict(mitoMapItem1._scorePercentile, mitoMapItem2._scorePercentile) //|| HasConflict(mitoMapItem1.IsInterval, mitoMapItem2.IsInterval) 
-                || HasConflict(mitoMapItem1._intervalEnd, mitoMapItem2._intervalEnd) || HasConflict(mitoMapItem1._variantType, mitoMapItem2._variantType))
+            if (HasConflictValue(mitoMapItem1.Chromosome, mitoMapItem2.Chromosome) || HasConflictValue(mitoMapItem1.Position, mitoMapItem2.Position) ||
+                HasConflictValue(mitoMapItem1.RefAllele, mitoMapItem2.RefAllele) || HasConflictValue(mitoMapItem1.AltAllele, mitoMapItem2.AltAllele) || HasConflictValue(mitoMapItem1._homoplasmy, mitoMapItem2._homoplasmy) || HasConflictValue(mitoMapItem1._heteroplasmy, mitoMapItem2._heteroplasmy) || HasConflictValue(mitoMapItem1._status, mitoMapItem2._status) || HasConflictValue(mitoMapItem1._clinicalSignificance, mitoMapItem2._clinicalSignificance) || HasConflictValue(mitoMapItem1._scorePercentile, mitoMapItem2._scorePercentile) //|| HasConflict(mitoMapItem1.IsInterval, mitoMapItem2.IsInterval) 
+                || HasConflictValue(mitoMapItem1._intervalEnd, mitoMapItem2._intervalEnd) || HasConflictValue(mitoMapItem1._variantType, mitoMapItem2._variantType))
             {
                 throw new InvalidDataException($"Conflict found at {mitoMapItem1.Position} when updating MITOMAP record: first record: {mitoMapItem1.GetJsonString()}; second record: {mitoMapItem2.GetJsonString()} ");
-                //Console.WriteLine($"Conflict found at {mitoMapItem1.Position} when updating MITOMAP record: first record: {mitoMapItem1.GetJsonString()}; second record: {mitoMapItem2.GetJsonString()} ");
-                //return null;
             }
             var homoplasmy = mitoMapItem1._homoplasmy ?? mitoMapItem2._homoplasmy;
             var heteroplasmy = mitoMapItem1._heteroplasmy ?? mitoMapItem2._heteroplasmy;
-            List<string> diseases;
-            if (mitoMapItem1._diseases != null && mitoMapItem2._diseases != null)
-            {
-                Console.WriteLine($"Merge diseases at {mitoMapItem1.Position}, {mitoMapItem1.RefAllele}-{mitoMapItem1.AltAllele}: {string.Join(",", mitoMapItem1._diseases)} and {string.Join(",",mitoMapItem2._diseases)}");
-                diseases = mitoMapItem1._diseases.Concat(mitoMapItem2._diseases).Distinct().ToList();
-            }
-            else
-            {
-                diseases = mitoMapItem1._diseases?.Count > 0 ? mitoMapItem1._diseases : mitoMapItem2._diseases;
-            }
+            string alleleInfo = $"{mitoMapItem1.Position} (Ref: {mitoMapItem1.RefAllele}, Alt: {mitoMapItem1.AltAllele})";
+            var diseases = MergeCollections(mitoMapItem1._diseases, mitoMapItem2._diseases, alleleInfo).ToList();
+            var pubMedIds = MergeCollections(mitoMapItem1._pubMedIds, mitoMapItem2._pubMedIds, alleleInfo).ToList();
             var status = mitoMapItem1._status ?? mitoMapItem2._status;
             var clinicalSignificance = mitoMapItem1._clinicalSignificance ?? mitoMapItem2._clinicalSignificance;
             var scorePercentile = mitoMapItem1._scorePercentile ?? mitoMapItem2._scorePercentile;
-            var isInterval = mitoMapItem1.IsInterval;
+            var isInterval = mitoMapItem1._isInterval;
             var intervalEnd = mitoMapItem1._intervalEnd ?? mitoMapItem2._intervalEnd;
             var variantType = mitoMapItem1._variantType ?? mitoMapItem2._variantType;
+            var numFullLengthSequences = Math.Max(mitoMapItem1._numGenBankFullLengthSeqs, mitoMapItem2._numGenBankFullLengthSeqs);
             return new MitoMapItem(mitoMapItem1.Chromosome, mitoMapItem1.Position, mitoMapItem1.RefAllele, mitoMapItem1.AltAllele,
                 diseases, homoplasmy, heteroplasmy, status, clinicalSignificance, scorePercentile, isInterval,
-                intervalEnd, variantType, null);
+                intervalEnd, variantType, null, numFullLengthSequences, pubMedIds);
         }
 
-        private static bool HasConflict<T>(T originalValue, T newValue)
+        private static IEnumerable<string> MergeCollections(ICollection<string> collection1, ICollection<string> collection2, string alleleInfo)
         {
-            return !IsNullOrEmpty(originalValue) && !IsNullOrEmpty(newValue) && !originalValue.Equals(newValue);
+            if (IsNullOrEmpty(collection1) || IsNullOrEmpty(collection2)) 
+                return (collection1?.Count ?? -1) > 0 
+                ? collection1 
+                : collection2 ?? Enumerable.Empty<string>();
+            
+            Console.WriteLine($"Merge data at {alleleInfo}: {string.Join(",", collection1)} and {string.Join(",", collection2)}");
+            return collection1.Concat(collection1).Distinct();
+
+        }
+
+        private static bool HasConflictValue<T>(T originalValue, T newValue)
+        {
+            bool hasConflict = !IsNullOrEmpty(originalValue) && !IsNullOrEmpty(newValue) && !originalValue.Equals(newValue);
+            if (hasConflict) Console.WriteLine($"Conflict found: {originalValue}, {newValue}");
+
+            return hasConflict;
         }
 
         private static bool IsNullOrEmpty<T>(T value)

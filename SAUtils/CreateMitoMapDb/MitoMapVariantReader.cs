@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text.RegularExpressions;
-using ErrorHandling.Exceptions;
+﻿using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 
 namespace SAUtils.CreateMitoMapDb
@@ -21,19 +22,19 @@ namespace SAUtils.CreateMitoMapDb
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly VariantAligner _variantAligner;
         private readonly IChromosome _chromosome;
+        private readonly MitoMapInputDb _mitoMapInputDb;
 
-
-        private readonly Dictionary<string, int[]> _mitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
+        private static readonly Dictionary<string, int[]> MitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
         {
-            {MitoMapDataTypes.MitoMapMutationsCodingControl, new[] {0, 2, 3, 6, 7, 8, -1}},
-            {MitoMapDataTypes.MitoMapMutationsRNA, new[] {0, 2, 3, 5, 6, 7, 8}},
-            {MitoMapDataTypes.MitoMapPolymorphismsCoding,  new[] {0, -1, 2, -1, -1, -1, -1}},
-            {MitoMapDataTypes.MitoMapPolymorphismsControl,  new[] {0, -1, 2, -1, -1, -1, -1}},
+            {MitoMapDataTypes.MitoMapMutationsCodingControl, new[] {0, 2, 3, 6, 7, 8, -1, 10, 11}},
+            {MitoMapDataTypes.MitoMapMutationsRNA, new[] {0, 2, 3, 5, 6, 7, 8, 10, 11}},
+            {MitoMapDataTypes.MitoMapPolymorphismsCoding,  new[] {0, -1, 2, -1, -1, -1, -1, 7, 8}},
+            {MitoMapDataTypes.MitoMapPolymorphismsControl,  new[] {0, -1, 2, -1, -1, -1, -1, 4, 5}},
             {MitoMapDataTypes.MitoMapInsertionsSimple,  new int[0]},
             {MitoMapDataTypes.MitoMapDeletionsSingle,  new int[0]}
         };
 
-        private readonly Dictionary<(string, int), string> _clininalSigfincances = new Dictionary<(string, int), string>
+        private static readonly Dictionary<(string, int), string> ClinicalSignificances = new Dictionary<(string, int), string>
         {
             {("up", 3), "confirmed pathogenic"},
             {("up", 2), "likely pathogenic"},
@@ -42,18 +43,19 @@ namespace SAUtils.CreateMitoMapDb
             {("down", 2), "likely benign"}
         };
 
-        private readonly Dictionary<string, bool> _symbolToBools = new Dictionary<string, bool>
+        private static readonly Dictionary<string, bool> SymbolToBools = new Dictionary<string, bool>
         {
             {"+", true},
             {"-", false}
         };
 
-        private readonly HashSet<string> _mitoMapDelSymbolSet = new HashSet<string> { ":", "del", "d" };
+        private static readonly HashSet<string> MitoMapDelSymbolSet = new HashSet<string> { ":", "del", "d" };
+        private static HashSet<string> IgnoredStatus = new HashSet<string> { "See 7471insC", "Reported  (alt loc)" };
 
-
-        public MitoMapVariantReader(FileInfo mitoMapFileInfo, ReferenceSequenceProvider sequenceProvider)
+        public MitoMapVariantReader(FileInfo mitoMapFileInfo, MitoMapInputDb mitoMapInputDb, ReferenceSequenceProvider sequenceProvider)
         {
             _mitoMapFileInfo = mitoMapFileInfo;
+            _mitoMapInputDb = mitoMapInputDb;
             _dataType = GetDataType();
             _sequenceProvider = sequenceProvider;
             _chromosome = sequenceProvider.RefNameToChromosome["chrM"];
@@ -63,7 +65,7 @@ namespace SAUtils.CreateMitoMapDb
         private string GetDataType()
         {
             var dataType = _mitoMapFileInfo.Name.Replace(".html", "");
-            if (!_mitoMapMutationColumnDefinitions.ContainsKey(dataType)) throw new InvalidDataException($"Unexpected data file: {_mitoMapFileInfo.Name}");
+            if (!MitoMapMutationColumnDefinitions.ContainsKey(dataType)) throw new InvalidDataException($"Unexpected data file: {_mitoMapFileInfo.Name}");
             return dataType;
         }
 
@@ -85,7 +87,7 @@ namespace SAUtils.CreateMitoMapDb
                     // last item
                     if (line.OptimizedStartsWith('[') && line.EndsWith("]],")) isDataLine = false;
 
-                    foreach (var mitoMapMutItem in ParseLine(line, _dataType))
+                    foreach (var mitoMapMutItem in ParseLine(line, _dataType, _sequenceProvider, _variantAligner, _chromosome, _mitoMapInputDb))
                     {
                         if (!string.IsNullOrEmpty(mitoMapMutItem.RefAllele) ||
                             !string.IsNullOrEmpty(mitoMapMutItem.AltAllele))
@@ -95,7 +97,8 @@ namespace SAUtils.CreateMitoMapDb
             }
         }
 
-        private List<MitoMapItem> ParseLine(string line, string dataType)
+        private static List<MitoMapItem> ParseLine(string line, string dataType, ISequenceProvider sequenceProvider,
+            VariantAligner variantAligner, IChromosome chromosome, MitoMapInputDb mitoMapInputDb)
         {
             // line validation
             if (!(line.OptimizedStartsWith('[') && line.EndsWith("],")))
@@ -108,14 +111,16 @@ namespace SAUtils.CreateMitoMapDb
             switch (dataType)
             {
                 case MitoMapDataTypes.MitoMapInsertionsSimple:
-                    return ExtractVariantItemFromInsertionsSimple(info);
+                    return ExtractVariantItemFromInsertionsSimple(info, sequenceProvider, variantAligner, chromosome, mitoMapInputDb);
                 case MitoMapDataTypes.MitoMapDeletionsSingle:
-                    return ExtractVariantItemFromDeletionsSingle(info);
+                    return ExtractVariantItemFromDeletionsSingle(info, sequenceProvider, variantAligner, chromosome, mitoMapInputDb);
             }
-            return ExtractVariantItem(info, _mitoMapMutationColumnDefinitions[dataType]);
+            return ExtractVariantItem(info, dataType, sequenceProvider, variantAligner, chromosome, mitoMapInputDb);
         }
 
-        private List<MitoMapItem> ExtractVariantItemFromDeletionsSingle(List<string> info)
+        private static List<MitoMapItem> ExtractVariantItemFromDeletionsSingle(List<string> info,
+            ISequenceProvider sequenceProvider, VariantAligner variantAligner, IChromosome chromosome,
+            MitoMapInputDb mitoMapInputDb)
         {
             var junctions = info[0].OptimizedSplit(':').Select(int.Parse).ToList();
             var start = junctions[0] + 1;
@@ -126,14 +131,17 @@ namespace SAUtils.CreateMitoMapDb
             var size = int.Parse(info[1].Substring(1));
             if (size > MitomapParsingParameters.LargeDeletionCutoff) return new List<MitoMapItem>();
             if (calculatedSize != size) Console.WriteLine($"Incorrect size of deleted region: size of {start}-{end} should be {calculatedSize}, provided size is {size}. Provided size is used.");
-            var refSequence = _sequenceProvider.Sequence.Substring(start - 1, size);
-            var leftAlignResults = GetLeftAlignedVariant(start, refSequence, "");
-            var mitoMapItem = new MitoMapItem(_chromosome, leftAlignResults.RefPosition, leftAlignResults.RefAllele, "-", null, null, null, "", "", "", false, null, null, _sequenceProvider);
+            var refSequence = sequenceProvider.Sequence.Substring(start - 1, size);
+            var leftAlignResults = GetLeftAlignedVariant(start, refSequence, "", variantAligner);
+            var pubMedIds = ParsingUtilities.GetPubMedIds(info[4], mitoMapInputDb);
+            var mitoMapItem = new MitoMapItem(chromosome, leftAlignResults.RefPosition, leftAlignResults.RefAllele, "-", null, null, null, "", "", "", false, null, null, sequenceProvider, default, pubMedIds);
             return new List<MitoMapItem> { mitoMapItem };
         }
 
         // extract small variant from this file
-        private List<MitoMapItem> ExtractVariantItemFromInsertionsSimple(List<string> info)
+        private static List<MitoMapItem> ExtractVariantItemFromInsertionsSimple(List<string> info,
+            ISequenceProvider sequenceProvider, VariantAligner variantAligner, IChromosome chromosome,
+            MitoMapInputDb mitoMapInputDb)
         {
             var altAlleleInfo = info[2];
             var dLoopPattern = new Regex(@"(?<start>^\d+)-(?<end>(\d+)) D-Loop region");
@@ -158,19 +166,23 @@ namespace SAUtils.CreateMitoMapDb
             var firstNumberMatch = firstNumberPattern.Match(info[3]);
             if (!firstNumberMatch.Success) throw new InvalidDataException($"Failed to extract variant position from {info[3]}");
             var position = int.Parse(firstNumberMatch.Groups["firstNumber"].Value);
-            var leftAlgnResults = GetLeftAlignedVariant(position, "", altAllele); // insertion
-            return new List<MitoMapItem>{new MitoMapItem(_chromosome, leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null, _sequenceProvider) };
+            var leftAlgnResults = GetLeftAlignedVariant(position, "", altAllele, variantAligner); // insertion
+            var pubMedIds = ParsingUtilities.GetPubMedIds(info[6], mitoMapInputDb);
+            return new List<MitoMapItem>{new MitoMapItem(chromosome, leftAlgnResults.RefPosition, "-", leftAlgnResults.AltAllele, null, null, null, "", "", "", false, null, null, sequenceProvider, default, pubMedIds) };
         }
 
-        private List<MitoMapItem> ExtractVariantItem(List<string> info, int[] fields)
+        private static List<MitoMapItem> ExtractVariantItem(List<string> info, string dataType,
+            ISequenceProvider sequenceProvider, VariantAligner variantAligner, IChromosome chromosome,
+            MitoMapInputDb mitoMapInputDb)
         {
+            int[] fields = MitoMapMutationColumnDefinitions[dataType];
             List<MitoMapItem> mitoMapVarItems = new List<MitoMapItem>();
             int position = int.Parse(info[fields[0]]);
             var mitomapDiseaseString = GetDiseaseInfo(info, fields[1]);
             if (DescribedAsDuplicatedRecord(mitomapDiseaseString)) return mitoMapVarItems;
 
             var diseases = string.IsNullOrEmpty(mitomapDiseaseString) ? null : new List<string> {mitomapDiseaseString};
-            var (refAllele, rawAltAllele, extractedPosition) = GetRefAltAlleles(info[fields[2]]);
+            var (refAllele, rawAltAllele, extractedPosition) = GetRefAltAlleles(info[fields[2]], sequenceProvider);
 
             if (extractedPosition.HasValue && position != extractedPosition)
                 Console.WriteLine($"Inconsistant positions found: annotated position: {position}; allele {info[fields[2]]}");
@@ -181,35 +193,73 @@ namespace SAUtils.CreateMitoMapDb
                 return mitoMapVarItems;
             }
 
-            if (_mitoMapDelSymbolSet.Contains(rawAltAllele)) rawAltAllele = DelSymbol;
+            if (MitoMapDelSymbolSet.Contains(rawAltAllele)) rawAltAllele = DelSymbol;
 
             var homoplasmy   = GetPlasmy(info, fields[3]);
             var heteroplasmy = GetPlasmy(info, fields[4]);
 
-            string status = fields[5] == -1 ? null : info[fields[5]];
+            string status = GetStatus(info, fields);
             (string scorePercentile, string clinicalSignificance) = GetFunctionalInfo(info, fields[6]);
+            int numFullLengthSeqs = GetNumFullLengthSequences(info[fields[7]], dataType);
+            var pubMedIds = ParsingUtilities.GetPubMedIds(info[fields[8]], mitoMapInputDb);
 
             if (!string.IsNullOrEmpty(rawAltAllele))
             {
                 foreach (var altAllele in GetAltAlleles(rawAltAllele))
                 {
-                    var thisLeftAlignResults = GetLeftAlignedVariant(position, refAllele, altAllele);
-                    mitoMapVarItems.Add(new MitoMapItem(_chromosome, thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, _sequenceProvider));
+                    var thisLeftAlignResults = GetLeftAlignedVariant(position, refAllele, altAllele, variantAligner);
+                    mitoMapVarItems.Add(new MitoMapItem(chromosome, thisLeftAlignResults.RefPosition, thisLeftAlignResults.RefAllele, thisLeftAlignResults.AltAllele, diseases, homoplasmy,heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, sequenceProvider, numFullLengthSeqs, pubMedIds));
                 }
                 if (mitoMapVarItems.Count > 1) Console.WriteLine($"Multiple Alternative Allele Sequences {info[fields[2]]} at {position}");
                 return mitoMapVarItems;         
             }
 
-            var leftAlignResults = GetLeftAlignedVariant(position, refAllele, rawAltAllele);
-            mitoMapVarItems.Add(new MitoMapItem(_chromosome, leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
-                    heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, _sequenceProvider));
+            var leftAlignResults = GetLeftAlignedVariant(position, refAllele, rawAltAllele, variantAligner);
+            mitoMapVarItems.Add(new MitoMapItem(chromosome, leftAlignResults.RefPosition, leftAlignResults.RefAllele, leftAlignResults.AltAllele, diseases, homoplasmy,
+                    heteroplasmy, status, clinicalSignificance, scorePercentile, false, null, null, sequenceProvider, numFullLengthSeqs, pubMedIds));
 
             return mitoMapVarItems;
         }
 
-        private bool? GetPlasmy(List<string> info, int fields)
+        private static string GetStatus(List<string> info, int[] fields)
         {
-            if (fields == -1 || !_symbolToBools.TryGetValue(info[fields], out bool b)) return null;
+            string status = fields[5] == -1 ? null : info[fields[5]];
+            return IgnoredStatus.Contains(status) ? null : status;
+        }
+
+        internal static int GetNumFullLengthSequences(string field, string dataType)
+        {
+            if (!field?.OptimizedStartsWith('<') ?? true) return 0;
+
+            int leadingCharIndex = -1;
+            int trailingCharIndex = -1;
+            switch (dataType)
+            {
+                case MitoMapDataTypes.MitoMapMutationsRNA:
+                case MitoMapDataTypes.MitoMapMutationsCodingControl:
+                    leadingCharIndex = field.IndexOf('>');
+                    trailingCharIndex = field.IndexOf(" (", StringComparison.Ordinal);
+                    break;
+
+                case MitoMapDataTypes.MitoMapPolymorphismsCoding:
+                    leadingCharIndex = field.IndexOf('>');
+                    trailingCharIndex = field.IndexOf("</", StringComparison.Ordinal);
+                break;
+
+                case MitoMapDataTypes.MitoMapPolymorphismsControl:
+                    leadingCharIndex = field.IndexOf('(');
+                    trailingCharIndex = field.IndexOf('/', leadingCharIndex+1);
+                    break;
+            }
+            string numFullLengthString = field.Substring(leadingCharIndex + 1, trailingCharIndex - leadingCharIndex - 1);
+            if (int.TryParse(numFullLengthString, out int numFullLength)) return numFullLength;
+            
+            throw new InvalidDataException($"Can't extract number of full length GenBank sequences from {field} in the {dataType} dataset.");
+        }
+
+        private static bool? GetPlasmy(List<string> info, int fields)
+        {
+            if (fields == -1 || !SymbolToBools.TryGetValue(info[fields], out bool b)) return null;
             return b;
         }
 
@@ -237,7 +287,7 @@ namespace SAUtils.CreateMitoMapDb
             return match.Success ? match.Groups["disease"].Value : diseaseString;
         }
 
-        private (string, string) GetFunctionalInfo(List<string> info, int fieldIndex)
+        private static (string, string) GetFunctionalInfo(List<string> info, int fieldIndex)
         {
             if (fieldIndex == -1) return (null, null);
             string functionInfoString = info[fieldIndex];
@@ -248,7 +298,7 @@ namespace SAUtils.CreateMitoMapDb
             return (match.Groups["scoreString"].Value, clineSignificance);
         }
 
-        private string GetClinicalSignificance(string significanceString)
+        private static string GetClinicalSignificance(string significanceString)
         {
             // < i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i><i class='fa fa-arrow-up' style='color:red' aria-hidden='true'></i>
             // filter out the symbol for frequency alert
@@ -256,24 +306,24 @@ namespace SAUtils.CreateMitoMapDb
             var nArrows = arrows.Count;
             if (nArrows == 0) return null;
             var arrowType = arrows[0].Contains("fa-arrow-up") ? "up" : "down";
-            return _clininalSigfincances[(arrowType, nArrows)];
+            return ClinicalSignificances[(arrowType, nArrows)];
         }
 
-        private (string RefAllele, string RawAltAllele, int? ExtractedPosition) GetRefAltAlleles(string alleleString)
+        private static (string RefAllele, string RawAltAllele, int? ExtractedPosition) GetRefAltAlleles(string alleleString, ISequenceProvider sequenceProvider)
         {
             var results = Evaluate_C123T(alleleString);
             if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
-            results = Evaluate_16021_16022del(alleleString);
+            results = Evaluate_16021_16022del(alleleString, sequenceProvider);
             if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
-            results = Evaluate_8042del2(alleleString);
+            results = Evaluate_8042del2(alleleString, sequenceProvider);
             if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
             results = Evaluate_C9537insC(alleleString);
             if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
-            results = Evaluate_3902_3908invACCTTGC(alleleString);
+            results = Evaluate_3902_3908invACCTTGC(alleleString, sequenceProvider);
             if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
             results = Evaluate_A_C_or_CC(alleleString);
@@ -282,7 +332,7 @@ namespace SAUtils.CreateMitoMapDb
             results = Evaluate_C_C_2_8(alleleString);
             if (results.Success) return (results.RefAllele, results.RawAltAllele, results.ExtractedPosition);
 
-            results = Evaluate_8042delAT(alleleString);
+            results = Evaluate_8042delAT(alleleString, sequenceProvider);
 
             return results.Success
                 ? (results.RefAllele, results.RawAltAllele, results.ExtractedPosition)
@@ -290,7 +340,7 @@ namespace SAUtils.CreateMitoMapDb
         }
 
         // 8042delAT
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_8042delAT(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_8042delAT(string alleleString, ISequenceProvider sequenceProvider)
         {
             var regex = new Regex(@"(?<position>^\d+)del(?<del>[ACGTacgtNn]+)");
             var match = regex.Match(alleleString);
@@ -298,7 +348,7 @@ namespace SAUtils.CreateMitoMapDb
 
             var extractedPosition      = int.Parse(match.Groups["position"].Value);
             string deletedSeq          = match.Groups["del"].Value;
-            string deletedReferenceSeq = GetRefAllelesFromReference(_sequenceProvider, extractedPosition, deletedSeq.Length);
+            string deletedReferenceSeq = GetRefAllelesFromReference(sequenceProvider, extractedPosition, deletedSeq.Length);
 
             if (deletedSeq != deletedReferenceSeq)
             {
@@ -340,7 +390,7 @@ namespace SAUtils.CreateMitoMapDb
         }
 
         // 3902_3908invACCTTGC
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_3902_3908invACCTTGC(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_3902_3908invACCTTGC(string alleleString, ISequenceProvider sequenceProvider)
         {
             var regex = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)inv(?<seq>[ACGTacgtNn]+)");
             var match = regex.Match(alleleString);
@@ -348,7 +398,7 @@ namespace SAUtils.CreateMitoMapDb
 
             var start       = int.Parse(match.Groups["start"].Value);
             var end         = int.Parse(match.Groups["end"].Value);
-            var refSequence = GetRefAllelesFromReference(_sequenceProvider, start, end - start + 1);
+            var refSequence = GetRefAllelesFromReference(sequenceProvider, start, end - start + 1);
             if (refSequence != match.Groups["seq"].Value) throw new InvalidDataException($"Inconsistent sequences: reference {refSequence}, annotation {match.Groups["seq"].Value}");
             return (true, refSequence, ReverseSequence(refSequence), start);
         }
@@ -367,18 +417,18 @@ namespace SAUtils.CreateMitoMapDb
         }
 
         // 8042del2
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_8042del2(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_8042del2(string alleleString, ISequenceProvider sequenceProvider)
         {
             var regex = new Regex(@"(?<position>^\d+)del(?<length>\d+)");
             var match = regex.Match(alleleString);
             if (!match.Success) return (false, null, null, null);
 
             var extractedPosition = int.Parse(match.Groups["position"].Value);
-            return (true, GetRefAllelesFromReference(_sequenceProvider, extractedPosition, int.Parse(match.Groups["length"].Value)), "-", extractedPosition);
+            return (true, GetRefAllelesFromReference(sequenceProvider, extractedPosition, int.Parse(match.Groups["length"].Value)), "-", extractedPosition);
         }
 
         // 16021_16022del
-        private (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_16021_16022del(string alleleString)
+        private static (bool Success, string RefAllele, string RawAltAllele, int? ExtractedPosition) Evaluate_16021_16022del(string alleleString, ISequenceProvider sequenceProvider)
         {
             var regex = new Regex(@"(?<start>^\d+)[_|-](?<end>\d+)del");
             var match = regex.Match(alleleString);
@@ -386,7 +436,7 @@ namespace SAUtils.CreateMitoMapDb
 
             var start = int.Parse(match.Groups["start"].Value);
             var end   = int.Parse(match.Groups["end"].Value);
-            return (true, GetRefAllelesFromReference(_sequenceProvider, start, end - start + 1), "-", start);
+            return (true, GetRefAllelesFromReference(sequenceProvider, start, end - start + 1), "-", start);
         }
 
         // C123T, A-del or A123del
@@ -401,7 +451,7 @@ namespace SAUtils.CreateMitoMapDb
             return (true, match.Groups["ref"].Value, match.Groups["alt"].Value, extractedPosition);
         }
 
-        private static string GetRefAllelesFromReference(ReferenceSequenceProvider sequenceProvider, int start,
+        private static string GetRefAllelesFromReference(ISequenceProvider sequenceProvider, int start,
             int length) => sequenceProvider.Sequence.Substring(start - 1, length);
 
         private static string ReverseSequence(string sequence)
@@ -427,12 +477,12 @@ namespace SAUtils.CreateMitoMapDb
                 .SelectMany(x => x).OrderBy(x => x.Position);
         }
 
-        private (int RefPosition, string RefAllele, string AltAllele) GetLeftAlignedVariant(int position, string refAllele, string altAllele)
+        private static (int RefPosition, string RefAllele, string AltAllele) GetLeftAlignedVariant(int position, string refAllele, string altAllele, VariantAligner variantAligner)
         {
             if (refAllele == null || altAllele == null) return (position, refAllele, altAllele);
             if (refAllele == "-") refAllele = "";
             if (altAllele == "-") altAllele = "";
-            var leftAlgnResults = _variantAligner.LeftAlign(position, refAllele, altAllele); 
+            var leftAlgnResults = variantAligner.LeftAlign(position, refAllele, altAllele); 
             var newPosition = leftAlgnResults.RefPosition;
             var newRefAllele = leftAlgnResults.RefAllele;
             var newAltAllele = leftAlgnResults.AltAllele;

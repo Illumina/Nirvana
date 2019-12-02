@@ -21,11 +21,11 @@ namespace SAUtils.DataStructures
             if (saItem.RefAllele == null || saItem.AltAllele == null || saItem.Position < 0)
                 return;
 
-            var newAlleles = BiDirectionalTrimmer.Trim(saItem.Position, saItem.RefAllele, saItem.AltAllele);
+            (int start, string refAllele, string altAllele) = BiDirectionalTrimmer.Trim(saItem.Position, saItem.RefAllele, saItem.AltAllele);
 
-            saItem.Position  = newAlleles.Start;
-            saItem.RefAllele = newAlleles.RefAllele;
-            saItem.AltAllele = newAlleles.AltAllele;
+            saItem.Position  = start;
+            saItem.RefAllele = refAllele;
+            saItem.AltAllele = altAllele;
 
         }
         public static List<ISupplementaryDataItem> DeDuplicatePrimateAiItems(List<ISupplementaryDataItem> saItems)
