@@ -57,6 +57,11 @@ namespace SAUtils.CreateGnomadDb
 	    private int[] _hcAsj;
 	    private int[] _hcSas;
 
+        // controls
+        private int[] _control_acAll;
+        private int _control_anAll;
+
+        private bool _isLowComplexityRegion;
         private int? _totalDepth;
         private GnomadDataType _dataType;
 
@@ -68,7 +73,8 @@ namespace SAUtils.CreateGnomadDb
 		}
 
 		private void Clear()
-		{
+        {
+            _isLowComplexityRegion = false;
 			_acAll = null;
 			_acAfr = null;
 			_acAmr = null;
@@ -106,6 +112,10 @@ namespace SAUtils.CreateGnomadDb
 		    _hcOth = null;
 		    _hcAsj = null;
 		    _hcSas = null;
+
+            //control
+            _control_acAll = null;
+            _control_anAll = 0;
 
             _totalDepth = null;
             _dataType = GnomadDataType.Unknown;
@@ -293,7 +303,11 @@ namespace SAUtils.CreateGnomadDb
 					GetCount(_hcAll, i), GetCount(_hcAfr, i), GetCount(_hcAmr, i), GetCount(_hcEas, i), GetCount(_hcFin, i),
 					GetCount(_hcNfe, i), GetCount(_hcOth, i), GetCount(_hcAsj, i), GetCount(_hcSas, i),
                     GetCount(_hcMale, i), GetCount(_hcFemale, i),
-				    hasFailedFilters,
+                    //controls
+                    _control_anAll,
+                    GetCount(_control_acAll, i),
+                    hasFailedFilters,
+                    _isLowComplexityRegion,
                     type)
 					);
 			}
@@ -319,7 +333,7 @@ namespace SAUtils.CreateGnomadDb
 		    foreach (string infoItem in infoItems)
 		    {
 		        (string key, string value) = infoItem.OptimizedKeyValue();
-
+                if (key == "lcr") _isLowComplexityRegion = true;
 		        // sanity check
 		        if (value != null) SetInfoField(key, value);
 		    }
@@ -463,6 +477,15 @@ namespace SAUtils.CreateGnomadDb
 
 			    case "nhomalt_sas":
 			        _hcSas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
+                    break;
+
+                // controls
+                case "controls_AN":
+                    _control_anAll = Convert.ToInt32(value);
+                    break;
+
+                case "controls_AC":
+                    _control_acAll = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
                 case "DP":

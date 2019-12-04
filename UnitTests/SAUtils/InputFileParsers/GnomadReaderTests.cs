@@ -48,7 +48,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var items = gnomadReader.GetCombinedItems().ToList();
 
             Assert.Equal(2, items.Count);
-            Assert.Equal("\"coverage\":218,\"failedFilter\":true,\"allAf\":0,\"allAn\":8734,\"allAc\":0,\"allHc\":0,\"afrAf\":0,\"afrAn\":2168,\"afrAc\":0,\"afrHc\":0,\"amrAf\":0,\"amrAn\":324,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":438,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":1296,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":4054,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":100,\"asjAc\":0,\"asjHc\":0,\"othAf\":0,\"othAn\":354,\"othAc\":0,\"othHc\":0,\"maleAf\":0,\"maleAn\":4898,\"maleAc\":0,\"maleHc\":0,\"femaleAf\":0,\"femaleAn\":3836,\"femaleAc\":0,\"femaleHc\":0", items[0].GetJsonString());
+            Assert.Equal("\"coverage\":218,\"failedFilter\":true,\"lowComplexityRegion\":true,\"allAf\":0,\"allAn\":8734,\"allAc\":0,\"allHc\":0,\"afrAf\":0,\"afrAn\":2168,\"afrAc\":0,\"afrHc\":0,\"amrAf\":0,\"amrAn\":324,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":438,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":1296,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":4054,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":100,\"asjAc\":0,\"asjHc\":0,\"othAf\":0,\"othAn\":354,\"othAc\":0,\"othHc\":0,\"maleAf\":0,\"maleAn\":4898,\"maleAc\":0,\"maleHc\":0,\"femaleAf\":0,\"femaleAn\":3836,\"femaleAc\":0,\"femaleHc\":0,\"controlsAllAf\":0,\"controlsAllAn\":3096,\"controlsAllAc\":0", items[0].GetJsonString());
         }
 
         private static Stream GetConflictingItemsStream()
@@ -183,7 +183,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal(15528137, items[6].Position);
 
             //this is the merged item.
-            Assert.Equal("\"coverage\":23,\"failedFilter\":true,\"allAf\":0.000476,\"allAn\":86114,\"allAc\":41,\"allHc\":0,\"afrAf\":0.003149,\"afrAn\":13018,\"afrAc\":41,\"afrHc\":0,\"amrAf\":0,\"amrAn\":11274,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":9354,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":5344,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":36372,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":1780,\"asjAc\":0,\"asjHc\":0,\"sasAf\":0,\"sasAn\":6060,\"sasAc\":0,\"sasHc\":0,\"othAf\":0,\"othAn\":2912,\"othAc\":0,\"othHc\":0,\"maleAf\":0.000335,\"maleAn\":44796,\"maleAc\":15,\"maleHc\":0,\"femaleAf\":0.000629,\"femaleAn\":41318,\"femaleAc\":26,\"femaleHc\":0", items[3].GetJsonString());
+            Assert.Equal("\"coverage\":23,\"failedFilter\":true,\"allAf\":0.000476,\"allAn\":86114,\"allAc\":41,\"allHc\":0,\"afrAf\":0.003149,\"afrAn\":13018,\"afrAc\":41,\"afrHc\":0,\"amrAf\":0,\"amrAn\":11274,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":9354,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":5344,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":36372,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":1780,\"asjAc\":0,\"asjHc\":0,\"sasAf\":0,\"sasAn\":6060,\"sasAc\":0,\"sasHc\":0,\"othAf\":0,\"othAn\":2912,\"othAc\":0,\"othHc\":0,\"maleAf\":0.000335,\"maleAn\":44796,\"maleAc\":15,\"maleHc\":0,\"femaleAf\":0.000629,\"femaleAn\":41318,\"femaleAc\":26,\"femaleHc\":0,\"controlsAllAf\":0.000476,\"controlsAllAn\":33612,\"controlsAllAc\":16", items[3].GetJsonString());
             
         }
         private Stream GetChr22_21006257_genome()

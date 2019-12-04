@@ -77,7 +77,12 @@ namespace SAUtils.CreateGnomadDb
                 item.SasHomCount,
                 item.MaleHomCount,
                 item.FemaleHomCount,
+                //controls
+                item.ControlsAllAlleleNumber,
+                item.ControlsAllAlleleCount,
+                
                 item.HasFailedFilters,
+                item.IsLowComplexityRegion,
                 item.DataType)
             ;
         }
@@ -131,7 +136,12 @@ namespace SAUtils.CreateGnomadDb
                 SaParseUtilities.Add(item1.SasHomCount, item2.SasHomCount),
                 SaParseUtilities.Add(item1.MaleHomCount, item2.MaleHomCount),
                 SaParseUtilities.Add(item1.FemaleHomCount, item2.FemaleHomCount),
+                //control
+                SaParseUtilities.Add(item1.ControlsAllAlleleNumber, item2.ControlsAllAlleleNumber),
+                SaParseUtilities.Add(item1.ControlsAllAlleleCount, item2.ControlsAllAlleleCount),
+                
                 item1.HasFailedFilters || item2.HasFailedFilters,
+                item1.IsLowComplexityRegion || item2.IsLowComplexityRegion,
                 item1.DataType
                 );
         }

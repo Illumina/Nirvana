@@ -60,9 +60,14 @@ namespace SAUtils.DataStructures
         public int? FemaleAlleleNumber { get; private set; }
         public int? FemaleHomCount { get; private set; }
 
+        //controls
+        public int? ControlsAllAlleleCount { get; private set; }
+        public int? ControlsAllAlleleNumber { get; private set; }
+        
         public int? Depth { get; private set; }
         public int? Coverage { get; }
         public bool HasFailedFilters { get; }
+        public bool IsLowComplexityRegion { get; }
         public GnomadDataType DataType { get; }
 
         #endregion
@@ -80,7 +85,10 @@ namespace SAUtils.DataStructures
             int? allHomCount, int? afrHomCount, int? amrHomCount, int? easHomCount,
             int? finHomCount, int? nfeHomCount, int? othHomCount, int? asjHomCount, int? sasHomCount,
             int? maleHomCount, int? femaleHomCount,
+            int? controlsAllAlleleNumber,
+            int? controlsAllAlleleCount,
             bool hasFailedFilters,
+            bool isLcr,
             GnomadDataType dataType)
         {
             Chromosome = chromosome;
@@ -91,7 +99,7 @@ namespace SAUtils.DataStructures
             Depth = depth;
             if (depth!=null && allAlleleNumber!=null && allAlleleNumber.Value > 0)
                 Coverage = ComputingUtilities.GetCoverage(depth.Value, allAlleleNumber.Value);
-
+            
             AllAlleleNumber = allAlleleNumber;
             AfrAlleleNumber = afrAlleleNumber;
             AmrAlleleNumber = amrAlleleNumber;
@@ -130,7 +138,12 @@ namespace SAUtils.DataStructures
             AsjHomCount = asjHomCount;
             SasHomCount = sasHomCount;
 
+            //controls
+            ControlsAllAlleleNumber = controlsAllAlleleNumber;
+            ControlsAllAlleleCount = controlsAllAlleleCount;
+            
             HasFailedFilters = hasFailedFilters;
+            IsLowComplexityRegion = isLcr;
             DataType = dataType;
 
             RemoveAlleleNumberZero();
@@ -228,6 +241,15 @@ namespace SAUtils.DataStructures
                 FemaleAlleleCount = null;
                 FemaleHomCount = null;
             }
+
+            //controls
+            if (SaUtilsCommon.IsNumberNullOrZero(ControlsAllAlleleNumber))
+            {
+                ControlsAllAlleleNumber = null;
+                ControlsAllAlleleCount = null;
+            }
+
+            
         }
 
 
@@ -238,6 +260,7 @@ namespace SAUtils.DataStructures
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddIntValue("coverage", Coverage);
 		    if (HasFailedFilters) jsonObject.AddBoolValue("failedFilter", true);
+            if (IsLowComplexityRegion) jsonObject.AddBoolValue("lowComplexityRegion", true);
 
             jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
 		    jsonObject.AddIntValue("allAn", AllAlleleNumber);
@@ -293,6 +316,12 @@ namespace SAUtils.DataStructures
             jsonObject.AddIntValue("femaleAn", FemaleAlleleNumber);
             jsonObject.AddIntValue("femaleAc", FemaleAlleleCount);
             jsonObject.AddIntValue("femaleHc", FemaleHomCount);
+
+            //controls
+            //jsonObject.AddIntValue("controlsCoverage", ControlsCoverage);
+            jsonObject.AddStringValue("controlsAllAf", ComputingUtilities.ComputeFrequency(ControlsAllAlleleNumber, ControlsAllAlleleCount), false);
+            jsonObject.AddIntValue("controlsAllAn", ControlsAllAlleleNumber);
+            jsonObject.AddIntValue("controlsAllAc", ControlsAllAlleleCount);
 
             return StringBuilderCache.GetStringAndRelease(sb);
 		}
