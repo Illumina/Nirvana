@@ -25,7 +25,7 @@ namespace SAUtils
         private readonly ExtendedBinaryWriter _memWriter;
 
         private readonly NsaBlock _block;
-        private readonly ChunkedIndex _index;
+        private readonly NsaIndex _index;
         private readonly bool _isPositional;
         private readonly bool _skipIncorrectRefEntries;
         private readonly bool _throwErrorOnConflicts;
@@ -44,7 +44,7 @@ namespace SAUtils
             _block = new NsaBlock(new Zstandard(), blockSize);
             _refProvider = refProvider;
 
-            _index = new ChunkedIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
+            _index = new NsaIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
             _memBuffer = new byte[short.MaxValue * 4];
             _memStream = new MemoryStream(_memBuffer);
             _memWriter = new ExtendedBinaryWriter(_memStream);

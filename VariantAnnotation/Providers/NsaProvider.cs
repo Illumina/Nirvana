@@ -201,17 +201,12 @@ namespace VariantAnnotation.Providers
 
         public void Dispose()
         {
-            if(_nsaReaders!=null)
-                foreach (var nsaReader in _nsaReaders)
-                {
-                    nsaReader.Dispose();
-                }
+            if (_nsaReaders == null) return;
+            foreach (var nsaReader in _nsaReaders)
+            {
+                nsaReader.Dispose();
+            }
 
-            if(_nsiReaders != null)
-                foreach (var nsiReader in _nsiReaders)
-                {
-                    nsiReader.Dispose();
-                }
         }
     }
 }

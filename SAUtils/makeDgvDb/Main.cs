@@ -64,7 +64,7 @@ namespace SAUtils.makeDgvDb
 
             using(var dgvReader = new DgvReader(GZipUtilities.GetAppropriateStreamReader(_inputFileName), referenceProvider.RefNameToChromosome))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
-            using(var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsaStream), version, referenceProvider.Assembly, SaCommon.DgvTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
+            using(var nsiWriter = new NsiWriter(nsaStream, version, referenceProvider.Assembly, SaCommon.DgvTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {
                 nsiWriter.Write(dgvReader.GetItems());
             }

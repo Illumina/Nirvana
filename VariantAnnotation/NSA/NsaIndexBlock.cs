@@ -3,14 +3,14 @@ using IO;
 
 namespace VariantAnnotation.NSA
 {
-    public sealed class Chunk
+    public sealed class NsaIndexBlock
     {
         private readonly int _start;
         private readonly int _end;
         public readonly long FilePosition;
         public readonly int Length;
 
-        public Chunk(int start, int end, long filePosition, int length)
+        public NsaIndexBlock(int start, int end, long filePosition, int length)
         {
             _start       = start;
             _end         = end;
@@ -19,7 +19,7 @@ namespace VariantAnnotation.NSA
         }
 
         [Obsolete("Use a factory method instead of an extra constructor.")]
-        public Chunk(ExtendedBinaryReader reader)
+        public NsaIndexBlock(ExtendedBinaryReader reader)
         {
             _start       = reader.ReadOptInt32();
             _end         = reader.ReadOptInt32();

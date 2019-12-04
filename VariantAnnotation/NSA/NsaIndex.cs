@@ -7,9 +7,9 @@ using VariantAnnotation.Providers;
 
 namespace VariantAnnotation.NSA
 {
-    public sealed class ChunkedIndex
+    public sealed class NsaIndex
     {
-        private readonly Dictionary<ushort, List<Chunk>> _chromChunks;
+        private readonly Dictionary<ushort, List<NsaIndexBlock>> _chromBlocks;
         private ushort _chromIndex = ushort.MaxValue;
         private readonly ExtendedBinaryWriter _writer;
 
@@ -22,7 +22,7 @@ namespace VariantAnnotation.NSA
         public readonly bool IsPositional;
 
 
-        public ChunkedIndex(ExtendedBinaryWriter indexWriter, GenomeAssembly assembly, DataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional)
+        public NsaIndex(ExtendedBinaryWriter indexWriter, GenomeAssembly assembly, DataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional)
         {
             _writer       = indexWriter;
             MatchByAllele = matchByAllele;
@@ -40,46 +40,46 @@ namespace VariantAnnotation.NSA
             indexWriter.WriteOpt(schemaVersion);
             indexWriter.Write(isPositional);
 
-            _chromChunks = new Dictionary<ushort, List<Chunk>>();
+            _chromBlocks = new Dictionary<ushort, List<NsaIndexBlock>>();
         }
 
         public void Add(ushort chromIndex, int start, int end, long filePosition, int dataLength)
         {
             _chromIndex = chromIndex;
             
-            if (! _chromChunks.ContainsKey(_chromIndex))
+            if (! _chromBlocks.ContainsKey(_chromIndex))
             {
-                _chromChunks[_chromIndex] = new List<Chunk>();
+                _chromBlocks[_chromIndex] = new List<NsaIndexBlock>();
             }
 
-            var chunk = new Chunk(start, end, filePosition, dataLength);
-            _chromChunks[_chromIndex].Add(chunk);
+            var indexBlock = new NsaIndexBlock(start, end, filePosition, dataLength);
+            _chromBlocks[_chromIndex].Add(indexBlock);
         }
 
         
         public void Write()
         {
-            _writer.WriteOpt(_chromChunks.Count);
+            _writer.WriteOpt(_chromBlocks.Count);
 
-            foreach ((ushort index, List<Chunk> chunks) in _chromChunks)
+            foreach ((ushort index, List<NsaIndexBlock> chunks) in _chromBlocks)
             {
                 _writer.WriteOpt(index);
                 _writer.WriteOpt(chunks.Count);
-                foreach (Chunk chunk in chunks)
+                foreach (NsaIndexBlock chunk in chunks)
                 {
                     chunk.Write(_writer);
                 }
             }
         }
 
-        public ChunkedIndex(Stream stream)
+        public NsaIndex(Stream stream)
         {
-            //reading the index in one shot
-            var buffer = new byte[1048576];
-            var indexLength= stream.Read(buffer, 0, 1048576);
-            using (var memStream = new MemoryStream(buffer, 0, indexLength))
+            using (var memStream = new MemoryStream())
             using (var memReader = new ExtendedBinaryReader(memStream))
             {
+                stream.CopyTo(memStream);//reading all bytes in stream to memStream
+                memStream.Position = 0;
+
                 Assembly      = (GenomeAssembly)memReader.ReadByte();
                 Version       = DataSourceVersion.Read(memReader);
                 JsonKey       = memReader.ReadAsciiString();
@@ -89,21 +89,21 @@ namespace VariantAnnotation.NSA
                 IsPositional  = memReader.ReadBoolean();
 
                 var chromCount = memReader.ReadOptInt32();
-                _chromChunks = new Dictionary<ushort, List<Chunk>>(chromCount);
+                _chromBlocks = new Dictionary<ushort, List<NsaIndexBlock>>(chromCount);
                 for (var i = 0; i < chromCount; i++)
                 {
                     var chromIndex = memReader.ReadOptUInt16();
                     var chunkCount = memReader.ReadOptInt32();
-                    _chromChunks[chromIndex] = new List<Chunk>(chunkCount);
+                    _chromBlocks[chromIndex] = new List<NsaIndexBlock>(chunkCount);
                     for (var j = 0; j < chunkCount; j++)
-                        _chromChunks[chromIndex].Add(new Chunk(memReader));
+                        _chromBlocks[chromIndex].Add(new NsaIndexBlock(memReader));
                 }
             }
         }
 
         public long GetFileLocation(ushort chromIndex, int start)
         {
-            if (_chromChunks == null || !_chromChunks.TryGetValue(chromIndex, out var chunks)) return -1;
+            if (_chromBlocks == null || !_chromBlocks.TryGetValue(chromIndex, out var chunks)) return -1;
             var index = BinarySearch(chunks, start);
 
             if (index < 0) return -1;
@@ -113,7 +113,7 @@ namespace VariantAnnotation.NSA
         public (long startFilePosition, int chunkCount) GetFileRange(ushort chromIndex, int start, int end)
         {
             //create a static empty entry.
-            if (_chromChunks == null || !_chromChunks.TryGetValue(chromIndex, out var chunks)) return (-1, 0);
+            if (_chromBlocks == null || !_chromBlocks.TryGetValue(chromIndex, out var chunks)) return (-1, 0);
 
             long startFilePosition = -1;
             long endFilePosition = -1;
@@ -136,7 +136,7 @@ namespace VariantAnnotation.NSA
             return (startFilePosition, endChunkIndex - startChunkIndex + 1);
         }
 
-        private static int BinarySearch(List<Chunk> chunks, int position)
+        private static int BinarySearch(List<NsaIndexBlock> chunks, int position)
         {
             var begin = 0;
             int end = chunks.Count - 1;

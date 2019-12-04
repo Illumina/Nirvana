@@ -38,15 +38,14 @@ namespace UnitTests.SAUtils.NsaWriters
 
             using (var saStream = new MemoryStream())
             {
-                using (var extWriter = new BinaryWriter(saStream, Encoding.UTF8, true))
-                using(var siWriter = new NsiWriter(extWriter, version, GenomeAssembly.GRCh37, "clingen",
-                    ReportFor.StructuralVariants, SaCommon.SchemaVersion))
+                using(var siWriter = new NsiWriter(saStream, version, GenomeAssembly.GRCh37, "clingen",
+                    ReportFor.StructuralVariants, SaCommon.SchemaVersion, true))
                 {
                     siWriter.Write(GetClinGenItems());
                 }
                 saStream.Position = 0;
 
-                var siReader = new NsiReader(saStream);
+                var siReader = NsiReader.Read(saStream);
                 var annotations = siReader.GetAnnotation(new Variant(chrom1, 100, 14590, "", "<DEL>", VariantType.deletion, "1:100:14590:del", false, false, false, null, null, null, true)).ToArray();
 
                 string[] expected = {

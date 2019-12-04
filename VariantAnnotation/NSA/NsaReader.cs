@@ -27,7 +27,7 @@ namespace VariantAnnotation.NSA
         private readonly Stream _stream;
         private readonly ExtendedBinaryReader _reader;
         public GenomeAssembly Assembly { get; }
-        private readonly ChunkedIndex _index;
+        private readonly NsaIndex _index;
         public IDataSourceVersion Version { get; }
 
         private readonly NsaBlock _block;
@@ -45,7 +45,7 @@ namespace VariantAnnotation.NSA
             _reader = new ExtendedBinaryReader(_stream);
             _block = new NsaBlock(new Zstandard(), blockSize);
 
-            _index = new ChunkedIndex(indexStream);
+            _index = new NsaIndex(indexStream);
             Assembly = _index.Assembly;
             Version = _index.Version;
             JsonKey = _index.JsonKey;

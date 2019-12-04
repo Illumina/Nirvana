@@ -10,6 +10,7 @@
 
         public const uint GuardInt        = 4041327495;
         public const string NgaIdentifier = "NirvanaGenes";
+        public const string NsiIdentifier = "NirvanaSupplementaryIntervals";
 
         public const string IndexSufix         = ".idx";
         public const string SaFileSuffix       = ".nsa";

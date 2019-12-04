@@ -34,11 +34,11 @@ namespace Nirvana
         public static IAnnotationProvider GetNsaProvider(AnnotationFiles files)
         {
             if (files == null) return null;
-
+            //todo: use using block to release nsa streams
             var nsaReaders = files.NsaFiles?.Select(x => new NsaReader(PersistentStreamUtils.GetReadStream(x.Nsa), PersistentStreamUtils.GetReadStream(x.Idx)))
                                             .OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray() ?? new INsaReader[] { };
-     
-            var nsiReaders = files.NsiFiles?.Select(x => new NsiReader(PersistentStreamUtils.GetReadStream(x)))
+            //todo: use using block to release nsi streams
+            var nsiReaders = files.NsiFiles?.Select(x => NsiReader.Read(PersistentStreamUtils.GetReadStream(x)))
                                             .OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray() ?? new INsiReader[] { };
 
             if (nsaReaders.Length == 0 && nsiReaders.Length == 0) return null;

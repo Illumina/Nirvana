@@ -67,7 +67,7 @@ namespace SAUtils.MakeOnekSvDb
             using(var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileName))
             using(var oneKGenSvReader = new OneKGenSvReader(reader, referenceProvider.RefNameToChromosome))
             using(var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
-            using(var nsiWriter = new NsiWriter(new ExtendedBinaryWriter(nsaStream), version, referenceProvider.Assembly,
+            using(var nsiWriter = new NsiWriter(nsaStream, version, referenceProvider.Assembly,
                 SaCommon.OnekSvTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {
                 nsiWriter.Write(oneKGenSvReader.GetItems());

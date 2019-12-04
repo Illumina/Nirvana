@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.NSA
             var stream = new MemoryStream();
             var writer = new ExtendedBinaryWriter(stream);
             var version = new DataSourceVersion("dbsnp", "150", DateTime.Now.Ticks, "dbsnp ids");
-            var index = new ChunkedIndex(writer, GenomeAssembly.GRCh37, version, "dbsnp", true, true, SaCommon.SchemaVersion, false);
+            var index = new NsaIndex(writer, GenomeAssembly.GRCh37, version, "dbsnp", true, true, SaCommon.SchemaVersion, false);
 
             index.Add(0, 100, 2000, 23457, 89320);
             index.Add(0, 2100, 4000, 112778, 58746);
@@ -54,7 +54,7 @@ namespace UnitTests.VariantAnnotation.NSA
             var stream = new MemoryStream();
             var writer = new ExtendedBinaryWriter(stream);
             var version = new DataSourceVersion("dbsnp", "150", DateTime.Now.Ticks, "dbsnp ids");
-            var index = new ChunkedIndex(writer, GenomeAssembly.GRCh37, version, "dbsnp", true, true, SaCommon.SchemaVersion, false);
+            var index = new NsaIndex(writer, GenomeAssembly.GRCh37, version, "dbsnp", true, true, SaCommon.SchemaVersion, false);
 
             index.Add(0, 100, 2000, 23457, 89320);
             index.Add(0, 2100, 4000, 112778, 58746);

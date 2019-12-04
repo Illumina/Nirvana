@@ -12,17 +12,26 @@ namespace VariantAnnotation.NSA
         public IChromosome Chromosome { get; }
         private readonly string _jsonString;
 
-        [Obsolete("Constructors should have parameters. Factory methods can use readers.")]
-        public SuppInterval(ExtendedBinaryReader reader)
+        private SuppInterval(IChromosome chromosome, int start, int end, string jsonString)
+        {
+            Chromosome  = chromosome;
+            Start       = start;
+            End         = end;
+            _jsonString = jsonString;
+        }
+
+        public static SuppInterval Read(ExtendedBinaryReader reader)
         {
             string ensemblName = reader.ReadAsciiString();
             string ucscName    = reader.ReadAsciiString();
             ushort chromIndex  = reader.ReadOptUInt16();
-            Chromosome         = new Chromosome(ucscName, ensemblName, chromIndex);
+            var chromosome     = new Chromosome(ucscName, ensemblName, chromIndex);
 
-            Start       = reader.ReadOptInt32();
-            End         = reader.ReadOptInt32();
-            _jsonString = reader.ReadString();
+            var start       = reader.ReadOptInt32();
+            var end         = reader.ReadOptInt32();
+            var jsonString  = reader.ReadString();
+
+            return new SuppInterval(chromosome, start, end, jsonString);
         }
 
         public string GetJsonString() => _jsonString;

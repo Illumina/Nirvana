@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
+using System.Text;
 using Compression.Algorithms;
+using Compression.FileHandling;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
@@ -16,54 +19,71 @@ namespace VariantAnnotation.NSA
 {
     public sealed class NsiReader : INsiReader
     {
-        private readonly Stream _stream;
         public GenomeAssembly Assembly { get; }
         public IDataSourceVersion Version { get; }
         public string JsonKey { get; }
         public ReportFor ReportFor { get; }
         private readonly Dictionary<ushort, IntervalArray<string>> _intervalArrays;
 
-        private const int MaxStreamLength = 10 * 1048576;
-        public NsiReader(Stream stream)
+        private NsiReader(GenomeAssembly assembly, IDataSourceVersion version, string jsonKey, ReportFor reportFor, Dictionary<ushort, IntervalArray<string>> intervalArrays)
         {
-            _stream = stream;
-            var compressData = new byte[MaxStreamLength];
-            int length = stream.Read(compressData, 0, MaxStreamLength);
-            //uncompress
-            var zstd = new Zstandard();
-            var decompressedLength = zstd.GetDecompressedLength(compressData, length);
-            var decompressedData = new byte[decompressedLength];
-            zstd.Decompress(compressData, length, decompressedData, decompressedLength);
+            Assembly        = assembly;
+            Version         = version;
+            JsonKey         = jsonKey;
+            ReportFor       = reportFor;
+            _intervalArrays = intervalArrays;
+        }
 
-            using (var memStream = new MemoryStream(decompressedData, 0, decompressedLength))
-            using (var memReader = new ExtendedBinaryReader(memStream))
+        public static NsiReader Read(Stream stream)
+        {
+            (IDataSourceVersion version, GenomeAssembly assembly, string jsonKey, ReportFor reportFor, int schemaVersion) = ReadHeader(stream);
+            if (schemaVersion != SaCommon.SchemaVersion)
+                throw new UserErrorException($"Schema version mismatch!! Expected {SaCommon.SchemaVersion}, observed {schemaVersion} for {jsonKey}");
+
+            using (var blockStream = new BlockStream(new Zstandard(), stream, CompressionMode.Decompress))
+            using (var reader = new ExtendedBinaryReader(blockStream))
             {
-                Version   = DataSourceVersion.Read(memReader);
-                Assembly  = (GenomeAssembly)memReader.ReadByte();
-                JsonKey   = memReader.ReadAsciiString();
-                ReportFor = (ReportFor)memReader.ReadByte();
-                int schemaVersion = memReader.ReadOptInt32();
-
-                if (schemaVersion != SaCommon.SchemaVersion)
-                    throw new UserErrorException($"Schema version mismatch!! Expected {SaCommon.SchemaVersion}, observed {schemaVersion} for {JsonKey}");
-
-                
-                int count = memReader.ReadOptInt32();
+                int count = reader.ReadOptInt32();
                 var suppIntervals = new Dictionary<ushort, List<Interval<string>>>();
                 for (var i = 0; i < count; i++)
                 {
-                    var saInterval = new SuppInterval(memReader);
+                    var saInterval = SuppInterval.Read(reader);
                     if (suppIntervals.TryGetValue(saInterval.Chromosome.Index, out var intervals)) intervals.Add(new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()));
                     else suppIntervals[saInterval.Chromosome.Index] = new List<Interval<string>> { new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()) };
                 }
 
-                _intervalArrays = new Dictionary<ushort, IntervalArray<string>>(suppIntervals.Count);
+                var intervalArrays = new Dictionary<ushort, IntervalArray<string>>(suppIntervals.Count);
                 foreach ((ushort chromIndex, List<Interval<string>> intervals) in suppIntervals)
                 {
-                    _intervalArrays[chromIndex] = new IntervalArray<string>(intervals.ToArray());
+                    intervalArrays[chromIndex] = new IntervalArray<string>(intervals.ToArray());
                 }
+
+                return new NsiReader(assembly, version, jsonKey, reportFor, intervalArrays);
             }
             
+        }
+
+        private static (IDataSourceVersion, GenomeAssembly, string, ReportFor, int) ReadHeader(Stream stream)
+        {
+
+            using (var reader = new ExtendedBinaryReader(stream, Encoding.UTF8, true))
+            {
+                var identifier = reader.ReadAsciiString();
+                if(identifier != SaCommon.NsiIdentifier)
+                    throw new InvalidDataException($"Failed to find identifier!!Expected: {SaCommon.NsiIdentifier}, observed:{identifier}");
+
+                var version       = DataSourceVersion.Read(reader);
+                var assembly      = (GenomeAssembly)reader.ReadByte();
+                var jsonKey       = reader.ReadAsciiString();
+                var reportFor     = (ReportFor)reader.ReadByte();
+                int schemaVersion = reader.ReadInt32();
+                
+                var guard = reader.ReadUInt32();
+                if (guard != SaCommon.GuardInt)
+                    throw new InvalidDataException($"Failed to find guard int!!Expected: {SaCommon.GuardInt}, observed:{guard}");
+
+                return (version, assembly, jsonKey, reportFor, schemaVersion);
+            }
         }
 
         public IEnumerable<string> GetAnnotation(IVariant variant)
@@ -95,9 +115,6 @@ namespace VariantAnnotation.NSA
             return jsonString;
         }
 
-        public void Dispose()
-        {
-            _stream?.Dispose();
-        }
+        
     }
 }

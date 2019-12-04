@@ -33,7 +33,7 @@ namespace SAUtils.Custom
             );
         }
 
-        public static NsiWriter GetNsiWriter(Stream nsiStream, DataSourceVersion version, GenomeAssembly assembly, string jsonTag) => new NsiWriter(new ExtendedBinaryWriter(nsiStream), version, assembly, jsonTag, ReportFor.AllVariants, SaCommon.SchemaVersion);
+        public static NsiWriter GetNsiWriter(Stream nsiStream, DataSourceVersion version, GenomeAssembly assembly, string jsonTag) => new NsiWriter(nsiStream, version, assembly, jsonTag, ReportFor.AllVariants, SaCommon.SchemaVersion);
 
         public static NgaWriter GetNgaWriter(Stream ngaStream, GeneAnnotationsParser parser, string dataVersion)
         {

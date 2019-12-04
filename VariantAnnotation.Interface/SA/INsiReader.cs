@@ -6,7 +6,7 @@ using Variants;
 
 namespace VariantAnnotation.Interface.SA
 {
-    public interface INsiReader:IDisposable
+    public interface INsiReader
     {
         GenomeAssembly Assembly { get; }
         IDataSourceVersion Version { get; }
