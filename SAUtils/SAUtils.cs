@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
+using SAUtils.ClinGen;
 using SAUtils.CreateMitoMapDb;
 using SAUtils.DbSnpRemapper;
 using SAUtils.dbVar;
@@ -50,6 +51,7 @@ namespace SAUtils
                 ["spliceAi"]              = new TopLevelOption("create SpliceAI database", SpliceAiDb.Run),
                 ["primateAi"]             = new TopLevelOption("create PrimateAI database", PrimateAiDb.Run),
                 ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run),
+                ["diseaseValidity"]       = new TopLevelOption("create disease validity database", GeneDiseaseValidity.Run),
                 ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run)
             };
 

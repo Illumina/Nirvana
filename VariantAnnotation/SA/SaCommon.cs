@@ -39,6 +39,7 @@
         public const string ExacScoreTag         = "exac";
         public const string GnomadGeneScoreTag   = "gnomAD";
         public const string DosageSensitivityTag = "clingenDosageSensitivityMap";
+        public const string DiseaseValidityTag   = "clingenGeneValidity";
         public const string SpliceAiTag          = "spliceAI";
         public const string PrimateAiTag         = "primateAI";
         public const string MitoHeteroplasmyTag  = "heteroplasmy";

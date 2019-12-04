@@ -51,7 +51,6 @@ namespace SAUtils.dbVar
 
             string outFileName = $"{dosageSensitivityVersion.Name.Replace(' ','_')}_{dosageSensitivityVersion.Version}";
 
-            //create universal gene archive
             using (var dosageSensitivityParser= new DosageSensitivityParser(GZipUtilities.GetAppropriateReadStream(_dosageSensitivityFile)))
             using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
             using (var ngaWriter = new NgaWriter(stream, dosageSensitivityVersion, SaCommon.DosageSensitivityTag, SaCommon.SchemaVersion, false))

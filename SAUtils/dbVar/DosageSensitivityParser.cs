@@ -10,6 +10,18 @@ namespace SAUtils.dbVar
     {
         private readonly Stream _stream;
 
+        private const string GeneSymbolTag = "#Gene Symbol";
+        private const string GeneIdTag = "Gene ID";
+        private const string HaploInsufficiencyScoreTag = "Haploinsufficiency Score";
+        private const string TriploSensitivityScoreTag = "Triplosensitivity Score";
+
+        private int _geneSymbolIndex = -1;
+        private int _geneIdIndex = -1;
+        private int _haploInsufficiencyScoreIndex = -1;
+        private int _triploSensitivityScoreIndex = -1;
+
+
+
         public DosageSensitivityParser(Stream stream)
         {
             _stream = stream;
@@ -68,18 +80,7 @@ namespace SAUtils.dbVar
         {
             if (line.StartsWith("#Gene Symbol")) GetColumnIndices(line);
         }
-
-        private const string GeneSymbolTag                    = "#Gene Symbol";
-        private const string GeneIdTag                        = "Gene ID";
-        private const string HaploInsufficiencyScoreTag       = "Haploinsufficiency Score";
-        private const string TriploSensitivityScoreTag        = "Triplosensitivity Score";
-
-        private int _geneSymbolIndex                    = -1;
-        private int _geneIdIndex                        = -1;
-        private int _haploInsufficiencyScoreIndex       = -1;
-        private int _triploSensitivityScoreIndex        = -1;
-
-
+        
         private void GetColumnIndices(string line)
         {
             var cols = line.OptimizedSplit('\t');
