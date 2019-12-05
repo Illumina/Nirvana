@@ -83,8 +83,11 @@ namespace SAUtils.InputFileParsers.OneKGen
 		    if (!_refNameDict.ContainsKey(chromosomeName)) return null;
 		    var chromosome = _refNameDict[chromosomeName];
 		    var position = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
-		    var id = splitLine[VcfCommon.IdIndex];
-		    //var refAllele = splitLine[VcfCommon.RefIndex];
+		    var id = RemoveMissingValues(splitLine[VcfCommon.IdIndex]);
+		    
+            var altAllele = splitLine[VcfCommon.AltIndex];
+            if (altAllele.StartsWith("<INS:ME:")) return null;
+
 		    var infoFields = splitLine[VcfCommon.InfoIndex];
             Clear();
 		    ParseInfoField(infoFields);
@@ -103,7 +106,13 @@ namespace SAUtils.InputFileParsers.OneKGen
                 _allAlleleFrequency, _afrAlleleFrequency, _amrAlleleFrequency, _easAlleleFrequency, _eurAlleleFrequency, _sasAlleleFrequency);
 		}
 
-	    private void ParseInfoField(string infoFields)
+        private string RemoveMissingValues(string idField)
+        {
+            var ids = idField.OptimizedSplit(';');
+            return string.Join(';', ids.Where(id => id != "."));
+        }
+
+        private void ParseInfoField(string infoFields)
 	    {
 	        if (infoFields == "" || infoFields == ".") return;
 	        var infoItems = infoFields.OptimizedSplit(';');

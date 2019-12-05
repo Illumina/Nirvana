@@ -118,6 +118,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             writer.WriteLine("1\t713044\tesv3584977;esv3584978\tC\t<CN0>,<CN2>\t100\tPASS\tAC=3,206;AF=0.000599042,0.0411342;AN=5008;CS=DUP_gs;END=755966;NS=2504;SVTYPE=CNV;DP=20698;EAS_AF=0.001,0.0615;AMR_AF=0.0014,0.0259;AFR_AF=0,0.0303;EUR_AF=0.001,0.0417;SAS_AF=0,0.045;VT=SV;EX_TARGET");
             writer.WriteLine("1\t738570\tesv3584979\tG\t<CN0>\t100\tPASS\tAC=1;AF=0.000199681;AN=5008;CIEND=0,354;CIPOS=-348,0;CS=DEL_union;END=742020;NS=2504;SVTYPE=DEL;DP=19859;EAS_AF=0.001;AMR_AF=0;AFR_AF=0;EUR_AF=0;SAS_AF=0;VT=SV;EX_TARGET");
             writer.WriteLine("1\t645710\tesv3584975\tA\t<INS:ME:ALU>\t100\tPASS\tAC=35;AF=0.00698882;AN=5008;CS=ALU_umary;MEINFO=AluYa4_5,1,223,-;NS=2504;SVLEN=222;SVTYPE=ALU;TSD=null;DP=12290;EAS_AF=0.0069;AMR_AF=0.0072;AFR_AF=0;EUR_AF=0.0189;SAS_AF=0.0041;VT=SV");
+            writer.WriteLine("1\t812283\tesv3584985\tG\t<INS:ME:LINE1>\t100\tPASS\tAC=58;AF=0.0115815;AN=5008;CS=L1_umary;MEINFO=LINE1,2926,3363,+;NS=2504;SVLEN=437;SVTYPE=LINE1;TSD=null;DP=19016;EAS_AF=0.0109;AMR_AF=0.0187;AFR_AF=0.0098;EUR_AF=0.0179;SAS_AF=0.0031;VT=SV");
+            writer.WriteLine("1\t2397655\t.;esv3585028\tC\t<CN0>,<CN2>\t100\tPASS\tAC=0,96;AF=0,0.0191693;AN=5008;CS=DUP_gs;END=2401469;NS=2504;SVTYPE=DUP;DP=16784;EAS_AF=0,0.0248;AMR_AF=0,0.0216;AFR_AF=0,0.0287;EUR_AF=0,0.0119;SAS_AF=0,0.0061;VT=SV");
             writer.Flush();
 
             stream.Position = 0;
@@ -141,8 +143,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
                 Assert.Equal("\"chromosome\":\"1\",\"begin\":738571,\"end\":742020,\"variantType\":\"copy_number_loss\",\"id\":\"esv3584979\",\"allAn\":5008,\"allAc\":1,\"allAf\":0.0002,\"afrAf\":0,\"amrAf\":0,\"eurAf\":0,\"easAf\":0.001,\"sasAf\":0", svItemList[2].GetJsonString());
 
-                Assert.Equal("\"chromosome\":\"1\",\"begin\":645711,\"end\":645932,\"variantType\":\"mobile_element_insertion\",\"id\":\"esv3584975\",\"allAn\":5008,\"allAc\":35,\"allAf\":0.006989,\"afrAf\":0,\"amrAf\":0.0072,\"eurAf\":0.0189,\"easAf\":0.0069,\"sasAf\":0.0041", svItemList[3].GetJsonString());
-
+                Assert.Equal("\"chromosome\":\"1\",\"begin\":2397656,\"end\":2401469,\"variantType\":\"copy_number_gain\",\"id\":\"esv3585028\",\"allAn\":5008,\"allAc\":96,\"allAf\":0.019169,\"afrAf\":0.0287,\"amrAf\":0.0216,\"eurAf\":0.0119,\"easAf\":0.0248,\"sasAf\":0.0061", svItemList[3].GetJsonString());
 
             }
 
