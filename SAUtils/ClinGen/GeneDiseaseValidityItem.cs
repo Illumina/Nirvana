@@ -1,6 +1,9 @@
-﻿using OptimizedCore;
+﻿using System;
+using System.Globalization;
+using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
+using VariantAnnotation.Utilities;
 
 namespace SAUtils.ClinGen
 {
@@ -39,7 +42,13 @@ namespace SAUtils.ClinGen
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        
+        public int CompareDate(GeneDiseaseValidityItem other)
+        {
+            var date = DateTime.ParseExact(ClassificationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var otherDate = DateTime.ParseExact(other.ClassificationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+            return date.CompareTo(otherDate);
+        }
     }
 
 }

@@ -24,6 +24,8 @@ namespace UnitTests.SAUtils.ClinGen
             writer.WriteLine("AARS\tHGNC:20\tundetermined early-onset epileptic encephalopathy\tMONDO_0018614\tSOP6\tLimited\thttps://search.clinicalgenome.org/kb/gene-validity/ac62fe65-ee56-4146-9fe4-00dc1db2d958--2018-11-20T17:00:00\t2018-11-20T17:00:00.000Z");
             writer.WriteLine("AASS\tHGNC:17366\thyperlysinemia (disease)\tMONDO_0009388\tSOP6\tModerate\thttps://search.clinicalgenome.org/kb/gene-validity/92e04f9e-f03e-4295-baac-e9fb6b48a258--2019-11-08T17:00:00\t2019-11-08T17:00:00.000Z");
             writer.WriteLine("ABCC9\tHGNC:60\thypertrichotic osteochondrodysplasia Cantu type\tMONDO_0009406\tSOP4\tDefinitive\thttps://search.clinicalgenome.org/kb/gene-validity/10028\t2017-09-27T00:00:00");
+            //duplicate item
+            writer.WriteLine("ABCC9\tHGNC:60\thypertrichotic osteochondrodysplasia Cantu type\tMONDO_0009406\tSOP4\tDefinitive\thttps://search.clinicalgenome.org/kb/gene-validity/10028\t2017-10-27T00:00:00");
 
             writer.Flush();
 
@@ -52,6 +54,10 @@ namespace UnitTests.SAUtils.ClinGen
             Assert.Equal(3, firstGene.Count);
 
             Assert.Equal("{\"diseaseId\":\"MONDO_0007893\",\"disease\":\"Noonan syndrome with multiple lentigines\",\"classification\":\"no reported evidence\",\"classificationDate\":\"2018-06-07\"}", firstGene[0].GetJsonString());
+
+            var thirdGene = items["ABCC9"];
+            Assert.Single(thirdGene);
+            Assert.Equal("{\"diseaseId\":\"MONDO_0009406\",\"disease\":\"hypertrichotic osteochondrodysplasia Cantu type\",\"classification\":\"definitive\",\"classificationDate\":\"2017-10-27\"}", thirdGene[0].GetJsonString());
         }
         
     }

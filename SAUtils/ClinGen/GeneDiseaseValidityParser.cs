@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 
@@ -35,7 +36,7 @@ namespace SAUtils.ClinGen
 
         public Dictionary<string, List<ISuppGeneItem>> GetItems()
         {
-            var geneAnnotations = new Dictionary<string, List<ISuppGeneItem>>();
+            var geneAnnotations = new Dictionary<string, Dictionary<string,GeneDiseaseValidityItem>>();
 
             using (var reader = new StreamReader(_stream))
             {
@@ -65,18 +66,46 @@ namespace SAUtils.ClinGen
                     var geneAnnotation = GetAnnotationItem(line);
                     if(geneAnnotation == null) continue;
 
-                    if(geneAnnotations.TryGetValue(geneAnnotation.GeneSymbol, out var annotations)) annotations.Add(geneAnnotation);
-                    else geneAnnotations.Add(geneAnnotation.GeneSymbol, new List<ISuppGeneItem> { geneAnnotation });
-                    
+                    if (geneAnnotations.TryGetValue(geneAnnotation.GeneSymbol, out var annotations))
+                        AddLatest(annotations, geneAnnotation);
+                    else geneAnnotations.Add(geneAnnotation.GeneSymbol, new Dictionary<string, GeneDiseaseValidityItem>(){{geneAnnotation.DiseaseId, geneAnnotation}});
+
                 }
             }
 
             Console.WriteLine($"Number of geneIds missing from the cache:{_unknownIds.Count} ({100.0*_unknownIds.Count/_hgncIdToSymbols.Count}%)");
             
-            return geneAnnotations;
-
+            return GetLatestAnnotations(geneAnnotations);
         }
-        private ISuppGeneItem GetAnnotationItem(string line)
+
+        private static Dictionary<string, List<ISuppGeneItem>> GetLatestAnnotations(Dictionary<string, Dictionary<string, GeneDiseaseValidityItem>> annotationByDiseaseIds)
+        {
+            var latestAnnotations = new Dictionary<string, List<ISuppGeneItem>>();
+            foreach (var annotation in annotationByDiseaseIds)
+            {
+                var geneAnnotation = new List<ISuppGeneItem>();
+                foreach (var geneAnno in annotation.Value.Values)
+                {
+                    geneAnnotation.Add(geneAnno);
+                }
+
+                latestAnnotations.Add(annotation.Key, geneAnnotation);
+            }
+
+            return latestAnnotations;
+        }
+
+        private void AddLatest(Dictionary<string, GeneDiseaseValidityItem> annotations, GeneDiseaseValidityItem geneAnnotation)
+        {
+            if(!annotations.TryGetValue(geneAnnotation.DiseaseId, out var diseaseItem)) annotations.Add(geneAnnotation.DiseaseId, geneAnnotation);
+            else
+            {
+                if (diseaseItem.CompareDate(geneAnnotation) < 0) annotations[geneAnnotation.DiseaseId] = geneAnnotation;
+            }
+        }
+
+
+        private GeneDiseaseValidityItem GetAnnotationItem(string line)
         {
             var cols = line.OptimizedSplit('\t');
 
