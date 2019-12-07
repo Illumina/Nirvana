@@ -7,7 +7,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using OptimizedCore;
-using SAUtils.dbVar;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.SA;
 

@@ -28,7 +28,7 @@ namespace GeneAnnotationLambda
     public class GeneAnnotationLambda
     {
         private readonly string _saPathPrefix = LambdaUrlHelper.GetBaseUrl();
-        private readonly string _saManifestUrl = $"{LambdaUrlHelper.GetBaseUrl()}latest_SA_GRCh37.txt";
+        private readonly string _saManifestUrl = LambdaUtilities.GetManifestUrl(null, GenomeAssembly.GRCh37);
 
         // ReSharper disable once UnusedMember.Global
         public Stream Run(GeneConfig config, ILambdaContext context)

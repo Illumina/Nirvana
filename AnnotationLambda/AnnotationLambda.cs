@@ -17,7 +17,6 @@ using IO;
 using Nirvana;
 using Vcf;
 using Tabix;
-using static ErrorHandling.ExitCodeUtilities;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 

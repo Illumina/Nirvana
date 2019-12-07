@@ -1,5 +1,4 @@
-﻿using CacheUtils.Genes.DataStores;
-using Genome;
+﻿using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;

@@ -37,7 +37,7 @@ namespace Cloud.Utilities
             switch (version)
             {
                 case "latest":
-                    return $"{s3BaseUrl}latest_SA_{genomeAssembly}.txt";
+                    return $"{s3BaseUrl}latest_blue_SA_{genomeAssembly}.txt";
                 case "release":
                     return $"{s3BaseUrl}DRAGEN_3.4_{genomeAssembly}.txt";
                 default:

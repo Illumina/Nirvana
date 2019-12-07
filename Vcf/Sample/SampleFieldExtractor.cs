@@ -1,5 +1,4 @@
-﻿using System;
-using OptimizedCore;
+﻿using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using Vcf.Sample.Legacy;

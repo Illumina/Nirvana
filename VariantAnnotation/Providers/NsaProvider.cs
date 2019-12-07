@@ -9,7 +9,6 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
-using VariantAnnotation.SA;
 using Variants;
 
 namespace VariantAnnotation.Providers

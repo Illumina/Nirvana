@@ -8,7 +8,6 @@ using VariantAnnotation.IO;
 using Variants;
 using Vcf;
 using Xunit;
-using Enumerable = System.Linq.Enumerable;
 
 namespace UnitTests.RepeatExpansions
 {

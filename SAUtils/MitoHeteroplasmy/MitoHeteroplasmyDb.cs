@@ -5,9 +5,6 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.InputFileParsers;
-using SAUtils.PrimateAi;
-using VariantAnnotation.Caches;
-using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 

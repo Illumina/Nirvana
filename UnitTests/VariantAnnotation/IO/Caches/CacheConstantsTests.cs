@@ -1,5 +1,4 @@
 ﻿using IO;
-using VariantAnnotation.IO.Caches;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO.Caches

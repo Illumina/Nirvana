@@ -111,12 +111,12 @@ namespace SingleAnnotationLambda
             string cachePathPrefix        = CacheUtilities.GetCachePathPrefix(lambdaConfig.vepVersion, genomeAssembly);
             string nirvanaS3Ref           = LambdaUrlHelper.GetRefUrl(genomeAssembly);
 
-            List<string> saManifestUrls = SupplementaryAnnotationUtilities.GetManifestUrls(lambdaConfig.supplementaryAnnotations, genomeAssembly);
+            string saManifestUrl        = LambdaUtilities.GetManifestUrl(lambdaConfig.supplementaryAnnotations, genomeAssembly);
             string annotatorVersion     = "Nirvana " + CommandLineUtilities.GetVersion(Assembly.GetAssembly(typeof(SingleAnnotationLambda)));
 
             Logger.LogLine($"Cache prefix: {cachePathPrefix}");
 
-            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, saManifestUrls, lambdaConfig.customAnnotations, false, false)
+            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string>(){ saManifestUrl}, lambdaConfig.customAnnotations, false, false)
             {
                 AnnotatorVersionTag = annotatorVersion
             };

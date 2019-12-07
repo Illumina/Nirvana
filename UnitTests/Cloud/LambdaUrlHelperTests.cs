@@ -1,6 +1,4 @@
-﻿using System;
-using Cloud;
-using Cloud.Utilities;
+﻿using Cloud;
 using Genome;
 using Xunit;
 

@@ -4,7 +4,6 @@ using Downloader;
 using Downloader.FileExtensions;
 using Genome;
 using IO;
-using VariantAnnotation.IO.Caches;
 using Xunit;
 
 namespace UnitTests.Downloader.FileExtensions

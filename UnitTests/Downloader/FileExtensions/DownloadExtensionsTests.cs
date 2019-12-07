@@ -5,7 +5,6 @@ using Downloader;
 using Downloader.FileExtensions;
 using IO;
 using Moq;
-using VariantAnnotation.IO.Caches;
 using Xunit;
 
 namespace UnitTests.Downloader.FileExtensions

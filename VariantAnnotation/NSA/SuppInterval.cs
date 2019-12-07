@@ -1,5 +1,4 @@
-﻿using System;
-using Genome;
+﻿using Genome;
 using IO;
 using VariantAnnotation.Interface.SA;
 
