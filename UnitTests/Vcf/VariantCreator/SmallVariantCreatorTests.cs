@@ -3,7 +3,7 @@ using Variants;
 using Vcf.VariantCreator;
 using Xunit;
 
-namespace UnitTests.Vcf
+namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class SmallVariantCreatorTests
     {

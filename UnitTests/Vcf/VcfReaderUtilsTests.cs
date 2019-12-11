@@ -97,7 +97,7 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["chr1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome, false);
 
             var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, seqProvider, variantFactory);
 
@@ -123,7 +123,7 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome, false);
 
 
             var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
@@ -149,7 +149,7 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome, false);
 
             var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);

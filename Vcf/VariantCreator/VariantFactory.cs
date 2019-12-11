@@ -15,11 +15,13 @@ namespace Vcf.VariantCreator
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly ISequence _sequence;
         public readonly FormatIndices FormatIndices = new FormatIndices();
+        private readonly bool _useBroadVids;
 
-        public VariantFactory(ISequence sequence, IDictionary<string, IChromosome> refNameToChromosome)
+        public VariantFactory(ISequence sequence, IDictionary<string, IChromosome> refNameToChromosome, bool useLegacyVids)
         {
             _sequence            = sequence;
             _refNameToChromosome = refNameToChromosome;
+            _useBroadVids        = !useLegacyVids;
         }
 
         public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
@@ -73,7 +75,18 @@ namespace Vcf.VariantCreator
         private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
             IInfoData infoData, VariantCategory category, bool isDecomposed, bool isRecomposed, string[] linkedVids)
         {
-            string vid = VariantId.Create(_sequence, category, infoData.SvType, chromosome, start, end, refAllele, altAllele);
+            string vid;
+            if (_useBroadVids)
+            {
+                vid = VariantId.Create(_sequence, category, infoData.SvType, chromosome, start, end, refAllele,
+                    altAllele);
+            }
+            else
+            {
+                vid = LegacyVariantId.Create(_refNameToChromosome, category, infoData.SvType, chromosome, start, end,
+                    refAllele, altAllele, infoData.RepeatUnit);
+            }
+
             int svEnd  = infoData.End ?? start;
 
             // ReSharper disable once SwitchStatementMissingSomeCases

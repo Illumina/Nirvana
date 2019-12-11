@@ -19,12 +19,13 @@ namespace Nirvana
     public static class StreamAnnotation
     {
         public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
-            Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter, bool ignoreEmptyChromosome = false)
+            Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter,
+            bool ignoreEmptyChromosome, bool useLegacyVids)
         {
             var logger  = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
             var metrics = new PerformanceMetrics(logger);
 
-            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter))
+            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, useLegacyVids))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {
                 try
@@ -80,7 +81,7 @@ namespace Nirvana
         }
 
         private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter)
+            IVcfFilter vcfFilter, bool useLegacyVids)
         {
             var vcfReader = FileUtilities.GetStreamReader(vcfStream);
 
@@ -94,7 +95,7 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter);
+                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, useLegacyVids);
         }
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome,

@@ -50,7 +50,7 @@ namespace Vcf.VariantCreator
             return breakEnds;
         }
 
-        private static (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(IDictionary<string, IChromosome> refNameToChromosome, string refAllele, string altAllele)
+        public static (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(IDictionary<string, IChromosome> refNameToChromosome, string refAllele, string altAllele)
         {
             string referenceName2;
             int position2;

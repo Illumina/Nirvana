@@ -62,9 +62,9 @@ namespace UnitTests.Vcf.Samples
         }
 
         [Theory]
-        [InlineData("GT:CN:MCN:CNQ:MCNQ:CNF:MCNF:SD:MAF:BC:AS", "1/2:2:0:1000:1000:2.03102:0.000203:248.8:0.0001:1493:1137", 2)]
-        [InlineData("GT:CN:MCN:CNQ:MCNQ:CNF:MCNF:SD:MAF:BC:AS", "1/2:3:0:1000:1000:3.02612:0.000303:370.7:0.0001:8765:9070", 3)]
-        public void ExtractSample_DragenCNV_MCC_LOH(string formatField, string sampleField, int mcc)
+        [InlineData("GT:CN:MCN:CNQ:MCNQ:CNF:MCNF:SD:MAF:BC:AS", "1/2:2:0:1000:1000:2.03102:0.000203:248.8:0.0001:1493:1137")]
+        [InlineData("GT:CN:MCN:CNQ:MCNQ:CNF:MCNF:SD:MAF:BC:AS", "1/2:3:0:1000:1000:3.02612:0.000303:370.7:0.0001:8765:9070")]
+        public void ExtractSample_DragenCNV_MCN_LOH(string formatField, string sampleField)
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set(formatField);

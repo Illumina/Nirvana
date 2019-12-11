@@ -24,16 +24,17 @@ namespace Nirvana
 
         private static bool _forceMitochondrialAnnotation;
         private static bool _disableRecomposition;
+        private static bool _useLegacyVids;
 
         private static ExitCodes ProgramExecution()
         {
             var annotationResources = GetAnnotationResources();
+            string jasixFileName    = _outputFileName == "-" ? null : _outputFileName + ".json.gz" + JasixCommons.FileExt;
 
-            string jasixFileName = _outputFileName == "-" ? null : _outputFileName + ".json.gz" + JasixCommons.FileExt;
-            using (var inputVcfStream = _vcfPath == "-" ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
-            using (var outputJsonStream = _outputFileName == "-" ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
-            using (var outputJsonIndexStream = jasixFileName == null ? null : FileUtilities.GetCreateStream(jasixFileName))
-                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter());
+            using (var inputVcfStream        = _vcfPath        == "-"  ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
+            using (var outputJsonStream      = _outputFileName == "-"  ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
+            using (var outputJsonIndexStream = jasixFileName   == null ? null : FileUtilities.GetCreateStream(jasixFileName))
+                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false, _useLegacyVids);
         }
 
         private static AnnotationResources GetAnnotationResources()
@@ -87,6 +88,11 @@ namespace Nirvana
                     "disable-recomposition",
                     "don't recompose function relevant variants",
                     v => _disableRecomposition = v != null
+                },
+                {
+                    "legacy-vids",
+                    "enables support for legacy VIDs",
+                    v => _useLegacyVids = v != null
                 }
             };
 

@@ -83,7 +83,7 @@ namespace AnnotationLambda
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))
                             {
-                                StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true);
+                                StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true, false);
                             }
 
                             Logger.LogLine("Annotation done.");

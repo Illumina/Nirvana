@@ -36,11 +36,11 @@ namespace Vcf
         public string[] GetSampleNames() => _sampleNames;
 
         private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter)
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, bool useLegacyVids)
         {
             _headerReader        = headerReader;
             _reader              = vcfLineReader;
-            _variantFactory      = new VariantFactory(sequenceProvider.Sequence, sequenceProvider.RefNameToChromosome);
+            _variantFactory      = new VariantFactory(sequenceProvider.Sequence, sequenceProvider.RefNameToChromosome, useLegacyVids);
             _sequenceProvider    = sequenceProvider;
             _refMinorProvider    = refMinorProvider;
             _vcfFilter           = vcfFilter;
@@ -48,9 +48,9 @@ namespace Vcf
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter)
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, bool useLegacyVids)
         {
-            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, useLegacyVids);
             vcfReader.ParseHeader();
             vcfReader.SetRecomposer(recomposer);
             return vcfReader;

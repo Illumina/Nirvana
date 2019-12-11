@@ -4,7 +4,7 @@ using Variants;
 using Vcf.VariantCreator;
 using Xunit;
 
-namespace UnitTests.Vcf
+namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class ReferenceVariantCreatorTests
     {
@@ -14,7 +14,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void Create_SinglePosition_NoGlobalMajorAllele_ReturnNull()
         {
-            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 100, "A", ".", null);
+            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 100, "A", ".", null);
             Assert.Null(variants);
         }
 
@@ -28,20 +28,20 @@ namespace UnitTests.Vcf
         [Fact]
         public void Create_MultiplePositions_NoGlobalMajorAllele_ReturnNull()
         {
-            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", null);
+            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", null);
             Assert.Null(variants);
         }
 
         [Fact]
         public void Create_MultiplePositions_HasGlobalMajorAllele_ReturnNull()
         {
-            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", "T");
+            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", "T");
             Assert.Null(variants);
         }
 
         private IVariant GetVariant(int start, int end, string refAllele, string altAllele, string globalMajorAllele)
         {
-            var variants = ReferenceVariantCreator.Create(Sequence, Chr1, start, end, refAllele, altAllele, globalMajorAllele);
+            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, start, end, refAllele, altAllele, globalMajorAllele);
             Assert.Single(variants);
             return variants[0];
         }

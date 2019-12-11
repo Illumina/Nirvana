@@ -15,7 +15,7 @@ namespace Vcf.VariantCreator
                 null, breakEnds, AnnotationBehavior.StructuralVariants, true);
         }
 
-        private static VariantType GetVariantType(string altAllele, string svType)
+        public static VariantType GetVariantType(string altAllele, string svType)
         {
             switch (svType)
             {

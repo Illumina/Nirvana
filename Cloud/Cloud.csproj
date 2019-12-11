@@ -8,10 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.6.0" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.32" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.69" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.2" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.109.1" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.97" />
+    <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 
   <ItemGroup>
