@@ -5,22 +5,24 @@ using System.Linq;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
-using VariantAnnotation.Interface.IO;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
 	public sealed class OneKGenSvReader:IDisposable
-	{
-		#region members
+    {
+        private const int ChromIndex = 0;
+        private const int StartIndex = 1;
+        private const int EndIndex = 2;
+        private const int IdIndex = 3;
+        private const int AltIndex = 4;
+        private const int InfoIndex = 5;
 
-		private readonly StreamReader _reader;
+        private readonly StreamReader _reader;
 	    private readonly IDictionary<string, IChromosome> _refNameDict;
 
 	    private string _svType;
-	    private int? _svEnd;
-	    private int? _svLen;
 
-	    private int? _allAlleleNumber;
+        private int? _allAlleleNumber;
 	    private int? _allAlleleCount;
         private double? _allAlleleFrequency;
 	    private double? _afrAlleleFrequency;
@@ -29,7 +31,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 	    private double? _easAlleleFrequency;
 	    private double? _sasAlleleFrequency;
 
-        #endregion
 
         public OneKGenSvReader(StreamReader reader, IDictionary<string, IChromosome> refNameDict)
 		{
@@ -63,50 +64,33 @@ namespace SAUtils.InputFileParsers.OneKGen
 	        _easAlleleFrequency = null;
 	        _sasAlleleFrequency = null;
 
-	        _svEnd = null;
-	        _svLen = null;
 	        _svType = null;
 	    }
 
         private OnekGenSvItem ExtractOneKGenSvItem(string line)
 		{
-		    var splitLine = line.OptimizedSplit('\t');// we don't care about the many fields after info field
-		    if (splitLine.Length < 8) return null;
-
-		    var altAlleles = splitLine[VcfCommon.AltIndex].OptimizedSplit(',');
-		    var hasSymbolicAllele = altAlleles.Any(x => x.OptimizedStartsWith('<') && x.OptimizedEndsWith('>'));
-
-            if (!hasSymbolicAllele)
-		        return null;
-
-            var chromosomeName = splitLine[VcfCommon.ChromIndex];
-		    if (!_refNameDict.ContainsKey(chromosomeName)) return null;
-		    var chromosome = _refNameDict[chromosomeName];
-		    var position = int.Parse(splitLine[VcfCommon.PosIndex]);//we have to get it from RSPOS in info
-		    var id = RemoveMissingValues(splitLine[VcfCommon.IdIndex]);
-		    
-            var altAllele = splitLine[VcfCommon.AltIndex];
+		    var splitLine = line.OptimizedSplit('\t');
+            string altAllele = splitLine[AltIndex];
             if (altAllele.StartsWith("<INS:ME:")) return null;
 
-		    var infoFields = splitLine[VcfCommon.InfoIndex];
+            string chromosomeName = splitLine[ChromIndex];
+		    if (!_refNameDict.ContainsKey(chromosomeName)) return null;
+		    var chromosome = _refNameDict[chromosomeName];
+		    int start = int.Parse(splitLine[StartIndex]) + 1; // start is 0-based in BED format
+            int end = int.Parse(splitLine[EndIndex]);
+		    string id = RemoveMissingValues(splitLine[IdIndex]);
+
+            string infoFields = splitLine[InfoIndex];
             Clear();
 		    ParseInfoField(infoFields);
 
-		    if (_svEnd == null  && _svLen!=null)
-		    {
-		        _svEnd = position + _svLen;
-		    }
-
-		    if (_svEnd == null)
-		        return null;
-
 		    var variantType = SaParseUtilities.GetSequenceAlteration(_svType);
-            return new OnekGenSvItem(chromosome, position+1, _svEnd.Value, variantType, id,  
+            return new OnekGenSvItem(chromosome, start, end, variantType, id,  
 				_allAlleleNumber, _allAlleleCount,
                 _allAlleleFrequency, _afrAlleleFrequency, _amrAlleleFrequency, _easAlleleFrequency, _eurAlleleFrequency, _sasAlleleFrequency);
 		}
 
-        private string RemoveMissingValues(string idField)
+        private static string RemoveMissingValues(string idField)
         {
             var ids = idField.OptimizedSplit(';');
             return string.Join(';', ids.Where(id => id != "."));
@@ -133,12 +117,6 @@ namespace SAUtils.InputFileParsers.OneKGen
 	            case "SVTYPE":
 	                _svType = value;// for SVs there is only one value in SVTYPE
 	                break;
-                case "SVLEN":
-                    _svLen = Convert.ToInt32(value);
-                    break;
-                case "END":
-	                _svEnd = Convert.ToInt32(value);
-	                break;
                 case "AN":
 	                _allAlleleNumber = Convert.ToInt32(value);
 	                break;
@@ -146,22 +124,22 @@ namespace SAUtils.InputFileParsers.OneKGen
 	                _allAlleleCount = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).Sum();
 	                break;
                 case "AF":
-	                _allAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).ToArray().Sum();
+	                _allAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).Sum();
 	                break;
 	            case "AMR_AF":
-	                _amrAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).ToArray().Sum();
+	                _amrAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).Sum();
                     break;
 	            case "AFR_AF":
-	                _afrAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).ToArray().Sum();
+	                _afrAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).Sum();
                     break;
 	            case "EUR_AF":
-	                _eurAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).ToArray().Sum();
+	                _eurAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).Sum();
                     break;
 	            case "EAS_AF":
-	                _easAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).ToArray().Sum();
+	                _easAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).Sum();
                     break;
 	            case "SAS_AF":
-	                _sasAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).ToArray().Sum();
+	                _sasAlleleFrequency = value.OptimizedSplit(',').Select(Convert.ToDouble).Sum();
                     break;
 	        }
 	    }

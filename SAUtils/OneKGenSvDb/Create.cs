@@ -11,9 +11,9 @@ using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.MakeOnekSvDb
+namespace SAUtils.OneKGenSvDb
 {
-    public static class Main
+    public static class Create
     {
         private static string _inputFileName;
         private static string _compressedReference;
@@ -30,7 +30,7 @@ namespace SAUtils.MakeOnekSvDb
                 },
                 {
                     "in|i=",
-                    "OneKGenSv VCFfile",
+                    "OneKGenSv BED file",
                     v => _inputFileName = v
                 },
                 {
@@ -45,12 +45,10 @@ namespace SAUtils.MakeOnekSvDb
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
-                .HasRequiredParameter(_inputFileName, "OneKGenSv VCFfile", "--in")
-                .CheckInputFilenameExists(_inputFileName, "OneKGenSv VCFfile", "--in")
-                .HasRequiredParameter(_outputDirectory, "output directory", "--out")
+                .CheckInputFilenameExists(_inputFileName, "OneKGenSv BED file", "--in")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
-                .ShowHelpMenu("Creates a supplementary database with ClinVar annotations", commandLineExample)
+                .ShowHelpMenu("Creates a supplementary database with 1000 Genome structural variant annotations", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 
@@ -61,7 +59,6 @@ namespace SAUtils.MakeOnekSvDb
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             var version = DataSourceVersionReader.GetSourceVersion(_inputFileName + ".version");
-
 
             string outFileName = $"{version.Name}_{version.Version}".Replace(' ','_');
             using(var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileName))
