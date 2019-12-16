@@ -36,12 +36,7 @@ namespace SAUtils.Omim
         internal static (string Phenotype, OmimItem.Comment[] Comments) ExtractPhenotypeAndComments(string phenotypeString)
         {
             phenotypeString = phenotypeString.Trim(' ').Trim(',').Replace(@"\\'", "'");
-            string phenotype = Regex.Replace(
-                            Regex.Replace(
-                            Regex.Replace(phenotypeString,
-                            @"(^\?|\[|\]|{|})", ""),
-                            @" \(\d\) ", " "),
-                            @"^\?", "");
+            string phenotype = Regex.Replace(phenotypeString,@" \(\d\) ", " ");
 
             var comments = phenotypeString.Select(GetComment)
                                           .Where(x => x != OmimItem.Comment.unknown)

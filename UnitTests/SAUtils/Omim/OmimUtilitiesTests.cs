@@ -25,11 +25,11 @@ namespace UnitTests.SAUtils.Omim
         }
 
         [Theory]
-        [InlineData("[Beta-glycopyranoside tasting], (3) {Alcohol dependence, susceptibility to}", "Beta-glycopyranoside tasting, Alcohol dependence, susceptibility to", "2,3")]
-        [InlineData("?Proteasome-associated autoinflammatory syndrome 3, digenic", "Proteasome-associated autoinflammatory syndrome 3, digenic", "1")]
-        [InlineData("{?Thyroid cancer, nonmedullary, 5}", "Thyroid cancer, nonmedullary, 5", "3,1")]
+        [InlineData("[Beta-glycopyranoside tasting], (3) {Alcohol dependence, susceptibility to}", "[Beta-glycopyranoside tasting], {Alcohol dependence, susceptibility to}", "2,3")]
+        [InlineData("?Proteasome-associated autoinflammatory syndrome 3, digenic", "?Proteasome-associated autoinflammatory syndrome 3, digenic", "1")]
+        [InlineData("{?Thyroid cancer, nonmedullary, 5}", "{?Thyroid cancer, nonmedullary, 5}", "3,1")]
         [InlineData("Methylmalonic aciduria, mut(0) type", "Methylmalonic aciduria, mut(0) type", "0")]
-        [InlineData("?{Diabetes, susceptibility to},", "Diabetes, susceptibility to", "1,3")]
+        [InlineData("?{Diabetes, susceptibility to},", "?{Diabetes, susceptibility to}", "1,3")]
         public void ExtractPhenotypeAndComments_AsExpected(string input, string expectedPhenotype, string commentsEnumString)
         {
             (string phenotype, var comments) = OmimUtilities.ExtractPhenotypeAndComments(input);
