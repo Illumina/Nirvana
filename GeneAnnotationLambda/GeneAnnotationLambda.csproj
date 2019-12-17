@@ -7,8 +7,8 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.104.1" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.106.1" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.104.4" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.106.4" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cloud\Cloud.csproj" />

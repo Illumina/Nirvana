@@ -1,11 +1,12 @@
 ﻿using Genome;
+using VariantAnnotation.Interface;
 
 namespace Vcf.VariantCreator
 {
-    public static class VariantId
+    public sealed class VariantId : IVariantIdCreator
     {
-        public static string Create(ISequence sequence, VariantCategory category, string svType, IChromosome chromosome,
-            int start, int end, string refAllele, string altAllele)
+        public string Create(ISequence sequence, VariantCategory category, string svType, IChromosome chromosome, int start, int end,
+            string refAllele, string altAllele, string repeatUnit)
         {
             if (altAllele == ".") altAllele = refAllele;
 

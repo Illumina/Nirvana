@@ -15,13 +15,12 @@ namespace Variants
         public bool IsRecomposed { get; }
         public bool IsDecomposed { get; }
         public string[] LinkedVids { get; }
-	    public IBreakEnd[] BreakEnds { get; }
-	    public AnnotationBehavior Behavior { get; }
+        public AnnotationBehavior Behavior { get; }
         public bool IsStructuralVariant { get; }
 
         public Variant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
             VariantType variantType, string variantId, bool isRefMinor, bool isDecomposed, bool isRecomposed,
-            string[] linkedVids, IBreakEnd[] breakEnds, AnnotationBehavior behavior, bool isStructuralVariant)
+            string[] linkedVids, AnnotationBehavior behavior, bool isStructuralVariant)
         {
             Chromosome          = chromosome;
             Start               = start;
@@ -35,7 +34,6 @@ namespace Variants
             IsDecomposed        = isDecomposed;
             LinkedVids          = linkedVids;
             Behavior            = behavior;
-            BreakEnds           = breakEnds;
             IsStructuralVariant = isStructuralVariant;
         }
     }

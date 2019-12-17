@@ -9,7 +9,7 @@ namespace Vcf.VariantCreator
         {
             var variantType = GetVariantType(altAllele);
             return new Variant(chromosome, start + 1, end, refAllele, altAllele, variantType, vid, false, false, false,
-                null, null, AnnotationBehavior.StructuralVariants, true);
+                null, AnnotationBehavior.StructuralVariants, true);
         }
 
         // For old style allelic CNV calls (e.g. <CN1>, <CN4>, etc.),

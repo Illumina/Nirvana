@@ -47,7 +47,7 @@ namespace UnitTests.SAUtils.NsaWriters
                 saStream.Position = 0;
 
                 var siReader = new NsiReader(saStream);
-                var annotations = siReader.GetAnnotation(new Variant(chrom1, 100, 14590, "", "<DEL>", VariantType.deletion, "1:100:14590:del", false, false, false, null, null, null, true)).ToArray();
+                var annotations = siReader.GetAnnotation(new Variant(chrom1, 100, 14590, "", "<DEL>", VariantType.deletion, "1:100:14590:del", false, false, false, null, null, true)).ToArray();
 
                 string[] expected = {
                     "\"chromosome\":\"1\",\"begin\":145,\"end\":2743,\"variantType\":\"copy_number_gain\",\"id\":\"cg1\",\"clinicalInterpretation\":\"likely benign\",\"phenotypes\":[\"phenotype1\",\"phenotype2\"],\"phenotypeIds\":[\"pid1\",\"pid2\"],\"observedGains\":3,\"validated\":true,\"reciprocalOverlap\":0.17935,\"annotationOverlap\":1",

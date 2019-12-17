@@ -10,11 +10,12 @@ namespace UnitTests.Vcf.VariantCreator
     {
         private static readonly ISequence Sequence = new NSequence();
         private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
+        private readonly VariantId _vidCreator = new VariantId();
 
         [Fact]
         public void Create_SinglePosition_NoGlobalMajorAllele_ReturnNull()
         {
-            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 100, "A", ".", null);
+            IVariant[] variants = ReferenceVariantCreator.Create(_vidCreator, Sequence, Chr1, 100, 100, "A", ".", null);
             Assert.Null(variants);
         }
 
@@ -28,20 +29,20 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void Create_MultiplePositions_NoGlobalMajorAllele_ReturnNull()
         {
-            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", null);
+            IVariant[] variants = ReferenceVariantCreator.Create(_vidCreator, Sequence, Chr1, 100, 101, "A", ".", null);
             Assert.Null(variants);
         }
 
         [Fact]
         public void Create_MultiplePositions_HasGlobalMajorAllele_ReturnNull()
         {
-            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, 100, 101, "A", ".", "T");
+            IVariant[] variants = ReferenceVariantCreator.Create(_vidCreator, Sequence, Chr1, 100, 101, "A", ".", "T");
             Assert.Null(variants);
         }
 
         private IVariant GetVariant(int start, int end, string refAllele, string altAllele, string globalMajorAllele)
         {
-            IVariant[] variants = ReferenceVariantCreator.Create(Sequence, Chr1, start, end, refAllele, altAllele, globalMajorAllele);
+            IVariant[] variants = ReferenceVariantCreator.Create(_vidCreator, Sequence, Chr1, start, end, refAllele, altAllele, globalMajorAllele);
             Assert.Single(variants);
             return variants[0];
         }

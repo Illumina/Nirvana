@@ -50,7 +50,7 @@ namespace SingleAnnotationLambda
             if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {vcfFields[VcfCommon.PosIndex]}");
 
             SimplePosition simplePosition = SimplePosition.GetSimplePosition(chromosome, start, vcfFields, new NullVcfFilter());
-            var variantFactory = new VariantFactory(sequenceProvider.Sequence, sequenceProvider.RefNameToChromosome, false);
+            var variantFactory = new VariantFactory(sequenceProvider.Sequence, new VariantId());
             return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, variantFactory);
         }
     }

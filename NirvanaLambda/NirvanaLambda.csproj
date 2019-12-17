@@ -9,8 +9,8 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.106.1" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.97" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.3.106.4" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.100" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Genome\Genome.csproj" />

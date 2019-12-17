@@ -1,104 +1,86 @@
-﻿using System.Collections.Generic;
-using Genome;
+﻿using System;
+using System.Collections.Generic;
 using Intervals;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class GeneFusionUtilities
     {
-        internal static IGeneFusionAnnotation GetGeneFusionAnnotation(IBreakEnd[] breakEnds, ITranscript transcript,
-            ITranscript[] fusedTranscriptCandidates)
+        internal static void GetGeneFusionsByTranscript(this Dictionary<string, IAnnotatedGeneFusion> transcriptIdToGeneFusions,
+            BreakEndAdjacency adjacency, ITranscript[] originTranscripts, ITranscript[] partnerTranscripts)
         {
-            if (transcript.Translation == null || breakEnds == null || breakEnds.Length == 0) return null;
-
-            var desiredBreakEnd = GetBreakEndWithinCodingRegion(breakEnds, transcript.Chromosome, transcript.Translation.CodingRegion);
-            if (desiredBreakEnd == null) return null;
-
-            var piece1  = MappedPositionUtilities.FindRegion(transcript.TranscriptRegions, desiredBreakEnd.Piece1.Position);
-            int? exon   = piece1.Region.Type == TranscriptRegionType.Exon   ? (int?)piece1.Region.Id : null;
-            int? intron = piece1.Region.Type == TranscriptRegionType.Intron ? (int?)piece1.Region.Id : null;
-
-            var piece1Hgvs = GetBreakEndHgvs(transcript, piece1.Index, desiredBreakEnd.Piece1.Position, desiredBreakEnd.Piece1.IsSuffix);
-
             var geneFusions = new List<IGeneFusion>();
-            foreach (var candidate in fusedTranscriptCandidates)
+
+            foreach (var originTranscript in originTranscripts)
             {
-                var piece2     = MappedPositionUtilities.FindRegion(candidate.TranscriptRegions, desiredBreakEnd.Piece2.Position);
-                var geneFusion = GetGeneFusion(transcript, candidate, desiredBreakEnd.Piece2, piece2.Index,
-                    piece1Hgvs.Hgvs, piece1Hgvs.IsTranscriptSuffix);
+                geneFusions.Clear();
+                bool originOnReverseStrand = originTranscript.Gene.OnReverseStrand ^ adjacency.Origin.OnReverseStrand;
+                (int originIndex, ITranscriptRegion originRegion) = MappedPositionUtilities.FindRegion(originTranscript.TranscriptRegions, adjacency.Origin.Position);
 
-                if (geneFusion != null) geneFusions.Add(geneFusion);
+                int? originExon   = originRegion.Type == TranscriptRegionType.Exon ? (int?) originRegion.Id : null;
+                int? originIntron = originRegion.Type == TranscriptRegionType.Intron ? (int?) originRegion.Id : null;
+                
+                foreach (var partnerTranscript in partnerTranscripts)
+                {
+                    bool partnerOnReverseStrand      = partnerTranscript.Gene.OnReverseStrand ^ adjacency.Partner.OnReverseStrand;
+                    bool differentStrand             = originOnReverseStrand != partnerOnReverseStrand;
+                    bool differentTranscriptSource   = originTranscript.Source != partnerTranscript.Source;
+                    bool sameGeneSymbol              = originTranscript.Gene.Symbol == partnerTranscript.Gene.Symbol;
+                    bool codingRegionAlreadyOverlaps = originTranscript.Translation.CodingRegion.Overlaps(partnerTranscript.Translation.CodingRegion);
+
+                    if (differentStrand || differentTranscriptSource || sameGeneSymbol || codingRegionAlreadyOverlaps) continue;
+
+                    (int partnerIndex, ITranscriptRegion partnerRegion) = MappedPositionUtilities.FindRegion(partnerTranscript.TranscriptRegions, adjacency.Partner.Position);
+
+                    int? partnerExon   = partnerRegion.Type == TranscriptRegionType.Exon ? (int?) partnerRegion.Id : null;
+                    int? partnerIntron = partnerRegion.Type == TranscriptRegionType.Intron ? (int?) partnerRegion.Id : null;
+
+                    BreakPointTranscript origin  = new BreakPointTranscript(originTranscript, adjacency.Origin.Position, originIndex);
+                    BreakPointTranscript partner = new BreakPointTranscript(partnerTranscript, adjacency.Partner.Position, partnerIndex);
+                    (BreakPointTranscript first, BreakPointTranscript second) = originOnReverseStrand ? (partner, origin) : (origin, partner);
+                    
+                    string hgvsCoding = GetHgvsCoding(first, second);
+
+                    geneFusions.Add(new GeneFusion(partnerExon, partnerIntron, hgvsCoding));
+                }
+
+                if (geneFusions.Count == 0) continue;
+                var annotatedGeneFusion = new AnnotatedGeneFusion(originExon, originIntron, geneFusions.ToArray());
+                transcriptIdToGeneFusions[originTranscript.Id.WithVersion] = annotatedGeneFusion;
             }
-
-            return geneFusions.Count == 0
-                ? null
-                : new GeneFusionAnnotation(exon, intron, geneFusions.ToArray());
         }
 
-        private static IBreakEnd GetBreakEndWithinCodingRegion(IBreakEnd[] breakEnds, IChromosome chromosome,
-            IInterval codingRegion)
+        internal static string GetHgvsCoding(BreakPointTranscript first, BreakPointTranscript second)
         {
-            // ReSharper disable once LoopCanBeConvertedToQuery
-            foreach (var breakend in breakEnds)
-            {
-                var position = breakend.Piece1.Position;
-                if (breakend.Piece1.Chromosome != chromosome || position < codingRegion.Start || position > codingRegion.End) continue;
-                return breakend;
-            }
+            (string firstBegin, string firstEnd)   = AdjustFirst(first);
+            (string secondBegin, string secondEnd) = AdjustSecond(second);
 
-            return null;
+            return $"{first.Transcript.Gene.Symbol}{{{first.Transcript.Id.WithVersion}}}:c.{firstBegin}_{firstEnd}_{second.Transcript.Gene.Symbol}{{{second.Transcript.Id.WithVersion}}}:c.{secondBegin}_{secondEnd}";
         }
 
-        private static (string Hgvs, bool IsTranscriptSuffix) GetBreakEndHgvs(ITranscript transcript, int regionIndex,
-            int position, bool isGenomicSuffix)
+        private static (string Begin, string End) AdjustFirst(BreakPointTranscript first)
         {
-            var positionOffset     = HgvsUtilities.GetCdnaPositionOffset(transcript, position, regionIndex);
-            var isTranscriptSuffix = isGenomicSuffix != transcript.Gene.OnReverseStrand;
-            var codingRegionLength = transcript.Translation.CodingRegion.CdnaEnd - transcript.Translation.CodingRegion.CdnaStart + 1;
-            var hgvsPosString      = isTranscriptSuffix ? positionOffset.Value + "_" + codingRegionLength : 1 + "_" + positionOffset.Value;
+            var codingRegion       = first.Transcript.Translation.CodingRegion;
+            int position           = first.GenomicPosition;
+            int codingRegionLength = codingRegion.CdnaEnd - codingRegion.CdnaStart + 1;
 
-            var hgvs = transcript.Gene.Symbol + "{" + transcript.Id.WithVersion + "}" + ":c." + hgvsPosString;
-            return (hgvs, isTranscriptSuffix);
+            if (position < codingRegion.Start) return ("?", (position - codingRegion.Start).ToString());
+            if (position > codingRegion.End) return ("?", (position - codingRegion.End + codingRegionLength).ToString());
+            return ("1", HgvsUtilities.GetCdnaPositionOffset(first.Transcript, position, first.RegionIndex).Value);
         }
 
-        /// <summary>
-        /// evaluate if a candidate transcript can lead to a gene fusion if satisfy
-        /// -- transcript coding region do not overlap
-        /// -- have the same transcript source
-        /// -- have different gene name
-        /// -- breakendPosition 2 falls to coding region
-        /// -- unidirectional fusion with the other gene
-        /// </summary>
-        private static IGeneFusion GetGeneFusion(ITranscript transcript, ITranscript transcript2,
-            IBreakEndPiece bePiece2, int piece2RegionIndex, string piece1Hgvs, bool isPos1TranscriptSuffix)
+        private static (string Begin, string End) AdjustSecond(BreakPointTranscript second)
         {
-            if (SkipGeneFusion(transcript, transcript2, bePiece2)) return null;
+            var codingRegion       = second.Transcript.Translation.CodingRegion;
+            int position           = second.GenomicPosition;
+            int codingRegionLength = codingRegion.CdnaEnd - codingRegion.CdnaStart + 1;
 
-            var region       = transcript2.TranscriptRegions[piece2RegionIndex];
-            var piece2Hgvs   = GetBreakEndHgvs(transcript2, piece2RegionIndex, bePiece2.Position, bePiece2.IsSuffix);
-            if (piece2Hgvs.IsTranscriptSuffix == isPos1TranscriptSuffix) return null;
-            
-            int? exon   = region.Type == TranscriptRegionType.Exon ? (int?)region.Id : null;
-            int? intron = region.Type == TranscriptRegionType.Intron ? (int?)region.Id : null;
-
-            var hgvs = isPos1TranscriptSuffix ? piece2Hgvs.Hgvs + "_" + piece1Hgvs : piece1Hgvs + "_" + piece2Hgvs.Hgvs;
-
-            return new GeneFusion(exon, intron, hgvs);
-        }
-
-        private static bool SkipGeneFusion(ITranscript transcript, ITranscript transcript2, IBreakEndPiece piece2)
-        {
-            return transcript.Source != transcript2.Source                                            ||
-                   transcript2.Translation == null                                                    ||
-                   transcript2.Gene.Symbol == transcript.Gene.Symbol                                  ||
-                   transcript2.Chromosome.Index == transcript.Chromosome.Index                        &&
-                   transcript2.Chromosome.Index != piece2.Chromosome.Index                            ||
-                   transcript2.Translation.CodingRegion.Overlaps(transcript.Translation.CodingRegion) ||
-                   !transcript2.Translation.CodingRegion.Overlaps(piece2.Position, piece2.Position);
+            if (position < codingRegion.Start) return ((position - codingRegion.Start).ToString(), "?");
+            if (position > codingRegion.End) return ((position - codingRegion.End + codingRegionLength).ToString(), "?");
+            return (HgvsUtilities.GetCdnaPositionOffset(second.Transcript, position, second.RegionIndex).Value, codingRegionLength.ToString());
         }
     }
 }

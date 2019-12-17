@@ -61,7 +61,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refMinorProvider = new Mock<IRefMinorProvider>();
             var seqProvider = ParserTestUtils.GetSequenceProvider(13813, "T", 'C', new Dictionary<string, IChromosome> { ["chr1"] = _chromosome });
             IDictionary<string, IChromosome> refNameToChromosome = seqProvider.RefNameToChromosome;
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome, false);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, new VariantId());
 
             var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
 

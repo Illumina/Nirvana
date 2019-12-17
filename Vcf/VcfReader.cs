@@ -4,6 +4,7 @@ using System.IO;
 using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
@@ -36,11 +37,11 @@ namespace Vcf
         public string[] GetSampleNames() => _sampleNames;
 
         private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, bool useLegacyVids)
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator)
         {
             _headerReader        = headerReader;
             _reader              = vcfLineReader;
-            _variantFactory      = new VariantFactory(sequenceProvider.Sequence, sequenceProvider.RefNameToChromosome, useLegacyVids);
+            _variantFactory      = new VariantFactory(sequenceProvider.Sequence, vidCreator);
             _sequenceProvider    = sequenceProvider;
             _refMinorProvider    = refMinorProvider;
             _vcfFilter           = vcfFilter;
@@ -48,9 +49,9 @@ namespace Vcf
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, bool useLegacyVids)
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator)
         {
-            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, useLegacyVids);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, vidCreator);
             vcfReader.ParseHeader();
             vcfReader.SetRecomposer(recomposer);
             return vcfReader;
@@ -151,7 +152,7 @@ namespace Vcf
 
                     if (InconsistentSampleFields(vcfFields))
                     {
-                        var sampleCount = _sampleNames?.Length ?? 0;
+                        int sampleCount = _sampleNames?.Length ?? 0;
                         throw new UserErrorException($"Inconsistent number of sample fields in line:\n{VcfLine}\nExpected number of sample fields: {sampleCount}");
                     }
                     vcfPosition = SimplePosition.GetSimplePosition(chromosome, start, vcfFields, _vcfFilter);
@@ -168,7 +169,7 @@ namespace Vcf
 
         private bool InconsistentSampleFields(string[] vcfFields)
         {
-            var sampleCount = _sampleNames?.Length ?? 0;
+            int sampleCount = _sampleNames?.Length ?? 0;
             if (sampleCount != 0)
             {
                 return vcfFields.Length != VcfCommon.FormatIndex + 1 + sampleCount;

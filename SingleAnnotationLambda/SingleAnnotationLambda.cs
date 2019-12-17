@@ -116,7 +116,7 @@ namespace SingleAnnotationLambda
 
             Logger.LogLine($"Cache prefix: {cachePathPrefix}");
 
-            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, saManifestUrls, lambdaConfig.customAnnotations, false, false)
+            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, saManifestUrls, lambdaConfig.customAnnotations, false, false, false)
             {
                 AnnotatorVersionTag = annotatorVersion
             };

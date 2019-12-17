@@ -17,6 +17,7 @@ namespace VariantAnnotation.Interface
         IGeneAnnotationProvider GeneAnnotationProvider { get; }
         IAnnotator Annotator { get; }
         IRecomposer Recomposer { get; }
+        IVariantIdCreator VidCreator { get; }
         List<IDataSourceVersion> DataSourceVersions { get; }
         string VepDataVersion { get; }
         string AnnotatorVersionTag { get; set; }

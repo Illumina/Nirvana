@@ -40,7 +40,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetJsonString_RecomposedSnvAfterTrimming_IsRecomposedTrue()
         {
             IVariant variant = new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob-100-A-G", false, false, true,
-                new[] { "bob-100-A-G" }, null, AnnotationBehavior.SmallVariants, false); ;
+                new[] { "bob-100-A-G" }, AnnotationBehavior.SmallVariants, false); ;
             var annotatedVariant = new AnnotatedVariant(variant);
 
             const string expectedResult = "{\"vid\":\"bob-100-A-G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"isRecomposedVariant\":true,\"linkedVids\":[\"bob-100-A-G\"]}";
@@ -72,7 +72,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         private IVariant GetRefMinorVariant()
         {
             return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
-                new[] { "bob:100:102:TAT" }, null, AnnotationBehavior.SmallVariants, false);
+                new[] { "bob:100:102:TAT" }, AnnotationBehavior.SmallVariants, false);
         }
     }
 }

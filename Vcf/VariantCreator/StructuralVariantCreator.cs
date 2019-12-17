@@ -5,14 +5,13 @@ namespace Vcf.VariantCreator
 {
     public static class StructuralVariantCreator
     {
-        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string svType,
-            IBreakEnd[] breakEnds, string vid)
+        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string svType, string vid)
         {
             var variantType = GetVariantType(altAllele, svType);
             if (variantType != VariantType.translocation_breakend) start++;
 
             return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
-                null, breakEnds, AnnotationBehavior.StructuralVariants, true);
+                null, AnnotationBehavior.StructuralVariants, true);
         }
 
         public static VariantType GetVariantType(string altAllele, string svType)

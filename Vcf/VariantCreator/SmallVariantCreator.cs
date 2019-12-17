@@ -6,10 +6,9 @@ namespace Vcf.VariantCreator
 {
     public static class SmallVariantCreator
     {
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele,
+        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
             bool isDecomposed, bool isRecomposed, string[] linkedVids, string vid, bool isRefMinor)
         {
-            int end         = start + refAllele.Length - 1;
             var variantType = GetVariantType(refAllele, altAllele);
 
             var annotationBehavior = variantType == VariantType.non_informative_allele
@@ -17,7 +16,7 @@ namespace Vcf.VariantCreator
                 : AnnotationBehavior.SmallVariants;
 
             return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, isRefMinor, isDecomposed,
-                isRecomposed, linkedVids, null, annotationBehavior, false);
+                isRecomposed, linkedVids, annotationBehavior, false);
         }
 
         public static VariantType GetVariantType(string refAllele, string altAllele)

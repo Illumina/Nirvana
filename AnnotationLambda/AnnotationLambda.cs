@@ -155,7 +155,8 @@ namespace AnnotationLambda
             string cachePathPrefix  = LambdaUrlHelper.GetCacheFolder().UrlCombine(genomeAssembly.ToString()).UrlCombine(LambdaUrlHelper.DefaultCacheSource);
             string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
             string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations, genomeAssembly);
-            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> { saManifestUrl }, annotationConfig.customAnnotations, false, false);
+            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> {saManifestUrl},
+                annotationConfig.customAnnotations, false, false, false);
 
             using (var tabixStream = PersistentStreamUtils.GetReadStream(annotationConfig.tabixUrl))
             {

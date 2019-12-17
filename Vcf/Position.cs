@@ -23,6 +23,8 @@ namespace Vcf
         public IVariant[] Variants { get; }
         public ISample[] Samples { get; }
         public IInfoData InfoData { get; }
+        public bool HasStructuralVariant { get; }
+        public bool HasShortTandemRepeat { get; }
         public string[] VcfFields { get; }
         public bool[] IsDecomposed { get; }
         public bool IsRecomposed { get; }
@@ -33,19 +35,38 @@ namespace Vcf
             double? quality, string[] filters, IVariant[] variants, ISample[] samples, IInfoData infoData,
             string[] vcfFields, bool[] isDecomposed, bool isRecomposed)
         {
-            Chromosome = chromosome;
-            Start      = start;
-            End        = end;
-            RefAllele  = refAllele;
-            AltAlleles = altAlleles;
-            Quality    = quality;
-            Filters    = filters;
-            Variants   = variants;
-            Samples    = samples;
-            InfoData   = infoData;
-            VcfFields  = vcfFields;
+            Chromosome   = chromosome;
+            Start        = start;
+            End          = end;
+            RefAllele    = refAllele;
+            AltAlleles   = altAlleles;
+            Quality      = quality;
+            Filters      = filters;
+            Variants     = variants;
+            Samples      = samples;
+            InfoData     = infoData;
+            VcfFields    = vcfFields;
             IsDecomposed = isDecomposed;
             IsRecomposed = isRecomposed;
+
+            (HasStructuralVariant, HasShortTandemRepeat) = CheckVariants(variants);
+        }
+
+        private static (bool HasStructuralVariant, bool HasShortTandemRepeat) CheckVariants(IVariant[] variants)
+        {
+            if (variants == null) return (false, false);
+
+            var hasStructuralVariant = false;
+            var hasShortTandemRepeat = false;
+
+            // ReSharper disable once LoopCanBeConvertedToQuery
+            foreach (var variant in variants)
+            {
+                if (variant.IsStructuralVariant) hasStructuralVariant = true;
+                if (variant.Type == VariantType.short_tandem_repeat_variation) hasShortTandemRepeat = true;
+            }
+
+            return (hasStructuralVariant, hasShortTandemRepeat);
         }
 
         public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, VariantFactory variantFactory)
@@ -81,12 +102,10 @@ namespace Vcf
                 simplePosition.IsRecomposed);
         }
 
-        private static IPosition GetReferencePosition(ISimplePosition simplePosition)
-        {
-            return new Position(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start, simplePosition.RefAllele,
-                simplePosition.AltAlleles, null, null, null, null, null, simplePosition.VcfFields, simplePosition.IsDecomposed,
-                simplePosition.IsRecomposed);
-        }
+        private static IPosition GetReferencePosition(ISimplePosition simplePosition) =>
+            new Position(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start,
+                simplePosition.RefAllele, simplePosition.AltAlleles, null, null, null, null, null,
+                simplePosition.VcfFields, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
 
         private static int ExtractEnd(IInfoData infoData, int start, int refAlleleLength)
         {

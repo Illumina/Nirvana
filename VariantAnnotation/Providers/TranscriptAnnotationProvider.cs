@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
@@ -36,10 +36,13 @@ namespace VariantAnnotation.Providers
         private IPredictionCache _polyphenCache;
         private ushort _currentRefIndex = ushort.MaxValue;
 
+        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+
         public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider)
         {
-            Name      = "Transcript annotation provider";
-            _sequence = sequenceProvider.Sequence;
+            Name                 = "Transcript annotation provider";
+            _sequence            = sequenceProvider.Sequence;
+            _refNameToChromosome = sequenceProvider.RefNameToChromosome;
 
             using (var stream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)))
             {
@@ -97,27 +100,28 @@ namespace VariantAnnotation.Providers
         {
             if (annotatedPosition.AnnotatedVariants == null || annotatedPosition.AnnotatedVariants.Length == 0) return;
 
-            ushort refIndex = annotatedPosition.Position.Chromosome.Index;
+            var position    = annotatedPosition.Position;
+            ushort refIndex = position.Chromosome.Index;
             LoadPredictionCaches(refIndex);
 
             AddRegulatoryRegions(annotatedPosition.AnnotatedVariants, _transcriptCache.RegulatoryIntervalForest);
-            AddTranscripts(annotatedPosition.AnnotatedVariants, _transcriptCache.TranscriptIntervalForest);
+            AddTranscripts(annotatedPosition.AnnotatedVariants);
+            if (position.HasStructuralVariant) AddGeneFusions(annotatedPosition.AnnotatedVariants);
         }
 
-        private void AddTranscripts(IAnnotatedVariant[] annotatedVariants, IIntervalForest<ITranscript> transcriptIntervalForest)
+        private void AddTranscripts(IAnnotatedVariant[] annotatedVariants)
         {
             foreach (var annotatedVariant in annotatedVariants)
             {
                 var variant = annotatedVariant.Variant;
                 if (variant.Behavior.MinimalTranscriptAnnotation) continue;
 
-                ITranscript[] geneFusionCandidates = GetGeneFusionCandidates(variant.BreakEnds, transcriptIntervalForest);
-                ITranscript[] transcripts          = transcriptIntervalForest.GetAllFlankingValues(variant);
+                ITranscript[] transcripts = _transcriptCache.TranscriptIntervalForest.GetAllFlankingValues(variant);
                 if (transcripts == null) continue;
 
                 IList<IAnnotatedTranscript> annotatedTranscripts =
                     TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant, transcripts, _sequence, _siftCache,
-                        _polyphenCache, geneFusionCandidates);
+                        _polyphenCache);
 
                 if (annotatedTranscripts.Count == 0) continue;
 
@@ -126,7 +130,65 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions) => throw new System.NotImplementedException();
+        private void AddGeneFusions(IAnnotatedVariant[] annotatedVariants)
+        {
+            var transcriptIdToGeneFusions = new Dictionary<string, IAnnotatedGeneFusion>();
+            
+            foreach (var annotatedVariant in annotatedVariants)
+            {
+                var variant = annotatedVariant.Variant;
+                if (!variant.IsStructuralVariant) continue;
+
+                BreakEndAdjacency[] adjacencies = GetBreakEndAdjacencies(variant, _refNameToChromosome);
+                if (adjacencies == null) continue;
+                
+                transcriptIdToGeneFusions.Clear();
+                
+                foreach (var adjacency in adjacencies)
+                {
+                    ITranscript[] originTranscripts  = GetOverlappingCodingTranscripts(adjacency.Origin);
+                    ITranscript[] partnerTranscripts = GetOverlappingCodingTranscripts(adjacency.Partner);
+                    if (originTranscripts == null || partnerTranscripts == null) continue;
+                    
+                    transcriptIdToGeneFusions.GetGeneFusionsByTranscript(adjacency, originTranscripts, partnerTranscripts);
+                }
+
+                foreach (var transcript in annotatedVariant.Transcripts)
+                {
+                    string transcriptId = transcript.Transcript.Id.WithVersion;
+                    if (transcriptIdToGeneFusions.TryGetValue(transcriptId, out var annotatedGeneFusion))
+                    {
+                        transcript.AddGeneFusion(annotatedGeneFusion);
+                    }
+                }
+            }
+        }
+
+        private ITranscript[] GetOverlappingCodingTranscripts(BreakPoint bp)
+        {
+            if (bp == null) return null;
+
+            ITranscript[] transcripts = _transcriptCache.TranscriptIntervalForest.GetAllOverlappingValues(bp.Chromosome.Index, bp.Position,
+                    bp.Position);
+            if (transcripts == null) return null;
+
+            var overlappingTranscripts = new List<ITranscript>();
+
+            foreach (var transcript in transcripts)
+            {
+                if (transcript.Id.IsPredictedTranscript() || transcript.Translation == null) continue;
+                overlappingTranscripts.Add(transcript);
+            }
+
+            return overlappingTranscripts.ToArray();
+        }
+
+        private static BreakEndAdjacency[] GetBreakEndAdjacencies(ISimpleVariant variant, IDictionary<string, IChromosome> refNameToChromosome) =>
+            variant.Type == VariantType.translocation_breakend
+                ? BreakEndUtilities.CreateFromTranslocation(variant, refNameToChromosome)
+                : BreakEndUtilities.CreateFromSymbolicAllele(variant, variant.Type);
+
+        public void PreLoad(IChromosome chromosome, List<int> positions) => throw new NotImplementedException();
 
         private void LoadPredictionCaches(ushort refIndex)
         {
@@ -148,28 +210,6 @@ namespace VariantAnnotation.Providers
             _siftCache       = null;
             _polyphenCache   = null;
             _currentRefIndex = ushort.MaxValue;
-        }
-
-        private static ITranscript[] GetGeneFusionCandidates(IBreakEnd[] breakEnds, IIntervalForest<ITranscript> transcriptIntervalForest)
-        {
-            if (breakEnds == null || breakEnds.Length == 0) return null;
-
-            var geneFusionCandidates = new HashSet<ITranscript>();
-
-            foreach (var breakEnd in breakEnds)
-            {
-                ITranscript[] transcripts = transcriptIntervalForest.GetAllOverlappingValues(
-                    breakEnd.Piece2.Chromosome.Index, breakEnd.Piece2.Position, breakEnd.Piece2.Position);
-                if (transcripts == null) continue;
-
-                foreach (var transcript in transcripts)
-                {
-                    if (transcript.Id.IsPredictedTranscript()) continue;
-                    geneFusionCandidates.Add(transcript);
-                }
-            }
-
-            return geneFusionCandidates.ToArray();
         }
 
         private static void AddRegulatoryRegions(IAnnotatedVariant[] annotatedVariants, IIntervalForest<IRegulatoryRegion> regulatoryIntervalForest)

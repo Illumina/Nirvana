@@ -9,12 +9,15 @@ using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using Vcf.VariantCreator;
 using Xunit;
 
 namespace UnitTests.Phantom.Recomposer
 {
     public sealed class VariantGeneratorTests
     {
+        private readonly VariantId _vidCreator = new VariantId();
+        
         [Fact]
         public void GetPositionsAndRefAltAlleles_AsExpected()
         {
@@ -33,8 +36,8 @@ namespace UnitTests.Phantom.Recomposer
             var alleleBlocks = mergedAlleleBlockToSampleHaplotype.Select(x => x.Key).ToArray();
             var sequence = new NSequence();
 
-            var result1 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[0], alleleSet, refSequence, starts[0], null, sequence);
-            var result2 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[1], alleleSet, refSequence, starts[0], null, sequence);
+            var result1 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[0], alleleSet, refSequence, starts[0], null, sequence, _vidCreator);
+            var result2 = VariantGenerator.GetPositionsAndRefAltAlleles(alleleBlocks[1], alleleSet, refSequence, starts[0], null, sequence, _vidCreator);
 
             var expectedVarPosIndexes1 = new List<int> { 0, 1 };
             var expectedVarPosIndexes2 = new List<int> { 0, 1, 2 };
@@ -61,7 +64,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:PS	.	1|0:789	0/1:.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
@@ -104,7 +107,7 @@ namespace UnitTests.Phantom.Recomposer
             var position2 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	C	.	PASS	.	GT:PS	0|1:1584593	0/0:.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 3, 4 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -124,7 +127,7 @@ namespace UnitTests.Phantom.Recomposer
             var position2 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	C	.	PASS	.	GT:PS	0|1:1584593	0/0:.	0/0:.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 3, 4 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2 }, functionBlockRanges).ToList();
 
             Assert.Empty(recomposedPositions);
@@ -146,7 +149,7 @@ namespace UnitTests.Phantom.Recomposer
 
             var functionBlockRanges = new List<int> { 3, 4, 6, 6 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3, position4 }, functionBlockRanges).ToList();
 
             Assert.Empty(recomposedPositions);
@@ -169,7 +172,7 @@ namespace UnitTests.Phantom.Recomposer
 
             var functionBlockRanges = new List<int> { 3, 4, 6, 6 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3, position4 }, functionBlockRanges).ToList();
 
             Assert.Empty(recomposedPositions);
@@ -190,7 +193,7 @@ namespace UnitTests.Phantom.Recomposer
 
             var functionBlockRanges = new List<int> { 4, 6, 6 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -212,7 +215,7 @@ namespace UnitTests.Phantom.Recomposer
 
             var functionBlockRanges = new List<int> { 4, 6, 6 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -233,7 +236,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	4	.	CTGAATCGCGA	C	.	PASS	.	GT	0/0	0|1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 6 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -254,7 +257,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	FailedForSomeReason	.	GT:PS	.	1|0:.	0/1:456", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
@@ -276,7 +279,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	1|1	0/1	0|0", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 6, 8, 10 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -297,7 +300,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	0|1	0|1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 6, 8, 10 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -318,7 +321,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	30.1	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
@@ -340,7 +343,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	.	1|0	0/1", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Equal(2, recomposedPositions.Count);
@@ -362,7 +365,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT	./.	1|0	./.", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -383,7 +386,7 @@ namespace UnitTests.Phantom.Recomposer
             var position3 = AnnotationUtilities.GetSimplePosition("chr1	6	.	G	C	.	PASS	.	GT:GQ:PS	./.	1|0	1|1:13:456", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -405,7 +408,7 @@ namespace UnitTests.Phantom.Recomposer
             var position4 = AnnotationUtilities.GetSimplePosition("chr1	8	.	A	G	.	PASS	.	GT	0|1	0|1	0|0	0|0", sequenceProvider.RefNameToChromosome);
             var functionBlockRanges = new List<int> { 4, 6, 8, 10 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3, position4 }, functionBlockRanges).ToList();
 
             Assert.Single(recomposedPositions);
@@ -429,7 +432,7 @@ namespace UnitTests.Phantom.Recomposer
 
             var functionBlockRanges = new List<int> { 4, 5, 6, 7, 8 };
 
-            var recomposer = new VariantGenerator(sequenceProvider);
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
             var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3, position4, position5 }, functionBlockRanges).ToList();
 
             Assert.Equal(3, recomposedPositions.Count);

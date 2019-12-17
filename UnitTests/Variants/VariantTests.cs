@@ -1,6 +1,5 @@
 ﻿using Genome;
 using Variants;
-using Vcf;
 using Xunit;
 
 namespace UnitTests.Variants
@@ -21,12 +20,11 @@ namespace UnitTests.Variants
             const bool expectedDecomposed  = false;
             const bool expectedRecomposed  = true;
             var expectedLinkedVids         = new[] { "1:102:T:G" };
-            var expectedBreakEnds          = new IBreakEnd[] { new BreakEnd(expectedChromosome, expectedChromosome, 100, 200, false, false) };
             var expectedBehavior           = AnnotationBehavior.SmallVariants;
 
             var variant                    = new Variant(expectedChromosome, expectedStart, expectedEnd, expectedRef, expectedAlt,
                 expectedType, expectedVid, expectedRefMinor, expectedDecomposed, expectedRecomposed, expectedLinkedVids,
-                expectedBreakEnds, expectedBehavior, false);
+                expectedBehavior, false);
 
             Assert.Equal(expectedChromosome, variant.Chromosome);
             Assert.Equal(expectedStart,      variant.Start);
@@ -39,7 +37,6 @@ namespace UnitTests.Variants
             Assert.Equal(expectedDecomposed, variant.IsDecomposed);
             Assert.Equal(expectedRecomposed, variant.IsRecomposed);
             Assert.Equal(expectedLinkedVids, variant.LinkedVids);
-            Assert.Equal(expectedBreakEnds,  variant.BreakEnds);
             Assert.Equal(expectedBehavior,   variant.Behavior);
         }
     }

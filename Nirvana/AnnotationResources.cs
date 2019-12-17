@@ -17,6 +17,7 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Vcf;
+using Vcf.VariantCreator;
 
 namespace Nirvana
 {
@@ -31,16 +32,18 @@ namespace Nirvana
         public IGeneAnnotationProvider GeneAnnotationProvider { get; }
         public IAnnotator Annotator { get; }
         public IRecomposer Recomposer { get; }
+        public IVariantIdCreator VidCreator { get; }
         public List<IDataSourceVersion> DataSourceVersions { get; }
         public string VepDataVersion { get; }
         public long InputStartVirtualPosition { get; set; }
         public string AnnotatorVersionTag { get; set; } = "Nirvana " + CommandLineUtilities.Version;
         public bool ForceMitochondrialAnnotation { get; }
 
-        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations, bool disableRecomposition, bool forceMitochondrialAnnotation)
+        public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations,
+            bool disableRecomposition, bool forceMitochondrialAnnotation, bool useLegacyVids)
         {
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
-            
+
             var annotationFiles = new AnnotationFiles();
             saDirectoryPaths?.ForEach(x => annotationFiles.AddFiles(x));
             customAnnotations?.ForEach(x => annotationFiles.AddFiles(x));
@@ -51,19 +54,21 @@ namespace Nirvana
             RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
 
-            var repeatExpansionProvider = new RepeatExpansionProvider(SequenceProvider.Assembly,
-                SequenceProvider.RefNameToChromosome, SequenceProvider.RefIndexToChromosome.Count);
+            var repeatExpansionProvider = new RepeatExpansionProvider(SequenceProvider.Assembly, SequenceProvider.RefNameToChromosome,
+                SequenceProvider.RefIndexToChromosome.Count);
 
-            Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider,
-                ConservationProvider, GeneAnnotationProvider, repeatExpansionProvider);
-            
+            Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider, ConservationProvider, GeneAnnotationProvider,
+                repeatExpansionProvider);
+
+            if (useLegacyVids) VidCreator = new LegacyVariantId(SequenceProvider.RefNameToChromosome);
+            else VidCreator               = new VariantId(); 
+
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
-                : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider);
-            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider,
-                GeneAnnotationProvider, ConservationProvider).ToList();
-            VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." +
-                             SaCommon.DataVersion;
+                : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider, VidCreator);
+            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider, GeneAnnotationProvider, ConservationProvider)
+                .ToList();
+            VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
 
             ForceMitochondrialAnnotation = forceMitochondrialAnnotation;
         }

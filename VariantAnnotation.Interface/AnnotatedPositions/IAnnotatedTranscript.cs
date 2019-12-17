@@ -15,8 +15,8 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         string HgvsProtein { get; }
         PredictionScore Sift { get; }
         PredictionScore PolyPhen { get; }
-        IEnumerable<ConsequenceTag> Consequences { get; }
-        IGeneFusionAnnotation GeneFusionAnnotation { get; }
+        List<ConsequenceTag> Consequences { get; }
         bool? CompleteOverlap { get; }
+        void AddGeneFusion(IAnnotatedGeneFusion geneFusion);
     }
 }

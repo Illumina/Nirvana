@@ -184,10 +184,10 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             featureEffectsMock.Setup(x => x.Truncation()).Returns(isTruncation);
 
             var variant = new Variant(null, 0, 0, null, null, VariantType.unknown, null, false, false, false, null,
-                null, AnnotationBehavior.StructuralVariants, true);
+                AnnotationBehavior.StructuralVariants, true);
 
             var consequence = new Consequences(null, featureEffectsMock.Object);
-            consequence.DetermineStructuralVariantEffect(variant, false);
+            consequence.DetermineStructuralVariantEffect(variant);
             ConsequenceTag[] observedConsequences = consequence.GetConsequences().ToArray();
 
             Assert.Equal(expectedConsequences, observedConsequences);

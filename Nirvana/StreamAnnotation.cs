@@ -13,6 +13,7 @@ using VariantAnnotation.IO;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Utilities;
 using Vcf;
+using Vcf.VariantCreator;
 
 namespace Nirvana
 {
@@ -25,7 +26,7 @@ namespace Nirvana
             var logger  = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
             var metrics = new PerformanceMetrics(logger);
 
-            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, useLegacyVids))
+            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {
                 try
@@ -81,7 +82,7 @@ namespace Nirvana
         }
 
         private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter, bool useLegacyVids)
+            IVcfFilter vcfFilter)
         {
             var vcfReader = FileUtilities.GetStreamReader(vcfStream);
 
@@ -95,7 +96,7 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, useLegacyVids);
+                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator);
         }
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome,

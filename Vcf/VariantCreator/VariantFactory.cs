@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using Variants;
@@ -12,16 +13,14 @@ namespace Vcf.VariantCreator
 {
     public sealed class VariantFactory
     {
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly IVariantIdCreator _vidCreator;
         private readonly ISequence _sequence;
         public readonly FormatIndices FormatIndices = new FormatIndices();
-        private readonly bool _useBroadVids;
 
-        public VariantFactory(ISequence sequence, IDictionary<string, IChromosome> refNameToChromosome, bool useLegacyVids)
+        public VariantFactory(ISequence sequence, IVariantIdCreator vidCreator)
         {
-            _sequence            = sequence;
-            _refNameToChromosome = refNameToChromosome;
-            _useBroadVids        = !useLegacyVids;
+            _sequence   = sequence;
+            _vidCreator = vidCreator;
         }
 
         public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
@@ -30,8 +29,7 @@ namespace Vcf.VariantCreator
             bool isReference = globalMajorAllele != null;
 
             if (isReference)
-                return ReferenceVariantCreator.Create(_sequence, chromosome, start, end, refAllele,
-                    altAlleles[0], globalMajorAllele);
+                return ReferenceVariantCreator.Create(_vidCreator, _sequence, chromosome, start, end, refAllele, altAlleles[0], globalMajorAllele);
 
             var variantCategory = GetVariantCategory(altAlleles[0], infoData.SvType);
 
@@ -50,7 +48,11 @@ namespace Vcf.VariantCreator
                 (int shiftedStart, string shiftedRef, string shiftedAlt) =
                     VariantUtils.TrimAndLeftAlign(start, refAllele, altAllele, _sequence);
 
-                variants.Add(GetVariant(chromosome, shiftedStart, end - (start- shiftedStart), shiftedRef, shiftedAlt, infoData, variantCategory, isDecomposed, isRecomposed, linkedVids?[i]?.ToArray()));
+                if (variantCategory == VariantCategory.SmallVariant || variantCategory == VariantCategory.Reference)
+                    end = shiftedStart + shiftedRef.Length - 1;
+
+                variants.Add(GetVariant(chromosome, shiftedStart, end, shiftedRef, shiftedAlt, infoData, variantCategory,
+                    isDecomposed, isRecomposed, linkedVids?[i]?.ToArray()));
             }
 
             return variants.Count == 0 ? null : variants.ToArray();
@@ -75,35 +77,21 @@ namespace Vcf.VariantCreator
         private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
             IInfoData infoData, VariantCategory category, bool isDecomposed, bool isRecomposed, string[] linkedVids)
         {
-            string vid;
-            if (_useBroadVids)
-            {
-                vid = VariantId.Create(_sequence, category, infoData.SvType, chromosome, start, end, refAllele,
-                    altAllele);
-            }
-            else
-            {
-                vid = LegacyVariantId.Create(_refNameToChromosome, category, infoData.SvType, chromosome, start, end,
-                    refAllele, altAllele, infoData.RepeatUnit);
-            }
-
-            int svEnd  = infoData.End ?? start;
+            string vid = _vidCreator.Create(_sequence, category, infoData.SvType, chromosome, start, end, refAllele, altAllele, infoData.RepeatUnit);
+            int svEnd = infoData.End ?? start;
 
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (category)
             {
                 case VariantCategory.SmallVariant:
-                    return SmallVariantCreator.Create(chromosome, start, refAllele, altAllele, isDecomposed,
-                        isRecomposed, linkedVids, vid, false);
+                    return SmallVariantCreator.Create(chromosome, start, end, refAllele, altAllele, isDecomposed, isRecomposed, linkedVids, vid,
+                        false);
 
                 case VariantCategory.ROH:
                     return RohVariantCreator.Create(chromosome, start, svEnd, refAllele, altAllele, vid);
 
                 case VariantCategory.SV:
-                    IBreakEnd[] svBreakEnds = infoData.SvType == "BND"
-                        ? BreakEndCreator.CreateFromTranslocations(_refNameToChromosome, chromosome, refAllele, altAllele, start)
-                        : BreakEndCreator.CreateFromDelDupInv(_refNameToChromosome, chromosome.EnsemblName, start, infoData.SvType, infoData.End);
-                    return StructuralVariantCreator.Create(chromosome, start, svEnd, refAllele, altAllele, infoData.SvType, svBreakEnds, vid);
+                    return StructuralVariantCreator.Create(chromosome, start, svEnd, refAllele, altAllele, infoData.SvType, vid);
 
                 case VariantCategory.CNV:
                     return CnvCreator.Create(chromosome, start, svEnd, refAllele, altAllele, vid);
