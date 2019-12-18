@@ -13,13 +13,15 @@ using VariantAnnotation.IO;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Utilities;
 using Vcf;
+using Vcf.VariantCreator;
 
 namespace Nirvana
 {
     public static class StreamAnnotation
     {
         public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
-            Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter, bool ignoreEmptyChromosome = false)
+            Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter,
+            bool ignoreEmptyChromosome, bool useLegacyVids)
         {
             var logger  = outputJsonStream is BlockGZipStream ? new ConsoleLogger() : (ILogger)new NullLogger();
             var metrics = new PerformanceMetrics(logger);
@@ -94,7 +96,7 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter);
+                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator);
         }
 
         private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome,

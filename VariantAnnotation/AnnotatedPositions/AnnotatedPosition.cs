@@ -5,7 +5,6 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
-using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
@@ -31,18 +30,18 @@ namespace VariantAnnotation.AnnotatedPositions
 
             sb.Append(JsonObject.OpenBrace);
 
-            var originalChromName = Position.VcfFields[0];
+            string originalChromName = Position.VcfFields[0];
 
             jsonObject.AddStringValue("chromosome",  originalChromName);
             jsonObject.AddIntValue("position",       Position.Start);
 
-            if (IsShortTandemRepeat())
+            if (Position.HasShortTandemRepeat)
             {
                 jsonObject.AddStringValue("repeatUnit",  Position.InfoData?.RepeatUnit);
                 jsonObject.AddIntValue("refRepeatCount", Position.InfoData?.RefRepeatCount);
             }
 
-            if (IsStructuralVariant(AnnotatedVariants)) jsonObject.AddIntValue("svEnd", Position.InfoData?.End);
+            if (Position.HasStructuralVariant) jsonObject.AddIntValue("svEnd", Position.InfoData?.End);
 
             jsonObject.AddStringValue("refAllele", Position.RefAllele);
             jsonObject.AddStringValues("altAlleles", Position.AltAlleles);
@@ -74,18 +73,9 @@ namespace VariantAnnotation.AnnotatedPositions
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        private static bool IsStructuralVariant(IAnnotatedVariant[] variants) =>
-            variants.Any(variant => variant.Variant.IsStructuralVariant);
-
-        private bool IsShortTandemRepeat() =>
-            Position.Variants.Any(x => x.Type == VariantType.short_tandem_repeat_variation);
-
         private void AddSuppIntervalToJsonObject(JsonObject jsonObject)
         {
-            foreach (var si in SupplementaryIntervals)
-            {
-                jsonObject.AddObjectValue(si.JsonKey, si);
-            }
+            foreach (var si in SupplementaryIntervals) jsonObject.AddObjectValue(si.JsonKey, si);
         }
     }
 }

@@ -42,7 +42,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             return new AnnotatedTranscript(transcript, leftAnnotation.RefAminoAcids, leftAnnotation.AltAminoAcids,
                 leftAnnotation.RefCodons, leftAnnotation.AltCodons, leftAnnotation.Position, hgvsCoding, hgvsProtein,
-                predictionScores.Sift, predictionScores.PolyPhen, consequences, null, false);
+                predictionScores.Sift, predictionScores.PolyPhen, consequences, false);
         }
 
         private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string

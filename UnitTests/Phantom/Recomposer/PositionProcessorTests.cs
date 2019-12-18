@@ -7,6 +7,7 @@ using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using Vcf.VariantCreator;
 using Xunit;
 
 namespace UnitTests.Phantom.Recomposer
@@ -15,12 +16,11 @@ namespace UnitTests.Phantom.Recomposer
     {
         private readonly Mock<IVariantGenerator> _variantGeneratorMock = new Mock<IVariantGenerator>();
         private readonly Mock<IPositionBuffer> _positionBufferMock = new Mock<IPositionBuffer>();
-
+        private readonly VariantId _vidCreator = new VariantId();
 
         [Fact]
         public void GenerateOutput_EmptyBuffer_ReturnEmptyVcfFieldList()
         {
-
             var positionProcessor = new PositionProcessor(_positionBufferMock.Object, _variantGeneratorMock.Object);
             Assert.Empty(positionProcessor.GenerateOutput(new BufferedPositions(new List<ISimplePosition>(), new List<bool>(), new List<int>())));
         }
@@ -92,7 +92,7 @@ namespace UnitTests.Phantom.Recomposer
                 });
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
-            var variantGenerator = new VariantGenerator(sequenceProvider);
+            var variantGenerator = new VariantGenerator(sequenceProvider, _vidCreator);
 
             var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT:PS	0|1:123", sequenceProvider.RefNameToChromosome);
             var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	G	.	PASS	.	GT	0/1", sequenceProvider.RefNameToChromosome);
@@ -120,7 +120,7 @@ namespace UnitTests.Phantom.Recomposer
                 });
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
-            var variantGenerator = new VariantGenerator(sequenceProvider);
+            var variantGenerator = new VariantGenerator(sequenceProvider, _vidCreator);
 
             var position1 = AnnotationUtilities.GetSimplePosition("chr1	2	.	A	T	.	PASS	.	GT:PS	0|1:.", sequenceProvider.RefNameToChromosome);
             var position2 = AnnotationUtilities.GetSimplePosition("chr1	4	.	C	G	.	PASS	.	GT	1/1", sequenceProvider.RefNameToChromosome);

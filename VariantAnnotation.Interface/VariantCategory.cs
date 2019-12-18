@@ -1,4 +1,4 @@
-﻿namespace Vcf.VariantCreator
+﻿namespace VariantAnnotation.Interface
 {
     public enum VariantCategory
     {

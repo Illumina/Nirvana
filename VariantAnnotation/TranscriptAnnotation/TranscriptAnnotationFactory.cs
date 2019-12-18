@@ -16,7 +16,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         public static IList<IAnnotatedTranscript> GetAnnotatedTranscripts(IVariant variant,
             ITranscript[] transcriptCandidates, ISequence compressedSequence, IPredictionCache siftCache,
-            IPredictionCache polyphenCache, ITranscript[] geneFusionCandidates = null)
+            IPredictionCache polyphenCache)
         {
             var annotatedTranscripts = new List<IAnnotatedTranscript>();
 
@@ -27,7 +27,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 var annotationStatus = DecideAnnotationStatus(variant, transcript, variant.Behavior);
 
                 var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript,
-                    annotationStatus, siftCache, polyphenCache, geneFusionCandidates);
+                    annotationStatus, siftCache, polyphenCache);
 
                 if (annotatedTranscript != null) annotatedTranscripts.Add(annotatedTranscript);
             }
@@ -36,8 +36,7 @@ namespace VariantAnnotation.TranscriptAnnotation
         }
 
         private static IAnnotatedTranscript GetAnnotatedTranscript(IVariant variant, ISequence compressedSequence,
-            ITranscript transcript, Status annotationStatus, IPredictionCache siftCache, IPredictionCache polyphenCache,
-            ITranscript[] geneFusionCandidates)
+            ITranscript transcript, Status annotationStatus, IPredictionCache siftCache, IPredictionCache polyphenCache)
         {
             IAnnotatedTranscript annotatedTranscript = null;
 
@@ -49,7 +48,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                         FlankingTranscriptAnnotator.GetAnnotatedTranscript(variant.End, transcript);
                     break;
                 case Status.ReducedAnnotation:
-                    annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, geneFusionCandidates);
+                    annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant);
                     break;
                 case Status.CompleteOverlapAnnotation:
                     annotatedTranscript = ReducedTranscriptAnnotator.GetCompleteOverlapTranscript(transcript);
@@ -71,7 +70,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         internal static Status DecideAnnotationStatus(IInterval variant, IInterval transcript, AnnotationBehavior behavior)
         {
-            var overlapsTranscript = variant.Overlaps(transcript);
+            bool overlapsTranscript = variant.Overlaps(transcript);
             
             if (!behavior.ReducedTranscriptAnnotation)
             {

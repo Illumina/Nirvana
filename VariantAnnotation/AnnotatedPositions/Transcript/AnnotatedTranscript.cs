@@ -20,28 +20,34 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public string HgvsProtein { get; }
         public PredictionScore Sift { get; }
         public PredictionScore PolyPhen { get; }
-        public IEnumerable<ConsequenceTag> Consequences { get; }
-        public IGeneFusionAnnotation GeneFusionAnnotation { get; }
+        public List<ConsequenceTag> Consequences { get; }
         public bool? CompleteOverlap { get; }
+
+        private IAnnotatedGeneFusion _geneFusion;
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPosition mappedPosition, string hgvsCoding,
             string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
-            IEnumerable<ConsequenceTag> consequences, IGeneFusionAnnotation geneFusionAnnotation, bool? completeOverlap)
+            List<ConsequenceTag> consequences, bool? completeOverlap)
         {
-            Transcript           = transcript;
-            ReferenceAminoAcids  = referenceAminoAcids;
-            AlternateAminoAcids  = alternateAminoAcids;
-            ReferenceCodons      = referenceCodons;
-            AlternateCodons      = alternateCodons;
-            MappedPosition       = mappedPosition;
-            HgvsCoding           = hgvsCoding;
-            HgvsProtein          = hgvsProtein;
-            Sift                 = sift;
-            PolyPhen             = polyphen;
-            Consequences         = consequences;
-            GeneFusionAnnotation = geneFusionAnnotation;
-            CompleteOverlap      = completeOverlap;
+            Transcript          = transcript;
+            ReferenceAminoAcids = referenceAminoAcids;
+            AlternateAminoAcids = alternateAminoAcids;
+            ReferenceCodons     = referenceCodons;
+            AlternateCodons     = alternateCodons;
+            MappedPosition      = mappedPosition;
+            HgvsCoding          = hgvsCoding;
+            HgvsProtein         = hgvsProtein;
+            Sift                = sift;
+            PolyPhen            = polyphen;
+            Consequences        = consequences;
+            CompleteOverlap     = completeOverlap;
+        }
+
+        public void AddGeneFusion(IAnnotatedGeneFusion geneFusion)
+        {
+            _geneFusion = geneFusion;
+            Consequences.Add(ConsequenceTag.unidirectional_gene_fusion);
         }
 
         public void SerializeJson(StringBuilder sb)
@@ -64,16 +70,18 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 jsonObject.AddStringValue("proteinPos", GetRangeString(MappedPosition.ProteinStart,   MappedPosition.ProteinEnd));
             }
 
-            var geneId = Transcript.Source == Source.Ensembl
+            string geneId = Transcript.Source == Source.Ensembl
                 ? Transcript.Gene.EnsemblId.ToString()
                 : Transcript.Gene.EntrezGeneId.ToString();
 
             if (CompleteOverlap.HasValue &&!CompleteOverlap.Value) jsonObject.AddStringValue("geneId", geneId);
             jsonObject.AddStringValue("hgnc", Transcript.Gene.Symbol);
-            jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
+
+            if (Consequences != null) AddConsequences(jsonObject);
             jsonObject.AddStringValue("hgvsc", HgvsCoding);
             jsonObject.AddStringValue("hgvsp", HgvsProtein);
-            jsonObject.AddStringValue("geneFusion", GeneFusionAnnotation?.ToString(), false);
+
+            jsonObject.AddObjectValue("geneFusion", _geneFusion);
 
             jsonObject.AddBoolValue("isCanonical", Transcript.IsCanonical);
 
@@ -89,6 +97,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (CompleteOverlap.HasValue) jsonObject.AddBoolValue("completeOverlap", CompleteOverlap.Value);
 
             sb.Append(JsonObject.CloseBrace);
+        }
+
+        private void AddConsequences(JsonObject jsonObject)
+        {
+            if (Consequences.Count == 0) Consequences.Add(ConsequenceTag.transcript_variant);
+            jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
         }
 
         public static string GetBioType(BioType bioType) => bioType == BioType.three_prime_overlapping_ncRNA

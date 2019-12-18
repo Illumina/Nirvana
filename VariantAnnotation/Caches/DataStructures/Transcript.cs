@@ -67,20 +67,20 @@ namespace VariantAnnotation.Caches.DataStructures
             ITranscriptRegion[] cacheTranscriptRegions, IInterval[] cacheMirnas, string[] cachePeptideSeqs)
         {
             // transcript
-            var referenceIndex = reader.ReadOptUInt16();
-            var start          = reader.ReadOptInt32();
-            var end            = reader.ReadOptInt32();
-            var id             = CompactId.Read(reader);
+            ushort referenceIndex = reader.ReadOptUInt16();
+            int start             = reader.ReadOptInt32();
+            int end               = reader.ReadOptInt32();
+            var id                = CompactId.Read(reader);
 
             // gene
-            var geneIndex = reader.ReadOptInt32();
+            int geneIndex = reader.ReadOptInt32();
             var gene      = cacheGenes[geneIndex];
 
             // encoded data
             var encoded = EncodedTranscriptData.Read(reader);
 
             // transcript regions
-            var transcriptRegions = encoded.HasTranscriptRegions ? ReadIndices(reader, cacheTranscriptRegions) : null;
+            ITranscriptRegion[] transcriptRegions = encoded.HasTranscriptRegions ? ReadIndices(reader, cacheTranscriptRegions) : null;
             ushort numExons       = reader.ReadOptUInt16();
 
             // protein function predictions
@@ -91,9 +91,9 @@ namespace VariantAnnotation.Caches.DataStructures
             var translation = encoded.HasTranslation ? DataStructures.Translation.Read(reader, cachePeptideSeqs) : null;
 
             // attributes
-            var mirnas          = encoded.HasMirnas          ? ReadIndices(reader, cacheMirnas)         : null;
-            var rnaEdits        = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;
-            var selenocysteines = encoded.HasSelenocysteines ? ReadItems(reader, x => x.ReadOptInt32()) : null;
+            IInterval[] mirnas    = encoded.HasMirnas          ? ReadIndices(reader, cacheMirnas)         : null;
+            IRnaEdit[] rnaEdits   = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;
+            int[] selenocysteines = encoded.HasSelenocysteines ? ReadItems(reader, x => x.ReadOptInt32()) : null;
 
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
@@ -136,7 +136,7 @@ namespace VariantAnnotation.Caches.DataStructures
             if (encoded.HasTranslation)
             {
                 // ReSharper disable once PossibleNullReferenceException
-                var peptideIndex = GetIndex(Translation.PeptideSeq, peptideIndices);
+                int peptideIndex = GetIndex(Translation.PeptideSeq, peptideIndices);
                 Translation.Write(writer, peptideIndex);
             }
 
@@ -150,7 +150,7 @@ namespace VariantAnnotation.Caches.DataStructures
         {
             int numItems = reader.ReadOptInt32();
             var items    = new T[numItems];
-            for (int i = 0; i < numItems; i++) items[i] = readFunc(reader);
+            for (var i = 0; i < numItems; i++) items[i] = readFunc(reader);
             return items;
         }
 
@@ -165,9 +165,9 @@ namespace VariantAnnotation.Caches.DataStructures
             int numItems = reader.ReadOptInt32();
             var items = new T[numItems];
 
-            for (int i = 0; i < numItems; i++)
+            for (var i = 0; i < numItems; i++)
             {
-                var index = reader.ReadOptInt32();
+                int index = reader.ReadOptInt32();
                 items[i] = cachedItems[index];
             }
 
@@ -184,7 +184,7 @@ namespace VariantAnnotation.Caches.DataStructures
         {
             if (item == null) return -1;
 
-            if (!indices.TryGetValue(item, out var index))
+            if (!indices.TryGetValue(item, out int index))
             {
                 throw new InvalidDataException($"Unable to locate the {typeof(T)} in the indices: {item}");
             }

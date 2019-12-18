@@ -16,7 +16,6 @@ namespace Variants
         public bool IsRecomposed { get; }           = false;
         public bool IsDecomposed { get; }           = false;
         public string[] LinkedVids { get; }         = null;
-        public IBreakEnd[] BreakEnds { get; }       = null;
         public AnnotationBehavior Behavior { get; } = AnnotationBehavior.RepeatExpansions;
         public bool IsStructuralVariant { get; }    = true;
 

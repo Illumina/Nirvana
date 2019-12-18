@@ -27,7 +27,7 @@ namespace Vcf.Sample
         }
 
         internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, int numAltAlleles,
-            LegacySampleFieldExtractor legacyExtractor=null)
+            LegacySampleFieldExtractor legacyExtractor = null)
         {
             // sanity check: make sure we have a format column
             if (string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;

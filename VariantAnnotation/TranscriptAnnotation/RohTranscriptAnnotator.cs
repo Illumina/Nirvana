@@ -8,7 +8,7 @@ namespace VariantAnnotation.TranscriptAnnotation
         public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript)
         {
             return transcript.IsCanonical ? new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null,
-                null, null, null) : null;
+                null, null) : null;
         }
     }
 }

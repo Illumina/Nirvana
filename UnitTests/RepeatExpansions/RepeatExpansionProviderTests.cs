@@ -57,7 +57,7 @@ namespace UnitTests.RepeatExpansions
         [Fact]
         public void Annotate_NotRepeatExpansion_NullPhenotypes()
         {
-            var variant = new Variant(_chr3, Start, End, "A", "C", VariantType.SNV, null, false, false, false, null, null,
+            var variant = new Variant(_chr3, Start, End, "A", "C", VariantType.SNV, null, false, false, false, null, 
                 AnnotationBehavior.SmallVariants, false);
 
             var annotatedPosition = GetAnnotatedPosition(variant);

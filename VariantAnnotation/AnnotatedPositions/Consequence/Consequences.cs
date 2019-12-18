@@ -63,18 +63,15 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             GetTier1Types();
             if (_consequences.Count == 0) GetTier2Types();
             if (_consequences.Count == 0) GetTier3Types();
-            if (_consequences.Count == 0) _consequences.Add(ConsequenceTag.transcript_variant);
         }
 
-        public void DetermineStructuralVariantEffect(IVariant variant, bool addGeneFusion)
+        public void DetermineStructuralVariantEffect(IVariant variant)
         {
             GetTier1Types();
             if (_consequences.Count == 0) GetStructuralTier2Types();
-            if (addGeneFusion) _consequences.Add(ConsequenceTag.unidirectional_gene_fusion);
 
             DetermineCopyNumberEffect(variant.Type);
             DetermineRepeatExpansionEffect(variant);
-            if (_consequences.Count == 0) _consequences.Add(ConsequenceTag.transcript_variant);
         }
 
         private void DetermineRepeatExpansionEffect(IVariant variant)

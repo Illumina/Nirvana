@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Genome;
 using Phantom.PositionCollections;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
@@ -14,8 +15,13 @@ namespace Phantom.Recomposer
     public sealed class VariantGenerator : IVariantGenerator
     {
         private readonly ISequenceProvider _sequenceProvider;
+        private readonly IVariantIdCreator _vidCreator;
 
-        public VariantGenerator(ISequenceProvider sequenceProvider) => _sequenceProvider = sequenceProvider;
+        public VariantGenerator(ISequenceProvider sequenceProvider, IVariantIdCreator vidCreator)
+        {
+            _sequenceProvider = sequenceProvider;
+            _vidCreator       = vidCreator;
+        }
 
         public IEnumerable<ISimplePosition> Recompose(List<ISimplePosition> simplePositions,
             List<int> functionBlockRanges)
@@ -36,7 +42,7 @@ namespace Phantom.Recomposer
             {
                 (int start, _, string refAllele, string altAllele, var varPosIndexesInAlleleBlock,
                     List<string> decomposedVids) = GetPositionsAndRefAltAlleles(alleleIndexBlock, alleleSet,
-                    totalRefSequence, regionStart, simplePositions, _sequenceProvider.Sequence);
+                    totalRefSequence, regionStart, simplePositions, _sequenceProvider.Sequence, _vidCreator);
 
                 if (start == default) continue;
 
@@ -142,7 +148,7 @@ namespace Phantom.Recomposer
 
         internal static (int Start, int End, string Ref, string Alt, List<int> VarPosIndexesInAlleleBlock, List<string>
             decomposedVids) GetPositionsAndRefAltAlleles(AlleleBlock alleleBlock, AlleleSet alleleSet,
-                string totalRefSequence, int regionStart, List<ISimplePosition> simplePositions, ISequence sequence)
+                string totalRefSequence, int regionStart, List<ISimplePosition> simplePositions, ISequence sequence, IVariantIdCreator vidCreator)
         {
             int numPositions = alleleBlock.AlleleIndexes.Length;
             int firstPositionIndex = alleleBlock.PositionIndex;
@@ -191,10 +197,9 @@ namespace Phantom.Recomposer
                 //Only SNVs get recomposed for now
                 if (thisPosition.Vids[varIndex] == null)
                 {
-                    thisPosition.Vids[varIndex] = VariantId.Create(sequence, VariantCategory.SmallVariant, null,
-                        alleleSet.Chromosome, thisPosition.Start,
-                        thisPosition.Start + thisPosition.RefAllele.Length - 1, thisPosition.RefAllele,
-                        thisPosition.AltAlleles[varIndex]);
+                    thisPosition.Vids[varIndex] = vidCreator.Create(sequence, VariantCategory.SmallVariant, null, alleleSet.Chromosome,
+                        thisPosition.Start, thisPosition.Start + thisPosition.RefAllele.Length - 1, thisPosition.RefAllele,
+                        thisPosition.AltAlleles[varIndex], null);
                     thisPosition.IsDecomposed[varIndex] = true;
                 }
 
@@ -211,8 +216,8 @@ namespace Phantom.Recomposer
 
             // trim recomposed alleles
             (int trimmedBlockStart, string trimmedRefSequence, string trimmedRecomposedAllele) = BiDirectionalTrimmer.Trim(blockStart, refSequence, recomposedAllele);
-            string recomposedVariantId = VariantId.Create(sequence, VariantCategory.SmallVariant, null,
-                alleleSet.Chromosome, trimmedBlockStart, trimmedBlockStart + trimmedRefSequence.Length - 1, trimmedRefSequence, trimmedRecomposedAllele);
+            string recomposedVariantId = vidCreator.Create(sequence, VariantCategory.SmallVariant, null, alleleSet.Chromosome, trimmedBlockStart,
+                trimmedBlockStart + trimmedRefSequence.Length - 1, trimmedRefSequence, trimmedRecomposedAllele, null); 
 
             vidListsNeedUpdate.ForEach(x => x.Add(recomposedVariantId));
             return (blockStart, blockRefEnd, refSequence, recomposedAllele, variantPosIndexesInAlleleBlock,
@@ -221,7 +226,7 @@ namespace Phantom.Recomposer
 
         private static bool FindConflictAllele(AlleleBlock alleleBlock, AlleleSet alleleSet)
         {
-            var starts = alleleSet.Starts;
+            int[] starts = alleleSet.Starts;
             int firstPositionIndex = alleleBlock.PositionIndex;
 
             int previousStart = starts[firstPositionIndex];
@@ -255,7 +260,7 @@ namespace Phantom.Recomposer
 
         private static bool CheckPreviousAlleles(IEnumerable<string> allelesToCheck, string chromName, int position)
         {
-            var distinctAlleles = allelesToCheck.Distinct().ToArray();
+            string[] distinctAlleles = allelesToCheck.Distinct().ToArray();
             if (distinctAlleles.Length <= 1) return false;
 
             Console.WriteLine($"WARNING: Conflicting alternative alleles identified at {chromName}:{position}. The following alleles are present: {string.Join(' ', distinctAlleles)}.");

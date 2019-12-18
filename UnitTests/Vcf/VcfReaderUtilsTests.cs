@@ -13,6 +13,8 @@ namespace UnitTests.Vcf
 {
     public sealed class VcfReaderUtilsTests
     {
+        private readonly VariantId _vidCreator = new VariantId();
+
 #if (NI_ALLELE)
         [Fact]
         public void ParseVcfLine_NonInformativeAlleles_Alone_NotFiltered()
@@ -97,7 +99,7 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["chr1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
 
             var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, seqProvider, variantFactory);
 
@@ -123,7 +125,7 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
 
 
             var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
@@ -149,7 +151,7 @@ namespace UnitTests.Vcf
                 new Dictionary<string, IChromosome> { ["1"] = chromosome });
             var refNameToChromosome = seqProvider.RefNameToChromosome;
 
-            var variantFactory = new VariantFactory(seqProvider.Sequence, refNameToChromosome);
+            var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
 
             var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);

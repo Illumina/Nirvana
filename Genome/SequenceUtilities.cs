@@ -5,12 +5,8 @@ namespace Genome
 {
 	public static class SequenceUtilities
 	{
-		#region members
-
 		private static readonly char[] ReverseComplementLookupTable;
 		private static readonly HashSet<char> CanonicalBases;
-
-		#endregion
 
 		static SequenceUtilities()
 		{
@@ -50,9 +46,6 @@ namespace Genome
 		/// <summary>
 		/// returns true if we have a base other than the 4 standard bases: A, C, G, and T
 		/// </summary>
-		public static bool HasNonCanonicalBase(string bases)
-		{
-		    return !string.IsNullOrEmpty(bases) && bases.Any(c => !CanonicalBases.Contains(c));
-		}
+		public static bool HasNonCanonicalBase(string bases) => !string.IsNullOrEmpty(bases) && bases.Any(c => !CanonicalBases.Contains(c));
     }
 }

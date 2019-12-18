@@ -3,7 +3,7 @@ using Variants;
 using Vcf.VariantCreator;
 using Xunit;
 
-namespace UnitTests.Vcf
+namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class SmallVariantCreatorTests
     {
@@ -12,7 +12,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void Create_Insertion_ReturnVariant()
         {
-            var variant = SmallVariantCreator.Create(Chr1, 101, "", "CG", false, false, null, null, false);
+            var variant = SmallVariantCreator.Create(Chr1, 101, 100, "", "CG", false, false, null, null, false);
             Assert.False(variant.IsRefMinor);
             Assert.Equal(AnnotationBehavior.SmallVariants, variant.Behavior);
             Assert.Equal("1", variant.Chromosome.EnsemblName);

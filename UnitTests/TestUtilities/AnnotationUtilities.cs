@@ -23,7 +23,7 @@ namespace UnitTests.TestUtilities
             var refMinorProvider  = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             var (annotator, sequenceProvider)   = GetAnnotatorAndSequenceProvider(cacheFilePrefix, saPaths);
 
-            var variantFactory    = new VariantFactory(sequenceProvider.Sequence, sequenceProvider.RefNameToChromosome);
+            var variantFactory    = new VariantFactory(sequenceProvider.Sequence, new VariantId());
             var position          = ParseVcfLine(vcfLine, refMinorProvider, sequenceProvider, variantFactory);
             var annotatedPosition = annotator.Annotate(position);
 

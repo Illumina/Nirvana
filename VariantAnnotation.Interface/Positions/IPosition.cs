@@ -9,5 +9,7 @@ namespace VariantAnnotation.Interface.Positions
         IVariant[] Variants { get; }
         ISample[] Samples { get; }
         IInfoData InfoData { get; }
+        bool HasStructuralVariant { get; }
+        bool HasShortTandemRepeat { get; }
     }
 }
