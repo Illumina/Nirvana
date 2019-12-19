@@ -17,7 +17,7 @@ namespace Variants
         public bool IsDecomposed { get; }           = false;
         public string[] LinkedVids { get; }         = null;
         public AnnotationBehavior Behavior { get; } = AnnotationBehavior.RepeatExpansions;
-        public bool IsStructuralVariant { get; }    = true;
+        public bool IsStructuralVariant { get; }    = false;
 
         public readonly int RepeatCount;
         public readonly int? RefRepeatCount;
