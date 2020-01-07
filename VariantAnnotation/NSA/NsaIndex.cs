@@ -21,7 +21,8 @@ namespace VariantAnnotation.NSA
         public readonly bool MatchByAllele;
         public readonly bool IsPositional;
 
-
+        public Dictionary<ushort, List<NsaIndexBlock>> GetBlockData() => _chromBlocks;
+        
         public NsaIndex(ExtendedBinaryWriter indexWriter, GenomeAssembly assembly, DataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional)
         {
             _writer       = indexWriter;
@@ -71,6 +72,22 @@ namespace VariantAnnotation.NSA
                 }
             }
         }
+
+        public void Write(Dictionary<ushort, List<NsaIndexBlock>>  chromBlocks)
+        {
+            _writer.WriteOpt(_chromBlocks.Count);
+
+            foreach ((ushort index, List<NsaIndexBlock> chunks) in chromBlocks)
+            {
+                _writer.WriteOpt(index);
+                _writer.WriteOpt(chunks.Count);
+                foreach (NsaIndexBlock chunk in chunks)
+                {
+                    chunk.Write(_writer);
+                }
+            }
+        }
+
 
         public NsaIndex(Stream stream)
         {

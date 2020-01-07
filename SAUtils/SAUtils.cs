@@ -9,6 +9,7 @@ using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GnomadGeneScores;
 using SAUtils.MitoHeteroplasmy;
+using SAUtils.NsaIndexUpdater;
 using SAUtils.PrimateAi;
 using SAUtils.ProcessSpliceNetTsv;
 using SAUtils.SpliceAi;
@@ -53,7 +54,8 @@ namespace SAUtils
                 ["primateAi"]             = new TopLevelOption("create PrimateAI database", PrimateAiDb.Run),
                 ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run),
                 ["diseaseValidity"]       = new TopLevelOption("create disease validity database", GeneDiseaseValidity.Run),
-                ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run)
+                ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
+                ["index"]                 = new TopLevelOption("edit an index file", UpdateIndex.Run)
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)

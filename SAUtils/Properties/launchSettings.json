@@ -123,6 +123,11 @@
       "commandName": "Project",
       "commandLineArgs": "MitoHet --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in coriell_GRCh37.MT.json.bed.gz --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "c:\\development\\ExternalDataSources\\MitoHeteroplasmy"
+    },
+    "RR sa index": {
+      "commandName": "Project",
+      "commandLineArgs": " index --ind C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAi_20191004.nsa.old.idx --ver C:\\development\\ExternalDataSources\\SpliceAI\\1.3\\GRCh38\\spliceai_scores.masked.hg38.vcf.gz.version --out C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAi_20191004.nsa.idx",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\"
     }
   }
 }
