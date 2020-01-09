@@ -86,6 +86,8 @@ namespace VariantAnnotation.Providers
 
         private void AddSmallVariantAnnotations(IAnnotatedPosition annotatedPosition)
         {
+            //if (annotatedPosition.Position.Start == 17148654)
+            //    Console.WriteLine("bug");
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;

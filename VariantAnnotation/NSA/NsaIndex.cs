@@ -75,7 +75,7 @@ namespace VariantAnnotation.NSA
 
         public void Write(Dictionary<ushort, List<NsaIndexBlock>>  chromBlocks)
         {
-            _writer.WriteOpt(_chromBlocks.Count);
+            _writer.WriteOpt(chromBlocks.Count);
 
             foreach ((ushort index, List<NsaIndexBlock> chunks) in chromBlocks)
             {

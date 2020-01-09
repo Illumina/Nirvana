@@ -8,6 +8,7 @@ using IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Providers;
+using Variants;
 
 namespace SAUtils.SpliceAi
 {
@@ -18,7 +19,6 @@ namespace SAUtils.SpliceAi
         private readonly Dictionary<ushort, IntervalArray<byte>> _spliceIntervals;
         private readonly HashSet<string> _unresolvedSymbols;
         public static int Count;
-        public static int NoGeneCount;
 
         private string _geneSymbol;
         private double _acceptorGainScore;
@@ -30,25 +30,20 @@ namespace SAUtils.SpliceAi
         private int _acceptorLossPosition;
         private int _donorGainPosition;
         private int _donorLossPosition;
-        private readonly IntervalForest<string> _geneTree;
-        private readonly Dictionary<string, List<string>> _geneSynonyms;
-        private readonly HashSet<string> _currentPositionGeneSymbols;
 
-        public SpliceAiParser(Stream stream, ISequenceProvider sequenceProvider, Dictionary<ushort, IntervalArray<byte>> spliceIntervals, IntervalForest<string> geneTree = null, Dictionary<string, List<string>> geneSynonyms = null)
+        private readonly Dictionary<string, string> _spliceToNirvanaSymbols;
+
+        public SpliceAiParser(Stream stream, ISequenceProvider sequenceProvider, Dictionary<ushort, IntervalArray<byte>> spliceIntervals, Dictionary<string, string> spliceToNirGeneSymbols)
         {
-            _stream              = stream;
-            _sequenceProvider    = sequenceProvider;
-            _spliceIntervals     = spliceIntervals;
-            _geneTree            = geneTree;
-            _geneSynonyms        = geneSynonyms;
-            _unresolvedSymbols   = new HashSet<string>();
-            _currentPositionGeneSymbols  = new HashSet<string>();
+            _stream                 = stream;
+            _sequenceProvider       = sequenceProvider;
+            _spliceIntervals        = spliceIntervals;
+            _spliceToNirvanaSymbols = spliceToNirGeneSymbols;
+            _unresolvedSymbols      = new HashSet<string>();
         }
 
         public IEnumerable<SpliceAiItem> GetItems()
         {
-            var previousItems = new List<SpliceAiItem>();
-
             using (var reader = FileUtilities.GetStreamReader(_stream))
             {
                 string line;
@@ -57,43 +52,22 @@ namespace SAUtils.SpliceAi
                     // Skip empty lines.
                     if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    // Skip comments.
-                    if (line.OptimizedStartsWith('#')) continue;
+                    // comments may contain the Format field
+                    if (line.OptimizedStartsWith('#'))
+                    {
+                        if (line.Contains("Format:")) GetFieldIndices(line);
+                        continue;
+                    }
 
                     var item = ExtractItem(line);
                     if (item == null) continue;
-                    if (previousItems.Count == 0 || SpliceAiItem.CompareTo(item, previousItems[0])==0)
-                    {
-                        //starting or extending new position
-                        previousItems.Add(item);
-                        continue;
-                    }
-                    //performing sanity check
-                    SanityCheck(previousItems);
-                    UpdateGeneSymbols(previousItems);
-
-                    foreach (var spliceAiItem in previousItems)
-                    {
-                        Count++;
-                        if (string.IsNullOrEmpty(spliceAiItem.Hgnc)) continue;
-                        yield return spliceAiItem;
-                    }
-                    previousItems.Clear();
-                    previousItems.Add(item);
+                    UpdateGeneSymbol(item);
+                    if (string.IsNullOrEmpty(item.Hgnc)) continue;
+                    yield return item;
+                    
                 }
             }
-            //clearing off the final items (they should all be at the same  position
-            UpdateGeneSymbols(previousItems);
-            foreach (var spliceAiItem in previousItems)
-            {
-                Count++;
-                // if an entry doesn't overlap any Nirvana gene, we skip it.
-                if (string.IsNullOrEmpty(spliceAiItem.Hgnc)) continue;
-                
-                yield return spliceAiItem;
-            }
-
-            Console.WriteLine($"Total item count: {Count}, items without overlapping Nirvana gene: {NoGeneCount} ({(100.0*NoGeneCount)/Count}%)");
+            
             Console.WriteLine($"{_unresolvedSymbols.Count} unresolved gene symbols encountered. Symbols:");
             foreach (var symbol in _unresolvedSymbols)
             {
@@ -101,32 +75,47 @@ namespace SAUtils.SpliceAi
             }
         }
 
-        private static void SanityCheck(List<SpliceAiItem> previousItems)
-        {
-            for (var i = 0; i < previousItems.Count - 1; i++)
-            {
-                if (previousItems[i].Position != previousItems[i + 1].Position)
-                    throw new DataMisalignedException("different positions grouped together");
-                if (previousItems[i].Chromosome.Index != previousItems[i + 1].Chromosome.Index)
-                    throw new DataMisalignedException("different chromosomes grouped together");
-            }
+        //##INFO=<ID=SpliceAI,Number=.,Type=String,Description="SpliceAIv1.3 variant annotation. These include delta scores (DS) and delta positions (DP) 
+        //for acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL). Format: ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL">
+        private int GeneSymbolIndex = -1;
+        private int DsAgIndex = -1;
+        private int DsAlIndex = -1;
+        private int DsDgIndex = -1;
+        private int DsDlIndex = -1;
+        private int DpAgIndex = -1;
+        private int DpAlIndex = -1;
+        private int DpDgIndex = -1;
+        private int DpDlIndex = -1;
+
+        private const string GeneSymbolTag = "SYMBOL";
+        private const string DsAgTag = "DS_AG";
+        private const string DsAlTag = "DS_AL";
+        private const string DsDgTag = "DS_DG";
+        private const string DsDlTag = "DS_DL";
+        private const string DpAgTag = "DP_AG";
+        private const string DpAlTag = "DP_AL";
+        private const string DpDgTag = "DP_DG";
+        private const string DpDlTag = "DP_DL";
+
+        private void GetFieldIndices(string line) {
+            var format = line.Split("Format:")[1];
+            format = format.EndsWith("\">") ? format.Substring(0, format.Length - 2): format;
+            var fields = format.OptimizedSplit('|');
+            
+            GeneSymbolIndex = Array.IndexOf(fields, GeneSymbolTag);
+
+            DsAgIndex = Array.IndexOf(fields, DsAgTag);
+            DsDgIndex = Array.IndexOf(fields, DsDgTag);
+            DsAlIndex = Array.IndexOf(fields, DsAlTag);
+            DsDlIndex = Array.IndexOf(fields, DsDlTag);
+
+            DpAgIndex = Array.IndexOf(fields, DpAgTag);
+            DpDgIndex = Array.IndexOf(fields, DpDgTag);
+            DpAlIndex = Array.IndexOf(fields, DpAlTag);
+            DpDlIndex = Array.IndexOf(fields, DpDlTag);
         }
-
-        private void UpdateGeneSymbols(List<SpliceAiItem> items)
-        {
-            _currentPositionGeneSymbols.Clear();
-            foreach (var item in items)
-            {
-                _currentPositionGeneSymbols.Add(item.Hgnc);
-            }
-
-            foreach (var item in items)
-            {
-                UpdateGeneSymbol(item);
-            }
-        }
-
-
+        
+        
         /// <summary>
         /// Extracts a splice AI item from the specified VCF line.
         /// </summary>
@@ -146,48 +135,29 @@ namespace SAUtils.SpliceAi
             var altAllele  = splitLine[VcfCommon.AltIndex];
             
             if (altAllele.Contains(',')) throw new DataException($"multiple alt allele present for {chromosome}-{position}");
+
+            var start = position;
+            (start, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, _sequenceProvider.Sequence);
+
+            var end = start + refAllele.Length - 1;
+            var isSpliceAdjacent = _spliceIntervals[chromosome.Index].OverlapsAny(start, end);
             
             ParseInfoField(splitLine[VcfCommon.InfoIndex]);
             
-            var isSpliceAdjacent = _spliceIntervals[chromosome.Index].OverlapsAny(position, position);
             if (!HasSignificantScore() && !isSpliceAdjacent) return null;
             
             Count++;
-            return new SpliceAiItem(chromosome, position, refAllele, altAllele, _geneSymbol,
+            return new SpliceAiItem(chromosome, start, refAllele, altAllele, _geneSymbol,
                 _acceptorGainScore, _acceptorLossScore, _donorGainScore, _donorLossScore,
                 _acceptorGainPosition, _acceptorLossPosition, _donorGainPosition, _donorLossPosition, isSpliceAdjacent);
         }
 
         private void UpdateGeneSymbol(SpliceAiItem item)
         {
-            if (_geneTree == null || _geneSynonyms == null) return;
-
-            var chromosome = item.Chromosome;
-            var position = item.Position;
-
-            if (_currentPositionGeneSymbols.Count > 1) return;//for multiple genes for a position, we cannot update the symbol
-
-            var nirvanaGenes = _geneTree.GetAllOverlappingValues(chromosome.Index, position, position);
-            if (nirvanaGenes == null)
-            {
-                NoGeneCount++;
-                item.Hgnc = null;
-                return;
-            }
-
-            var uniqueOverlapping = new HashSet<string>(nirvanaGenes);
-
-            if (uniqueOverlapping.Contains(item.Hgnc)) return;
-
-            //gene not found in cache
-            if (uniqueOverlapping.Count == 1) item.Hgnc = uniqueOverlapping.First(); //update gene symbol
+            if (_spliceToNirvanaSymbols.TryGetValue(item.Hgnc, out var nirHgnc)) item.Hgnc = nirHgnc;
             else
             {
-                if (!_geneSynonyms.TryGetValue(item.Hgnc, out var symbolsList)) return;
-
-                var commonSymbols = symbolsList.Intersect(uniqueOverlapping).ToArray();
-                if (commonSymbols.Length == 1) item.Hgnc = commonSymbols[0]; 
-                else _unresolvedSymbols.Add(item.Hgnc);
+                _unresolvedSymbols.Add(item.Hgnc);
             }
         }
 
@@ -199,18 +169,23 @@ namespace SAUtils.SpliceAi
                    _donorLossScore    >= SpliceAiItem.MinSpliceAiScore;
         }
 
+        //1       69091   .       A       C       .       .       SpliceAI=C|OR4F5|0.01|0.00|0.00|0.00|42|25|24|2
         private void ParseInfoField(string infoFields)
         {
             Clear();
             if (infoFields == "" || infoFields == ".") return;
-            var infoItems = infoFields.OptimizedSplit(';');
+            var values = infoFields.OptimizedSplit('|');
 
-            foreach (var infoItem in infoItems)
-            {
-                var (key, value) = infoItem.OptimizedKeyValue();
-                // sanity check
-                if (value != null) SetInfoField(key, value);
-            }
+            _geneSymbol = values[GeneSymbolIndex];
+            _acceptorGainScore = Convert.ToDouble(values[DsAgIndex]);
+            _acceptorLossScore = Convert.ToDouble(values[DsAlIndex]);
+            _donorGainScore = Convert.ToDouble(values[DsDgIndex]);
+            _donorLossScore = Convert.ToDouble(values[DsDlIndex]);
+
+            _acceptorGainPosition = Convert.ToInt32(values[DpAgIndex]);
+            _acceptorLossPosition = Convert.ToInt32(values[DpAlIndex]);
+            _donorGainPosition = Convert.ToInt32(values[DpDgIndex]);
+            _donorLossPosition = Convert.ToInt32(values[DpDlIndex]);
         }
 
         private void Clear()
@@ -228,49 +203,6 @@ namespace SAUtils.SpliceAi
             _donorLossPosition    = int.MaxValue;
         }
 
-        private void SetInfoField(string vcfId, string value)
-        {
-            switch (vcfId)
-            {
-                case "DS_AG":
-                    _acceptorGainScore =Convert.ToDouble(value);
-                    break;
-
-                case "DS_AL":
-                    _acceptorLossScore = Convert.ToDouble(value);
-                    break;
-
-                case "DS_DG":
-                    _donorGainScore = Convert.ToDouble(value);
-                    break;
-
-                case "DS_DL":
-                    _donorLossScore = Convert.ToDouble(value);
-                    break;
-
-                case "DP_AG":
-                    _acceptorGainPosition = Convert.ToInt32(value);
-                    break;
-
-                case "DP_AL":
-                    _acceptorLossPosition = Convert.ToInt32(value);
-                    break;
-
-                case "DP_DG":
-                    _donorGainPosition = Convert.ToInt32(value);
-                    break;
-
-                case "DP_DL":
-                    _donorLossPosition = Convert.ToInt32(value);
-                    break;
-
-                case "SYMBOL":
-                    _geneSymbol = value;
-                    break;
-
-            }
-
-        }
         public void Dispose()
         {
             _stream?.Dispose();

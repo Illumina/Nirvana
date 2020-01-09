@@ -52,18 +52,19 @@ namespace UnitTests.SAUtils.SpliceAi
             intervalArrays[20] = chrom21Array;
             return new IntervalForest<string>(intervalArrays);
         }
-
-        private Dictionary<string, List<string>> GetGeneSymbolSynonyms()
+        private Dictionary<string, string> GetSpliceToNirvanaGenes()
         {
-            return new Dictionary<string, List<string>>()
+            return new Dictionary<string, string>()
             {
-                { "TUBB8", new List<string>(){"TUBB8"}},
-                { "CDK11B", new List<string>(){"CDK11B"}},
-                { "MMP23B", new List<string>(){"MMP23B"}},
-                { "KRTAP19-3", new List<string>(){"KRTAP19-3"}},
-                { "KRTAP19-2", new List<string>(){"KRTAP19-2"}},
+                {"TUBB8", "TUBB8"},
+                {"CDK11B", "CDK11B" },
+                {"MMP23B", "MMP23B" },
+                {"KRTAP19-3", "KRTAP19-3" },
+                {"KRTAP19-2", "KRTAP19-2" },
+                { "SPLICE", "NIR91"}
             };
         }
+
         private static readonly IChromosome Chr10 = new Chromosome("chr10", "10", 9);
         private static readonly IChromosome Chr3 = new Chromosome("chr3", "3", 2);
         private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
@@ -141,15 +142,16 @@ namespace UnitTests.SAUtils.SpliceAi
             var writer = new StreamWriter(stream);
 
             writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">") ;
             writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
             //this line should not produce any objects since all values are <0.10 and its far from splice sites
-            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.0000;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
+            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
             // values are small but it is close to a splice site. So we report all of it
-            writer.WriteLine("10\t92946\t.\tC\tT\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.0000;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
+            writer.WriteLine("10\t92946\t.\tC\tT\t.\t.\tSpliceAI=T|TUBB8|0.00|0.00|0.00|0.00|-26|-10|3|35");
             // not around a splice site but has higher than 0.1 value. So, we report the one that is significant 
-            writer.WriteLine("10\t93389\t.\tC\tA\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-496;DS_AG=0.1062;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-11;DP_AL=-29;DP_DG=-11;DP_DL=-32");
+            writer.WriteLine("10\t93389\t.\tC\tA\t.\t.\tSpliceAI=A|TUBB8|0.11|0.00|0.00|0.00|-11|-29|-11|-32");
             //should be reported back with 4 object since it is within splice interval;
-            writer.WriteLine("10\t93816\t.\tC\tG\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=238;DS_AG=0.1909;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-7;DP_AL=-50;DP_DG=-7;DP_DL=-6");
+            writer.WriteLine("10\t93816\t.\tC\tG\t.\t.\tSpliceAI=G|TUBB8|0.19|0.00|0.00|0.00|-7|-50|-7|-6");
 
             writer.Flush();
 
@@ -164,46 +166,13 @@ namespace UnitTests.SAUtils.SpliceAi
             var writer = new StreamWriter(stream);
 
             writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
             writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
-            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.3200;DS_AL=0.1500;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
-            writer.WriteLine("10\t92946\t.\tC\tT\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.0000;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
-            writer.WriteLine("10\t92946\t.\tC\tA\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.2000;DS_AL=0.0030;DS_DG=0.2120;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
-            writer.WriteLine("10\t93389\t.\tC\tA\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-496;DS_AG=0.1062;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-11;DP_AL=-29;DP_DG=-11;DP_DL=-32");
-            writer.WriteLine("10\t93816\t.\tC\tG\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=238;DS_AG=0.1909;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-7;DP_AL=-50;DP_DG=-7;DP_DL=-6");
-
-            writer.Flush();
-
-            stream.Position = 0;
-            return stream;
-        }
-
-        private static Stream GetMultiChromosomeStream()
-        {
-            //testing the position caching using minHeap. All entries have significant entries, so all of them should be reported
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-
-            writer.WriteLine("##fileformat=VCFv4.0");
-            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
-            //having two gene symbols at the same position should avoid updating gene symbol
-            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSYMBOL=GENE1;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.3200;DS_AL=0.1500;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
-            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSYMBOL=GENE8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.3200;DS_AL=0.1500;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
-            //The previous entries should be flushed since we changed chromosome
-            writer.WriteLine("1\t92900\t.\tC\tT\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=-53;DS_AG=0.3200;DS_AL=0.1500;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-26;DP_AL=-10;DP_DG=3;DP_DL=35");
-
-            writer.Flush();
-
-            stream.Position = 0;
-            return stream;
-        }
-        private static Stream GetMultiScoreStream()
-        {
-            var stream = new MemoryStream();
-            var writer = new StreamWriter(stream);
-
-            writer.WriteLine("##fileformat=VCFv4.0");
-            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
-            writer.WriteLine("10\t93816\t.\tC\tG\t.\t.\tSYMBOL=TUBB8;STRAND=-;TYPE=E;DIST=238;DS_AG=0.1909;DS_AL=0.3760;DS_DG=0.0000;DS_DL=0.2480;DP_AG=-7;DP_AL=-50;DP_DG=-7;DP_DL=-6");
+            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSpliceAI=A|TUBB8|0.80|0.00|0.00|0.00|-4|-2|-12|25");
+            writer.WriteLine("10\t92946\t.\tC\tT\t.\t.\tSpliceAI=T|TUBB8|0.00|0.00|0.00|0.00|-26|-10|3|35");
+            writer.WriteLine("10\t92946\t.\tC\tA\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-10|-48|35|-21");
+            writer.WriteLine("10\t93389\t.\tC\tA\t.\t.\tSpliceAI=A|TUBB8|0.11|0.00|0.00|0.00|-11|-29|-11|-32");
+            writer.WriteLine("10\t93816\t.\tC\tG\t.\t.\tSpliceAI=G|TUBB8|0.19|0.00|0.00|0.00|-7|-50|-7|-6");
 
             writer.Flush();
 
@@ -217,9 +186,10 @@ namespace UnitTests.SAUtils.SpliceAi
             var writer = new StreamWriter(stream);
 
             writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
             writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
-            writer.WriteLine("1\t1577180\t.\tC\tT\t.\t.\tSYMBOL=MMP23B;STRAND=+;TYPE=I;DIST=-7889;DS_AG=0.0002;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=8;DP_AL=-16;DP_DG=-16;DP_DL=26");
-            writer.WriteLine("1\t1577180\t.\tC\tT\t.\t.\tSYMBOL=CDK11B;STRAND=-;TYPE=E;DIST=1;DS_AG=0.9244;DS_AL=0.0000;DS_DG=0.0004;DS_DL=0.0000;DP_AG=-2;DP_AL=-8;DP_DG=33;DP_DL=-13");
+            writer.WriteLine("1\t1577180\t.\tC\tT\t.\t.\tSpliceAI=T|MMP23B|0.00|0.00|0.00|0.00|8|-16|-16|26");
+            writer.WriteLine("1\t1577180\t.\tC\tT\t.\t.\tSpliceAI=T|CDK11B|0.92|0.00|0.00|0.00|-2|-8|33|-13");
 
             writer.Flush();
 
@@ -233,24 +203,29 @@ namespace UnitTests.SAUtils.SpliceAi
             var writer = new StreamWriter(stream);
 
             writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
             writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
-            writer.WriteLine("21\t35275955\t.\tG\tA\t.\t.\tSYMBOL=AP000304.12;STRAND=-;TYPE=I;DIST=3690;DS_AG=0.1441;DS_AL=0.0000;DS_DG=0.0003;DS_DL=0.0000;DP_AG=-12;DP_AL=24;DP_DG=-41;DP_DL=5");
-            writer.WriteLine("21\t35275955\t.\tG\tA\t.\t.\tSYMBOL=ATP5O;STRAND=-;TYPE=I;DIST=-12;DS_AG=0.0000;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-12;DP_AL=24;DP_DG=-41;DP_DL=-12");
+            writer.WriteLine("21\t35275955\t.\tG\tA\t.\t.\tSpliceAI=A|AP000304.12|0.14|0.00|0.00|0.00|-12|24|-41|5");
+            writer.WriteLine("21\t35275955\t.\tG\tA\t.\t.\tSpliceAI=A|ATP5O|0.00|0.00|0.00|0.00|-12|24|-41|-12");
 
             writer.Flush();
 
             stream.Position = 0;
             return stream;
         }
-        private static Stream GetMultiGeneAtSameLocationStream()
+        private static Stream GetMultiChromosomeStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
 
             writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
             writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
-            writer.WriteLine("21\t31859677\t.\tG\tA\t.\t.\tSYMBOL=KRTAP19-3;STRAND=-;TYPE=I;DIST=4472;DS_AG=0.0000;DS_AL=0.0000;DS_DG=0.0000;DS_DL=0.0000;DP_AG=-42;DP_AL=38;DP_DG=23;DP_DL=38");
-            writer.WriteLine("21\t31859677\t.\tG\tA\t.\t.\tSYMBOL=KRTAP19-2;STRAND=-;TYPE=E;DIST=78;DS_AG=0.0061;DS_AL=0.0000;DS_DG=0.0262;DS_DL=0.0000;DP_AG=-42;DP_AL=38;DP_DG=23;DP_DL=-11");
+            //having two gene symbols at the same position should avoid updating gene symbol
+            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSpliceAI=A|TUBB8|0.00|0.50|0.00|0.00|-4|-2|-12|25");
+            writer.WriteLine("10\t92900\t.\tC\tT\t.\t.\tSpliceAI=A|SPLICE|0.00|0.00|0.00|0.20|-4|-2|-12|25");
+            //The previous entries should be flushed since we changed chromosome
+            writer.WriteLine("1\t92900\t.\tC\tT\t.\t.\tSpliceAI=A|TUBB8|0.30|0.00|0.00|0.00|-4|-2|-12|25");
 
             writer.Flush();
 
@@ -261,21 +236,23 @@ namespace UnitTests.SAUtils.SpliceAi
         [Fact]
         public void Check_multi_chromosome_gene_update()
         {
-            using (var spliceParser = new SpliceAiParser(GetMultiChromosomeStream(), GetSequenceProvider(), GetSpliceIntervals(), GetGeneForest(),GetGeneSymbolSynonyms()))
+            using (var spliceParser = new SpliceAiParser(GetMultiChromosomeStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
                 // the third item will be skipped since hgnc is null
-                Assert.Equal(2, spliceItems.Count);
-                Assert.Equal("GENE1", spliceItems[0].Hgnc);
-                Assert.Equal("GENE8", spliceItems[1].Hgnc);
+                Assert.Equal(3, spliceItems.Count);
+                Assert.Equal("TUBB8", spliceItems[0].Hgnc);
+                //checking a case where the splice AI gene is different from Nirvana
+                Assert.Equal("NIR91", spliceItems[1].Hgnc);
 
             }
         }
+
         [Fact]
         public void Parse_standard_lines()
         {
-            using (var spliceParser = new SpliceAiParser(GetStream(), GetSequenceProvider(), GetSpliceIntervals()))
+            using (var spliceParser = new SpliceAiParser(GetStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
@@ -289,7 +266,7 @@ namespace UnitTests.SAUtils.SpliceAi
         [Fact]
         public void MissingEntry()
         {
-            using (var spliceParser = new SpliceAiParser(GetMissingEntryStream(), GetSequenceProvider(), GetSpliceIntervals()))
+            using (var spliceParser = new SpliceAiParser(GetMissingEntryStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
@@ -298,10 +275,26 @@ namespace UnitTests.SAUtils.SpliceAi
             }
         }
 
+        private static Stream GetMultiScoreStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            writer.WriteLine("10\t93816\t.\tC\tG\t.\t.\tSpliceAI=G|TUBB8|0.19|0.40|0.00|0.20|-7|-50|-7|-6");
+
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+
         [Fact]
         public void Parse_multiScore_entry()
         {
-            using (var spliceParser = new SpliceAiParser(GetMultiScoreStream(), GetSequenceProvider(), GetSpliceIntervals()))
+            using (var spliceParser = new SpliceAiParser(GetMultiScoreStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
@@ -313,7 +306,7 @@ namespace UnitTests.SAUtils.SpliceAi
         [Fact]
         public void Parse_multiGene_entry()
         {
-            using (var spliceParser = new SpliceAiParser(GetMultiGeneStream(), GetSequenceProvider(), GetSpliceIntervals()))
+            using (var spliceParser = new SpliceAiParser(GetMultiGeneStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
@@ -326,7 +319,7 @@ namespace UnitTests.SAUtils.SpliceAi
         [Fact]
         public void Check_position_caching()
         {
-            using (var spliceParser = new SpliceAiParser(GetPositionCachingStream(), GetSequenceProvider(), GetSpliceIntervals()))
+            using (var spliceParser = new SpliceAiParser(GetPositionCachingStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
@@ -406,17 +399,110 @@ namespace UnitTests.SAUtils.SpliceAi
             }
         }
 
-        
+        private static Stream GetMultiGeneAtSameLocationStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            writer.WriteLine("21\t31859677\t.\tG\tA\t.\t.\tSpliceAI=A|KRTAP19-3|0.00|0.00|0.00|0.00|-42|38|23|38");
+            writer.WriteLine("21\t31859677\t.\tG\tA\t.\t.\tSpliceAI=A|KRTAP19-2|0.01|0.00|0.0262|0.00|-42|38|23|-11");
+
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+
         [Fact]
         public void Two_symbols_in_spliceAi()
         {
-            using (var spliceParser = new SpliceAiParser(GetMultiGeneAtSameLocationStream(), GetSequenceProvider(), GetSpliceIntervals(), GetGeneForest(), GetGeneSymbolSynonyms()))
+            using (var spliceParser = new SpliceAiParser(GetMultiGeneAtSameLocationStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
                 Assert.Equal(2, spliceItems.Count);
                 Assert.Equal("\"hgnc\":\"KRTAP19-3\",\"acceptorGainScore\":0,\"acceptorGainDistance\":-42,\"acceptorLossScore\":0,\"acceptorLossDistance\":38,\"donorGainScore\":0,\"donorGainDistance\":23,\"donorLossScore\":0,\"donorLossDistance\":38", spliceItems[0].GetJsonString());
                 Assert.Equal("\"hgnc\":\"KRTAP19-2\",\"acceptorGainScore\":0,\"acceptorGainDistance\":-42,\"acceptorLossScore\":0,\"acceptorLossDistance\":38,\"donorGainScore\":0,\"donorGainDistance\":23,\"donorLossScore\":0,\"donorLossDistance\":-11", spliceItems[1].GetJsonString());
+            }
+        }
+
+        private static Stream GetInsertionStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            // insertions at the boundary of splice intervals
+            // splice boundary is [92931- 92961]
+
+            //insertion just before the interval should be skipped
+            writer.WriteLine("10\t92930\t.\tC\tCT\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // insertion right on the boundary should be kept
+            writer.WriteLine("10\t92931\t.\tC\tCT\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // insertion just after the interval should be skipped
+            writer.WriteLine("10\t92961\t.\tC\tCT\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // insertion right on the interval boundary should be kept
+            writer.WriteLine("10\t92960\t.\tC\tCT\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+        [Fact]
+        public void Parse_insertions()
+        {
+            using (var spliceParser = new SpliceAiParser(GetInsertionStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
+            {
+                var spliceItems = spliceParser.GetItems().ToList();
+
+                Assert.Equal(2, spliceItems.Count);
+                
+            }
+        }
+
+        private static Stream GetDeletionStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
+
+            // deletions at the boundary of splice intervals
+            // splice boundary is [92931- 92961]
+
+            // deletion just before the interval should be skipped
+            writer.WriteLine("10\t92929\t.\tCT\tC\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // deletion that start before the interval but is long enough to go into the interval is kept
+            writer.WriteLine("10\t92929\t.\tCTA\tC\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // deletion right on the boundary should be kept
+            writer.WriteLine("10\t92930\t.\tCT\tC\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // deletion just after the interval should be skipped
+            writer.WriteLine("10\t92961\t.\tCT\tC\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+            // deletion right on the interval boundary should be kept
+            writer.WriteLine("10\t92959\t.\tCT\tC\t.\t.\tSpliceAI=A|TUBB8|0.00|0.00|0.00|0.00|-4|-2|-12|25");
+
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+        [Fact]
+        public void Parse_deletions()
+        {
+            using (var spliceParser = new SpliceAiParser(GetDeletionStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
+            {
+                var spliceItems = spliceParser.GetItems().ToList();
+
+                Assert.Equal(3, spliceItems.Count);
+                
             }
         }
     }

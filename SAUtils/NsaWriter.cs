@@ -36,16 +36,16 @@ namespace SAUtils
         //todo: filter chromIndex=ushort.Max
         public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, bool throwErrorOnConflicts = false, int blockSize = SaCommon.DefaultBlockSize)
         {
-            _stream            = writer.BaseStream;
-            _writer            = writer;
-            _isPositional      = isPositional;
+            _stream                  = writer.BaseStream;
+            _writer                  = writer;
+            _isPositional            = isPositional;
             _skipIncorrectRefEntries = skipIncorrectRefEntries;
-            _throwErrorOnConflicts = throwErrorOnConflicts;
-            _block = new NsaBlock(new Zstandard(), blockSize);
-            _refProvider = refProvider;
+            _throwErrorOnConflicts   = throwErrorOnConflicts;
+            _block                   = new NsaBlock(new Zstandard(), blockSize);
+            _refProvider             = refProvider;
 
-            _index = new NsaIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
-            _memBuffer = new byte[short.MaxValue * 4];
+            _index     = new NsaIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
+            _memBuffer = new byte[blockSize];
             _memStream = new MemoryStream(_memBuffer);
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }

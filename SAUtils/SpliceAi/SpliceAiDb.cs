@@ -38,7 +38,7 @@ namespace SAUtils.SpliceAi
                 },
                 {
                     "gene|g=",
-                    "Gene info data file from NCBI",
+                    "SpliceAi gene data",
                     v => _geneInfoFile = v
                 },
                 {
@@ -62,8 +62,8 @@ namespace SAUtils.SpliceAi
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_transcriptCachePrefix), "transcript cache prefix", "--cache")
                 .HasRequiredParameter(_inputFile, "SpliceAI VCF file", "--in")
                 .CheckInputFilenameExists(_inputFile, "SpliceAI VCF file", "--in")
-                .HasRequiredParameter(_geneInfoFile, "Gene info data file from NCBI", "--gene")
-                .CheckInputFilenameExists(_geneInfoFile, "Gene info data file from NCBI", "--gene")
+                .HasRequiredParameter(_geneInfoFile, "SpliceAi gene data", "--gene")
+                .CheckInputFilenameExists(_geneInfoFile, "SpliceAi gene data", "--gene")
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
@@ -84,23 +84,25 @@ namespace SAUtils.SpliceAi
             }
 
             var spliceIntervals    = SpliceUtilities.GetSpliceIntervals(referenceProvider, transcriptData);
-            var nirvanaGeneForest  = SpliceUtilities.GetGeneForest(transcriptData);
+            var nirEnstToGeneSymbols  = SpliceUtilities.GetEnstToGeneSymbols(referenceProvider, transcriptData);
 
-            Console.WriteLine("Loaded transcripts and generated splice intervals.");
-
-            Dictionary<string, List<string>> geneSymbolSynonyms;
-            using (var geneInfoParser = new GeneInfoParser(GZipUtilities.GetAppropriateStreamReader(_geneInfoFile)))
+            Dictionary<string, string> spliceAiEnstToGeneSymbols;
+            using (var reader = new StreamReader(GZipUtilities.GetAppropriateReadStream(_geneInfoFile)))
             {
-                geneSymbolSynonyms = geneInfoParser.GetGeneSymbolSynonyms();
+                spliceAiEnstToGeneSymbols = SpliceUtilities.GetSpliceAiGeneSymbols(reader);
             }
 
-            Console.WriteLine("Loaded gene symbol synonyms");
+            var spliceAiToNirvanaGeneSymbols =
+                SpliceUtilities.GetSymbolMapping(spliceAiEnstToGeneSymbols, nirEnstToGeneSymbols);
+
+            Console.WriteLine($"Mapped {spliceAiToNirvanaGeneSymbols.Count} spliceAI gene symbols to Nirvana gene symbols (out of {spliceAiEnstToGeneSymbols.Count})");
+
             var version        = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             string outFileName = $"{version.Name}_{version.Version}";
 
             using (var spliceAiParser = new SpliceAiParser(
                 GZipUtilities.GetAppropriateReadStream(_inputFile), 
-                referenceProvider, spliceIntervals, nirvanaGeneForest, geneSymbolSynonyms))
+                referenceProvider, spliceIntervals, spliceAiToNirvanaGeneSymbols))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
             {
