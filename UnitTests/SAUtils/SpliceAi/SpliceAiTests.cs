@@ -6,6 +6,7 @@ using Genome;
 using Intervals;
 using Moq;
 using SAUtils.SpliceAi;
+using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -13,6 +14,7 @@ using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
+using Variants;
 using Xunit;
 
 namespace UnitTests.SAUtils.SpliceAi
@@ -61,6 +63,7 @@ namespace UnitTests.SAUtils.SpliceAi
                 {"MMP23B", "MMP23B" },
                 {"KRTAP19-3", "KRTAP19-3" },
                 {"KRTAP19-2", "KRTAP19-2" },
+                { "CECR5", "CECR5"},
                 { "SPLICE", "NIR91"}
             };
         }
@@ -69,6 +72,7 @@ namespace UnitTests.SAUtils.SpliceAi
         private static readonly IChromosome Chr3 = new Chromosome("chr3", "3", 2);
         private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
         private static readonly IChromosome Chr21 = new Chromosome("chr21", "21", 20);
+        private static readonly IChromosome Chr22 = new Chromosome("chr22", "22", 21);
         private static ISequenceProvider GetSequenceProvider()
         {
             var refNameToChrom = new Dictionary<string, IChromosome>()
@@ -77,6 +81,7 @@ namespace UnitTests.SAUtils.SpliceAi
                 {"3", Chr3},
                 {"10", Chr10},
                 {"21", Chr21},
+                {"22", Chr22},
             };
             var refIndexToChrom = new Dictionary<ushort, IChromosome>()
             {
@@ -84,11 +89,14 @@ namespace UnitTests.SAUtils.SpliceAi
                 { Chr3.Index, Chr3},
                 { Chr10.Index, Chr10} ,
                 { Chr21.Index, Chr21},
+                { Chr22.Index, Chr22},
             };
 
             var mockProvider = new Mock<ISequenceProvider>();
             mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(refNameToChrom);
             mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(refIndexToChrom);
+            //only for unit tests that uses variants at 17148654 
+            mockProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "GAAAAA", 17148654 - 1 - VariantUtils.MaxUpstreamLength));
             return mockProvider.Object;
         }
 
@@ -126,7 +134,11 @@ namespace UnitTests.SAUtils.SpliceAi
             {
                 new Interval<byte>(31859677 - SpliceUtilities.SpliceFlankLength, 31859677 + SpliceUtilities.SpliceFlankLength, 0),
                 new Interval<byte>(35275955 - SpliceUtilities.SpliceFlankLength, 35275955 + SpliceUtilities.SpliceFlankLength, 0),
+            };
 
+            var intervals22 = new[]
+            {
+                new Interval<byte>(17148600 - SpliceUtilities.SpliceFlankLength, 17148600 + SpliceUtilities.SpliceFlankLength, 0),
             };
 
             return new Dictionary<ushort, IntervalArray<byte>>()
@@ -134,6 +146,7 @@ namespace UnitTests.SAUtils.SpliceAi
                 { Chr1.Index, new IntervalArray<byte>(intervals1) },
                 {Chr10.Index, new IntervalArray<byte>(intervals10)},
                 {Chr21.Index, new IntervalArray<byte>(intervals21)},
+                {Chr22.Index, new IntervalArray<byte>(intervals22)},
             };  
         }
         private static Stream GetStream()
@@ -316,6 +329,36 @@ namespace UnitTests.SAUtils.SpliceAi
             }
         }
 
+        private static Stream GetShiftableInsertionStream()
+        {
+            var stream = new MemoryStream();
+            var writer = new StreamWriter(stream);
+
+            writer.WriteLine("##fileformat=VCFv4.0");
+            writer.WriteLine("##INFO=<ID=SpliceAI,Number=.,Type=String,Description=\"SpliceAIv1.3 variant annotation.These include delta scores(DS) and delta positions(DP) for acceptor gain (AG), acceptor loss(AL), donor gain(DG), and donor loss(DL).Format:ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL\">");
+            writer.WriteLine("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO");
+            writer.WriteLine("22\t17148654\t.\tG\tGA\t.\t.\tSpliceAI=GA|CECR5|0.10|0.00|0.00|0.00|-10|10|-10|-15");
+            writer.WriteLine("22\t17148655\t.\tA\tAA\t.\t.\tSpliceAI=AA|CECR5|0.10|0.00|0.00|0.00|-11|9|-11|-16");
+
+            writer.Flush();
+
+            stream.Position = 0;
+            return stream;
+        }
+
+        [Fact]
+        public void Skip_shiftable_indels()
+        {
+            using (var spliceParser = new SpliceAiParser(GetShiftableInsertionStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
+            {
+                var spliceItems = spliceParser.GetItems().ToList();
+
+                Assert.Single(spliceItems);
+                Assert.Equal("\"hgnc\":\"CECR5\",\"acceptorGainScore\":0.1,\"acceptorGainDistance\":-10", spliceItems[0].GetJsonString());
+                
+            }
+        }
+
         [Fact]
         public void Check_position_caching()
         {
@@ -394,8 +437,8 @@ namespace UnitTests.SAUtils.SpliceAi
                 var spliceIntervals = SpliceUtilities.GetSpliceIntervals(seqProvider, transcriptData);
 
                 Assert.Single(spliceIntervals);
-                //given 2 exons, there should be 4 splice intervals
-                Assert.Equal(4, spliceIntervals[2].Array.Length);
+                //given 2 exons, there should be 2 splice intervals
+                Assert.Equal(2, spliceIntervals[2].Array.Length);
             }
         }
 

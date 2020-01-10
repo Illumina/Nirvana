@@ -126,7 +126,7 @@
     },
     "RR sa index": {
       "commandName": "Project",
-      "commandLineArgs": " index --ind C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAi_20191004.nsa.idx.old --ver C:\\development\\ExternalDataSources\\SpliceAI\\1.3\\GRCh38\\spliceai_scores.masked.hg38.vcf.gz.version --out C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAi_20191004.nsa.idx",
+      "commandLineArgs": " index --ind C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAiIndel_20191004.nsa.idx --ver C:\\development\\ExternalDataSources\\SpliceAI\\1.3\\GRCh38\\spliceai_scores.masked.hg38.vcf.gz.version --out C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAi_1.3.nsa.idx",
       "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\"
     },
     "RR_spliceAi-38": {

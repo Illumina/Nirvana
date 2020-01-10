@@ -77,15 +77,15 @@ namespace SAUtils.SpliceAi
 
         //##INFO=<ID=SpliceAI,Number=.,Type=String,Description="SpliceAIv1.3 variant annotation. These include delta scores (DS) and delta positions (DP) 
         //for acceptor gain (AG), acceptor loss (AL), donor gain (DG), and donor loss (DL). Format: ALLELE|SYMBOL|DS_AG|DS_AL|DS_DG|DS_DL|DP_AG|DP_AL|DP_DG|DP_DL">
-        private int GeneSymbolIndex = -1;
-        private int DsAgIndex = -1;
-        private int DsAlIndex = -1;
-        private int DsDgIndex = -1;
-        private int DsDlIndex = -1;
-        private int DpAgIndex = -1;
-        private int DpAlIndex = -1;
-        private int DpDgIndex = -1;
-        private int DpDlIndex = -1;
+        private int _geneSymbolIndex = -1;
+        private int _dsAgIndex = -1;
+        private int _dsAlIndex = -1;
+        private int _dsDgIndex = -1;
+        private int _dsDlIndex = -1;
+        private int _dpAgIndex = -1;
+        private int _dpAlIndex = -1;
+        private int _dpDgIndex = -1;
+        private int _dpDlIndex = -1;
 
         private const string GeneSymbolTag = "SYMBOL";
         private const string DsAgTag = "DS_AG";
@@ -102,17 +102,17 @@ namespace SAUtils.SpliceAi
             format = format.EndsWith("\">") ? format.Substring(0, format.Length - 2): format;
             var fields = format.OptimizedSplit('|');
             
-            GeneSymbolIndex = Array.IndexOf(fields, GeneSymbolTag);
+            _geneSymbolIndex = Array.IndexOf(fields, GeneSymbolTag);
 
-            DsAgIndex = Array.IndexOf(fields, DsAgTag);
-            DsDgIndex = Array.IndexOf(fields, DsDgTag);
-            DsAlIndex = Array.IndexOf(fields, DsAlTag);
-            DsDlIndex = Array.IndexOf(fields, DsDlTag);
+            _dsAgIndex = Array.IndexOf(fields, DsAgTag);
+            _dsDgIndex = Array.IndexOf(fields, DsDgTag);
+            _dsAlIndex = Array.IndexOf(fields, DsAlTag);
+            _dsDlIndex = Array.IndexOf(fields, DsDlTag);
 
-            DpAgIndex = Array.IndexOf(fields, DpAgTag);
-            DpDgIndex = Array.IndexOf(fields, DpDgTag);
-            DpAlIndex = Array.IndexOf(fields, DpAlTag);
-            DpDlIndex = Array.IndexOf(fields, DpDlTag);
+            _dpAgIndex = Array.IndexOf(fields, DpAgTag);
+            _dpDgIndex = Array.IndexOf(fields, DpDgTag);
+            _dpAlIndex = Array.IndexOf(fields, DpAlTag);
+            _dpDlIndex = Array.IndexOf(fields, DpDlTag);
         }
         
         
@@ -137,8 +137,10 @@ namespace SAUtils.SpliceAi
             if (altAllele.Contains(',')) throw new DataException($"multiple alt allele present for {chromosome}-{position}");
 
             var start = position;
-            (start, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, _sequenceProvider.Sequence);
-
+            //skipping insertions/deletions that were shifted
+            if (VariantUtils.IsLeftShiftPossible(refAllele, altAllele)) return null;
+            (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
+            
             var end = start + refAllele.Length - 1;
             var isSpliceAdjacent = _spliceIntervals[chromosome.Index].OverlapsAny(start, end);
             
@@ -176,16 +178,16 @@ namespace SAUtils.SpliceAi
             if (infoFields == "" || infoFields == ".") return;
             var values = infoFields.OptimizedSplit('|');
 
-            _geneSymbol = values[GeneSymbolIndex];
-            _acceptorGainScore = Convert.ToDouble(values[DsAgIndex]);
-            _acceptorLossScore = Convert.ToDouble(values[DsAlIndex]);
-            _donorGainScore = Convert.ToDouble(values[DsDgIndex]);
-            _donorLossScore = Convert.ToDouble(values[DsDlIndex]);
+            _geneSymbol = values[_geneSymbolIndex];
+            _acceptorGainScore = Convert.ToDouble(values[_dsAgIndex]);
+            _acceptorLossScore = Convert.ToDouble(values[_dsAlIndex]);
+            _donorGainScore = Convert.ToDouble(values[_dsDgIndex]);
+            _donorLossScore = Convert.ToDouble(values[_dsDlIndex]);
 
-            _acceptorGainPosition = Convert.ToInt32(values[DpAgIndex]);
-            _acceptorLossPosition = Convert.ToInt32(values[DpAlIndex]);
-            _donorGainPosition = Convert.ToInt32(values[DpDgIndex]);
-            _donorLossPosition = Convert.ToInt32(values[DpDlIndex]);
+            _acceptorGainPosition = Convert.ToInt32(values[_dpAgIndex]);
+            _acceptorLossPosition = Convert.ToInt32(values[_dpAlIndex]);
+            _donorGainPosition = Convert.ToInt32(values[_dpDgIndex]);
+            _donorLossPosition = Convert.ToInt32(values[_dpDlIndex]);
         }
 
         private void Clear()

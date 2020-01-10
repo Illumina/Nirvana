@@ -16,11 +16,11 @@ namespace SAUtils.SpliceAi
         {
             var cache = transcriptData.GetCache();
 
-            var spliceIntervals = new Dictionary<ushort, IntervalArray<byte>>(sequenceProvider.RefIndexToChromosome.Count);
+            var spliceIntervalDict = new Dictionary<ushort, IntervalArray<byte>>(sequenceProvider.RefIndexToChromosome.Count);
 
             foreach (var chromIndex in sequenceProvider.RefIndexToChromosome.Keys)
             {
-                var spliceInterval = new List<Interval<byte>>(8 * 1024);
+                var spliceIntervals = new List<Interval<byte>>(8 * 1024);
                 var overlappingTranscripts =
                     cache.TranscriptIntervalForest.GetAllOverlappingValues(chromIndex, 1, int.MaxValue);
 
@@ -29,6 +29,7 @@ namespace SAUtils.SpliceAi
                 foreach (var transcript in overlappingTranscripts)
                 {
                     if (transcript.Id.IsPredictedTranscript()) continue;
+                    bool isFirstExon = true;
                     foreach (var transcriptRegion in transcript.TranscriptRegions)
                     {
                         if (transcriptRegion.Type != TranscriptRegionType.Exon) continue;
@@ -38,15 +39,19 @@ namespace SAUtils.SpliceAi
                         var firstInterval = new Interval<byte>(firstSplicePosition - SpliceFlankLength, firstSplicePosition + SpliceFlankLength, 0);
                         var secondInterval = new Interval<byte>(secondSplicePosition - SpliceFlankLength, secondSplicePosition + SpliceFlankLength, 0);
 
-                        spliceInterval.Add(firstInterval);
-                        spliceInterval.Add(secondInterval);
+                        if(!isFirstExon) spliceIntervals.Add(firstInterval);
+                        spliceIntervals.Add(secondInterval);
+                        isFirstExon = false;
                     }
+                    //remove the last added interval since this is the tail of the last exon- which is not a splice site
+                    if(spliceIntervals.Count > 0)spliceIntervals.RemoveAt(spliceIntervals.Count - 1);
+
                 }
 
-                spliceIntervals[chromIndex] = new IntervalArray<byte>(spliceInterval.OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray());
+                spliceIntervalDict[chromIndex] = new IntervalArray<byte>(spliceIntervals.OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray());
             }
 
-            return spliceIntervals;
+            return spliceIntervalDict;
         }
 
         public static Dictionary<string, string> GetEnstToGeneSymbols(ISequenceProvider sequenceProvider, TranscriptCacheData transcriptData)
