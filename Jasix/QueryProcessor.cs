@@ -71,7 +71,7 @@ namespace Jasix
                 query.Chromosome = _jasixIndex.GetIndexChromName(query.Chromosome);
                 if (!_jasixIndex.ContainsChr(query.Chromosome)) continue;
 
-                count = PrintLargeVariantsExtendingIntoQuery(query);
+                count += PrintLargeVariantsExtendingIntoQuery(query);
                 count += PrintAllVariantsFromQueryBegin(query, count > 0);
             }
 
