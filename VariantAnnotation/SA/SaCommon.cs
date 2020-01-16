@@ -44,5 +44,6 @@
         public const string SpliceAiTag          = "spliceAI";
         public const string PrimateAiTag         = "primateAI";
         public const string MitoHeteroplasmyTag  = "heteroplasmy";
+        public const string RevelTag             = "revel";
     }
 }

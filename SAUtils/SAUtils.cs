@@ -55,6 +55,7 @@ namespace SAUtils
                 ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run),
                 ["diseaseValidity"]       = new TopLevelOption("create disease validity database", GeneDiseaseValidity.Run),
                 ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
+                ["Revel"]                 = new TopLevelOption("create REVEL database", Revel.Create.Run),
                 ["index"]                 = new TopLevelOption("edit an index file", UpdateIndex.Run)
             };
 
