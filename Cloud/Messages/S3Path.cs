@@ -36,11 +36,11 @@ namespace Cloud.Messages
                 throw new UserErrorException($"Unknown S3 Region {region}");
         }
 
-        private const int MaxRetryCount = 5;
+        private const int MaxRetryCount = 4;
         private void ValidateCredentials(IS3Client s3Client, bool isDirectory)
         {
-            var retryCount = MaxRetryCount;
-            while (retryCount > 0)
+            var maxRetryCount = MaxRetryCount;
+            while (true)
             {
                 try
                 {
@@ -71,17 +71,14 @@ namespace Cloud.Messages
                     var processedException = AwsExceptionUtilities.TryConvertUserException(exception, this);
                     if (processedException is UserErrorException) throw processedException;
 
-                    if (retryCount == 0)
-                    {
-                        Logger.LogLine("Max retry limit reached for validating S3 credentials.");
-                        throw;
-                    }
-                    Logger.LogLine($"Failed to validate S3 credentials\n{exception.Message}");
-
+                    Logger.LogLine($"Failed to validate S3 credentials\n{processedException.Message}");
+                    
+                    maxRetryCount--;
+                    if (maxRetryCount >= 0) continue;
+                    Logger.LogLine("Max retry limit reached for validating S3 credentials.");
+                    throw processedException;
                 }
-                retryCount--;
             }
-            
         }
 
         internal static void ValidatePathFormat(string path, bool isDirectory)

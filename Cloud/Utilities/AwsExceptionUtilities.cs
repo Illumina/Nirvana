@@ -15,7 +15,7 @@ namespace Cloud.Utilities
                 if (exception.InnerException == null) return exception;
                 exception = exception.InnerException;
             }
-
+            
             string extraInfo;
             switch (s3Exception.ErrorCode)
             {
@@ -32,6 +32,7 @@ namespace Cloud.Utilities
                 case "NoSuchBucket":
                     extraInfo = s3Path?.bucketName;
                     break;
+                case "AccessDenied":
                 case "NoSuchKey":
                     extraInfo = s3Path?.path;
                     break;
