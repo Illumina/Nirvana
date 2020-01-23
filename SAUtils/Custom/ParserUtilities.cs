@@ -103,6 +103,9 @@ namespace SAUtils.Custom
                     case "allelefrequency":
                         categories[i] = CustomAnnotationCategories.AlleleFrequency;
                         break;
+                    case "homozygouscount":
+                        categories[i] = CustomAnnotationCategories.HomozygousCount;
+                        break;
                     case "prediction":
                         categories[i] = CustomAnnotationCategories.Prediction;
                         annotationValidators[i] = AllowedValues.ValidatePredictionValue;

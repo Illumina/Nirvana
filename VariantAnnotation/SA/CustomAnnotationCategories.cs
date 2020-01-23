@@ -9,6 +9,7 @@
         Prediction,
         Filter,
         Description,
-        Identifier
+        Identifier,
+        HomozygousCount
     }
 }
