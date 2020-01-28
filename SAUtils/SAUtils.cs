@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
 using SAUtils.ClinGen;
-using SAUtils.CreateMitoMapDb;
 using SAUtils.DbSnpRemapper;
 using SAUtils.dbVar;
 using SAUtils.ExtractCosmicSvs;
@@ -9,6 +8,7 @@ using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.GnomadGeneScores;
 using SAUtils.MitoHeteroplasmy;
+using SAUtils.MitoMap;
 using SAUtils.NsaIndexUpdater;
 using SAUtils.PrimateAi;
 using SAUtils.ProcessSpliceNetTsv;
