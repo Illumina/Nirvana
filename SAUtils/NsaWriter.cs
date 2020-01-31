@@ -4,12 +4,12 @@ using System.IO;
 using CommandLine.Utilities;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
+using Genome;
 using IO;
 using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Variants;
 
@@ -18,7 +18,9 @@ namespace SAUtils
     public sealed class NsaWriter : IDisposable
     {
         private readonly ExtendedBinaryWriter _writer;
+        private readonly ExtendedBinaryWriter _indexWriter;
         private readonly Stream _stream;
+        private readonly Stream _indexStream;
 
         private readonly byte[] _memBuffer;
         private readonly MemoryStream _memStream;
@@ -30,28 +32,54 @@ namespace SAUtils
         private readonly bool _skipIncorrectRefEntries;
         private readonly bool _throwErrorOnConflicts;
         private readonly ISequenceProvider _refProvider;
+        private readonly bool _leaveOpen;
         private int _count;
 
 
         //todo: filter chromIndex=ushort.Max
-        public NsaWriter(ExtendedBinaryWriter writer, ExtendedBinaryWriter indexWriter, DataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, bool throwErrorOnConflicts = false, int blockSize = SaCommon.DefaultBlockSize)
+        public NsaWriter(Stream nsaStream, Stream indexStream, IDataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, bool throwErrorOnConflicts = false, int blockSize = SaCommon.DefaultBlockSize, GenomeAssembly assembly= GenomeAssembly.Unknown, bool leaveOpen=false)
         {
-            _stream                  = writer.BaseStream;
-            _writer                  = writer;
+            _stream                  = nsaStream;
+            _indexStream             = indexStream;
+            _writer                  = new ExtendedBinaryWriter(_stream,System.Text.Encoding.Default, leaveOpen);
+            _indexWriter             = new ExtendedBinaryWriter(_indexStream,System.Text.Encoding.Default, leaveOpen);
             _isPositional            = isPositional;
             _skipIncorrectRefEntries = skipIncorrectRefEntries;
             _throwErrorOnConflicts   = throwErrorOnConflicts;
-            _block                   = new NsaBlock(new Zstandard(), blockSize);
             _refProvider             = refProvider;
+            _leaveOpen = leaveOpen;
 
-            _index     = new NsaIndex(indexWriter, refProvider.Assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
+            assembly = _refProvider?.Assembly ?? assembly;
+
+            _block     = new NsaBlock(new Zstandard(), blockSize);
+            _index     = new NsaIndex(_indexWriter, assembly, version, jsonKey, matchByAllele, isArray, schemaVersion, isPositional);
             _memBuffer = new byte[blockSize];
             _memStream = new MemoryStream(_memBuffer);
             _memWriter = new ExtendedBinaryWriter(_memStream);
         }
 
-        public int Write(IEnumerable<ISupplementaryDataItem> saItems)
+        internal void Write(ushort chromIndex, NsaReader nsaReader)
         {
+            if (nsaReader == null) return;
+
+            var dataBlocks  = nsaReader.GetCompressedBlocks(chromIndex);
+            var indexBlocks = nsaReader.GetIndexBlocks(chromIndex);
+
+            var i = 0;//index of the index Blocks
+            //cannot convert the dataBlocks into a list since that may take up GBs of memory (proportional to the nas file size)
+            foreach (var dataBlock in dataBlocks) {
+                if (i > indexBlocks.Count) throw new IndexOutOfRangeException("Nsa Index have less blocks than the Nsa file. They have to be the same.");
+
+                var oldIndexBlock = indexBlocks[i];
+                _index.Add(chromIndex, oldIndexBlock.Start, oldIndexBlock.End, _writer.BaseStream.Position, oldIndexBlock.Length);
+                dataBlock.WriteCompressedBytes(_writer);
+                i++;
+            }
+            if (i < indexBlocks.Count) throw new IndexOutOfRangeException("Nsa Index have more blocks than the Nsa file. They have to be the same.");
+        }
+
+        public int Write(IEnumerable<ISupplementaryDataItem> saItems)
+        { 
             var itemsMinHeap = new MinHeap<ISupplementaryDataItem>(SuppDataUtilities.CompareTo);
             var chromIndex = ushort.MaxValue;
             var currentEnsemblName = "";
@@ -96,8 +124,8 @@ namespace SAUtils
             WriteUptoPosition(itemsMinHeap, int.MaxValue);
             Flush(chromIndex);
             Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
-
-            _index.Write();
+            
+            
             return _count;
         }
 
@@ -126,13 +154,13 @@ namespace SAUtils
 
         }
 
-        private void WritePosition(List<ISupplementaryDataItem> saItems)
+        private void WritePosition(List<ISupplementaryDataItem> items)
         {
-            int position = saItems[0].Position;
+            int position = items[0].Position;
             _memStream.Position = 0;
             if (_isPositional)
             {
-                var positionalItem = SuppDataUtilities.GetPositionalAnnotation(saItems);
+                var positionalItem = SuppDataUtilities.GetPositionalAnnotation(items);
                 if (positionalItem == null) return;
                 _memWriter.Write(positionalItem.GetJsonString());
             }
@@ -140,14 +168,14 @@ namespace SAUtils
             {
                 // any data source that is reported by allele and is not an array (e.g. allele frequencies) need this filtering step
                 if (_index.MatchByAllele && !_index.IsArray)
-                    saItems = SuppDataUtilities.RemoveConflictingAlleles(saItems, _throwErrorOnConflicts);
+                    items = SuppDataUtilities.RemoveConflictingAlleles(items, _throwErrorOnConflicts);
 
                 if (_index.JsonKey == SaCommon.PrimateAiTag)
-                    saItems = SuppDataUtilities.DeDuplicatePrimateAiItems(saItems);
+                    items = SuppDataUtilities.DeDuplicatePrimateAiItems(items);
 
-                _memWriter.WriteOpt(saItems.Count);
+                _memWriter.WriteOpt(items.Count);
 
-                foreach (ISupplementaryDataItem saItem in saItems)
+                foreach (ISupplementaryDataItem saItem in items)
                 {
                     _memWriter.WriteOptAscii(saItem.RefAllele);
                     _memWriter.WriteOptAscii(saItem.AltAllele);
@@ -156,7 +184,7 @@ namespace SAUtils
             }
 
             int numBytes = (int)_memStream.Position;
-            if (!_block.HasSpace(numBytes)) Flush(saItems[0].Chromosome.Index);
+            if (!_block.HasSpace(numBytes)) Flush(items[0].Chromosome.Index);
             _block.Add(_memBuffer, numBytes, position);
         }
 
@@ -173,8 +201,12 @@ namespace SAUtils
 
         public void Dispose()
         {
-            _writer?.Dispose();
-            _stream?.Dispose();
+            _index.Write();
+
+            if (!_leaveOpen) _writer?.Dispose();
+            if (!_leaveOpen) _indexWriter?.Dispose();
+            if (!_leaveOpen) _stream?.Dispose();
+            if (!_leaveOpen) _indexStream?.Dispose();
             _memWriter?.Dispose();
             _memStream?.Dispose();
         }

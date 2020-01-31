@@ -57,14 +57,14 @@ namespace SAUtils.CreateTopMedDb
         private static ExitCodes ProgramExecution()
         {
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            var topMedReader      = new TopMedReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider);
             var version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             
             string outFileName = $"{version.Name}_{version.Version}";
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var topMedReader = new TopMedReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
+            using (var nsaStream    = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
+            using (var indexStream  = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter    = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.TopMedTag, true, false, SaCommon.SchemaVersion, false))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.TopMedTag, true, false, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(topMedReader.GetItems());
             }
 

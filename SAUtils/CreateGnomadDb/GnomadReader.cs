@@ -72,7 +72,12 @@ namespace SAUtils.CreateGnomadDb
             _sequenceProvider = sequenceProvider;
 		}
 
-		private void Clear()
+        public GnomadReader(ISequenceProvider sequenceProvider)
+        {
+            _sequenceProvider = sequenceProvider;
+        }
+
+        private void Clear()
         {
             _isLowComplexityRegion = false;
 			_acAll = null;
@@ -233,7 +238,7 @@ namespace SAUtils.CreateGnomadDb
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-        private IEnumerable<GnomadItem> GetItems(StreamReader reader, GnomadDataType type)
+        public IEnumerable<GnomadItem> GetItems(StreamReader reader, GnomadDataType type)
 		{
             if(reader == null) yield break;
 			using (reader)

@@ -81,8 +81,8 @@ namespace SAUtils.PrimateAi
             using (var primateAiParser = new PrimateAiParser(GZipUtilities.GetAppropriateReadStream(_inputFile),referenceProvider, entrezToHgnc, ensemblToHgnc))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.PrimateAiTag, true, true, SaCommon.SchemaVersion, false))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.PrimateAiTag, true, true, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(primateAiParser.GetItems());
             }
 

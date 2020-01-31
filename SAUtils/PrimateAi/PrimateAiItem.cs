@@ -5,7 +5,7 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.PrimateAi
 {
-    public class PrimateAiItem : ISupplementaryDataItem
+    public sealed class PrimateAiItem : ISupplementaryDataItem
     {
         public IChromosome Chromosome { get; }
         public int Position { get; set; }

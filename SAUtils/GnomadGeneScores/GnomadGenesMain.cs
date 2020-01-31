@@ -105,7 +105,7 @@ namespace SAUtils.GnomadGeneScores
                 {
                     if(geneIdToSymbols[geneId] != gene.Symbol)
                         throw new DataMisalignedException($"Multiple symbols found for {geneId}");
-                };
+                }
             }
 
             return geneIdToSymbols;

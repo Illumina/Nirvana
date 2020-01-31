@@ -56,7 +56,8 @@ namespace SAUtils
                 ["diseaseValidity"]       = new TopLevelOption("create disease validity database", GeneDiseaseValidity.Run),
                 ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
                 ["Revel"]                 = new TopLevelOption("create REVEL database", Revel.Create.Run),
-                ["index"]                 = new TopLevelOption("edit an index file", UpdateIndex.Run)
+                ["index"]                 = new TopLevelOption("edit an index file", UpdateIndex.Run),
+                ["concat"]                = new TopLevelOption("merge multiple NSA files for the same data source having non-overlapping regions", NsaConcatenator.NsaConcatenator.Run)
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)

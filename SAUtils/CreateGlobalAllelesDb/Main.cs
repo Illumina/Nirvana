@@ -63,9 +63,8 @@ namespace SAUtils.CreateGlobalAllelesDb
             string outFileName = $"{version.Name}_{version.Version}_globalMinor";
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.GlobalAlleleTag, true, false, SaCommon.SchemaVersion, true))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.GlobalAlleleTag, true, false, SaCommon.SchemaVersion, true);
-
                 nsaWriter.Write(globalMinorReader.GetItems());
             }
 

@@ -3,9 +3,6 @@ using CommandLine.NDesk.Options;
 using ErrorHandling;
 using IO;
 using SAUtils.InputFileParsers;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using VariantAnnotation.NSA;
 
 namespace SAUtils.NsaIndexUpdater
@@ -62,7 +59,7 @@ namespace SAUtils.NsaIndexUpdater
                 var oldIndex = new NsaIndex(indexStream);
                 var newIndex = new NsaIndex(extWriter, oldIndex.Assembly, version, oldIndex.JsonKey, oldIndex.MatchByAllele, oldIndex.IsArray, oldIndex.SchemaVersion, oldIndex.IsPositional);
 
-                newIndex.Write(oldIndex.GetBlockData());
+                newIndex.Write(oldIndex.GetBlocks());
             }
 
             return ExitCodes.Success;

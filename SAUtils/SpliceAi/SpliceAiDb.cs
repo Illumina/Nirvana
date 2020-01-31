@@ -103,10 +103,10 @@ namespace SAUtils.SpliceAi
             using (var spliceAiParser = new SpliceAiParser(
                 GZipUtilities.GetAppropriateReadStream(_inputFile), 
                 referenceProvider, spliceIntervals, spliceAiToNirvanaGeneSymbols))
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
+            using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter   = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.SpliceAiTag, true, true, SaCommon.SchemaVersion, false))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream),  version, referenceProvider, SaCommon.SpliceAiTag, true, true, SaCommon.SchemaVersion,false);
                 nsaWriter.Write(spliceAiParser.GetItems());
             }
 

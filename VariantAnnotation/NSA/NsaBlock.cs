@@ -39,6 +39,25 @@ namespace VariantAnnotation.NSA
                 _uncompressedBlock, _uncompressedBlock.Length);
         }
 
+        public void ReadCompressedBytes(ExtendedBinaryReader reader)
+        {
+            _compressedLength = reader.ReadOptInt32();
+            _firstPosition = reader.ReadOptInt32();
+            //_lastPosition = reader.ReadOptInt32();
+            _count = reader.ReadOptInt32();
+            reader.Read(_compressedBlock, 0, _compressedLength);
+
+        }
+
+        public void WriteCompressedBytes(ExtendedBinaryWriter writer)
+        {
+            writer.WriteOpt(_compressedLength);
+            writer.WriteOpt(_firstPosition);
+            //writer.WriteOpt(_lastPosition);
+            writer.WriteOpt(_count);
+            writer.Write(_compressedBlock, 0, _compressedLength);
+
+        }
 
         public bool HasSpace(int length)
         {

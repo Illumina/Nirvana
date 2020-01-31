@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -9,6 +10,7 @@ using ErrorHandling.Exceptions;
 using IO;
 using OptimizedCore;
 using SAUtils.InputFileParsers;
+using SAUtils.NsaConcatenator;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
@@ -22,7 +24,8 @@ namespace SAUtils.CreateGnomadDb
         private static string _exomeDirectory;
         private static string _compressedReference;
         private static string _outputDirectory;
-        
+        private static string _tempDirectory;
+
         public static ExitCodes Run(string command, string[] commandArgs)
         {
             var creator = new GnomadMain();
@@ -44,8 +47,13 @@ namespace SAUtils.CreateGnomadDb
                     v => _exomeDirectory = v
                 },
                 {
+                    "temp|t=",
+                    "output temp directory for intermediate (per chrom) NSA files",
+                    v => _tempDirectory = v
+                },
+                {
                     "out|o=",
-                    "output directory for TSVs",
+                    "output directory for NSA file",
                     v => _outputDirectory = v
                 }
             };
@@ -55,12 +63,10 @@ namespace SAUtils.CreateGnomadDb
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
-                .HasRequiredParameter(_genomeDirectory, "input directory containing genome vcf files", "--genome")
                 .CheckDirectoryExists(_genomeDirectory, "input directory containing genome vcf files", "--genome")
-                .HasRequiredParameter(_exomeDirectory, "input directory containing exome vcf files", "--exome")
-                .CheckDirectoryExists(_genomeDirectory, "input directory containing exome vcf files", "--exome")
-                .HasRequiredParameter(_outputDirectory, "output Supplementary directory", "--out")
+                .CheckDirectoryExists(_exomeDirectory, "input directory containing exome vcf files", "--exome")
                 .CheckDirectoryExists(_outputDirectory, "output Supplementary directory", "--out")
+                .CheckDirectoryExists(_tempDirectory, "output temp directory for intermediate (per chrom) NSA files", "--temp")
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
@@ -70,26 +76,55 @@ namespace SAUtils.CreateGnomadDb
         }
         private ExitCodes ProgramExecution()
         {
-            var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
+            //clearing temp directory
+            Console.WriteLine($"Cleaning {SaCommon.SaFileSuffix} and {SaCommon.IndexSufix} files from temp directory {_tempDirectory}");
+            foreach (var file in Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}"))
+            {
+                File.Delete(file);
+            }
+            foreach (var file in Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}{SaCommon.IndexSufix}"))
+            {
+                File.Delete(file);
+            }
+
+            var version     = GetVersion();
 
             var genomeFiles = GetVcfFiles(_genomeDirectory);
-            var exomeFiles  = GetVcfFiles(_exomeDirectory);
-            var version     = GetVersion();
-            
-            Console.WriteLine($"Creating merged gnomAD database file from {genomeFiles.Length + exomeFiles.Length} input files");
-            
-            string outFileName = $"{version.Name}_{version.Version}";
-            
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using (var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.GnomadTag, true, false, SaCommon.SchemaVersion, false))
-            {
-                nsaWriter.Write(GetItems(genomeFiles,exomeFiles, referenceProvider));
-            }
+            var exomeFiles = GetVcfFiles(_exomeDirectory);
+            var degOfParalleleism = 4;//hard coding since we are IO bound and stressing the disk doesn't help
+            Console.WriteLine($"Creating merged gnomAD database file from {genomeFiles.Length + exomeFiles.Length} input files. Degree of parallelism {degOfParalleleism}");
+
+            Parallel.ForEach(
+                genomeFiles,
+                new ParallelOptions { MaxDegreeOfParallelism = degOfParalleleism },
+                (genomeFile) => CreateNsa(exomeFiles, genomeFile, version, DataStructures.GnomadDataType.Genome)
+                );
+            string outFileName = Path.Combine(_outputDirectory, $"{version.Name}_{version.Version}");
+
+            //concat the nsa files
+            Console.WriteLine("Concatenating per chromosome nsa files");
+            var tempNsaFiles = Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}");
+            ConcatUtilities.ConcatenateNsaFiles(tempNsaFiles, outFileName);
 
             return ExitCodes.Success;
         }
 
+        private static void CreateNsa(string[] exomeFiles, string genomeFile, DataSourceVersion version, DataStructures.GnomadDataType type) {
+            Console.WriteLine($"Processing file: {genomeFile}");
+            var outName = Path.GetFileNameWithoutExtension(genomeFile);
+
+            using (var exomeReader = GetExomeReader(exomeFiles, genomeFile))
+            using (var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference)))
+            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_tempDirectory, outName + SaCommon.SaFileSuffix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_tempDirectory, outName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.GnomadTag, true, false, SaCommon.SchemaVersion, false))
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(genomeFile))
+            {
+                var gnomadReader = new GnomadReader(reader, exomeReader, referenceProvider);
+                var count = nsaWriter.Write(gnomadReader.GetCombinedItems());
+                Console.WriteLine($"Wrote {count} items to NSA file.");
+            }
+        }
         private static IEnumerable<ISupplementaryDataItem> GetItems(string[] genomeFiles, string[] exomeFiles, ISequenceProvider referenceProvider)
         {
             foreach (var fileName in genomeFiles)

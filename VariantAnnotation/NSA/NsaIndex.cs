@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Genome;
+using Intervals;
 using IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
@@ -20,10 +23,12 @@ namespace VariantAnnotation.NSA
         public readonly bool IsArray;
         public readonly bool MatchByAllele;
         public readonly bool IsPositional;
+        public IEnumerable<ushort> ChromosomeIndices => _chromBlocks.Keys;
 
-        public Dictionary<ushort, List<NsaIndexBlock>> GetBlockData() => _chromBlocks;
-        
-        public NsaIndex(ExtendedBinaryWriter indexWriter, GenomeAssembly assembly, DataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional)
+        public Dictionary<ushort, List<NsaIndexBlock>> GetBlocks() => _chromBlocks;
+        public List<NsaIndexBlock> GetChromBlocks(ushort chromIndex) => _chromBlocks[chromIndex];
+
+        public NsaIndex(ExtendedBinaryWriter indexWriter, GenomeAssembly assembly, IDataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional)
         {
             _writer       = indexWriter;
             MatchByAllele = matchByAllele;
@@ -171,8 +176,6 @@ namespace VariantAnnotation.NSA
             return ~begin;
         }
 
-        
     }
-
     
 }

@@ -78,11 +78,9 @@ namespace UnitTests.SAUtils.NsaWriters
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
             {
-                using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
-                using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
+                using (var saWriter = new NsaWriter(saStream, indexStream, version, GetSequenceProvider(), "clinvar",
+                    false, true, SaCommon.SchemaVersion, false, true, false, 1024, GenomeAssembly.GRCh37, true))
                 {
-                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetSequenceProvider(), "clinvar",
-                        false, true, SaCommon.SchemaVersion, false, true, false, 1024);
                     saWriter.Write(GetClinvarItems());
                 }
 
@@ -149,14 +147,10 @@ namespace UnitTests.SAUtils.NsaWriters
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
             {
-                using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
-                using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
-                {
-                    var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetAllASequenceProvider(), "dbsnp",
-                        true, true, SaCommon.SchemaVersion, false, true, false, 1024);
+                using (var saWriter = new NsaWriter(saStream, indexStream, version, GetAllASequenceProvider(), "dbsnp",
+                    true, true, SaCommon.SchemaVersion, false, true, false, 1024, GenomeAssembly.GRCh37, true)) {
                     saWriter.Write(GetDbsnpItems(1000));
                 }
-
                 saStream.Position = 0;
                 indexStream.Position = 0;
 
@@ -197,8 +191,8 @@ namespace UnitTests.SAUtils.NsaWriters
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
             using (var saWriter = new NsaWriter(
-                new ExtendedBinaryWriter(saStream),
-                new ExtendedBinaryWriter(indexStream),
+                saStream,
+                indexStream,
                 new DataSourceVersion("customeSa", "test", DateTime.Now.Ticks),
                 GetSequenceProvider(),
                 "customeSa", false, true, SaCommon.SchemaVersion, false, false))
@@ -214,11 +208,9 @@ namespace UnitTests.SAUtils.NsaWriters
 
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
-            using (var extWriter = new ExtendedBinaryWriter(saStream, Encoding.UTF8, true))
-            using (var indexExtWriter = new ExtendedBinaryWriter(indexStream, Encoding.UTF8, true))
+            using (var saWriter = new NsaWriter(saStream, indexStream, version, GetAllASequenceProvider(), "gnomad",
+                        true, true, SaCommon.SchemaVersion, false, true, false, 1024))
             {
-                var saWriter = new NsaWriter(extWriter, indexExtWriter, version, GetAllASequenceProvider(), "gnomad",
-                    true, true, SaCommon.SchemaVersion, false, true, false, 1024);
                 Assert.Equal(0, saWriter.Write(GetConflictingGnomadItems()));
             }
         }

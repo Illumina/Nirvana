@@ -62,8 +62,7 @@ namespace SAUtils.Revel
             using (var revelReader = new RevelReader(streamReader, referenceProvider.RefNameToChromosome))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using (var indexWriter = new ExtendedBinaryWriter(indexStream))
-            using  (var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), indexWriter, version, referenceProvider, SaCommon.RevelTag, true, false, SaCommon.SchemaVersion, false))
+            using  (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.RevelTag, true, false, SaCommon.SchemaVersion, false))
             {
                 nsaWriter.Write(revelReader.GetItems());
             }

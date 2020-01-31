@@ -62,8 +62,8 @@ namespace SAUtils.MitoHeteroplasmy
             using (var primateAiParser = new MitoHeteroplasmyParser(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.MitoHeteroplasmyTag, true, false, SaCommon.SchemaVersion, false))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.MitoHeteroplasmyTag, true, false, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(primateAiParser.GetItems());
             }
 

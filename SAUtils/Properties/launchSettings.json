@@ -12,8 +12,8 @@
     },
     "RR_gnomad": {
       "commandName": "Project",
-      "commandLineArgs": " Gnomad --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test --genome genome\\ --exome exome\\",
-      "workingDirectory": "C:\\development\\ExternalDataSources\\gnomAD\\2.1\\GRCh37\\"
+      "commandLineArgs": " Gnomad --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --out c:\\Development\\SupplementaryDatabase\\test --genome genome\\ --exome exome\\ --temp C:\\development\\SupplementaryDatabase\\merge",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\gnomAD\\2.1\\GRCh38\\"
     },
     "RR_clingen": {
       "commandName": "Project",
@@ -124,10 +124,20 @@
       "commandLineArgs": "MitoHet --ref c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in coriell_GRCh37.MT.json.bed.gz --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "c:\\development\\ExternalDataSources\\MitoHeteroplasmy"
     },
+    "RR_merge": {
+      "commandName": "Project",
+      "commandLineArgs": " merge --dir C:\\development\\SupplementaryDatabase\\merge --out C:\\development\\SupplementaryDatabase\\test\\gnomad ",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\gnomAD\\2.1\\GRCh38"
+    },
     "RR sa index": {
       "commandName": "Project",
       "commandLineArgs": " index --ind C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAiIndel_20191004.nsa.idx --ver C:\\development\\ExternalDataSources\\SpliceAI\\1.3\\GRCh38\\spliceai_scores.masked.hg38.vcf.gz.version --out C:\\development\\SupplementaryDatabase\\56\\GRCh38\\SpliceAi_1.3.nsa.idx",
       "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\"
+    },
+    "RR nsa_concat": {
+      "commandName": "Project",
+      "commandLineArgs": " concat --dir C:\\development\\SupplementaryDatabase\\merge --out C:\\development\\SupplementaryDatabase\\test\\gnomad ",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\gnomAD\\2.1\\GRCh38"
     },
     "RR_spliceAi-38": {
       "commandName": "Project",

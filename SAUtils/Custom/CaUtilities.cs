@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using ErrorHandling.Exceptions;
 using Genome;
-using IO;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
@@ -19,8 +18,8 @@ namespace SAUtils.Custom
         public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, VariantAnnotationsParser parser, string dataVersion, ISequenceProvider referenceProvider, out DataSourceVersion version)
         {
             return new NsaWriter(
-                new ExtendedBinaryWriter(nsaStream),
-                new ExtendedBinaryWriter(indexStream),
+                nsaStream,
+                indexStream,
                 version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks),
                 referenceProvider,
                 parser.JsonTag,

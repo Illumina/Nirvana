@@ -3,11 +3,10 @@ using System.Globalization;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.ClinGen
 {
-    public class GeneDiseaseValidityItem: ISuppGeneItem
+    public sealed class GeneDiseaseValidityItem: ISuppGeneItem
     {
         public string GeneSymbol { get; }
 

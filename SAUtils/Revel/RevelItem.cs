@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.Revel
 {
-    public class RevelItem : ISupplementaryDataItem
+    public sealed class RevelItem : ISupplementaryDataItem
     {
         public IChromosome Chromosome { get; }
         public int Position { get; set; }

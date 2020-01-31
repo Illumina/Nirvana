@@ -16,7 +16,7 @@
     //}
     //}
 
-    public class PositionStats
+    public sealed class PositionStats
     {
         public AlleleStats A_C;
         public AlleleStats A_G;

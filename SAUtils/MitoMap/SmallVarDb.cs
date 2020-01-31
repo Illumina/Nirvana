@@ -73,10 +73,10 @@ namespace SAUtils.MitoMap
             var mergedMitoMapVarItems = MitoMapVariantReader.GetMergeAndSortedItems(mitoMapVarReaders);
 
             string outFileName = $"{version.Name}_{version.Version}";
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
+            using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var nsaWriter   = new NsaWriter(nsaStream, indexStream, version, sequenceProvider, SaCommon.MitoMapTag, false, true, SaCommon.SchemaVersion, false))
             {
-                var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, sequenceProvider, SaCommon.MitoMapTag, false, true, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(mergedMitoMapVarItems);
             }
 

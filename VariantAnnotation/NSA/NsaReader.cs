@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
@@ -36,12 +37,14 @@ namespace VariantAnnotation.NSA
         public bool MatchByAllele { get; }
         public bool IsArray { get; }
         public bool IsPositional { get; }
-
+        public IEnumerable<ushort> ChromosomeIndices => _index.ChromosomeIndices;
         private readonly List<AnnotationItem> _annotations;
+        private int _blockSize;
         
         public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream = dataStream;
+            _blockSize = blockSize;
             _reader = new ExtendedBinaryReader(_stream);
             _block = new NsaBlock(new Zstandard(), blockSize);
 
@@ -99,6 +102,39 @@ namespace VariantAnnotation.NSA
             return i;
         }
 
+        public IEnumerable<AnnotationItem> GetAnnotationItems(ushort chromIndex, int start, int end) {
+            var (location, blockCount) = _index.GetFileRange(chromIndex, start, end);
+            if (location == -1) yield break;
+            _reader.BaseStream.Position = location;
+            
+            for (var i = 0; i < blockCount; i++) {
+                _block.Read(_reader);
+                foreach (var annotation in _block.GetAnnotations())
+                    yield return new AnnotationItem(annotation.position, annotation.data);
+            }
+        }
+
+        public List<NsaIndexBlock> GetIndexBlocks(ushort chromIndex) => _index.GetChromBlocks(chromIndex);
+
+        public bool HasDataBlocks(ushort chromIndex) {
+            var (location, blockCount) = _index.GetFileRange(chromIndex, 1, int.MaxValue);
+            return location != -1;
+        }
+        public IEnumerable<NsaBlock> GetCompressedBlocks(ushort chromIndex)
+        {
+            var (location, blockCount) = _index.GetFileRange(chromIndex, 1, int.MaxValue);
+            if (location == -1) yield break;
+
+            _reader.BaseStream.Position = location;
+
+            for (var i = 0; i < blockCount; i++)
+            {
+                var block = new NsaBlock(new Zstandard(), _blockSize);
+                block.ReadCompressedBytes(_reader);
+                yield return block;
+            }
+        }
+
         private IEnumerable<(string refAllele, string altAllele, string jsonString)> ExtractAnnotations(byte[] data)
         {
             using (var reader = new ExtendedBinaryReader(new MemoryStream(data)))
@@ -122,7 +158,10 @@ namespace VariantAnnotation.NSA
                 return annotations;
             }
         }
-
+        public bool HasAnnotation(int position) {
+            int index = BinarySearch(position);
+            return index >= 0;
+        }
         public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position)
         {
             int index = BinarySearch(position);
@@ -151,5 +190,6 @@ namespace VariantAnnotation.NSA
         {
             _stream?.Dispose();
         }
+
     }
 }
