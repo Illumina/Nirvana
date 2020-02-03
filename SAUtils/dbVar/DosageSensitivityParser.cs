@@ -20,8 +20,6 @@ namespace SAUtils.dbVar
         private int _haploInsufficiencyScoreIndex = -1;
         private int _triploSensitivityScoreIndex = -1;
 
-
-
         public DosageSensitivityParser(Stream stream)
         {
             _stream = stream;
@@ -54,7 +52,6 @@ namespace SAUtils.dbVar
             }
 
             return geneAnnotations;
-
         }
 
         private ISuppGeneItem GetGeneAndScores(string line)

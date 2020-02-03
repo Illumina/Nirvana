@@ -52,6 +52,7 @@ namespace SAUtils
                 ["mitomapSvDb"]           = new TopLevelOption("create MITOMAP structural variants database", StructVarDb.Run),
                 ["spliceAi"]              = new TopLevelOption("create SpliceAI database", SpliceAiDb.Run),
                 ["primateAi"]             = new TopLevelOption("create PrimateAI database", PrimateAiDb.Run),
+                ["dosageMapRegions"]      = new TopLevelOption("create dosage map regions", DosageMapRegions.Run),
                 ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run),
                 ["diseaseValidity"]       = new TopLevelOption("create disease validity database", GeneDiseaseValidity.Run),
                 ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
