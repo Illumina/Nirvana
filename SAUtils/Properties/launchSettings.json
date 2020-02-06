@@ -143,6 +143,16 @@
       "commandName": "Project",
       "commandLineArgs": "SpliceAi --ref  c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --cache c:\\Development\\Cache\\26\\GRCh38\\Both --gene ..\\genesymbol_to_ensemblid.tsv --in miniSpliceAi.vcf --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "C:\\development\\ExternalDataSources\\SpliceAI\\1.3\\GRCh38"
+    },
+    "RR_aaCon-38": {
+      "commandName": "Project",
+      "commandLineArgs": "AaCon --ref  c:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --cache c:\\Development\\Cache\\26\\GRCh38\\Both --scr conservationScores.tsv.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\MultiZ100Way\\GRCh38"
+    },
+    "RR_aaCon-37": {
+      "commandName": "Project",
+      "commandLineArgs": "AaCon --ref  c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cache c:\\Development\\Cache\\26\\GRCh37\\Both --scr conservationScores.tsv.gz --out c:\\Development\\SupplementaryDatabase\\test",
+      "workingDirectory": "C:\\development\\ExternalDataSources\\MultiZ46Way\\GRCh37"
     }
   }
 }

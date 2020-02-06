@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using Genome;
 using OptimizedCore;
-using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;

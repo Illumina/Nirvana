@@ -21,6 +21,7 @@ namespace Cloud
         public static string GetUgaUrl(string baseUrl = null) => GetCacheFolder(baseUrl) + UgaFileName;
         public static string GetRefPrefix(string baseUrl = null) => GetBaseUrl(baseUrl) + S3RefPrefix;
         public static string GetRefUrl(GenomeAssembly genomeAssembly, string baseUrl = null) => GetRefPrefix(baseUrl) + genomeAssembly + RefSuffix;
+
         
     }
 }

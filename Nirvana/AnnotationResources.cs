@@ -26,6 +26,7 @@ namespace Nirvana
         private ImmutableDictionary<IChromosome, List<int>> _variantPositions;
         public ISequenceProvider SequenceProvider { get; }
         public ITranscriptAnnotationProvider TranscriptAnnotationProvider { get; }
+        public ProteinConservationProvider ProteinConservationProvider { get; }
         public IAnnotationProvider SaProvider { get; }
         public IAnnotationProvider ConservationProvider { get; }
         public IRefMinorProvider RefMinorProvider { get; }
@@ -48,7 +49,8 @@ namespace Nirvana
             saDirectoryPaths?.ForEach(x => annotationFiles.AddFiles(x));
             customAnnotations?.ForEach(x => annotationFiles.AddFiles(x));
 
-            TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider);
+            ProteinConservationProvider  = ProviderUtilities.GetProteinConservationProvider(annotationFiles);
+            TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider, ProteinConservationProvider);
             SaProvider                   = ProviderUtilities.GetNsaProvider(annotationFiles);
             ConservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
             RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(annotationFiles);

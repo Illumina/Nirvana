@@ -2,6 +2,7 @@
 using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Providers;
 
 namespace UnitTests.TestDataStructures
 {

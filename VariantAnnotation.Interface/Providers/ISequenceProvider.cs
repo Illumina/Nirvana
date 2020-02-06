@@ -7,7 +7,7 @@ namespace VariantAnnotation.Interface.Providers
     {
         ISequence Sequence { get; }
         IDictionary<string, IChromosome> RefNameToChromosome { get; }
-	    IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
+        IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
         void LoadChromosome(IChromosome chromosome);
     }
 }

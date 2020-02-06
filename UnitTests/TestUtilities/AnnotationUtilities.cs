@@ -53,7 +53,7 @@ namespace UnitTests.TestUtilities
 
             string sequenceFilePath          = cacheFilePrefix + ".bases";
             var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
-            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider);
+            var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider, null);
             var saProvider                   = ProviderUtilities.GetNsaProvider(annotationFiles);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
 

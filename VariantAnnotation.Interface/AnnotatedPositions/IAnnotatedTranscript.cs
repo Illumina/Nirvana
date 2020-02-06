@@ -17,6 +17,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         PredictionScore PolyPhen { get; }
         List<ConsequenceTag> Consequences { get; }
         bool? CompleteOverlap { get; }
+        List<double> ConservationScores { get; set; }
         void AddGeneFusion(IAnnotatedGeneFusion geneFusion);
     }
 }

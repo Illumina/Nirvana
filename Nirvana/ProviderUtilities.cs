@@ -17,6 +17,10 @@ namespace Nirvana
         {
              return new ReferenceSequenceProvider(PersistentStreamUtils.GetReadStream(compressedReferencePath));
         }
+        public static ProteinConservationProvider GetProteinConservationProvider(AnnotationFiles files)=>
+            files == null || string.IsNullOrEmpty(files.ProteinConservationFile)
+                ? null
+                : new ProteinConservationProvider(PersistentStreamUtils.GetReadStream(files.ProteinConservationFile));
 
         public static IAnnotationProvider GetConservationProvider(AnnotationFiles files) =>
             files == null || files.ConservationFile == default
@@ -47,13 +51,21 @@ namespace Nirvana
         }
 
         public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path,
-            ISequenceProvider sequenceProvider)
+            ISequenceProvider sequenceProvider, ProteinConservationProvider proteinConservationProvider)
          {
             var benchmark = new Benchmark();
-            var provider = new TranscriptAnnotationProvider(path, sequenceProvider);
+            var provider = new TranscriptAnnotationProvider(path, sequenceProvider, proteinConservationProvider);
             var wallTimeSpan = benchmark.GetElapsedTime();
             Console.WriteLine("Cache Time: {0} ms", wallTimeSpan.TotalMilliseconds);
+            
+            benchmark.Reset();
+            proteinConservationProvider?.Load();
+            wallTimeSpan = benchmark.GetElapsedTime();
+            Console.WriteLine("Protein conservation load time: {0} ms", wallTimeSpan.TotalMilliseconds);
+
             return provider;
         }
+
+        
     }
 }

@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Piano", "Piano\Piano.csproj", "{E435C06D-762A-4BB8-9EF8-B75D02812737}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{D71384D9-A24C-4F7A-BE25-AEA088C36E7B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VariantAnnotation.Interface", "..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj", "{3D09B50F-73B4-4021-B5F0-2100574BD54B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ErrorHandling", "..\ErrorHandling\ErrorHandling.csproj", "{2B6B916D-B9DD-4156-A486-F2835C1EE992}"
@@ -22,6 +18,10 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Compression", "..\Compression\Compression.csproj", "{82F0CE32-D465-4E7B-91CA-A4B67763F433}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Vcf", "..\Vcf\Vcf.csproj", "{BCB37D8F-9B8A-4846-B441-6975CF67BADF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AminoAcidAligner", "AminoAcidAligner\AminoAcidAligner.csproj", "{793E5969-C6A0-4072-9D6B-4878AA79C917}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IO", "..\IO\IO.csproj", "{5A95D583-1B37-4AE9-BC38-FDCCCB3183CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +69,14 @@ Global
 		{BCB37D8F-9B8A-4846-B441-6975CF67BADF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCB37D8F-9B8A-4846-B441-6975CF67BADF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCB37D8F-9B8A-4846-B441-6975CF67BADF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{793E5969-C6A0-4072-9D6B-4878AA79C917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{793E5969-C6A0-4072-9D6B-4878AA79C917}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{793E5969-C6A0-4072-9D6B-4878AA79C917}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{793E5969-C6A0-4072-9D6B-4878AA79C917}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A95D583-1B37-4AE9-BC38-FDCCCB3183CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A95D583-1B37-4AE9-BC38-FDCCCB3183CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A95D583-1B37-4AE9-BC38-FDCCCB3183CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A95D583-1B37-4AE9-BC38-FDCCCB3183CE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -32,8 +32,8 @@
     },
     "RR clinvar": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar --disable-recomposition",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --sd C:\\Development\\SupplementaryDatabase\\56\\GRCh37 --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar",
+      "workingDirectory": "c:\\Development\\TestDatasets\\ClinvarSmoke"
     },
     "RR platypus": {
       "commandName": "Project",
@@ -200,7 +200,7 @@
       "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in spliceAi-37.vcf--out spliceAi-37",
       "workingDirectory": "c:\\development\\TestDatasets"
     },
-    "RR spliceAi-38": {
+    "RR DQ-38": {
       "commandName": "Project",
       "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh38\\Both --sd C:\\Development\\SupplementaryDatabase\\56\\GRCh38 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --disable-recomposition --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq",
       "workingDirectory": "c:\\development\\TestDatasets"

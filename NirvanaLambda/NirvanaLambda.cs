@@ -96,7 +96,7 @@ namespace NirvanaLambda
             using (var tabixReader      = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress)))
             using (var referenceStream  = PersistentStreamUtils.GetReadStream(LambdaUrlHelper.GetRefUrl(genomeAssembly)))
             using (var sequenceProvider = new ReferenceSequenceProvider(referenceStream))
-            using (var taProvider       = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider))
+            using (var taProvider       = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider, null))
             {
                 long vcfSize = HttpUtilities.GetLength(config.vcfUrl);
                 int numPartitions = Math.Max(Math.Min((int)((vcfSize - 1) / MinPartitionSize + 1), MaxNumPartitions), MinNumPartitions);

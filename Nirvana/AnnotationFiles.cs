@@ -3,6 +3,7 @@ using System.IO;
 using Cloud;
 using Cloud.Messages;
 using IO;
+using VariantAnnotation.ProteinConservation;
 using VariantAnnotation.SA;
 
 namespace Nirvana
@@ -13,6 +14,7 @@ namespace Nirvana
         public List<string> NsiFiles { get; } = new List<string>();
         public List<string> NgaFiles { get; } = new List<string>();
         public (string Npd, string Idx) ConservationFile { get; private set; }
+        public string ProteinConservationFile { get; private set; }
         public (string Rma, string Idx) RefMinorFile { get; private set; }
 
         public void AddFiles(string saDirectoryPath)
@@ -33,6 +35,9 @@ namespace Nirvana
                         break;
                     case SaCommon.PhylopFileSuffix:
                         ConservationFile = (filePath, filePath + SaCommon.IndexSufix);
+                        break;
+                    case ProteinConservationCommon.FileSuffix:
+                        ProteinConservationFile = filePath;
                         break;
                     case SaCommon.RefMinorFileSuffix:
                         RefMinorFile = (filePath, filePath + SaCommon.IndexSufix);

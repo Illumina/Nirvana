@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
@@ -37,12 +38,14 @@ namespace VariantAnnotation.Providers
         private ushort _currentRefIndex = ushort.MaxValue;
 
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly ProteinConservationProvider _conservationProvider;
 
-        public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider)
+        public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider, ProteinConservationProvider conservationProvider)
         {
             Name                 = "Transcript annotation provider";
             _sequence            = sequenceProvider.Sequence;
             _refNameToChromosome = sequenceProvider.RefNameToChromosome;
+            _conservationProvider = conservationProvider;
 
             using (var stream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)))
             {
@@ -51,6 +54,7 @@ namespace VariantAnnotation.Providers
 
             Assembly           = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
+            if (conservationProvider != null) DataSourceVersions.Concat(new[] {conservationProvider.Version});
 
             _siftStream = PersistentStreamUtils.GetReadStream(CacheConstants.SiftPath(pathPrefix));
             _siftReader = new PredictionCacheReader(_siftStream, PredictionCacheReader.SiftDescriptions);
@@ -126,8 +130,36 @@ namespace VariantAnnotation.Providers
                 if (annotatedTranscripts.Count == 0) continue;
 
                 foreach (var annotatedTranscript in annotatedTranscripts)
+                {
+                    AddConservationScore(annotatedTranscript);
+                }
+                
+                foreach (var annotatedTranscript in annotatedTranscripts)
                     annotatedVariant.Transcripts.Add(annotatedTranscript);
             }
+        }
+
+        private void AddConservationScore(IAnnotatedTranscript annotatedTranscript)
+        {
+            if (_conservationProvider == null) return;
+            if(annotatedTranscript.MappedPosition == null) return;
+            
+            var scores = new List<double>();
+            var start = annotatedTranscript.MappedPosition.ProteinStart;
+            var end = annotatedTranscript.MappedPosition.ProteinEnd;
+
+            if (start == -1 || end == -1) return;
+            for (int aaPos = start; aaPos <= end; aaPos++)
+            {
+                var transcriptId = annotatedTranscript.Transcript.Source == Source.Ensembl
+                    ? annotatedTranscript.Transcript.Id.WithoutVersion
+                    : annotatedTranscript.Transcript.Id.WithVersion;
+                var score = _conservationProvider.GetConservationScore(transcriptId, aaPos);
+                if(score == -1) return; //don't add conservation scores
+                scores.Add((1.0*score)/100);
+            }
+
+            annotatedTranscript.ConservationScores = scores;
         }
 
         private void AddGeneFusions(IAnnotatedVariant[] annotatedVariants)

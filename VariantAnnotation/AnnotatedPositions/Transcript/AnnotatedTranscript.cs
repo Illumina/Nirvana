@@ -22,6 +22,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public PredictionScore PolyPhen { get; }
         public List<ConsequenceTag> Consequences { get; }
         public bool? CompleteOverlap { get; }
+        public List<double> ConservationScores { get; set; }
 
         private IAnnotatedGeneFusion _geneFusion;
 
@@ -93,6 +94,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddDoubleValue("siftScore", Sift?.Score);
 
             jsonObject.AddStringValue("siftPrediction", Sift?.Prediction);
+
+            if (ConservationScores != null && ConservationScores.Count > 0)
+            {
+                jsonObject.AddObjectValue("aminoAcidConservation", new AnnotatedConservationScore(ConservationScores));
+            }
 
             if (CompleteOverlap.HasValue) jsonObject.AddBoolValue("completeOverlap", CompleteOverlap.Value);
 
