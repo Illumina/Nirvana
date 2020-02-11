@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
 using Genome;
+using SAUtils.InputFileParsers.ClinVar;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
+
 
 namespace SAUtils.DataStructures
 {
@@ -22,7 +24,7 @@ namespace SAUtils.DataStructures
         public IEnumerable<string> AlleleOrigins { get; }
         public IEnumerable<string> Phenotypes { get; }
         public string[] Significances { get; }
-        public ReviewStatus ReviewStatus { get; }
+        public ClinVarCommon.ReviewStatus ReviewStatus { get; }
         private string IsAlleleSpecific { get; }
         public IEnumerable<string> MedGenIds { get; }
         public IEnumerable<string> OmimIds { get; }
@@ -32,39 +34,6 @@ namespace SAUtils.DataStructures
         public long LastUpdatedDate { get; }
 
         public SaJsonSchema JsonSchema { get; }
-
-        public static readonly ImmutableDictionary<string, ReviewStatus> ReviewStatusNameMapping = new Dictionary<string, ReviewStatus>
-        {
-            ["no_assertion"] = ReviewStatus.no_assertion,
-            ["no_criteria"] = ReviewStatus.no_criteria,
-            ["guideline"] = ReviewStatus.practice_guideline,
-            ["single"] = ReviewStatus.single_submitter,
-            ["mult"] = ReviewStatus.multiple_submitters,
-            ["conf"] = ReviewStatus.conflicting_interpretations,
-            ["exp"] = ReviewStatus.expert_panel,
-            // the following are the long forms found in XML
-            ["no assertion provided"] = ReviewStatus.no_assertion,
-            ["no assertion criteria provided"] = ReviewStatus.no_criteria,
-            ["practice guideline"] = ReviewStatus.practice_guideline,
-            ["criteria provided, conflicting interpretations"] = ReviewStatus.conflicting_interpretations,
-            ["reviewed by expert panel"] = ReviewStatus.expert_panel,
-            ["classified by multiple submitters"] = ReviewStatus.multiple_submitters,
-            ["criteria provided, multiple submitters, no conflicts"] = ReviewStatus.multiple_submitters_no_conflict,
-            ["criteria provided, single submitter"] = ReviewStatus.single_submitter
-        }.ToImmutableDictionary();
-
-        private static readonly Dictionary<ReviewStatus, string> ReviewStatusStrings = new Dictionary<ReviewStatus, string>
-        {
-            [ReviewStatus.no_criteria] = "no assertion criteria provided",
-            [ReviewStatus.no_assertion] = "no assertion provided",
-            [ReviewStatus.expert_panel] = "reviewed by expert panel",
-            [ReviewStatus.single_submitter] = "criteria provided, single submitter",
-            [ReviewStatus.practice_guideline] = "practice guideline",
-            [ReviewStatus.multiple_submitters] = "classified by multiple submitters",
-            [ReviewStatus.conflicting_interpretations] = "criteria provided, conflicting interpretations",
-            [ReviewStatus.multiple_submitters_no_conflict] = "criteria provided, multiple submitters, no conflicts"
-
-        };
 
         public ClinVarItem(IChromosome chromosome,
             int position,
@@ -76,7 +45,7 @@ namespace SAUtils.DataStructures
             string variantType,
             string id,
             int? variationId,
-            ReviewStatus reviewStatus,
+            ClinVarCommon.ReviewStatus reviewStatus,
             IEnumerable<string> medGenIds,
             IEnumerable<string> omimIds,
             IEnumerable<string> orphanetIds,
@@ -94,7 +63,7 @@ namespace SAUtils.DataStructures
             JsonSchema       = jsonSchema;
             VariantType      = variantType;
             Id               = id;
-            VariationId        = variationId;
+            VariationId      = variationId;
             MedGenIds        = medGenIds;
             OmimIds          = omimIds;
             OrphanetIds      = orphanetIds;
@@ -120,10 +89,10 @@ namespace SAUtils.DataStructures
                 //the exact order of adding values has to be preserved. the order is dictated by the json schema
                 new[] {Id},
                 new[] {VariationId?.ToString()},
-                new[] {ReviewStatusStrings[ReviewStatus]},
+                new[] {ClinVarCommon.ReviewStatusStrings[ReviewStatus]},
                 AlleleOrigins?.ToArray(),
-                new[] {NormalizeAllele(RefAllele)},
-                new[] {NormalizeAllele(AltAllele)},
+                new[] {ClinVarCommon.NormalizeAllele(RefAllele)},
+                new[] {ClinVarCommon.NormalizeAllele(AltAllele)},
                 Phenotypes?.ToArray(),
                 MedGenIds?.ToArray(),
                 OmimIds?.ToArray(),
@@ -136,12 +105,6 @@ namespace SAUtils.DataStructures
             return values;
         }
 
-        private string NormalizeAllele(string allele)
-        {
-            if (string.IsNullOrEmpty(allele)) return "-";
-            return allele == "N" ? null : allele;
-        }
-
         public int CompareTo(ClinVarItem other)
         {
             return Chromosome.Index != other.Chromosome.Index
@@ -150,17 +113,5 @@ namespace SAUtils.DataStructures
         }
     }
 
-    public enum ReviewStatus
-    {
-        // ReSharper disable InconsistentNaming
-        no_assertion,
-        no_criteria,
-        single_submitter,
-        multiple_submitters,
-        multiple_submitters_no_conflict,
-        conflicting_interpretations,
-        expert_panel,
-        practice_guideline
-        // ReSharper restore InconsistentNaming
-    }
+    
 }

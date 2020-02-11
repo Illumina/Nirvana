@@ -11,6 +11,7 @@ namespace UnitTests.TestUtilities
 		public static string EndToEnd37(string path) => Path.Combine(Top, "EndToEnd", "GRCh37", path);
 		public static string InputFiles(string path) => Path.Combine(Top, "InputFiles", path);
 	    public static string ClinvarXmlFiles(string path) => Path.Combine(Top, "ClinVarXmlFiles", path);
+	    public static string VcvXmlFiles(string path) => Path.Combine(Top, "ClinVarXmlFiles","VCVs", path);
 		public static string SaGRCh37(string path) => Path.Combine(Top, "SA", "GRCh37", path);
         public static string MockSaFiles => Path.Combine(Top, "SA", "MockSaFiles");
 

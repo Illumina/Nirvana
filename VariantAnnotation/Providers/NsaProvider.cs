@@ -54,8 +54,30 @@ namespace VariantAnnotation.Providers
                     }
                 throw new UserErrorException("Multiple genome assemblies detected in Supplementary annotation directory");
             }
-
             Assembly = distinctAssemblies[0];
+            //check if there are any duplicate jsonKeys in any of the nsa files
+            var jsonKeys = new HashSet<string>();
+            if (_nsaReaders != null)
+            {
+                foreach (var reader in _nsaReaders)
+                {
+                    if(jsonKeys.Contains(reader.JsonKey)) throw new UserErrorException("Multiple nsa file found for the Json Key: " + reader.JsonKey);
+                    jsonKeys.Add(reader.JsonKey);
+                }
+
+            }
+
+            //check if there are any duplicate jsonKeys in any of the nsi files
+            jsonKeys.Clear();
+            if (_nsiReaders != null)
+            {
+                foreach (var reader in _nsiReaders)
+                {
+                    if(jsonKeys.Contains(reader.JsonKey)) throw new UserErrorException("Multiple nsi file found for the Json Key: " + reader.JsonKey);
+                    jsonKeys.Add(reader.JsonKey);
+                }
+            }
+
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
@@ -86,8 +108,6 @@ namespace VariantAnnotation.Providers
 
         private void AddSmallVariantAnnotations(IAnnotatedPosition annotatedPosition)
         {
-            //if (annotatedPosition.Position.Start == 17148654)
-            //    Console.WriteLine("bug");
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
@@ -165,21 +185,6 @@ namespace VariantAnnotation.Providers
                         nsaReader.IsPositional, jsonString, null));
                     break;
                 }
-        }
-
-        private static string AddZscore(string jsonString)
-        {
-            var splits = jsonString.Split(',');
-            var meanStr = splits[0].Split(':')[1];
-            var stdevStr = splits[1].Split(':')[1];
-
-            var mean = double.Parse(meanStr);
-            var stdev = double.Parse(stdevStr);
-
-            var zscore = (0.5 - mean) / stdev;
-
-            //add to the return string
-            return jsonString + $",\"vrfZscore\":{zscore:0.######}";
         }
 
         public void PreLoad(IChromosome chromosome, List<int> positions)

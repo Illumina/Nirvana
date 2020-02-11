@@ -1,6 +1,369 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full"
+            xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-<ClinVarSet ID="36056832"><RecordStatus>current</RecordStatus><Title>NM_173660.4(DOK7):c.1124_1127dupTGCC (p.Ala378Serfs) AND Congenital myasthenic syndrome</Title><ReferenceClinVarAssertion DateCreated="2016-07-19" DateLastUpdated="2018-12-23" ID="557938"><ClinVarAccession Acc="RCV000235027" Version="1" Type="RCV" DateUpdated="2018-12-24" /><RecordStatus>current</RecordStatus><ClinicalSignificance DateLastEvaluated="2016-07-14"><ReviewStatus>no assertion criteria provided</ReviewStatus><Description>Pathogenic</Description></ClinicalSignificance><Assertion Type="variation to disease" /><ObservedIn><Sample><Origin>germline</Origin><Species TaxonomyId="9606">human</Species><AffectedStatus>yes</AffectedStatus></Sample><Method><MethodType>literature only</MethodType></Method><ObservedData ID="34960682"><Attribute Type="Description">not provided</Attribute></ObservedData></ObservedIn><MeasureSet Type="Variant" ID="1273"><Measure Type="Duplication" ID="16312"><Name><ElementValue Type="Preferred">NM_173660.4(DOK7):c.1124_1127dupTGCC (p.Ala378Serfs)</ElementValue></Name><AttributeSet><Attribute Change="c.1124_1127dup" Accession="NM_173660" Version="4" Type="HGVS, coding">NM_173660.4:c.1124_1127dup</Attribute></AttributeSet><AttributeSet><Attribute Change="c.1124_1127dupTGCC" Accession="NM_173660" Version="4" Type="HGVS, coding, RefSeq">NM_173660.4:c.1124_1127dupTGCC</Attribute></AttributeSet><AttributeSet><Attribute Change="g.34805_34808dup" Accession="NG_013072" Version="2" Type="HGVS, genomic, RefSeqGene">NG_013072.2:g.34805_34808dup</Attribute></AttributeSet><AttributeSet><Attribute Change="g.3493110_3493113dupTGCC" Accession="NC_000004" Version="12" Type="HGVS, genomic, top level" integerValue="38">NC_000004.12:g.3493110_3493113dupTGCC</Attribute></AttributeSet><AttributeSet><Attribute Change="g.3494837_3494840dupTGCC" Accession="NC_000004" Version="11" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000004.11:g.3494837_3494840dupTGCC</Attribute></AttributeSet><AttributeSet><Attribute Change="p.Ala378SerfsTer30" Accession="NP_775931" Version="3" Type="HGVS, protein">NP_775931.3:p.Ala378SerfsTer30</Attribute></AttributeSet><AttributeSet><Attribute Change="p.Ala378Serfs" Accession="NP_775931" Version="3" Type="HGVS, protein, RefSeq">NP_775931.3:p.Ala378Serfs</Attribute></AttributeSet><AttributeSet><Attribute Type="Location">NM_173660.4:exon 7</Attribute></AttributeSet><AttributeSet><Attribute Type="MolecularConsequence">3 prime UTR variant</Attribute><XRef ID="SO:0001624" DB="Sequence Ontology" /><XRef ID="NM_001164673.1:c.*348_*349insTGCC" DB="RefSeq" /></AttributeSet><AttributeSet><Attribute Type="MolecularConsequence">frameshift variant</Attribute><XRef ID="SO:0001589" DB="Sequence Ontology" /><XRef ID="NM_173660.4:c.1124_1127dupTGCC" DB="RefSeq" /></AttributeSet><AlleleFrequencyList><AlleleFrequency Value="0.00066" Source="NHLBI Exome Sequencing Project (ESP) Exome Variant Server" /><AlleleFrequency Value="0.00075" Source="Exome Aggregation Consortium (ExAC)" /><AlleleFrequency Value="0.00117" Source="The Genome Aggregation Database (gnomAD)" /><AlleleFrequency Value="0.00064" Source="The Genome Aggregation Database (gnomAD), exomes" /></AlleleFrequencyList><CytogeneticLocation>4p16.3</CytogeneticLocation><SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="4" Accession="NC_000004.12" start="3493110" stop="3493113" display_start="3493110" display_stop="3493113" variantLength="4" referenceAllele="TGCC" alternateAllele="TGCCTGCC" positionVCF="3493106" referenceAlleleVCF="A" alternateAlleleVCF="AGCCT" /><SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="4" Accession="NC_000004.11" start="3494837" stop="3494840" display_start="3494837" display_stop="3494840" variantLength="4" referenceAllele="TGCC" alternateAllele="TGCCTGCC" positionVCF="3494833" referenceAlleleVCF="A" alternateAlleleVCF="AGCCT" /><MeasureRelationship Type="within single gene"><Name><ElementValue Type="Preferred">docking protein 7</ElementValue></Name><Symbol><ElementValue Type="Preferred">DOK7</ElementValue></Symbol><SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="4" Accession="NC_000004.12" start="3463306" stop="3501476" display_start="3463306" display_stop="3501476" Strand="+" /><SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="4" Accession="NC_000004.11" start="3465032" stop="3496208" display_start="3465032" display_stop="3496208" variantLength="31177" Strand="+" /><XRef ID="285489" DB="Gene" /><XRef Type="MIM" ID="610285" DB="OMIM" /><XRef ID="HGNC:26594" DB="HGNC" /></MeasureRelationship><XRef Type="Allelic variant" ID="610285.0001" DB="OMIM" /><XRef Type="rs" ID="606231128" DB="dbSNP" /></Measure><Name><ElementValue Type="Preferred">NM_173660.4(DOK7):c.1124_1127dupTGCC (p.Ala378Serfs)</ElementValue></Name><XRef ID="CA249193" DB="ClinGen" /></MeasureSet><TraitSet Type="Disease" ID="9634"><Trait ID="9474" Type="Disease"><Name><ElementValue Type="Preferred">Congenital myasthenic syndrome</ElementValue></Name><Symbol><ElementValue Type="Preferred">CMS</ElementValue></Symbol><AttributeSet><Attribute Type="public definition">Congenital myasthenic syndromes (designated as CMS throughout this entry) are characterized by fatigable weakness of skeletal muscle (e.g., ocular, bulbar, limb muscles) with onset at or shortly after birth or in early childhood; rarely, symptoms may not manifest until later in childhood. Cardiac and smooth muscle are usually not involved. Severity and course of disease are highly variable, ranging from minor symptoms to progressive disabling weakness. In some subtypes of CMS, myasthenic symptoms may be mild, but sudden severe exacerbations of weakness or even sudden episodes of respiratory insufficiency may be precipitated by fever, infections, or excitement. Major findings of the neonatal-onset subtype include: respiratory insufficiency with sudden apnea and cyanosis; feeding difficulties; poor suck and cry; choking spells; eyelid ptosis; and facial, bulbar, and generalized weakness. Arthrogryposis multiplex congenita may also be present. Stridor in infancy may be an important clue to CMS. Later childhood-onset subtypes show abnormal muscle fatigability with difficulty in activities such as running or climbing stairs; motor milestones may be delayed; fluctuating eyelid ptosis and fixed or fluctuating extraocular muscle weakness are common presentations.</Attribute><XRef ID="NBK1168" DB="GeneReviews" /></AttributeSet><Citation Type="review" Abbrev="GeneReviews"><ID Source="PubMed">20301347</ID><ID Source="BookShelf">NBK1168</ID></Citation><XRef ID="C0751882" DB="MedGen" /><XRef Type="Phenotypic series" ID="PS601462" DB="OMIM" /></Trait></TraitSet></ReferenceClinVarAssertion><ClinVarAssertion ID="557913"><ClinVarSubmissionID localKey="NM_173660.4:c.1124_1127dupTGCC|MedGen:C0751882" submittedAssembly="not applicable" submitter="GeneReviews" submitterDate="2016-07-14" /><ClinVarAccession Acc="SCV000292401" Version="1" Type="SCV" OrgID="500062" OrganizationCategory="resource" OrgType="primary" DateUpdated="2018-11-26" /><RecordStatus>current</RecordStatus><ClinicalSignificance DateLastEvaluated="2016-07-14"><ReviewStatus>no assertion criteria provided</ReviewStatus><Description>Pathogenic</Description><Citation><ID Source="PubMed">22230109</ID></Citation><Citation><ID Source="PubMed">16917026</ID></Citation><Citation><URL>http://www.ncbi.nlm.nih.gov/books/NBK1168/</URL></Citation></ClinicalSignificance><Assertion Type="variation to disease" /><ObservedIn><Sample><Origin>germline</Origin><Species TaxonomyId="9606">human</Species><AffectedStatus>yes</AffectedStatus></Sample><Method><MethodType>literature only</MethodType></Method><ObservedData><Attribute Type="Description">not provided</Attribute></ObservedData></ObservedIn><MeasureSet Type="Variant"><Measure Type="Variation"><Name><ElementValue Type="Alternate">NP_775931.3:p.Ala378SerfsTer30</ElementValue></Name><AttributeSet><Attribute Type="HGVS">NM_173660.4:c.1124_1127dupTGCC</Attribute></AttributeSet><MeasureRelationship Type="variant in gene"><Symbol><ElementValue Type="Preferred">DOK7</ElementValue></Symbol></MeasureRelationship></Measure></MeasureSet><TraitSet Type="Disease"><Trait Type="Disease"><XRef DB="MedGen" ID="C0751882" Type="CUI" /></Trait></TraitSet></ClinVarAssertion></ClinVarSet>
+    <ClinVarSet ID="49282424">
+        <RecordStatus>current</RecordStatus>
+        <Replaces>RCV000610359</Replaces>
+        <Title>NM_173660.5(DOK7):c.1124_1127dup (p.Ala378fs) AND Congenital myasthenic syndrome</Title>
+        <ReferenceClinVarAssertion DateCreated="2016-07-19" DateLastUpdated="2019-12-31" ID="557938">
+            <ClinVarAccession Acc="RCV000235027" Version="1" Type="RCV" DateUpdated="2019-12-31"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2015-12-16">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Pathogenic</Description>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <AttributeSet>
+                <Attribute Type="ModeOfInheritance" integerValue="263">Autosomal recessive inheritance</Attribute>
+                <XRef ID="63693434" DB="Laboratory for Molecular Medicine,Partners HealthCare Personalized Medicine"/>
+            </AttributeSet>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>yes</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>literature only</MethodType>
+                </Method>
+                <ObservedData ID="50068401">
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>not provided</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData ID="50068402">
+                    <Attribute integerValue="1" Type="VariantAlleles"/>
+                </ObservedData>
+                <ObservedData ID="50068402">
+                    <Attribute integerValue="1" Type="NumFamiliesWithVariant"/>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant" ID="1273" Acc="VCV000001273" Version="4">
+                <Measure Type="Duplication" ID="16312">
+                    <Name>
+                        <ElementValue Type="Preferred">NM_173660.5(DOK7):c.1124_1127dup (p.Ala378fs)</ElementValue>
+                    </Name>
+                    <Name>
+                        <ElementValue Type="Alternate">p.Ala378SerfsX30</ElementValue>
+                    </Name>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001164673" Version="2" Change="c.*345_*348dup"
+                                   Type="HGVS, coding, RefSeq">NM_001164673.2:c.*345_*348dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001301071" Version="2" Change="c.1124_1127dup"
+                                   Type="HGVS, coding, RefSeq">NM_001301071.2:c.1124_1127dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_173660" Version="5" Change="c.1124_1127dup"
+                                   Type="HGVS, coding, RefSeq">NM_173660.5:c.1124_1127dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001256896" Version="1" Change="c.194_197dup"
+                                   Type="HGVS, coding, RefSeq">NM_001256896.1:c.194_197dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001363811" Version="2" Change="c.692_695dup"
+                                   Type="HGVS, coding, RefSeq">NM_001363811.2:c.692_695dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NG_013072" Version="2" Change="g.34805_34808dup"
+                                   Type="HGVS, genomic, RefSeqGene">NG_013072.2:g.34805_34808dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000004" Version="12" Change="g.3493110_3493113dup"
+                                   Type="HGVS, genomic, top level" integerValue="38">NC_000004.12:g.3493110_3493113dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000004" Version="11" Change="g.3494840_3494841insTGCC"
+                                   Type="HGVS, genomic, top level, other" integerValue="37">
+                            NC_000004.11:g.3494840_3494841insTGCC
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000004" Version="11" Change="g.3494837_3494840dup"
+                                   Type="HGVS, genomic, top level, previous" integerValue="37">
+                            NC_000004.11:g.3494837_3494840dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_173660" Version="4" Change="c.1124_1127dupTGCC" Type="HGVS, previous">
+                            NM_173660.4:c.1124_1127dupTGCC
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_775931" Version="3" Change="p.Ala378SerfsTer30" Type="HGVS, protein">
+                            NP_775931.3:p.Ala378SerfsTer30
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001350740" Version="1" Change="p.Ala234fs"
+                                   Type="HGVS, protein, RefSeq">NP_001350740.1:p.Ala234fs
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001288000" Version="1" Change="p.Ala378fs"
+                                   Type="HGVS, protein, RefSeq">NP_001288000.1:p.Ala378fs
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_775931" Version="3" Change="p.Ala378fs" Type="HGVS, protein, RefSeq">
+                            NP_775931.3:p.Ala378fs
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001243825" Version="1" Change="p.Ala68fs" Type="HGVS, protein, RefSeq">
+                            NP_001243825.1:p.Ala68fs
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="Location">NM_173660.4:exon 7</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">3 prime UTR variant</Attribute>
+                        <XRef ID="SO:0001624" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001164673.2:c.*345_*348dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+                        <XRef ID="SO:0001589" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001256896.1:c.194_197dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+                        <XRef ID="SO:0001589" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001301071.2:c.1124_1127dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+                        <XRef ID="SO:0001589" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001363811.2:c.692_695dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">frameshift variant</Attribute>
+                        <XRef ID="SO:0001589" DB="Sequence Ontology"/>
+                        <XRef ID="NM_173660.5:c.1124_1127dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <CytogeneticLocation>4p16.3</CytogeneticLocation>
+                    <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                      AssemblyStatus="current" Chr="4" Accession="NC_000004.12" start="3493110"
+                                      stop="3493113" display_start="3493110" display_stop="3493113" variantLength="4"
+                                      positionVCF="3493106" referenceAlleleVCF="A" alternateAlleleVCF="AGCCT"/>
+                    <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                      AssemblyStatus="previous" Chr="4" Accession="NC_000004.11" start="3494837"
+                                      stop="3494840" display_start="3494837" display_stop="3494840" variantLength="4"
+                                      positionVCF="3494833" referenceAlleleVCF="A" alternateAlleleVCF="AGCCT"/>
+                    <MeasureRelationship Type="within single gene">
+                        <Name>
+                            <ElementValue Type="Preferred">docking protein 7</ElementValue>
+                        </Name>
+                        <Symbol>
+                            <ElementValue Type="Preferred">DOK7</ElementValue>
+                        </Symbol>
+                        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                          AssemblyStatus="current" Chr="4" Accession="NC_000004.12" start="3463306"
+                                          stop="3501482" display_start="3463306" display_stop="3501482" Strand="+"/>
+                        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                          AssemblyStatus="previous" Chr="4" Accession="NC_000004.11" start="3465032"
+                                          stop="3496208" display_start="3465032" display_stop="3496208"
+                                          variantLength="31177" Strand="+"/>
+                        <XRef ID="285489" DB="Gene"/>
+                        <XRef Type="MIM" ID="610285" DB="OMIM"/>
+                        <XRef ID="HGNC:26594" DB="HGNC"/>
+                    </MeasureRelationship>
+                    <XRef Type="Allelic variant" ID="610285.0001" DB="OMIM"/>
+                    <XRef Type="rs" ID="606231128" DB="dbSNP"/>
+                </Measure>
+                <Name>
+                    <ElementValue Type="Preferred">NM_173660.5(DOK7):c.1124_1127dup (p.Ala378fs)</ElementValue>
+                </Name>
+                <XRef ID="CA249193" DB="ClinGen"/>
+            </MeasureSet>
+            <TraitSet Type="Disease" ID="9634">
+                <Trait ID="9474" Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">Congenital myasthenic syndrome</ElementValue>
+                    </Name>
+                    <Symbol>
+                        <ElementValue Type="Preferred">CMS</ElementValue>
+                    </Symbol>
+                    <AttributeSet>
+                        <Attribute Type="public definition">Congenital myasthenic syndromes (designated as CMS
+                            throughout this entry) are characterized by fatigable weakness of skeletal muscle (e.g.,
+                            ocular, bulbar, limb muscles) with onset at or shortly after birth or in early childhood;
+                            rarely, symptoms may not manifest until later in childhood. Cardiac and smooth muscle are
+                            usually not involved. Severity and course of disease are highly variable, ranging from minor
+                            symptoms to progressive disabling weakness. In some subtypes of CMS, myasthenic symptoms may
+                            be mild, but sudden severe exacerbations of weakness or even sudden episodes of respiratory
+                            insufficiency may be precipitated by fever, infections, or excitement. Major findings of the
+                            neonatal-onset subtype include: respiratory insufficiency with sudden apnea and cyanosis;
+                            feeding difficulties; poor suck and cry; choking spells; eyelid ptosis; and facial, bulbar,
+                            and generalized weakness. Arthrogryposis multiplex congenita may also be present. Stridor in
+                            infancy may be an important clue to CMS. Later childhood-onset subtypes show abnormal muscle
+                            fatigability with difficulty in activities such as running or climbing stairs; motor
+                            milestones may be delayed; fluctuating eyelid ptosis and fixed or fluctuating extraocular
+                            muscle weakness are common presentations.
+                        </Attribute>
+                        <XRef ID="NBK1168" DB="GeneReviews"/>
+                    </AttributeSet>
+                    <Citation Type="review" Abbrev="GeneReviews">
+                        <ID Source="PubMed">20301347</ID>
+                        <ID Source="BookShelf">NBK1168</ID>
+                    </Citation>
+                    <XRef ID="C0751882" DB="MedGen"/>
+                    <XRef Type="Phenotypic series" ID="PS601462" DB="OMIM"/>
+                </Trait>
+            </TraitSet>
+        </ReferenceClinVarAssertion>
+        <ClinVarAssertion ID="557913">
+            <ClinVarSubmissionID localKey="NM_173660.4:c.1124_1127dupTGCC|MedGen:C0751882"
+                                 submittedAssembly="not applicable" submitter="GeneReviews" submitterDate="2016-07-14"/>
+            <ClinVarAccession Acc="SCV000292401" Version="1" Type="SCV" OrgID="500062" OrganizationCategory="resource"
+                              OrgType="primary" DateUpdated="2019-07-02"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2016-07-14">
+                <ReviewStatus>no assertion criteria provided</ReviewStatus>
+                <Description>Pathogenic</Description>
+                <Citation>
+                    <ID Source="PubMed">22230109</ID>
+                </Citation>
+                <Citation>
+                    <ID Source="PubMed">16917026</ID>
+                </Citation>
+                <Citation>
+                    <URL>http://www.ncbi.nlm.nih.gov/books/NBK1168/</URL>
+                </Citation>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>yes</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>literature only</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <Name>
+                        <ElementValue Type="Alternate">NP_775931.3:p.Ala378SerfsTer30</ElementValue>
+                    </Name>
+                    <AttributeSet>
+                        <Attribute Type="HGVS">NM_173660.4:c.1124_1127dupTGCC</Attribute>
+                    </AttributeSet>
+                    <MeasureRelationship Type="variant in gene">
+                        <Symbol>
+                            <ElementValue Type="Preferred">DOK7</ElementValue>
+                        </Symbol>
+                    </MeasureRelationship>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <XRef DB="MedGen" ID="C0751882" Type="CUI"/>
+                </Trait>
+            </TraitSet>
+        </ClinVarAssertion>
+        <ClinVarAssertion ID="1392845" SubmissionName="SUB5348977">
+            <ClinVarSubmissionID localKey="63693434|Orphanet:ORPHA590" submittedAssembly="GRCh37"
+                                 submitter="Laboratory for Molecular Medicine,Partners HealthCare Personalized Medicine"
+                                 submitterDate="2019-03-21"/>
+            <ClinVarAccession Acc="SCV000711740" Version="1" Type="SCV" OrgID="21766" OrganizationCategory="laboratory"
+                              OrgType="primary" DateUpdated="2019-08-30"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2015-12-16">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Pathogenic</Description>
+                <Citation>
+                    <ID Source="PubMed">19261599</ID>
+                </Citation>
+                <Comment>The p.Ala378fs variant in DOK7 has been reported in 17 individuals with congenit al myasthenia
+                    syndrome (CMS) with limb-girdle pattern of muscle weakness who wer e either homozygous or compound
+                    heterozygous for this variant (Beeson 2006 and L orenzoni 2013). It has been identified in 0.1%
+                    (28/24230) of Eurpoean chromosome s by the Exome Aggregation Consortium (ExAC,
+                    http://exac.broadinstitute.org), wh ich is consistent with a carrier frequency for this disease. In
+                    vitro functional studies also provide some evidence that the Ala378fs variant may impact protein
+                    function. This variant is predicted to cause a frameshift, which alters the pro tein?s amino acid
+                    sequence beginning at position 378 and leads to a premature te rmination codon 30 amino acids
+                    downstream. Loss of function of the DOK7 gene is an established disease mechanism in individuals
+                    with CMS. In summary, this varia nt meets our criteria to be classified as pathogenic for CMS in an
+                    autosomal rec essive manner based upon its segregation in affected individuals and predicted i mpact
+                    on protein function.
+                </Comment>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ExternalID DB="Laboratory for Molecular Medicine" ID="63693434"/>
+            <AttributeSet>
+                <Attribute Type="ModeOfInheritance">Autosomal recessive inheritance</Attribute>
+            </AttributeSet>
+            <AttributeSet>
+                <Attribute Type="AssertionMethod">LMM Criteria</Attribute>
+                <Citation>
+                    <ID Source="PubMed">24033266</ID>
+                </Citation>
+            </AttributeSet>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>not provided</AffectedStatus>
+                    <FamilyData NumFamiliesWithVariant="1"/>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="VariantAlleles" integerValue="1"/>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <Name>
+                        <ElementValue Type="Alternate">NM_173660.4:c.1124_1127dupTGCC</ElementValue>
+                    </Name>
+                    <Name>
+                        <ElementValue Type="Alternate">p.Ala378SerfsX30</ElementValue>
+                    </Name>
+                    <AttributeSet>
+                        <Attribute Type="Location">NM_173660.4:EXON 7</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="HGVS">NC_000004.11:g.3494840_3494841insTGCC</Attribute>
+                    </AttributeSet>
+                    <MeasureRelationship Type="variant in gene">
+                        <Symbol>
+                            <ElementValue Type="Preferred">DOK7</ElementValue>
+                        </Symbol>
+                    </MeasureRelationship>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <XRef DB="Orphanet" ID="ORPHA590"/>
+                </Trait>
+            </TraitSet>
+        </ClinVarAssertion>
+    </ClinVarSet>
 
 </ReleaseSet>

@@ -1,4 +1,7 @@
-﻿using CommandLine.Builders;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 
@@ -7,17 +10,45 @@ namespace SAUtils.ExtractMiniXml
     public static class ExtractMiniXmlMain
 	{
 	    private  static string _inputXmlFile;
-	    private  static string _rcvIds;
+	    private  static string _accessions;
 	    private  static string _outputDir;
 
 	    private static ExitCodes ProgramExecution()
-        {
-	        var extractor = new XmlExtractor(_inputXmlFile, _rcvIds, _outputDir);
-	        extractor.Extract();
+	    {
+		    var accessions = GetAccessions(_accessions);
+	        if (accessions.Any(x=>x.StartsWith("RCV")))
+	        {
+		        var rcvExtractor = new RcvXmlExtractor(_inputXmlFile, accessions, _outputDir);
+		        rcvExtractor.Extract();
+	        }
 
-            return ExitCodes.Success;
+	        if (accessions.Any(x=>x.StartsWith("VCV")))
+	        {
+		        var vcvExtractor = new VcvXmlExtractor(_inputXmlFile, accessions, _outputDir);
+		        vcvExtractor.Extract();
+	        }
+
+	        return ExitCodes.Success;
         }
-        public static ExitCodes Run(string command, string[] commandArgs)
+
+	    public static List<string> GetAccessions(string accString)
+	    {
+		    var accessions = new List<string>();
+		    if (Directory.Exists(accString))
+		    {
+			    foreach (var fileName in Directory.EnumerateFiles(accString))
+			    {
+				    if(fileName.Contains("RCV") || fileName.Contains("VCV")) accessions.Add(Path.GetFileNameWithoutExtension(fileName));
+			    }
+
+			    return accessions;
+		    }
+
+		    return accString.Split(',').ToList();
+		    
+	    }
+
+	    public static ExitCodes Run(string command, string[] commandArgs)
         {
 			var ops = new OptionSet
 			{
@@ -27,9 +58,9 @@ namespace SAUtils.ExtractMiniXml
 					v => _inputXmlFile = v
 				},
 				{
-					"r|rcv=",
-					"RCV ID",
-					v => _rcvIds = v
+					"a|acc=",
+					"accessions",
+					v => _accessions = v
 				},
 				{
 					"o|out=",
@@ -44,7 +75,7 @@ namespace SAUtils.ExtractMiniXml
 	            .Parse()
 	            .CheckInputFilenameExists(_inputXmlFile, "input XML file", "--in")
 	            .HasRequiredParameter(_outputDir, "output directory", "--out")
-                .HasRequiredParameter(_rcvIds, "comma separated list of RCV ids or folder containing RCV files to update", "--rcv")
+                .HasRequiredParameter(_accessions, "comma separated list of accessions or folder containing mini XML files to update", "--acc")
                 .SkipBanner()
                 .ShowHelpMenu("Extracts mini supplementary annotations for the given range from Nirvana Supplementary Annotations files.", commandLineExample)
 	            .ShowErrors()

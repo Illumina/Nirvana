@@ -23,7 +23,7 @@ namespace SAUtils
         {
             var ops                    = new Dictionary<string, TopLevelOption>
             {
-                ["clinvar"]               = new TopLevelOption("create ClinVar database", CreateClinvarDb.Main.Run),
+                ["clinvar"]               = new TopLevelOption("create ClinVar database", CreateClinVarDb.ClinVarMain.Run),
                 ["cosmic"]                = new TopLevelOption("create COSMIC database", CreateCosmicDb.Main.Run),
                 ["ClinGen"]               = new TopLevelOption("create ClinGen database", MakeClinGenDb.Main.Run),
                 ["CustomVar"]             = new TopLevelOption("create custom variant annotation database", Custom.VariantMain.Run),

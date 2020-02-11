@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ClinVarVariationRelease xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_variation/variation_archive_1.4.xsd" ReleaseDate="2019-12-31">
+<VariationArchive VariationID="431749" VariationName="GRCh37/hg19 1p36.31(chr1:6051187-6158763)" VariationType="copy number gain" DateCreated="2017-08-12" DateLastUpdated="2019-09-10" Accession="VCV000431749" Version="1" RecordType="included" NumberOfSubmissions="0" NumberOfSubmitters="0">
+  <RecordStatus>current</RecordStatus>
+  <Species>Homo sapiens</Species>
+  <IncludedRecord>
+    <SimpleAllele AlleleID="425239" VariationID="431749">
+      <GeneList>
+        <Gene Symbol="KCNAB2" FullName="potassium voltage-gated channel subfamily A regulatory beta subunit 2" GeneID="8514" HGNC_ID="HGNC:6229" Source="calculated" RelationshipType="genes overlapped by variant">
+          <Location>
+            <CytogeneticLocation>1p36.31</CytogeneticLocation>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="5992639" stop="6101186" display_start="5992639" display_stop="6101186" Strand="+"/>
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="6052357" stop="6161252" display_start="6052357" display_stop="6161252" Strand="+"/>
+          </Location>
+          <OMIM>601142</OMIM>
+        </Gene>
+        <Gene Symbol="NPHP4" FullName="nephrocystin 4" GeneID="261734" HGNC_ID="HGNC:19104" Source="calculated" RelationshipType="genes overlapped by variant">
+          <Location>
+            <CytogeneticLocation>1p36.31</CytogeneticLocation>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="5862810" stop="5992425" display_start="5862810" display_stop="5992425" Strand="-"/>
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="5922869" stop="6052532" display_start="5922869" display_stop="6052532" Strand="-"/>
+          </Location>
+          <OMIM>607215</OMIM>
+        </Gene>
+      </GeneList>
+      <Name>GRCh37/hg19 1p36.31(chr1:6051187-6158763)</Name>
+      <VariantType>copy number gain</VariantType>
+      <Location>
+        <CytogeneticLocation>1p36.31</CytogeneticLocation>
+        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" forDisplay="true" AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="6051187" stop="6158763" display_start="6051187" display_stop="6158763"/>
+      </Location>
+      <Interpretations>
+        <Interpretation NumberOfSubmissions="0" NumberOfSubmitters="0" Type="Clinical significance">
+          <Description>no interpretation for the single variant</Description>
+        </Interpretation>
+      </Interpretations>
+      <XRefList>
+        <XRef Type="Interpreted" ID="431733" DB="ClinVar"/>
+      </XRefList>
+    </SimpleAllele>
+    <ReviewStatus>no interpretation for the single variant</ReviewStatus>
+    <Interpretations>
+      <Interpretation NumberOfSubmissions="0" NumberOfSubmitters="0" Type="Clinical significance">
+        <Description>no interpretation for the single variant</Description>
+      </Interpretation>
+    </Interpretations>
+    <SubmittedInterpretationList>
+      <SCV Title="SUB1895145" Accession="SCV000296057" Version="1"/>
+    </SubmittedInterpretationList>
+    <InterpretedVariationList>
+      <InterpretedVariation VariationID="431733" Accession="VCV000431733" Version="1"/>
+    </InterpretedVariationList>
+  </IncludedRecord>
+</VariationArchive>
+</ClinVarVariationRelease>

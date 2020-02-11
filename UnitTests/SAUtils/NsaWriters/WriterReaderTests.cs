@@ -32,24 +32,24 @@ namespace UnitTests.SAUtils.NsaWriters
             var clinvarItems = new List<ClinVarItem>
             {
                 new ClinVarItem(_chrom1, 100, 100, "T", "A", ClinVarSchema.Get(), new[] {"origin1"}, "SNV", "RCV0001",
-                    null, ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"},
+                    null, ClinVarCommon.ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"},
                     new[] {"phenotype1"}, new[] {"significance"}, new[] {10024875684920}, 658794146787),
 
                 new ClinVarItem(_chrom1, 101, 101, "A", "", ClinVarSchema.Get(), new[] {"origin1"}, "del", "RCV00011",
-                    101, ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"},
+                    101, ClinVarCommon.ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"},
                     new[] {"phenotype1"}, new[] {"significance"}, new[] {10024875684920}, 658794146787),
 
                 new ClinVarItem(_chrom1, 106, 106, "C", "", ClinVarSchema.Get(), new[] {"origin5"}, "del", "RCV0005",
-                    null, ReviewStatus.multiple_submitters, new[] {"medgen5"}, new[] {"omim5"}, new[] {"orpha5"},
+                    null, ClinVarCommon.ReviewStatus.multiple_submitters, new[] {"medgen5"}, new[] {"omim5"}, new[] {"orpha5"},
                     new[] {"phenotype5"}, new[] {"significance5"}, new[] {10024255684920}, 658794187787),
 
                 new ClinVarItem(_chrom2, 200, 200, "G", "A", ClinVarSchema.Get(),
-                    new[] {"origin21"}, "SNV", "RCV20001", null, ReviewStatus.multiple_submitters_no_conflict,
+                    new[] {"origin21"}, "SNV", "RCV20001", null, ClinVarCommon.ReviewStatus.multiple_submitters_no_conflict,
                     new[] {"medgen20"}, new[] {"omim20"}, new[] {"orpha20"}, new[] {"phenotype20"},
                     new[] {"significance20"}, new[] {10024875684480}, 669794146787),
 
                 new ClinVarItem(_chrom2, 205, 205, "T", "C", ClinVarSchema.Get(), new[] {"origin25"}, "ins", "RCV20005",
-                    null, ReviewStatus.expert_panel, new[] {"medgen25"}, new[] {"omim25"}, new[] {"orpha25"},
+                    null, ClinVarCommon.ReviewStatus.expert_panel, new[] {"medgen25"}, new[] {"omim25"}, new[] {"orpha25"},
                     new[] {"phenotype25"}, new[] {"significance25"}, new[] {10024255684925}, 658794187287)
             };
 

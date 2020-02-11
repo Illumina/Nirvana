@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ClinVarVariationRelease xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_variation/variation_archive_1.4.xsd" ReleaseDate="2019-12-31">
+<VariationArchive VariationID="79" VariationName="LIPA, 934G-A" VariationType="single nucleotide variant" DateCreated="2010-12-01" DateLastUpdated="2019-03-29" Accession="VCV000000079" Version="1" RecordType="interpreted" NumberOfSubmissions="1" NumberOfSubmitters="1">
+  <RecordStatus>current</RecordStatus>
+  <Species>Homo sapiens</Species>
+  <InterpretedRecord>
+    <SimpleAllele AlleleID="15118" VariationID="79">
+      <GeneList>
+        <Gene Symbol="LIPA" FullName="lipase A, lysosomal acid type" GeneID="3988" HGNC_ID="HGNC:6617" Source="submitted" RelationshipType="asserted, but not computed">
+          <Location>
+            <CytogeneticLocation>10q23.31</CytogeneticLocation>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="89213569" stop="89252039" display_start="89213569" display_stop="89252039" Strand="-"/>
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="90973325" stop="91011659" display_start="90973325" display_stop="91011659" Strand="-"/>
+          </Location>
+          <OMIM>613497</OMIM>
+        </Gene>
+      </GeneList>
+      <Name>LIPA, 934G-A</Name>
+      <VariantType>single nucleotide variant</VariantType>
+      <Location>
+        <CytogeneticLocation>10q23.31</CytogeneticLocation>
+      </Location>
+      <OtherNameList>
+        <Name>934G-A</Name>
+      </OtherNameList>
+      <XRefList>
+        <XRef Type="Allelic variant" ID="613497.0002" DB="OMIM"/>
+      </XRefList>
+    </SimpleAllele>
+    <ReviewStatus>no assertion criteria provided</ReviewStatus>
+    <RCVList>
+      <RCVAccession Title="LIPA, 934G-A AND Lysosomal acid lipase deficiency" DateLastEvaluated="1996-04-01" ReviewStatus="no assertion criteria provided" Interpretation="Pathogenic" SubmissionCount="1" Accession="RCV000000098" Version="3">
+        <InterpretedConditionList>
+          <InterpretedCondition DB="MedGen" ID="C0043208">Lysosomal acid lipase deficiency</InterpretedCondition>
+        </InterpretedConditionList>
+      </RCVAccession>
+    </RCVList>
+    <Interpretations>
+      <Interpretation DateLastEvaluated="1996-04-01" NumberOfSubmissions="1" NumberOfSubmitters="1" Type="Clinical significance">
+        <Description>Pathogenic</Description>
+        <Citation Type="general">
+          <CitationText>Maslen, C. L., Illingworth, D. R. Molecular genetics of cholesterol ester hydrolase deficiency. (Abstract) Am. J. Hum. Genet. 53 (suppl.): A926, 1993.</CitationText>
+        </Citation>
+        <Citation Type="general">
+          <ID Source="PubMed">7759067</ID>
+        </Citation>
+        <Citation Type="general">
+          <ID Source="PubMed">8254026</ID>
+        </Citation>
+        <Citation Type="general">
+          <ID Source="PubMed">8598644</ID>
+        </Citation>
+        <Citation Type="general">
+          <ID Source="PubMed">8617513</ID>
+        </Citation>
+        <ConditionList>
+          <TraitSet ID="41" Type="Disease">
+            <Trait ID="2626" Type="Disease">
+              <Name>
+                <ElementValue Type="Alternate">CHOLESTEROL ESTER HYDROLASE DEFICIENCY</ElementValue>
+                <XRef Type="MIM" ID="278000" DB="OMIM"/>
+              </Name>
+              <Name>
+                <ElementValue Type="Preferred">Lysosomal acid lipase deficiency</ElementValue>
+                <XRef ID="Wolman+disease/7523" DB="Genetic Alliance"/>
+              </Name>
+              <Name>
+                <ElementValue Type="Alternate">LAL DEFICIENCY</ElementValue>
+                <XRef Type="MIM" ID="278000" DB="OMIM"/>
+              </Name>
+              <AttributeSet>
+                <Attribute Type="public definition">The phenotypic spectrum of lysosomal acid lipase (LAL) deficiency ranges from the infantile-onset form (Wolman disease) to later-onset forms collectively known as cholesterol ester storage disease (CESD). Wolman disease is characterized by infantile-onset malabsorption that results in malnutrition, storage of cholesterol esters and triglycerides in hepatic macrophages that results in hepatomegaly and liver disease, and adrenal gland calcification that results in adrenal cortical insufficiency. Unless successfully treated with hematopoietic stem cell transplantation (HSCT), infants with classic Wolman disease do not survive beyond age one year. CESD may present in childhood in a manner similar to Wolman disease or later in life with such findings as serum lipid abnormalities, hepatosplenomegaly, and/or elevated liver enzymes long before a diagnosis is made. The morbidity of late-onset CESD results from atherosclerosis (coronary artery disease, stroke), liver disease (e.g., altered liver function &#177; jaundice, steatosis, fibrosis, cirrhosis and related complications of esophageal varices, and/or liver failure), complications of secondary hypersplenism (i.e., anemia and/or thrombocytopenia), and/or malabsorption. Individuals with CESD may have a normal life span depending on the severity of disease manifestations.</Attribute>
+                <XRef ID="NBK305870" DB="GeneReviews"/>
+              </AttributeSet>
+              <Citation Type="Suggested Reading" Abbrev="Shirley, 2015">
+                <ID Source="PubMed">26452566</ID>
+              </Citation>
+              <Citation Type="review" Abbrev="GeneReviews">
+                <ID Source="PubMed">26225414</ID>
+                <ID Source="BookShelf">NBK305870</ID>
+              </Citation>
+              <XRef ID="275761" DB="Orphanet"/>
+              <XRef ID="C0043208" DB="MedGen"/>
+              <XRef Type="MIM" ID="278000" DB="OMIM"/>
+            </Trait>
+          </TraitSet>
+        </ConditionList>
+      </Interpretation>
+    </Interpretations>
+    <ClinicalAssertionList>
+      <ClinicalAssertion ID="20241" DateCreated="2011-01-25" DateLastUpdated="2019-03-31" SubmissionDate="2010-12-30">
+        <ClinVarSubmissionID localKey="613497.0002_CHOLESTERYL ESTER STORAGE DISEASE" title="LIPA, 934G-A_CHOLESTERYL ESTER STORAGE DISEASE"/>
+        <ClinVarAccession Accession="SCV000020241" Type="SCV" Version="2" SubmitterName="OMIM" OrgID="3" OrganizationCategory="resource"/>
+        <RecordStatus>current</RecordStatus>
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Interpretation DateLastEvaluated="1996-04-01">
+          <Description>Pathogenic</Description>
+        </Interpretation>
+        <Assertion>variation to disease</Assertion>
+        <ObservedInList>
+          <ObservedIn>
+            <Sample>
+              <Origin>germline</Origin>
+              <Species>human</Species>
+              <AffectedStatus>not provided</AffectedStatus>
+            </Sample>
+            <Method>
+              <MethodType>literature only</MethodType>
+            </Method>
+            <ObservedData>
+              <Attribute Type="Description">In a 12-year-old patient with cholesteryl ester storage disease (278000) from a nonconsanguineous Polish-German family, Klima et al. (1993) detected a 72-bp in-frame deletion resulting in the loss of amino acid codons 254 through 277. Analysis of genomic DNA revealed that the 72 bp represented an exon, indicating that the deletion in the mRNA was caused by defective splicing. Sequence analysis of the patient's genomic DNA revealed a G-to-A substitution in the last nucleotide of the 72-bp exon on 1 allele. No normal-sized mRNA was detectable in the propositus even though he was not homozygous for the splice site mutation. Klima et al. (1993) concluded that the patient was compound heterozygous for the splice site mutation and a null allele. The patient showed LIPA activity in cultured skin fibroblasts approximately 9% of normal. Hepatosplenomegaly had been present since age 5 years.</Attribute>
+              <Citation>
+                <ID Source="PubMed">8254026</ID>
+              </Citation>
+              <XRef DB="OMIM" ID="278000" Type="MIM"/>
+            </ObservedData>
+            <ObservedData>
+              <Attribute Type="Description">Aslanidis et al. (1996) restudied the patient of Klima et al. (1993) and defined the splice site mutation as a G-to-A mutation at position -1 of the splice donor site following exon 8, resulting in incorrect splicing and the removal of the 72-bp exon 8 of the LIPA gene. They determined that the other allele of the patient carried a premature termination mutation (613497.0003) as well as the L179P mutation (613497.0001); the LIPA mRNA was rendered unstable by the premature stop codon. Aslanidis et al. (1996) demonstrated that the splice site mutation allowed the production of approximately 3 to 4% of correctly spliced mRNA relative to wildtype. Aslanidis et al. (1996) also identified a mutation at the same splice donor site, and also resulting in deletion of exon 8, in 2 sibs with Wolman disease; that mutation, at the +1 position, allowed no correct splicing, and patient fibroblasts were devoid of enzymatic activity. See 613497.0005.</Attribute>
+              <Citation>
+                <ID Source="PubMed">8617513</ID>
+              </Citation>
+              <Citation>
+                <ID Source="PubMed">8254026</ID>
+              </Citation>
+            </ObservedData>
+            <ObservedData>
+              <Attribute Type="Description">In 2 sibs with CESD, Maslen and Illingworth (1993) and Maslen et al. (1995) identified compound heterozygosity for this splice site mutation in the LIPA gene, inherited from their father, and the L179P mutation (613497.0001). The affected children were a sister and brother who presented with idiopathic hepatomegaly at ages 6 and 8 years, respectively. Subsequent analyses indicated that they also had hypercholesterolemia and a severe reduction in cholesteryl ester hydrolase activity in cultured fibroblasts.</Attribute>
+              <Citation>
+                <CitationText>Maslen, C. L., Illingworth, D. R. Molecular genetics of cholesterol ester hydrolase deficiency. (Abstract) Am. J. Hum. Genet. 53 (suppl.): A926, 1993.</CitationText>
+              </Citation>
+              <Citation>
+                <ID Source="PubMed">8598644</ID>
+              </Citation>
+            </ObservedData>
+            <ObservedData>
+              <Attribute Type="Description">Muntoni et al. (1995) observed homozygosity for the splice site mutation (Klima et al., 1993) in a Spanish kindred with cholesterol ester storage disease. Exon 8 of the LIPA gene was deleted.</Attribute>
+              <Citation>
+                <ID Source="PubMed">7759067</ID>
+              </Citation>
+              <Citation>
+                <ID Source="PubMed">8254026</ID>
+              </Citation>
+            </ObservedData>
+          </ObservedIn>
+        </ObservedInList>
+        <SimpleAllele>
+          <GeneList>
+            <Gene Symbol="LIPA"/>
+          </GeneList>
+          <Name>LIPA, 934G-A</Name>
+          <VariantType>Variation</VariantType>
+          <OtherNameList>
+            <Name Type="NonHGVS">934G-A</Name>
+          </OtherNameList>
+          <XRefList>
+            <XRef DB="OMIM" ID="613497.0002" Type="Allelic variant"/>
+          </XRefList>
+        </SimpleAllele>
+        <TraitSet Type="Disease">
+          <Trait Type="Disease">
+            <Name>
+              <ElementValue Type="Preferred">CHOLESTERYL ESTER STORAGE DISEASE</ElementValue>
+            </Name>
+          </Trait>
+        </TraitSet>
+      </ClinicalAssertion>
+    </ClinicalAssertionList>
+    <TraitMappingList>
+      <TraitMapping ClinicalAssertionID="20241" TraitType="Disease" MappingType="Name" MappingValue="CHOLESTERYL ESTER STORAGE DISEASE" MappingRef="Preferred">
+        <MedGen CUI="C0008384" Name="Cholesteryl ester storage disease"/>
+      </TraitMapping>
+    </TraitMappingList>
+  </InterpretedRecord>
+</VariationArchive>
+
+<VariationArchive VariationID="86" VariationName="HPSE2, EX8-9DEL" VariationType="Deletion" DateCreated="2010-12-01" DateLastUpdated="2019-03-29" Accession="VCV000000086" Version="1" RecordType="interpreted" NumberOfSubmissions="1" NumberOfSubmitters="1">
+  <RecordStatus>current</RecordStatus>
+  <Species>Homo sapiens</Species>
+  <InterpretedRecord>
+    <SimpleAllele AlleleID="15125" VariationID="86">
+      <GeneList>
+        <Gene Symbol="HPSE2" FullName="heparanase 2 (inactive)" GeneID="60495" HGNC_ID="HGNC:18374" Source="submitted" RelationshipType="asserted, but not computed">
+          <Location>
+            <CytogeneticLocation>10q24.2</CytogeneticLocation>
+            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="98457077" stop="99235875" display_start="98457077" display_stop="99235875" Strand="-"/>
+            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="100216833" stop="100995631" display_start="100216833" display_stop="100995631" Strand="-"/>
+          </Location>
+          <OMIM>613469</OMIM>
+        </Gene>
+      </GeneList>
+      <Name>HPSE2, EX8-9DEL</Name>
+      <VariantType>Deletion</VariantType>
+      <Location>
+        <CytogeneticLocation>10q23-q24</CytogeneticLocation>
+      </Location>
+      <OtherNameList>
+        <Name>EX8-9DEL</Name>
+      </OtherNameList>
+      <XRefList>
+        <XRef Type="Allelic variant" ID="613469.0004" DB="OMIM"/>
+      </XRefList>
+    </SimpleAllele>
+    <ReviewStatus>no assertion criteria provided</ReviewStatus>
+    <RCVList>
+      <RCVAccession Title="HPSE2, EX8-9DEL AND Ochoa syndrome" DateLastEvaluated="2010-06-11" ReviewStatus="no assertion criteria provided" Interpretation="Pathogenic" SubmissionCount="1" Accession="RCV000000106" Version="5">
+        <InterpretedConditionList>
+          <InterpretedCondition DB="MedGen" ID="C0403555">Ochoa syndrome</InterpretedCondition>
+        </InterpretedConditionList>
+      </RCVAccession>
+    </RCVList>
+    <Interpretations>
+      <Interpretation DateLastEvaluated="2010-06-11" NumberOfSubmissions="1" NumberOfSubmitters="1" Type="Clinical significance">
+        <Description>Pathogenic</Description>
+        <Citation Type="general">
+          <ID Source="PubMed">20560210</ID>
+        </Citation>
+        <ConditionList>
+          <TraitSet ID="42" Type="Disease">
+            <Trait ID="5090" Type="Disease">
+              <Name>
+                <ElementValue Type="Preferred">Ochoa syndrome</ElementValue>
+                <XRef ID="Ochoa+syndrome/5288" DB="Genetic Alliance"/>
+                <XRef ID="ochoa-syndrome" DB="Genetics Home Reference"/>
+                <XRef ID="104" DB="Office of Rare Diseases"/>
+                <XRef ID="236533008" DB="SNOMED CT"/>
+              </Name>
+              <Name>
+                <ElementValue Type="Alternate">Urofacial syndrome 1</ElementValue>
+              </Name>
+              <Name>
+                <ElementValue Type="Alternate">HPSE2-Releated Urofacial Syndrome</ElementValue>
+              </Name>
+              <Name>
+                <ElementValue Type="Alternate">Urofacial Syndrome</ElementValue>
+              </Name>
+              <Symbol>
+                <ElementValue Type="Alternate">UFS</ElementValue>
+                <XRef Type="MIM" ID="236730" DB="OMIM"/>
+                <XRef ID="104" DB="Office of Rare Diseases"/>
+              </Symbol>
+              <Symbol>
+                <ElementValue Type="Preferred">UFS1</ElementValue>
+                <XRef Type="MIM" ID="236730" DB="OMIM"/>
+              </Symbol>
+              <AttributeSet>
+                <Attribute Type="public definition">Urofacial syndrome (UFS) is characterized by prenatal or infantile onset of urinary bladder voiding dysfunction, abnormal facial movement with expression (resulting from abnormal co-contraction of the corners of the mouth and eyes), and often bowel dysfunction (constipation and/or encopresis). Bladder voiding dysfunction increases the risk for urinary incontinence, megacystis, vesicoureteric reflux, hydroureteronephrosis, urosepsis, and progressive renal impairment. In rare instances, an individual who has (a) a molecularly confirmed diagnosis and/or (b) an affected relative meeting clinical diagnostic criteria manifests only the characteristic facial features or only the urinary bladder voiding dysfunction (not both). Nocturnal lagophthalmos (incomplete closing of the eyes during sleep) appears to be a common and significant finding.</Attribute>
+                <XRef ID="NBK154138" DB="GeneReviews"/>
+              </AttributeSet>
+              <Citation Type="review" Abbrev="GeneReviews">
+                <ID Source="PubMed">23967498</ID>
+                <ID Source="BookShelf">NBK154138</ID>
+              </Citation>
+              <XRef ID="2704" DB="Orphanet"/>
+              <XRef ID="C0403555" DB="MedGen"/>
+              <XRef Type="MIM" ID="236730" DB="OMIM"/>
+            </Trait>
+          </TraitSet>
+        </ConditionList>
+      </Interpretation>
+    </Interpretations>
+    <ClinicalAssertionList>
+      <ClinicalAssertion ID="20249" DateCreated="2011-01-25" DateLastUpdated="2019-03-31" SubmissionDate="2010-12-30">
+        <ClinVarSubmissionID localKey="613469.0004_UROFACIAL SYNDROME 1" title="HPSE2, EX8-9DEL_UROFACIAL SYNDROME 1"/>
+        <ClinVarAccession Accession="SCV000020249" Type="SCV" Version="3" SubmitterName="OMIM" OrgID="3" OrganizationCategory="resource"/>
+        <RecordStatus>current</RecordStatus>
+        <ReviewStatus>no assertion criteria provided</ReviewStatus>
+        <Interpretation DateLastEvaluated="2010-06-11">
+          <Description>Pathogenic</Description>
+        </Interpretation>
+        <Assertion>variation to disease</Assertion>
+        <ObservedInList>
+          <ObservedIn>
+            <Sample>
+              <Origin>germline</Origin>
+              <Species>human</Species>
+              <AffectedStatus>not provided</AffectedStatus>
+            </Sample>
+            <Method>
+              <MethodType>literature only</MethodType>
+            </Method>
+            <ObservedData>
+              <Attribute Type="Description">By copy number analysis in a consanguineous British Pakistani family with urofacial syndrome (UFS1; 236730), Daly et al. (2010) identified homozygosity for an intragenic deletion encompassing exons 8 and 9 of the HPSE2 gene that segregated with the disease. PCR analysis and DNA sequencing across the breakpoints defined a 10.81-kb deletion and a 23-bp insertion at the breakpoints, predicted to cause an in-frame deletion of exons 8 and 9 and removal of 74 amino acids. The unaffected parents were heterozygous for the mutation, which was not found in 93 Pakistani controls.</Attribute>
+              <Citation>
+                <ID Source="PubMed">20560210</ID>
+              </Citation>
+              <XRef DB="OMIM" ID="236730" Type="MIM"/>
+            </ObservedData>
+          </ObservedIn>
+        </ObservedInList>
+        <SimpleAllele>
+          <GeneList>
+            <Gene Symbol="HPSE2"/>
+          </GeneList>
+          <Name>HPSE2, EX8-9DEL</Name>
+          <VariantType>Variation</VariantType>
+          <OtherNameList>
+            <Name Type="NonHGVS">EX8-9DEL</Name>
+          </OtherNameList>
+          <XRefList>
+            <XRef DB="OMIM" ID="613469.0004" Type="Allelic variant"/>
+          </XRefList>
+        </SimpleAllele>
+        <TraitSet Type="Disease">
+          <Trait Type="Disease">
+            <Name>
+              <ElementValue Type="Preferred">UROFACIAL SYNDROME 1</ElementValue>
+            </Name>
+          </Trait>
+        </TraitSet>
+      </ClinicalAssertion>
+    </ClinicalAssertionList>
+    <TraitMappingList>
+      <TraitMapping ClinicalAssertionID="20249" TraitType="Disease" MappingType="Name" MappingValue="UROFACIAL SYNDROME 1" MappingRef="Preferred">
+        <MedGen CUI="C0403555" Name="Ochoa syndrome"/>
+      </TraitMapping>
+    </TraitMappingList>
+  </InterpretedRecord>
+</VariationArchive>
+</ClinVarVariationRelease>

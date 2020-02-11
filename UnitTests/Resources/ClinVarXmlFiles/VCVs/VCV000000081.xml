@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ClinVarVariationRelease xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_variation/variation_archive_1.4.xsd"
+                         ReleaseDate="2019-12-31">
+    <VariationArchive VariationID="81" VariationName="NM_000235.4(LIPA):c.894+1G&gt;A"
+                      VariationType="single nucleotide variant" DateCreated="2010-12-01" DateLastUpdated="2019-10-27"
+                      Accession="VCV000000081" Version="1" RecordType="interpreted" NumberOfSubmissions="1"
+                      NumberOfSubmitters="1">
+        <RecordStatus>current</RecordStatus>
+        <Species>Homo sapiens</Species>
+        <InterpretedRecord>
+            <SimpleAllele AlleleID="15120" VariationID="81">
+                <GeneList>
+                    <Gene Symbol="LIPA" FullName="lipase A, lysosomal acid type" GeneID="3988" HGNC_ID="HGNC:6617"
+                          Source="submitted" RelationshipType="within single gene">
+                        <Location>
+                            <CytogeneticLocation>10q23.31</CytogeneticLocation>
+                            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                              AssemblyStatus="current" Chr="10" Accession="NC_000010.11"
+                                              start="89213569" stop="89252039" display_start="89213569"
+                                              display_stop="89252039" Strand="-"/>
+                            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                              AssemblyStatus="previous" Chr="10" Accession="NC_000010.10"
+                                              start="90973325" stop="91011659" display_start="90973325"
+                                              display_stop="91011659" Strand="-"/>
+                        </Location>
+                        <OMIM>613497</OMIM>
+                    </Gene>
+                </GeneList>
+                <Name>NM_000235.4(LIPA):c.894+1G&gt;A</Name>
+                <VariantType>single nucleotide variant</VariantType>
+                <Location>
+                    <CytogeneticLocation>10q23.31</CytogeneticLocation>
+                    <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" forDisplay="true"
+                                      AssemblyStatus="current" Chr="10" Accession="NC_000010.11" start="89222510"
+                                      stop="89222510" display_start="89222510" display_stop="89222510" variantLength="1"
+                                      positionVCF="89222510" referenceAlleleVCF="C" alternateAlleleVCF="T"/>
+                    <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                      AssemblyStatus="previous" Chr="10" Accession="NC_000010.10" start="90982267"
+                                      stop="90982267" display_start="90982267" display_stop="90982267" variantLength="1"
+                                      positionVCF="90982267" referenceAlleleVCF="C" alternateAlleleVCF="T"/>
+                </Location>
+                <OtherNameList>
+                    <Name>IVS8, G-A, +1</Name>
+                </OtherNameList>
+                <HGVSlist>
+                    <HGVS Assembly="GRCh37" Type="genomic, top-level">
+                        <NucleotideExpression sequenceAccessionVersion="NC_000010.10" sequenceAccession="NC_000010"
+                                              sequenceVersion="10" change="g.90982267C&gt;T" Assembly="GRCh37">
+                            <Expression>NC_000010.10:g.90982267C&gt;T</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                    <HGVS Assembly="GRCh38" Type="genomic, top-level">
+                        <NucleotideExpression sequenceAccessionVersion="NC_000010.11" sequenceAccession="NC_000010"
+                                              sequenceVersion="11" change="g.89222510C&gt;T" Assembly="GRCh38">
+                            <Expression>NC_000010.11:g.89222510C&gt;T</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                    <HGVS Type="coding">
+                        <NucleotideExpression sequenceAccessionVersion="NM_000235.4" sequenceAccession="NM_000235"
+                                              sequenceVersion="4" change="c.894+1G&gt;A">
+                            <Expression>NM_000235.4:c.894+1G&gt;A</Expression>
+                        </NucleotideExpression>
+                        <MolecularConsequence ID="SO:0001575" Type="splice donor variant" DB="SO"/>
+                    </HGVS>
+                    <HGVS Type="coding">
+                        <NucleotideExpression sequenceAccessionVersion="NM_001127605.3" sequenceAccession="NM_001127605"
+                                              sequenceVersion="3" change="c.894+1G&gt;A">
+                            <Expression>NM_001127605.3:c.894+1G&gt;A</Expression>
+                        </NucleotideExpression>
+                        <MolecularConsequence ID="SO:0001575" Type="splice donor variant" DB="SO"/>
+                    </HGVS>
+                    <HGVS Type="coding">
+                        <NucleotideExpression sequenceAccessionVersion="NM_001288979.1" sequenceAccession="NM_001288979"
+                                              sequenceVersion="1" change="c.546+1G&gt;A">
+                            <Expression>NM_001288979.1:c.546+1G&gt;A</Expression>
+                        </NucleotideExpression>
+                        <MolecularConsequence ID="SO:0001575" Type="splice donor variant" DB="SO"/>
+                    </HGVS>
+                    <HGVS Type="genomic">
+                        <NucleotideExpression sequenceAccessionVersion="NG_008194.1" sequenceAccession="NG_008194"
+                                              sequenceVersion="1" change="g.34394G&gt;A">
+                            <Expression>NG_008194.1:g.34394G&gt;A</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                </HGVSlist>
+                <XRefList>
+                    <XRef Type="Allelic variant" ID="613497.0005" DB="OMIM"/>
+                    <XRef Type="rs" ID="1564751995" DB="dbSNP"/>
+                </XRefList>
+                <Comment DataSource="ClinGen" Type="public">ClinGen staff contributed the HGVS expression for this
+                    variant.
+                </Comment>
+            </SimpleAllele>
+            <ReviewStatus>no assertion criteria provided</ReviewStatus>
+            <RCVList>
+                <RCVAccession Title="NM_000235.4(LIPA):c.894+1G&gt;A AND Wolman disease" DateLastEvaluated="1996-04-01"
+                              ReviewStatus="no assertion criteria provided" Interpretation="Pathogenic"
+                              SubmissionCount="1" Accession="RCV000000101" Version="3">
+                    <InterpretedConditionList>
+                        <InterpretedCondition DB="MedGen" ID="CN438428">Wolman disease</InterpretedCondition>
+                    </InterpretedConditionList>
+                </RCVAccession>
+            </RCVList>
+            <Interpretations>
+                <Interpretation DateLastEvaluated="1996-04-01" NumberOfSubmissions="1" NumberOfSubmitters="1"
+                                Type="Clinical significance">
+                    <Description>Pathogenic</Description>
+                    <Citation Type="general">
+                        <ID Source="PubMed">8617513</ID>
+                    </Citation>
+                    <ConditionList>
+                        <TraitSet ID="40" Type="Disease">
+                            <Trait ID="9048" Type="Disease">
+                                <Name>
+                                    <ElementValue Type="Preferred">Wolman disease</ElementValue>
+                                    <XRef ID="7899" DB="Office of Rare Diseases"/>
+                                </Name>
+                                <XRef ID="75233" DB="Orphanet"/>
+                                <XRef ID="CN438428" DB="MedGen"/>
+                            </Trait>
+                        </TraitSet>
+                    </ConditionList>
+                </Interpretation>
+            </Interpretations>
+            <ClinicalAssertionList>
+                <ClinicalAssertion ID="20244" DateCreated="2011-01-25" DateLastUpdated="2019-03-31"
+                                   SubmissionDate="2010-12-30">
+                    <ClinVarSubmissionID localKey="613497.0005_WOLMAN DISEASE"
+                                         title="LIPA, IVS8, G-A, +1_WOLMAN DISEASE"/>
+                    <ClinVarAccession Accession="SCV000020244" Type="SCV" Version="2" SubmitterName="OMIM" OrgID="3"
+                                      OrganizationCategory="resource"/>
+                    <RecordStatus>current</RecordStatus>
+                    <ReviewStatus>no assertion criteria provided</ReviewStatus>
+                    <Interpretation DateLastEvaluated="1996-04-01">
+                        <Description>Pathogenic</Description>
+                    </Interpretation>
+                    <Assertion>variation to disease</Assertion>
+                    <ObservedInList>
+                        <ObservedIn>
+                            <Sample>
+                                <Origin>germline</Origin>
+                                <Species>human</Species>
+                                <AffectedStatus>not provided</AffectedStatus>
+                            </Sample>
+                            <Method>
+                                <MethodType>literature only</MethodType>
+                            </Method>
+                            <ObservedData>
+                                <Attribute Type="Description">In 2 sibs with Wolman disease (278000) from a
+                                    consanguineous family, Aslanidis et al. (1996) detected homozygosity for a G-to-A
+                                    mutation at position +1 of the splice donor site following exon 8 of the LIPA gene.
+                                    Both children died within the first year of life. The parents, who were heterozygous
+                                    for the mutation, had reduced enzymatic activity, while no enzymatic activity was
+                                    detectable in fibroblasts from the affected children. Although the same donor splice
+                                    site is involved as in the mutation reported in CESD (934G-A, 613497.0002), the
+                                    nucleotide at position +1 was changed in the Wolman disease mutation while the
+                                    nucleotide at position -1 was changed in the CESD mutation. Both mutations result in
+                                    deletion of the same 24 amino acids (exon 8), but the effects are dramatically
+                                    different: the -1 mutation allowed some correct splicing (3% of total LIPA RNA), but
+                                    the +1 splice site mutation, which affects one of the invariable nucleotides of the
+                                    splice consensus sequences, permits no correct splicing. Aslanidis et al. (1996)
+                                    suggested that the residual activity in CESD patients compared to Wolman patients
+                                    may result either from a partially active enzyme with the internal deletion of 24
+                                    amino acids (skipping of exon 8) or from the production of low amounts of the full
+                                    size of the protein due to inefficient exon exclusion from the mutated allele.
+                                </Attribute>
+                                <Citation>
+                                    <ID Source="PubMed">8617513</ID>
+                                </Citation>
+                                <XRef DB="OMIM" ID="278000" Type="MIM"/>
+                            </ObservedData>
+                        </ObservedIn>
+                    </ObservedInList>
+                    <SimpleAllele>
+                        <GeneList>
+                            <Gene Symbol="LIPA"/>
+                        </GeneList>
+                        <Name>LIPA, IVS8, G-A, +1</Name>
+                        <VariantType>Variation</VariantType>
+                        <OtherNameList>
+                            <Name Type="NonHGVS">IVS8, G-A, +1</Name>
+                        </OtherNameList>
+                        <XRefList>
+                            <XRef DB="OMIM" ID="613497.0005" Type="Allelic variant"/>
+                        </XRefList>
+                    </SimpleAllele>
+                    <TraitSet Type="Disease">
+                        <Trait Type="Disease">
+                            <Name>
+                                <ElementValue Type="Preferred">WOLMAN DISEASE</ElementValue>
+                            </Name>
+                        </Trait>
+                    </TraitSet>
+                </ClinicalAssertion>
+            </ClinicalAssertionList>
+            <TraitMappingList>
+                <TraitMapping ClinicalAssertionID="20244" TraitType="Disease" MappingType="Name"
+                              MappingValue="WOLMAN DISEASE" MappingRef="Preferred">
+                    <MedGen CUI="CN438428" Name="Wolman disease"/>
+                </TraitMapping>
+            </TraitMappingList>
+        </InterpretedRecord>
+    </VariationArchive>
+</ClinVarVariationRelease>

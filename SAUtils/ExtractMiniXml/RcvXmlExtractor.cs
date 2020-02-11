@@ -8,17 +8,17 @@ using IO;
 
 namespace SAUtils.ExtractMiniXml
 {
-	public sealed class XmlExtractor
+	public sealed class RcvXmlExtractor
 	{
 		private readonly string _inputXmlFile;
 		private readonly string _outputDir;
-		private readonly string _rcvIds;
+		private readonly List<string> _rcvIds;
 
 		private const string XmlHeader = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>"+"\n"+ "<ReleaseSet Dated=\"2016-07-04\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" Type=\"full\" xsi:noNamespaceSchemaLocation=\"http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd\">"+"\n\n";
 
 		private const string XmlFooter = "\n\n</ReleaseSet>";
 
-		public XmlExtractor(string inputXmlFile, string rcvIds, string outputDir)
+		public RcvXmlExtractor(string inputXmlFile, List<string>  rcvIds, string outputDir)
 		{
 			_inputXmlFile = inputXmlFile;
 			_rcvIds       = rcvIds;
@@ -27,19 +27,16 @@ namespace SAUtils.ExtractMiniXml
 
 		public void Extract()
 		{
-            var rcvs = ExtractRcvIds(_rcvIds);
-
-
-			using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputXmlFile))
+            using (var reader = GZipUtilities.GetAppropriateStreamReader(_inputXmlFile))
 			using (var xmlReader = XmlReader.Create(reader, new XmlReaderSettings { DtdProcessing = DtdProcessing.Prohibit, IgnoreWhitespace = true }))
 			{
 				var existVarSet = xmlReader.ReadToDescendant("ClinVarSet");
 
-                while (rcvs.Count > 0 && existVarSet)
+                while (_rcvIds.Count > 0 && existVarSet)
 				{
 					 var rcvContents = xmlReader.ReadOuterXml();
 
-					var rcv = DetectRcv(rcvs, rcvContents);
+					var rcv = DetectRcv(_rcvIds, rcvContents);
                     
                     if (rcv!=null)
                     {
@@ -53,9 +50,9 @@ namespace SAUtils.ExtractMiniXml
 
 			}
 
-			if (rcvs.Count > 0)
+			if (_rcvIds.Count > 0)
 			{
-				Console.WriteLine($"Failed to Find {string.Join(',',rcvs)}");
+				Console.WriteLine($"Failed to Find {string.Join(',',_rcvIds)}");
 			}
 
 		}
@@ -85,20 +82,5 @@ namespace SAUtils.ExtractMiniXml
             }
         }
 
-        private static List<string> ExtractRcvIds(string rcvIds)
-        {
-            var ids= new List<string>();
-            if (Directory.Exists(rcvIds))
-            {
-                foreach (var fileName in Directory.EnumerateFiles(rcvIds))
-                {
-                    if(fileName.Contains("RCV")) ids.Add(Path.GetFileNameWithoutExtension(fileName));
-                }
-
-                return ids;
-            }
-
-            return rcvIds.Split(',').ToList();
-        }
-    }
+	}
 }

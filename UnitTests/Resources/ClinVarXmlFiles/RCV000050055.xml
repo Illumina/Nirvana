@@ -1,6 +1,395 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full" xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+<ReleaseSet Dated="2016-07-04" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Type="full"
+            xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
 
-<ClinVarSet ID="37032374"><RecordStatus>current</RecordStatus><Title>NM_017890.4(VPS13B):c.11825_11827dupATG (p.Asp3942_Gly3943insAsp) AND Cohen syndrome</Title><ReferenceClinVarAssertion DateCreated="2013-07-22" DateLastUpdated="2019-01-17" ID="132715"><ClinVarAccession Acc="RCV000050055" Version="1" Type="RCV" DateUpdated="2019-01-22" /><RecordStatus>current</RecordStatus><ClinicalSignificance><ReviewStatus>no assertion criteria provided</ReviewStatus><Description>Likely pathogenic</Description></ClinicalSignificance><Assertion Type="variation to disease" /><ObservedIn><Sample><Origin>not provided</Origin><Species TaxonomyId="9606">human</Species><AffectedStatus>not provided</AffectedStatus><NumberTested>1</NumberTested></Sample><Method><MethodType>literature only</MethodType></Method><ObservedData ID="36015744"><Attribute Type="Description">not provided</Attribute></ObservedData></ObservedIn><MeasureSet Type="Variant" ID="56642"><Measure Type="Duplication" ID="71281"><Name><ElementValue Type="Preferred">NM_017890.4(VPS13B):c.11825_11827dupATG (p.Asp3942_Gly3943insAsp)</ElementValue></Name><AttributeSet><Attribute Change="c.11825_11827dup" Accession="NM_017890" Version="4" Type="HGVS, coding">NM_017890.4:c.11825_11827dup</Attribute></AttributeSet><AttributeSet><Attribute Change="c.11750_11752dup" Accession="LRG_351t2" Type="HGVS, coding, LRG">LRG_351t2:c.11750_11752dup</Attribute></AttributeSet><AttributeSet><Attribute Change="c.11825_11827dup" Accession="LRG_351t1" Type="HGVS, coding, LRG">LRG_351t1:c.11825_11827dup</Attribute></AttributeSet><AttributeSet><Attribute Change="c.11750_11752dup" Accession="NM_152564" Version="4" Type="HGVS, coding, RefSeq">NM_152564.4:c.11750_11752dup</Attribute></AttributeSet><AttributeSet><Attribute Change="c.11825_11827dupATG" Accession="NM_017890" Version="4" Type="HGVS, coding, RefSeq">NM_017890.4:c.11825_11827dupATG</Attribute></AttributeSet><AttributeSet><Attribute Change="g.867157_867159dup" Accession="LRG_351" Type="HGVS, genomic, LRG">LRG_351:g.867157_867159dup</Attribute></AttributeSet><AttributeSet><Attribute Change="g.867157_867159dup" Accession="NG_007098" Version="2" Type="HGVS, genomic, RefSeqGene">NG_007098.2:g.867157_867159dup</Attribute></AttributeSet><AttributeSet><Attribute Change="g.99875422_99875424dupATG" Accession="NC_000008" Version="11" Type="HGVS, genomic, top level" integerValue="38">NC_000008.11:g.99875422_99875424dupATG</Attribute></AttributeSet><AttributeSet><Attribute Change="g.100887650_100887652dupATG" Accession="NC_000008" Version="10" Type="HGVS, genomic, top level, previous" integerValue="37">NC_000008.10:g.100887650_100887652dupATG</Attribute></AttributeSet><AttributeSet><Attribute Change="c.11825_11827dupATG" Accession="NM_017890" Version="3" Type="HGVS, previous">NM_017890.3:c.11825_11827dupATG</Attribute></AttributeSet><AttributeSet><Attribute Change="p.Asp3942_Gly3943insAsp" Accession="LRG_351p1" Type="HGVS, protein">LRG_351p1:p.Asp3942_Gly3943insAsp</Attribute></AttributeSet><AttributeSet><Attribute Change="p.Gly3918delinsAspGly" Accession="LRG_351p2" Type="HGVS, protein">LRG_351p2:p.Gly3918delinsAspGly</Attribute></AttributeSet><AttributeSet><Attribute Change="p.Asp3917_Gly3918insAsp" Accession="NP_689777" Version="3" Type="HGVS, protein, RefSeq">NP_689777.3:p.Asp3917_Gly3918insAsp</Attribute></AttributeSet><AttributeSet><Attribute Change="p.Asp3942_Gly3943insAsp" Accession="NP_060360" Version="3" Type="HGVS, protein, RefSeq">NP_060360.3:p.Asp3942_Gly3943insAsp</Attribute></AttributeSet><AttributeSet><Attribute Type="Location">NM_017890.4:exon 62</Attribute><XRef ID="CI110618" DB="HGMD" /></AttributeSet><AttributeSet><Attribute Type="MolecularConsequence">inframe_variant</Attribute><XRef ID="SO:0001650" DB="Sequence Ontology" /><XRef ID="NM_017890.4:c.11825_11827dupATG" DB="RefSeq" /></AttributeSet><GlobalMinorAlleleFrequency Value="0.00220" Source="1000 Genomes Project" MinorAllele="GATGATG" /><CytogeneticLocation>8q22.2</CytogeneticLocation><SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="8" Accession="NC_000008.11" start="99875422" stop="99875424" display_start="99875422" display_stop="99875424" variantLength="3" referenceAllele="ATG" alternateAllele="ATGATG" positionVCF="99875420" referenceAlleleVCF="A" alternateAlleleVCF="AGAT" /><SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="8" Accession="NC_000008.10" start="100887650" stop="100887652" display_start="100887650" display_stop="100887652" variantLength="3" referenceAllele="ATG" alternateAllele="ATGATG" positionVCF="100887648" referenceAlleleVCF="A" alternateAlleleVCF="AGAT" /><MeasureRelationship Type="within single gene"><Name><ElementValue Type="Preferred">vacuolar protein sorting 13 homolog B</ElementValue></Name><Symbol><ElementValue Type="Preferred">VPS13B</ElementValue></Symbol><SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" AssemblyStatus="current" Chr="8" Accession="NC_000008.11" start="99013085" stop="99877586" display_start="99013085" display_stop="99877586" Strand="+" /><SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25" AssemblyStatus="previous" Chr="8" Accession="NC_000008.10" start="100025493" stop="100889813" display_start="100025493" display_stop="100889813" variantLength="864321" Strand="+" /><XRef ID="157680" DB="Gene" /><XRef Type="MIM" ID="607817" DB="OMIM" /><XRef ID="HGNC:2183" DB="HGNC" /></MeasureRelationship><Citation Type="general"><ID Source="PubMed">20921020</ID></Citation><XRef Type="rs" ID="386834068" DB="dbSNP" /></Measure><Name><ElementValue Type="Preferred">NM_017890.4(VPS13B):c.11825_11827dupATG (p.Asp3942_Gly3943insAsp)</ElementValue></Name><XRef ID="CA223354" DB="ClinGen" /></MeasureSet><TraitSet Type="Disease" ID="723"><Trait ID="825" Type="Disease"><Name><ElementValue Type="Preferred">Cohen syndrome</ElementValue><XRef ID="Cohen+Syndrome/1715" DB="Genetic Alliance" /><XRef ID="cohen-syndrome" DB="Genetics Home Reference" /><XRef ID="6126" DB="Office of Rare Diseases" /><XRef ID="56604005" DB="SNOMED CT" /></Name><Name><ElementValue Type="Alternate">Cutis verticis gyrata, retinitis pigmentosa, and sensorineural deafness</ElementValue></Name><Symbol><ElementValue Type="Preferred">COH1</ElementValue><XRef Type="MIM" ID="216550" DB="OMIM" /><XRef ID="6126" DB="Office of Rare Diseases" /></Symbol><Symbol><ElementValue Type="Alternate">CHS1</ElementValue><XRef Type="MIM" ID="216550" DB="OMIM" /></Symbol><Symbol><ElementValue Type="Alternate">COH</ElementValue><XRef Type="MIM" ID="216550" DB="OMIM" /></Symbol><AttributeSet><Attribute Type="public definition">Cohen syndrome is characterized by failure to thrive in infancy and childhood; truncal obesity in the teen years; early-onset hypotonia and developmental delays; microcephaly developing during the first year of life; moderate to profound psychomotor retardation; progressive retinochoroidal dystrophy and high myopia; neutropenia in many with recurrent infections and aphthous ulcers in some; a cheerful disposition; joint hypermobility; and characteristic facial features.</Attribute><XRef ID="NBK1482" DB="GeneReviews" /></AttributeSet><Citation Type="review" Abbrev="GeneReviews"><ID Source="PubMed">20301655</ID><ID Source="BookShelf">NBK1482</ID></Citation><XRef ID="C0265223" DB="MedGen" /><XRef ID="193" DB="Orphanet" /><XRef Type="MIM" ID="216550" DB="OMIM" /></Trait></TraitSet></ReferenceClinVarAssertion><ClinVarAssertion ID="131853" SubmissionName="FinDis_mutations"><ClinVarSubmissionID localKey="FINDIS548" submitter="Juha Muilu Group; Institute for Molecular Medicine Finland (FIMM)" submitterDate="2013-05-19" /><ClinVarAccession Acc="SCV000082464" OrgType="primary" OrganizationCategory="laboratory" Version="1" Type="SCV" OrgID="500116" DateUpdated="2017-08-31" /><RecordStatus>current</RecordStatus><ClinicalSignificance><ReviewStatus>no assertion criteria provided</ReviewStatus><Description>probable-pathogenic</Description><Comment>Converted during submission to Likely pathogenic.</Comment></ClinicalSignificance><Assertion Type="variation to disease" /><ObservedIn><Sample><Origin>not provided</Origin><Species>human</Species><AffectedStatus>not provided</AffectedStatus><NumberTested>1</NumberTested></Sample><Method><MethodType>not provided</MethodType></Method><ObservedData><Attribute Type="Description">not provided</Attribute></ObservedData></ObservedIn><MeasureSet Type="Variant"><Measure Type="Variation"><AttributeSet><Attribute Type="HGVS">NM_017890.4:c.11825_11827dupATG</Attribute></AttributeSet><Citation Type="general"><ID Source="PubMed">20921020</ID></Citation></Measure></MeasureSet><TraitSet Type="Disease"><Trait Type="Disease"><Name><ElementValue Type="Preferred">Cohen syndrome</ElementValue></Name><XRef DB="OMIM" ID="216550" Type="MIM" /></Trait></TraitSet><Comment>FinDis database variant: This variant was not found or characterized by our laboratory, data were collected from public sources: see reference</Comment></ClinVarAssertion></ClinVarSet>
+    <ClinVarSet ID="47101830">
+        <RecordStatus>current</RecordStatus>
+        <Title>NM_017890.4(VPS13B):c.11825_11827dup (p.Asp3942dup) AND Cohen syndrome</Title>
+        <ReferenceClinVarAssertion DateCreated="2013-07-22" DateLastUpdated="2019-11-02" ID="132715">
+            <ClinVarAccession Acc="RCV000050055" Version="3" Type="RCV" DateUpdated="2019-11-02"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2018-09-26">
+                <ReviewStatus>criteria provided, multiple submitters, no conflicts</ReviewStatus>
+                <Description>Uncertain significance</Description>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData ID="47956212">
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+                <ObservedData ID="47956212">
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <ObservedIn>
+                <Sample>
+                    <Origin>not provided</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>not provided</AffectedStatus>
+                    <NumberTested>1</NumberTested>
+                </Sample>
+                <Method>
+                    <MethodType>literature only</MethodType>
+                </Method>
+                <ObservedData ID="47956213">
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant" ID="56642" Acc="VCV000056642" Version="3">
+                <Measure Type="Duplication" ID="71281">
+                    <Name>
+                        <ElementValue Type="Preferred">NM_017890.4(VPS13B):c.11825_11827dup (p.Asp3942dup)
+                        </ElementValue>
+                    </Name>
+                    <AttributeSet>
+                        <Attribute Accession="NM_017890" Version="4" Change="c.11825_11827dupATG" Type="HGVS, coding">
+                            NM_017890.4:c.11825_11827dupATG
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_351t2" Change="c.11750_11752dup" Type="HGVS, coding, LRG">
+                            LRG_351t2:c.11750_11752dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_351t1" Change="c.11825_11827dup" Type="HGVS, coding, LRG">
+                            LRG_351t1:c.11825_11827dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_152564" Version="4" Change="c.11750_11752dup"
+                                   Type="HGVS, coding, RefSeq">NM_152564.4:c.11750_11752dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_017890" Version="4" Change="c.11825_11827dup"
+                                   Type="HGVS, coding, RefSeq">NM_017890.4:c.11825_11827dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_351" Change="g.867157_867159dup" Type="HGVS, genomic, LRG">
+                            LRG_351:g.867157_867159dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NG_007098" Version="2" Change="g.867157_867159dup"
+                                   Type="HGVS, genomic, RefSeqGene">NG_007098.2:g.867157_867159dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000008" Version="11" Change="g.99875422_99875424dup"
+                                   Type="HGVS, genomic, top level" integerValue="38">NC_000008.11:g.99875422_99875424dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000008" Version="10" Change="g.100887650_100887652dup"
+                                   Type="HGVS, genomic, top level, previous" integerValue="37">
+                            NC_000008.10:g.100887650_100887652dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_017890" Version="3" Change="c.11825_11827dupATG" Type="HGVS, previous">
+                            NM_017890.3:c.11825_11827dupATG
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_351p2" Change="p.Asp3917dup" Type="HGVS, protein">
+                            LRG_351p2:p.Asp3917dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_351p1" Change="p.Asp3942dup" Type="HGVS, protein">
+                            LRG_351p1:p.Asp3942dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_689777" Version="3" Change="p.Asp3917dup" Type="HGVS, protein, RefSeq">
+                            NP_689777.3:p.Asp3917dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_060360" Version="3" Change="p.Asp3942dup" Type="HGVS, protein, RefSeq">
+                            NP_060360.3:p.Asp3942dup
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="Location">NM_017890.4:exon 62</Attribute>
+                        <XRef ID="CI110618" DB="HGMD"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">inframe_insertion</Attribute>
+                        <XRef ID="SO:0001821" DB="Sequence Ontology"/>
+                        <XRef ID="NM_017890.4:c.11825_11827dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">inframe_insertion</Attribute>
+                        <XRef ID="SO:0001821" DB="Sequence Ontology"/>
+                        <XRef ID="NM_152564.4:c.11750_11752dup" DB="RefSeq"/>
+                    </AttributeSet>
+                    <GlobalMinorAlleleFrequency Value="0.00220" Source="1000 Genomes Project" MinorAllele="GATGATG"/>
+                    <CytogeneticLocation>8q22.2</CytogeneticLocation>
+                    <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                      AssemblyStatus="current" Chr="8" Accession="NC_000008.11" start="99875422"
+                                      stop="99875424" display_start="99875422" display_stop="99875424" variantLength="3"
+                                      positionVCF="99875420" referenceAlleleVCF="A" alternateAlleleVCF="AGAT"/>
+                    <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                      AssemblyStatus="previous" Chr="8" Accession="NC_000008.10" start="100887650"
+                                      stop="100887652" display_start="100887650" display_stop="100887652"
+                                      variantLength="3" positionVCF="100887648" referenceAlleleVCF="A"
+                                      alternateAlleleVCF="AGAT"/>
+                    <MeasureRelationship Type="within single gene">
+                        <Name>
+                            <ElementValue Type="Preferred">vacuolar protein sorting 13 homolog B</ElementValue>
+                        </Name>
+                        <Symbol>
+                            <ElementValue Type="Preferred">VPS13B</ElementValue>
+                        </Symbol>
+                        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                          AssemblyStatus="current" Chr="8" Accession="NC_000008.11" start="99013266"
+                                          stop="99877586" display_start="99013266" display_stop="99877586" Strand="+"/>
+                        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                          AssemblyStatus="previous" Chr="8" Accession="NC_000008.10" start="100025493"
+                                          stop="100889813" display_start="100025493" display_stop="100889813"
+                                          variantLength="864321" Strand="+"/>
+                        <XRef ID="157680" DB="Gene"/>
+                        <XRef Type="MIM" ID="607817" DB="OMIM"/>
+                        <XRef ID="HGNC:2183" DB="HGNC"/>
+                    </MeasureRelationship>
+                    <Citation Type="general">
+                        <ID Source="PubMed">20921020</ID>
+                    </Citation>
+                    <XRef Type="rs" ID="386834068" DB="dbSNP"/>
+                </Measure>
+                <Name>
+                    <ElementValue Type="Preferred">NM_017890.4(VPS13B):c.11825_11827dup (p.Asp3942dup)</ElementValue>
+                </Name>
+                <XRef ID="CA223354" DB="ClinGen"/>
+            </MeasureSet>
+            <TraitSet Type="Disease" ID="723">
+                <Trait ID="825" Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">Cohen syndrome</ElementValue>
+                        <XRef ID="Cohen+Syndrome/1715" DB="Genetic Alliance"/>
+                        <XRef ID="cohen-syndrome" DB="Genetics Home Reference"/>
+                        <XRef ID="6126" DB="Office of Rare Diseases"/>
+                        <XRef ID="56604005" DB="SNOMED CT"/>
+                    </Name>
+                    <Name>
+                        <ElementValue Type="Alternate">Cutis verticis gyrata, retinitis pigmentosa, and sensorineural
+                            deafness
+                        </ElementValue>
+                    </Name>
+                    <Symbol>
+                        <ElementValue Type="Preferred">COH1</ElementValue>
+                        <XRef Type="MIM" ID="216550" DB="OMIM"/>
+                        <XRef ID="6126" DB="Office of Rare Diseases"/>
+                    </Symbol>
+                    <Symbol>
+                        <ElementValue Type="Alternate">CHS1</ElementValue>
+                        <XRef Type="MIM" ID="216550" DB="OMIM"/>
+                    </Symbol>
+                    <Symbol>
+                        <ElementValue Type="Alternate">COH</ElementValue>
+                        <XRef Type="MIM" ID="216550" DB="OMIM"/>
+                    </Symbol>
+                    <AttributeSet>
+                        <Attribute Type="public definition">Cohen syndrome is characterized by failure to thrive in
+                            infancy and childhood; truncal obesity in the teen years; early-onset hypotonia and
+                            developmental delays; microcephaly developing during the first year of life; moderate to
+                            profound psychomotor retardation; progressive retinochoroidal dystrophy and high myopia;
+                            neutropenia in many with recurrent infections and aphthous ulcers in some; a cheerful
+                            disposition; joint hypermobility; and characteristic facial features.
+                        </Attribute>
+                        <XRef ID="NBK1482" DB="GeneReviews"/>
+                    </AttributeSet>
+                    <Citation Type="review" Abbrev="GeneReviews">
+                        <ID Source="PubMed">20301655</ID>
+                        <ID Source="BookShelf">NBK1482</ID>
+                    </Citation>
+                    <XRef ID="C0265223" DB="MedGen"/>
+                    <XRef ID="193" DB="Orphanet"/>
+                    <XRef Type="MIM" ID="216550" DB="OMIM"/>
+                </Trait>
+            </TraitSet>
+        </ReferenceClinVarAssertion>
+        <ClinVarAssertion ID="131853" SubmissionName="FinDis_mutations">
+            <ClinVarSubmissionID localKey="FINDIS548"
+                                 submitter="Juha Muilu Group; Institute for Molecular Medicine Finland (FIMM)"
+                                 submitterDate="2013-05-19"/>
+            <ClinVarAccession Acc="SCV000082464" Version="1" Type="SCV" OrgID="500116" OrganizationCategory="laboratory"
+                              OrgType="primary" DateUpdated="2019-03-31"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance>
+                <ReviewStatus>no assertion criteria provided</ReviewStatus>
+                <Description>probable-pathogenic</Description>
+                <Comment Type="ConvertedByNCBI">Converted during submission to Likely pathogenic.</Comment>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ObservedIn>
+                <Sample>
+                    <Origin>not provided</Origin>
+                    <Species>human</Species>
+                    <AffectedStatus>not provided</AffectedStatus>
+                    <NumberTested>1</NumberTested>
+                </Sample>
+                <Method>
+                    <MethodType>not provided</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <AttributeSet>
+                        <Attribute Type="HGVS">NM_017890.4:c.11825_11827dupATG</Attribute>
+                    </AttributeSet>
+                    <Citation Type="general">
+                        <ID Source="PubMed">20921020</ID>
+                    </Citation>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">Cohen syndrome</ElementValue>
+                    </Name>
+                    <XRef DB="OMIM" ID="216550" Type="MIM"/>
+                </Trait>
+            </TraitSet>
+            <Comment Type="public">FinDis database variant: This variant was not found or characterized by our
+                laboratory, data were collected from public sources: see reference
+            </Comment>
+        </ClinVarAssertion>
+        <ClinVarAssertion ID="1762906" SubmissionName="SUB4910108">
+            <ClinVarSubmissionID localKey="626|OMIM:216550" submittedAssembly="GRCh37"
+                                 submitter="Center for Genomics, Ann and Robert H. Lurie Children's Hospital of Chicago"
+                                 submitterDate="2018-12-12"/>
+            <ClinVarAccession Acc="SCV000899088" Version="1" Type="SCV" OrgID="506344" OrganizationCategory="laboratory"
+                              OrgType="primary" DateUpdated="2019-04-24"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2018-02-02">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Uncertain significance</Description>
+                <Comment Type="public">VPS13B NM_017890.4 exon 62 p.Asp3942_dup (c.11825_11827dupATG): This variant has
+                    been reported in the literature as a compound heterozygote (in trans with a multi-exon deletion of
+                    this gene) in 1 individual with a diagnosis of Cohen syndrome (Rivera-Brugues 2011 PMID:20921020,
+                    gene identified as alternate name COH1). However, this variant is present in 0.4% (100/24024) of
+                    African alleles in the Genome Aggregation Database (http://gnomad.broadinstitute.org/rs558633643).
+                    This variant is present in ClinVar (Variation ID:56642). Evolutionary conservation and computational
+                    predictive tools for this variant are limited or unavailable. This variant represents a duplication
+                    of 1 amino acid at position 3942 and is not predicted to alter the reading frame. However, the
+                    effect of this variant on the protein is unclear. In summary, data on this variant is insufficient
+                    for disease classification. Therefore, the clinical significance of this variant is uncertain.
+                </Comment>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ExternalID DB="Center for Genomics" ID="626"/>
+            <AttributeSet>
+                <Attribute Type="AssertionMethod">ACMG Guidelines, 2015</Attribute>
+                <Citation>
+                    <ID Source="PubMed">25741868</ID>
+                </Citation>
+            </AttributeSet>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <SequenceLocation Assembly="GRCh37" Chr="8" alternateAllele="GAT" referenceAllele="-"
+                                      start="100887648" stop="100887649" variantLength="2"/>
+                    <MeasureRelationship Type="variant in gene">
+                        <Symbol>
+                            <ElementValue Type="Preferred">VPS13B</ElementValue>
+                        </Symbol>
+                    </MeasureRelationship>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <XRef DB="OMIM" ID="216550" Type="MIM"/>
+                </Trait>
+            </TraitSet>
+        </ClinVarAssertion>
+        <ClinVarAssertion ID="1858348" SubmissionName="SUB5371970">
+            <ClinVarSubmissionID localKey="940775|MedGen:C0265223" submittedAssembly="GRCh37" submitter="Invitae"
+                                 submitterDate="2019-03-28"/>
+            <ClinVarAccession Acc="SCV000963968" Version="1" Type="SCV" OrgID="500031" OrganizationCategory="laboratory"
+                              OrgType="primary" DateUpdated="2019-08-13"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2018-09-26">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Uncertain significance</Description>
+                <Comment>This variant, c.11825_11827dupATG, results in the insertion of 1 amino acid(s) to the VPS13B
+                    protein (p.Asp3942dup), but otherwise preserves the integrity of the reading frame. This variant is
+                    present in population databases (rs558633643, ExAC 0.4%). This variant has been observed in an
+                    individual affected with Cohen syndrome (PMID:Â¬â€ 20921020). ClinVar contains an entry for this
+                    variant (Variation ID: 56642). Experimental studies and prediction algorithms are not available for
+                    this variant, and the functional significance of the affected amino acid(s) is currently unknown. In
+                    summary, the available evidence is currently insufficient to determine the role of this variant in
+                    disease. Therefore, it has been classified as a Variant of Uncertain Significance.
+                </Comment>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ExternalID DB="Invitae" ID="940775"/>
+            <AttributeSet>
+                <Attribute Type="AssertionMethod">Invitae Variant Classification Sherloc (09022015)</Attribute>
+                <Citation>
+                    <ID Source="PubMed">28492532</ID>
+                </Citation>
+            </AttributeSet>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <AttributeSet>
+                        <Attribute Type="HGVS">NM_017890.4:c.11825_11827dupATG</Attribute>
+                    </AttributeSet>
+                    <MeasureRelationship Type="variant in gene">
+                        <Symbol>
+                            <ElementValue Type="Preferred">VPS13B</ElementValue>
+                        </Symbol>
+                    </MeasureRelationship>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">Cohen syndrome</ElementValue>
+                    </Name>
+                    <XRef DB="MedGen" ID="C0265223" Type="CUI"/>
+                </Trait>
+            </TraitSet>
+        </ClinVarAssertion>
+    </ClinVarSet>
 
 </ReleaseSet>
