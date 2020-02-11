@@ -13,6 +13,7 @@ namespace SAUtils.AAConservation
     public sealed class ProteinConservationWriter:IDisposable
     {
         private readonly Stream _stream;
+        private readonly Stream _transcriptGroupStream;
         private readonly GenomeAssembly _assembly;
         private readonly ExtendedBinaryWriter _writer;
         private readonly DataSourceVersion _version;
@@ -22,9 +23,10 @@ namespace SAUtils.AAConservation
         // so, we need to load them up and check for duplicates and resolve them.
         
 
-        public ProteinConservationWriter(Stream stream, TranscriptCacheData transcriptData, DataSourceVersion version)
+        public ProteinConservationWriter(Stream stream, Stream groupStream, TranscriptCacheData transcriptData, DataSourceVersion version)
         {
             _stream              = stream;
+            _transcriptGroupStream = groupStream;
             _writer              = new ExtendedBinaryWriter(_stream);
             _transcriptCacheData = transcriptData;
             _version             = version;
@@ -43,6 +45,12 @@ namespace SAUtils.AAConservation
             CheckProteinSetOverlap(alignedProteinsAndScores, nirvanaProteins);
             
             var transcriptScores = new Dictionary<string, byte[]>();
+            //protein sequence -> transcript ids mapping
+            var transcriptGroupsByProtein = new Dictionary<string, List<string>>(alignedProteinsAndScores.Count);
+            foreach (var protein in alignedProteinsAndScores.Keys)
+            {
+                transcriptGroupsByProtein.Add(protein, new List<string>());
+            }
             foreach (var transcriptIntervalArray in _transcriptCacheData.TranscriptIntervalArrays)
             {
                 if (transcriptIntervalArray == null) continue;//may happen since for GRCh38 decoy contigs, there may be none
@@ -50,9 +58,11 @@ namespace SAUtils.AAConservation
                 {
                     var transcript = transcriptInterval.Value;
                     if(transcript.Translation == null) continue;
+                    var peptideSeq = transcript.Translation.PeptideSeq;
                     if(!alignedProteinsAndScores.TryGetValue(transcript.Translation.PeptideSeq, out var scores)) continue;
 
                     transcriptScores.TryAdd(transcript.Id.WithVersion, scores);
+                    transcriptGroupsByProtein[peptideSeq].Add(transcript.Id.WithVersion);
                 }
             }
             
@@ -62,10 +72,34 @@ namespace SAUtils.AAConservation
                 transcriptScore.Write(_writer);
             }
 
+            WriteTranscriptGroups(transcriptGroupsByProtein);
+
             Console.WriteLine($"Recorded conservation scores for {transcriptScores.Count} transcripts.");
             //writing an empty item to indicate end of records
             var endOfRecordItem = TranscriptConservationScores.GetEmptyItem();
             endOfRecordItem.Write(_writer);
+        }
+
+        private void WriteTranscriptGroups(Dictionary<string, List<string>> transcriptGroupsByProtein)
+        {
+            using (var writer = new StreamWriter(_transcriptGroupStream))
+            {
+                var ensemblIds = new List<string>();
+                var refseqIds = new List<string>();
+                writer.WriteLine("#EnsemblIds\tRefSeqIds\tPeptide sequence");
+                foreach (var (protein,ids) in transcriptGroupsByProtein)
+                {
+                    if(ids.Count == 0) continue;
+                    ensemblIds.Clear();
+                    refseqIds.Clear();
+                    foreach (var id in ids)
+                    {
+                        if(id.StartsWith("ENST")) ensemblIds.Add(id);
+                        else refseqIds.Add(id);
+                    }
+                    writer.WriteLine($"{string.Join(',',ensemblIds)}\t{string.Join(',',refseqIds)}\t{protein}");
+                }
+            }
         }
 
         private void CheckProteinSetOverlap(Dictionary<string, byte[]> proteinAndScores, HashSet<string> nirvanaProteins)

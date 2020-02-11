@@ -73,7 +73,8 @@ namespace SAUtils.AAConservation
             using (var stream = GZipUtilities.GetAppropriateReadStream(_scoresFile))
             using(var parser = new ProteinConservationParser(stream))
             using(var outStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName+ProteinConservationCommon.FileSuffix)))
-            using(var writer = new ProteinConservationWriter(outStream, transcriptData, version))    
+            using(var groupStream = FileUtilities.GetCreateStream("transcriptGroups.txt"))
+            using(var writer = new ProteinConservationWriter(outStream, groupStream, transcriptData, version))    
             {
                 writer.Write(parser.GetItems());
             }
