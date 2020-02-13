@@ -18,6 +18,7 @@ namespace VariantAnnotation.IO.Caches
         private readonly BlockStream _blockStream;
         private readonly ImmutableArray<string> _predictionDescriptions;
         private readonly IndexEntry[] _indexEntries;
+        private readonly int _numRefSeqs;
         public readonly PredictionHeader Header;
 
         public PredictionCacheReader(Stream stream, ImmutableArray<string> predictionDescriptions)
@@ -29,6 +30,7 @@ namespace VariantAnnotation.IO.Caches
             _predictionDescriptions = predictionDescriptions;
 
             _indexEntries = Header.Custom.Entries;
+            _numRefSeqs = _indexEntries.Length;
         }
 
         public void Dispose()
@@ -42,6 +44,7 @@ namespace VariantAnnotation.IO.Caches
         /// </summary>
         public IPredictionCache Read(ushort refIndex)
         {
+            if (refIndex >= _numRefSeqs) return null;
             var predictions = GetPredictions(refIndex);
             return new PredictionCache(Header.Assembly, predictions, _predictionDescriptions);
         }

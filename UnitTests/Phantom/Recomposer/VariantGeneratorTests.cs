@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.TranscriptCache;
-using Genome;
 using Moq;
 using Phantom.PositionCollections;
 using Phantom.Recomposer;
@@ -32,7 +31,7 @@ namespace UnitTests.Phantom.Recomposer
             var alleleBlockToSampleHaplotype = AlleleBlock.GetAlleleBlockToSampleHaplotype(genotypeToSample, indexOfUnsupportedVars, starts, functionBlockRanges, out var alleleBlockGraph);
             var mergedAlleleBlockToSampleHaplotype =
                 AlleleBlockMerger.Merge(alleleBlockToSampleHaplotype, alleleBlockGraph).ToArray();
-            var alleleSet = new AlleleSet(new Chromosome("chr1", "1", 1), starts, alleles);
+            var alleleSet = new AlleleSet(ChromosomeUtilities.Chr1, starts, alleles);
             var alleleBlocks = mergedAlleleBlockToSampleHaplotype.Select(x => x.Key).ToArray();
             var sequence = new NSequence();
 
@@ -55,7 +54,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -99,7 +98,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -119,7 +118,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -138,7 +137,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -161,7 +160,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -183,7 +182,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -205,7 +204,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -227,7 +226,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAATCGCGA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -248,7 +247,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -270,7 +269,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -291,7 +290,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -312,7 +311,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -334,7 +333,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -356,7 +355,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -377,7 +376,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -398,7 +397,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAACT"));
             var sequenceProvider = mockSequenceProvider.Object;
 
@@ -420,7 +419,7 @@ namespace UnitTests.Phantom.Recomposer
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
             mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
-                .Returns(new Dictionary<string, IChromosome> { { "chr1", new Chromosome("chr1", "1", 0) } });
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
             mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("CAGCTGAA"));
             var sequenceProvider = mockSequenceProvider.Object;
 

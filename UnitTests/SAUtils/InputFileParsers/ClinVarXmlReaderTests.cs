@@ -16,13 +16,10 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class ClinVarXmlReaderTests
     {
-        private static ISequenceProvider GetSequenceProvider(GenomeAssembly assembly, IChromosome chromosome, int start, string refSequence)
+        private static ISequenceProvider GetSequenceProvider(GenomeAssembly assembly, int start, string refSequence)
         {
             var seqProvider = new Mock<ISequenceProvider>();
-            if (chromosome.EnsemblName == "X" || chromosome.EnsemblName == "Y")
-                seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome> { { "X", new Chromosome("chrX", "X", 1) }, { "Y", new Chromosome("chrY", "Y", 2) } });
-            else
-                seqProvider.Setup(x => x.RefNameToChromosome).Returns(new Dictionary<string, IChromosome> { { chromosome.EnsemblName, chromosome } });
+            seqProvider.Setup(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
             seqProvider.Setup(x => x.Assembly).Returns(assembly);
             seqProvider.Setup(x => x.Sequence).Returns(new SimpleSequence(refSequence, start - 1));
             return seqProvider.Object;
@@ -31,7 +28,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void BasicReadTest()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr17", "17", 16), 41234419, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 41234419, "A");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000077146.xml")),Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -55,7 +52,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void RCV000001373_NoExtraOmimId()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr20", "20", 19), 3209662, "AGCAGACGGGCA");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 3209662, "AGCAGACGGGCA");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000001373.xml")), Stream.Null, sequenceProvider);
             var clinVarItems = reader.GetRcvItems().ToArray();
             Assert.Single(clinVarItems);
@@ -71,7 +68,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void RCV000435546_NotMissing()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr12", "12", 11), 110221557, "CGCGG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 110221557, "CGCGG");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000435546.xml")), Stream.Null, sequenceProvider);
             var clinVarItems = reader.GetRcvItems();
             Assert.True(clinVarItems.Any());
@@ -81,7 +78,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void MissingAltAllele()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 0), 118165691, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 118165691, "C");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000120902.xml")), Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -98,7 +95,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void NonEnglishChars()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 0), 225592188, "TAGAAGA");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 225592188, "TAGAAGA");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000087262.xml")), Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -113,7 +110,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void WrongPosition()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr5", "5", 4), 112064826, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 112064826, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000073701.xml")), Stream.Null, sequenceProvider);
 
@@ -137,7 +134,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest1()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr3", "3", 2), 10183453, "AGCGCGCACGCAGCTCCGCCCC");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 10183453, "AGCGCGCACGCAGCTCCGCCCC");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000152657.xml")),Stream.Null, sequenceProvider);
 
@@ -153,7 +150,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest2()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr11", "11", 10), 5247992, "CAAAG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 5247992, "CAAAG");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000016673.xml")), Stream.Null, sequenceProvider);
 
@@ -169,7 +166,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest3()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr7", "7", 6), 55259485, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 55259485, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000038438.xml")), Stream.Null, sequenceProvider);
 
@@ -185,7 +182,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest4()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr10", "10", 6), 43609944, "GCTGT");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 43609944, "GCTGT");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000021819.xml")), Stream.Null, sequenceProvider);
 
@@ -201,7 +198,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest5()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr16", "16", 6), 88907409, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 88907409, "A");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000000734.xml")), Stream.Null, sequenceProvider);
 
@@ -219,7 +216,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest6()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 6), 118165691, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 118165691, "C");
 
             //extracting from SCV record
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000120902.xml")), Stream.Null, sequenceProvider);
@@ -236,7 +233,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void PubmedTest7_comma_trimming()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr17", "17", 16), 41258568, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 41258568, "A");
 
             //extracting from SCV record
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000167792.xml")), Stream.Null, sequenceProvider);
@@ -253,8 +250,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void MultiScvPubmed()
         {
-            var sequenceProvider =
-                GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 6), 15589551, "AG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 15589551, "AG");
 
             //extracting from SCV record
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000194003.xml")) , Stream.Null, sequenceProvider);
@@ -272,7 +268,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void NoClinVarItem_due_to_ref_mismatch()
         {
             var sequenceProvider =
-                GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr10", "10", 10), 90982267, "A");
+                GetSequenceProvider(GenomeAssembly.GRCh37, 90982267, "A");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000000101.xml")), Stream.Null, sequenceProvider);
 
@@ -282,7 +278,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void ClinVarForRef()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 6), 31496350, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 31496350, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000124712.xml")), Stream.Null, sequenceProvider);
 
@@ -299,7 +295,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void MultiplePhenotypes()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr5", "5", 6), 172659738, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 172659738, "C");
 
             //no citations show up for this RCV in the website. But the XML has these pubmed ids under fields that we parse pubmed ids from
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000144179.xml")), Stream.Null, sequenceProvider);
@@ -317,7 +313,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void MultipleOrigins()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 23), 18671566, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 18671566, "G");
             //no citations show up for this RCV in the website. But the XML has these pubmed ids under fields that we parse pubmed ids from
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000080071.xml")), Stream.Null, sequenceProvider);
 
@@ -335,7 +331,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void SkipGeneralCitations()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 0), 67705958, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 67705958, "G");
             //no citations show up for this RCV in the website. But the XML has these pubmed ids under fields that we parse pubmed ids from
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000003254.xml")), Stream.Null, sequenceProvider);
 
@@ -359,7 +355,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void IndelTest()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 3), 187122303, "TCATACAGGTCATCGCT");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 187122303, "TCATACAGGTCATCGCT");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000032548.xml")), Stream.Null, sequenceProvider);
 
@@ -387,7 +383,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2034")]
         public void MultiScvPubmeds()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr7", "7", 3), 116411990, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 116411990, "C");
 
             //extracting from SCV record
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000203290.xml")), Stream.Null, sequenceProvider);
@@ -405,7 +401,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2034")]
         public void MultipleAlleleOrigins()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 3), 32890572, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 32890572, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000112977.xml")), Stream.Null, sequenceProvider);
 
@@ -428,7 +424,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2748")]
         public void Discard_entries_with_unknown_variant_type()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 0), 66765160, "CAG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 66765160, "CAG");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000485802.xml")), Stream.Null, sequenceProvider);
 
@@ -439,7 +435,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2035")]
         public void EmptyRefAndAlt()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr2", "2", 3), 31805881, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 31805881, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000083638.xml")), Stream.Null, sequenceProvider);
 
@@ -450,7 +446,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2036")]
         public void SkipMicrosattelite()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr16", "16", 15), 87637894, "CTG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 87637894, "CTG");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000005426.xml")), Stream.Null, sequenceProvider);
 
@@ -460,7 +456,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void SkipAlus()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 12), 32893302, "TAAA");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 32893302, "TAAA");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000724338.xml")), Stream.Null, sequenceProvider);
 
@@ -471,7 +467,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void MissingClinvarInsertion()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 2337967, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 2337967, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000179026.xml")), Stream.Null, sequenceProvider);
 
@@ -488,7 +484,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void MissingClinvarInsertionShift()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 3751645, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 3751645, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000207071.xml")), Stream.Null, sequenceProvider);
 
@@ -505,7 +501,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void MissingClinvarInsertionShift2()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 9324412, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 9324412, "C");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000017510.xml")), Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -521,7 +517,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2045")]
         public void AlternatePhenotype()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr7", "7", 1), 42018227, "GTC");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 42018227, "GTC");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000032707.xml")), Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -537,7 +533,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void IupacBases()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr13", "13", 1), 32339320, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, 32339320, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000113363.xml")), Stream.Null, sequenceProvider);
 
@@ -558,7 +554,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void OmitOmimFromAltPhenotypes()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 55529187, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 55529187, "G");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000030349.xml")), Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -574,7 +570,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2072")]
         public void TrimSpaceFromOmimIds()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 1), 129283520, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 129283520, "A");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000373191.xml")), Stream.Null, sequenceProvider);
 
             var items = reader.GetRcvItems();
@@ -591,7 +587,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2099")]
         public void ClinvarInsertion()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 1), 122318386, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 122318386, "A");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000153339.xml")), Stream.Null, sequenceProvider);
             var items = reader.GetRcvItems();
@@ -607,7 +603,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Remove9DigitsPubmedId()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr11", "11", 1), 534286, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 534286, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000207504.xml")), Stream.Null, sequenceProvider);
             var items = reader.GetRcvItems();
@@ -622,7 +618,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void CaptureGeneOmimId()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 1), 3494833, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 3494833, "A");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000235027.xml")), Stream.Null, sequenceProvider);
             var items = reader.GetRcvItems();
@@ -637,7 +633,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void CapturePhenotypicSeriesOmimIDandUniq()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 1), 122746325, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 122746325, "A");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000401212.xml")), Stream.Null, sequenceProvider);
             var items = reader.GetRcvItems();
@@ -652,7 +648,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void CapturePhenotypeSeriesOmimId()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 1), 15513004, "GGAA");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 15513004, "GGAA");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000406351.xml")), Stream.Null, sequenceProvider);
             var items = reader.GetRcvItems();
@@ -667,7 +663,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void RemoveDuplicationWithWrongRefSequence()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr3", "3", 1), 10183702, "GCGGCCGCGGCCCG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 10183702, "GCGGCCGCGGCCCG");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000267121.xml")), Stream.Null, sequenceProvider);
             Assert.False(reader.GetRcvItems().Any());
@@ -677,7 +673,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void AllelicOmimIdsForSnvs()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 1), 111329354, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 111329354, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000170338.xml")), Stream.Null, sequenceProvider);
 
@@ -693,7 +689,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void AllelicOmimIdsForDeletions()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 1), 111335401, "GCTC");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 111335401, "GCTC");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000170338.xml")), Stream.Null, sequenceProvider);
 
@@ -709,7 +705,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void ExcludeAllelicOmimIdsFromTraits()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr8", "8", 1), 100887648, "AGAT");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 100887648, "AGAT");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000050055.xml")), Stream.Null, sequenceProvider);
 
@@ -725,7 +721,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void AllelicOmimIdsFromAttributeSetChrX()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 1), 595469, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 595469, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000010551.xml")), Stream.Null, sequenceProvider);
 
@@ -743,7 +739,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void AllelicOmimIdsFromAttributeSetChrY()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrY", "Y", 1), 545469, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 545469, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000010551.xml")), Stream.Null, sequenceProvider);
 
@@ -761,7 +757,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void MultipleEntryRecordVariant1()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 8045031, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 8045031, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000007484.xml")), Stream.Null, sequenceProvider);
 
@@ -774,7 +770,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void MultipleEntryRecordVariant2()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr1", "1", 1), 8021910, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 8021910, "G");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000007484.xml")), Stream.Null, sequenceProvider);
 
@@ -787,7 +783,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2372")]
         public void SkipMicrosatellitesWithoutAltAllele()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr22", "22", 1), 46191240, "ATTCT");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 46191240, "ATTCT");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000001054.xml")), Stream.Null, sequenceProvider);
 
@@ -798,7 +794,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Trait("jira", "NIR-2029")]
         public void MissingClinvarInsertion2()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr9", "9", 1), 132903738, "A");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, 132903738, "A");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000342164.xml")), Stream.Null, sequenceProvider);
 
             var clinvarItems = reader.GetRcvItems().ToList();
@@ -808,7 +804,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Skip_entries_with_inconsistant_start_end()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr9", "9", 1), 132903739, "AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 132903739, "AAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTCAAACGCTCATAGAGTAACTGGTTGTGCAGTAAAAGCAACTGGTCTC");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000342164.xml")), Stream.Null, sequenceProvider);
 
             Assert.False(reader.GetRcvItems().Any());
@@ -817,7 +813,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Alternate_phenotypes()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr2", "2", 1), 204732740, "G");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 204732740, "G");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000537563.xml")), Stream.Null, sequenceProvider);
 
             var clinvarItems = reader.GetRcvItems().ToList();
@@ -828,7 +824,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Mising_entry()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr13", "13", 12), 36888396, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 36888396, "C");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000171474.xml")), Stream.Null, sequenceProvider);
 
             var clinvarItems = reader.GetRcvItems().ToList();
@@ -839,7 +835,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Multiple_significance()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr15", "15", 15), 72349076, "T");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, 72349076, "T");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000169296.xml")), Stream.Null, sequenceProvider);
 
             var clinvarItems = reader.GetRcvItems().ToList();
@@ -850,7 +846,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Multiple_significance_from_explanation()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, new Chromosome("chr19", "19", 19), 12665750, "T");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh38, 12665750, "T");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000001752.xml")), Stream.Null, sequenceProvider);
 
             var clinvarItems = reader.GetRcvItems().ToList();
@@ -861,7 +857,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void Override_microsatellite_type()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chr4", "4", 3), 88929173, "CGAG");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 88929173, "CGAG");
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000205418.xml")), Stream.Null, sequenceProvider);
 
             var clinvarItems = reader.GetRcvItems();
@@ -872,7 +868,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void OneRcv_oneVcv()
         {
-            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, new Chromosome("chrX", "X", 6), 31496350, "C");
+            var sequenceProvider = GetSequenceProvider(GenomeAssembly.GRCh37, 31496350, "C");
 
             var reader = new ClinVarReader(FileUtilities.GetReadStream(Resources.ClinvarXmlFiles("RCV000124712.xml")),
                 FileUtilities.GetReadStream(Resources.VcvXmlFiles("VCV000137106.xml")), sequenceProvider);

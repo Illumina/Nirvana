@@ -1,4 +1,4 @@
-﻿using Genome;
+﻿using UnitTests.TestUtilities;
 using Variants;
 using Vcf.Info;
 using Vcf.VariantCreator;
@@ -8,8 +8,6 @@ namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class CnvCreatorTests
     {
-        private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
-
         [Fact]
         public void Create_Dragen_3_3_DEL()
         {
@@ -17,9 +15,9 @@ namespace UnitTests.Vcf.VariantCreator
             var infoData = new InfoData(null, null, 909406, null, null, null, null, null, null,
                 "CNV");
 
-            var observedResults = CnvCreator.Create(Chr1, 907965, infoData.End.Value, "N", "<DEL>", null);
+            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 907965, infoData.End.Value, "N", "<DEL>", null);
 
-            Assert.Equal(Chr1, observedResults.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
             Assert.Equal(907966, observedResults.Start);
             Assert.Equal(909406, observedResults.End);
             Assert.Equal("N", observedResults.RefAllele);
@@ -34,9 +32,9 @@ namespace UnitTests.Vcf.VariantCreator
             var infoData = new InfoData(null, null, 1750149, null, null, null, null, null, null,
                 "CNV");
 
-            var observedResults = CnvCreator.Create(Chr1, 1715898, infoData.End.Value, "N", "<DUP>", null);
+            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 1715898, infoData.End.Value, "N", "<DUP>", null);
 
-            Assert.Equal(Chr1, observedResults.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
             Assert.Equal(1715899, observedResults.Start);
             Assert.Equal(1750149, observedResults.End);
             Assert.Equal("N", observedResults.RefAllele);
@@ -51,9 +49,9 @@ namespace UnitTests.Vcf.VariantCreator
             var infoData = new InfoData(null, null, 2581225, null, null, null, null, null, null,
                 "CNV");
 
-            var observedResults = CnvCreator.Create(Chr1, 723707, infoData.End.Value, "N", "<CNV>", null);
+            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 723707, infoData.End.Value, "N", "<CNV>", null);
 
-            Assert.Equal(Chr1, observedResults.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
             Assert.Equal(723708, observedResults.Start);
             Assert.Equal(2581225, observedResults.End);
             Assert.Equal("N", observedResults.RefAllele);
@@ -68,9 +66,9 @@ namespace UnitTests.Vcf.VariantCreator
             var infoData = new InfoData(new[] { -291, -291 }, new[] { -291, -291 }, 861879, null, null, null, null, null, null,
                 "CNV");
 
-            var observedResults = CnvCreator.Create(Chr1, 854895, infoData.End.Value, "N", "<CN0>", null);
+            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 854895, infoData.End.Value, "N", "<CN0>", null);
 
-            Assert.Equal(Chr1, observedResults.Chromosome);
+            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
             Assert.Equal(854896, observedResults.Start);
             Assert.Equal(861879, observedResults.End);
             Assert.Equal("N", observedResults.RefAllele);

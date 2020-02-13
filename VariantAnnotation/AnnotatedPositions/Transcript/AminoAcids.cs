@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using OptimizedCore;
+using VariantAnnotation.TranscriptAnnotation;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
@@ -144,15 +145,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         internal static string AddUnknownAminoAcid(string aminoAcids) => aminoAcids == StopCodon ? aminoAcids : aminoAcids + 'X';
 
-        public (string Reference, string Alternate) Translate(string referenceCodons,
-            string alternateCodons)
+        public SequenceChange Translate(string referenceCodons, string alternateCodons)
         {
-            if (string.IsNullOrEmpty(referenceCodons) && string.IsNullOrEmpty(alternateCodons)) return ("", "");
-            if (referenceCodons != null && (referenceCodons.Contains("N") || alternateCodons.Contains("N"))) return ("", "");
+            if (string.IsNullOrEmpty(referenceCodons) && string.IsNullOrEmpty(alternateCodons)) return new SequenceChange("", "");
+            if (referenceCodons != null && (referenceCodons.Contains("N") || alternateCodons.Contains("N"))) return new SequenceChange("", "");
 
             var referenceAminoAcids = TranslateBases(referenceCodons, false);
             var alternateAminoAcids = TranslateBases(alternateCodons, false);
-            return (referenceAminoAcids, alternateAminoAcids);
+            return new SequenceChange(referenceAminoAcids, alternateAminoAcids);
         }
 
         /// <summary>

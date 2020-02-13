@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 using Genome;
+using UnitTests.TestUtilities;
 using Vcf;
 using Xunit;
 
@@ -12,8 +13,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void FastForward_UcscNamingStyle_ChangeReaderStateCorrectly()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var annotationRange = new GenomicRange(new GenomicPosition(chromosome, 100), new GenomicPosition(chromosome, 200) );
+            var annotationRange = new GenomicRange(new GenomicPosition(ChromosomeUtilities.Chr1, 100), new GenomicPosition(ChromosomeUtilities.Chr1, 200) );
 
             var vcfFilter = new VcfFilter(annotationRange);
 
@@ -48,8 +48,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void FastForward_EnsemblNamingStyle_ChangeReaderStateCorrectly()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var annotationRange = new GenomicRange(new GenomicPosition(chromosome, 100), new GenomicPosition(chromosome, 200));
+            var annotationRange = new GenomicRange(new GenomicPosition(ChromosomeUtilities.Chr1, 100), new GenomicPosition(ChromosomeUtilities.Chr1, 200));
 
             var vcfFilter = new VcfFilter(annotationRange);
 
@@ -106,14 +105,13 @@ namespace UnitTests.Vcf
         [Fact]
         public void PassedTheEnd_AsExpected()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var annotationRange = new GenomicRange(new GenomicPosition(chromosome, 100), new GenomicPosition(chromosome, 200));
+            var annotationRange = new GenomicRange(new GenomicPosition(ChromosomeUtilities.Chr1, 100), new GenomicPosition(ChromosomeUtilities.Chr1, 200));
             var vcfFilter = new VcfFilter(annotationRange);
 
-            Assert.False(vcfFilter.PassedTheEnd(new Chromosome("chr1", "1", 0), 150));
-            Assert.False(vcfFilter.PassedTheEnd(new Chromosome("chr1", "1", 0), 200));
-            Assert.True(vcfFilter.PassedTheEnd(new Chromosome("chr1", "1", 0), 201));
-            Assert.True(vcfFilter.PassedTheEnd(new Chromosome("chr2", "2", 1), 150));
+            Assert.False(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr1, 150));
+            Assert.False(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr1, 200));
+            Assert.True(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr1, 201));
+            Assert.True(vcfFilter.PassedTheEnd(ChromosomeUtilities.Chr2, 150));
         }
     }
 }

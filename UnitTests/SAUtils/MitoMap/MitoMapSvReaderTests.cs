@@ -1,21 +1,20 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
 using SAUtils.MitoMap;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.SAUtils.MitoMap
 {
     public class MitoMapSvReaderTests
     {
-        private static readonly Chromosome Chromosome = new Chromosome("chrM", "MT", 0);
-        private static readonly string RawSequence = "ABC" + new string('N', 200); 
-        private static readonly ISequence Sequence = new SimpleSequence(RawSequence);
-        private readonly SimpleSequenceProvider _sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, Sequence, 
-            new Dictionary<string, IChromosome> { { "chrM", Chromosome} });
-       
+        private static readonly string    RawSequence = "ABC" + new string('N', 200);
+        private static readonly ISequence Sequence    = new SimpleSequence(RawSequence);
+
+        private readonly SimpleSequenceProvider _sequenceProvider =
+            new SimpleSequenceProvider(GenomeAssembly.GRCh37, Sequence, ChromosomeUtilities.RefNameToChromosome);
         
         [Theory]
         [InlineData("[\"5:105\",\"-101\",\"1837-1840/5447-5451\",\"D, 4/4\",\"<a href='/cgi-bin/print_ref_list?refs=253&title=mtDNA+Deletion%3A+1836%3A5447+-3610+D%2C+4%2F4+1837-1840%2F5447-5451+8' target='_blank'>1</a>\"],", 

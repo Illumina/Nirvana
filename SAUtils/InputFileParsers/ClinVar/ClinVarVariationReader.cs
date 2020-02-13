@@ -4,8 +4,6 @@ using System.IO;
 using System.Xml;
 using System.Xml.Linq;
 using IO;
-using SAUtils.DataStructures;
-using VariantAnnotation.Utilities;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {

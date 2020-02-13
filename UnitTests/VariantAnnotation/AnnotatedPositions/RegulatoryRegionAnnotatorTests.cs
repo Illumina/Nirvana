@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
@@ -13,13 +13,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 {
     public sealed class RegulatoryRegionAnnotatorTests
     {
-        private readonly IChromosome _chromosome;
-
-        public RegulatoryRegionAnnotatorTests()
-        {
-            _chromosome = new Chromosome("chrBob", "bob", 0);
-        }
-
         [Fact]
         public void Annotate_Promoter()
         {
@@ -37,7 +30,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private IRegulatoryRegion GetRegulatoryRegion()
         {
-            return new RegulatoryRegion(_chromosome, 948000, 950401, CompactId.Convert("ENSR00001037666"),
+            return new RegulatoryRegion(ChromosomeUtilities.Chr1, 948000, 950401, CompactId.Convert("ENSR00001037666"),
                 RegulatoryRegionType.promoter);
         }
 

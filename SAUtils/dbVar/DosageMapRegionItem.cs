@@ -1,4 +1,3 @@
-using System.IO;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;

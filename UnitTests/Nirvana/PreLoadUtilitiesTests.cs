@@ -3,21 +3,13 @@ using System.IO;
 using Genome;
 using Nirvana;
 using UnitTests.SAUtils.InputFileParsers;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Nirvana
 {
     public sealed class PreLoadUtilitiesTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 0);
-        private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 1);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
-        {
-            { "1", Chrom1},
-            { "2", Chrom2}
-        };
-
         private static Stream GetVcfStream()
         {
             var stream = new MemoryStream();
@@ -42,24 +34,23 @@ namespace UnitTests.Nirvana
         public void GetAllPositions()
         {
             //we only need the sequence provider for variant rotation. 
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var positions = PreLoadUtilities.GetPositions(GetVcfStream(), null, seqProvider, null);
 
             Assert.Equal(2, positions.Count);
-            Assert.Equal(4, positions[Chrom1].Count);
-            Assert.Equal(4, positions[Chrom2].Count);
+            Assert.Equal(4, positions[ChromosomeUtilities.Chr1].Count);
+            Assert.Equal(4, positions[ChromosomeUtilities.Chr2].Count);
         }
 
         [Fact]
         public void GetPositions_inRange()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-            var annotationRange = new GenomicRange(new GenomicPosition(chromosome, 10019), new GenomicPosition(chromosome, 10290));
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var annotationRange = new GenomicRange(new GenomicPosition(ChromosomeUtilities.Chr1, 10019), new GenomicPosition(ChromosomeUtilities.Chr1, 10290));
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var positions = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, seqProvider, null);
 
             Assert.Single(positions);
-            Assert.Equal(3, positions[Chrom1].Count);
+            Assert.Equal(3, positions[ChromosomeUtilities.Chr1].Count);
         }
 
         private static Stream GetRefMinorVcfStream()
@@ -90,20 +81,18 @@ namespace UnitTests.Nirvana
         public void GetAllPositions_skip_refs()
         {
             //we only need the sequence provider for variant rotation. 
-            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var refMinorProvider = ParserTestUtils.GetRefMinorProvider(
-                new List<(IChromosome chrom, int position, string globalMinor)>()
+                new List<(IChromosome chrom, int position, string globalMinor)>
                 {
-                    (Chrom1, 10275, "A" )
+                    (ChromosomeUtilities.Chr1, 10275, "A" )
                 }
             );
             var positions = PreLoadUtilities.GetPositions(GetRefMinorVcfStream(), null, seqProvider, refMinorProvider);
 
             Assert.Equal(2, positions.Count);
-            Assert.Equal(5, positions[Chrom1].Count);
-            Assert.Equal(4, positions[Chrom2].Count);
+            Assert.Equal(5, positions[ChromosomeUtilities.Chr1].Count);
+            Assert.Equal(4, positions[ChromosomeUtilities.Chr2].Count);
         }
-
-
     }
 }

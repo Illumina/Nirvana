@@ -64,11 +64,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             if (MappedPosition != null)
             {
-                jsonObject.AddStringValue("cdnaPos",    GetRangeString(MappedPosition.CdnaStart,      MappedPosition.CdnaEnd));
-                jsonObject.AddStringValue("cdsPos",     GetRangeString(MappedPosition.CdsStart,       MappedPosition.CdsEnd));
+                jsonObject.AddStringValue("cdnaPos",    GetRangeString(MappedPosition.CoveredCdnaStart, MappedPosition.CoveredCdnaEnd));
+                jsonObject.AddStringValue("cdsPos",     GetRangeString(MappedPosition.CoveredCdsStart, MappedPosition.CoveredCdsEnd));
                 jsonObject.AddStringValue("exons",      GetFractionString(MappedPosition.ExonStart,   MappedPosition.ExonEnd, Transcript.NumExons));
                 jsonObject.AddStringValue("introns",    GetFractionString(MappedPosition.IntronStart, MappedPosition.IntronEnd, Transcript.NumExons - 1));
-                jsonObject.AddStringValue("proteinPos", GetRangeString(MappedPosition.ProteinStart,   MappedPosition.ProteinEnd));
+                jsonObject.AddStringValue("proteinPos", GetRangeString(MappedPosition.CoveredProteinStart, MappedPosition.CoveredProteinEnd));
             }
 
             string geneId = Transcript.Source == Source.Ensembl

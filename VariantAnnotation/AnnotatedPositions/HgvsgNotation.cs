@@ -9,7 +9,7 @@ namespace VariantAnnotation.AnnotatedPositions
     {
         private const char NotationType = 'g';
 
-        public static string GetNotation(string referenceAssertion, ISimpleVariant variant, ISequence refSequence,
+        public static string GetNotation(string refseqAccession, ISimpleVariant variant, ISequence refSequence,
             IInterval referenceInterval)
         {
             var rotatedVariant = VariantRotator.Right(variant, referenceInterval, refSequence, false);
@@ -26,7 +26,7 @@ namespace VariantAnnotation.AnnotatedPositions
                 start          = end - referenceBases.Length + 1;
             }
 
-            return HgvsUtilities.FormatDnaNotation(start.ToString(), end.ToString(), referenceAssertion, referenceBases, alternateBases, type, NotationType);
+            return HgvsUtilities.FormatDnaNotation(start.ToString(), end.ToString(), refseqAccession, referenceBases, alternateBases, type, NotationType);
         }
     }
 }

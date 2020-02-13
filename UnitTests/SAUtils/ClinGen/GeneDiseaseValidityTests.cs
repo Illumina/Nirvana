@@ -34,7 +34,7 @@ namespace UnitTests.SAUtils.ClinGen
         }
         private Dictionary<int, string> GetIdToSymbols()
         {
-            return new Dictionary<int, string>()
+            return new Dictionary<int, string>
             {
                 { 23336,"A2ML1" },
                 { 20, "AARS"},

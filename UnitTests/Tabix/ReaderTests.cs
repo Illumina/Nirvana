@@ -1,7 +1,5 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
-using Genome;
 using IO;
 using Tabix;
 using UnitTests.TestUtilities;
@@ -14,11 +12,9 @@ namespace UnitTests.Tabix
         [Fact]
         public void Read_Nominal()
         {
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr17"] = new Chromosome("chr17", "17", 16) };
-
             using (var stream = FileUtilities.GetReadStream(Resources.TopPath("miniHEXA_minimal.vcf.gz.tbi")))
             {
-                var index = Reader.GetTabixIndex(stream, refNameToChromosome);
+                Index index = Reader.GetTabixIndex(stream, ChromosomeUtilities.RefNameToChromosome);
 
                 Assert.Equal(1, index.BeginIndex);
                 Assert.Equal('#', index.CommentChar);

@@ -14,7 +14,7 @@ namespace Downloader.FileExtensions
             foreach (var genomeAssembly in genomeAssemblies)
             {
                 string filename    = $"Homo_sapiens.{genomeAssembly}.Nirvana.dat";
-                string remotePath  = $"{remoteReferencesDirectory}/{CompressedSequenceCommon.HeaderVersion}/{filename}";
+                string remotePath  = $"{remoteReferencesDirectory}/{ReferenceSequenceCommon.HeaderVersion}/{filename}";
                 string localPath   = Path.Combine(referencesDirectory, filename);
                 string description = filename;
                 files.Add(new RemoteFile(remotePath, localPath, description));

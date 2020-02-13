@@ -2,10 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using Genome;
 using Moq;
 using SAUtils.DataStructures;
 using SAUtils.PrimateAi;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using Xunit;
@@ -14,34 +14,11 @@ namespace UnitTests.SAUtils.PrimateAi
 {
     public sealed class PrimateAiTests
     {
-        private static readonly IChromosome Chr10 = new Chromosome("chr10", "10", 9);
-        private static readonly IChromosome Chr3 = new Chromosome("chr3", "3", 2);
-        private static readonly IChromosome Chr4 = new Chromosome("chr4", "4", 3);
-        private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
-        private static readonly IChromosome Chr21 = new Chromosome("chr21", "21", 20);
         private static ISequenceProvider GetSequenceProvider()
         {
-            var refNameToChrom = new Dictionary<string, IChromosome>()
-            {
-                {"1", Chr1 },
-                {"3", Chr3},
-                {"4", Chr4 },
-                {"10", Chr10},
-                {"21", Chr21}
-                
-            };
-            var refIndexToChrom = new Dictionary<ushort, IChromosome>()
-            {
-                { Chr1.Index, Chr1},
-                { Chr3.Index, Chr3},
-                { Chr4.Index, Chr4 },
-                { Chr10.Index, Chr10} ,
-                { Chr21.Index, Chr21},
-            };
-
             var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(refNameToChrom);
-            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(refIndexToChrom);
+            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
+            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(ChromosomeUtilities.RefIndexToChromosome);
             return mockProvider.Object;
         }
         private static Stream GetStream()
@@ -71,12 +48,12 @@ namespace UnitTests.SAUtils.PrimateAi
         [Fact]
         public void ExtractEntries()
         {
-            var entrezToHgnc = new Dictionary<string, string>()
+            var entrezToHgnc = new Dictionary<string, string>
             {
                 { "79501", "Gene1" },
             };
 
-            var ensemblToHgnc = new Dictionary<string, string>()
+            var ensemblToHgnc = new Dictionary<string, string>
             {
                 {"ENSG00000234810", "Gene2" }
             };
@@ -106,12 +83,12 @@ namespace UnitTests.SAUtils.PrimateAi
         [Fact]
         public void ResolveDuplicates()
         {
-            var entrezToHgnc = new Dictionary<string, string>()
+            var entrezToHgnc = new Dictionary<string, string>
             {
                 { "255403", "Gene1"}
             };
 
-            var ensemblToHgnc = new Dictionary<string, string>()
+            var ensemblToHgnc = new Dictionary<string, string>
             {
                 {"ENSG00000234810", "Gene2" }
             };

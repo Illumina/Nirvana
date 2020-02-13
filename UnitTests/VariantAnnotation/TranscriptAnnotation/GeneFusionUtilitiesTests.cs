@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -10,8 +10,6 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
 {
     public sealed class GeneFusionUtilitiesTests
     {
-        private readonly IChromosome _chr2 = new Chromosome("chr2", "2", 1);
-
         private readonly ITranscript _enst00000425361;
         private readonly ITranscript _enst00000427024;
         private readonly ITranscript[] _originTranscripts;
@@ -19,8 +17,8 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
 
         public GeneFusionUtilitiesTests()
         {
-            IGene mzt2BGene = new Gene(_chr2, 0, 0, false, "MZT2B", 0, CompactId.Empty, CompactId.Empty);
-            IGene mzt2AGene = new Gene(_chr2, 0, 0, true, "MZT2A", 0, CompactId.Empty, CompactId.Empty);
+            IGene mzt2BGene = new Gene(ChromosomeUtilities.Chr2, 0, 0, false, "MZT2B", 0, CompactId.Empty, CompactId.Empty);
+            IGene mzt2AGene = new Gene(ChromosomeUtilities.Chr2, 0, 0, true, "MZT2A", 0, CompactId.Empty, CompactId.Empty);
 
             var transcriptRegions = new ITranscriptRegion[5];
             transcriptRegions[0] = new TranscriptRegion(TranscriptRegionType.Exon, 1, 130181729, 130181797, 1, 61);
@@ -32,7 +30,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var codingRegion = new CodingRegion(130181737, 130190626, 1, 368, 369);
             var translation  = new Translation(codingRegion, CompactId.Empty, null);
 
-            _enst00000425361 = new Transcript(_chr2, 130181737, 130190713, CompactId.Convert("ENST00000425361", 5), translation, BioType.other,
+            _enst00000425361 = new Transcript(ChromosomeUtilities.Chr2, 130181737, 130190713, CompactId.Convert("ENST00000425361", 5), translation, BioType.other,
                 mzt2BGene, 0, 0, false, transcriptRegions, 0, null, 0, 0, Source.Ensembl, false, false, null, null);
             _originTranscripts = new[] {_enst00000425361};
 
@@ -51,7 +49,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var codingRegion2 = new CodingRegion(131470316, 131492335, 1, 421, 423);
             var translation2  = new Translation(codingRegion2, CompactId.Empty, null);
 
-            _enst00000427024 = new Transcript(_chr2, 131464900, 131492335, CompactId.Convert("ENST00000427024", 5), translation2, BioType.other,
+            _enst00000427024 = new Transcript(ChromosomeUtilities.Chr2, 131464900, 131492335, CompactId.Convert("ENST00000427024", 5), translation2, BioType.other,
                 mzt2AGene, 0, 0, false, transcriptRegions2, 0, null, 0, 0, Source.Ensembl, false, false, null, null);
 
             var transcriptRegions3 = new ITranscriptRegion[5];
@@ -64,7 +62,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var codingRegion3 = new CodingRegion(131484061, 131492376, 47, 523, 477);
             var translation3  = new Translation(codingRegion3, CompactId.Empty, null);
 
-            var enst00000309451 = new Transcript(_chr2, 131483960, 131492422, CompactId.Convert("ENST00000309451", 6), translation3, BioType.other,
+            var enst00000309451 = new Transcript(ChromosomeUtilities.Chr2, 131483960, 131492422, CompactId.Convert("ENST00000309451", 6), translation3, BioType.other,
                 mzt2AGene, 0, 0, false, transcriptRegions3, 0, null, 0, 0, Source.Ensembl, false, false, null, null);
 
             _partnerTranscripts = new[] {_enst00000427024, enst00000309451};
@@ -75,8 +73,8 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         {
             // chr2 130185834 T [chr2:131488839[
             // ENST00000427024.5, ENST00000425361.5, ENST00000309451.6
-            var origin    = new BreakPoint(_chr2, 130185834, true);
-            var partner   = new BreakPoint(_chr2, 131488839, false);
+            var origin    = new BreakPoint(ChromosomeUtilities.Chr2, 130185834, true);
+            var partner   = new BreakPoint(ChromosomeUtilities.Chr2, 131488839, false);
             var adjacency = new BreakEndAdjacency(origin, partner);
             
             var transcriptIdToGeneFusions = new Dictionary<string, IAnnotatedGeneFusion>();
@@ -107,8 +105,8 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         {
             // chr2 130185834 T [chr2:131488839[
             // ENST00000427024.5, ENST00000425361.5, ENST00000309451.6
-            var origin    = new BreakPoint(_chr2, 130185834, true); // second
-            var partner   = new BreakPoint(_chr2, 131488839, false); // first
+            var origin    = new BreakPoint(ChromosomeUtilities.Chr2, 130185834, true); // second
+            var partner   = new BreakPoint(ChromosomeUtilities.Chr2, 131488839, false); // first
             var adjacency = new BreakEndAdjacency(origin, partner);
             
             var transcriptIdToGeneFusions = new Dictionary<string, IAnnotatedGeneFusion>();

@@ -84,21 +84,6 @@ namespace Vcf.Sample.Legacy
             return foundError ? null : (int?)number;
         }
 
-        private static int[] GetIntegers(string s)
-        {
-            var cols = GetStrings(s);
-            if (cols == null) return null;
-
-            var result = new int[cols.Length];
-            for (var i = 0; i < cols.Length; i++)
-            {
-                (int number, bool foundError) = cols[i].OptimizedParseInt32();
-                if (foundError) return null;
-                result[i] = number;
-            }
-            return result;
-        }
-
         private static (int?, int?) GetLinkedIntegers(string s, string s2)
         {
             var num = GetInteger(s);

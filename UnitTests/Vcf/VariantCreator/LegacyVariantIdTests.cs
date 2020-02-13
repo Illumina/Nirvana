@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface;
 using Variants;
 using Vcf.VariantCreator;
@@ -10,25 +9,7 @@ namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class LegacyVariantIdTests
     {
-        private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
-        private static readonly IChromosome Chr2 = new Chromosome("chr2", "2", 1);
-        private static readonly IChromosome Chr3 = new Chromosome("chr3", "3", 2);
-
-        private static readonly IDictionary<string, IChromosome> RefNameToChromosome = new Dictionary<string, IChromosome>();
-
-        private readonly LegacyVariantId _vidCreator;
-
-        public LegacyVariantIdTests()
-        {
-            RefNameToChromosome["chr1"] = Chr1;
-            RefNameToChromosome["1"]    = Chr1;
-            RefNameToChromosome["chr2"] = Chr2;
-            RefNameToChromosome["2"]    = Chr2;
-            RefNameToChromosome["chr3"] = Chr3;
-            RefNameToChromosome["3"]    = Chr3;
-
-            _vidCreator = new LegacyVariantId(RefNameToChromosome);
-        }
+        private readonly LegacyVariantId _vidCreator = new LegacyVariantId(ChromosomeUtilities.RefNameToChromosome);
 
         [Theory]
         [InlineData(66507, 66507, "T", "A", "1:66507:A")]
@@ -45,7 +26,7 @@ namespace UnitTests.Vcf.VariantCreator
         [InlineData(100, 300, "", "<M>", "1:100:*")]
         public void Create_SmallVariants_ReturnVid(int start, int end, string refAllele, string altAllele, string expectedVid)
         {
-            string observedVid = _vidCreator.Create(null, VariantCategory.SmallVariant, null, Chr1, start, end, refAllele, altAllele, null);
+            string observedVid = _vidCreator.Create(null, VariantCategory.SmallVariant, null, ChromosomeUtilities.Chr1, start, end, refAllele, altAllele, null);
             Assert.Equal(expectedVid, observedVid);
         }
 
@@ -55,14 +36,14 @@ namespace UnitTests.Vcf.VariantCreator
         [InlineData(100, 100, "T", ".", "1:100:100:T")]
         public void Create_Reference_ReturnVid(int start, int end, string refAllele, string altAllele, string expectedVid)
         {
-            string observedVid = _vidCreator.Create(null, VariantCategory.Reference, null, Chr1, start, end, refAllele, altAllele, null);
+            string observedVid = _vidCreator.Create(null, VariantCategory.Reference, null, ChromosomeUtilities.Chr1, start, end, refAllele, altAllele, null);
             Assert.Equal(expectedVid, observedVid);
         }
 
         [Fact]
         public void Create_TranslocationBreakend_ReturnVid()
         {
-            string observedVid = _vidCreator.Create(null, VariantCategory.SV, "BND", Chr2, 321681, 321681, "G", "G[13:123460[", null);
+            string observedVid = _vidCreator.Create(null, VariantCategory.SV, "BND", ChromosomeUtilities.Chr2, 321681, 321681, "G", "G[13:123460[", null);
             Assert.Equal("2:321681:+:13:123460:+", observedVid);
         }
 
@@ -87,7 +68,7 @@ namespace UnitTests.Vcf.VariantCreator
         public void Create_StructuralVariants_ReturnVid(int start, int end, string altAllele, string repeatUnit,
             string svType, VariantCategory category, string expectedVid)
         {
-            string observedVid = _vidCreator.Create(null, category, svType, Chr1, start, end, "", altAllele, repeatUnit);
+            string observedVid = _vidCreator.Create(null, category, svType, ChromosomeUtilities.Chr1, start, end, "", altAllele, repeatUnit);
             Assert.Equal(expectedVid, observedVid);
         }
 
@@ -97,7 +78,7 @@ namespace UnitTests.Vcf.VariantCreator
             Assert.Throws<ArgumentOutOfRangeException>(delegate
             {
                 // ReSharper disable once UnusedVariable
-                string vid = LegacyVariantId.GetSmallVariantVid(Chr1, 100, 200, "A", VariantType.complex_structural_alteration);
+                string vid = LegacyVariantId.GetSmallVariantVid(ChromosomeUtilities.Chr1, 100, 200, "A", VariantType.complex_structural_alteration);
             });
         }
     }

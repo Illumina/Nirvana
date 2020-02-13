@@ -1,5 +1,6 @@
 ﻿using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface;
 using Vcf.VariantCreator;
 using Xunit;
@@ -8,8 +9,6 @@ namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class VariantIdTests
     {
-        private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
-
         private readonly ISequence _sequence;
         private readonly VariantId _vidCreator = new VariantId();
 
@@ -40,7 +39,7 @@ namespace UnitTests.Vcf.VariantCreator
         [InlineData(66573, "", "TACTATATATTA", "1-66572-G-GTACTATATATTA")]
         public void Create_SmallVariants_ReturnShortVid(int position, string refAllele, string altAllele, string expectedVid)
         {
-            string observedVid = _vidCreator.Create(_sequence, VariantCategory.SmallVariant, null, Chr1, position, position, refAllele, altAllele,
+            string observedVid = _vidCreator.Create(_sequence, VariantCategory.SmallVariant, null, ChromosomeUtilities.Chr1, position, position, refAllele, altAllele,
                 null);
             Assert.Equal(expectedVid, observedVid);
         }
@@ -48,7 +47,7 @@ namespace UnitTests.Vcf.VariantCreator
         [Fact]
         public void Create_TranslocationBreakend_ReturnShortVid()
         {
-            string observedVid = _vidCreator.Create(_sequence, VariantCategory.SV, "BND", Chr1, 2617277, 2617277, "A",
+            string observedVid = _vidCreator.Create(_sequence, VariantCategory.SV, "BND", ChromosomeUtilities.Chr1, 2617277, 2617277, "A",
                 "AAAAAAAAAAAAAAAAAATTAGTCAGGCAC[chr3:153444911[", null);
             Assert.Equal("1-2617277-A-AAAAAAAAAAAAAAAAAATTAGTCAGGCAC[chr3:153444911[", observedVid);
         }
@@ -65,7 +64,7 @@ namespace UnitTests.Vcf.VariantCreator
         public void Create_StructuralVariants_RecoverRefAllele_ReturnLongVid(int position, int endPosition,
             string refAllele, string altAllele, string svType, VariantCategory category, string expectedVid)
         {
-            string observedVid = _vidCreator.Create(_sequence, category, svType, Chr1, position, endPosition, refAllele, altAllele, null);
+            string observedVid = _vidCreator.Create(_sequence, category, svType, ChromosomeUtilities.Chr1, position, endPosition, refAllele, altAllele, null);
             Assert.Equal(expectedVid, observedVid);
         }
     }

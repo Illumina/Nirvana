@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices.ComTypes;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.ProteinConservation;
 

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using IO;
-
-namespace VariantAnnotation.ProteinConservation
+﻿namespace VariantAnnotation.ProteinConservation
 {
     public sealed class ProteinConservationItem
     {

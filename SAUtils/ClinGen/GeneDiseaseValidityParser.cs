@@ -12,7 +12,7 @@ namespace SAUtils.ClinGen
         private Dictionary<int, string> _hgncIdToSymbols;
 
         private readonly HashSet<int> _unknownIds = new HashSet<int>();
-        private readonly HashSet<string> _classificationSet = new HashSet<string>()
+        private readonly HashSet<string> _classificationSet = new HashSet<string>
         {
             "no reported evidence",
             "disputed",
@@ -67,7 +67,7 @@ namespace SAUtils.ClinGen
 
                     if (geneAnnotations.TryGetValue(geneAnnotation.GeneSymbol, out var annotations))
                         AddLatest(annotations, geneAnnotation);
-                    else geneAnnotations.Add(geneAnnotation.GeneSymbol, new Dictionary<string, GeneDiseaseValidityItem>(){{geneAnnotation.DiseaseId, geneAnnotation}});
+                    else geneAnnotations.Add(geneAnnotation.GeneSymbol, new Dictionary<string, GeneDiseaseValidityItem> {{geneAnnotation.DiseaseId, geneAnnotation}});
 
                 }
             }

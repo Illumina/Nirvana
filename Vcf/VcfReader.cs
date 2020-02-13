@@ -129,8 +129,6 @@ namespace Vcf
             return samples;
         }
         
-        public IEnumerable<string> GetHeaderLines() => _headerLines;
-
         private ISimplePosition GetNextSimplePosition()
         {
             while (_queuedPositions.Count == 0)

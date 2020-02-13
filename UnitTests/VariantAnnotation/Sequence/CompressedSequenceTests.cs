@@ -15,7 +15,7 @@ namespace UnitTests.VariantAnnotation.Sequence
             _compressedSequence = new CompressedSequence { Assembly = GenomeAssembly.hg19 };
 
             // create the following sequence: NNATGTTTCCACTTTCTCCTCATTAGANNNTAACGAATGGGTGATTTCCCTAN
-            var buffer = new byte[] { 14, 42, 93, 169, 150, 122, 204, 11, 211, 224, 35, 169, 91, 0 };
+            var twoBitBuffer = new byte[] { 14, 42, 93, 169, 150, 122, 204, 11, 211, 224, 35, 169, 91, 0 };
 
 			var maskedIntervals = new Interval<MaskedEntry>[3];
 			maskedIntervals[0]  = new Interval<MaskedEntry>(0, 1, new MaskedEntry(0, 1));
@@ -23,9 +23,8 @@ namespace UnitTests.VariantAnnotation.Sequence
 			maskedIntervals[2]  = new Interval<MaskedEntry>(52, 52, new MaskedEntry(52, 52));
 
 			var maskedIntervalArray = new IntervalArray<MaskedEntry>(maskedIntervals);
-
-			_compressedSequence.Set(NumBases, buffer, maskedIntervalArray);
-		}
+            _compressedSequence.Set(NumBases, 0, twoBitBuffer, maskedIntervalArray, null);
+        }
 
 	    [Fact]
 	    public void Assembly_hg19()

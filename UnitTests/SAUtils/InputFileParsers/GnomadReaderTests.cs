@@ -6,6 +6,7 @@ using SAUtils;
 using SAUtils.CreateGnomadDb;
 using SAUtils.DataStructures;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;
 using Variants;
 using Xunit;
@@ -14,9 +15,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class GnomadReaderTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-        private static readonly IChromosome Chrom22 = new Chromosome("chr22", "22", 22);
-
         private static Stream GetGenomeStream()
         {
             var stream = new MemoryStream();
@@ -39,9 +37,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TGTGTTGTTATTCTGTGTGCAT", 10114 - VariantUtils.MaxUpstreamLength);
 
-            var refNameToChrom = new Dictionary<string, IChromosome> { { "1", Chrom1 } };
-
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new StreamReader(GetGenomeStream());
             var gnomadReader = new GnomadReader(reader, null, sequenceProvider);
 
@@ -72,9 +68,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TAAGCCAGCCAGCCAGCCAAGCTGGCCAAGCCAGACAGGCAGCCAAGCCAACCAAGACACCCAGGCAGCCAAGCCAGC", 16558315 - VariantUtils.MaxUpstreamLength);
 
-            var refNameToChrom = new Dictionary<string, IChromosome> { { "22", Chrom22 } };
-
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new StreamReader(GetConflictingItemsStream());
             var gnomadReader = new GnomadReader(reader, null, sequenceProvider);
 
@@ -112,9 +106,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "GCGCGC", 157100394 -1 - VariantUtils.MaxUpstreamLength);
 
-            var refNameToChrom = new Dictionary<string, IChromosome> { { "6", new Chromosome("chr6","6",6)} };
-
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new StreamReader(GetShiftingItemsStream());
             var gnomadReader = new GnomadReader(reader, null, sequenceProvider);
 
@@ -164,11 +156,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void GetMergedItems()
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TTATCTTCTCTTCATTCTTAAAAAAGGAACACATTTTATA", 15528100 - VariantUtils.MaxUpstreamLength);
-
-            var refNameToChrom = new Dictionary<string, IChromosome> { { "22", Chrom22 } };
-
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
-
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var gnomadReader = new GnomadReader(new StreamReader(GetChr22GenomeStream()), new StreamReader(GetChr22ExomeStream()), sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
@@ -184,8 +172,8 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             //this is the merged item.
             Assert.Equal("\"coverage\":23,\"failedFilter\":true,\"allAf\":0.000476,\"allAn\":86114,\"allAc\":41,\"allHc\":0,\"afrAf\":0.003149,\"afrAn\":13018,\"afrAc\":41,\"afrHc\":0,\"amrAf\":0,\"amrAn\":11274,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":9354,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":5344,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":36372,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":1780,\"asjAc\":0,\"asjHc\":0,\"sasAf\":0,\"sasAn\":6060,\"sasAc\":0,\"sasHc\":0,\"othAf\":0,\"othAn\":2912,\"othAc\":0,\"othHc\":0,\"maleAf\":0.000335,\"maleAn\":44796,\"maleAc\":15,\"maleHc\":0,\"femaleAf\":0.000629,\"femaleAn\":41318,\"femaleAc\":26,\"femaleHc\":0,\"controlsAllAf\":0.000476,\"controlsAllAn\":33612,\"controlsAllAc\":16", items[3].GetJsonString());
-            
         }
+        
         private Stream GetChr22_21006257_genome()
         {
             var stream = new MemoryStream();
@@ -217,10 +205,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void CombineCoverage_when_one_AN_is_zero()
         {
             var sequence = new SimpleSequence(new string('G', VariantUtils.MaxUpstreamLength) + "TAAA", 21006257 - VariantUtils.MaxUpstreamLength);
-
-            var refNameToChrom = new Dictionary<string, IChromosome> { { "22", Chrom22 } };
-
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
             var gnomadReader = new GnomadReader(new StreamReader(GetChr22_21006257_genome()), new StreamReader(GetChr22_21006257_exome()), sequenceProvider);
 
@@ -262,8 +247,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void RemoveConflictingItems()
         {
             var sequence         = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "G", 22055875 - VariantUtils.MaxUpstreamLength);
-            var refNameToChrom   = new Dictionary<string, IChromosome> { { "22", Chrom22 } };
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
             var gnomadReader = new GnomadReader(new StreamReader(GetChr22_22055876_genome()), new StreamReader(GetChr22_22055876_exome()), sequenceProvider);
 
@@ -292,8 +276,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         public void DoNotReportCoverage_whenAnZero()
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "C" + new string('G', 16689902 - 16689820) + "GGGGA", 16689820 - 1 - VariantUtils.MaxUpstreamLength);
-            var refNameToChrom = new Dictionary<string, IChromosome> { { "22", Chrom22 } };
-            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, refNameToChrom);
+            var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
             var gnomadReader = new GnomadReader(new StreamReader(GetChr22_16689800_16689902_genome()), null, sequenceProvider);
 

@@ -13,7 +13,6 @@ using VariantAnnotation.IO;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Utilities;
 using Vcf;
-using Vcf.VariantCreator;
 
 namespace Nirvana
 {

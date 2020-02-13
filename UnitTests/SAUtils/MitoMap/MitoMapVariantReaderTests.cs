@@ -5,16 +5,16 @@ using Genome;
 using SAUtils.InputFileParsers.ClinVar;
 using SAUtils.MitoMap;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.SAUtils.MitoMap
 {
     public sealed class MitoMapVariantReaderTests
     {
-        private static readonly Chromosome Chromosome  = new Chromosome("chrM", "MT", 0);
         private static readonly ISequence  Sequence    = new NSequence();
         private static readonly SimpleSequenceProvider SequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, Sequence, 
-            new Dictionary<string, IChromosome> { { "chrM", Chromosome} });
+            ChromosomeUtilities.RefNameToChromosome);
         private static readonly VariantAligner VariantAligner = new VariantAligner(SequenceProvider?.Sequence);
         private static readonly MitoMapInputDb MitoMapInputDb = new MitoMapInputDb(
             new Dictionary<string, string> {{"7616", "17616"},{"3510", "13510"},{"90282","190282"},{"99016","199016"}});
@@ -57,7 +57,7 @@ namespace UnitTests.SAUtils.MitoMap
              "PolymorphismsCoding", "\"refAllele\":\"A\",\"altAllele\":\"G\",\"numGenBankFullLengthSeqs\":15,\"pubMedIds\":[\"190282\",\"199016\"]")]
         public void ParseLine_AsExpected(string line, string fileName, string expectedJsonString)
         {
-            string jsonString = MitoMapVariantReader.ParseLine(line, fileName, SequenceProvider, VariantAligner, Chromosome, MitoMapInputDb)
+            string jsonString = MitoMapVariantReader.ParseLine(line, fileName, SequenceProvider, VariantAligner, ChromosomeUtilities.ChrM, MitoMapInputDb)
                                                     .FirstOrDefault()
                                                     ?.GetJsonString();
             Assert.Equal(expectedJsonString, jsonString);

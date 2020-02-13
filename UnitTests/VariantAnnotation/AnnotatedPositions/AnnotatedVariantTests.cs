@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
@@ -13,14 +13,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 {
     public sealed class AnnotatedVariantTests
     {
-        private readonly IChromosome _chromosome;
-        const string OriginalChromosomeName = "BoB";
-
-        public AnnotatedVariantTests()
-        {
-            _chromosome = new Chromosome("chrBob", "bob", 3);
-        }
-
+        private const string OriginalChromosomeName = "BoB";
+        
         [Fact]
         public void GetJsonString_RefMinor_WithTranscripts()
         {
@@ -39,8 +33,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetJsonString_RecomposedSnvAfterTrimming_IsRecomposedTrue()
         {
-            IVariant variant = new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob-100-A-G", false, false, true,
-                new[] { "bob-100-A-G" }, AnnotationBehavior.SmallVariants, false); ;
+            IVariant variant = new Variant(ChromosomeUtilities.Bob, 100, 200, "A", "G", VariantType.SNV, "bob-100-A-G", false, false, true,
+                new[] { "bob-100-A-G" }, AnnotationBehavior.SmallVariants, false);
             var annotatedVariant = new AnnotatedVariant(variant);
 
             const string expectedResult = "{\"vid\":\"bob-100-A-G\",\"chromosome\":\"BoB\",\"begin\":100,\"end\":200,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"isRecomposedVariant\":true,\"linkedVids\":[\"bob-100-A-G\"]}";
@@ -51,7 +45,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private void AddRegulatoryRegion(IAnnotatedVariant annotatedVariant)
         {
-            var regulatoryRegion = new RegulatoryRegion(_chromosome, 103, 104, CompactId.Convert("7157"),
+            var regulatoryRegion = new RegulatoryRegion(ChromosomeUtilities.Bob, 103, 104, CompactId.Convert("7157"),
                 RegulatoryRegionType.TF_binding_site);
             var consequences = new List<ConsequenceTag> { ConsequenceTag.regulatory_region_amplification };
 
@@ -71,7 +65,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private IVariant GetRefMinorVariant()
         {
-            return new Variant(_chromosome, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
+            return new Variant(ChromosomeUtilities.Bob, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
                 new[] { "bob:100:102:TAT" }, AnnotationBehavior.SmallVariants, false);
         }
     }

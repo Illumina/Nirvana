@@ -18,7 +18,7 @@ namespace UnitTests.Downloader.FileExtensions
             const string remoteReferencesDirectory = "remote";
             const string referencesDirectory       = "local";
 
-            const ushort dataVersion = CompressedSequenceCommon.HeaderVersion;
+            const ushort dataVersion = ReferenceSequenceCommon.HeaderVersion;
 
             var expectedFiles = new List<RemoteFile>
             {

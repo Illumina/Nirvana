@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CacheUtils.TranscriptCache;
 using Genome;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -20,9 +21,6 @@ namespace UnitTests.VariantAnnotation.Caches
         private readonly IEnumerable<IDataSourceVersion> _expectedDataSourceVersions;
         private const GenomeAssembly ExpectedAssembly = GenomeAssembly.hg19;
 
-        private readonly IChromosome _chr1  = new Chromosome("chr1", "1", 0);
-        private readonly IChromosome _chr11 = new Chromosome("chr11", "11", 10);
-
         public TranscriptCacheTests()
         {
             _expectedDataSourceVersions        = GetDataSourceVersions();
@@ -36,7 +34,7 @@ namespace UnitTests.VariantAnnotation.Caches
         [Fact]
         public void GetOverlappingFlankingTranscripts_TwoOverlaps()
         {
-            var interval = new ChromosomeInterval(_chr1, 100, 200);
+            var interval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 100, 200);
             ITranscript[] overlappingTranscripts = _cache.TranscriptIntervalForest.GetAllFlankingValues(interval);
 
             Assert.NotNull(overlappingTranscripts);
@@ -46,7 +44,7 @@ namespace UnitTests.VariantAnnotation.Caches
         [Fact]
         public void GetOverlappingFlankingTranscripts_NoOverlaps()
         {
-            var interval = new ChromosomeInterval(_chr11, 5000, 5001);
+            var interval = new ChromosomeInterval(ChromosomeUtilities.Chr11, 5000, 5001);
             ITranscript[] overlappingTranscripts = _cache.TranscriptIntervalForest.GetAllFlankingValues(interval);
 
             Assert.Null(overlappingTranscripts);
@@ -56,7 +54,7 @@ namespace UnitTests.VariantAnnotation.Caches
         public void GetOverlappingRegulatoryRegions_OneOverlap()
         {
             var overlappingRegulatoryRegions =
-                _cache.RegulatoryIntervalForest.GetAllOverlappingValues(_chr1.Index, 100, 200);
+                _cache.RegulatoryIntervalForest.GetAllOverlappingValues(ChromosomeUtilities.Chr1.Index, 100, 200);
 
             Assert.NotNull(overlappingRegulatoryRegions);
             Assert.Single(overlappingRegulatoryRegions);
@@ -66,7 +64,7 @@ namespace UnitTests.VariantAnnotation.Caches
         public void GetOverlappingRegulatoryRegions_NoOverlaps()
         {
             var overlappingRegulatoryRegions =
-                _cache.RegulatoryIntervalForest.GetAllOverlappingValues(_chr1.Index, 5000, 5001);
+                _cache.RegulatoryIntervalForest.GetAllOverlappingValues(ChromosomeUtilities.Chr1.Index, 5000, 5001);
 
             Assert.Null(overlappingRegulatoryRegions);
         }
@@ -102,13 +100,13 @@ namespace UnitTests.VariantAnnotation.Caches
         {
             var regulatoryRegions = new IRegulatoryRegion[3];
 
-            regulatoryRegions[0] = new RegulatoryRegion(_chr11, 11000, 12000, CompactId.Empty,
+            regulatoryRegions[0] = new RegulatoryRegion(ChromosomeUtilities.Chr11, 11000, 12000, CompactId.Empty,
                 RegulatoryRegionType.promoter);
 
-            regulatoryRegions[1] = new RegulatoryRegion(_chr1, 120, 180, CompactId.Empty,
+            regulatoryRegions[1] = new RegulatoryRegion(ChromosomeUtilities.Chr1, 120, 180, CompactId.Empty,
                 RegulatoryRegionType.promoter);
 
-            regulatoryRegions[2] = new RegulatoryRegion(_chr1, 300, 320, CompactId.Empty,
+            regulatoryRegions[2] = new RegulatoryRegion(ChromosomeUtilities.Chr1, 300, 320, CompactId.Empty,
                 RegulatoryRegionType.promoter);
 
             return regulatoryRegions;
@@ -118,11 +116,11 @@ namespace UnitTests.VariantAnnotation.Caches
         {
             return new ITranscript[]
             {
-                new Transcript(_chr11, 11000, 12000, CompactId.Empty, null, BioType.other, null, 0, 0,
+                new Transcript(ChromosomeUtilities.Chr11, 11000, 12000, CompactId.Empty, null, BioType.other, null, 0, 0,
                     false, null, 0, null, 0, 0, Source.None, false, false, null, null),
-                new Transcript(_chr1, 120, 180, CompactId.Empty, null, BioType.other, null, 0, 0,
+                new Transcript(ChromosomeUtilities.Chr1, 120, 180, CompactId.Empty, null, BioType.other, null, 0, 0,
                     false, null, 0, null, 0, 0, Source.None, false, false, null, null),
-                new Transcript(_chr1, 300, 320, CompactId.Empty, null, BioType.other, null, 0, 0,
+                new Transcript(ChromosomeUtilities.Chr1, 300, 320, CompactId.Empty, null, BioType.other, null, 0, 0,
                     false, null, 0, null, 0, 0, Source.None, false, false, null, null)
             };
         }

@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Genome;
 using SAUtils.InputFileParsers.TOPMed;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using Variants;
 using Xunit;
 
@@ -11,15 +11,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class TopMedReaderTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-        private static readonly IChromosome Chrom2 = new Chromosome("chr2", "2", 2);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
-        {
-            { "chr1", Chrom1},
-            { "chr2", Chrom2}
-        };
-
         private static Stream GetStream()
         {
             var stream = new MemoryStream();
@@ -42,7 +33,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "A" +new string('T', 10146- 10128) + "AC" +new string('T', 10177- 10146-1)+"A", 10128 - 1 - VariantUtils.MaxUpstreamLength);
 
-            var seqProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, _chromDict);
+            var seqProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, ChromosomeUtilities.RefNameToChromosome);
             var gnomadReader = new TopMedReader(new StreamReader(GetStream()), seqProvider);
 
             var items = gnomadReader.GetItems().ToList();

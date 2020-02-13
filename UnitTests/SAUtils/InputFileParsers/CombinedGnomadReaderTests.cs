@@ -1,13 +1,10 @@
 ﻿using System.IO;
-using Genome;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class CombinedGnomadReaderTests
     {
-        private static readonly IChromosome Chrom22 = new Chromosome("chr22", "22", 22);
-
         private Stream GetGenomeStream()
         {
             var stream = new MemoryStream();
@@ -43,6 +40,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             stream.Position = 0;
             return stream;
         }
+        
         [Fact]
         public void CombineItemsInSamePosition()
         {

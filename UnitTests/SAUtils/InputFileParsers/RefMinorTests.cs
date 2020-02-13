@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Genome;
@@ -7,6 +6,7 @@ using IO;
 using Moq;
 using SAUtils.InputFileParsers.OneKGen;
 using SAUtils.RefMinorDb;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
@@ -17,13 +17,6 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class RefMinorTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
-        {
-            { "1", Chrom1}
-        };
-
         private static Stream GetStream()
         {
             var stream = new MemoryStream();
@@ -56,7 +49,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var seqProvider = new Mock<ISequenceProvider>();
             seqProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
-            seqProvider.SetupGet(x => x.RefNameToChromosome).Returns(_chromDict);
+            seqProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
             seqProvider.Setup(x => x.Sequence.Substring(15274 -1, 1)).Returns("A");
             seqProvider.Setup(x => x.Sequence.Substring(241369-1, 1)).Returns("C");
 
@@ -78,10 +71,10 @@ namespace UnitTests.SAUtils.InputFileParsers
                 stream.Position = 0;
                 indexStream.Position = 0;
 
-                using (var dbReader = new RefMinorDbReader(stream,indexStream))
+                using (var dbReader = new RefMinorDbReader(stream, indexStream))
                 {
-                    Assert.Equal("T", dbReader.GetGlobalMajorAllele(Chrom1, 15274));
-                    Assert.Null(dbReader.GetGlobalMajorAllele(Chrom1, 1524));
+                    Assert.Equal("T", dbReader.GetGlobalMajorAllele(ChromosomeUtilities.Chr1, 15274));
+                    Assert.Null(dbReader.GetGlobalMajorAllele(ChromosomeUtilities.Chr1, 1524));
                 }
             }
         }

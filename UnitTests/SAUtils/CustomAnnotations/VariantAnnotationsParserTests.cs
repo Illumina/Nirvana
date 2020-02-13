@@ -1,11 +1,11 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
 using Genome;
 using Moq;
 using SAUtils.Custom;
 using SAUtils.Schema;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
 using Xunit;
@@ -14,12 +14,6 @@ namespace UnitTests.SAUtils.CustomAnnotations
 {
     public sealed class VariantAnnotationsParserTests
     {
-        private static readonly Dictionary<string, IChromosome> RefChromDict = new Dictionary<string, IChromosome>
-        {
-            {"chr1", new Chromosome("chr1", "1", 0) },
-            {"chr2", new Chromosome("chr2", "2", 1) }
-        };
-
         private static readonly ISequence Sequence = GetMockedSequence();
 
         private static readonly ISequenceProvider SequenceProvider = GetMockedSequenceProvider();
@@ -284,7 +278,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         private static ISequenceProvider GetMockedSequenceProvider()
         {
             var seqProviderMock = new Mock<ISequenceProvider>();
-            seqProviderMock.SetupGet(x => x.RefNameToChromosome).Returns(RefChromDict);
+            seqProviderMock.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
             seqProviderMock.SetupGet(x => x.Sequence).Returns(Sequence);
 
             return seqProviderMock.Object;

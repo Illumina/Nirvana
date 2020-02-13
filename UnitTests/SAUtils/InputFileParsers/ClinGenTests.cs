@@ -1,21 +1,13 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using Genome;
 using SAUtils.InputFileParsers.ClinGen;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
 {
     public sealed class ClinGenTests
     {
-        private static readonly IChromosome Chrom1 = new Chromosome("chr1", "1", 1);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
-        {
-            { "1", Chrom1}
-        };
-
         private static Stream GetStream()
         {
             var stream = new MemoryStream();
@@ -34,7 +26,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetItems()
         {
-            using (var reader = new ClinGenReader(new StreamReader(GetStream()), _chromDict))
+            using (var reader = new ClinGenReader(new StreamReader(GetStream()), ChromosomeUtilities.RefNameToChromosome))
             {
                 var items = reader.GetItems().ToList();
 

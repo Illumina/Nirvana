@@ -1,6 +1,5 @@
 ﻿using System;
 using IO;
-using OptimizedCore;
 
 namespace VariantAnnotation.ProteinConservation
 {

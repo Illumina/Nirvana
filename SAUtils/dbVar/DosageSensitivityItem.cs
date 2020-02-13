@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;

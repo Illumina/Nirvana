@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Genome;
 using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.TOPMed;
 using UnitTests.SAUtils.InputFileParsers;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;
 using Xunit;
 
@@ -12,13 +12,6 @@ namespace UnitTests.SAUtils.NsaWriters
 {
     public sealed class NsaUtilitiesTests
     {
-        private static readonly IChromosome Chrom5 = new Chromosome("chr5", "5", 4);
-
-        private readonly Dictionary<string, IChromosome> _chromDict = new Dictionary<string, IChromosome>
-        {
-            { "chr5", Chrom5}
-        };
-
         private static Stream GetDupItemsStream()
         {
             var stream = new MemoryStream();
@@ -37,7 +30,7 @@ namespace UnitTests.SAUtils.NsaWriters
         [Fact]
         public void RemoveConflictingAlleles_does_not_remove_duplicates()
         {
-            var seqProvider = ParserTestUtils.GetSequenceProvider(70220313, "TGCC", 'A', _chromDict);
+            var seqProvider = ParserTestUtils.GetSequenceProvider(70220313, "TGCC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var topMedReader = new TopMedReader(new StreamReader(GetDupItemsStream()), seqProvider);
 
             var items = topMedReader.GetItems().ToList();

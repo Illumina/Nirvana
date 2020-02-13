@@ -1,6 +1,6 @@
-﻿using Genome;
-using OptimizedCore;
+﻿using OptimizedCore;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.TranscriptAnnotation;
 using Variants;
@@ -13,8 +13,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void SerializeJson_NominalUsage()
         {
-            var chromosome  = new Chromosome("chr1", "1", 0);
-            var variant     = new Variant(chromosome, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant     = new Variant(ChromosomeUtilities.Chr1, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(HgvsProteinNomenclatureTests.Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = HgvsProteinNomenclatureTests.GetMockedTranscriptOnForwardStrand();
 

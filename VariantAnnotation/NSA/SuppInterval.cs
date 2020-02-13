@@ -24,7 +24,7 @@ namespace VariantAnnotation.NSA
             string ensemblName = reader.ReadAsciiString();
             string ucscName    = reader.ReadAsciiString();
             ushort chromIndex  = reader.ReadOptUInt16();
-            var chromosome     = new Chromosome(ucscName, ensemblName, chromIndex);
+            var chromosome     = new Chromosome(ucscName, ensemblName, null, null, 1, chromIndex);
 
             var start       = reader.ReadOptInt32();
             var end         = reader.ReadOptInt32();

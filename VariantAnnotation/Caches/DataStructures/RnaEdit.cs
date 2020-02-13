@@ -16,7 +16,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Start = start;
             End   = end;
             Bases = bases;
-            Type = VariantType.unknown;
+            Type  = VariantType.unknown;
         }
 
         public static IRnaEdit Read(BufferedBinaryReader reader)

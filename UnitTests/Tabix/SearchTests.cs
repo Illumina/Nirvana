@@ -1,6 +1,4 @@
-﻿using Genome;
-using System.Collections.Generic;
-using IO;
+﻿using IO;
 using Tabix;
 using Xunit;
 using UnitTests.TestUtilities;
@@ -14,18 +12,10 @@ namespace UnitTests.Tabix
 
         public SearchTests()
         {
-            var chr15 = new Chromosome("chr15", "15", 14);
-
-            var refNameToChromosome = new Dictionary<string, IChromosome>
-            {
-                [chr15.EnsemblName] = chr15,
-                [chr15.UcscName]    = chr15
-            };
-
             Index index;
             using (var stream = FileUtilities.GetReadStream(Resources.TopPath("miniHEXA_minimal.vcf.gz.tbi")))
             {
-                index = Reader.GetTabixIndex(stream, refNameToChromosome);
+                index = Reader.GetTabixIndex(stream, ChromosomeUtilities.RefNameToChromosome);
             }
 
             var vcfStream = FileUtilities.GetReadStream(Resources.TopPath("miniHEXA_minimal.vcf.gz"));

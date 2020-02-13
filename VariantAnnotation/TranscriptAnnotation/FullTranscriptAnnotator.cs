@@ -48,7 +48,7 @@ namespace VariantAnnotation.TranscriptAnnotation
         private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
             AltAminoAcids, string RefCodons, string AltCodons, string TranscriptAltAllele) AnnotateTranscript(ITranscript transcript, ISimpleVariant variant, AminoAcids aminoAcids, ISequence refSequence)
         {
-            var onReverseStrand = transcript.Gene.OnReverseStrand;
+            bool onReverseStrand = transcript.Gene.OnReverseStrand;
             var start = MappedPositionUtilities.FindRegion(transcript.TranscriptRegions, variant.Start);
             var end   = MappedPositionUtilities.FindRegion(transcript.TranscriptRegions, variant.End);
 
@@ -56,40 +56,52 @@ namespace VariantAnnotation.TranscriptAnnotation
                 end.Index, variant, onReverseStrand, transcript.Translation?.CodingRegion, transcript.StartExonPhase,
                 variant.Type == VariantType.insertion);
 
-            var transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
+            string transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
             var codingSequence = GetCodingSequence(transcript, refSequence);
-
-            var codons = Codons.GetCodons(transcriptAltAllele, position.CdsStart, position.CdsEnd,
-                position.ProteinStart, position.ProteinEnd, codingSequence);
+            var codons = Codons.GetCodons(transcriptAltAllele, position.CdsStart, position.CdsEnd, position.ProteinStart, position.ProteinEnd, codingSequence);
             
-            var coveredCdna = transcript.TranscriptRegions.GetCoveredCdnaPositions(position.CdnaStart, start.Index,
-                position.CdnaEnd, end.Index, onReverseStrand);
-
             var aa = aminoAcids.Translate(codons.Reference, codons.Alternate);
+            (aa, position.ProteinStart, position.ProteinEnd) = TryTrimAminoAcidsAndUpdateProteinPositions(aa, position.ProteinStart, position.ProteinEnd);
 
-            var coveredPositions = MappedPositionUtilities.GetCoveredCdsAndProteinPositions(coveredCdna.Start, coveredCdna.End,
-                transcript.StartExonPhase, transcript.Translation?.CodingRegion);
+            (position.CoveredCdnaStart, position.CoveredCdnaEnd) = transcript.TranscriptRegions.GetCoveredCdnaPositions(position.CdnaStart, start.Index, position.CdnaEnd, end.Index, onReverseStrand);
+            (position.CoveredCdsStart, position.CoveredCdsEnd, position.CoveredProteinStart, position.CoveredProteinEnd) = MappedPositionUtilities.GetCoveredCdsAndProteinPositions(position.CoveredCdnaStart, position.CoveredCdnaEnd, transcript.StartExonPhase, transcript.Translation?.CodingRegion);
 
+            SequenceChange coveredAa;
             // only generate the covered version of ref & alt alleles when CDS start/end is -1
-            var coveredAa = position.CdsStart == -1 || position.CdsEnd == -1
-                ? GetCoveredAa(aminoAcids, transcriptAltAllele, coveredPositions, codingSequence)
-                : aa;
+            if (position.CdsStart == -1 || position.CdsEnd == -1)
+            {
+                coveredAa = GetCoveredAa(aminoAcids, transcriptAltAllele, position.CoveredCdsStart, position.CoveredCdsEnd, position.CoveredProteinStart, position.CoveredProteinEnd, codingSequence);
+                (coveredAa, position.CoveredProteinStart, position.CoveredProteinEnd) = TryTrimAminoAcidsAndUpdateProteinPositions(coveredAa, position.CoveredProteinStart, position.CoveredProteinEnd);
+            }
+            else
+            {
+                coveredAa = aa;
+                position.CoveredProteinStart = position.ProteinStart;
+                position.CoveredProteinEnd = position.ProteinEnd;
+            }
+            
 
             var positionalEffect = GetPositionalEffect(transcript, variant, position, aa.Reference, aa.Alternate,
-                coveredCdna.Start, coveredCdna.End, coveredPositions.CdsStart, coveredPositions.CdsEnd);
+                position.CoveredCdnaStart, position.CoveredCdnaEnd, position.CoveredCdsStart, position.CoveredCdsEnd);
 
             var variantEffect = new VariantEffect(positionalEffect, variant, transcript, aa.Reference, aa.Alternate,
                 codons.Reference, codons.Alternate, position.ProteinStart, coveredAa.Reference, coveredAa.Alternate);
 
-            return (variantEffect, position, aa.Reference, aa.Alternate, codons.Reference, codons.Alternate,
-                transcriptAltAllele);
+            return (variantEffect, position, aa.Reference, aa.Alternate, codons.Reference, codons.Alternate, transcriptAltAllele);
         }
 
-        private static (string Reference, string Alternate) GetCoveredAa(AminoAcids aminoAcids, string transcriptAltAllele, (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) coveredPositions, ISequence codingSequence)
+        internal static (SequenceChange AaChange, int ProteinStart, int ProteinEnd) TryTrimAminoAcidsAndUpdateProteinPositions(SequenceChange aaChange, int proteinStart, int proteinEnd)
         {
-            (string reference, string alternate) = Codons.GetCodons(transcriptAltAllele, coveredPositions.CdsStart,
-                coveredPositions.CdsEnd, coveredPositions.ProteinStart, coveredPositions.ProteinEnd, codingSequence);
-            return aminoAcids.Translate(reference, alternate);
+            (int newStart, string newReference, string newAlternate) = BiDirectionalTrimmer.Trim(proteinStart, aaChange.Reference, aaChange.Alternate);
+
+            return string.IsNullOrEmpty(newReference) ? (aaChange, proteinStart, proteinEnd) : 
+                (new SequenceChange(newReference, newAlternate), newStart, newStart + newReference.Length - 1);
+        }
+
+        private static SequenceChange GetCoveredAa(AminoAcids aminoAcids, string transcriptAltAllele, int coveredCdsStart, int coveredCdsEnd, int coveredProteinStart, int coveredProteinEnd, ISequence codingSequence)
+        {
+            var codonsChange = Codons.GetCodons(transcriptAltAllele, coveredCdsStart, coveredCdsEnd, coveredProteinStart, coveredProteinEnd, codingSequence);
+            return aminoAcids.Translate(codonsChange.Reference, codonsChange.Alternate);
         }
 
         private static ISequence GetCodingSequence(ITranscript transcript, ISequence refSequence)
@@ -101,7 +113,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                        transcript.Gene.OnReverseStrand, transcript.StartExonPhase, transcript.RnaEdits));
         }
 
-        private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, ITranscriptRegion startRegion,
+        private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, ITranscriptRegion startRegion, 
             int startIndex, ITranscriptRegion endRegion, int endIndex, IInterval variant, bool onReverseStrand,
             ICodingRegion codingRegion, byte startExonPhase, bool isInsertion)
         {
@@ -124,7 +136,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             IMappedPosition position, string refAminoAcid, string altAminoAcid, int coveredCdnaStart,
             int coveredCdnaEnd, int coveredCdsStart, int coveredCdsEnd)
         {
-            var startCodonInsertionWithNoImpact = variant.Type == VariantType.insertion &&
+            bool startCodonInsertionWithNoImpact = variant.Type == VariantType.insertion &&
                                                   position.ProteinStart <= 1 &&
                                                   altAminoAcid.EndsWith(refAminoAcid);
 

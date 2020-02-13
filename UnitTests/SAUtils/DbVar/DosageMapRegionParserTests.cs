@@ -1,8 +1,7 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Genome;
 using SAUtils.dbVar;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.SAUtils.DbVar
@@ -29,19 +28,11 @@ namespace UnitTests.SAUtils.DbVar
             stream.Position = 0;
             return stream;
         }
-
-        private IDictionary<string, IChromosome> refNameToChromosome = new Dictionary<string, IChromosome>
-        {
-            {"chrX", new Chromosome("chrX", "X", 22)},
-            {"chr15", new Chromosome("chr15", "15", 14)},
-            {"chr7", new Chromosome("chr7", "7", 6)}
-        };
-
-
+        
         [Fact]
         public void StandardParsing()
         {
-            using (var dosageMapRegionParser = new DosageMapRegionParser(GetStream(), refNameToChromosome))
+            using (var dosageMapRegionParser = new DosageMapRegionParser(GetStream(), ChromosomeUtilities.RefNameToChromosome))
             {
                 var items = dosageMapRegionParser.GetItems().OrderBy(x => x.Chromosome.Index).ToArray();
 

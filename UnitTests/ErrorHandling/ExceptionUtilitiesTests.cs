@@ -12,8 +12,6 @@ namespace UnitTests.ErrorHandling
         private readonly Exception _generalException = new Exception("first level", new Exception("second level", new Exception("third level")));
         private readonly Exception _taskCancellation1 = new Exception("first level", new TaskCanceledException("second level", new Exception("third level")));
         private readonly Exception _taskCancellation2 = new Exception("first level", new Exception("second level", new TaskCanceledException("third level")));
-        private const string ExceptionMessage = "Something wrong.";
-        private const string HttpRequestUrl = "http://unit.test";
 
         [Fact]
         public void HasException_AsExpected()

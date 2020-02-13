@@ -1,8 +1,8 @@
 ﻿using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.TranscriptCache;
 using CacheUtils.TranscriptCache.Comparers;
-using Genome;
 using Intervals;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Xunit;
@@ -16,8 +16,6 @@ namespace UnitTests.CacheUtils.TranscriptCache
         [Fact]
         public void GetTranscriptRegions_OneExon()
         {
-            var chromosome = new Chromosome("chr5", "5", 4);
-
             var cdnaMaps = new[]
             {
                 new MutableTranscriptRegion(TranscriptRegionType.Exon, 0, 64571756, 64572037, 2569, 2850)
@@ -25,7 +23,7 @@ namespace UnitTests.CacheUtils.TranscriptCache
 
             var exons = new[]
             {
-                new MutableExon(chromosome, 64571756, 64572037, 0)
+                new MutableExon(ChromosomeUtilities.Chr5, 64571756, 64572037, 0)
             };
 
             var expectedRegions = new ITranscriptRegion[]
@@ -41,19 +39,17 @@ namespace UnitTests.CacheUtils.TranscriptCache
         [Fact]
         public void GetTranscriptRegions_WithGap_Forward()
         {
-            var chromosome = new Chromosome("chr5", "5", 4);
-
             var exons = new[]
             {
-                new MutableExon(chromosome, 89623195, 89624305, 0),
-                new MutableExon(chromosome, 89653782, 89653866, 0),
-                new MutableExon(chromosome, 89690803, 89690846, 0),
-                new MutableExon(chromosome, 89692770, 89693008, 0),
-                new MutableExon(chromosome, 89702368, 89702526, 0),
-                new MutableExon(chromosome, 89711875, 89712016, 0),
-                new MutableExon(chromosome, 89717610, 89717776, 0),
-                new MutableExon(chromosome, 89720651, 89720875, 0),
-                new MutableExon(chromosome, 89725044, 89731687, 0)
+                new MutableExon(ChromosomeUtilities.Chr5, 89623195, 89624305, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89653782, 89653866, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89690803, 89690846, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89692770, 89693008, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89702368, 89702526, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89711875, 89712016, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89717610, 89717776, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89720651, 89720875, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 89725044, 89731687, 0)
             };
 
             var introns = new IInterval[]
@@ -113,14 +109,12 @@ namespace UnitTests.CacheUtils.TranscriptCache
         [Fact]
         public void GetTranscriptRegions_WithGap_Reverse()
         {
-            var chromosome = new Chromosome("chr5", "5", 4);
-
             var exons = new[]
             {
-                new MutableExon(chromosome, 64571756, 64574228, 2),
-                new MutableExon(chromosome, 64575621, 64575829, 0),
-                new MutableExon(chromosome, 64578301, 64578407, 0),
-                new MutableExon(chromosome, 64578866, 64578927, 0)
+                new MutableExon(ChromosomeUtilities.Chr5, 64571756, 64574228, 2),
+                new MutableExon(ChromosomeUtilities.Chr5, 64575621, 64575829, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 64578301, 64578407, 0),
+                new MutableExon(ChromosomeUtilities.Chr5, 64578866, 64578927, 0)
             };
 
             var introns = new IInterval[]
@@ -160,12 +154,10 @@ namespace UnitTests.CacheUtils.TranscriptCache
         [Fact]
         public void GetTranscriptRegions_Reverse()
         {
-            var chromosome = new Chromosome("chr1", "1", 0);
-
             var exons = new[]
             {
-                new MutableExon(chromosome, 20977055, 20977207, 1),
-                new MutableExon(chromosome, 20976856, 20977050, 1)
+                new MutableExon(ChromosomeUtilities.Chr1, 20977055, 20977207, 1),
+                new MutableExon(ChromosomeUtilities.Chr1, 20976856, 20977050, 1)
             };
 
             var introns = new IInterval[]
@@ -194,16 +186,14 @@ namespace UnitTests.CacheUtils.TranscriptCache
         [Fact]
         public void GetTranscriptRegions_TwoExonsNoGap_Forward()
         {
-            var chromosome = new Chromosome("chr12", "12", 11);
-
             var exons = new[]
             {
-                new MutableExon(chromosome, 7079944, 7080253, 1),
-                new MutableExon(chromosome, 7083501, 7083602, 2),
-                new MutableExon(chromosome, 7083714, 7083855, 2),
-                new MutableExon(chromosome, 7084252, 7084310, 1),
-                new MutableExon(chromosome, 7084391, 7084540, 2),
-                new MutableExon(chromosome, 7084858, 7085165, 2)
+                new MutableExon(ChromosomeUtilities.Chr12, 7079944, 7080253, 1),
+                new MutableExon(ChromosomeUtilities.Chr12, 7083501, 7083602, 2),
+                new MutableExon(ChromosomeUtilities.Chr12, 7083714, 7083855, 2),
+                new MutableExon(ChromosomeUtilities.Chr12, 7084252, 7084310, 1),
+                new MutableExon(ChromosomeUtilities.Chr12, 7084391, 7084540, 2),
+                new MutableExon(ChromosomeUtilities.Chr12, 7084858, 7085165, 2)
             };
 
             var introns = new IInterval[]

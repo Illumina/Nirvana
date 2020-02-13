@@ -1,14 +1,15 @@
 ﻿using System;
 using Genome;
+using VariantAnnotation.TranscriptAnnotation;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public static class Codons
     {
-        public static (string Reference, string Alternate) GetCodons(string transcriptAlternateAllele,
+        public static SequenceChange GetCodons(string transcriptAlternateAllele,
             int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, ISequence codingSequence)
         {
-            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return ("", "");
+            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return new SequenceChange("", "");
 
             // current implementation of GetCoveredCdsAndProteinPositions may return negative cdsStart and cdsEnd beyond the CDS region
             if (cdsStart < 1) cdsStart = 1;
@@ -35,7 +36,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             var refCodons = GetCodon(transcriptReferenceAllele, prefix, suffix);
             var altCodons = GetCodon(transcriptAlternateAllele, prefix, suffix);
-            return (refCodons, altCodons);
+            return new SequenceChange(refCodons, altCodons);
         }
 
         /// <summary>

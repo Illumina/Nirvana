@@ -1,6 +1,7 @@
 ﻿using Genome;
 using Moq;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 using Xunit;
@@ -9,8 +10,6 @@ namespace UnitTests.Variants
 {
     public sealed class VariantRotatorTests
     {
-        private static readonly IChromosome Chromosome = new Chromosome("chrBob", "bob", 2);
-
         private readonly ISequence _refSequence =
             new SimpleSequence(
                 new string('A', VariantRotator.MaxDownstreamLength) + "ATGTGTGTGTGCAGT" +
@@ -37,7 +36,7 @@ namespace UnitTests.Variants
         [Fact]
         public void Right_Deletion_ReverseStrand()
         {
-            var variant = new SimpleVariant(Chromosome, 966399, 966401, "TG", "", VariantType.deletion);
+            var variant = new SimpleVariant(ChromosomeUtilities.Chr1, 966399, 966401, "TG", "", VariantType.deletion);
 
             var transcript = new Mock<ITranscript>();
             transcript.SetupGet(x => x.Start).Returns(966300);
@@ -79,7 +78,7 @@ namespace UnitTests.Variants
         [Fact]
         public void Right_Identity_WhenNotInsertionOrDeletion()
         {
-            var originalVariant = new SimpleVariant(Chromosome, 966392, 966392, "T", "A", VariantType.SNV);
+            var originalVariant = new SimpleVariant(ChromosomeUtilities.Chr1, 966392, 966392, "T", "A", VariantType.SNV);
             var rotated = VariantRotator.Right(originalVariant, null, _refSequence, false);
             Assert.True(ReferenceEquals(originalVariant, rotated));
         }
@@ -142,10 +141,10 @@ namespace UnitTests.Variants
         }
 
         private static ISimpleVariant GetDeletion() =>
-            new SimpleVariant(Chromosome, 966392, 966394, "TG", "", VariantType.deletion);
+            new SimpleVariant(ChromosomeUtilities.Chr1, 966392, 966394, "TG", "", VariantType.deletion);
 
         private static ISimpleVariant GetInsertion() =>
-            new SimpleVariant(Chromosome, 966397, 966396, "", "TG", VariantType.insertion);
+            new SimpleVariant(ChromosomeUtilities.Chr1, 966397, 966396, "", "TG", VariantType.insertion);
 
         [Theory]
         [InlineData(519, "TG", 515, "TG")]

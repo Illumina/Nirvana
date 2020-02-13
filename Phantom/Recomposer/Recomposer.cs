@@ -5,7 +5,6 @@ using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
-using Vcf.VariantCreator;
 
 namespace Phantom.Recomposer
 {

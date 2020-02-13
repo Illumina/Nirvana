@@ -9,7 +9,6 @@ using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils.dbVar
 {

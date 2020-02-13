@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Genome;
-using Intervals;
 using IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;

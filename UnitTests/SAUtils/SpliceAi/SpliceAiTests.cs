@@ -7,6 +7,7 @@ using Intervals;
 using Moq;
 using SAUtils.SpliceAi;
 using UnitTests.TestDataStructures;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
@@ -21,42 +22,9 @@ namespace UnitTests.SAUtils.SpliceAi
 {
     public sealed class SpliceAiTests
     {
-        private IntervalForest<string> GetGeneForest()
-        {
-            var intervalArrays = new IntervalArray<string>[25];// 1-22, X,Y,MT
-            // creating dummy interval trees for all the chromosomes
-            for (var i = 0; i < intervalArrays.Length; i++)
-            {
-                intervalArrays[i] = new IntervalArray<string>(new[]
-                {
-                    new Interval<string>(1, int.MaxValue, "chr"+i),
-                });
-            }
-
-            var chrom1Array = new IntervalArray<string>(new[]
-            {
-                new Interval<string>(1570603,1590558, "CDK11B"),
-                new Interval<string>(1567060,1570639, "MMP23B"),
-            });
-            var chrom10Array = new IntervalArray<string>(new[]
-            {
-                new Interval<string>(92828,95178, "TUBB8"),
-            });
-
-            var chrom21Array = new IntervalArray<string>(new[]
-            {
-                new Interval<string>(31863782,30491464, "KRTAP19-3"),
-                new Interval<string>(31859362,31859755, "KRTAP19-2"),
-            });
-
-            intervalArrays[0] = chrom1Array;
-            intervalArrays[9] = chrom10Array;
-            intervalArrays[20] = chrom21Array;
-            return new IntervalForest<string>(intervalArrays);
-        }
         private Dictionary<string, string> GetSpliceToNirvanaGenes()
         {
-            return new Dictionary<string, string>()
+            return new Dictionary<string, string>
             {
                 {"TUBB8", "TUBB8"},
                 {"CDK11B", "CDK11B" },
@@ -68,33 +36,11 @@ namespace UnitTests.SAUtils.SpliceAi
             };
         }
 
-        private static readonly IChromosome Chr10 = new Chromosome("chr10", "10", 9);
-        private static readonly IChromosome Chr3 = new Chromosome("chr3", "3", 2);
-        private static readonly IChromosome Chr1 = new Chromosome("chr1", "1", 0);
-        private static readonly IChromosome Chr21 = new Chromosome("chr21", "21", 20);
-        private static readonly IChromosome Chr22 = new Chromosome("chr22", "22", 21);
         private static ISequenceProvider GetSequenceProvider()
         {
-            var refNameToChrom = new Dictionary<string, IChromosome>()
-            {
-                {"1", Chr1 },
-                {"3", Chr3},
-                {"10", Chr10},
-                {"21", Chr21},
-                {"22", Chr22},
-            };
-            var refIndexToChrom = new Dictionary<ushort, IChromosome>()
-            {
-                { Chr1.Index, Chr1},
-                { Chr3.Index, Chr3},
-                { Chr10.Index, Chr10} ,
-                { Chr21.Index, Chr21},
-                { Chr22.Index, Chr22},
-            };
-
             var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(refNameToChrom);
-            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(refIndexToChrom);
+            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
+            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(ChromosomeUtilities.RefIndexToChromosome);
             //only for unit tests that uses variants at 17148654 
             mockProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "GAAAAA", 17148654 - 1 - VariantUtils.MaxUpstreamLength));
             return mockProvider.Object;
@@ -102,18 +48,9 @@ namespace UnitTests.SAUtils.SpliceAi
 
         private static ISequenceProvider GetCacheSequenceProvider()
         {
-            var refNameToChrom = new Dictionary<string, IChromosome>()
-            {
-                {"3", Chr3}
-            };
-            var refIndexToChrom = new Dictionary<ushort, IChromosome>()
-            {
-                { Chr3.Index, Chr3}
-            };
-
             var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(refNameToChrom);
-            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(refIndexToChrom);
+            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
+            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(ChromosomeUtilities.RefIndexToChromosome);
             return mockProvider.Object;
         }
 
@@ -141,12 +78,12 @@ namespace UnitTests.SAUtils.SpliceAi
                 new Interval<byte>(17148600 - SpliceUtilities.SpliceFlankLength, 17148600 + SpliceUtilities.SpliceFlankLength, 0),
             };
 
-            return new Dictionary<ushort, IntervalArray<byte>>()
+            return new Dictionary<ushort, IntervalArray<byte>>
             {
-                { Chr1.Index, new IntervalArray<byte>(intervals1) },
-                {Chr10.Index, new IntervalArray<byte>(intervals10)},
-                {Chr21.Index, new IntervalArray<byte>(intervals21)},
-                {Chr22.Index, new IntervalArray<byte>(intervals22)},
+                {ChromosomeUtilities.Chr1.Index, new IntervalArray<byte>(intervals1)},
+                {ChromosomeUtilities.Chr10.Index, new IntervalArray<byte>(intervals10)},
+                {ChromosomeUtilities.Chr21.Index, new IntervalArray<byte>(intervals21)},
+                {ChromosomeUtilities.Chr22.Index, new IntervalArray<byte>(intervals22)},
             };  
         }
         private static Stream GetStream()
@@ -392,15 +329,15 @@ namespace UnitTests.SAUtils.SpliceAi
             var peptideSeqs = new[] { "MASE*" };
 
             var genes = new IGene[1];
-            genes[0] = new Gene(Chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
+            genes[0] = new Gene(ChromosomeUtilities.Chr3, 100, 200, true, "TP53", 300, CompactId.Convert("7157"),
                 CompactId.Convert("ENSG00000141510"));
 
             var regulatoryRegions = new IRegulatoryRegion[2];
-            regulatoryRegions[0] = new RegulatoryRegion(Chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
-            regulatoryRegions[1] = new RegulatoryRegion(Chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[0] = new RegulatoryRegion(ChromosomeUtilities.Chr3, 1200, 1300, CompactId.Convert("123"), RegulatoryRegionType.enhancer);
+            regulatoryRegions[1] = new RegulatoryRegion(ChromosomeUtilities.Chr3, 1250, 1450, CompactId.Convert("456"), RegulatoryRegionType.enhancer);
             var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(3);
 
-            var transcripts = GetTranscripts(Chr3, genes, transcriptRegions, mirnas);
+            var transcripts = GetTranscripts(ChromosomeUtilities.Chr3, genes, transcriptRegions, mirnas);
             var transcriptIntervalArrays = transcripts.ToIntervalArrays(3);
 
             var expectedCacheData = new TranscriptCacheData(expectedHeader, genes, transcriptRegions, mirnas, peptideSeqs,

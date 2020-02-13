@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using CacheUtils.MiniCache;
 using CacheUtils.PredictionCache;
-using CacheUtils.Sequence;
 using CacheUtils.TranscriptCache;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
@@ -18,7 +17,6 @@ using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.ExtractTranscripts
 {
@@ -41,13 +39,12 @@ namespace CacheUtils.Commands.ExtractTranscripts
             var chromosome = ReferenceNameUtilities.GetChromosome(bundle.SequenceReader.RefNameToChromosome, _referenceName);
             bundle.Load(chromosome);
 
-            string outputStub  = GetOutputStub(chromosome, bundle.Source);
-            var interval    = new ChromosomeInterval(chromosome, _referencePosition, _referenceEndPosition);
-            var transcripts = GetTranscripts(logger, bundle, interval);
+            string outputStub = GetOutputStub(chromosome, bundle.Source);
+            var interval      = new ChromosomeInterval(chromosome, _referencePosition, _referenceEndPosition);
+            var transcripts   = GetTranscripts(logger, bundle, interval);
 
-            var sift              = GetPredictionStaging(logger, "SIFT", transcripts, chromosome, bundle.SiftPredictions, bundle.SiftReader, x => x.SiftIndex, numRefSeqs);
-            var polyphen          = GetPredictionStaging(logger, "PolyPhen", transcripts, chromosome, bundle.PolyPhenPredictions, bundle.PolyPhenReader, x => x.PolyPhenIndex, numRefSeqs);
-            string referenceBases = GetReferenceBases(logger, bundle.SequenceReader, interval);
+            var sift     = GetPredictionStaging(logger, "SIFT", transcripts, chromosome, bundle.SiftPredictions, bundle.SiftReader, x => x.SiftIndex, numRefSeqs);
+            var polyphen = GetPredictionStaging(logger, "PolyPhen", transcripts, chromosome, bundle.PolyPhenPredictions, bundle.PolyPhenReader, x => x.PolyPhenIndex, numRefSeqs);
 
             var regulatoryRegionIntervalArrays = GetRegulatoryRegionIntervalArrays(logger, bundle.TranscriptCache, interval, numRefSeqs);
             var transcriptIntervalArrays = PredictionUtilities.UpdateTranscripts(transcripts, bundle.SiftPredictions,
@@ -58,8 +55,6 @@ namespace CacheUtils.Commands.ExtractTranscripts
             WriteCache(logger, FileUtilities.GetCreateStream(CacheConstants.TranscriptPath(outputStub)), transcriptStaging, "transcript");
             WriteCache(logger, FileUtilities.GetCreateStream(CacheConstants.SiftPath(outputStub)), sift.Staging, "SIFT");
             WriteCache(logger, FileUtilities.GetCreateStream(CacheConstants.PolyPhenPath(outputStub)), polyphen.Staging, "PolyPhen");
-            WriteReference(logger, CacheConstants.BasesPath(outputStub), bundle.SequenceReader, chromosome,
-                referenceBases, interval.Start);
 
             return ExitCodes.Success;
         }
@@ -69,19 +64,6 @@ namespace CacheUtils.Commands.ExtractTranscripts
             IntervalArray<IRegulatoryRegion>[] regulatoryRegionIntervalArrays) =>
             TranscriptCacheStaging.GetStaging(header, transcriptIntervalArrays, regulatoryRegionIntervalArrays);
 
-        private static void WriteReference(ILogger logger, string outputPath, CompressedSequenceReader reader,
-            IChromosome chromosome, string referenceBases, int offset)
-        {
-            logger.Write("- writing reference bases... ");
-            var cytogeneticBands = new CytogeneticBands(reader.CytogeneticBands);
-
-            using (var writer = new CompressedSequenceWriter(FileUtilities.GetCreateStream(outputPath),
-                reader.ReferenceMetadataList, cytogeneticBands, reader.Assembly))
-            {
-                writer.Write(chromosome.EnsemblName, referenceBases, offset);
-            }
-            logger.WriteLine("finished.");
-        }
 
         private static void WriteCache(ILogger logger, Stream stream, IStaging staging, string description)
         {
@@ -95,16 +77,6 @@ namespace CacheUtils.Commands.ExtractTranscripts
 
         private static string GetSource(Source source) =>
             source != Source.BothRefSeqAndEnsembl ? source.ToString() : "Both";
-
-        private static string GetReferenceBases(ILogger logger, CompressedSequenceReader reader, IChromosomeInterval interval)
-        {
-            logger.Write("- retrieving reference bases... ");
-            reader.GetCompressedSequence(interval.Chromosome);
-            string referenceBases = reader.Sequence.Substring(interval.Start, interval.End - interval.Start + 1);
-            logger.WriteLine($"{referenceBases.Length} bases extracted.");
-
-            return referenceBases;
-        }
 
         private static (PredictionCacheStaging Staging, Prediction[] Predictions) GetPredictionStaging(ILogger logger,
             string description, IEnumerable<ITranscript> transcripts, IChromosome chromosome, IReadOnlyList<Prediction> oldPredictions,

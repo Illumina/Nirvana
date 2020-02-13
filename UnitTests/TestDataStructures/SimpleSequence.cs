@@ -2,7 +2,6 @@
 using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Providers;
 
 namespace UnitTests.TestDataStructures
 {
@@ -11,18 +10,18 @@ namespace UnitTests.TestDataStructures
         private readonly string _sequence;
         private readonly int _zeroBasedStartOffset;
         public int Length => _zeroBasedStartOffset + _sequence.Length;
+        public Band[] CytogeneticBands => null;
 
         public SimpleSequence(string s, int zeroBasedStartOffset = 0)
         {
             _zeroBasedStartOffset = zeroBasedStartOffset;
-            _sequence = s;
+            _sequence             = s;
         }
 
         public string Substring(int offset, int length)
         {
-            if (offset - _zeroBasedStartOffset + length > _sequence.Length
-                || offset < _zeroBasedStartOffset)
-                return "";
+            if (offset - _zeroBasedStartOffset + length > _sequence.Length || 
+                offset < _zeroBasedStartOffset) return "";
             return _sequence.Substring(offset - _zeroBasedStartOffset, length);
         }
     }
@@ -45,22 +44,16 @@ namespace UnitTests.TestDataStructures
         public ISequence Sequence { get; }
         public IDictionary<string, IChromosome> RefNameToChromosome { get; }
         public IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
-        public void LoadChromosome(IChromosome chromosome)
-        {
-            
-        }
+        public void LoadChromosome(IChromosome chromosome) { }
 
         public SimpleSequenceProvider(GenomeAssembly assembly, ISequence sequence,
             IDictionary<string, IChromosome> refNameToChromosome)
         {
-            Assembly = assembly;
-            Sequence = sequence;
+            Assembly            = assembly;
+            Sequence            = sequence;
             RefNameToChromosome = refNameToChromosome;
         }
 
-        public void Dispose()
-        {
-            
-        }
+        public void Dispose() { }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Genome;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Genome
@@ -7,7 +8,6 @@ namespace UnitTests.Genome
     {
         private readonly IChromosome _emptyChromosome  = new EmptyChromosome("chr1");
         private readonly IChromosome _emptyChromosome2 = new EmptyChromosome("chr1");
-        private readonly IChromosome _chr1             = new Chromosome("chr1", "1", 0);
 
         [Fact]
         public void Equals_True()
@@ -18,8 +18,8 @@ namespace UnitTests.Genome
         [Fact]
         public void Equals_False()
         {
-            Assert.False(_emptyChromosome.Equals(_chr1));
-            Assert.False(_chr1.Equals(_emptyChromosome));
+            Assert.False(_emptyChromosome.Equals(ChromosomeUtilities.Chr1));
+            Assert.False(ChromosomeUtilities.Chr1.Equals(_emptyChromosome));
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace UnitTests.Genome
         [Fact]
         public void GetHashCode_False()
         {
-            Assert.NotEqual(_emptyChromosome.GetHashCode(), _chr1.GetHashCode());
+            Assert.NotEqual(_emptyChromosome.GetHashCode(), ChromosomeUtilities.Chr1.GetHashCode());
         }
     }
 }

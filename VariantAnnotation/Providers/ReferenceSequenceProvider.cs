@@ -11,37 +11,34 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ReferenceSequenceProvider : ISequenceProvider
     {
-        public IDictionary<string, IChromosome> RefNameToChromosome => _sequenceReader.RefNameToChromosome;
+        public IDictionary<string, IChromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
         public IDictionary<ushort, IChromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
-        public GenomeAssembly Assembly => _sequenceReader.Assembly;
-        public ISequence Sequence => _sequenceReader.Sequence;
+        public GenomeAssembly                   Assembly             => _sequenceReader.Assembly;
+        public string                           Name                 => "Reference sequence provider";
+        public IEnumerable<IDataSourceVersion>  DataSourceVersions   => null;
 
-        public string Name { get; } = "Reference sequence provider";
-        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = null;
+        public ISequence Sequence { get; }
 
-        private readonly CytogeneticBands _cytogeneticBands;
         private ushort _currentChromosomeIndex = 65534; // guaranteed to be updated
         private readonly CompressedSequenceReader _sequenceReader;
 
         public ReferenceSequenceProvider(Stream stream)
         {
-            _sequenceReader   = new CompressedSequenceReader(stream);
-            _cytogeneticBands = new CytogeneticBands(_sequenceReader.CytogeneticBands);
+            _sequenceReader = new CompressedSequenceReader(stream);
+            Sequence        = _sequenceReader.Sequence;
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
         {
             if (annotatedPosition.AnnotatedVariants == null) return;
 
-            annotatedPosition.CytogeneticBand = _cytogeneticBands.GetCytogeneticBand(annotatedPosition.Position.Chromosome, annotatedPosition.Position.Start,
+            annotatedPosition.CytogeneticBand = Sequence.CytogeneticBands.Find(annotatedPosition.Position.Chromosome, annotatedPosition.Position.Start,
                 annotatedPosition.Position.End);
-
-            if (annotatedPosition.Position.Chromosome.UcscName != "chrM") return;
-
-            const string assertionNumber = "NC_012920.1";
+            
+            string refSeqAccession = annotatedPosition.Position.Chromosome.RefSeqAccession;
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
-                annotatedVariant.HgvsgNotation = HgvsgNotation.GetNotation(assertionNumber, annotatedVariant.Variant, Sequence, new Interval(0, Sequence.Length));
+                annotatedVariant.HgvsgNotation = HgvsgNotation.GetNotation(refSeqAccession, annotatedVariant.Variant, Sequence, new Interval(0, Sequence.Length));
             }
         }
 

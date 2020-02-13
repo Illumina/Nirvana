@@ -17,6 +17,7 @@ namespace SAUtils.Custom
         private static string _inputFile;
         private static string _compressedReference;
         private static string _outputDirectory;
+        
         public static ExitCodes Run(string command, string[] commandArgs)
         {
             var ops = new OptionSet

@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using Genome;
 using OptimizedCore;
-using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Utilities;
-using Vcf.VariantCreator;
 
 namespace SAUtils.dbVar
 {

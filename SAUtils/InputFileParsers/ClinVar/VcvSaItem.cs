@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Genome;
 using OptimizedCore;
-using SAUtils.DataStructures;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 

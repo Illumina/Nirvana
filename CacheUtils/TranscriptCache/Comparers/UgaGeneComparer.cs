@@ -13,7 +13,6 @@ namespace CacheUtils.TranscriptCache.Comparers
             return x.Chromosome.Index == y.Chromosome.Index &&
                 Equals(x.GRCh37, y.GRCh37)                  &&
                 Equals(x.GRCh38, y.GRCh38)                  &&
-                x.GRCh38              == y.GRCh38           &&
                 x.OnReverseStrand     == y.OnReverseStrand  &&
                 x.HgncId              == y.HgncId           &&
                 x.Symbol              == y.Symbol           &&

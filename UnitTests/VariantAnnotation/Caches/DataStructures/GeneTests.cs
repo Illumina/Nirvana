@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Genome;
 using IO;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -17,17 +17,12 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         {
             const int expectedStart           = int.MaxValue;
             const int expectedEnd             = int.MinValue;
-            IChromosome expectedChromosome    = new Chromosome("chrBob", "Bob", 1);
+            IChromosome expectedChromosome    = ChromosomeUtilities.Chr1;
             const bool expectedReverseStrand  = true;
             const string expectedSymbol       = "anavrin";
             const string expectedEntrezGeneId = "7157";
             const string expectedEnsemblId    = "ENSG00000141510";
             const int expectedHgncId          = int.MaxValue;
-
-            var indexToChromosome = new Dictionary<ushort, IChromosome>
-            {
-                [expectedChromosome.Index] = expectedChromosome
-            };
 
             // ReSharper disable ConditionIsAlwaysTrueOrFalse
             var gene = new Gene(expectedChromosome, expectedStart, expectedEnd, expectedReverseStrand,
@@ -48,7 +43,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
                 using (var reader = new BufferedBinaryReader(ms))
                 {
-                    observedGene = Gene.Read(reader, indexToChromosome);
+                    observedGene = Gene.Read(reader, ChromosomeUtilities.RefIndexToChromosome);
                 }
             }
 

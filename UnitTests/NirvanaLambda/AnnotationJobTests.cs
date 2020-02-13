@@ -40,7 +40,7 @@ namespace UnitTests.NirvanaLambda
         [Fact]
         public void CheckResponse_AsExpected()
         {
-            Assert.Throws<Exception>(() => new AnnotationJob(null, 1).CheckResponse(new InvokeResponse(){FunctionError = "Unhandled"}));
+            Assert.Throws<Exception>(() => new AnnotationJob(null, 1).CheckResponse(new InvokeResponse {FunctionError = "Unhandled"}));
             Assert.Throws<Exception>(() => new AnnotationJob(null, 1).CheckResponse(null));
         }
 

@@ -9,8 +9,8 @@
 		public Band(int begin, int end, string name)
 		{
 			Begin = begin;
-			End = end;
-			Name = name;
+			End   = end;
+			Name  = name;
 		}
 
 		public int Compare(int position)

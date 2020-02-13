@@ -2,7 +2,7 @@
 
 namespace ErrorHandling.Exceptions
 {
-    public class DeploymentErrorException : Exception
+    public sealed class DeploymentErrorException : Exception
     {
         public DeploymentErrorException(string message) : base(message) { }
     }

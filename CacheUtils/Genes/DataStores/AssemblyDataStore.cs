@@ -26,14 +26,14 @@ namespace CacheUtils.Genes.DataStores
 
         public static AssemblyDataStore Create(string description, ILogger logger,
             FilePaths.AssemblySpecificPaths paths, IDictionary<string, IChromosome> refNameToChromosome,
-            IDictionary<string, IChromosome> accessionToChromosome, bool useGrch37)
+            bool useGrch37)
         {
             string ensemblGtfPath      = useGrch37 ? ExternalFiles.EnsemblGtfFile37.FilePath      : ExternalFiles.EnsemblGtfFile38.FilePath;
             string refseqGffPath       = useGrch37 ? ExternalFiles.RefSeqGffFile37.FilePath       : ExternalFiles.RefSeqGffFile38.FilePath;
             string refseqGenomeGffPath = useGrch37 ? ExternalFiles.RefSeqGenomeGffFile37.FilePath : ExternalFiles.RefSeqGenomeGffFile38.FilePath;
 
             var ensemblGtf = EnsemblGtf.Create(ensemblGtfPath, refNameToChromosome);
-            var refSeqGff  = RefSeqGff.Create(refseqGffPath, refseqGenomeGffPath, accessionToChromosome);
+            var refSeqGff  = RefSeqGff.Create(refseqGffPath, refseqGenomeGffPath, refNameToChromosome);
 
             var (refIndexToChromosome, _, _) = SequenceHelper.GetDictionaries(paths.ReferencePath);
             var globalCache = GlobalCache.Create(paths.RefSeqCachePath, paths.EnsemblCachePath, refIndexToChromosome, refNameToChromosome);

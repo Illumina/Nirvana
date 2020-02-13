@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Genome;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
@@ -15,8 +16,6 @@ namespace UnitTests.SAUtils
 {
     public sealed class NsaProviderTests
     {
-        private readonly Chromosome _chrom1 = new Chromosome("chr1", "1", 0);
-
         private IAnnotationProvider GetDbSnpProvider()
         {
             var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
@@ -83,7 +82,7 @@ namespace UnitTests.SAUtils
         public void Annotate_alleleSpecific()
         {
             var provider = GetDbSnpProvider();
-            var position = GetPosition(_chrom1, 100, "A", new []{"T"});
+            var position = GetPosition(ChromosomeUtilities.Chr1, 100, "A", new []{"T"});
 
             provider.Annotate(position);
             var jsonString = position.AnnotatedVariants[0].GetJsonString("chr1");
@@ -94,12 +93,11 @@ namespace UnitTests.SAUtils
         public void Annotate_notAlleleSpecific_isArray()
         {
             var provider = GetClinVarProvider();
-            var position = GetPosition(_chrom1, 100, "A", new[] { "T" });
+            var position = GetPosition(ChromosomeUtilities.Chr1, 100, "A", new[] { "T" });
 
             provider.Annotate(position);
             var jsonString = position.AnnotatedVariants[0].GetJsonString("chr1");
             Assert.Equal("{\"chromosome\":\"chr1\",\"begin\":100,\"end\":100,\"refAllele\":\"A\",\"altAllele\":\"T\",\"variantType\":\"SNV\",\"clinvar\":[{RCV00001,\"isAlleleSpecific\":true},{RCV00002}]}", jsonString);
         }
-
     }
 }

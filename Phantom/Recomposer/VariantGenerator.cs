@@ -8,7 +8,6 @@ using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Variants;
-using Vcf.VariantCreator;
 
 namespace Phantom.Recomposer
 {

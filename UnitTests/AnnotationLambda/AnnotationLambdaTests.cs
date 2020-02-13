@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using Cloud.Messages.Annotation;
 using Compression.Utilities;
-using Genome;
 using IO;
 using Tabix;
 using UnitTests.TestUtilities;
@@ -12,8 +10,6 @@ namespace UnitTests.AnnotationLambda
 {
     public sealed class AnnotationLambdaTests
     {
-        private readonly Dictionary<string, IChromosome> _refNameToChromosome = new Dictionary<string, IChromosome> { ["chr22"] = new Chromosome("chr22", "22", 21) };
-
         [Fact]
         public void GetTabixVirtualPosition_AsExpected()
         {
@@ -28,9 +24,9 @@ namespace UnitTests.AnnotationLambda
             var tabixStream = FileUtilities.GetReadStream(annotationConfig.tabixUrl);
             
             var indexReader = new BinaryReader(GZipUtilities.GetAppropriateReadStream(annotationConfig.tabixUrl));
-            var expectedPosition = Reader.Read(indexReader, _refNameToChromosome).GetOffset("chr22", annotationConfig.annotationRange.Start.Position);
+            var expectedPosition = Reader.Read(indexReader, ChromosomeUtilities.RefNameToChromosome).GetOffset("chr22", annotationConfig.annotationRange.Start.Position);
 
-            var virtualPosition = global::AnnotationLambda.AnnotationLambda.GetTabixVirtualPosition(annotationConfig.annotationRange, tabixStream, _refNameToChromosome);
+            var virtualPosition = global::AnnotationLambda.AnnotationLambda.GetTabixVirtualPosition(annotationConfig.annotationRange, tabixStream, ChromosomeUtilities.RefNameToChromosome);
 
             Assert.Equal(expectedPosition, virtualPosition);
         }

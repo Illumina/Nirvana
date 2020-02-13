@@ -6,7 +6,7 @@ namespace Intervals
     {
 		public readonly Interval<T>[] Array;
 
-        public IntervalArray(Interval<T>[] array)
+		public IntervalArray(Interval<T>[] array)
 		{
 			Array = array;
 			SetMaxIntervals();
@@ -15,12 +15,9 @@ namespace Intervals
 		/// <summary>
 		/// returns true if there are any overlapping intervals in the specified region
 		/// </summary>
-		public bool OverlapsAny(int begin, int end)
-		{
-			return GetFirstIndexAny(begin, end) >= 0;
-		}
+		public bool OverlapsAny(int begin, int end) => GetFirstIndexAny(begin, end) >= 0;
 
-        /// <summary>
+		/// <summary>
 		/// returns values for all intervals that overlap the specified interval
 		/// </summary>
 		public T[] GetAllOverlappingValues(int begin, int end)

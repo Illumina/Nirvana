@@ -44,7 +44,7 @@ namespace UnitTests.SingleAnnotationLambda
         {
             id             = "Test",
             genomeAssembly = "Assembly",
-            variant        = new SingleVariant()
+            variant        = new SingleVariant
             {
                 chromosome = "1",
                 position   = 100,

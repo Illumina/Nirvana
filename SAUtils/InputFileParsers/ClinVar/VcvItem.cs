@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using OptimizedCore;
-using SAUtils.DataStructures;
 using VariantAnnotation.IO;
 
 namespace SAUtils.InputFileParsers.ClinVar

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using IO;
-using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.ClinVar;
 using UnitTests.TestUtilities;
 using Xunit;

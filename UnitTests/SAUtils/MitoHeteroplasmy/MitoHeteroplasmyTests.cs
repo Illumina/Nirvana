@@ -1,9 +1,8 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using Genome;
 using Moq;
 using SAUtils.MitoHeteroplasmy;
+using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using Xunit;
 
@@ -11,21 +10,11 @@ namespace UnitTests.SAUtils.MitoHeteroplasmy
 {
     public sealed class MitoHeteroplasmyTests
     {
-        private static readonly IChromosome ChrM = new Chromosome("chrM", "MT", 24);
         private static ISequenceProvider GetSequenceProvider()
         {
-            var refNameToChrom = new Dictionary<string, IChromosome>()
-            {
-                {"MT", ChrM}
-            };
-            var refIndexToChrom = new Dictionary<ushort, IChromosome>()
-            {
-                { ChrM.Index, ChrM}
-            };
-
             var mockProvider = new Mock<ISequenceProvider>();
-            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(refNameToChrom);
-            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(refIndexToChrom);
+            mockProvider.SetupGet(x => x.RefNameToChromosome).Returns(ChromosomeUtilities.RefNameToChromosome);
+            mockProvider.SetupGet(x => x.RefIndexToChromosome).Returns(ChromosomeUtilities.RefIndexToChromosome);
             return mockProvider.Object;
         }
         private static Stream GetStream()

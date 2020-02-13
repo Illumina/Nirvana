@@ -114,6 +114,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         public int Length => _codingRegion.Length;
+        public Band[] CytogeneticBands => null;
 
         public string Substring(int offset, int length)
         {
