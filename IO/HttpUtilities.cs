@@ -31,9 +31,18 @@ namespace IO
             {
                 try
                 {
-                    if (retryCounter > 0) Thread.Sleep(2_000);
+                    if (retryCounter > 0)
+                    {
+                        Console.WriteLine($"Attempt {retryCounter+1} to get response from {url}");
+                        Thread.Sleep(2_000);
+                    }
 
                     var request = (HttpWebRequest) WebRequest.Create(url);
+                    if (retryCounter > 0)
+                    {
+                        Console.WriteLine($"Succeeded at attempt#: {retryCounter+1}");
+                    }
+
                     return (HttpWebResponse) request.GetResponse();
                 }
                 catch (Exception e)

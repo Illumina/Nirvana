@@ -48,7 +48,6 @@ namespace GeneAnnotationLambda
                 snsTopicArn = LambdaUtilities.GetEnvironmentVariable(LambdaUtilities.SnsTopicKey);
 
                 config.Validate();
-                LambdaUtilities.ValidateSupplementaryData(GenomeAssembly.GRCh37, "latest");
                 string result = GetGeneAnnotation(config, _saManifestUrl, _saPathPrefix);
                 
                 return LambdaResponse.Create(config.id, LambdaUrlHelper.SuccessMessage, result);

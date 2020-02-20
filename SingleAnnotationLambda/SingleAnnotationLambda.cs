@@ -50,9 +50,7 @@ namespace SingleAnnotationLambda
                 config.Validate();
 
                 GenomeAssembly genomeAssembly = GenomeAssemblyHelper.Convert(config.genomeAssembly);
-                LambdaUtilities.ValidateCoreData(genomeAssembly);
-                LambdaUtilities.ValidateSupplementaryData(genomeAssembly, config.supplementaryAnnotations);
-
+                
                 var cacheConfiguration        = new CacheConfiguration(genomeAssembly, config.supplementaryAnnotations, config.vepVersion);
                 bool preloadRequired          = !string.IsNullOrEmpty(config.supplementaryAnnotations);
                 AnnotationResources annotationResources = GetAndCacheAnnotationResources(config, cacheConfiguration);

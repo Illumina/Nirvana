@@ -64,9 +64,6 @@ namespace NirvanaLambda
 
                 var genomeAssembly = GenomeAssemblyHelper.Convert(config.genomeAssembly);
 
-                LambdaUtilities.ValidateCoreData(genomeAssembly);
-                LambdaUtilities.ValidateSupplementaryData(genomeAssembly, config.supplementaryAnnotations);
-
                 if (!_supportedAssemblies.Contains(genomeAssembly))
                     throw new UserErrorException($"Unsupported assembly: {config.genomeAssembly}");
 

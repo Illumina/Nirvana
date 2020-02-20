@@ -130,8 +130,6 @@ namespace CustomAnnotationLambda
         {
             var parser = VariantAnnotationsParser.Create(new StreamReader(GZipUtilities.GetAppropriateStream(customTsvStream)));
 
-            LambdaUtilities.ValidateCoreData(parser.Assembly);
-
             parser.SequenceProvider = new ReferenceSequenceProvider(PersistentStreamUtils.GetReadStream(LambdaUrlHelper.GetRefUrl(parser.Assembly)));
 
             return parser;
