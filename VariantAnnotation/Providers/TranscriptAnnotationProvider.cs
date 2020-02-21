@@ -54,7 +54,7 @@ namespace VariantAnnotation.Providers
 
             Assembly           = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
-            if (conservationProvider != null) DataSourceVersions.Concat(new[] {conservationProvider.Version});
+            if (conservationProvider != null) DataSourceVersions = DataSourceVersions.Concat(new[] {conservationProvider.Version});
 
             _siftStream = PersistentStreamUtils.GetReadStream(CacheConstants.SiftPath(pathPrefix));
             _siftReader = new PredictionCacheReader(_siftStream, PredictionCacheReader.SiftDescriptions);
