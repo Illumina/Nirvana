@@ -4,7 +4,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.DbVar
 {
-    public class DosageSensitivityParserTests
+    public sealed class DosageSensitivityParserTests
     {
         private static Stream GetStream()
         {

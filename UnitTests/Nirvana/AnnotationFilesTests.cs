@@ -5,7 +5,7 @@ using Xunit;
 
 namespace UnitTests.Nirvana
 {
-    public class AnnotationFilesTests
+    public sealed class AnnotationFilesTests
     {
         [Fact]
         public void GetFiles_FromDirectory_AsExpected()
@@ -17,13 +17,13 @@ namespace UnitTests.Nirvana
             var expectedNsaFiles = new List<(string, string)>
             {
                 (Path.Combine(saDirectory, "sa1.nsa"), Path.Combine(saDirectory, "sa1.nsa.idx")),
-                (Path.Combine(saDirectory, "sa2.nsa"), Path.Combine(saDirectory, "sa2.nsa.idx")),
+                (Path.Combine(saDirectory, "sa2.nsa"), Path.Combine(saDirectory, "sa2.nsa.idx"))
             };
 
             var expectedNsiFiles = new List<string>
             {
                 Path.Combine(saDirectory, "sa3.nsi"),
-                Path.Combine(saDirectory, "sa4.nsi"),
+                Path.Combine(saDirectory, "sa4.nsi")
             };
 
             var expectedConservationFile = (Path.Combine(saDirectory, "sa5.npd"), Path.Combine(saDirectory, "sa5.npd.idx"));

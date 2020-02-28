@@ -31,7 +31,7 @@ namespace SAUtils.ExtractMiniXml
 	        return ExitCodes.Success;
         }
 
-	    public static List<string> GetAccessions(string accString)
+	    private static List<string> GetAccessions(string accString)
 	    {
 		    var accessions = new List<string>();
 		    if (Directory.Exists(accString))

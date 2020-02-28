@@ -16,14 +16,14 @@ namespace NirvanaLambda
 {
     public static class PartitionUtilities
     {
-        public static List<long> GetFileOffsets(string vcfUrl, int numPartitions, Index tabixIndex)
+        public static List<long> GetFileOffsets(string vcfUrl, int numPartitions, Tabix.Index tabixIndex)
         {
             long fileSize = HttpUtilities.GetLength(vcfUrl);
             long[] sizeBasedOffsets = GetEqualSizeOffsets(fileSize, numPartitions);
             return GetBlockOffsets(sizeBasedOffsets, tabixIndex);
         }
 
-        private static List<long> GetBlockOffsets(long[] sizeBasedOffsets, Index tabixIndex)
+        private static List<long> GetBlockOffsets(long[] sizeBasedOffsets, Tabix.Index tabixIndex)
         {
             long[] allLinearOffsets = GetAllLinearFileOffsets(tabixIndex);
 
@@ -62,7 +62,7 @@ namespace NirvanaLambda
             return offsets;
         }
 
-        private static long[] GetAllLinearFileOffsets(Index tabixIndex) =>
+        private static long[] GetAllLinearFileOffsets(Tabix.Index tabixIndex) =>
         MergeConsecutiveEqualValues(tabixIndex.ReferenceSequences.SelectMany(x => x.LinearFileOffsets.Select(y => VirtualPosition.From((long)y).FileOffset))).ToArray();
 
         public static IEnumerable<T> MergeConsecutiveEqualValues<T>(IEnumerable<T> values)
@@ -116,7 +116,7 @@ namespace NirvanaLambda
                 //The end position in an annotation range can be smaller than 1, which indicate it ends at the end of previous chromosome
                 yield return new AnnotationRange(adjustedStarts[i], new AnnotationPosition(adjustedStarts[i + 1].Chromosome, adjustedStarts[i + 1].Position - 1));
             
-            yield return new AnnotationRange(adjustedStarts[adjustedStarts.Count - 1], null);
+            yield return new AnnotationRange(adjustedStarts[^1], null);
         }
 
 

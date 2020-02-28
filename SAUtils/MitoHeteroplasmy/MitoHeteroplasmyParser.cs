@@ -69,7 +69,7 @@ namespace SAUtils.MitoHeteroplasmy
             
         }
 
-        private IEnumerable<(string, string, AlleleStats)> GetAlleleStats(PositionStats stats)
+        private static IEnumerable<(string, string, AlleleStats)> GetAlleleStats(PositionStats stats)
         {
             if (stats.A_C != null) yield return ("A", "C", stats.A_C);
             if (stats.A_G != null) yield return ("A", "G", stats.A_G);

@@ -17,8 +17,7 @@ namespace UnitTests.Vcf
 
             var vcfFilter = new VcfFilter(annotationRange);
 
-            var firstLineInRange =
-                "chr1\t100\t.\tC\tT\t165.00\tPASS\tSNVSB=-12.5;SNVHPOL=2\tGT:GQ:GQX:DP:DPF:AD\t0/1:119:35:25:0:8,17";
+            const string firstLineInRange = "chr1\t100\t.\tC\tT\t165.00\tPASS\tSNVSB=-12.5;SNVHPOL=2\tGT:GQ:GQX:DP:DPF:AD\t0/1:119:35:25:0:8,17";
 
             using (var ms = new MemoryStream())
             {
@@ -52,7 +51,7 @@ namespace UnitTests.Vcf
 
             var vcfFilter = new VcfFilter(annotationRange);
 
-            var firstLineInRange = "1\t100\t.\tC\tT\t165.00\tPASS\tSNVSB=-12.5;SNVHPOL=2\tGT:GQ:GQX:DP:DPF:AD\t0/1:119:35:25:0:8,17";
+            const string firstLineInRange = "1\t100\t.\tC\tT\t165.00\tPASS\tSNVSB=-12.5;SNVHPOL=2\tGT:GQ:GQX:DP:DPF:AD\t0/1:119:35:25:0:8,17";
 
             using (var ms = new MemoryStream())
             {

@@ -112,8 +112,10 @@ namespace SAUtils.InputFileParsers.ClinVar
 			        yield return clinVarItem;
 			        continue;
 		        }
+		        
 		        var vcvId = clinVarItem.VariationId.Value;
 		        var vcvIndex = SuppDataUtilities.BinarySearch(vcvList, vcvId);
+		        
 		        if (vcvIndex < 0)
 		        {
 			        Console.WriteLine($"Unknown vcv id:{vcvId} found in {clinVarItem.Id}");
@@ -132,7 +134,6 @@ namespace SAUtils.InputFileParsers.ClinVar
 			        vcvItem.Accession, vcvItem.Version, vcvItem.LastUpdatedDate, vcvItem.ReviewStatus, vcvItem.Significances);
 
 		        yield return clinVarItem;
-
 	        }
 
 	        Console.WriteLine($"{unknownVcvs.Count} unknown VCVs found in RCVs.");
@@ -554,7 +555,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		    
 		}
 
-        private void UpdateVariantType(ClinvarVariant variant)
+        private static void UpdateVariantType(ClinvarVariant variant)
         {
             var refAllele = variant.RefAllele;
             var altAllele = variant.AltAllele;

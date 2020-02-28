@@ -6,7 +6,7 @@ using CacheUtils.Genes.Utilities;
 using CacheUtils.Utilities;
 using Genome;
 using Intervals;
-using VariantAnnotation.Interface;
+using IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
 
@@ -14,16 +14,14 @@ namespace CacheUtils.TranscriptCache
 {
     public sealed class TranscriptCacheBuilder
     {
-        private readonly ILogger _logger;
         private readonly GenomeAssembly _genomeAssembly;
         private readonly Source _source;
         private readonly long _vepReleaseTicks;
         private readonly ushort _vepVersion;
 
-        public TranscriptCacheBuilder(ILogger logger, GenomeAssembly genomeAssembly, Source source,
-            long vepReleaseTicks, ushort vepVersion)
+        public TranscriptCacheBuilder(GenomeAssembly genomeAssembly, Source source, long vepReleaseTicks,
+            ushort vepVersion)
         {
-            _logger          = logger;
             _genomeAssembly  = genomeAssembly;
             _source          = source;
             _vepReleaseTicks = vepReleaseTicks;
@@ -33,9 +31,9 @@ namespace CacheUtils.TranscriptCache
         public TranscriptCacheStaging CreateTranscriptCache(MutableTranscript[] mutableTranscripts,
             IEnumerable<IRegulatoryRegion> regulatoryRegions, IIntervalForest<UgaGene> geneForest, int numRefSeqs)
         {
-            _logger.Write("- assigning UGA genes to transcripts... ");
+            Logger.Write("- assigning UGA genes to transcripts... ");
             AssignUgaGenesToTranscripts(mutableTranscripts, geneForest);
-            _logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
 
             var transcriptIntervalArrays       = mutableTranscripts.ToTranscripts().ToIntervalArrays(numRefSeqs);
             var regulatoryRegionIntervalArrays = regulatoryRegions.ToIntervalArrays(numRefSeqs);

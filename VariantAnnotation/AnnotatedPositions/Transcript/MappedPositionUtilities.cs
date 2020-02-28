@@ -57,7 +57,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (startRegion.Type != TranscriptRegionType.Exon && endRegion.Type != TranscriptRegionType.Exon)
                 return (-1, -1);
 
-            int codingEnd = onReverseStrand ? regions[0].CdnaEnd : regions[regions.Length - 1].CdnaEnd;
+            int codingEnd = onReverseStrand ? regions[0].CdnaEnd : regions[^1].CdnaEnd;
 
             cdnaStart = GetCoveredCdnaPosition(cdnaStart, startRegion, startRegionIndex, onReverseStrand, codingEnd);
             cdnaEnd   = GetCoveredCdnaPosition(cdnaEnd, endRegion, endRegionIndex, onReverseStrand, codingEnd);
@@ -68,7 +68,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private static ITranscriptRegion GetCoveredRegion(this ITranscriptRegion[] regions, int regionIndex)
         {
             if (regionIndex == -1) return regions[0];
-            return regionIndex == ~regions.Length ? regions[regions.Length - 1] : regions[regionIndex];
+            return regionIndex == ~regions.Length ? regions[^1] : regions[regionIndex];
         }
 
         private static int GetCoveredCdnaPosition(int cdnaPosition, ITranscriptRegion region, int regionIndex, bool onReverseStrand, int codingEnd)

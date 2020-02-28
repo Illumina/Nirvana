@@ -87,7 +87,7 @@ namespace SAUtils.CreateGnomadDb
             ;
         }
 
-        public static GnomadItem MergeItems(GnomadItem item1, GnomadItem item2)
+        private static GnomadItem MergeItems(GnomadItem item1, GnomadItem item2)
         {
             if (item1.Chromosome.Index != item2.Chromosome.Index
                || item1.Position != item2.Position

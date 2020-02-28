@@ -50,7 +50,7 @@ namespace UnitTests.SAUtils.PrimateAi
         {
             var entrezToHgnc = new Dictionary<string, string>
             {
-                { "79501", "Gene1" },
+                { "79501", "Gene1" }
             };
 
             var ensemblToHgnc = new Dictionary<string, string>

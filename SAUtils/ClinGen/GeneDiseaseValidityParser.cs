@@ -9,7 +9,7 @@ namespace SAUtils.ClinGen
     public sealed class GeneDiseaseValidityParser: IDisposable
     {
         private readonly Stream _stream;
-        private Dictionary<int, string> _hgncIdToSymbols;
+        private readonly Dictionary<int, string> _hgncIdToSymbols;
 
         private readonly HashSet<int> _unknownIds = new HashSet<int>();
         private readonly HashSet<string> _classificationSet = new HashSet<string>
@@ -94,7 +94,7 @@ namespace SAUtils.ClinGen
             return latestAnnotations;
         }
 
-        private void AddLatest(Dictionary<string, GeneDiseaseValidityItem> annotations, GeneDiseaseValidityItem geneAnnotation)
+        private static void AddLatest(Dictionary<string, GeneDiseaseValidityItem> annotations, GeneDiseaseValidityItem geneAnnotation)
         {
             if(!annotations.TryGetValue(geneAnnotation.DiseaseId, out var diseaseItem)) annotations.Add(geneAnnotation.DiseaseId, geneAnnotation);
             else

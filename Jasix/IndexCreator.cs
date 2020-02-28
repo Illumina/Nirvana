@@ -10,29 +10,22 @@ using Jasix.DataStructures;
 using Newtonsoft.Json;
 using OptimizedCore;
 
-
 namespace Jasix
 {
     public sealed class IndexCreator : IDisposable
     {
-        #region members
         private readonly BgzipTextReader _reader;
         private readonly Stream _writeStream;
-        private readonly HashSet<string> _processedChromosome;
 
         private readonly Benchmark _chromBenchmark;
         private readonly Benchmark _benchmark;
 
-        #endregion
-
-       
         public IndexCreator(BlockGZipStream readStream, Stream writeStream)
         {
-            _reader              = new BgzipTextReader(readStream);
-            _writeStream         = writeStream;
-            _processedChromosome = new HashSet<string>();
-            _chromBenchmark      = new Benchmark();
-            _benchmark           = new Benchmark();
+            _reader         = new BgzipTextReader(readStream);
+            _writeStream    = writeStream;
+            _chromBenchmark = new Benchmark();
+            _benchmark      = new Benchmark();
         }
 
         public IndexCreator(string fileName)
@@ -63,7 +56,7 @@ namespace Jasix
 
         private string IndexPositions(JasixIndex index)
         {
-// we need the location before accessing the line
+            // we need the location before accessing the line
             long linePosition = _reader.Position;
             index.BeginSection(JasixCommons.PositionsSectionTag, linePosition);
             Console.WriteLine($"section:{JasixCommons.PositionsSectionTag} starts at {linePosition}");
@@ -149,11 +142,6 @@ namespace Jasix
         // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
         private void CheckSorting(string chr, int pos, string previousChr, int previousPos)
         {
-            if (chr != previousChr && _processedChromosome.Contains(chr))
-            {
-                throw new UserErrorException($"the Json file is not sorted at {chr}: {pos}");
-            }
-
             if (chr == previousChr && pos < previousPos)
             {
                 throw new UserErrorException($"the Json file is not sorted at {chr}: {pos}");

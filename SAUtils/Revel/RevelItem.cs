@@ -9,17 +9,17 @@ namespace SAUtils.Revel
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
-        public string Score;
+        private readonly string _score;
         
         public RevelItem(IChromosome chromosome, int position, string refAllele, string altAllele, string score)
         {
             Chromosome = chromosome;
-            Position = position;
-            RefAllele = refAllele;
-            AltAllele = altAllele;
-            Score = score;
+            Position   = position;
+            RefAllele  = refAllele;
+            AltAllele  = altAllele;
+            _score     = score;
         }
         
-        public string GetJsonString() => $"\"score\":{Score}";
+        public string GetJsonString() => $"\"score\":{_score}";
     }
 }

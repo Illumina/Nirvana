@@ -93,25 +93,6 @@ namespace SAUtils.SpliceAi
             return enstToGeneSymbols;
         }
 
-        public static IntervalForest<string> GetGeneForest(TranscriptCacheData transcriptData)
-        {
-            var geneDictionary = new Dictionary<ushort, List<Interval<string>>> ();
-            foreach (var gene in transcriptData.Genes)
-            {
-                if (!geneDictionary.ContainsKey(gene.Chromosome.Index))
-                    geneDictionary[gene.Chromosome.Index] = new List<Interval<string>>();
-
-                geneDictionary[gene.Chromosome.Index].Add(new Interval<string>(gene.Start, gene.End, gene.Symbol));
-            }
-            var geneIntervalArrays = new IntervalArray<string>[geneDictionary.Keys.Max()+1];
-            foreach (var (index, geneIntervals) in geneDictionary)
-            {
-                geneIntervalArrays[index] = new IntervalArray<string>( geneIntervals.OrderBy(x=>x.Begin).ThenBy(x=>x.End).ToArray());
-            }
-
-            return new IntervalForest<string>(geneIntervalArrays);
-        }
-
         public static Dictionary<string, string> GetSymbolMapping(Dictionary<string, string> spliceAiEnstToGeneSymbols, Dictionary<string, string> nirEnstToGeneSymbols)
         {
             var spliceToNirSymbols= new Dictionary<string, string>();

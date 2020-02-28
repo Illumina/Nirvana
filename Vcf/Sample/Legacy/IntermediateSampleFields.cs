@@ -12,11 +12,11 @@ namespace Vcf.Sample.Legacy
         public int? TotalAlleleCount { get; }
         public string VcfRefAllele { get; }
         public int? MajorChromosomeCount { get; }
-        public int? CopyNumber { get; }        
-        public string RepeatNumber { get; }
+        public int? CopyNumber { get; }
+
         // ReSharper disable InconsistentNaming
-        public float? AQ { get; }
-        public float? LQ { get; }
+        private float? AQ { get; }
+        private float? LQ { get; }
         public double? VF { get; }
         public int? TIR { get; }
         public int? TAR { get; }
@@ -24,7 +24,8 @@ namespace Vcf.Sample.Legacy
         public int? CCount { get; }
         public int? GCount { get; }
         public int? TCount { get; }
-        public string[] DST { get; }
+
+        private string[] DST { get; }
         // ReSharper restore InconsistentNaming
 
         // ReSharper disable once SuggestBaseTypeForParameter
@@ -42,7 +43,7 @@ namespace Vcf.Sample.Legacy
             LQ                   = GetFloat(GetString(formatIndices.LQ, sampleCols));
             VF                   = GetDouble(GetString(formatIndices.VF, sampleCols));
 
-            (CopyNumber, RepeatNumber) = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
+            (CopyNumber, _) = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
 
             (ACount, CCount, GCount, TCount, TotalAlleleCount) = GetAlleleCounts(
                 GetString(formatIndices.AU, sampleCols), GetString(formatIndices.CU, sampleCols),
@@ -57,13 +58,7 @@ namespace Vcf.Sample.Legacy
             return s == "." ? null : s;
         }
 
-        internal static bool GetBool(string s, string trueString)
-        {
-            if (s == null) return false;
-            return s == trueString;
-        }
-
-        internal static float? GetFloat(string s)
+        private static float? GetFloat(string s)
         {
             if (s == null) return null;
             if (float.TryParse(s, out float ret)) return ret;
@@ -77,7 +72,7 @@ namespace Vcf.Sample.Legacy
             return null;
         }
 
-        internal static int? GetInteger(string s)
+        private static int? GetInteger(string s)
         {
             if (s == null) return null;
             (int number, bool foundError) = s.OptimizedParseInt32();

@@ -1,7 +1,7 @@
-﻿// ReSharper disable InconsistentNaming
-
-namespace Cloud.Messages.Custom
+﻿namespace Cloud.Messages.Custom
 {
+    // ReSharper disable NotAccessedField.Global
+    // ReSharper disable InconsistentNaming
     public sealed class CustomResult
     {
         public string id;
@@ -9,4 +9,6 @@ namespace Cloud.Messages.Custom
         public string genomeAssembly;
         public FileList created;
     }
+    // ReSharper restore InconsistentNaming
+    // ReSharper restore NotAccessedField.Global
 }

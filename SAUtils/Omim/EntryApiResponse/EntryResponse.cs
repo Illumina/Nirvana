@@ -1,13 +1,15 @@
 ﻿namespace SAUtils.Omim.EntryApiResponse
 {
-    public class EntryRoot
+    // ReSharper disable InconsistentNaming
+    public sealed class EntryRoot
     {
         public RootItem omim;
     }
 
+    // ReSharper disable ClassNeverInstantiated.Global
     public class RootItem
     {
-        public string version;
+        public string  version;
         public Entry[] entryList;
     }
 
@@ -18,9 +20,9 @@
 
     public class EntryItem
     {
-        public int mimNumber;
+        public int           mimNumber;
         public TextSection[] textSectionList;
-        public GeneMap geneMap;
+        public GeneMap       geneMap;
     }
 
     public class TextSection
@@ -34,4 +36,6 @@
         public string textSectionTitle;
         public string textSectionContent;
     }
+    // ReSharper restore ClassNeverInstantiated.Global
+    // ReSharper restore InconsistentNaming
 }

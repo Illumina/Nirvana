@@ -122,7 +122,7 @@ namespace IO
 
         private static void Log(string methodName, Exception e)
         {
-            Logger.LogLine($"Retrying exception found in {methodName}");
+            Logger.WriteLine($"Retrying exception found in {methodName}");
             Logger.Log(e);
         }
 

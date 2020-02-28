@@ -70,7 +70,7 @@ namespace Variants
                     Math.Max(rotatingBases.Length,
                         MaxDownstreamLength)); // for large rotatingBases, we need to factor in its length but still make sure that we do not go past the end of transcript
 
-            var downStreamSeq = onReverseStrand
+            string downStreamSeq = onReverseStrand
                 ? SequenceUtilities.GetReverseComplement(
                     refSequence.Substring(simpleVariant.Start - 1 - downStreamLength, downStreamLength))
                 : refSequence.Substring(simpleVariant.End, downStreamLength);

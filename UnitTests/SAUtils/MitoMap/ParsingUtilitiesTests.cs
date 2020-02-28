@@ -6,13 +6,13 @@ namespace UnitTests.SAUtils.MitoMap
 {
     public sealed class ParsingUtilitiesTests
     {
-        private static MitoMapInputDb MitoMapInputDb = new MitoMapInputDb(new Dictionary<string, string>
+        private static readonly MitoMapInputDb MitoMapInputDb = new MitoMapInputDb(new Dictionary<string, string>
         {
             {"1", "101"},
             {"2", "102"},
             {"13", "103"},
             {"4100", "104"},
-            {"5678", "105"},
+            {"5678", "105"}
         });
 
         [Theory]

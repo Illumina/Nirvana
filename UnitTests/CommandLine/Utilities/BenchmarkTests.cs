@@ -27,10 +27,11 @@ namespace UnitTests.CommandLine.Utilities
         [Fact]
         public void Benchmark_EndToEnd()
         {
-            var benchmark            = new Benchmark();
+            var benchmark   = new Benchmark();
+            var elapsedTime = benchmark.GetElapsedTime();
             // perform some work
-            benchmark.GetElapsedIterationTime(100, out double unitsPerSecond);
-            Assert.True(unitsPerSecond>0);
+            double unitsPerSecond = Benchmark.GetElapsedIterationsPerSecond(elapsedTime, 100);
+            Assert.True(unitsPerSecond > 0);
         }
     }
 }

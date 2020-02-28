@@ -15,7 +15,7 @@ namespace SAUtils.Revel
         private const int RefIndex = 2;
         private const int AltIndex = 3;
         private const int ScoreIndex = 6;
-        private static string[] altAlleles = {"A", "C", "G", "T"};
+        private static readonly string[] AltAlleles = {"A", "C", "G", "T"};
         private readonly StreamReader _reader;
         private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly IDictionary<string, string> _highestScores;
@@ -73,7 +73,7 @@ namespace SAUtils.Revel
         private static IEnumerable<ISupplementaryDataItem> GetItemsAtOnePosition(IChromosome currentChromosome, int currentPosition, string refAllele, IDictionary<string, string> highestScores)
         {
             if (currentChromosome == null) yield break;
-            foreach (var altAllele in altAlleles)
+            foreach (var altAllele in AltAlleles)
             {
                 var score = highestScores[altAllele];
                 if (score == null) continue;

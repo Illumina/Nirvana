@@ -47,7 +47,7 @@ namespace Phantom.Graph
             }
         }
 
-        public IEnumerable<T> GetVertices() => _vertexToNeighbors.Keys;
+        private IEnumerable<T> GetVertices() => _vertexToNeighbors.Keys;
 
         public LinkedList<T> GetNeighbors(T vertex) => _vertexToNeighbors[vertex];
 

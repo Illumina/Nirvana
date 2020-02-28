@@ -22,18 +22,18 @@ namespace Intervals
 		/// </summary>
 		public T[] GetAllOverlappingValues(int begin, int end)
 		{
-			var firstIndex = GetFirstIndex(begin, end);
+			int firstIndex = GetFirstIndex(begin, end);
 			return firstIndex == -1 ? null : AddOverlappingValues(firstIndex, begin, end);
 		}
 
         public Interval<T>[] GetAllOverlappingIntervals(int begin, int end)
         {
             var intervals = new List<Interval<T>>();
-            var firstIndex = GetFirstIndex(begin, end);
+            int firstIndex = GetFirstIndex(begin, end);
             if (firstIndex == -1) return null;
-            for (var index = firstIndex; index < Array.Length; index++)
+            for (int index = firstIndex; index < Array.Length; index++)
             {
-                var interval = Array[index];
+                Interval<T> interval = Array[index];
                 if (interval.Begin > end) break;
                 if (interval.Overlaps(begin, end)) intervals.Add(interval);
             }
@@ -47,7 +47,7 @@ namespace Intervals
 		private T[] AddOverlappingValues(int firstIndex, int begin, int end)
 		{
 			var values = new List<T>();
-			for (var index = firstIndex; index < Array.Length; index++)
+			for (int index = firstIndex; index < Array.Length; index++)
 			{
 				var interval = Array[index];
 				if (interval.Begin > end) break;
@@ -62,16 +62,16 @@ namespace Intervals
 		private int GetFirstIndex(int intervalBegin, int intervalEnd)
 		{
 			var begin = 0;
-			var end = Array.Length - 1;
+			int end = Array.Length - 1;
 
 			var lastOverlapIndex = -1;
 
 			while (begin <= end)
 			{
-				var index = begin + (end - begin >> 1);
+				int index = begin + (end - begin >> 1);
 
 				if (Array[index].Overlaps(intervalBegin, intervalEnd)) lastOverlapIndex = index;
-				var ret = Array[index].CompareMax(intervalBegin);
+				int ret = Array[index].CompareMax(intervalBegin);
 
 				if (ret <= 0) end = index - 1;
 				else begin = index + 1;
@@ -86,14 +86,14 @@ namespace Intervals
 		private int GetFirstIndexAny(int intervalBegin, int intervalEnd)
 		{
 			var begin = 0;
-			var end = Array.Length - 1;
+			int end = Array.Length - 1;
 
 			while (begin <= end)
 			{
-				var index = begin + (end - begin >> 1);
+				int index = begin + (end - begin >> 1);
 
 				if (Array[index].Overlaps(intervalBegin, intervalEnd)) return index;
-				var ret = Array[index].CompareMax(intervalBegin);
+				int ret = Array[index].CompareMax(intervalBegin);
 
 				if (ret <= 0) end = index - 1;
 				else begin = index + 1;

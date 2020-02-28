@@ -19,7 +19,7 @@ namespace Cloud.Messages.Nirvana
 
         internal void CheckRequiredFieldsNotNull()
         {
-            string BuildErrorMessage(string message) => message + " cannot be null.";
+            static string BuildErrorMessage(string message) => message + " cannot be null.";
 
             if (id                       == null) throw new UserErrorException(BuildErrorMessage("id"));
             if (genomeAssembly           == null) throw new UserErrorException(BuildErrorMessage("genomeAssembly"));

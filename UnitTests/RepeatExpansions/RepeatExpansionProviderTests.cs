@@ -82,7 +82,7 @@ namespace UnitTests.RepeatExpansions
             Assert.Equal(expectedJson, observedJson);
         }
 
-        private IAnnotatedPosition GetAnnotatedPosition(IVariant variant)
+        private static IAnnotatedPosition GetAnnotatedPosition(IVariant variant)
         {
             IVariant[] variants = { variant };
             var position = new Position(ChromosomeUtilities.Chr3, Start, End, null, null, null, null, variants, null, null, null, null,

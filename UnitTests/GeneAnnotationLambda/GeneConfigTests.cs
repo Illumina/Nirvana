@@ -4,7 +4,7 @@ using Xunit;
 
 namespace UnitTests.GeneAnnotationLambda
 {
-    public class GeneConfigTests
+    public sealed class GeneConfigTests
     {
         [Fact]
         public void Validate_NoId_ThrowException()

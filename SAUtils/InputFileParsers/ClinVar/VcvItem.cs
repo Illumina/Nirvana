@@ -5,7 +5,7 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-    public class VcvItem:IComparable<int>, IComparable<VcvItem>
+    public sealed class VcvItem : IComparable<int>, IComparable<VcvItem>
     {
         public readonly int          VariantId;
         public readonly string       Accession;

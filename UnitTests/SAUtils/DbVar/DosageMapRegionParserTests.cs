@@ -6,7 +6,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.DbVar
 {
-    public class DosageMapRegionParserTests
+    public sealed class DosageMapRegionParserTests
     { 
         private static Stream GetStream()
         {

@@ -12,7 +12,6 @@ namespace SAUtils.AAConservation
 {
     public sealed class ProteinConservationWriter:IDisposable
     {
-        private readonly Stream _stream;
         private readonly Stream _transcriptGroupStream;
         private readonly GenomeAssembly _assembly;
         private readonly ExtendedBinaryWriter _writer;
@@ -25,12 +24,10 @@ namespace SAUtils.AAConservation
 
         public ProteinConservationWriter(Stream stream, Stream groupStream, TranscriptCacheData transcriptData, DataSourceVersion version)
         {
-            _stream              = stream;
             _transcriptGroupStream = groupStream;
-            _writer              = new ExtendedBinaryWriter(_stream);
-            _transcriptCacheData = transcriptData;
-            _version             = version;
-            
+            _writer                = new ExtendedBinaryWriter(stream);
+            _transcriptCacheData   = transcriptData;
+            _version               = version;
         }
 
         public void Write(IEnumerable<ProteinConservationItem> items)
@@ -102,7 +99,7 @@ namespace SAUtils.AAConservation
             }
         }
 
-        private void CheckProteinSetOverlap(Dictionary<string, byte[]> proteinAndScores, HashSet<string> nirvanaProteins)
+        private static void CheckProteinSetOverlap(Dictionary<string, byte[]> proteinAndScores, HashSet<string> nirvanaProteins)
         {
             var count = 0;
             foreach (var protein in proteinAndScores.Keys)

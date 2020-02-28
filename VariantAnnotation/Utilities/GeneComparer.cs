@@ -19,12 +19,12 @@ namespace VariantAnnotation.Utilities
 
         public override int GetHashCode(IGene obj)
         {
-            var entrezGeneId = obj.EntrezGeneId.WithVersion;
-            var ensemblId = obj.EnsemblId.WithVersion;
+            string entrezGeneId = obj.EntrezGeneId.WithVersion;
+            string ensemblId    = obj.EnsemblId.WithVersion;
 
             unchecked
             {
-                var hashCode = obj.Start;
+                int hashCode = obj.Start;
                 hashCode = (hashCode * 397) ^ obj.End;
                 hashCode = (hashCode * 397) ^ obj.Chromosome.Index;
                 hashCode = (hashCode * 397) ^ obj.OnReverseStrand.GetHashCode();

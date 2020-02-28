@@ -27,7 +27,6 @@ namespace VariantAnnotation.TranscriptAnnotation
                 : AnnotateTranscript(transcript, rightShiftedVariant, aminoAcids, refSequence);
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
-
             
             var hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
@@ -117,16 +116,16 @@ namespace VariantAnnotation.TranscriptAnnotation
             int startIndex, ITranscriptRegion endRegion, int endIndex, IInterval variant, bool onReverseStrand,
             ICodingRegion codingRegion, byte startExonPhase, bool isInsertion)
         {
-            var (cdnaStart, cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(startRegion, endRegion, variant, onReverseStrand, isInsertion);
+            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(startRegion, endRegion, variant, onReverseStrand, isInsertion);
             if (onReverseStrand) Swap.Int(ref cdnaStart, ref cdnaEnd);
 
-            var (cdsStart, cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, cdnaStart, cdnaEnd,
+            (int cdsStart, int cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, cdnaStart, cdnaEnd,
                 startExonPhase, isInsertion);
 
-            var proteinStart = MappedPositionUtilities.GetProteinPosition(cdsStart);
-            var proteinEnd   = MappedPositionUtilities.GetProteinPosition(cdsEnd);
+            int proteinStart = MappedPositionUtilities.GetProteinPosition(cdsStart);
+            int proteinEnd   = MappedPositionUtilities.GetProteinPosition(cdsEnd);
 
-            var (exonStart, exonEnd, intronStart, intronEnd) = regions.GetExonsAndIntrons(startIndex, endIndex);
+            (int exonStart, int exonEnd, int intronStart, int intronEnd) = regions.GetExonsAndIntrons(startIndex, endIndex);
 
             return new MappedPosition(cdnaStart, cdnaEnd, cdsStart, cdsEnd, proteinStart, proteinEnd, exonStart,
                 exonEnd, intronStart, intronEnd, startIndex, endIndex);

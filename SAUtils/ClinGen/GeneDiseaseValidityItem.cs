@@ -11,19 +11,19 @@ namespace SAUtils.ClinGen
         public string GeneSymbol { get; }
 
         public readonly string DiseaseId;
-        public readonly string Disease;
-        public readonly string Classification;
-        public readonly string ClassificationDate;
+        private readonly string _disease;
+        private readonly string _classification;
+        private readonly string _classificationDate;
 
 
         public GeneDiseaseValidityItem(string geneSymbol, string diseaseId, string disease, string classification,
             string classificationDate)
         {
-            GeneSymbol         = geneSymbol;
-            DiseaseId          = diseaseId;
-            Disease            = disease;
-            Classification     = classification;
-            ClassificationDate = classificationDate;
+            GeneSymbol          = geneSymbol;
+            DiseaseId           = diseaseId;
+            _disease            = disease;
+            _classification     = classification;
+            _classificationDate = classificationDate;
         }
 
         public string GetJsonString()
@@ -33,9 +33,9 @@ namespace SAUtils.ClinGen
 
             sb.Append(JsonObject.OpenBrace);
             jsonObject.AddStringValue("diseaseId", DiseaseId);
-            jsonObject.AddStringValue("disease", Disease);
-            jsonObject.AddStringValue("classification", Classification);
-            jsonObject.AddStringValue("classificationDate", ClassificationDate);
+            jsonObject.AddStringValue("disease", _disease);
+            jsonObject.AddStringValue("classification", _classification);
+            jsonObject.AddStringValue("classificationDate", _classificationDate);
             sb.Append(JsonObject.CloseBrace);
 
             return StringBuilderCache.GetStringAndRelease(sb);
@@ -43,8 +43,8 @@ namespace SAUtils.ClinGen
 
         public int CompareDate(GeneDiseaseValidityItem other)
         {
-            var date = DateTime.ParseExact(ClassificationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-            var otherDate = DateTime.ParseExact(other.ClassificationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var date = DateTime.ParseExact(_classificationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+            var otherDate = DateTime.ParseExact(other._classificationDate, "yyyy-MM-dd", CultureInfo.InvariantCulture);
 
             return date.CompareTo(otherDate);
         }

@@ -12,6 +12,7 @@ using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using Nirvana;
+using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
@@ -24,6 +25,7 @@ using JsonWriter = VariantAnnotation.IO.JsonWriter;
 namespace SingleAnnotationLambda
 {
     // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once UnusedType.Global
     public class SingleAnnotationLambda
     {
         private const int MaxNumCacheConfigurations = 2;
@@ -79,7 +81,7 @@ namespace SingleAnnotationLambda
                 {
                     _recentCacheConfigurations.Remove(cacheConfiguration);
                     _recentCacheConfigurations.AddLast(cacheConfiguration);
-                    Logger.LogLine($"Cached configurations: {string.Join("; ", _recentCacheConfigurations)}");
+                    Logger.WriteLine($"Cached configurations: {string.Join("; ", _recentCacheConfigurations)}");
                 }
 
                 return annotationResources;
@@ -94,11 +96,11 @@ namespace SingleAnnotationLambda
                 GC.WaitForPendingFinalizers();
             }
 
-            Logger.LogLine($"Creating annotation resources for {cacheConfiguration}");
+            Logger.WriteLine($"Creating annotation resources for {cacheConfiguration}");
             annotationResources = GetAnnotationResources(input);
             _cacheConfigurationToAnnotationResources[cacheConfiguration] = annotationResources;
             _recentCacheConfigurations.AddLast(cacheConfiguration);
-            Logger.LogLine($"Cached configurations: {string.Join("; ", _recentCacheConfigurations)}");
+            Logger.WriteLine($"Cached configurations: {string.Join("; ", _recentCacheConfigurations)}");
 
             return annotationResources;
         }
@@ -111,10 +113,12 @@ namespace SingleAnnotationLambda
 
             string saManifestUrl        = LambdaUtilities.GetManifestUrl(lambdaConfig.supplementaryAnnotations, genomeAssembly);
             string annotatorVersion     = "Nirvana " + CommandLineUtilities.GetVersion(Assembly.GetAssembly(typeof(SingleAnnotationLambda)));
+            var metrics = new PerformanceMetrics();
 
-            Logger.LogLine($"Cache prefix: {cachePathPrefix}");
+            Logger.WriteLine($"Cache prefix: {cachePathPrefix}");
 
-            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> { saManifestUrl}, lambdaConfig.customAnnotations, false, false, false)
+            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,
+                new List<string> {saManifestUrl}, lambdaConfig.customAnnotations, false, false, false, metrics)
             {
                 AnnotatorVersionTag = annotatorVersion
             };
@@ -122,7 +126,7 @@ namespace SingleAnnotationLambda
             return annotationResources;
         }
 
-        public static string GetPositionAnnotation(IPosition position, IAnnotationResources resources, string[] sampleNames, bool preloadRequired)
+        private static string GetPositionAnnotation(IPosition position, IAnnotationResources resources, string[] sampleNames, bool preloadRequired)
         {
             if (preloadRequired) resources.SingleVariantPreLoad(position);
             IAnnotatedPosition annotatedPosition = resources.Annotator.Annotate(position);
@@ -141,7 +145,7 @@ namespace SingleAnnotationLambda
             return Encoding.UTF8.GetString(outputJsonStream.ToArray());
         }
 
-        public static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter,
+        private static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter,
             string jsonOutput) => jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
     }
 }

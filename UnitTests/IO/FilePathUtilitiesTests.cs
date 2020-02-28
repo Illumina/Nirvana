@@ -3,7 +3,7 @@ using Xunit;
 
 namespace UnitTests.IO
 {
-    public class FilePathUtilitiesTests
+    public sealed class FilePathUtilitiesTests
     {
         [InlineData("C:\\Input files\\input.test.mp3", ".mp3", true)]
         [InlineData("C:\\Input files\\input", "C:\\Input files\\input", true)]

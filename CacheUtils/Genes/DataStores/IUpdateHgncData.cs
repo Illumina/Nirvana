@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
-using VariantAnnotation.Interface;
 
 namespace CacheUtils.Genes.DataStores
 {
@@ -8,6 +7,5 @@ namespace CacheUtils.Genes.DataStores
     {
         Dictionary<ushort, List<MutableGene>> EnsemblGenesByRef { get; }
         Dictionary<ushort, List<MutableGene>> RefSeqGenesByRef { get; }
-        ILogger Logger { get; }
     }
 }

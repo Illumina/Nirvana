@@ -12,7 +12,7 @@ namespace SAUtils.NsaConcatenator
 {
     public static class ConcatUtilities
     {
-        internal static (IDataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, bool isPositional, GenomeAssembly assembly) GetIndexFields(List<NsaReader> nsaReaders)
+        private static (IDataSourceVersion version, string jsonKey, bool matchByAllele, bool isArray, bool isPositional, GenomeAssembly assembly) GetIndexFields(List<NsaReader> nsaReaders)
         {
             var version       = nsaReaders[0].Version;
             var jsonKey       = nsaReaders[0].JsonKey;
@@ -35,12 +35,13 @@ namespace SAUtils.NsaConcatenator
 
             return (version, jsonKey, matchByAllele, isArray, isPositional, assembly);
         }
-        public static NsaReader GetNsaReader(ushort chromIndex, List<NsaReader> nsaReaders)
+
+        private static NsaReader GetNsaReader(ushort chromIndex, List<NsaReader> nsaReaders)
         {
             if (nsaReaders == null) return null;
 
             var hasDataArray = nsaReaders.Select(x => x.HasDataBlocks(chromIndex)).ToArray();
-            var count = hasDataArray.Count(x => x == true);
+            var count = hasDataArray.Count(x => x);
 
             if (count > 1) throw new DataMisalignedException("Only one of the NSA files should have data for a given chromosome.");
 
@@ -76,12 +77,13 @@ namespace SAUtils.NsaConcatenator
                 {
                     Console.WriteLine($"Working on chromosome index: {chromIndex}");
 
-                    nsaWriter.Write(chromIndex, ConcatUtilities.GetNsaReader(chromIndex, nsaReaders));
+                    nsaWriter.Write(chromIndex, GetNsaReader(chromIndex, nsaReaders));
                 }
 
             }
         }
-        public static IEnumerable<ushort> GetChromIndices(List<NsaReader> nsaReaders)
+
+        private static IEnumerable<ushort> GetChromIndices(List<NsaReader> nsaReaders)
         {
             var indices = new List<ushort>();
             if (nsaReaders == null) return indices;

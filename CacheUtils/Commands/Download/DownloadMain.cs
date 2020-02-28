@@ -1,5 +1,4 @@
 ﻿using ErrorHandling;
-using VariantAnnotation.Logger;
 
 namespace CacheUtils.Commands.Download
 {
@@ -7,8 +6,7 @@ namespace CacheUtils.Commands.Download
     {
         private static ExitCodes ProgramExecution()
         {
-            var logger = new ConsoleLogger();
-            ExternalFiles.Download(logger);
+            ExternalFiles.Download();
             return ExitCodes.Success;
         }
 

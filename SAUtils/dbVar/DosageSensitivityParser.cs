@@ -33,9 +33,9 @@ namespace SAUtils.dbVar
         {
             var geneAnnotations = new Dictionary<string, List<ISuppGeneItem>>();
 
-            string line;
             using (var reader = new StreamReader(_stream))
             {
+                string line;
                 while ((line = reader.ReadLine()) != null)
                 {
                     if (line.StartsWith("#"))

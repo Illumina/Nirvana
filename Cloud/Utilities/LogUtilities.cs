@@ -9,7 +9,7 @@ namespace Cloud.Utilities
 {
     public static class LogUtilities
     {
-        public static void LogLambdaInfo(ILambdaContext context, string version) => Logger.LogLine(
+        public static void LogLambdaInfo(ILambdaContext context, string version) => Logger.WriteLine(
             $"Lambda version: {version} ARN: {context?.InvokedFunctionArn}\nLog group: {context?.LogGroupName}\nLog stream: {context?.LogStreamName}");
 
         public static void LogObject<T>(string title, T config)
@@ -26,7 +26,7 @@ namespace Cloud.Utilities
                     break;
             }
 
-            Logger.LogLine($"{title}:\n{json.Redact()}");
+            Logger.WriteLine($"{title}:\n{json.Redact()}");
         }
 
         public static void Log(IEnumerable<string> environmentVariables)
@@ -41,12 +41,12 @@ namespace Cloud.Utilities
                 sb.AppendLine($"- {key}: {value}");
             }
 
-            Logger.LogLine(sb.ToString());
+            Logger.WriteLine(sb.ToString());
         }
 
         public static void UpdateLogger(ILambdaLogger logger, StringBuilder sb)
         {
-            Logger.LogLine = s =>
+            Logger.WriteLine = s =>
             {
                 logger.LogLine(s);
                 sb?.Append(s + "\n");

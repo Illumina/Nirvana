@@ -11,13 +11,13 @@ namespace UnitTests.SAUtils.CustomAnnotations
     public sealed class GeneAnnotationParserTests
     {
 
-        private static Dictionary<string, string> entrezGeneIdToSymbol = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> EntrezGeneIdToSymbol = new Dictionary<string, string>
         {
             {"1", "Gene1" },
             {"2", "Gene2" }
         };
 
-        private static Dictionary<string, string> ensemblIdToSymbol = new Dictionary<string, string>
+        private static readonly Dictionary<string, string> EnsemblIdToSymbol = new Dictionary<string, string>
         {
             {"ENSG1", "Gene1" },
             {"ENSG2", "Gene2" }
@@ -47,7 +47,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                       "#type\t\tstring\tbool\tstring\tnumber\tstring\n";
 
 
-            using (var parser = new GeneAnnotationsParser(GetReadStream(headerLines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            using (var parser = new GeneAnnotationsParser(GetReadStream(headerLines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
             {
                 parser.ParseHeaderLines();
                 var expectedJsonKeys = new[] {"OMIM Description", "Is Oncogene", "phenotype", "mimNumber", "notes"};
@@ -85,7 +85,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                               "#descriptions\t.\t.\t.\t.\tSome\tText\tHere\n" +
                                               "#type\t\t\tstring\tnumber\t.\n";
 
-            using (var parser = new GeneAnnotationsParser(GetReadStream(invalidHeaderLines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            using (var parser = new GeneAnnotationsParser(GetReadStream(invalidHeaderLines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
             {
                 Assert.Throws<UserErrorException>(() => parser.ParseHeaderLines());
             }
@@ -101,7 +101,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                  "#type\t\tstring\tbool\tstring\tnumber\tstring\n" +
                                  "Abc\t3\tsome text\ttrue\tgood\t234\ttest\n";
                                  
-            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
             {
                 Assert.Throws<UserErrorException>(() => parser.GetItems());
             }
@@ -119,7 +119,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                  "Abc\t1\tsome text\ttrue\tgood\t234\ttest\n" + 
                                  "123\tENSG1\tsome other text\tfalse\tbad\t200\ttest2\n";
 
-            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
             {
                 Assert.Throws<UserErrorException>(() => parser.GetItems());
             }
@@ -136,7 +136,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                  "Abc\t1\t\t.\t\t.\t\n" +
                                  "Abc\tENSG2\tsome other text\tfalse\tbad\t200\ttest2\n";
 
-            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
             {
                 Assert.Throws<UserErrorException>(() => parser.GetItems());
             }
@@ -154,7 +154,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                  "Abc\t1\tsome text\ttrue\tgood\t234\ttest\n" +
                                  "Abc\tENSG2\tsome other text\tfalse\tbad\t200\ttest2\n";
 
-            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), entrezGeneIdToSymbol, ensemblIdToSymbol))
+            using (var parser = GeneAnnotationsParser.Create(GetReadStream(lines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
             {
                 var geneSymbol2Items = parser.GetItems();
                 Assert.Equal(2, geneSymbol2Items.Count);

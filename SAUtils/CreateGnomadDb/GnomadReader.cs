@@ -63,7 +63,6 @@ namespace SAUtils.CreateGnomadDb
 
         private bool _isLowComplexityRegion;
         private int? _totalDepth;
-        private GnomadDataType _dataType;
 
 		public GnomadReader(StreamReader genomeReader, StreamReader exomeReader, ISequenceProvider sequenceProvider) 
 		{
@@ -72,12 +71,7 @@ namespace SAUtils.CreateGnomadDb
             _sequenceProvider = sequenceProvider;
 		}
 
-        public GnomadReader(ISequenceProvider sequenceProvider)
-        {
-            _sequenceProvider = sequenceProvider;
-        }
-
-        private void Clear()
+		private void Clear()
         {
             _isLowComplexityRegion = false;
 			_acAll = null;
@@ -123,7 +117,6 @@ namespace SAUtils.CreateGnomadDb
             _control_anAll = 0;
 
             _totalDepth = null;
-            _dataType = GnomadDataType.Unknown;
         }
 
         /// <summary>
@@ -190,7 +183,7 @@ namespace SAUtils.CreateGnomadDb
             }
         }
 
-        private (Dictionary<(string refAllele, string altAllele), GnomadItem> genomeItems, Dictionary<(string refAllele, string altAllele), GnomadItem> exomeItems) GetMinItems(MinHeap<GnomadItem> minHeap)
+        private static (Dictionary<(string refAllele, string altAllele), GnomadItem> genomeItems, Dictionary<(string refAllele, string altAllele), GnomadItem> exomeItems) GetMinItems(MinHeap<GnomadItem> minHeap)
         {
             var genomeItems = new List<ISupplementaryDataItem>();
             var exomeItems = new List<ISupplementaryDataItem>();
@@ -238,7 +231,7 @@ namespace SAUtils.CreateGnomadDb
 		/// all the data objects that have been extracted.
 		/// </summary>
 		/// <returns></returns>
-        public IEnumerable<GnomadItem> GetItems(StreamReader reader, GnomadDataType type)
+        private IEnumerable<GnomadItem> GetItems(StreamReader reader, GnomadDataType type)
 		{
             if(reader == null) yield break;
 			using (reader)
@@ -261,11 +254,12 @@ namespace SAUtils.CreateGnomadDb
 			}
 		}
 
-       
+
         /// <summary>
         /// Extracts a gnomad item(s) from the specified VCF line.
         /// </summary>
         /// <param name="line"></param>
+        /// <param name="type"></param>
         /// <returns></returns>
         private List<GnomadItem> ExtractItems(string line, GnomadDataType type)
 		{
@@ -496,10 +490,7 @@ namespace SAUtils.CreateGnomadDb
                 case "DP":
 					_totalDepth = Convert.ToInt32(value);
 					break;
-
 			}
-
 		}
-
 	}
 }

@@ -93,11 +93,12 @@ namespace SAUtils.GnomadGeneScores
             return new GnomadGeneItem(gene, pLi, pRec, pNull, synZ, misZ, loeuf);
         }
 
-        private double? GetScore(string score)
+        private static double? GetScore(string score)
         {
             if (score == "NA" || score == "NaN") return null;
             return double.Parse(score);
         }
+        
         private bool GetColumnIndices(string line)
         {
             var cols = line.OptimizedSplit('\t');

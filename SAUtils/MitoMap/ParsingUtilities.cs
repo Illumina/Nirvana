@@ -11,8 +11,8 @@ namespace SAUtils.MitoMap
         {
             if (field == "0") return default;
             //"?refs=4,140,189,91687,91737&title="
-            string leadingString = "refs=";
-            string trailingString = "&title=";
+            const string leadingString = "refs=";
+            const string trailingString = "&title=";
             var leadingStringIndex = field.IndexOf(leadingString, StringComparison.Ordinal);
             var trailingStringIndex = field.IndexOf(trailingString, StringComparison.Ordinal);
             var startIndex = leadingStringIndex + leadingString.Length;

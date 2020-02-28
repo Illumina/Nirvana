@@ -11,11 +11,9 @@ using Genome;
 using Intervals;
 using IO;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 
 namespace CacheUtils.Commands.ExtractTranscripts
@@ -33,7 +31,6 @@ namespace CacheUtils.Commands.ExtractTranscripts
 
         private static ExitCodes ProgramExecution()
         {
-            var logger     = new ConsoleLogger();
             var bundle     = DataBundle.GetDataBundle(_inputReferencePath, _inputPrefix);
             int numRefSeqs = bundle.SequenceReader.NumRefSeqs;
             var chromosome = ReferenceNameUtilities.GetChromosome(bundle.SequenceReader.RefNameToChromosome, _referenceName);
@@ -41,20 +38,20 @@ namespace CacheUtils.Commands.ExtractTranscripts
 
             string outputStub = GetOutputStub(chromosome, bundle.Source);
             var interval      = new ChromosomeInterval(chromosome, _referencePosition, _referenceEndPosition);
-            var transcripts   = GetTranscripts(logger, bundle, interval);
+            var transcripts   = GetTranscripts(bundle, interval);
 
-            var sift     = GetPredictionStaging(logger, "SIFT", transcripts, chromosome, bundle.SiftPredictions, bundle.SiftReader, x => x.SiftIndex, numRefSeqs);
-            var polyphen = GetPredictionStaging(logger, "PolyPhen", transcripts, chromosome, bundle.PolyPhenPredictions, bundle.PolyPhenReader, x => x.PolyPhenIndex, numRefSeqs);
+            var sift     = GetPredictionStaging("SIFT", transcripts, chromosome, bundle.SiftPredictions, bundle.SiftReader, x => x.SiftIndex, numRefSeqs);
+            var polyphen = GetPredictionStaging("PolyPhen", transcripts, chromosome, bundle.PolyPhenPredictions, bundle.PolyPhenReader, x => x.PolyPhenIndex, numRefSeqs);
 
-            var regulatoryRegionIntervalArrays = GetRegulatoryRegionIntervalArrays(logger, bundle.TranscriptCache, interval, numRefSeqs);
+            var regulatoryRegionIntervalArrays = GetRegulatoryRegionIntervalArrays(bundle.TranscriptCache, interval, numRefSeqs);
             var transcriptIntervalArrays = PredictionUtilities.UpdateTranscripts(transcripts, bundle.SiftPredictions,
                 sift.Predictions, bundle.PolyPhenPredictions, polyphen.Predictions, numRefSeqs);
 
             var transcriptStaging = GetTranscriptStaging(bundle.TranscriptCacheData.Header, transcriptIntervalArrays, regulatoryRegionIntervalArrays);
 
-            WriteCache(logger, FileUtilities.GetCreateStream(CacheConstants.TranscriptPath(outputStub)), transcriptStaging, "transcript");
-            WriteCache(logger, FileUtilities.GetCreateStream(CacheConstants.SiftPath(outputStub)), sift.Staging, "SIFT");
-            WriteCache(logger, FileUtilities.GetCreateStream(CacheConstants.PolyPhenPath(outputStub)), polyphen.Staging, "PolyPhen");
+            WriteCache(FileUtilities.GetCreateStream(CacheConstants.TranscriptPath(outputStub)), transcriptStaging, "transcript");
+            WriteCache(FileUtilities.GetCreateStream(CacheConstants.SiftPath(outputStub)), sift.Staging, "SIFT");
+            WriteCache(FileUtilities.GetCreateStream(CacheConstants.PolyPhenPath(outputStub)), polyphen.Staging, "PolyPhen");
 
             return ExitCodes.Success;
         }
@@ -65,11 +62,11 @@ namespace CacheUtils.Commands.ExtractTranscripts
             TranscriptCacheStaging.GetStaging(header, transcriptIntervalArrays, regulatoryRegionIntervalArrays);
 
 
-        private static void WriteCache(ILogger logger, Stream stream, IStaging staging, string description)
+        private static void WriteCache(Stream stream, IStaging staging, string description)
         {
-            logger.Write($"- writing {description} cache... ");
+            Logger.Write($"- writing {description} cache... ");
             staging.Write(stream);
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
         }
 
         private static string GetOutputStub(IChromosome chromosome, Source source) => Path.Combine(_outputDirectory,
@@ -78,17 +75,17 @@ namespace CacheUtils.Commands.ExtractTranscripts
         private static string GetSource(Source source) =>
             source != Source.BothRefSeqAndEnsembl ? source.ToString() : "Both";
 
-        private static (PredictionCacheStaging Staging, Prediction[] Predictions) GetPredictionStaging(ILogger logger,
+        private static (PredictionCacheStaging Staging, Prediction[] Predictions) GetPredictionStaging(
             string description, IEnumerable<ITranscript> transcripts, IChromosome chromosome, IReadOnlyList<Prediction> oldPredictions,
             PredictionCacheReader reader, Func<ITranscript, int> indexFunc, int numRefSeqs)
         {
-            logger.Write($"- retrieving {description} predictions... ");
+            Logger.Write($"- retrieving {description} predictions... ");
 
             var indexSet          = GetUniqueIndices(transcripts, indexFunc);
             var predictionsPerRef = GetPredictions(indexSet, chromosome, numRefSeqs, oldPredictions);
             var staging           = new PredictionCacheStaging(reader.Header, predictionsPerRef);
 
-            logger.WriteLine($"found {indexSet.Count} predictions.");
+            Logger.WriteLine($"found {indexSet.Count} predictions.");
             return (staging, predictionsPerRef[chromosome.Index]);
         }
 
@@ -117,23 +114,23 @@ namespace CacheUtils.Commands.ExtractTranscripts
             return indexSet;
         }
 
-        private static IntervalArray<IRegulatoryRegion>[] GetRegulatoryRegionIntervalArrays(ILogger logger,
+        private static IntervalArray<IRegulatoryRegion>[] GetRegulatoryRegionIntervalArrays(
             ITranscriptCache cache, IChromosomeInterval interval, int numRefSeqs)
         {
-            logger.Write("- retrieving regulatory regions... ");
+            Logger.Write("- retrieving regulatory regions... ");
             var regulatoryIntervalForest = cache.RegulatoryIntervalForest;
             var regulatoryRegions =
                 regulatoryIntervalForest.GetAllOverlappingValues(interval.Chromosome.Index, interval.Start,
                     interval.End);
-            logger.WriteLine($"found {regulatoryRegions.Length} regulatory regions.");
+            Logger.WriteLine($"found {regulatoryRegions.Length} regulatory regions.");
             return regulatoryRegions.ToIntervalArrays(numRefSeqs);
         }
 
-        private static List<ITranscript> GetTranscripts(ILogger logger, DataBundle bundle, IChromosomeInterval interval)
+        private static List<ITranscript> GetTranscripts(DataBundle bundle, IChromosomeInterval interval)
         {
-            logger.Write("- retrieving transcripts... ");
+            Logger.Write("- retrieving transcripts... ");
             var transcripts = TranscriptCacheUtilities.GetTranscripts(bundle, interval);
-            logger.WriteLine($"found {transcripts.Count} transcripts.");
+            Logger.WriteLine($"found {transcripts.Count} transcripts.");
 
             if (transcripts.Count == 0) throw new InvalidDataException("Expected at least one transcript, but found none.");
             return transcripts;

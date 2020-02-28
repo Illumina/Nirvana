@@ -51,7 +51,7 @@ namespace Cloud.Utilities
 
                 if (processedException is UserErrorException) throw processedException;
 
-                Logger.LogLine($"Exception: {exception.Message}.");
+                Logger.WriteLine($"Exception: {exception.Message}.");
                 return false;
             }
         }

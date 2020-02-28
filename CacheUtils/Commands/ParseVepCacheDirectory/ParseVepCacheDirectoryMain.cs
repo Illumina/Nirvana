@@ -8,12 +8,9 @@ using System;
 using System.Collections.Generic;
 using CacheUtils.Commands.Download;
 using CacheUtils.Genbank;
-using CacheUtils.Logger;
 using Genome;
 using IO;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
 
@@ -33,16 +30,14 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 
         private static ExitCodes ProgramExecution()
         {
-            var logger = new ConsoleLogger();
-
             var transcriptSource = GetSource(_transcriptSource);
             var sequenceReader   = new CompressedSequenceReader(FileUtilities.GetReadStream(_inputReferencePath));
             var vepRootDirectory = new VepRootDirectory(sequenceReader.RefNameToChromosome);
             var refIndexToVepDir = vepRootDirectory.GetRefIndexToVepDir(_inputVepDirectory);
 
-            var genomeAssembly   = GenomeAssemblyHelper.Convert(_genomeAssembly);
+            var  genomeAssembly  = GenomeAssemblyHelper.Convert(_genomeAssembly);
             long vepReleaseTicks = DateTime.Parse(_vepReleaseDate).Ticks;
-            var idToGenbank      = GetIdToGenbank(logger, genomeAssembly, transcriptSource);
+            var  idToGenbank     = GetIdToGenbank(genomeAssembly, transcriptSource);
 
             // =========================
             // create the pre-cache file
@@ -99,11 +94,11 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return ExitCodes.Success;
         }
 
-        private static Dictionary<string, GenbankEntry> GetIdToGenbank(ILogger logger, GenomeAssembly assembly, Source source)
+        private static Dictionary<string, GenbankEntry> GetIdToGenbank(GenomeAssembly assembly, Source source)
         {
             if (assembly != GenomeAssembly.GRCh37 || source != Source.RefSeq) return null;
 
-            logger.Write("- loading the intermediate Genbank file... ");
+            Logger.Write("- loading the intermediate Genbank file... ");
 
             Dictionary<string, GenbankEntry> genbankDict;
             using (var reader = new IntermediateIO.GenbankReader(GZipUtilities.GetAppropriateReadStream(ExternalFiles.GenbankFilePath)))
@@ -111,7 +106,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
                 genbankDict = reader.GetIdToGenbank();
             }
 
-            logger.WriteLine($"{genbankDict.Count} entries loaded.");
+            Logger.WriteLine($"{genbankDict.Count} entries loaded.");
             return genbankDict;
         }
 

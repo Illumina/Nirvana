@@ -5,9 +5,9 @@ using Xunit;
 
 namespace UnitTests.SAUtils.ClinGen
 {
-    public class GeneDiseaseValidityTests
+    public sealed class GeneDiseaseValidityTests
     {
-        private Stream GetGeneValidityStream()
+        private static Stream GetGeneValidityStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -32,7 +32,8 @@ namespace UnitTests.SAUtils.ClinGen
             stream.Position = 0;
             return stream;
         }
-        private Dictionary<int, string> GetIdToSymbols()
+        
+        private static Dictionary<int, string> GetIdToSymbols()
         {
             return new Dictionary<int, string>
             {

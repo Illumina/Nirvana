@@ -21,7 +21,7 @@ namespace Compression.Utilities
 
         public static StreamReader GetAppropriateStreamReader(string filePath) => FileUtilities.GetStreamReader(GetAppropriateReadStream(filePath));
         public static StreamWriter GetStreamWriter(string filePath) => new StreamWriter(GetWriteStream(filePath));
-        public static Stream GetWriteStream(string filePath) => new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
+        private static Stream GetWriteStream(string filePath) => new BlockGZipStream(FileUtilities.GetCreateStream(filePath), CompressionMode.Compress);
 
         private static Stream GetAppropriateStream(Stream stream, CompressionAlgorithm compressionAlgorithm)
         {

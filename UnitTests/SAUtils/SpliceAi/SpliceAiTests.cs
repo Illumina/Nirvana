@@ -22,7 +22,7 @@ namespace UnitTests.SAUtils.SpliceAi
 {
     public sealed class SpliceAiTests
     {
-        private Dictionary<string, string> GetSpliceToNirvanaGenes()
+        private static Dictionary<string, string> GetSpliceToNirvanaGenes()
         {
             return new Dictionary<string, string>
             {
@@ -59,7 +59,7 @@ namespace UnitTests.SAUtils.SpliceAi
             var intervals10 = new[]
             {
                 new Interval<byte>(92946 - SpliceUtilities.SpliceFlankLength, 92946 + SpliceUtilities.SpliceFlankLength, 0),
-                new Interval<byte>(93816 - SpliceUtilities.SpliceFlankLength, 93816 + SpliceUtilities.SpliceFlankLength, 0),
+                new Interval<byte>(93816 - SpliceUtilities.SpliceFlankLength, 93816 + SpliceUtilities.SpliceFlankLength, 0)
             };
 
             var intervals1 = new[]
@@ -70,12 +70,12 @@ namespace UnitTests.SAUtils.SpliceAi
             var intervals21 = new[]
             {
                 new Interval<byte>(31859677 - SpliceUtilities.SpliceFlankLength, 31859677 + SpliceUtilities.SpliceFlankLength, 0),
-                new Interval<byte>(35275955 - SpliceUtilities.SpliceFlankLength, 35275955 + SpliceUtilities.SpliceFlankLength, 0),
+                new Interval<byte>(35275955 - SpliceUtilities.SpliceFlankLength, 35275955 + SpliceUtilities.SpliceFlankLength, 0)
             };
 
             var intervals22 = new[]
             {
-                new Interval<byte>(17148600 - SpliceUtilities.SpliceFlankLength, 17148600 + SpliceUtilities.SpliceFlankLength, 0),
+                new Interval<byte>(17148600 - SpliceUtilities.SpliceFlankLength, 17148600 + SpliceUtilities.SpliceFlankLength, 0)
             };
 
             return new Dictionary<ushort, IntervalArray<byte>>
@@ -83,7 +83,7 @@ namespace UnitTests.SAUtils.SpliceAi
                 {ChromosomeUtilities.Chr1.Index, new IntervalArray<byte>(intervals1)},
                 {ChromosomeUtilities.Chr10.Index, new IntervalArray<byte>(intervals10)},
                 {ChromosomeUtilities.Chr21.Index, new IntervalArray<byte>(intervals21)},
-                {ChromosomeUtilities.Chr22.Index, new IntervalArray<byte>(intervals22)},
+                {ChromosomeUtilities.Chr22.Index, new IntervalArray<byte>(intervals22)}
             };  
         }
         private static Stream GetStream()
@@ -307,7 +307,7 @@ namespace UnitTests.SAUtils.SpliceAi
             }
         }
         
-        private Stream GetCacheStream()
+        private static Stream GetCacheStream()
         {
             const GenomeAssembly genomeAssembly = GenomeAssembly.GRCh38;
 

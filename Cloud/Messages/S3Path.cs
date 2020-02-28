@@ -39,7 +39,7 @@ namespace Cloud.Messages
         private const int MaxRetryCount = 4;
         private void ValidateCredentials(IS3Client s3Client, bool isDirectory)
         {
-            var maxRetryCount = MaxRetryCount;
+            int maxRetryCount = MaxRetryCount;
             while (true)
             {
                 try
@@ -71,11 +71,11 @@ namespace Cloud.Messages
                     var processedException = AwsExceptionUtilities.TryConvertUserException(exception, this);
                     if (processedException is UserErrorException) throw processedException;
 
-                    Logger.LogLine($"Failed to validate S3 credentials\n{processedException.Message}");
+                    Logger.WriteLine($"Failed to validate S3 credentials\n{processedException.Message}");
                     
                     maxRetryCount--;
                     if (maxRetryCount >= 0) continue;
-                    Logger.LogLine("Max retry limit reached for validating S3 credentials.");
+                    Logger.WriteLine("Max retry limit reached for validating S3 credentials.");
                     throw processedException;
                 }
             }

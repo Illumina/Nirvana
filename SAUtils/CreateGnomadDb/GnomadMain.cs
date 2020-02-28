@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CommandLine.Builders;
@@ -11,8 +10,6 @@ using IO;
 using OptimizedCore;
 using SAUtils.InputFileParsers;
 using SAUtils.NsaConcatenator;
-using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -70,11 +67,12 @@ namespace SAUtils.CreateGnomadDb
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
-                .Execute(creator.ProgramExecution);
+                .Execute(ProgramExecution);
 
             return exitCode;
         }
-        private ExitCodes ProgramExecution()
+        
+        private static ExitCodes ProgramExecution()
         {
             //clearing temp directory
             Console.WriteLine($"Cleaning {SaCommon.SaFileSuffix} and {SaCommon.IndexSufix} files from temp directory {_tempDirectory}");
@@ -91,13 +89,13 @@ namespace SAUtils.CreateGnomadDb
 
             var genomeFiles = GetVcfFiles(_genomeDirectory);
             var exomeFiles = GetVcfFiles(_exomeDirectory);
-            var degOfParalleleism = 4;//hard coding since we are IO bound and stressing the disk doesn't help
+            const int degOfParalleleism = 4; //hard coding since we are IO bound and stressing the disk doesn't help
             Console.WriteLine($"Creating merged gnomAD database file from {genomeFiles.Length + exomeFiles.Length} input files. Degree of parallelism {degOfParalleleism}");
 
             Parallel.ForEach(
                 genomeFiles,
                 new ParallelOptions { MaxDegreeOfParallelism = degOfParalleleism },
-                (genomeFile) => CreateNsa(exomeFiles, genomeFile, version, DataStructures.GnomadDataType.Genome)
+                genomeFile => CreateNsa(exomeFiles, genomeFile, version)
                 );
             string outFileName = Path.Combine(_outputDirectory, $"{version.Name}_{version.Version}");
 
@@ -109,7 +107,7 @@ namespace SAUtils.CreateGnomadDb
             return ExitCodes.Success;
         }
 
-        private static void CreateNsa(string[] exomeFiles, string genomeFile, DataSourceVersion version, DataStructures.GnomadDataType type) {
+        private static void CreateNsa(string[] exomeFiles, string genomeFile, DataSourceVersion version) {
             Console.WriteLine($"Processing file: {genomeFile}");
             var outName = Path.GetFileNameWithoutExtension(genomeFile);
 
@@ -124,21 +122,6 @@ namespace SAUtils.CreateGnomadDb
                 var count = nsaWriter.Write(gnomadReader.GetCombinedItems());
                 Console.WriteLine($"Wrote {count} items to NSA file.");
             }
-        }
-        private static IEnumerable<ISupplementaryDataItem> GetItems(string[] genomeFiles, string[] exomeFiles, ISequenceProvider referenceProvider)
-        {
-            foreach (var fileName in genomeFiles)
-            {
-                var exomeReader  = GetExomeReader(exomeFiles, fileName);
-                var genomeReader = GZipUtilities.GetAppropriateStreamReader(fileName);
-                var reader = new GnomadReader(genomeReader, exomeReader, referenceProvider);
-
-                foreach (var item in reader.GetCombinedItems())
-                {
-                    yield return item;
-                }
-            }
-            
         }
 
         private static StreamReader GetExomeReader(string[] exomeFileNames, string genomeFileName)
@@ -199,8 +182,5 @@ namespace SAUtils.CreateGnomadDb
 
             return files;
         }
-
-        
     }
-
 }

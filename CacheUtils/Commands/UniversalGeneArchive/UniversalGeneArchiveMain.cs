@@ -13,8 +13,6 @@ using Compression.FileHandling;
 using ErrorHandling;
 using IO;
 using Microsoft.Extensions.Configuration;
-using VariantAnnotation.Interface;
-using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
 
@@ -27,27 +25,25 @@ namespace CacheUtils.Commands.UniversalGeneArchive
 
         private static ExitCodes ProgramExecution()
         {
-            var logger = new ConsoleLogger();
-
             if (UniversalGeneArchiveCurrent())
             {
-                logger.WriteLine("- universal gene archive is already up-to-date.");
+                Logger.WriteLine("- universal gene archive is already up-to-date.");
                 return ExitCodes.Success;
             }
 
             const string jsonPath = "CacheUtils.dll.gene.json";
             var filePaths = GetFilePaths(jsonPath);
             
-            var ds = LoadDataStores(logger, filePaths);
+            var ds = LoadDataStores(filePaths);
 
             var grch37GenesByRef = ds.Assembly37.UpdateHgncIds(ds.Hgnc).MergeByHgnc(true);            
             var grch38GenesByRef = ds.Assembly38.UpdateHgncIds(ds.Hgnc).MergeByHgnc(false);
 
-            var universalGenes = CombineGenomeAssemblies(logger, grch37GenesByRef, grch38GenesByRef).UpdateGeneSymbols(logger,
+            var universalGenes = CombineGenomeAssemblies(grch37GenesByRef, grch38GenesByRef).UpdateGeneSymbols(
                 ds.Hgnc.HgncIdToSymbol, ds.GeneInfoData.EntrezGeneIdToSymbol,
                 ds.Assembly38.EnsemblGtf.EnsemblIdToSymbol, ds.Assembly37.RefSeqGff.EntrezGeneIdToSymbol);
 
-            WriteGenes(logger, universalGenes);
+            WriteGenes(universalGenes);
             
             return ExitCodes.Success;
         }
@@ -59,46 +55,44 @@ namespace CacheUtils.Commands.UniversalGeneArchive
         }
 
         private static (GeneInfoData GeneInfoData, AssemblyDataStore Assembly37, AssemblyDataStore Assembly38, Hgnc Hgnc)
-            LoadDataStores(ILogger logger, FilePaths filePaths)
+            LoadDataStores(FilePaths filePaths)
         {
-            logger.Write("- loading datastores... ");
+            Logger.Write("- loading datastores... ");
             var loadBenchmark = new Benchmark();
 
             var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(filePaths.GRCh38.ReferencePath);
 
             var geneInfoData = GeneInfoData.Create(ExternalFiles.GeneInfoFile.FilePath);
-            var dataStore37  = AssemblyDataStore.Create("GRCh37", logger, filePaths.GRCh37, refNameToChromosome, true);
-            var dataStore38  = AssemblyDataStore.Create("GRCh38", logger, filePaths.GRCh38, refNameToChromosome, false);
+            var dataStore37  = AssemblyDataStore.Create("GRCh37", filePaths.GRCh37, refNameToChromosome, true);
+            var dataStore38  = AssemblyDataStore.Create("GRCh38", filePaths.GRCh38, refNameToChromosome, false);
             var hgnc         = Hgnc.Create(ExternalFiles.HgncFile.FilePath, refNameToChromosome);
 
-            logger.WriteLine($"{Benchmark.ToHumanReadable(loadBenchmark.GetElapsedTime())}");
+            Logger.WriteLine($"{Benchmark.ToHumanReadable(loadBenchmark.GetElapsedTime())}");
 
             return (geneInfoData, dataStore37, dataStore38, hgnc);
         }
 
-        private static UgaGene[] CombineGenomeAssemblies(ILogger logger, Dictionary<ushort, List<UgaGene>> genesByRef37, Dictionary<ushort, List<UgaGene>> genesByRef38)
+        private static UgaGene[] CombineGenomeAssemblies(Dictionary<ushort, List<UgaGene>> genesByRef37, Dictionary<ushort, List<UgaGene>> genesByRef38)
         {
-            logger.WriteLine();
-            logger.WriteLine("*** Global ***");
-            logger.Write("- combining genes from GRCh37 and GRCh38... ");
+            Logger.WriteLine("\n*** Global ***");
+            Logger.Write("- combining genes from GRCh37 and GRCh38... ");
             var combinedGenes = UgaAssemblyCombiner.Combine(genesByRef37, genesByRef38);
-            logger.WriteLine($"{combinedGenes.Length} genes.");
+            Logger.WriteLine($"{combinedGenes.Length} genes.");
 
             return combinedGenes;
         }
 
-        private static UgaGene[] UpdateGeneSymbols(this UgaGene[] genes, ILogger logger,
-            Dictionary<int, string> hgncIdToSymbol, Dictionary<string, string> entrezGeneIdToSymbol,
+        private static UgaGene[] UpdateGeneSymbols(this UgaGene[] genes, Dictionary<int, string> hgncIdToSymbol, Dictionary<string, string> entrezGeneIdToSymbol,
             Dictionary<string, string> ensemblIdToSymbol, Dictionary<string, string> refseqGeneIdToSymbol)
         {
-            var updater = new GeneSymbolUpdater(logger, hgncIdToSymbol, entrezGeneIdToSymbol, ensemblIdToSymbol, refseqGeneIdToSymbol);
+            var updater = new GeneSymbolUpdater(hgncIdToSymbol, entrezGeneIdToSymbol, ensemblIdToSymbol, refseqGeneIdToSymbol);
             updater.Update(genes);
             return genes;
         }
 
-        private static void WriteGenes(ILogger logger, UgaGene[] genes)
+        private static void WriteGenes(UgaGene[] genes)
         {
-            logger.Write($"- writing genes to {Path.GetFileName(ExternalFiles.UniversalGeneFilePath)}... ");
+            Logger.Write($"- writing genes to {Path.GetFileName(ExternalFiles.UniversalGeneFilePath)}... ");
 
             using (var stream = new BlockGZipStream(FileUtilities.GetCreateStream(ExternalFiles.UniversalGeneFilePath), CompressionMode.Compress))
             using (var writer = new UgaGeneWriter(stream))
@@ -106,7 +100,7 @@ namespace CacheUtils.Commands.UniversalGeneArchive
                 writer.Write(genes);
             }
 
-            logger.WriteLine("finished");
+            Logger.WriteLine("finished");
         }
 
         private static FilePaths GetFilePaths(string jsonPath)

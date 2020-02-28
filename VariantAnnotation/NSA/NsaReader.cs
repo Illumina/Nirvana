@@ -38,7 +38,7 @@ namespace VariantAnnotation.NSA
         public bool IsPositional { get; }
         public IEnumerable<ushort> ChromosomeIndices => _index.ChromosomeIndices;
         private readonly List<AnnotationItem> _annotations;
-        private int _blockSize;
+        private readonly int _blockSize;
         
         public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
@@ -80,7 +80,6 @@ namespace VariantAnnotation.NSA
                 // we need to decrease it by 1 since the loop will increment it.
                 if (lastLoadedPositionIndex > i) i = lastLoadedPositionIndex - 1;
             }
-
         }
 
         private int LoadAnnotations(List<int> positions, int i)
@@ -101,24 +100,13 @@ namespace VariantAnnotation.NSA
             return i;
         }
 
-        public IEnumerable<AnnotationItem> GetAnnotationItems(ushort chromIndex, int start, int end) {
-            var (location, blockCount) = _index.GetFileRange(chromIndex, start, end);
-            if (location == -1) yield break;
-            _reader.BaseStream.Position = location;
-            
-            for (var i = 0; i < blockCount; i++) {
-                _block.Read(_reader);
-                foreach (var annotation in _block.GetAnnotations())
-                    yield return new AnnotationItem(annotation.position, annotation.data);
-            }
-        }
-
         public List<NsaIndexBlock> GetIndexBlocks(ushort chromIndex) => _index.GetChromBlocks(chromIndex);
 
         public bool HasDataBlocks(ushort chromIndex) {
-            var (location, blockCount) = _index.GetFileRange(chromIndex, 1, int.MaxValue);
+            var (location, _) = _index.GetFileRange(chromIndex, 1, int.MaxValue);
             return location != -1;
         }
+        
         public IEnumerable<NsaBlock> GetCompressedBlocks(ushort chromIndex)
         {
             var (location, blockCount) = _index.GetFileRange(chromIndex, 1, int.MaxValue);
@@ -157,10 +145,7 @@ namespace VariantAnnotation.NSA
                 return annotations;
             }
         }
-        public bool HasAnnotation(int position) {
-            int index = BinarySearch(position);
-            return index >= 0;
-        }
+
         public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position)
         {
             int index = BinarySearch(position);
@@ -185,10 +170,6 @@ namespace VariantAnnotation.NSA
             return ~begin;
         }
 
-        public void Dispose()
-        {
-            _stream?.Dispose();
-        }
-
+        public void Dispose() => _stream?.Dispose();
     }
 }

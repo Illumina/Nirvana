@@ -23,7 +23,7 @@ namespace VariantAnnotation.Interface.IO
         public const int FormatIndex   = 8;
         public const int GenotypeIndex = 9;
 
-        public static readonly ImmutableHashSet<string> NonInformativeAltAllele =
+        private static readonly ImmutableHashSet<string> NonInformativeAltAllele =
             new HashSet<string> {"<*>", "*", "<M>", GatkNonRefAllele}.ToImmutableHashSet();
 
         public static readonly ImmutableHashSet<string> ReferenceAltAllele =

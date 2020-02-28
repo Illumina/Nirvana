@@ -7,7 +7,7 @@ namespace SAUtils.MitoHeteroplasmy
 {
     public sealed class MitoHeteroplasmyItem:ISupplementaryDataItem
     {
-        private AlleleStats _stats;
+        private readonly AlleleStats _stats;
         public MitoHeteroplasmyItem(IChromosome chromosome, int position, string refAllele, string altAllele, AlleleStats stats)
         {
             Chromosome = chromosome;

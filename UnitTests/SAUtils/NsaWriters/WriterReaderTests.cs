@@ -23,7 +23,7 @@ namespace UnitTests.SAUtils.NsaWriters
 {
     public sealed class WriterReaderTests
     {
-        private IEnumerable<ClinVarItem> GetClinvarItems()
+        private static IEnumerable<ClinVarItem> GetClinvarItems()
         {
             var clinvarItems = new List<ClinVarItem>
             {
@@ -52,7 +52,7 @@ namespace UnitTests.SAUtils.NsaWriters
             return clinvarItems;
         }
 
-        private ISequenceProvider GetSequenceProvider()
+        private static ISequenceProvider GetSequenceProvider()
         {
             var sequence = new SimpleSequence(new string('A', 99) + "TAGTCGGTTAA" + new string('A', 89) + "GCCCAT");
             return new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, ChromosomeUtilities.RefNameToChromosome);
@@ -107,7 +107,7 @@ namespace UnitTests.SAUtils.NsaWriters
         }
 
 
-        private IEnumerable<DbSnpItem> GetDbsnpItems(int count)
+        private static IEnumerable<DbSnpItem> GetDbsnpItems(int count)
         {
             var items = new List<DbSnpItem>();
             var position = 100;
@@ -175,7 +175,7 @@ namespace UnitTests.SAUtils.NsaWriters
             Assert.Throws<UserErrorException>(() => WriteCustomSaItem(customItem));
         }
 
-        private void WriteCustomSaItem(CustomItem customItem)
+        private static void WriteCustomSaItem(CustomItem customItem)
         {
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
@@ -204,7 +204,7 @@ namespace UnitTests.SAUtils.NsaWriters
             }
         }
 
-        private Stream GetChr22_17467787_17467799_genome()
+        private static Stream GetChr22_17467787_17467799_genome()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -221,7 +221,7 @@ namespace UnitTests.SAUtils.NsaWriters
             return stream;
         }
 
-        private IEnumerable<ISupplementaryDataItem> GetConflictingGnomadItems()
+        private static IEnumerable<ISupplementaryDataItem> GetConflictingGnomadItems()
         {
             var sequence = new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "AAAGAAAGAAAG", 17467787 - 1 - VariantUtils.MaxUpstreamLength);
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);

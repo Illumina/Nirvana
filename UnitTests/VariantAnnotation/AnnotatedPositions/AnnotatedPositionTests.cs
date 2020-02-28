@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using Genome;
-using Moq;
+﻿using Moq;
 using UnitTests.SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation;
@@ -56,7 +54,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var refMinorProvider = new Mock<IRefMinorProvider>();
             var seqProvider = ParserTestUtils.GetSequenceProvider(13813, "T", 'C', ChromosomeUtilities.RefNameToChromosome);
-            IDictionary<string, IChromosome> refNameToChromosome = seqProvider.RefNameToChromosome;
             var variantFactory = new VariantFactory(seqProvider.Sequence, new VariantId());
 
             var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
@@ -74,7 +71,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
         private static ISample[] GetSamples() => new ISample[] { Sample.EmptySample };
 
-        private IVariant[] GetVariants()
+        private static IVariant[] GetVariants()
         {
             var variant = new Mock<IVariant>();
             variant.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
@@ -87,7 +84,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             return new[] { variant.Object };
         }
 
-        private IPosition GetPosition(string originalChromosomeName, IVariant[] variants, ISample[] samples)
+        private static IPosition GetPosition(string originalChromosomeName, IVariant[] variants, ISample[] samples)
         {
             var vcfFields = new string[8];
             vcfFields[0] = originalChromosomeName;

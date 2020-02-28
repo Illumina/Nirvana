@@ -17,7 +17,7 @@ namespace Vcf.Sample.Legacy
             _formatIndices = formatIndices;
         }
 
-        private int? GetInfoDepth(string infoColumn)
+        private static int? GetInfoDepth(string infoColumn)
         {
             var splits = infoColumn.OptimizedSplit(';');
             foreach (string split in splits)

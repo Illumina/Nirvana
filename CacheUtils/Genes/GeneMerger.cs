@@ -6,6 +6,7 @@ using CacheUtils.Genes.DataStores;
 using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.Utilities;
 using Intervals;
+using IO;
 
 namespace CacheUtils.Genes
 {
@@ -13,7 +14,7 @@ namespace CacheUtils.Genes
     {
         public static Dictionary<ushort, List<UgaGene>> MergeByHgnc(this IUpdateHgncData data, bool isGrch37)
         {
-            data.Logger.Write("- merging RefSeq & Ensembl genes... ");
+            Logger.Write("- merging RefSeq & Ensembl genes... ");
 
             var genesByRef       = new Dictionary<ushort, List<MutableGene>>();
             var mergedGenesByRef = new Dictionary<ushort, List<UgaGene>>();
@@ -35,7 +36,7 @@ namespace CacheUtils.Genes
                 totalMergedEntries += numMergedEntries;
             }
 
-            data.Logger.WriteLine($"orphans: {totalOrphanEntries}, merged: {totalMergedEntries}");
+            Logger.WriteLine($"orphans: {totalOrphanEntries}, merged: {totalMergedEntries}");
 
             return mergedGenesByRef;
         }

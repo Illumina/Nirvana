@@ -49,8 +49,9 @@ namespace SAUtils.DataStructures
         {
             var maxScoreItems = new Dictionary<string, ISupplementaryDataItem>();
 
-            foreach (PrimateAiItem saItem in saItems)
+            foreach (var supplementaryDataItem in saItems)
             {
+                var saItem = (PrimateAiItem) supplementaryDataItem;
                 var refAlt = saItem.RefAllele + '>' + saItem.AltAllele;
 
                 if (maxScoreItems.TryGetValue(refAlt, out var dupItem))

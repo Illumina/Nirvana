@@ -47,12 +47,13 @@ namespace VariantAnnotation.NSA
             }
         }
 
-        public int Write(IEnumerable<ISuppIntervalItem> siItems)
+        public void Write(IEnumerable<ISuppIntervalItem> siItems)
         {
             var sortedItems = siItems.OrderBy(x => x.Chromosome.Index).ThenBy(x => x.Start).ThenBy(x => x.End).ToList();
 
             Console.WriteLine($"Writing {sortedItems.Count} intervals to database...");
             _writer.WriteOpt(sortedItems.Count);
+            
             foreach (ISuppIntervalItem item in sortedItems)
             {
                 _writer.WriteOptAscii(item.Chromosome.EnsemblName);
@@ -62,8 +63,6 @@ namespace VariantAnnotation.NSA
                 _writer.WriteOpt(item.End);
                 _writer.Write(item.GetJsonString());
             }
-
-            return sortedItems.Count;
         }
 
         public void Dispose()

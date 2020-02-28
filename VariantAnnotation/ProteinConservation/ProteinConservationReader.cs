@@ -10,15 +10,13 @@ namespace VariantAnnotation.ProteinConservation
 {
     public sealed class ProteinConservationReader:IDisposable
     {
-        private readonly Stream _stream;
-        public GenomeAssembly Assembly { get; private set; }
+        private GenomeAssembly Assembly { get; }
         private readonly ExtendedBinaryReader _reader;
         public readonly IDataSourceVersion Version;
 
         public ProteinConservationReader(Stream stream)
         {
-            _stream = stream;
-            _reader = new ExtendedBinaryReader(_stream);
+            _reader = new ExtendedBinaryReader(stream);
             
             var schemaVersion = _reader.ReadOptInt32();
             if(schemaVersion != ProteinConservationCommon.SchemaVersion)

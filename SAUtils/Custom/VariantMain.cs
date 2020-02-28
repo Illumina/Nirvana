@@ -66,7 +66,6 @@ namespace SAUtils.Custom
             string nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
             string nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
             string nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
-            int nsaItemsCount;
 
             using (var parser = VariantAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
@@ -75,7 +74,7 @@ namespace SAUtils.Custom
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
-                (jsonTag, nsaItemsCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
+                (jsonTag, _, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
                 if (intervals == null) return ExitCodes.Success;
             }
 

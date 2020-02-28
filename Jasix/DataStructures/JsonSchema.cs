@@ -7,17 +7,17 @@ using Intervals;
 namespace Jasix.DataStructures
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-	public class JsonSchema:IInterval
-	{
-	    // ReSharper disable UnassignedField.Global
-		public string chromosome;	    
-		public int position;
-		public string refAllele;
-		public IList<string> altAlleles;
-		public int svEnd;
+    public sealed class JsonSchema : IInterval
+    {
+        // ReSharper disable UnassignedField.Global
+        public string        chromosome;
+        public int           position;
+        public string        refAllele;
+        public IList<string> altAlleles;
+        public int           svEnd;
 
-		// ReSharper restore UnassignedField.Global
-	    public int Start => position;
-	    public int End => Utilities.GetJsonEntryEnd(this);
+        // ReSharper restore UnassignedField.Global
+        public int Start => position;
+        public int End   => Utilities.GetJsonEntryEnd(this);
     }
 }

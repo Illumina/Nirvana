@@ -25,6 +25,7 @@ using VariantAnnotation.Utilities;
 namespace GeneAnnotationLambda
 {
     // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class GeneAnnotationLambda
     {
         private readonly string _saPathPrefix = LambdaUrlHelper.GetBaseUrl();

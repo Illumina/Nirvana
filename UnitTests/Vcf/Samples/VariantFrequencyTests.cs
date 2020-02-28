@@ -51,7 +51,7 @@ namespace UnitTests.Vcf.Samples
             Evaluate(expectedResults, observedResults);
         }
 
-        private void Evaluate(double[] expectedResults, double[] observedResults)
+        private static void Evaluate(double[] expectedResults, double[] observedResults)
         {
             if (expectedResults == null || observedResults == null)
             {

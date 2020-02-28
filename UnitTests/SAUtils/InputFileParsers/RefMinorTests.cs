@@ -45,7 +45,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             
         }
 
-        private ISequenceProvider GetSequenceProvider()
+        private static ISequenceProvider GetSequenceProvider()
         {
             var seqProvider = new Mock<ISequenceProvider>();
             seqProvider.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);

@@ -21,16 +21,8 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private int _mutationIdIndex       = -1;
         private int _primarySiteIndex      = -1;
-        private int _siteSubtypeOneIndex   = -1;
-        private int _siteSubtypeTwoIndex   = -1;
-        private int _siteSubtypeThreeIndex = -1;
-
-        private int _primaryHistologyIndex      = -1;
-        private int _histologySubtypeOneIndex   = -1;
-        private int _histologySubtypeTwoIndex   = -1;
-        private int _histologySubtypeThreeIndex = -1;
-
-        private int _studyIdIndex = -1;
+        private int _primaryHistologyIndex = -1;
+        private int _studyIdIndex          = -1;
 
         private const string StudyIdTag = "ID_STUDY";
 
@@ -104,9 +96,6 @@ namespace SAUtils.InputFileParsers.Cosmic
             var histologies = new HashSet<string>();
             var primaryHistology = columns[_primaryHistologyIndex].Replace('_', ' ');
             TryAddValue(primaryHistology, histologies);
-            //TryAddValue(columns[_histologySubtypeOneIndex], histologies);
-            //TryAddValue(columns[_histologySubtypeTwoIndex], histologies);
-            //TryAddValue(columns[_histologySubtypeThreeIndex], histologies);
 
             return histologies.ToList();
         }
@@ -117,9 +106,6 @@ namespace SAUtils.InputFileParsers.Cosmic
 
             var primarySite = columns[_primarySiteIndex].Replace('_', ' ');
             TryAddValue(primarySite, sites);
-            //TryAddValue(columns[_siteSubtypeOneIndex], sites);
-            //TryAddValue(columns[_siteSubtypeTwoIndex], sites);
-            //TryAddValue(columns[_siteSubtypeThreeIndex], sites);
 
             return sites.ToList();
         }
@@ -155,26 +141,8 @@ namespace SAUtils.InputFileParsers.Cosmic
                     case "Primary site":
                         _primarySiteIndex = i;
                         break;
-                    case "Site subtype 1":
-                        _siteSubtypeOneIndex = i;
-                        break;
-                    case "Site subtype 2":
-                        _siteSubtypeTwoIndex = i;
-                        break;
-                    case "Site subtype 3":
-                        _siteSubtypeThreeIndex = i;
-                        break;
                     case "Primary histology":
                         _primaryHistologyIndex = i;
-                        break;
-                    case "Histology subtype 1":
-                        _histologySubtypeOneIndex = i;
-                        break;
-                    case "Histology subtype 2":
-                        _histologySubtypeTwoIndex = i;
-                        break;
-                    case "Histology subtype 3":
-                        _histologySubtypeThreeIndex = i;
                         break;
                 }
             }

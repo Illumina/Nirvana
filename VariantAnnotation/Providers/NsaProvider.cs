@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -189,18 +188,9 @@ namespace VariantAnnotation.Providers
 
         public void PreLoad(IChromosome chromosome, List<int> positions)
         {
-            var benchmark = new Benchmark();
-            Console.Write("Pre-loading SA....");
-
-            var preloadTasks = _nsaReaders.Select(x => DoPreload(x, chromosome, positions)).ToArray();
+            Task[] preloadTasks = _nsaReaders.Select(x => DoPreload(x, chromosome, positions)).ToArray();
             Task.WaitAll(preloadTasks);
-            foreach (var preloadTask in preloadTasks)
-            {
-                preloadTask.Dispose();
-            }
-
-            var totalTime = benchmark.GetElapsedTime();
-            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");
+            foreach (var preloadTask in preloadTasks) preloadTask.Dispose();
         }
 
         private static Task DoPreload(INsaReader nsaReader, IChromosome chromosome, List<int> positions) => Task.Run(() => { nsaReader.PreLoad(chromosome, positions); });

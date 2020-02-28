@@ -7,7 +7,7 @@ using IO;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-    public class ClinVarVariationReader:IDisposable
+    public sealed class ClinVarVariationReader : IDisposable
     {
         private const string VcvRecordTag      = "VariationArchive";
         private const string AccessionTag      = "Accession";
@@ -51,7 +51,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             }
         }
 
-        private VcvItem ExtractVariantRecord(XElement xElement)
+        private static VcvItem ExtractVariantRecord(XElement xElement)
         {
             if (xElement == null || xElement.IsEmpty) return null;
             
@@ -91,7 +91,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         }
 
         
-        private List<string> GetSignificances(XElement interpretations)
+        private static List<string> GetSignificances(XElement interpretations)
         {
             if (interpretations == null || interpretations.IsEmpty) return null;
             

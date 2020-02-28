@@ -31,8 +31,8 @@ namespace UnitTests.NirvanaLambda
         [Fact]
         public void GetEqualSizeOffsets_AsExpected()
         {
-            var fileSize = 1001;
-            var numPartitions = 3;
+            const int fileSize      = 1001;
+            const int numPartitions = 3;
 
             var expected = new long[] { 0, 333, 666 };
 

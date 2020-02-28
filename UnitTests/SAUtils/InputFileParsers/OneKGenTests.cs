@@ -82,8 +82,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void MissingSubPopulationFrequencies()
         {
-            var vcfLine =
-                "1\t10616\trs376342519\tCCGCCGTTGCAAAGGCGCGCCG\tC\t100\tPASS\tAN=5008;AC=4973;AF=0.993011;AA=;EAS_AN=1008;EAS_AC=999;EAS_AF=0.9911;EUR_AN=1006;EUR_AC=1000;EUR_AF=0.994;AFR_AN=1322;AFR_AC=1308;AFR_AF=0.9894;AMR_AN=694;AMR_AC=691;AMR_AF=0.9957;SAS_AN=978;SAS_AC=975;SAS_AF=0.9969";
+            const string vcfLine = "1\t10616\trs376342519\tCCGCCGTTGCAAAGGCGCGCCG\tC\t100\tPASS\tAN=5008;AC=4973;AF=0.993011;AA=;EAS_AN=1008;EAS_AC=999;EAS_AF=0.9911;EUR_AN=1006;EUR_AC=1000;EUR_AF=0.994;AFR_AN=1322;AFR_AC=1308;AFR_AF=0.9894;AMR_AN=694;AMR_AC=691;AMR_AF=0.9957;SAS_AN=978;SAS_AC=975;SAS_AF=0.9969";
 
             var oneKGenReader = new OneKGenReader(null, ParserTestUtils.GetSequenceProvider(10616, "CCGCCGTTGCAAAGGCGCGCCG", 'C', ChromosomeUtilities.RefNameToChromosome));
             var items = oneKGenReader.ExtractItems(vcfLine).ToList();

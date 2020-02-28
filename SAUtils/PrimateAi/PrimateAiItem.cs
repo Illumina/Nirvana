@@ -11,7 +11,7 @@ namespace SAUtils.PrimateAi
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
-        public string Hgnc { get; }
+        private string Hgnc { get; }
         public double ScorePercentile { get; }
         public PrimateAiItem(IChromosome chromosome, int position, string refAllele, string altAllele, string hgnc,
             double percentile)

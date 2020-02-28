@@ -95,7 +95,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 {"ENSG00000162825", "NBPF20"},
                 {"ENSG00000203832", "NBPF20"},
                 {"ENSG00000268674", "FAM231D"},
-                {"ENSG00000203815", "FAM231D"},
+                {"ENSG00000203815", "FAM231D"}
             };
             using (var reader = new GnomadGeneParser(new StreamReader(GetStream_resolve_without_loeuf()), geneIdToSymbols))
             {

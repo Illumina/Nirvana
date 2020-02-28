@@ -17,12 +17,14 @@ using IO;
 using Nirvana;
 using Vcf;
 using Tabix;
+using VariantAnnotation;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace AnnotationLambda
 {
     // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class AnnotationLambda
     {
         // ReSharper disable once UnusedMember.Global
@@ -57,7 +59,7 @@ namespace AnnotationLambda
                         annotationResources.GetVariantPositions(new BlockGZipStream(preloadVcfStream, CompressionMode.Decompress), config.annotationRange.ToGenomicRange(annotationResources.SequenceProvider.RefNameToChromosome));
                     }
 
-                    Logger.LogLine("Scan for positions to preload complete.");
+                    Logger.WriteLine("Scan for positions to preload complete.");
 
                     using (var aes = new AesCryptoServiceProvider())
                     {
@@ -82,10 +84,10 @@ namespace AnnotationLambda
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))
                             {
-                                StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true, false);
+                                StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true);
                             }
 
-                            Logger.LogLine("Annotation done.");
+                            Logger.WriteLine("Annotation done.");
 
                             jsonMetadata  = jsonMd5Stream.GetFileMetadata();
                             jasixMetadata = jasixMd5Stream.GetFileMetadata();
@@ -98,7 +100,7 @@ namespace AnnotationLambda
                         s3Client.DecryptUpload(config.outputDir.bucketName, jasixKey, jasixPath, aes, jasixMetadata);
                         s3Client.DecryptUpload(config.outputDir.bucketName, result.filePath, jsonPath, aes, jsonMetadata);
 
-                        Logger.LogLine("Nirvana result files uploaded.");
+                        Logger.WriteLine("Nirvana result files uploaded.");
                     }
                 }
 
@@ -127,7 +129,7 @@ namespace AnnotationLambda
 
             result.status = e.Message;
             result.errorCategory = ExceptionUtilities.ExceptionToErrorCategory(e);
-            Logger.LogLine($"Error Category: {result.errorCategory}");
+            Logger.WriteLine($"Error Category: {result.errorCategory}");
 
             if (result.errorCategory != ErrorCategory.UserError)
             {
@@ -154,15 +156,17 @@ namespace AnnotationLambda
             string cachePathPrefix  = LambdaUrlHelper.GetCacheFolder().UrlCombine(genomeAssembly.ToString()).UrlCombine(LambdaUrlHelper.DefaultCacheSource);
             string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
             string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations, genomeAssembly);
-            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix, new List<string> {saManifestUrl},
-                annotationConfig.customAnnotations, false, false, false);
+            var metrics = new PerformanceMetrics();
+
+            var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,
+                new List<string> {saManifestUrl}, annotationConfig.customAnnotations, false, false, false, metrics);
 
             using (var tabixStream = PersistentStreamUtils.GetReadStream(annotationConfig.tabixUrl))
             {
                 annotationResources.InputStartVirtualPosition = GetTabixVirtualPosition(annotationConfig.annotationRange, tabixStream, annotationResources.SequenceProvider.RefNameToChromosome);
             }
 
-            Logger.LogLine($"Tabix position :{annotationResources.InputStartVirtualPosition}");
+            Logger.WriteLine($"Tabix position :{annotationResources.InputStartVirtualPosition}");
 
             return annotationResources;
         }

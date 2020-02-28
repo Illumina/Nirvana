@@ -59,7 +59,7 @@ namespace CustomAnnotationLambda
                 if (config.skipGeneIdValidation)
                 {
                     string logS3Key = string.Join('/', config.outputDir.path.Trim('/'), LogFileName);
-                    Logger.LogLine("uploading log file to " + logS3Key);
+                    Logger.WriteLine("uploading log file to " + logS3Key);
                     s3Client.DecryptUpload(config.outputDir.bucketName, logS3Key, localLogPath, aes, logMetaData);
                 }
 

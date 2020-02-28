@@ -8,7 +8,7 @@ namespace UnitTests.IO
 {
     public sealed class PersistentStreamTests
     {
-        private Stream GetMockStream()
+        private static Stream GetMockStream()
         {
             var memStream = new MemoryStream();
             using (var writer = new StreamWriter(memStream, Encoding.Default, 4096, true))
@@ -21,7 +21,8 @@ namespace UnitTests.IO
             memStream.Position = 0;
             return memStream;
         }
-        private IConnect GetWebRequest_connect_on_third()
+        
+        private static IConnect GetWebRequest_connect_on_third()
         {
             var moqRequest = new Mock<IConnect>();
 
@@ -34,7 +35,7 @@ namespace UnitTests.IO
             return moqRequest.Object;
         }
 
-        private IConnect GetWebRequest_flaky_stream()
+        private static IConnect GetWebRequest_flaky_stream()
         {
             var moqRequest = new Mock<IConnect>();
 
@@ -45,7 +46,7 @@ namespace UnitTests.IO
             return moqRequest.Object;
         }
 
-        private IConnect GetWebRequest_connect_on_seventh()
+        private static IConnect GetWebRequest_connect_on_seventh()
         {
             var moqRequest = new Mock<IConnect>();
 
@@ -73,7 +74,7 @@ namespace UnitTests.IO
         [Fact]
         public void FailToConnect()
         {
-            Assert.Throws<IOException>(()=>new PersistentStream(GetWebRequest_connect_on_seventh(),0));
+            Assert.Throws<IOException>(() => new PersistentStream(GetWebRequest_connect_on_seventh(), 0));
         }
 
         [Fact]

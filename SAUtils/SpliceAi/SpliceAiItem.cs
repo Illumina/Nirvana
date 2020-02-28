@@ -13,97 +13,90 @@ namespace SAUtils.SpliceAi
         public string AltAllele { get; set; }
         public string Hgnc { get; set; }
         public const double MinSpliceAiScore = 0.1;
-        public readonly bool IsSpliceAdjacent;
+        private readonly bool _isSpliceAdjacent;
 
-        public readonly double AcceptorGainScore;
-        public readonly double AcceptorLossScore;
-        public readonly double DonorGainScore;
-        public readonly double DonorLossScore;
+        private readonly double _acceptorGainScore;
+        private readonly double _acceptorLossScore;
+        private readonly double _donorGainScore;
+        private readonly double _donorLossScore;
 
-        public readonly int AcceptorGainPosition;
-        public readonly int AcceptorLossPosition;
-        public readonly int DonorGainPosition;
-        public readonly int DonorLossPosition;
+        private readonly int _acceptorGainPosition;
+        private readonly int _acceptorLossPosition;
+        private readonly int _donorGainPosition;
+        private readonly int _donorLossPosition;
 
-        public SpliceAiItem(IChromosome chromosome, int position, string refAllele, string altAllele, string hgnc, double acceptorGainScore, double acceptorLossScore, double donorGainScore, double donorLossScore, int acceptorGainPosition, int acceptorLossPosition, int donorGainPosition, int donorLossPosition ,bool isSpliceAdjacent)
+        public SpliceAiItem(IChromosome chromosome, int position, string refAllele, string altAllele, string hgnc,
+            double acceptorGainScore, double acceptorLossScore, double donorGainScore, double donorLossScore,
+            int acceptorGainPosition, int acceptorLossPosition, int donorGainPosition, int donorLossPosition,
+            bool isSpliceAdjacent)
         {
             Chromosome = chromosome;
             Position   = position;
             RefAllele  = refAllele;
             AltAllele  = altAllele;
 
-            Hgnc                 = hgnc;
-            AcceptorGainScore    = acceptorGainScore;
-            AcceptorLossScore    = acceptorLossScore;
-            DonorGainScore       = donorGainScore;
-            DonorLossScore       = donorLossScore;
-            AcceptorGainPosition = acceptorGainPosition;
-            AcceptorLossPosition = acceptorLossPosition;
-            DonorGainPosition    = donorGainPosition;
-            DonorLossPosition    = donorLossPosition;
-            IsSpliceAdjacent     = isSpliceAdjacent;
-            
+            Hgnc                  = hgnc;
+            _acceptorGainScore    = acceptorGainScore;
+            _acceptorLossScore    = acceptorLossScore;
+            _donorGainScore       = donorGainScore;
+            _donorLossScore        = donorLossScore;
+            _acceptorGainPosition = acceptorGainPosition;
+            _acceptorLossPosition = acceptorLossPosition;
+            _donorGainPosition    = donorGainPosition;
+            _donorLossPosition    = donorLossPosition;
+            _isSpliceAdjacent     = isSpliceAdjacent;
         }
 
-        
         public string GetJsonString()
         {
             var sb = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("hgnc", Hgnc);
-            if (IsSpliceAdjacent)
+            if (_isSpliceAdjacent)
             {
-                jsonObject.AddDoubleValue("acceptorGainScore", AcceptorGainScore, "0.#");
-                jsonObject.AddDoubleValue("acceptorGainDistance", AcceptorGainPosition);
+                jsonObject.AddDoubleValue("acceptorGainScore", _acceptorGainScore, "0.#");
+                jsonObject.AddDoubleValue("acceptorGainDistance", _acceptorGainPosition);
 
-                jsonObject.AddDoubleValue("acceptorLossScore", AcceptorLossScore, "0.#");
-                jsonObject.AddDoubleValue("acceptorLossDistance", AcceptorLossPosition);
+                jsonObject.AddDoubleValue("acceptorLossScore", _acceptorLossScore, "0.#");
+                jsonObject.AddDoubleValue("acceptorLossDistance", _acceptorLossPosition);
 
-                jsonObject.AddDoubleValue("donorGainScore", DonorGainScore, "0.#");
-                jsonObject.AddDoubleValue("donorGainDistance", DonorGainPosition);
+                jsonObject.AddDoubleValue("donorGainScore", _donorGainScore, "0.#");
+                jsonObject.AddDoubleValue("donorGainDistance", _donorGainPosition);
 
-                jsonObject.AddDoubleValue("donorLossScore", DonorLossScore, "0.#");
-                jsonObject.AddDoubleValue("donorLossDistance", DonorLossPosition);
+                jsonObject.AddDoubleValue("donorLossScore", _donorLossScore, "0.#");
+                jsonObject.AddDoubleValue("donorLossDistance", _donorLossPosition);
             }
             else
             {
-                if (AcceptorGainScore >= MinSpliceAiScore)
+                if (_acceptorGainScore >= MinSpliceAiScore)
                 {
-                    jsonObject.AddDoubleValue("acceptorGainScore", AcceptorGainScore, "0.#");
-                    jsonObject.AddDoubleValue("acceptorGainDistance", AcceptorGainPosition);
+                    jsonObject.AddDoubleValue("acceptorGainScore", _acceptorGainScore, "0.#");
+                    jsonObject.AddDoubleValue("acceptorGainDistance", _acceptorGainPosition);
                 }
 
-                if (AcceptorLossScore >= MinSpliceAiScore)
+                if (_acceptorLossScore >= MinSpliceAiScore)
                 {
-                    jsonObject.AddDoubleValue("acceptorLossScore", AcceptorLossScore, "0.#");
-                    jsonObject.AddDoubleValue("acceptorLossDistance", AcceptorLossPosition);
+                    jsonObject.AddDoubleValue("acceptorLossScore", _acceptorLossScore, "0.#");
+                    jsonObject.AddDoubleValue("acceptorLossDistance", _acceptorLossPosition);
                 }
 
-                if (DonorGainScore >= MinSpliceAiScore)
+                if (_donorGainScore >= MinSpliceAiScore)
                 {
-                    jsonObject.AddDoubleValue("donorGainScore", DonorGainScore, "0.#");
-                    jsonObject.AddDoubleValue("donorGainDistance", DonorGainPosition);
+                    jsonObject.AddDoubleValue("donorGainScore", _donorGainScore, "0.#");
+                    jsonObject.AddDoubleValue("donorGainDistance", _donorGainPosition);
 
                 }
 
-                if (DonorLossScore >= MinSpliceAiScore)
+                if (_donorLossScore >= MinSpliceAiScore)
                 {
-                    jsonObject.AddDoubleValue("donorLossScore", DonorLossScore, "0.#");
-                    jsonObject.AddDoubleValue("donorLossDistance", DonorLossPosition);
+                    jsonObject.AddDoubleValue("donorLossScore", _donorLossScore, "0.#");
+                    jsonObject.AddDoubleValue("donorLossDistance", _donorLossPosition);
 
                 }
             }
 
             return StringBuilderCache.GetStringAndRelease(sb);
-        }
-
-        public static int CompareTo(SpliceAiItem one, SpliceAiItem other)
-        {
-            if (one.Chromosome.Index != other.Chromosome.Index)
-                return one.Chromosome.Index.CompareTo(other.Chromosome.Index);
-
-            return one.Position.CompareTo(other.Position);
         }
     }
 }

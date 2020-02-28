@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using IO;
-using CommandLine.Utilities;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
@@ -51,21 +50,7 @@ namespace Nirvana
         }
 
         public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path,
-            ISequenceProvider sequenceProvider, ProteinConservationProvider proteinConservationProvider)
-         {
-            var benchmark = new Benchmark();
-            var provider = new TranscriptAnnotationProvider(path, sequenceProvider, proteinConservationProvider);
-            var wallTimeSpan = benchmark.GetElapsedTime();
-            Console.WriteLine("Cache Time: {0} ms", wallTimeSpan.TotalMilliseconds);
-            
-            benchmark.Reset();
-            proteinConservationProvider?.Load();
-            wallTimeSpan = benchmark.GetElapsedTime();
-            Console.WriteLine("Protein conservation load time: {0} ms", wallTimeSpan.TotalMilliseconds);
-
-            return provider;
-        }
-
-        
+            ISequenceProvider sequenceProvider, ProteinConservationProvider proteinConservationProvider) =>
+            new TranscriptAnnotationProvider(path, sequenceProvider, proteinConservationProvider);
     }
 }

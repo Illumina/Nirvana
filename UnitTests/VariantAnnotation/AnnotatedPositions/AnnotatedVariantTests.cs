@@ -43,7 +43,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Equal(expectedResult, observedResult);
         }
 
-        private void AddRegulatoryRegion(IAnnotatedVariant annotatedVariant)
+        private static void AddRegulatoryRegion(IAnnotatedVariant annotatedVariant)
         {
             var regulatoryRegion = new RegulatoryRegion(ChromosomeUtilities.Bob, 103, 104, CompactId.Convert("7157"),
                 RegulatoryRegionType.TF_binding_site);
@@ -63,7 +63,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             annotatedVariant.Transcripts.Add(annotatedTranscript.Object);
         }
 
-        private IVariant GetRefMinorVariant()
+        private static IVariant GetRefMinorVariant()
         {
             return new Variant(ChromosomeUtilities.Bob, 100, 200, "A", "G", VariantType.SNV, "bob:100:G", true, false, false,
                 new[] { "bob:100:102:TAT" }, AnnotationBehavior.SmallVariants, false);

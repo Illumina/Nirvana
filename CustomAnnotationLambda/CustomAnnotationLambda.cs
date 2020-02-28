@@ -17,6 +17,7 @@ using IO;
 
 namespace CustomAnnotationLambda
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class CustomAnnotationLambda
     {
         // ReSharper disable once UnusedMember.Global
@@ -45,7 +46,7 @@ namespace CustomAnnotationLambda
                 LambdaUtilities.DeleteTempOutput();
 
                 string inputBaseName = config.tsvUrl.TrimEndFromFirst("?").TrimStartToLast("/").TrimEndFromFirst(".tsv");
-                Logger.LogLine($"input file base name is: {inputBaseName}");
+                Logger.WriteLine($"input file base name is: {inputBaseName}");
 
                 return IsGeneAnnotationTsv(config.tsvUrl) 
                     ? GeneAnnotationCreator.Create(config, inputBaseName, result, s3Client) 
@@ -72,7 +73,7 @@ namespace CustomAnnotationLambda
 
         public static CustomResult GetSuccessResult(CustomConfig customSaConfig, CustomResult result, List<string> outputFiles)
         {
-            Logger.LogLine("All files uploaded.");
+            Logger.WriteLine("All files uploaded.");
 
             result.created = new FileList
             {

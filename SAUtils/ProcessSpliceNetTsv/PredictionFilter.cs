@@ -16,8 +16,8 @@ namespace SAUtils.ProcessSpliceNetTsv
         private const int PredChrColumn = 0;
         private const int PredPosColumn = 1;
         private static readonly int[] PredScoreColumns = { 6, 8, 10, 12 };
-        private static readonly double _freqCutoff = 0.05;
-        private static readonly int _intronBoundaryDistanceCutoff = 15;
+        private const double FreqCutoff = 0.05;
+        private const int IntronBoundaryDistanceCutoff = 15;
 
         public static void Filter(string intputTsv, string gffFile1, string gffFile2, string outputTsv)
         {
@@ -34,7 +34,7 @@ namespace SAUtils.ProcessSpliceNetTsv
                     ushort chrIndex = GetChrIndex(info[PredChrColumn]);
                     int pos = int.Parse(info[PredPosColumn]);
                     if (intronFlankingRegions.OverlapsAny(chrIndex, pos, pos) ||
-                        AnyScorePassTheCutoff(info, PredScoreColumns, _freqCutoff))
+                        AnyScorePassTheCutoff(info, PredScoreColumns, FreqCutoff))
                     {
                         resultsWriter.WriteLine(line);
                     }
@@ -65,7 +65,7 @@ namespace SAUtils.ProcessSpliceNetTsv
             {
                 var allStartsThisChr = new HashSet<int>(flankingRegionStarts1[i]);
                 allStartsThisChr.UnionWith(flankingRegionStarts2[i]);
-                var intervals = GetIntervals(allStartsThisChr, _intronBoundaryDistanceCutoff * 2);
+                var intervals = GetIntervals(allStartsThisChr, IntronBoundaryDistanceCutoff * 2);
                 flankingRegions[i] = new IntervalArray<byte>(intervals.ToArray());
             }
             return new IntervalForest<byte>(flankingRegions);
@@ -125,9 +125,9 @@ namespace SAUtils.ProcessSpliceNetTsv
             for (var i = 1; i < exonBoundaries.Count; i++)
             {
                 // Donor site for intron i
-                flankingRegionStartsthisChr.Add(exonBoundaries[i - 1].End - _intronBoundaryDistanceCutoff + 1);
+                flankingRegionStartsthisChr.Add(exonBoundaries[i - 1].End - IntronBoundaryDistanceCutoff + 1);
                 // Acceptor site for intron i
-                flankingRegionStartsthisChr.Add(exonBoundaries[i].Start - _intronBoundaryDistanceCutoff);
+                flankingRegionStartsthisChr.Add(exonBoundaries[i].Start - IntronBoundaryDistanceCutoff);
             }
         }
 

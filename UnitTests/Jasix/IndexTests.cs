@@ -164,15 +164,16 @@ namespace UnitTests.Jasix
         {
             var jsonStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("cosmicv72.indels.json.gz")), CompressionMode.Decompress);
 
-            var writeStream= new MemoryStream();
+            var writeStream = new MemoryStream();
             using (var indexCreator = new IndexCreator(jsonStream, writeStream))
             {
                 indexCreator.CreateIndex();
             }
 
             JasixIndex readBackIndex;
-            var readStream = new MemoryStream(writeStream.ToArray());
+            var        readStream = new MemoryStream(writeStream.ToArray());
             readStream.Seek(0, SeekOrigin.Begin);
+
             using (readStream)
             {
                 readBackIndex = new JasixIndex(readStream);

@@ -26,7 +26,7 @@ namespace Nirvana
         private ImmutableDictionary<IChromosome, List<int>> _variantPositions;
         public ISequenceProvider SequenceProvider { get; }
         public ITranscriptAnnotationProvider TranscriptAnnotationProvider { get; }
-        public ProteinConservationProvider ProteinConservationProvider { get; }
+        private ProteinConservationProvider ProteinConservationProvider { get; }
         public IAnnotationProvider SaProvider { get; }
         public IAnnotationProvider ConservationProvider { get; }
         public IRefMinorProvider RefMinorProvider { get; }
@@ -39,22 +39,31 @@ namespace Nirvana
         public long InputStartVirtualPosition { get; set; }
         public string AnnotatorVersionTag { get; set; } = "Nirvana " + CommandLineUtilities.Version;
         public bool ForceMitochondrialAnnotation { get; }
+        public readonly PerformanceMetrics Metrics;
 
         public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations,
-            bool disableRecomposition, bool forceMitochondrialAnnotation, bool useLegacyVids)
+            bool disableRecomposition, bool forceMitochondrialAnnotation, bool useLegacyVids, PerformanceMetrics metrics)
         {
+            Metrics = metrics;
+            PerformanceMetrics.ShowInitializationHeader();
+            
             SequenceProvider = ProviderUtilities.GetSequenceProvider(refSequencePath);
 
             var annotationFiles = new AnnotationFiles();
             saDirectoryPaths?.ForEach(x => annotationFiles.AddFiles(x));
             customAnnotations?.ForEach(x => annotationFiles.AddFiles(x));
 
-            ProteinConservationProvider  = ProviderUtilities.GetProteinConservationProvider(annotationFiles);
+            ProteinConservationProvider = ProviderUtilities.GetProteinConservationProvider(annotationFiles);
+            ProteinConservationProvider?.Load();
+            
+            metrics.Cache.Start();
             TranscriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(inputCachePrefix, SequenceProvider, ProteinConservationProvider);
-            SaProvider                   = ProviderUtilities.GetNsaProvider(annotationFiles);
-            ConservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
-            RefMinorProvider             = ProviderUtilities.GetRefMinorProvider(annotationFiles);
-            GeneAnnotationProvider       = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
+            metrics.ShowCacheLoad();
+
+            SaProvider             = ProviderUtilities.GetNsaProvider(annotationFiles);
+            ConservationProvider   = ProviderUtilities.GetConservationProvider(annotationFiles);
+            RefMinorProvider       = ProviderUtilities.GetRefMinorProvider(annotationFiles);
+            GeneAnnotationProvider = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
 
             var repeatExpansionProvider = new RepeatExpansionProvider(SequenceProvider.Assembly, SequenceProvider.RefNameToChromosome,
                 SequenceProvider.RefIndexToChromosome.Count);
@@ -99,7 +108,11 @@ namespace Nirvana
             }
 
             vcfStream.Position = Tabix.VirtualPosition.From(InputStartVirtualPosition).BlockOffset;
-            _variantPositions = PreLoadUtilities.GetPositions(vcfStream, genomicRange, SequenceProvider, RefMinorProvider).ToImmutableDictionary();
+            int numPositions;
+            
+            Metrics.SaPositionScan.Start();
+            (_variantPositions, numPositions) = PreLoadUtilities.GetPositions(vcfStream, genomicRange, SequenceProvider, RefMinorProvider);
+            Metrics.ShowSaPositionScanLoad(numPositions);
         }
 
         public void PreLoad(IChromosome chromosome)

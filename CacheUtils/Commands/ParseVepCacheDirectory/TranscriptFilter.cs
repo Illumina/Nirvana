@@ -7,7 +7,6 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.DataDumperImport.Utilities;
 using CacheUtils.Genbank;
 using CacheUtils.Genes.Utilities;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
@@ -16,11 +15,11 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
     {
         private static readonly MutableTranscriptComparer Comparer = new MutableTranscriptComparer();
 
-        private static void Log(this ILogger logger, string transcriptId, string description) =>
+        private static void Log(this TranscriptMergerLogger logger, string transcriptId, string description) =>
             logger.WriteLine($"{transcriptId}\t{description}");
 
         public static List<MutableTranscript> PickSpecificTranscript(
-            this List<MutableTranscript> transcripts, ILogger logger, string transcriptId)
+            this List<MutableTranscript> transcripts, TranscriptMergerLogger logger, string transcriptId)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -53,7 +52,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> InvestigateInconsistentCdnaMaps(this List<MutableTranscript> transcripts,
-            ILogger logger, string transcriptId)
+            TranscriptMergerLogger logger, string transcriptId)
         {
             var index = 0;
             foreach (var transcript in transcripts)
@@ -93,7 +92,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> ChooseEditedTranscripts(
-            this List<MutableTranscript> transcripts, ILogger logger)
+            this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -105,7 +104,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> RemoveFailedTranscripts(
-            this List<MutableTranscript> transcripts, ILogger logger)
+            this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -117,7 +116,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> RemoveTranscriptsWithLowestVersion(
-            this List<MutableTranscript> transcripts, ILogger logger)
+            this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -139,7 +138,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> FixCodingRegionCdnaStart(this List<MutableTranscript> transcripts,
-            ILogger logger, IReadOnlyDictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
+            TranscriptMergerLogger logger, IReadOnlyDictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
         {
             if (transcripts.Count == 1 || idToGenbankEntry == null || !idToGenbankEntry.TryGetValue(transcriptId, out var genbankEntry)) return transcripts;
 
@@ -154,7 +153,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> FixCodingRegionCdnaEnd(this List<MutableTranscript> transcripts,
-            ILogger logger, IReadOnlyDictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
+            TranscriptMergerLogger logger, IReadOnlyDictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
         {
             if (transcripts.Count == 1 || idToGenbankEntry == null || !idToGenbankEntry.TryGetValue(transcriptId, out var genbankEntry)) return transcripts;
 
@@ -169,7 +168,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> FixGeneSymbolSource(this List<MutableTranscript> transcripts,
-            ILogger logger)
+            TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -185,7 +184,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
-        public static List<MutableTranscript> FixBioType(this List<MutableTranscript> transcripts, ILogger logger)
+        public static List<MutableTranscript> FixBioType(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -236,7 +235,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return BioType.other;
         }
 
-        public static List<MutableTranscript> FixGeneId(this List<MutableTranscript> transcripts, ILogger logger,
+        public static List<MutableTranscript> FixGeneId(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger,
             Dictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
         {
             if (transcripts.Count == 1 || idToGenbankEntry == null || !idToGenbankEntry.TryGetValue(transcriptId, out var genbankEntry)) return transcripts;
@@ -252,7 +251,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public static List<MutableTranscript> UnsupervisedFixGeneId(this List<MutableTranscript> transcripts,
-            ILogger logger)
+            TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -265,7 +264,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
-        public static List<MutableTranscript> FixGeneSymbols(this List<MutableTranscript> transcripts, ILogger logger,
+        public static List<MutableTranscript> FixGeneSymbols(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger,
             Dictionary<string, GenbankEntry> idToGenbankEntry, string transcriptId)
         {
             if (transcripts.Count == 1) return transcripts;
@@ -284,7 +283,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
-        public static List<MutableTranscript> FixCanonical(this List<MutableTranscript> transcripts, ILogger logger)
+        public static List<MutableTranscript> FixCanonical(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -296,7 +295,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
-        public static List<MutableTranscript> FixHgncId(this List<MutableTranscript> transcripts, ILogger logger)
+        public static List<MutableTranscript> FixHgncId(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -311,7 +310,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
-        public static List<MutableTranscript> FixGeneStart(this List<MutableTranscript> transcripts, ILogger logger)
+        public static List<MutableTranscript> FixGeneStart(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -327,7 +326,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts.Unique();
         }
 
-        public static List<MutableTranscript> FixGeneEnd(this List<MutableTranscript> transcripts, ILogger logger)
+        public static List<MutableTranscript> FixGeneEnd(this List<MutableTranscript> transcripts, TranscriptMergerLogger logger)
         {
             if (transcripts.Count == 1) return transcripts;
 
@@ -344,7 +343,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         private static List<MutableTranscript> UnsupervisedFixGeneSymbols(this IReadOnlyList<MutableTranscript> transcripts,
-            ILogger logger, List<string> symbols)
+            TranscriptMergerLogger logger, List<string> symbols)
         {
             var nonLocGeneSymbols = symbols.FindAll(x => !string.IsNullOrEmpty(x) && !x.StartsWith("LOC"));
             string symbol = nonLocGeneSymbols.Count > 0 ? nonLocGeneSymbols[0] : symbols[0];

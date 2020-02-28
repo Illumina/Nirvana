@@ -60,7 +60,7 @@
         {
             if (chunks == null) return 0;
 
-            ulong minOverlapOffset = ulong.MaxValue;
+            var minOverlapOffset = ulong.MaxValue;
 
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var chunk in chunks)

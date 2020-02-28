@@ -50,7 +50,7 @@ namespace SAUtils.MitoMap
         };
 
         private static readonly HashSet<string> MitoMapDelSymbolSet = new HashSet<string> { ":", "del", "d" };
-        private static HashSet<string> IgnoredStatus = new HashSet<string> { "See 7471insC", "Reported  (alt loc)" };
+        private static readonly HashSet<string> IgnoredStatus = new HashSet<string> { "See 7471insC", "Reported  (alt loc)" };
 
         public MitoMapVariantReader(FileInfo mitoMapFileInfo, MitoMapInputDb mitoMapInputDb, ReferenceSequenceProvider sequenceProvider)
         {

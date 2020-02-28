@@ -30,8 +30,8 @@ namespace VariantAnnotation.IO
         {
         }
 
-        private static StreamWriter GetProperWriter(Stream jsonStream) => jsonStream is BlockGZipStream
-            ? new BgzipTextWriter((BlockGZipStream)jsonStream)
+        private static StreamWriter GetProperWriter(Stream jsonStream) => jsonStream is BlockGZipStream stream
+            ? new BgzipTextWriter(stream)
             : new StreamWriter(jsonStream);
 
         public JsonWriter(StreamWriter writer, Stream indexStream, string annotator, string creationTime, string vepDataVersion,

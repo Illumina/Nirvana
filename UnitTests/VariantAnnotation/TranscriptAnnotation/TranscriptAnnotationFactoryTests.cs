@@ -92,7 +92,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
-            ITranscript[] transcripts = new[] { transcript1.Object, transcript2.Object };
+            ITranscript[] transcripts = { transcript1.Object, transcript2.Object };
 
             variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.SmallVariants);
             variant.SetupGet(x => x.Start).Returns(123456);
@@ -126,7 +126,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             var transcript1 = new Mock<ITranscript>();
             var transcript2 = new Mock<ITranscript>();
 
-            ITranscript[] transcripts = new[] { transcript1.Object, transcript2.Object };
+            ITranscript[] transcripts = { transcript1.Object, transcript2.Object };
 
             variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.RunsOfHomozygosity);
             variant.SetupGet(x => x.Start).Returns(10000);

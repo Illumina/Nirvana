@@ -174,7 +174,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal("\"coverage\":23,\"failedFilter\":true,\"allAf\":0.000476,\"allAn\":86114,\"allAc\":41,\"allHc\":0,\"afrAf\":0.003149,\"afrAn\":13018,\"afrAc\":41,\"afrHc\":0,\"amrAf\":0,\"amrAn\":11274,\"amrAc\":0,\"amrHc\":0,\"easAf\":0,\"easAn\":9354,\"easAc\":0,\"easHc\":0,\"finAf\":0,\"finAn\":5344,\"finAc\":0,\"finHc\":0,\"nfeAf\":0,\"nfeAn\":36372,\"nfeAc\":0,\"nfeHc\":0,\"asjAf\":0,\"asjAn\":1780,\"asjAc\":0,\"asjHc\":0,\"sasAf\":0,\"sasAn\":6060,\"sasAc\":0,\"sasHc\":0,\"othAf\":0,\"othAn\":2912,\"othAc\":0,\"othHc\":0,\"maleAf\":0.000335,\"maleAn\":44796,\"maleAc\":15,\"maleHc\":0,\"femaleAf\":0.000629,\"femaleAn\":41318,\"femaleAc\":26,\"femaleHc\":0,\"controlsAllAf\":0.000476,\"controlsAllAn\":33612,\"controlsAllAc\":16", items[3].GetJsonString());
         }
         
-        private Stream GetChr22_21006257_genome()
+        private static Stream GetChr22_21006257_genome()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -187,7 +187,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             stream.Position = 0;
             return stream;
         }
-        private Stream GetChr22_21006257_exome()
+        
+        private static Stream GetChr22_21006257_exome()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -215,7 +216,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal(21, items[0].Coverage);
         }
 
-        private Stream GetChr22_22055876_genome()
+        private static Stream GetChr22_22055876_genome()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -229,7 +230,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             stream.Position = 0;
             return stream;
         }
-        private Stream GetChr22_22055876_exome()
+        
+        private static Stream GetChr22_22055876_exome()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -243,6 +245,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             stream.Position = 0;
             return stream;
         }
+        
         [Fact]
         public void RemoveConflictingItems()
         {
@@ -258,7 +261,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal(18686, items[0].AllAlleleNumber);
         }
 
-        private Stream GetChr22_16689800_16689902_genome()
+        private static Stream GetChr22_16689800_16689902_genome()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -272,6 +275,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             stream.Position = 0;
             return stream;
         }
+        
         [Fact]
         public void DoNotReportCoverage_whenAnZero()
         {

@@ -21,13 +21,7 @@ namespace CommandLine.Utilities
                 : $"{span.Hours:D2}:{span.Minutes:D2}:{span.Seconds:D2}.{span.Milliseconds/100:D1}";
         }
 
-        public void GetElapsedIterationTime(int numUnits, out double unitsPerSecond)
-        {
-            var stopTime = DateTime.Now;
-            var span = new TimeSpan(stopTime.Ticks - _startTime.Ticks);
-
-            unitsPerSecond = numUnits / span.TotalSeconds;
-        }
+        public static double GetElapsedIterationsPerSecond(TimeSpan span, int numUnits) => numUnits / span.TotalSeconds;
 
         public void Reset() => _startTime = DateTime.Now;
     }

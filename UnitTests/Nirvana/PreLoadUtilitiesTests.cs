@@ -35,7 +35,7 @@ namespace UnitTests.Nirvana
         {
             //we only need the sequence provider for variant rotation. 
             var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
-            var positions = PreLoadUtilities.GetPositions(GetVcfStream(), null, seqProvider, null);
+            (var positions, _) = PreLoadUtilities.GetPositions(GetVcfStream(), null, seqProvider, null);
 
             Assert.Equal(2, positions.Count);
             Assert.Equal(4, positions[ChromosomeUtilities.Chr1].Count);
@@ -47,7 +47,7 @@ namespace UnitTests.Nirvana
         {
             var annotationRange = new GenomicRange(new GenomicPosition(ChromosomeUtilities.Chr1, 10019), new GenomicPosition(ChromosomeUtilities.Chr1, 10290));
             var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
-            var positions = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, seqProvider, null);
+            (var positions, _) = PreLoadUtilities.GetPositions(GetVcfStream(), annotationRange, seqProvider, null);
 
             Assert.Single(positions);
             Assert.Equal(3, positions[ChromosomeUtilities.Chr1].Count);
@@ -88,7 +88,7 @@ namespace UnitTests.Nirvana
                     (ChromosomeUtilities.Chr1, 10275, "A" )
                 }
             );
-            var positions = PreLoadUtilities.GetPositions(GetRefMinorVcfStream(), null, seqProvider, refMinorProvider);
+            (var positions, _) = PreLoadUtilities.GetPositions(GetRefMinorVcfStream(), null, seqProvider, refMinorProvider);
 
             Assert.Equal(2, positions.Count);
             Assert.Equal(5, positions[ChromosomeUtilities.Chr1].Count);

@@ -64,13 +64,13 @@ namespace NirvanaLambda
                 }
                 catch (Exception e) when (ExceptionUtilities.HasException<TooManyRequestsException>(e))
                 {
-                    Logger.LogLine($"Job {_jobIndex}: Invocation is throttled. Retry in {WaitBeforeRetry} ms.");
+                    Logger.WriteLine($"Job {_jobIndex}: Invocation is throttled. Retry in {WaitBeforeRetry} ms.");
                     _numRetries++;
                     await Task.Delay(WaitBeforeRetry);
                 }
                 catch (Exception e) when (e.HasErrorMessage(UnknownErrorMessage))
                 {
-                    Logger.LogLine($"Job {_jobIndex}: {UnknownErrorMessage}. Retry in {WaitBeforeRetry} ms.");
+                    Logger.WriteLine($"Job {_jobIndex}: {UnknownErrorMessage}. Retry in {WaitBeforeRetry} ms.");
                     _numRetries++;
                     await Task.Delay(WaitBeforeRetry);
                 }

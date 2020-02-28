@@ -8,7 +8,7 @@ using Xunit;
 
 namespace UnitTests.SAUtils.MitoMap
 {
-    public class MitoMapSvReaderTests
+    public sealed class MitoMapSvReaderTests
     {
         private static readonly string    RawSequence = "ABC" + new string('N', 200);
         private static readonly ISequence Sequence    = new SimpleSequence(RawSequence);

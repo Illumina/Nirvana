@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnitTests.TestUtilities;
 using Xunit;
 
@@ -11,13 +10,8 @@ namespace UnitTests
     public sealed class EndToEndTests
     {
         private readonly string _cacheFilePrefix;
-        private readonly List<string> _saDirs;
 
-        public EndToEndTests()
-        {
-            _cacheFilePrefix = Resources.EndToEnd37("chr12_7018490_7086889_Both");
-            _saDirs          = new List<string> { Resources.EndToEnd37("") };
-        }
+        public EndToEndTests() => _cacheFilePrefix = Resources.EndToEnd37("chr12_7018490_7086889_Both");
 
         [Fact]
         public void Annotation_RefMinor_not_annotated_when_no_SA()

@@ -8,8 +8,8 @@ namespace SAUtils.dbVar
     public sealed class DosageSensitivityItem : ISuppGeneItem
     {
         public string GeneSymbol { get; }
-        private int _hiScore;
-        private int _tsScore;
+        private readonly int _hiScore;
+        private readonly int _tsScore;
 
         public DosageSensitivityItem(string geneSymbol, int hiScore, int tsScore)
         {

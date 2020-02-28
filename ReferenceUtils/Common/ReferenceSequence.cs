@@ -40,10 +40,10 @@ namespace ReferenceUtils.Common
                     writer.Flush();
                 }
 
-                var numBytes = (int)ms.Position;
-                var buffer   = ms.ToArray();
+                var    numBytes = (int) ms.Position;
+                byte[] buffer   = ms.ToArray();
 
-                block = new CompressionBlock(_refIndex, buffer, numBytes, _sequenceOffset);
+                block = new CompressionBlock(_refIndex, buffer, numBytes);
                 block.Compress();
             }
 

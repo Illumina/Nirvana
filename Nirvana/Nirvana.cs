@@ -8,6 +8,7 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using Jasix.DataStructures;
+using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Providers;
 using Vcf;
@@ -34,13 +35,16 @@ namespace Nirvana
             using (var inputVcfStream        = _vcfPath        == "-"  ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
             using (var outputJsonStream      = _outputFileName == "-"  ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName   == null ? null : FileUtilities.GetCreateStream(jasixFileName))
-                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false, _useLegacyVids);
+                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false);
         }
 
         private static AnnotationResources GetAnnotationResources()
         {
+            if (_outputFileName == "-") Logger.Silence();
+            var metrics = new PerformanceMetrics();
+            
             var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null,
-                _disableRecomposition, _forceMitochondrialAnnotation, _useLegacyVids);
+                _disableRecomposition, _forceMitochondrialAnnotation, _useLegacyVids, metrics);
             
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 

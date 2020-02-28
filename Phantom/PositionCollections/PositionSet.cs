@@ -135,8 +135,8 @@ namespace Phantom.PositionCollections
             var entireBlock = new GenotypeBlock(genotypes);
             var blockRanges = GetGenotypeBlockRange(positionSet.PsInfo.Values[sampleIndex], genotypes.Select(x => x.IsPhased).ToArray(), genotypes.Select(x => x.IsHomozygous).ToArray());
             var genotypeBlocks = new List<GenotypeBlock>();
-            foreach (var range in blockRanges)
-                genotypeBlocks.Add(entireBlock.GetSubBlock(range.StartIndex, range.PositionCount));
+            foreach ((int startIndex, int positionCount) in blockRanges)
+                genotypeBlocks.Add(entireBlock.GetSubBlock(startIndex, positionCount));
 
             return genotypeBlocks;
         }

@@ -28,7 +28,7 @@ namespace VariantAnnotation.Providers
         }
 
         
-        public int GetConservationScore(String transcriptId, int position)
+        public int GetConservationScore(string transcriptId, int position)
         {
             if (_conservationScores.TryGetValue(transcriptId, out var scores))
                 return position < scores.Length ? scores[position - 1] : -1;

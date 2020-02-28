@@ -11,7 +11,7 @@ namespace SAUtils.MitoMap
         public int Start { get; }
         public int End { get; }
         public IChromosome Chromosome { get; }
-        public VariantType VariantType { get; }
+        private VariantType VariantType { get; }
 
         public MitoMapSvItem(IChromosome chromosome, int start, int end, VariantType variantType)
         {

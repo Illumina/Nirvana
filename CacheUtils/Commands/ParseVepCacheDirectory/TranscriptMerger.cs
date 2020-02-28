@@ -4,7 +4,6 @@ using System.Linq;
 using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.Genbank;
 using CacheUtils.Genes.Utilities;
-using VariantAnnotation.Interface;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
 {
@@ -15,7 +14,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         /// islands. From there we can resolve differences and return a unique transcript 
         /// for each cluster.
         /// </summary>
-        public static List<MutableTranscript> Merge(ILogger logger, IEnumerable<MutableTranscript> transcripts,
+        public static List<MutableTranscript> Merge(TranscriptMergerLogger logger, IEnumerable<MutableTranscript> transcripts,
             Dictionary<string, GenbankEntry> idToGenbankEntry)
         {
             var idToTranscripts   = transcripts.GetMultiValueDict(x => x.Id + "|" + x.Start + "|" + x.End);
@@ -23,7 +22,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return mergedTranscripts.OrderBy(x => x.Start).ThenBy(x => x.End).ToList();
         }
 
-        private static MutableTranscript Merge(ILogger logger, IReadOnlyList<MutableTranscript> transcripts,
+        private static MutableTranscript Merge(TranscriptMergerLogger logger, IReadOnlyList<MutableTranscript> transcripts,
             Dictionary<string, GenbankEntry> idToGenbankEntry)
         {
             string transcriptId = transcripts[0].Id;

@@ -10,10 +10,10 @@ namespace Phantom.Recomposer
 {
     public sealed class PositionBuffer : IPositionBuffer
     {
-        public ICodonInfoProvider CodonInfoProvider { get; }
+        private ICodonInfoProvider CodonInfoProvider { get; }
         public IChromosome CurrentChromosome { get; private set; }
-        public BufferedPositions BufferedPositions { get; private set; }
-        public IIntervalForest<IGene> GeneIntervalForest { get; } // used to find overlap genes for now
+        private BufferedPositions BufferedPositions { get; set; }
+        private IIntervalForest<IGene> GeneIntervalForest { get; } // used to find overlap genes for now
 
         public PositionBuffer(ICodonInfoProvider codonInfoProvider, IIntervalForest<IGene> geneIntervalForest)
         {
@@ -60,7 +60,7 @@ namespace Phantom.Recomposer
             return CurrentChromosome.Index == simplePosition.Chromosome.Index && blockRangesCount != 0  && simplePosition.Start <= BufferedPositions.FunctionBlockRanges[blockRangesCount - 1] && InGeneRegion(simplePosition);
         }
 
-        public void UpdateFunctionBlockRanges(ISimplePosition simplePosition)
+        private void UpdateFunctionBlockRanges(ISimplePosition simplePosition)
         {
             BufferedPositions.FunctionBlockRanges.Add(CodonInfoProvider.GetLongestFunctionBlockDistance(simplePosition));
         }

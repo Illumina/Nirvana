@@ -119,7 +119,7 @@ namespace Phantom.Recomposer
         private static string GetStringWithMinValueOrDot(IEnumerable<string> strings)
         {
             var currentString = ".";
-            float currentValue = float.MaxValue;
+            var currentValue = float.MaxValue;
             foreach (string thisString in strings)
             {
                 if (thisString == ".") continue;

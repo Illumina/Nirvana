@@ -5,8 +5,7 @@
 		void Write(bool b);
 		void Write(byte b);
         void Write(byte[] buffer);
-        void Write(string s);
-	    void Write(ushort value);
+        void Write(ushort value);
         void Write(uint value);
 	    void WriteOpt(ushort value);
 		void WriteOpt(int value);

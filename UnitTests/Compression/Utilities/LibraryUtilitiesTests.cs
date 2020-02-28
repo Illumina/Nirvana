@@ -8,11 +8,7 @@ namespace UnitTests.Compression.Utilities
         [Fact]
         public void CheckLibrary_ValidLibrary_NoExceptionThrown()
         {
-            var ex = Record.Exception(() =>
-            {
-                LibraryUtilities.CheckLibrary();
-            });
-
+            var ex = Record.Exception(LibraryUtilities.CheckLibrary);
             Assert.Null(ex);
         }
     }

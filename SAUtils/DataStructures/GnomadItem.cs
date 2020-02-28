@@ -64,7 +64,7 @@ namespace SAUtils.DataStructures
         public int? ControlsAllAlleleCount { get; private set; }
         public int? ControlsAllAlleleNumber { get; private set; }
         
-        public int? Depth { get; private set; }
+        public int? Depth { get; }
         public int? Coverage { get; }
         public bool HasFailedFilters { get; }
         public bool IsLowComplexityRegion { get; }

@@ -96,7 +96,7 @@ namespace UnitTests.VariantAnnotation.Caches
             };
         }
 
-        private IRegulatoryRegion[] GetRegulatoryRegions()
+        private static IRegulatoryRegion[] GetRegulatoryRegions()
         {
             var regulatoryRegions = new IRegulatoryRegion[3];
 
@@ -112,7 +112,7 @@ namespace UnitTests.VariantAnnotation.Caches
             return regulatoryRegions;
         }
 
-        private ITranscript[] GetTranscripts()
+        private static ITranscript[] GetTranscripts()
         {
             return new ITranscript[]
             {

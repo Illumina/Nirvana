@@ -15,19 +15,17 @@ namespace VariantAnnotation.Sequence
         public int BufferSize { get; private set; }
 
         public readonly ushort RefIndex;
-        public readonly int SequenceOffset;
 
         public int UncompressedBufferSize { get; }
         public int CompressedBufferSize { get; private set; }
 
         private static readonly Zstandard Zstd = new Zstandard(21);
 
-        public CompressionBlock(ushort refIndex, byte[] uncompressedBuffer, int numBytes, int sequenceOffset)
+        public CompressionBlock(ushort refIndex, byte[] uncompressedBuffer, int numBytes)
         {
             RefIndex               = refIndex;
             _uncompressedBuffer    = uncompressedBuffer;
             UncompressedBufferSize = numBytes;
-            SequenceOffset         = sequenceOffset;
             _compressedBufferSize  = Zstd.GetCompressedBufferBounds(numBytes);
             _compressedBuffer      = new byte[_compressedBufferSize];
         }

@@ -47,7 +47,7 @@ namespace IO
                 }
                 catch (Exception e)
                 {
-                    Logger.LogLine($"TryGetResponse exception found when connecting to {url}");
+                    Logger.WriteLine($"TryGetResponse exception found when connecting to {url}");
                     Logger.Log(e);
                     exceptions.Add(ProcessHttpRequestWebProtocolErrorException(e, url));
                 }
@@ -100,7 +100,7 @@ namespace IO
             // For example, the AccessDenied error code could be triggered by either incorrect credentials provided by the user, or network congestion while reading from S3.
             // Therefore, such errors are treated as general exceptions.
             // And we don't pass through the general error to end user to avoid possible confusion.
-            Logger.LogLine($"The following error occurred while reading from {url}: {errorMessage}. Exception: {exception.Message}");
+            Logger.WriteLine($"The following error occurred while reading from {url}: {errorMessage}. Exception: {exception.Message}");
             return new WebException($"An error occurred while reading from the URL for {urlPath} ({exception.GetType()})");
         }
 

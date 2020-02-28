@@ -16,7 +16,7 @@ namespace UnitTests.SAUtils
 {
     public sealed class NsaProviderTests
     {
-        private IAnnotationProvider GetDbSnpProvider()
+        private static IAnnotationProvider GetDbSnpProvider()
         {
             var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {
@@ -38,7 +38,7 @@ namespace UnitTests.SAUtils
             return provider;
         }
 
-        private IAnnotationProvider GetClinVarProvider()
+        private static IAnnotationProvider GetClinVarProvider()
         {
             var chrom1Pos100Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {

@@ -9,7 +9,7 @@ namespace CustomAnnotationLambda
     {
         public static void CheckRequiredFieldsNotNull(this CustomConfig config)
         {
-            string BuildErrorMessage(string message) => message + " cannot be null.";
+            static string BuildErrorMessage(string message) => message + " cannot be null.";
 
             if (config.id                     == null) throw new UserErrorException(BuildErrorMessage("id"));
             if (config.tsvUrl                 == null) throw new UserErrorException(BuildErrorMessage("tsvUrl"));

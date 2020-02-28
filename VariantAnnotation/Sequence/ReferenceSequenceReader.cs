@@ -88,7 +88,7 @@ namespace VariantAnnotation.Sequence
                 cytogeneticBands);
         }
 
-        private (int SequenceOffset, int NumBases) GetMetadata(MemoryBufferBinaryReader reader)
+        private static (int SequenceOffset, int NumBases) GetMetadata(MemoryBufferBinaryReader reader)
         {
             int sequenceOffset = reader.ReadOptInt32();
             int numBases       = reader.ReadOptInt32();
@@ -141,16 +141,13 @@ namespace VariantAnnotation.Sequence
             NumRefSeqs        = (ushort)_reader.ReadOptInt32();
         }
 
-        private IChromosome[] GetChromosomes()
+        private void GetChromosomes()
         {
-            var chromosomes = new IChromosome[NumRefSeqs];
             for (var i = 0; i < NumRefSeqs; i++)
             {
                 var chromosome = ChromosomeExtensions.Read(_reader);
                 AddReferenceName(chromosome);
-                chromosomes[i] = chromosome;
             }
-            return chromosomes;
         }
 
         private IndexEntry[] LoadIndex()

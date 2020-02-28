@@ -66,7 +66,7 @@ namespace Phantom.CodonInformation
             return longestRange;
         }
 
-        public int[] GetFunctionBlockDistances(IChromosomeInterval chrInterval)
+        private int[] GetFunctionBlockDistances(IChromosomeInterval chrInterval)
         {
             var overlappingCodingBlocks = GetOverlappingCodingBlocks(chrInterval);
             if (overlappingCodingBlocks == null) return null;

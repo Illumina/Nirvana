@@ -28,7 +28,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Equal(expectedConsequence, consequences[0]);
         }
 
-        private IRegulatoryRegion GetRegulatoryRegion()
+        private static IRegulatoryRegion GetRegulatoryRegion()
         {
             return new RegulatoryRegion(ChromosomeUtilities.Chr1, 948000, 950401, CompactId.Convert("ENSR00001037666"),
                 RegulatoryRegionType.promoter);

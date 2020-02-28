@@ -113,7 +113,7 @@ namespace Vcf
             if (_headerLines.Count == 0 || !_headerLines[0].StartsWith("##fileformat=VCFv"))
                 throw new UserErrorException("Please provide a valid VCF file with proper fileformat field.");
 
-            if (!_headerLines[_headerLines.Count - 1].StartsWith(VcfCommon.ChromosomeHeader))
+            if (!_headerLines[^1].StartsWith(VcfCommon.ChromosomeHeader))
                 throw new UserErrorException($"Could not find the vcf header line starting with {VcfCommon.ChromosomeHeader}. Is this a valid vcf file?");
         }
 

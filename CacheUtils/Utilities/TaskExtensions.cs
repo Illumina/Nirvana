@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using CommandLine.Utilities;
-using VariantAnnotation.Interface;
+using IO;
 
 namespace CacheUtils.Utilities
 {
     public static class TaskExtensions
     {
-        public static void Execute<T>(this IReadOnlyList<T> items, ILogger logger, string description,
+        public static void Execute<T>(this IReadOnlyList<T> items, string description,
             Action<T> executeAction, int numThreads = 5)
         {
             var bench     = new Benchmark();
@@ -25,7 +25,7 @@ namespace CacheUtils.Utilities
             }
 
             Task.WaitAll(tasks);
-            logger.WriteLine($"- all {description} finished ({Benchmark.ToHumanReadable(bench.GetElapsedTime())}).\n");
+            Logger.WriteLine($"- all {description} finished ({Benchmark.ToHumanReadable(bench.GetElapsedTime())}).\n");
         }
     }
 }

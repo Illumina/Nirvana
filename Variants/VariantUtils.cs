@@ -28,10 +28,10 @@ namespace Variants
 
             // adjust the max upstream length when you are near the beginning of the chrom
             if (maxUpstreamLength >= start) maxUpstreamLength = start - 1;
-            var upstreamSeq = refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength);
+            string upstreamSeq = refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength);
             
             // compressed seq is 0 based
-            var combinedSeq = upstreamSeq;
+            string combinedSeq = upstreamSeq;
             int repeatLength;
             int i;
             if (refAllele.Length > altAllele.Length)
@@ -44,7 +44,7 @@ namespace Variants
                     if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
                 }
 
-                var newRefAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
+                string newRefAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
                 return (start, newRefAllele, ""); //alt is empty for deletion
             }
 
@@ -56,7 +56,8 @@ namespace Variants
             {
                 if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
             }
-            var newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
+            
+            string newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
             return (start, "", newAltAllele);
         }
 
@@ -70,8 +71,8 @@ namespace Variants
         {
             if (refAllele == altAllele) return false;
             if (string.IsNullOrEmpty(refAllele) || string.IsNullOrEmpty(altAllele)) return true;
-            if (refAllele.Length == 1) return refAllele[0] == altAllele[altAllele.Length - 1];
-            if (altAllele.Length == 1) return altAllele[0] == refAllele[refAllele.Length - 1];
+            if (refAllele.Length == 1) return refAllele[0] == altAllele[^1];
+            if (altAllele.Length == 1) return altAllele[0] == refAllele[^1];
 
             return true;
         }

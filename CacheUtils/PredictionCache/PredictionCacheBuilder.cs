@@ -5,8 +5,8 @@ using CacheUtils.DataDumperImport.DataStructures.Mutable;
 using CacheUtils.IntermediateIO;
 using CacheUtils.Utilities;
 using Genome;
+using IO;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
 
@@ -14,20 +14,15 @@ namespace CacheUtils.PredictionCache
 {
     public sealed class PredictionCacheBuilder
     {
-        private readonly ILogger _logger;
         private readonly GenomeAssembly _genomeAssembly;
 
-        public PredictionCacheBuilder(ILogger logger, GenomeAssembly genomeAssembly)
-        {
-            _logger         = logger;
-            _genomeAssembly = genomeAssembly;
-        }
+        public PredictionCacheBuilder(GenomeAssembly genomeAssembly) => _genomeAssembly = genomeAssembly;
 
         public (PredictionCacheStaging Sift, PredictionCacheStaging PolyPhen) CreatePredictionCaches(
             Dictionary<ushort, List<MutableTranscript>> transcriptsByRefIndex, PredictionReader siftReader,
             PredictionReader polyphenReader, int numRefSeqs)
         {
-            _logger.Write("- converting prediction strings... ");
+            Logger.Write("- converting prediction strings... ");
 
             var siftRoundedPredictionsPerRef     = new RoundedEntryPrediction[numRefSeqs][];
             var polyPhenRoundedPredictionsPerRef = new RoundedEntryPrediction[numRefSeqs][];
@@ -51,7 +46,7 @@ namespace CacheUtils.PredictionCache
                 polyPhenRoundedPredictionsPerRef[refIndex] = polyPhenPredictions;
             }
 
-            _logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
 
             var siftStaging     = BuildCacheStaging("SIFT", siftRoundedPredictionsPerRef, numRefSeqs);
             var polyPhenStaging = BuildCacheStaging("PolyPhen", polyPhenRoundedPredictionsPerRef, numRefSeqs);
@@ -62,13 +57,13 @@ namespace CacheUtils.PredictionCache
         private PredictionCacheStaging BuildCacheStaging(string description,
             IReadOnlyList<RoundedEntryPrediction[]> roundedPredictionsPerRef, int numReferenceSeqs)
         {
-            _logger.Write($"- calculating {description} LUT... ");
+            Logger.Write($"- calculating {description} LUT... ");
             var (lut, roundedEntryToLutIndex) = CreateLut(roundedPredictionsPerRef);
-            _logger.WriteLine($"{lut.Length} entries.");
+            Logger.WriteLine($"{lut.Length} entries.");
 
-            _logger.Write($"- converting {description} rounded entries... ");
+            Logger.Write($"- converting {description} rounded entries... ");
             var predictionsPerRef = ConvertPredictions(roundedPredictionsPerRef, roundedEntryToLutIndex, lut);
-            _logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
 
             var header = CreateHeader(numReferenceSeqs, lut);
             return new PredictionCacheStaging(header, predictionsPerRef);

@@ -15,8 +15,6 @@ using ErrorHandling;
 using Genome;
 using Intervals;
 using IO;
-using VariantAnnotation.Interface;
-using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
 
@@ -31,7 +29,6 @@ namespace CacheUtils.Commands.CreateCache
 
         private static ExitCodes ProgramExecution()
         {
-            var logger            = new ConsoleLogger();
             string transcriptPath = _inputPrefix + ".transcripts.gz";
             string siftPath       = _inputPrefix + ".sift.gz";
             string polyphenPath   = _inputPrefix + ".polyphen.gz";
@@ -50,39 +47,39 @@ namespace CacheUtils.Commands.CreateCache
                 long vepReleaseTicks = transcriptReader.Header.VepReleaseTicks;
                 ushort vepVersion    = transcriptReader.Header.VepVersion;
 
-                logger.Write("- loading universal gene archive file... ");
+                Logger.Write("- loading universal gene archive file... ");
                 var genes      = geneReader.GetGenes();
                 var geneForest = CreateGeneForest(genes, numRefSeqs, genomeAssembly);
-                logger.WriteLine($"{genes.Length:N0} loaded.");
+                Logger.WriteLine($"{genes.Length:N0} loaded.");
 
-                logger.Write("- loading regulatory region file... ");
+                Logger.Write("- loading regulatory region file... ");
                 var regulatoryRegions = regulatoryReader.GetRegulatoryRegions();
-                logger.WriteLine($"{regulatoryRegions.Length:N0} loaded.");
+                Logger.WriteLine($"{regulatoryRegions.Length:N0} loaded.");
 
-                logger.Write("- loading transcript file... ");
+                Logger.Write("- loading transcript file... ");
                 var transcripts = transcriptReader.GetTranscripts();
                 var transcriptsByRefIndex = transcripts.GetMultiValueDict(x => x.Chromosome.Index);
-                logger.WriteLine($"{transcripts.Length:N0} loaded.");
+                Logger.WriteLine($"{transcripts.Length:N0} loaded.");
 
-                MarkCanonicalTranscripts(logger, transcripts);
+                MarkCanonicalTranscripts(transcripts);
 
-                var predictionBuilder = new PredictionCacheBuilder(logger, genomeAssembly);
+                var predictionBuilder = new PredictionCacheBuilder(genomeAssembly);
                 var predictionCaches  = predictionBuilder.CreatePredictionCaches(transcriptsByRefIndex, siftReader, polyphenReader, numRefSeqs);
 
-                logger.Write("- writing SIFT prediction cache... ");
+                Logger.Write("- writing SIFT prediction cache... ");
                 predictionCaches.Sift.Write(FileUtilities.GetCreateStream(CacheConstants.SiftPath(_outputCacheFilePrefix)));
-                logger.WriteLine("finished.");
+                Logger.WriteLine("finished.");
 
-                logger.Write("- writing PolyPhen prediction cache... ");
+                Logger.Write("- writing PolyPhen prediction cache... ");
                 predictionCaches.PolyPhen.Write(FileUtilities.GetCreateStream(CacheConstants.PolyPhenPath(_outputCacheFilePrefix)));
-                logger.WriteLine("finished.");
+                Logger.WriteLine("finished.");
 
-                var transcriptBuilder = new TranscriptCacheBuilder(logger, genomeAssembly, source, vepReleaseTicks, vepVersion);
+                var transcriptBuilder = new TranscriptCacheBuilder(genomeAssembly, source, vepReleaseTicks, vepVersion);
                 var transcriptStaging = transcriptBuilder.CreateTranscriptCache(transcripts, regulatoryRegions, geneForest, numRefSeqs);
 
-                logger.Write("- writing transcript cache... ");
+                Logger.Write("- writing transcript cache... ");
                 transcriptStaging.Write(FileUtilities.GetCreateStream(CacheConstants.TranscriptPath(_outputCacheFilePrefix)));
-                logger.WriteLine("finished.");
+                Logger.WriteLine("finished.");
             }
 
             return ExitCodes.Success;
@@ -111,15 +108,15 @@ namespace CacheUtils.Commands.CreateCache
             return new IntervalForest<UgaGene>(refIntervalArrays);
         }
 
-        private static void MarkCanonicalTranscripts(ILogger logger, MutableTranscript[] transcripts)
+        private static void MarkCanonicalTranscripts(MutableTranscript[] transcripts)
         {
             var ccdsIdToEnsemblId = CcdsReader.GetCcdsIdToEnsemblId(ExternalFiles.CcdsFile.FilePath);
             var lrgTranscriptIds  = LrgReader.GetTranscriptIds(ExternalFiles.LrgFile.FilePath, ccdsIdToEnsemblId);
 
-            logger.Write("- marking canonical transcripts... ");
+            Logger.Write("- marking canonical transcripts... ");
             var canonical = new CanonicalTranscriptMarker(lrgTranscriptIds);
             int numCanonicalTranscripts = canonical.MarkTranscripts(transcripts);
-            logger.WriteLine($"{numCanonicalTranscripts:N0} marked.");
+            Logger.WriteLine($"{numCanonicalTranscripts:N0} marked.");
         }
 
         public static ExitCodes Run(string command, string[] args)

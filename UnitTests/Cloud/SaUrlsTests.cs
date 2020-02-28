@@ -4,7 +4,7 @@ using Xunit;
 
 namespace UnitTests.Cloud
 {
-    public class SaUrlsTests
+    public sealed class SaUrlsTests
     {
         [Theory]
         [InlineData("test.nsa", "test.idx", "test.nsi", "test.nga")]

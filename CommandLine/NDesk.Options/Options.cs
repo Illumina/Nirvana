@@ -134,7 +134,7 @@ namespace CommandLine.NDesk.Options
                     nameof(maxValueCount));
             if (OptionValueType == OptionValueType.None && maxValueCount > 1)
                 throw new ArgumentException(
-                    string.Format("Cannot provide maxValueCount of {0} for OptionValueType.None.", maxValueCount),
+                    $"Cannot provide maxValueCount of {maxValueCount} for OptionValueType.None.",
                     nameof(maxValueCount));
             if (Array.IndexOf(Names, "<>") >= 0 &&
                 (Names.Length == 1 && OptionValueType != OptionValueType.None ||
@@ -226,14 +226,14 @@ namespace CommandLine.NDesk.Options
                     case '{':
                         if (start != -1)
                             throw new ArgumentException(
-                                string.Format("Ill-formed name/value separator found in \"{0}\".", name),
+                                $"Ill-formed name/value separator found in \"{name}\".",
                                 nameof(name));
                         start = i + 1;
                         break;
                     case '}':
                         if (start == -1)
                             throw new ArgumentException(
-                                string.Format("Ill-formed name/value separator found in \"{0}\".", name),
+                                $"Ill-formed name/value separator found in \"{name}\".",
                                 nameof(name));
                         seps.Add(name.Substring(start, i - start));
                         start = -1;
@@ -486,13 +486,13 @@ namespace CommandLine.NDesk.Options
 
         private bool ParseBool(string option, string n, OptionContext c)
         {
-            if (n.Length < 1 || n[n.Length - 1] != '+' && n[n.Length - 1] != '-') return false;
+            if (n.Length < 1 || n[^1] != '+' && n[^1] != '-') return false;
 
             string rn = n.Substring(0, n.Length - 1);
             if (!Contains(rn)) return false;
 
             var p = this[rn];
-            string v = n[n.Length - 1] == '+' ? option : null;
+            string v = n[^1] == '+' ? option : null;
             c.OptionName = option;
             c.Option = p;
             c.OptionValues.Add(v);

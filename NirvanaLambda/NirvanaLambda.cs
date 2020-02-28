@@ -30,6 +30,7 @@ using JsonSerializer = Amazon.Lambda.Serialization.Json.JsonSerializer;
 namespace NirvanaLambda
 {
     // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class NirvanaLambda
     {
         private const string AnnotationLambdaFailedStatus = "One or more annotation Lambdas failed";
@@ -183,8 +184,8 @@ namespace NirvanaLambda
 
             if (failedJobs.Count == 0) return (null, null);
 
-            Logger.LogLine(AnnotationLambdaFailedStatus);
-            failedJobs.ForEach(x => Logger.LogLine($"Job {x.Index + 1}: {x.Item.ErrorCategory} {x.Item.ErrorMessage}"));
+            Logger.WriteLine(AnnotationLambdaFailedStatus);
+            failedJobs.ForEach(x => Logger.WriteLine($"Job {x.Index + 1}: {x.Item.ErrorCategory} {x.Item.ErrorMessage}"));
 
             ErrorCategory? mostSevereError = failedJobs.Select(x => x.Item.ErrorCategory).Min();
             string errorMessage = mostSevereError == ErrorCategory.UserError 
@@ -194,14 +195,14 @@ namespace NirvanaLambda
             return (mostSevereError, errorMessage);
         }
 
-        private Task<AnnotationResultSummary>[] CallAnnotationLambdas(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, IEnumerable<AnnotationRange> annotationRanges) =>
+        private static Task<AnnotationResultSummary>[] CallAnnotationLambdas(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, IEnumerable<AnnotationRange> annotationRanges) =>
             annotationRanges?.Select((x, i) => RunAnnotationJob(config, annotationLambdaArn, context, x, i + 1)).ToArray() 
             ?? new[] { RunAnnotationJob(config, annotationLambdaArn, context, null, 1) };
 
-        private Task<AnnotationResultSummary> RunAnnotationJob(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, AnnotationRange range, int jobIndex)
+        private static Task<AnnotationResultSummary> RunAnnotationJob(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, AnnotationRange range, int jobIndex)
         {
             var annotationConfig = GetAnnotationConfig(config, range, jobIndex);
-            Logger.LogLine($"Job: {jobIndex}, Annotation region: {DescribeAnnotationRegion(range)}");
+            Logger.WriteLine($"Job: {jobIndex}, Annotation region: {DescribeAnnotationRegion(range)}");
 
             string configString = JsonUtilities.Stringify(annotationConfig);
 

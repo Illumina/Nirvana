@@ -15,10 +15,8 @@ using Intervals;
 using IO;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Logger;
 using VariantAnnotation.Providers;
 using VariantAnnotation.Sequence;
 
@@ -34,9 +32,8 @@ namespace CacheUtils.Commands.CombineCacheDirectories
         private static ExitCodes ProgramExecution()
         {
             var sequenceData = SequenceHelper.GetDictionaries(_refSequencePath);
-            var logger       = new ConsoleLogger();
 
-            var caches = LoadTranscriptCaches(logger, CacheConstants.TranscriptPath(_inputPrefix),
+            var caches = LoadTranscriptCaches(CacheConstants.TranscriptPath(_inputPrefix),
                 CacheConstants.TranscriptPath(_inputPrefix2), sequenceData.refIndexToChromosome);
 
             if (caches.Cache.TranscriptIntervalArrays.Length != caches.Cache2.TranscriptIntervalArrays.Length)
@@ -63,47 +60,47 @@ namespace CacheUtils.Commands.CombineCacheDirectories
                     var chromosome = sequenceData.refIndexToChromosome[refIndex];
 
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    logger.WriteLine($"\n{chromosome.UcscName}:");
+                    Logger.WriteLine($"\n{chromosome.UcscName}:");
                     Console.ResetColor();
 
-                    var sift = CombinePredictions(logger, chromosome, "SIFT", siftReader, siftReader2);
+                    var sift = CombinePredictions(chromosome, "SIFT", siftReader, siftReader2);
                     siftPredictionsPerRef[refIndex] = sift.Predictions;
 
-                    var polyphen = CombinePredictions(logger, chromosome, "PolyPhen", polyphenReader, polyphenReader2);
+                    var polyphen = CombinePredictions(chromosome, "PolyPhen", polyphenReader, polyphenReader2);
                     polyphenPredictionsPerRef[refIndex] = polyphen.Predictions;
 
                     var transcriptIntervalArray  = caches.Cache.TranscriptIntervalArrays[refIndex];
                     var transcriptIntervalArray2 = caches.Cache2.TranscriptIntervalArrays[refIndex];
 
-                    combinedIntervalArrays[refIndex] = CombineTranscripts(logger, transcriptIntervalArray,
+                    combinedIntervalArrays[refIndex] = CombineTranscripts(transcriptIntervalArray,
                         transcriptIntervalArray2, sift.Offset, polyphen.Offset);
                 }
             }
 
-            logger.WriteLine();
-            WritePredictions(logger, "SIFT", CacheConstants.SiftPath(_outputPrefix), siftHeader, siftPredictionsPerRef);
-            WritePredictions(logger, "PolyPhen", CacheConstants.PolyPhenPath(_outputPrefix), polyphenHeader, polyphenPredictionsPerRef);
-            WriteTranscripts(logger, CloneHeader(caches.Cache.Header), combinedIntervalArrays,
+            Logger.WriteLine("");
+            WritePredictions("SIFT", CacheConstants.SiftPath(_outputPrefix), siftHeader, siftPredictionsPerRef);
+            WritePredictions("PolyPhen", CacheConstants.PolyPhenPath(_outputPrefix), polyphenHeader, polyphenPredictionsPerRef);
+            WriteTranscripts(CloneHeader(caches.Cache.Header), combinedIntervalArrays,
                 caches.Cache.RegulatoryRegionIntervalArrays);
 
             return ExitCodes.Success;
         }
 
-        private static void WriteTranscripts(ILogger logger, CacheHeader header,
+        private static void WriteTranscripts(CacheHeader header,
             IntervalArray<ITranscript>[] transcriptIntervalArrays,
             IntervalArray<IRegulatoryRegion>[] regulatoryRegionIntervalArrays)
         {
             var staging = TranscriptCacheStaging.GetStaging(header, transcriptIntervalArrays, regulatoryRegionIntervalArrays);
 
-            logger.Write("- writing transcripts... ");
+            Logger.Write("- writing transcripts... ");
             staging.Write(FileUtilities.GetCreateStream(CacheConstants.TranscriptPath(_outputPrefix)));
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
         }
 
-        private static void WritePredictions(ILogger logger, string description, string filePath,
+        private static void WritePredictions(string description, string filePath,
             PredictionHeader header, Prediction[][] predictionsPerRef)
         {
-            logger.Write($"- writing {description} predictions... ");
+            Logger.Write($"- writing {description} predictions... ");
 
             using (var stream = new BlockStream(new Zstandard(), FileUtilities.GetCreateStream(filePath), CompressionMode.Compress))
             using (var writer = new PredictionCacheWriter(stream, CloneHeader(header)))
@@ -111,14 +108,13 @@ namespace CacheUtils.Commands.CombineCacheDirectories
                 writer.Write(header.LookupTable, predictionsPerRef);
             }
 
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
         }
 
-        private static IntervalArray<ITranscript> CombineTranscripts(ILogger logger,
-            IntervalArray<ITranscript> intervalArray, IntervalArray<ITranscript> intervalArray2,
-            int siftOffset, int polyphenOffset)
+        private static IntervalArray<ITranscript> CombineTranscripts(IntervalArray<ITranscript> intervalArray,
+            IntervalArray<ITranscript> intervalArray2, int siftOffset, int polyphenOffset)
         {
-            logger.Write("- combine transcripts... ");
+            Logger.Write("- combine transcripts... ");
 
             int numCombinedTranscripts = GetNumCombinedTranscripts(intervalArray, intervalArray2);
             var combinedIntervals      = new Interval<ITranscript>[numCombinedTranscripts];
@@ -127,7 +123,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
             CopyItems(intervalArray?.Array,  combinedIntervals, ref combinedIndex, interval => interval);
             CopyItems(intervalArray2?.Array, combinedIntervals, ref combinedIndex, interval => GetUpdatedTranscript(interval, siftOffset, polyphenOffset));
 
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
 
             return new IntervalArray<ITranscript>(combinedIntervals.OrderBy(x => x.Begin).ThenBy(x => x.End).ToArray());
         }
@@ -171,22 +167,22 @@ namespace CacheUtils.Commands.CombineCacheDirectories
         private static CacheHeader CloneHeader(CacheHeader header) =>
             new CacheHeader(CloneBaseHeader(header), header.Custom);
 
-        private static (Prediction[] Predictions, int Offset) CombinePredictions(ILogger logger, IChromosome chromosome,
+        private static (Prediction[] Predictions, int Offset) CombinePredictions(IChromosome chromosome,
             string description, PredictionCacheReader reader, PredictionCacheReader reader2)
         {
-            logger.Write($"- load {description} predictions... ");
+            Logger.Write($"- load {description} predictions... ");
             var predictions  = reader.GetPredictions(chromosome.Index);
             var predictions2 = reader2.GetPredictions(chromosome.Index);
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
 
-            var combinedPredictions = CombinePredictions(logger, description, predictions, predictions2);
+            var combinedPredictions = CombinePredictions(description, predictions, predictions2);
             return (combinedPredictions, predictions.Length);
         }
 
-        private static Prediction[] CombinePredictions(ILogger logger, string description, Prediction[] predictions,
+        private static Prediction[] CombinePredictions(string description, Prediction[] predictions,
             Prediction[] predictions2)
         {
-            logger.Write($"- combine {description} predictions... ");
+            Logger.Write($"- combine {description} predictions... ");
 
             int numCombinedPredictions = predictions.Length + predictions2.Length;
             var combinedPredictions    = new Prediction[numCombinedPredictions];
@@ -195,18 +191,18 @@ namespace CacheUtils.Commands.CombineCacheDirectories
             CopyItems(predictions, combinedPredictions, ref combinedIndex, x => x);
             CopyItems(predictions2, combinedPredictions, ref combinedIndex, x => x);
 
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
 
             return combinedPredictions;
         }
 
-        private static (TranscriptCacheData Cache, TranscriptCacheData Cache2) LoadTranscriptCaches(ILogger logger,
+        private static (TranscriptCacheData Cache, TranscriptCacheData Cache2) LoadTranscriptCaches(
             string transcriptPath, string transcriptPath2, IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             TranscriptCacheData cache;
             TranscriptCacheData cache2;
 
-            logger.Write("- loading transcript caches... ");
+            Logger.Write("- loading transcript caches... ");
 
             using (var transcriptReader  = new TranscriptCacheReader(FileUtilities.GetReadStream(transcriptPath)))
             using (var transcriptReader2 = new TranscriptCacheReader(FileUtilities.GetReadStream(transcriptPath2)))
@@ -215,7 +211,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
                 cache2 = transcriptReader2.Read(refIndexToChromosome);
             }
 
-            logger.WriteLine("finished.");
+            Logger.WriteLine("finished.");
             return (cache, cache2);
         }
 

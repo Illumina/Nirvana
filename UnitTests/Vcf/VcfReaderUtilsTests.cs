@@ -89,7 +89,6 @@ namespace UnitTests.Vcf
 
             var refMinorProvider    = new Mock<IRefMinorProvider>();
             var seqProvider         = ParserTestUtils.GetSequenceProvider(8021910, "GGTGCTGGACGGTGTCCCT", 'A', ChromosomeUtilities.RefNameToChromosome);
-            var refNameToChromosome = seqProvider.RefNameToChromosome;
 
             var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
 

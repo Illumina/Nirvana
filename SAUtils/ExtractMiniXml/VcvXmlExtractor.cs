@@ -7,7 +7,7 @@ using IO;
 
 namespace SAUtils.ExtractMiniXml
 {
-    public class VcvXmlExtractor
+    public sealed class VcvXmlExtractor
     {
         private readonly string _inputXmlFile;
         private readonly string _outputDir;
@@ -83,7 +83,5 @@ namespace SAUtils.ExtractMiniXml
 
             return null;
         }
-        
-
     }
 }

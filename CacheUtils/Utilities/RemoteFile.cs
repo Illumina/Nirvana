@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
-using VariantAnnotation.Interface;
+using IO;
 using VariantAnnotation.Utilities;
 
 namespace CacheUtils.Utilities
@@ -34,14 +34,14 @@ namespace CacheUtils.Utilities
             return $"{filenameStub}_{Date.GetDate(DateTime.Now.Ticks)}{extension}";
         }
 
-        public void Download(ILogger logger)
+        public void Download()
         {
             if (File.Exists(FilePath)) return;
 
-            logger.WriteLine($"- downloading the {_description}");
+            Logger.WriteLine($"- downloading the {_description}");
             while (!SuccessfulDownload())
             {
-                logger.WriteLine($"- requeueing download of the {_description}");
+                Logger.WriteLine($"- requeueing download of the {_description}");
             }
         }
 

@@ -16,8 +16,8 @@ namespace Cloud.Notifications
             }
             catch (Exception e)
             {
-                Logger.LogLine("Unable to log to SNS!!");
-                Logger.LogLine(e.Message);
+                Logger.WriteLine("Unable to log to SNS!!");
+                Logger.WriteLine(e.Message);
             }
         }
 

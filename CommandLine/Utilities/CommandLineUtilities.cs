@@ -13,12 +13,15 @@ namespace CommandLine.Utilities
 
         static CommandLineUtilities()
         {
-            var assembly = Assembly.GetEntryAssembly();
+            var executingAssembly = Assembly.GetExecutingAssembly();
 
-            Copyright            = GetCopyright(assembly);
-            Title                = GetTitle(assembly);
-            Version              = GetVersion(assembly);
-            InformationalVersion = GetInformationalVersion(assembly);
+            Copyright            = GetCopyright(executingAssembly);
+            Version              = GetVersion(executingAssembly);
+            InformationalVersion = GetInformationalVersion(executingAssembly);
+            
+            var entryAssembly = Assembly.GetEntryAssembly();
+            
+            Title = GetTitle(entryAssembly);
         }
 
         private static string GetCopyright(Assembly entryAssembly)

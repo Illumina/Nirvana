@@ -42,9 +42,9 @@ namespace VariantAnnotation.Providers
 
         public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider, ProteinConservationProvider conservationProvider)
         {
-            Name                 = "Transcript annotation provider";
-            _sequence            = sequenceProvider.Sequence;
-            _refNameToChromosome = sequenceProvider.RefNameToChromosome;
+            Name                  = "Transcript annotation provider";
+            _sequence             = sequenceProvider.Sequence;
+            _refNameToChromosome  = sequenceProvider.RefNameToChromosome;
             _conservationProvider = conservationProvider;
 
             using (var stream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)))
@@ -54,7 +54,10 @@ namespace VariantAnnotation.Providers
 
             Assembly           = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
-            if (conservationProvider != null) DataSourceVersions = DataSourceVersions.Concat(new[] {conservationProvider.Version});
+
+            // TODO: this is not great. We should not be using IEnumerables if we have to resort to strange stuff like this
+            if (conservationProvider != null)
+                DataSourceVersions = DataSourceVersions.Concat(new[] {conservationProvider.Version});
 
             _siftStream = PersistentStreamUtils.GetReadStream(CacheConstants.SiftPath(pathPrefix));
             _siftReader = new PredictionCacheReader(_siftStream, PredictionCacheReader.SiftDescriptions);
@@ -155,8 +158,8 @@ namespace VariantAnnotation.Providers
                     ? annotatedTranscript.Transcript.Id.WithoutVersion
                     : annotatedTranscript.Transcript.Id.WithVersion;
                 var score = _conservationProvider.GetConservationScore(transcriptId, aaPos);
-                if(score == -1) return; //don't add conservation scores
-                scores.Add((1.0*score)/100);
+                if (score == -1) return; //don't add conservation scores
+                scores.Add(1.0 * score / 100);
             }
 
             annotatedTranscript.ConservationScores = scores;
