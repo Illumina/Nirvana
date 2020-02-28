@@ -15,8 +15,8 @@ namespace Vcf.Sample.Legacy
         public int? CopyNumber { get; }
 
         // ReSharper disable InconsistentNaming
-        private float? AQ { get; }
-        private float? LQ { get; }
+        public float? AQ { get; }
+        public float? LQ { get; }
         public double? VF { get; }
         public int? TIR { get; }
         public int? TAR { get; }
@@ -25,7 +25,7 @@ namespace Vcf.Sample.Legacy
         public int? GCount { get; }
         public int? TCount { get; }
 
-        private string[] DST { get; }
+        public string[] DST { get; }
         // ReSharper restore InconsistentNaming
 
         // ReSharper disable once SuggestBaseTypeForParameter
@@ -43,7 +43,7 @@ namespace Vcf.Sample.Legacy
             LQ                   = GetFloat(GetString(formatIndices.LQ, sampleCols));
             VF                   = GetDouble(GetString(formatIndices.VF, sampleCols));
 
-            (CopyNumber, _) = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
+            CopyNumber = GetCopyNumber(GetString(formatIndices.CN, sampleCols), vcfColumns[VcfCommon.AltIndex].Contains("STR"));
 
             (ACount, CCount, GCount, TCount, TotalAlleleCount) = GetAlleleCounts(
                 GetString(formatIndices.AU, sampleCols), GetString(formatIndices.CU, sampleCols),
@@ -89,11 +89,10 @@ namespace Vcf.Sample.Legacy
 
         private static string[] GetStrings(string s) => s?.OptimizedSplit(',');
 
-        private static (int? CopyNumber, string RepeatNumber) GetCopyNumber(string s, bool containsStr)
+        private static int? GetCopyNumber(string s, bool containsStr)
         {
-            if (s == null) return (null, null);
-            if (containsStr) return (null, s);
-            return (GetInteger(s), null);
+            if (s == null || containsStr) return null;
+            return GetInteger(s);
         }
 
         private static (int?, int?, int?, int?, int?) GetAlleleCounts(string au, string cu, string gu, string tu)

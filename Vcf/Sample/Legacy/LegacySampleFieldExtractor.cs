@@ -57,7 +57,9 @@ namespace Vcf.Sample.Legacy
                                           sampleFields.MajorChromosomeCount.Value == sampleFields.CopyNumber.Value &&
                                           sampleFields.CopyNumber.Value > 1;
 
-            var sample = new Sample(alleleDepths, null, sampleFields.CopyNumber,null, failedFilter, genotype,genotypeQuality, false, null, pairEndReadCounts, null, splitReadCounts, totalDepth,variantFrequencies,null,null,isLossOfHeterozygosity);
+            var sample = new Sample(alleleDepths, sampleFields.AQ, sampleFields.CopyNumber, sampleFields.DST,
+                failedFilter, genotype, genotypeQuality, false, sampleFields.LQ, pairEndReadCounts, null, splitReadCounts,
+                totalDepth, variantFrequencies, null, null, isLossOfHeterozygosity);
 
             return sample;
         }
