@@ -14,7 +14,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             const string header = @"CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	GRCh	Chromosome:G_Start..G_Stop";
 
-            var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
+            var readStream = ResourceUtilities.GetReadStream(Resources.SaPath("CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
                 ChromosomeUtilities.RefNameToChromosome,
@@ -29,7 +29,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             const string header = @"CNV_ID	ID_GENE	gene_name	ID_SAMPLE	ID_TUMOUR	Primary site	Site subtype 1	Site subtype 2	Site subtype 3	Primary histology	Histology subtype 1	Histology subtype 2	Histology subtype 3	SAMPLE_NAME	TOTAL_CN	MINOR_ALLELE	MUT_TYPE	ID_STUDY	Chromosome:G_Start..G_Stop";
 
-            var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
+            var readStream = ResourceUtilities.GetReadStream(Resources.SaPath("CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
                 ChromosomeUtilities.RefNameToChromosome,
@@ -41,7 +41,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void GetEntries()
         {
-            var readStream = ResourceUtilities.GetReadStream(Resources.TopPath("SA\\CosmicCNV.tsv"));
+            var readStream = ResourceUtilities.GetReadStream(Resources.SaPath("CosmicCNV.tsv"));
 
             var cnvReader = new CosmicCnvReader(readStream,
                 ChromosomeUtilities.RefNameToChromosome,

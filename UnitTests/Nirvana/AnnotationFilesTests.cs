@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Nirvana;
 using Xunit;
 
@@ -36,10 +37,10 @@ namespace UnitTests.Nirvana
 
             var expectedRefMinorFile = (Path.Combine(saDirectory, "sa8.rma"), Path.Combine(saDirectory, "sa8.rma.idx"));
 
-            Assert.Equal(expectedNsaFiles, files.NsaFiles);
-            Assert.Equal(expectedNsiFiles, files.NsiFiles);
+            Assert.Equal(expectedNsaFiles, files.NsaFiles.OrderBy(x=> x.Nsa));
+            Assert.Equal(expectedNsiFiles, files.NsiFiles.OrderBy(x=>x));
             Assert.Equal(expectedConservationFile, files.ConservationFile);
-            Assert.Equal(expectedNgaFiles, files.NgaFiles);
+            Assert.Equal(expectedNgaFiles, files.NgaFiles.OrderBy(x=>x));
             Assert.Equal(expectedRefMinorFile, files.RefMinorFile);
         }
 

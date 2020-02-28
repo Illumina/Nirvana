@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ErrorHandling.Exceptions;
+using Newtonsoft.Json.Linq;
 
 namespace Jasix.DataStructures
 {
@@ -49,7 +50,8 @@ namespace Jasix.DataStructures
 	    {
 		    if (needComma)
 			    writer.Write("," + Environment.NewLine);
-			writer.Write(entry);
+		    var jObject = JObject.Parse(entry);
+			writer.Write(jObject.ToString());
 		}
 
 	    public static bool IsLargeVariant(int start, int end)
