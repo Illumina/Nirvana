@@ -70,7 +70,7 @@ namespace Nirvana
 
             foreach (string allele in altAllele.OptimizedSplit(','))
             {
-                if (allele.OptimizedStartsWith('<') || allele.Contains('[') || altAllele.Contains(']')) continue;
+                if (allele.OptimizedStartsWith('<') && allele != "<NON_REF>" || allele.Contains('[') || altAllele.Contains(']')) continue;
 
                 (int shiftedPos, string _, string _) =
                     VariantUtils.TrimAndLeftAlign(position, refAllele, allele, refSequence);
