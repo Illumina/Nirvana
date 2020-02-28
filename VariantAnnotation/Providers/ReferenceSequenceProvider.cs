@@ -34,6 +34,9 @@ namespace VariantAnnotation.Providers
 
             annotatedPosition.CytogeneticBand = Sequence.CytogeneticBands.Find(annotatedPosition.Position.Chromosome, annotatedPosition.Position.Start,
                 annotatedPosition.Position.End);
+
+            // we don't want HGVS g. nomenclature for structural variants or STRs
+            if (annotatedPosition.Position.HasStructuralVariant || annotatedPosition.Position.HasShortTandemRepeat) return;
             
             string refSeqAccession = annotatedPosition.Position.Chromosome.RefSeqAccession;
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
