@@ -32,6 +32,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         [InlineData(31410878, "C", "]6:42248252]C", true, "6", 42248252, true)]
         [InlineData(31561816, "C", "CGATCTCAT[6:41297838[", false, "6", 41297838, false)]
         [InlineData(84461562, "A", "A]8:100990100]", false, "8", 100990100, true)]
+        [InlineData(32518102, "C", "C]HLA-DRB1*10:01:01:12922]", false, "HLA-DRB1*10:01:01", 12922, true)]
         public void CreateFromTranslocation_Nominal(int position, string refAllele, string altAllele,
             bool expectedOnReverseStrand, string expectedPartnerChr, int expectedPartnerPosition,
             bool expectedPartnerOnReverseStrand)
