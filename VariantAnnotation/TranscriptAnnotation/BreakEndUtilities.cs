@@ -10,8 +10,8 @@ namespace VariantAnnotation.TranscriptAnnotation
     public static class BreakEndUtilities
     {
         private const           string ReverseBracket = "]";
-        private static readonly Regex  ForwardRegex   = new Regex(@"\w+([\[\]])([^:]+):(\d+)([\[\]])", RegexOptions.Compiled);
-        private static readonly Regex  ReverseRegex   = new Regex(@"([\[\]])([^:]+):(\d+)([\[\]])\w+", RegexOptions.Compiled);
+        private static readonly Regex  ForwardRegex   = new Regex(@"\w+([\[\]])(.+):(\d+)([\[\]])", RegexOptions.Compiled);
+        private static readonly Regex  ReverseRegex   = new Regex(@"([\[\]])(.+):(\d+)([\[\]])\w+", RegexOptions.Compiled);
 
         public static BreakEndAdjacency[] CreateFromTranslocation(ISimpleVariant variant,
             IDictionary<string, IChromosome> refNameToChromosome) => variant.AltAllele.StartsWith(variant.RefAllele)
