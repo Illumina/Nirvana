@@ -1,5 +1,6 @@
 ﻿using Cloud.Utilities;
 using Genome;
+using Genome;
 
 namespace Cloud
 {
@@ -9,7 +10,7 @@ namespace Cloud
 
         private const string S3CacheFolder                 = "ab0cf104f39708eabd07b8cb67e149ba-Cache/26/";
         private const string UgaFileName                   = "UGA.tsv.gz";
-        private const string S3RefPrefix                   = "d95867deadfe690e40f42068d6b59df8-References/6/Homo_sapiens.";
+        private const string S3RefPrefix                   = "d95867deadfe690e40f42068d6b59df8-References/7/Homo_sapiens.";
         public const string DefaultCacheSource             = "Both";
         public const string RefSuffix                      = ".Nirvana.dat";
         public const string JsonSuffix                     = ".json.gz";
