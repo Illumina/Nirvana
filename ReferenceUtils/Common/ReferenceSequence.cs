@@ -6,18 +6,19 @@ using VariantAnnotation.Sequence;
 
 namespace ReferenceUtils.Common
 {
-    internal sealed class ReferenceSequence
+    public sealed class ReferenceSequence
     {
-        private readonly ushort _refIndex;
-        private byte[] _buffer;
-        private MaskedEntry[] _maskedEntries;
-        private Band[] _cytogeneticBands;
-        private readonly int _sequenceOffset;
-        private readonly int _numBases;
+        public readonly  ushort        RefIndex;
+        private          byte[]        _buffer;
+        private          MaskedEntry[] _maskedEntries;
+        private          Band[]        _cytogeneticBands;
+        private readonly int           _sequenceOffset;
+        private readonly int           _numBases;
 
-        public ReferenceSequence(ushort refIndex, byte[] buffer, MaskedEntry[] maskedEntries, Band[] cytogeneticBands, int sequenceOffset, int numBases)
+        public ReferenceSequence(ushort refIndex, byte[] buffer, MaskedEntry[] maskedEntries, Band[] cytogeneticBands,
+            int sequenceOffset, int numBases)
         {
-            _refIndex         = refIndex;
+            RefIndex          = refIndex;
             _buffer           = buffer;
             _maskedEntries    = maskedEntries;
             _cytogeneticBands = cytogeneticBands;
@@ -25,33 +26,27 @@ namespace ReferenceUtils.Common
             _numBases         = numBases;
         }
 
-        public CompressionBlock GetBlock()
+        public ReferenceBuffer GetReferenceBuffer(ushort refIndex)
         {
-            CompressionBlock block;
+            int    bufferSize;
+            byte[] buffer;
 
             using (var ms = new MemoryStream())
             {
                 using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true))
                 {
+                    writer.Write(ReferenceSequenceCommon.ReferenceStartTag);
                     WriteMetadata(writer);
                     WriteBuffer(writer);
                     WriteMaskedEntries(writer);
                     WriteCytogeneticBands(writer);
-                    writer.Flush();
                 }
 
-                var    numBytes = (int) ms.Position;
-                byte[] buffer   = ms.ToArray();
-
-                block = new CompressionBlock(_refIndex, buffer, numBytes);
-                block.Compress();
+                bufferSize = (int) ms.Position;
+                buffer     = ms.ToArray();
             }
 
-            _buffer           = null;
-            _maskedEntries    = null;
-            _cytogeneticBands = null;
-
-            return block;
+            return new ReferenceBuffer(refIndex, buffer, bufferSize);
         }
 
         private void WriteMetadata(IExtendedBinaryWriter writer)

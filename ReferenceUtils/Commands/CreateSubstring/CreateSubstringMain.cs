@@ -12,7 +12,6 @@ using IO;
 using ReferenceUtils.Common;
 using ReferenceUtils.IO;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace ReferenceUtils.Commands.CreateSubstring
 {
@@ -52,14 +51,9 @@ namespace ReferenceUtils.Commands.CreateSubstring
             var referenceSequence = CreateReferenceSequence(fastaSequence, cytogeneticBands);
             Console.WriteLine("finished.");
 
-            Console.Write("- create output block... ");
-            var outputBlock = referenceSequence.GetBlock();
-            (long uncompressedBytes, long compressedBytes, double percentage) = CalculateCompressionStats(outputBlock);
-            Console.WriteLine($"{compressedBytes:N0} / {uncompressedBytes:N0} ({percentage:N1} %)");
-
             Console.Write("- creating reference sequence file... ");
             var minimalChromosomes = new List<IChromosome> { fastaSequence.Chromosome };
-            CreateReferenceSequenceFile(genomeAssembly, minimalChromosomes, outputBlock);
+            CreateReferenceSequenceFile(genomeAssembly, minimalChromosomes, referenceSequence);
             long fileSize = new FileInfo(_outputCompressedPath).Length;
             Console.WriteLine($"{fileSize:N0} bytes");
 
@@ -77,22 +71,12 @@ namespace ReferenceUtils.Commands.CreateSubstring
                 .ToList();
         }
 
-        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, IReadOnlyCollection<IChromosome> chromosomes, CompressionBlock outputBlock)
+        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, IReadOnlyCollection<IChromosome> chromosomes, ReferenceSequence referenceSequence)
         {
             using (var writer = new ReferenceSequenceWriter(FileUtilities.GetCreateStream(_outputCompressedPath), chromosomes, genomeAssembly, 0))
             {
-                writer.Write(new List<CompressionBlock> { outputBlock });
+                writer.Write(new List<ReferenceSequence> { referenceSequence });
             }
-        }
-
-        private static (long UncompressedBytes, long CompressedBytes, double Percentage) CalculateCompressionStats(CompressionBlock block)
-        {
-            long uncompressedBytes = block.UncompressedBufferSize;
-            long compressedBytes   = block.BufferSize;
-
-            double percentage = compressedBytes / (double)uncompressedBytes * 100.0;
-
-            return (uncompressedBytes, compressedBytes, percentage);
         }
 
         private static ReferenceSequence CreateReferenceSequence(FastaSequence fastaSequence, List<Band> cytogeneticBands)

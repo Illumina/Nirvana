@@ -34,7 +34,7 @@ namespace VariantAnnotation.Sequence
 
             CheckHeaderVersion();
             LoadHeader();
-            GetChromosomes();
+            AddChromosomes();
             _indexEntries = LoadIndex();
         }
 
@@ -63,9 +63,9 @@ namespace VariantAnnotation.Sequence
                 return;
             }
 
-            var indexEntry   = _indexEntries[index];
+            var indexEntry = _indexEntries[index];
             _stream.Position = indexEntry.FileOffset;
-
+            
             uint tag = _reader.ReadUInt32();
 
             if (tag != ReferenceSequenceCommon.ReferenceStartTag)
@@ -73,29 +73,23 @@ namespace VariantAnnotation.Sequence
                 throw new InvalidDataException($"The reference start tag does not match the expected values: Obs: {tag} vs Exp: {ReferenceSequenceCommon.ReferenceStartTag}");
             }
 
-            int uncompressedBufferSize = _reader.ReadInt32();
-            int compressedBufferSize   = _reader.ReadInt32();
-
-            var buffer = CompressionBlock.Read(_stream, uncompressedBufferSize, compressedBufferSize);
-            var reader = new MemoryBufferBinaryReader(buffer);
-
-            var metadata                 = GetMetadata(reader);
-            var twoBitBuffer             = GetTwoBitBuffer(reader);
-            var maskedEntryIntervalArray = GetMaskedEntries(reader);
-            var cytogeneticBands         = GetCytogeneticBands(reader);
+            var metadata                 = GetMetadata(_reader);
+            var twoBitBuffer             = GetTwoBitBuffer(_reader);
+            var maskedEntryIntervalArray = GetMaskedEntries(_reader);
+            var cytogeneticBands         = GetCytogeneticBands(_reader);
 
             Sequence.Set(metadata.NumBases, metadata.SequenceOffset, twoBitBuffer, maskedEntryIntervalArray,
                 cytogeneticBands);
         }
 
-        private static (int SequenceOffset, int NumBases) GetMetadata(MemoryBufferBinaryReader reader)
+        private static (int SequenceOffset, int NumBases) GetMetadata(ExtendedBinaryReader reader)
         {
             int sequenceOffset = reader.ReadOptInt32();
             int numBases       = reader.ReadOptInt32();
             return (sequenceOffset, numBases);
         }
 
-        private static Band[] GetCytogeneticBands(MemoryBufferBinaryReader reader)
+        private static Band[] GetCytogeneticBands(ExtendedBinaryReader reader)
         {
             int numBands = reader.ReadOptInt32();
             var bands    = new Band[numBands];
@@ -112,7 +106,7 @@ namespace VariantAnnotation.Sequence
             return bands;
         }
 
-        private static IntervalArray<MaskedEntry> GetMaskedEntries(MemoryBufferBinaryReader reader)
+        private static IntervalArray<MaskedEntry> GetMaskedEntries(ExtendedBinaryReader reader)
         {
             int numEntries    = reader.ReadOptInt32();
             var maskedEntries = new Interval<MaskedEntry>[numEntries];
@@ -128,7 +122,7 @@ namespace VariantAnnotation.Sequence
             return new IntervalArray<MaskedEntry>(maskedEntries);
         }
 
-        private static byte[] GetTwoBitBuffer(MemoryBufferBinaryReader reader)
+        private static byte[] GetTwoBitBuffer(ExtendedBinaryReader reader)
         {
             int numBytes = reader.ReadOptInt32();
             return reader.ReadBytes(numBytes);
@@ -141,7 +135,7 @@ namespace VariantAnnotation.Sequence
             NumRefSeqs        = (ushort)_reader.ReadOptInt32();
         }
 
-        private void GetChromosomes()
+        private void AddChromosomes()
         {
             for (var i = 0; i < NumRefSeqs; i++)
             {
@@ -165,8 +159,8 @@ namespace VariantAnnotation.Sequence
 
             for (var i = 0; i < numEntries; i++)
             {
-                ushort refIndex = _reader.ReadUInt16();
-                long fileOffset = _reader.ReadInt64();
+                ushort refIndex   = _reader.ReadUInt16();
+                long   fileOffset = _reader.ReadInt64();
                 indexEntries[i] = new IndexEntry(refIndex, fileOffset);
 
                 _refIndexToIndex[refIndex] = i;

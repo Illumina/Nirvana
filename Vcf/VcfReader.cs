@@ -143,8 +143,6 @@ namespace Vcf
                     var chromosome = ReferenceNameUtilities.GetChromosome(_refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
                     CheckVcfOrder(vcfFields[VcfCommon.ChromIndex]);
 
-                    _sequenceProvider.LoadChromosome(chromosome);
-
                     (int start, bool foundError) = vcfFields[VcfCommon.PosIndex].OptimizedParseInt32();
                     if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {vcfFields[VcfCommon.PosIndex]}");
 

@@ -64,47 +64,26 @@ namespace ReferenceUtils.Commands.CreateReference
             var referenceSequences = CreateReferenceSequences(fastaSequences, cytogeneticBandsByRef);
             Console.WriteLine("finished.");
 
-            Console.Write("- create output blocks... ");
-            var outputBlocks = GetOutputBlocks(referenceSequences);
-            (long uncompressedBytes, long compressedBytes, double percentage) = CalculateCompressionStats(outputBlocks);
-            Console.WriteLine($"{compressedBytes:N0} / {uncompressedBytes:N0} ({percentage:N1} %)");
-
             Console.Write("- creating reference sequence file... ");
-            CreateReferenceSequenceFile(genomeAssembly, _patchLevel, chromosomes, outputBlocks);
+            CreateReferenceSequenceFile(genomeAssembly, _patchLevel, chromosomes, referenceSequences);
             long fileSize = new FileInfo(_outputCompressedPath).Length;
             Console.WriteLine($"{fileSize:N0} bytes");
 
             return ExitCodes.Success;
         }
 
-        private static (long UncompressedBytes, long CompressedBytes, double Percentage) CalculateCompressionStats(IEnumerable<CompressionBlock> outputBlocks)
-        {
-            long uncompressedBytes = 0;
-            long compressedBytes   = 0;
-
-            foreach (var outputBlock in outputBlocks)
-            {
-                compressedBytes   += outputBlock.BufferSize;
-                uncompressedBytes += outputBlock.UncompressedBufferSize;
-            }
-
-            double percentage = compressedBytes / (double) uncompressedBytes * 100.0;
-
-            return (uncompressedBytes, compressedBytes, percentage);
-        }
-
         private static long GetGenomeLength(IEnumerable<FastaSequence> fastaSequences) =>
             fastaSequences.Aggregate<FastaSequence, long>(0, (current, fastaSequence) => current + fastaSequence.Bases.Length);
 
-        private static IEnumerable<ReferenceSequence> CreateReferenceSequences(IEnumerable<FastaSequence> fastaSequences, IReadOnlyList<List<Band>> cytogeneticBandsByRef)
+        private static List<ReferenceSequence> CreateReferenceSequences(IEnumerable<FastaSequence> fastaSequences, IReadOnlyList<List<Band>> cytogeneticBandsByRef)
         {
             var referenceSequences = new List<ReferenceSequence>();
 
             foreach (var fastaSequence in fastaSequences)
             {
-                var cytogeneticBands        = cytogeneticBandsByRef[fastaSequence.Chromosome.Index].ToArray();
+                var cytogeneticBands = cytogeneticBandsByRef[fastaSequence.Chromosome.Index].ToArray();
                 var (buffer, maskedEntries) = TwoBitCompressor.Compress(fastaSequence.Bases);
-                var referenceSequence       = new ReferenceSequence(fastaSequence.Chromosome.Index, buffer, maskedEntries,
+                var referenceSequence = new ReferenceSequence(fastaSequence.Chromosome.Index, buffer, maskedEntries,
                     cytogeneticBands, 0, fastaSequence.Bases.Length);
                 referenceSequences.Add(referenceSequence);
             }
@@ -162,14 +141,13 @@ namespace ReferenceUtils.Commands.CreateReference
             }
         }
 
-        private static List<CompressionBlock> GetOutputBlocks(IEnumerable<ReferenceSequence> referenceSequences) =>
-            referenceSequences.Select(referenceSequence => referenceSequence.GetBlock()).ToList();
-
-        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, byte patchLevel, IReadOnlyCollection<IChromosome> chromosomes, List<CompressionBlock> blocks)
+        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, byte patchLevel,
+            IReadOnlyCollection<IChromosome> chromosomes, List<ReferenceSequence> referenceSequences)
         {
-            using (var writer = new ReferenceSequenceWriter(FileUtilities.GetCreateStream(_outputCompressedPath), chromosomes, genomeAssembly, patchLevel))
+            using (var writer = new ReferenceSequenceWriter(FileUtilities.GetCreateStream(_outputCompressedPath),
+                chromosomes, genomeAssembly, patchLevel))
             {
-                writer.Write(blocks);
+                writer.Write(referenceSequences);
             }
         }
 

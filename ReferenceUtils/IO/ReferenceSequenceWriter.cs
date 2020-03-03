@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Genome;
 using IO;
+using ReferenceUtils.Common;
 using VariantAnnotation.Sequence;
 
 namespace ReferenceUtils.IO
@@ -32,32 +33,38 @@ namespace ReferenceUtils.IO
             foreach (var chromosome in chromosomes) chromosome.Write(_writer);
         }
 
-        public void Write(List<CompressionBlock> blocks)
+        public void Write(List<ReferenceSequence> referenceSequences)
         {
             _writer.Flush();
 
             long indexOffset = _stream.Position;
-            int indexSize    = 8 + IndexEntry.Size * blocks.Count;
-            var index        = CreateIndex(blocks, indexOffset, indexSize);
+            int  indexSize   = 8 + IndexEntry.Size * referenceSequences.Count;
+
+            var    buffers  = new List<ReferenceBuffer>(referenceSequences.Count);
+            ushort refIndex = 0;
+
+            foreach (var referenceSequence in referenceSequences)
+            {
+                buffers.Add(referenceSequence.GetReferenceBuffer(refIndex));
+                refIndex++;
+            }
+
+            var index = CreateIndex(buffers, indexOffset, indexSize);
 
             WriteIndex(index);
-            _writer.Flush();
-
-            WriteBlocks(blocks);
+            WriteReferenceBuffers(buffers);
         }
 
-        private static IndexEntry[] CreateIndex(IReadOnlyCollection<CompressionBlock> blocks, long indexOffset, int indexSize)
+        private static IndexEntry[] CreateIndex(List<ReferenceBuffer> referenceBuffers, long indexOffset, int indexSize)
         {
-            var indexEntries     = new IndexEntry[blocks.Count];
+            var indexEntries     = new IndexEntry[referenceBuffers.Count];
             long referenceOffset = indexOffset + indexSize;
 
             var index = 0;
-            foreach (var block in blocks)
+            foreach (var block in referenceBuffers)
             {
                 indexEntries[index] = new IndexEntry(block.RefIndex, referenceOffset);
-
-                int blockSize = block.BufferSize + 12;
-                referenceOffset += blockSize;
+                referenceOffset += block.BufferSize;
                 index++;
             }
 
@@ -76,14 +83,11 @@ namespace ReferenceUtils.IO
             }
         }
 
-        private void WriteBlocks(IEnumerable<CompressionBlock> blocks)
+        private void WriteReferenceBuffers(IEnumerable<ReferenceBuffer> referenceBuffers)
         {
-            foreach (var block in blocks)
+            foreach (var referenceBuffer in referenceBuffers)
             {
-                _writer.Write(ReferenceSequenceCommon.ReferenceStartTag);
-                _writer.Write(block.UncompressedBufferSize);
-                _writer.Write(block.CompressedBufferSize);
-                _writer.Write(block.Buffer, 0, block.BufferSize);
+                _writer.Write(referenceBuffer.Buffer, 0, referenceBuffer.BufferSize);
             }
         }
     }
