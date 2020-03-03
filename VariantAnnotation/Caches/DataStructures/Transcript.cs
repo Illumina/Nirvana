@@ -89,7 +89,7 @@ namespace VariantAnnotation.Caches.DataStructures
 
             // translation
             var translation = encoded.HasTranslation ? DataStructures.Translation.Read(reader, cachePeptideSeqs) : null;
-
+            
             // attributes
             IInterval[] mirnas    = encoded.HasMirnas          ? ReadIndices(reader, cacheMirnas)         : null;
             IRnaEdit[] rnaEdits   = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;

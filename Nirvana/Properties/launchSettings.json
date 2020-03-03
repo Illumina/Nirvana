@@ -37,178 +37,178 @@
     },
     "RR clinvar": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat  --sd C:\\Development\\SupplementaryDatabase\\56\\GRCh37 --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar",
-      "workingDirectory": "c:\\Development\\TestDatasets\\ClinvarSmoke"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat  --sd /Users/rroy1/development/SupplementaryDatabase\\56\\GRCh37 --in ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf.gz --out clinvar",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets\\ClinvarSmoke"
     },
     "RR platypus": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in Platypus_chrM.vcf --out platypus",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase\\50\\GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in Platypus_chrM.vcf --out platypus",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK bugfix": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_bugfix\\test.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o test -sd CA_data/sa/",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_bugfix"
+      "commandLineArgs": "-i E:\\Nirvana_resources/test_runs/test_bugfix/test.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o test -sd CA_data/sa/",
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_bugfix"
     },
     "SK Nirvana": {
       "commandName": "Project",
       "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\temp\\deletion_nonSV_vid.vcf -o test ",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_bugfix"
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_bugfix"
     },
     "SK Pedigree": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf  -o Pedigree_NIR_Phan_out",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+      "commandLineArgs": "-i E:\\Nirvana_resources/test_runs/test_Phantom/test_data\\Pedigree.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --vcf  -o Pedigree_NIR_Phan_out",
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_Phantom\\"
     },
     "RR_zodiacSnv": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in ZodiacR2_COSMICv72_SNVs_2D-dummyInfo-dummyInfo-short-hg19.vcf.gz --out zodiacR2_snv",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Both --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in hgvspInvestigation.vcf --out zodiac_all_snv",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_momGen": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in C:\\Development\\TestDatasets\\Mother.genome.vcf.gz --out C:\\Development\\TestDatasets\\momGen",
-      "workingDirectory": "C:\\Development\\TestDatasets\\"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/test --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in /Users/rroy1/development/TestDatasets\\Mother.genome.vcf.gz --out /Users/rroy1/development/TestDatasets\\momGen",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets\\"
     },
     "RR_mother": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\52\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in Mother.vcf.gz --out mom",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase\\52\\GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in Mother.vcf.gz --out mom",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK streaming": {
       "commandName": "Project",
       "commandLineArgs": "--cache http://illumina-annotation.s3.amazonaws.com/Cache/26/GRCh37/Ensembl --ref http://illumina-annotation.s3.amazonaws.com/References/5/Homo_sapiens.GRCh37.Nirvana.dat  --in https://illumina-annotation.s3.amazonaws.com/Test/Mother.vcf.gz --out .",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\streaming"
+      "workingDirectory": "E:\\Nirvana_resources/test_runs\\streaming"
     },
     "RR_momGen_chr22_s3": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd https://illumina-annotation.s3.amazonaws.com/Test/CachableSa --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in C:\\Development\\TestDatasets\\Mother_chr22.genome.vcf.gz --out C:\\Development\\TestDatasets\\momGen22_s3"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd https://illumina-annotation.s3.amazonaws.com/Test/CachableSa --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in /Users/rroy1/development/TestDatasets\\Mother_chr22.genome.vcf.gz --out /Users/rroy1/development/TestDatasets\\momGen22_s3"
     },
     "RR_refMinor": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-RefMinor-GRCh37.vcf.gz --out refMinor",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37Both --sd /Users/rroy1/development/SupplementaryDatabase\\50\\GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in NA12878_HSX_PcrFree-Strelka-Germline-RefMinor-GRCh37.vcf.gz --out refMinor",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dogBeach": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in DogBeach-SpliceGirl-unknown-WG-hg19.vcf.gz --out dog",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/test --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in DogBeach-SpliceGirl-unknown-WG-hg19.vcf.gz --out dog",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_colo_38": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh38\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test\\GRCh38 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --disable-recomposition --in COLO829BL_twotile-Strelka-Germline-chr4-hg38.vcf.gz --out refSites",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache\\26\\GRCh38\\Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/test\\GRCh38 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh38.Nirvana.dat --in COLO829BL_twotile-Strelka-Germline-chr4-hg38.vcf.gz --out refSites",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_custom": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\test --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz --out custom",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/test --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz --out custom",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dragen_na12878": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in NA12878-dragen-joint.vcf.gz --out dragenNa12878 --disable-recomposition",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in NA12878-dragen-joint.vcf.gz --out dragenNa12878 --disable-recomposition",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
-    "RR_miniIcsl\\": {
+    "RR_miniIcsl": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in miniIcsl.vcf --out mini",
-      "workingDirectory": "C:\\Development\\ExternalDataSources\\ICSL\\GRCh37"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in miniIcsl.vcf --out mini",
+      "workingDirectory": "/Users/rroy1/development/ExternalDataSources\\ICSL\\GRCh37"
     },
     "RR_dragen3.2": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in paul_chrM.vcf.gz --out paul_M",
-      "workingDirectory": "C:\\Development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in paul_chrM.vcf.gz --out paul_M",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dragen3.2_cnv": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --sd C:\\Development\\SupplementaryDatabase\\47\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878.cnv.vcf --out test",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in NA12878.cnv.vcf --out test",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK Custom SA": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\custom_SA\\AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd E:\\Nirvana_resources\\test_runs\\custom_SA\\  -o custom",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\custom_SA\\"
+      "commandLineArgs": "-i E:\\Nirvana_resources/test_runs\\custom_SA\\AU144A_BadVariant-pseq-unknown-single-hg19.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd E:\\Nirvana_resources/test_runs\\custom_SA\\  -o custom",
+      "workingDirectory": "E:\\Nirvana_resources/test_runs\\custom_SA\\"
     },
     "RR_na12878_chr22": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\temp --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in NA12878_HSX_PcrFree-Strelka-Germline-chr22-GRCh37.vcf.gz --out chr22_tm",
-      "workingDirectory": "c:\\Development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37Both --sd /Users/rroy1/development/SupplementaryDatabase\\temp --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in NA12878_HSX_PcrFree-Strelka-Germline-chr22-GRCh37.vcf.gz --out chr22_tm",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK TITIN_OOM": {
       "commandName": "Project",
       "commandLineArgs": " -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Both -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i E:\\Nirvana_resources\\temp\\dragen-joint.hard-filtered.vcf.gz -o TITIN_OOM",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_OOM_2019"
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_OOM_2019"
     },
     "RR_gHapMixTrio": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in chr9-10.vcf.gz --out chr9-10.50",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37Both --sd /Users/rroy1/development/SupplementaryDatabase\\50\\GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in chr9-10.vcf.gz --out chr9-10.50",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK_Nirvana_fail": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\nirvana-fail.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o fail",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Nirvana_fail\\"
+      "commandLineArgs": "-i E:\\Nirvana_resources/test_runs/test_Nirvana_fail\\nirvana-fail.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o fail",
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_Nirvana_fail\\"
     },
     "RR_left_shift": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\RefSeq --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --sd c:\\development\\SupplementaryDatabase\\50\\GRCh37 --in  NA12878_HSX_PcrFree-Strelka-Germline-MT-GRCh37.vcf.gz --out mtLeftShift",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37RefSeq --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --sd /Users/rroy1/development/SupplementaryDatabase\\50\\GRCh37 --in  NA12878_HSX_PcrFree-Strelka-Germline-MT-GRCh37.vcf.gz --out mtLeftShift",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_variants_past_edits": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\RefSeq  --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in Variants_after_indel_edits_SK.vcf --out test",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37RefSeq  --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in Variants_after_indel_edits_SK.vcf --out test",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK Codon test": {
       "commandName": "Project",
-      "commandLineArgs": "-c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i E:\\Nirvana_resources\\test_runs\\test_RNA_edit\\Variants_after_indel_edits_SK.vcf  -o extract_cache --disable-recomposition",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_RNA_edit"
+      "commandLineArgs": "-c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -i E:\\Nirvana_resources/test_runs/test_RNA_edit\\Variants_after_indel_edits_SK.vcf  -o extract_cache --disable-recomposition",
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_RNA_edit"
     },
     "RR_rnaEdit": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh38\\RefSeq --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in Dragen_v3.2-Dragen-Pedigree-RnaEdits-hg38-RefSeq-VEP91.vcf.gz --out rnaEdit",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache\\26\\GRCh38\\RefSeq --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh38.Nirvana.dat --in Dragen_v3.2-Dragen-Pedigree-RnaEdits-hg38-RefSeq-VEP91.vcf.gz --out rnaEdit",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dragen3.2_SV": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --disable-recomposition --in Dragen_v3.2-DragenSV-Germline-chr1-GRCh37.vcf.gz --out svLeftShift",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37Both --sd /Users/rroy1/development/SupplementaryDatabase\\50\\GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in Dragen_v3.2-DragenSV-Germline-chr1-GRCh37.vcf.gz --out svLeftShift",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RNAEdit fail test": {
       "commandName": "Project",
-      "commandLineArgs": "-c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources\\test_runs\\test_RNA_edit\\tsCEPH_chr11.vcf.gz -o out_range --disable-recomposition"
+      "commandLineArgs": "-c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh38\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -i E:\\Nirvana_resources/test_runs/test_RNA_edit\\tsCEPH_chr11.vcf.gz -o out_range --disable-recomposition"
     },
     "SK Del over stop": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_stop_lose\\del_over_stop.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o stop_lose",
-      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_stop_lose"
+      "commandLineArgs": "-i E:\\Nirvana_resources/test_runs/test_stop_lose\\del_over_stop.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\Refseq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o stop_lose",
+      "workingDirectory": "E:\\Nirvana_resources/test_runs/test_stop_lose"
     },
     "RR_ceph": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh37\\Both --sd C:\\Development\\SupplementaryDatabase\\50\\GRCh37 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in CephFather_SMN1_caller-Smn1-Germline-chr5-GRCh37.vcf.gz --out ceph",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37Both --sd /Users/rroy1/development/SupplementaryDatabase\\50\\GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in CephFather_SMN1_caller-Smn1-Germline-chr5-GRCh37.vcf.gz --out ceph",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "SK preloading fix": {
       "commandName": "Project",
-      "commandLineArgs": "-i E:\\Nirvana_resources\\temp\\ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd https://ilmn-nirvana.s3-us-west-2.amazonaws.com/latest_relative_SA_GRCh37.txt -o Shankar_preloading --disable-recomposition ",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\temp\\ClinVar20150901_ShankarBugNIR1202-ClinVar_dbSNP-unknown-WG-hg19.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\26\\GRCh37\\RefSeq -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --sd https://ilmn-nirvana.s3-us-west-2.amazonaws.com/latest_relative_SA_GRCh37.txt -o Shankar_preloading ",
       "environmentVariables": {
         "NirvanaDataUrlBase": "https://ilmn-nirvana.s3-us-west-2.amazonaws.com/"
       }
     },
     "RR DQ strelka": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh38\\Both --sd C:\\Development\\SupplementaryDatabase\\56\\GRCh38 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache\\26\\GRCh38\\Both --sd /Users/rroy1/development/SupplementaryDatabase\\56\\GRCh38 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh38.Nirvana.dat --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR spliceAi-37": {
       "commandName": "Project",
-      "commandLineArgs": " --cache C:\\Development\\Cache\\26\\GRCh37\\Ensembl --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --in spliceAi-37.vcf--out spliceAi-37",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in spliceAi-37.vcf--out spliceAi-37",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR DQ-38": {
       "commandName": "Project",
-      "commandLineArgs": "--cache C:\\Development\\Cache\\26\\GRCh38\\Both --sd C:\\Development\\SupplementaryDatabase\\56\\GRCh38 --ref C:\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat --disable-recomposition --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq",
-      "workingDirectory": "c:\\development\\TestDatasets"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache\\26\\GRCh38\\Both --sd /Users/rroy1/development/SupplementaryDatabase\\56\\GRCh38 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh38.Nirvana.dat --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     }
   }
 }

@@ -79,7 +79,7 @@ namespace VariantAnnotation.AnnotatedPositions
 					return HgvspNotation.GetExtensionNotation(proteinId, proteinStart, refAbbreviation, altAbbreviation,countToStop);
 
 				case ProteinChange.StartLost:
-					return HgvspNotation.GetStartLostNotation(proteinId, proteinStart, end, refAbbreviation);
+					return HgvspNotation.GetStartLostNotation(proteinId);
 			}
 
 			return null;
