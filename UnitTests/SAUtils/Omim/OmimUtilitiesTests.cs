@@ -19,9 +19,20 @@ namespace UnitTests.SAUtils.Omim
         [InlineData("(NFKB; see {164011})", "(NFKB)")]
         [InlineData("(see ISGF3G, {147574})", "(see ISGF3G)")]
         [InlineData("(DCK; {EC 2.7.1.74}; {125450})", "(DCK; EC 2.7.1.74)")]
-        public void RemoveLinksInText_AsExpected(string input, string output)
+        [InlineData("chromosome 13q21 (see {603680.0001} and {613289.0001}).", "chromosome 13q21.")]
+        [InlineData("common genetic haptoglobin types, Hp1 ({140100.0001}), Hp2 ({140100.0002}), and the heterozygous phenotype Hp2-1.", "common genetic haptoglobin types, Hp1, Hp2, and the heterozygous phenotype Hp2-1.")]
+        [InlineData("and RBBP7/4 ({300825}/{602923}).", "and RBBP7/4.")]
+        [InlineData("ultimately to formation of fibrin ({134570}/{134580}).", "ultimately to formation of fibrin.")]
+        public void RemoveLinks_AsExpected(string input, string output)
         {
-            Assert.Equal(output, OmimUtilities.RemoveLinksInText(input));
+            Assert.Equal(output, input.RemoveLinks());
+        }
+        
+        [Theory]
+        [InlineData("<Subhead> UGT1A Gene Complex", " UGT1A Gene Complex")]
+        public void RemoveFormatControl_AsExpected(string input, string output)
+        {
+            Assert.Equal(output, input.RemoveFormatControl());
         }
 
         [Theory]

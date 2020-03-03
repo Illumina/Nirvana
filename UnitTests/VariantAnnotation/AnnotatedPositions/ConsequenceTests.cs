@@ -55,7 +55,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Equal(ConsequenceTag.mature_miRNA_variant, observedConsequences[0]);
         }
 
-
         [Fact]
         public void DetermineSmallVariantEffects_tier3()
         {

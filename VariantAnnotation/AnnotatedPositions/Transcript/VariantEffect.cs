@@ -557,7 +557,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                      (string.IsNullOrEmpty(_transcript.Translation.PeptideSeq) ||
                       string.IsNullOrEmpty(_alternateAminoAcids) || _alternateAminoAcids.Contains("X"))
                      && !(IsFrameshiftVariant() || IsInframeDeletion() || IsIncompleteTerminalCodonVariant() ||
-                          IsProteinAlteringVariant() || IsStopGained() || IsStopRetained() || IsStopLost());
+                          IsProteinAlteringVariant() || IsStopGained() || IsStopRetained() || IsStopLost() || 
+                          IsStartRetained());
 
             _cache.Add(ct, result);
             return result;

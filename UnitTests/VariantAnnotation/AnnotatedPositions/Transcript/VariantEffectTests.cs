@@ -140,25 +140,31 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 null, "*", "X");
 
             Assert.True(variantEffect.IsStopLost());
-
         }
+        
+        [Theory]
+        [InlineData(ConsequenceTag.start_retained_variant)]
+        [InlineData(ConsequenceTag.incomplete_terminal_codon_variant)]
+        public void IsCodingSequenceVariant_WithMoreSpecificConsequence_ReturnFalse(ConsequenceTag ct)
+        {
+            var positionalEffect = new TranscriptPositionalEffect
+            {
+                BeforeCoding = false,
+                AfterCoding  = true,
+                WithinCdna   = true
+            };
 
-        //[Theory]
-        //public void IsFrameShiftVariant(bool isCoding,bool isIncompleteTerminalCodonVariant,bool hasFrameShift,bool isStopRetained,bool isTrucatedByStop,bool expected)
-        //{
-        //    var positionalEffect = new TranscriptPositionalEffect
-        //    {
-        //        IsCoding = isCoding,
-        //        HasFrameShift = hasFrameShift
+            var cache = new VariantEffectCache();
+            cache.Add(ct, true);
+            var variant = new Mock<ISimpleVariant>();
+            variant.SetupGet(x => x.AltAllele).Returns("ATAGCCC");
+            variant.SetupGet(x => x.RefAllele).Returns("A");
 
-        //    };
+            var variantEffect = new VariantEffect(positionalEffect, variant.Object, null, "", "", "", "",
+                null, null, null, cache);
 
-        //    var cache = new VariantEffectCache();
-        //    cache.Add(ConsequenceTag.incomplete_terminal_codon_variant,isIncompleteTerminalCodonVariant);
-        //    cache.Add(ConsequenceTag.stop_retained_variant, isStopRetained);
-        //    //cache.Add();
-        //}
-
-
+            Assert.False(variantEffect.IsCodingSequenceVariant());
+        }
+        
     }
 }
