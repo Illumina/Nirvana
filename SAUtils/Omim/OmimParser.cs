@@ -38,7 +38,7 @@ namespace SAUtils.Omim
             {
                 int mimNumber = entry.mimNumber;
 
-                string description = OmimUtilities.RemoveLinksInText(entry.textSectionList?[0].textSection.textSectionContent);
+                string description = entry.textSectionList?[0].textSection.textSectionContent.RemoveLinks().RemoveFormatControl();
                 string geneName = entry.geneMap?.geneName;
                 var phenotypes = entry.geneMap?.phenotypeMapList?.Select(x => OmimUtilities.GetPhenotype(x, _jsonSchema.GetSubSchema("phenotypes")))
                                      .ToList() ?? new List<OmimItem.Phenotype>();

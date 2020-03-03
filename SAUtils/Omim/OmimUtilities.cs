@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using OptimizedCore;
@@ -35,7 +36,7 @@ namespace SAUtils.Omim
 
         internal static (string Phenotype, OmimItem.Comment[] Comments) ExtractPhenotypeAndComments(string phenotypeString)
         {
-            phenotypeString = phenotypeString.Trim(' ').Trim(',').Replace(@"\\'", "'");
+            phenotypeString = phenotypeString.Trim(' ').Trim(',').Replace(@"\\'", "'", StringComparison.Ordinal);
             string phenotype = Regex.Replace(phenotypeString,@" \(\d\) ", " ");
 
             var comments = phenotypeString.Select(GetComment)
@@ -48,7 +49,7 @@ namespace SAUtils.Omim
         private static OmimItem.Comment GetComment(char symbol)
         {
             switch (symbol)
-            {
+            { 
                 case '?':
                     return OmimItem.Comment.unconfirmed_or_possibly_spurious_mapping;
                 case '[':
@@ -83,13 +84,15 @@ namespace SAUtils.Omim
             return geneToOmimEntries;
         }
 
-        public static string RemoveLinksInText(string text)
-        {
-           if (text == null) return null;
-           // remove links enclosed by parentheses with only numbers, e.g. ({12345})
-           text = Regex.Replace(Regex.Replace(text, @"((and|see|;|(e\.g\.)?,) )*{\d+}", ""), @" ?\(\)", "");
-           // remove format control characters
-           return Regex.Replace(text, @"{(\d+:)?(.+?)}", "$2");
-        }
+        // remove links enclosed by parentheses with only numbers, e.g. ({12345})
+        public static string RemoveLinks(this string text) => text == null
+            ? null
+            : Regex.Replace(Regex.Replace(Regex.Replace(text, 
+                        @"((and|see|;|(e\.g\.)?,) )*{\d+(\.\d+)?}", ""),
+                        @" ?\((\ |/)*\)", ""),
+                        @"{(\d+:)?(.+?)}", "$2");
+
+        public static string RemoveFormatControl(this string text) => text == null ? null : 
+            Regex.Replace(text, "<Subhead>", "");
     }
 }
