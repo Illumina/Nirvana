@@ -15,8 +15,8 @@ using ErrorHandling;
 using Genome;
 using Intervals;
 using IO;
+using ReferenceSequence.Utilities;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.CreateCache
 {

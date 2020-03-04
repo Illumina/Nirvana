@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using Genome;
-using VariantAnnotation.Sequence;
+using ReferenceSequence;
 
 namespace Downloader.FileExtensions
 {

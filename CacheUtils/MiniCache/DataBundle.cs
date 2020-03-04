@@ -1,9 +1,9 @@
 ﻿using Genome;
 using IO;
+using ReferenceSequence.IO;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
-using VariantAnnotation.Sequence;
 using VC = VariantAnnotation.Caches;
 
 namespace CacheUtils.MiniCache

@@ -10,9 +10,9 @@ using CacheUtils.Commands.Download;
 using CacheUtils.Genbank;
 using Genome;
 using IO;
+using ReferenceSequence.IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.ParseVepCacheDirectory
 {

@@ -59,7 +59,7 @@ namespace CacheUtils.DataDumperImport.FauxRegex
 
             int firstPosAfterFatArrow = fatArrowPos + 3;
             if (s[firstPosAfterFatArrow] == '\'') return GetEntryTypeStringKeyValue(s, firstPosAfterFatArrow + 1, key);
-            if (s[^1] == '{') return (EntryType.ObjectKeyValue, key, null);
+            if (s[s.Length - 1] == '{') return (EntryType.ObjectKeyValue, key, null);
 
             string afterFatArrow = s.Substring(firstPosAfterFatArrow);
 

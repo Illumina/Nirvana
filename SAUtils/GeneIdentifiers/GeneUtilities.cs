@@ -4,7 +4,7 @@ using CacheUtils.Genes.DataStructures;
 using CacheUtils.Genes.IO;
 using Compression.Utilities;
 using Genome;
-using VariantAnnotation.Sequence;
+using ReferenceSequence.Utilities;
 
 namespace SAUtils.GeneIdentifiers
 {

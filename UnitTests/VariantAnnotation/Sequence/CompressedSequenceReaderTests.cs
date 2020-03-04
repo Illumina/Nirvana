@@ -1,6 +1,6 @@
 ﻿using Genome;
+using ReferenceSequence.IO;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Sequence;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Sequence

@@ -14,12 +14,12 @@ namespace Tabix
         public readonly int NumLinesToSkip;
         // ReSharper restore MemberCanBePrivate.Global
         // ReSharper restore NotAccessedField.Global
-        public readonly ReferenceSequence[] ReferenceSequences;
+        public readonly ReferenceIndex[] ReferenceSequences;
 
         internal readonly Dictionary<string, ushort> RefNameToTabixIndex;
 
         public Index(int format, int sequenceNameIndex, int beginIndex, int endIndex, char commentChar,
-            int numLinesToSkip, ReferenceSequence[] referenceSequences, Dictionary<string, ushort> refNameToTabixIndex)
+            int numLinesToSkip, ReferenceIndex[] referenceSequences, Dictionary<string, ushort> refNameToTabixIndex)
         {
             Format              = format;
             SequenceNameIndex   = sequenceNameIndex;

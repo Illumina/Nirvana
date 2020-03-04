@@ -3,7 +3,7 @@ using CacheUtils.Commands.Download;
 using CacheUtils.Commands.UniversalGeneArchive;
 using Genome;
 using IO;
-using VariantAnnotation.Sequence;
+using ReferenceSequence.Utilities;
 
 namespace CacheUtils.Genes.DataStores
 {

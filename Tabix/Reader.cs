@@ -26,7 +26,7 @@ namespace Tabix
             byte[] concatenatedNames           = reader.ReadBytes(concatenatedSequenceNameLen);
 
             string[] referenceSequenceNames = GetReferenceSequenceNames(concatenatedNames, numReferenceSequences);
-            var referenceSequences     = new ReferenceSequence[numReferenceSequences];
+            var referenceSequences     = new ReferenceIndex[numReferenceSequences];
             var refNameToTabixIndex    = new Dictionary<string, ushort>(numReferenceSequences);
 
             for (ushort i = 0; i < numReferenceSequences; i++)
@@ -75,7 +75,7 @@ namespace Tabix
             return nullPositions;
         }
 
-        private static ReferenceSequence ReadReferenceSequence(BinaryReader reader, IChromosome chromosome)
+        private static ReferenceIndex ReadReferenceSequence(BinaryReader reader, IChromosome chromosome)
         {
             int numBins = reader.ReadInt32();
             var idToChunks = new Dictionary<int, Interval[]>();
@@ -97,7 +97,7 @@ namespace Tabix
             }
 
             for (var i = 0; i < firstNonZero; i++) linearFileOffsets[i] = linearFileOffsets[firstNonZero];
-            return new ReferenceSequence(chromosome, idToChunks, linearFileOffsets);
+            return new ReferenceIndex(chromosome, idToChunks, linearFileOffsets);
         }
 
         private static (int Id, Interval[] Chunks) ReadBin(BinaryReader reader)

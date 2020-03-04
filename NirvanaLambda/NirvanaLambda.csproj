@@ -1,9 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
     <OutputPath>bin\$(Configuration)</OutputPath>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
@@ -15,7 +16,6 @@
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\Cloud\Cloud.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
-    <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\Tabix\Tabix.csproj" />
     <ProjectReference Include="..\VariantAnnotation\VariantAnnotation.csproj" />

@@ -2,10 +2,10 @@
 using System.IO;
 using Genome;
 using Intervals;
+using ReferenceSequence.IO;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Sequence;
 
 namespace VariantAnnotation.Providers
 {

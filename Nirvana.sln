@@ -44,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tabix", "Tabix\Tabix.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cloud", "Cloud\Cloud.csproj", "{E93914C8-2599-46BE-BE18-6229E53F581B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceUtils", "ReferenceUtils\ReferenceUtils.csproj", "{234765A8-2B5C-4FD5-ACBA-6D48002E9074}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceSequence", "ReferenceSequence\ReferenceSequence.csproj", "{234765A8-2B5C-4FD5-ACBA-6D48002E9074}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "Downloader\Downloader.csproj", "{5B81B762-8A86-466A-A947-AC2CA53EE40D}"
 EndProject

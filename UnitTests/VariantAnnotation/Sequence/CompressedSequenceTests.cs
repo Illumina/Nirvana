@@ -1,18 +1,18 @@
 ﻿using Genome;
 using Intervals;
-using VariantAnnotation.Sequence;
+using ReferenceSequence.Common;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Sequence
 {
 	public sealed class CompressedSequenceTests
 	{
-		private readonly CompressedSequence _compressedSequence;
+		private readonly ReferenceSequence.Common.Sequence _sequence;
 		private const int NumBases = 53;
 
 		public CompressedSequenceTests()
 		{
-            _compressedSequence = new CompressedSequence { Assembly = GenomeAssembly.hg19 };
+            _sequence = new ReferenceSequence.Common.Sequence { Assembly = GenomeAssembly.hg19 };
 
             // create the following sequence: NNATGTTTCCACTTTCTCCTCATTAGANNNTAACGAATGGGTGATTTCCCTAN
             var twoBitBuffer = new byte[] { 14, 42, 93, 169, 150, 122, 204, 11, 211, 224, 35, 169, 91, 0 };
@@ -23,20 +23,20 @@ namespace UnitTests.VariantAnnotation.Sequence
 			maskedIntervals[2]  = new Interval<MaskedEntry>(52, 52, new MaskedEntry(52, 52));
 
 			var maskedIntervalArray = new IntervalArray<MaskedEntry>(maskedIntervals);
-            _compressedSequence.Set(NumBases, 0, twoBitBuffer, maskedIntervalArray, null);
+            _sequence.Set(NumBases, 0, twoBitBuffer, maskedIntervalArray, null);
         }
 
 	    [Fact]
 	    public void Assembly_hg19()
 	    {
-	        Assert.Equal(GenomeAssembly.hg19, _compressedSequence.Assembly);
+	        Assert.Equal(GenomeAssembly.hg19, _sequence.Assembly);
 	    }
 
         [Fact]
 	    public void GetNumBufferBytes()
         {
             const int expectedNumBufferBytes = 25;
-            var observedNumBufferBytes = CompressedSequence.GetNumBufferBytes(97);
+            var observedNumBufferBytes = ReferenceSequence.Common.Sequence.GetNumBufferBytes(97);
             Assert.Equal(expectedNumBufferBytes, observedNumBufferBytes);
         }
 
@@ -50,7 +50,7 @@ namespace UnitTests.VariantAnnotation.Sequence
 		[InlineData(23, 0, null)]
 		public void Substring(int offset, int length, string expectedSubstring)
 		{
-			var observedSubstring = _compressedSequence.Substring(offset, length);
+			var observedSubstring = _sequence.Substring(offset, length);
 			Assert.Equal(expectedSubstring, observedSubstring);
 		}		
 	}

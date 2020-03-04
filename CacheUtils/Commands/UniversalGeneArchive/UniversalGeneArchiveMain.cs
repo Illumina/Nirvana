@@ -13,8 +13,8 @@ using Compression.FileHandling;
 using ErrorHandling;
 using IO;
 using Microsoft.Extensions.Configuration;
+using ReferenceSequence.Utilities;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.UniversalGeneArchive
 {
