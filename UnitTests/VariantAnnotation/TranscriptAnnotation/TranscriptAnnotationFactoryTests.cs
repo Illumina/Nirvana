@@ -31,25 +31,6 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         }
 
         [Fact]
-        public void DecideAnnotationStatus_Reduced_TranscriptCompleteOverlap_ReturnSvCompleteOverlapAnnotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), AnnotationBehavior.StructuralVariants);
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.CompleteOverlapAnnotation, observedStatus);
-        }
-
-        // the only thing that matters now is overlap w.r.t. the transcript (not gene)
-        [Fact]
-        public void DecideAnnotationStatus_Reduced_TranscriptCompleteOverlap_GenePartialOverlap_ReturnSvCompleteOverlapAnnotation()
-        {
-            var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), AnnotationBehavior.StructuralVariants);
-
-            Assert.Equal(TranscriptAnnotationFactory.Status.CompleteOverlapAnnotation, observedStatus);
-        }
-
-        [Fact]
         public void DecideAnnotationStatus_Reduced_TranscriptPartialOverlap_ReturnReducedAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 200),
