@@ -199,6 +199,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             Assert.Equal(235, observedResults.Start);
             Assert.Equal(300, observedResults.End);
         }
+        
+        [Fact]
+        public void GetCoveredCdnaPositions_Forward_StartExon_EndIntron()
+        {
+            var observedResults = _forwardTranscriptRegions.GetCoveredCdnaPositions(250, 2, -1, 3, false);
+            Assert.Equal(250, observedResults.Start);
+            Assert.Equal(426, observedResults.End);
+        }
 
         [Fact]
         public void GetCoveredCdnaPositions_Forward_StartExon_EndAfter()
@@ -266,6 +274,20 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var observedResults = regions.GetCoveredCdnaPositions(643, 0, -1, 1, true);
             Assert.Equal(643, observedResults.Start);
             Assert.Equal(825, observedResults.End);
+        }
+        
+        [Fact]
+        public void GetCoveredCdnaPositions_Reverse_StartExon_EndIntron()
+        {
+            var regions = new ITranscriptRegion[]
+            {
+                new TranscriptRegion(TranscriptRegionType.Exon, 3, 103288513, 103288696, 642, 825),
+                new TranscriptRegion(TranscriptRegionType.Intron, 2, 103288697, 103288999, 641, 642)
+            };
+            
+            var observedResults = regions.GetCoveredCdnaPositions(-1, 0, 666, 1, true);
+            Assert.Equal(642, observedResults.Start);
+            Assert.Equal(666, observedResults.End);
         }
 
         [Fact]

@@ -59,8 +59,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             int codingEnd = onReverseStrand ? regions[0].CdnaEnd : regions[regions.Length - 1].CdnaEnd;
 
-            cdnaStart = GetCoveredCdnaPosition(cdnaStart, startRegion, startRegionIndex, onReverseStrand, codingEnd);
-            cdnaEnd   = GetCoveredCdnaPosition(cdnaEnd, endRegion, endRegionIndex, onReverseStrand, codingEnd);
+            cdnaStart = GetCoveredCdnaPosition(cdnaStart, startRegion, startRegionIndex, codingEnd, onReverseStrand, false);
+            cdnaEnd   = GetCoveredCdnaPosition(cdnaEnd, endRegion, endRegionIndex, codingEnd, onReverseStrand, true);
 
             return cdnaStart < cdnaEnd ? (cdnaStart, cdnaEnd) : (cdnaEnd, cdnaStart);
         }
@@ -71,18 +71,19 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return regionIndex == ~regions.Length ? regions[regions.Length - 1] : regions[regionIndex];
         }
 
-        private static int GetCoveredCdnaPosition(int cdnaPosition, ITranscriptRegion region, int regionIndex, bool onReverseStrand, int codingEnd)
+        private static int GetCoveredCdnaPosition(int cdnaPosition, ITranscriptRegion region, int regionIndex, int codingEnd, 
+            bool onReserveStrand, bool isEndPosition)
         {
             if (cdnaPosition >= 0) return cdnaPosition;
 
-            // start before transcript
-            if (regionIndex == -1) return onReverseStrand ? codingEnd : 1;
+            // genomic position on the left of the transcript
+            if (regionIndex == -1) return onReserveStrand ? codingEnd : 1;
 
-            // end after transcript
-            if (regionIndex < -1) return onReverseStrand ? 1 : codingEnd;
+            // genomic position on the right of the transcript
+            if (regionIndex < -1) return onReserveStrand ? 1 : codingEnd;
 
             // intron
-            return onReverseStrand ? region.CdnaStart : region.CdnaEnd;
+            return isEndPosition ? region.CdnaStart : region.CdnaEnd;
         }
 
         public static (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) GetCoveredCdsAndProteinPositions(int coveredCdnaStart, int coveredCdnaEnd,
