@@ -12,15 +12,14 @@ namespace VariantAnnotation.TranscriptAnnotation
     {
         public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant variant)
         {
-            var mappedPosition                = GetMappedPosition(transcript.TranscriptRegions, variant);
+            bool completeOverlap = variant.Contains(transcript);
+            var  mappedPosition  = completeOverlap ? null : GetMappedPosition(transcript.TranscriptRegions, variant);
+
             List<ConsequenceTag> consequences = GetConsequences(transcript, variant);
 
             return new AnnotatedTranscript(transcript, null, null, null, null, mappedPosition, null, null, null, null,
-                consequences, false);
+                consequences, completeOverlap);
         }
-
-        public static IAnnotatedTranscript GetCompleteOverlapTranscript(ITranscript transcript) =>
-            new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null, null, true);
 
         private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, IInterval variant)
         {

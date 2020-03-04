@@ -50,9 +50,6 @@ namespace VariantAnnotation.TranscriptAnnotation
                 case Status.ReducedAnnotation:
                     annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant);
                     break;
-                case Status.CompleteOverlapAnnotation:
-                    annotatedTranscript = ReducedTranscriptAnnotator.GetCompleteOverlapTranscript(transcript);
-                    break;
                 case Status.RohAnnotation:
                     annotatedTranscript = RohTranscriptAnnotator.GetAnnotatedTranscript(transcript);
                     break;
@@ -82,7 +79,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             {
                 // handle large variants
                 if (behavior.CanonicalTranscriptOnly) return Status.RohAnnotation;
-                return variant.Contains(transcript) ? Status.CompleteOverlapAnnotation : Status.ReducedAnnotation;
+                return Status.ReducedAnnotation;
             }
 
             return Status.NoAnnotation;
@@ -91,7 +88,6 @@ namespace VariantAnnotation.TranscriptAnnotation
         public enum Status
         {
             NoAnnotation,
-            CompleteOverlapAnnotation,
             FlankingAnnotation,
             ReducedAnnotation,
             FullAnnotation,
