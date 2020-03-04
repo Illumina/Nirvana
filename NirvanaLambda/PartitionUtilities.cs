@@ -115,8 +115,8 @@ namespace NirvanaLambda
             for (var i = 0; i < adjustedStarts.Count - 1; i++)
                 //The end position in an annotation range can be smaller than 1, which indicate it ends at the end of previous chromosome
                 yield return new AnnotationRange(adjustedStarts[i], new AnnotationPosition(adjustedStarts[i + 1].Chromosome, adjustedStarts[i + 1].Position - 1));
-            
-            yield return new AnnotationRange(adjustedStarts[^1], null);
+
+            yield return new AnnotationRange(adjustedStarts[adjustedStarts.Count - 1], null);
         }
 
 

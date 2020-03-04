@@ -1,7 +1,7 @@
 ﻿using IO;
+using ReferenceSequence;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
-using VariantAnnotation.Sequence;
 
 namespace VariantAnnotation.Providers
 {

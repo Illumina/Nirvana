@@ -13,12 +13,12 @@ using ErrorHandling;
 using Genome;
 using Intervals;
 using IO;
+using ReferenceSequence.Utilities;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.CombineCacheDirectories
 {

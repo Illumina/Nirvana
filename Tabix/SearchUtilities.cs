@@ -48,7 +48,7 @@
             return -1;
         }
 
-        internal static ReferenceSequence GetTabixReferenceSequence(this Index index, string chromosomeName)
+        internal static ReferenceIndex GetTabixReferenceSequence(this Index index, string chromosomeName)
         {
             if (string.IsNullOrEmpty(chromosomeName)) return null;
             return !index.RefNameToTabixIndex.TryGetValue(chromosomeName, out ushort tabixIndex)
@@ -72,7 +72,7 @@
             return (long)minOverlapOffset;
         }
 
-        internal static ulong GetMinOffset(ReferenceSequence refSeq, int begin)
+        internal static ulong GetMinOffset(ReferenceIndex refSeq, int begin)
         {
             int bin = BinUtilities.FirstBin(Constants.NumLevels) + (begin >> Constants.MinShift);
 
@@ -92,7 +92,7 @@
             return refSeq.LinearFileOffsets[bottomBin];
         }
 
-        internal static ulong GetMaxOffset(ReferenceSequence refSeq, int end)
+        internal static ulong GetMaxOffset(ReferenceIndex refSeq, int end)
         {
             int bin = BinUtilities.FirstBin(Constants.NumLevels) + ((end - 1) >> Constants.MinShift) + 1;
 

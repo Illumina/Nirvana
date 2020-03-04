@@ -71,8 +71,8 @@ namespace Variants
         {
             if (refAllele == altAllele) return false;
             if (string.IsNullOrEmpty(refAllele) || string.IsNullOrEmpty(altAllele)) return true;
-            if (refAllele.Length == 1) return refAllele[0] == altAllele[^1];
-            if (altAllele.Length == 1) return altAllele[0] == refAllele[^1];
+            if (refAllele.Length == 1) return refAllele[0] == altAllele[altAllele.Length - 1];
+            if (altAllele.Length == 1) return altAllele[0] == refAllele[refAllele.Length - 1];
 
             return true;
         }

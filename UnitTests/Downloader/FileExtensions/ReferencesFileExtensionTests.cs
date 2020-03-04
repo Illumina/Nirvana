@@ -3,7 +3,7 @@ using System.IO;
 using Downloader;
 using Downloader.FileExtensions;
 using Genome;
-using VariantAnnotation.Sequence;
+using ReferenceSequence;
 using Xunit;
 
 namespace UnitTests.Downloader.FileExtensions

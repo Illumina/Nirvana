@@ -6,9 +6,9 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
+using ReferenceSequence.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Providers;
-using VariantAnnotation.Sequence;
 
 namespace CacheUtils.Commands.RegulatoryGFF
 {
@@ -23,7 +23,7 @@ namespace CacheUtils.Commands.RegulatoryGFF
             using (var writer = GZipUtilities.GetStreamWriter(_outputFileName))
             {
                 string cachePath    = CacheConstants.TranscriptPath(_inputPrefix);
-                var sequenceData = SequenceHelper.GetDictionaries(_referencePath);
+                var    sequenceData = SequenceHelper.GetDictionaries(_referencePath);
 
                 // load the cache
                 Console.Write("- reading {0}... ", Path.GetFileName(cachePath));

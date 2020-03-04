@@ -40,7 +40,7 @@ namespace SAUtils.DataStructures
             var min = _itemArray[0];
 
             // the last item form the array is brought to the root and pushed down to the appropriate position
-            _itemArray[0] = _itemArray[^1];
+            _itemArray[0] = _itemArray[_itemArray.Count - 1];
             _itemArray.RemoveAt(_itemArray.Count - 1);
 
 

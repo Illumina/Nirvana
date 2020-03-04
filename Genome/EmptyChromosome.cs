@@ -1,4 +1,6 @@
-﻿namespace Genome
+﻿using IO;
+
+namespace Genome
 {
     public sealed class EmptyChromosome : IChromosome
     {
@@ -8,7 +10,7 @@
         public string GenBankAccession { get; }
         public int Length { get; }
         public ushort Index { get; }
-
+        
         public EmptyChromosome(string chromosomeName)
         {
             UcscName         = chromosomeName;
@@ -18,6 +20,8 @@
             Length           = 0;
             Index            = ushort.MaxValue;
         }
+        
+        public void Write(ExtendedBinaryWriter writer) => throw new System.NotImplementedException();
 
         public bool Equals(IChromosome other) => UcscName == other.UcscName && Index == other.Index;
 

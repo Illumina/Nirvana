@@ -1,4 +1,5 @@
 ﻿using System;
+using IO;
 
 namespace Genome
 {
@@ -10,5 +11,6 @@ namespace Genome
         string GenBankAccession { get; }
         int Length { get; }
         ushort Index { get; }
+        void Write(ExtendedBinaryWriter writer);
     }
 }
