@@ -8,6 +8,8 @@ namespace IO
         // can be redirected to any logger
         public static Action<string> WriteLine { get; set; }
         public static Action<string> Write     { get; set; }
+        
+        public const string Url = "Url";
 
         static Logger()
         {
@@ -37,6 +39,7 @@ namespace IO
                 sb.AppendLine($"{e.GetType()}: {e.Message}");
                 sb.AppendLine($"Stack trace: {e.StackTrace}");
                 if (e.Data.Contains(vcfLine)) sb.AppendLine($"VCF line: {e.Data[vcfLine]}");
+                if (e.Data.Contains(Url)) sb.AppendLine($"URL: {e.Data[Url]}");
 
                 sb.AppendLine(line);
                 e = e.InnerException;

@@ -13,11 +13,20 @@ namespace IO
         public (HttpWebResponse Response, Stream Stream) Connect(long position)
         {
             if (position < 0) throw new ArgumentOutOfRangeException(nameof(position));
-            var request = WebRequest.CreateHttp(_url);
-            request.AddRange(position);
-            var response = (HttpWebResponse)request.GetResponse();
-            var stream = response.GetResponseStream();
-            return (response, stream);
+
+            try
+            {
+                var request = WebRequest.CreateHttp(_url);
+                request.AddRange(position);
+                var response = (HttpWebResponse)request.GetResponse();
+                var stream   = response.GetResponseStream();
+                return (response, stream);
+            }
+            catch (Exception e)
+            {
+                e.Data[Logger.Url] = _url;
+                throw;
+            }
         }
     }
 }
