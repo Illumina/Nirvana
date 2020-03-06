@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CacheUtils.TranscriptCache;
+﻿using CacheUtils.TranscriptCache;
 using Genome;
 using UnitTests.TestDataStructures;
 using Variants;
@@ -11,10 +10,16 @@ namespace UnitTests.Vcf.VariantCreator
 {
     public sealed class VariantFactoryTests
     {
-        private readonly Chromosome _chromosome1                  = new Chromosome("chr1", "1", 0);
-        private static readonly ISequence Sequence                = new NSequence();
-        private readonly SimpleSequenceProvider _sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh37, Sequence, new Dictionary<string, IChromosome> { { "1", new Chromosome("chr1", "1", 0) } });
-        private readonly VariantId _vidCreator = new VariantId();
+        private readonly Chromosome _chromosome1 = new Chromosome("chr1", "1", 0);
+
+        private static readonly ISequence Sequence = new NSequence();
+        private readonly ISequence _chr12Seq = new SimpleSequence(
+            "TCCCCATGCTGCTCTTTTTTGCAAACACCAACACAATTTGGGCTCCATTTATAAGGCATCTGCTGCACCAACCCTCTTTCTTGGTGCTTACTGGACCTGCTCAGGGTTAATTTCTAACTCAAAGAACCTAACTTGGAGTAACTCCGTACCACCAGCAAAGCGACTGGCTTTGGGGAATGACATTTACAATGTATCCACTGTTATTTGGTCACCCAGCAAACTGTCATTTTTCAGAAACCAGGGCTGTCTCACAAACTGGCTTTCAATAAGGTGGGTTGCTTAGCAACTGCCAAGGAATTAAGAAGACAGAATAAGGTATCCGCCAGAGATATTTTATGACCAAAATGAGCTGCACTCATGTGTCTGGTTGTGTTCAAGGTAACCAAGTAAGAGATAACACCCGACTATTTTTGCATCATGAGGAAAAATACTTGGCTTCTGCCCAGAAGGGCAATTATCTCAAAGTCTTGGCAGGCCCCATGGTATGAGAAATGGTAACTGATATGGGGGTTAAAAAAAA",
+            106499648);
+
+        private readonly VariantId       _vidCreator       = new VariantId();
+        private readonly LegacyVariantId _legacyVidCreator = new LegacyVariantId(null);
+        
         //chr1    69391    .    A    <DEL>    .    .    SVTYPE=DEL;END=138730    .    .
         [Fact]
         public void GetVariant_svDel()
@@ -123,6 +128,38 @@ namespace UnitTests.Vcf.VariantCreator
 
             Assert.Equal(AnnotationBehavior.RunsOfHomozygosity, variants[0].Behavior);
             Assert.Equal(VariantType.run_of_homozygosity, variants[0].Type);
+        }
+        
+        // chr12	106500158	.	GTTA	GTA,GT	.	.	.
+        [Fact]
+        public void GetVariant_LegacyVid_DisableLeftAlignment_MultiAllelic_Deletions()
+        {
+            var infoData       = new InfoData(null, null, null, null, null, null, null, null, null, null);
+            var chromosome12   = new Chromosome("chr12", "12", 11);
+            var variantFactory = new VariantFactory(_chr12Seq, _legacyVidCreator);
+
+            IVariant[] variants = variantFactory.CreateVariants(chromosome12, 106500158, 106500161, "GTTA",
+                new[] {"GTA", "GT"}, infoData, new[] {false, false}, false, null, null);
+
+            Assert.Equal(2, variants.Length);
+            Assert.Equal("12:106500160:106500160", variants[0].VariantId);
+            Assert.Equal("12:106500160:106500161", variants[1].VariantId);
+        }
+        
+        // chr12	106500158	.	GTTA	GTA,GT	.	.	.
+        [Fact]
+        public void GetVariant_NormalVid_EnableLeftAlignment_MultiAllelic_Deletions()
+        {
+            var infoData       = new InfoData(null, null, null, null, null, null, null, null, null, null);
+            var chromosome12   = new Chromosome("chr12", "12", 11);
+            var variantFactory = new VariantFactory(_chr12Seq, _vidCreator);
+
+            IVariant[] variants = variantFactory.CreateVariants(chromosome12, 106500158, 106500161, "GTTA",
+                new[] {"GTA", "GT"}, infoData, new[] {false, false}, false, null, null);
+            
+            Assert.Equal(2, variants.Length);
+            Assert.Equal("12-106500158-GT-G", variants[0].VariantId);
+            Assert.Equal("12-106500159-TTA-T", variants[1].VariantId);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Genome;
 using VariantAnnotation.Interface;
+using Variants;
 
 namespace Vcf.VariantCreator
 {
@@ -35,6 +36,9 @@ namespace Vcf.VariantCreator
             if (category == VariantCategory.RepeatExpansion) svType = "STR";
             return GetLongVid(chromosome.EnsemblName, start, end, refAllele, altAllele, svType);
         }
+
+        public (int Start, string RefAllele, string AltAllele) Normalize(ISequence sequence, int start,
+            string refAllele, string altAllele) => VariantUtils.TrimAndLeftAlign(start, refAllele, altAllele, sequence);
 
         private static string GetVid(string chromosomeName, int paddedPosition, string paddedRefAllele,
             string paddedAltAllele) =>

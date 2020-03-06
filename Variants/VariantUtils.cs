@@ -6,11 +6,8 @@ namespace Variants
     {
         public const int MaxUpstreamLength = 500;
 
-        /// <summary>
-        /// Left aligns the variant using base rotation
-        /// </summary>
-        /// <returns>Tuple of new position, ref and alt allele</returns>
-        public static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele, string altAllele, ISequence refSequence, int maxUpstreamLength = MaxUpstreamLength)
+        public static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele,
+            string altAllele, ISequence refSequence, int maxUpstreamLength = MaxUpstreamLength)
         {
             if (IsStructuralVariant(altAllele)) return (start, refAllele, altAllele);
 
@@ -21,49 +18,51 @@ namespace Variants
 
             // alignment only makes sense for insertion and deletion
             if (!(altAllele.Length == 0 || refAllele.Length == 0)) return (start, refAllele, altAllele);
-            if(! isLeftShiftPossible) return (start, refAllele, altAllele);
+            if (!isLeftShiftPossible) return (start, refAllele, altAllele);
 
             // base checking to make sure we can safely left shift
             if (IfRefBaseMismatched(start, refAllele, refSequence)) return (start, refAllele, altAllele);
 
             // adjust the max upstream length when you are near the beginning of the chrom
             if (maxUpstreamLength >= start) maxUpstreamLength = start - 1;
-            var upstreamSeq = refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength);
-            
+            string upstreamSeq = refSequence.Substring(start - maxUpstreamLength - 1, maxUpstreamLength);
+
             // compressed seq is 0 based
-            var combinedSeq = upstreamSeq;
+            string combinedSeq = upstreamSeq;
             int repeatLength;
             int i;
+            
             if (refAllele.Length > altAllele.Length)
             {
                 // deletion
-                combinedSeq += refAllele;
-                repeatLength = refAllele.Length;
+                combinedSeq  += refAllele;
+                repeatLength =  refAllele.Length;
+                
                 for (i = combinedSeq.Length - 1; i >= repeatLength; i--, start--)
                 {
                     if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
                 }
 
-                var newRefAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
+                string newRefAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
                 return (start, newRefAllele, ""); //alt is empty for deletion
             }
 
             //insertion
-            combinedSeq += altAllele;
-            repeatLength = altAllele.Length;
+            combinedSeq  += altAllele;
+            repeatLength =  altAllele.Length;
 
             for (i = combinedSeq.Length - 1; i >= repeatLength; i--, start--)
             {
                 if (combinedSeq[i] != combinedSeq[i - repeatLength]) break;
             }
-            var newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
+
+            string newAltAllele = combinedSeq.Substring(i + 1 - repeatLength, repeatLength);
             return (start, "", newAltAllele);
         }
 
-        private static bool IfRefBaseMismatched(int start, string refAllele, ISequence refSequence)
-        {
-            return refSequence != null && !string.IsNullOrEmpty(refAllele) && refAllele != refSequence.Substring(start - 1, refAllele.Length);
-        }
+        private static bool IfRefBaseMismatched(int start, string refAllele, ISequence sequence) =>
+            sequence  != null && !string.IsNullOrEmpty(refAllele) &&
+            refAllele != sequence.Substring(start - 1, refAllele.Length);
 
         // we have a padding base we can check if its possible to left shift at all
         public static bool IsLeftShiftPossible(string refAllele, string altAllele)
@@ -76,9 +75,7 @@ namespace Variants
             return true;
         }
 
-        private static bool IsStructuralVariant(string altAllele)
-        {
-            return altAllele.StartsWith('<') || altAllele.Contains('[') || altAllele.Contains(']');
-        }
+        private static bool IsStructuralVariant(string altAllele) =>
+            altAllele.StartsWith('<') || altAllele.Contains('[') || altAllele.Contains(']');
     }
 }

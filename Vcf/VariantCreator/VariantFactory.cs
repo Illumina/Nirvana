@@ -46,7 +46,7 @@ namespace Vcf.VariantCreator
                 if (isDecomposed && isRecomposed) throw new InvalidDataException("A variant can't be both decomposed and recomposed");
 
                 (int shiftedStart, string shiftedRef, string shiftedAlt) =
-                    VariantUtils.TrimAndLeftAlign(start, refAllele, altAllele, _sequence);
+                    _vidCreator.Normalize(_sequence, start, refAllele, altAllele);
 
                 if (variantCategory == VariantCategory.SmallVariant || variantCategory == VariantCategory.Reference)
                     end = shiftedStart + shiftedRef.Length - 1;

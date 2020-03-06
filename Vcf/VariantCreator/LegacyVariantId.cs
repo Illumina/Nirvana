@@ -40,6 +40,9 @@ namespace Vcf.VariantCreator
             }
         }
 
+        public (int Start, string RefAllele, string AltAllele) Normalize(ISequence sequence, int start,
+            string refAllele, string altAllele) => BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
+
         private static string GetSvVid(IDictionary<string, IChromosome> refNameToChromosome, string svType, IChromosome chromosome, int start, int end, string refAllele, string altAllele)
         {
             var variantType = StructuralVariantCreator.GetVariantType(altAllele, svType);
