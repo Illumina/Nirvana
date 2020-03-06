@@ -92,6 +92,17 @@ namespace UnitTests.Vcf.VariantCreator
         }
 
         [Fact]
+        public void Create_LOH_ReturnsCnvVid()
+        {
+            const string altAllele       = "<CNV>";
+            const string svType          = "LOH";
+            var          variantCategory = VariantFactory.GetVariantCategory(altAllele, svType);
+
+            string observedVid = _vidCreator.Create(null, variantCategory, svType, Chr1, 787923, 887923, "N", altAllele, null);
+            Assert.Equal("1:787924:887923:CNV", observedVid);
+        }
+
+        [Fact]
         public void GetSmallVariantVid_UnknownVariantType_ThrowsException()
         {
             Assert.Throws<ArgumentOutOfRangeException>(delegate
