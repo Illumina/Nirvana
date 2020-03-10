@@ -1,10 +1,10 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Company>Illumina</Company>
-    <Copyright>© 2019 Illumina, Inc.</Copyright>
-    <FileVersion>3.6.1</FileVersion>
-    <AssemblyVersion>3.6.1</AssemblyVersion>
-    <Version>3.6.1</Version>
+    <Copyright>© 2020 Illumina, Inc.</Copyright>
+    <FileVersion>3.6.2</FileVersion>
+    <AssemblyVersion>3.6.2</AssemblyVersion>
+    <Version>3.6.2</Version>
     <Authors>Stromberg, Roy, Lajugie, Jiang, Li, and Kang</Authors>
   </PropertyGroup>
 </Project>
