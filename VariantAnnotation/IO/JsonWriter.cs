@@ -102,8 +102,8 @@ namespace VariantAnnotation.IO
         public void WriteAnnotatedGenes(IEnumerable<string> annotatedGenes)
         {
             _positionFieldClosed = true;
+            _jasixIndexCreator?.EndSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position);
             _writer.Flush();
-            _jasixIndexCreator?.EndSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position - 1);
 
             _writer.Write("\n]");
 
@@ -125,8 +125,8 @@ namespace VariantAnnotation.IO
 
             _writer.Write(sb.ToString());
             _writer.Flush();
-            _jasixIndexCreator?.EndSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position - 1);
-
+            _jasixIndexCreator?.EndSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position );
+            
             StringBuilderCache.GetStringAndRelease(sb);
             _writer.WriteLine();
             _writer.Write("]");

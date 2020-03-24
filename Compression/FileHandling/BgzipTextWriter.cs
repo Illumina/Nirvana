@@ -25,6 +25,8 @@ namespace Compression.FileHandling
         {
             if (_bufferIndex == 0) return;
             _stream.Write(_buffer, 0, _bufferIndex);
+            //here we want to close the gzip blockB
+            _stream.CloseBlock();
             _bufferIndex = 0;
         }
 

@@ -60,6 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleAnnotationLambda", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepeatExpansions", "RepeatExpansions\RepeatExpansions.csproj", "{E586F712-DEDA-4CA2-AE97-96DE0180DB0E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jist", "Jist\Jist.csproj", "{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -174,6 +176,10 @@ Global
 		{E586F712-DEDA-4CA2-AE97-96DE0180DB0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E586F712-DEDA-4CA2-AE97-96DE0180DB0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E586F712-DEDA-4CA2-AE97-96DE0180DB0E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

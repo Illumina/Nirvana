@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ErrorHandling.Exceptions;
@@ -18,8 +19,9 @@ namespace Jasix.DataStructures
         }
     }
 
-    public sealed class JasixIndex
-	{
+    public sealed class JasixIndex:IDisposable
+    {
+	    private readonly Stream _stream;
 		private readonly Dictionary<string, JasixChrIndex> _chrIndices;
 	    private readonly Dictionary<string, string> _synonymToChrName;
 	    private readonly Dictionary<string, FileRange> _sectionRanges;
@@ -32,42 +34,43 @@ namespace Jasix.DataStructures
             _synonymToChrName = new Dictionary<string, string>();
             _sectionRanges = new Dictionary<string, FileRange>();
 		}
+		
 
-		private JasixIndex(ExtendedBinaryReader reader):this()
+		public JasixIndex(Stream stream) : this()
 		{
-			int version = reader.ReadOptInt32();
-			if (version != JasixCommons.Version)
-				throw new InvalidDataException($"Invalid Jasix version: Observed {version}, expected{JasixCommons.Version}");
-
-			int count = reader.ReadOptInt32();
-
-			for (var i = 0; i < count; i++)
+			_stream = stream;
+			using (var reader = new ExtendedBinaryReader(stream))
 			{
-				var chrIndex = new JasixChrIndex(reader);
-				_chrIndices[chrIndex.ReferenceSequence]= chrIndex;
+				int version = reader.ReadOptInt32();
+				if (version != JasixCommons.Version)
+					throw new InvalidDataException($"Invalid Jasix version: Observed {version}, expected{JasixCommons.Version}");
+
+				int count = reader.ReadOptInt32();
+
+				for (var i = 0; i < count; i++)
+				{
+					var chrIndex = new JasixChrIndex(reader);
+					_chrIndices[chrIndex.ReferenceSequence] = chrIndex;
+				}
+
+				int synonymCount = reader.ReadOptInt32();
+				for (var i = 0; i < synonymCount; i++)
+				{
+					string synonym   = reader.ReadAsciiString();
+					string indexName = reader.ReadAsciiString();
+					_synonymToChrName[synonym] = indexName;
+				}
+
+				int sectionCount = reader.ReadOptInt32();
+				for (var i = 0; i < sectionCount; i++)
+				{
+					string sectionName = reader.ReadAsciiString();
+					long   begin       = reader.ReadOptInt64();
+					long   end         = reader.ReadOptInt64();
+					_sectionRanges[sectionName] = new FileRange(begin, end);
+				}
+
 			}
-
-		    int synonymCount = reader.ReadOptInt32();
-		    for (var i = 0; i < synonymCount; i++)
-		    {
-		        string synonym             = reader.ReadAsciiString();
-		        string indexName           = reader.ReadAsciiString();
-		        _synonymToChrName[synonym] = indexName;
-		    }
-
-		    int sectionCount = reader.ReadOptInt32();
-		    for (var i = 0; i < sectionCount; i++)
-		    {
-		        string sectionName = reader.ReadAsciiString();
-		        long begin         = reader.ReadOptInt64();
-		        long end           = reader.ReadOptInt64();
-                _sectionRanges[sectionName] = new FileRange(begin, end);
-		    }
-
-		}
-
-		public JasixIndex(Stream stream) : this(new ExtendedBinaryReader(stream))
-		{
 		}
 
 		public void Write(Stream writeStream)
@@ -197,6 +200,11 @@ namespace Jasix.DataStructures
 	    public long GetSectionEnd(string section)
 	    {
 	        return _sectionRanges[section].End;
+	    }
+
+	    public void Dispose()
+	    {
+		    _stream?.Dispose();
 	    }
     }
 }

@@ -53,11 +53,11 @@ namespace UnitTests.Compression.FileHandling
             Assert.Equal(0,         observedLines[1].Length);
             Assert.Equal("ABC 123", observedLines[2]);
             Assert.Equal(asterisks, observedLines[3]);
-            Assert.Equal(4,         observedPositions[0]);
-            Assert.Equal(5,         observedPositions[1]);
-            Assert.Equal(13,        observedPositions[2]);
-            Assert.Equal(43843598,  observedPositions[3]);
-            Assert.Equal(87097359,  observedPositions[4]);
+            Assert.Equal(2162687,   observedPositions[0]);
+            Assert.Equal(2162688,   observedPositions[1]);
+            Assert.Equal(2162696,   observedPositions[2]);
+            Assert.Equal(45678601,  observedPositions[3]);
+            Assert.Equal(88932362,  observedPositions[4]);
         }
     }
 }

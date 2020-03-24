@@ -234,6 +234,8 @@ namespace Compression.FileHandling
             }
         }
 
+        public void CloseBlock() => Flush(_blockOffset);
+        
         private void SeekVirtualFilePointer(ulong virtualPosition)
         {
             long compressedOffset  = GetCompressedOffset(virtualPosition);
