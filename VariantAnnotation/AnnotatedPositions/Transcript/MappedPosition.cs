@@ -16,12 +16,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public int IntronEnd { get; }
         public int RegionStartIndex { get; }
         public int RegionEndIndex { get; }
-        public int CoveredProteinStart { get; set; }
-        public int CoveredProteinEnd { get; set; }
-        public int CoveredCdsStart { get; set; }
-        public int CoveredCdsEnd { get; set; }
-        public int CoveredCdnaStart { get; set; }
-        public int CoveredCdnaEnd { get; set; }
+
+        public int CoveredProteinStart { get; set; } = -1;
+        public int CoveredProteinEnd { get; set; }   = -1;
+        public int CoveredCdsStart { get; set; }     = -1;
+        public int CoveredCdsEnd { get; set; }       = -1;
+        public int CoveredCdnaStart { get; set; }    = -1;
+        public int CoveredCdnaEnd { get; set; }      = -1;
 
         public MappedPosition(int cdnaStart, int cdnaEnd, int cdsStart, int cdsEnd, int proteinStart, int proteinEnd,
             int exonStart, int exonEnd, int intronStart, int intronEnd, int regionStartIndex, int regionEndIndex)
