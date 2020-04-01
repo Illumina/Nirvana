@@ -154,9 +154,7 @@ namespace VariantAnnotation.Providers
             if (start == -1 || end == -1) return;
             for (int aaPos = start; aaPos <= end; aaPos++)
             {
-                var transcriptId = annotatedTranscript.Transcript.Source == Source.Ensembl
-                    ? annotatedTranscript.Transcript.Id.WithoutVersion
-                    : annotatedTranscript.Transcript.Id.WithVersion;
+                var transcriptId = annotatedTranscript.Transcript.Id.WithVersion;
                 var score = _conservationProvider.GetConservationScore(transcriptId, aaPos);
                 if (score == -1) return; //don't add conservation scores
                 scores.Add(1.0 * score / 100);
