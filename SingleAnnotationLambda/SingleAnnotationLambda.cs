@@ -116,9 +116,9 @@ namespace SingleAnnotationLambda
             var metrics = new PerformanceMetrics();
 
             Logger.WriteLine($"Cache prefix: {cachePathPrefix}");
-
+            //todo: get customStrTsv from lambdaConfig
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,
-                new List<string> {saManifestUrl}, lambdaConfig.customAnnotations, false, false, false, metrics)
+                new List<string> {saManifestUrl}, lambdaConfig.customAnnotations, null, false, false, false, metrics)
             {
                 AnnotatorVersionTag = annotatorVersion
             };

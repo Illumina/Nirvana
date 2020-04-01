@@ -158,8 +158,9 @@ namespace AnnotationLambda
             string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations, genomeAssembly);
             var metrics = new PerformanceMetrics();
 
+            //todo: get customStrTsv from annotationConfig
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,
-                new List<string> {saManifestUrl}, annotationConfig.customAnnotations, false, false, false, metrics);
+                new List<string> {saManifestUrl}, annotationConfig.customAnnotations, null, false, false, false, metrics);
 
             using (var tabixStream = PersistentStreamUtils.GetReadStream(annotationConfig.tabixUrl))
             {

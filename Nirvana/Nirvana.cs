@@ -22,6 +22,7 @@ namespace Nirvana
         private static string _vcfPath;
         private static string _refSequencePath;
         private static string _outputFileName;
+        private static string _customStrTsv;
 
         private static bool _forceMitochondrialAnnotation;
         private static bool _disableRecomposition;
@@ -43,7 +44,8 @@ namespace Nirvana
             if (_outputFileName == "-") Logger.Silence();
             var metrics = new PerformanceMetrics();
             
-            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, SupplementaryAnnotationDirectories, null,
+            var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, 
+                SupplementaryAnnotationDirectories, null, _customStrTsv,
                 _disableRecomposition, _forceMitochondrialAnnotation, _useLegacyVids, metrics);
             
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
@@ -99,6 +101,11 @@ namespace Nirvana
                     "legacy-vids",
                     "enables support for legacy VIDs",
                     v => _useLegacyVids = v != null
+                },
+                {
+                    "str=",
+                    "user provided STR annotation TSV file",
+                    v => _customStrTsv = v
                 }
             };
 
@@ -110,6 +117,7 @@ namespace Nirvana
                 .CheckInputFilenameExists(CacheConstants.TranscriptPath(_inputCachePrefix), "transcript cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.SiftPath(_inputCachePrefix), "SIFT cache", "--cache")
                 .CheckInputFilenameExists(CacheConstants.PolyPhenPath(_inputCachePrefix), "PolyPhen cache", "--cache")
+                .CheckInputFilenameExists(_customStrTsv, "custom STR annotation TSV", "--str", false)
                 .HasRequiredParameter(_outputFileName, "output file stub", "--out")
                 .DisableOutput(_outputFileName == "-")
                 .ShowBanner(Constants.Authors)

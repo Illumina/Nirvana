@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Genome;
 using Intervals;
+using IO;
 using RepeatExpansions.IO;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
@@ -11,10 +15,27 @@ namespace RepeatExpansions
     {
         private readonly Matcher _matcher;
 
-        public RepeatExpansionProvider(GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refNameToChromosome, int numRefSeqs)
+        public RepeatExpansionProvider(GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refNameToChromosome, 
+            int numRefSeqs, string customTsvPath)
         {
-            IIntervalForest<RepeatExpansionPhenotype> phenotypeForest = RepeatExpansionReader.Load(genomeAssembly, refNameToChromosome, numRefSeqs);
-            _matcher = new Matcher(phenotypeForest);
+            using ( Stream stream = GetTsvStream(genomeAssembly, customTsvPath))
+            {
+                IIntervalForest<RepeatExpansionPhenotype> phenotypeForest = RepeatExpansionReader.Load(stream, genomeAssembly, refNameToChromosome, numRefSeqs);
+                _matcher = new Matcher(phenotypeForest);
+            }
+        }
+
+        private static Stream GetTsvStream(GenomeAssembly genomeAssembly, string customTsvPath)
+        {
+            //since we are using the executing assembly, we cannot move the following lines about getting stream further upstream.
+            var    assembly     = Assembly.GetExecutingAssembly();
+            string resourceName = $"RepeatExpansions.Resources.RepeatExpansions.{genomeAssembly}.tsv";
+            var stream = customTsvPath != null
+                ? PersistentStreamUtils.GetReadStream(customTsvPath)
+                : assembly.GetManifestResourceStream(resourceName);
+            
+            if (stream == null) throw new NullReferenceException("Unable to read from the STR resource file");
+            return stream;
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)

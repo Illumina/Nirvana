@@ -109,10 +109,10 @@
       "commandLineArgs": " --cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in NA12878-dragen-joint.vcf.gz --out dragenNa12878 --disable-recomposition",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
-    "RR_miniIcsl": {
+    "RR_str": {
       "commandName": "Project",
-      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh37.Nirvana.dat --in miniIcsl.vcf --out mini",
-      "workingDirectory": "/Users/rroy1/development/ExternalDataSources\\ICSL\\GRCh37"
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh38/Both --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh38 --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --in strTest.vcf --out strTest",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dragen3.2": {
       "commandName": "Project",

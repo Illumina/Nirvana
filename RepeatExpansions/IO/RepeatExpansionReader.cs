@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Genome;
 using Intervals;
+using IO;
 using OptimizedCore;
 
 namespace RepeatExpansions.IO
@@ -22,19 +23,16 @@ namespace RepeatExpansions.IO
         private const int CategoryRangesIndex = 8;
         private const int MinNumberOfColumns  = 9;
 
-        public static IIntervalForest<RepeatExpansionPhenotype> Load(GenomeAssembly desiredGenomeAssembly,
+        public static IIntervalForest<RepeatExpansionPhenotype> Load(Stream stream, GenomeAssembly desiredGenomeAssembly,
             IDictionary<string, IChromosome> refNameToChromosome, int numRefSeqs)
         {
             var intervalLists = new List<Interval<RepeatExpansionPhenotype>>[numRefSeqs];
             for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<RepeatExpansionPhenotype>>();
 
-            var assembly        = Assembly.GetExecutingAssembly();
-            string resourceName = $"RepeatExpansions.Resources.RepeatExpansions.{desiredGenomeAssembly}.tsv";
+            
 
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (stream)
             {
-                if (stream == null) throw new NullReferenceException("Unable to read from the STR resource file");
-
                 using (var reader = new StreamReader(stream))
                 {
                     CheckHeader(reader, desiredGenomeAssembly);

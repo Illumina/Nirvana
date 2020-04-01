@@ -42,7 +42,7 @@ namespace Nirvana
         public readonly PerformanceMetrics Metrics;
 
         public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations,
-            bool disableRecomposition, bool forceMitochondrialAnnotation, bool useLegacyVids, PerformanceMetrics metrics)
+            string customStrTsvPath, bool disableRecomposition, bool forceMitochondrialAnnotation, bool useLegacyVids, PerformanceMetrics metrics)
         {
             Metrics = metrics;
             PerformanceMetrics.ShowInitializationHeader();
@@ -52,7 +52,7 @@ namespace Nirvana
             var annotationFiles = new AnnotationFiles();
             saDirectoryPaths?.ForEach(x => annotationFiles.AddFiles(x));
             customAnnotations?.ForEach(x => annotationFiles.AddFiles(x));
-
+            
             ProteinConservationProvider = ProviderUtilities.GetProteinConservationProvider(annotationFiles);
             ProteinConservationProvider?.Load();
             
@@ -66,7 +66,7 @@ namespace Nirvana
             GeneAnnotationProvider = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
 
             var repeatExpansionProvider = new RepeatExpansionProvider(SequenceProvider.Assembly, SequenceProvider.RefNameToChromosome,
-                SequenceProvider.RefIndexToChromosome.Count);
+                SequenceProvider.RefIndexToChromosome.Count, customStrTsvPath);
 
             Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider, ConservationProvider, GeneAnnotationProvider,
                 repeatExpansionProvider);
