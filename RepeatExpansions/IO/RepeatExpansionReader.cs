@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using Genome;
 using Intervals;
-using IO;
 using OptimizedCore;
 
 namespace RepeatExpansions.IO
@@ -28,8 +27,6 @@ namespace RepeatExpansions.IO
         {
             var intervalLists = new List<Interval<RepeatExpansionPhenotype>>[numRefSeqs];
             for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<RepeatExpansionPhenotype>>();
-
-            
 
             using (stream)
             {
