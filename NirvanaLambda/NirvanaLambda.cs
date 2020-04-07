@@ -227,6 +227,7 @@ namespace NirvanaLambda
             outputPrefix             = GetIndexedPrefix(config.vcfUrl, jobIndex),
             supplementaryAnnotations = config.supplementaryAnnotations,
             customAnnotations        = config.customAnnotations,
+            customStrUrl             = config.customStrUrl,
             annotationRange          = annotationRange
         };
 

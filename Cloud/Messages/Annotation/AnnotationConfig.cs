@@ -14,6 +14,7 @@ namespace Cloud.Messages.Annotation
         public string outputPrefix;
         public string supplementaryAnnotations;
         public List<SaUrls> customAnnotations;
+        public string customStrUrl;
         public AnnotationRange annotationRange;
         // ReSharper restore NotAccessedField.Global
         // ReSharper restore InconsistentNaming

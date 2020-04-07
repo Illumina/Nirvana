@@ -15,6 +15,7 @@ namespace Cloud.Messages.Nirvana
         public string supplementaryAnnotations;
         // ReSharper disable once UnassignedField.Global
         public List<SaUrls> customAnnotations;
+        public string customStrUrl;
         // ReSharper restore InconsistentNaming
 
         internal void CheckRequiredFieldsNotNull()
@@ -44,6 +45,8 @@ namespace Cloud.Messages.Nirvana
             outputDir.Validate(true);
 
             customAnnotations?.ForEach(x => x.Validate());
+
+            if (customStrUrl != null) HttpUtilities.ValidateUrl(customStrUrl);
         }
     }
 }
