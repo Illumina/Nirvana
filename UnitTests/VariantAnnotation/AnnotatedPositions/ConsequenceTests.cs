@@ -170,11 +170,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [InlineData(false, true, false, false, ConsequenceTag.transcript_amplification)]
         [InlineData(true, false, true, false, ConsequenceTag.transcript_ablation)]
         [InlineData(false, false, true, false, ConsequenceTag.feature_elongation)]
-        [InlineData(false, false, false, true, ConsequenceTag.transcript_truncation)]
+        [InlineData(false, false, false, true, ConsequenceTag.feature_truncation)]
         public void DetermineStructuralVariantEffect(bool isAblation, bool isAmplification, bool isElongation,
             bool isTruncation, ConsequenceTag expectedConsequence)
         {
-            ConsequenceTag[] expectedConsequences = { expectedConsequence };
+            ConsequenceTag[] expectedConsequences = { expectedConsequence, ConsequenceTag.transcript_variant };
 
             var featureEffectsMock = new Mock<IFeatureVariantEffects>();
             featureEffectsMock.Setup(x => x.Ablation()).Returns(isAblation);

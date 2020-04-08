@@ -47,7 +47,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
                 (() => _variantEffect.IsNonsenseMediatedDecayTranscriptVariant(), ConsequenceTag.NMD_transcript_variant),
                 (() => _variantEffect.IsNonCodingTranscriptVariant(),             ConsequenceTag.non_coding_transcript_variant),
                 (() => _featureEffect.Elongation(),                               ConsequenceTag.feature_elongation),
-                (() => _featureEffect.Truncation(),                               ConsequenceTag.transcript_truncation)
+                (() => _featureEffect.Truncation(),                               ConsequenceTag.feature_truncation)
             }.ToImmutableArray();
         }
 
@@ -70,6 +70,10 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             GetTier1Types();
             if (_consequences.Count == 0) GetStructuralTier2Types();
 
+            //all structural variants get 'transcript_variant' as a consequence
+            // since the consequence graph shows that transcript_variant is in a different branch
+            _consequences.Add(ConsequenceTag.transcript_variant);
+            
             DetermineCopyNumberEffect(variant.Type);
             DetermineRepeatExpansionEffect(variant);
         }
@@ -114,8 +118,8 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             // FeatureElongation
             if (_featureEffect.Elongation()) _consequences.Add(ConsequenceTag.feature_elongation);
 
-            // TranscriptTruncation
-            if (_featureEffect.Truncation()) _consequences.Add(ConsequenceTag.transcript_truncation);
+            // FeatureTruncation
+            if (_featureEffect.Truncation()) _consequences.Add(ConsequenceTag.feature_truncation);
         }
 
         private void GetTier1Types()

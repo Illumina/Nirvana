@@ -36,7 +36,7 @@
         three_prime_UTR_variant,
         transcript_amplification,
         transcript_ablation,
-        transcript_truncation,
+        feature_truncation,
         upstream_gene_variant,
         short_tandem_repeat_change,
         short_tandem_repeat_expansion,
