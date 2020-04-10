@@ -8,7 +8,7 @@ namespace SAUtils.MitoMap
 {
     internal static class MitoMapDatabaseUtilities
     {
-        private const string ReferenceQueryPrefix = "COPY reference (";
+        private const string ReferenceQueryPrefix = "COPY mitomap.reference (";
         public static MitoMapInputDb Create(string mitoMapDatabase)
         {
             var internalReferenceIdToPubmedId = new Dictionary<string, string>();
