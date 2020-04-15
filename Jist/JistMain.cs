@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using Compression.FileHandling;
 using ErrorHandling;
 using IO;
 using Jasix.DataStructures;
