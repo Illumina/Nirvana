@@ -47,38 +47,5 @@ namespace UnitTests.Downloader
             List<(GenomeAssembly GenomeAssembly, string ManifestPath)> list = Manifest.CreateGenomeAssemblyPaths(ManifestGRCh37, ManifestGRCh38, genomeAssemblies).ToList();
             Assert.Empty(list);
         }
-
-        [Fact]
-        public void GetRemotePaths_Nominal()
-        {
-            var genomeAssemblies = new List<GenomeAssembly> { GenomeAssembly.GRCh37, GenomeAssembly.GRCh38 };
-
-            var expectedPathsGRCh37 = new List<string>
-            {
-                "0bf0cb93e64824b20f0b551a629596fd-TopMed/3/GRCh37/TOPMed_freeze_5.nsa",
-                "43321b1a4f1c73724c00223e07d5e812-1kgSv/3/GRCh37/1000_Genomes_Project_Phase_3_v5a.nsi"
-            };
-
-            var expectedPathsGRCh38 = new List<string>
-            {
-                "645778a7d475ac437d15765ef3c6f50c-OMIM/3/GRCh38/OMIM_20190225.nga"
-            };
-
-            var expectedResults = new Dictionary<GenomeAssembly, List<string>>
-            {
-                [GenomeAssembly.GRCh37] = expectedPathsGRCh37,
-                [GenomeAssembly.GRCh38] = expectedPathsGRCh38
-            };
-
-            var clientMock = new Mock<IClient>();
-            clientMock.Setup(x => x.DownloadLinesAsync(ManifestGRCh37)).ReturnsAsync(expectedPathsGRCh37);
-            clientMock.Setup(x => x.DownloadLinesAsync(ManifestGRCh38)).ReturnsAsync(expectedPathsGRCh38);
-
-            Dictionary<GenomeAssembly, List<string>> remotePathsByGenomeAssembly =
-                Manifest.GetRemotePaths(clientMock.Object, genomeAssemblies, ManifestGRCh37, ManifestGRCh38);
-
-            Assert.Equal(2, remotePathsByGenomeAssembly.Count);
-            Assert.Equal(expectedResults, remotePathsByGenomeAssembly);
-        }
     }
 }

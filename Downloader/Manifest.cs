@@ -15,7 +15,7 @@ namespace Downloader
 
             foreach ((var genomeAssembly, string manifestPath) in genomeAssemblyPaths)
             {
-                List<string> remotePaths = client.DownloadLinesAsync(manifestPath).ConfigureAwait(false).GetAwaiter().GetResult();
+                List<string> remotePaths = client.DownloadLines(manifestPath);
                 remotePathsByGenomeAssembly[genomeAssembly] = remotePaths;
             }
 

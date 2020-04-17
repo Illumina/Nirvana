@@ -4,8 +4,7 @@ using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
+using Downloader.Utilities;
 
 namespace Downloader
 {
@@ -27,20 +26,20 @@ namespace Downloader
             _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/octet-stream"));
         }
 
-        public async Task<List<string>> DownloadLinesAsync(string path)
+        public List<string> DownloadLines(string remotePath)
         {
             var lines = new List<string>();
 
-            using (var response = await _httpClient.GetAsync(path, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
+            using (var response = _httpClient.GetAsync(remotePath, HttpCompletionOption.ResponseHeadersRead).AsSync())
             {
-                var stream = await response.Content.ReadAsStreamAsync();
+                var stream = response.Content.ReadAsStreamAsync().AsSync();
                 if (!response.IsSuccessStatusCode) return lines;
 
                 using (var reader = new StreamReader(stream))
                 {
                     while (true)
                     {
-                        string line = await reader.ReadLineAsync();
+                        string line = reader.ReadLineAsync().AsSync();
                         if (line == null) break;
 
                         lines.Add(line);
@@ -51,47 +50,43 @@ namespace Downloader
             return lines;
         }
 
-        public void Download(RemoteFile file, CancellationTokenSource tokenSource)
+        public bool SetMetadata(RemoteFile file)
         {
-            if (File.Exists(file.LocalPath)) return;
-
-            Console.WriteLine($"- downloading {file.Description}");
-
-            var numAttempts       = 0;
-            const int maxAttempts = 3;
-
-            while (!SuccessfulDownloadAsync(file).ConfigureAwait(false).GetAwaiter().GetResult())
+            using (var response = _httpClient.GetAsync(file.RemotePath, HttpCompletionOption.ResponseHeadersRead).AsSync())
             {
-                if (numAttempts == maxAttempts)
+                if (response.StatusCode == HttpStatusCode.NotFound)
                 {
-                    tokenSource.Cancel();
-                    throw new InvalidDataException($"Unable to download {file.Description} after retrying {maxAttempts} times.");
+                    Console.Write("  - ");
+                    ConsoleEmbellishments.PrintWarning("WARNING: ");
+                    Console.WriteLine($"{file.Description} could not be found. Skipping this file.");
+                    file.Missing = true;
+                    file.Skipped = true;
+                    return true;
                 }
 
-                Console.WriteLine($"- requeuing download of {file.Description}");
-                numAttempts++;
+                if (!response.IsSuccessStatusCode) return false;
+
+                long? contentLength = response.Content.Headers.ContentLength;
+                if (contentLength.HasValue) file.FileSize = contentLength.Value;
+
+                DateTimeOffset? lastModified = response.Content.Headers.LastModified;
+                if (lastModified.HasValue) file.LastModified = lastModified.Value;
             }
+
+            return true;
         }
 
-        private async Task<bool> SuccessfulDownloadAsync(RemoteFile file)
+        public bool DownloadFile(RemoteFile file)
         {
-            try
+            using (var response = _httpClient.GetAsync(file.RemotePath, HttpCompletionOption.ResponseHeadersRead).AsSync())
             {
-                using (var response = await _httpClient.GetAsync(file.RemotePath, HttpCompletionOption.ResponseHeadersRead).ConfigureAwait(false))
-                {
-                    var stream = await response.Content.ReadAsStreamAsync();
-                    if (!response.IsSuccessStatusCode) return false;
+                if (!response.IsSuccessStatusCode) return false;
 
-                    var fileInfo = new FileInfo(file.LocalPath);
-                    using (var fileStream = fileInfo.OpenWrite())
-                    {
-                        await stream.CopyToAsync(fileStream);
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                return false;
+                Console.WriteLine($"  - downloading {file.Description}");
+
+                var stream   = response.Content.ReadAsStreamAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+                var fileInfo = new FileInfo(file.LocalPath);
+                using (var fileStream = fileInfo.OpenWrite()) stream.CopyTo(fileStream);
             }
 
             return true;

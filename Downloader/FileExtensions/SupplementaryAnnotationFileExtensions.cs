@@ -6,15 +6,22 @@ namespace Downloader.FileExtensions
 {
     public static class SupplementaryAnnotationFileExtensions
     {
-        public static List<RemoteFile> AddSupplementaryAnnotationFiles(this List<RemoteFile> files,
+        private static readonly HashSet<string> NeedsIndexSet = new HashSet<string>();
+
+        static SupplementaryAnnotationFileExtensions()
+        {
+            NeedsIndexSet.Add(".nsa");
+            NeedsIndexSet.Add(".npd");
+            NeedsIndexSet.Add(".rma");
+        }
+        
+        public static void AddSupplementaryAnnotationFiles(this List<RemoteFile> files,
             Dictionary<GenomeAssembly, List<string>> remotePathsByGenomeAssembly, string saDirectory)
         {
             foreach ((var genomeAssembly, List<string> remotePaths) in remotePathsByGenomeAssembly)
             {
                 files.AddDataSources(remotePaths, genomeAssembly, saDirectory);
             }
-
-            return files;
         }
 
         private static void AddDataSources(this ICollection<RemoteFile> files, IEnumerable<string> remotePaths, GenomeAssembly genomeAssembly, string saDirectory)
@@ -23,7 +30,7 @@ namespace Downloader.FileExtensions
             {
                 files.AddFile(genomeAssembly, saDirectory, path);
                 string extension = Path.GetExtension(path);
-                if (extension == ".nsa") files.AddFile(genomeAssembly, saDirectory, path + ".idx");
+                if (NeedsIndexSet.Contains(extension)) files.AddFile(genomeAssembly, saDirectory, path + ".idx");
             }
         }
 

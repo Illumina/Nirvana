@@ -2,7 +2,7 @@
 using ErrorHandling.Exceptions;
 using Genome;
 using Xunit;
-using GenomeAssemblyHelper = Downloader.GenomeAssemblyHelper;
+using du = Downloader.Utilities;
 
 namespace UnitTests.Downloader
 {
@@ -11,7 +11,7 @@ namespace UnitTests.Downloader
         [Fact]
         public void GetGenomeAssemblies_GRCh37()
         {
-            List<GenomeAssembly> genomeAssemblies = GenomeAssemblyHelper.GetGenomeAssemblies("GRCh37");
+            List<GenomeAssembly> genomeAssemblies = du.GenomeAssemblyHelper.GetGenomeAssemblies("GRCh37");
             Assert.Single(genomeAssemblies);
             Assert.Equal(GenomeAssembly.GRCh37, genomeAssemblies[0]);
         }
@@ -19,7 +19,7 @@ namespace UnitTests.Downloader
         [Fact]
         public void GetGenomeAssemblies_GRCh38()
         {
-            List<GenomeAssembly> genomeAssemblies = GenomeAssemblyHelper.GetGenomeAssemblies("GrcH38");
+            List<GenomeAssembly> genomeAssemblies = du.GenomeAssemblyHelper.GetGenomeAssemblies("GrcH38");
             Assert.Single(genomeAssemblies);
             Assert.Equal(GenomeAssembly.GRCh38, genomeAssemblies[0]);
         }
@@ -27,7 +27,7 @@ namespace UnitTests.Downloader
         [Fact]
         public void GetGenomeAssemblies_Both()
         {
-            List<GenomeAssembly> genomeAssemblies = GenomeAssemblyHelper.GetGenomeAssemblies("BoTh");
+            List<GenomeAssembly> genomeAssemblies = du.GenomeAssemblyHelper.GetGenomeAssemblies("BoTh");
             Assert.Equal(2, genomeAssemblies.Count);
             Assert.Equal(GenomeAssembly.GRCh37, genomeAssemblies[0]);
             Assert.Equal(GenomeAssembly.GRCh38, genomeAssemblies[1]);
@@ -39,7 +39,7 @@ namespace UnitTests.Downloader
             Assert.Throws<UserErrorException>(delegate
             {
                 // ReSharper disable once UnusedVariable
-                List<GenomeAssembly> genomeAssemblies = GenomeAssemblyHelper.GetGenomeAssemblies("hg19");
+                List<GenomeAssembly> genomeAssemblies = du.GenomeAssemblyHelper.GetGenomeAssemblies("hg19");
             });
         }
     }

@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Downloader
 {
+    /// <summary>
+    /// IClient should abstract away all network activity for improved testing
+    /// </summary>
     public interface IClient
     {
-        Task<List<string>> DownloadLinesAsync(string path);
-        void Download(RemoteFile file, CancellationTokenSource tokenSource);
+        List<string> DownloadLines(string remotePath);
+        bool SetMetadata(RemoteFile file);
+        bool DownloadFile(RemoteFile file);
     }
 }
