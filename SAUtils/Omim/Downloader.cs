@@ -61,8 +61,8 @@ namespace SAUtils.Omim
 
             using (var omimQuery = new OmimQuery(_apiKey, _outputDirectory))
             {
-                var mimToGeneSymbol = omimQuery.GenerateMimToGeneSymbol(geneSymbolUpdater);
-                omimQuery.GenerateJsonResponse(mimToGeneSymbol);
+                omimQuery.GenerateMimToGeneSymbolFile(geneSymbolUpdater);
+                omimQuery.GenerateJsonResponse();
             }
             OmimVersion.WriteToFile(OmimQuery.JsonResponseFile, _outputDirectory);
 

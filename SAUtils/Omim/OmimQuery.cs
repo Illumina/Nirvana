@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using OptimizedCore;
@@ -14,12 +13,15 @@ namespace SAUtils.Omim
     public sealed class OmimQuery : IDisposable
     {
         private readonly HttpClient _httpClient;
-        private readonly FileStream _minToSymbolStream;
+        private readonly FileStream _mimToSymbolStream;
         private readonly FileStream _jsonResponseStream;
         private string _jsonPrefix;
+        private readonly string _mimTitlesUrl;
 
         private const string Mim2GeneUrl = "https://omim.org/static/omim/data/mim2gene.txt";
+        private const string MimTitlesFileName = "mimTitles.txt";
         private const string OmimApiUrl = "https://api.omim.org/api/";
+        private const string OmimDownloadBaseUrl = "https://data.omim.org/downloads/";
         private const string EntryHandler = "entry";
         private const int EntryQueryLimit = 20;
         private const string ReturnDataFormat = "json";
@@ -34,73 +36,89 @@ namespace SAUtils.Omim
             _httpClient.DefaultRequestHeaders.Add("ApiKey", apiKey);
 
             if (string.IsNullOrEmpty(outputDirectory)) return;
-            _minToSymbolStream = new FileStream(Path.Combine(outputDirectory, MimToSymbolFile), FileMode.Create);
+            
+            _mimTitlesUrl = GetMimTitlesUrl(apiKey);
+            _mimToSymbolStream = new FileStream(Path.Combine(outputDirectory, MimToSymbolFile), FileMode.Create);
             _jsonResponseStream = new FileStream(Path.Combine(outputDirectory, JsonResponseFile), FileMode.Create);
         }
 
-        public IDictionary<string, string> GenerateMimToGeneSymbol(GeneSymbolUpdater geneSymbolUpdater)
+        private static string GetMimTitlesUrl(string apiKey) => $"{OmimDownloadBaseUrl}{apiKey}/{MimTitlesFileName}";
+
+        private IList<string> GetMimsToDownload()
         {
-            var mimNumberToGeneSymbol = new Dictionary<string, string>();
-            using (StreamWriter writer = new StreamWriter(_minToSymbolStream))
-            using (var response = _httpClient.GetAsync(Mim2GeneUrl).Result)
+            var mims = new List<string>();
+            using (var response = _httpClient.GetAsync(_mimTitlesUrl).Result)
             using (var reader = new StreamReader(response.Content.ReadAsStreamAsync().Result))
             {
-                writer.WriteLine("#MIM number\tGene symbol");
                 string line;
                 while ((line = reader.ReadLine()) != null)
                 {
-                    if (line.OptimizedStartsWith('#')) continue;
+                    //Caret (^)  Entry has been removed from the database or moved to another entry
+                    if (line.OptimizedStartsWith('#') || line.StartsWith("Caret")) continue;
 
-                    var fields = line.OptimizedSplit('\t');
-                    string geneSymbol = fields[3];
-                    if (string.IsNullOrEmpty(geneSymbol)) continue;
-
-                    string mimNumber = fields[0];
-                    string entrezGeneId = fields[2];
-                    string ensemblGeneId = fields[4];
-                    string updatedGeneSymbol = geneSymbolUpdater.UpdateGeneSymbol(geneSymbol, ensemblGeneId, entrezGeneId);
-                    if (string.IsNullOrEmpty(updatedGeneSymbol)) continue;
-
-                    writer.WriteLine($"{mimNumber}\t{updatedGeneSymbol}");
-                    mimNumberToGeneSymbol[mimNumber] = updatedGeneSymbol;
+                    var fields = line.Split('\t', 3);
+                    mims.Add(fields[1]);
                 }
             }
 
-            return mimNumberToGeneSymbol;
+            return mims;
         }
 
-        public void GenerateJsonResponse(IDictionary<string, string> mimToGeneSymbol)
+        public void GenerateMimToGeneSymbolFile(GeneSymbolUpdater geneSymbolUpdater)
+        {
+            using StreamWriter writer = new StreamWriter(_mimToSymbolStream);
+            using var response = _httpClient.GetAsync(Mim2GeneUrl).Result;
+            using var reader = new StreamReader(response.Content.ReadAsStreamAsync().Result);
+            writer.WriteLine("#MIM number\tGene symbol");
+            string line;
+            while ((line = reader.ReadLine()) != null)
+            {
+                if (line.OptimizedStartsWith('#')) continue;
+
+                var fields     = line.OptimizedSplit('\t');
+                var geneSymbol = fields[3];
+                if (string.IsNullOrEmpty(geneSymbol)) continue;
+
+                var mimNumber         = fields[0];
+                var entrezGeneId      = fields[2];
+                var ensemblGeneId     = fields[4];
+                var updatedGeneSymbol = geneSymbolUpdater.UpdateGeneSymbol(geneSymbol, ensemblGeneId, entrezGeneId);
+                if (string.IsNullOrEmpty(updatedGeneSymbol)) continue;
+
+                writer.WriteLine($"{mimNumber}\t{updatedGeneSymbol}");
+            }
+        }
+
+        public void GenerateJsonResponse()
         {
             var i = 0;
-            var mimNumbers = mimToGeneSymbol.Select(x => x.Key).ToArray();
+            var mimNumbers = GetMimsToDownload();
 
-            bool needComma = false;
-            using (Stream gzStream = new GZipStream(_jsonResponseStream, CompressionMode.Compress))
-            using (StreamWriter writer = new StreamWriter(gzStream))
+            var needComma = false;
+            using Stream gzStream = new GZipStream(_jsonResponseStream, CompressionMode.Compress);
+            using StreamWriter writer = new StreamWriter(gzStream);
+            while (i < mimNumbers.Count)
             {
-                while (i < mimNumbers.Length)
+                var endMimNumberIndex = Math.Min(i + EntryQueryLimit - 1, mimNumbers.Count - 1);
+                var mimNumberString   = GetMimNumbersString(mimNumbers, i, endMimNumberIndex);
+                var queryUrl = GetApiQueryUrl(OmimApiUrl, EntryHandler, ("mimNumber", mimNumberString),
+                    ("include", "text:description"), ("include", "externalLinks"), ("include", "geneMap"),
+                    ("format", ReturnDataFormat));
+
+                using (var response = _httpClient.GetAsync(queryUrl).Result)
                 {
-                    int endMimNumberIndex = Math.Min(i + EntryQueryLimit - 1, mimNumbers.Length - 1);
-                    string mimNumberString = GetMimNumbersString(mimNumbers, i, endMimNumberIndex);
-                    string queryUrl = GetApiQueryUrl(OmimApiUrl, EntryHandler, ("mimNumber", mimNumberString),
-                        ("include", "text:description"), ("include", "externalLinks"), ("include", "geneMap"),
-                        ("format", ReturnDataFormat));
-
-                    using (var response = _httpClient.GetAsync(queryUrl).Result)
-                    {
-                        string responseContent = response.Content.ReadAsStringAsync().Result;
-                        string entries = SetPrefixAndGetEntriesString(responseContent);
-                        if (i == 0) writer.Write(_jsonPrefix);
-                        if (needComma) writer.Write(',');
-                        writer.Write(entries);
-                        needComma = true;
-                    }
-
-                    i = endMimNumberIndex + 1;
+                    string responseContent = response.Content.ReadAsStringAsync().Result;
+                    string entries         = SetPrefixAndGetEntriesString(responseContent);
+                    if (i == 0) writer.Write(_jsonPrefix);
+                    if (needComma) writer.Write(',');
+                    writer.Write(entries);
+                    needComma = true;
                 }
 
-                writer.WriteLine(JsonTextEnding);
+                i = endMimNumberIndex + 1;
             }
+
+            writer.WriteLine(JsonTextEnding);
         }
 
         private string SetPrefixAndGetEntriesString(string responseContent)
@@ -119,7 +137,7 @@ namespace SAUtils.Omim
             return responseContent.Substring(_jsonPrefix.Length, entriesStringLength);
         }
 
-        private static string GetMimNumbersString(IReadOnlyList<string> allMimNumbers, int startIndex, int endIndex)
+        private static string GetMimNumbersString(IList<string> allMimNumbers, int startIndex, int endIndex)
         {
             var sb = StringBuilderCache.Acquire();
             var needComma = false;
@@ -158,7 +176,7 @@ namespace SAUtils.Omim
         public void Dispose()
         {
             _httpClient?.Dispose();
-            _minToSymbolStream?.Dispose();
+            _mimToSymbolStream?.Dispose();
             _jsonResponseStream?.Dispose();
         }
     }

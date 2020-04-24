@@ -1,10 +1,10 @@
 
 {
     "region" : "us-west-2",
-    "profile" : "default",
+    "profile" : "Olympia",
     "configuration" : "Release",
     "framework"     : "netcoreapp2.1",
-    "function-name" : "Annotation-rr-test",
+    "function-name" : "Annotation-SK-test",
     "function-handler" : "AnnotationLambda::AnnotationLambda.AnnotationLambda::Run",
     "function-memory-size" : 3008,
     "function-role"        : "arn:aws:iam::670055277015:role/illumina-olympia-dev-annotation-role",

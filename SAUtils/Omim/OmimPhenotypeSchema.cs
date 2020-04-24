@@ -11,6 +11,7 @@ namespace SAUtils.Omim
         private static readonly (string JsonKey, SaJsonValueType ValueType)[] SchemaDescription = {
             ("mimNumber", SaJsonValueType.Number),
             ("phenotype", SaJsonValueType.String),
+            ("description", SaJsonValueType.String),
             ("mapping", SaJsonValueType.String),
             ("inheritances", SaJsonValueType.StringArray),
             ("comments", SaJsonValueType.String)

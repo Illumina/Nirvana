@@ -51,15 +51,17 @@ namespace SAUtils.DataStructures
         {
             private readonly int _mimNumber;
             private readonly string _phenotype;
+            private readonly string _description;
             private readonly Mapping _mapping;
             private readonly Comment[] _comments;
             private readonly HashSet<string> _inheritance;
             private readonly SaJsonSchema _jsonSchema;
 
-            public Phenotype(int mimNumber, string phenotype, Mapping mapping, Comment[] comments, HashSet<string> inheritance, SaJsonSchema schema)
+            public Phenotype(int mimNumber, string phenotype, string description, Mapping mapping, Comment[] comments, HashSet<string> inheritance, SaJsonSchema schema)
             {
                 _mimNumber   = mimNumber;
                 _phenotype   = phenotype;
+                _description = description;
                 _mapping     = mapping;
                 _comments    = comments;
                 _inheritance = inheritance;
@@ -76,6 +78,7 @@ namespace SAUtils.DataStructures
                 if (_mimNumber >= 100000)
                     _jsonSchema.CountKeyIfAdded(jsonObject.AddIntValue("mimNumber", _mimNumber), "mimNumber");
                 _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("phenotype", _phenotype), "phenotype");
+                _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("description", string.IsNullOrEmpty(_description) ? null : JsonConvert.SerializeObject(_description), false), "description");
                 if (_mapping != Mapping.unknown)
                     _jsonSchema.CountKeyIfAdded(jsonObject.AddStringValue("mapping", _mapping.ToString().Replace("_", " ")), "mapping");
                 if (_inheritance != null && _inheritance.Count > 0)

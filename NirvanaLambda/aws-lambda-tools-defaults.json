@@ -1,10 +1,10 @@
 
 {
     "region" : "us-west-2",
-    "profile" : "default",
+    "profile" : "Olympia",
     "configuration" : "Release",
     "framework"     : "netcoreapp2.1",
-    "function-name" : "Nirvana-rr-test",
+    "function-name" : "Nirvana-SK-test",
     "function-handler" : "NirvanaLambda::NirvanaLambda.NirvanaLambda::Run",
     "function-memory-size" : 3008,
     "function-role"        : "arn:aws:iam::670055277015:role/illumina-olympia-dev-nirvana-role",

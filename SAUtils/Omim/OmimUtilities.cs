@@ -12,18 +12,21 @@ namespace SAUtils.Omim
 {
     public static class OmimUtilities
     {
-        public static OmimItem.Phenotype GetPhenotype(PhenotypeMap phenotypeMap, SaJsonSchema jsonSchema)
+        public static OmimItem.Phenotype GetPhenotype(PhenotypeMap phenotypeMap,
+            IDictionary<int, string> phenotypeDescriptions, SaJsonSchema jsonSchema)
         {
             var phenotypeItem = phenotypeMap.phenotypeMap;
+            var mimNumber = phenotypeItem.phenotypeMimNumber;
+            phenotypeDescriptions.TryGetValue(mimNumber, out var description);
 
             var (phenotype, comments) = ExtractPhenotypeAndComments(phenotypeItem.phenotype);
-            return new OmimItem.Phenotype(phenotypeItem.phenotypeMimNumber, phenotype, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, comments, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
+            return new OmimItem.Phenotype(mimNumber, phenotype, description, (OmimItem.Mapping)phenotypeItem.phenotypeMappingKey, comments, ExtractInheritances(phenotypeItem.phenotypeInheritance), jsonSchema);
         }
 
         private static HashSet<string> ExtractInheritances(string inheritance)
         {
             var inheritances = new HashSet<string>();
-            if (string.IsNullOrEmpty(inheritance)) return inheritances;
+            if (String.IsNullOrEmpty(inheritance)) return inheritances;
 
             foreach (string content in inheritance.OptimizedSplit(';'))
             {
@@ -48,17 +51,14 @@ namespace SAUtils.Omim
 
         private static OmimItem.Comment GetComment(char symbol)
         {
-            switch (symbol)
-            { 
-                case '?':
-                    return OmimItem.Comment.unconfirmed_or_possibly_spurious_mapping;
-                case '[':
-                    return OmimItem.Comment.nondiseases;
-                case '{':
-                    return OmimItem.Comment.contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection;
-                default:
-                    return OmimItem.Comment.unknown;
-            }
+            return symbol switch
+            {
+                '?' => OmimItem.Comment.unconfirmed_or_possibly_spurious_mapping,
+                '[' => OmimItem.Comment.nondiseases,
+                '{' => OmimItem.Comment
+                    .contribute_to_susceptibility_to_multifactorial_disorders_or_to_susceptibility_to_infection,
+                _ => OmimItem.Comment.unknown
+            };
         }
 
         public static Dictionary<string, List<ISuppGeneItem>> GetGeneToOmimEntriesAndSchema(IEnumerable<OmimItem> omimItems)
@@ -90,9 +90,16 @@ namespace SAUtils.Omim
             : Regex.Replace(Regex.Replace(Regex.Replace(text, 
                         @"((and|see|;|(e\.g\.)?,) )*{\d+(\.\d+)?}", ""),
                         @" ?\((\ |/)*\)", ""),
-                        @"{(\d+:)?(.+?)}", "$2");
+                        @"{([\d,]+:)?(.+?)}", "$2");
 
         public static string RemoveFormatControl(this string text) => text == null ? null : 
             Regex.Replace(text, "<Subhead>", "");
+
+        public static string ExtractAndProcessItemDescription(EntryItem item)
+        {
+            const string sectionName = "description";
+            return item.textSectionList?.FirstOrDefault(x => x.textSection.textSectionName == sectionName)?
+                .textSection.textSectionContent.RemoveLinks().RemoveFormatControl();
+        }
     }
-}
+} 

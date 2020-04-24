@@ -20,7 +20,9 @@
 
     public class EntryItem
     {
+        public char          prefix;
         public int           mimNumber;
+        public string        status;
         public TextSection[] textSectionList;
         public GeneMap       geneMap;
     }

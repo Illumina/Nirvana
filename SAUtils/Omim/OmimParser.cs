@@ -21,7 +21,7 @@ namespace SAUtils.Omim
 
         private const string CurrentOmimJsonVersion = "1.0";
 
-        public OmimParser(string mimToGeneSymbolFile, string omimJsonFile,  SaJsonSchema jsonSchema)
+        public OmimParser(string mimToGeneSymbolFile, string omimJsonFile, SaJsonSchema jsonSchema)
         {
             _mimToGeneSymbolFile = mimToGeneSymbolFile;
             _omimJsonFile = omimJsonFile;
@@ -33,51 +33,80 @@ namespace SAUtils.Omim
         public IEnumerable<OmimItem> GetItems()
         {
             var mimToGeneSymbol = GetMimNumberToGeneSymbol();
+            var entryRoot = GetEntryRootObject();
+            var phenotypeDescriptions = GetPhenotypeDescriptions(entryRoot);
+
+            foreach (var omimItem in GetOmimItems(entryRoot, mimToGeneSymbol, phenotypeDescriptions))
+                yield return omimItem;
             
-            foreach (var entry in GetEntryItems())
-            {
-                int mimNumber = entry.mimNumber;
-
-                string description = entry.textSectionList?[0].textSection.textSectionContent.RemoveLinks().RemoveFormatControl();
-                string geneName = entry.geneMap?.geneName;
-                var phenotypes = entry.geneMap?.phenotypeMapList?.Select(x => OmimUtilities.GetPhenotype(x, _jsonSchema.GetSubSchema("phenotypes")))
-                                     .ToList() ?? new List<OmimItem.Phenotype>();
-
-                yield return new OmimItem(mimToGeneSymbol[mimNumber.ToString()], geneName, description, mimNumber,phenotypes, _jsonSchema);
-            }
         }
 
-        private IDictionary<string, string> GetMimNumberToGeneSymbol()
+        private static IDictionary<int, string> GetPhenotypeDescriptions(EntryRoot entryRoot)
         {
-            var mimNumberToGeneSymbol = new Dictionary<string, string>();
+            
+            IDictionary<int, string> phenotypeToDescription = new Dictionary<int, string>();
+
+            foreach (var entry in entryRoot.omim.entryList)
+            {
+                var item = entry.entry;
+                // gene only item
+                if (item.prefix == '*') continue;
+        
+                var description = OmimUtilities.ExtractAndProcessItemDescription(item);
+                if (string.IsNullOrEmpty(description)) continue;
+                phenotypeToDescription[item.mimNumber] = description;
+            }
+
+            return phenotypeToDescription;
+        }
+
+        private IDictionary<int, string> GetMimNumberToGeneSymbol()
+        {
+            var mimNumberToGeneSymbol = new Dictionary<int, string>();
             using (var stream = new FileStream(_mimToGeneSymbolFile, FileMode.Open))
             using (var reader = new StreamReader(stream))
             {
                 string line;
+                //title line
+                reader.ReadLine();
                 while ((line = reader.ReadLine()) != null)
                 {
                     var fields = line.OptimizedSplit('\t');
-                    mimNumberToGeneSymbol[fields[0]] = fields[1];
+                    mimNumberToGeneSymbol[int.Parse(fields[0])] = fields[1];
                 }
             }
 
             return mimNumberToGeneSymbol;
         }
 
-        private IEnumerable<EntryItem> GetEntryItems()
+        private EntryRoot GetEntryRootObject()
         {
-            using (var fileStream = new FileStream(_omimJsonFile, FileMode.Open))
-            using (var uncompressedStream = new GZipStream(fileStream, CompressionMode.Decompress))
-            using (var streamReader = new StreamReader(uncompressedStream))
-            {
-                var entryQueryResponse = JsonConvert.DeserializeObject<EntryRoot>(streamReader.ReadToEnd());
-                if (entryQueryResponse.omim.version != CurrentOmimJsonVersion)
-                    throw new InvalidDataException($"An unknown version of OMIM JSON schema has been used: version {entryQueryResponse.omim.version}. The latest known version is {CurrentOmimJsonVersion}");
+            using var fileStream = new FileStream(_omimJsonFile, FileMode.Open);
+            using var uncompressedStream = new GZipStream(fileStream, CompressionMode.Decompress);
+            using var streamReader = new StreamReader(uncompressedStream);
+            var entryQueryResponse = JsonConvert.DeserializeObject<EntryRoot>(streamReader.ReadToEnd());
+            if (entryQueryResponse.omim.version != CurrentOmimJsonVersion)
+                throw new InvalidDataException($"An unknown version of OMIM JSON schema has been used: version {entryQueryResponse.omim.version}. The latest known version is {CurrentOmimJsonVersion}");
 
-                foreach (var entry in entryQueryResponse.omim.entryList)
-                {
-                    yield return entry.entry;
-                }
+            return entryQueryResponse;
+        }
+
+        private IEnumerable<OmimItem> GetOmimItems(EntryRoot entryRoot, IDictionary<int, string> mimToGeneSymbol, IDictionary<int, string> phenotypeDescriptions)
+        {
+            foreach (var entry in entryRoot.omim.entryList)
+            {
+                var item = entry.entry;
+                var mimNumber = item.mimNumber;
+                //skip if not a supported gene symbol
+                if (!mimToGeneSymbol.TryGetValue(mimNumber, out var geneSymbol)) continue;
+
+                string description = OmimUtilities.ExtractAndProcessItemDescription(item);
+                string geneName    = item.geneMap?.geneName;
+                var phenotypes = item.geneMap?.phenotypeMapList?.Select(x => OmimUtilities.GetPhenotype(x, phenotypeDescriptions, _jsonSchema.GetSubSchema("phenotypes")))
+                    .ToList() ?? new List<OmimItem.Phenotype>();
+
+                yield return new OmimItem(geneSymbol, geneName, description, mimNumber, phenotypes, _jsonSchema);
+
             }
         }
     }
