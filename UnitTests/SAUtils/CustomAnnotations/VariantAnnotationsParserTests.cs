@@ -7,6 +7,7 @@ using SAUtils.Custom;
 using SAUtils.Schema;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.SA;
 using Xunit;
 
@@ -98,6 +99,25 @@ namespace UnitTests.SAUtils.CustomAnnotations
             }
         }
 
+        [Fact]
+        public void ParseHeaderLines_matchBy_sv()
+        {
+            const string headerLines = "#title=IcslAlleleFrequencies\n" +
+                                       "#assembly=GRCh38\n" +
+                                       "#matchVariantsBy=sv\n" +
+                                       "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
+                                       "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                       "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
+                                       "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring";
+
+
+            using (var custParser = new VariantAnnotationsParser(GetReadStream(headerLines), null))
+            {
+                custParser.ParseHeaderLines();
+                Assert.Equal(ReportFor.StructuralVariants, custParser.ReportFor);
+            }
+        }
+        
         [Fact]
         public void ParseHeaderLines_InconsistentFields()
         {
@@ -228,7 +248,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             const string text = "#title=IcslAlleleFrequencies\n" +
                                 "#assembly=GRCh38\n" +
-                                "#matchVariantsBy=allele\n" +
+                                "#matchVariantsBy=sv\n" +
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
@@ -240,6 +260,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
             using (var custParser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
                 var items = custParser.GetItems().ToArray();
+                Assert.Equal(ReportFor.StructuralVariants, custParser.ReportFor);
                 Assert.Equal(2, items.Length);
 
                 var intervals = custParser.GetCustomIntervals();

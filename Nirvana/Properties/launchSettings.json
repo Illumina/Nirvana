@@ -116,7 +116,7 @@
     },
     "RR_dragen3.3": {
       "commandName": "Project",
-      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/57/GRCh37 --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --in Dragen_v3.3-Dragen-TumorNormal-WG-GRCh37.vcf.gz --out dragen-3.3-WG-37",
+      "commandLineArgs": "--cache /Users/rroy1/development/Cache/26/GRCh37/Ensembl --sd /Users/rroy1/development/SupplementaryDatabase/59/GRCh37/custom --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --in Dragen_v3.3-Dragen-TumorNormal-WG-GRCh37-chr1.vcf.gz --out customTest",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dragen3.2_cnv": {

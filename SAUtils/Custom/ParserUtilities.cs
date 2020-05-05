@@ -4,6 +4,7 @@ using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 using SAUtils.Schema;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.SA;
 
 namespace SAUtils.Custom
@@ -41,7 +42,7 @@ namespace SAUtils.Custom
             return assembly;
         }
 
-        public static (bool MatchByAllele, bool IsArray, SaJsonValueType PrimaryType) ParseMatchVariantsBy(string line)
+        public static (bool MatchByAllele, bool IsArray, SaJsonValueType PrimaryType, ReportFor reportFor) ParseMatchVariantsBy(string line)
         {
             CheckPrefix(line, "#matchVariantsBy", "third");
             string firstCol = line.OptimizedSplit('\t')[0];
@@ -50,10 +51,11 @@ namespace SAUtils.Custom
             bool matchByAllele;
             bool isArray;
             SaJsonValueType primaryType;
+            ReportFor reportFor = ReportFor.AllVariants;
             switch (matchBy)
             {
                 case null:
-                    throw new UserErrorException("Please provide the genome assembly in the format: #matchVariantsBy=allele.");
+                    throw new UserErrorException("Please provide the annotation reporting criteria in the format: #matchVariantsBy=allele.");
                 case "allele":
                     matchByAllele = true;
                     isArray = false;
@@ -64,11 +66,17 @@ namespace SAUtils.Custom
                     matchByAllele = false;
                     isArray = true;
                     break;
+                case "sv":
+                    primaryType   = SaJsonValueType.ObjectArray;
+                    matchByAllele = false;
+                    isArray       = true;
+                    reportFor     = ReportFor.StructuralVariants;
+                    break;
                 default:
                     throw new UserErrorException("matchVariantsBy tag has to be either \'allele\' or \'position\'");
             }
 
-            return (matchByAllele, isArray, primaryType);
+            return (matchByAllele, isArray, primaryType, reportFor);
         }
 
         public static string[] ParseTags(string line, string prefix, int numRequiredCols, string rowNumber)

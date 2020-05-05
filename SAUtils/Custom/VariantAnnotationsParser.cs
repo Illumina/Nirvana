@@ -9,6 +9,7 @@ using OptimizedCore;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.SA;
 using Variants;
 
@@ -26,6 +27,8 @@ namespace SAUtils.Custom
         internal CustomAnnotationCategories[] Categories;
         internal string[] Descriptions;
         internal SaJsonValueType[] ValueTypes;
+
+        public ReportFor ReportFor;
 
         private int _numRequiredColumns;
         private int _numAnnotationColumns;
@@ -75,7 +78,7 @@ namespace SAUtils.Custom
         {
             JsonTag = ParserUtilities.ParseTitle(_reader.ReadLine());
             Assembly = ParserUtilities.ParseGenomeAssembly(_reader.ReadLine(), _allowedGenomeAssemblies);
-            (MatchByAllele, IsArray, _primaryType) = ParserUtilities.ParseMatchVariantsBy(_reader.ReadLine());
+            (MatchByAllele, IsArray, _primaryType, ReportFor) = ParserUtilities.ParseMatchVariantsBy(_reader.ReadLine());
             Tags = ParserUtilities.ParseTags(_reader.ReadLine(), "#CHROM", _numRequiredColumns, "forth");
             CheckTagsAndSetJsonKeys();
             Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns, _annotationValidators, "fifth");

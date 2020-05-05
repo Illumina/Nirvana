@@ -10,6 +10,7 @@ using IO;
 using SAUtils.Custom;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -36,6 +37,7 @@ namespace CustomAnnotationLambda
                 DataSourceVersion version;
                 GenomeAssembly genomeAssembly;
                 int nsaItemsCount;
+                ReportFor reportFor;
 
                 using (var customTsvStream = (PersistentStream) PersistentStreamUtils.GetReadStream(config.tsvUrl))
                 using (var parser = GetVariantAnnotationsParserFromCustomTsvStream(customTsvStream))
@@ -54,6 +56,7 @@ namespace CustomAnnotationLambda
                 {
                     genomeAssembly = parser.Assembly;
                     result.genomeAssembly = genomeAssembly.ToString();
+                    reportFor = parser.ReportFor;
 
                     using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, config.tsvUrl, parser.SequenceProvider, out version))
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
@@ -99,7 +102,7 @@ namespace CustomAnnotationLambda
                     new CryptoStream(nsiSchemaSteam, aes.CreateEncryptor(), CryptoStreamMode.Write))
                 using (var nsiSchemaMd5Stream = new MD5Stream(nsiSchemaCryptoStream))
                 {
-                    using (var nsiWriter = CaUtilities.GetNsiWriter(nsiMd5Stream, version, genomeAssembly, jsonTag))
+                    using (var nsiWriter = CaUtilities.GetNsiWriter(nsiMd5Stream, version, genomeAssembly, jsonTag, reportFor))
                     using (var schemaWriter = new StreamWriter(nsiSchemaMd5Stream))
                     {
                         nsiWriter.Write(intervals);

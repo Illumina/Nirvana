@@ -7,6 +7,7 @@ using ErrorHandling;
 using IO;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
@@ -66,6 +67,7 @@ namespace SAUtils.Custom
             string nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
             string nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
             string nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
+            ReportFor reportFor;
 
             using (var parser = VariantAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
@@ -75,11 +77,12 @@ namespace SAUtils.Custom
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 (jsonTag, _, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
+                reportFor = parser.ReportFor;
                 if (intervals == null) return ExitCodes.Success;
             }
 
             using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix)))
-            using (var nsiWriter = CaUtilities.GetNsiWriter(nsiStream, version, referenceProvider.Assembly, jsonTag))
+            using (var nsiWriter = CaUtilities.GetNsiWriter(nsiStream, version, referenceProvider.Assembly, jsonTag, reportFor))
             using (var siJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(siJsonSchemaStream))
             {
