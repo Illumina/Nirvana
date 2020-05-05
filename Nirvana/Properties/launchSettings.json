@@ -209,6 +209,11 @@
       "commandName": "Project",
       "commandLineArgs": "--cache /Users/rroy1/development/Cache\\26\\GRCh38\\Both --sd /Users/rroy1/development/SupplementaryDatabase\\56\\GRCh38 --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh38.Nirvana.dat --in DQ-Strelka-Germline-chr22-hg38.vcf.gz --out dq",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
+    },
+    "SK MitoHeteroplasmy": {
+      "commandName": "Project",
+      "commandLineArgs": "-i debug.vcf -c D:\\Nirvana\\Development\\Cache\\26\\GRCh38\\Both -r D:\\Nirvana\\Development\\References\\Homo_sapiens.GRCh38.Nirvana.dat -o debug",
+      "workingDirectory": "D:\\Nirvana\\test_runs\\run_Nirvana"
     }
   }
 }

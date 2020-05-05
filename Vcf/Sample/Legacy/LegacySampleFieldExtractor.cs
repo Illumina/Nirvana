@@ -59,7 +59,7 @@ namespace Vcf.Sample.Legacy
 
             var sample = new Sample(alleleDepths, sampleFields.AQ, sampleFields.CopyNumber, sampleFields.DST,
                 failedFilter, genotype, genotypeQuality, false, sampleFields.LQ, pairEndReadCounts, null, splitReadCounts,
-                totalDepth, variantFrequencies, null, null, isLossOfHeterozygosity);
+                totalDepth, variantFrequencies, null, null, isLossOfHeterozygosity, null);
 
             return sample;
         }

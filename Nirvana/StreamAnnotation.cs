@@ -4,6 +4,7 @@ using ErrorHandling;
 using ErrorHandling.Exceptions;
 using Genome;
 using IO;
+using MitoHeteroplasmy;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
@@ -23,10 +24,10 @@ namespace Nirvana
             var metrics = annotationResources.Metrics;
             PerformanceMetrics.ShowAnnotationHeader();
 
-            IChromosome currentChromosome = new EmptyChromosome("dummy");
-            int         numVariants       = 0;
-
-            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter))
+            IChromosome currentChromosome                      = new EmptyChromosome("dummy");
+            int         numVariants                            = 0;
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetData();
+            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {
                 try
@@ -97,7 +98,7 @@ namespace Nirvana
         }
 
         private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter)
+            IVcfFilter vcfFilter, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider)
         {
             var vcfReader = FileUtilities.GetStreamReader(vcfStream);
 
@@ -111,7 +112,7 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator);
+                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator, mitoHeteroplasmyProvider);
         }
     }
 }

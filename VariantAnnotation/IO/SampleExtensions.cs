@@ -32,7 +32,8 @@ namespace VariantAnnotation.IO
             if (sample.IsLossOfHeterozygosity.HasValue)
                 jsonObject.AddBoolValue("lossOfHeterozygosity", sample.IsLossOfHeterozygosity.Value);
             jsonObject.AddDoubleValue("somaticQuality",               sample.SomaticQuality, "0.#");
-            
+            jsonObject.AddStringValues("heteroplasmyPercentile", sample.HeteroplasmyPercentile);
+
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderCache.GetStringAndRelease(sb);
         }

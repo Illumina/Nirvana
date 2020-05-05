@@ -40,12 +40,5 @@
     {
         public int[] ad;
         public double[] vrf;
-        public VrfStats vrf_stats;
-    }
-
-    public class VrfStats
-    {
-        public double mean;
-        public double stdev;
     }
 }

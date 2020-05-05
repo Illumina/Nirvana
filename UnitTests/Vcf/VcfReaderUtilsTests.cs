@@ -92,7 +92,7 @@ namespace UnitTests.Vcf
 
             var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
 
-            var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, seqProvider, variantFactory);
+            var position1           = AnnotationUtilities.ParseVcfLine(vcfLine1, refMinorProvider.Object, seqProvider, null, variantFactory);
 
             var annotatedVariants1 = Annotator.GetAnnotatedVariants(position1.Variants);
 
@@ -115,7 +115,7 @@ namespace UnitTests.Vcf
                 ParserTestUtils.GetSequenceProvider(10628385, "C", 'A', ChromosomeUtilities.RefNameToChromosome);
             var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
             
-            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
+            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);
 
             Assert.Equal("C", position.RefAllele);
@@ -137,7 +137,7 @@ namespace UnitTests.Vcf
                 ParserTestUtils.GetSequenceProvider(10005, "C", 'A', ChromosomeUtilities.RefNameToChromosome);
             var variantFactory = new VariantFactory(seqProvider.Sequence, _vidCreator);
 
-            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
+            var position          = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
             var annotatedVariants = Annotator.GetAnnotatedVariants(position.Variants);
 
             Assert.Equal("C", position.RefAllele);

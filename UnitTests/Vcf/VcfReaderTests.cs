@@ -39,7 +39,7 @@ namespace UnitTests.Vcf
             AddLines(headers);
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
             var reader = FileUtilities.GetStreamReader(_ms);
-            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator));
+            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null));
         }
 
         [Fact]
@@ -49,7 +49,7 @@ namespace UnitTests.Vcf
             AddLines(headers);
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
             var reader = FileUtilities.GetStreamReader(_ms);
-            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator));
+            Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null));
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace UnitTests.Vcf
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null))
             {
                 samples = vcfReader.GetSampleNames();
             }
@@ -97,7 +97,7 @@ namespace UnitTests.Vcf
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-                Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator));
+                Assert.Throws<UserErrorException>(() => VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null));
         }
 
         [Theory]
@@ -110,7 +110,7 @@ namespace UnitTests.Vcf
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null))
             {
                 Assert.Equal(GenomeAssembly.Unknown, vcfReader.InferredGenomeAssembly);
             }
@@ -125,7 +125,7 @@ namespace UnitTests.Vcf
             AddLines(headers);
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null))
             {
                 Assert.Equal(GenomeAssembly.Unknown, vcfReader.InferredGenomeAssembly);
                 Assert.True(vcfReader.IsRcrsMitochondrion);
@@ -142,7 +142,7 @@ namespace UnitTests.Vcf
             var seqProvider = ParserTestUtils.GetSequenceProvider(1000, "A", 'T', ChromosomeUtilities.RefNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, null, null, new NullVcfFilter(), _vidCreator, null))
             {
                 Assert.Equal(GenomeAssembly.Unknown, vcfReader.InferredGenomeAssembly);
                 Assert.False(vcfReader.IsRcrsMitochondrion);
@@ -176,7 +176,7 @@ namespace UnitTests.Vcf
             IPosition observedResult;
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter(), _vidCreator, null))
             {
                 observedResult = vcfReader.GetNextPosition();
             }
@@ -209,7 +209,7 @@ namespace UnitTests.Vcf
             var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', ChromosomeUtilities.RefNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter(), _vidCreator, null))
             {
                 //first line is valid. So, no exception
                 Assert.NotNull(vcfReader.GetNextPosition()); 
@@ -236,7 +236,7 @@ namespace UnitTests.Vcf
             var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', ChromosomeUtilities.RefNameToChromosome);
 
             using (var reader = FileUtilities.GetStreamReader(_ms))
-            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter(), _vidCreator))
+            using (var vcfReader = VcfReader.Create(reader, reader, seqProvider, refMinorProvider.Object, new NullRecomposer(), new NullVcfFilter(), _vidCreator, null))
             {
                 //first line is valid. So, no exception
                 Assert.NotNull(vcfReader.GetNextPosition());

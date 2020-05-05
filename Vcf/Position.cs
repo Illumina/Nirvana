@@ -8,6 +8,7 @@ using Variants;
 using Vcf.Info;
 using Vcf.Sample;
 using Vcf.VariantCreator;
+using MitoHeteroplasmy;
 
 namespace Vcf
 {
@@ -69,7 +70,7 @@ namespace Vcf
             return (hasStructuralVariant, hasShortTandemRepeat);
         }
 
-        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, VariantFactory variantFactory)
+        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory)
         {
             if (simplePosition == null) return null;
 
@@ -91,7 +92,7 @@ namespace Vcf
             int end           = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
             double? quality   = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
             string[] filters  = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
-            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, altAlleles.Length);
+            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, mitoHeteroplasmyProvider);
 
             IVariant[] variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,

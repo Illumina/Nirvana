@@ -1,6 +1,10 @@
-﻿using VariantAnnotation.Interface.Positions;
+﻿using MitoHeteroplasmy;
+using UnitTests.TestUtilities;
+using VariantAnnotation.Interface.Positions;
+using Vcf;
 using Vcf.Sample;
 using Xunit;
+using static UnitTests.Vcf.Samples.TestUtilities;
 
 namespace UnitTests.Vcf.Samples
 {
@@ -24,15 +28,15 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set("GT:GQ:AD:DP:VF:NL:SB:NC:US:AQ:LQ");
-            var sample = SampleFieldExtractor.ExtractSample("0/1:5:338,1:339:0.00295:30:-7.3191:0.0314:0,0,0,1,0,0,17,1,129,21,148,22:3.366:0.000", formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample("0/1:5:338,1:339:0.00295:30:-7.3191:0.0314:0,0,0,1,0,0,17,1,129,21,148,22:3.366:0.000", formatIndices, GetSimplePositionUsingAlleleNum(1), null);
 
-            Assert.Equal("0/1",             sample.Genotype);
-            Assert.Equal(5,                 sample.GenotypeQuality);
-            Assert.Equal(new[] { 338, 1 },  sample.AlleleDepths);
-            Assert.Equal(339,               sample.TotalDepth);
+            Assert.Equal("0/1", sample.Genotype);
+            Assert.Equal(5, sample.GenotypeQuality);
+            Assert.Equal(new[] { 338, 1 }, sample.AlleleDepths);
+            Assert.Equal(339, sample.TotalDepth);
             Assert.Equal(new[] { 0.00295 }, sample.VariantFrequencies);
-            Assert.Equal(3.366f,            sample.ArtifactAdjustedQualityScore);
-            Assert.Equal(0.000f,            sample.LikelihoodRatioQualityScore);
+            Assert.Equal(3.366f, sample.ArtifactAdjustedQualityScore);
+            Assert.Equal(0.000f, sample.LikelihoodRatioQualityScore);
         }
 
         [Fact]
@@ -40,13 +44,13 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set("GT:SQ:AD:AF:F1R2:F2R1:DP:SB:MB:PS");
-            var sample = SampleFieldExtractor.ExtractSample("0|1:3.96:33,8:0.195:13,6:20,2:41:17,16,4,4:13,20,4,4:534234", formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample("0|1:3.96:33,8:0.195:13,6:20,2:41:17,16,4,4:13,20,4,4:534234", formatIndices, GetSimplePositionUsingAlleleNum(1), null);
 
             Assert.Equal("0|1", sample.Genotype);
             Assert.Equal(3.96, sample.SomaticQuality);
             Assert.Equal(new[] { 33, 8 }, sample.AlleleDepths);
             Assert.Equal(41, sample.TotalDepth);
-            Assert.Equal(new[] { 8/41.0 }, sample.VariantFrequencies);
+            Assert.Equal(new[] { 8 / 41.0 }, sample.VariantFrequencies);
         }
 
         [Fact]
@@ -54,7 +58,7 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set("GT:CN:MCN");
-            var sample = SampleFieldExtractor.ExtractSample("0|1:3:1", formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample("0|1:3:1", formatIndices, GetSimplePositionUsingAlleleNum(1), null);
 
             Assert.Equal("0|1", sample.Genotype);
             Assert.Equal(3, sample.CopyNumber);
@@ -68,7 +72,7 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set(formatField);
-            var sample = SampleFieldExtractor.ExtractSample(sampleField, formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample(sampleField, formatIndices, GetSimplePositionUsingAlleleNum(1), null);
 
             Assert.True(sample.IsLossOfHeterozygosity);
         }
@@ -78,7 +82,7 @@ namespace UnitTests.Vcf.Samples
         {
             var formatIndices = new FormatIndices();
             formatIndices.Set("GT:SO:REPCN:REPCI:ADSP:ADFL:ADIR:LC");
-            var sample = SampleFieldExtractor.ExtractSample("1/1:SPANNING/SPANNING:15/15:15-15/15-15:22/22:23/23:0/0:38.270270", formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample("1/1:SPANNING/SPANNING:15/15:15-15/15-15:22/22:23/23:0/0:38.270270", formatIndices, GetSimplePositionUsingAlleleNum(1), null);
 
             Assert.Equal("1/1", sample.Genotype);
             Assert.Equal(new[] { 15, 15 }, sample.RepeatUnitCounts);
@@ -88,7 +92,7 @@ namespace UnitTests.Vcf.Samples
         public void ExtractSample_EmptySampleColumn_ReturnEmptySample()
         {
             var formatIndices = new FormatIndices();
-            var sample = SampleFieldExtractor.ExtractSample(null, formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample(null, formatIndices, GetSimplePositionUsingAlleleNum(1), null);
             Assert.True(sample.IsEmpty);
         }
 
@@ -96,7 +100,7 @@ namespace UnitTests.Vcf.Samples
         public void ExtractSample_DotInSampleColumn_ReturnEmptySample()
         {
             var formatIndices = new FormatIndices();
-            var sample = SampleFieldExtractor.ExtractSample(".", formatIndices, 1);
+            var sample = SampleFieldExtractor.ExtractSample(".", formatIndices, GetSimplePositionUsingAlleleNum(1), null);
             Assert.True(sample.IsEmpty);
         }
 
@@ -129,7 +133,7 @@ namespace UnitTests.Vcf.Samples
                 "./1:.:.:.:.:1.26335:3:4:6:cnvLength:Inherited"
             };
 
-            ISample[] samples = cols.ToSamples(formatIndices, 1);
+            ISample[] samples = cols.ToSamples(formatIndices, GetSimplePositionUsingAlleleNum(1), null);
 
             Assert.Equal(4, samples.Length);
 
@@ -166,8 +170,25 @@ namespace UnitTests.Vcf.Samples
                 "SVTYPE=CNV;END=125075279;REFLEN=6510"
             };
 
-            ISample[] samples = cols.ToSamples(formatIndices, 1);
+            ISample[] samples = cols.ToSamples(formatIndices, GetSimplePositionUsingAlleleNum(1), null);
             Assert.Null(samples);
+        }
+
+        [Fact]
+        public void ExtractSample_MitoHeteroplasmy_AsExpected()
+        {
+            var provider = new MitoHeteroplasmyProvider();
+            provider.Add(1, "C", new[] { 0.123, 0.200, 0.301 }, new[] { 1, 3, 4 });
+            provider.Add(1, "G", new[] { 0.101, 0.201 }, new[] { 1, 2 });
+
+            var simplePosition = new SimplePosition(ChromosomeUtilities.ChrM, 1, "A", new[] { "C", "T"});
+
+            var formatIndices = new FormatIndices();
+            formatIndices.Set("GT:SQ:AD:AF:F1R2:F2R1:DP:SB:MB:PS");
+            var sample = SampleFieldExtractor.ExtractSample("1|2:3.96:0,15,85:0.195:13,6:20,2:100:17,16,4,4:13,20,4,4:534234", formatIndices, simplePosition, provider);
+
+            Assert.Equal(new[] { 15 / 100.0, 85 / 100.0 }, sample.VariantFrequencies);
+            Assert.Equal(new[] { "0.13", null }, sample.HeteroplasmyPercentile);
         }
     }
 }

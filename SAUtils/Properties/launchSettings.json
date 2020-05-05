@@ -153,6 +153,11 @@
       "commandName": "Project",
       "commandLineArgs": "AaCon --ref  c:\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat --cache c:\\Development\\Cache\\26\\GRCh37\\Both --scr conservationScores.tsv.gz --out c:\\Development\\SupplementaryDatabase\\test",
       "workingDirectory": "C:\\development\\ExternalDataSources\\MultiZ46Way\\GRCh37"
+    },
+    "MitoHeteroplasmy_SK": {
+      "commandName": "Project",
+      "commandLineArgs": "MitoHet --in coriell_GRCh37.MT.json.bed.gz --out .",
+      "workingDirectory": "D:\\Nirvana\\gen_data\\MitoHeteroplasmy"
     }
   }
 }

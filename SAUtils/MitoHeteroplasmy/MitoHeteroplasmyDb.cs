@@ -5,27 +5,21 @@ using Compression.Utilities;
 using ErrorHandling;
 using IO;
 using SAUtils.InputFileParsers;
-using VariantAnnotation.Providers;
-using VariantAnnotation.SA;
 
 namespace SAUtils.MitoHeteroplasmy
 {
     public static class MitoHeteroplasmyDb
     {
         private static string _inputFile;
-        private static string _compressedReference;
         private static string _outputDirectory;
+        private const string OutFileName = "MitoHeteroplasmy.tsv";
+        private const string HeaderLine = "#POS\tREF\tALT\tVRFs\tAlleleDepths";
 
         public static ExitCodes Run(string command, string[] commandArgs)
 
         {
             var ops = new OptionSet
             {
-                {
-                    "ref|r=",
-                    "compressed reference sequence file",
-                    v => _compressedReference = v
-                },
                 {
                     "in|i=",
                     "input BED file path",
@@ -42,11 +36,10 @@ namespace SAUtils.MitoHeteroplasmy
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-                .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
                 .CheckInputFilenameExists(_inputFile, "Mitochondrial Heteroplasmy BED file", "--in")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
-                .ShowHelpMenu("Creates a supplementary database containing 1000 Genomes allele frequencies", commandLineExample)
+                .ShowHelpMenu("Creates a TSV file with mitochondrial heteroplasmy information", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 
@@ -55,17 +48,12 @@ namespace SAUtils.MitoHeteroplasmy
 
         private static ExitCodes ProgramExecution()
         {
-            var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            var version = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
-            string outFileName = $"{version.Name}_{version.Version}";
-
-            using (var primateAiParser = new MitoHeteroplasmyParser(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider))
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
-            using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.MitoHeteroplasmyTag, true, false, SaCommon.SchemaVersion, false))
-            {
-                nsaWriter.Write(primateAiParser.GetItems());
-            }
+            using var mitoHeteroplasmyParser = new MitoHeteroplasmyParser(GZipUtilities.GetAppropriateReadStream(_inputFile));
+            using var tsvStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, OutFileName));
+            using var tsvWriter = new StreamWriter(tsvStream);
+            tsvWriter.WriteLine(HeaderLine);
+            foreach(var line in mitoHeteroplasmyParser.GetOutputLines())
+                tsvWriter.WriteLine(line);
 
             return ExitCodes.Success;
         }

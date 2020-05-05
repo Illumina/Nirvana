@@ -2,6 +2,7 @@
 using Cloud.Messages.Single;
 using ErrorHandling.Exceptions;
 using Genome;
+using MitoHeteroplasmy;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
@@ -51,7 +52,8 @@ namespace SingleAnnotationLambda
 
             SimplePosition simplePosition = SimplePosition.GetSimplePosition(chromosome, start, vcfFields, new NullVcfFilter());
             var variantFactory = new VariantFactory(sequenceProvider.Sequence, new VariantId());
-            return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, variantFactory);
+            var mitoHeteroplasmyProvider = new MitoHeteroplasmyProvider();
+            return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory);
         }
     }
 }

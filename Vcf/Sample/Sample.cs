@@ -22,14 +22,15 @@ namespace Vcf.Sample
         public int? MinorHaplotypeCopyNumber { get; }
         public double? SomaticQuality { get; }
         public bool? IsLossOfHeterozygosity { get; }
+        public string[] HeteroplasmyPercentile { get; }
 
         public static readonly Sample EmptySample =
-            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null, null, null, null);
+            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null, null, null, null, null);
 
         public Sample(int[] alleleDepths, float? artifactAdjustedQualityScore, int? copyNumber,
             string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo,
             float? likelihoodRatioQualityScore, int[] pairedEndReadCounts, int[] repeatUnitCounts,
-            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality, bool? isLossOfHeterozygosity)
+            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality, bool? isLossOfHeterozygosity, string[] heteroplasmyPercentile)
         {
             AlleleDepths                 = alleleDepths;
             ArtifactAdjustedQualityScore = artifactAdjustedQualityScore;
@@ -46,6 +47,7 @@ namespace Vcf.Sample
             TotalDepth                   = totalDepth;
             VariantFrequencies           = variantFrequencies;
             IsLossOfHeterozygosity       = isLossOfHeterozygosity;
+            HeteroplasmyPercentile       = heteroplasmyPercentile;
             MinorHaplotypeCopyNumber     = minorHaplotypeCopyNumber;
             SomaticQuality               = somaticQuality;
 
@@ -64,6 +66,7 @@ namespace Vcf.Sample
                       IsLossOfHeterozygosity       == null &&
                       MinorHaplotypeCopyNumber     == null &&
                       SomaticQuality               == null &&
+                      HeteroplasmyPercentile       == null &&
                       !FailedFilter                        &&
                       !IsDeNovo;
         }

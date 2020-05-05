@@ -19,7 +19,7 @@ namespace Vcf
         public string[] Vids { get; private set; }
         public List<string>[] LinkedVids { get; private set; }
 
-        private SimplePosition(IChromosome chromosome, int start, string refAllele, string[] altAlleles)
+        internal SimplePosition(IChromosome chromosome, int start, string refAllele, string[] altAlleles)
         {
             Chromosome = chromosome;
             Start      = start;

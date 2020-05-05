@@ -56,7 +56,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var seqProvider = ParserTestUtils.GetSequenceProvider(13813, "T", 'C', ChromosomeUtilities.RefNameToChromosome);
             var variantFactory = new VariantFactory(seqProvider.Sequence, new VariantId());
 
-            var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, variantFactory);
+            var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
 
             IVariant[] variants = GetVariants();
             IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);

@@ -44,7 +44,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tabix", "Tabix\Tabix.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cloud", "Cloud\Cloud.csproj", "{E93914C8-2599-46BE-BE18-6229E53F581B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReferenceSequence", "ReferenceSequence\ReferenceSequence.csproj", "{234765A8-2B5C-4FD5-ACBA-6D48002E9074}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ReferenceSequence", "ReferenceSequence\ReferenceSequence.csproj", "{234765A8-2B5C-4FD5-ACBA-6D48002E9074}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Downloader", "Downloader\Downloader.csproj", "{5B81B762-8A86-466A-A947-AC2CA53EE40D}"
 EndProject
@@ -58,11 +58,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NirvanaLambda", "NirvanaLam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SingleAnnotationLambda", "SingleAnnotationLambda\SingleAnnotationLambda.csproj", "{C9B4E16E-FF30-4CE0-A617-F833696FBE10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RepeatExpansions", "RepeatExpansions\RepeatExpansions.csproj", "{E586F712-DEDA-4CA2-AE97-96DE0180DB0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RepeatExpansions", "RepeatExpansions\RepeatExpansions.csproj", "{E586F712-DEDA-4CA2-AE97-96DE0180DB0E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jist", "Jist\Jist.csproj", "{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Jist", "Jist\Jist.csproj", "{62109AB0-2E66-4C84-8D62-7A8C9B7E335A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomStrValidationLambda", "CustomStrValidationLambda\CustomStrValidationLambda.csproj", "{F3E60E51-EE07-4768-8EC3-E3A323DFA547}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MitoHeteroplasmy", "MitoHeteroplasmy\MitoHeteroplasmy.csproj", "{387E4C8D-6A27-40DE-A305-F3F047B8D865}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -186,6 +188,10 @@ Global
 		{F3E60E51-EE07-4768-8EC3-E3A323DFA547}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3E60E51-EE07-4768-8EC3-E3A323DFA547}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3E60E51-EE07-4768-8EC3-E3A323DFA547}.Release|Any CPU.Build.0 = Release|Any CPU
+		{387E4C8D-6A27-40DE-A305-F3F047B8D865}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{387E4C8D-6A27-40DE-A305-F3F047B8D865}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{387E4C8D-6A27-40DE-A305-F3F047B8D865}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{387E4C8D-6A27-40DE-A305-F3F047B8D865}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

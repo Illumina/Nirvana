@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\MitoHeteroplasmy.tsv.gz" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
+    <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
+  </ItemGroup>
+
+</Project>

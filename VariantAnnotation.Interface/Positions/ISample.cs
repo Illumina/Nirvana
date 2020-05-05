@@ -20,6 +20,6 @@
         int? MinorHaplotypeCopyNumber { get; }
         double? SomaticQuality { get; }
         bool? IsLossOfHeterozygosity { get; }
-        
+        string[] HeteroplasmyPercentile { get; }
     }
 }

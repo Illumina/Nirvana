@@ -36,15 +36,13 @@ namespace UnitTests.SAUtils.MitoHeteroplasmy
         [Fact]
         public void ParseItems()
         {
-            using (var parser = new MitoHeteroplasmyParser(GetStream(), GetSequenceProvider()))
-            {
-                var items = parser.GetItems().ToList();
+            using var parser = new MitoHeteroplasmyParser(GetStream());
+            var items = parser.GetOutputLines().ToList();
 
-                Assert.Equal(4, items.Count);
+            Assert.Equal(4, items.Count);
 
-                Assert.Equal("\"vrfMean\":0.000026,\"vrfStdev\":0.000404", items[0].GetJsonString());
-                
-            }
+            Assert.Equal("6\tC\tA\t0.006\t1", items[0]);
+            Assert.Equal("8\tG\tA\t0.002,0.003,0.004\t1,2,1", items[1]);
         }
 
         [Fact]

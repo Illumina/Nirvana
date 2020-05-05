@@ -1,4 +1,6 @@
-﻿using OptimizedCore;
+﻿using System.Linq;
+using MitoHeteroplasmy;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using Vcf.Sample.Legacy;
@@ -7,7 +9,7 @@ namespace Vcf.Sample
 {
     internal static class SampleFieldExtractor
     {
-        internal static ISample[] ToSamples(this string[] vcfColumns, FormatIndices formatIndices, int numAltAlleles)
+        internal static ISample[]  ToSamples(this string[] vcfColumns, FormatIndices formatIndices, ISimplePosition simplePosition, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider)
         {
             if (vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
 
@@ -20,14 +22,14 @@ namespace Vcf.Sample
 
             for (int index = VcfCommon.GenotypeIndex; index < vcfColumns.Length; index++)
             {
-                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, numAltAlleles, legacySampleExtractor);
+                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, simplePosition, mitoHeteroplasmyProvider, legacySampleExtractor);
             }
 
             return samples;
         }
 
-        internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, int numAltAlleles,
-            LegacySampleFieldExtractor legacyExtractor = null)
+        internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, ISimplePosition simplePosition, 
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider,  LegacySampleFieldExtractor legacyExtractor = null)
         {
             // sanity check: make sure we have a format column
             if (string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;
@@ -59,13 +61,15 @@ namespace Vcf.Sample
             int? minorHaplotypeCopyNumber       = sampleColumns.GetString(formatIndices.MCN).GetInteger();
             double? somaticQuality              = sampleColumns.GetString(formatIndices.SQ).GetDouble();
 
-            double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, numAltAlleles);
+            double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, simplePosition.AltAlleles.Length);
+            string[] mitoHeteroplasmyPercentiles = mitoHeteroplasmyProvider?.GetVrfPercentiles(genotype, simplePosition.Chromosome, simplePosition.Start,
+                simplePosition.AltAlleles, variantFrequencies)?.Select(x => x?.ToString("0.##")).ToArray();
 
             var isLoh = GetLoh(copyNumber, minorHaplotypeCopyNumber, genotype);
 
             var sample = new Sample(alleleDepths, artifactAdjustedQualityScore, copyNumber, diseaseAffectedStatuses,
                 failedFilter, genotype, genotypeQuality, isDeNovo, likelihoodRatioQualityScore, pairedEndReadCounts,
-                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality, isLoh);
+                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality, isLoh, mitoHeteroplasmyPercentiles);
 
             return sample;
         }

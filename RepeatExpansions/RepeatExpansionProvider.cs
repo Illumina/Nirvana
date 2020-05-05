@@ -6,6 +6,7 @@ using Genome;
 using Intervals;
 using IO;
 using RepeatExpansions.IO;
+using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 

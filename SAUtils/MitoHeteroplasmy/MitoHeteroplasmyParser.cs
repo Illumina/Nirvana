@@ -1,72 +1,83 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using IO;
 using Newtonsoft.Json;
 using OptimizedCore;
-using VariantAnnotation.Interface.Providers;
 
 namespace SAUtils.MitoHeteroplasmy
 {
-    public sealed class MitoHeteroplasmyParser: IDisposable
+    public sealed class MitoHeteroplasmyParser : IDisposable
     {
         private readonly Stream _stream;
-        private readonly ISequenceProvider _referenceProvider;
 
-        public MitoHeteroplasmyParser(Stream stream, ISequenceProvider referenceProvider)
+        public MitoHeteroplasmyParser(Stream stream)
         {
             _stream = stream;
-            _referenceProvider = referenceProvider;
         }
 
         public void Dispose()
         {
             _stream?.Dispose();
-            _referenceProvider?.Dispose();
         }
 
-        public IEnumerable<MitoHeteroplasmyItem> GetItems()
+        public IEnumerable<string> GetOutputLines()
         {
-
-            using (var reader = FileUtilities.GetStreamReader(_stream))
+            using var reader = FileUtilities.GetStreamReader(_stream);
+            string line;
+            while ((line = reader.ReadLine()) != null)
             {
-                string line;
-                while ((line = reader.ReadLine()) != null)
-                {
-                    // Skip empty lines.
-                    if (string.IsNullOrWhiteSpace(line)) continue;
+                // Skip empty lines.
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
-                    // Skip comments, headers
-                    if (line.OptimizedStartsWith('#')) continue;
+                // Skip comments, headers
+                if (line.OptimizedStartsWith('#')) continue;
 
-                    var items = ExtractItems(line);
-                    foreach (var item in items)
-                    {
-                        if (item == null) continue;
-                        yield return item;
-                    }
-                }
+                foreach (string item in ExtractItems(line))
+                    yield return item;
             }
-
         }
+
         //MT      5       6       {"C:A":{"ad":[1],"allele_type":"alt","vrf":[0.006329113924050633],"vrf_stats":{"kurtosis":241.00408163265314,"max":0.0063291139240506328,"mean":2.5728105382319646e-05,"min":0.0,"nobs":246,"skewness":15.588588185998534,"stdev":0.00040352956522996095,"variance":1.6283611001468132e-07}}}
-        private IEnumerable<MitoHeteroplasmyItem> ExtractItems(string line)
+        private static IEnumerable<string> ExtractItems(string line)
         {
             var splits = line.Split('\t');
-            if(splits.Length < 4) yield break;
-            var chromosomeName = splits[0];
-            if (!_referenceProvider.RefNameToChromosome.ContainsKey(chromosomeName)) yield break;
+            if (splits.Length < 4) yield break;
 
-            var chromosome   = _referenceProvider.RefNameToChromosome[chromosomeName];
-            var position     = int.Parse(splits[1])+1; // since this is a bed file
-            var info         = splits[3];
-            var stats        = DeserializeStats(info);
+            var position = int.Parse(splits[1]) + 1; // since this is a bed file
+            var info = splits[3];
+            var stats = DeserializeStats(info);
 
             foreach ((string refAllele, string altAllele, AlleleStats alleleStats) in GetAlleleStats(stats))
             {
-                yield return new MitoHeteroplasmyItem(chromosome, position, refAllele, altAllele, alleleStats);
+                (string formattedVrfs, string alleleDepths) = MergeAndSortByVrf(alleleStats);
+                yield return string.Join('\t', position, refAllele, altAllele, formattedVrfs, alleleDepths);
             }
-            
+
+        }
+
+        private static (string formattedVrfs, string alleleDepths) MergeAndSortByVrf(AlleleStats alleleStats)
+        {
+            var vrfToAd = new Dictionary<string, int>();
+            foreach ((string vrf, int ad) in alleleStats.vrf.Select(x => x.ToString("0.###"))
+                                                            .Zip(alleleStats.ad, (a, b) => (a, b)))
+            {
+                if (vrfToAd.ContainsKey(vrf)) vrfToAd[vrf] += ad;
+                else vrfToAd[vrf] = ad;
+            }
+
+            var formattedVrfs = new string[vrfToAd.Count];
+            var alleleDepths = new int[vrfToAd.Count];
+            var i = 0;
+            foreach (var vrf in vrfToAd.Keys.OrderBy(x => double.Parse(x)))
+            {
+                formattedVrfs[i] = vrf;
+                alleleDepths[i] = vrfToAd[vrf];
+                i++;
+            }
+
+            return (string.Join(',',formattedVrfs), string.Join(',', alleleDepths));
         }
 
         private static IEnumerable<(string, string, AlleleStats)> GetAlleleStats(PositionStats stats)
@@ -91,7 +102,7 @@ namespace SAUtils.MitoHeteroplasmy
         public static PositionStats DeserializeStats(string s)
         {
             var charArray = s.ToCharArray();
-            for (int i = 0; i < charArray.Length - 3; i++)
+            for (var i = 0; i < charArray.Length - 3; i++)
             {
                 if (IsNucleotide(charArray[i])
                     && charArray[i + 1] == ':'

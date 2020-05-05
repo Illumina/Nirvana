@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Genome;
+using MitoHeteroplasmy;
 using Nirvana;
 using OptimizedCore;
 using VariantAnnotation;
@@ -14,7 +15,7 @@ namespace UnitTests.TestUtilities
 {
     public static class AnnotationUtilities
 	{
-        internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths,
+        internal static IAnnotatedPosition GetAnnotatedPosition(string cacheFilePrefix, List<string> saPaths, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider,
             string vcfLine)
         {
             var annotationFiles = new AnnotationFiles();
@@ -24,16 +25,16 @@ namespace UnitTests.TestUtilities
             var (annotator, sequenceProvider)   = GetAnnotatorAndSequenceProvider(cacheFilePrefix, saPaths);
 
             var variantFactory    = new VariantFactory(sequenceProvider.Sequence, new VariantId());
-            var position          = ParseVcfLine(vcfLine, refMinorProvider, sequenceProvider, variantFactory);
+            var position          = ParseVcfLine(vcfLine, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory);
             var annotatedPosition = annotator.Annotate(position);
 
             return annotatedPosition;
         }
 
-	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, VariantFactory variantFactory)
+	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory)
 	    {
 	        var simplePosition = GetSimplePosition(vcfLine, sequenceProvider.RefNameToChromosome);
-	        return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, variantFactory);
+	        return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory);
 	    }
 
         internal static SimplePosition GetSimplePosition(string vcfLine,
