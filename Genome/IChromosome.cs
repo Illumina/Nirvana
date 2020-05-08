@@ -10,6 +10,7 @@ namespace Genome
         string RefSeqAccession { get; }
         string GenBankAccession { get; }
         int Length { get; }
+        int FlankingLength { get; }
         ushort Index { get; }
         void Write(ExtendedBinaryWriter writer);
     }

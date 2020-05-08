@@ -8,7 +8,8 @@
 		open_chromatin_region,
 		promoter,
 		promoter_flanking_region,
-		TF_binding_site
+		TF_binding_site,
+		mature_protein_region
 		// ReSharper restore InconsistentNaming
 	}
 }

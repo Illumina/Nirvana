@@ -16,7 +16,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_NoOverlap_ReturnNoAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 101),
-                new Interval(5102, 6100), AnnotationBehavior.SmallVariants);
+                new Interval(5102, 6100), AnnotationBehavior.SmallVariants, Chromosome.ShortFlankingLength);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.NoAnnotation, observedStatus);
         }
@@ -25,7 +25,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Flanking_ReturnFlankingAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 100),
-                new Interval(102, 305), AnnotationBehavior.SmallVariants);
+                new Interval(102, 305), AnnotationBehavior.SmallVariants, Chromosome.ShortFlankingLength);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FlankingAnnotation, observedStatus);
         }
@@ -34,7 +34,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Reduced_TranscriptPartialOverlap_ReturnReducedAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 200),
-                new Interval(102, 305), AnnotationBehavior.StructuralVariants);
+                new Interval(102, 305), AnnotationBehavior.StructuralVariants, Chromosome.ShortFlankingLength);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.ReducedAnnotation, observedStatus);
         }
@@ -43,7 +43,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Full_PartialOverlap_ReturnFullAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 105),
-                new Interval(102, 305), AnnotationBehavior.SmallVariants);
+                new Interval(102, 305), AnnotationBehavior.SmallVariants, Chromosome.ShortFlankingLength);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
         }
@@ -52,7 +52,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_Full_CompleteOverlap_ReturnFullAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), AnnotationBehavior.SmallVariants);
+                new Interval(102, 305), AnnotationBehavior.SmallVariants, Chromosome.ShortFlankingLength);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.FullAnnotation, observedStatus);
         }
@@ -61,7 +61,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         public void DecideAnnotationStatus_ROH_Return_RohAnnotation()
         {
             var observedStatus = TranscriptAnnotationFactory.DecideAnnotationStatus(new Interval(100, 500),
-                new Interval(102, 305), AnnotationBehavior.RunsOfHomozygosity);
+                new Interval(102, 305), AnnotationBehavior.RunsOfHomozygosity, Chromosome.ShortFlankingLength);
 
             Assert.Equal(TranscriptAnnotationFactory.Status.RohAnnotation, observedStatus);
         }
@@ -76,6 +76,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             ITranscript[] transcripts = { transcript1.Object, transcript2.Object };
 
             variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.SmallVariants);
+            variant.SetupGet(x => x.Chromosome.FlankingLength).Returns(Chromosome.ShortFlankingLength);
             variant.SetupGet(x => x.Start).Returns(123456);
             variant.SetupGet(x => x.End).Returns(123456);
 
@@ -110,6 +111,7 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
             ITranscript[] transcripts = { transcript1.Object, transcript2.Object };
 
             variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.RunsOfHomozygosity);
+            variant.SetupGet(x => x.Chromosome.FlankingLength).Returns(Chromosome.ShortFlankingLength);
             variant.SetupGet(x => x.Start).Returns(10000);
             variant.SetupGet(x => x.End).Returns(20000);
 

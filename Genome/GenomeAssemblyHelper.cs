@@ -7,7 +7,7 @@ namespace Genome
     public static class GenomeAssemblyHelper
     {
         public static readonly ImmutableHashSet<GenomeAssembly> AutosomeAndAllosomeAssemblies =
-            new HashSet<GenomeAssembly> { GenomeAssembly.GRCh37, GenomeAssembly.GRCh38, GenomeAssembly.hg19 }.ToImmutableHashSet();
+            new HashSet<GenomeAssembly> { GenomeAssembly.GRCh37, GenomeAssembly.GRCh38, GenomeAssembly.hg19,GenomeAssembly.SARSCoV2 }.ToImmutableHashSet();
 
         public static GenomeAssembly Convert(string genomeAssembly)
         {
@@ -26,6 +26,9 @@ namespace Genome
                     break;
                 case "rcrs":
                     ret = GenomeAssembly.rCRS;
+                    break;
+                case "sarscov2":
+                    ret = GenomeAssembly.SARSCoV2;
                     break;
                 case "":
                     ret = GenomeAssembly.Unknown;

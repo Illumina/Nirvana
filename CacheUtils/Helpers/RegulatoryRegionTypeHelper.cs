@@ -17,7 +17,8 @@ namespace CacheUtils.Helpers
                 ["enhancer"]                 = RegulatoryRegionType.enhancer,
                 ["open_chromatin_region"]    = RegulatoryRegionType.open_chromatin_region,
                 ["promoter"]                 = RegulatoryRegionType.promoter,
-                ["promoter_flanking_region"] = RegulatoryRegionType.promoter_flanking_region
+                ["promoter_flanking_region"] = RegulatoryRegionType.promoter_flanking_region,
+                ["mature_protein_region"]    = RegulatoryRegionType.mature_protein_region
             };
         }
 

@@ -4,7 +4,6 @@ using Intervals;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Intervals;
 using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
@@ -24,7 +23,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             {
                 if (transcript.Id.IsPredictedTranscript()) continue;
 
-                var annotationStatus = DecideAnnotationStatus(variant, transcript, variant.Behavior);
+                var annotationStatus = DecideAnnotationStatus(variant, transcript, variant.Behavior,
+                    variant.Chromosome.FlankingLength);
 
                 var annotatedTranscript = GetAnnotatedTranscript(variant, compressedSequence, transcript,
                     annotationStatus, siftCache, polyphenCache);
@@ -44,8 +44,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             switch (annotationStatus)
             {
                 case Status.FlankingAnnotation:
-                    annotatedTranscript =
-                        FlankingTranscriptAnnotator.GetAnnotatedTranscript(variant.End, transcript);
+                    annotatedTranscript = FlankingTranscriptAnnotator.GetAnnotatedTranscript(variant.End, transcript);
                     break;
                 case Status.ReducedAnnotation:
                     annotatedTranscript = ReducedTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant);
@@ -65,7 +64,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             return annotatedTranscript;
         }
 
-        internal static Status DecideAnnotationStatus(IInterval variant, IInterval transcript, AnnotationBehavior behavior)
+        internal static Status DecideAnnotationStatus(IInterval variant, IInterval transcript, AnnotationBehavior behavior, int flankingLength)
         {
             bool overlapsTranscript = variant.Overlaps(transcript);
             
@@ -73,7 +72,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             {
                 // handle small variants
                 if (overlapsTranscript) return Status.FullAnnotation;
-                if (behavior.NeedFlankingTranscripts && variant.Overlaps(transcript, OverlapBehavior.FlankingLength)) return Status.FlankingAnnotation;
+                if (behavior.NeedFlankingTranscripts && variant.Overlaps(transcript, flankingLength)) return Status.FlankingAnnotation;
             }
             else if (overlapsTranscript)
             {

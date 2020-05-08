@@ -65,8 +65,8 @@ namespace Nirvana
             RefMinorProvider       = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             GeneAnnotationProvider = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
 
-            var repeatExpansionProvider = new RepeatExpansionProvider(SequenceProvider.Assembly, SequenceProvider.RefNameToChromosome,
-                SequenceProvider.RefIndexToChromosome.Count, customStrTsvPath);
+            IRepeatExpansionProvider repeatExpansionProvider = GetRepeatExpansionProvider(SequenceProvider.Assembly,
+                SequenceProvider.RefNameToChromosome, SequenceProvider.RefIndexToChromosome.Count, customStrTsvPath);
 
             Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider, ConservationProvider, GeneAnnotationProvider,
                 repeatExpansionProvider);
@@ -82,6 +82,13 @@ namespace Nirvana
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
 
             ForceMitochondrialAnnotation = forceMitochondrialAnnotation;
+        }
+
+        private static IRepeatExpansionProvider GetRepeatExpansionProvider(GenomeAssembly genomeAssembly,
+            IDictionary<string, IChromosome> refNameToChromosome, int numRefSeqs, string customStrTsvPath)
+        {
+            if (genomeAssembly != GenomeAssembly.GRCh37 && genomeAssembly != GenomeAssembly.GRCh38) return null;
+            return new RepeatExpansionProvider(genomeAssembly, refNameToChromosome, numRefSeqs, customStrTsvPath);
         }
 
         private static IEnumerable<IDataSourceVersion> GetDataSourceVersions(params IProvider[] providers)

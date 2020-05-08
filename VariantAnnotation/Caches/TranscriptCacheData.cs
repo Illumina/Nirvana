@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
@@ -44,7 +45,11 @@ namespace VariantAnnotation.Caches
 
             ushort vepVersion = header.Custom.VepVersion;
 
-            var dataSourceVersion = new DataSourceVersion("VEP", vepVersion.ToString(), header.CreationTimeTicks, header.Source.ToString());
+            // TODO: Embed the data source version in the next cache file format. This hack let's us handle the SARS-CoV-2 genome
+            DataSourceVersion dataSourceVersion = vepVersion == 0
+                ? new DataSourceVersion("RefSeq", "NC_045512.2", new DateTime(2020,3,20,0,0,0,DateTimeKind.Utc).Ticks, "Severe acute respiratory syndrome coronavirus 2 (SARS-CoV2)")
+                : new DataSourceVersion("VEP", vepVersion.ToString(), header.CreationTimeTicks, header.Source.ToString());
+            
             dataSourceVersions.Add(dataSourceVersion);
             return dataSourceVersions;
         }

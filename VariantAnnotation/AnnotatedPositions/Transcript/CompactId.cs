@@ -48,6 +48,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (s.StartsWith("XR_"))     return GetCompactId(s, 3, IdType.RefSeqPredictedNonCodingRNA, version);
             if (s.StartsWith("XM_"))     return GetCompactId(s, 3, IdType.RefSeqPredictedMessengerRNA, version);
             if (s.StartsWith("XP_"))     return GetCompactId(s, 3, IdType.RefSeqPredictedProtein, version);
+            if (s.StartsWith("YP_"))     return GetCompactId(s, 3, IdType.RefSeq_YP, version);
 
             if (int.TryParse(s, out int i)) return GetNumericalCompactId(i, s.Length);
 
@@ -126,6 +127,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                     return "XM_";
                 case IdType.RefSeqPredictedProtein:
                     return "XP_";
+                case IdType.RefSeq_YP:
+                    return "YP_";
             }
 
             return null;
@@ -164,7 +167,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         RefSeqPredictedMessengerRNA,
         RefSeqPredictedNonCodingRNA,
         RefSeqPredictedProtein,
-        RefSeqProtein
+        RefSeqProtein,
+        RefSeq_YP
         // ReSharper restore InconsistentNaming
     }
 }

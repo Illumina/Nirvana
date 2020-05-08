@@ -9,10 +9,12 @@ namespace Genome
         public string EnsemblName { get; }
         public string RefSeqAccession { get; }
         public string GenBankAccession { get; }
+        public int FlankingLength { get; }
         public int Length { get; }
         public ushort Index { get; }
 
         public const ushort UnknownReferenceIndex = ushort.MaxValue;
+        public const int ShortFlankingLength = 100;
 
         public Chromosome(string ucscName, string ensemblName, string refSeqAccession, string genBankAccession,
             int length, ushort index)
@@ -23,6 +25,12 @@ namespace Genome
             GenBankAccession = genBankAccession;
             Length           = length;
             Index            = index;
+
+            // for short references (< 30 kbp), let's use a shorter flanking length
+            const int longFlankingLength      = 5_000;
+            const int shortReferenceThreshold = 30_000_000;
+
+            FlankingLength = length < shortReferenceThreshold ? ShortFlankingLength : longFlankingLength;
         }
         
         public void Write(ExtendedBinaryWriter writer)

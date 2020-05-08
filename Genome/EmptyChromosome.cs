@@ -9,6 +9,7 @@ namespace Genome
         public string RefSeqAccession { get; }
         public string GenBankAccession { get; }
         public int Length { get; }
+        public int FlankingLength => Chromosome.ShortFlankingLength;
         public ushort Index { get; }
         
         public EmptyChromosome(string chromosomeName)

@@ -1,7 +1,6 @@
 ﻿using Genome;
 using Intervals;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Intervals;
 
 namespace VariantAnnotation.Caches
 {
@@ -9,6 +8,6 @@ namespace VariantAnnotation.Caches
     {
         public static ITranscript[] GetAllFlankingValues(this IIntervalForest<ITranscript> transcriptIntervalForest,
             IChromosomeInterval interval) => transcriptIntervalForest.GetAllOverlappingValues(interval.Chromosome.Index,
-            interval.Start - OverlapBehavior.FlankingLength, interval.End + OverlapBehavior.FlankingLength);
+            interval.Start - interval.Chromosome.FlankingLength, interval.End + interval.Chromosome.FlankingLength);
     }
 }
