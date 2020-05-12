@@ -15,13 +15,15 @@ namespace UnitTests.MitoHeteroplasmy
 
             var chrom = ChromosomeUtilities.ChrM;
             var position = 1;
-            var altAlleles = new[] {"C", "T",};
+            var altAlleles = new[] {"C", "T", "ACC"};
             
             var percentilesSample1 = provider.GetVrfPercentiles("0|1", chrom, position, altAlleles, new[] { 0.2});
-            var percentilesSample2 = provider.GetVrfPercentiles("0/2", chrom, position, altAlleles, new[] { 0.12, 0.421});
+            var percentilesSample2 = provider.GetVrfPercentiles("0/2", chrom, position, altAlleles, new[] { 0.12});
+            var percentilesSample3 = provider.GetVrfPercentiles("0/3", chrom, position, altAlleles, new[] { 0.02});
 
             Assert.Equal(new double?[]{0.5}, percentilesSample1);
             Assert.Null(percentilesSample2);
+            Assert.Null(percentilesSample3);
         }
     }
 }

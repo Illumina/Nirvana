@@ -18,7 +18,7 @@ namespace MitoHeteroplasmy
             var vrfsInt = vrfs.Select(ToIntVrfForm).ToArray();
             _alleleToVrf[EncodeMitoPositionAndAltAllele(position, altAllele)] = (vrfsInt, alleleDepths);
         }
-
+        
         public double?[] GetVrfPercentiles(string genotypes, IChromosome chrom, int position, string[] altAlleles, double[] vrfs)
         {
             if (vrfs == null) return null;
@@ -35,7 +35,7 @@ namespace MitoHeteroplasmy
 
         private double? GetVrfPercentile(int position, string altAllele, double vrf)
         {
-            if (string.IsNullOrEmpty(altAllele)) return null;
+            if (string.IsNullOrEmpty(altAllele) || !AlleleToInt.ContainsKey(altAllele)) return null;
 
             var positionAndAltAlleleIntForm = EncodeMitoPositionAndAltAllele(position, altAllele);
 
