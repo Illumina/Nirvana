@@ -178,7 +178,7 @@ namespace UnitTests.Vcf.Samples
         public void ExtractSample_MitoHeteroplasmy_AsExpected()
         {
             var provider = new MitoHeteroplasmyProvider();
-            provider.Add(1, "C", new[] { 0.123, 0.200, 0.301 }, new[] { 1, 3, 4 });
+            provider.Add(1, "C", new[] { 0.123, 0.200, 0.301 }, new[] { 1, 2, 4 });
             provider.Add(1, "G", new[] { 0.101, 0.201 }, new[] { 1, 2 });
 
             var simplePosition = new SimplePosition(ChromosomeUtilities.ChrM, 1, "A", new[] { "C", "T"});
@@ -188,7 +188,7 @@ namespace UnitTests.Vcf.Samples
             var sample = SampleFieldExtractor.ExtractSample("1|2:3.96:0,15,85:0.195:13,6:20,2:100:17,16,4,4:13,20,4,4:534234", formatIndices, simplePosition, provider);
 
             Assert.Equal(new[] { 15 / 100.0, 85 / 100.0 }, sample.VariantFrequencies);
-            Assert.Equal(new[] { "0.13", null }, sample.HeteroplasmyPercentile);
+            Assert.Equal(new[] { "14.29", null }, sample.HeteroplasmyPercentile);
         }
     }
 }

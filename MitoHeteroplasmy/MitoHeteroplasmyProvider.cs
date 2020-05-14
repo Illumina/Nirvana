@@ -56,7 +56,7 @@ namespace MitoHeteroplasmy
                 numAllAlleles += data.AlleleDepths[i];
             }
 
-            return numSmallerOrEqualAlleles / numAllAlleles;
+            return numSmallerOrEqualAlleles / numAllAlleles * 100;
         }
 
         private static int ToIntVrfForm(double vrf) => Convert.ToInt32(vrf * 1000);
