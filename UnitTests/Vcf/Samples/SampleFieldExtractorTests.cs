@@ -188,7 +188,7 @@ namespace UnitTests.Vcf.Samples
             var sample = SampleFieldExtractor.ExtractSample("1|2:3.96:0,15,85:0.195:13,6:20,2:100:17,16,4,4:13,20,4,4:534234", formatIndices, simplePosition, provider);
 
             Assert.Equal(new[] { 15 / 100.0, 85 / 100.0 }, sample.VariantFrequencies);
-            Assert.Equal(new[] { "14.29", null }, sample.HeteroplasmyPercentile);
+            Assert.Equal(new[] { "14.29", "null" }, sample.HeteroplasmyPercentile);
         }
     }
 }

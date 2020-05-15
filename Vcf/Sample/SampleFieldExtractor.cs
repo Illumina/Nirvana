@@ -63,7 +63,7 @@ namespace Vcf.Sample
 
             double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, simplePosition.AltAlleles.Length);
             string[] mitoHeteroplasmyPercentiles = mitoHeteroplasmyProvider?.GetVrfPercentiles(genotype, simplePosition.Chromosome, simplePosition.Start,
-                simplePosition.AltAlleles, variantFrequencies)?.Select(x => x?.ToString("0.##")).ToArray();
+                simplePosition.AltAlleles, variantFrequencies)?.Select(x => x?.ToString("0.##") ?? "null").ToArray();
 
             var isLoh = GetLoh(copyNumber, minorHaplotypeCopyNumber, genotype);
 
