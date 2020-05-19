@@ -30,7 +30,7 @@ namespace Jist
         public const string GeneHeaderLine = "\n],\"genes\":[";
         public const string FooterLine = "]}";
 
-        private static bool _isFirstHeaderBlock = true;
+        private bool _isFirstHeaderBlock = true;
         private static readonly byte[] BgzBlock = new byte[BlockGZipStream.BlockGZipFormatCommon.MaxBlockSize];
         private static readonly byte[] CommaBlock = JistUtilities.GetCompressedBlock(",\n");//will be added to the end of a block when needed
         
@@ -111,21 +111,23 @@ namespace Jist
             }
         }
 
-        private static int WritePositionBlocks(Stream jsonStream, Stream jasixStream,
+        private int WritePositionBlocks(Stream jsonStream, Stream jasixStream,
             BinaryWriter writer)
         {
             var blockCount = 0;
             using (var reader = new BgzBlockReader(jsonStream, true))
             using (var jasixIndex = new JasixIndex(jasixStream))
             {
-                int count;
-                var isFirstBlock     = true;
                 var positionSectionBegin = jasixIndex.GetSectionBegin(JasixCommons.PositionsSectionTag);
+                if (positionSectionBegin == -1) return 0;//no positions found. and therefore, cannot have genes either.
+
+                var positionSectionEnd   = jasixIndex.GetSectionEnd(JasixCommons.PositionsSectionTag);
                 var geneSectionBegin     = jasixIndex.GetSectionBegin(JasixCommons.GenesSectionTag);
-                var geneSectionEnd       = jasixIndex.GetSectionEnd(JasixCommons.GenesSectionTag);
-                do
+                
+                var isFirstBlock = true;
+                
+                for (int count = reader.ReadCompressedBlock(BgzBlock); count > 0; count=reader.ReadCompressedBlock(BgzBlock))
                 {
-                    count = reader.ReadCompressedBlock(BgzBlock);
                     if (isFirstBlock)
                     {
                         if (_isFirstHeaderBlock)
@@ -135,25 +137,25 @@ namespace Jist
                         }
 
                         isFirstBlock = false;
+                        continue;
                     }
-                    else
+                    //we need the following check because there is one block between the positions and the genes block that we want to skip
+                    // the block that contains: ],"genes":[...
+                    
+                    // the 16 bit left shift is due to the representation of the position in bgzip file
+                    if(reader.Position >= positionSectionEnd >>16)
                     {
-                        if (count <= 0) continue;
-                        // the 16 bit left shift is due to the format of bgzip file
-                        if (reader.Position << 16 > geneSectionBegin && reader.Position << 16 <= geneSectionEnd)
-                        {
-                            //setting back the stream to the gene section begin
-                            jsonStream.Position = geneSectionBegin >> 16;
-                            return blockCount;
-                        }
-
-
-                        if (reader.Position << 16 <= positionSectionBegin ||
-                            reader.Position << 16 >= geneSectionBegin) continue;
+                        //we have read the last position block
                         blockCount++;
                         writer.Write(BgzBlock, 0, count);
+                        if(geneSectionBegin!=-1) jsonStream.Position = geneSectionBegin >> 16;
+                        return blockCount;
                     }
-                } while (count > 0);
+                    
+                    blockCount++;
+                    writer.Write(BgzBlock, 0, count);
+                }
+                
             }
 
             return blockCount;

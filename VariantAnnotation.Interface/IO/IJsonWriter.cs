@@ -5,6 +5,6 @@ namespace VariantAnnotation.Interface.IO
 {
     public interface IJsonWriter : IDisposable
     {
-        void WriteJsonEntry(IPosition position, string entry);
+        void WritePosition(IPosition position, string entry);
     }
 }

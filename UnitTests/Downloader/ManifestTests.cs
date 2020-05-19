@@ -2,7 +2,6 @@
 using System.Linq;
 using Downloader;
 using Genome;
-using Moq;
 using Xunit;
 
 namespace UnitTests.Downloader

@@ -195,11 +195,11 @@ namespace Jasix.DataStructures
 
 	    public long GetSectionBegin(string section)
 	    {
-	        return _sectionRanges[section].Begin;
+	        return _sectionRanges.ContainsKey(section)? _sectionRanges[section].Begin: -1;
 	    }
 	    public long GetSectionEnd(string section)
 	    {
-	        return _sectionRanges[section].End;
+	        return _sectionRanges.ContainsKey(section)? _sectionRanges[section].End: -1;
 	    }
 
 	    public void Dispose()

@@ -138,7 +138,7 @@ namespace SingleAnnotationLambda
             using (var jsonWriter = new JsonWriter(outputJsonStream, null, resources, Date.CurrentTimeStamp, sampleNames, true))
             {
                 WriteAnnotatedPosition(annotatedPosition, jsonWriter, json);
-                jsonWriter.WriteAnnotatedGenes(resources.Annotator.GetGeneAnnotations());
+                jsonWriter.WriteGenes(resources.Annotator.GetGeneAnnotations());
             }
 
             outputJsonStream.Position = 0;
@@ -146,6 +146,6 @@ namespace SingleAnnotationLambda
         }
 
         private static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter,
-            string jsonOutput) => jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
+            string jsonOutput) => jsonWriter.WritePosition(annotatedPosition.Position, jsonOutput);
     }
 }

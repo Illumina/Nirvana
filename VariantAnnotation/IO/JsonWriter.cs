@@ -57,7 +57,8 @@ namespace VariantAnnotation.IO
         private void WriteHeader(string annotator, string creationTime, string genomeAssembly, int schemaVersion,
             string vepDataVersion, IEnumerable<IDataSourceVersion> dataSourceVersions, string[] sampleNames)
         {
-            _jasixIndexCreator?.BeginSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position);
+            
+            BeginSection(JasixCommons.HeaderSectionTag);
 
             var sb         = StringBuilderCache.Acquire();
             var jsonObject = new JsonObject(sb);
@@ -75,45 +76,62 @@ namespace VariantAnnotation.IO
             sb.Append($"}},\"{JasixCommons.PositionsSectionTag}\":[\n");
 
             _writer.Write(StringBuilderCache.GetStringAndRelease(sb));
-            _writer.Flush();
-            _jasixIndexCreator?.EndSection(JasixCommons.HeaderSectionTag, _bgzipTextWriter.Position - 1);
+            if(_bgzipTextWriter != null) EndSection(JasixCommons.HeaderSectionTag);
         }
 
         public void Dispose()
         {
             WriteFooter();
-            _writer.Flush();
+            _writer?.Flush();
+            _jasixIndexCreator?.Flush();
             if (_leaveOpen) return;
-            _writer.Dispose();
+            _writer?.Dispose();
             _jasixIndexCreator?.Dispose();
         }
+        
+        // due to the flush, the end of a section will point to the next to last block for a section.
+        // e.g. if positions start at block 2 and end at block 10, blocks 2..9 contains positions. 
+        private void BeginSection(string section)
+        {
+            if (_bgzipTextWriter == null) return;
+            _bgzipTextWriter.Flush();
+            _jasixIndexCreator.BeginSection(section, _bgzipTextWriter.Position);
+        }
 
-        public void WriteJsonEntry(IPosition position, string entry)
+        private void EndSection(string section)
+        {
+            if (_bgzipTextWriter == null) return;
+            _bgzipTextWriter.Flush();
+            _jasixIndexCreator.EndSection(section, _bgzipTextWriter.Position);
+        }
+
+
+        public void WritePosition(IPosition position, string entry)
         {
             if (string.IsNullOrEmpty(entry)) return;
             _jasixIndexCreator?.Add(position, _bgzipTextWriter.Position);
-            if (!_firstEntry) _writer.WriteLine(",");
-            else _jasixIndexCreator?.BeginSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position);
+            if (_firstEntry)
+            {
+                BeginSection(JasixCommons.PositionsSectionTag);
+            }
+            else _writer.WriteLine(",");
 
             _firstEntry = false;
             _writer.Write(entry);
         }
 
-        public void WriteAnnotatedGenes(IEnumerable<string> annotatedGenes)
+        public void WriteGenes(IEnumerable<string> annotatedGenes)
         {
             _positionFieldClosed = true;
-            _jasixIndexCreator?.EndSection(JasixCommons.PositionsSectionTag, _bgzipTextWriter.Position);
-            _writer.Flush();
-
+            EndSection(JasixCommons.PositionsSectionTag);
+            
             _writer.Write("\n]");
 
             if (annotatedGenes == null) return;
             _writer.Write($",\"{JasixCommons.GenesSectionTag}\":[\n");
-            _writer.Flush();
+            BeginSection(JasixCommons.GenesSectionTag);
 
-            _jasixIndexCreator?.BeginSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position);
-
-            var sb             = StringBuilderCache.Acquire();
+            var sb= StringBuilderCache.Acquire();
             var firstGeneEntry = true;
 
             foreach (string jsonString in annotatedGenes)
@@ -124,8 +142,7 @@ namespace VariantAnnotation.IO
             }
 
             _writer.Write(sb.ToString());
-            _writer.Flush();
-            _jasixIndexCreator?.EndSection(JasixCommons.GenesSectionTag, _bgzipTextWriter.Position );
+            EndSection(JasixCommons.GenesSectionTag);
             
             StringBuilderCache.GetStringAndRelease(sb);
             _writer.WriteLine();
@@ -136,6 +153,8 @@ namespace VariantAnnotation.IO
         {
             if (!_positionFieldClosed)
             {
+                EndSection(JasixCommons.PositionsSectionTag);
+
                 _writer.WriteLine();
                 _writer.Write("]");
             }

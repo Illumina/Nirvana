@@ -36,9 +36,9 @@ namespace UnitTests.VariantAnnotation.IO
                 using (var streamWriter = new StreamWriter(ms, Encoding.ASCII, 1024, true))
                 using (var writer       = new JsonWriter(streamWriter, null, "nirvana", "time", "vep", dataSourceVersions, "hg19", sampleNames, false))
                 {
-                    writer.WriteJsonEntry(position1.Object, "{\"test\":\"good\"}");
-                    writer.WriteJsonEntry(position2.Object, "{\"crash\":\"bad\"}");
-                    writer.WriteJsonEntry(null, null);
+                    writer.WritePosition(position1.Object, "{\"test\":\"good\"}");
+                    writer.WritePosition(position2.Object, "{\"crash\":\"bad\"}");
+                    writer.WritePosition(null, null);
                 }
 
                 observedResult = Encoding.UTF8.GetString(ms.ToArray());

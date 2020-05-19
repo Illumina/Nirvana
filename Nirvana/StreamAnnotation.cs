@@ -60,12 +60,12 @@ namespace Nirvana
                         var annotatedPosition = position.Variants != null ? annotationResources.Annotator.Annotate(position) : null;
 
                         string json = annotatedPosition?.GetJsonString();
-                        if (json != null) jsonWriter.WriteJsonEntry(annotatedPosition.Position, json);
+                        if (json != null) jsonWriter.WritePosition(annotatedPosition.Position, json);
 
                         numVariants++;
                     }
 
-                    jsonWriter.WriteAnnotatedGenes(annotationResources.Annotator.GetGeneAnnotations());
+                    jsonWriter.WriteGenes(annotationResources.Annotator.GetGeneAnnotations());
 
                 }
                 catch (Exception e)

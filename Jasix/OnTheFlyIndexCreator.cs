@@ -58,9 +58,14 @@ namespace Jasix
 
         public void Dispose()
         {
+            Flush();
+            _indexStream.Dispose();
+        }
+
+        public void Flush()
+        {
             _jasixIndex.Write(_indexStream);
             _indexStream.Flush();
-            _indexStream.Dispose();
         }
     }
 }
