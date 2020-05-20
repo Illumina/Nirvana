@@ -15,12 +15,13 @@ namespace CustomAnnotationLambda
     public static class GeneAnnotationCreator
     {
         private const string LogFileName = "unrecognizedGeneIds.txt";
-        public static CustomResult Create(CustomConfig config, string inputBaseName, CustomResult result, IS3Client s3Client)
+        public static CustomResult Create(CustomConfig config, string inputFileName, CustomResult result, IS3Client s3Client)
         {
-            string ngaFileName = inputBaseName + SaCommon.NgaFileSuffix;
-            string localNgaPath = Path.Combine(Path.GetTempPath(), ngaFileName);
+            string inputBaseName   = inputFileName.TrimEndFromFirst(".tsv");
+            string ngaFileName     = inputBaseName + SaCommon.NgaFileSuffix;
+            string localNgaPath    = Path.Combine(Path.GetTempPath(), ngaFileName);
             string localSchemaPath = localNgaPath + SaCommon.JsonSchemaSuffix;
-            string localLogPath = Path.Combine(Path.GetTempPath(), LogFileName);
+            string localLogPath    = Path.Combine(Path.GetTempPath(), LogFileName);
             
             HttpUtilities.ValidateUrl(LambdaUrlHelper.GetUgaUrl());
             var outputFiles = new List<string>();
@@ -42,7 +43,7 @@ namespace CustomAnnotationLambda
                 using (var schemaCryptoStream = new CryptoStream(schemaStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
                 using (var schemaMd5Stream = new MD5Stream(schemaCryptoStream))
                 {
-                    using (var ngaWriter    = CaUtilities.GetNgaWriter(ngaMd5Stream, parser, config.tsvUrl))
+                    using (var ngaWriter    = CaUtilities.GetNgaWriter(ngaMd5Stream, parser, inputFileName))
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
                     using (var logWriter    = new StreamWriter(logMd5Stream))
                     {

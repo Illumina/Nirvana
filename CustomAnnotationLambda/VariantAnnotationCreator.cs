@@ -18,9 +18,10 @@ namespace CustomAnnotationLambda
 {
     public static class VariantAnnotationCreator
     {
-        public static CustomResult Create(CustomConfig config, string inputBaseName, CustomResult result, IS3Client s3Client)
+        public static CustomResult Create(CustomConfig config, string inputFileName, CustomResult result, IS3Client s3Client)
         {
             string tempPath        = Path.GetTempPath();
+            string inputBaseName   = inputFileName.TrimEndFromFirst(".tsv");
             string nsaFileName     = inputBaseName + SaCommon.SaFileSuffix;
             string localNsaPath    = Path.Combine(tempPath, nsaFileName);
             string localIndexPath  = localNsaPath + SaCommon.IndexSufix;
@@ -58,7 +59,7 @@ namespace CustomAnnotationLambda
                     result.genomeAssembly = genomeAssembly.ToString();
                     reportFor = parser.ReportFor;
 
-                    using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, config.tsvUrl, parser.SequenceProvider, out version))
+                    using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, inputFileName, parser.SequenceProvider, out version))
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
                     {
                         (jsonTag, nsaItemsCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);

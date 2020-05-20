@@ -45,12 +45,12 @@ namespace CustomAnnotationLambda
 
                 LambdaUtilities.DeleteTempOutput();
 
-                string inputBaseName = config.tsvUrl.TrimEndFromFirst("?").TrimStartToLast("/").TrimEndFromFirst(".tsv");
-                Logger.WriteLine($"input file base name is: {inputBaseName}");
+                string inputFileName = config.tsvUrl.TrimEndFromFirst("?").TrimStartToLast("/");
+                Logger.WriteLine($"input file name is: {inputFileName}");
 
                 return IsGeneAnnotationTsv(config.tsvUrl) 
-                    ? GeneAnnotationCreator.Create(config, inputBaseName, result, s3Client) 
-                    : VariantAnnotationCreator.Create(config, inputBaseName, result, s3Client);
+                    ? GeneAnnotationCreator.Create(config, inputFileName, result, s3Client) 
+                    : VariantAnnotationCreator.Create(config, inputFileName, result, s3Client);
             }
             catch (Exception e)
             {
