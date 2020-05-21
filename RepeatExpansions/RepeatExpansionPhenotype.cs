@@ -34,7 +34,7 @@ namespace RepeatExpansions
 
         public string GetAnnotation(int repeatNumber)
         {
-            double percentile            = GetPercentile(repeatNumber);
+            double percentile                   = PercentileUtilities.GetPercentile(repeatNumber, _repeatNumbers, _percentiles);
             IEnumerable<string> classifications = GetClassifications(repeatNumber);
 
             return GetJson(percentile, classifications);
@@ -57,15 +57,6 @@ namespace RepeatExpansions
             }
 
             return classifications;
-        }
-
-        internal double GetPercentile(int repeatNumber)
-        {
-            int index = Array.BinarySearch(_repeatNumbers, repeatNumber);
-            if (index >= 0) return _percentiles[index];
-
-            index = ~index;
-            return index == _repeatNumbers.Length ? 100.00 : _percentiles[index];
         }
     }
 }

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using Genome;
 using Intervals;
 using IO;
 using RepeatExpansions.IO;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -29,7 +27,7 @@ namespace RepeatExpansions
         private static Stream GetTsvStream(GenomeAssembly genomeAssembly, string customTsvPath)
         {
             //since we are using the executing assembly, we cannot move the following lines about getting stream further upstream.
-            var    assembly     = Assembly.GetExecutingAssembly();
+            var    assembly     = System.Reflection.Assembly.GetExecutingAssembly();
             string resourceName = $"RepeatExpansions.Resources.RepeatExpansions.{genomeAssembly}.tsv";
             var stream = customTsvPath != null
                 ? PersistentStreamUtils.GetReadStream(customTsvPath)

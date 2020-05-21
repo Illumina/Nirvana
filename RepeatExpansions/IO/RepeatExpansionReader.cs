@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using Genome;
 using Intervals;
 using OptimizedCore;
@@ -75,7 +73,7 @@ namespace RepeatExpansions.IO
 
             var chromosome         = ReferenceNameUtilities.GetChromosome(refNameToChromosome, chromosomeString);
             var chromosomeInterval = new ChromosomeInterval(chromosome, start, end);
-            double[] percentiles   = ComputePercentiles(repeatNumbers, alleleCounts);
+            double[] percentiles   = PercentileUtilities.ComputePercentiles(repeatNumbers.Length, alleleCounts);
 
             var rePhenotype = new RepeatExpansionPhenotype(chromosomeInterval, phenotype, omimId, repeatNumbers, percentiles, classifications, classificationRanges);
             return (chromosome.Index, new Interval<RepeatExpansionPhenotype>(start, end, rePhenotype));
@@ -100,23 +98,6 @@ namespace RepeatExpansions.IO
 
             // skip the header fields line
             reader.ReadLine();
-        }
-
-        internal static double[] ComputePercentiles(IReadOnlyCollection<int> repeatNumbers, IReadOnlyList<int> alleleCounts)
-        {
-            var percentiles       = new double[repeatNumbers.Count];
-            var smallerValueCount = 0;
-            int totalCount        = alleleCounts.Sum();
-
-            percentiles[0] = 0;
-            
-            for (var i = 1; i < repeatNumbers.Count; i++)
-            {
-                smallerValueCount += alleleCounts[i - 1];
-                percentiles[i] = 100.0 * smallerValueCount / totalCount;
-            }
-
-            return percentiles;
         }
     }
 }

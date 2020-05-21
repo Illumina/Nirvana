@@ -15,7 +15,7 @@ namespace MitoHeteroplasmy
         private const int AlleleDepthIndex           = 4;
 
         private const string ResourceName = "MitoHeteroplasmy.Resources.MitoHeteroplasmy.tsv.gz";
-        public static MitoHeteroplasmyProvider GetData()
+        public static MitoHeteroplasmyProvider GetProvider()
         {
             var assembly = Assembly.GetExecutingAssembly();
             using var stream = assembly.GetManifestResourceStream(ResourceName);
@@ -25,7 +25,7 @@ namespace MitoHeteroplasmy
             using var reader = new StreamReader(gzStream);
             reader.ReadLine();
             
-            var mitoHeteroplasmyData = new MitoHeteroplasmyProvider();
+            var heteroplasmyProvider = new MitoHeteroplasmyProvider();
             while (true)
             {
                 string line = reader.ReadLine();
@@ -35,10 +35,10 @@ namespace MitoHeteroplasmy
                 var position = int.Parse(fields[PositionIndex]);
                 var vrfs = fields[VrfIndex].Split(',').Select(double.Parse);
                 var alleleDepths = fields[AlleleDepthIndex].Split(',').Select(int.Parse).ToArray();
-                mitoHeteroplasmyData.Add(position, fields[AltIndex], vrfs, alleleDepths);
+                heteroplasmyProvider.Add(position, fields[AltIndex], vrfs, alleleDepths);
             }
 
-            return mitoHeteroplasmyData;
+            return heteroplasmyProvider;
         }
     }
 }

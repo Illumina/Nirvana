@@ -6,6 +6,7 @@ using Cloud.Messages;
 using CommandLine.Utilities;
 using Genome;
 using IO;
+using MitoHeteroplasmy;
 using RepeatExpansions;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
@@ -31,6 +32,7 @@ namespace Nirvana
         public IAnnotationProvider ConservationProvider { get; }
         public IRefMinorProvider RefMinorProvider { get; }
         public IGeneAnnotationProvider GeneAnnotationProvider { get; }
+        public IMitoHeteroplasmyProvider MitoHeteroplasmyProvider { get; }
         public IAnnotator Annotator { get; }
         public IRecomposer Recomposer { get; }
         public IVariantIdCreator VidCreator { get; }
@@ -64,9 +66,11 @@ namespace Nirvana
             ConservationProvider   = ProviderUtilities.GetConservationProvider(annotationFiles);
             RefMinorProvider       = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             GeneAnnotationProvider = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
-
+            
             IRepeatExpansionProvider repeatExpansionProvider = GetRepeatExpansionProvider(SequenceProvider.Assembly,
                 SequenceProvider.RefNameToChromosome, SequenceProvider.RefIndexToChromosome.Count, customStrTsvPath);
+
+            MitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
 
             Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider, ConservationProvider, GeneAnnotationProvider,
                 repeatExpansionProvider);
@@ -77,7 +81,7 @@ namespace Nirvana
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
                 : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider, VidCreator);
-            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider, GeneAnnotationProvider, ConservationProvider)
+            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider, GeneAnnotationProvider, ConservationProvider, MitoHeteroplasmyProvider)
                 .ToList();
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
 

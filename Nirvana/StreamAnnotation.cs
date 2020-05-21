@@ -9,6 +9,7 @@ using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using VariantAnnotation.Utilities;
 using Vcf;
@@ -26,7 +27,7 @@ namespace Nirvana
 
             IChromosome currentChromosome                      = new EmptyChromosome("dummy");
             int         numVariants                            = 0;
-            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetData();
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
             using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {

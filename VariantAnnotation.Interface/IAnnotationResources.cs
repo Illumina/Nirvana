@@ -15,6 +15,7 @@ namespace VariantAnnotation.Interface
         IAnnotationProvider ConservationProvider { get; }
         IRefMinorProvider RefMinorProvider { get; }
         IGeneAnnotationProvider GeneAnnotationProvider { get; }
+        IMitoHeteroplasmyProvider MitoHeteroplasmyProvider { get; }
         IAnnotator Annotator { get; }
         IRecomposer Recomposer { get; }
         IVariantIdCreator VidCreator { get; }

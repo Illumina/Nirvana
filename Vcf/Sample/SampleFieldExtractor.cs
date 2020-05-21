@@ -3,6 +3,7 @@ using MitoHeteroplasmy;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Interface.Providers;
 using Vcf.Sample.Legacy;
 
 namespace Vcf.Sample
@@ -62,7 +63,7 @@ namespace Vcf.Sample
             double? somaticQuality              = sampleColumns.GetString(formatIndices.SQ).GetDouble();
 
             double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, simplePosition.AltAlleles.Length);
-            string[] mitoHeteroplasmyPercentiles = mitoHeteroplasmyProvider?.GetVrfPercentiles(genotype, simplePosition.Chromosome, simplePosition.Start,
+            string[] mitoHeteroplasmyPercentiles = mitoHeteroplasmyProvider?.GetVrfPercentiles(simplePosition.Chromosome, simplePosition.Start,
                 simplePosition.AltAlleles, variantFrequencies)?.Select(x => x?.ToString("0.##") ?? "null").ToArray();
 
             var isLoh = GetLoh(copyNumber, minorHaplotypeCopyNumber, genotype);
