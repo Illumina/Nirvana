@@ -32,6 +32,7 @@ namespace Vcf.Sample
         internal int? MCC;
         internal int? GQX;
         internal int? DPI;
+        internal int? DQ;
         // ReSharper restore InconsistentNaming
 
         internal int NumColumns;
@@ -65,6 +66,7 @@ namespace Vcf.Sample
             MCC = null;
             GQX = null;
             DPI = null;
+            DQ  = null;
 
         }
 
@@ -157,6 +159,9 @@ namespace Vcf.Sample
                         break;
                     case "MCC":
                         MCC = index;
+                        break;
+                    case "DQ":
+                        DQ = index;
                         break;
                 }
             }

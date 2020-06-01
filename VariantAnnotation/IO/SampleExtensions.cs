@@ -14,7 +14,7 @@ namespace VariantAnnotation.IO
             sb.Append(JsonObject.OpenBrace);
 
             jsonObject.AddBoolValue("isEmpty",                        sample.IsEmpty);
-            jsonObject.AddStringValue("genotype",                     sample.Genotype);
+            jsonObject.AddStringValue("genotype",                  sample.Genotype);
             jsonObject.AddDoubleValues("variantFrequencies",          sample.VariantFrequencies);
             jsonObject.AddIntValue("totalDepth",                      sample.TotalDepth);
             jsonObject.AddIntValue("genotypeQuality",                 sample.GenotypeQuality);
@@ -26,6 +26,7 @@ namespace VariantAnnotation.IO
             jsonObject.AddIntValues("splitReadCounts",                sample.SplitReadCounts);
             jsonObject.AddIntValues("pairedEndReadCounts",            sample.PairedEndReadCounts);
             jsonObject.AddBoolValue("isDeNovo",                       sample.IsDeNovo);
+            jsonObject.AddDoubleValue("deNovoQuality",                sample.DeNovoQuality);
             jsonObject.AddStringValues("diseaseAffectedStatuses",     sample.DiseaseAffectedStatuses);
             jsonObject.AddDoubleValue("artifactAdjustedQualityScore", sample.ArtifactAdjustedQualityScore, "0.#");
             jsonObject.AddDoubleValue("likelihoodRatioQualityScore",  sample.LikelihoodRatioQualityScore, "0.#");

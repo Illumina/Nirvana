@@ -10,6 +10,7 @@
         string Genotype { get; }
         int? GenotypeQuality { get; }
         bool IsDeNovo { get; }
+        double? DeNovoQuality { get; }
         bool IsEmpty { get; }
         float? LikelihoodRatioQualityScore { get; } // PEPE
         int[] PairedEndReadCounts { get; } // Manta

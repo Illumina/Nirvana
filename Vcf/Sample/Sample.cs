@@ -12,6 +12,7 @@ namespace Vcf.Sample
         public string Genotype { get; }
         public int? GenotypeQuality { get; }
         public bool IsDeNovo { get; }
+        public double? DeNovoQuality { get; }//for legacy callers only
         public bool IsEmpty { get; }
         public float? LikelihoodRatioQualityScore { get; } // PEPE
         public int[] PairedEndReadCounts { get; } // Manta
@@ -25,12 +26,17 @@ namespace Vcf.Sample
         public string[] HeteroplasmyPercentile { get; }
 
         public static readonly Sample EmptySample =
-            new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null, null, null, null, null);
+            new Sample(null, null, null, null,
+                false, null, null, false, null, 
+                null, null, null, null, 
+                null, null, null, null, 
+                null, null);
 
         public Sample(int[] alleleDepths, float? artifactAdjustedQualityScore, int? copyNumber,
-            string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo,
+            string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo, double? deNovoQuality,
             float? likelihoodRatioQualityScore, int[] pairedEndReadCounts, int[] repeatUnitCounts,
-            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality, bool? isLossOfHeterozygosity, string[] heteroplasmyPercentile)
+            int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality, 
+            bool? isLossOfHeterozygosity, string[] heteroplasmyPercentile)
         {
             AlleleDepths                 = alleleDepths;
             ArtifactAdjustedQualityScore = artifactAdjustedQualityScore;
@@ -40,6 +46,7 @@ namespace Vcf.Sample
             Genotype                     = genotype;
             GenotypeQuality              = genotypeQuality;
             IsDeNovo                     = isDeNovo;
+            DeNovoQuality                = deNovoQuality;
             LikelihoodRatioQualityScore  = likelihoodRatioQualityScore;
             PairedEndReadCounts          = pairedEndReadCounts;
             RepeatUnitCounts             = repeatUnitCounts;
@@ -67,6 +74,7 @@ namespace Vcf.Sample
                       MinorHaplotypeCopyNumber     == null &&
                       SomaticQuality               == null &&
                       HeteroplasmyPercentile       == null &&
+                      DeNovoQuality                == null &&
                       !FailedFilter                        &&
                       !IsDeNovo;
         }

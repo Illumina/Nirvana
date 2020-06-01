@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using MitoHeteroplasmy;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
@@ -18,7 +19,7 @@ namespace Vcf.Sample
             var samples    = new ISample[numSamples];
 
             formatIndices.Set(vcfColumns[VcfCommon.FormatIndex]);
-
+            
             var legacySampleExtractor = IsLegacyVariantCaller(formatIndices) ? new LegacySampleFieldExtractor(vcfColumns, formatIndices) : null;
 
             for (int index = VcfCommon.GenotypeIndex; index < vcfColumns.Length; index++)
@@ -69,7 +70,7 @@ namespace Vcf.Sample
             var isLoh = GetLoh(copyNumber, minorHaplotypeCopyNumber, genotype);
 
             var sample = new Sample(alleleDepths, artifactAdjustedQualityScore, copyNumber, diseaseAffectedStatuses,
-                failedFilter, genotype, genotypeQuality, isDeNovo, likelihoodRatioQualityScore, pairedEndReadCounts,
+                failedFilter, genotype, genotypeQuality, isDeNovo, null, likelihoodRatioQualityScore, pairedEndReadCounts,
                 repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality, isLoh, mitoHeteroplasmyPercentiles);
 
             return sample;

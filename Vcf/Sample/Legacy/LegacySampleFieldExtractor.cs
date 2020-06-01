@@ -9,14 +9,14 @@ namespace Vcf.Sample.Legacy
         private readonly string[] _vcfColumns;
         private readonly FormatIndices _formatIndices;
         private readonly int? _infoDepth;
-
+        
         internal LegacySampleFieldExtractor(string[] vcfColumns, FormatIndices formatIndices)
         {
             _vcfColumns = vcfColumns;
             _infoDepth = GetInfoDepth(vcfColumns[VcfCommon.InfoIndex]);
             _formatIndices = formatIndices;
         }
-
+        
         private static int? GetInfoDepth(string infoColumn)
         {
             var splits = infoColumn.OptimizedSplit(';');
@@ -48,6 +48,7 @@ namespace Vcf.Sample.Legacy
 
             var genotypeQuality    = GenotypeQuality.GetGenotypeQuality(sampleFields);
             var totalDepth         = TotalDepth.GetTotalDepth(_infoDepth, sampleFields);
+            double? denovoQuality       = sampleColumns.GetString(_formatIndices.DQ).GetDouble();
             var variantFrequencies = LegacyVariantFrequency.GetVariantFrequencies(sampleFields);
             var splitReadCounts    = ReadCounts.GetSplitReadCounts(sampleFields);
             var pairEndReadCounts  = ReadCounts.GetPairEndReadCounts(sampleFields);
@@ -58,7 +59,7 @@ namespace Vcf.Sample.Legacy
                                           sampleFields.CopyNumber.Value > 1;
 
             var sample = new Sample(alleleDepths, sampleFields.AQ, sampleFields.CopyNumber, sampleFields.DST,
-                failedFilter, genotype, genotypeQuality, false, sampleFields.LQ, pairEndReadCounts, null, splitReadCounts,
+                failedFilter, genotype, genotypeQuality, false, denovoQuality, sampleFields.LQ, pairEndReadCounts, null, splitReadCounts,
                 totalDepth, variantFrequencies, null, null, isLossOfHeterozygosity, null);
 
             return sample;
