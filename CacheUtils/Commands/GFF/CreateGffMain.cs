@@ -1,11 +1,16 @@
-﻿using CacheUtils.GFF;
+﻿using System.Collections.Generic;
+using CacheUtils.Commands.ParseVepCacheDirectory;
+using CacheUtils.GFF;
 using CacheUtils.Helpers;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using Genome;
 using IO;
 using ReferenceSequence.Utilities;
+using VariantAnnotation.Caches;
+using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Providers;
 
 namespace CacheUtils.Commands.GFF
@@ -15,17 +20,22 @@ namespace CacheUtils.Commands.GFF
         private static string _compressedReferencePath;
         private static string _inputPrefix;
         private static string _outputFileName;
+        private static string _transcriptSource;
 
         private static ExitCodes ProgramExecution()
         {
-            string cachePath                 = CacheConstants.TranscriptPath(_inputPrefix);
-            var (refIndexToChromosome, _, _) = SequenceHelper.GetDictionaries(_compressedReferencePath);
-            var cache                        = TranscriptCacheHelper.GetCache(cachePath, refIndexToChromosome);
-            var geneToInternalId             = InternalGenes.CreateDictionary(cache.Genes);
+            Source transcriptSource = ParseVepCacheDirectoryMain.GetSource(_transcriptSource);
+            string cachePath        = CacheConstants.TranscriptPath(_inputPrefix);
+
+            IDictionary<ushort, IChromosome> refIndexToChromosome =
+                SequenceHelper.GetDictionaries(_compressedReferencePath).refIndexToChromosome;
+            
+            TranscriptCacheData     cache            = TranscriptCacheHelper.GetCache(cachePath, refIndexToChromosome);
+            IDictionary<IGene, int> geneToInternalId = InternalGenes.CreateDictionary(cache.Genes);
 
             using (var writer = new GffWriter(GZipUtilities.GetStreamWriter(_outputFileName)))
             {
-                var creator = new GffCreator(writer, geneToInternalId);
+                var creator = new GffCreator(writer, geneToInternalId, transcriptSource);
                 creator.Create(cache.TranscriptIntervalArrays);
             }
 
@@ -45,6 +55,11 @@ namespace CacheUtils.Commands.GFF
                     "out|o=",
                     "output {file name}",
                     v => _outputFileName = v
+                },
+                {
+                    "source|s=",
+                    "transcript {source}",
+                    v => _transcriptSource = v
                 },
                 {
                     "ref|r=",

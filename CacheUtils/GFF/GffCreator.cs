@@ -9,13 +9,15 @@ namespace CacheUtils.GFF
     public sealed class GffCreator
     {
         private readonly IDictionary<IGene, int> _geneToInternalId;
+        private readonly Source _source;
         private readonly GffWriter _writer;
         private readonly HashSet<int> _observedGenes;
 
-        public GffCreator(GffWriter writer, IDictionary<IGene, int> geneToInternalId)
+        public GffCreator(GffWriter writer, IDictionary<IGene, int> geneToInternalId, Source source)
         {
             _writer           = writer;
             _geneToInternalId = geneToInternalId;
+            _source           = source;
             _observedGenes    = new HashSet<int>();
         }
 
@@ -32,6 +34,8 @@ namespace CacheUtils.GFF
 
         private void Write(ITranscript transcript)
         {
+            if (transcript.Source != _source) return;
+            
             var requiredFields = GetRequiredFields(transcript);
             var attribs        = GetGeneralAttributes(transcript);
 

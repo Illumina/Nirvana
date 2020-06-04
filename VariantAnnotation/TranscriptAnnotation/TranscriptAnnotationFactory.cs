@@ -21,8 +21,6 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             foreach (var transcript in transcriptCandidates)
             {
-                if (transcript.Id.IsPredictedTranscript()) continue;
-
                 var annotationStatus = DecideAnnotationStatus(variant, transcript, variant.Behavior,
                     variant.Chromosome.FlankingLength);
 

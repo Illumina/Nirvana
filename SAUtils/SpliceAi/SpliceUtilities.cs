@@ -28,7 +28,6 @@ namespace SAUtils.SpliceAi
 
                 foreach (var transcript in overlappingTranscripts)
                 {
-                    if (transcript.Id.IsPredictedTranscript()) continue;
                     bool isFirstExon = true;
                     foreach (var transcriptRegion in transcript.TranscriptRegions)
                     {

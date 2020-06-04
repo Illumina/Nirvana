@@ -14,6 +14,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\IO\IO.csproj" />
+    <ProjectReference Include="..\ReferenceSequence\ReferenceSequence.csproj" />
   </ItemGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

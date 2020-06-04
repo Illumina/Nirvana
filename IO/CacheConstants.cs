@@ -13,7 +13,7 @@
 
 		// increment the data version when the contents are updated
 		// e.g. a bug is fixed in SIFT parsing or if transcripts are filtered differently
-		public const ushort DataVersion = 26;
+		public const ushort DataVersion = 27;
 
 		public static string TranscriptPath(string prefix) => Combine(prefix, ".transcripts.ndb");
 		public static string SiftPath(string prefix)       => Combine(prefix, ".sift.ndb");

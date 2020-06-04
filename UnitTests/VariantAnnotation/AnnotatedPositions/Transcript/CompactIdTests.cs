@@ -102,28 +102,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         [Fact]
-        public void IsPredictedTranscript_ReturnsTrue()
-        {
-            var id  = CompactId.Convert("XM_005244780", 1);
-            var id2 = CompactId.Convert("XR_005244780", 1);
-            Assert.True(id.IsPredictedTranscript());
-            Assert.True(id2.IsPredictedTranscript());
-        }
-
-        [Fact]
-        public void IsPredictedTranscript_ReturnsFalse()
-        {
-            var id  = CompactId.Convert("XP_005244780", 1);
-            var id2 = CompactId.Convert("NM_005244780", 1);
-            var id3 = CompactId.Convert("NR_074509", 1);
-            var id4 = CompactId.Convert("NP_001025056", 1);
-            Assert.False(id.IsPredictedTranscript());
-            Assert.False(id2.IsPredictedTranscript());
-            Assert.False(id3.IsPredictedTranscript());
-            Assert.False(id4.IsPredictedTranscript());
-        }
-
-        [Fact]
         public void Convert_NullInput_ReturnsEmptyId()
         {
             var id = CompactId.Convert(null);

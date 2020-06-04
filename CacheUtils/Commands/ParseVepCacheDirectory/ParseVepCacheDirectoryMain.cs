@@ -138,7 +138,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             writer.Write(chromosome, predictionDict);
         }
 
-        private static Source GetSource(string source)
+        public static Source GetSource(string source)
         {
             source = source.ToLower();
             if (source.StartsWith("ensembl")) return Source.Ensembl;

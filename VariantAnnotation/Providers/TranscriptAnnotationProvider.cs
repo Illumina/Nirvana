@@ -209,7 +209,7 @@ namespace VariantAnnotation.Providers
 
             foreach (var transcript in transcripts)
             {
-                if (transcript.Id.IsPredictedTranscript() || transcript.Translation == null) continue;
+                if (transcript.Translation == null) continue;
                 overlappingTranscripts.Add(transcript);
             }
 

@@ -28,7 +28,6 @@ namespace VariantAnnotation.Caches.Utilities
                 foreach (var transcriptInterval in transcriptIntervalArrays[chrIndex].Array)
                 {
                     var transcript = transcriptInterval.Value;
-                    if (transcript.Id.IsPredictedTranscript()) continue;
 
                     var gene = transcript.Gene;
                     if (geneSet.Contains(gene)) continue;
