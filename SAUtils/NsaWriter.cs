@@ -203,10 +203,15 @@ namespace SAUtils
         {
             _index.Write();
 
-            if (!_leaveOpen) _writer?.Dispose();
-            if (!_leaveOpen) _indexWriter?.Dispose();
-            if (!_leaveOpen) _stream?.Dispose();
-            if (!_leaveOpen) _indexStream?.Dispose();
+            if (!_leaveOpen)
+            {
+                _writer?.Dispose();
+                _indexWriter?.Dispose();
+                _stream?.Dispose();
+                _indexStream?.Dispose();
+                _block?.Dispose();
+            }
+            
             _memWriter?.Dispose();
             _memStream?.Dispose();
         }

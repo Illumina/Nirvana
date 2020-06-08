@@ -31,8 +31,16 @@ namespace UnitTests.SAUtils
             dbsnpReader.SetupGet(x => x.JsonKey).Returns("dbSnp");
             dbsnpReader.SetupGet(x => x.Version)
                 .Returns(new DataSourceVersion("dbsnp", "v1", DateTime.Now.Ticks, "dummy db snp"));
-            dbsnpReader.SetupSequence(x => x.GetAnnotation(100)).Returns(chrom1Pos100Annotations);
-
+            
+            //dbsnpReader.SetupSequence(x => x.GetAnnotation(100)).Returns(chrom1Pos100Annotations);
+            //List<(string refAllele, string altAllele, string annotation)> annotations=null;
+            dbsnpReader.Setup(x =>
+                x.GetAnnotation(It.IsAny<int>(), It.IsAny<List<(string refAllele, string altAllele, string annotation)>>() ))
+                .Callback((int position, List<(string refAllele, string altAllele, string annotation)> annotations) =>
+                {
+                    annotations.Clear();
+                    annotations.AddRange(chrom1Pos100Annotations);
+                });
             var provider = new NsaProvider(new[] {dbsnpReader.Object}, null);
 
             return provider;
@@ -53,7 +61,13 @@ namespace UnitTests.SAUtils
             clinvarReader.SetupGet(x => x.JsonKey).Returns("clinvar");
             clinvarReader.SetupGet(x => x.Version)
                 .Returns(new DataSourceVersion("clinvar", "v1", DateTime.Now.Ticks, "dummy clinvar data"));
-            clinvarReader.SetupSequence(x => x.GetAnnotation(100)).Returns(chrom1Pos100Annotations);
+            clinvarReader.Setup(x =>
+                    x.GetAnnotation(It.IsAny<int>(), It.IsAny<List<(string refAllele, string altAllele, string annotation)>>() ))
+                .Callback((int position, List<(string refAllele, string altAllele, string annotation)> annotations) =>
+                {
+                    annotations.Clear();
+                    annotations.AddRange(chrom1Pos100Annotations);
+                });
 
             var provider = new NsaProvider(new[] { clinvarReader.Object }, null);
 

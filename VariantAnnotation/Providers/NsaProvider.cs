@@ -114,23 +114,24 @@ namespace VariantAnnotation.Providers
             }
         }
 
+        private List<(string refAllele, string altAllele, string jsonString)> _annotations= new List<(string refAllele, string altAllele, string jsonString)>();
         private void AddSmallAnnotations(IAnnotatedVariant annotatedVariant)
         {
             foreach (INsaReader nsaReader in _nsaReaders)
             {
                 var variant = annotatedVariant.Variant;
-                var annotations = nsaReader.GetAnnotation(variant.Start);
-                if (annotations == null) continue;
+                nsaReader.GetAnnotation(variant.Start, _annotations);
+                if (_annotations.Count == 0) continue;
 
                 if (nsaReader.IsPositional)
                 {
-                    AddPositionalAnnotation(annotations, annotatedVariant, nsaReader);
+                    AddPositionalAnnotation(_annotations, annotatedVariant, nsaReader);
                     continue;
                 }
 
-                if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, annotations, annotatedVariant, variant);
+                if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, _annotations, annotatedVariant, variant);
 
-                else AddNonAlleleSpecificAnnotations(annotations, variant, annotatedVariant, nsaReader);
+                else AddNonAlleleSpecificAnnotations(_annotations, variant, annotatedVariant, nsaReader);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
@@ -40,6 +41,11 @@ namespace VariantAnnotation.NSA
         private readonly List<AnnotationItem> _annotations;
         private readonly int _blockSize;
         
+        private ExtendedBinaryReader _annotationReader;
+        private MemoryStream         _annotationStream;
+        private byte[]               _annotationBuffer;
+
+        
         public NsaReader(Stream dataStream, Stream indexStream, int blockSize = SaCommon.DefaultBlockSize)
         {
             _stream = dataStream;
@@ -58,6 +64,9 @@ namespace VariantAnnotation.NSA
             if (_index.SchemaVersion != SaCommon.SchemaVersion) throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion} for {JsonKey}");
 
             _annotations = new List<AnnotationItem>(64 * 1024);
+            _annotationBuffer = new byte[1024*1024];
+            _annotationStream = new MemoryStream(_annotationBuffer);
+            _annotationReader = new ExtendedBinaryReader(_annotationStream);
         }
 
         public void PreLoad(IChromosome chrom, List<int> positions)
@@ -65,39 +74,24 @@ namespace VariantAnnotation.NSA
             if (positions == null || positions.Count == 0) return;
 
             _annotations.Clear();
-            for (var i = 0; i < positions.Count; i++)
+            for (var i = 0; i < positions.Count;)
             {
                 int position = positions[i];
                 long fileLocation = _index.GetFileLocation(chrom.Index, position);
-                if (fileLocation == -1) continue;
+                if (fileLocation == -1)
+                {
+                    i++;
+                    continue;
+                }
 
                 //only reconnect if necessary
                 if (_reader.BaseStream.Position != fileLocation)
                     _reader.BaseStream.Position = fileLocation;
                 _block.Read(_reader);
-                int lastLoadedPositionIndex = LoadAnnotations(positions, i);
-                //if there were any positions in the block, the index will move ahead.
-                // we need to decrease it by 1 since the loop will increment it.
-                if (lastLoadedPositionIndex > i) i = lastLoadedPositionIndex - 1;
+                var newIndex = _block.AddAnnotations(positions, i, _annotations);
+                if (newIndex == i) i++; //no positions were found in this block
+                else i = newIndex;
             }
-        }
-
-        private int LoadAnnotations(List<int> positions, int i)
-        {
-            foreach (var annotation in _block.GetAnnotations())
-            {
-                if (annotation.position < positions[i]) continue;
-
-                while (i < positions.Count && positions[i] < annotation.position) i++;
-                if (i >= positions.Count) break;
-
-                int position = positions[i];
-
-                if (position != annotation.position) continue;
-
-                _annotations.Add(new AnnotationItem(position, annotation.data));
-            }
-            return i;
         }
 
         public List<NsaIndexBlock> GetIndexBlocks(ushort chromIndex) => _index.GetChromBlocks(chromIndex);
@@ -122,34 +116,34 @@ namespace VariantAnnotation.NSA
             }
         }
 
-        private IEnumerable<(string refAllele, string altAllele, string jsonString)> ExtractAnnotations(byte[] data)
+        private void ExtractAnnotations(byte[] data, List<(string refAllele, string altAllele, string annotation)> annotations)
         {
-            using (var reader = new ExtendedBinaryReader(new MemoryStream(data)))
+            Array.Copy(data, _annotationBuffer, data.Length);
+            _annotationStream.Position = 0;
+            if (IsPositional)
             {
-                if (IsPositional)
-                {
-                    var positionalAnno = reader.ReadString();
-                    return new List<(string, string, string)> { (null, null, positionalAnno) };
-                }
-
-                int count = reader.ReadOptInt32();
-                var annotations = new (string, string, string)[count];
-                for (var i = 0; i < count; i++)
-                {
-                    string refAllele = reader.ReadAsciiString();
-                    string altAllele = reader.ReadAsciiString();
-                    string annotation = reader.ReadString();
-                    annotations[i] = (refAllele ?? "", altAllele ?? "", annotation);
-                }
-
-                return annotations;
+                var positionalAnno = _annotationReader.ReadString();
+                annotations.Add((null, null, positionalAnno));
+                return;
             }
+
+            int count       = _annotationReader.ReadOptInt32();
+            for (var i = 0; i < count; i++)
+            {
+                string refAllele  = _annotationReader.ReadAsciiString();
+                string altAllele  = _annotationReader.ReadAsciiString();
+                string annotation = _annotationReader.ReadString();
+                annotations.Add((refAllele ?? "", altAllele ?? "", annotation));
+            }
+            
         }
 
-        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(int position)
+        public void GetAnnotation(int position, List<(string refAllele, string altAllele, string annotation)> annotations)
         {
+            annotations.Clear();
             int index = BinarySearch(position);
-            return index < 0 ? null : ExtractAnnotations(_annotations[index].Data);
+            if(index < 0) return;
+            ExtractAnnotations(_annotations[index].Data, annotations);
         }
 
         private int BinarySearch(int position)
@@ -170,6 +164,12 @@ namespace VariantAnnotation.NSA
             return ~begin;
         }
 
-        public void Dispose() => _stream?.Dispose();
+        public void Dispose()
+        {
+            _stream?.Dispose();
+            _block?.Dispose();
+            _annotationStream?.Dispose();
+            _annotationReader?.Dispose();
+        } 
     }
 }

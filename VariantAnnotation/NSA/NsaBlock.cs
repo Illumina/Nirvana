@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Compression.Algorithms;
 using IO;
 
 namespace VariantAnnotation.NSA
 {
-    public sealed class NsaBlock
+    public sealed class NsaBlock:IDisposable
     {
         private readonly ICompressionAlgorithm _compressionAlgorithm;
         private readonly byte[] _compressedBlock;
@@ -17,38 +19,50 @@ namespace VariantAnnotation.NSA
         private int _firstPosition;
         private int _lastPosition;
         private int _count;
-
+        
+        private readonly ExtendedBinaryReader _blockReader;
+        private readonly MemoryStream         _blockStream;
+        
+        
         public NsaBlock(ICompressionAlgorithm compressionAlgorithm, int size)
         {
             _compressionAlgorithm = compressionAlgorithm;
-            _uncompressedBlock = new byte[size];
-            _writer = new ExtendedBinaryWriter(new MemoryStream(_uncompressedBlock));
+            _uncompressedBlock    = new byte[size];
+            _blockStream          = new MemoryStream(_uncompressedBlock);
+            _blockReader          = new ExtendedBinaryReader(_blockStream);
+            _writer               = new ExtendedBinaryWriter(new MemoryStream(_uncompressedBlock));
+            
             int compressedBlockSize = compressionAlgorithm.GetCompressedBufferBounds(size);
             _compressedBlock = new byte[compressedBlockSize];
+            
         }
 
         public void Read(ExtendedBinaryReader reader)
         {
             _compressedLength = reader.ReadOptInt32();
-            _firstPosition = reader.ReadOptInt32();
-            //_lastPosition = reader.ReadOptInt32();
-            _count = reader.ReadOptInt32();
+            _firstPosition    = reader.ReadOptInt32();
+            //_lastPosition   = reader.ReadOptInt32();
+            _count            = reader.ReadOptInt32();
             reader.Read(_compressedBlock, 0, _compressedLength);
 
             _uncompressedLength = _compressionAlgorithm.Decompress(_compressedBlock, _compressedLength,
                 _uncompressedBlock, _uncompressedBlock.Length);
+            
+            _blockStream.Position = 0;
         }
 
+        //read block but do not uncompress
         public void ReadCompressedBytes(ExtendedBinaryReader reader)
         {
             _compressedLength = reader.ReadOptInt32();
-            _firstPosition = reader.ReadOptInt32();
-            //_lastPosition = reader.ReadOptInt32();
-            _count = reader.ReadOptInt32();
+            _firstPosition    = reader.ReadOptInt32();
+            //_lastPosition   = reader.ReadOptInt32();
+            _count            = reader.ReadOptInt32();
             reader.Read(_compressedBlock, 0, _compressedLength);
 
         }
 
+        //write a block that has not been uncompressed
         public void WriteCompressedBytes(ExtendedBinaryWriter writer)
         {
             writer.WriteOpt(_compressedLength);
@@ -82,25 +96,50 @@ namespace VariantAnnotation.NSA
             _count++;
         }
 
-        public IEnumerable<(int position, byte[] data)> GetAnnotations()
+        
+        public int AddAnnotations(List<int> vcfPositions, int j, List<AnnotationItem> annotationItems)
         {
-            if (_uncompressedLength == 0) yield break;
-            _lastPosition = _firstPosition;
-            using (var reader = new ExtendedBinaryReader(new MemoryStream(_uncompressedBlock, 0, _uncompressedLength)))
+            if (_uncompressedLength == 0) return j;
+
+            _blockStream.Position = 0;
+            var position = _firstPosition;
+
+            var i = 0;
+            var length = _blockReader.ReadOptInt32();
+            position += _blockReader.ReadOptInt32();
+
+            while (i < _count && j < vcfPositions.Count)
             {
-                for (int i = 0; i < _count; i++)
+                if (position < vcfPositions[j])
                 {
-                    var length = reader.ReadOptInt32();
-                    _lastPosition += reader.ReadOptInt32();
-
-                    var data = reader.ReadBytes(length);
-
-                    yield return (_lastPosition, data);
+                    _blockStream.Position += length;
+                    //this position is not needed, move to next
+                    length   =  _blockReader.ReadOptInt32();
+                    position += _blockReader.ReadOptInt32();
+                    i++;
+                    continue;
                 }
 
-            }
-        }
+                if (vcfPositions[j] < position)
+                {
+                    //go to next position from vcf
+                    j++;
+                    continue;
+                }
+                
+                //positions have matched
+                var data = _blockReader.ReadBytes(length);
+                
+                annotationItems.Add(new AnnotationItem(position, data));
 
+                j++;
+                i++;
+                length   =  _blockReader.ReadOptInt32();
+                position += _blockReader.ReadOptInt32();
+            }
+            return j;
+        }
+        
         public (int firstPosition, int lastPosition, int numBytes) Write(ExtendedBinaryWriter writer)
         {
             var compressedLength = _compressionAlgorithm.Compress(_uncompressedBlock, BlockOffset,
@@ -124,6 +163,14 @@ namespace VariantAnnotation.NSA
             _lastPosition = -1;
             _compressedLength = 0;
             _uncompressedLength = 0;
+            _blockStream.Position = 0;
+        }
+        
+        public void Dispose()
+        {
+            _writer?.Dispose();
+            _blockReader?.Dispose();
+            _blockStream?.Dispose();
         }
     }
 }

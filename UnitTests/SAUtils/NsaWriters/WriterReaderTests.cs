@@ -81,7 +81,8 @@ namespace UnitTests.SAUtils.NsaWriters
                     Assert.Equal(GenomeAssembly.GRCh37, saReader.Assembly);
                     Assert.Equal(version.ToString(), saReader.Version.ToString());
                     saReader.PreLoad(ChromosomeUtilities.Chr1, new List<int> {100, 101, 106});
-                    var annotations = saReader.GetAnnotation(100).ToList();
+                    var annotations = new List<(string refAllele, string altAllele, string annotation)>();
+                    saReader.GetAnnotation(100, annotations);
 
                     Assert.Equal("T", annotations[0].refAllele);
                     Assert.Equal("A", annotations[0].altAllele);
@@ -89,7 +90,7 @@ namespace UnitTests.SAUtils.NsaWriters
                         "\"id\":\"RCV0001\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"T\",\"altAllele\":\"A\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
                         annotations[0].annotation);
 
-                    annotations = saReader.GetAnnotation(101).ToList();
+                    saReader.GetAnnotation(101, annotations);
                     Assert.Equal("A", annotations[0].refAllele);
                     Assert.Equal("", annotations[0].altAllele);
                     Assert.Equal(
@@ -97,7 +98,8 @@ namespace UnitTests.SAUtils.NsaWriters
                         annotations[0].annotation);
 
                     saReader.PreLoad(ChromosomeUtilities.Chr2, new List<int> {200, 205});
-                    var (refAllele, altAllele, annotation) = saReader.GetAnnotation(200).First();
+                    saReader.GetAnnotation(200,annotations);
+                    var (refAllele, altAllele, annotation) = annotations[0];
                     Assert.Equal("G", refAllele);
                     Assert.Equal("A", altAllele);
                     Assert.NotNull(annotation);
@@ -146,12 +148,22 @@ namespace UnitTests.SAUtils.NsaWriters
                 using (var saReader = new NsaReader(saStream, indexStream, 1024))
                 {
                     saReader.PreLoad(ChromosomeUtilities.Chr1, GetPositions(50, 1000));
+                    var annotations = new List<(string refAllele, string altAllele, string annotation)>();
+                    
+                    saReader.GetAnnotation(90, annotations);
+                    Assert.True(annotations.Count==0); //before any SA existed
 
-                    Assert.Null(saReader.GetAnnotation(90)); //before any SA existed
-                    Assert.NotNull(saReader.GetAnnotation(100)); //first entry of first block
-                    Assert.NotNull(saReader.GetAnnotation(480)); //last query of first block
-                    Assert.Null(saReader.GetAnnotation(488)); //between first and second block
-                    Assert.NotNull(saReader.GetAnnotation(490)); //first entry of second block
+                    saReader.GetAnnotation(100, annotations);
+                    Assert.True(annotations.Count > 0); //first entry of first block
+
+                    saReader.GetAnnotation(480, annotations);
+                    Assert.True(annotations.Count > 0); //last query of first block
+
+                    saReader.GetAnnotation(488, annotations);
+                    Assert.True(annotations.Count ==0);//between first and second block
+
+                    saReader.GetAnnotation(490, annotations);
+                    Assert.True(annotations.Count > 0);//first entry of second block
                 }
             }
         }
