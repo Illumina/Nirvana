@@ -54,7 +54,7 @@ namespace Vcf.Sample
             string genotype                     = sampleColumns.GetString(formatIndices.GT);
             int? genotypeQuality                = sampleColumns.GetString(formatIndices.GQ).GetInteger();
             bool isDeNovo                       = sampleColumns.GetString(formatIndices.DN).IsDeNovo();
-            double? deNovoQuality               = sampleColumns.GetString(formatIndices.DQ).GetDouble();
+            double? deNovoQuality               = enableDq? sampleColumns.GetString(formatIndices.DQ).GetDouble():null;
             float? likelihoodRatioQualityScore  = sampleColumns.GetString(formatIndices.LQ).GetFloat();
             int[] pairedEndReadCounts           = sampleColumns.GetString(formatIndices.PR).GetIntegers();
             int[] repeatUnitCounts              = sampleColumns.GetString(formatIndices.REPCN).GetIntegers('/');

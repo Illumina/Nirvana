@@ -51,6 +51,7 @@ namespace Vcf
             _refNameToChromosome      = sequenceProvider.RefNameToChromosome;
             _mitoHeteroplasmyProvider = mitoHeteroplasmyProvider;
             EnableDq                  = enableDq;
+            
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
