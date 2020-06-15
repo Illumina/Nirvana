@@ -14,6 +14,7 @@ namespace SAUtils.Custom
 
         public static string ParseTitle(string line)
         {
+            line = line.Trim();
             CheckPrefix(line, "#title", "first");
             string firstCol = line.OptimizedSplit('\t')[0];
             (_, string jsonTag) = firstCol.OptimizedKeyValue();
@@ -28,6 +29,7 @@ namespace SAUtils.Custom
 
         public static GenomeAssembly ParseGenomeAssembly(string line, HashSet<GenomeAssembly> allowedGenomeAssemblies)
         {
+            line = line.Trim();
             CheckPrefix(line, "#assembly", "second");
             string firstCol = line.OptimizedSplit('\t')[0];
             (_, string assemblyString) = firstCol.OptimizedKeyValue();
@@ -44,6 +46,7 @@ namespace SAUtils.Custom
 
         public static (bool MatchByAllele, bool IsArray, SaJsonValueType PrimaryType, ReportFor reportFor) ParseMatchVariantsBy(string line)
         {
+            line = line.Trim();
             CheckPrefix(line, "#matchVariantsBy", "third");
             string firstCol = line.OptimizedSplit('\t')[0];
             (_, string matchBy) = firstCol.OptimizedKeyValue();
@@ -129,6 +132,10 @@ namespace SAUtils.Custom
                     case "description":
                         categories[i] = CustomAnnotationCategories.Description;
                         annotationValidators[i] = AllowedValues.ValidateDescriptionValue;
+                        break;
+                    case "score":
+                        categories[i] = CustomAnnotationCategories.Score;
+                        annotationValidators[i] = AllowedValues.ValidateScoreValue;
                         break;
                     case ".":
                     case "":

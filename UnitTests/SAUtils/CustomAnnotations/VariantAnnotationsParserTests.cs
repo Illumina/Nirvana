@@ -56,29 +56,30 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void ParseHeaderLines_AsExpected()
         {
-            const string headerLines = "#title=IcslAlleleFrequencies\n" +
-                                       "#assembly=GRCh38\n" +
+            const string headerLines = "#title=IcslAlleleFrequencies \n" +
+                                       "#assembly=GRCh38\t\n" +
                                        "#matchVariantsBy=allele\n" +
-                                       "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
-                                       "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
-                                       "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
-                                       "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring";
+                                       "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tdeNovoQual\tnotes\n" +
+                                       "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\tScore\t.\n" +
+                                       "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n" +
+                                       "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tnumber\tstring";
 
 
             using (var custParser = new VariantAnnotationsParser(GetReadStream(headerLines), null))
             {
                 custParser.ParseHeaderLines();
                 var expectedJsonKeys = new[]
-                    {"refAllele", "altAllele", "allAc", "allAn", "allAf", "failedFilter", "pathogenicity", "notes"};
+                    {"refAllele", "altAllele", "allAc", "allAn", "allAf", "failedFilter", "pathogenicity", "deNovoQual", "notes"};
                 var expectedIntervalJsonKeys = new[]
-                    {"start", "end", "allAc", "allAn", "allAf", "failedFilter", "pathogenicity", "notes"};
+                    {"start", "end", "allAc", "allAn", "allAf", "failedFilter", "pathogenicity", "deNovoQual", "notes"};
                 var expectedCategories = new[]
                 {
                     CustomAnnotationCategories.AlleleCount, CustomAnnotationCategories.AlleleNumber,
                     CustomAnnotationCategories.AlleleFrequency, CustomAnnotationCategories.Unknown,
-                    CustomAnnotationCategories.Prediction, CustomAnnotationCategories.Unknown
+                    CustomAnnotationCategories.Prediction, CustomAnnotationCategories.Score,
+                    CustomAnnotationCategories.Unknown
                 };
-                var expectedDescriptions = new[] { "ALL", "ALL", "ALL", null, null, null };
+                var expectedDescriptions = new[] { "ALL", "ALL", "ALL", null, null, null, null };
                 var expectedTypes = new[]
                 {
                     SaJsonValueType.Number,
@@ -86,6 +87,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                     SaJsonValueType.Number,
                     SaJsonValueType.Bool,
                     SaJsonValueType.String,
+                    SaJsonValueType.Number, 
                     SaJsonValueType.String
                 };
 
@@ -163,7 +165,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "#assembly=GRCh38\n" +
                                 "#matchVariantsBy=allele\n" +
                                 "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\n" +
-                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\t.\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\tscore\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n" +
                                 "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\n" +
                                 "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\n" +
@@ -177,6 +179,26 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUS\",\"anyNumber\":1.000", items[0].GetJsonString());
                 Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"anyNumber\":3", items[1].GetJsonString());
                 Assert.Equal("\"refAllele\":\"T\",\"altAllele\":\"C\",\"allAc\":10,\"allAn\":1000,\"allAf\":0.01,\"anyNumber\":100.1234567", items[2].GetJsonString());
+            }
+        }
+        
+        [Fact]
+        public void GetItems_invalid_scores()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\tscore\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n" +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\n" +
+                                "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
+                                "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
+                                "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\tthree";
+            using (var custParser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                Assert.Throws<UserErrorException>(()=>custParser.GetItems().ToArray());
             }
         }
 

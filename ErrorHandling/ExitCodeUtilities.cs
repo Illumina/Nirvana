@@ -9,6 +9,7 @@ namespace ErrorHandling
 	{
 		private static readonly Dictionary<Type, ExitCodes> ExceptionsToExitCodes;
 	    public const string VcfLine = "VcfLine";
+	    public const string Line = "Line"; 
 
 		// constructor
 		static ExitCodeUtilities()
@@ -74,6 +75,14 @@ namespace ErrorHandling
 					Console.WriteLine("\nVCF line:");
 					Console.ResetColor();
 					Console.WriteLine(e.Data[VcfLine]);
+				}
+				
+				if (e.Data.Contains(Line))
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("\nLine:");
+					Console.ResetColor();
+					Console.WriteLine(e.Data[Line]);
 				}
 			}
 

@@ -10,6 +10,7 @@
         Filter,
         Description,
         Identifier,
-        HomozygousCount
+        HomozygousCount,
+        Score
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ErrorHandling.Exceptions;
 
@@ -34,6 +35,17 @@ namespace SAUtils.Custom
         public static void ValidateIdentifierValue(string value, string line) => CheckValueLength(value, line, MaxIdentifierLength);
 
         public static void ValidateDescriptionValue(string value, string line) => CheckValueLength(value, line, MaxDescriptionLength);
+
+        public static void ValidateScoreValue(string value, string line)
+        {
+            if (double.TryParse(value, out _)) return;
+            
+            var e = new UserErrorException(
+                $"{value} is not a valid score value. Scores are expected to be numbers.");
+            e.Data["Line"] = line;
+            throw e;
+
+        }
 
         public static bool IsEmptyValue(string value) => EmptyValues.Contains(value);
 

@@ -1,6 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ErrorHandling;
+using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
 using OptimizedCore;
@@ -36,10 +39,20 @@ namespace RepeatExpansions.IO
                     {
                         string line = reader.ReadLine();
                         if (line == null) break;
+                        if(line == string.Empty) continue;
 
-                        (ushort refIndex, Interval<RepeatExpansionPhenotype> phenotypeInterval) = GetPhenotype(line, refNameToChromosome);
-                        if(refIndex == ushort.MaxValue) throw new InvalidDataException("Unknown chromosome encountered in line:\n"+line);
-                        intervalLists[refIndex].Add(phenotypeInterval);
+                        try
+                        {
+                            (ushort refIndex, Interval<RepeatExpansionPhenotype> phenotypeInterval) = GetPhenotype(line, refNameToChromosome);
+                            if(refIndex == ushort.MaxValue) throw new InvalidDataException("Unknown chromosome encountered.");
+                            intervalLists[refIndex].Add(phenotypeInterval);
+                        }
+                        catch (Exception e)
+                        {
+                            e.Data[ExitCodeUtilities.Line] = line;
+                            throw;
+                        }
+                        
                     }
                 }
             }
@@ -91,10 +104,14 @@ namespace RepeatExpansions.IO
         private static void CheckHeader(TextReader reader, GenomeAssembly desiredGenomeAssembly)
         {
             string line = reader.ReadLine();
+            while (line == string.Empty) line = reader.ReadLine();
+            if(line==null) throw new UserErrorException("The file provided is empty.");
+            
+            line = line.Trim();
             string genomeAssemblyString = line.OptimizedSplit('=')[1];
 
             var genomeAssembly = GenomeAssemblyHelper.Convert(genomeAssemblyString);
-            if (genomeAssembly != desiredGenomeAssembly) throw new InvalidDataException($"Expected {desiredGenomeAssembly} in the STR data file, but found {genomeAssembly}");
+            if (genomeAssembly != desiredGenomeAssembly) throw new UserErrorException($"Expected {desiredGenomeAssembly} in the STR data file, but found {genomeAssembly}");
 
             // skip the header fields line
             reader.ReadLine();

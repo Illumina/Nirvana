@@ -33,15 +33,17 @@ namespace IO
             sb.AppendLine(line);
 
             const string vcfLine = "VcfLine";
+            const string errorLine = "Line";
 
             while (e != null)
             {
                 sb.AppendLine($"{e.GetType()}: {e.Message}");
                 sb.AppendLine($"Stack trace: {e.StackTrace}");
                 if (e.Data.Contains(vcfLine)) sb.AppendLine($"VCF line: {e.Data[vcfLine]}");
+                if (e.Data.Contains(errorLine)) sb.AppendLine($"Line: {e.Data[errorLine]}");
                 if (e.Data.Contains(Url)) sb.AppendLine($"URL: {e.Data[Url]}");
 
-                sb.AppendLine(line);
+                sb.AppendLine(errorLine);
                 e = e.InnerException;
             }
 
