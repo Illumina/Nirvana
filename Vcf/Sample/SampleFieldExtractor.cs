@@ -11,7 +11,7 @@ namespace Vcf.Sample
 {
     internal static class SampleFieldExtractor
     {
-        internal static ISample[]  ToSamples(this string[] vcfColumns, FormatIndices formatIndices, ISimplePosition simplePosition, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider)
+        internal static ISample[]  ToSamples(this string[] vcfColumns, FormatIndices formatIndices, ISimplePosition simplePosition, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq=false)
         {
             if (vcfColumns.Length < VcfCommon.MinNumColumnsSampleGenotypes) return null;
 
@@ -24,14 +24,14 @@ namespace Vcf.Sample
 
             for (int index = VcfCommon.GenotypeIndex; index < vcfColumns.Length; index++)
             {
-                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, simplePosition, mitoHeteroplasmyProvider, legacySampleExtractor);
+                samples[index - VcfCommon.GenotypeIndex] = ExtractSample(vcfColumns[index], formatIndices, simplePosition, mitoHeteroplasmyProvider, legacySampleExtractor, enableDq);
             }
 
             return samples;
         }
 
         internal static ISample ExtractSample(string sampleColumn, FormatIndices formatIndices, ISimplePosition simplePosition, 
-            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider,  LegacySampleFieldExtractor legacyExtractor = null)
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider,  LegacySampleFieldExtractor legacyExtractor = null, bool enableDq=false)
         {
             // sanity check: make sure we have a format column
             if (string.IsNullOrEmpty(sampleColumn)) return Sample.EmptySample;
@@ -54,6 +54,7 @@ namespace Vcf.Sample
             string genotype                     = sampleColumns.GetString(formatIndices.GT);
             int? genotypeQuality                = sampleColumns.GetString(formatIndices.GQ).GetInteger();
             bool isDeNovo                       = sampleColumns.GetString(formatIndices.DN).IsDeNovo();
+            double? deNovoQuality               = enableDq? sampleColumns.GetString(formatIndices.DQ).GetDouble():null;
             float? likelihoodRatioQualityScore  = sampleColumns.GetString(formatIndices.LQ).GetFloat();
             int[] pairedEndReadCounts           = sampleColumns.GetString(formatIndices.PR).GetIntegers();
             int[] repeatUnitCounts              = sampleColumns.GetString(formatIndices.REPCN).GetIntegers('/');
@@ -70,7 +71,7 @@ namespace Vcf.Sample
             var isLoh = GetLoh(copyNumber, minorHaplotypeCopyNumber, genotype);
 
             var sample = new Sample(alleleDepths, artifactAdjustedQualityScore, copyNumber, diseaseAffectedStatuses,
-                failedFilter, genotype, genotypeQuality, isDeNovo, null, likelihoodRatioQualityScore, pairedEndReadCounts,
+                failedFilter, genotype, genotypeQuality, isDeNovo, deNovoQuality, likelihoodRatioQualityScore, pairedEndReadCounts,
                 repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality, isLoh, mitoHeteroplasmyPercentiles);
 
             return sample;

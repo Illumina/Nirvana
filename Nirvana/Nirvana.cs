@@ -27,6 +27,7 @@ namespace Nirvana
         private static bool _forceMitochondrialAnnotation;
         private static bool _disableRecomposition;
         private static bool _useLegacyVids;
+        private static bool _enableDq;
 
         private static ExitCodes ProgramExecution()
         {
@@ -36,7 +37,7 @@ namespace Nirvana
             using (var inputVcfStream        = _vcfPath        == "-"  ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
             using (var outputJsonStream      = _outputFileName == "-"  ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName   == null ? null : FileUtilities.GetCreateStream(jasixFileName))
-                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false);
+                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false, _enableDq);
         }
 
         private static AnnotationResources GetAnnotationResources()
@@ -101,6 +102,11 @@ namespace Nirvana
                     "legacy-vids",
                     "enables support for legacy VIDs",
                     v => _useLegacyVids = v != null
+                },
+                {
+                    "enable-dq",
+                    "report DQ from VCF samples field",
+                    v => _enableDq = v != null
                 },
                 {
                     "str=",

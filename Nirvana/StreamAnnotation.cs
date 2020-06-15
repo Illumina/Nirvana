@@ -20,7 +20,7 @@ namespace Nirvana
     {
         public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
             Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter,
-            bool ignoreEmptyChromosome)
+            bool ignoreEmptyChromosome, bool enableDq=false)
         {
             var metrics = annotationResources.Metrics;
             PerformanceMetrics.ShowAnnotationHeader();
@@ -28,7 +28,7 @@ namespace Nirvana
             IChromosome currentChromosome                      = new EmptyChromosome("dummy");
             int         numVariants                            = 0;
             IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
-            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider))
+            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider, enableDq))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {
                 try
@@ -99,7 +99,7 @@ namespace Nirvana
         }
 
         private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider)
+            IVcfFilter vcfFilter, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq=false)
         {
             var vcfReader = FileUtilities.GetStreamReader(vcfStream);
 
@@ -113,7 +113,7 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator, mitoHeteroplasmyProvider);
+                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator, mitoHeteroplasmyProvider, enableDq);
         }
     }
 }

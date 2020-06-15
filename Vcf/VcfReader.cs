@@ -37,9 +37,10 @@ namespace Vcf
         private string _currentReferenceName;
 
         public string[] GetSampleNames() => _sampleNames;
+        public readonly bool EnableDq;
 
         private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider)
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false)
         {
             _headerReader             = headerReader;
             _reader                   = vcfLineReader;
@@ -49,12 +50,14 @@ namespace Vcf
             _vcfFilter                = vcfFilter;
             _refNameToChromosome      = sequenceProvider.RefNameToChromosome;
             _mitoHeteroplasmyProvider = mitoHeteroplasmyProvider;
+            EnableDq                  = enableDq;
+            
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider)
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq=false)
         {
-            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, vidCreator, mitoHeteroplasmyProvider);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, vidCreator, mitoHeteroplasmyProvider, enableDq);
             vcfReader.ParseHeader();
             vcfReader.SetRecomposer(recomposer);
             return vcfReader;
@@ -190,7 +193,7 @@ namespace Vcf
             _currentReferenceName = referenceName;
         }
 
-        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory);
+        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, EnableDq);
 
         public void Dispose() => _reader?.Dispose();
     }
