@@ -44,7 +44,7 @@ namespace RepeatExpansions.IO
                         try
                         {
                             (ushort refIndex, Interval<RepeatExpansionPhenotype> phenotypeInterval) = GetPhenotype(line, refNameToChromosome);
-                            if(refIndex == ushort.MaxValue) throw new InvalidDataException("Unknown chromosome encountered.");
+                            if(refIndex == ushort.MaxValue) throw new InvalidDataException("Unknown chromosome encountered in STR file.");
                             intervalLists[refIndex].Add(phenotypeInterval);
                         }
                         catch (Exception e)
@@ -105,16 +105,37 @@ namespace RepeatExpansions.IO
         {
             string line = reader.ReadLine();
             while (line == string.Empty) line = reader.ReadLine();
-            if(line==null) throw new UserErrorException("The file provided is empty.");
-            
-            line = line.Trim();
-            string genomeAssemblyString = line.OptimizedSplit('=')[1];
+            if(line==null) throw new UserErrorException("The custom STR file provided is empty.");
 
-            var genomeAssembly = GenomeAssemblyHelper.Convert(genomeAssemblyString);
-            if (genomeAssembly != desiredGenomeAssembly) throw new UserErrorException($"Expected {desiredGenomeAssembly} in the STR data file, but found {genomeAssembly}");
+            GenomeAssembly genomeAssembly = GenomeAssembly.Unknown;
+            var headerNum = 0;
+            while (line!=null && line.StartsWith("#"))
+            {
+                headerNum++;
+                line = line.Trim();
+                var columns = line.Split('=','\t');
+                var tag = columns[0].ToLower();
+                switch (headerNum)
+                {
+                    case 1:
+                        if(tag != "#assembly")
+                            throw new UserErrorException("First line in STR data file has to contain assembly. For example: #assembly=GRCh38");
+                        genomeAssembly = GenomeAssemblyHelper.Convert(columns[1]);
+                        if (genomeAssembly != desiredGenomeAssembly) 
+                            throw new UserErrorException($"Expected {desiredGenomeAssembly} in the STR data file, but found {genomeAssembly}");
+                        break;
+                    case 2:
+                        if(tag!="#chrom")
+                            throw new UserErrorException("Second line in TSV has to contain column labels. For example: #Chrom\tStart\tEnd\tPhenotype\t...");
+                        return; // we should not read the next line
+                    default:
+                        throw new UserErrorException($"Unexpected header tag observed:\n{line}");
+                }
+                line = reader.ReadLine();
+            }
+            if(genomeAssembly == GenomeAssembly.Unknown) 
+                throw new UserErrorException("Genome assembly not specified in STR header. It is a required field.");
 
-            // skip the header fields line
-            reader.ReadLine();
         }
     }
 }

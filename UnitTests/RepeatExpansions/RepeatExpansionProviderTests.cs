@@ -23,6 +23,7 @@ namespace UnitTests.RepeatExpansions
             _provider = new RepeatExpansionProvider(GenomeAssembly.GRCh37, ChromosomeUtilities.RefNameToChromosome, 23, null);
         }
 
+        
         [Fact]
         public void Annotate_NotRepeatExpansion_NullPhenotypes()
         {
