@@ -80,7 +80,7 @@ namespace SAUtils.GnomadGeneScores
             var outFileName = $"{version.Name}_{version.Version}";
 
             using (var gnomadGeneParser = new GnomadGeneParser(GZipUtilities.GetAppropriateStreamReader(_inputFile), geneIdToSymbols))
-            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
+            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix)))
             using (var ngaWriter = new NgaWriter(stream, version, SaCommon.GnomadGeneScoreTag, SaCommon.SchemaVersion, false))
             {
                 ngaWriter.Write(gnomadGeneParser.GetItems());

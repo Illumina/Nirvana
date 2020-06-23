@@ -56,7 +56,7 @@ namespace SAUtils.Custom
             var (entrezGeneIdToSymbol, ensemblGeneIdToSymbol) = GeneUtilities.ParseUniversalGeneArchive(null, _universalGeneArchivePath);
 
             string outputPrefix = GetOutputPrefix(_inputFile);
-            string ngaFilePath = Path.Combine(_outputDirectory, outputPrefix + SaCommon.NgaFileSuffix);
+            string ngaFilePath = Path.Combine(_outputDirectory, outputPrefix + SaCommon.GeneFileSuffix);
             string ngaSchemaFilePath = ngaFilePath + SaCommon.JsonSchemaSuffix;
 
             using (var parser = GeneAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), entrezGeneIdToSymbol, ensemblGeneIdToSymbol))

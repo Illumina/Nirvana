@@ -18,6 +18,7 @@ namespace VariantAnnotation
     {
         private readonly IAnnotationProvider _saProvider;
         private readonly IAnnotationProvider _taProvider;
+        private readonly IAnnotationProvider _lcrProvider;
         private readonly ISequenceProvider _sequenceProvider;
         private readonly IAnnotationProvider _conservationProvider;        
         private readonly IGeneAnnotationProvider _geneAnnotationProvider;
@@ -28,13 +29,14 @@ namespace VariantAnnotation
         public GenomeAssembly Assembly { get; }
 
         public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider,
-            IAnnotationProvider saProvider, IAnnotationProvider conservationProvider,
+            IAnnotationProvider saProvider, IAnnotationProvider conservationProvider, IAnnotationProvider lcrProvider,
             IGeneAnnotationProvider geneAnnotationProvider, IRepeatExpansionProvider repeatExpansionProvider)
         {
             _saProvider              = saProvider;
             _taProvider              = taProvider;
             _sequenceProvider        = sequenceProvider;
             _conservationProvider    = conservationProvider;
+            _lcrProvider             = lcrProvider;
             _geneAnnotationProvider  = geneAnnotationProvider;
             _repeatExpansionProvider = repeatExpansionProvider;
             _affectedGenes           = new HashSet<string>();
@@ -83,6 +85,7 @@ namespace VariantAnnotation
 
             _sequenceProvider?.Annotate(annotatedPosition);
             _saProvider?.Annotate(annotatedPosition);
+            _lcrProvider?.Annotate(annotatedPosition);
             _repeatExpansionProvider?.Annotate(annotatedPosition);
             _conservationProvider?.Annotate(annotatedPosition);
             _taProvider.Annotate(annotatedPosition);

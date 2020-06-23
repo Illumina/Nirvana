@@ -27,6 +27,11 @@ namespace Nirvana
                 : new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(files.ConservationFile.Npd),
                     PersistentStreamUtils.GetReadStream(files.ConservationFile.Idx));
 
+        public static IAnnotationProvider GetLcrProvider(AnnotationFiles files) =>
+            files?.LowComplexityRegionFile == null
+                ? null
+                : new LcrProvider(PersistentStreamUtils.GetReadStream(files.LowComplexityRegionFile));
+        
         public static IRefMinorProvider GetRefMinorProvider(AnnotationFiles files) =>
             files == null || files.RefMinorFile == default ? null : 
                 new RefMinorProvider(PersistentStreamUtils.GetReadStream(files.RefMinorFile.Rma), 

@@ -81,9 +81,9 @@ namespace SAUtils.Custom
                 if (intervals == null) return ExitCodes.Success;
             }
 
-            using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix)))
+            using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.IntervalFileSuffix)))
             using (var nsiWriter = CaUtilities.GetNsiWriter(nsiStream, version, referenceProvider.Assembly, jsonTag, reportFor))
-            using (var siJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SiFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var siJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.IntervalFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(siJsonSchemaStream))
             {
                 nsiWriter.Write(intervals);

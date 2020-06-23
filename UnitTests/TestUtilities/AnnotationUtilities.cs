@@ -56,10 +56,11 @@ namespace UnitTests.TestUtilities
             var sequenceProvider             = ProviderUtilities.GetSequenceProvider(sequenceFilePath);
             var transcriptAnnotationProvider = ProviderUtilities.GetTranscriptAnnotationProvider(cacheFilePrefix, sequenceProvider, null);
             var saProvider                   = ProviderUtilities.GetNsaProvider(annotationFiles);
+            var lcrProvider                  = ProviderUtilities.GetLcrProvider(annotationFiles);
             var conservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider,
-                conservationProvider, null, null);
+                conservationProvider, lcrProvider, null, null);
             return (annotator,sequenceProvider);
         }
     }

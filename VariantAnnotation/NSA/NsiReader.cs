@@ -114,7 +114,14 @@ namespace VariantAnnotation.NSA
                 jsonString += JsonObject.Comma + "\"annotationOverlap\":" + annotationOverlap.Value.ToString("0.#####");
             return jsonString;
         }
-
         
+        public bool OverlapsAny(IChromosomeInterval variant)
+        {
+            if (!_intervalArrays.ContainsKey(variant.Chromosome.Index)) return false;
+
+            return _intervalArrays[variant.Chromosome.Index]
+                .OverlapsAny(variant.Start, variant.End);
+
+        }
     }
 }

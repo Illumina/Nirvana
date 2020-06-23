@@ -6,8 +6,8 @@ using ErrorHandling.Exceptions;
 using Genome;
 using Moq;
 using SAUtils;
-using SAUtils.CreateGnomadDb;
 using SAUtils.DataStructures;
+using SAUtils.gnomAD;
 using SAUtils.InputFileParsers.ClinVar;
 using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
@@ -238,7 +238,7 @@ namespace UnitTests.SAUtils.NsaWriters
             var sequence = new SimpleSequence(new string('T', VariantUtils.MaxUpstreamLength) + "AAAGAAAGAAAG", 17467787 - 1 - VariantUtils.MaxUpstreamLength);
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
-            var gnomadReader = new GnomadReader(new StreamReader(GetChr22_17467787_17467799_genome()), null, sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(new StreamReader(GetChr22_17467787_17467799_genome()), null, sequenceProvider);
 
             return gnomadReader.GetCombinedItems();
         }

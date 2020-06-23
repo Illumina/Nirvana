@@ -53,7 +53,7 @@ namespace SAUtils.ExacScores
 
             //create universal gene archive
             using (var exacParser= new ExacScoresParser(GZipUtilities.GetAppropriateStreamReader(_inputFile)))
-            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
+            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix)))
             using (var ngaWriter = new NgaWriter(stream, version, SaCommon.ExacScoreTag, SaCommon.SchemaVersion, false))
             {
                 ngaWriter.Write(exacParser.GetItems());

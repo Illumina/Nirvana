@@ -3,15 +3,15 @@ using System.IO;
 using System.Linq;
 using Genome;
 using SAUtils;
-using SAUtils.CreateGnomadDb;
 using SAUtils.DataStructures;
+using SAUtils.gnomAD;
 using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;
 using Variants;
 using Xunit;
 
-namespace UnitTests.SAUtils.InputFileParsers
+namespace UnitTests.SAUtils.gnomAD
 {
     public sealed class GnomadReaderTests
     {
@@ -39,7 +39,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new StreamReader(GetGenomeStream());
-            var gnomadReader = new GnomadReader(reader, null, sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(reader, null, sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
 
@@ -70,7 +70,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new StreamReader(GetConflictingItemsStream());
-            var gnomadReader = new GnomadReader(reader, null, sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(reader, null, sequenceProvider);
 
             var items = new List<ISupplementaryDataItem>();
             foreach (GnomadItem item in gnomadReader.GetCombinedItems())
@@ -108,7 +108,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
             var reader = new StreamReader(GetShiftingItemsStream());
-            var gnomadReader = new GnomadReader(reader, null, sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(reader, null, sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
             Assert.Equal(3, items.Count);
@@ -157,7 +157,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         {
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "TTATCTTCTCTTCATTCTTAAAAAAGGAACACATTTTATA", 15528100 - VariantUtils.MaxUpstreamLength);
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
-            var gnomadReader = new GnomadReader(new StreamReader(GetChr22GenomeStream()), new StreamReader(GetChr22ExomeStream()), sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(new StreamReader(GetChr22GenomeStream()), new StreamReader(GetChr22ExomeStream()), sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
 
@@ -208,7 +208,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var sequence = new SimpleSequence(new string('G', VariantUtils.MaxUpstreamLength) + "TAAA", 21006257 - VariantUtils.MaxUpstreamLength);
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
-            var gnomadReader = new GnomadReader(new StreamReader(GetChr22_21006257_genome()), new StreamReader(GetChr22_21006257_exome()), sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(new StreamReader(GetChr22_21006257_genome()), new StreamReader(GetChr22_21006257_exome()), sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
 
@@ -252,7 +252,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var sequence         = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "G", 22055875 - VariantUtils.MaxUpstreamLength);
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
-            var gnomadReader = new GnomadReader(new StreamReader(GetChr22_22055876_genome()), new StreamReader(GetChr22_22055876_exome()), sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(new StreamReader(GetChr22_22055876_genome()), new StreamReader(GetChr22_22055876_exome()), sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
 
@@ -282,7 +282,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             var sequence = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "C" + new string('G', 16689902 - 16689820) + "GGGGA", 16689820 - 1 - VariantUtils.MaxUpstreamLength);
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
-            var gnomadReader = new GnomadReader(new StreamReader(GetChr22_16689800_16689902_genome()), null, sequenceProvider);
+            var gnomadReader = new GnomadSnvReader(new StreamReader(GetChr22_16689800_16689902_genome()), null, sequenceProvider);
 
             var items = gnomadReader.GetCombinedItems().ToList();
 

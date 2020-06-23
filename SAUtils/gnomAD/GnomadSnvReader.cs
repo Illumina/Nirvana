@@ -9,9 +9,9 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using Variants;
 
-namespace SAUtils.CreateGnomadDb
+namespace SAUtils.gnomAD
 {
-	public sealed class GnomadReader 
+	public sealed class GnomadSnvReader 
 	{
         private readonly StreamReader _genomeReader;
         private readonly StreamReader _exomeReader;
@@ -64,7 +64,7 @@ namespace SAUtils.CreateGnomadDb
         private bool _isLowComplexityRegion;
         private int? _totalDepth;
 
-		public GnomadReader(StreamReader genomeReader, StreamReader exomeReader, ISequenceProvider sequenceProvider) 
+		public GnomadSnvReader(StreamReader genomeReader, StreamReader exomeReader, ISequenceProvider sequenceProvider) 
 		{
 			_genomeReader     = genomeReader;
             _exomeReader      = exomeReader;

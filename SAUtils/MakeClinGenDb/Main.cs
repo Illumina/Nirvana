@@ -63,7 +63,7 @@ namespace SAUtils.MakeClinGenDb
             string outFileName = $"{version.Name}_{version.Version}";
 
             using (var clinGenReader = new ClinGenReader(GZipUtilities.GetAppropriateStreamReader(_inputFileName), referenceProvider.RefNameToChromosome))
-            using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
+            using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.IntervalFileSuffix)))
             using (var nsiWriter = new NsiWriter(nsiStream, version, referenceProvider.Assembly, SaCommon.ClinGenTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {
                 nsiWriter.Write(clinGenReader.GetItems());

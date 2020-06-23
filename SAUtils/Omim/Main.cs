@@ -58,9 +58,9 @@ namespace SAUtils.Omim
             var omimParser = new OmimParser(_mimToGeneFile, _omimJsonFile, omimSchema);
             var version = omimParser.GetVersion();
             string outFileName = $"{version.Name}_{version.Version}";
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
+            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix)))
             using (var ngaWriter = new NgaWriter(nsaStream, version, SaCommon.OmimTag, SaCommon.SchemaVersion, true))
-            using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix + SaCommon.JsonSchemaSuffix)))
+            using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 var omimItems = omimParser.GetItems();

@@ -4,7 +4,7 @@ using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using Variants;
 
-namespace SAUtils.CreateGnomadDb
+namespace SAUtils.gnomAD
 {
     public static class GnomadUtilities
     {

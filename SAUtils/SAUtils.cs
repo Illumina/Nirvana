@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
 using SAUtils.ClinGen;
+using SAUtils.CreateClinvarDb;
 using SAUtils.DbSnpRemapper;
 using SAUtils.dbVar;
 using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
+using SAUtils.gnomAD;
 using SAUtils.GnomadGeneScores;
 using SAUtils.MitoHeteroplasmy;
 using SAUtils.MitoMap;
@@ -23,7 +25,7 @@ namespace SAUtils
         {
             var ops                    = new Dictionary<string, TopLevelOption>
             {
-                ["clinvar"]               = new TopLevelOption("create ClinVar database", CreateClinVarDb.ClinVarMain.Run),
+                ["clinvar"]               = new TopLevelOption("create ClinVar database", ClinVarMain.Run),
                 ["cosmic"]                = new TopLevelOption("create COSMIC database", CreateCosmicDb.Main.Run),
                 ["ClinGen"]               = new TopLevelOption("create ClinGen database", MakeClinGenDb.Main.Run),
                 ["CustomVar"]             = new TopLevelOption("create custom variant annotation database", Custom.VariantMain.Run),
@@ -33,7 +35,7 @@ namespace SAUtils
                 ["OneKGen"]               = new TopLevelOption("create 1000 Genome small variants database", CreateOneKgDb.Main.Run),
                 ["RefMinor"]              = new TopLevelOption("create Reference Minor database from 1000 Genome ", RefMinorDb.Main.Run),
                 ["ancestralAllele"]       = new TopLevelOption("create Ancestral allele database from 1000Genomes data", MakeAaDb.Main.Run),
-                ["Dbsnp"]                 = new TopLevelOption("create dbSNP database", CreateDbsnpDb.Main.Run),
+                ["dbsnp"]                 = new TopLevelOption("create dbSNP database", CreateDbsnpDb.Main.Run),
                 ["globalMinor"]           = new TopLevelOption("create global minor allele database", CreateGlobalAllelesDb.Main.Run),  
                 ["Dgv"]                   = new TopLevelOption("create DGV database", makeDgvDb.Main.Run),
                 ["Omim"]                  = new TopLevelOption("create OMIM database", Omim.Main.Run),
@@ -41,8 +43,9 @@ namespace SAUtils
                 ["ExacScores"]            = new TopLevelOption("create ExAC gene scores database", ExacScores.Main.Run),
                 ["extractMiniSA"]         = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
                 ["extractMiniXml"]        = new TopLevelOption("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
-                ["Gnomad"]                = new TopLevelOption("create gnomAD database", CreateGnomadDb.GnomadMain.Run),
-                ["GnomadGeneScores"]      = new TopLevelOption("create gnomAD gene scores database", GnomadGenesMain.Run),
+                ["gnomad"]                = new TopLevelOption("create gnomAD database", GnomadSnvMain.Run),
+                ["gnomad-lcr"]            = new TopLevelOption("create gnomAD low complexity region database", LcrRegionsMain.Run),
+                ["gnomadGeneScores"]      = new TopLevelOption("create gnomAD gene scores database", GnomadGenesMain.Run),
                 ["TopMed"]                = new TopLevelOption("create TOPMed database", CreateTopMedDb.Main.Run),
                 ["PhyloP"]                = new TopLevelOption("create PhyloP database", PhyloP.Main.Run),
                 ["CosmicSv"]              = new TopLevelOption("create COSMIC SV tsv files", ExtractCosmicSvsMain.Run),

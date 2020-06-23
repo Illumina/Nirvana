@@ -16,6 +16,8 @@ namespace VariantAnnotation.AnnotatedPositions
         public IList<ISupplementaryAnnotation> SaList { get; }              = new List<ISupplementaryAnnotation>();
         public ISupplementaryAnnotation RepeatExpansionPhenotypes { get; set; }
         public double? PhylopScore { get; set; }
+        
+        public bool InLowComplexityRegion { get; set; }
         public AnnotatedVariant(IVariant variant) => Variant = variant;
 
         public string GetJsonString(string originalChromName)
@@ -45,6 +47,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddStringValue("hgvsg", HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
+            jsonObject.AddBoolValue("inLowComplexityRegion", InLowComplexityRegion);
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);
 

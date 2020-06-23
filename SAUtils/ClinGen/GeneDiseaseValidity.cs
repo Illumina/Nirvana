@@ -63,7 +63,7 @@ namespace SAUtils.ClinGen
 
             // read uga file to get hgnc id to gene symbols dictionary
             using (var diseaseValidityParser = new GeneDiseaseValidityParser(GZipUtilities.GetAppropriateReadStream(_diseaseValidityFile), GetHgncIdToGeneSymbols()))
-            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.NgaFileSuffix)))
+            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix)))
             using (var ngaWriter = new NgaWriter(stream, dosageSensitivityVersion, SaCommon.DiseaseValidityTag, SaCommon.SchemaVersion, true))
             {
                 ngaWriter.Write(diseaseValidityParser.GetItems());

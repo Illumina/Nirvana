@@ -63,7 +63,7 @@ namespace SAUtils.OneKGenSvDb
             string outFileName = $"{version.Name}_{version.Version}".Replace(' ','_');
             using(var reader = GZipUtilities.GetAppropriateStreamReader(_inputFileName))
             using(var oneKGenSvReader = new OneKGenSvReader(reader, referenceProvider.RefNameToChromosome))
-            using(var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
+            using(var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.IntervalFileSuffix)))
             using(var nsiWriter = new NsiWriter(nsaStream, version, referenceProvider.Assembly,
                 SaCommon.OnekSvTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {

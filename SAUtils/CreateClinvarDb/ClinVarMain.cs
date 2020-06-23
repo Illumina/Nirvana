@@ -9,7 +9,7 @@ using SAUtils.InputFileParsers.ClinVar;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.CreateClinVarDb
+namespace SAUtils.CreateClinvarDb
 {
     public static class ClinVarMain
     {

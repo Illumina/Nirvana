@@ -13,9 +13,9 @@ using SAUtils.NsaConcatenator;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.CreateGnomadDb
+namespace SAUtils.gnomAD
 {
-    public sealed class GnomadMain
+    public sealed class GnomadSnvMain
     {
         private static string _genomeDirectory;
         private static string _exomeDirectory;
@@ -25,7 +25,7 @@ namespace SAUtils.CreateGnomadDb
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-            var creator = new GnomadMain();
+            var creator = new GnomadSnvMain();
             var ops = new OptionSet
             {
                 {
@@ -118,7 +118,7 @@ namespace SAUtils.CreateGnomadDb
             using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.GnomadTag, true, false, SaCommon.SchemaVersion, false))
             using (var reader = GZipUtilities.GetAppropriateStreamReader(genomeFile))
             {
-                var gnomadReader = new GnomadReader(reader, exomeReader, referenceProvider);
+                var gnomadReader = new GnomadSnvReader(reader, exomeReader, referenceProvider);
                 var count = nsaWriter.Write(gnomadReader.GetCombinedItems());
                 Console.WriteLine($"Wrote {count} items to NSA file.");
             }

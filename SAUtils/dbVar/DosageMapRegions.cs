@@ -59,7 +59,7 @@ namespace SAUtils.dbVar
             string outFileName =  $"{dosageMapRegionVersion.Name.Replace(' ', '_')}_{dosageMapRegionVersion.Version}";
             var referenceProvider = new ReferenceSequenceProvider(GZipUtilities.GetAppropriateReadStream(_inputReferencePath));
             using (var dosageSensitivityParser = new DosageMapRegionParser(GZipUtilities.GetAppropriateReadStream(_dosageMapRegionFile), referenceProvider.RefNameToChromosome))
-            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
+            using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.IntervalFileSuffix)))
             using (var nsiWriter = new NsiWriter(stream, dosageMapRegionVersion, referenceProvider.Assembly, SaCommon.DosageSensitivityTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {
                 nsiWriter.Write(dosageSensitivityParser.GetItems());

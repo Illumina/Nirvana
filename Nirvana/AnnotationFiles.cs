@@ -14,6 +14,7 @@ namespace Nirvana
         public List<string> NsiFiles { get; } = new List<string>();
         public List<string> NgaFiles { get; } = new List<string>();
         public (string Npd, string Idx) ConservationFile { get; private set; }
+        public string LowComplexityRegionFile { get; private set; }
         public string ProteinConservationFile { get; private set; }
         public (string Rma, string Idx) RefMinorFile { get; private set; }
 
@@ -27,10 +28,10 @@ namespace Nirvana
                     case SaCommon.SaFileSuffix:
                         NsaFiles.Add((filePath, filePath + SaCommon.IndexSufix));
                         break;
-                    case SaCommon.SiFileSuffix:
+                    case SaCommon.IntervalFileSuffix:
                         NsiFiles.Add(filePath);
                         break;
-                    case SaCommon.NgaFileSuffix:
+                    case SaCommon.GeneFileSuffix:
                         NgaFiles.Add(filePath);
                         break;
                     case SaCommon.PhylopFileSuffix:
@@ -38,6 +39,9 @@ namespace Nirvana
                         break;
                     case ProteinConservationCommon.FileSuffix:
                         ProteinConservationFile = filePath;
+                        break;
+                    case SaCommon.LcrFileSuffix:
+                        LowComplexityRegionFile = filePath;
                         break;
                     case SaCommon.RefMinorFileSuffix:
                         RefMinorFile = (filePath, filePath + SaCommon.IndexSufix);

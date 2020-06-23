@@ -67,7 +67,7 @@ namespace SAUtils.MitoMap
             var sortedMitoMapVarItems = MitoMapSvReader.GetSortedItems(mitoMapSvReaders);
 
             string outFileName = $"{version.Name}_{version.Version}";
-            using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SiFileSuffix)))
+            using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.IntervalFileSuffix)))
             using(var nsiWriter = new NsiWriter(nsiStream, version, GenomeAssembly.rCRS, SaCommon.MitoMapTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {
                 nsiWriter.Write(sortedMitoMapVarItems);

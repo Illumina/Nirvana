@@ -90,7 +90,7 @@ namespace CustomAnnotationLambda
                 if (intervals == null) return CustomAnnotationLambda.GetSuccessResult(config, result, outputFiles);
 
                 FileMetadata nsiMetadata, nsiSchemaMetadata;
-                string nsiFileName = inputBaseName + SaCommon.SiFileSuffix;
+                string nsiFileName = inputBaseName + SaCommon.IntervalFileSuffix;
                 string localNsiPath = Path.Combine(tempPath, nsiFileName);
                 string localNsiSchemaPath = localNsiPath + SaCommon.JsonSchemaSuffix;
                 //

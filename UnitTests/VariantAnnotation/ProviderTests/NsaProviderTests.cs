@@ -12,7 +12,7 @@ using Variants;
 using Vcf.VariantCreator;
 using Xunit;
 
-namespace UnitTests.SAUtils
+namespace UnitTests.VariantAnnotation.ProviderTests
 {
     public sealed class NsaProviderTests
     {

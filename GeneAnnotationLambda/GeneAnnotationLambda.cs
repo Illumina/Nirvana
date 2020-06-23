@@ -119,7 +119,7 @@ namespace GeneAnnotationLambda
                 {
                     string filePath = saPathPrefix + line;
                     string suffix = filePath.GetFileSuffix(true);
-                    if (suffix == SaCommon.NgaFileSuffix) yield return filePath;
+                    if (suffix == SaCommon.GeneFileSuffix) yield return filePath;
                 }
             }
 

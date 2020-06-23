@@ -13,6 +13,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         IList<ISupplementaryAnnotation> SaList { get; }
         ISupplementaryAnnotation RepeatExpansionPhenotypes { get; set; }
 		double? PhylopScore { get; set; }
+		bool InLowComplexityRegion { get; set; }
         string GetJsonString(string originalChromName);
     }	
 }

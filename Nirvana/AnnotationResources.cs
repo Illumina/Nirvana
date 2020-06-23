@@ -31,6 +31,7 @@ namespace Nirvana
         public IAnnotationProvider SaProvider { get; }
         public IAnnotationProvider ConservationProvider { get; }
         public IRefMinorProvider RefMinorProvider { get; }
+        public IAnnotationProvider LcrProvider { get; }
         public IGeneAnnotationProvider GeneAnnotationProvider { get; }
         public IMitoHeteroplasmyProvider MitoHeteroplasmyProvider { get; }
         public IAnnotator Annotator { get; }
@@ -64,6 +65,7 @@ namespace Nirvana
 
             SaProvider             = ProviderUtilities.GetNsaProvider(annotationFiles);
             ConservationProvider   = ProviderUtilities.GetConservationProvider(annotationFiles);
+            LcrProvider            = ProviderUtilities.GetLcrProvider(annotationFiles);
             RefMinorProvider       = ProviderUtilities.GetRefMinorProvider(annotationFiles);
             GeneAnnotationProvider = ProviderUtilities.GetGeneAnnotationProvider(annotationFiles);
             
@@ -72,7 +74,7 @@ namespace Nirvana
 
             MitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
 
-            Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider, ConservationProvider, GeneAnnotationProvider,
+            Annotator = new Annotator(TranscriptAnnotationProvider, SequenceProvider, SaProvider, ConservationProvider, LcrProvider, GeneAnnotationProvider,
                 repeatExpansionProvider);
 
             if (useLegacyVids) VidCreator = new LegacyVariantId(SequenceProvider.RefNameToChromosome);
@@ -81,7 +83,7 @@ namespace Nirvana
             Recomposer = disableRecomposition
                 ? new NullRecomposer()
                 : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider, VidCreator);
-            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider, GeneAnnotationProvider, ConservationProvider, MitoHeteroplasmyProvider)
+            DataSourceVersions = GetDataSourceVersions(TranscriptAnnotationProvider, SaProvider, GeneAnnotationProvider, ConservationProvider, LcrProvider, MitoHeteroplasmyProvider)
                 .ToList();
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
 

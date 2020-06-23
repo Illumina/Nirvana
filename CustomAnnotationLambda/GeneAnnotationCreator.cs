@@ -18,7 +18,7 @@ namespace CustomAnnotationLambda
         public static CustomResult Create(CustomConfig config, string inputFileName, CustomResult result, IS3Client s3Client)
         {
             string inputBaseName   = inputFileName.TrimEndFromFirst(".tsv");
-            string ngaFileName     = inputBaseName + SaCommon.NgaFileSuffix;
+            string ngaFileName     = inputBaseName + SaCommon.GeneFileSuffix;
             string localNgaPath    = Path.Combine(Path.GetTempPath(), ngaFileName);
             string localSchemaPath = localNgaPath + SaCommon.JsonSchemaSuffix;
             string localLogPath    = Path.Combine(Path.GetTempPath(), LogFileName);
