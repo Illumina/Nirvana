@@ -18,8 +18,9 @@ namespace Intervals
 		/// </summary>
 		public bool OverlapsAny(ushort refIndex, int begin, int end)
 		{
-			if (refIndex > _maxIndex) throw new ArgumentOutOfRangeException($"The specified reference index ({refIndex}) is larger than the max index ({_maxIndex}).");
+			if (refIndex > _maxIndex) return false;
 			var intervalArray = _intervalArrays[refIndex];
+			if (intervalArray == null) return false;
 			return intervalArray.OverlapsAny(begin, end);
 		}
 
@@ -30,7 +31,14 @@ namespace Intervals
 		{
 			if (refIndex > _maxIndex) return null;
             var intervalArray = _intervalArrays[refIndex];
-		    return intervalArray?.GetAllOverlappingValues(begin, end);
+            return intervalArray?.GetAllOverlappingValues(begin, end);
+		}
+		
+		public Interval<T>[] GetAllOverlappingIntervals(ushort refIndex, int begin, int end)
+		{
+			if (refIndex > _maxIndex) return null;
+			var intervalArray = _intervalArrays[refIndex];
+			return intervalArray?.GetAllOverlappingIntervals(begin, end);
 		}
 	}
 }

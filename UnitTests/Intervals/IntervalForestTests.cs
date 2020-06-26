@@ -57,16 +57,6 @@ namespace UnitTests.Intervals
             Assert.Equal(expectedResult, _intervalForest.OverlapsAny(refIndex, begin, end));
         }
 
-        [Fact]
-        public void OverlapsAny_ThrowException_WhenRefIndexInvalid()
-        {
-            Assert.Throws<ArgumentOutOfRangeException>(delegate
-            {
-                // ReSharper disable once UnusedVariable
-                bool result = _intervalForest.OverlapsAny(3, 10, 20);
-            });
-        }
-
         [Theory]
         [InlineData(0, 6, 9, new[] { "mary", "jane" })]
         [InlineData(1, 180, 190, new[] { "jones" })]

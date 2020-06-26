@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using Compression.Algorithms;
 using Compression.FileHandling;
@@ -23,15 +24,15 @@ namespace VariantAnnotation.NSA
         public IDataSourceVersion Version { get; }
         public string JsonKey { get; }
         public ReportFor ReportFor { get; }
-        private readonly Dictionary<ushort, IntervalArray<string>> _intervalArrays;
-
-        private NsiReader(GenomeAssembly assembly, IDataSourceVersion version, string jsonKey, ReportFor reportFor, Dictionary<ushort, IntervalArray<string>> intervalArrays)
+        private readonly IntervalForest<string> _intervalForest;
+        
+        private NsiReader(GenomeAssembly assembly, IDataSourceVersion version, string jsonKey, ReportFor reportFor, IntervalArray<string>[] intervalArrays)
         {
             Assembly        = assembly;
             Version         = version;
             JsonKey         = jsonKey;
             ReportFor       = reportFor;
-            _intervalArrays = intervalArrays;
+            _intervalForest = new IntervalForest<string>(intervalArrays);
         }
 
         public static NsiReader Read(Stream stream)
@@ -52,12 +53,15 @@ namespace VariantAnnotation.NSA
                     else suppIntervals[saInterval.Chromosome.Index] = new List<Interval<string>> { new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()) };
                 }
 
-                var intervalArrays = new Dictionary<ushort, IntervalArray<string>>(suppIntervals.Count);
-                foreach ((ushort chromIndex, List<Interval<string>> intervals) in suppIntervals)
+                var maxChromIndex = suppIntervals.Keys.Max();
+                var intervalArrays = new IntervalArray<string>[maxChromIndex + 1];
+                for (ushort i = 0; i < intervalArrays.Length; i++)
                 {
-                    intervalArrays[chromIndex] = new IntervalArray<string>(intervals.ToArray());
+                    intervalArrays[i] = suppIntervals.ContainsKey(i)
+                        ? new IntervalArray<string>(suppIntervals[i].ToArray())
+                        : null;
                 }
-
+                
                 return new NsiReader(assembly, version, jsonKey, reportFor, intervalArrays);
             }
             
@@ -88,11 +92,9 @@ namespace VariantAnnotation.NSA
 
         public IEnumerable<string> GetAnnotation(IVariant variant)
         {
-            if (!_intervalArrays.ContainsKey(variant.Chromosome.Index)) return null;
-
-            var overlappingSvs = _intervalArrays[variant.Chromosome.Index]
-                .GetAllOverlappingIntervals(variant.Start, variant.End);
-
+            var overlappingSvs =
+                  _intervalForest.GetAllOverlappingIntervals(variant.Chromosome.Index, variant.Start, variant.End);
+              
             if (overlappingSvs == null) return null;
             
             var jsonStrings = new List<string>();
@@ -114,14 +116,10 @@ namespace VariantAnnotation.NSA
                 jsonString += JsonObject.Comma + "\"annotationOverlap\":" + annotationOverlap.Value.ToString("0.#####");
             return jsonString;
         }
-        
+
         public bool OverlapsAny(IChromosomeInterval variant)
         {
-            if (!_intervalArrays.ContainsKey(variant.Chromosome.Index)) return false;
-
-            return _intervalArrays[variant.Chromosome.Index]
-                .OverlapsAny(variant.Start, variant.End);
-
+            return _intervalForest.OverlapsAny(variant.Chromosome.Index, variant.Start, variant.End);
         }
     }
 }
