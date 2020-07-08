@@ -31,6 +31,7 @@
 
         // non variants
         run_of_homozygosity = 33,
+        
         // misc
         reference = 42,
         non_informative_allele = 43

@@ -107,7 +107,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private void AddConsequences(JsonObject jsonObject)
         {
-            if (Consequences.Count == 0) Consequences.Add(ConsequenceTag.transcript_variant);
             jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
         }
 

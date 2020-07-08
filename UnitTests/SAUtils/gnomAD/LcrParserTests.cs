@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Genome;
 using Moq;
 using SAUtils.gnomAD;
 using UnitTests.TestUtilities;

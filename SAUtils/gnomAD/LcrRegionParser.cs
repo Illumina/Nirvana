@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Genome;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.gnomAD
 {

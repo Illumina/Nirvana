@@ -15,7 +15,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             bool completeOverlap = variant.Contains(transcript);
             var  mappedPosition  = completeOverlap ? null : GetMappedPosition(transcript.TranscriptRegions, variant);
 
-            List<ConsequenceTag> consequences = GetConsequences(transcript, variant);
+            List<ConsequenceTag> consequences = GetConsequences(transcript, transcript.Gene.OnReverseStrand, variant);
 
             return new AnnotatedTranscript(transcript, null, null, null, null, mappedPosition, null, null, null, null,
                 consequences, completeOverlap);
@@ -32,10 +32,12 @@ namespace VariantAnnotation.TranscriptAnnotation
                 endIndex);
         }
 
-        private static List<ConsequenceTag> GetConsequences(IInterval transcript, IVariant variant)
+        private static List<ConsequenceTag> GetConsequences(IInterval transcript, bool onReverseStrand, IVariant variant)
         {
-            var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant, true);
-            var consequence   = new Consequences(null, featureEffect);
+            OverlapType overlapType = Intervals.Utilities.GetOverlapType(transcript.Start, transcript.End, variant.Start, variant.End);
+            EndpointOverlapType endpointOverlapType = Intervals.Utilities.GetEndpointOverlapType(transcript.Start, transcript.End, variant.Start, variant.End);
+            var featureEffect = new FeatureVariantEffects(overlapType, endpointOverlapType, onReverseStrand, variant.Type, true);
+            var consequence   = new Consequences(variant.Type, null, featureEffect);
             consequence.DetermineStructuralVariantEffect(variant);
             return consequence.GetConsequences();
         }

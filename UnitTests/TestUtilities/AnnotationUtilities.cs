@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Genome;
-using MitoHeteroplasmy;
 using Nirvana;
 using OptimizedCore;
 using VariantAnnotation;

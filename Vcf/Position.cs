@@ -8,7 +8,6 @@ using Variants;
 using Vcf.Info;
 using Vcf.Sample;
 using Vcf.VariantCreator;
-using MitoHeteroplasmy;
 
 namespace Vcf
 {

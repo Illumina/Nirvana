@@ -14,7 +14,6 @@ using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace UnitTests.Jist
 {

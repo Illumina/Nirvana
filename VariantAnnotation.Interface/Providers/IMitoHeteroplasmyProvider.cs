@@ -1,5 +1,4 @@
-﻿using System;
-using Genome;
+﻿using Genome;
 
 namespace VariantAnnotation.Interface.Providers
 {

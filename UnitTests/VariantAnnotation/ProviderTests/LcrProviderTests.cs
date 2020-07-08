@@ -4,13 +4,11 @@ using Genome;
 using Moq;
 using SAUtils.gnomAD;
 using UnitTests.TestUtilities;
-using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using Variants;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.ProviderTests

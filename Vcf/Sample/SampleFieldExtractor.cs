@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using MitoHeteroplasmy;
+﻿using System.Linq;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;

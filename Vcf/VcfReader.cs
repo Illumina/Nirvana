@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using ErrorHandling.Exceptions;
 using Genome;
-using MitoHeteroplasmy;
 using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;

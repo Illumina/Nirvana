@@ -26,7 +26,8 @@ namespace VariantAnnotation.TranscriptAnnotation
                 ? leftAnnotation
                 : AnnotateTranscript(transcript, rightShiftedVariant, aminoAcids, refSequence);
 
-            var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
+            List<ConsequenceTag> consequences = GetConsequences(transcript, transcript.Gene.OnReverseStrand,
+                leftShiftedVariant, leftAnnotation.VariantEffect);
             
             var hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
@@ -146,13 +147,14 @@ namespace VariantAnnotation.TranscriptAnnotation
             return positionalEffect;
         }
 
-        private static List<ConsequenceTag> GetConsequences(IInterval transcript, IVariant variant,
+        private static List<ConsequenceTag> GetConsequences(IInterval transcript, bool onReverseStrand, IVariant variant,
             IVariantEffect variantEffect)
         {
-            var featureEffect = new FeatureVariantEffects(transcript, variant.Type, variant,
-                variant.IsStructuralVariant);
+            OverlapType overlapType = Intervals.Utilities.GetOverlapType(transcript.Start, transcript.End, variant.Start, variant.End);
+            EndpointOverlapType endpointOverlapType = Intervals.Utilities.GetEndpointOverlapType(transcript.Start, transcript.End, variant.Start, variant.End);
+            var featureEffect = new FeatureVariantEffects(overlapType, endpointOverlapType, onReverseStrand, variant.Type, variant.IsStructuralVariant);
 
-            var consequence = new Consequences(variantEffect, featureEffect);
+            var consequence = new Consequences(variant.Type, variantEffect, featureEffect);
             consequence.DetermineSmallVariantEffects();
             return consequence.GetConsequences();
         }

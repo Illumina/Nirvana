@@ -4,7 +4,6 @@ using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
 using IO;
-using SAUtils.GnomadGeneScores;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
