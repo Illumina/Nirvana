@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using ErrorHandling.Exceptions;
-using Genome;
 using OptimizedCore;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
@@ -11,43 +9,10 @@ namespace SAUtils.Custom
 {
     public static class ParserUtilities
     {
-
-        public static string ParseTitle(string line)
-        {
-            line = line.Trim();
-            CheckPrefix(line, "#title", "first");
-            string firstCol = line.OptimizedSplit('\t')[0];
-            (_, string jsonTag) = firstCol.OptimizedKeyValue();
-
-            if (jsonTag == null)
-                throw new UserErrorException("Please provide the title in the format: #title=titleValue.");
-
-            if (CheckJsonTagConflict(jsonTag))
-                throw new UserErrorException($"{jsonTag} is a reserved supplementary annotation tag in Nirvana. Please use a different value.");
-            return jsonTag;
-        }
-
-        public static GenomeAssembly ParseGenomeAssembly(string line, HashSet<GenomeAssembly> allowedGenomeAssemblies)
-        {
-            line = line.Trim();
-            CheckPrefix(line, "#assembly", "second");
-            string firstCol = line.OptimizedSplit('\t')[0];
-            (_, string assemblyString) = firstCol.OptimizedKeyValue();
-
-            if (assemblyString == null)
-                throw new UserErrorException("Please provide the genome assembly in the format: #assembly=genomeAssembly.");
-
-            var assembly = GenomeAssemblyHelper.Convert(assemblyString);
-            if (!allowedGenomeAssemblies.Contains(assembly))
-                throw new UserErrorException("Only GRCh37 and GRCh38 are accepted for genome assembly.");
-
-            return assembly;
-        }
-
         public static (bool MatchByAllele, bool IsArray, SaJsonValueType PrimaryType, ReportFor reportFor) ParseMatchVariantsBy(string line)
         {
             line = line.Trim();
-            CheckPrefix(line, "#matchVariantsBy", "third");
+            CheckPrefix(line, "#matchVariantsBy");
             string firstCol = line.OptimizedSplit('\t')[0];
             (_, string matchBy) = firstCol.OptimizedKeyValue();
 
@@ -82,9 +47,9 @@ namespace SAUtils.Custom
             return (matchByAllele, isArray, primaryType, reportFor);
         }
 
-        public static string[] ParseTags(string line, string prefix, int numRequiredCols, string rowNumber)
+        public static string[] ParseTags(string line, string prefix, int numRequiredCols)
         {
-            CheckPrefix(line, prefix, rowNumber);
+            CheckPrefix(line, prefix);
 
             var tags = line.OptimizedSplit('\t');
             if (tags.Length < numRequiredCols)
@@ -94,9 +59,9 @@ namespace SAUtils.Custom
         }
 
 
-        public static CustomAnnotationCategories[] ParseCategories(string line, int numRequiredColumns, int numAnnotationColumns, Action<string, string>[] annotationValidators, string rowNumber)
+        public static CustomAnnotationCategories[] ParseCategories(string line, int numRequiredColumns, int numAnnotationColumns, Action<string, string>[] annotationValidators)
         {
-            CheckPrefix(line, "#categories", rowNumber);
+            CheckPrefix(line, "#categories");
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != numRequiredColumns + numAnnotationColumns) throw new UserErrorException("#categories row must have the same number of columns as the header row with column names.");
 
@@ -149,9 +114,9 @@ namespace SAUtils.Custom
             return categories;
         }
 
-        public static string[] ParseDescriptions(string line, int numRequiredColumns, int numAnnotationColumns, string rowNumber)
+        public static string[] ParseDescriptions(string line, int numRequiredColumns, int numAnnotationColumns)
         {
-            CheckPrefix(line,"#descriptions", rowNumber);
+            CheckPrefix(line,"#descriptions");
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != numRequiredColumns + numAnnotationColumns) throw new UserErrorException("#descriptions row must have the same number of columns as the header row with column names");
 
@@ -165,9 +130,9 @@ namespace SAUtils.Custom
             return descriptions;
         }
 
-        public static SaJsonValueType[] ParseTypes(string line, int numRequiredColumns, int numAnnotationColumns, string rowNumber)
+        public static SaJsonValueType[] ParseTypes(string line, int numRequiredColumns, int numAnnotationColumns)
         {
-            CheckPrefix(line, "#type", rowNumber);
+            CheckPrefix(line, "#type");
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != numRequiredColumns + numAnnotationColumns) throw new UserErrorException("#types row must have the same number of columns as the header row with column names");
 
@@ -194,13 +159,13 @@ namespace SAUtils.Custom
         }
 
         // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Global
-        internal static void CheckPrefix(string line, string prefix, string rowNumber)
+        internal static void CheckPrefix(string line, string prefix)
         {
             if (line != null && !line.StartsWith(prefix))
-                throw new UserErrorException($"The TSV file is required to start with {prefix} in the {rowNumber} row.");
+                throw new UserErrorException($"Expected a line starting with {prefix}. Observed \n{line}");
         }
 
-        private static bool CheckJsonTagConflict(string value)
+        public static bool CheckJsonTagConflict(string value)
         {
             return value.Equals(SaCommon.DbsnpTag)
                    || value.Equals(SaCommon.GlobalAlleleTag)

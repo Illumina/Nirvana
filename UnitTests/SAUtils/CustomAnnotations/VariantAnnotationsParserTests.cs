@@ -317,6 +317,83 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.Equal("TA", item.AltAllele);
             }
         }
+        [Fact]
+        public void ParseTitle_Conflict_JsonTag()
+        {
+            const string text = "#title=topmed\n"                                                          +
+                                "#assembly=GRCh38\n"                                                                      +
+                                "#matchVariantsBy=allele\n"                                                               +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n"   +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n"                                     +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            Assert.Throws<UserErrorException>(() => VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider));
+            
+        }
+
+        [Fact]
+        public void ParseTitle_IncorrectFormat()
+        {
+            const string text = "#title:IcslAlleleFrequencies\n"                                                          +
+                                "#assembly=GRCh38\n"                                                                      +
+                                "#matchVariantsBy=allele\n"                                                               +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n"   +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n"                                     +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            Assert.Throws<UserErrorException>(() => VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider));
+        }
+
+        [Fact]
+        public void ParseGenomeAssembly_UnsupportedAssembly_ThrowException()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n"                                                          +
+                                "#assembly=hg20\n"                                                                      +
+                                "#matchVariantsBy=allele\n"                                                               +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n"   +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n"                                     +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            Assert.Throws<UserErrorException>(() => VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider));
+        }
+
+        [Fact]
+        public void ParseGenomeAssembly_IncorrectFormat_ThrowException()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n"                                                          +
+                                "#assembly-hg20\n"                                                                      +
+                                "#matchVariantsBy=allele\n"                                                               +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n"   +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n"                                     +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            Assert.Throws<UserErrorException>(() => VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider));
+        }
+
+
+        [Fact]
+        public void ParseHeader_version_and_description()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n" +
+                                "#version=v4.5\t\n"+
+                                "#description=Internal allele frequencies\t\n" +
+                                "#matchVariantsBy=allele\n" +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n" +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            using (var parser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                Assert.Equal("v4.5", parser.Version);
+                Assert.Equal("Internal allele frequencies", parser.DataSourceDescription);
+            }
+        }
 
         private static ISequenceProvider GetMockedSequenceProvider()
         {

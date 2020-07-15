@@ -15,12 +15,15 @@ namespace SAUtils.Custom
 {
     public static class CaUtilities
     {
-        public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, VariantAnnotationsParser parser, string dataVersion, ISequenceProvider referenceProvider, out DataSourceVersion version)
+        public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, VariantAnnotationsParser parser,string dataVersion,ISequenceProvider referenceProvider, out DataSourceVersion version)
         {
+            dataVersion = string.IsNullOrEmpty(parser.Version) ? dataVersion : parser.Version;
+            version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks,
+                parser.DataSourceDescription);
             return new NsaWriter(
                 nsaStream,
                 indexStream,
-                version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks),
+                version,
                 referenceProvider,
                 parser.JsonTag,
                 parser.MatchByAllele, // match by allele
@@ -36,7 +39,8 @@ namespace SAUtils.Custom
 
         public static NgaWriter GetNgaWriter(Stream ngaStream, GeneAnnotationsParser parser, string dataVersion)
         {
-            var version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks);
+            dataVersion = string.IsNullOrEmpty(parser.Version) ? dataVersion : parser.Version;
+            var version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks, parser.DataSourceDescription);
             return new NgaWriter(ngaStream, version, parser.JsonTag, SaCommon.SchemaVersion, false);
         }
 

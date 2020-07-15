@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ErrorHandling;
 using ErrorHandling.Exceptions;
 using OptimizedCore;
 using SAUtils.GeneIdentifiers;
@@ -19,6 +20,9 @@ namespace SAUtils.Custom
         private readonly Dictionary<string, string> _ensemblIdToSymbol;
 
         public string JsonTag;
+        public string Version;
+        public string DataSourceDescription;
+
         private string[] _tags;
         internal CustomAnnotationCategories[] Categories;
         internal string[] Descriptions;
@@ -52,12 +56,34 @@ namespace SAUtils.Custom
 
         internal void ParseHeaderLines()
         {
-            JsonTag = ParserUtilities.ParseTitle(_reader.ReadLine());
-            _tags = ParserUtilities.ParseTags(_reader.ReadLine(), "#geneSymbol", NumRequiredColumns, "second");
+            string line;
+            while ((line = _reader.ReadLine()) !=null)
+            {
+                if (line.StartsWith("#geneSymbol")) break;
+                line = line.Trim();
+                (string key, string value) = line.OptimizedKeyValue();
+                switch (key)
+                {
+                    case "#title":
+                        JsonTag = value;
+                        break;
+                    case "#version":
+                        Version = value;
+                        break;
+                    case "#description":
+                        DataSourceDescription = value;
+                        break;
+                    default:
+                        var e = new UserErrorException("Unexpected header tag observed");
+                        e.Data[ExitCodeUtilities.Line] = line;
+                        throw e;
+                }
+            }
+            _tags = ParserUtilities.ParseTags(line, "#geneSymbol", NumRequiredColumns);
             CheckTagsAndSetJsonKeys();
-            Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, _annotationValidators, "third");
-            Descriptions = ParserUtilities.ParseDescriptions(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, "forth");
-            ValueTypes = ParserUtilities.ParseTypes(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, "fifth");
+            Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, _annotationValidators);
+            Descriptions = ParserUtilities.ParseDescriptions(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns);
+            ValueTypes = ParserUtilities.ParseTypes(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns);
         }
 
         private void InitiateSchema()
