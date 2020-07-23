@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Compression.FileHandling;
 using Intervals;
 using Jasix.DataStructures;
 using Newtonsoft.Json;
@@ -38,11 +39,16 @@ namespace Jasix
 		}
 
 		
-        public void PrintChromosomeList()
+        public void ListChromosomesAndSections()
 		{
 			foreach (string chrName in _jasixIndex.GetChromosomeList())
 			{
                 _writer.WriteLine(chrName);
+			}
+
+			foreach (var section in _jasixIndex.GetSections())
+			{
+				_writer.WriteLine(section);
 			}
 		}
 
@@ -53,7 +59,16 @@ namespace Jasix
 			_writer.WriteLine("{" + headerString+"}");
 		}
 
-		
+		public void PrintSection(string section)
+		{
+			_writer.WriteLine("[");
+			foreach (var line in GetSectionLines(section))
+			{
+				_writer.WriteLine(line);
+			}
+			_writer.WriteLine("]");
+		}
+
 		public int ProcessQuery(IEnumerable<string> queryStrings, bool printHeader = false)
 		{
 			_writer.Write("{");
@@ -142,7 +157,24 @@ namespace Jasix
 
 	        return headerLine?.Substring(1, headerLine.Length - 1 - additionalTail.Length);
 	    }
+	    
+	    private static readonly byte[] BgzBlock = new byte[BlockGZipStream.BlockGZipFormatCommon.MaxBlockSize];
+	    public IEnumerable<string> GetSectionLines(string section)
+	    {
+		    if (_jasixIndex.GetSectionBegin(section) == -1) yield break;
+		    
+		    long sectionBegin = _jasixIndex.GetSectionBegin(section);
+		    RepositionReader(sectionBegin);
 
+		    string line = _jsonReader.ReadLine();
+		    // at the end of both positions and genes section, we have a line that closes the array.
+		    // So, our terminating condition can be the following
+		    while (line != null && !line.StartsWith("]"))
+		    {
+			    yield return line;
+			    line = _jsonReader.ReadLine();
+		    }
+	    }
         internal IEnumerable<string> ReadOverlappingJsonLines((string Chr, int Start, int End) query)
 		{
             (string chr, int start, int end) = query;
@@ -188,5 +220,7 @@ namespace Jasix
 
 	        return jsonEntry;
 	    }
+
+	    
 	}
 }

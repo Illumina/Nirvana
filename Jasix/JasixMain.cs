@@ -17,9 +17,10 @@ namespace Jasix
         private static string _inputJson;
         private static string _outputFile;
         private static readonly List<string> Queries = new List<string>();
+        private static string _section;
         private static bool _printHeader;
         private static bool _printHeaderOnly;
-        private static bool _listChromosomeNames;
+        private static bool _list;
         private static bool _createIndex;
 
         public static int Main(string[] args)
@@ -37,9 +38,9 @@ namespace Jasix
                     v => _printHeaderOnly = v != null
                 },
                 {
-                    "chromosomes|l",
-                    "list chromosome names",
-                    v => _listChromosomeNames = v != null
+                    "list|l",
+                    "list chromosome and section names",
+                    v => _list = v != null
                 },
                 {
                     "index|c",
@@ -60,6 +61,11 @@ namespace Jasix
                     "query|q=",
                     "query range",
                     v => Queries.Add(v)
+                },
+                {
+                    "section|s=",
+                    "complete section (positions or genes) to output",
+                    v => _section = v
                 }
             };
 
@@ -96,15 +102,21 @@ namespace Jasix
             using (var queryProcessor = new QueryProcessor(GZipUtilities.GetAppropriateStreamReader(_inputJson),
                     FileUtilities.GetReadStream(indexFileName), writer))
             {
-                if (_listChromosomeNames)
+                if (_list)
                 {
-                    queryProcessor.PrintChromosomeList();
+                    queryProcessor.ListChromosomesAndSections();
                     return ExitCodes.Success;
                 }
 
                 if (_printHeaderOnly)
                 {
                     queryProcessor.PrintHeaderOnly();
+                    return ExitCodes.Success;
+                }
+
+                if (!string.IsNullOrEmpty(_section))
+                {
+                    queryProcessor.PrintSection(_section);
                     return ExitCodes.Success;
                 }
 
