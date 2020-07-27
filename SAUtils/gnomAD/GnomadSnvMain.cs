@@ -61,9 +61,7 @@ namespace SAUtils.gnomAD
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
                 .CheckDirectoryExists(_genomeDirectory, "input directory containing genome vcf files", "--genome")
-                .CheckDirectoryExists(_exomeDirectory, "input directory containing exome vcf files", "--exome")
                 .CheckDirectoryExists(_outputDirectory, "output Supplementary directory", "--out")
-                .CheckDirectoryExists(_tempDirectory, "output temp directory for intermediate (per chrom) NSA files", "--temp")
                 .SkipBanner()
                 .ShowHelpMenu("Reads provided supplementary data files and populates tsv files", commandLineExample)
                 .ShowErrors()
@@ -75,6 +73,7 @@ namespace SAUtils.gnomAD
         private static ExitCodes ProgramExecution()
         {
             //clearing temp directory
+            if (!Directory.Exists(_tempDirectory)) Directory.CreateDirectory(_tempDirectory);
             Console.WriteLine($"Cleaning {SaCommon.SaFileSuffix} and {SaCommon.IndexSufix} files from temp directory {_tempDirectory}");
             foreach (var file in Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}"))
             {
@@ -159,6 +158,8 @@ namespace SAUtils.gnomAD
                 throw new InvalidDataException($"Only one .version file should exist in: {_genomeDirectory}");
             var genomeVersion = DataSourceVersionReader.GetSourceVersion(genomeVersionFiles[0]);
 
+            if (string.IsNullOrEmpty(_exomeDirectory)) return genomeVersion;
+
             var exomeVersionFiles = Directory.GetFiles(_exomeDirectory, "*.version");
             if (exomeVersionFiles.Length != 1)
                 throw new InvalidDataException($"Only one .version file should exist in: {_exomeDirectory}");
@@ -172,6 +173,7 @@ namespace SAUtils.gnomAD
 
         private static string[] GetVcfFiles(string directory)
         {
+            if (string.IsNullOrEmpty(directory)) return new string[]{};
             // the files might have gz or bgz extensions
             var files = Directory.GetFiles(directory, "*.vcf.bgz");
             if(files.Length == 0)
