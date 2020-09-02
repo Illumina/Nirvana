@@ -12,6 +12,7 @@ using CommandLine.Utilities;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
 using IO;
+using SAUtils.Custom;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -20,6 +21,7 @@ namespace CustomAnnotationLambda
     // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class CustomAnnotationLambda
     {
+        
         // ReSharper disable once UnusedMember.Global
         public CustomResult Run(CustomConfig config, ILambdaContext context)
         {
@@ -97,6 +99,7 @@ namespace CustomAnnotationLambda
             var errorCategory = ExceptionUtilities.ExceptionToErrorCategory(e);
 
             result.status = $"{errorCategory}: {e.Message}";
+            result.noValidEntries = e.Message == GeneAnnotationsParser.NoValidEntriesErrorMessage;
 
             if (errorCategory != ErrorCategory.UserError)
             {

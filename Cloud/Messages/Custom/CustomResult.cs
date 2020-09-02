@@ -8,6 +8,7 @@
         public string status;
         public string genomeAssembly;
         public FileList created;
+        public bool noValidEntries;
     }
     // ReSharper restore InconsistentNaming
     // ReSharper restore NotAccessedField.Global

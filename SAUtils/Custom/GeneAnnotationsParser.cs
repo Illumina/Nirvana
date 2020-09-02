@@ -30,17 +30,18 @@ namespace SAUtils.Custom
         internal readonly List<string> JsonKeys = new List<string>();
         public SaJsonSchema JsonSchema;
 
-        private const int NumRequiredColumns = 2;
-        private int _numAnnotationColumns;
-        private Action<string, string>[] _annotationValidators;
-
+        private const    int                      NumRequiredColumns = 2;
+        private          int                      _numAnnotationColumns;
+        private          Action<string, string>[] _annotationValidators;
+        private readonly List<string>             _unknownGenes = new List<string>();
+        
+        public const string NoValidEntriesErrorMessage = "The provided TSV has no valid custom annotation entries.";
         
         internal GeneAnnotationsParser(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
         {
             _reader = reader;
             _entrezGeneIdToSymbol = entrezGeneIdToSymbol;
             _ensemblIdToSymbol = ensemblIdToSymbol;
-
         }
 
         public static GeneAnnotationsParser Create(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
@@ -128,10 +129,11 @@ namespace SAUtils.Custom
                     AddItem(line, geneAnnotations, skipGeneIdValidation, logWriter);
                 }
             }
-            if (geneAnnotations.Count == 0) throw new UserErrorException("The provided TSV has no valid custom annotation entries.");
+            if (geneAnnotations.Count == 0) throw new UserErrorException(NoValidEntriesErrorMessage);
             return geneAnnotations;
         }
 
+        
         private void AddItem(string line, IDictionary<string, List<ISuppGeneItem>> geneAnnotations, bool skipGeneIdValidation, StreamWriter logWriter)
         {
             var splits = line.OptimizedSplit('\t');
@@ -156,9 +158,8 @@ namespace SAUtils.Custom
             string geneSymbol = GeneUtilities.GetGeneSymbolFromId(geneId, _entrezGeneIdToSymbol, _ensemblIdToSymbol);
             if (geneSymbol == null)
             {
-                if(!skipGeneIdValidation)
-                    throw new UserErrorException($"Unrecognized gene ID {geneId} found in the input file:\n {line}");
-
+                if (!skipGeneIdValidation) _unknownGenes.Add(geneId);
+                
                 logWriter?.WriteLine($"Skipping unrecognized gene ID {geneId}");
                 return;
             }
@@ -167,6 +168,7 @@ namespace SAUtils.Custom
             geneAnnotations[geneSymbol] = new List<ISuppGeneItem> {new CustomGene(geneSymbol, annotationValues.Select(x => new[] {x}).ToList(), JsonSchema, line)};
         }
 
+        public IReadOnlyList<string> GetUnknownGenes() => _unknownGenes.OrderBy(x=>x).ToList();
         public void Dispose() => _reader?.Dispose();
     }
 }

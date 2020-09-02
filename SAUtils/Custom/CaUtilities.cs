@@ -50,7 +50,7 @@ namespace SAUtils.Custom
             schemaWriter.Write(parser.JsonSchema);
             var intervals = parser.GetCustomIntervals();
 
-            if (nsaItemsCount == 0 & intervals == null) throw new UserErrorException("The provided TSV has no valid custom annotation entries.");
+            if (nsaItemsCount == 0 & intervals == null) throw new UserErrorException(GeneAnnotationsParser.NoValidEntriesErrorMessage);
             return (parser.JsonTag, nsaItemsCount, parser.IntervalJsonSchema, intervals);
         }
 
