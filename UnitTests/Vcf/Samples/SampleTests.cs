@@ -9,7 +9,7 @@ namespace UnitTests.Vcf.Samples
         public void Sample_ReturnEmpty()
         {
             var emptySample = new Sample(null, null, null, null, false, null, null, false, null, null, null, null, null, null,
-                null, null, null, null, null);
+                null, null, null, null, null, null);
 
             Assert.True(emptySample.IsEmpty);
             Assert.True(Sample.EmptySample.IsEmpty);

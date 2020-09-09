@@ -46,11 +46,33 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             string observedResult = annotatedPosition.GetJsonString();
             Assert.Null(observedResult);
         }
+        
+        //21    9411410    .    C    T    9.51    DRAGENSnpHardQUAL    AC=2;AF=1.000;AN=2;DP=2;FS=0.000;MQ=100.00;QD=9.51;SOR=1.609    GT:AD:AF:DP:GQ:FT:F1R2:F2R1:PL:GP:PP    ./.:.:.:0:0:.:.:.    ./.:.:.:0:0:.:.:.    1/1:0,1:1.000:1:3:PASS:0,1:0,0:45,3,0:1.0415e+01,3.4301e+00,3.4199e+00:45,3,0
+        [Fact]
+        public void GetJsonString_fisherStrand()
+        {
+            const string vcfLine = "21\t9411410\t.\tC\tT\t9.51\tDRAGENSnpHardQUAL\tAC=2;AF=1.000;AN=2;DP=2;FS=0.000;MQ=100.00;QD=9.51;SOR=1.609";
+
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            var seqProvider      = ParserTestUtils.GetSequenceProvider(9411410, "C", 'A', ChromosomeUtilities.RefNameToChromosome);
+            var variantFactory   = new VariantFactory(seqProvider.Sequence, new VariantId());
+
+            var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
+
+            IVariant[]          variants          = GetVariants();
+            IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
+            var                 annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+
+            string observedResult = annotatedPosition.GetJsonString();
+
+            Assert.NotNull(observedResult);
+            Assert.Contains("\"fisherStrandBias\":0", observedResult);
+        }
 
         [Fact]
         public void GetJsonString_StrelkaSomatic()
         {
-            const string vcfLine = "chr1	13813	.	T	G	.	LowQscore	SOMATIC;QSS=33;TQSS=1;NT=ref;QSS_NT=16;TQSS_NT=1;SGT=TT->GT;DP=266;MQ=23.89;MQ0=59;ALTPOS=69;ALTMAP=37;ReadPosRankSum=1.22;SNVSB=5.92;PNOISE=0.00;PNOISE2=0.00;VQSR=1.93";
+            const string vcfLine = "chr1	13813	.	T	G	.	LowQscore	SOMATIC;QSS=33;TQSS=1;NT=ref;QSS_NT=16;TQSS_NT=1;SGT=TT->GT;DP=266;MQ=23.89;MQ0=59;ALTPOS=69;ALTMAP=37;ReadPosRankSum=1.22;SNVSB=5.92;PNOISE=0.00;PNOISE2=0.00;VQSR=1.93;FS=12.123";
 
             var refMinorProvider = new Mock<IRefMinorProvider>();
             var seqProvider = ParserTestUtils.GetSequenceProvider(13813, "T", 'C', ChromosomeUtilities.RefNameToChromosome);
@@ -67,6 +89,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.NotNull(observedResult);
             Assert.Contains("\"jointSomaticNormalQuality\":16", observedResult);
             Assert.Contains("\"recalibratedQuality\":1.93", observedResult);
+            Assert.Contains("\"mappingQuality\":23.89", observedResult);
+            Assert.Contains("\"fisherStrandBias\":12.123", observedResult);
         }
 
         private static ISample[] GetSamples() => new ISample[] { Sample.EmptySample };
@@ -89,7 +113,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var vcfFields = new string[8];
             vcfFields[0] = originalChromosomeName;
 
-            var infoData = new InfoData(null, null, null, null, null, null, null, null, null, null);
+            var infoData = new InfoData(null, null, null, null, null, null, null, null, null, null, null, null);
 
             return new Position(ChromosomeUtilities.Chr1, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);

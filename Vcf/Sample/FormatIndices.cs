@@ -21,6 +21,7 @@ namespace Vcf.Sample
         internal int? VF;
         internal int? MCN;
         internal int? SQ;
+        internal int? BC;
 
         //legacy fields
         internal int? TAR;
@@ -55,6 +56,7 @@ namespace Vcf.Sample
             VF    = null;
             MCN   = null;
             SQ    = null;
+            BC    = null;
             
             // legacy sample fields
             TAR = null;
@@ -131,6 +133,9 @@ namespace Vcf.Sample
                         break;
                     case "SQ":
                         SQ = index;
+                        break;
+                    case "BC":
+                        BC = index;
                         break;
                     //LEGACY
                     case "TAR":
