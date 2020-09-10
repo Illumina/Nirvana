@@ -13,14 +13,15 @@ namespace UnitTests.SAUtils.Revel
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
 
-            writer.WriteLine("chr,hg19_pos,ref,alt,aaref,aaalt,REVEL");
-            writer.WriteLine("1,35290,G,A,P,D,0.035");
-            writer.WriteLine("1,35290,G,A,P,S,0.031");
-            writer.WriteLine("1,35290,G,C,P,A,0.040");
-            writer.WriteLine("1,35290,G,T,P,T,0.035");
-            writer.WriteLine("1,35290,G,C,P,A,0.063");
-            writer.WriteLine("1,35291,G,C,F,L,0.022");
-            writer.WriteLine("1,35291,G,T,F,L,0.022");
+            writer.WriteLine("##REVEL");
+            writer.WriteLine("#chr\tpos\tref\talt\trefAA\taltAA\tscore");
+            writer.WriteLine("1\t35290\tG\tA\tP\tD\t0.035");
+            writer.WriteLine("1\t35290\tG\tA\tP\tS\t0.031");
+            writer.WriteLine("1\t35290\tG\tC\tP\tA\t0.040");
+            writer.WriteLine("1\t35290\tG\tT\tP\tT\t0.035");
+            writer.WriteLine("1\t35290\tG\tC\tP\tA\t0.063");
+            writer.WriteLine("1\t35291\tG\tC\tF\tL\t0.022");
+            writer.WriteLine("1\t35291\tG\tT\tF\tL\t0.022");
             writer.Flush();
 
             stream.Position = 0;

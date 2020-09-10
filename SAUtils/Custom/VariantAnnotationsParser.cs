@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ErrorHandling;
 using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
@@ -21,6 +22,8 @@ namespace SAUtils.Custom
         public ISequenceProvider SequenceProvider;
         public string JsonTag;
         public GenomeAssembly Assembly;
+        public string Version;
+        public string DataSourceDescription;
         public bool MatchByAllele;
         public bool IsArray;
         public string[] Tags;
@@ -76,14 +79,59 @@ namespace SAUtils.Custom
 
         internal void ParseHeaderLines()
         {
-            JsonTag = ParserUtilities.ParseTitle(_reader.ReadLine());
-            Assembly = ParserUtilities.ParseGenomeAssembly(_reader.ReadLine(), _allowedGenomeAssemblies);
-            (MatchByAllele, IsArray, _primaryType, ReportFor) = ParserUtilities.ParseMatchVariantsBy(_reader.ReadLine());
-            Tags = ParserUtilities.ParseTags(_reader.ReadLine(), "#CHROM", _numRequiredColumns, "forth");
+            var hasMatchByLine = false;
+
+            string line;
+            while ((line = _reader.ReadLine())!=null)
+            {
+                if (line.StartsWith("#CHROM")) break;
+                line = line.Trim();
+                (string key, string value) = line.OptimizedKeyValue();
+                switch (key)
+                {
+                    case "#title":
+                        JsonTag = value;
+                        break;
+                    case "#assembly":
+                        Assembly = GenomeAssemblyHelper.Convert(value);
+                        break;
+                    case "#matchVariantsBy":
+                        (MatchByAllele, IsArray, _primaryType, ReportFor) = ParserUtilities.ParseMatchVariantsBy(line);
+                        hasMatchByLine = true;
+                        break;
+                    case "#version":
+                        Version = value;
+                        break;
+                    case "#description":
+                        DataSourceDescription = value;
+                        break;
+                    default:
+                        var e = new UserErrorException("Unexpected header tag observed");
+                        e.Data[ExitCodeUtilities.Line] = line;
+                        throw e;
+                }
+            }
+            CheckRequiredFields(hasMatchByLine);
+
+            //The following lines have to appear in exact order
+            Tags = ParserUtilities.ParseTags(line, "#CHROM", _numRequiredColumns);
             CheckTagsAndSetJsonKeys();
-            Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns, _annotationValidators, "fifth");
-            Descriptions = ParserUtilities.ParseDescriptions(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns, "sixth");
-            ValueTypes = ParserUtilities.ParseTypes(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns, "seventh");
+            Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns, _annotationValidators);
+            Descriptions = ParserUtilities.ParseDescriptions(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns);
+            ValueTypes = ParserUtilities.ParseTypes(_reader.ReadLine(), _numRequiredColumns, _numAnnotationColumns);
+        }
+
+        private void CheckRequiredFields(bool hasMatchByLine)
+        {
+            if (string.IsNullOrEmpty(JsonTag))
+                throw new UserErrorException("Please provide the title in the format: #title=titleValue.");
+            if (ParserUtilities.CheckJsonTagConflict(JsonTag))
+                throw new UserErrorException($"{JsonTag} is a reserved supplementary annotation tag in Nirvana. Please use a different value.");
+            if (!_allowedGenomeAssemblies.Contains(Assembly))
+                throw new UserErrorException("Only GRCh37 and GRCh38 are accepted as genome assembly.");
+            if (!hasMatchByLine)
+                throw new UserErrorException(
+                    "Please provide the annotation reporting criteria in the format: #matchVariantsBy=allele.");
         }
 
         private void CheckTagsAndSetJsonKeys()

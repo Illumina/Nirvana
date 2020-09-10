@@ -30,6 +30,8 @@ namespace UnitTests.Vcf
             var info = VcfInfoParser.Parse("AC=2;AF=0.250;AN=8;BaseQRankSum=1.719;DB;DP=106;Dels=0.00;FS=20.202;HaplotypeScore=0.0000;MLEAC=2;MLEAF=0.250;MQ=43.50;MQ0=52;MQRankSum=2.955;QD=4.73;ReadPosRankSum=1.024;SB=-1.368e+02;VQSLOD=-0.3503;culprit=MQ;PLF");
 
             Assert.Equal(-136.8, info.StrandBias);
+            Assert.Equal(20.202, info.FisherStrandBias);
+            Assert.Equal(43.50, info.MappingQuality);
         }
 
         [Fact]

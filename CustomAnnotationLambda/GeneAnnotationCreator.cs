@@ -5,6 +5,7 @@ using Cloud;
 using Cloud.Messages.Custom;
 using Cloud.Utilities;
 using Compression.Utilities;
+using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.Custom;
 using SAUtils.GeneIdentifiers;
@@ -48,10 +49,16 @@ namespace CustomAnnotationLambda
                     using (var logWriter    = new StreamWriter(logMd5Stream))
                     {
                         ngaWriter.Write(parser.GetItems(config.skipGeneIdValidation, logWriter));
+                        var unknownGenes = parser.GetUnknownGenes();
+                        if (!config.skipGeneIdValidation && unknownGenes.Count > 0)
+                        {
+                            throw new UserErrorException($"The following gene IDs were not recognized in Nirvana: {string.Join(',', unknownGenes)}");
+                        }
+
                         schemaWriter.Write(parser.JsonSchema);
                     }
+                    
                     //all the writers have to be disposed before GetFileMetaData is called
-
                     ngaMetadata = ngaMd5Stream.GetFileMetadata();
                     schemaMetadata = schemaMd5Stream.GetFileMetadata();
                     logMetaData = logMd5Stream.GetFileMetadata();

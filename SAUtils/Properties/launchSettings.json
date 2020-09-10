@@ -25,6 +25,11 @@
       "commandLineArgs": " gnomad-lcr --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --in LCR.GRCh37_compliant.interval_list.gz --out /Users/rroy1/development/SupplementaryDatabase/58/GRCh37",
       "workingDirectory": "/Users/rroy1/development/ExternalDataSources/gnomAD/2.1/LCR/"
     },
+    "RR_revel_38": {
+      "commandName": "Project",
+      "commandLineArgs": " revel --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --in sorted.chr21.tsv.gz --out /Users/rroy1/development/SupplementaryDatabase/test/GRCh38",
+      "workingDirectory": "/Users/rroy1/development/ExternalDataSources/REVEL/2020/GRCh38/"
+    },
     "RR_clingen": {
       "commandName": "Project",
       "commandLineArgs": " makeClinGenDb --ref ~/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --out ~/development/SupplementaryDatabase/59/test --in ClinGen_GRCh37_unified_sorted.tsv.gz",

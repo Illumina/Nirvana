@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using ErrorHandling;
 using ErrorHandling.Exceptions;
 using OptimizedCore;
 using SAUtils.GeneIdentifiers;
@@ -19,6 +20,9 @@ namespace SAUtils.Custom
         private readonly Dictionary<string, string> _ensemblIdToSymbol;
 
         public string JsonTag;
+        public string Version;
+        public string DataSourceDescription;
+
         private string[] _tags;
         internal CustomAnnotationCategories[] Categories;
         internal string[] Descriptions;
@@ -26,17 +30,18 @@ namespace SAUtils.Custom
         internal readonly List<string> JsonKeys = new List<string>();
         public SaJsonSchema JsonSchema;
 
-        private const int NumRequiredColumns = 2;
-        private int _numAnnotationColumns;
-        private Action<string, string>[] _annotationValidators;
-
+        private const    int                      NumRequiredColumns = 2;
+        private          int                      _numAnnotationColumns;
+        private          Action<string, string>[] _annotationValidators;
+        private readonly List<string>             _unknownGenes = new List<string>();
+        
+        public const string NoValidEntriesErrorMessage = "The provided TSV has no valid custom annotation entries.";
         
         internal GeneAnnotationsParser(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
         {
             _reader = reader;
             _entrezGeneIdToSymbol = entrezGeneIdToSymbol;
             _ensemblIdToSymbol = ensemblIdToSymbol;
-
         }
 
         public static GeneAnnotationsParser Create(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
@@ -52,12 +57,34 @@ namespace SAUtils.Custom
 
         internal void ParseHeaderLines()
         {
-            JsonTag = ParserUtilities.ParseTitle(_reader.ReadLine());
-            _tags = ParserUtilities.ParseTags(_reader.ReadLine(), "#geneSymbol", NumRequiredColumns, "second");
+            string line;
+            while ((line = _reader.ReadLine()) !=null)
+            {
+                if (line.StartsWith("#geneSymbol")) break;
+                line = line.Trim();
+                (string key, string value) = line.OptimizedKeyValue();
+                switch (key)
+                {
+                    case "#title":
+                        JsonTag = value;
+                        break;
+                    case "#version":
+                        Version = value;
+                        break;
+                    case "#description":
+                        DataSourceDescription = value;
+                        break;
+                    default:
+                        var e = new UserErrorException("Unexpected header tag observed");
+                        e.Data[ExitCodeUtilities.Line] = line;
+                        throw e;
+                }
+            }
+            _tags = ParserUtilities.ParseTags(line, "#geneSymbol", NumRequiredColumns);
             CheckTagsAndSetJsonKeys();
-            Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, _annotationValidators, "third");
-            Descriptions = ParserUtilities.ParseDescriptions(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, "forth");
-            ValueTypes = ParserUtilities.ParseTypes(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, "fifth");
+            Categories = ParserUtilities.ParseCategories(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns, _annotationValidators);
+            Descriptions = ParserUtilities.ParseDescriptions(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns);
+            ValueTypes = ParserUtilities.ParseTypes(_reader.ReadLine(), NumRequiredColumns, _numAnnotationColumns);
         }
 
         private void InitiateSchema()
@@ -102,10 +129,11 @@ namespace SAUtils.Custom
                     AddItem(line, geneAnnotations, skipGeneIdValidation, logWriter);
                 }
             }
-            if (geneAnnotations.Count == 0) throw new UserErrorException("The provided TSV has no valid custom annotation entries.");
+            if (geneAnnotations.Count == 0) throw new UserErrorException(NoValidEntriesErrorMessage);
             return geneAnnotations;
         }
 
+        
         private void AddItem(string line, IDictionary<string, List<ISuppGeneItem>> geneAnnotations, bool skipGeneIdValidation, StreamWriter logWriter)
         {
             var splits = line.OptimizedSplit('\t');
@@ -130,9 +158,8 @@ namespace SAUtils.Custom
             string geneSymbol = GeneUtilities.GetGeneSymbolFromId(geneId, _entrezGeneIdToSymbol, _ensemblIdToSymbol);
             if (geneSymbol == null)
             {
-                if(!skipGeneIdValidation)
-                    throw new UserErrorException($"Unrecognized gene ID {geneId} found in the input file:\n {line}");
-
+                if (!skipGeneIdValidation) _unknownGenes.Add(geneId);
+                
                 logWriter?.WriteLine($"Skipping unrecognized gene ID {geneId}");
                 return;
             }
@@ -141,6 +168,7 @@ namespace SAUtils.Custom
             geneAnnotations[geneSymbol] = new List<ISuppGeneItem> {new CustomGene(geneSymbol, annotationValues.Select(x => new[] {x}).ToList(), JsonSchema, line)};
         }
 
+        public IReadOnlyList<string> GetUnknownGenes() => _unknownGenes.OrderBy(x=>x).ToList();
         public void Dispose() => _reader?.Dispose();
     }
 }

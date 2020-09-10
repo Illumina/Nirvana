@@ -35,8 +35,7 @@ namespace SAUtils
         private readonly bool _leaveOpen;
         private int _count;
 
-
-        //todo: filter chromIndex=ushort.Max
+        
         public NsaWriter(Stream nsaStream, Stream indexStream, IDataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, bool throwErrorOnConflicts = false, int blockSize = SaCommon.DefaultBlockSize, GenomeAssembly assembly= GenomeAssembly.Unknown, bool leaveOpen=false)
         {
             _stream                  = nsaStream;

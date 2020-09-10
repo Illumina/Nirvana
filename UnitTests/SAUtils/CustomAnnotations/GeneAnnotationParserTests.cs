@@ -77,6 +77,26 @@ namespace UnitTests.SAUtils.CustomAnnotations
         }
         
         [Fact]
+        public void ParseHeaderLines_version_and_Description()
+        {
+            const string headerLines = "#title=InternalGeneAnnotation\n" +
+                                       "#version=v1.1\n" +
+                                       "#description=Internal Gene Annotation\n" +
+                                      "#geneSymbol\tgeneId\tOMIM Description\tIs Oncogene\tphenotype\tmimNumber\tnotes\n" +
+                                      "#categories\t.\tDescription\tFilter\t\tIdentifier\t.\n" +
+                                      "#descriptions\t.\tGene description from OMIM\t\tGene phenotype\t\tFree text\n" +
+                                      "#type\t\tstring\tbool\tstring\tnumber\tstring\n";
+
+
+            using (var parser = new GeneAnnotationsParser(GetReadStream(headerLines), EntrezGeneIdToSymbol, EnsemblIdToSymbol))
+            {
+                parser.ParseHeaderLines();
+                Assert.Equal("v1.1", parser.Version);
+                Assert.Equal("Internal Gene Annotation", parser.DataSourceDescription);
+            }
+        }
+        
+        [Fact]
         public void ParseHeaderLines_InconsistentFields()
         {
             const string invalidHeaderLines = "#title=InternalGeneAnnotation\n" +

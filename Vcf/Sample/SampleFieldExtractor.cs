@@ -44,23 +44,24 @@ namespace Vcf.Sample
                 return legacyExtractor.ExtractSample(sampleColumn);
             }
 
-            int[] alleleDepths                  = sampleColumns.GetString(formatIndices.AD).GetIntegers();
-            float? artifactAdjustedQualityScore = sampleColumns.GetString(formatIndices.AQ).GetFloat();
-            int? copyNumber                     = sampleColumns.GetString(formatIndices.CN).GetInteger();
-            string[] diseaseAffectedStatuses    = sampleColumns.GetString(formatIndices.DST).GetStrings();
-            bool failedFilter                   = sampleColumns.GetString(formatIndices.FT).GetFailedFilter();
-            string genotype                     = sampleColumns.GetString(formatIndices.GT);
-            int? genotypeQuality                = sampleColumns.GetString(formatIndices.GQ).GetInteger();
-            bool isDeNovo                       = sampleColumns.GetString(formatIndices.DN).IsDeNovo();
-            double? deNovoQuality               = enableDq? sampleColumns.GetString(formatIndices.DQ).GetDouble():null;
-            float? likelihoodRatioQualityScore  = sampleColumns.GetString(formatIndices.LQ).GetFloat();
-            int[] pairedEndReadCounts           = sampleColumns.GetString(formatIndices.PR).GetIntegers();
-            int[] repeatUnitCounts              = sampleColumns.GetString(formatIndices.REPCN).GetIntegers('/');
-            int[] splitReadCounts               = sampleColumns.GetString(formatIndices.SR).GetIntegers();
-            int? totalDepth                     = sampleColumns.GetString(formatIndices.DP).GetInteger();
-            double? variantFrequency            = sampleColumns.GetString(formatIndices.VF).GetDouble();
-            int? minorHaplotypeCopyNumber       = sampleColumns.GetString(formatIndices.MCN).GetInteger();
-            double? somaticQuality              = sampleColumns.GetString(formatIndices.SQ).GetDouble();
+            int[]    alleleDepths                 = sampleColumns.GetString(formatIndices.AD).GetIntegers();
+            float?   artifactAdjustedQualityScore = sampleColumns.GetString(formatIndices.AQ).GetFloat();
+            int?     copyNumber                   = sampleColumns.GetString(formatIndices.CN).GetInteger();
+            string[] diseaseAffectedStatuses      = sampleColumns.GetString(formatIndices.DST).GetStrings();
+            bool     failedFilter                 = sampleColumns.GetString(formatIndices.FT).GetFailedFilter();
+            string   genotype                     = sampleColumns.GetString(formatIndices.GT);
+            int?     genotypeQuality              = sampleColumns.GetString(formatIndices.GQ).GetInteger();
+            bool     isDeNovo                     = sampleColumns.GetString(formatIndices.DN).IsDeNovo();
+            double?  deNovoQuality                = enableDq? sampleColumns.GetString(formatIndices.DQ).GetDouble():null;
+            float?   likelihoodRatioQualityScore  = sampleColumns.GetString(formatIndices.LQ).GetFloat();
+            int[]    pairedEndReadCounts          = sampleColumns.GetString(formatIndices.PR).GetIntegers();
+            int[]    repeatUnitCounts             = sampleColumns.GetString(formatIndices.REPCN).GetIntegers('/');
+            int[]    splitReadCounts              = sampleColumns.GetString(formatIndices.SR).GetIntegers();
+            int?     totalDepth                   = sampleColumns.GetString(formatIndices.DP).GetInteger();
+            double?  variantFrequency             = sampleColumns.GetString(formatIndices.VF).GetDouble();
+            int?     minorHaplotypeCopyNumber     = sampleColumns.GetString(formatIndices.MCN).GetInteger();
+            double?  somaticQuality               = sampleColumns.GetString(formatIndices.SQ).GetDouble();
+            int?     binCount                     = sampleColumns.GetString(formatIndices.BC).GetInteger();
 
             double[] variantFrequencies = VariantFrequency.GetVariantFrequencies(variantFrequency, alleleDepths, simplePosition.AltAlleles.Length);
             string[] mitoHeteroplasmyPercentiles = mitoHeteroplasmyProvider?.GetVrfPercentiles(simplePosition.Chromosome, simplePosition.Start,
@@ -70,7 +71,7 @@ namespace Vcf.Sample
 
             var sample = new Sample(alleleDepths, artifactAdjustedQualityScore, copyNumber, diseaseAffectedStatuses,
                 failedFilter, genotype, genotypeQuality, isDeNovo, deNovoQuality, likelihoodRatioQualityScore, pairedEndReadCounts,
-                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality, isLoh, mitoHeteroplasmyPercentiles);
+                repeatUnitCounts, splitReadCounts, totalDepth, variantFrequencies, minorHaplotypeCopyNumber, somaticQuality, isLoh, mitoHeteroplasmyPercentiles, binCount);
 
             return sample;
         }

@@ -29,15 +29,17 @@ namespace SAUtils.Revel
         
         public IEnumerable<ISupplementaryDataItem> GetItems()
         {
-            //skip the header line
-            _reader.ReadLine();
             string line;
             int currentPosition = -1;
             IChromosome currentChromosome = null;
             string refAllele = null;
             while ((line = _reader.ReadLine()) != null)
             {
-                var fields = line.OptimizedSplit(',');
+                if (line.StartsWith("#"))
+                {
+                    continue;
+                }
+                var fields = line.OptimizedSplit('\t');
                 
                 if (!_refNameToChromosome.TryGetValue(fields[ChrIndex], out var chromosome)) continue;
                 var position = int.Parse(fields[PosIndex]);

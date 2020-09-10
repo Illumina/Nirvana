@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.GeneIdentifiers;
 using VariantAnnotation.SA;
@@ -66,6 +68,8 @@ namespace SAUtils.Custom
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
                 ngaWriter.Write(parser.GetItems());
+                if(parser.GetUnknownGenes().Count > 0)
+                    throw new UserErrorException($"The following gene IDs were not recognized in Nirvana: {string.Join(',',parser.GetUnknownGenes())}.");
                 schemaWriter.Write(parser.JsonSchema);
             }
 

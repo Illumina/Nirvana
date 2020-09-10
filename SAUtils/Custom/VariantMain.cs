@@ -72,7 +72,7 @@ namespace SAUtils.Custom
             using (var parser = VariantAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
             using (var indexStream = FileUtilities.GetCreateStream(nsaIndexFileName))       
-            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser, CaUtilities.GetInputFileName(_inputFile), referenceProvider, out version))
+            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser,  CaUtilities.GetInputFileName(_inputFile),referenceProvider, out version))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {

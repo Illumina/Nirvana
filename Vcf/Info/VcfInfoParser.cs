@@ -23,6 +23,9 @@ namespace Vcf.Info
             double? recalibratedQuality    = null;
             int? svLen                     = null;
             string svType                  = null;
+            //emedgene requests
+            double? fisherStrandBias = null;
+            double? mappingQuality   = null;
 
             foreach ((string key, string value) in infoKeyValue)
             {
@@ -47,6 +50,12 @@ namespace Vcf.Info
                     case "SB":
                         strandBias = value.GetNullableValue<double>(double.TryParse);
                         break;
+                    case "FS":
+                        fisherStrandBias = value.GetNullableValue<double>(double.TryParse);
+                        break;
+                    case "MQ":
+                        mappingQuality = value.GetNullableValue<double>(double.TryParse);
+                        break;
                     case "QSI_NT":
                     case "SOMATICSCORE":
                     case "QSS_NT":
@@ -67,7 +76,7 @@ namespace Vcf.Info
             }
 
             return new InfoData(ciEnd, ciPos, end, recalibratedQuality, jointSomaticNormalQuality, refRepeatCount,
-                repeatUnit, strandBias, svLen, svType);
+                repeatUnit, strandBias, svLen, svType, fisherStrandBias, mappingQuality);
         }
 
         private static readonly Dictionary<string, string> EmptyDictionary = new Dictionary<string, string>();
