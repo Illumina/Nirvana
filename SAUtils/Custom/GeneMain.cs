@@ -69,7 +69,7 @@ namespace SAUtils.Custom
             {
                 ngaWriter.Write(parser.GetItems());
                 if(parser.GetUnknownGenes().Count > 0)
-                    throw new UserErrorException($"The following gene IDs were not recognized in Nirvana: {string.Join(',',parser.GetUnknownGenes())}.");
+                    throw new UserErrorException($"{GeneAnnotationsParser.UnknownGeneIdsErrorMessage} {string.Join(',',parser.GetUnknownGenes())}.");
                 schemaWriter.Write(parser.JsonSchema);
             }
 

@@ -52,7 +52,7 @@ namespace CustomAnnotationLambda
                         var unknownGenes = parser.GetUnknownGenes();
                         if (!config.skipGeneIdValidation && unknownGenes.Count > 0)
                         {
-                            throw new UserErrorException($"The following gene IDs were not recognized in Nirvana: {string.Join(',', unknownGenes)}");
+                            throw new UserErrorException($"{GeneAnnotationsParser.UnknownGeneIdsErrorMessage} {string.Join(',', unknownGenes)}");
                         }
 
                         schemaWriter.Write(parser.JsonSchema);
