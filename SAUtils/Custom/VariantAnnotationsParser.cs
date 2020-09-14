@@ -267,6 +267,9 @@ namespace SAUtils.Custom
                     throw new UserErrorException($"END is not an integer.\nInput line: {line}.");
 
                 jsonStringValues.AddRange(annotationValues);
+                //for symbolic alleles, position needs to increment to account for the padding base 
+                if (IsSymbolicAllele(splits[_altColumnIndex]))
+                    position++;
                 _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues.Select(x => new[] { x }).ToList(), IntervalJsonSchema, line));
                 return null;
             }
@@ -277,6 +280,11 @@ namespace SAUtils.Custom
 
             (position, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, SequenceProvider.Sequence);
             return new CustomItem(chrom, position, refAllele, altAllele, annotationValues.Select(x => new[] { x }).ToArray(), JsonSchema, line);
+        }
+
+        private bool IsSymbolicAllele(string altAllele)
+        {
+            return altAllele.StartsWith('<') && altAllele.EndsWith('>');
         }
 
         private bool IsInterval(string[] splits) => _endColumnIndex != -1 && !AllowedValues.IsEmptyValue(splits[_endColumnIndex]);

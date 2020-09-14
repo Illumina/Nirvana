@@ -317,6 +317,29 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.Equal("TA", item.AltAllele);
             }
         }
+
+        [Fact]
+        public void Extract_symbolic_alleles()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n"                                                          +
+                                "#assembly=GRCh38\n"                                                                      +
+                                "#matchVariantsBy=allele\n"                                                               +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\n"   +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\n"                                     +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\n";
+
+            using (var parser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                parser.ExtractItems("chr1\t12783\tA\t<DEL>\t24486\t20\t125568\t0.000159\ttrue\tVUS\t");
+                var intervals = parser.GetCustomIntervals();
+                Assert.Single(intervals);
+                Assert.Equal(12784, intervals[0].Start);
+                Assert.Equal(24486, intervals[0].End);
+
+            }
+        }
+
         [Fact]
         public void ParseTitle_Conflict_JsonTag()
         {
