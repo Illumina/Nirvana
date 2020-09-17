@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Jasix": {
-      "commandName": "Project",
-      "commandLineArgs": " --in trioChr1.json.gz -q chr1:10000-10010",
-      "workingDirectory": "C:\\Development\\TestDatasets"
-    }
-  }
-}
