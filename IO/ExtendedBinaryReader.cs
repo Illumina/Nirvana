@@ -83,5 +83,6 @@ namespace IO
 			// ReSharper disable once AssignNullToNotNullAttribute
 			return numBytes == 0 ? null : Encoding.ASCII.GetString(ReadBytes(numBytes));
 		}
+        
 	}
 }
