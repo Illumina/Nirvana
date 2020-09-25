@@ -20,8 +20,9 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private const string IncludedRecordTag = "IncludedRecord";
         
-        private const string DescriptionTag       = "Description";
-        private const string TypeTag              = "Type";
+        private const string DescriptionTag = "Description";
+        private const string ExplanationTag = "Explanation";
+        private const string TypeTag        = "Type";
 
 
         private readonly Stream _readStream;
@@ -101,10 +102,11 @@ namespace SAUtils.InputFileParsers.ClinVar
                 var type = interpretation.Attribute(TypeTag)?.Value;
                 if(type==null || type != "Clinical significance") continue;
                 
-                var significanceString = interpretation.Element(DescriptionTag)?.Value.ToLower();
-                if(significanceString == null) continue;
+                var description = interpretation.Element(DescriptionTag)?.Value.ToLower();
+                var explanation = interpretation.Element(ExplanationTag)?.Value.ToLower();
+                if(description == null && explanation == null) continue;
 
-                var significances = ClinVarCommon.GetSignificances(significanceString, null);
+                var significances = ClinVarCommon.GetSignificances(description, explanation);
                 foreach (var significance in significances)
                 {
                     if (!ClinVarCommon.ValidPathogenicity.Contains(significance)) 
