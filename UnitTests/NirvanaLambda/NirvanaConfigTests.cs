@@ -34,11 +34,7 @@ namespace UnitTests.NirvanaLambda
             config.outputDir.path = null;
             exception = Assert.Throws<UserErrorException>(() => config.CheckRequiredFieldsNotNull());
             Assert.Equal("path of outputDir cannot be null.", exception.Message);
-
-            config = GetConfig();
-            config.supplementaryAnnotations = null;
-            exception = Assert.Throws<UserErrorException>(() => config.CheckRequiredFieldsNotNull());
-            Assert.Equal("supplementaryAnnotations cannot be null.", exception.Message);
+            
         }
 
         private static NirvanaConfig GetConfig() => new NirvanaConfig
