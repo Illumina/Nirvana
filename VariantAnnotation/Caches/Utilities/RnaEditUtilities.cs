@@ -19,6 +19,16 @@ namespace VariantAnnotation.Caches.Utilities
 
             return VariantType.unknown;
         }
+        
+        public static void SetTypes(IRnaEdit[] rnaEdits)
+        {
+            if (rnaEdits == null) return;
+            foreach (var rnaEdit in rnaEdits)
+            {
+                rnaEdit.Type = GetRnaEditType(rnaEdit);
+            }
+            
+        }
 
         public static void SetTypesAndSort(IRnaEdit[] rnaEdits)
         {
