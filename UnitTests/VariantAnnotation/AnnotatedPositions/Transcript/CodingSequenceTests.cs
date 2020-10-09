@@ -2,6 +2,7 @@
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
+using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Xunit;
 
@@ -531,6 +532,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new RnaEdit(932, 932, "A")
 
             };
+            rnaEdits = RnaEditUtilities.RemoveDeletions(rnaEdits);
             const byte startExonPhase = 0;
             const bool onReverseStrand = true;
             var codingSequence = new CodingSequence(genomicSeq, codingRegion, regions, onReverseStrand, startExonPhase, rnaEdits);
@@ -653,6 +655,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new RnaEdit(5805, 5805, "T"),
                 new RnaEdit(5819, 5819, "C")
             };
+
+            rnaEdits = RnaEditUtilities.RemoveDeletions(rnaEdits);
             const byte startExonPhase = 0;
             const bool onReverseStrand = false;
             var codingSequence = new CodingSequence(genomicSeq, codingRegion, regions, onReverseStrand, startExonPhase, rnaEdits);

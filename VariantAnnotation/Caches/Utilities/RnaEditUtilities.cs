@@ -22,6 +22,7 @@ namespace VariantAnnotation.Caches.Utilities
 
         public static void SetTypesAndSort(IRnaEdit[] rnaEdits)
         {
+            if (rnaEdits == null) return;
             foreach (var rnaEdit in rnaEdits)
             {
                 if (rnaEdit.Type != VariantType.unknown) return;
@@ -33,7 +34,7 @@ namespace VariantAnnotation.Caches.Utilities
 
         public static IRnaEdit[] RemoveDeletions(IRnaEdit[] rnaEdits)
         {
-            return rnaEdits.Where(x => x.Type != VariantType.deletion).ToArray();
+            return rnaEdits?.Where(x => x.Type != VariantType.deletion).ToArray();
         }
     }
 }

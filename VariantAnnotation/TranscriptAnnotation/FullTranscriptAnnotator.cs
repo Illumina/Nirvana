@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Genome;
 using Intervals;
 using VariantAnnotation.Algorithms;
@@ -19,6 +20,9 @@ namespace VariantAnnotation.TranscriptAnnotation
         {
             var rightShiftedVariant = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
+
+            if(transcript.Id.WithVersion == "NM_000314.6")
+                Console.WriteLine("bug");
 
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
