@@ -109,6 +109,11 @@ namespace VariantAnnotation.Caches.DataStructures
 
                 transcriptRegions = newRegions.ToArray();
             }
+            // debug: correct rna edits for NM_000314.6
+            if (id.WithVersion == "NM_000314.6")
+            {
+                rnaEdits = RnaEditUtilities.RemoveDeletions(rnaEdits);
+            }
 
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,

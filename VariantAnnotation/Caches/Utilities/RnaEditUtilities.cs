@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -28,6 +29,11 @@ namespace VariantAnnotation.Caches.Utilities
             }
 
             Array.Sort(rnaEdits);
+        }
+
+        public static IRnaEdit[] RemoveDeletions(IRnaEdit[] rnaEdits)
+        {
+            return rnaEdits.Where(x => x.Type != VariantType.deletion).ToArray();
         }
     }
 }
