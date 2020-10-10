@@ -42,6 +42,26 @@ namespace VariantAnnotation.Caches.Utilities
             Array.Sort(rnaEdits);
         }
 
+        public static int GetRnaEditedPosition( int cdnaPosition, IRnaEdit[] rnaEdits)
+        {
+            if (rnaEdits == null) return cdnaPosition;
+            var offset = 0;
+            foreach (var rnaEdit in rnaEdits)
+            {
+                if (cdnaPosition < rnaEdit.Start) break;
+                switch (rnaEdit.Type)
+                {
+                    case VariantType.deletion:
+                        offset -= rnaEdit.End - rnaEdit.Start + 1;
+                        break;
+                    case VariantType.insertion:
+                        offset += rnaEdit.Bases.Length;
+                        break;
+                    
+                }
+            }
+            return cdnaPosition + offset;
+        }
         public static IRnaEdit[] RemoveDeletions(IRnaEdit[] rnaEdits)
         {
             return rnaEdits?.Where(x => x.Type != VariantType.deletion).ToArray();

@@ -111,12 +111,12 @@ namespace VariantAnnotation.Caches.DataStructures
             //     transcriptRegions = newRegions.ToArray();
             // }
             // debug: correct rna edits for NM_000314.6
-            if (id.WithVersion == "NM_000314.6")
-            {
-                RnaEditUtilities.SetTypesAndSort(rnaEdits);
-                rnaEdits = RnaEditUtilities.RemoveDeletions(rnaEdits);
-            }
-            
+            // if (id.WithVersion == "NM_000314.6")
+            // {
+            //     RnaEditUtilities.SetTypesAndSort(rnaEdits);
+            //     rnaEdits = RnaEditUtilities.RemoveDeletions(rnaEdits);
+            // }
+            //
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
