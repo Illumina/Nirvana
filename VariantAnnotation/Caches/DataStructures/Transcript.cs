@@ -95,28 +95,6 @@ namespace VariantAnnotation.Caches.DataStructures
             var rnaEdits        = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;
             var selenocysteines = encoded.HasSelenocysteines ? ReadItems(reader, x => x.ReadOptInt32()) : null;
 
-            RnaEditUtilities.SetTypes(rnaEdits);
-            // DEBUG: Correct the gene model for NM_000314.6
-            // if (id.WithVersion == "NM_000314.6")
-            // {
-            //     var newRegions = new List<ITranscriptRegion>();
-            //
-            //     var exon1a = transcriptRegions[0];
-            //     var exon1b = transcriptRegions[2];
-            //
-            //     newRegions.Add(new TranscriptRegion(TranscriptRegionType.Exon, 1, exon1a.Start, exon1b.End,
-            //         exon1a.CdnaStart, exon1b.CdnaEnd));
-            //     for (int i = 3; i < transcriptRegions.Length; i++) newRegions.Add(transcriptRegions[i]);
-            //
-            //     transcriptRegions = newRegions.ToArray();
-            // }
-            // debug: correct rna edits for NM_000314.6
-            // if (id.WithVersion == "NM_000314.6")
-            // {
-            //     RnaEditUtilities.SetTypesAndSort(rnaEdits);
-            //     rnaEdits = RnaEditUtilities.RemoveDeletions(rnaEdits);
-            // }
-            //
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,

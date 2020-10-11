@@ -172,8 +172,8 @@ namespace VariantAnnotation.AnnotatedPositions
                     break;
             }
 
-            var rnaEditOffset = GetRnaEditOffset(cdsPos, rnaEdits);
-            cdsPos -= rnaEditOffset;
+            //var rnaEditOffset = GetRnaEditOffset(cdsPos, rnaEdits);
+            //cdsPos -= rnaEditOffset;
             return (cdsPos, offset);
             
         }

@@ -57,48 +57,6 @@ namespace VariantAnnotation.AnnotatedPositions
             // generic formatting
             return hgvsNotation.ToString();
         }
-        
-        public static string GetHgvscForCodingVariants(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,
-             IMappedPosition mappedPosition)
-        {
-            // sanity check: don't try to handle odd characters, make sure this is not a reference allele, 
-            //               and make sure that we have protein coordinates
-            if (variant.Type == VariantType.reference || SequenceUtilities.HasNonCanonicalBase(variant.AltAllele)) return null;
-
-            if (mappedPosition.CdsStart == -1 || mappedPosition.CdsEnd == -1) return null;
-            bool onReverseStrand = transcript.Gene.OnReverseStrand;
-
-            string refAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele;
-            string altAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.AltAllele) : variant.AltAllele;
-
-            // decide event type from HGVS nomenclature
-            var genomicChange = GetGenomicChange(transcript, onReverseStrand, refSequence, variant);
-
-            int variantStart = variant.Start;
-            int variantEnd   = variant.End;
-
-            if (genomicChange == GenomicChange.Duplication)
-            {
-                (variantStart, variantEnd, refAllele, _, _) = transcript.TranscriptRegions.ShiftDuplication(variantStart, altAllele, onReverseStrand);
-            }
-
-            var startPositionOffset = new PositionOffset(mappedPosition.CdsStart, 0, mappedPosition.CdsStart.ToString(), false);
-            var endPositionOffset = variantStart == variantEnd
-                ? startPositionOffset
-                : new PositionOffset(mappedPosition.CdsEnd, 0, mappedPosition.CdsEnd.ToString(), false);
-
-            if (onReverseStrand)
-            {
-                var tmp = startPositionOffset;
-                startPositionOffset = endPositionOffset;
-                endPositionOffset = tmp;
-            }
-            var hgvsNotation = new HgvscNotation(refAllele, altAllele, transcript.Id.WithVersion, genomicChange,
-                startPositionOffset, endPositionOffset, transcript.Translation != null);
-
-            // generic formatting
-            return hgvsNotation.ToString();
-        }
 
         /// <summary>
         /// Adjust positions by alt allele length

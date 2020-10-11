@@ -30,16 +30,11 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
 
-            if(transcript.Id.WithVersion == "NM_000314.6")
-                Console.WriteLine("bug");
+            // if(transcript.Id.WithVersion == "NM_000314.6")
+            //     Console.WriteLine("bug");
 
             string hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
-
-            string codingHgvsc = HgvsCodingNomenclature.GetHgvscForCodingVariants(transcript, rightShiftedVariant,
-                refSequence, rightAnnotation.Position);
-
-            if (codingHgvsc != null) hgvsCoding = codingHgvsc;
             
             string hgvsProtein = HgvsProteinNomenclature.GetHgvsProteinAnnotation(transcript,
                 rightAnnotation.RefAminoAcids, rightAnnotation.AltAminoAcids, rightAnnotation.TranscriptAltAllele,
