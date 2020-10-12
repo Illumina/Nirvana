@@ -9,7 +9,7 @@ namespace VariantAnnotation.AnnotatedPositions
     public static class HgvsCodingNomenclature
     {
         public static string GetHgvscAnnotation(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,
-            int regionStart, int regionEnd, IMappedPosition mappedPosition=null)
+            int regionStart, int regionEnd, string refCodon = null, string altCodon = null)
         {
             // sanity check: don't try to handle odd characters, make sure this is not a reference allele, 
             //               and make sure that we have protein coordinates
@@ -18,7 +18,9 @@ namespace VariantAnnotation.AnnotatedPositions
             bool onReverseStrand = transcript.Gene.OnReverseStrand;
 
             string refAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele;
+            if (!string.IsNullOrEmpty(refCodon)) refAllele = refCodon;
             string altAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.AltAllele) : variant.AltAllele;
+            if (!string.IsNullOrEmpty(altCodon)) altAllele = altCodon;
 
             // decide event type from HGVS nomenclature
             var genomicChange = GetGenomicChange(transcript, onReverseStrand, refSequence, variant);

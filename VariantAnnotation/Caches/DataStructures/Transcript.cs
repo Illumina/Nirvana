@@ -95,6 +95,8 @@ namespace VariantAnnotation.Caches.DataStructures
             var rnaEdits        = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;
             var selenocysteines = encoded.HasSelenocysteines ? ReadItems(reader, x => x.ReadOptInt32()) : null;
 
+            // if (id.WithVersion == "NM_033486.1")
+            //     TranscriptUtilities.PrintTranscriptDetails(transcriptRegions, rnaEdits);
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
@@ -114,7 +116,7 @@ namespace VariantAnnotation.Caches.DataStructures
             writer.WriteOpt(End);
             // ReSharper disable once ImpureMethodCallOnReadonlyValueField
             Id.Write(writer);
-
+            
             // gene
             writer.WriteOpt(GetIndex(Gene, geneIndices));
 

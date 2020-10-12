@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System;
+using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
@@ -61,5 +62,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 	        var results = StringBuilderCache.GetStringAndRelease(sb);
 		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(results) : results;
 	    }
+        
+        public static void PrintTranscriptDetails(ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits)
+        {
+	        foreach (var transcriptRegion in transcriptRegions)
+	        {
+		        Console.WriteLine($"new TranscriptRegion(TranscriptRegionType.{transcriptRegion.Type}, {transcriptRegion.Id}, {transcriptRegion.Start}, {transcriptRegion.End}, " +
+		                          $"{transcriptRegion.CdnaStart}, {transcriptRegion.CdnaEnd}),");
+	        }
+
+	        if(rnaEdits!=null)
+		        foreach (var rnaEdit in rnaEdits)
+		        {
+			        Console.WriteLine($"new RnaEdit({rnaEdit.Start}, {rnaEdit.End}, \"{rnaEdit.Bases}\"),");
+		        }
+        }
     }
 }

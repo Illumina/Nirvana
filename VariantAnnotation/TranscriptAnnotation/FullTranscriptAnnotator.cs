@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Genome;
 using Intervals;
 using VariantAnnotation.Algorithms;
@@ -33,8 +34,11 @@ namespace VariantAnnotation.TranscriptAnnotation
             // if(transcript.Id.WithVersion == "NM_000314.6")
             //     Console.WriteLine("bug");
 
+            var refAllele = GetAlleleFromCodon(rightAnnotation.RefCodons);
+            var altAllele = GetAlleleFromCodon(rightAnnotation.AltCodons);
             string hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
-                    rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
+                    rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex, 
+                    refAllele, altAllele);
             
             string hgvsProtein = HgvsProteinNomenclature.GetHgvsProteinAnnotation(transcript,
                 rightAnnotation.RefAminoAcids, rightAnnotation.AltAminoAcids, rightAnnotation.TranscriptAltAllele,
@@ -49,6 +53,11 @@ namespace VariantAnnotation.TranscriptAnnotation
                 sift, polyPhen, consequences, null, false);
         }
 
+        private static string GetAlleleFromCodon(string codons)
+        {
+            return new string(codons.Where(char.IsUpper).ToArray());
+        }
+
         private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
             AltAminoAcids, string RefCodons, string AltCodons, string TranscriptAltAllele) AnnotateTranscript(ITranscript transcript, ISimpleVariant variant, AminoAcids aminoAcids, ISequence refSequence)
         {
@@ -57,11 +66,13 @@ namespace VariantAnnotation.TranscriptAnnotation
             (int endIndex, ITranscriptRegion endRegion)     = MappedPositionUtilities.FindRegion(transcript.TranscriptRegions, variant.End);
 
             
-            var position = GetMappedPosition(transcript.TranscriptRegions, transcript.RnaEdits, startRegion, startIndex, endRegion,
+            var position = GetMappedPosition(transcript.TranscriptRegions, startRegion, startIndex, endRegion,
                 endIndex, variant, onReverseStrand, transcript.Translation?.CodingRegion, transcript.StartExonPhase,
                 variant.Type == VariantType.insertion);
 
             string transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
+            // if(transcript.Id.WithVersion=="NM_152486.2")
+            //     Console.WriteLine("bug");
             var codingSequence = GetCodingSequence(transcript, refSequence);
 
             var codons = Codons.GetCodons(transcriptAltAllele, position.CdsStart, position.CdsEnd, position.ProteinStart, position.ProteinEnd, codingSequence);
@@ -119,13 +130,11 @@ namespace VariantAnnotation.TranscriptAnnotation
                        transcript.Gene.OnReverseStrand, transcript.StartExonPhase, transcript.RnaEdits));
         }
 
-        private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, IRnaEdit[] rnaEdits,  ITranscriptRegion startRegion, 
+        private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions,  ITranscriptRegion startRegion, 
             int startIndex, ITranscriptRegion endRegion, int endIndex, IInterval variant, bool onReverseStrand,
             ICodingRegion codingRegion, byte startExonPhase, bool isInsertion)
         {
             (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(startRegion, endRegion, variant, onReverseStrand, isInsertion);
-            //cdnaStart = RnaEditUtilities.GetRnaEditedPosition(cdnaStart, rnaEdits);
-            //cdnaEnd = RnaEditUtilities.GetRnaEditedPosition(cdnaEnd, rnaEdits);
             if (onReverseStrand) Swap.Int(ref cdnaStart, ref cdnaEnd);
 
             (int cdsStart, int cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, cdnaStart, cdnaEnd,
