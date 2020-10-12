@@ -37,7 +37,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             var refAllele = GetAlleleFromCodon(rightAnnotation.RefCodons);
             var altAllele = GetAlleleFromCodon(rightAnnotation.AltCodons);
             string hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
-                    rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex);
+                    rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex, 
+                    refAllele, altAllele);
             
             string hgvsProtein = HgvsProteinNomenclature.GetHgvsProteinAnnotation(transcript,
                 rightAnnotation.RefAminoAcids, rightAnnotation.AltAminoAcids, rightAnnotation.TranscriptAltAllele,
@@ -54,6 +55,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
         private static string GetAlleleFromCodon(string codons)
         {
+            if (string.IsNullOrEmpty(codons)) return null;
             return new string(codons.Where(char.IsUpper).ToArray());
         }
 
