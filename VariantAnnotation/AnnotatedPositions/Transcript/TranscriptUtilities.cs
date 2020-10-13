@@ -65,12 +65,17 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         
         public static void PrintTranscriptDetails(ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits)
         {
+	        var start = int.MaxValue;
+	        var end = 0;
 	        foreach (var transcriptRegion in transcriptRegions)
 	        {
+		        if (transcriptRegion.Start < start) start = transcriptRegion.Start;
+		        if (transcriptRegion.End > end) end = transcriptRegion.End;
 		        Console.WriteLine($"new TranscriptRegion(TranscriptRegionType.{transcriptRegion.Type}, {transcriptRegion.Id}, {transcriptRegion.Start}, {transcriptRegion.End}, " +
 		                          $"{transcriptRegion.CdnaStart}, {transcriptRegion.CdnaEnd}),");
 	        }
 
+	        Console.WriteLine($"genomic region: {start}-{end}");
 	        if(rnaEdits!=null)
 		        foreach (var rnaEdit in rnaEdits)
 		        {

@@ -28,13 +28,15 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             _geneOnReverseStrand = geneOnReverseStrand;
             _startExonPhase      = startExonPhase;
             _compressedSequence  = compressedSequence;
+
+            _sequence = GetCodingSequence();
         }
 
         public string GetCodingSequence()
         {
             if (_sequence != null) return _sequence;
 
-            var sb = StringBuilderCache.Acquire(Length);
+            var sb = StringBuilderCache.Acquire(_codingRegion.Length);
 
             // account for the exon phase (forward orientation)
             if (_startExonPhase > 0 && !_geneOnReverseStrand) sb.Append('N', _startExonPhase);
@@ -113,7 +115,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             sb.Append(_compressedSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
         }
 
-        public int Length => _codingRegion.Length;
+        public int Length => _sequence.Length;
         public Band[] CytogeneticBands => null;
 
         public string Substring(int offset, int length)

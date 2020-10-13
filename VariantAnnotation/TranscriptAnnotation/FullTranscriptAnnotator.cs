@@ -72,7 +72,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 variant.Type == VariantType.insertion);
 
             string transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
-            // if(transcript.Id.WithVersion=="NM_152486.2")
+            // if(transcript.Id.WithVersion=="NM_033489.2")
             //     Console.WriteLine("bug");
             var codingSequence = GetCodingSequence(transcript, refSequence);
 
