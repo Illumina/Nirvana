@@ -83,7 +83,8 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
 
                 using (var reader = new BufferedBinaryReader(ms))
                 {
-                    observedTranscript = Transcript.Read(reader, indexToChromosome, genes, expectedTranscriptRegions, expectedMicroRnas, peptideSeqs);
+                    // SET-362 DEBUG: Remove the null arguments in the future
+                    observedTranscript = Transcript.Read(reader, indexToChromosome, genes, expectedTranscriptRegions, expectedMicroRnas, peptideSeqs, null);
                 }
             }
 
