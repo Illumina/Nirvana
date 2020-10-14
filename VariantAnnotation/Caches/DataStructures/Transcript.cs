@@ -351,7 +351,7 @@ namespace VariantAnnotation.Caches.DataStructures
                 if (cdna != expected) throw new InvalidDataException("NM_001220766.1 is still not right.");
             }
 
-            if (id.WithVersion == "NM_001220767.1")
+            if (id.WithVersion == "NM_001220767.1" || id.WithVersion == "NM_001220769.1")
             {
                 rnaEdits    = new IRnaEdit[5];
                 rnaEdits[0] = new RnaEdit(1,   0,   "GAATTCCGGCGT");
@@ -398,7 +398,7 @@ namespace VariantAnnotation.Caches.DataStructures
                 // NOTE: this expected sequence has been truncated compared with the full cDNA sequence
                 const string expected =
                     "GAATTCCGGCGTCGCGGACGCATCCCAGTCTGGGCGGGACGCTCGGCCGCGGCGAGGCGGGCAAGCCTGGCAGGGCAGAGGGAGCCCCGGCTCCGAGGTTGCTCTTCGCCCCCGAGGATCAGTCTTGGCCCCAAAGCGCGACGCACAAATCCACATAACCTGAGGACCATGGATGCTGATGAGGGTCAAGACATGTCCCAAGTTTCAGGGAAGGAAAGCCCCCCTGTAAGCGATACTCCAGATGAGGGCGATGAGCCCATGCCGATCCCCGAGGACCTCTCCACCACCTCGGGAGGACAGCAAAGCTCCAAGAGTGACAGAGTCGTGGGAG";
-                if (cdna != expected) throw new InvalidDataException("NM_001220767.1 is still not right.");
+                if (cdna != expected) throw new InvalidDataException("NM_001220767.1/NM_001220769.1 is still not right.");
             }
 
             if (id.WithVersion == "NM_001220768.1")
