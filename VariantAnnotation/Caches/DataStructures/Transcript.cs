@@ -493,11 +493,6 @@ namespace VariantAnnotation.Caches.DataStructures
                 if (cdna != expected) throw new InvalidDataException("NM_001220768.1 is still not right.");
             }
 
-            if (id.WithVersion == "NM_000314.4" || id.WithVersion == "NM_000314.6")
-            {
-                Console.WriteLine("BOB");
-            }
-
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
