@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Net.Mime;
 using Genome;
 using OptimizedCore;
+using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
@@ -63,19 +65,16 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(results) : results;
 	    }
         
-        public static void PrintTranscriptDetails(ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits)
+        public static void PrintTranscriptDetails(int start, int end, ICodingRegion codingRegion, ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits)
         {
-	        var start = int.MaxValue;
-	        var end = 0;
+	        Console.WriteLine($"genomic region: {start}-{end}");
+	        Console.WriteLine($"new CodingRegion({codingRegion.Start}, {codingRegion.End}, {codingRegion.CdnaStart}, {codingRegion.CdnaEnd}, {codingRegion.Length})");
 	        foreach (var transcriptRegion in transcriptRegions)
 	        {
-		        if (transcriptRegion.Start < start) start = transcriptRegion.Start;
-		        if (transcriptRegion.End > end) end = transcriptRegion.End;
 		        Console.WriteLine($"new TranscriptRegion(TranscriptRegionType.{transcriptRegion.Type}, {transcriptRegion.Id}, {transcriptRegion.Start}, {transcriptRegion.End}, " +
 		                          $"{transcriptRegion.CdnaStart}, {transcriptRegion.CdnaEnd}),");
 	        }
 
-	        Console.WriteLine($"genomic region: {start}-{end}");
 	        if(rnaEdits!=null)
 		        foreach (var rnaEdit in rnaEdits)
 		        {

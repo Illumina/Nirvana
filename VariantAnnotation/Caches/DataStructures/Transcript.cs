@@ -33,6 +33,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public bool CdsStartNotFound { get; }
         public bool CdsEndNotFound { get; }
         public ISequence CodingSequence { get; set; }
+        public ISequence CdnaSequence { get; set; }
 
         public Transcript(IChromosome chromosome, int start, int end, ICompactId id, ITranslation translation,
             BioType bioType, IGene gene, int totalExonLength, byte startExonPhase, bool isCanonical,
@@ -95,8 +96,8 @@ namespace VariantAnnotation.Caches.DataStructures
             var rnaEdits        = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;
             var selenocysteines = encoded.HasSelenocysteines ? ReadItems(reader, x => x.ReadOptInt32()) : null;
 
-            // if (id.WithVersion == "NM_033489.2")
-            //     TranscriptUtilities.PrintTranscriptDetails(transcriptRegions, rnaEdits);
+            // if (id.WithVersion == "NM_001310134.1")
+            //     TranscriptUtilities.PrintTranscriptDetails(start, end, translation.CodingRegion, transcriptRegions, rnaEdits);
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
