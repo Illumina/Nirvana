@@ -204,6 +204,10 @@ namespace VariantAnnotation.Caches.DataStructures
                 rnaEdits[0] = new RnaEdit(667,  667, null);
                 rnaEdits[1] = new RnaEdit(707,  707, "C");
                 rnaEdits[2] = new RnaEdit(5548, 5547, "AAAAAAAAAAAAAAAAAAAAAAAAAA");
+
+                var oldCodingRegion = translation.CodingRegion;
+                var codingRegion    = new CodingRegion(oldCodingRegion.Start, oldCodingRegion.End, 1032, 2243, 1212);
+                translation = new Translation(codingRegion, (CompactId) translation.ProteinId, translation.PeptideSeq);
                 
                 sequenceProvider.LoadChromosome(chromosome);
                 var cdnaSequence = new CdnaSequence(sequenceProvider.Sequence, translation.CodingRegion,
@@ -446,6 +450,11 @@ namespace VariantAnnotation.Caches.DataStructures
                 const string expected =
                     "GAATTCCGGCGTCGCGGACGCATCCCAGTCTGGGCGGGACGCTCGGCCGCGGCGAGGCGGGCAAGCCTGGCAGGGCAGAGGGAGCCCCGGCTCCGAGGTTGCTCTTCGCCCCCGAGGATCAGTCTTGGCCCCAAAGCGCGACGCACAAATCCACATAACCTGAGGACCATGGATGCTGATGAGGGTCAAGACATGTCCCAAGTTTCAGGGAAGGAAAGCCCCCCTGTAAGCGATACTCCAGATGAGGGCGATGAGCCCATGCCGATCCCCGAGGACCTCTCCACCACCTCGGGAGGACAGCAAAGCTCCAAGAGTGACAGAGTCGTGGCCAGTAA";
                 if (cdna != expected) throw new InvalidDataException("NM_001220768.1 is still not right.");
+            }
+
+            if (id.WithVersion == "NM_000314.4" || id.WithVersion == "NM_000314.6")
+            {
+                Console.WriteLine("BOB");
             }
 
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
