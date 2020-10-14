@@ -65,9 +65,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(results) : results;
 	    }
         
-        public static void PrintTranscriptDetails(int start, int end, ICodingRegion codingRegion, ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits)
+        public static void PrintTranscriptDetails(int start, int end, ICodingRegion codingRegion,
+	        ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits, byte startExonPhase)
         {
 	        Console.WriteLine($"genomic region: {start}-{end}");
+	        Console.WriteLine($"Start exon phase:{startExonPhase}");
 	        Console.WriteLine($"new CodingRegion({codingRegion.Start}, {codingRegion.End}, {codingRegion.CdnaStart}, {codingRegion.CdnaEnd}, {codingRegion.Length})");
 	        foreach (var transcriptRegion in transcriptRegions)
 	        {

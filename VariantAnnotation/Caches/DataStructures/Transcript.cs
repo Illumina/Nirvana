@@ -96,8 +96,8 @@ namespace VariantAnnotation.Caches.DataStructures
             var rnaEdits        = encoded.HasRnaEdits        ? ReadItems(reader, RnaEdit.Read)          : null;
             var selenocysteines = encoded.HasSelenocysteines ? ReadItems(reader, x => x.ReadOptInt32()) : null;
 
-            // if (id.WithVersion == "NM_001310134.1")
-            //     TranscriptUtilities.PrintTranscriptDetails(start, end, translation.CodingRegion, transcriptRegions, rnaEdits);
+            // if (id.WithVersion == "NM_000314.4")
+            //     TranscriptUtilities.PrintTranscriptDetails(start, end, translation.CodingRegion, transcriptRegions, rnaEdits, encoded.StartExonPhase);
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
