@@ -155,8 +155,6 @@ namespace VariantAnnotation.Caches.DataStructures
                 if (cdna != expected) throw new InvalidDataException("NM_000535.5 is still not right.");
             }
 
-            // if (id.WithVersion == "NM_001310134.1")
-            //     TranscriptUtilities.PrintTranscriptDetails(start, end, translation.CodingRegion, transcriptRegions, rnaEdits);
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
