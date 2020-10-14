@@ -188,6 +188,44 @@ namespace VariantAnnotation.Caches.DataStructures
                 if (cdna != expected) throw new InvalidDataException("NM_001145076.1 is still not right.");
             }
 
+            if (id.WithVersion == "NM_001220765.1")
+            {
+                rnaEdits    = new IRnaEdit[4];
+                rnaEdits[0] = new RnaEdit(1, 0, "GAATTCCGGCGT");
+                rnaEdits[1] = new RnaEdit(6, 5, "A");
+                rnaEdits[2] = new RnaEdit(16, 16, "T");
+                rnaEdits[3] = new RnaEdit(97, 97, "C");
+
+                var               newRegions = new List<ITranscriptRegion>();
+                ITranscriptRegion oldExon    = transcriptRegions[0];
+
+                var exon1a = new TranscriptRegion(TranscriptRegionType.Exon, 1, oldExon.Start, oldExon.Start + 5, 13,
+                    17);
+                var exon1b = new TranscriptRegion(TranscriptRegionType.Exon, 1, oldExon.Start + 6, oldExon.End, 19,
+                    oldExon.CdnaEnd                                                           + 13);
+
+                newRegions.Add(exon1a);
+                newRegions.Add(exon1b);
+
+                for (int i = 1; i < transcriptRegions.Length; i++)
+                {
+                    var region = transcriptRegions[i];
+                    newRegions.Add(new TranscriptRegion(region.Type, region.Id, region.Start, region.End,
+                        region.CdnaStart + 13, region.CdnaEnd + 13));
+                }
+
+                transcriptRegions = newRegions.ToArray();
+                
+                sequenceProvider.LoadChromosome(chromosome);
+                var cdnaSequence = new CdnaSequence(sequenceProvider.Sequence, translation.CodingRegion,
+                    transcriptRegions, gene.OnReverseStrand, encoded.StartExonPhase, rnaEdits);
+                string cdna = cdnaSequence.GetCdnaSequence();
+                
+                // NOTE: this expected sequence has been truncated compared with the full cDNA sequence
+                const string expected = "GAATTCCGGCGTCGCGGACGCATCCCAGTCTGGGCGGGACGCTCGGCCGCGGCGAGGCGGGCAAGCCTGGCAGGGCAGAGGGAGCCCCGGCTCCGAGGTTGCTCTTCGCCCCCGAGGATCAGTCTTGGCCCCAAAGCGCGACGCACAAATCCACATAACCTGAGGACCATGGATGCTGATGAGGGTCAAGACATGTCCCAAGTTTCAGGGAAGGAAAGCCCCCCTGTAAGCGATACTCCAGATGAGGGCGATGAGCCCATGCCGATCCCCGAGGACCTCTCCACCACCTCGGGAGGACAGCAAAGCTCCAAGAGTGACAGAGTCGTGG";
+                if (cdna != expected) throw new InvalidDataException("NM_001220765.1 is still not right.");
+            }
+
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
