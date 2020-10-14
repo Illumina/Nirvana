@@ -178,7 +178,7 @@ namespace VariantAnnotation.AnnotatedPositions
             
         }
 
-        private static int GetRnaEditOffset(int position, IRnaEdit[] rnaEdits)
+        public static int GetRnaEditOffset(int position, IRnaEdit[] rnaEdits)
         {
             var rnaEditOffset = 0;
             if (rnaEdits == null) return rnaEditOffset;
