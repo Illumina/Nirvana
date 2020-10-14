@@ -382,6 +382,53 @@ namespace VariantAnnotation.Caches.DataStructures
                 if (cdna != expected) throw new InvalidDataException("NM_001220767.1 is still not right.");
             }
 
+            if (id.WithVersion == "NM_001220768.1")
+            {
+                rnaEdits    = new IRnaEdit[5];
+                rnaEdits[0] = new RnaEdit(1,   0,   "GAATTCCGGCGT");
+                rnaEdits[1] = new RnaEdit(6,   5,   "A");
+                rnaEdits[2] = new RnaEdit(16,  16,  "T");
+                rnaEdits[3] = new RnaEdit(97,  97,  "C");
+                rnaEdits[4] = new RnaEdit(316, 315, "CCA");
+                
+                var               newRegions = new List<ITranscriptRegion>();
+                ITranscriptRegion oldExon    = transcriptRegions[0];
+                
+                var exon1a = new TranscriptRegion(TranscriptRegionType.Exon, 1, oldExon.Start, oldExon.Start + 5, 13,
+                    17);
+                var exon1b = new TranscriptRegion(TranscriptRegionType.Exon, 1, oldExon.Start + 6, oldExon.End, 19,
+                    oldExon.CdnaEnd                                                           + 13);
+                
+                newRegions.Add(exon1a);
+                newRegions.Add(exon1b);
+                ITranscriptRegion region;
+                
+                for (int i = 1; i < transcriptRegions.Length - 1; i++)
+                {
+                    region = transcriptRegions[i];
+                    newRegions.Add(new TranscriptRegion(region.Type, region.Id, region.Start, region.End,
+                        region.CdnaStart + 13, region.CdnaEnd + 13));
+                }
+                
+                newRegions.Add(new TranscriptRegion(TranscriptRegionType.Exon, 3, 50367234, 50367353,
+                    209, 329));
+                
+                newRegions.Add(new TranscriptRegion(TranscriptRegionType.Exon, 3, 50367354, 50367357,
+                    332, 335));
+
+                transcriptRegions = newRegions.ToArray();
+
+                sequenceProvider.LoadChromosome(chromosome);
+                var cdnaSequence = new CdnaSequence(sequenceProvider.Sequence, translation.CodingRegion,
+                    transcriptRegions, gene.OnReverseStrand, encoded.StartExonPhase, rnaEdits);
+                string cdna = cdnaSequence.GetCdnaSequence();
+
+                // NOTE: this expected sequence has been truncated compared with the full cDNA sequence
+                const string expected =
+                    "GAATTCCGGCGTCGCGGACGCATCCCAGTCTGGGCGGGACGCTCGGCCGCGGCGAGGCGGGCAAGCCTGGCAGGGCAGAGGGAGCCCCGGCTCCGAGGTTGCTCTTCGCCCCCGAGGATCAGTCTTGGCCCCAAAGCGCGACGCACAAATCCACATAACCTGAGGACCATGGATGCTGATGAGGGTCAAGACATGTCCCAAGTTTCAGGGAAGGAAAGCCCCCCTGTAAGCGATACTCCAGATGAGGGCGATGAGCCCATGCCGATCCCCGAGGACCTCTCCACCACCTCGGGAGGACAGCAAAGCTCCAAGAGTGACAGAGTCGTGGCCAGTAA";
+                if (cdna != expected) throw new InvalidDataException("NM_001220768.1 is still not right.");
+            }
+
             return new Transcript(chromosomeIndexDictionary[referenceIndex], start, end, id, translation,
                 encoded.BioType, gene, ExonUtilities.GetTotalExonLength(transcriptRegions), encoded.StartExonPhase,
                 encoded.IsCanonical, transcriptRegions, numExons, mirnas, siftIndex, polyphenIndex,
