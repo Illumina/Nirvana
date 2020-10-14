@@ -78,15 +78,6 @@ namespace VariantAnnotation.TranscriptAnnotation
             var cdnaSequence = GetCdnaSequence(transcript, refSequence);
             //var codingFromCdna = transcript.Translation != null ?
             //                     GetCodingFromCdna(transcript.Translation.CodingRegion, cdnaSequence): null;
-            if (transcript.Id.WithVersion == "NM_000314.4")
-            {
-                Console.WriteLine("cdna sequence:");
-                Console.WriteLine(cdnaSequence.Substring(0, cdnaSequence.Length));
-                Console.WriteLine("coding sequence:");
-                Console.WriteLine(codingSequence.Substring(0, codingSequence.Length));
-                throw new Exception("done");
-            }
-            
             // if (codingSequence != null && codingSequence.Substring(0,codingSequence.Length) !=codingFromCdna)
             // {
             //     Console.WriteLine($"Coding sequence mismatch !! Transcript Id: {transcript.Id.WithVersion}");
