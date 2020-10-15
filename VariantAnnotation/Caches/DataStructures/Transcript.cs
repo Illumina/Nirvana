@@ -445,6 +445,10 @@ namespace VariantAnnotation.Caches.DataStructures
 
                 transcriptRegions = newRegions.ToArray();
                 
+                var oldCodingRegion = translation.CodingRegion;
+                var codingRegion    = new CodingRegion(oldCodingRegion.Start, oldCodingRegion.End, 169, 328, oldCodingRegion.Length);
+                translation = new Translation(codingRegion, (CompactId) translation.ProteinId, translation.PeptideSeq);
+                
                 sequenceProvider.LoadChromosome(chromosome);
                 var cdnaSequence = new CdnaSequence(sequenceProvider.Sequence, translation.CodingRegion,
                     transcriptRegions, gene.OnReverseStrand, encoded.StartExonPhase, rnaEdits);
