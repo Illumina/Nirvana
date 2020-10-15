@@ -275,6 +275,11 @@ namespace VariantAnnotation.Caches.DataStructures
                 };
 
                 rnaEdits = newRnaEdits;
+                
+                var oldCodingRegion = translation.CodingRegion;
+                var codingRegion    = new CodingRegion(oldCodingRegion.Start, oldCodingRegion.End, 25, 5151, 5127);
+                translation = new Translation(codingRegion, (CompactId) translation.ProteinId, translation.PeptideSeq);
+                
                 sequenceProvider.LoadChromosome(chromosome);
                 var cdnaSequence = new CdnaSequence(sequenceProvider.Sequence, translation.CodingRegion,
                     transcriptRegions, gene.OnReverseStrand, encoded.StartExonPhase, rnaEdits);
