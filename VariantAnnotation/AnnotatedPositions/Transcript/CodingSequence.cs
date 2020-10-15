@@ -67,29 +67,35 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private void ApplyRnaEdits(StringBuilder sb)
         {
             if (_rnaEdits == null) return;
-            var codingStart = _codingRegion.CdnaStart;
-            var editOffset = 0;
+            int codingStart = _codingRegion.CdnaStart;
+            var editOffset  = 0;
             RnaEditUtilities.SetTypesAndSort(_rnaEdits);
+
+            int cdsLength = _codingRegion.Length;
 
             foreach (var rnaEdit in _rnaEdits)
             {
-                //if the edits are in utr regions, we can skip them
-                var cdsEditStart = rnaEdit.Start - codingStart + editOffset;
+                // if the edits are in utr regions, we can skip them
+                int cdsEditStart = rnaEdit.Start - codingStart + editOffset;
+                if (sb.Length < cdsEditStart) continue;
 
-                if (sb.Length <= cdsEditStart) continue;
-                
                 switch (rnaEdit.Type)
                 {
                     case VariantType.SNV:
-                        if(cdsEditStart >= 0 ) sb[cdsEditStart] = rnaEdit.Bases[0];
+                        if (cdsEditStart >= 0) sb[cdsEditStart] = rnaEdit.Bases[0];
                         break;
                     case VariantType.MNV:
                         for (var i = 0; i < rnaEdit.Bases.Length && cdsEditStart >= 0; i++)
                             sb[cdsEditStart + i] = rnaEdit.Bases[i];
                         break;
                     case VariantType.insertion:
-                        if (cdsEditStart >= 0) sb.Insert(cdsEditStart, rnaEdit.Bases);
-                        editOffset += rnaEdit.Bases.Length; //account for inserted bases
+                        int    maxLength = cdsLength - sb.Length;
+                        string bases     = rnaEdit.Bases;
+
+                        if (bases.Length > maxLength) bases = bases.Substring(0, maxLength);
+
+                        if (cdsEditStart >= 0) sb.Insert(cdsEditStart, bases);
+                        editOffset += bases.Length; //account for inserted bases
                         break;
                     case VariantType.deletion:
                         //from the transcripts NM_033089.6 and NM_001317107.1, it seems that deletion edits are
