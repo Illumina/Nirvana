@@ -181,7 +181,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             return transcript.CdnaSequence ?? (transcript.CdnaSequence = new CdnaSequence(refSequence,
                 transcript.Translation.CodingRegion, transcript.TranscriptRegions,
-                transcript.Gene.OnReverseStrand, transcript.StartExonPhase, transcript.RnaEdits));
+                transcript.Gene.OnReverseStrand, transcript.RnaEdits));
         }
 
         private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions,  ITranscriptRegion startRegion, 
