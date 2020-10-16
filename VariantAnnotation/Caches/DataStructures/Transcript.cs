@@ -104,24 +104,24 @@ namespace VariantAnnotation.Caches.DataStructures
             
             if (id.WithVersion == "NM_001220773.1")
             {
-                var newRnaEdits = new IRnaEdit[] 
+                rnaEdits = new IRnaEdit[]
                 {
-                    new RnaEdit(1,0,"GAATTCCGGCGTCGCGGACGCATCCCAGTCTGGGCGGGACGCTCGGCCGCGGCGAGGCGGGCAAGCCTGGCAGGGCAGAGGGAGCCCCGGCTCCGAGGTTGCTCTTCGCCCCCGAGGATCAGTCTTGGCCCCAAAGCGCGACGCACAAATCCACATAACCTGAGGACCATGGATGCTGATGAGGGTCAAGACATGTC"),
-                    new RnaEdit(1,6,"CCAAGT"),
-                    new RnaEdit(8,8,"T"),
-                    new RnaEdit(5457,5456,"AAAAAAAAAAAAAAA")
+                    new RnaEdit(1, 0,
+                        "GAATTCCGGCGTCGCGGACGCATCCCAGTCTGGGCGGGACGCTCGGCCGCGGCGAGGCGGGCAAGCCTGGCAGGGCAGAGGGAGCCCCGGCTCCGAGGTTGCTCTTCGCCCCCGAGGATCAGTCTTGGCCCCAAAGCGCGACGCACAAATCCACATAACCTGAGGACCATGGATGCTGATGAGGGTCAAGACATGTCCCAA"),
+                    new RnaEdit(5,    8,    null),
+                    new RnaEdit(5457, 5456, "AAAAAAAAAAAAAAA")
                 };
-                
-                var newRegions = new List<ITranscriptRegion>();
-                foreach (var region in transcriptRegions)
+
+                transcriptRegions = new ITranscriptRegion[]
                 {
-                    var cdnaStart = region.CdnaStart + HgvsUtilities.GetRnaEditOffset(region.CdnaStart, newRnaEdits);
-                    var cdnaEnd = region.CdnaEnd + HgvsUtilities.GetRnaEditOffset(region.CdnaEnd, newRnaEdits);
-                    
-                    newRegions.Add(new TranscriptRegion(region.Type, region.Id, region.Start, region.End, cdnaStart, cdnaEnd));
-                }
-                rnaEdits = newRnaEdits;
-                transcriptRegions = newRegions.ToArray();
+                    new TranscriptRegion(TranscriptRegionType.Exon,   1, 50455032, 50455035, 202, 205),
+                    new TranscriptRegion(TranscriptRegionType.Gap,    1, 50455036, 50455039, 205, 206),
+                    new TranscriptRegion(TranscriptRegionType.Exon,   1, 50455040, 50455168, 206, 334),
+                    new TranscriptRegion(TranscriptRegionType.Intron, 1, 50455169, 50459426, 334, 335),
+                    new TranscriptRegion(TranscriptRegionType.Exon,   1, 50459427, 50459561, 335, 469),
+                    new TranscriptRegion(TranscriptRegionType.Intron, 1, 50459562, 50467615, 469, 470),
+                    new TranscriptRegion(TranscriptRegionType.Exon,   1, 50467616, 50472799, 470, 5653),
+                };
                 
                 var codingRegion = new CodingRegion(50455032, 50468325, 169, 1179, 1011);
                 translation = new Translation(codingRegion, (CompactId) translation.ProteinId,
