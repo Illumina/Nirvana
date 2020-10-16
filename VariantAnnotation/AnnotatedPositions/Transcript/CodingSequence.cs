@@ -84,7 +84,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 switch (rnaEdit.Type)
                 {
                     case VariantType.SNV:
-                        if (cdsEditStart >= 0) sb[cdsEditStart] = rnaEdit.Bases[0];
+                        if (cdsEditStart >= 0 && cdsEditStart < sb.Length) sb[cdsEditStart] = rnaEdit.Bases[0];
                         break;
 
                     case VariantType.MNV:
@@ -97,7 +97,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
                         if (cdsEditStart >= 0)
                         {
-                            int    maxLength = cdsLength - sb.Length;
+                            int maxLength = cdsLength - sb.Length;
                             if (bases.Length > maxLength) bases = bases.Substring(0, maxLength);
                             sb.Insert(cdsEditStart, bases);
                         }
