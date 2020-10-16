@@ -11,13 +11,13 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class CodingSequence : ISequence
     {
-        private readonly ICodingRegion _codingRegion;
+        private readonly ICodingRegion       _codingRegion;
         private readonly ITranscriptRegion[] _regions;
-        private readonly IRnaEdit[] _rnaEdits;
-        private readonly bool _geneOnReverseStrand;
-        private readonly byte _startExonPhase;
-        private readonly ISequence _compressedSequence;
-        private string _sequence;
+        private readonly IRnaEdit[]          _rnaEdits;
+        private readonly bool                _geneOnReverseStrand;
+        private readonly byte                _startExonPhase;
+        private readonly ISequence           _compressedSequence;
+        private          string              _sequence;
 
         public CodingSequence(ISequence compressedSequence, ICodingRegion codingRegion, ITranscriptRegion[] regions,
             bool geneOnReverseStrand, byte startExonPhase, IRnaEdit[] rndEdits)
@@ -44,7 +44,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             foreach (var region in _regions)
             {
                 // handle exons that are entirely in the UTR
-                if (region.Type != TranscriptRegionType.Exon || region.End < _codingRegion.Start || region.Start > _codingRegion.End) continue;
+                if (region.Type  != TranscriptRegionType.Exon || region.End < _codingRegion.Start ||
+                    region.Start > _codingRegion.End) continue;
                 AddCodingRegion(region, sb);
             }
 
@@ -56,10 +57,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                 sb.Clear();
                 sb.Append(revComp);
             }
+
             //RNA edits for transcripts on reverse strand come with reversed bases. So, no positional or base adjustment necessary
             // ref: unit test with NM_031947.3, chr5:140682196-140683630
             ApplyRnaEdits(sb);
-            _sequence= StringBuilderCache.GetStringAndRelease(sb);
+            _sequence = StringBuilderCache.GetStringAndRelease(sb);
 
             return _sequence;
         }
@@ -84,19 +86,25 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
                     case VariantType.SNV:
                         if (cdsEditStart >= 0) sb[cdsEditStart] = rnaEdit.Bases[0];
                         break;
+
                     case VariantType.MNV:
                         for (var i = 0; i < rnaEdit.Bases.Length && cdsEditStart >= 0; i++)
                             sb[cdsEditStart + i] = rnaEdit.Bases[i];
                         break;
+
                     case VariantType.insertion:
-                        int    maxLength = cdsLength - sb.Length;
-                        string bases     = rnaEdit.Bases;
+                        string bases = rnaEdit.Bases;
 
-                        if (bases.Length > maxLength) bases = bases.Substring(0, maxLength);
-
-                        if (cdsEditStart >= 0) sb.Insert(cdsEditStart, bases);
+                        if (cdsEditStart >= 0)
+                        {
+                            int    maxLength = cdsLength - sb.Length;
+                            if (bases.Length > maxLength) bases = bases.Substring(0, maxLength);
+                            sb.Insert(cdsEditStart, bases);
+                        }
+                        
                         editOffset += bases.Length; //account for inserted bases
                         break;
+                    
                     case VariantType.deletion:
                         //from the transcripts NM_033089.6 and NM_001317107.1, it seems that deletion edits are
                         //already accounted for in the exons. So, we don't need to delete any more.
@@ -121,7 +129,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             sb.Append(_compressedSequence.Substring(tempBegin - 1, tempEnd - tempBegin + 1));
         }
 
-        public int Length => _sequence.Length;
+        public int    Length           => _sequence.Length;
         public Band[] CytogeneticBands => null;
 
         public string Substring(int offset, int length)
