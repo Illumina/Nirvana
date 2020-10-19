@@ -246,7 +246,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (codingRegionEnd != -1)
             {
-                if (position > codingRegionEnd)
+                if (position >= codingRegionEnd)
                 {
                     cdnaCoord = "*" + (position - codingRegionEnd);
                     hasStopCodonNotation = true;
