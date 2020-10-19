@@ -32,11 +32,11 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
 
-            // if(transcript.Id.WithVersion == "NM_000314.6")
-            //     Console.WriteLine("bug");
+            //if(transcript.Id.WithVersion=="NM_001309883.1")
+            //    Console.WriteLine("bug");
 
             var refAllele = rightAnnotation.TranscriptRefAllele;
-            var altAllele = rightAnnotation.TranscriptAltAllele;//GetAlleleFromCodon(rightAnnotation.AltCodons);
+            var altAllele = rightAnnotation.TranscriptAltAllele;
             string hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
                     rightAnnotation.Position.RegionStartIndex, rightAnnotation.Position.RegionEndIndex, 
                     refAllele, altAllele);
@@ -53,13 +53,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 leftAnnotation.RefCodons, leftAnnotation.AltCodons, leftAnnotation.Position, hgvsCoding, hgvsProtein,
                 sift, polyPhen, consequences, null, false);
         }
-
-        private static string GetAlleleFromCodon(string codons)
-        {
-            if (string.IsNullOrEmpty(codons)) return null;
-            return new string(codons.Where(char.IsUpper).ToArray());
-        }
-
+        
         private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
             AltAminoAcids, string RefCodons, string AltCodons, string TranscriptAltAllele, string TranscriptRefAllele) AnnotateTranscript(ITranscript transcript, ISimpleVariant variant, AminoAcids aminoAcids, ISequence refSequence)
         {
@@ -72,19 +66,8 @@ namespace VariantAnnotation.TranscriptAnnotation
                 endIndex, variant, onReverseStrand, transcript.Translation?.CodingRegion, transcript.StartExonPhase,
                 variant.Type == VariantType.insertion);
 
-            // if(transcript.Id.WithVersion=="NM_033489.2")
-            //     Console.WriteLine("bug");
             var codingSequence = GetCodingSequence(transcript, refSequence);
             var cdnaSequence = GetCdnaSequence(transcript, refSequence);
-            //var codingFromCdna = transcript.Translation != null ?
-            //                     GetCodingFromCdna(transcript.Translation.CodingRegion, cdnaSequence): null;
-            // if (codingSequence != null && codingSequence.Substring(0,codingSequence.Length) !=codingFromCdna)
-            // {
-            //     Console.WriteLine($"Coding sequence mismatch !! Transcript Id: {transcript.Id.WithVersion}");
-            //     Console.WriteLine(codingSequence.Substring(0,codingSequence.Length));
-            //     Console.WriteLine(codingFromCdna);
-            //     throw new InvalidDataException("mismatch between coding sequence and extracted from cdna sequence");
-            // }
             
             var transcriptRefAllele = GetTranscriptRefAllele(variant, position, cdnaSequence, onReverseStrand);
             string transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);

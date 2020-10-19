@@ -246,17 +246,18 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (codingRegionEnd != -1)
             {
-                if (position >= codingRegionEnd)
+                
+                if (position > codingRegionEnd)
                 {
                     cdnaCoord = "*" + (position - codingRegionEnd);
                     hasStopCodonNotation = true;
                 }
-                else if (offset != 0 && position == codingRegionEnd)
-                {
-                    cdnaCoord = "*";
-                    hasStopCodonNotation = true;
-                    hasNoPosition = true;
-                }
+                // else if (offset != 0 && position == codingRegionEnd)
+                // {
+                //     cdnaCoord = "*";
+                //     hasStopCodonNotation = true;
+                //     hasNoPosition = true;
+                // }
             }
 
             if (!hasStopCodonNotation && codingRegionStart != -1)
