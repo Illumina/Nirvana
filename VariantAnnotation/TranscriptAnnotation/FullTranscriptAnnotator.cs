@@ -24,6 +24,9 @@ namespace VariantAnnotation.TranscriptAnnotation
             var rightShiftedVariant = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
             
+            if(transcript.Id.WithVersion=="NM_001293228.1")
+                Console.WriteLine("bug");
+
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
             var rightAnnotation = ReferenceEquals(leftShiftedVariant, rightShiftedVariant)
@@ -31,10 +34,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                 : AnnotateTranscript(transcript, rightShiftedVariant, aminoAcids, refSequence);
 
             var consequences = GetConsequences(transcript, leftShiftedVariant, leftAnnotation.VariantEffect);
-
-            //if(transcript.Id.WithVersion=="NM_001309883.1")
-            //    Console.WriteLine("bug");
-
+            
             var refAllele = rightAnnotation.TranscriptRefAllele;
             var altAllele = rightAnnotation.TranscriptAltAllele;
             string hgvsCoding = HgvsCodingNomenclature.GetHgvscAnnotation(transcript, rightShiftedVariant, refSequence,
