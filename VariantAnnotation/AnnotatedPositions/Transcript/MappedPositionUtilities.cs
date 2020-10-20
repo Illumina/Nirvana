@@ -33,12 +33,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition,  bool onReverseStrand)
         {
-            if (region == null || region.Type == TranscriptRegionType.Intron) return -1;
-
-            if (region.Type == TranscriptRegionType.Gap)
-            {
-                return onReverseStrand ? region.CdnaStart : region.CdnaEnd;
-            }
+            if (region == null || region.Type != TranscriptRegionType.Exon) return -1;
 
             return onReverseStrand
                 ? region.End - variantPosition + region.CdnaStart
