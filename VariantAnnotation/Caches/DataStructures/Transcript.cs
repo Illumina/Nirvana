@@ -106,7 +106,7 @@ namespace VariantAnnotation.Caches.DataStructures
             if (id.WithVersion == "NM_012234.6")
             {
                 var transcriptId = "NM_012234.6";
-                var codingRegion = new CodingRegion(translation.CodingRegion.Start, translation.CodingRegion.End, translation.CodingRegion.CdnaStart+183, translation.CodingRegion.CdnaEnd, translation.CodingRegion.Length);
+                var codingRegion = new CodingRegion(translation.CodingRegion.Start, translation.CodingRegion.End, translation.CodingRegion.CdnaStart+183, translation.CodingRegion.CdnaEnd, 687);
                 translation = new Translation(codingRegion, (CompactId) translation.ProteinId,
                     "MTMGDKKSPTRPKRQAKPAADEGFWDCSVCTFRNSAEAFKCSICDVRKGTSTRKPRINSQLVAQQVAQQYATPPPPKKEKKEKVEKQDKEKPEKDKEISPSVTKKNTNKKTKPKSDILKDPPSEANSIQSANATTKTSETNHTSRPRLKNVDRSTAQQLAVTVGNVTVIITDFKEKTRSSSTSSSTVTSSAGSEQQNQSSSGSESTDKGSSRSSTPKGDMSAVNDESF*");
 
