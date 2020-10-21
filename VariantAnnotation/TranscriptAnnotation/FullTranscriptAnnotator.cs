@@ -24,8 +24,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             var rightShiftedVariant = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
             
-            if(transcript.Id.WithVersion=="NM_001293228.1")
-                Console.WriteLine("bug");
+            // if(transcript.Id.WithVersion=="NM_001293228.1")
+            //     Console.WriteLine("bug");
 
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
