@@ -173,14 +173,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 		//NP_001263627.1:p.(Met1?)
 		public void Start_lost_start_equals_end()
 	    {
-		    Assert.Equal("NP_001263627.1:p.(Met1?)", HgvspNotation.GetStartLostNotation("NP_001263627.1", 1, 1, "Met"));
+		    Assert.Equal("NP_001263627.1:p.0?", HgvspNotation.GetStartLostNotation("NP_001263627.1", 1, 1, "Met"));
 		}
 
 	    [Fact]
 	    //NP_001263627.1:p.(Met1?)
 	    public void Start_lost_start_not_equals_end()
 	    {
-		    Assert.Equal("NP_001263627.1:p.(Met1_?3)", HgvspNotation.GetStartLostNotation("NP_001263627.1", 1, 3, "Met"));
+		    Assert.Equal("NP_001263627.1:p.0?", HgvspNotation.GetStartLostNotation("NP_001263627.1", 1, 3, "Met"));
 	    }
 
 	    [Fact]

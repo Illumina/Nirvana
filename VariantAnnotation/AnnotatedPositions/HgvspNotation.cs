@@ -58,9 +58,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
         public static string GetStartLostNotation(string proteinId, int start, int end, string refAbbreviation)
         {
-            return start == end
-             ? $"{proteinId}:p.({refAbbreviation}{start}?)"
-             : $"{proteinId}:p.({refAbbreviation.Substring(0, 3)}{start}_?{end})";
+            return $"{proteinId}:p.0?";
         }
 
         public static string GetSilentNotation(string hgvscNotation, int start, string refAbbreviation, bool isStopRetained)
