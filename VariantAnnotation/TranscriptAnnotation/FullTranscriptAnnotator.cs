@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Genome;
 using Intervals;
 using VariantAnnotation.Algorithms;
@@ -9,7 +7,6 @@ using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using Variants;
@@ -69,7 +66,6 @@ namespace VariantAnnotation.TranscriptAnnotation
             var codingSequence = GetCodingSequence(transcript, refSequence);
             var cdnaSequence = GetCdnaSequence(transcript, refSequence);
             
-            var transcriptRefAllele = GetTranscriptRefAllele(variant, position, cdnaSequence, onReverseStrand);
             string transcriptAltAllele = HgvsUtilities.GetTranscriptAllele(variant.AltAllele, onReverseStrand);
             
             var codons = Codons.GetCodons(transcriptAltAllele, position.CdsStart, position.CdsEnd, position.ProteinStart, position.ProteinEnd, codingSequence);
@@ -80,6 +76,8 @@ namespace VariantAnnotation.TranscriptAnnotation
             (position.CoveredCdnaStart, position.CoveredCdnaEnd) = transcript.TranscriptRegions.GetCoveredCdnaPositions(position.CdnaStart, startIndex, position.CdnaEnd, endIndex, onReverseStrand);
             (position.CoveredCdsStart, position.CoveredCdsEnd, position.CoveredProteinStart, position.CoveredProteinEnd) = MappedPositionUtilities.GetCoveredCdsAndProteinPositions(position.CoveredCdnaStart, position.CoveredCdnaEnd, transcript.StartExonPhase, transcript.Translation?.CodingRegion);
 
+            var transcriptRefAllele = GetTranscriptRefAllele(position, cdnaSequence, variant, onReverseStrand);
+            
             SequenceChange coveredAa;
             
             // only generate the covered version of ref & alt alleles when CDS start/end is -1
@@ -104,21 +102,19 @@ namespace VariantAnnotation.TranscriptAnnotation
             return (variantEffect, position, aa.Reference, aa.Alternate, codons.Reference, codons.Alternate, transcriptAltAllele, transcriptRefAllele);
         }
 
-        private static string GetTranscriptRefAllele(ISimpleVariant variant, IMappedPosition position, ISequence cdnaSequence,
+        private static string GetTranscriptRefAllele(IMappedPosition position, ISequence cdnaSequence, ISimpleVariant variant, 
             bool onReverseStrand)
         {
             try
             {
-                if (position == null || cdnaSequence==null) return null;
-                var start = position.CdnaStart;
-                var end = position.CdnaEnd;
-                if (end < start) Swap.Int(ref start, ref end);
-                var transcriptRefAllele = start != -1 && end != -1
-                    ? cdnaSequence.Substring(start - 1, end - start + 1)
-                    : null;
-
-                transcriptRefAllele = transcriptRefAllele ?? HgvsUtilities.GetTranscriptAllele(variant.RefAllele, onReverseStrand);
-                return transcriptRefAllele;
+                var variantRef = HgvsUtilities.GetTranscriptAllele(variant.RefAllele, onReverseStrand);
+                if (position == null || cdnaSequence == null) return variantRef;
+                var start = position.CoveredCdnaStart;
+                var end = position.CoveredCdnaEnd;
+                if (start == -1 && end == -1) return variantRef;
+                if (start != -1 && end != -1 && end < start) Swap.Int(ref start, ref end);
+                
+                return cdnaSequence.Substring(start - 1, end - start + 1);
             }
             catch (Exception e)
             {

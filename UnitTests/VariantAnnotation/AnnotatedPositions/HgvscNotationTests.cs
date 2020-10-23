@@ -26,7 +26,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var hgvsc = new HgvscNotation("T", "", "NM_012232.1", GenomicChange.Deletion, startPosOff, endPosOff, true);
 
-            Assert.Equal("NM_012232.1:c.19delT", hgvsc.ToString());
+            Assert.Equal("NM_012232.1:c.19del", hgvsc.ToString());
         }
 
         // NM_012232.1:c.19_21delTGC (multiple nucleotide)
@@ -38,7 +38,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var hgvsc = new HgvscNotation("TGC", "", "NM_012232.1", GenomicChange.Deletion, startPosOff, endPosOff, true);
 
-            Assert.Equal("NM_012232.1:c.19_21delTGC", hgvsc.ToString());
+            Assert.Equal("NM_012232.1:c.19_21del", hgvsc.ToString());
         }
 
         // NM_012232.1:c.7dupT (one base duplication)
