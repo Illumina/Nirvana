@@ -295,7 +295,7 @@ namespace VariantAnnotation.Caches.DataStructures
                 //     rnaEdits, translation);
                 
             }
-            
+
             if (id.WithVersion == "NM_175741.1" && sequenceProvider.Assembly != GenomeAssembly.GRCh38)
             {
                 rnaEdits = new IRnaEdit[] 
@@ -304,9 +304,23 @@ namespace VariantAnnotation.Caches.DataStructures
                     new RnaEdit(380,380,"C")
                 };
 
-                TranscriptValidator.Validate(sequenceProvider, chromosome, "NM_175741.1", gene.OnReverseStrand,
-                    transcriptRegions,
-                    rnaEdits, translation);
+                // TranscriptValidator.Validate(sequenceProvider, chromosome, "NM_175741.1", gene.OnReverseStrand,
+                //     transcriptRegions,
+                //     rnaEdits, translation);
+                
+            }
+
+            if (id.WithVersion == "NR_003085.2" && sequenceProvider.Assembly != GenomeAssembly.GRCh38)
+            {
+                rnaEdits = new IRnaEdit[] 
+                {
+                    new RnaEdit(1703,1703,"G"), 
+                    new RnaEdit(2832,2831,"AAAAAAAAAAAAAAA"),
+                };
+                
+                // TranscriptValidator.Validate(sequenceProvider, chromosome, "NR_003085.2", gene.OnReverseStrand,
+                //     transcriptRegions,
+                //     rnaEdits, translation);
                 
             }
 

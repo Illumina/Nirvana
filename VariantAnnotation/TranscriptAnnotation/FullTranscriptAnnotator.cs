@@ -21,9 +21,6 @@ namespace VariantAnnotation.TranscriptAnnotation
             var rightShiftedVariant = VariantRotator.Right(leftShiftedVariant, transcript, refSequence,
                 transcript.Gene.OnReverseStrand);
             
-            // if(transcript.Id.WithVersion=="NM_001293228.1")
-            //     Console.WriteLine("bug");
-
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, refSequence);
 
             var rightAnnotation = ReferenceEquals(leftShiftedVariant, rightShiftedVariant)
@@ -156,10 +153,8 @@ namespace VariantAnnotation.TranscriptAnnotation
         
         private static ISequence GetCdnaSequence(ITranscript transcript, ISequence refSequence)
         {
-            if (transcript.Translation == null) return null;
-
             return transcript.CdnaSequence ?? (transcript.CdnaSequence = new CdnaSequence(refSequence,
-                transcript.Translation.CodingRegion, transcript.TranscriptRegions,
+                transcript.Translation?.CodingRegion, transcript.TranscriptRegions,
                 transcript.Gene.OnReverseStrand, transcript.RnaEdits));
         }
 

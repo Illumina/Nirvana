@@ -90,7 +90,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             }
         }
         
-        public int Length => _sequence?.Length ?? _codingRegion.Length;
+        public int Length => _sequence?.Length ?? _codingRegion?.Length ?? 0;
         public Band[] CytogeneticBands => null;
 
         public string Substring(int offset, int length)
