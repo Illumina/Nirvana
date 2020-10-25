@@ -293,7 +293,7 @@ namespace VariantAnnotation.AnnotatedPositions
                     sb.Append(coordinates + "inv" + referenceBases);
                     break;
                 case GenomicChange.Duplication:
-                    sb.Append(coordinates + "dup" + referenceBases);
+                    sb.Append(coordinates + "dup");
                     break;
                 case GenomicChange.Substitution:
                     if (referenceBases == alternateBases)
