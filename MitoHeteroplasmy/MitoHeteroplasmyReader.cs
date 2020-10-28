@@ -40,7 +40,7 @@ namespace MitoHeteroplasmy
                 
                 var vrfs         = fields[VrfBinsIndex].Split(',').Select(double.Parse);
                 var alleleDepths = fields[VrfCountsIndex].Split(',').Select(int.Parse).ToArray();
-                heteroplasmyProvider.Add(position, altAllele, vrfs, alleleDepths);
+                heteroplasmyProvider.Add(position, altAllele, vrfs.ToArray(), alleleDepths);
             }
 
             return heteroplasmyProvider;

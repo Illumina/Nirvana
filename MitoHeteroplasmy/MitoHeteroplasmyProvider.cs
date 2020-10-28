@@ -29,11 +29,10 @@ namespace MitoHeteroplasmy
             DataSourceVersions = new[] {dataSourceVersion};
         }
 
-        public void Add(int position, string altAllele, IEnumerable<double> vrfs, int[] alleleDepths)
+        public void Add(int position, string altAllele, double[] vrfs, int[] alleleDepths)
         {
-            var roundedVrfs = vrfs.Select(ToRoundedVrf).ToArray();
-            double[] percentiles = PercentileUtilities.ComputePercentiles(roundedVrfs.Length, alleleDepths);
-            _alleleToDistribution[EncodeMitoPositionAndAltAllele(position, altAllele)] = (roundedVrfs, percentiles);
+            double[] percentiles = PercentileUtilities.ComputePercentiles(vrfs.Length, alleleDepths);
+            _alleleToDistribution[EncodeMitoPositionAndAltAllele(position, altAllele)] = (vrfs, percentiles);
         }
         
         public double?[] GetVrfPercentiles(IChromosome chrom, int position, string[] altAlleles, double[] vrfs)
