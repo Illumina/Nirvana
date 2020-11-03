@@ -118,8 +118,14 @@ namespace VariantAnnotation.NSA
 
         private void ExtractAnnotations(byte[] data, List<(string refAllele, string altAllele, string annotation)> annotations)
         {
-            if(_annotationBuffer.Length < data.Length)
-                _annotationBuffer = new byte[2*data.Length];
+            if (_annotationBuffer.Length < data.Length)
+            {
+                _annotationBuffer = new byte[2 *data.Length];
+                _annotationReader.Dispose();
+                _annotationStream?.Dispose();
+                _annotationStream = new MemoryStream(_annotationBuffer);
+                _annotationReader = new ExtendedBinaryReader(_annotationStream);
+            }
             Array.Copy(data, _annotationBuffer, data.Length);
             _annotationStream.Position = 0;
             if (IsPositional)

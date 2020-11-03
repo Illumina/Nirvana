@@ -33,7 +33,7 @@ namespace Cloud.Messages.Nirvana
             if (outputDir.accessKey      == null) throw new UserErrorException(BuildErrorMessage("accessKey of outputDir"));
             if (outputDir.secretKey      == null) throw new UserErrorException(BuildErrorMessage("secretKey of outputDir"));
             if (outputDir.sessionToken   == null) throw new UserErrorException(BuildErrorMessage("sessionToken of outputDir"));
-            if (supplementaryAnnotations == null) throw new UserErrorException(BuildErrorMessage("supplementaryAnnotations"));
+            
         }
 
         public void Validate()

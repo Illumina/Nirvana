@@ -36,6 +36,7 @@ namespace SAUtils.Custom
         private readonly List<string>             _unknownGenes = new List<string>();
         
         public const string NoValidEntriesErrorMessage = "The provided TSV has no valid custom annotation entries.";
+        public const string UnknownGeneIdsErrorMessage = "The following gene IDs were not recognized in Nirvana:";
         
         internal GeneAnnotationsParser(StreamReader reader, Dictionary<string, string> entrezGeneIdToSymbol, Dictionary<string, string> ensemblIdToSymbol)
         {
@@ -129,6 +130,13 @@ namespace SAUtils.Custom
                     AddItem(line, geneAnnotations, skipGeneIdValidation, logWriter);
                 }
             }
+
+            if (_unknownGenes.Count > 0 && geneAnnotations.Count == 0)
+                throw new UserErrorException($"{UnknownGeneIdsErrorMessage} {string.Join(',',_unknownGenes)}. {NoValidEntriesErrorMessage}");
+            
+            if (_unknownGenes.Count > 0)
+                throw new UserErrorException($"{UnknownGeneIdsErrorMessage} {string.Join(',',_unknownGenes)}.");
+            
             if (geneAnnotations.Count == 0) throw new UserErrorException(NoValidEntriesErrorMessage);
             return geneAnnotations;
         }

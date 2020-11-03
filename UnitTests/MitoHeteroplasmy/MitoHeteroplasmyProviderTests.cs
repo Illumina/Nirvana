@@ -63,7 +63,38 @@ namespace UnitTests.MitoHeteroplasmy
             
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
-            Assert.Equal(5.62, percentilesSample[0].Value, 2);
+            Assert.Equal(52.22, percentilesSample[0].Value, 2);
+        }
+        [Fact]
+        public void GetVrfPercentiles_zero()
+        {
+            var provider = GetProvider();
+
+            var chrom      = ChromosomeUtilities.ChrM;
+            var position   = 1;
+            var altAlleles = new[] { "G" };
+
+            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.0034 });
+            
+            Assert.Single(percentilesSample);
+            Assert.True(percentilesSample[0].HasValue);
+            Assert.Equal(0, percentilesSample[0].Value, 2);
+        }
+        
+        [Fact]
+        public void GetVrfPercentiles_100()
+        {
+            var provider = GetProvider();
+
+            var chrom      = ChromosomeUtilities.ChrM;
+            var position   = 2;
+            var altAlleles = new[] { "T" };
+
+            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.0034 });
+            
+            Assert.Single(percentilesSample);
+            Assert.True(percentilesSample[0].HasValue);
+            Assert.Equal(100, percentilesSample[0].Value, 2);
         }
     }
 }

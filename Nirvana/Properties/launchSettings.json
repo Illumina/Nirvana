@@ -166,7 +166,22 @@
     },
     "RR_rnaEdit": {
       "commandName": "Project",
-      "commandLineArgs": " --cache /Users/rroy1/development/Cache\\26\\GRCh38\\RefSeq --ref /Users/rroy1/development/References/6/Homo_sapiens.GRCh38.Nirvana.dat --in Dragen_v3.2-Dragen-Pedigree-RnaEdits-hg38-RefSeq-VEP91.vcf.gz --out rnaEdit",
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh38/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --in Dragen_v3.2-Dragen-Pedigree-RnaEdits-hg38-RefSeq-VEP91.vcf.gz --out rnaEdit",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
+    },
+    "RR_chrM": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh37/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --in inputs/chrMT.vcf --out outputs/chrMT",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
+    },
+    "RR_gnomad-missing": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh38/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --sd /Users/rroy1/development/SupplementaryDatabase/59/GRCh38 --in inputs/chr12.vcf.gz --out outputs/gnomad-missing",
+      "workingDirectory": "/Users/rroy1/development/TestDatasets"
+    },
+    "RR_gnomad-missing-1": {
+      "commandName": "Project",
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh38/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --sd /Users/rroy1/development/SupplementaryDatabase/59/GRCh38 --in inputs/partial-chr12.vcf.gz --out outputs/partial-gnomad-missing",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_dragen3.2_SV": {

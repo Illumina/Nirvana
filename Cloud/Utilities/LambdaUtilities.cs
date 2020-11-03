@@ -40,6 +40,8 @@ namespace Cloud.Utilities
                     return $"{s3BaseUrl}latest_SA_{genomeAssembly}.txt";
                 case "release":
                     return $"{s3BaseUrl}DRAGEN_3.4_{genomeAssembly}.txt";
+                case "none":
+                    return null;
                 default:
                     return $"{s3BaseUrl}{version}_SA_{genomeAssembly}.txt";
             }

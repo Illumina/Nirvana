@@ -157,7 +157,7 @@ namespace SAUtils.MitoMap
                 : collection2 ?? Enumerable.Empty<string>();
             
             Console.WriteLine($"Merge data at {alleleInfo}: {string.Join(",", collection1)} and {string.Join(",", collection2)}");
-            return collection1.Concat(collection1).Distinct();
+            return collection1.Concat(collection2).Distinct();
 
         }
 

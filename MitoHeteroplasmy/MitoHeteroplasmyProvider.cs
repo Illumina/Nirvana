@@ -21,7 +21,7 @@ namespace MitoHeteroplasmy
         private static readonly long CreateDateTicks = new DateTime(2020, 5, 21).Ticks;
         private static readonly Dictionary<string, int> AlleleToInt = new Dictionary<string, int> { { "A", 0 }, { "C", 1 }, { "G", 2 }, { "T", 3 } };
         private const int SequenceLengthMax = int.MaxValue / 4;
-        private readonly Dictionary<int, (int[] Vrfs, double[] Percentiles)> _alleleToDistribution = new Dictionary<int, (int[], double[])>();
+        private readonly Dictionary<int, (double[] Vrfs, double[] Percentiles)> _alleleToDistribution = new Dictionary<int, (double[], double[])>();
 
         public MitoHeteroplasmyProvider()
         {
@@ -29,11 +29,10 @@ namespace MitoHeteroplasmy
             DataSourceVersions = new[] {dataSourceVersion};
         }
 
-        public void Add(int position, string altAllele, IEnumerable<double> vrfs, int[] alleleDepths)
+        public void Add(int position, string altAllele, double[] vrfs, int[] alleleDepths)
         {
-            int[] vrfsInt = vrfs.Select(ToIntVrfForm).ToArray();
-            double[] percentiles = PercentileUtilities.ComputePercentiles(vrfsInt.Length, alleleDepths);
-            _alleleToDistribution[EncodeMitoPositionAndAltAllele(position, altAllele)] = (vrfsInt, percentiles);
+            double[] percentiles = PercentileUtilities.ComputePercentiles(vrfs.Length, alleleDepths);
+            _alleleToDistribution[EncodeMitoPositionAndAltAllele(position, altAllele)] = (vrfs, percentiles);
         }
         
         public double?[] GetVrfPercentiles(IChromosome chrom, int position, string[] altAlleles, double[] vrfs)
@@ -51,13 +50,13 @@ namespace MitoHeteroplasmy
 
             var positionAndAltAlleleIntForm = EncodeMitoPositionAndAltAllele(position, altAllele);
 
-            if (!_alleleToDistribution.TryGetValue(positionAndAltAlleleIntForm, out (int[] Vrfs, double[] Percentiles) data)) return null;
+            if (!_alleleToDistribution.TryGetValue(positionAndAltAlleleIntForm, out (double[] Vrfs, double[] Percentiles) data)) return null;
 
-            return PercentileUtilities.GetPercentile(ToIntVrfForm(vrf), data.Vrfs, data.Percentiles);
+            return PercentileUtilities.GetPercentile(vrf, data.Vrfs, data.Percentiles);
         }
 
         private static int EncodeMitoPositionAndAltAllele(int position, string altAllele) => SequenceLengthMax * AlleleToInt[altAllele] + position;
-
-        private static int ToIntVrfForm(double vrf) => Convert.ToInt32(vrf * 1000);
+        
+        private static double ToRoundedVrf(double vrf) => Math.Round(vrf, 3, MidpointRounding.AwayFromZero);
     }
 }

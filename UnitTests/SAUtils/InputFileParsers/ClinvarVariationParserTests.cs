@@ -34,5 +34,16 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             }
         }
+        
+        [Fact]
+        public void SignificanceTest()
+        {
+            using (var reader = new ClinVarVariationReader(FileUtilities.GetReadStream(Resources.VcvXmlFiles("VCV000476472.xml"))))
+            {
+                var items = reader.GetItems().ToArray();
+                Assert.Equal(new []{"likely benign","uncertain significance"}, items[0].Significances);
+                
+            }
+        }
     }
 }

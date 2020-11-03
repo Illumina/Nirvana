@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ClinVarVariationRelease xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                         xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_variation/variation_archive_1.4.xsd"
+                         ReleaseDate="2019-12-31">
+    <VariationArchive VariationID="476472" VariationName="NM_001849.3(COL6A2):c.2697G&gt;A (p.Thr899=)"
+                      VariationType="single nucleotide variant" DateCreated="2017-12-20" DateLastUpdated="2020-06-05"
+                      Accession="VCV000476472" Version="4" RecordType="interpreted" NumberOfSubmissions="3"
+                      NumberOfSubmitters="3">
+        <RecordStatus>current</RecordStatus>
+        <Species>Homo sapiens</Species>
+        <InterpretedRecord>
+            <SimpleAllele AlleleID="470827" VariationID="476472">
+                <GeneList>
+                    <Gene Symbol="COL6A2" FullName="collagen type VI alpha 2 chain" GeneID="1292" HGNC_ID="HGNC:2212"
+                          Source="submitted" RelationshipType="within single gene">
+                        <Location>
+                            <CytogeneticLocation>21q22.3</CytogeneticLocation>
+                            <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                              AssemblyStatus="current" Chr="21" Accession="NC_000021.9" start="46098071"
+                                              stop="46132849" display_start="46098071" display_stop="46132849"
+                                              Strand="+"/>
+                            <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                              AssemblyStatus="previous" Chr="21" Accession="NC_000021.8"
+                                              start="47518032" stop="47552762" display_start="47518032"
+                                              display_stop="47552762" Strand="+"/>
+                        </Location>
+                        <OMIM>120240</OMIM>
+                    </Gene>
+                </GeneList>
+                <Name>NM_001849.3(COL6A2):c.2697G&gt;A (p.Thr899=)</Name>
+                <CanonicalSPDI>NC_000021.9:46132188:G:A</CanonicalSPDI>
+                <VariantType>single nucleotide variant</VariantType>
+                <Location>
+                    <CytogeneticLocation>21q22.3</CytogeneticLocation>
+                    <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38" forDisplay="true"
+                                      AssemblyStatus="current" Chr="21" Accession="NC_000021.9" start="46132189"
+                                      stop="46132189" display_start="46132189" display_stop="46132189" variantLength="1"
+                                      positionVCF="46132189" referenceAlleleVCF="G" alternateAlleleVCF="A"/>
+                    <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                      AssemblyStatus="previous" Chr="21" Accession="NC_000021.8" start="47552103"
+                                      stop="47552103" display_start="47552103" display_stop="47552103" variantLength="1"
+                                      positionVCF="47552103" referenceAlleleVCF="G" alternateAlleleVCF="A"/>
+                </Location>
+                <HGVSlist>
+                    <HGVS Assembly="GRCh37" Type="genomic, top-level">
+                        <NucleotideExpression sequenceAccessionVersion="NC_000021.8" sequenceAccession="NC_000021"
+                                              sequenceVersion="8" change="g.47552103G&gt;A" Assembly="GRCh37">
+                            <Expression>NC_000021.8:g.47552103G&gt;A</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                    <HGVS Assembly="GRCh38" Type="genomic, top-level">
+                        <NucleotideExpression sequenceAccessionVersion="NC_000021.9" sequenceAccession="NC_000021"
+                                              sequenceVersion="9" change="g.46132189G&gt;A" Assembly="GRCh38">
+                            <Expression>NC_000021.9:g.46132189G&gt;A</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                    <HGVS Type="coding">
+                        <NucleotideExpression sequenceAccessionVersion="NM_001849.3" sequenceAccession="NM_001849"
+                                              sequenceVersion="3" change="c.2697G&gt;A">
+                            <Expression>NM_001849.3:c.2697G&gt;A</Expression>
+                        </NucleotideExpression>
+                        <ProteinExpression sequenceAccessionVersion="NP_001840.3" sequenceAccession="NP_001840"
+                                           sequenceVersion="3" change="p.Thr899=">
+                            <Expression>NP_001840.3:p.Thr899=</Expression>
+                        </ProteinExpression>
+                        <MolecularConsequence ID="SO:0001819" Type="synonymous variant" DB="SO"/>
+                    </HGVS>
+                    <HGVS Type="coding">
+                        <NucleotideExpression sequenceAccessionVersion="LRG_476t1" sequenceAccession="LRG_476t1"
+                                              change="c.2697G&gt;A">
+                            <Expression>LRG_476t1:c.2697G&gt;A</Expression>
+                        </NucleotideExpression>
+                        <ProteinExpression sequenceAccessionVersion="LRG_476p1" sequenceAccession="LRG_476p1"
+                                           change="p.Thr899=">
+                            <Expression>LRG_476p1:p.Thr899=</Expression>
+                        </ProteinExpression>
+                    </HGVS>
+                    <HGVS Type="genomic">
+                        <NucleotideExpression sequenceAccessionVersion="NG_008675.1" sequenceAccession="NG_008675"
+                                              sequenceVersion="1" change="g.39071G&gt;A">
+                            <Expression>NG_008675.1:g.39071G&gt;A</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                    <HGVS Type="genomic">
+                        <NucleotideExpression sequenceAccessionVersion="LRG_476" sequenceAccession="LRG_476"
+                                              change="g.39071G&gt;A">
+                            <Expression>LRG_476:g.39071G&gt;A</Expression>
+                        </NucleotideExpression>
+                    </HGVS>
+                </HGVSlist>
+                <XRefList>
+                    <XRef ID="CA10072979" DB="ClinGen"/>
+                    <XRef Type="rs" ID="11554669" DB="dbSNP"/>
+                </XRefList>
+                <AlleleFrequencyList>
+                    <AlleleFrequency Value="0.00010" Source="Trans-Omics for Precision Medicine (TOPMed)"/>
+                </AlleleFrequencyList>
+                <GlobalMinorAlleleFrequency Value="0.01697" Source="1000 Genomes Project" MinorAllele="T"/>
+            </SimpleAllele>
+            <ReviewStatus>criteria provided, conflicting interpretations</ReviewStatus>
+            <RCVList>
+                <RCVAccession Title="NM_001849.3(COL6A2):c.2697G&gt;A (p.Thr899=) AND Bethlem myopathy 1"
+                              DateLastEvaluated="2019-12-31" ReviewStatus="criteria provided, single submitter"
+                              Interpretation="Likely benign" SubmissionCount="1" Accession="RCV000546795" Version="3">
+                    <InterpretedConditionList TraitSetID="5661">
+                        <InterpretedCondition DB="MedGen" ID="CN029274">Bethlem myopathy 1</InterpretedCondition>
+                    </InterpretedConditionList>
+                </RCVAccession>
+                <RCVAccession Title="NM_001849.3(COL6A2):c.2697G&gt;A (p.Thr899=) AND not specified"
+                              DateLastEvaluated="2017-09-11" ReviewStatus="criteria provided, single submitter"
+                              Interpretation="Likely benign" SubmissionCount="1" Accession="RCV000609723" Version="1">
+                    <InterpretedConditionList TraitSetID="9590">
+                        <InterpretedCondition DB="MedGen" ID="CN169374">not specified</InterpretedCondition>
+                    </InterpretedConditionList>
+                </RCVAccession>
+                <RCVAccession Title="NM_001849.3(COL6A2):c.2697G&gt;A (p.Thr899=) AND Collagen VI-related myopathy"
+                              DateLastEvaluated="2018-01-15" ReviewStatus="criteria provided, single submitter"
+                              Interpretation="Uncertain significance" SubmissionCount="1" Accession="RCV001143621"
+                              Version="1">
+                    <InterpretedConditionList TraitSetID="7429">
+                        <InterpretedCondition DB="MedGen" ID="CN117976">Collagen VI-related myopathy
+                        </InterpretedCondition>
+                    </InterpretedConditionList>
+                </RCVAccession>
+            </RCVList>
+            <Interpretations>
+                <Interpretation DateLastEvaluated="2019-12-31" NumberOfSubmissions="3" NumberOfSubmitters="3"
+                                Type="Clinical significance">
+                    <Description>Conflicting interpretations of pathogenicity</Description>
+                    <Explanation DataSource="ClinVar" Type="public">Likely benign(2);Uncertain significance(1)
+                    </Explanation>
+                    <Comment DataSource="ClinVar" Type="public">Likely benign(2);Uncertain significance(1)</Comment>
+                    <DescriptionHistory Dated="2020-05-31">
+                        <Description>Likely benign</Description>
+                    </DescriptionHistory>
+                    <ConditionList>
+                        <TraitSet ID="5661" Type="Disease">
+                            <Trait ID="492" Type="Disease">
+                                <Name>
+                                    <ElementValue Type="Alternate">Myopathy, benign congenital, with contractures
+                                    </ElementValue>
+                                </Name>
+                                <Name>
+                                    <ElementValue Type="Alternate">Muscular dystrophy, benign congenital</ElementValue>
+                                </Name>
+                                <Name>
+                                    <ElementValue Type="Preferred">Bethlem myopathy 1</ElementValue>
+                                </Name>
+                                <Name>
+                                    <ElementValue Type="Alternate">MUSCULAR DYSTROPHY, LIMB-GIRDLE, AUTOSOMAL DOMINANT
+                                        5
+                                    </ElementValue>
+                                    <XRef Type="MIM" ID="158810" DB="OMIM"/>
+                                </Name>
+                                <Symbol>
+                                    <ElementValue Type="Preferred">BTHLM1</ElementValue>
+                                    <XRef Type="MIM" ID="158810" DB="OMIM"/>
+                                </Symbol>
+                                <Symbol>
+                                    <ElementValue Type="Alternate">LGMDD5</ElementValue>
+                                    <XRef Type="MIM" ID="158810" DB="OMIM"/>
+                                </Symbol>
+                                <AttributeSet>
+                                    <Attribute Type="public definition">Collagen type VI-related disorders represent a
+                                        continuum of overlapping phenotypes with Bethlem myopathy at the mild end,
+                                        Ullrich congenital muscular dystrophy (CMD) at the severe end, and two rare,
+                                        less well-defined disorders – autosomal dominant limb-girdle muscular dystrophy
+                                        and autosomal recessive myosclerosis myopathy – in between. Although Bethlem
+                                        myopathy and Ullrich CMD were defined long before their molecular basis was
+                                        known, they remain useful for clarification of prognosis and management. Bethlem
+                                        myopathy, characterized by the combination of proximal muscle weakness and
+                                        variable contractures, affects most frequently the long finger flexors, elbows,
+                                        and ankles. Onset may be prenatal (characterized by decreased fetal movements),
+                                        neonatal (hypotonia or torticollis), in early childhood (delayed motor
+                                        milestones, muscle weakness, and contractures), or in adulthood (proximal
+                                        weakness and Achilles tendon or long finger flexor contractures). Because of
+                                        slow progression, more than two thirds of affected individuals over age 50 years
+                                        rely on supportive means for outdoor mobility. Respiratory involvement is rare
+                                        and appears to be related to more severe muscle weakness in later life. Ullrich
+                                        CMD is characterized by congenital weakness and hypotonia, proximal joint
+                                        contractures, and striking hyperlaxity of distal joints. Some affected children
+                                        acquire the ability to walk independently; however, progression of the disease
+                                        often results in later loss of ambulation. Early and severe respiratory
+                                        involvement may require ventilatory support in the first or second decade of
+                                        life.
+                                    </Attribute>
+                                    <XRef ID="NBK1503" DB="GeneReviews"/>
+                                </AttributeSet>
+                                <Citation Type="review" Abbrev="GeneReviews">
+                                    <ID Source="PubMed">20301676</ID>
+                                    <ID Source="BookShelf">NBK1503</ID>
+                                </Citation>
+                                <Citation Type="practice guideline" Abbrev="Int'l SCC for CMD, 2010">
+                                    <ID Source="PubMed">21078917</ID>
+                                </Citation>
+                                <Citation Type="review" Abbrev="GeneReviews">
+                                    <ID Source="PubMed">20301468</ID>
+                                    <ID Source="BookShelf">NBK1291</ID>
+                                </Citation>
+                                <XRef ID="610" DB="Orphanet"/>
+                                <XRef ID="CN029274" DB="MedGen"/>
+                                <XRef ID="MONDO:0024530" DB="MONDO"/>
+                                <XRef Type="MIM" ID="158810" DB="OMIM"/>
+                            </Trait>
+                        </TraitSet>
+                        <TraitSet ID="7429" Type="Disease">
+                            <Trait ID="16600" Type="Disease">
+                                <Name>
+                                    <ElementValue Type="Preferred">Collagen VI-related myopathy</ElementValue>
+                                    <XRef ID="Collagen+VI-related+myopathy/8002" DB="Genetic Alliance"/>
+                                </Name>
+                                <Name>
+                                    <ElementValue Type="Alternate">Collagen 6-related myopathy</ElementValue>
+                                </Name>
+                                <Symbol>
+                                    <ElementValue Type="Preferred">COL6-RM</ElementValue>
+                                </Symbol>
+                                <AttributeSet>
+                                    <Attribute Type="public definition">Collagen type VI-related disorders represent a
+                                        continuum of overlapping phenotypes with Bethlem myopathy at the mild end,
+                                        Ullrich congenital muscular dystrophy (CMD) at the severe end, and two rare,
+                                        less well-defined disorders – autosomal dominant limb-girdle muscular dystrophy
+                                        and autosomal recessive myosclerosis myopathy – in between. Although Bethlem
+                                        myopathy and Ullrich CMD were defined long before their molecular basis was
+                                        known, they remain useful for clarification of prognosis and management. Bethlem
+                                        myopathy, characterized by the combination of proximal muscle weakness and
+                                        variable contractures, affects most frequently the long finger flexors, elbows,
+                                        and ankles. Onset may be prenatal (characterized by decreased fetal movements),
+                                        neonatal (hypotonia or torticollis), in early childhood (delayed motor
+                                        milestones, muscle weakness, and contractures), or in adulthood (proximal
+                                        weakness and Achilles tendon or long finger flexor contractures). Because of
+                                        slow progression, more than two thirds of affected individuals over age 50 years
+                                        rely on supportive means for outdoor mobility. Respiratory involvement is rare
+                                        and appears to be related to more severe muscle weakness in later life. Ullrich
+                                        CMD is characterized by congenital weakness and hypotonia, proximal joint
+                                        contractures, and striking hyperlaxity of distal joints. Some affected children
+                                        acquire the ability to walk independently; however, progression of the disease
+                                        often results in later loss of ambulation. Early and severe respiratory
+                                        involvement may require ventilatory support in the first or second decade of
+                                        life.
+                                    </Attribute>
+                                    <XRef ID="NBK1503" DB="GeneReviews"/>
+                                </AttributeSet>
+                                <Citation Type="review" Abbrev="GeneReviews">
+                                    <ID Source="PubMed">20301676</ID>
+                                    <ID Source="BookShelf">NBK1503</ID>
+                                </Citation>
+                                <XRef ID="CN117976" DB="MedGen"/>
+                            </Trait>
+                        </TraitSet>
+                        <TraitSet ID="9590" Type="Disease">
+                            <Trait ID="16789" Type="Disease">
+                                <Name>
+                                    <ElementValue Type="Alternate">AllHighlyPenetrant</ElementValue>
+                                </Name>
+                                <Name>
+                                    <ElementValue Type="Preferred">not specified</ElementValue>
+                                </Name>
+                                <AttributeSet>
+                                    <Attribute Type="public definition">The term 'not specified' was created for use in
+                                        ClinVar so that submitters can convey the concept that a variant is benign,
+                                        likely benign, or of uncertain significance for an unspecified set of disorders.
+                                        This usage was introduced in 2014 to replace AllHighlyPenetrant.
+                                    </Attribute>
+                                </AttributeSet>
+                                <XRef ID="CN169374" DB="MedGen"/>
+                            </Trait>
+                        </TraitSet>
+                    </ConditionList>
+                </Interpretation>
+            </Interpretations>
+            <ClinicalAssertionList>
+                <ClinicalAssertion ID="1403880" DateCreated="2018-04-04" DateLastUpdated="2019-03-31"
+                                   SubmissionDate="2018-03-26">
+                    <ClinVarSubmissionID localKey="GDX:1784188|Not Provided" submittedAssembly="GRCh37"/>
+                    <ClinVarAccession Accession="SCV000722725" Type="SCV" Version="1" SubmitterName="GeneDx"
+                                      OrgID="26957" OrganizationCategory="laboratory"/>
+                    <RecordStatus>current</RecordStatus>
+                    <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                    <Interpretation DateLastEvaluated="2017-09-11">
+                        <Description>Likely benign</Description>
+                        <Comment Type="public">This variant is considered likely benign or benign based on one or more
+                            of the following criteria: it is a conservative change, it occurs at a poorly conserved
+                            position in the protein, it is predicted to be benign by multiple in silico algorithms,
+                            and/or has population frequency not consistent with disease.
+                        </Comment>
+                    </Interpretation>
+                    <Assertion>variation to disease</Assertion>
+                    <AttributeSet>
+                        <Attribute Type="AssertionMethod">GeneDX Variant Classification (06012015)</Attribute>
+                        <Citation>
+                            <URL>
+                                https://submit.ncbi.nlm.nih.gov/ft/byid/7oynscmk/mdi-5616_26957_genedx_interprules_final_061215.pdf
+                            </URL>
+                        </Citation>
+                    </AttributeSet>
+                    <ObservedInList>
+                        <ObservedIn>
+                            <Sample>
+                                <Origin>germline</Origin>
+                                <Species TaxonomyId="9606">human</Species>
+                                <AffectedStatus>yes</AffectedStatus>
+                            </Sample>
+                            <Method>
+                                <MethodType>clinical testing</MethodType>
+                            </Method>
+                            <ObservedData>
+                                <Attribute Type="Description">not provided</Attribute>
+                            </ObservedData>
+                        </ObservedIn>
+                    </ObservedInList>
+                    <SimpleAllele>
+                        <GeneList>
+                            <Gene Symbol="COL6A2"/>
+                        </GeneList>
+                        <VariantType>Variation</VariantType>
+                        <Location>
+                            <SequenceLocation Assembly="GRCh37" Chr="21" alternateAllele="A" referenceAllele="G"
+                                              start="47552103" stop="47552103" variantLength="1"/>
+                        </Location>
+                        <AttributeSet>
+                            <Attribute Type="HGVS">NM_001849.3:c.2697G&gt;A</Attribute>
+                        </AttributeSet>
+                    </SimpleAllele>
+                    <TraitSet Type="Disease">
+                        <Trait Type="Disease">
+                            <Name>
+                                <ElementValue Type="Preferred">not specified</ElementValue>
+                            </Name>
+                        </Trait>
+                    </TraitSet>
+                    <SubmissionNameList>
+                        <SubmissionName>SUB3839901</SubmissionName>
+                    </SubmissionNameList>
+                </ClinicalAssertion>
+                <ClinicalAssertion ID="1255376" DateCreated="2017-12-20" DateLastUpdated="2020-05-05"
+                                   SubmissionDate="2020-01-29">
+                    <ClinVarSubmissionID localKey="1519820|MedGen:CN029274" submittedAssembly="GRCh37"/>
+                    <ClinVarAccession Accession="SCV000657167" Type="SCV" Version="3" SubmitterName="Invitae"
+                                      OrgID="500031" OrganizationCategory="laboratory"/>
+                    <RecordStatus>current</RecordStatus>
+                    <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                    <Interpretation DateLastEvaluated="2019-12-31">
+                        <Description>Likely benign</Description>
+                    </Interpretation>
+                    <Assertion>variation to disease</Assertion>
+                    <AttributeSet>
+                        <Attribute Type="AssertionMethod">Invitae Variant Classification Sherloc (09022015)</Attribute>
+                        <Citation>
+                            <ID Source="PubMed">28492532</ID>
+                        </Citation>
+                    </AttributeSet>
+                    <ObservedInList>
+                        <ObservedIn>
+                            <Sample>
+                                <Origin>germline</Origin>
+                                <Species TaxonomyId="9606">human</Species>
+                                <AffectedStatus>unknown</AffectedStatus>
+                            </Sample>
+                            <Method>
+                                <MethodType>clinical testing</MethodType>
+                            </Method>
+                            <ObservedData>
+                                <Attribute Type="Description">not provided</Attribute>
+                            </ObservedData>
+                        </ObservedIn>
+                    </ObservedInList>
+                    <SimpleAllele>
+                        <GeneList>
+                            <Gene Symbol="COL6A2"/>
+                        </GeneList>
+                        <VariantType>Variation</VariantType>
+                        <AttributeSet>
+                            <Attribute Type="HGVS">NM_001849.3:c.2697G&gt;A</Attribute>
+                        </AttributeSet>
+                    </SimpleAllele>
+                    <TraitSet Type="Disease">
+                        <Trait Type="Disease">
+                            <Name>
+                                <ElementValue Type="Preferred">Bethlem myopathy 1</ElementValue>
+                            </Name>
+                            <XRef DB="MedGen" ID="CN029274" Type="CUI"/>
+                        </Trait>
+                    </TraitSet>
+                    <SubmissionNameList>
+                        <SubmissionName>SUB6897608</SubmissionName>
+                    </SubmissionNameList>
+                </ClinicalAssertion>
+                <ClinicalAssertion ID="2530780" DateCreated="2020-05-26" DateLastUpdated="2020-06-01"
+                                   SubmissionDate="2020-02-20">
+                    <ClinVarSubmissionID localKey="1414007|MedGen:CN117976" submittedAssembly="GRCh37"/>
+                    <ClinVarAccession Accession="SCV001304160" Type="SCV" Version="1"
+                                      SubmitterName="Illumina Clinical Services Laboratory,Illumina" OrgID="504895"
+                                      OrganizationCategory="laboratory"/>
+                    <RecordStatus>current</RecordStatus>
+                    <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                    <Interpretation DateLastEvaluated="2018-01-15">
+                        <Description>Uncertain significance</Description>
+                        <Comment>This variant was observed in the ICSL laboratory as part of a predisposition screen in
+                            an ostensibly healthy population. It had not been previously curated by ICSL or reported in
+                            the Human Gene Mutation Database (HGMD: prior to June 1st, 2018), and was therefore a
+                            candidate for classification through an automated scoring system. Utilizing variant allele
+                            frequency, disease prevalence and penetrance estimates, and inheritance mode, an automated
+                            score was calculated to assess if this variant is too frequent to cause the disease. Based
+                            on the score, this variant could not be ruled out of causing disease and therefore its
+                            association with disease required further investigation. A literature search was performed
+                            for the gene, cDNA change, and amino acid change (if applicable). No publications were found
+                            based on this search. This variant was therefore classified as a variant of unknown
+                            significance for this disease.
+                        </Comment>
+                    </Interpretation>
+                    <Assertion>variation to disease</Assertion>
+                    <AttributeSet>
+                        <Attribute Type="AssertionMethod">ICSL Variant Classification Criteria 13 December 2019
+                        </Attribute>
+                        <Citation>
+                            <URL>
+                                https://submit.ncbi.nlm.nih.gov/ft/byid/r0x0xrmc/icsl_variant_classification_criteria_13_december_2019.pdf
+                            </URL>
+                        </Citation>
+                    </AttributeSet>
+                    <ObservedInList>
+                        <ObservedIn>
+                            <Sample>
+                                <Origin>germline</Origin>
+                                <Species TaxonomyId="9606">human</Species>
+                                <AffectedStatus>unknown</AffectedStatus>
+                            </Sample>
+                            <Method>
+                                <MethodType>clinical testing</MethodType>
+                            </Method>
+                            <ObservedData>
+                                <Attribute Type="Description">not provided</Attribute>
+                            </ObservedData>
+                        </ObservedIn>
+                    </ObservedInList>
+                    <SimpleAllele>
+                        <GeneList>
+                            <Gene Symbol="COL6A2"/>
+                        </GeneList>
+                        <VariantType>Variation</VariantType>
+                        <Location>
+                            <SequenceLocation Assembly="GRCh37" Chr="21" alternateAllele="A" referenceAllele="G"
+                                              start="47552103" stop="47552103" variantLength="1"/>
+                        </Location>
+                        <AttributeSet>
+                            <Attribute Type="HGVS">NM_001849.3:c.2697G&gt;A</Attribute>
+                        </AttributeSet>
+                    </SimpleAllele>
+                    <TraitSet Type="Disease">
+                        <Trait Type="Disease">
+                            <Name>
+                                <ElementValue Type="Preferred">Collagen VI-related myopathy</ElementValue>
+                            </Name>
+                            <XRef DB="MedGen" ID="CN117976" Type="CUI"/>
+                        </Trait>
+                    </TraitSet>
+                    <SubmissionNameList>
+                        <SubmissionName>SUB6641900</SubmissionName>
+                    </SubmissionNameList>
+                </ClinicalAssertion>
+            </ClinicalAssertionList>
+            <TraitMappingList>
+                <TraitMapping ClinicalAssertionID="2530780" TraitType="Disease" MappingType="Name"
+                              MappingValue="Collagen VI-related myopathy" MappingRef="Preferred">
+                    <MedGen CUI="CN117976" Name="Collagen VI-related myopathy"/>
+                </TraitMapping>
+                <TraitMapping ClinicalAssertionID="1255376" TraitType="Disease" MappingType="Name"
+                              MappingValue="Bethlem myopathy 1" MappingRef="Preferred">
+                    <MedGen CUI="CN029274" Name="Bethlem myopathy 1"/>
+                </TraitMapping>
+                <TraitMapping ClinicalAssertionID="1403880" TraitType="Disease" MappingType="Name"
+                              MappingValue="not specified" MappingRef="Preferred">
+                    <MedGen CUI="CN169374" Name="not specified"/>
+                </TraitMapping>
+            </TraitMappingList>
+        </InterpretedRecord>
+    </VariationArchive>
+</ClinVarVariationRelease>

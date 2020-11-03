@@ -99,7 +99,7 @@ namespace CustomAnnotationLambda
             var errorCategory = ExceptionUtilities.ExceptionToErrorCategory(e);
 
             result.status = $"{errorCategory}: {e.Message}";
-            result.noValidEntries = e.Message == GeneAnnotationsParser.NoValidEntriesErrorMessage;
+            result.noValidEntries = e.Message.Contains(GeneAnnotationsParser.NoValidEntriesErrorMessage);
 
             if (errorCategory != ErrorCategory.UserError)
             {
