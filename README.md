@@ -1,5 +1,4 @@
-<img align="left" src="https://github.com/Illumina/Nirvana/wiki/images/NirvanaLogo.png" width="300" />
-<br clear=left>
+# Nirvana
 
 Nirvana provides **clinical-grade annotation of genomic variants** (SNVs, MNVs, insertions, deletions, indels, and SVs (including CNVs). It can be run as a stand-alone package or integrated into larger software tools that require variant annotation.
 
