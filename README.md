@@ -12,6 +12,5 @@ Backronym: **NI**mble and **R**obust **VA**riant a**N**not**A**tor
 
 ## Resources
 
-* [Getting Started](https://github.com/Illumina/Nirvana/wiki/Getting-Started)
-* [Wiki](https://github.com/Illumina/Nirvana/wiki)
+* [Documentation](https://illumina.github.io/NirvanaDocumentation/)
 * [Release Notes](https://github.com/Illumina/Nirvana/releases)
