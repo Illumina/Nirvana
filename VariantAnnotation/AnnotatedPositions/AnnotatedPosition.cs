@@ -53,6 +53,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddIntValues("ciPos",   Position.InfoData?.CiPos);
             jsonObject.AddIntValues("ciEnd",   Position.InfoData?.CiEnd);
             jsonObject.AddIntValue("svLength", Position.InfoData?.SvLength);
+            jsonObject.AddStringValue("breakendEventId", Position.InfoData?.BreakendEventId);
 
             jsonObject.AddDoubleValue("strandBias",             Position.InfoData?.StrandBias,JsonCommon.FrequencyRoundingFormat);
             jsonObject.AddDoubleValue("fisherStrandBias",             Position.InfoData?.FisherStrandBias,"0.###");

@@ -13,16 +13,17 @@ namespace Vcf.Info
 
             Dictionary<string, string> infoKeyValue = ExtractInfoFields(infoField);
 
-            int[] ciEnd                    = null;
-            int[] ciPos                    = null;
-            int? end                       = null;
-            int? refRepeatCount            = null;
-            string repeatUnit              = null;
-            int? jointSomaticNormalQuality = null;
-            double? strandBias             = null;
-            double? recalibratedQuality    = null;
-            int? svLen                     = null;
-            string svType                  = null;
+            int[]   ciEnd                     = null;
+            int[]   ciPos                     = null;
+            int?    end                       = null;
+            int?    refRepeatCount            = null;
+            string  repeatUnit                = null;
+            int?    jointSomaticNormalQuality = null;
+            double? strandBias                = null;
+            double? recalibratedQuality       = null;
+            int?    svLen                     = null;
+            string  svType                    = null;
+            string  breakendEventId           = null;
             //emedgene requests
             double? fisherStrandBias = null;
             double? mappingQuality   = null;
@@ -40,6 +41,9 @@ namespace Vcf.Info
                         break;
                     case "END":
                         end = value.GetNullableInt();
+                        break;
+                    case "EVENT":
+                        breakendEventId = value;
                         break;
                     case "REF":
                         refRepeatCount = Convert.ToInt32(value);
@@ -76,7 +80,7 @@ namespace Vcf.Info
             }
 
             return new InfoData(ciEnd, ciPos, end, recalibratedQuality, jointSomaticNormalQuality, refRepeatCount,
-                repeatUnit, strandBias, svLen, svType, fisherStrandBias, mappingQuality);
+                repeatUnit, strandBias, svLen, svType, fisherStrandBias, mappingQuality, breakendEventId);
         }
 
         private static readonly Dictionary<string, string> EmptyDictionary = new Dictionary<string, string>();
