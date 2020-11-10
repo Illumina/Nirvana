@@ -294,8 +294,9 @@ namespace UnitTests.SAUtils.CustomAnnotations
         [Fact]
         public void IsValidNucleotideSequence_IsValidSequence_Pass()
         {
-            Assert.True(VariantAnnotationsParser.IsValidNucleotideSequence("actgnACTGN"));
-            Assert.False(VariantAnnotationsParser.IsValidNucleotideSequence("AC-GT"));
+            Assert.True(VariantAnnotationsParser.IsValidAltAllele("actgnACTGN"));
+            Assert.True(VariantAnnotationsParser.IsValidAltAllele("AAAAAAAAAAAAAAAAAATTAGTCAGGCAC[chr3:153444911["));
+            Assert.False(VariantAnnotationsParser.IsValidAltAllele("AC-GT"));
         }
 
         [Fact]

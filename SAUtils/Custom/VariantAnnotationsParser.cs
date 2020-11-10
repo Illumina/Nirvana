@@ -275,7 +275,7 @@ namespace SAUtils.Custom
             }
 
             string altAllele = splits[_altColumnIndex];
-            if (!IsValidNucleotideSequence(altAllele))
+            if (!IsValidAltAllele(altAllele))
                 throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
             (position, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, SequenceProvider.Sequence);
@@ -305,8 +305,10 @@ namespace SAUtils.Custom
 
         public List<CustomInterval> GetCustomIntervals() => _intervals.Count > 0 ? _intervals : null;
 
-        internal static bool IsValidNucleotideSequence(string sequence)
+        internal static bool IsValidAltAllele(string sequence)
         {
+            if (sequence.Contains('[') || sequence.Contains(']')) return true;
+            
             var validNucleotides = new[] { 'a', 'c', 'g', 't', 'n' };
             foreach (char nucleotide in sequence.ToLower())
             {

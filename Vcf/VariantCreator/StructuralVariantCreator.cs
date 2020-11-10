@@ -7,13 +7,17 @@ namespace Vcf.VariantCreator
     {
         public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string svType, string vid)
         {
-            var variantType = GetVariantType(altAllele, svType);
+            VariantType variantType = GetVariantType(altAllele, svType);
+            AnnotationBehavior behavior = variantType == VariantType.translocation_breakend
+                ? AnnotationBehavior.BreakendVariants
+                : AnnotationBehavior.StructuralVariants;
+
             if (variantType != VariantType.translocation_breakend) start++;
 
             return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
-                null, AnnotationBehavior.StructuralVariants, true);
+                null, behavior, true);
         }
-
+                
         public static VariantType GetVariantType(string altAllele, string svType)
         {
             switch (svType)

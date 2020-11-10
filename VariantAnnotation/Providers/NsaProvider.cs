@@ -81,7 +81,7 @@ namespace VariantAnnotation.Providers
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
         {
-            if (_nsaReaders != null) AddSmallVariantAnnotations(annotatedPosition);
+            if (_nsaReaders != null) AddPositionAndAlleleAnnotations(annotatedPosition);
 
             if (_nsiReaders != null) GetStructuralVariantAnnotations(annotatedPosition);
         }
@@ -89,7 +89,7 @@ namespace VariantAnnotation.Providers
         private void GetStructuralVariantAnnotations(IAnnotatedPosition annotatedPosition)
         {
             bool needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
-            bool needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
+            bool needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior == AnnotationBehavior.SmallVariants);
 
             foreach (INsiReader nsiReader in _nsiReaders)
             {
@@ -105,17 +105,19 @@ namespace VariantAnnotation.Providers
 
         }
 
-        private void AddSmallVariantAnnotations(IAnnotatedPosition annotatedPosition)
+        private void AddPositionAndAlleleAnnotations(IAnnotatedPosition annotatedPosition)
         {
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
-                if (!annotatedVariant.Variant.Behavior.NeedSaPosition) continue;
-                AddSmallAnnotations(annotatedVariant);
+                var needSaPosition = annotatedVariant.Variant.Behavior.NeedSaPosition;
+                var needSaAllele = annotatedVariant.Variant.Behavior.NeedSaAllele;
+                if (!needSaPosition && !needSaAllele) continue;
+                AddSmallAnnotations(annotatedVariant, needSaPosition, needSaAllele);
             }
         }
 
         private List<(string refAllele, string altAllele, string jsonString)> _annotations= new List<(string refAllele, string altAllele, string jsonString)>();
-        private void AddSmallAnnotations(IAnnotatedVariant annotatedVariant)
+        private void AddSmallAnnotations(IAnnotatedVariant annotatedVariant, bool needSaPosition, bool needSaAllele)
         {
             foreach (INsaReader nsaReader in _nsaReaders)
             {
@@ -123,13 +125,13 @@ namespace VariantAnnotation.Providers
                 nsaReader.GetAnnotation(variant.Start, _annotations);
                 if (_annotations.Count == 0) continue;
 
-                if (nsaReader.IsPositional)
+                if (nsaReader.IsPositional && needSaPosition)
                 {
                     AddPositionalAnnotation(_annotations, annotatedVariant, nsaReader);
                     continue;
                 }
 
-                if (nsaReader.MatchByAllele) AddAlleleSpecificAnnotation(nsaReader, _annotations, annotatedVariant, variant);
+                if (nsaReader.MatchByAllele && needSaAllele) AddAlleleSpecificAnnotation(nsaReader, _annotations, annotatedVariant, variant);
 
                 else AddNonAlleleSpecificAnnotations(_annotations, variant, annotatedVariant, nsaReader);
             }
