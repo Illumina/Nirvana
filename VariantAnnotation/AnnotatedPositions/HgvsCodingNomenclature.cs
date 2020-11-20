@@ -84,7 +84,7 @@ namespace VariantAnnotation.AnnotatedPositions
             int altLength = variant.AltAllele.Length;
 
             // sanity check: make sure that the alleles are different
-            if (variant.RefAllele == variant.AltAllele) return GenomicChange.Unknown;
+            if (variant.RefAllele == variant.AltAllele) return GenomicChange.Reference;
 
             // deletion
             if (altLength == 0) return GenomicChange.Deletion;
@@ -118,6 +118,7 @@ namespace VariantAnnotation.AnnotatedPositions
         DelIns,
         Insertion,
         Inversion,
-        Substitution
+        Substitution,
+        Reference
     }
 }

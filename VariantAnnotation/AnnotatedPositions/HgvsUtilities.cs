@@ -289,7 +289,9 @@ namespace VariantAnnotation.AnnotatedPositions
                 case GenomicChange.Insertion:
                     sb.Append(coordinates + "ins" + alternateBases);
                     break;
-
+                case GenomicChange.Reference:
+                    sb.Append(coordinates + "=");
+                    break;
                 default:
                     throw new InvalidOperationException("Unhandled genomic change found: " + type);
             }
