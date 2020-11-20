@@ -25,9 +25,10 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         int[] Selenocysteines { get; }
         IRnaEdit[] RnaEdits { get; }
 
-        bool CdsStartNotFound { get; }
-        bool CdsEndNotFound { get; }
-        ISequence CodingSequence { get; set; }
+        bool      CdsStartNotFound { get; }
+        bool      CdsEndNotFound   { get; }
+        ISequence CodingSequence   { get; set; }
+        ISequence CdnaSequence     { get; set; }
 
         void Write(IExtendedBinaryWriter writer, Dictionary<IGene, int> geneIndices,
             Dictionary<ITranscriptRegion, int> transcriptRegionIndices, Dictionary<IInterval, int> microRnaIndices,

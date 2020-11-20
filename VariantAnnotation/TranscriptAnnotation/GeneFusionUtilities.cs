@@ -68,7 +68,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             if (position < codingRegion.Start) return ("?", (position - codingRegion.Start).ToString());
             if (position > codingRegion.End) return ("?", (position - codingRegion.End + codingRegionLength).ToString());
-            return ("1", HgvsUtilities.GetCdnaPositionOffset(first.Transcript, position, first.RegionIndex).Value);
+            return ("1", HgvsUtilities.GetCdnaPositionOffset(first.Transcript, position, first.RegionIndex, true).Value);
         }
 
         private static (string Begin, string End) AdjustSecond(BreakPointTranscript second)
@@ -79,7 +79,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             if (position < codingRegion.Start) return ((position - codingRegion.Start).ToString(), "?");
             if (position > codingRegion.End) return ((position - codingRegion.End + codingRegionLength).ToString(), "?");
-            return (HgvsUtilities.GetCdnaPositionOffset(second.Transcript, position, second.RegionIndex).Value, codingRegionLength.ToString());
+            return (HgvsUtilities.GetCdnaPositionOffset(second.Transcript, position, second.RegionIndex, false).Value, codingRegionLength.ToString());
         }
     }
 }

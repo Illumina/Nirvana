@@ -116,7 +116,7 @@ namespace VariantAnnotation.AnnotatedPositions
             return aminoAcids.TranslateBases(altCds, true);
         }
 
-        public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int genomicPosition, int regionIndex)
+        public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int genomicPosition, int regionIndex, bool isRegionStart)
         {
             if (!transcript.Overlaps(genomicPosition, genomicPosition)) return null;
 
@@ -124,7 +124,7 @@ namespace VariantAnnotation.AnnotatedPositions
             int codingRegionStart = transcript.Translation?.CodingRegion.CdnaStart ?? -1;
             int codingRegionEnd   = transcript.Translation?.CodingRegion.CdnaEnd   ?? -1;
             
-            (int position, int offset) = GetPositionAndOffset(genomicPosition, region, transcript.RnaEdits, transcript.Gene.OnReverseStrand);
+            (int position, int offset) = GetPositionAndOffset(genomicPosition, region, transcript.Gene.OnReverseStrand, isRegionStart);
             if (position == -1) return null;
 
             (string cdnaCoord, bool hasStopCodonNotation, bool hasNoPosition) = GetCdnaCoord(position, offset, codingRegionStart, codingRegionEnd);
@@ -134,8 +134,8 @@ namespace VariantAnnotation.AnnotatedPositions
             return new PositionOffset(position, offset, value, hasStopCodonNotation);
         }
 
-        private static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region, IRnaEdit[] rnaEdits,
-            bool onReverseStrand)
+        private static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region,
+            bool onReverseStrand, bool isRegionStart)
         {
             int cdsPos = -1;
             int offset = -1;
@@ -147,43 +147,16 @@ namespace VariantAnnotation.AnnotatedPositions
                     offset = 0;
                     break;
                 case TranscriptRegionType.Gap:
-                    (cdsPos, offset) = GetGapPositionAndOffset(position, region, onReverseStrand);
+                    (cdsPos, offset) = GetGapPositionAndOffset(region, isRegionStart);
                     break;
                 case TranscriptRegionType.Intron:
                     (cdsPos, offset) = GetIntronPositionAndOffset(position, region, onReverseStrand);
                     break;
             }
 
-            int rnaEditOffset = GetRnaEditOffset(cdsPos, rnaEdits);
-            cdsPos -= rnaEditOffset;
             return (cdsPos, offset);
         }
-
-        private static int GetRnaEditOffset(int position, IRnaEdit[] rnaEdits)
-        {
-            var rnaEditOffset = 0;
-            if (rnaEdits == null) return rnaEditOffset;
-
-            RnaEditUtilities.SetTypesAndSort(rnaEdits);
-
-            foreach (var rnaEdit in rnaEdits)
-            {
-                if (rnaEdit.Start > position) break;
-
-                switch (rnaEdit.Type)
-                {
-                    case VariantType.insertion:
-                        rnaEditOffset += rnaEdit.Bases.Length;
-                        break;
-                    case VariantType.deletion:
-                        rnaEditOffset -= rnaEdit.End - rnaEdit.Start + 1;
-                        break;
-                }
-            }
-
-            return rnaEditOffset;
-        }
-
+        
         private static (int Position, int Offset) GetIntronPositionAndOffset(int position, ITranscriptRegion region,
             bool onReverseStrand)
         {
@@ -209,13 +182,9 @@ namespace VariantAnnotation.AnnotatedPositions
             return (cdnaPosition, offset);
         }
 
-        private static (int Position, int Offset) GetGapPositionAndOffset(int position, ITranscriptRegion region, bool onReverseStrand)
+        private static (int Position, int Offset) GetGapPositionAndOffset(ITranscriptRegion region, bool isRegionStart)
         {
-            int leftDist  = position   - region.Start + 1;
-            int rightDist = region.End - position     + 1;
-
-            if (leftDist < rightDist && !onReverseStrand || rightDist < leftDist && onReverseStrand) return (region.CdnaStart, 0);
-            return (region.CdnaEnd, 0);
+            return isRegionStart ? (region.CdnaEnd, 0) : (region.CdnaStart, 0);
         }
 
         private static (string CdnaCoord, bool HasStopCodonNotation, bool HasNoPosition) GetCdnaCoord(int position,
@@ -231,12 +200,6 @@ namespace VariantAnnotation.AnnotatedPositions
                 {
                     cdnaCoord            = "*" + (position - codingRegionEnd);
                     hasStopCodonNotation = true;
-                }
-                else if (offset != 0 && position == codingRegionEnd)
-                {
-                    cdnaCoord            = "*";
-                    hasStopCodonNotation = true;
-                    hasNoPosition        = true;
                 }
             }
 
@@ -271,7 +234,7 @@ namespace VariantAnnotation.AnnotatedPositions
             switch (type)
             {
                 case GenomicChange.Deletion:
-                    sb.Append(coordinates + "del" + referenceBases);
+                    sb.Append(coordinates + "del");
                     break;
                 case GenomicChange.Inversion:
                     sb.Append(coordinates + "inv" + referenceBases);
@@ -280,11 +243,18 @@ namespace VariantAnnotation.AnnotatedPositions
                     sb.Append(coordinates + "dup" + referenceBases);
                     break;
                 case GenomicChange.Substitution:
-                    sb.Append(start + referenceBases + '>' + alternateBases);
+                    if (referenceBases == alternateBases)
+                    {
+                        sb.Append(start + '=');
+                    }
+                    else
+                    {
+                        sb.Append(start + referenceBases + '>' + alternateBases);
+                    } 
                     break;
                 case GenomicChange.DelIns:
                     // NOTE: change to delins, now use del--ins-- to reduce anavarin differences
-                    sb.Append(coordinates + "del" + referenceBases + "ins" + alternateBases);
+                    sb.Append(coordinates + "delins" + alternateBases);
                     break;
                 case GenomicChange.Insertion:
                     sb.Append(coordinates + "ins" + alternateBases);
