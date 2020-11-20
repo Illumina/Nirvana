@@ -166,7 +166,7 @@
     },
     "RR_rnaEdit": {
       "commandName": "Project",
-      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh38/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --in Dragen_v3.2-Dragen-Pedigree-RnaEdits-hg38-RefSeq-VEP91.vcf.gz --out rnaEdit",
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh38/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --in inputs/rnaEdit.vcf --out outputs/rnaEdit",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_chrM": {

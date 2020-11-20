@@ -12,27 +12,28 @@ namespace VariantAnnotation.Caches.DataStructures
 {
     public sealed class Transcript : ITranscript
     {
-        public IChromosome Chromosome { get; }
-        public int Start { get; }
-        public int End { get; }
-        public ICompactId Id { get; }
-        public BioType BioType { get; }
-        public bool IsCanonical { get; }
-        public Source Source { get; }
-        public IGene Gene { get; }
+        public IChromosome         Chromosome        { get; }
+        public int                 Start             { get; }
+        public int                 End               { get; }
+        public ICompactId          Id                { get; }
+        public BioType             BioType           { get; }
+        public bool                IsCanonical       { get; }
+        public Source              Source            { get; }
+        public IGene               Gene              { get; }
         public ITranscriptRegion[] TranscriptRegions { get; }
-        public ushort NumExons { get; }
-        public int TotalExonLength { get; }
-        public byte StartExonPhase { get; }
-        public int SiftIndex { get; }
-        public int PolyPhenIndex { get; }
-        public ITranslation Translation { get; }
-        public IInterval[] MicroRnas { get; }
-        public int[] Selenocysteines { get; }
-        public IRnaEdit[] RnaEdits { get; }
-        public bool CdsStartNotFound { get; }
-        public bool CdsEndNotFound { get; }
-        public ISequence CodingSequence { get; set; }
+        public ushort              NumExons          { get; }
+        public int                 TotalExonLength   { get; }
+        public byte                StartExonPhase    { get; }
+        public int                 SiftIndex         { get; }
+        public int                 PolyPhenIndex     { get; }
+        public ITranslation        Translation       { get; }
+        public IInterval[]         MicroRnas         { get; }
+        public int[]               Selenocysteines   { get; }
+        public IRnaEdit[]          RnaEdits          { get; }
+        public bool                CdsStartNotFound  { get; }
+        public bool                CdsEndNotFound    { get; }
+        public ISequence           CodingSequence    { get; set; }
+        public ISequence           CdnaSequence    { get; set; }
 
         public Transcript(IChromosome chromosome, int start, int end, ICompactId id, ITranslation translation,
             BioType bioType, IGene gene, int totalExonLength, byte startExonPhase, bool isCanonical,

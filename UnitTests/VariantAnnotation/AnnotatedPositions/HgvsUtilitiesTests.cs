@@ -187,7 +187,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Intron_RltL_Reverse()
         {
             var transcript = HgvsCodingNomenclatureTests.GetReverseTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 137619, 1);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 137619, 1,true);
 
             Assert.NotNull(po);
             Assert.True(po.HasStopCodonNotation);
@@ -214,7 +214,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             transcript.SetupGet(x => x.TranscriptRegions).Returns(regions);
             transcript.SetupGet(x => x.Translation).Returns(translation.Object);
 
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 108909672, 0);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 108909672, 0, true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -227,7 +227,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Intron_LltR_Reverse()
         {
             var transcript = HgvsCodingNomenclatureTests.GetReverseTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 136000, 1);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 136000, 1, true);
 
             Assert.NotNull(po);
             Assert.True(po.HasStopCodonNotation);
@@ -256,7 +256,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             transcript.SetupGet(x => x.TranscriptRegions).Returns(regions);
             transcript.SetupGet(x => x.Translation).Returns(translation.Object);
 
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 136711, 1);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 136711, 1, true);
 
             Assert.NotNull(po);
             Assert.True(po.HasStopCodonNotation);
@@ -269,7 +269,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Gap_LeftSide_Forward()
         {
             var transcript = GetForwardGapTranscript();
-            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1101, 1);
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1101, 1,false);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -282,7 +282,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Gap_RightSide_Forward()
         {
             var transcript = GetForwardGapTranscript();
-            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1102, 1);
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1102, 1,true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -295,7 +295,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Gap_LeftSide_Reverse()
         {
             var transcript = GetReverseGapTranscript();
-            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1102, 1);
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1102, 1,true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -308,7 +308,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Gap_RightSide_Reverse()
         {
             var transcript = GetReverseGapTranscript();
-            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1103, 1);
+            var po         = HgvsUtilities.GetCdnaPositionOffset(transcript, 1103, 1,false);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -321,7 +321,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Intron_RltL_Forward()
         {
             var transcript = HgvsCodingNomenclatureTests.GetForwardTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1262210, 1);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1262210, 1,true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -334,7 +334,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Intron_LltR_Forward()
         {
             var transcript = HgvsCodingNomenclatureTests.GetForwardTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1260583, 1);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1260583, 1,true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -347,7 +347,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Intron_LeqR_Forward()
         {
             var transcript = HgvsCodingNomenclatureTests.GetForwardTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1261349, 1);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1261349, 1,true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -360,7 +360,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Exon_Forward()
         {
             var transcript = HgvsCodingNomenclatureTests.GetForwardTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1262627, 4);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 1262627, 4,true);
 
             Assert.NotNull(po);
             Assert.False(po.HasStopCodonNotation);
@@ -373,7 +373,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         public void GetCdnaPositionOffset_Exon_Reverse()
         {
             var transcript = HgvsCodingNomenclatureTests.GetReverseTranscript();
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 137721, 2);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript, 137721, 2,true);
 
             Assert.NotNull(po);
             Assert.True(po.HasStopCodonNotation);
@@ -413,7 +413,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             transcript.SetupGet(x => x.TranscriptRegions).Returns(regions);
             transcript.SetupGet(x => x.Translation).Returns(translation.Object);
 
-            var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 135001, 0);
+            var po = HgvsUtilities.GetCdnaPositionOffset(transcript.Object, 135001, 0,false);
 
             Assert.NotNull(po);
             Assert.True(po.HasStopCodonNotation);

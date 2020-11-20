@@ -57,8 +57,8 @@
     },
     "RR_custom": {
       "commandName": "Project",
-      "commandLineArgs": " CustomVar  --ref /Users/rroy1/Development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --out /Users/rroy1/Development/SupplementaryDatabase/59/GRCh37/custom --in Polaris_SV.OLYM.v4.tsv",
-      "workingDirectory": "/Users/rroy1/Development/ExternalDataSources/Custom/GRCh37/"
+      "commandLineArgs": " CustomVar  --ref /Users/rroy1/Development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --out /Users/rroy1/Development/SupplementaryDatabase/60/GRCh38/ --in MyDataSource3.tsv",
+      "workingDirectory": "/Users/rroy1/Development/ExternalDataSources/Custom/GRCh38/"
     },
     "RR_globalAllele": {
       "commandName": "Project",

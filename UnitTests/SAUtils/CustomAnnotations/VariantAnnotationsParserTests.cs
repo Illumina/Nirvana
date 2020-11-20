@@ -157,6 +157,50 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421", items[1].GetJsonString());
             }
         }
+        
+        [Fact]
+        public void GetIntervals_noALT()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n"                                                          +
+                                "#assembly=GRCh38\n"                                                                      +
+                                "#matchVariantsBy=allele\n"                                                               +
+                                "#CHROM\tPOS\tREF\tEND\tnotes\n"   +
+                                "#categories\t.\t.\t.\t.\n" +
+                                "#descriptions\t.\t.\t.\t.\n"                                     +
+                                "#type\t.\t.\t.\tstring\n"                       +
+                                "chr16\t20000000\tT\t70000000\tLots of false positives in this region";
+            using (var custParser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                var items = custParser.GetItems().ToArray();
+                Assert.Empty(items);
+                var intervals = custParser.GetCustomIntervals();
+                Assert.Single(intervals);
+                Assert.Equal("\"start\":20000000,\"end\":70000000,\"notes\":\"Lots of false positives in this region\"", intervals[0].GetJsonString());
+            }
+        }
+        
+        [Fact]
+        public void GetIntervals_start()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n"             +
+                                "#matchVariantsBy=allele\n"      +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tnotes\n" +
+                                "#categories\t.\t.\t.\t.\t.\n"      +
+                                "#descriptions\t.\t.\t.\t.\t.\n"    +
+                                "#type\t.\t.\t.\t.\tstring\n"       +
+                                "chr21\t10510818\tT\t.\t10699435\tinterval 1\n"+
+                                "chr21\t10510818\tT\t<DEL>\t10699435\tinterval 2";
+            using (var custParser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                var items = custParser.GetItems().ToArray();
+                Assert.Empty(items);
+                var intervals = custParser.GetCustomIntervals();
+                Assert.Equal(2,intervals.Count);
+                Assert.Equal("\"start\":10510818,\"end\":10699435,\"notes\":\"interval 1\"", intervals[0].GetJsonString());
+                Assert.Equal("\"start\":10510819,\"end\":10699435,\"notes\":\"interval 2\"", intervals[1].GetJsonString());
+            }
+        }
 
         [Fact]
         public void GetItems_OnlyAlleleFrequencyTreatedAsDouble_OtherNumbersPrintAsIs()
@@ -287,15 +331,16 @@ namespace UnitTests.SAUtils.CustomAnnotations
 
                 var intervals = custParser.GetCustomIntervals();
                 Assert.Single(intervals);
-                Assert.Equal("\"start\":46993,\"end\":50879,\"allAc\":50,\"allAn\":250,\"allAf\":0.001,\"pathogenicity\":\"benign\"", intervals[0].GetJsonString());
+                Assert.Equal("\"start\":46994,\"end\":50879,\"allAc\":50,\"allAn\":250,\"allAf\":0.001,\"pathogenicity\":\"benign\"", intervals[0].GetJsonString());
             }
         }
 
         [Fact]
         public void IsValidNucleotideSequence_IsValidSequence_Pass()
         {
-            Assert.True(VariantAnnotationsParser.IsValidNucleotideSequence("actgnACTGN"));
-            Assert.False(VariantAnnotationsParser.IsValidNucleotideSequence("AC-GT"));
+            Assert.True(VariantAnnotationsParser.IsValidAltAllele("actgnACTGN"));
+            Assert.True(VariantAnnotationsParser.IsValidAltAllele("AAAAAAAAAAAAAAAAAATTAGTCAGGCAC[chr3:153444911["));
+            Assert.False(VariantAnnotationsParser.IsValidAltAllele("AC-GT"));
         }
 
         [Fact]

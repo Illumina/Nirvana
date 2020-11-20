@@ -9,17 +9,29 @@ namespace VariantAnnotation.AnnotatedPositions
     public static class HgvsCodingNomenclature
     {
         public static string GetHgvscAnnotation(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,
-            int regionStart, int regionEnd)
+            int regionStart, int regionEnd, string transcriptRef, string transcriptAlt )
         {
             // sanity check: don't try to handle odd characters, make sure this is not a reference allele, 
             //               and make sure that we have protein coordinates
             if (variant.Type == VariantType.reference || SequenceUtilities.HasNonCanonicalBase(variant.AltAllele)) return null;
 
+            // do not report HGVSc notation when variant lands inside gap region
+            if (regionStart > -1 && regionEnd > -1)
+            {
+                var startRegion = transcript.TranscriptRegions[regionStart];
+                var endRegion   = transcript.TranscriptRegions[regionEnd];
+                if (startRegion.Id == endRegion.Id && startRegion.Type == TranscriptRegionType.Gap &&
+                    endRegion.Type == TranscriptRegionType.Gap) return null;
+            }
+            
             bool onReverseStrand = transcript.Gene.OnReverseStrand;
 
-            string refAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele;
-            string altAllele = onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.AltAllele) : variant.AltAllele;
-
+            string refAllele = string.IsNullOrEmpty(transcriptRef)? onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele
+                : transcriptRef;
+            string altAllele = string.IsNullOrEmpty(transcriptAlt)
+                ? onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.AltAllele) : variant.AltAllele
+                : transcriptAlt;
+            
             // decide event type from HGVS nomenclature
             var genomicChange = GetGenomicChange(transcript, onReverseStrand, refSequence, variant);
 
@@ -31,10 +43,10 @@ namespace VariantAnnotation.AnnotatedPositions
                 (variantStart, variantEnd, refAllele, regionStart, regionEnd) = transcript.TranscriptRegions.ShiftDuplication(variantStart, altAllele, onReverseStrand);
             }
 
-            var startPositionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, variantStart, regionStart);
+            var startPositionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, variantStart, regionStart, true);
             var endPositionOffset = variantStart == variantEnd
                 ? startPositionOffset
-                : HgvsUtilities.GetCdnaPositionOffset(transcript, variantEnd, regionEnd);
+                : HgvsUtilities.GetCdnaPositionOffset(transcript, variantEnd, regionEnd, false);
 
             if (onReverseStrand)
             {
@@ -84,7 +96,7 @@ namespace VariantAnnotation.AnnotatedPositions
             int altLength = variant.AltAllele.Length;
 
             // sanity check: make sure that the alleles are different
-            if (variant.RefAllele == variant.AltAllele) return GenomicChange.Unknown;
+            if (variant.RefAllele == variant.AltAllele) return GenomicChange.Reference;
 
             // deletion
             if (altLength == 0) return GenomicChange.Deletion;
@@ -118,6 +130,7 @@ namespace VariantAnnotation.AnnotatedPositions
         DelIns,
         Insertion,
         Inversion,
-        Substitution
+        Substitution,
+        Reference
     }
 }

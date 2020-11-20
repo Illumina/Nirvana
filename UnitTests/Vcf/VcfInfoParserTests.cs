@@ -33,6 +33,14 @@ namespace UnitTests.Vcf
             Assert.Equal(20.202, info.FisherStrandBias);
             Assert.Equal(43.50, info.MappingQuality);
         }
+        
+        [Fact]
+        public void Parse_Breakend_Event_Id()
+        {
+            var info = VcfInfoParser.Parse("SVTYPE=BND;MATEID=MantaBND:2312:0:1:1:0:0:0;IMPRECISE;CIPOS=-344,344;EVENT=MantaBND:2312:0:1:0:0:0:0;JUNCTION_QUAL=204;BND_DEPTH=38;MATE_BND_DEPTH=46");
+
+            Assert.Equal("MantaBND:2312:0:1:0:0:0:0", info.BreakendEventId);
+        }
 
         [Fact]
         public void EmptyInfoField()

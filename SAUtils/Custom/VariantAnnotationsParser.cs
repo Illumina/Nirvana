@@ -106,7 +106,7 @@ namespace SAUtils.Custom
                         DataSourceDescription = value;
                         break;
                     default:
-                        var e = new UserErrorException("Unexpected header tag observed");
+                        var e = new UserErrorException("Unexpected header tag observed:"+value);
                         e.Data[ExitCodeUtilities.Line] = line;
                         throw e;
                 }
@@ -261,21 +261,22 @@ namespace SAUtils.Custom
 
             if (IsInterval(splits))
             {
-                var jsonStringValues = new List<string> { splits[1], splits[_endColumnIndex] };
-
+                
                 if (!int.TryParse(splits[_endColumnIndex], out var end))
                     throw new UserErrorException($"END is not an integer.\nInput line: {line}.");
 
-                jsonStringValues.AddRange(annotationValues);
                 //for symbolic alleles, position needs to increment to account for the padding base 
-                if (IsSymbolicAllele(splits[_altColumnIndex]))
+                if (_altColumnIndex >=0 && IsSymbolicAllele(splits[_altColumnIndex]))
                     position++;
+
+                var jsonStringValues = new List<string> { position.ToString(), splits[_endColumnIndex] };
+                jsonStringValues.AddRange(annotationValues);
                 _intervals.Add(new CustomInterval(chrom, position, end, jsonStringValues.Select(x => new[] { x }).ToList(), IntervalJsonSchema, line));
                 return null;
             }
 
             string altAllele = splits[_altColumnIndex];
-            if (!IsValidNucleotideSequence(altAllele))
+            if (!IsValidAltAllele(altAllele))
                 throw new UserErrorException($"Invalid nucleotides in ALT column: {altAllele}.\nInput line: {line}");
 
             (position, refAllele, altAllele) = VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, SequenceProvider.Sequence);
@@ -305,8 +306,10 @@ namespace SAUtils.Custom
 
         public List<CustomInterval> GetCustomIntervals() => _intervals.Count > 0 ? _intervals : null;
 
-        internal static bool IsValidNucleotideSequence(string sequence)
+        internal static bool IsValidAltAllele(string sequence)
         {
+            if (sequence.Contains('[') || sequence.Contains(']')) return true;
+            
             var validNucleotides = new[] { 'a', 'c', 'g', 't', 'n' };
             foreach (char nucleotide in sequence.ToLower())
             {

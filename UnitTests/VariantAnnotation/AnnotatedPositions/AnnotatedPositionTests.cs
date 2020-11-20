@@ -92,6 +92,27 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Contains("\"mappingQuality\":23.89", observedResult);
             Assert.Contains("\"fisherStrandBias\":12.123", observedResult);
         }
+        
+        [Fact]
+        public void GetJsonString_BreakEndEventId()
+        {
+            const string vcfLine = "1\t38432782\tMantaBND:2312:0:1:0:0:0:0\tG\tG]6:28863899]\t971\tPASS\tSVTYPE=BND;MATEID=MantaBND:2312:0:1:0:0:0:1;EVENT=MantaBND:2312:0:1:0:0:0:0;JUNCTION_QUAL=716;BND_DEPTH=52;MATE_BND_DEPTH=56";
+
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            var seqProvider      = ParserTestUtils.GetSequenceProvider(38432782, "G", 'C', ChromosomeUtilities.RefNameToChromosome);
+            var variantFactory   = new VariantFactory(seqProvider.Sequence, new VariantId());
+
+            var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
+
+            IVariant[]          variants          = GetVariants();
+            IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
+            var                 annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+
+            string observedResult = annotatedPosition.GetJsonString();
+
+            Assert.NotNull(observedResult);
+            Assert.Contains("\"breakendEventId\":\"MantaBND:2312:0:1:0:0:0:0\"", observedResult);
+        }
 
         private static ISample[] GetSamples() => new ISample[] { Sample.EmptySample };
 
@@ -113,7 +134,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var vcfFields = new string[8];
             vcfFields[0] = originalChromosomeName;
 
-            var infoData = new InfoData(null, null, null, null, null, null, null, null, null, null, null, null);
+            var infoData = new InfoData(null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             return new Position(ChromosomeUtilities.Chr1, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);

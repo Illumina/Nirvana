@@ -60,14 +60,16 @@ namespace SAUtils.Custom
             var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
             
             List<CustomInterval> intervals;
-            SaJsonSchema intervalJsonSchema;
-            string jsonTag;
-            DataSourceVersion version;
-            string outputPrefix      = GetOutputPrefix(_inputFile);
-            string nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
-            string nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
-            string nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
-            ReportFor reportFor;
+            SaJsonSchema         intervalJsonSchema;
+            string               jsonTag;
+            DataSourceVersion    version;
+            string               outputPrefix      = GetOutputPrefix(_inputFile);
+            string               nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
+            string               nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
+            string               nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
+            ReportFor            reportFor;
+
+            var nsaItemCount = 0;
 
             using (var parser = VariantAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
@@ -76,9 +78,16 @@ namespace SAUtils.Custom
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
-                (jsonTag, _, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
+                (jsonTag, nsaItemCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
                 reportFor = parser.ReportFor;
                 if (intervals == null) return ExitCodes.Success;
+            }
+
+            if (nsaItemCount == 0)
+            {
+                File.Delete(nsaFileName);
+                File.Delete(nsaIndexFileName);
+                File.Delete(nsaSchemaFileName);
             }
 
             using (var nsiStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.IntervalFileSuffix)))

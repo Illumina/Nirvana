@@ -16,9 +16,11 @@ namespace Vcf.Info
         public string  SvType                    { get; }
         public double? FisherStrandBias          { get; }
         public double? MappingQuality            { get; }
+        public string  BreakendEventId           { get; }
 
         public InfoData(int[] ciEnd, int[] ciPos, int? end, double? recalibratedQuality, int? jointSomaticNormalQuality,
-            int? refRepeatCount, string repeatUnit, double? strandBias, int? svLength, string svType, double? fisherStrandBias, double? mappingQuality)
+            int? refRepeatCount, string repeatUnit, double? strandBias, int? svLength, string svType, double? fisherStrandBias, 
+            double? mappingQuality, string breakendEventId)
         {
             CiEnd                     = ciEnd;
             CiPos                     = ciPos;
@@ -32,6 +34,7 @@ namespace Vcf.Info
             SvType                    = svType;
             FisherStrandBias          = fisherStrandBias;
             MappingQuality            = mappingQuality;
+            BreakendEventId           = breakendEventId;
         }
     }
 }
