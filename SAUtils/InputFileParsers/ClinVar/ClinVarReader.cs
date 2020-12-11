@@ -64,8 +64,9 @@ namespace SAUtils.InputFileParsers.ClinVar
         private HashSet<string> _allilicOmimIDs;
 		private HashSet<string> _orphanetIDs;
 
-        private HashSet<long> _pubMedIds= new HashSet<long>();
-		private long _lastUpdatedDate;
+        private HashSet<long> _pubMedIds = new HashSet<long>();
+		private long          _lastUpdatedDate;
+		private List<VcvItem> _vcvItems;
 
         public SaJsonSchema JsonSchema { get; } = ClinVarSchema.Get();
 
@@ -101,38 +102,36 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         public IEnumerable<ISupplementaryDataItem> GetItems()
         {
-	        var vcvList = GetVariationRecords();
-	        Console.WriteLine($"Found {vcvList.Count} VCV records");
+	        _vcvItems = GetVariationRecords();
+	        Console.WriteLine($"Found {_vcvItems.Count} VCV records");
 	        
 	        var unknownVcvs = new HashSet<int>();
 	        foreach (var clinVarItem in GetRcvItems())
 	        {
-		        if (clinVarItem.VariationId == null)
+		        if (string.IsNullOrEmpty(clinVarItem.VariationId))
 		        {
 			        yield return clinVarItem;
 			        continue;
 		        }
 		        
-		        var vcvId = clinVarItem.VariationId.Value;
-		        var vcvIndex = SuppDataUtilities.BinarySearch(vcvList, vcvId);
+		        var vcvId = int.Parse(clinVarItem.VariationId);
+		        var vcvIndex = SuppDataUtilities.BinarySearch(_vcvItems, vcvId);
 		        
 		        if (vcvIndex < 0)
 		        {
 			        Console.WriteLine($"Unknown vcv id:{vcvId} found in {clinVarItem.Id}");
 			        unknownVcvs.Add(vcvId);
 			        //remove the VariationId
-			        yield return new ClinVarItem(clinVarItem.Chromosome, clinVarItem.Position, clinVarItem.Stop,
-				        clinVarItem.RefAllele, clinVarItem.AltAllele, clinVarItem.JsonSchema, clinVarItem.AlleleOrigins,
-				        clinVarItem.VariantType, clinVarItem.Id, null, clinVarItem.ReviewStatus,
-				        clinVarItem.MedGenIds, clinVarItem.OmimIds, clinVarItem.OrphanetIds,
-				        clinVarItem.Phenotypes, clinVarItem.Significances, clinVarItem.PubmedIds, clinVarItem.LastUpdatedDate);
+			        clinVarItem.VariationId = null;
+			        yield return clinVarItem;
 			        continue;
 		        }
 
-		        var vcvItem = vcvList[vcvIndex];
+		        var vcvItem = _vcvItems[vcvIndex];
 		        yield return new VcvSaItem(clinVarItem.Chromosome, clinVarItem.Position, clinVarItem.RefAllele, clinVarItem.AltAllele,
 			        vcvItem.Accession, vcvItem.Version, vcvItem.LastUpdatedDate, vcvItem.ReviewStatus, vcvItem.Significances);
 
+		        clinVarItem.VariationId = $"{vcvItem.Accession}.{vcvItem.Version}";
 		        yield return clinVarItem;
 	        }
 
@@ -503,7 +502,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private void ParseMeasureSet(XElement xElement)
 		{
 			if (xElement == null || xElement.IsEmpty) return;
-            var variantId = xElement.Attribute(IdTag) == null ? (int?)null : int.Parse(xElement.Attribute(IdTag)?.Value);
+            var variantId = xElement.Attribute(IdTag) == null ? null : xElement.Attribute(IdTag)?.Value;
             foreach (var element in xElement.Elements(MeasureTag))
 		    {
 		        ParseMeasure(element, variantId);
@@ -513,7 +512,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 
         private const string SeqLocationTag = "SequenceLocation";
-        private void ParseMeasure(XElement xElement, int? variantId)
+        private void ParseMeasure(XElement xElement, string variantId)
 		{
 			if (xElement == null || xElement.IsEmpty) return;
 
@@ -606,7 +605,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string VcfAltAlleleTag = "alternateAlleleVCF";
         
 
-        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict, int? variantId)
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict, string variantId)
         {
 		    if (xElement == null ) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />

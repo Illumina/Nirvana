@@ -16,18 +16,18 @@ namespace SAUtils.DataStructures
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
 
-        public int Stop { get; }
-        public string VariantType { get; }
-        public string Id { get; }
-        public int? VariationId { get; }
-        public IEnumerable<string> AlleleOrigins { get; }
-        public IEnumerable<string> Phenotypes { get; }
-        public string[] Significances { get; }
-        public ClinVarCommon.ReviewStatus ReviewStatus { get; }
-        private string IsAlleleSpecific { get; }
-        public IEnumerable<string> MedGenIds { get; }
-        public IEnumerable<string> OmimIds { get; }
-        public IEnumerable<string> OrphanetIds { get; }
+        public  int                        Stop             { get; }
+        public  string                     VariantType      { get; }
+        public  string                     Id               { get; }
+        public  string                     VariationId      { get; set; }
+        public  IEnumerable<string>        AlleleOrigins    { get; }
+        public  IEnumerable<string>        Phenotypes       { get; }
+        public  string[]                   Significances    { get; }
+        public  ClinVarCommon.ReviewStatus ReviewStatus     { get; }
+        private string                     IsAlleleSpecific { get; }
+        public  IEnumerable<string>        MedGenIds        { get; }
+        public  IEnumerable<string>        OmimIds          { get; }
+        public  IEnumerable<string>        OrphanetIds      { get; }
 
         public IEnumerable<long> PubmedIds { get; }
         public long LastUpdatedDate { get; }
@@ -43,7 +43,7 @@ namespace SAUtils.DataStructures
             IEnumerable<string> alleleOrigins,
             string variantType,
             string id,
-            int? variationId,
+            string variationId,
             ClinVarCommon.ReviewStatus reviewStatus,
             IEnumerable<string> medGenIds,
             IEnumerable<string> omimIds,
@@ -87,7 +87,7 @@ namespace SAUtils.DataStructures
             {
                 //the exact order of adding values has to be preserved. the order is dictated by the json schema
                 new[] {Id},
-                new[] {VariationId?.ToString()},
+                new[] {VariationId},
                 new[] {ClinVarCommon.ReviewStatusStrings[ReviewStatus]},
                 AlleleOrigins?.ToArray(),
                 new[] {ClinVarCommon.NormalizeAllele(RefAllele)},

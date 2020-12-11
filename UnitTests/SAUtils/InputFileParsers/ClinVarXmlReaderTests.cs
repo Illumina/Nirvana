@@ -207,9 +207,9 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in items)
             {
-                Assert.Equal(699, clinVarItem.VariationId);
+                Assert.Equal("699", clinVarItem.VariationId);
                 Assert.Null(clinVarItem.PubmedIds);
-                Assert.Contains("\"variationId\":699", clinVarItem.GetJsonString());
+                Assert.Contains("\"variationId\":\"699\"", clinVarItem.GetJsonString());
             }
         }
 
@@ -875,6 +875,8 @@ namespace UnitTests.SAUtils.InputFileParsers
             
             var items = reader.GetItems().ToArray();
             Assert.Equal(2,items.Length);
+            var rcvJson = items[1].GetJsonString();
+            Assert.Contains("VCV000137106.3", rcvJson);
         }
     }
 }

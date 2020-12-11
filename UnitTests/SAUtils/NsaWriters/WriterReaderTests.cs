@@ -31,7 +31,7 @@ namespace UnitTests.SAUtils.NsaWriters
                     new[] {"phenotype1"}, new[] {"significance"}, new[] {10024875684920}, 658794146787),
 
                 new ClinVarItem(ChromosomeUtilities.Chr1, 101, 101, "A", "", ClinVarSchema.Get(), new[] {"origin1"}, "del", "RCV00011",
-                    101, ClinVarCommon.ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"},
+                    "101", ClinVarCommon.ReviewStatus.no_assertion, new[] {"medgen1"}, new[] {"omim1"}, new[] {"orpha1"},
                     new[] {"phenotype1"}, new[] {"significance"}, new[] {10024875684920}, 658794146787),
 
                 new ClinVarItem(ChromosomeUtilities.Chr1, 106, 106, "C", "", ClinVarSchema.Get(), new[] {"origin5"}, "del", "RCV0005",
@@ -93,7 +93,7 @@ namespace UnitTests.SAUtils.NsaWriters
                     Assert.Equal("A", annotations[0].refAllele);
                     Assert.Equal("", annotations[0].altAllele);
                     Assert.Equal(
-                        "\"id\":\"RCV00011\",\"variationId\":101,\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"A\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
+                        "\"id\":\"RCV00011\",\"variationId\":\"101\",\"reviewStatus\":\"no assertion provided\",\"alleleOrigins\":[\"origin1\"],\"refAllele\":\"A\",\"altAllele\":\"-\",\"phenotypes\":[\"phenotype1\"],\"medGenIds\":[\"medgen1\"],\"omimIds\":[\"omim1\"],\"orphanetIds\":[\"orpha1\"],\"significance\":[\"significance\"],\"lastUpdatedDate\":\"0001-01-01\",\"pubMedIds\":[\"10024875684920\"]",
                         annotations[0].annotation);
 
                     saReader.PreLoad(ChromosomeUtilities.Chr2, new List<int> {200, 205});

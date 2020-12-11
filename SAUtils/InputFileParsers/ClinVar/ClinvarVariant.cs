@@ -12,9 +12,9 @@ namespace SAUtils.InputFileParsers.ClinVar
         public readonly string AltAllele;
         public string VariantType;
         public readonly List<string> AllelicOmimIds;
-        public readonly int? VariantId;
+        public readonly string VariantId;
 
-        public ClinvarVariant(IChromosome chr, int start, int stop, int? variantId, string refAllele, string altAllele, List<string> allilicOmimIds =null)
+        public ClinvarVariant(IChromosome chr, int start, int stop, string variantId, string refAllele, string altAllele, List<string> allilicOmimIds =null)
         {
             Chromosome      = chr;
             Start           = start;

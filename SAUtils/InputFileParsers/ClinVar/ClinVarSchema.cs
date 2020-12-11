@@ -30,7 +30,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private static readonly List<SaJsonValueType> ValueTypes = new List<SaJsonValueType>
         {
             SaJsonValueType.String,
-            SaJsonValueType.Number,
+            SaJsonValueType.String,
             SaJsonValueType.String,
             SaJsonValueType.StringArray,
             SaJsonValueType.String,  
