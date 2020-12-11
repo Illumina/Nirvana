@@ -96,5 +96,22 @@ namespace UnitTests.MitoHeteroplasmy
             Assert.True(percentilesSample[0].HasValue);
             Assert.Equal(100, percentilesSample[0].Value, 2);
         }
+
+        [Fact]
+        public void CapVrf()
+        {
+            var provider = new MitoHeteroplasmyProvider();
+            provider.Add(750, "G", new[] { 0.0,0.001,0.002,0.991,0.994,0.995,0.996,0.997,0.998,0.999 }, new[] { 24,4,2,3,2,1,1,4,3,2460});
+            
+            var chrom      = ChromosomeUtilities.ChrM;
+            var position   = 750;
+            var altAlleles = new[] { "G" };
+
+            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 1.0 });
+            
+            Assert.Single(percentilesSample);
+            Assert.True(percentilesSample[0].HasValue);
+            Assert.Equal(1.76, percentilesSample[0].Value, 2);
+        }
     }
 }

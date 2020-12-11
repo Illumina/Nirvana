@@ -52,6 +52,7 @@ namespace MitoHeteroplasmy
 
             if (!_alleleToDistribution.TryGetValue(positionAndAltAlleleIntForm, out (double[] Vrfs, double[] Percentiles) data)) return null;
 
+            if (vrf > 0.999) vrf = 0.999;
             return PercentileUtilities.GetPercentile(vrf, data.Vrfs, data.Percentiles);
         }
 
