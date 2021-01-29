@@ -18,15 +18,16 @@ namespace Nirvana
 {
     public static class StreamAnnotation
     {
-        public static ExitCodes Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
+        public static (int variantCount, ExitCodes exitCode) Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
             Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter,
             bool ignoreEmptyChromosome, bool enableDq=false)
         {
             var metrics = annotationResources.Metrics;
             PerformanceMetrics.ShowAnnotationHeader();
 
-            IChromosome currentChromosome                      = new EmptyChromosome("dummy");
-            int         numVariants                            = 0;
+            IChromosome               currentChromosome        = new EmptyChromosome("dummy");
+            int                       numVariants              = 0;
+            int                       variantCount             = 0;
             IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
             using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider, enableDq))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
@@ -64,6 +65,7 @@ namespace Nirvana
                         if (json != null) jsonWriter.WritePosition(annotatedPosition.Position, json);
 
                         numVariants++;
+                        variantCount += position.Variants?.Length ?? 0;
                     }
 
                     jsonWriter.WriteGenes(annotationResources.Annotator.GetGeneAnnotations());
@@ -81,7 +83,7 @@ namespace Nirvana
 
             metrics.ShowSummaryTable();
 
-            return ExitCodes.Success;
+            return (variantCount, ExitCodes.Success);
         }
 
         private static void CheckGenomeAssembly(IAnnotationResources annotationResources, VcfReader vcfReader)

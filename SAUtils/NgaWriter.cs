@@ -39,10 +39,11 @@ namespace SAUtils
 
         public void Dispose() => _writer.Dispose();
 
-        public void Write(Dictionary<string, List<ISuppGeneItem>> geneToEntries)
+        public int Write(Dictionary<string, List<ISuppGeneItem>> geneToEntries)
         {
             _writer.WriteOpt(geneToEntries.Count);
 
+            var count = 0;
             foreach ((string geneSymbol, List<ISuppGeneItem> entries) in geneToEntries)
             {
                 _writer.WriteOptAscii(geneSymbol);
@@ -50,9 +51,12 @@ namespace SAUtils
 
                 foreach (ISuppGeneItem geneItem in entries)
                 {
+                    count++;
                     _writer.Write(geneItem.GetJsonString());
                 }
             }
+
+            return count;
         }
     }
 }

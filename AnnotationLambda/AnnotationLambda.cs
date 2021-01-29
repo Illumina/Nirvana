@@ -46,8 +46,8 @@ namespace AnnotationLambda
 
                 snsTopicArn = LambdaUtilities.GetEnvironmentVariable(LambdaUtilities.SnsTopicKey);
 
-                string vcfUrl = config.vcfUrl;
-
+                string vcfUrl       = config.vcfUrl;
+                int    variantCount = 0;
                 using (var annotationResources = GetAnnotationResources(config))
                 {
                     if (annotationResources.InputStartVirtualPosition == -1) return GetSuccessOutput(result);
@@ -60,7 +60,7 @@ namespace AnnotationLambda
                     }
 
                     Logger.WriteLine("Scan for positions to preload complete.");
-
+                    
                     using (var aes = new AesCryptoServiceProvider())
                     {
                         FileMetadata jsonMetadata, jasixMetadata;
@@ -84,7 +84,7 @@ namespace AnnotationLambda
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))
                             {
-                                StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true);
+                                variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true).variantCount;
                             }
 
                             Logger.WriteLine("Annotation done.");
@@ -107,6 +107,7 @@ namespace AnnotationLambda
                 LambdaUtilities.DeleteTempOutput();
                 if (string.IsNullOrEmpty(result.filePath)) throw new FileNotFoundException();
 
+                result.variantCount = variantCount;
                 return GetSuccessOutput(result);
             }
             catch (Exception exception)

@@ -11,6 +11,8 @@ namespace Cloud.Messages.Annotation
         public string status;
         public string filePath;
         public ErrorCategory? errorCategory;
+
+        public int variantCount;
         // ReSharper restore UnassignedField.Global
         // ReSharper restore InconsistentNaming
     }

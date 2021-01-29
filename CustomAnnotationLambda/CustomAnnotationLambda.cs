@@ -56,6 +56,8 @@ namespace CustomAnnotationLambda
             }
             catch (Exception e)
             {
+                result.jwtFields    = config.jwtFields;
+                result.variantCount = 0;
                 return HandleException(runLog, result, e, snsTopicArn);
             }
         }

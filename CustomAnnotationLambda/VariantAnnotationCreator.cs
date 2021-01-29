@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Cloud;
+using Cloud.Messages;
 using Cloud.Messages.Custom;
 using Cloud.Utilities;
 using Compression.Utilities;
@@ -26,6 +27,7 @@ namespace CustomAnnotationLambda
             string localNsaPath    = Path.Combine(tempPath, nsaFileName);
             string localIndexPath  = localNsaPath + SaCommon.IndexSufix;
             string localSchemaPath = localNsaPath + SaCommon.JsonSchemaSuffix;
+            int    variantCount    = 0;
 
             var outputFiles = new List<string>();
             using (var aes = new AesCryptoServiceProvider())
@@ -55,9 +57,10 @@ namespace CustomAnnotationLambda
                 using (var schemaCryptoStream = new CryptoStream(schemaStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
                 using (var schemaMd5Stream    = new MD5Stream(schemaCryptoStream))
                 {
-                    genomeAssembly = parser.Assembly;
+                    genomeAssembly        = parser.Assembly;
                     result.genomeAssembly = genomeAssembly.ToString();
-                    reportFor = parser.ReportFor;
+                    reportFor             = parser.ReportFor;
+                    result.jwtFields      = config.jwtFields;
 
                     using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, inputFileName, parser.SequenceProvider, out version))
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
@@ -65,11 +68,15 @@ namespace CustomAnnotationLambda
                         (jsonTag, nsaItemsCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
                     }
 
+                    variantCount += nsaItemsCount;
+                    variantCount += intervals?.Count ?? 0;
+
                     nsaMetadata    = nsaMd5Stream.GetFileMetadata();
                     indexMetadata  = indexMd5Stream.GetFileMetadata();
                     schemaMetadata = schemaMd5Stream.GetFileMetadata();
                 }
 
+                result.variantCount = variantCount;
                 if (nsaItemsCount > 0)
                 {
                     string nsaS3Path    = string.Join('/', config.outputDir.path.Trim('/'), nsaFileName);

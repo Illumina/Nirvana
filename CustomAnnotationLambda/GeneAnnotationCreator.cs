@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Cloud;
+using Cloud.Messages;
 using Cloud.Messages.Custom;
 using Cloud.Utilities;
 using Compression.Utilities;
@@ -23,6 +24,8 @@ namespace CustomAnnotationLambda
             string localNgaPath    = Path.Combine(Path.GetTempPath(), ngaFileName);
             string localSchemaPath = localNgaPath + SaCommon.JsonSchemaSuffix;
             string localLogPath    = Path.Combine(Path.GetTempPath(), LogFileName);
+
+            int variantCount = 0;
             
             HttpUtilities.ValidateUrl(LambdaUrlHelper.GetUgaUrl());
             var outputFiles = new List<string>();
@@ -48,7 +51,7 @@ namespace CustomAnnotationLambda
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
                     using (var logWriter    = new StreamWriter(logMd5Stream))
                     {
-                        ngaWriter.Write(parser.GetItems(config.skipGeneIdValidation, logWriter));
+                        variantCount = ngaWriter.Write(parser.GetItems(config.skipGeneIdValidation, logWriter));
                         var unknownGenes = parser.GetUnknownGenes();
                         if (!config.skipGeneIdValidation && unknownGenes.Count > 0)
                         {
@@ -83,6 +86,9 @@ namespace CustomAnnotationLambda
 
                 LambdaUtilities.DeleteTempOutput();
 
+                result.jwtFields = config.jwtFields;
+
+                result.variantCount    = variantCount;
                 return CustomAnnotationLambda.GetSuccessResult(config, result, outputFiles);
             }
         }

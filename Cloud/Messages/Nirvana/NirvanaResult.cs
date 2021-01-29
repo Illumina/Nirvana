@@ -4,9 +4,12 @@
     {
         // ReSharper disable InconsistentNaming
         // ReSharper disable NotAccessedField.Global
-        public string id;
-        public string status;
-        public FileList created;
+        public string    id;
+        public string    status;
+        public FileList  created;
+        public JwtFields jwtFields;
+        public int       variantCount;
+
         // ReSharper restore NotAccessedField.Global
         // ReSharper restore InconsistentNaming
     }
