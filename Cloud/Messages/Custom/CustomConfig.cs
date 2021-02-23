@@ -10,5 +10,6 @@ namespace Cloud.Messages.Custom
         public JwtFields jwtFields;
         
         public bool skipGeneIdValidation;
+        public bool skipRefBaseValidation;
     }
 }

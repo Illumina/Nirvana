@@ -15,7 +15,7 @@ namespace SAUtils.Custom
 {
     public static class CaUtilities
     {
-        public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, VariantAnnotationsParser parser,string dataVersion,ISequenceProvider referenceProvider, out DataSourceVersion version)
+        public static NsaWriter GetNsaWriter(Stream nsaStream, Stream indexStream, VariantAnnotationsParser parser, string dataVersion, ISequenceProvider referenceProvider, out DataSourceVersion version, bool skipRefBaseValidation)
         {
             dataVersion = string.IsNullOrEmpty(parser.Version) ? dataVersion : parser.Version;
             version = new DataSourceVersion(parser.JsonTag, dataVersion, DateTime.Now.Ticks,
@@ -30,7 +30,7 @@ namespace SAUtils.Custom
                 parser.IsArray, // is array
                 SaCommon.SchemaVersion,
                 false, // is positional
-                false, // skip incorrect ref base
+                skipRefBaseValidation, // skip incorrect ref base
                 true // throw error on conflicting entries
             );
         }

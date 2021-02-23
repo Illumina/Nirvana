@@ -62,7 +62,7 @@ namespace CustomAnnotationLambda
                     reportFor             = parser.ReportFor;
                     result.jwtFields      = config.jwtFields;
 
-                    using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, inputFileName, parser.SequenceProvider, out version))
+                    using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, inputFileName, parser.SequenceProvider, out version, config.skipRefBaseValidation))
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
                     {
                         (jsonTag, nsaItemsCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
