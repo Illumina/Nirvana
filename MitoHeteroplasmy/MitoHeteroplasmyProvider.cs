@@ -5,6 +5,7 @@ using Genome;
 using RepeatExpansions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
+using Variants;
 
 namespace MitoHeteroplasmy
 {
@@ -35,17 +36,21 @@ namespace MitoHeteroplasmy
             _alleleToDistribution[EncodeMitoPositionAndAltAllele(position, altAllele)] = (vrfs, percentiles);
         }
         
-        public double?[] GetVrfPercentiles(IChromosome chrom, int position, string[] altAlleles, double[] vrfs)
+        public double?[] GetVrfPercentiles(IVariant[] variants, double[] vrfs)
         {
             if (vrfs == null) return null;
-            if (chrom.UcscName != MitoChromUcscName) return null;
+            if (variants == null || variants.Length == 0) return null;
+            
+            if (variants[0].Chromosome.UcscName != MitoChromUcscName) return null;
 
-            var percentiles = vrfs.Zip(altAlleles, (vrf, allele) => GetVrfPercentile(position, allele, vrf)).ToArray();
+            var percentiles = vrfs.Zip(variants, (vrf, variant) => GetVrfPercentile(variant, vrf)).ToArray();
             return percentiles.All(x => x == null) ? null : percentiles;
         }
 
-        private double? GetVrfPercentile(int position, string altAllele, double vrf)
+        private double? GetVrfPercentile(IVariant variant, double vrf)
         {
+            var position  = variant.Start;
+            var altAllele = variant.AltAllele;
             if (string.IsNullOrEmpty(altAllele) || !AlleleToInt.ContainsKey(altAllele)) return null;
 
             var positionAndAltAlleleIntForm = EncodeMitoPositionAndAltAllele(position, altAllele);
@@ -55,7 +60,7 @@ namespace MitoHeteroplasmy
             if (vrf > 0.999) vrf = 0.999;
             return PercentileUtilities.GetPercentile(vrf, data.Vrfs, data.Percentiles);
         }
-
+        
         private static int EncodeMitoPositionAndAltAllele(int position, string altAllele) => SequenceLengthMax * AlleleToInt[altAllele] + position;
         
         private static double ToRoundedVrf(double vrf) => Math.Round(vrf, 3, MidpointRounding.AwayFromZero);

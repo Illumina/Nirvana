@@ -41,7 +41,7 @@ namespace SAUtils.Custom
                     reportFor     = ReportFor.StructuralVariants;
                     break;
                 default:
-                    throw new UserErrorException("matchVariantsBy tag has to be either \'allele\' or \'position\'");
+                    throw new UserErrorException("matchVariantsBy tag has to be \'allele\', \'sv\' or \'position\'");
             }
 
             return (matchByAllele, isArray, primaryType, reportFor);
