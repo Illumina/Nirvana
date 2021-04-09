@@ -88,7 +88,7 @@ namespace SAUtils.gnomAD
 
             var genomeFiles = GetVcfFiles(_genomeDirectory);
             var exomeFiles = GetVcfFiles(_exomeDirectory);
-            const int degOfParalleleism = 4; //hard coding since we are IO bound and stressing the disk doesn't help
+            const int degOfParalleleism = 12; //hard coding since we are IO bound and stressing the disk doesn't help
             Console.WriteLine($"Creating merged gnomAD database file from {genomeFiles.Length + exomeFiles.Length} input files. Degree of parallelism {degOfParalleleism}");
 
             Parallel.ForEach(
