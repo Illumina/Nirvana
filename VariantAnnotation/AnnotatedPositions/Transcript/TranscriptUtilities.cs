@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Net.Mime;
 using Genome;
 using OptimizedCore;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript

@@ -50,7 +50,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var hgvsc = new HgvscNotation("T", "T", "NM_012232.1", GenomicChange.Duplication, startPosOff, endPosOff, true);
 
-            Assert.Equal("NM_012232.1:c.7dupT", hgvsc.ToString());
+            Assert.Equal("NM_012232.1:c.7dup", hgvsc.ToString());
         }
 
         // NM_012232.1:c.6_8dupTGC (multi base duplication)
@@ -62,7 +62,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var hgvsc = new HgvscNotation("TGC", "TGC", "NM_012232.1", GenomicChange.Duplication, startPosOff, endPosOff, true);
 
-            Assert.Equal("NM_012232.1:c.6_8dupTGC", hgvsc.ToString());
+            Assert.Equal("NM_012232.1:c.6_8dup", hgvsc.ToString());
         }
 
         // NM_012232.1:c.5756_5757insAGG (multi base insertion)

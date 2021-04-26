@@ -302,7 +302,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var regions = new ITranscriptRegion[]
             {
                 new TranscriptRegion(TranscriptRegionType.Exon,   2, 25398208, 25398329, 167, 288),
-                new TranscriptRegion(TranscriptRegionType.Intron, 1, 25398330, 25403697, 166, 167),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 25398330, 25403697, 166, 167)
             };
 
             // ENST00000556131

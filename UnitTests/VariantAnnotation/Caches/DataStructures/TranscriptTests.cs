@@ -4,10 +4,12 @@ using System.Text;
 using Genome;
 using Intervals;
 using IO;
+using Moq;
 using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.Providers;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches.DataStructures
@@ -71,6 +73,8 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             // ReSharper restore ConditionIsAlwaysTrueOrFalse
 
             ITranscript observedTranscript;
+            var         mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.Setup(x => x.Assembly).Returns(GenomeAssembly.GRCh38);
 
             using (var ms = new MemoryStream())
             {
@@ -84,7 +88,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
                 using (var reader = new BufferedBinaryReader(ms))
                 {
                     // SET-362 DEBUG: Remove the null arguments in the future
-                    observedTranscript = Transcript.Read(reader, indexToChromosome, genes, expectedTranscriptRegions, expectedMicroRnas, peptideSeqs, null);
+                    observedTranscript = Transcript.Read(reader, indexToChromosome, genes, expectedTranscriptRegions, expectedMicroRnas, peptideSeqs, mockSequenceProvider.Object);
                 }
             }
 
