@@ -169,9 +169,9 @@
       "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh38/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh38.Nirvana.dat --in inputs/rnaEdit.vcf --out outputs/rnaEdit",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
-    "RR_chrM": {
+    "RR_gzip": {
       "commandName": "Project",
-      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh37/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --in inputs/chrMT.vcf --out outputs/chrMT",
+      "commandLineArgs": " --cache /Users/rroy1/development/Cache/27/GRCh37/Both --ref /Users/rroy1/development/References/7/Homo_sapiens.GRCh37.Nirvana.dat --in inputs/test-gzip.vcf.gz --out outputs/test-gzip",
       "workingDirectory": "/Users/rroy1/development/TestDatasets"
     },
     "RR_gnomad-missing": {
