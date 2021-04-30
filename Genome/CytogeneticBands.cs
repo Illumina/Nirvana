@@ -4,6 +4,7 @@
     {
         public static string Find(this Band[] bands, IChromosome chromosome, int start, int end)
         {
+            if (chromosome.IsEmpty()) return null;
             string startCytogeneticBand = bands.GetCytogeneticBand(start);
             if (startCytogeneticBand == null) return null;
 
