@@ -30,18 +30,17 @@ namespace VariantAnnotation.Providers
 
         private readonly PredictionCacheReader _siftReader;
         private readonly PredictionCacheReader _polyphenReader;
-        private          IPredictionCache      _siftCache;
-        private          IPredictionCache      _polyphenCache;
-        private          ushort                _currentRefIndex = ushort.MaxValue;
+        private IPredictionCache _siftCache;
+        private IPredictionCache _polyphenCache;
+        private ushort _currentRefIndex = ushort.MaxValue;
 
         public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider)
         {
-            Name              = "Transcript annotation provider";
-            _sequence         = sequenceProvider.Sequence;
+            Name = "Transcript annotation provider";
+            _sequence = sequenceProvider.Sequence;
 
             var transcriptStream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix));
-            // SET-362 DEBUG: Remove the sequenceProvider argument in the future
-            (_transcriptCache, TranscriptIntervalArrays, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly, sequenceProvider);
+            (_transcriptCache, TranscriptIntervalArrays, VepVersion) = InitiateCache(transcriptStream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
 
             Assembly = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
@@ -55,7 +54,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static (TranscriptCache Cache, IntervalArray<ITranscript>[] TranscriptIntervalArrays, ushort VepVersion) InitiateCache(Stream stream,
-            IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refAssembly, ISequenceProvider sequenceProvider)
+            IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refAssembly)
         {
             TranscriptCache cache;
             ushort vepVersion;
@@ -65,9 +64,8 @@ namespace VariantAnnotation.Providers
             {
                 vepVersion = reader.Header.Custom.VepVersion;
                 CheckHeaderVersion(reader.Header, refAssembly);
-                
-                cacheData = reader.Read(sequenceProvider, refIndexToChromosome);
-                cache     = cacheData.GetCache();
+                cacheData = reader.Read(refIndexToChromosome);
+                cache = cacheData.GetCache();
             }
 
             return (cache, cacheData.TranscriptIntervalArrays, vepVersion);

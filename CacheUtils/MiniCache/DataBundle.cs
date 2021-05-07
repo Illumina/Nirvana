@@ -60,8 +60,7 @@ namespace CacheUtils.MiniCache
 
             using (var transcriptReader = new TranscriptCacheReader(FileUtilities.GetReadStream(CacheConstants.TranscriptPath(cachePrefix))))
             {
-                // SET-362 DEBUG: Remove the null arguments in the future
-                cacheData = transcriptReader.Read(null, sequenceReader.RefIndexToChromosome);
+                cacheData = transcriptReader.Read(sequenceReader.RefIndexToChromosome);
                 cache     = cacheData.GetCache();
                 source    = transcriptReader.Header.Source;
             }

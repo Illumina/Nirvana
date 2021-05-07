@@ -75,8 +75,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
 
                 using (var reader = new TranscriptCacheReader(ms))
                 {
-                    // SET-362 DEBUG: Remove the null arguments in the future
-                    observedCache = reader.Read(null, ChromosomeUtilities.RefIndexToChromosome);
+                    observedCache = reader.Read(ChromosomeUtilities.RefIndexToChromosome);
                 }
             }
 

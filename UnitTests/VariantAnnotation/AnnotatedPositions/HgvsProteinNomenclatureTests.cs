@@ -132,7 +132,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:c.10_12delinsAGT(p.(Ser4=))", hgvspNotation);
+            Assert.Equal("ENST00000343938.4:c.10_12delTCGinsAGT(p.(Ser4=))", hgvspNotation);
         }
 
         [Fact]

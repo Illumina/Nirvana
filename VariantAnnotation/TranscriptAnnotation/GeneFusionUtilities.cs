@@ -22,7 +22,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             int? exon   = piece1.Region.Type == TranscriptRegionType.Exon   ? (int?)piece1.Region.Id : null;
             int? intron = piece1.Region.Type == TranscriptRegionType.Intron ? (int?)piece1.Region.Id : null;
 
-            var piece1Hgvs = GetBreakEndHgvs(transcript, piece1.Index, desiredBreakEnd.Piece1.Position, desiredBreakEnd.Piece1.IsSuffix, true);
+            var piece1Hgvs = GetBreakEndHgvs(transcript, piece1.Index, desiredBreakEnd.Piece1.Position, desiredBreakEnd.Piece1.IsSuffix);
 
             var geneFusions = new List<IGeneFusion>();
             foreach (var candidate in fusedTranscriptCandidates)
@@ -54,9 +54,9 @@ namespace VariantAnnotation.TranscriptAnnotation
         }
 
         private static (string Hgvs, bool IsTranscriptSuffix) GetBreakEndHgvs(ITranscript transcript, int regionIndex,
-            int position, bool isGenomicSuffix, bool isPiece1)
+            int position, bool isGenomicSuffix)
         {
-            var positionOffset     = HgvsUtilities.GetCdnaPositionOffset(transcript, position, regionIndex, isPiece1);
+            var positionOffset     = HgvsUtilities.GetCdnaPositionOffset(transcript, position, regionIndex);
             var isTranscriptSuffix = isGenomicSuffix != transcript.Gene.OnReverseStrand;
             var codingRegionLength = transcript.Translation.CodingRegion.CdnaEnd - transcript.Translation.CodingRegion.CdnaStart + 1;
             var hgvsPosString      = isTranscriptSuffix ? positionOffset.Value + "_" + codingRegionLength : 1 + "_" + positionOffset.Value;
@@ -79,7 +79,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             if (SkipGeneFusion(transcript, transcript2, bePiece2)) return null;
 
             var region       = transcript2.TranscriptRegions[piece2RegionIndex];
-            var piece2Hgvs   = GetBreakEndHgvs(transcript2, piece2RegionIndex, bePiece2.Position, bePiece2.IsSuffix, false);
+            var piece2Hgvs   = GetBreakEndHgvs(transcript2, piece2RegionIndex, bePiece2.Position, bePiece2.IsSuffix);
             if (piece2Hgvs.IsTranscriptSuffix == isPos1TranscriptSuffix) return null;
             
             int? exon   = region.Type == TranscriptRegionType.Exon ? (int?)region.Id : null;

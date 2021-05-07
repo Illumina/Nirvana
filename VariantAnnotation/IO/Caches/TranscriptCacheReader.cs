@@ -9,7 +9,6 @@ using Intervals;
 using IO;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.Providers;
 
 namespace VariantAnnotation.IO.Caches
 {
@@ -30,15 +29,14 @@ namespace VariantAnnotation.IO.Caches
         /// <summary>
         /// parses the database cache file and populates the specified lists and interval trees
         /// </summary>
-        // SET-362 DEBUG: Remove the sequenceProvider argument in the future
-        public TranscriptCacheData Read(ISequenceProvider sequenceProvider, IDictionary<ushort, IChromosome> refIndexToChromosome)
+        public TranscriptCacheData Read(IDictionary<ushort, IChromosome> refIndexToChromosome)
         {
             var genes             = ReadItems(_reader,     () => Gene.Read(_reader, refIndexToChromosome));
             var transcriptRegions = ReadItems(_reader,     () => TranscriptRegion.Read(_reader));
             var mirnas            = ReadItems(_reader,     () => IntervalExtensions.Read(_reader));
             var peptideSeqs       = ReadItems(_reader,     () => _reader.ReadAsciiString());
             var regulatoryRegions = ReadIntervals(_reader, () => RegulatoryRegion.Read(_reader, refIndexToChromosome));
-            var transcripts       = ReadIntervals(_reader, () => Transcript.Read(_reader, refIndexToChromosome, genes, transcriptRegions, mirnas, peptideSeqs, sequenceProvider));
+            var transcripts       = ReadIntervals(_reader, () => Transcript.Read(_reader, refIndexToChromosome, genes, transcriptRegions, mirnas, peptideSeqs));
 
             return new TranscriptCacheData(Header, genes, transcriptRegions, mirnas, peptideSeqs, transcripts, regulatoryRegions);
         }

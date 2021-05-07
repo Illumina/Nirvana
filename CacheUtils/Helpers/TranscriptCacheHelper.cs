@@ -15,8 +15,7 @@ namespace CacheUtils.Helpers
             if (!File.Exists(cachePath)) throw new FileNotFoundException($"Could not find {cachePath}");
 
             TranscriptCacheData cache;
-            // SET-362 DEBUG: Remove the null arguments in the future
-            using (var reader = new TranscriptCacheReader(FileUtilities.GetReadStream(cachePath))) cache = reader.Read(null, refIndexToChromosome);
+            using (var reader = new TranscriptCacheReader(FileUtilities.GetReadStream(cachePath))) cache = reader.Read(refIndexToChromosome);
             return cache;
         }
     }

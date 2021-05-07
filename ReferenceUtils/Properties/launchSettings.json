@@ -1,0 +1,24 @@
+{
+  "profiles": {
+    "GRCh37": {
+      "commandName": "Project",
+      "commandLineArgs": "create --cb Cytoband\\cytoBand_hg19.txt --ga GRCh37 --gar Cytoband\\GCF_000001405.25_GRCh37.p13_assembly_report.txt -i Cytoband\\GRCh37\\hs_ref_GRCh37.p13_ --rn Cytoband\\Reference_Names_GRCh37.tsv --patch 13 -o References\\6\\Homo_sapiens.GRCh37.Nirvana.dat",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "GRCh38": {
+      "commandName": "Project",
+      "commandLineArgs": "create --cb Cytoband\\cytoBand_hg38.txt --ga GRCh38 --gar Cytoband\\GCF_000001405.39_GRCh38.p13_assembly_report.txt -i Cytoband\\GRCh38\\hs_ref_GRCh38.p12_ --rn Cytoband\\Reference_Names_GRCh38.tsv --patch 12 -o References\\6\\Homo_sapiens.GRCh38.Nirvana.dat",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    },
+    "TestSeq": {
+      "commandName": "Project",
+      "commandLineArgs": "create --cb TestSeq\\TestSeq_cytoBand_hg19.txt --ga GRCh37 --patch 13 --rn TestSeq\\TestSeq_Reference_Names_GRCh37.tsv -i TestSeq\\TestSeq -o D:\\Projects\\NirvanaHgvsG\\UnitTests\\Resources\\TestSeq_reference.dat --gar TestSeq\\TestSeq_GRCh37.p13_assembly_report.txt",
+      "workingDirectory": "E:\\Data\\Nirvana\\Cytoband"
+    },
+	"chr12 RefMinor": {
+      "commandName": "Project",
+      "commandLineArgs": "substring --cb Cytoband\\cytoBand_hg19.txt --ga GRCh37 -i Cytoband\\GRCh37\\\\hs_ref_GRCh37.p13_chr12.fa.gz -o D:\\Projects\\NirvanaHgvsG\\UnitTests\\Resources\\EndToEnd\\GRCh37\\chr12_7018490_7086889_Both.bases --gar GCF_000001405.25_GRCh37.p13_assembly_report.txt --begin 7018491 --end 7086890",
+      "workingDirectory": "E:\\Data\\Nirvana"
+    }
+  }
+}

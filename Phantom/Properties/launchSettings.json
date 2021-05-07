@@ -1,0 +1,27 @@
+{
+  "profiles": {
+    "Phantom": {
+      "commandName": "Project"
+    },
+    "Test_SK": {
+      "commandName": "Project",
+      "commandLineArgs": "-i \\\\ussd-prd-isi04\\Nirvana\\Data\\Zodiac\\Zodiac_BruteForce.vcf -c \\\\ussd-prd-isi04\\Nirvana\\Development\\Cache\\25\\GRCh37\\Both90 -r \\\\ussd-prd-isi04\\Nirvana\\References\\latest\\Homo_sapiens.GRCh37.Nirvana.dat -o test_out ",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom"
+    },
+    "Test2": {
+      "commandName": "Executable",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Pedigree.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh38\\Ensembl90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh38.Nirvana.dat -o Pedigree_test_out",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+    },
+    "Small_Test": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\Unsorted_Chromosomes.vcf -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh37\\Ensembl -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o small_test_out",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+    },
+    "Test1K": {
+      "commandName": "Project",
+      "commandLineArgs": "-i E:\\Nirvana_resources\\test_runs\\test_Phantom\\test_data\\ALL.chr9.phase3_shapeit2_mvncall_integrated_v5a.20130502.genotypes.vcf.gz -c E:\\Nirvana_resources\\Nirvana\\Development\\Cache\\25\\GRCh37\\Both90 -r E:\\Nirvana_resources\\Nirvana\\Development\\References\\5\\Homo_sapiens.GRCh37.Nirvana.dat -o test_out ",
+      "workingDirectory": "E:\\Nirvana_resources\\test_runs\\test_Phantom\\"
+    }
+  }
+}
