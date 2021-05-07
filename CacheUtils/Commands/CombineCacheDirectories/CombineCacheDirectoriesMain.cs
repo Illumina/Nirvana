@@ -211,9 +211,8 @@ namespace CacheUtils.Commands.CombineCacheDirectories
             using (var transcriptReader  = new TranscriptCacheReader(FileUtilities.GetReadStream(transcriptPath)))
             using (var transcriptReader2 = new TranscriptCacheReader(FileUtilities.GetReadStream(transcriptPath2)))
             {
-                // SET-362 DEBUG: Remove the null arguments in the future
-                cache  = transcriptReader.Read(null, refIndexToChromosome);
-                cache2 = transcriptReader2.Read(null, refIndexToChromosome);
+                cache  = transcriptReader.Read(refIndexToChromosome);
+                cache2 = transcriptReader2.Read(refIndexToChromosome);
             }
 
             logger.WriteLine("finished.");
