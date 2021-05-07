@@ -1,8 +1,5 @@
-﻿using System;
-using System.Net.Mime;
-using Genome;
+﻿using Genome;
 using OptimizedCore;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
@@ -64,24 +61,5 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 	        var results = StringBuilderCache.GetStringAndRelease(sb);
 		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(results) : results;
 	    }
-        
-        public static void PrintTranscriptDetails(int start, int end, ICodingRegion codingRegion,
-	        ITranscriptRegion[] transcriptRegions, IRnaEdit[] rnaEdits, byte startExonPhase)
-        {
-	        Console.WriteLine($"genomic region: {start}-{end}");
-	        Console.WriteLine($"Start exon phase:{startExonPhase}");
-	        Console.WriteLine($"new CodingRegion({codingRegion.Start}, {codingRegion.End}, {codingRegion.CdnaStart}, {codingRegion.CdnaEnd}, {codingRegion.Length})");
-	        foreach (var transcriptRegion in transcriptRegions)
-	        {
-		        Console.WriteLine($"new TranscriptRegion(TranscriptRegionType.{transcriptRegion.Type}, {transcriptRegion.Id}, {transcriptRegion.Start}, {transcriptRegion.End}, " +
-		                          $"{transcriptRegion.CdnaStart}, {transcriptRegion.CdnaEnd}),");
-	        }
-
-	        if(rnaEdits!=null)
-		        foreach (var rnaEdit in rnaEdits)
-		        {
-			        Console.WriteLine($"new RnaEdit({rnaEdit.Start}, {rnaEdit.End}, \"{rnaEdit.Bases}\"),");
-		        }
-        }
     }
 }

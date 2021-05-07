@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
@@ -112,15 +111,6 @@ namespace Nirvana
         public void PreLoad(IChromosome chromosome)
         {
             SequenceProvider.LoadChromosome(chromosome);
-            //NM_033487.1
-            // if (chromosome.Index == 0)
-            // {
-            //     var start = 1570603;
-            //     var end = 1590558;
-            //
-            //     var sequence = SequenceProvider.Sequence.Substring(start - 1, end - start + 1);
-            //     Console.WriteLine(sequence);
-            // }
 
             if (_variantPositions == null || !_variantPositions.TryGetValue(chromosome, out var positions)) return;
             SaProvider?.PreLoad(chromosome, positions);
