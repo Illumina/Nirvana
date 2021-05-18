@@ -12,16 +12,16 @@ namespace UnitTests.Vcf.VariantCreator
         public void Create_Dragen_3_3_DEL()
         {
             // chr1    907965  DRAGEN:LOSS:907966-909406       N       <DEL>   .       SampleFT        SVTYPE=CNV;END=909406;REFLEN=1441       GT:SM:CN:BC:QS:FT:DN    0/1:0.516574:1:1:24:cnvLength:.     0/1:0.409726:1:1:26:cnvLength:. 0/1:0.496663:1:1:23:cnvLength:Inherited
-            var infoData = new InfoData(null, null, 909406, null, null, null, null, null, null,
-                "CNV", null, null, null);
+            var      builder  = new InfoDataBuilder {SvType = "CNV", End = 909406};
+            InfoData infoData = builder.Create();
 
-            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 907965, infoData.End.Value, "N", "<DEL>", null);
+            IVariant observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 907965, infoData.End.Value, "N", "<DEL>", null);
 
-            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
-            Assert.Equal(907966, observedResults.Start);
-            Assert.Equal(909406, observedResults.End);
-            Assert.Equal("N", observedResults.RefAllele);
-            Assert.Equal("<DEL>", observedResults.AltAllele);
+            Assert.Equal(ChromosomeUtilities.Chr1,     observedResults.Chromosome);
+            Assert.Equal(907966,                       observedResults.Start);
+            Assert.Equal(909406,                       observedResults.End);
+            Assert.Equal("N",                          observedResults.RefAllele);
+            Assert.Equal("<DEL>",                      observedResults.AltAllele);
             Assert.Equal(VariantType.copy_number_loss, observedResults.Type);
         }
 
@@ -29,16 +29,16 @@ namespace UnitTests.Vcf.VariantCreator
         public void Create_Dragen_3_3_DUP()
         {
             // chr1    1715898 DRAGEN:GAIN:1715899-1750149     N       <DUP>   .       PASS    SVTYPE=CNV;END=1750149;REFLEN=34251     GT:SM:CN:BC:QS:FT:DN    ./.:1.07189:2:6:33:PASS:.   ./1:1.53631:3:6:49:PASS:.       ./.:1.012:2:6:38:PASS:Inherited
-            var infoData = new InfoData(null, null, 1750149, null, null, null, null, null, null,
-                "CNV", null, null, null);
+            var      builder  = new InfoDataBuilder {SvType = "CNV", End = 1750149};
+            InfoData infoData = builder.Create();
 
-            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 1715898, infoData.End.Value, "N", "<DUP>", null);
+            IVariant observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 1715898, infoData.End.Value, "N", "<DUP>", null);
 
-            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
-            Assert.Equal(1715899, observedResults.Start);
-            Assert.Equal(1750149, observedResults.End);
-            Assert.Equal("N", observedResults.RefAllele);
-            Assert.Equal("<DUP>", observedResults.AltAllele);
+            Assert.Equal(ChromosomeUtilities.Chr1,     observedResults.Chromosome);
+            Assert.Equal(1715899,                      observedResults.Start);
+            Assert.Equal(1750149,                      observedResults.End);
+            Assert.Equal("N",                          observedResults.RefAllele);
+            Assert.Equal("<DUP>",                      observedResults.AltAllele);
             Assert.Equal(VariantType.copy_number_gain, observedResults.Type);
         }
 
@@ -46,16 +46,16 @@ namespace UnitTests.Vcf.VariantCreator
         public void Create_Canvas_TotalCopyNumber()
         {
             // 1	723707	Canvas:GAIN:1:723708:2581225	N	<CNV>	41	PASS	SVTYPE=CNV;END=2581225	RC:BC:CN:MCC	.	129:3123:3:2
-            var infoData = new InfoData(null, null, 2581225, null, null, null, null, null, null,
-                "CNV", null, null, null);
+            var      builder  = new InfoDataBuilder {SvType = "CNV", End = 2581225};
+            InfoData infoData = builder.Create();
 
-            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 723707, infoData.End.Value, "N", "<CNV>", null);
+            IVariant observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 723707, infoData.End.Value, "N", "<CNV>", null);
 
-            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
-            Assert.Equal(723708, observedResults.Start);
-            Assert.Equal(2581225, observedResults.End);
-            Assert.Equal("N", observedResults.RefAllele);
-            Assert.Equal("<CNV>", observedResults.AltAllele);
+            Assert.Equal(ChromosomeUtilities.Chr1,          observedResults.Chromosome);
+            Assert.Equal(723708,                            observedResults.Start);
+            Assert.Equal(2581225,                           observedResults.End);
+            Assert.Equal("N",                               observedResults.RefAllele);
+            Assert.Equal("<CNV>",                           observedResults.AltAllele);
             Assert.Equal(VariantType.copy_number_variation, observedResults.Type);
         }
 
@@ -63,16 +63,16 @@ namespace UnitTests.Vcf.VariantCreator
         public void Create_Canvas_AlleleSpecificCopyNumber()
         {
             //chr1    854895  Canvas:COMPLEXCNV:chr1:854896-861879    N       <CN0>,<CN3>     .       PASS    SVTYPE=CNV;END=861879;CNVLEN=6984;CIPOS=-291,291;CIEND=-291,291 GT:RC:BC:CN:MCC:MCCQ:QS:FT:DQ   0/1:59.45:12:1:1:.:25.34:PASS:. 0/1:59.45:12:1:1:.:25.34:PASS:. 1/2:165.40:12:3:3:16.80:16.71:PASS:.
-            var infoData = new InfoData(new[] { -291, -291 }, new[] { -291, -291 }, 861879, null, null, null, null, null, null,
-                "CNV", null, null, null);
+            var      builder  = new InfoDataBuilder {SvType = "CNV", End = 861879, CiPos = new[] {-291, 291}, CiEnd = new[] {-291, 291}};
+            InfoData infoData = builder.Create();
 
-            var observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 854895, infoData.End.Value, "N", "<CN0>", null);
+            IVariant observedResults = CnvCreator.Create(ChromosomeUtilities.Chr1, 854895, infoData.End.Value, "N", "<CN0>", null);
 
-            Assert.Equal(ChromosomeUtilities.Chr1, observedResults.Chromosome);
-            Assert.Equal(854896, observedResults.Start);
-            Assert.Equal(861879, observedResults.End);
-            Assert.Equal("N", observedResults.RefAllele);
-            Assert.Equal("<CN0>", observedResults.AltAllele);
+            Assert.Equal(ChromosomeUtilities.Chr1,          observedResults.Chromosome);
+            Assert.Equal(854896,                            observedResults.Start);
+            Assert.Equal(861879,                            observedResults.End);
+            Assert.Equal("N",                               observedResults.RefAllele);
+            Assert.Equal("<CN0>",                           observedResults.AltAllele);
             Assert.Equal(VariantType.copy_number_variation, observedResults.Type);
         }
     }

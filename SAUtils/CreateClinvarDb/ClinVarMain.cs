@@ -67,7 +67,7 @@ namespace SAUtils.CreateClinvarDb
             using (var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference)))
             using (var clinvarReader     = new ClinVarReader(GZipUtilities.GetAppropriateReadStream(_rcvFile), GZipUtilities.GetAppropriateReadStream(_vcvFile), referenceProvider))
             using (var nsaStream         = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName+SaCommon.SaFileSuffix)))
-            using (var indexStream       = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream       = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             using (var nsaWriter         = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.ClinvarTag, false, true, SaCommon.SchemaVersion, false))
             using (var schemaStream      = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter      = new StreamWriter(schemaStream))

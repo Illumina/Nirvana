@@ -1,43 +1,24 @@
 ﻿namespace VariantAnnotation.AnnotatedPositions
 {
-    public sealed class PositionOffset
-    {
-        public readonly int Position;
-        public readonly int Offset;
-        public readonly string Value;
-        public readonly bool HasStopCodonNotation;
-
-        public PositionOffset(int position, int offset, string value, bool hasStopCodonNotation)
-        {
-            Position             = position;
-            Offset               = offset;
-            Value                = value;
-            HasStopCodonNotation = hasStopCodonNotation;
-        }
-    }
-
     public sealed class HgvscNotation
     {
-        private readonly string _referenceBases;
-        private readonly string _alternateBases;
-
-        private PositionOffset _start;
-        private PositionOffset _end;
-
-        private readonly string _transcriptId;
-
-        private readonly char _transcriptType;
-
-        private readonly GenomicChange _type;
+        private readonly string         _referenceBases;
+        private readonly string         _alternateBases;
+        private          PositionOffset _start;
+        private          PositionOffset _end;
+        private readonly string         _transcriptId;
+        private readonly char           _transcriptType;
+        private readonly GenomicChange  _type;
 
         private const char CodingType    = 'c';
         private const char NonCodingType = 'n';
 
-        public HgvscNotation(string referenceBases, string alternateBases, string transcriptId, GenomicChange changeType, PositionOffset start, PositionOffset end, bool isCoding)
+        public HgvscNotation(string referenceBases, string alternateBases, string transcriptId, GenomicChange changeType, PositionOffset start,
+            PositionOffset end, bool isCoding)
         {
             _transcriptId = transcriptId;
             _start        = start;
-            _end          = end;            
+            _end          = end;
             _type         = changeType;
 
             SwapEndpoints();
@@ -56,18 +37,14 @@
         /// </summary>
         private void SwapEndpoints()
         {
-            if (_start.Position <= _end.Position &&
-                (_start.Position != _end.Position || _start.Offset <= _end.Offset)) return;
+            if (_start.Position <= _end.Position && (_start.Position != _end.Position || _start.Offset <= _end.Offset)) return;
 
-            var temp = _start;
-            _start   = _end;
-            _end     = temp;
+            PositionOffset temp = _start;
+            _start = _end;
+            _end   = temp;
         }
 
-        public override string ToString()
-        {
-            return HgvsUtilities.FormatDnaNotation(_start.Value, _end.Value, _transcriptId, _referenceBases,
-                _alternateBases, _type, _transcriptType);
-        }
+        public override string ToString() => HgvsUtilities.FormatDnaNotation(_start.Value, _end.Value, _transcriptId, _referenceBases,
+            _alternateBases, _type, _transcriptType);
     }
 }

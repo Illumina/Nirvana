@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -18,6 +18,10 @@
     <ProjectReference Include="..\Variants\Variants.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="IsExternalInit" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
   </ItemGroup>
   <Import Project="..\CommonAssemblyInfo.props" />

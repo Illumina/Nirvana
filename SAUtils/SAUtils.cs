@@ -1,12 +1,15 @@
 ﻿using System.Collections.Generic;
 using CommandLine.Builders;
+using ErrorHandling;
 using SAUtils.ClinGen;
+using SAUtils.CosmicGeneFusions;
 using SAUtils.CreateClinvarDb;
 using SAUtils.DbSnpRemapper;
 using SAUtils.dbVar;
 using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
+using SAUtils.FusionCatcher;
 using SAUtils.gnomAD;
 using SAUtils.GnomadGeneScores;
 using SAUtils.MitoHeteroplasmy;
@@ -23,56 +26,60 @@ namespace SAUtils
     {
         public static int Main(string[] args)
         {
-            var ops                    = new Dictionary<string, TopLevelOption>
+            var ops = new Dictionary<string, TopLevelOption>
             {
-                ["clinvar"]               = new TopLevelOption("create ClinVar database", ClinVarMain.Run),
-                ["cosmic"]                = new TopLevelOption("create COSMIC database", CreateCosmicDb.Main.Run),
-                ["ClinGen"]               = new TopLevelOption("create ClinGen database", MakeClinGenDb.Main.Run),
-                ["CustomVar"]             = new TopLevelOption("create custom variant annotation database", Custom.VariantMain.Run),
-                ["CustomGene"]            = new TopLevelOption("create custom gene annotation database", Custom.GeneMain.Run),
-                ["OneKGenSvVcfToBed"]     = new TopLevelOption("convert 1000 Genomes structural variants VCF file into a BED-like file", OneKGenSvDb.VcfToBed.Run),
-                ["OneKGenSv"]             = new TopLevelOption("create 1000 Genomes structural variants database", OneKGenSvDb.Create.Run),
-                ["OneKGen"]               = new TopLevelOption("create 1000 Genome small variants database", CreateOneKgDb.Main.Run),
-                ["RefMinor"]              = new TopLevelOption("create Reference Minor database from 1000 Genome ", RefMinorDb.Main.Run),
-                ["ancestralAllele"]       = new TopLevelOption("create Ancestral allele database from 1000Genomes data", MakeAaDb.Main.Run),
-                ["dbsnp"]                 = new TopLevelOption("create dbSNP database", CreateDbsnpDb.Main.Run),
-                ["globalMinor"]           = new TopLevelOption("create global minor allele database", CreateGlobalAllelesDb.Main.Run),  
-                ["Dgv"]                   = new TopLevelOption("create DGV database", makeDgvDb.Main.Run),
-                ["Omim"]                  = new TopLevelOption("create OMIM database", Omim.Main.Run),
-                ["downloadOmim"]          = new TopLevelOption("download OMIM database", Omim.Downloader.Run),
-                ["ExacScores"]            = new TopLevelOption("create ExAC gene scores database", ExacScores.Main.Run),
-                ["extractMiniSA"]         = new TopLevelOption("extracts mini SA", ExtractMiniSaMain.Run),
-                ["extractMiniXml"]        = new TopLevelOption("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
-                ["gnomad"]                = new TopLevelOption("create gnomAD database", GnomadSnvMain.Run),
-                ["gnomad-lcr"]            = new TopLevelOption("create gnomAD low complexity region database", LcrRegionsMain.Run),
-                ["gnomadGeneScores"]      = new TopLevelOption("create gnomAD gene scores database", GnomadGenesMain.Run),
-                ["TopMed"]                = new TopLevelOption("create TOPMed database", CreateTopMedDb.Main.Run),
-                ["PhyloP"]                = new TopLevelOption("create PhyloP database", PhyloP.Main.Run),
-                ["CosmicSv"]              = new TopLevelOption("create COSMIC SV tsv files", ExtractCosmicSvsMain.Run),
-                ["remapWithDbsnp"]        = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
-                ["filterSpliceNetTsv"]    = new TopLevelOption("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run),
-                ["mitomapVarDb"]          = new TopLevelOption("create MITOMAP small variants database", SmallVarDb.Run),
-                ["mitomapSvDb"]           = new TopLevelOption("create MITOMAP structural variants database", StructVarDb.Run),
-                ["spliceAi"]              = new TopLevelOption("create SpliceAI database", SpliceAiDb.Run),
-                ["primateAi"]             = new TopLevelOption("create PrimateAI database", PrimateAiDb.Run),
-                ["dosageMapRegions"]      = new TopLevelOption("create dosage map regions", DosageMapRegions.Run),
-                ["dosageSensitivity"]     = new TopLevelOption("create dosage sensitivity database", DosageSensitivity.Run),
-                ["diseaseValidity"]       = new TopLevelOption("create disease validity database", GeneDiseaseValidity.Run),
-                ["MitoHet"]               = new TopLevelOption("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
-                ["Revel"]                 = new TopLevelOption("create REVEL database", Revel.Create.Run),
-                ["index"]                 = new TopLevelOption("edit an index file", UpdateIndex.Run),
-                ["concat"]                = new TopLevelOption("merge multiple NSA files for the same data source having non-overlapping regions", NsaConcatenator.NsaConcatenator.Run),
-                ["AaCon"]                 = new TopLevelOption("create AA conservation database", AAConservation.AaConservationMain.Run)
+                ["AaCon"]           = new("create AA conservation database", AAConservation.AaConservationMain.Run),
+                ["ancestralAllele"] = new("create Ancestral allele database from 1000Genomes data", MakeAaDb.Main.Run),
+                ["ClinGen"]         = new("create ClinGen database", MakeClinGenDb.Main.Run),
+                ["clinvar"]         = new("create ClinVar database", ClinVarMain.Run),
+                ["concat"] = new("merge multiple NSA files for the same data source having non-overlapping regions",
+                    NsaConcatenator.NsaConcatenator.Run),
+                ["Cosmic"]             = new("create COSMIC database", CreateCosmicDb.Main.Run),
+                ["CosmicSv"]           = new("create COSMIC SV database", ExtractCosmicSvsMain.Run),
+                ["CosmicFusion"]       = new("create COSMIC gene fusion database", CreateCosmicGeneFusions.Run),
+                ["CustomGene"]         = new("create custom gene annotation database", Custom.GeneMain.Run),
+                ["CustomVar"]          = new("create custom variant annotation database", Custom.VariantMain.Run),
+                ["Dbsnp"]              = new("create dbSNP database", CreateDbsnpDb.Main.Run),
+                ["Dgv"]                = new("create DGV database", makeDgvDb.Main.Run),
+                ["DiseaseValidity"]    = new("create disease validity database", GeneDiseaseValidity.Run),
+                ["DosageMapRegions"]   = new("create dosage map regions", DosageMapRegions.Run),
+                ["DosageSensitivity"]  = new("create dosage sensitivity database", DosageSensitivity.Run),
+                ["DownloadOmim"]       = new("download OMIM database", Omim.Downloader.Run),
+                ["ExacScores"]         = new("create ExAC gene scores database", ExacScores.Main.Run),
+                ["ExtractMiniSA"]      = new("extracts mini SA", ExtractMiniSaMain.Run),
+                ["ExtractMiniXml"]     = new("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
+                ["FilterSpliceNetTsv"] = new("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run),
+                ["FusionCatcher"]      = new("create FusionCatcher database", CreateFusionCatcher.Run),
+                ["GlobalMinor"]        = new("create global minor allele database", CreateGlobalAllelesDb.Main.Run),
+                ["Gnomad"]             = new("create gnomAD database", GnomadSnvMain.Run),
+                ["Gnomad-lcr"]         = new("create gnomAD low complexity region database", LcrRegionsMain.Run),
+                ["GnomadGeneScores"]   = new("create gnomAD gene scores database", GnomadGenesMain.Run),
+                ["Index"]              = new("edit an index file", UpdateIndex.Run),
+                ["MitoHet"]            = new("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
+                ["MitomapSvDb"]        = new("create MITOMAP structural variants database", StructVarDb.Run),
+                ["MitomapVarDb"]       = new("create MITOMAP small variants database", SmallVarDb.Run),
+                ["Omim"]               = new("create OMIM database", Omim.Main.Run),
+                ["OneKGen"]            = new("create 1000 Genome small variants database", CreateOneKgDb.Main.Run),
+                ["OneKGenSv"]          = new("create 1000 Genomes structural variants database", OneKGenSvDb.Create.Run),
+                ["OneKGenSvVcfToBed"] = new("convert 1000 Genomes structural variants VCF file into a BED-like file",
+                    OneKGenSvDb.VcfToBed.Run),
+                ["PhyloP"]         = new("create PhyloP database", PhyloP.Main.Run),
+                ["PrimateAi"]      = new("create PrimateAI database", PrimateAiDb.Run),
+                ["RefMinor"]       = new("create Reference Minor database from 1000 Genome ", RefMinorDb.Main.Run),
+                ["RemapWithDbsnp"] = new("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
+                ["Revel"]          = new("create REVEL database", Revel.Create.Run),
+                ["SpliceAi"]       = new("create SpliceAI database", SpliceAiDb.Run),
+                ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run)
             };
 
-            var exitCode = new TopLevelAppBuilder(args, ops)
+            ExitCodes exitCode = new TopLevelAppBuilder(args, ops)
                 .Parse()
                 .ShowBanner(Constants.Authors)
                 .ShowHelpMenu("Utilities focused on supplementary annotation")
                 .ShowErrors()
                 .Execute();
 
-            return (int)exitCode;
+            return (int) exitCode;
         }
     }
 }

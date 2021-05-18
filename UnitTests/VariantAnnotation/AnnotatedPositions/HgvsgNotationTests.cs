@@ -20,8 +20,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [InlineData(5, 7, "GTG", "", VariantType.deletion, "NC_012920.1:m.5_7del")]
         [InlineData(10, 12, "GAC", "", VariantType.deletion, "NC_012920.1:m.12_14del")]
         [InlineData(16, 15, "", "GATA", VariantType.insertion, "NC_012920.1:m.15_16insGATA")]
-        [InlineData(19, 22, "TGAC", "GTCA", VariantType.MNV, "NC_012920.1:m.19_22invTGAC")]
-        [InlineData(10, 9, "", "GAC", VariantType.insertion, "NC_012920.1:m.12_14dupCGA")]
+        [InlineData(19, 22, "TGAC", "GTCA", VariantType.MNV, "NC_012920.1:m.19_22inv")]
+        [InlineData(10, 9, "", "GAC", VariantType.insertion, "NC_012920.1:m.12_14dup")]
         public void GetNotation_MT(int start, int end, string referenceAllele, string altAllele, VariantType type, string expectedHgvs)
         {
             var    simpleVariant = new SimpleVariant(ChromosomeUtilities.ChrM, start, end, referenceAllele, altAllele, type);

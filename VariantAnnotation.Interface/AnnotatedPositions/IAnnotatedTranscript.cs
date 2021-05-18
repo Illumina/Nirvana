@@ -5,19 +5,21 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 {
     public interface IAnnotatedTranscript : IJsonSerializer
     {
-        ITranscript Transcript { get; }
-        string ReferenceAminoAcids { get; }
-        string AlternateAminoAcids { get; }
-        string ReferenceCodons { get; }
-        string AlternateCodons { get; }
-        IMappedPosition MappedPosition { get; }
-        string HgvsCoding { get; }
-        string HgvsProtein { get; }
-        PredictionScore Sift { get; }
-        PredictionScore PolyPhen { get; }
-        List<ConsequenceTag> Consequences { get; }
-        bool? CompleteOverlap { get; }
-        List<double> ConservationScores { get; set; }
-        void AddGeneFusion(IAnnotatedGeneFusion geneFusion);
+        ITranscript          Transcript          { get; }
+        string               ReferenceAminoAcids { get; }
+        string               AlternateAminoAcids { get; }
+        string               ReferenceCodons     { get; }
+        string               AlternateCodons     { get; }
+        IMappedPosition      MappedPosition      { get; }
+        string               HgvsCoding          { get; }
+        string               HgvsProtein         { get; }
+        PredictionScore      Sift                { get; }
+        PredictionScore      PolyPhen            { get; }
+        List<ConsequenceTag> Consequences        { get; }
+        bool?                CompleteOverlap     { get; }
+        List<double>         ConservationScores  { get; set; }
+
+        void AddGeneFusions(IAnnotatedGeneFusion[] geneFusions);
+        void AddGeneFusionPairs(HashSet<IGeneFusionPair> geneKeys);
     }
 }

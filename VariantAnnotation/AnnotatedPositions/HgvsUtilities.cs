@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Text;
 using Genome;
 using Intervals;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -116,26 +116,26 @@ namespace VariantAnnotation.AnnotatedPositions
             return aminoAcids.TranslateBases(altCds, true);
         }
 
-        public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int genomicPosition, int regionIndex, bool isRegionStart)
+        public static PositionOffset GetPositionOffset(ITranscript transcript, int genomicPosition, int regionIndex, bool isRegionStart)
         {
             if (!transcript.Overlaps(genomicPosition, genomicPosition)) return null;
 
-            var region            = transcript.TranscriptRegions[regionIndex];
-            int codingRegionStart = transcript.Translation?.CodingRegion.CdnaStart ?? -1;
-            int codingRegionEnd   = transcript.Translation?.CodingRegion.CdnaEnd   ?? -1;
-            
+            ITranscriptRegion region            = transcript.TranscriptRegions[regionIndex];
+            int               codingRegionStart = transcript.Translation?.CodingRegion.CdnaStart ?? -1;
+            int               codingRegionEnd   = transcript.Translation?.CodingRegion.CdnaEnd   ?? -1;
+
             (int position, int offset) = GetPositionAndOffset(genomicPosition, region, transcript.Gene.OnReverseStrand, isRegionStart);
             if (position == -1) return null;
 
-            (string cdnaCoord, bool hasStopCodonNotation, bool hasNoPosition) = GetCdnaCoord(position, offset, codingRegionStart, codingRegionEnd);
+            string coordinate   = GetCoordinate(position, codingRegionStart, codingRegionEnd);
             string offsetString = offset == 0 ? "" : offset.ToString("+0;-0;+0");
-            string value        = hasNoPosition ? "*" + offset : cdnaCoord + offsetString;
+            string value        = coordinate + offsetString;
 
-            return new PositionOffset(position, offset, value, hasStopCodonNotation);
+            return new PositionOffset(position, offset, value);
         }
 
-        private static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region,
-            bool onReverseStrand, bool isRegionStart)
+        internal static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region, bool onReverseStrand,
+            bool isRegionStart)
         {
             int cdsPos = -1;
             int offset = -1;
@@ -182,34 +182,16 @@ namespace VariantAnnotation.AnnotatedPositions
             return (cdnaPosition, offset);
         }
 
-        private static (int Position, int Offset) GetGapPositionAndOffset(ITranscriptRegion region, bool isRegionStart)
+        private static (int Position, int Offset) GetGapPositionAndOffset(ITranscriptRegion region, bool isRegionStart) =>
+            isRegionStart ? (region.CdnaEnd, 0) : (region.CdnaStart, 0);
+
+        private static string GetCoordinate(int position, int codingRegionStart, int codingRegionEnd)
         {
-            return isRegionStart ? (region.CdnaEnd, 0) : (region.CdnaStart, 0);
-        }
+            if (codingRegionEnd != -1 && position > codingRegionEnd) return "*" + (position - codingRegionEnd);
 
-        private static (string CdnaCoord, bool HasStopCodonNotation, bool HasNoPosition) GetCdnaCoord(int position,
-            int offset, int codingRegionStart, int codingRegionEnd)
-        {
-            string cdnaCoord            = null;
-            var    hasStopCodonNotation = false;
-            var    hasNoPosition        = false;
-
-            if (codingRegionEnd != -1)
-            {
-                if (position > codingRegionEnd)
-                {
-                    cdnaCoord            = "*" + (position - codingRegionEnd);
-                    hasStopCodonNotation = true;
-                }
-            }
-
-            if (!hasStopCodonNotation && codingRegionStart != -1)
-            {
-                cdnaCoord = (position + (position >= codingRegionStart ? 1 : 0) - codingRegionStart).ToString();
-            }
-
-            if (cdnaCoord == null) cdnaCoord = position.ToString();
-            return (cdnaCoord, hasStopCodonNotation, hasNoPosition);
+            return codingRegionStart != -1
+                ? (position + (position >= codingRegionStart ? 1 : 0) - codingRegionStart).ToString()
+                : position.ToString();
         }
 
         public static string GetTranscriptAllele(string variantAllele, bool onReverseStrand) =>
@@ -218,7 +200,7 @@ namespace VariantAnnotation.AnnotatedPositions
         public static string FormatDnaNotation(string start, string end, string referenceId, string referenceBases,
             string alternateBases, GenomicChange type, char notationType)
         {
-            var sb = StringBuilderCache.Acquire();
+            StringBuilder sb = StringBuilderCache.Acquire();
 
             // all start with transcript name & numbering type
             sb.Append(referenceId + ':' + notationType + '.');
@@ -237,10 +219,10 @@ namespace VariantAnnotation.AnnotatedPositions
                     sb.Append(coordinates + "del");
                     break;
                 case GenomicChange.Inversion:
-                    sb.Append(coordinates + "inv" + referenceBases);
+                    sb.Append(coordinates + "inv");
                     break;
                 case GenomicChange.Duplication:
-                    sb.Append(coordinates + "dup" + referenceBases);
+                    sb.Append(coordinates + "dup");
                     break;
                 case GenomicChange.Substitution:
                     if (referenceBases == alternateBases)

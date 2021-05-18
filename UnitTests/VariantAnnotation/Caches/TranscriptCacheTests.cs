@@ -112,7 +112,7 @@ namespace UnitTests.VariantAnnotation.Caches
             return regulatoryRegions;
         }
 
-        private static ITranscript[] GetTranscripts()
+        internal static ITranscript[] GetTranscripts()
         {
             return new ITranscript[]
             {

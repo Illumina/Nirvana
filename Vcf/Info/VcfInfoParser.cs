@@ -7,26 +7,15 @@ namespace Vcf.Info
 {
     public static class VcfInfoParser
     {
+        private static readonly InfoDataBuilder            Builder         = new();
+        private static readonly Dictionary<string, string> EmptyDictionary = new();
+
         public static IInfoData Parse(string infoField)
         {
             if (string.IsNullOrEmpty(infoField)) return null;
 
             Dictionary<string, string> infoKeyValue = ExtractInfoFields(infoField);
-
-            int[]   ciEnd                     = null;
-            int[]   ciPos                     = null;
-            int?    end                       = null;
-            int?    refRepeatCount            = null;
-            string  repeatUnit                = null;
-            int?    jointSomaticNormalQuality = null;
-            double? strandBias                = null;
-            double? recalibratedQuality       = null;
-            int?    svLen                     = null;
-            string  svType                    = null;
-            string  breakendEventId           = null;
-            //emedgene requests
-            double? fisherStrandBias = null;
-            double? mappingQuality   = null;
+            Builder.Reset();
 
             foreach ((string key, string value) in infoKeyValue)
             {
@@ -34,56 +23,61 @@ namespace Vcf.Info
                 switch (key)
                 {
                     case "CIEND":
-                        ciEnd = value.SplitToArray();
+                        Builder.CiEnd = value.SplitToArray();
                         break;
                     case "CIPOS":
-                        ciPos = value.SplitToArray();
+                        Builder.CiPos = value.SplitToArray();
                         break;
                     case "END":
-                        end = value.GetNullableInt();
+                        Builder.End = value.GetNullableInt();
                         break;
                     case "EVENT":
-                        breakendEventId = value;
+                        Builder.BreakendEventId = value;
                         break;
                     case "REF":
-                        refRepeatCount = Convert.ToInt32(value);
+                        Builder.RefRepeatCount = Convert.ToInt32(value);
                         break;
                     case "RU":
-                        repeatUnit = value;
+                        Builder.RepeatUnit = value;
                         break;
                     case "SB":
-                        strandBias = value.GetNullableValue<double>(double.TryParse);
+                        Builder.StrandBias = value.GetNullableValue<double>(double.TryParse);
                         break;
                     case "FS":
-                        fisherStrandBias = value.GetNullableValue<double>(double.TryParse);
+                        Builder.FisherStrandBias = value.GetNullableValue<double>(double.TryParse);
                         break;
                     case "MQ":
-                        mappingQuality = value.GetNullableValue<double>(double.TryParse);
+                        Builder.MappingQuality = value.GetNullableValue<double>(double.TryParse);
                         break;
                     case "QSI_NT":
                     case "SOMATICSCORE":
                     case "QSS_NT":
-                        jointSomaticNormalQuality = value.GetNullableInt();
+                        Builder.JointSomaticNormalQuality = value.GetNullableInt();
                         break;
                     case "SVLEN":
-                        svLen = value.GetNullableInt();
-                        if (svLen != null)
-                            svLen = Math.Abs(svLen.Value);
+                        Builder.SvLength = value.GetNullableInt();
+                        if (Builder.SvLength != null) Builder.SvLength = Math.Abs(Builder.SvLength.Value);
                         break;
                     case "SVTYPE":
-                        svType = value;
+                        Builder.SvType = value;
                         break;
                     case "VQSR":
-                        recalibratedQuality = value.GetNullableValue<double>(double.TryParse);
+                        Builder.RecalibratedQuality = value.GetNullableValue<double>(double.TryParse);
+                        break;
+                    case "IMPRECISE":
+                        Builder.IsImprecise = true;
+                        break;
+                    case "INV3":
+                        Builder.IsInv3 = true;
+                        break;
+                    case "INV5":
+                        Builder.IsInv5 = true;
                         break;
                 }
             }
 
-            return new InfoData(ciEnd, ciPos, end, recalibratedQuality, jointSomaticNormalQuality, refRepeatCount,
-                repeatUnit, strandBias, svLen, svType, fisherStrandBias, mappingQuality, breakendEventId);
+            return Builder.Create();
         }
-
-        private static readonly Dictionary<string, string> EmptyDictionary = new Dictionary<string, string>();
 
         private static Dictionary<string, string> ExtractInfoFields(string infoField)
         {
@@ -93,9 +87,9 @@ namespace Vcf.Info
 
             foreach (string field in infoField.OptimizedSplit(';'))
             {
-                (string key, string value) = field.OptimizedKeyValue();
-                if (value == null) value = "true";
-                infoKeyValue[key] = value;
+                (string key, string value) =   field.OptimizedKeyValue();
+                value                      ??= "true";
+                infoKeyValue[key]          =   value;
             }
 
             return infoKeyValue;

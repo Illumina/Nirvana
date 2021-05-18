@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Downloader": {
-      "commandName": "Project",
-      "commandLineArgs": "--ga GRCh37 --out TempData",
-      "workingDirectory": "E:\\Data\\Nirvana"
-    }
-  }
-}

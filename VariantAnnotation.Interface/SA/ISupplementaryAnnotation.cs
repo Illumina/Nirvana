@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.Interface.SA
 {
-    public interface ISupplementaryAnnotation:IJsonSerializer
+    public interface ISupplementaryAnnotation : IJsonSerializer
     {
         string JsonKey { get; }
     }

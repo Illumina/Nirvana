@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using IO;
 using VariantAnnotation.GeneAnnotation;
+using VariantAnnotation.GeneFusions.IO;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
@@ -14,9 +16,10 @@ namespace Nirvana
     {
         public static ISequenceProvider GetSequenceProvider(string compressedReferencePath)
         {
-             return new ReferenceSequenceProvider(PersistentStreamUtils.GetReadStream(compressedReferencePath));
+            return new ReferenceSequenceProvider(PersistentStreamUtils.GetReadStream(compressedReferencePath));
         }
-        public static ProteinConservationProvider GetProteinConservationProvider(AnnotationFiles files)=>
+
+        public static ProteinConservationProvider GetProteinConservationProvider(AnnotationFiles files) =>
             files == null || string.IsNullOrEmpty(files.ProteinConservationFile)
                 ? null
                 : new ProteinConservationProvider(PersistentStreamUtils.GetReadStream(files.ProteinConservationFile));
@@ -31,31 +34,56 @@ namespace Nirvana
             files?.LowComplexityRegionFile == null
                 ? null
                 : new LcrProvider(PersistentStreamUtils.GetReadStream(files.LowComplexityRegionFile));
-        
+
         public static IRefMinorProvider GetRefMinorProvider(AnnotationFiles files) =>
-            files == null || files.RefMinorFile == default ? null : 
-                new RefMinorProvider(PersistentStreamUtils.GetReadStream(files.RefMinorFile.Rma), 
+            files == null || files.RefMinorFile == default
+                ? null
+                : new RefMinorProvider(PersistentStreamUtils.GetReadStream(files.RefMinorFile.Rma),
                     PersistentStreamUtils.GetReadStream(files.RefMinorFile.Idx));
 
-        public static IGeneAnnotationProvider GetGeneAnnotationProvider(AnnotationFiles files) => files?.NsiFiles == null ? null : new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(files.NgaFiles));
+        public static IGeneAnnotationProvider GetGeneAnnotationProvider(AnnotationFiles files) => files?.NsiFiles == null
+            ? null
+            : new GeneAnnotationProvider(PersistentStreamUtils.GetStreams(files.NgaFiles));
 
         public static IAnnotationProvider GetNsaProvider(AnnotationFiles files)
         {
             if (files == null) return null;
-            //todo: use using block to release nsa streams
-            var nsaReaders = files.NsaFiles?.Select(x => new NsaReader(PersistentStreamUtils.GetReadStream(x.Nsa), PersistentStreamUtils.GetReadStream(x.Idx)))
-                                            .OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray() ?? new INsaReader[] { };
-            //todo: use using block to release nsi streams
-            var nsiReaders = files.NsiFiles?.Select(x => NsiReader.Read(PersistentStreamUtils.GetReadStream(x)))
-                                            .OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray() ?? new INsiReader[] { };
 
-            if (nsaReaders.Length == 0 && nsiReaders.Length == 0) return null;
-            
-            return new NsaProvider(nsaReaders, nsiReaders);
+            INsaReader[]          nsaReaders    = GetNsaReaders(files.NsaFiles);
+            INsiReader[]          nsiReaders    = GetNsiReaders(files.NsiFiles);
+            IGeneFusionSaReader[] fusionReaders = GetGeneFusionReaders(files.GeneFusionSourceFiles);
+
+            int numReaders = nsaReaders.Length + nsiReaders.Length + fusionReaders.Length;
+            return numReaders == 0 ? null : new NsaProvider(nsaReaders, nsiReaders, fusionReaders);
         }
 
-        public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path,
-            ISequenceProvider sequenceProvider, ProteinConservationProvider proteinConservationProvider) =>
+        private static INsaReader[] GetNsaReaders(IReadOnlyCollection<(string Nsa, string Idx)> filePaths)
+        {
+            var readers = new List<INsaReader>(filePaths.Count);
+            foreach ((string nsaPath, string idxPath) in filePaths)
+                readers.Add(new NsaReader(PersistentStreamUtils.GetReadStream(nsaPath), PersistentStreamUtils.GetReadStream(idxPath)));
+            return readers.SortByJsonKey();
+        }
+
+        private static INsiReader[] GetNsiReaders(IReadOnlyCollection<string> filePaths)
+        {
+            var readers = new List<INsiReader>(filePaths.Count);
+            foreach (string filePath in filePaths) readers.Add(NsiReader.Read(PersistentStreamUtils.GetReadStream(filePath)));
+            return readers.SortByJsonKey();
+        }
+
+        private static IGeneFusionSaReader[] GetGeneFusionReaders(IReadOnlyCollection<string> filePaths)
+        {
+            var readers = new List<IGeneFusionSaReader>(filePaths.Count);
+            foreach (string filePath in filePaths) readers.Add(new GeneFusionSourceReader(PersistentStreamUtils.GetReadStream(filePath)));
+            return readers.SortByJsonKey();
+        }
+
+        private static T[] SortByJsonKey<T>(this IEnumerable<T> entries) where T : ISaMetadata =>
+            entries.OrderBy(x => x.JsonKey, StringComparer.Ordinal).ToArray();
+
+        public static ITranscriptAnnotationProvider GetTranscriptAnnotationProvider(string path, ISequenceProvider sequenceProvider,
+            ProteinConservationProvider proteinConservationProvider) =>
             new TranscriptAnnotationProvider(path, sequenceProvider, proteinConservationProvider);
     }
 }

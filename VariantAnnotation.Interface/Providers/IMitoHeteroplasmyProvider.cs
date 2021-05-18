@@ -1,5 +1,4 @@
-﻿using Genome;
-using Variants;
+﻿using Variants;
 
 namespace VariantAnnotation.Interface.Providers
 {

@@ -9,13 +9,13 @@ namespace VariantAnnotation.AnnotatedPositions
 {
     public sealed class AnnotatedVariant : IAnnotatedVariant
     {
-        public IVariant Variant { get; }
-        public string HgvsgNotation { get; set; }
-        public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; } = new List<IAnnotatedRegulatoryRegion>();
-        public IList<IAnnotatedTranscript> Transcripts { get; }             = new List<IAnnotatedTranscript>();
-        public IList<ISupplementaryAnnotation> SaList { get; }              = new List<ISupplementaryAnnotation>();
-        public ISupplementaryAnnotation RepeatExpansionPhenotypes { get; set; }
-        public double? PhylopScore { get; set; }
+        public IVariant                          Variant                   { get; }
+        public string                            HgvsgNotation             { get; set; }
+        public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions         { get; } = new List<IAnnotatedRegulatoryRegion>();
+        public IList<IAnnotatedTranscript>       Transcripts               { get; } = new List<IAnnotatedTranscript>();
+        public IList<ISupplementaryAnnotation>   SaList                    { get; } = new List<ISupplementaryAnnotation>();
+        public ISupplementaryAnnotation          RepeatExpansionPhenotypes { get; set; }
+        public double?                           PhylopScore               { get; set; }
         
         public bool InLowComplexityRegion { get; set; }
         public AnnotatedVariant(IVariant variant) => Variant = variant;

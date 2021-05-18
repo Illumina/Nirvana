@@ -71,7 +71,7 @@ namespace SAUtils.Custom
             DataSourceVersion    version;
             string               outputPrefix      = GetOutputPrefix(_inputFile);
             string               nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
-            string               nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
+            string               nsaIndexFileName  = nsaFileName + SaCommon.IndexSuffix;
             string               nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
             ReportFor            reportFor;
 

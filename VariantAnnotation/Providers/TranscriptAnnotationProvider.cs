@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
@@ -9,8 +10,10 @@ using IO;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Caches;
+using VariantAnnotation.GeneFusions.Calling;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
+using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
 using VariantAnnotation.TranscriptAnnotation;
@@ -21,37 +24,38 @@ namespace VariantAnnotation.Providers
     public sealed class TranscriptAnnotationProvider : ITranscriptAnnotationProvider
     {
         private readonly ITranscriptCache _transcriptCache;
-        private readonly ISequence _sequence;
+        private readonly ISequence        _sequence;
 
-        public string Name { get; }
-        public GenomeAssembly Assembly { get; }
-        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
-        public IntervalArray<ITranscript>[] TranscriptIntervalArrays { get; }
-        public ushort VepVersion { get; }
+        public string                          Name                     { get; }
+        public GenomeAssembly                  Assembly                 { get; }
+        public IEnumerable<IDataSourceVersion> DataSourceVersions       { get; }
+        public IntervalArray<ITranscript>[]    TranscriptIntervalArrays { get; }
+        public ushort                          VepVersion               { get; }
 
-        private readonly Stream _siftStream;
-        private readonly Stream _polyphenStream;
+        private readonly Stream                _siftStream;
+        private readonly Stream                _polyphenStream;
         private readonly PredictionCacheReader _siftReader;
         private readonly PredictionCacheReader _polyphenReader;
-        private IPredictionCache _siftCache;
-        private IPredictionCache _polyphenCache;
-        private ushort _currentRefIndex = ushort.MaxValue;
+        private          IPredictionCache      _siftCache;
+        private          IPredictionCache      _polyphenCache;
+        private          ushort                _currentRefIndex = ushort.MaxValue;
 
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
         private readonly ProteinConservationProvider _conservationProvider;
+        private readonly GeneFusionCaller            _fusionCaller;
 
         public TranscriptAnnotationProvider(string pathPrefix, ISequenceProvider sequenceProvider, ProteinConservationProvider conservationProvider)
         {
             Name                  = "Transcript annotation provider";
             _sequence             = sequenceProvider.Sequence;
-            _refNameToChromosome  = sequenceProvider.RefNameToChromosome;
             _conservationProvider = conservationProvider;
 
             using (var stream = PersistentStreamUtils.GetReadStream(CacheConstants.TranscriptPath(pathPrefix)))
             {
-                (_transcriptCache, TranscriptIntervalArrays, VepVersion) = InitiateCache(stream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
+                (_transcriptCache, TranscriptIntervalArrays, VepVersion) =
+                    InitiateCache(stream, sequenceProvider.RefIndexToChromosome, sequenceProvider.Assembly);
             }
 
+            _fusionCaller      = new GeneFusionCaller(sequenceProvider.RefNameToChromosome, _transcriptCache.TranscriptIntervalForest);
             Assembly           = _transcriptCache.Assembly;
             DataSourceVersions = _transcriptCache.DataSourceVersions;
 
@@ -69,17 +73,11 @@ namespace VariantAnnotation.Providers
         private static (TranscriptCache Cache, IntervalArray<ITranscript>[] TranscriptIntervalArrays, ushort VepVersion) InitiateCache(Stream stream,
             IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refAssembly)
         {
-            TranscriptCache cache;
-            ushort vepVersion;
-            TranscriptCacheData cacheData;
-
-            using (var reader = new TranscriptCacheReader(stream))
-            {
-                vepVersion = reader.Header.Custom.VepVersion;
-                CheckHeaderVersion(reader.Header, refAssembly);
-                cacheData = reader.Read(refIndexToChromosome);
-                cache = cacheData.GetCache();
-            }
+            using var reader     = new TranscriptCacheReader(stream);
+            ushort    vepVersion = reader.Header.Custom.VepVersion;
+            CheckHeaderVersion(reader.Header, refAssembly);
+            TranscriptCacheData cacheData = reader.Read(refIndexToChromosome);
+            TranscriptCache     cache     = cacheData.GetCache();
 
             return (cache, cacheData.TranscriptIntervalArrays, vepVersion);
         }
@@ -96,7 +94,7 @@ namespace VariantAnnotation.Providers
 
         private static string GetAssemblyErrorMessage(GenomeAssembly cacheAssembly, GenomeAssembly refAssembly)
         {
-            var sb = StringBuilderCache.Acquire();
+            StringBuilder sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
             sb.AppendLine($"- Using {refAssembly}: Reference sequence provider");
             sb.AppendLine($"- Using {cacheAssembly}: Transcript annotation provider");
@@ -107,13 +105,16 @@ namespace VariantAnnotation.Providers
         {
             if (annotatedPosition.AnnotatedVariants == null || annotatedPosition.AnnotatedVariants.Length == 0) return;
 
-            var position    = annotatedPosition.Position;
-            ushort refIndex = position.Chromosome.Index;
+            IPosition position = annotatedPosition.Position;
+            ushort    refIndex = position.Chromosome.Index;
             LoadPredictionCaches(refIndex);
 
             AddRegulatoryRegions(annotatedPosition.AnnotatedVariants, _transcriptCache.RegulatoryIntervalForest);
             AddTranscripts(annotatedPosition.AnnotatedVariants);
-            if (position.HasStructuralVariant) AddGeneFusions(annotatedPosition.AnnotatedVariants);
+
+            if (position.HasStructuralVariant)
+                _fusionCaller.AddGeneFusions(annotatedPosition.AnnotatedVariants, annotatedPosition.Position.InfoData.IsImprecise,
+                    position.InfoData.IsInv3, position.InfoData.IsInv5);
         }
 
         private void AddTranscripts(IAnnotatedVariant[] annotatedVariants)
@@ -132,94 +133,36 @@ namespace VariantAnnotation.Providers
 
                 if (annotatedTranscripts.Count == 0) continue;
 
-                foreach (var annotatedTranscript in annotatedTranscripts)
+                foreach (IAnnotatedTranscript annotatedTranscript in annotatedTranscripts)
                 {
                     AddConservationScore(annotatedTranscript);
                 }
-                
-                foreach (var annotatedTranscript in annotatedTranscripts)
+
+                foreach (IAnnotatedTranscript annotatedTranscript in annotatedTranscripts)
                     annotatedVariant.Transcripts.Add(annotatedTranscript);
             }
         }
 
         private void AddConservationScore(IAnnotatedTranscript annotatedTranscript)
         {
-            if (_conservationProvider == null) return;
-            if(annotatedTranscript.MappedPosition == null) return;
-            
+            if (_conservationProvider              == null) return;
+            if (annotatedTranscript.MappedPosition == null) return;
+
             var scores = new List<double>();
-            var start = annotatedTranscript.MappedPosition.ProteinStart;
-            var end = annotatedTranscript.MappedPosition.ProteinEnd;
+            int start  = annotatedTranscript.MappedPosition.ProteinStart;
+            int end    = annotatedTranscript.MappedPosition.ProteinEnd;
 
             if (start == -1 || end == -1) return;
             for (int aaPos = start; aaPos <= end; aaPos++)
             {
-                var transcriptId = annotatedTranscript.Transcript.Id.WithVersion;
-                var score = _conservationProvider.GetConservationScore(transcriptId, aaPos);
+                string transcriptId = annotatedTranscript.Transcript.Id.WithVersion;
+                int    score        = _conservationProvider.GetConservationScore(transcriptId, aaPos);
                 if (score == -1) return; //don't add conservation scores
                 scores.Add(1.0 * score / 100);
             }
 
             annotatedTranscript.ConservationScores = scores;
         }
-
-        private void AddGeneFusions(IAnnotatedVariant[] annotatedVariants)
-        {
-            var transcriptIdToGeneFusions = new Dictionary<string, IAnnotatedGeneFusion>();
-            
-            foreach (var annotatedVariant in annotatedVariants)
-            {
-                var variant = annotatedVariant.Variant;
-                if (!variant.IsStructuralVariant) continue;
-
-                BreakEndAdjacency[] adjacencies = GetBreakEndAdjacencies(variant, _refNameToChromosome);
-                if (adjacencies == null) continue;
-                
-                transcriptIdToGeneFusions.Clear();
-                
-                foreach (var adjacency in adjacencies)
-                {
-                    ITranscript[] originTranscripts  = GetOverlappingCodingTranscripts(adjacency.Origin);
-                    ITranscript[] partnerTranscripts = GetOverlappingCodingTranscripts(adjacency.Partner);
-                    if (originTranscripts == null || partnerTranscripts == null) continue;
-                    
-                    transcriptIdToGeneFusions.GetGeneFusionsByTranscript(adjacency, originTranscripts, partnerTranscripts);
-                }
-
-                foreach (var transcript in annotatedVariant.Transcripts)
-                {
-                    string transcriptId = transcript.Transcript.Id.WithVersion;
-                    if (transcriptIdToGeneFusions.TryGetValue(transcriptId, out var annotatedGeneFusion))
-                    {
-                        transcript.AddGeneFusion(annotatedGeneFusion);
-                    }
-                }
-            }
-        }
-
-        private ITranscript[] GetOverlappingCodingTranscripts(BreakPoint bp)
-        {
-            if (bp == null) return null;
-
-            ITranscript[] transcripts = _transcriptCache.TranscriptIntervalForest.GetAllOverlappingValues(bp.Chromosome.Index, bp.Position,
-                    bp.Position);
-            if (transcripts == null) return null;
-
-            var overlappingTranscripts = new List<ITranscript>();
-
-            foreach (var transcript in transcripts)
-            {
-                if (transcript.Translation == null) continue;
-                overlappingTranscripts.Add(transcript);
-            }
-
-            return overlappingTranscripts.ToArray();
-        }
-
-        private static BreakEndAdjacency[] GetBreakEndAdjacencies(ISimpleVariant variant, IDictionary<string, IChromosome> refNameToChromosome) =>
-            variant.Type == VariantType.translocation_breakend
-                ? BreakEndUtilities.CreateFromTranslocation(variant, refNameToChromosome)
-                : BreakEndUtilities.CreateFromSymbolicAllele(variant, variant.Type);
 
         public void PreLoad(IChromosome chromosome, List<int> positions) => throw new NotImplementedException();
 
@@ -247,14 +190,14 @@ namespace VariantAnnotation.Providers
 
         private static void AddRegulatoryRegions(IAnnotatedVariant[] annotatedVariants, IIntervalForest<IRegulatoryRegion> regulatoryIntervalForest)
         {
-            foreach (var annotatedVariant in annotatedVariants)
+            foreach (IAnnotatedVariant annotatedVariant in annotatedVariants)
             {
                 if (!annotatedVariant.Variant.Behavior.NeedRegulatoryRegions) continue;
 
                 // In case of insertions, the base(s) are assumed to be inserted at the end position
                 // if this is an insertion just before the beginning of the regulatory element, this takes care of it
-                var variant      = annotatedVariant.Variant;
-                int variantBegin = variant.Type == VariantType.insertion ? variant.End : variant.Start;
+                IVariant variant      = annotatedVariant.Variant;
+                int      variantBegin = variant.Type == VariantType.insertion ? variant.End : variant.Start;
 
                 if (SkipLargeVariants(variantBegin, variant.End)) continue;
 
@@ -263,7 +206,7 @@ namespace VariantAnnotation.Providers
                         variant.End);
                 if (regulatoryRegions == null) continue;
 
-                foreach (var regulatoryRegion in regulatoryRegions)
+                foreach (IRegulatoryRegion regulatoryRegion in regulatoryRegions)
                 {
                     // if the insertion is at the end, its past the feature and therefore not overlapping
                     if (variant.Type == VariantType.insertion && variant.End == regulatoryRegion.End) continue;

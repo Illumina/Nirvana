@@ -41,7 +41,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
                     annotations.Clear();
                     annotations.AddRange(chrom1Pos100Annotations);
                 });
-            var provider = new NsaProvider(new[] {dbsnpReader.Object}, null);
+            var provider = new NsaProvider(new[] {dbsnpReader.Object}, null, null);
 
             return provider;
         }
@@ -69,7 +69,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
                     annotations.AddRange(chrom1Pos100Annotations);
                 });
 
-            var provider = new NsaProvider(new[] { clinvarReader.Object }, null);
+            var provider = new NsaProvider(new[] {clinvarReader.Object}, null, null);
 
             return provider;
         }

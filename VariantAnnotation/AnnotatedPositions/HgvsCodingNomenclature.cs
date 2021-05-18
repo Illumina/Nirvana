@@ -43,21 +43,22 @@ namespace VariantAnnotation.AnnotatedPositions
                 (variantStart, variantEnd, refAllele, regionStart, regionEnd) = transcript.TranscriptRegions.ShiftDuplication(variantStart, altAllele, onReverseStrand);
             }
 
-            var startPositionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, variantStart, regionStart, true);
+            var startPositionOffset = HgvsUtilities.GetPositionOffset(transcript, variantStart, regionStart, true);
             var endPositionOffset = variantStart == variantEnd
                 ? startPositionOffset
-                : HgvsUtilities.GetCdnaPositionOffset(transcript, variantEnd, regionEnd, false);
+                : HgvsUtilities.GetPositionOffset(transcript, variantEnd, regionEnd, false);
 
             if (onReverseStrand)
             {
-                var tmp = startPositionOffset;
+                PositionOffset tmp = startPositionOffset;
                 startPositionOffset = endPositionOffset;
                 endPositionOffset = tmp;
             }
 
             if (startPositionOffset == null && variant.Type == VariantType.insertion)
             {
-                startPositionOffset= new PositionOffset( endPositionOffset.Position+1, endPositionOffset.Offset, $"{endPositionOffset.Position + 1}", endPositionOffset.HasStopCodonNotation);
+                startPositionOffset =
+                    new PositionOffset(endPositionOffset.Position + 1, endPositionOffset.Offset, $"{endPositionOffset.Position + 1}");
             }
 
             // sanity check: make sure we have coordinates

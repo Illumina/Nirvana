@@ -214,7 +214,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262629, 1262628, "", "TA", VariantType.insertion);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, sequence.Object, 4, 4, null, null);
 
-            Assert.Equal("ENST00000343938.4:c.129_130dupTA", observedHgvsc);
+            Assert.Equal("ENST00000343938.4:c.129_130dup", observedHgvsc);
         }
 
         [Fact]
@@ -272,7 +272,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var variant       = new SimpleVariant(ChromosomeUtilities.Chr1, 1262410, 1262414, "ATGTC", "GACAT", VariantType.MNV);
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, 2, 3, null, null);
 
-            Assert.Equal("ENST00000343938.4:c.120_122+2invATGTC", observedHgvsc);
+            Assert.Equal("ENST00000343938.4:c.120_122+2inv", observedHgvsc);
         }
 
         [Fact]
@@ -341,7 +341,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var variant = new SimpleVariant(ChromosomeUtilities.ChrX, 70361157, 70361156, "", "ACAC", VariantType.insertion);//right shifted variant
             var observedHgvsc = HgvsCodingNomenclature.GetHgvscAnnotation(GetForwardTranscriptWithoutUtr(), variant, sequence.Object, 0, 0, null, null);
 
-            Assert.Equal("ENST00000579622.1:n.119_122dupACAC", observedHgvsc);
+            Assert.Equal("ENST00000579622.1:n.119_122dup", observedHgvsc);
         }
     }
 }

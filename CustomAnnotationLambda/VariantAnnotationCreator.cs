@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using Cloud;
-using Cloud.Messages;
 using Cloud.Messages.Custom;
 using Cloud.Utilities;
 using Compression.Utilities;
@@ -25,7 +24,7 @@ namespace CustomAnnotationLambda
             string inputBaseName   = inputFileName.TrimEndFromFirst(".tsv");
             string nsaFileName     = inputBaseName + SaCommon.SaFileSuffix;
             string localNsaPath    = Path.Combine(tempPath, nsaFileName);
-            string localIndexPath  = localNsaPath + SaCommon.IndexSufix;
+            string localIndexPath  = localNsaPath + SaCommon.IndexSuffix;
             string localSchemaPath = localNsaPath + SaCommon.JsonSchemaSuffix;
             int    variantCount    = 0;
 
@@ -80,7 +79,7 @@ namespace CustomAnnotationLambda
                 if (nsaItemsCount > 0)
                 {
                     string nsaS3Path    = string.Join('/', config.outputDir.path.Trim('/'), nsaFileName);
-                    string indexS3Path  = nsaS3Path + SaCommon.IndexSufix;
+                    string indexS3Path  = nsaS3Path + SaCommon.IndexSuffix;
                     string schemaS3Path = nsaS3Path + SaCommon.JsonSchemaSuffix;
 
                     s3Client.DecryptUpload(config.outputDir.bucketName, nsaS3Path, localNsaPath, aes, nsaMetadata);
@@ -90,7 +89,7 @@ namespace CustomAnnotationLambda
                         schemaMetadata);
 
                     outputFiles.Add(nsaFileName);
-                    outputFiles.Add(nsaFileName + SaCommon.IndexSufix);
+                    outputFiles.Add(nsaFileName + SaCommon.IndexSuffix);
                     outputFiles.Add(nsaFileName + SaCommon.JsonSchemaSuffix);
                 }
 

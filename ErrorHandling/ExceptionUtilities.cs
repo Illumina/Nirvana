@@ -7,6 +7,14 @@ namespace ErrorHandling
 {
     public static class ExceptionUtilities
     {
+        public const string UserError = "UserError";
+        
+        public static Exception MakeUserError(this Exception e)
+        {
+            e.Data[UserError] = true;
+            return e;
+        }
+        
         // define which exceptions should not include a full stack trace
         public static readonly ImmutableHashSet<Type> UserFriendlyExceptions = new HashSet<Type>
         {

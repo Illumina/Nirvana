@@ -1,4 +1,5 @@
-﻿using Vcf.Info;
+﻿using VariantAnnotation.Interface.Positions;
+using Vcf.Info;
 using Xunit;
 
 namespace UnitTests.Vcf
@@ -8,12 +9,15 @@ namespace UnitTests.Vcf
         [Fact]
         public void Parse_Somatic_Manta()
         {
-            var info = VcfInfoParser.Parse("END=1660503;SVTYPE=DEL;SVLEN=-65919;IMPRECISE;CIPOS=-285,285;CIEND=-205,205;SOMATIC;SOMATICSCORE=36;ColocalizedCanvas");
-            Assert.Equal(65919, info.SvLength);
-            Assert.Equal(1660503, info.End);
-            Assert.Equal(36, info.JointSomaticNormalQuality);
+            IInfoData info =
+                VcfInfoParser.Parse(
+                    "END=1660503;SVTYPE=DEL;SVLEN=-65919;IMPRECISE;CIPOS=-285,285;CIEND=-205,205;SOMATIC;SOMATICSCORE=36;ColocalizedCanvas");
+            Assert.Equal(65919,             info.SvLength);
+            Assert.Equal(1660503,           info.End);
+            Assert.Equal(36,                info.JointSomaticNormalQuality);
             Assert.Equal(new[] {-285, 285}, info.CiPos);
             Assert.Equal(new[] {-205, 205}, info.CiEnd);
+            Assert.True(info.IsImprecise);
         }
 
         [Fact]
