@@ -5,6 +5,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using CommandLine.Utilities;
 using Downloader.FileExtensions;
+using Downloader.Utilities;
 using ErrorHandling;
 using Genome;
 using VariantAnnotation.Interface;
@@ -16,11 +17,13 @@ namespace Downloader
     {
         private static string _genomeAssembly;
         private static string _outputDirectory;
+        private static string _hostName;
+        private static string _manifestPrefix;
 
         private static ExitCodes ProgramExecution()
         {
             (string hostName, string remoteCacheDir, string remoteReferencesDir, string manifestGRCh37,
-                string manifestGRCh38) = Configuration.Load();
+                string manifestGRCh38) = Configuration.Load(_hostName, _manifestPrefix);
 
             List<GenomeAssembly> genomeAssemblies = GenomeAssemblyHelper.GetGenomeAssemblies(_genomeAssembly);
 
@@ -42,7 +45,7 @@ namespace Downloader
             Console.WriteLine($"{fileList.Count} files.\n");
             
             // get rid of extra files in the output directories
-            OutputDirectory.Cleanup(fileList, outputDirectories);
+            OutputDirectory.Cleanup(fileList, outputDirectories, referencesDir);
             
             // get length, checksum, and checks existence
             Console.WriteLine("- downloading file metadata:");
@@ -58,6 +61,7 @@ namespace Downloader
             if (filesToDownload.Count > 0)
             {
                 long numBytesToDownload = OutputDirectory.GetNumDownloadBytes(filesToDownload);
+                DiskSpaceUtilities.CheckAvailableDiskSpace(_outputDirectory, numBytesToDownload);
                 Console.WriteLine($"- downloading files ({MemoryUtilities.ToHumanReadable(numBytesToDownload)}):");
                 
                 AnnotationRepository.DownloadFiles(client, filesToDownload);
@@ -80,13 +84,23 @@ namespace Downloader
                     v => _genomeAssembly = v
                 },
                 {
+                    "host=",
+                    "annotation {hostname} (optional)",
+                    v => _hostName = v
+                },
+                {
+                    "manifest=",
+                    "manifest {prefix} (optional)",
+                    v => _manifestPrefix = v
+                },
+                {
                     "out|o=",
                     "top-level output {directory}",
                     v => _outputDirectory = v
                 }
             };
 
-            var exitCode = new ConsoleAppBuilder(args, ops)
+            ExitCodes exitCode = new ConsoleAppBuilder(args, ops)
                 .Parse()
                 .HasRequiredParameter(_genomeAssembly, "genome assembly", "--ga")
                 .CheckDirectoryExists(_outputDirectory, "top-level output directory", "--out")

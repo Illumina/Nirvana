@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Downloader.FileExtensions;
 using Downloader.Utilities;
 using Genome;
 
@@ -33,25 +34,32 @@ namespace Downloader
                 Directory.CreateDirectory(directory);
             }
         }
-        
-        public static void Cleanup(IEnumerable<RemoteFile> files, IEnumerable<string> outputDirectories)
+
+        public static void Cleanup(IEnumerable<RemoteFile> files, IEnumerable<string> outputDirectories, string referencesDirectory)
         {
-            IEnumerable<string> existingFiles = GetExistingFiles(outputDirectories);
-            List<string> cacheFiles    = files.Select(x => x.LocalPath).ToList();
-            List<string> filesToDelete = existingFiles.Except(cacheFiles).ToList();
-            
+            IEnumerable<string> existingFiles  = GetExistingFiles(outputDirectories);
+            IEnumerable<string> referenceFiles = GetReferenceFiles(referencesDirectory);
+            List<string>        desiredFiles   = files.Select(x => x.LocalPath).ToList();
+            List<string>        filesToDelete  = existingFiles.Except(desiredFiles).Except(referenceFiles).ToList();
+
             if (filesToDelete.Count == 0) return;
 
             Console.WriteLine("- removing extra files in output directories");
-            
+
             foreach (string file in filesToDelete)
             {
                 Console.WriteLine($"  - deleting extra file: {file}");
                 File.Delete(file);
             }
-            
+
             Console.WriteLine();
         }
+
+        private static IEnumerable<string> GetReferenceFiles(string referencesDirectory) => new List<string>
+        {
+            Path.Combine(referencesDirectory, ReferencesFileExtensions.GetFilename(GenomeAssembly.GRCh37)),
+            Path.Combine(referencesDirectory, ReferencesFileExtensions.GetFilename(GenomeAssembly.GRCh38))
+        };
 
         private static IEnumerable<string> GetExistingFiles(IEnumerable<string> outputDirectories)
         {
