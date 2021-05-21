@@ -222,6 +222,29 @@ namespace UnitTests.Phantom.Recomposer
         }
 
         [Fact]
+        public void VariantGenerator_OverlappingInsertionInTheMiddle_Ignored()
+        {
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.SetupGet(x => x.RefNameToChromosome)
+                .Returns(ChromosomeUtilities.RefNameToChromosome);
+            mockSequenceProvider.SetupGet(x => x.Sequence).Returns(new SimpleSequence("TACAGGGTTTCCC"));
+            var sequenceProvider = mockSequenceProvider.Object;
+
+            var position1 = AnnotationUtilities.GetSimplePosition("1\t2\t.\tA\tC\t153\tPASS\tSNVHPOL=4;MQ=58\tGT:GQ:GQX:DP:DPF:AD:ADF:ADR:SB:FT:PL:RPS:ME:DQ\t1|0:119:7:30:9:20,10:20,8:0,2:-13.6:PASS:121,0,187:240982163:0:0\t1|0:100:11:36:9:27,9:22,4:5,5:-4.8:PASS:102,0,300:.:.:.\t0|0:83:83:37:20:36,1:26,0:10,1:0:PASS:0,82,370:.:.:.", sequenceProvider.RefNameToChromosome);
+            var position2 = AnnotationUtilities.GetSimplePosition("1\t3\t.\tC\tT\t56\tPASS\tSNVHPOL=3;MQ=58\tGT:GQ:GQX:DP:DPF:AD:ADF:ADR:SB:FT:PL:RPS:ME:DQ\t1|0:65:9:31:8:24,6:22,4:2,2:-4.1:PASS:66,0,274:240982163:0:.\t1|0:57:3:35:11:29,6:23,2:6,4:1.6:LowGQX:59,0,334:.:.:.\t0|0:111:111:38:20:38,0:26,0:12,0:0:PASS:0,114,370:.:.:.", sequenceProvider.RefNameToChromosome);
+            var position3 = AnnotationUtilities.GetSimplePosition("1\t3\t.\tC\tCGTGGGTGAAGAGCCGTGGGTGAAGGGCT\t75\tPASS\tCIGAR=1M28I;RU=.;REFREP=0;IDREP=1;MQ=58\tGT:GQ:GQX:DPI:AD:ADF:ADR:FT:PL:RPS:ME:DQ\t0|1:118:5:39:19,10:14,9:5,1:PASS:115,0,303:240982163:0:.\t0|0:142:142:46:43,0:28,0:15,0:PASS:0,145,880:.:.:.\t1|0:25:0:58:42,8:23,5:19,3:LowGQX:22,0,699:.:.:.", sequenceProvider.RefNameToChromosome);
+            var position4 = AnnotationUtilities.GetSimplePosition("1\t4\t.\tA\tG\t649\tPASS\tSNVHPOL=2;MQ=59\tGT:GQ:GQX:DP:DPF:AD:ADF:ADR:SB:FT:PL:RPS:ME:DQ\t1|1:90:13:31:7:0,31:0,28:0,3:-19.9:PASS:370,93,0:.:0:0\t1|0:179:14:39:7:22,17:18,10:4,7:-19.8:PASS:181,0,231:240982173:.:.\t1|0:114:10:33:25:21,12:17,6:4,6:-9:PASS:116,0,240:240982171:.:.", sequenceProvider.RefNameToChromosome);
+
+            var functionBlockRanges = new List<int> { 4, 5, 5, 6 };
+
+            var recomposer = new VariantGenerator(sequenceProvider, _vidCreator);
+            var recomposedPositions = recomposer.Recompose(new List<ISimplePosition> { position1, position2, position3, position4 }, functionBlockRanges).ToList();
+
+            Assert.Single(recomposedPositions);
+            Assert.Equal("1\t2\t.\tAC\tCT\t56\tPASS\tRECOMPOSED\tGT:GQ\t1|0:65\t.\t0|0:83", string.Join("\t", recomposedPositions[0].VcfFields));
+        }
+
+        [Fact]
         public void VariantGenerator_OverlappingDeletionAtTheEnd_Ignored()
         {
             var mockSequenceProvider = new Mock<ISequenceProvider>();
