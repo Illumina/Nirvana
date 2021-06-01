@@ -14,6 +14,7 @@ namespace Nirvana
         public List<string>                   NsiFiles                { get; } = new();
         public List<string>                   NgaFiles                { get; } = new();
         public List<string>                   GeneFusionSourceFiles   { get; } = new();
+        public List<string>                   GeneFusionJsonFiles     { get; } = new();
         public (string Npd, string Idx)       ConservationFile        { get; private set; }
         public string                         LowComplexityRegionFile { get; private set; }
         public string                         ProteinConservationFile { get; private set; }
@@ -49,6 +50,9 @@ namespace Nirvana
                         break;
                     case SaCommon.GeneFusionSourceSuffix:
                         GeneFusionSourceFiles.Add(filePath);
+                        break;
+                    case SaCommon.GeneFusionJsonSuffix:
+                        GeneFusionJsonFiles.Add(filePath);
                         break;
                 }
             }

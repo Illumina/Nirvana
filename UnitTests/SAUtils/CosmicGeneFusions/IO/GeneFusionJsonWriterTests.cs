@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using SAUtils.CosmicGeneFusions;
+using SAUtils.CosmicGeneFusions.IO;
 using VariantAnnotation.GeneFusions.IO;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 using Xunit;
 
-namespace UnitTests.SAUtils.CosmicGeneFusions
+namespace UnitTests.SAUtils.CosmicGeneFusions.IO
 {
     public sealed class GeneFusionJsonWriterTests
     {
@@ -18,7 +18,7 @@ namespace UnitTests.SAUtils.CosmicGeneFusions
             IDataSourceVersion          expectedVersion       = new DataSourceVersion("COSMIC Gene Fusions", "102", DateTime.Now.Ticks, "COSMIC");
 
             using var ms = new MemoryStream();
-            using (var writer = new GeneFusionJsonWriter(ms, expectedVersion, true))
+            using (var writer = new GeneFusionJsonWriter(ms, "cosmicGeneFusions", expectedVersion, true))
             {
                 writer.Write(expectedGeneKeyToJson);
             }
@@ -30,7 +30,8 @@ namespace UnitTests.SAUtils.CosmicGeneFusions
 
             using (var reader = new GeneFusionJsonReader(ms))
             {
-                actualGeneKeyToJson = reader.GetGeneFusions();
+                reader.LoadAnnotations();
+                actualGeneKeyToJson = reader.FusionKeyToFusions;
                 actualVersion       = reader.Version;
             }
 

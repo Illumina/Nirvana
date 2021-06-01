@@ -51,7 +51,7 @@ namespace Nirvana
 
             INsaReader[]          nsaReaders    = GetNsaReaders(files.NsaFiles);
             INsiReader[]          nsiReaders    = GetNsiReaders(files.NsiFiles);
-            IGeneFusionSaReader[] fusionReaders = GetGeneFusionReaders(files.GeneFusionSourceFiles);
+            IGeneFusionSaReader[] fusionReaders = GetGeneFusionReaders(files.GeneFusionSourceFiles, files.GeneFusionJsonFiles);
 
             int numReaders = nsaReaders.Length + nsiReaders.Length + fusionReaders.Length;
             return numReaders == 0 ? null : new NsaProvider(nsaReaders, nsiReaders, fusionReaders);
@@ -72,10 +72,12 @@ namespace Nirvana
             return readers.SortByJsonKey();
         }
 
-        private static IGeneFusionSaReader[] GetGeneFusionReaders(IReadOnlyCollection<string> filePaths)
+        private static IGeneFusionSaReader[] GetGeneFusionReaders(IReadOnlyCollection<string> sourceFilePaths,
+            IReadOnlyCollection<string> jsonFilePaths)
         {
-            var readers = new List<IGeneFusionSaReader>(filePaths.Count);
-            foreach (string filePath in filePaths) readers.Add(new GeneFusionSourceReader(PersistentStreamUtils.GetReadStream(filePath)));
+            var readers = new List<IGeneFusionSaReader>(jsonFilePaths.Count);
+            foreach (string filePath in sourceFilePaths) readers.Add(new GeneFusionSourceReader(PersistentStreamUtils.GetReadStream(filePath)));
+            foreach (string filePath in jsonFilePaths) readers.Add(new GeneFusionJsonReader(PersistentStreamUtils.GetReadStream(filePath)));
             return readers.SortByJsonKey();
         }
 

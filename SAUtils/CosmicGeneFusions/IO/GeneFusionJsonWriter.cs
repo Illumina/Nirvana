@@ -8,22 +8,23 @@ using IO.v2;
 using VariantAnnotation.GeneFusions.IO;
 using VariantAnnotation.Interface.Providers;
 
-namespace SAUtils.CosmicGeneFusions
+namespace SAUtils.CosmicGeneFusions.IO
 {
     public sealed class GeneFusionJsonWriter : IDisposable
     {
         private readonly ExtendedBinaryWriter _writer;
 
-        public GeneFusionJsonWriter(Stream stream, IDataSourceVersion version, bool leaveOpen = false)
+        public GeneFusionJsonWriter(Stream stream, string jsonKey, IDataSourceVersion version, bool leaveOpen = false)
         {
             _writer = new ExtendedBinaryWriter(stream, Encoding.UTF8, leaveOpen);
             WriteHeader();
+            _writer.Write(jsonKey);
             version.Write(_writer);
         }
 
         private void WriteHeader()
         {
-            var header = new Header(FileType.FusionCatcher, GeneFusionSourceReader.SupportedFileFormatVersion);
+            var header = new Header(FileType.GeneFusionJson, GeneFusionJsonReader.SupportedFileFormatVersion);
             header.Write(_writer);
         }
 

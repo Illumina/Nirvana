@@ -4,7 +4,7 @@ using System.Linq;
 using SAUtils.GnomadGeneScores;
 using Xunit;
 
-namespace UnitTests.SAUtils.InputFileParsers
+namespace UnitTests.SAUtils.gnomAD
 {
     public sealed class GnomadGeneScoreTests
     {

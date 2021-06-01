@@ -1,32 +1,72 @@
-﻿using CommandLine.Builders;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using CommandLine.Builders;
 using CommandLine.NDesk.Options;
+using Compression.Utilities;
 using ErrorHandling;
+using Genome;
+using IO;
+using SAUtils.CosmicGeneFusions.Cache;
+using SAUtils.CosmicGeneFusions.Conversion;
+using SAUtils.CosmicGeneFusions.IO;
+using VariantAnnotation.Providers;
+using VariantAnnotation.SA;
 
 namespace SAUtils.CosmicGeneFusions
 {
     public static class CreateCosmicGeneFusions
     {
-        private static string _transcriptCache37Path;
-        private static string _transcriptCache38Path;
-        private static string _dataDirectory;
-        private static string _reference38Path;
+        private static string _transcriptCachePath;
+        private static string _cosmicGeneFusionsPath;
+        private static string _referencePath;
         private static string _outputDirectory;
-        
+        private static string _releaseDate;
+        private static string _cosmicVersion;
+
         private static ExitCodes ProgramExecution()
         {
-            // var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
-            // var cosmicReader      = new MergedCosmicReader(_vcfFile, _tsvFile, referenceProvider);
-            // var version           = DataSourceVersionReader.GetSourceVersion(_vcfFile + ".version");
-            //
-            // string outFileName = $"{version.Name}_{version.Version}";
-            // using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            // using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
-            // using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.CosmicTag, false, true, SaCommon.SchemaVersion, false))
-            // {
-            //     nsaWriter.Write(cosmicReader.GetItems());
-            // }
+            Console.Write("- loading reference sequence... ");
+            IDictionary<ushort, IChromosome> refIndexToChromosome = ReferenceLoader.GetRefIndexToChromosome(_referencePath);
+            Console.WriteLine("finished.");
+
+            Console.Write("- loading transcript cache... ");
+            using FileStream cacheStream     = FileUtilities.GetReadStream(_transcriptCachePath);
+            var              transcriptCache = TranscriptCache.Create(cacheStream, refIndexToChromosome);
+            Console.WriteLine("finished.");
+            
+            Console.Write("- parsing COSMIC gene fusions... ");
+            using StreamReader                            cosmicReader      = GZipUtilities.GetAppropriateStreamReader(_cosmicGeneFusionsPath);
+            Dictionary<int, HashSet<RawCosmicGeneFusion>> fusionIdToEntries = CosmicGeneFusionParser.Parse(cosmicReader);
+            Console.WriteLine($"{fusionIdToEntries.Count:N0} fusion IDs loaded");
+
+            Console.Write("- converting COSMIC entries... ");
+            Dictionary<ulong, string[]> fusionKeyToJson = CosmicConverter.Convert(fusionIdToEntries, transcriptCache);
+            Console.WriteLine($"{fusionKeyToJson.Count:N0} gene pairs converted");
+            
+            DataSourceVersion version = CreateDataSourceVersion(_cosmicVersion, _releaseDate);
+            WriteGeneFusions(_outputDirectory, fusionKeyToJson, version);
+
+            Console.WriteLine();
+            Console.WriteLine($"Total: {fusionKeyToJson.Count:N0} gene pairs in database.");
 
             return ExitCodes.Success;
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
+        private static void WriteGeneFusions(string outputDirectory, Dictionary<ulong, string[]> geneKeyToJson, DataSourceVersion version)
+        {
+            Console.Write("- writing gene fusions SA file... ");
+            string    outputPath = Path.Combine(outputDirectory, $"COSMIC_GeneFusions_{version.Version}{SaCommon.GeneFusionJsonSuffix}");
+            using var writer     = new GeneFusionJsonWriter(FileUtilities.GetCreateStream(outputPath), "cosmicGeneFusions", version);
+            writer.Write(geneKeyToJson);
+            Console.WriteLine("finished.");
+        }
+
+        internal static DataSourceVersion CreateDataSourceVersion(string version, string releaseDate)
+        {
+            long releaseTicks = DateTime.Parse(releaseDate).Ticks;
+            return new DataSourceVersion("COSMIC gene fusions", version, releaseTicks, "manually curated somatic gene fusions");
         }
 
         public static ExitCodes Run(string command, string[] commandArgs)
@@ -34,19 +74,14 @@ namespace SAUtils.CosmicGeneFusions
             var ops = new OptionSet
             {
                 {
-                    "cache37=",
-                    "transcript cache {path} for GRCh37",
-                    v => _transcriptCache37Path = v
-                },
-                {
-                    "cache38=",
-                    "transcript cache {path} for GRCh38",
-                    v => _transcriptCache38Path = v
+                    "cache|c=",
+                    "transcript cache {path}",
+                    v => _transcriptCachePath = v
                 },
                 {
                     "in|i=",
-                    "FusionCatcher data {directory}",
-                    v => _dataDirectory = v
+                    "COSMIC gene fusions {path}",
+                    v => _cosmicGeneFusionsPath = v
                 },
                 {
                     "out|o=",
@@ -55,8 +90,18 @@ namespace SAUtils.CosmicGeneFusions
                 },
                 {
                     "ref|r=",
-                    "input reference sequence {path} for GRCh38",
-                    v => _reference38Path = v
+                    "input reference sequence {path}",
+                    v => _referencePath = v
+                },
+                {
+                    "releaseDate=",
+                    "release {date} (YYYY-MM-dd)",
+                    v => _releaseDate = v
+                },
+                {
+                    "cosmicVersion=",
+                    "COSMIC {version} (e.g. 92)",
+                    v => _cosmicVersion = v
                 }
             };
 
@@ -64,13 +109,14 @@ namespace SAUtils.CosmicGeneFusions
 
             ExitCodes exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
-                .CheckInputFilenameExists(_reference38Path,       "reference sequence (GRCh38)", "--ref")
-                .CheckInputFilenameExists(_transcriptCache37Path, "transcript cache (GRCh37)",   "--cache37")
-                .CheckInputFilenameExists(_transcriptCache38Path, "transcript cache (GRCh38)",   "--cache38")
-                .CheckDirectoryExists(_dataDirectory,   "FusionCatcher data directory", "--in")
-                .CheckDirectoryExists(_outputDirectory, "output directory",             "--out")
+                .CheckInputFilenameExists(_referencePath,         "reference sequence",  "--ref")
+                .CheckInputFilenameExists(_transcriptCachePath,   "transcript cache",    "--cache")
+                .CheckInputFilenameExists(_cosmicGeneFusionsPath, "COSMIC gene fusions", "--in")
+                .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
+                .HasRequiredDate(_releaseDate, "COSMIC release date", "--date")
+                .HasRequiredParameter(_cosmicVersion, "COSMIC version", "--version")
                 .SkipBanner()
-                .ShowHelpMenu("Creates a supplementary database with FusionCatcher annotations", commandLineExample)
+                .ShowHelpMenu("Creates a supplementary database with COSMIC gene fusion annotations", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 

@@ -108,7 +108,7 @@ namespace SAUtils.FusionCatcher
         }
 
         private static void AddGenes(string cachePath, IDictionary<ushort, IChromosome> refIndexToChromosome, ISet<string> knownGenes,
-                                     string description)
+            string description)
         {
             Console.Write($"- loading known genes ({description})... ");
             int startCount = knownGenes.Count;
