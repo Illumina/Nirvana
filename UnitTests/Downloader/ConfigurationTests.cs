@@ -9,7 +9,7 @@ namespace UnitTests.Downloader
         public void Load_ExpectedResults()
         {
             (string hostName, string cacheDir, string referencesDir, string manifestGRCh37, string manifestGRCh38) = Configuration.Load(null, null);
-            Assert.EndsWith("cloudfront.net", hostName);
+            Assert.EndsWith("annotations.nirvana.illumina.com", hostName);
             Assert.StartsWith("/", cacheDir);
             Assert.EndsWith("Cache", cacheDir);
             Assert.StartsWith("/", referencesDir);
