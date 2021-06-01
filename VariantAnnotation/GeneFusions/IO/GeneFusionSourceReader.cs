@@ -28,6 +28,7 @@ namespace VariantAnnotation.GeneFusions.IO
         public IDataSourceVersion Version  { get; }
         public string             JsonKey  { get; }
 
+        internal uint[]                       OncogeneKeys;
         internal GeneFusionSourceCollection[] Index;
         internal GeneFusionIndexEntry[]       IndexEntries;
 
@@ -59,6 +60,10 @@ namespace VariantAnnotation.GeneFusions.IO
             ArrayPool<byte>    bytePool = ArrayPool<byte>.Shared;
             byte[]             bytes    = _reader.ReadCompressedByteArray(bytePool);
             ReadOnlySpan<byte> byteSpan = bytes.AsSpan();
+            
+            int numOncogenes = SpanBufferBinaryReader.ReadOptInt32(ref byteSpan);
+            OncogeneKeys = new uint[numOncogenes];
+            for (var i = 0; i < numOncogenes; i++) OncogeneKeys[i] = SpanBufferBinaryReader.ReadOptUInt32(ref byteSpan);
 
             int indexLength = SpanBufferBinaryReader.ReadOptInt32(ref byteSpan);
             Index = new GeneFusionSourceCollection[indexLength];
@@ -77,9 +82,9 @@ namespace VariantAnnotation.GeneFusions.IO
 
             foreach (IGeneFusionPair fusionPair in fusionPairs)
             {
-                ushort? index = IndexEntries.GetIndex(fusionPair.GeneKey);
+                ushort? index = IndexEntries.GetIndex(fusionPair.FusionKey);
                 if (index == null) continue;
-                jsonEntries.Add(Index[index.Value].GetJsonEntry(fusionPair.GeneSymbols));
+                jsonEntries.Add(Index[index.Value].GetJsonEntry(fusionPair, OncogeneKeys));
             }
 
             if (jsonEntries.Count == 0) return;

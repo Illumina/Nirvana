@@ -19,8 +19,6 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
         [InlineData(GeneFusionSource.Healthy_prefrontal_cortex,   "Healthy prefrontal cortex")]
         [InlineData(GeneFusionSource.Human_Protein_Atlas,         "Human Protein Atlas")]
         [InlineData(GeneFusionSource.NonTumorCellLines,           "non-tumor cell lines")]
-        [InlineData(GeneFusionSource.Pseudogene,                  "pseudogene")]
-        [InlineData(GeneFusionSource.Readthrough,                 "readthrough")]
         [InlineData(GeneFusionSource.Robinson_prostate_cancers,   "Robinson prostate cancers")]
         [InlineData(GeneFusionSource.TCGA_Normal,                 "TCGA normal")]
         [InlineData(GeneFusionSource.TCGA_oesophageal_carcinomas, "TCGA oesophageal carcinomas")]

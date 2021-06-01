@@ -6,9 +6,9 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
 {
     public sealed class GeneFusionPairTests
     {
-        private readonly GeneFusionPair _fusionPair     = new(1000, new[] {"A", "B"});
-        private readonly GeneFusionPair _fusionPairDup  = new(1000, new[] {"A", "B"});
-        private readonly GeneFusionPair _fusionPairDiff = new(2000, new[] {"A", "B"});
+        private readonly GeneFusionPair _fusionPair     = new(1000, "A", 123, "B", 456);
+        private readonly GeneFusionPair _fusionPairDup  = new(1000, "A", 123, "B", 456);
+        private readonly GeneFusionPair _fusionPairDiff = new(2000, "A", 123, "B", 456);
 
         [Fact]
         public void Equals_ExpectedResults()

@@ -94,10 +94,6 @@ namespace VariantAnnotation.GeneFusions.Calling
             int? partnerExon   = partnerRegion.Type == TranscriptRegionType.Exon ? partnerRegion.Id : null;
             int? partnerIntron = partnerRegion.Type == TranscriptRegionType.Intron ? partnerRegion.Id : null;
 
-            string originGeneId  = originGene.EnsemblId.WithoutVersion;
-            string partnerGeneId = partnerGene.EnsemblId.WithoutVersion;
-            ulong  geneKey       = GeneFusionKey.Create(originGeneId, partnerGeneId);
-
             var origin  = new BreakPointTranscript(originTranscript,  adjacency.Origin.Position,  originIndex);
             var partner = new BreakPointTranscript(partnerTranscript, adjacency.Partner.Position, partnerIndex);
 
@@ -106,24 +102,40 @@ namespace VariantAnnotation.GeneFusions.Calling
 
             bool     isInFrame   = !isImprecise && DetermineInFrameFusion(first, second);
             string   hgvsr       = HgvsRnaNomenclature.GetHgvs(first, second);
-            string[] geneSymbols = GetGeneSymbols(originGene, partnerGene);
 
-            geneFusions.Add(new AnnotatedGeneFusion(partnerTranscript, partnerExon, partnerIntron, hgvsr, isInFrame, geneKey, geneSymbols));
-            geneKeys.Add(GeneFusionKey.Create(originGeneId, partnerGeneId));
+            (ulong fusionKey, string firstGeneSymbol, uint firstGeneKey, string secondGeneSymbol, uint secondGeneKey) =
+                GetGeneAndFusionKeys(originGene, partnerGene);
+
+            geneFusions.Add(new AnnotatedGeneFusion(partnerTranscript, partnerExon, partnerIntron, hgvsr, isInFrame, fusionKey, firstGeneSymbol,
+                firstGeneKey, secondGeneSymbol, secondGeneKey));
+            geneKeys.Add(fusionKey);
         }
 
-        internal static string[] GetGeneSymbols(IGene originGene, IGene partnerGene)
+        internal static (ulong FusionKey, string FirstGeneSymbol, uint FirstGeneKey, string SecondGeneSymbol, uint SecondGeneKey)
+            GetGeneAndFusionKeys(IGene originGene, IGene partnerGene)
+        {
+            (IGene firstGene, IGene secondGene) = SortGenes(originGene, partnerGene);
+
+            string firstGeneId   = firstGene.EnsemblId.WithoutVersion;
+            string secondGeneId  = secondGene.EnsemblId.WithoutVersion;
+            uint   firstGeneKey  = GeneFusionKey.CreateGeneKey(firstGeneId);
+            uint   secondGeneKey = GeneFusionKey.CreateGeneKey(secondGeneId);
+            ulong  fusionKey     = GeneFusionKey.Create(firstGeneKey, secondGeneKey);
+            return (fusionKey, firstGene.Symbol, firstGeneKey, secondGene.Symbol, secondGeneKey);
+        }
+
+        private static (IGene FirstGene, IGene SecondGene) SortGenes(IGene originGene, IGene partnerGene)
         {
             if (originGene.Chromosome.Index == partnerGene.Chromosome.Index)
             {
                 return originGene.Start < partnerGene.Start
-                    ? new[] {originGene.Symbol, partnerGene.Symbol}
-                    : new[] {partnerGene.Symbol, originGene.Symbol};
+                    ? (originGene, partnerGene)
+                    : (partnerGene, originGene);
             }
 
             return originGene.Chromosome.Index < partnerGene.Chromosome.Index
-                ? new[] {originGene.Symbol, partnerGene.Symbol}
-                : new[] {partnerGene.Symbol, originGene.Symbol};
+                ? (originGene, partnerGene)
+                : (partnerGene, originGene);
         }
 
         // ReSharper disable UseDeconstructionOnParameter
@@ -162,6 +174,7 @@ namespace VariantAnnotation.GeneFusions.Calling
             return (byte) ((cdsPosition - 1) % 3 + 1);
         }
 
+        // ReSharper disable once UseDeconstructionOnParameter
         internal static bool FoundViableGeneFusion(BreakEndAdjacency adjacency, IGene originGene, IChromosomeInterval originInterval,
             Source originSource, IGene partnerGene, IChromosomeInterval partnerInterval, Source partnerSource)
         {

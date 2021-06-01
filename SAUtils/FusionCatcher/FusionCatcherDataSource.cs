@@ -13,8 +13,8 @@ namespace SAUtils.FusionCatcher
         {
             Console.Write($"- parsing {source}... ");
 
-            using StreamReader reader              = new StreamReader(stream);
-            var                numGeneFusionsAdded = 0;
+            using var reader              = new StreamReader(stream);
+            var       numGeneFusionsAdded = 0;
 
             while (true)
             {
@@ -31,12 +31,12 @@ namespace SAUtils.FusionCatcher
                 bool hasGene2 = knownEnsemblGenes.Contains(gene2);
                 if (!hasGene || !hasGene2) continue;
 
-                ulong key = GeneFusionKey.Create(cols[0], cols[1]);
+                ulong fusionKey = GeneFusionKey.Create(GeneFusionKey.CreateGeneKey(cols[0]), GeneFusionKey.CreateGeneKey(cols[1]));
 
-                if (!geneKeyToFusion.TryGetValue(key, out GeneFusionSourceBuilder geneFusion))
+                if (!geneKeyToFusion.TryGetValue(fusionKey, out GeneFusionSourceBuilder geneFusion))
                 {
                     geneFusion           = new GeneFusionSourceBuilder();
-                    geneKeyToFusion[key] = geneFusion;
+                    geneKeyToFusion[fusionKey] = geneFusion;
                 }
 
                 switch (collectionType)
@@ -48,7 +48,20 @@ namespace SAUtils.FusionCatcher
                         geneFusion.SomaticSources.Add(source);
                         break;
                     case CollectionType.Relationships:
-                        geneFusion.Relationships.Add(source);
+                        switch (source)
+                        {
+                            case GeneFusionSource.Pseudogene:
+                                geneFusion.IsPseudogenePair = true;
+                                break;
+                            case GeneFusionSource.Paralog:
+                                geneFusion.IsParalogPair = true;
+                                break;
+                            case GeneFusionSource.Readthrough:
+                                geneFusion.IsReadthrough = true;
+                                break;
+                            default:
+                                throw new NotSupportedException($"Found an unsupported relationship: {source}");
+                        }
                         break;
                     default:
                         throw new NotSupportedException($"Found an unsupported gene fusion collection type: {collectionType}");

@@ -18,7 +18,7 @@ namespace SAUtils.CosmicGeneFusions.Conversion
             (string geneId5, string geneSymbol5) = transcriptCache.GetGene(transcriptId5);
             (string geneId3, string geneSymbol3) = transcriptCache.GetGene(transcriptId3);
 
-            ulong fusionKey = GeneFusionKey.Create(geneId5, geneId3);
+            ulong fusionKey = GeneFusionKey.Create(GeneFusionKey.CreateGeneKey(geneId5), GeneFusionKey.CreateGeneKey(geneId3));
 
             return (new[] {geneSymbol5, geneSymbol3}, fusionKey);
         }

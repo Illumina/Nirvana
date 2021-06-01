@@ -79,7 +79,7 @@ namespace VariantAnnotation.GeneFusions.IO
 
             foreach (IGeneFusionPair fusionPair in fusionPairs)
             {
-                if (!FusionKeyToFusions.TryGetValue(fusionPair.GeneKey, out string[] entries)) continue;
+                if (!FusionKeyToFusions.TryGetValue(fusionPair.FusionKey, out string[] entries)) continue;
                 jsonEntries.AddRange(entries);
             }
 

@@ -11,10 +11,10 @@ namespace UnitTests.SAUtils.FusionCatcher
         [Fact]
         public void Convert_ExpectedResults()
         {
-            var expectedSourceCollection = new GeneFusionSourceCollection(new[] {GeneFusionSource.Paralog},
+            var expectedSourceCollection = new GeneFusionSourceCollection(false, true, false,
                 new[] {GeneFusionSource.OneK_Genomes_Project, GeneFusionSource.Healthy}, new[] {GeneFusionSource.Alaei_Mahabadi_18_Cancers});
 
-            var expectedSourceCollection2 = new GeneFusionSourceCollection(new[] {GeneFusionSource.Paralog}, null, null);
+            var expectedSourceCollection2 = new GeneFusionSourceCollection(false, true, false, null, null);
 
             var expectedIndexEntries = new GeneFusionIndexEntry[]
             {
@@ -40,28 +40,28 @@ namespace UnitTests.SAUtils.FusionCatcher
         {
             var builder = new GeneFusionSourceBuilder
             {
-                Relationships   = {GeneFusionSource.Paralog},
+                IsParalogPair = true,
                 GermlineSources = {GeneFusionSource.OneK_Genomes_Project, GeneFusionSource.Healthy},
                 SomaticSources  = {GeneFusionSource.Alaei_Mahabadi_18_Cancers}
             };
             
             var builder2 = new GeneFusionSourceBuilder
             {
-                Relationships   = {GeneFusionSource.Paralog},
+                IsParalogPair   = true,
                 GermlineSources = {GeneFusionSource.OneK_Genomes_Project, GeneFusionSource.Healthy},
                 SomaticSources  = {GeneFusionSource.Alaei_Mahabadi_18_Cancers}
             };
             
             var builder3 = new GeneFusionSourceBuilder
             {
-                Relationships   = {GeneFusionSource.Paralog},
+                IsParalogPair   = true,
                 GermlineSources = {GeneFusionSource.OneK_Genomes_Project, GeneFusionSource.Healthy},
                 SomaticSources  = {GeneFusionSource.Alaei_Mahabadi_18_Cancers}
             };
             
             var builder4 = new GeneFusionSourceBuilder
             {
-                Relationships   = {GeneFusionSource.Paralog}
+                IsParalogPair = true
             };
 
             return new Dictionary<ulong, GeneFusionSourceBuilder>

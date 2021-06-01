@@ -5,8 +5,8 @@ using VariantAnnotation.IO;
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     // ReSharper disable InconsistentNaming
-    public sealed record AnnotatedGeneFusion(ITranscript transcript, int? exon, int? intron, string hgvsr, bool isInFrame, ulong geneKey,
-        string[] geneSymbols) : IAnnotatedGeneFusion
+    public sealed record AnnotatedGeneFusion(ITranscript transcript, int? exon, int? intron, string hgvsr, bool isInFrame, ulong FusionKey,
+        string FirstGeneSymbol, uint FirstGeneKey, string SecondGeneSymbol, uint SecondGeneKey) : IAnnotatedGeneFusion
     {
         // ReSharper restore InconsistentNaming
 

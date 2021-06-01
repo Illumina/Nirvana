@@ -3,30 +3,50 @@ using System.Collections.Generic;
 using System.Text;
 using IO;
 using OptimizedCore;
+using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO;
 
 namespace VariantAnnotation.GeneFusions.SA
 {
     public sealed class GeneFusionSourceCollection : IEquatable<GeneFusionSourceCollection>
     {
-        private readonly GeneFusionSource[] _relationships;
+        private readonly bool               _isPseudogenePair;
+        private readonly bool               _isParalogPair;
+        private readonly bool               _isReadthrough;
         private readonly GeneFusionSource[] _germlineSources;
         private readonly GeneFusionSource[] _somaticSources;
 
-        public GeneFusionSourceCollection(GeneFusionSource[] relationships, GeneFusionSource[] germlineSources, GeneFusionSource[] somaticSources)
+        private const int PseudogeneMask  = 1;
+        private const int ParalogMask     = 2;
+        private const int ReadthroughMask = 4;
+
+        public GeneFusionSourceCollection(bool isPseudogenePair, bool isParalogPair, bool isReadthrough, GeneFusionSource[] germlineSources,
+            GeneFusionSource[] somaticSources)
         {
-            _relationships   = relationships;
-            _germlineSources = germlineSources;
-            _somaticSources  = somaticSources;
+            _isPseudogenePair = isPseudogenePair;
+            _isParalogPair    = isParalogPair;
+            _isReadthrough    = isReadthrough;
+            _germlineSources  = germlineSources;
+            _somaticSources   = somaticSources;
         }
 
         public void Write(ExtendedBinaryWriter writer)
         {
-            WriteSourceGroup(writer, _relationships);
+            writer.Write(GetFlags());
             WriteSourceGroup(writer, _germlineSources);
             WriteSourceGroup(writer, _somaticSources);
         }
 
+        private byte GetFlags()
+        {
+            byte flags                   = 0;
+            if (_isPseudogenePair) flags |= PseudogeneMask;
+            if (_isParalogPair) flags    |= ParalogMask;
+            if (_isReadthrough) flags    |= ReadthroughMask;
+            return flags;
+        }
+
+        // ReSharper disable once SuggestBaseTypeForParameter
         private static void WriteSourceGroup(ExtendedBinaryWriter writer, GeneFusionSource[] sources)
         {
             if (sources == null)
@@ -41,10 +61,14 @@ namespace VariantAnnotation.GeneFusions.SA
 
         public static GeneFusionSourceCollection Read(ref ReadOnlySpan<byte> byteSpan)
         {
-            GeneFusionSource[] relationships   = ReadSources(ref byteSpan);
+            byte flags            = SpanBufferBinaryReader.ReadByte(ref byteSpan);
+            bool isPseudogenePair = (flags & PseudogeneMask)  != 0;
+            bool isParalogPair    = (flags & ParalogMask)     != 0;
+            bool isReadthrough    = (flags & ReadthroughMask) != 0;
+
             GeneFusionSource[] germlineSources = ReadSources(ref byteSpan);
             GeneFusionSource[] somaticSources  = ReadSources(ref byteSpan);
-            return new GeneFusionSourceCollection(relationships, germlineSources, somaticSources);
+            return new GeneFusionSourceCollection(isPseudogenePair, isParalogPair, isReadthrough, germlineSources, somaticSources);
         }
 
         private static GeneFusionSource[] ReadSources(ref ReadOnlySpan<byte> byteSpan)
@@ -63,17 +87,39 @@ namespace VariantAnnotation.GeneFusions.SA
         }
 
         // ReSharper disable once ParameterTypeCanBeEnumerable.Global
-        public string GetJsonEntry(string[] geneSymbols)
+        public string GetJsonEntry(IGeneFusionPair geneFusionPair, uint[] oncogeneKeys)
         {
             StringBuilder sb         = StringBuilderCache.Acquire();
             var           jsonObject = new JsonObject(sb);
             var           entries    = new List<string>();
 
-            jsonObject.AddStringValues("genes", geneSymbols);
-            if (_relationships   != null) AddGeneFusionSource("relationships",   _relationships,   entries, jsonObject);
+            AddGenes(geneFusionPair, oncogeneKeys, jsonObject);
             if (_germlineSources != null) AddGeneFusionSource("germlineSources", _germlineSources, entries, jsonObject);
             if (_somaticSources  != null) AddGeneFusionSource("somaticSources",  _somaticSources,  entries, jsonObject);
             return StringBuilderCache.GetStringAndRelease(sb);
+        }
+
+        private void AddGenes(IGeneFusionPair geneFusionPair, uint[] oncogeneKeys, JsonObject jsonObject)
+        {
+            jsonObject.StartObjectWithKey("genes");
+            AddGene("first",  geneFusionPair.FirstGeneKey,  geneFusionPair.FirstGeneSymbol,  oncogeneKeys, jsonObject);
+            AddGene("second", geneFusionPair.SecondGeneKey, geneFusionPair.SecondGeneSymbol, oncogeneKeys, jsonObject);
+
+            jsonObject.AddBoolValue("isParalogPair",    _isParalogPair);
+            jsonObject.AddBoolValue("isPseudogenePair", _isPseudogenePair);
+            jsonObject.AddBoolValue("isReadthrough",    _isReadthrough);
+            jsonObject.EndObject();
+        }
+
+        private static void AddGene(string key, uint geneKey, string geneSymbol, uint[] oncogeneKeys, JsonObject jsonObject)
+        {
+            jsonObject.StartObjectWithKey(key);
+            jsonObject.AddStringValue("hgnc", geneSymbol);
+
+            bool isOncogene = Array.BinarySearch(oncogeneKeys, geneKey) >= 0;
+            jsonObject.AddBoolValue("isOncogene", isOncogene);
+
+            jsonObject.EndObject();
         }
 
         // ReSharper disable once ParameterTypeCanBeEnumerable.Local
@@ -89,7 +135,9 @@ namespace VariantAnnotation.GeneFusions.SA
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
 
-            return _relationships.ArrayEqual(other._relationships)     &&
+            return _isPseudogenePair == other._isPseudogenePair        &&
+                   _isParalogPair    == other._isParalogPair           &&
+                   _isReadthrough    == other._isReadthrough           &&
                    _germlineSources.ArrayEqual(other._germlineSources) &&
                    _somaticSources.ArrayEqual(other._somaticSources);
         }
@@ -97,10 +145,9 @@ namespace VariantAnnotation.GeneFusions.SA
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
-            
-            if (_relationships != null)
-                foreach (GeneFusionSource source in _relationships)
-                    hashCode.Add((byte) source);
+            hashCode.Add(_isPseudogenePair);
+            hashCode.Add(_isParalogPair);
+            hashCode.Add(_isReadthrough);
             
             if (_germlineSources != null)
                 foreach (GeneFusionSource source in _germlineSources)

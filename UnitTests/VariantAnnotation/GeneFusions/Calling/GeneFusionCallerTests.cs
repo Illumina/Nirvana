@@ -523,24 +523,31 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Calling
         public void GetGeneSymbols_SameChromosome()
         {
             IGene a = new Gene(ChromosomeUtilities.Chr1, 1000, 2000, false, "A", 0, CompactId.Empty, CompactId.Empty);
-            IGene b = new Gene(ChromosomeUtilities.Chr1, 900, 1900, false, "B", 0, CompactId.Empty, CompactId.Empty);
+            IGene b = new Gene(ChromosomeUtilities.Chr1, 900,  1900, false, "B", 0, CompactId.Empty, CompactId.Empty);
 
-            string[] expectedGeneSymbols = {"B", "A"};
-            string[] actualGeneSymbols   = GeneFusionCaller.GetGeneSymbols(a, b);
+            var expectedFirstGeneSymbol  = "B";
+            var expectedSecondGeneSymbol = "A";
 
-            Assert.Equal(expectedGeneSymbols, actualGeneSymbols);
+            (ulong actualFusionKey, string actualFirstGeneSymbol, uint actualFirstGeneKey, string actualSecondGeneSymbol, uint actualSecondGeneKey) =
+                GeneFusionCaller.GetGeneAndFusionKeys(a, b);
+
+            Assert.Equal(expectedFirstGeneSymbol,  actualFirstGeneSymbol);
+            Assert.Equal(expectedSecondGeneSymbol, actualSecondGeneSymbol);
         }
-        
+
         [Fact]
         public void GetGeneSymbols_DifferentChromosomes()
         {
             IGene a = new Gene(ChromosomeUtilities.Chr1, 1000, 2000, false, "A", 0, CompactId.Empty, CompactId.Empty);
             IGene b = new Gene(ChromosomeUtilities.Chr3, 900,  1900, false, "B", 0, CompactId.Empty, CompactId.Empty);
 
-            string[] expectedGeneSymbols = {"A", "B"};
-            string[] actualGeneSymbols   = GeneFusionCaller.GetGeneSymbols(a, b);
+            var expectedFirstGeneSymbol  = "A";
+            var expectedSecondGeneSymbol = "B";
+            (ulong actualFusionKey, string actualFirstGeneSymbol, uint actualFirstGeneKey, string actualSecondGeneSymbol, uint actualSecondGeneKey) =
+                GeneFusionCaller.GetGeneAndFusionKeys(a, b);
 
-            Assert.Equal(expectedGeneSymbols, actualGeneSymbols);
+            Assert.Equal(expectedFirstGeneSymbol,  actualFirstGeneSymbol);
+            Assert.Equal(expectedSecondGeneSymbol, actualSecondGeneSymbol);
         }
 
         [Fact]

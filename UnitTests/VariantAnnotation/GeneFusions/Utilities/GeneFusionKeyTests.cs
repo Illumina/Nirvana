@@ -12,7 +12,7 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Utilities
             const string geneB             = "ENSG00000102962";
             const ulong  expectedFusionKey = 26671747011122;
 
-            ulong actualFusionKey = GeneFusionKey.Create(geneA, geneB);
+            ulong actualFusionKey = GeneFusionKey.Create(GeneFusionKey.CreateGeneKey(geneA), GeneFusionKey.CreateGeneKey(geneB));
             Assert.Equal(expectedFusionKey, actualFusionKey);
         }
 
@@ -23,7 +23,7 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Utilities
         public void Create_OneGeneIsNull_ReturnZero(string geneA, string geneB)
         {
             const ulong expectedFusionKey = 0;
-            ulong       actualFusionKey   = GeneFusionKey.Create(geneA, geneB);
+            ulong       actualFusionKey   = GeneFusionKey.Create(GeneFusionKey.CreateGeneKey(geneA), GeneFusionKey.CreateGeneKey(geneB));
             Assert.Equal(expectedFusionKey, actualFusionKey);
         }
     }

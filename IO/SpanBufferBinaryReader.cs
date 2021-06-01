@@ -55,6 +55,29 @@ namespace IO
 
             throw new FormatException("Unable to read the 7-bit encoded integer");
         }
+        
+        public static uint ReadOptUInt32(ref ReadOnlySpan<byte> byteSpan)
+        {
+            uint value = 0;
+            var  shift = 0;
+            var  index = 0;
+
+            while (shift != 35)
+            {
+                byte b = byteSpan[index++];
+                value |= (uint)((b & sbyte.MaxValue) << shift);
+                shift += VlqBitShift;
+
+                // ReSharper disable once InvertIf
+                if ((b & MostSignificantBit) == 0)
+                {
+                    byteSpan = byteSpan.Slice(index);
+                    return value;
+                }
+            }
+
+            throw new FormatException("Unable to read the 7-bit encoded unsigned integer");
+        }
 
         public static long ReadOptInt64(ref ReadOnlySpan<byte> byteSpan)
         {

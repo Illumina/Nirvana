@@ -2,7 +2,10 @@
 {
     public interface IGeneFusionPair
     {
-        ulong    GeneKey     { get; }
-        string[] GeneSymbols { get; }
+        ulong  FusionKey        { get; }
+        string FirstGeneSymbol  { get; }
+        uint   FirstGeneKey     { get; }
+        string SecondGeneSymbol { get; }
+        uint   SecondGeneKey    { get; }
     }
 }

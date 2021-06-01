@@ -1,5 +1,6 @@
 ﻿// ReSharper disable InconsistentNaming
 // ReSharper disable UnusedMember.Global
+
 namespace VariantAnnotation.GeneFusions.SA
 {
     public enum GeneFusionSource : byte
@@ -30,6 +31,20 @@ namespace VariantAnnotation.GeneFusions.SA
         Robinson_prostate_cancers,
         TCGA_Normal,
         TCGA_oesophageal_carcinomas,
-        TCGA_Tumor
+        TCGA_Tumor,
+
+        // additional data sources (2021-05-25)
+        CCLE_Klign, // ccle2.txt
+        ChimerKB_4,
+        ChimerPub_4,
+        ChimerSeq_4,
+        Known,
+        Mitelman_DB,
+        OncoKB,
+        PCAWG,
+        TumorFusions,        // tcga.txt
+        TCGA_Gao,            // tcga2.txt
+        TCGA_Vellichirammal, // tcga3.txt
+        TICdb
     }
 }

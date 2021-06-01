@@ -41,7 +41,9 @@ namespace UnitTests.SAUtils.CosmicGeneFusions.Conversion
         {
             (TranscriptCache transcriptCache, ITranscript transcript, ITranscript transcript2) = GetTranscriptCache();
             string[] expectedGeneSymbols = {transcript.Gene.Symbol, transcript2.Gene.Symbol};
-            ulong    expectedFusionKey   = GeneFusionKey.Create(transcript.Gene.EnsemblId.WithoutVersion, transcript2.Gene.EnsemblId.WithoutVersion);
+            ulong expectedFusionKey = GeneFusionKey.Create(
+                GeneFusionKey.CreateGeneKey(transcript.Gene.EnsemblId.WithoutVersion),
+                GeneFusionKey.CreateGeneKey(transcript2.Gene.EnsemblId.WithoutVersion));
 
             (string[] actualGeneSymbols, ulong actualFusionKey) =
                 HgvsRnaParser.GetTranscripts("ENST00000290663.10(MED8):r.1_79+?_ENST00000347849.7(ERG):r.312_5034", transcriptCache);

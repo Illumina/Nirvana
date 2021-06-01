@@ -16,7 +16,9 @@ namespace UnitTests.SAUtils.CosmicGeneFusions.Conversion
             (TranscriptCache transcriptCache, ITranscript transcript, ITranscript transcript2) = HgvsRnaParserTests.GetTranscriptCache();
             Dictionary<int, HashSet<RawCosmicGeneFusion>> fusionIdToEntries = GetFusionIdToEntries(transcript, transcript2);
 
-            ulong expectedFusionKey = GeneFusionKey.Create(transcript.Gene.EnsemblId.WithoutVersion, transcript2.Gene.EnsemblId.WithoutVersion);
+            ulong expectedFusionKey = GeneFusionKey.Create(
+                GeneFusionKey.CreateGeneKey(transcript.Gene.EnsemblId.WithoutVersion),
+                GeneFusionKey.CreateGeneKey(transcript2.Gene.EnsemblId.WithoutVersion));
 
             string[] expectedJsonEntries =
             {

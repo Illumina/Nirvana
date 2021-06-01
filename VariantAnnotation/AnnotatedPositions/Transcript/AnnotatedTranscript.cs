@@ -150,7 +150,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public void AddGeneFusionPairs(HashSet<IGeneFusionPair> fusionPairs)
         {
             if (_geneFusions == null) return;
-            foreach (IAnnotatedGeneFusion geneFusion in _geneFusions) fusionPairs.Add(new GeneFusionPair(geneFusion.geneKey, geneFusion.geneSymbols));
+            foreach (IAnnotatedGeneFusion gf in _geneFusions)
+                fusionPairs.Add(new GeneFusionPair(gf.FusionKey, gf.FirstGeneSymbol, gf.FirstGeneKey, gf.SecondGeneSymbol, gf.SecondGeneKey));
         }
     }
 }

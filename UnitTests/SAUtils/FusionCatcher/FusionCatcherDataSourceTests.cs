@@ -40,11 +40,13 @@ namespace UnitTests.SAUtils.FusionCatcher
             FusionCatcherDataSource.Parse(ms, GeneFusionSource.OneK_Genomes_Project, CollectionType.Germline, geneKeyToFusion, knownEnsemblGenes);
             Assert.Single(geneKeyToFusion);
 
-            ulong geneKey = GeneFusionKey.Create("ENSG00000035499", "ENSG00000155959");
+            ulong fusionKey = GeneFusionKey.Create(GeneFusionKey.CreateGeneKey("ENSG00000035499"), GeneFusionKey.CreateGeneKey("ENSG00000155959"));
 
-            bool hasEntry = geneKeyToFusion.TryGetValue(geneKey, out GeneFusionSourceBuilder actualBuilder);
+            bool hasEntry = geneKeyToFusion.TryGetValue(fusionKey, out GeneFusionSourceBuilder actualBuilder);
             Assert.True(hasEntry);
-            Assert.Empty(actualBuilder.Relationships);
+            Assert.False(actualBuilder.IsPseudogenePair);
+            Assert.False(actualBuilder.IsParalogPair);
+            Assert.False(actualBuilder.IsReadthrough);
             Assert.Single(actualBuilder.GermlineSources);
             Assert.Empty(actualBuilder.SomaticSources);
             Assert.Equal(GeneFusionSource.OneK_Genomes_Project, actualBuilder.GermlineSources[0]);
@@ -90,11 +92,13 @@ namespace UnitTests.SAUtils.FusionCatcher
             
             Assert.Single(geneKeyToFusion);
 
-            ulong geneKey = GeneFusionKey.Create("ENSG00000035499", "ENSG00000155959");
+            ulong fusionKey = GeneFusionKey.Create(GeneFusionKey.CreateGeneKey("ENSG00000035499"), GeneFusionKey.CreateGeneKey("ENSG00000155959"));
 
-            bool hasEntry = geneKeyToFusion.TryGetValue(geneKey, out GeneFusionSourceBuilder actualBuilder);
+            bool hasEntry = geneKeyToFusion.TryGetValue(fusionKey, out GeneFusionSourceBuilder actualBuilder);
             Assert.True(hasEntry);
-            Assert.Single(actualBuilder.Relationships);
+            Assert.False(actualBuilder.IsPseudogenePair);
+            Assert.False(actualBuilder.IsParalogPair);
+            Assert.True(actualBuilder.IsReadthrough);
             Assert.Empty(actualBuilder.GermlineSources);
             Assert.Single(actualBuilder.SomaticSources);
         }

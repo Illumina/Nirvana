@@ -28,11 +28,14 @@ namespace SAUtils.FusionCatcher
             header.Write(_writer);
         }
 
-        public void Write(GeneFusionSourceCollection[] index, GeneFusionIndexEntry[] indexEntries)
+        public void Write(uint[] oncogeneKeys, GeneFusionSourceCollection[] index, GeneFusionIndexEntry[] indexEntries)
         {
             using var ms = new MemoryStream();
             using (var writer = new ExtendedBinaryWriter(ms, Encoding.UTF8, true))
             {
+                writer.WriteOpt(oncogeneKeys.Length);
+                foreach (uint geneKey in oncogeneKeys) writer.WriteOpt(geneKey);
+
                 writer.WriteOpt(index.Length);
                 foreach (GeneFusionSourceCollection sourceCollection in index) sourceCollection.Write(writer);
 

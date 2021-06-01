@@ -6,13 +6,15 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
     public sealed class GeneFusionSourceCollectionTests
     {
         private readonly GeneFusionSourceCollection _sourceCollection =
-            new(null, new[] {GeneFusionSource.Healthy}, new[] {GeneFusionSource.Bao_gliomas, GeneFusionSource.Robinson_prostate_cancers});
+            new(false, false, false, new[] {GeneFusionSource.Healthy}, new[]
+                {GeneFusionSource.Bao_gliomas, GeneFusionSource.Robinson_prostate_cancers});
 
         private readonly GeneFusionSourceCollection _sourceCollectionDup =
-            new(null, new[] {GeneFusionSource.Healthy}, new[] {GeneFusionSource.Bao_gliomas, GeneFusionSource.Robinson_prostate_cancers});
+            new(false, false, false, new[] {GeneFusionSource.Healthy}, new[]
+                {GeneFusionSource.Bao_gliomas, GeneFusionSource.Robinson_prostate_cancers});
 
         private readonly GeneFusionSourceCollection _sourceCollectionDiff =
-            new(new[] {GeneFusionSource.Paralog}, new[] {GeneFusionSource.Healthy}, new[]
+            new(false, true, false, new[] {GeneFusionSource.Healthy}, new[]
                 {GeneFusionSource.Bao_gliomas, GeneFusionSource.Robinson_prostate_cancers});
         
         [Fact]
@@ -27,8 +29,10 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
         [Fact]
         public void GetJsonEntry_ExpectedResults()
         {
-            const string expectedJson = "\"genes\":[\"A\",\"B\"],\"germlineSources\":[\"Healthy\"],\"somaticSources\":[\"Bao gliomas\",\"Robinson prostate cancers\"]";
-            string       actualJson   = _sourceCollection.GetJsonEntry(new[] {"A", "B"});
+            const string expectedJson =
+                "\"genes\":{\"first\":{\"hgnc\":\"A\"},\"second\":{\"hgnc\":\"B\"}},\"germlineSources\":[\"Healthy\"],\"somaticSources\":[\"Bao gliomas\",\"Robinson prostate cancers\"]";
+            var    geneFusionPair = new GeneFusionPair(100, "A", 100, "B", 200);
+            string actualJson     = _sourceCollection.GetJsonEntry(geneFusionPair, new uint[] {123});
             Assert.Equal(expectedJson, actualJson);
         }
 
