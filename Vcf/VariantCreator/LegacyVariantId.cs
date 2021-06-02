@@ -40,6 +40,12 @@ namespace Vcf.VariantCreator
             }
         }
 
+        public (int Start, string RefAllele, string AltAllele) Normalize(ISequence sequence, int start, string refAllele, string altAllele)
+        {
+            if (altAllele.Contains('[') || altAllele.Contains(']')) return (start, refAllele, altAllele);
+            return BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
+        }
+
         private static string GetSvVid(IDictionary<string, IChromosome> refNameToChromosome, string svType, IChromosome chromosome, int start, int end, string refAllele, string altAllele)
         {
             var variantType = StructuralVariantCreator.GetVariantType(altAllele, svType);
@@ -74,21 +80,20 @@ namespace Vcf.VariantCreator
                     return $"{chromosome.EnsemblName}:{start + 1}:{end}";
             }
         }
-        
-        private static (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(IDictionary<string, IChromosome> refNameToChromosome, string refAllele, string altAllele)
+
+        private static (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(
+            IDictionary<string, IChromosome> refNameToChromosome, string refAllele, string altAllele)
         {
             string referenceName2;
-            int position2;
-            bool isSuffix2;
-            
+            int    position2;
+            bool   isSuffix2;
+
             const string forwardBreakEnd = "[";
 
-            // (\w+)([\[\]])([^:]+):(\d+)([\[\]])
-            // ([\[\]])([^:]+):(\d+)([\[\]])(\w+)
             if (altAllele.StartsWith(refAllele))
             {
-                var forwardRegex = new Regex(@"\w+([\[\]])([^:]+):(\d+)([\[\]])", RegexOptions.Compiled);
-                var match = forwardRegex.Match(altAllele);
+                var   forwardRegex = new Regex(@"\w+([\[\]])(.+):(\d+)([\[\]])", RegexOptions.Compiled);
+                Match match        = forwardRegex.Match(altAllele);
 
                 if (!match.Success)
                     throw new InvalidDataException(
@@ -102,8 +107,8 @@ namespace Vcf.VariantCreator
             }
             else
             {
-                var reverseRegex = new Regex(@"([\[\]])([^:]+):(\d+)([\[\]])\w+", RegexOptions.Compiled);
-                var match = reverseRegex.Match(altAllele);
+                var   reverseRegex = new Regex(@"([\[\]])(.+):(\d+)([\[\]])\w+", RegexOptions.Compiled);
+                Match match        = reverseRegex.Match(altAllele);
 
                 if (!match.Success)
                     throw new InvalidDataException(
