@@ -232,7 +232,6 @@ namespace NirvanaLambda
             tabixUrl                 = config.tabixUrl,
             outputDir                = config.outputDir,
             outputPrefix             = GetIndexedPrefix(config.vcfUrl, jobIndex),
-            supplementaryAnnotations = config.supplementaryAnnotations,
             customAnnotations        = config.customAnnotations,
             customStrUrl             = config.customStrUrl,
             annotationRange          = annotationRange

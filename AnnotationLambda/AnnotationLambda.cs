@@ -156,7 +156,9 @@ namespace AnnotationLambda
             var genomeAssembly      = GenomeAssemblyHelper.Convert(annotationConfig.genomeAssembly);
             string cachePathPrefix  = LambdaUrlHelper.GetCacheFolder().UrlCombine(genomeAssembly.ToString()).UrlCombine(LambdaUrlHelper.DefaultCacheSource);
             string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
-            string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations ?? "latest", genomeAssembly);
+            // SaVersion will be provided as an environment variable. Defaults to "latest"
+            string saVersion = Environment.GetEnvironmentVariable("SaVersion");
+            string saManifestUrl    = LambdaUtilities.GetManifestUrl(string.IsNullOrEmpty(saVersion)? "latest": saVersion, genomeAssembly);
             var metrics = new PerformanceMetrics();
 
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,

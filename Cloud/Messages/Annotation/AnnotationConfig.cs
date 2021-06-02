@@ -6,15 +6,14 @@ namespace Cloud.Messages.Annotation
     {
         // ReSharper disable InconsistentNaming
         // ReSharper disable NotAccessedField.Global
-        public string id;
-        public string genomeAssembly;
-        public string vcfUrl;
-        public string tabixUrl;
-        public S3Path outputDir;
-        public string outputPrefix;
-        public string supplementaryAnnotations;
-        public List<SaUrls> customAnnotations;
-        public string customStrUrl;
+        public string          id;
+        public string          genomeAssembly;
+        public string          vcfUrl;
+        public string          tabixUrl;
+        public S3Path          outputDir;
+        public string          outputPrefix;
+        public List<SaUrls>    customAnnotations;
+        public string          customStrUrl;
         public AnnotationRange annotationRange;
         // ReSharper restore NotAccessedField.Global
         // ReSharper restore InconsistentNaming
