@@ -10,13 +10,15 @@ namespace Nirvana
 {
     public sealed class AnnotationFiles
     {
-        public List<(string Nsa, string Idx)> NsaFiles { get; } = new List<(string, string)>();
-        public List<string> NsiFiles { get; } = new List<string>();
-        public List<string> NgaFiles { get; } = new List<string>();
-        public (string Npd, string Idx) ConservationFile { get; private set; }
-        public string LowComplexityRegionFile { get; private set; }
-        public string ProteinConservationFile { get; private set; }
-        public (string Rma, string Idx) RefMinorFile { get; private set; }
+        public List<(string Nsa, string Idx)> NsaFiles                { get; } = new();
+        public List<string>                   NsiFiles                { get; } = new();
+        public List<string>                   NgaFiles                { get; } = new();
+        public List<string>                   GeneFusionSourceFiles   { get; } = new();
+        public List<string>                   GeneFusionJsonFiles     { get; } = new();
+        public (string Npd, string Idx)       ConservationFile        { get; private set; }
+        public string                         LowComplexityRegionFile { get; private set; }
+        public string                         ProteinConservationFile { get; private set; }
+        public (string Rma, string Idx)       RefMinorFile            { get; private set; }
 
         public void AddFiles(string saDirectoryPath)
         {
@@ -26,7 +28,7 @@ namespace Nirvana
                 switch (filePath.GetFileSuffix(true))
                 {
                     case SaCommon.SaFileSuffix:
-                        NsaFiles.Add((filePath, filePath + SaCommon.IndexSufix));
+                        NsaFiles.Add((filePath, filePath + SaCommon.IndexSuffix));
                         break;
                     case SaCommon.IntervalFileSuffix:
                         NsiFiles.Add(filePath);
@@ -35,7 +37,7 @@ namespace Nirvana
                         NgaFiles.Add(filePath);
                         break;
                     case SaCommon.PhylopFileSuffix:
-                        ConservationFile = (filePath, filePath + SaCommon.IndexSufix);
+                        ConservationFile = (filePath, filePath + SaCommon.IndexSuffix);
                         break;
                     case ProteinConservationCommon.FileSuffix:
                         ProteinConservationFile = filePath;
@@ -44,7 +46,13 @@ namespace Nirvana
                         LowComplexityRegionFile = filePath;
                         break;
                     case SaCommon.RefMinorFileSuffix:
-                        RefMinorFile = (filePath, filePath + SaCommon.IndexSufix);
+                        RefMinorFile = (filePath, filePath + SaCommon.IndexSuffix);
+                        break;
+                    case SaCommon.GeneFusionSourceSuffix:
+                        GeneFusionSourceFiles.Add(filePath);
+                        break;
+                    case SaCommon.GeneFusionJsonSuffix:
+                        GeneFusionJsonFiles.Add(filePath);
                         break;
                 }
             }

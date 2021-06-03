@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Intervals
+﻿namespace Intervals
 {
 	public sealed class IntervalForest<T> : IIntervalForest<T>
 	{

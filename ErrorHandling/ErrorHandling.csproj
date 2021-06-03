@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
   <ItemGroup>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.109.4" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.0.17" />
   </ItemGroup>
 </Project>

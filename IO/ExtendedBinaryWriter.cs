@@ -43,6 +43,19 @@ namespace IO
 
             Write((byte)num);
         }
+        
+        public void WriteOpt(uint value)
+        {
+            uint num = value;
+
+            while (num >= 128U)
+            {
+                Write((byte)(num | 128U));
+                num >>= 7;
+            }
+
+            Write((byte)num);
+        }
 
         /// <summary>
         /// writes a long to the binary writer

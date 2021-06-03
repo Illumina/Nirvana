@@ -37,7 +37,7 @@ namespace Nirvana
             using (var inputVcfStream        = _vcfPath        == "-"  ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
             using (var outputJsonStream      = _outputFileName == "-"  ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName   == null ? null : FileUtilities.GetCreateStream(jasixFileName))
-                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false, _enableDq);
+                return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, new NullVcfFilter(), false, _enableDq).exitCode;
         }
 
         private static AnnotationResources GetAnnotationResources()

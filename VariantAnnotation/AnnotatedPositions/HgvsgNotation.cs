@@ -7,17 +7,18 @@ namespace VariantAnnotation.AnnotatedPositions
 {
     public static class HgvsgNotation
     {
-        private const char NotationType = 'g';
+        private const char NotationType     = 'g';
+        private const char MitoNotationType = 'm';
 
         public static string GetNotation(string refseqAccession, ISimpleVariant variant, ISequence refSequence,
-            IInterval referenceInterval)
+                                         IInterval referenceInterval)
         {
-            var rotatedVariant = VariantRotator.Right(variant, referenceInterval, refSequence, false);
-            var start          = Math.Min(rotatedVariant.Start, rotatedVariant.End);
-            var end            = Math.Max(rotatedVariant.Start, rotatedVariant.End);
-            var referenceBases = rotatedVariant.RefAllele;
-            var alternateBases = rotatedVariant.AltAllele;
-            var type           = HgvsCodingNomenclature.GetGenomicChange(referenceInterval, false, refSequence, rotatedVariant);
+            ISimpleVariant rotatedVariant = VariantRotator.Right(variant, referenceInterval, refSequence, false);
+            int            start          = Math.Min(rotatedVariant.Start, rotatedVariant.End);
+            int            end            = Math.Max(rotatedVariant.Start, rotatedVariant.End);
+            string         referenceBases = rotatedVariant.RefAllele;
+            string         alternateBases = rotatedVariant.AltAllele;
+            GenomicChange  type           = HgvsCodingNomenclature.GetGenomicChange(referenceInterval, false, refSequence, rotatedVariant);
 
             if (type == GenomicChange.Duplication && variant.Type == VariantType.insertion)
             {
@@ -26,7 +27,9 @@ namespace VariantAnnotation.AnnotatedPositions
                 start          = end - referenceBases.Length + 1;
             }
 
-            return HgvsUtilities.FormatDnaNotation(start.ToString(), end.ToString(), refseqAccession, referenceBases, alternateBases, type, NotationType);
+            char notationType = variant.Chromosome.UcscName == "chrM" ? MitoNotationType : NotationType;
+            return HgvsUtilities.FormatDnaNotation(start.ToString(), end.ToString(), refseqAccession, referenceBases, alternateBases, type,
+                notationType);
         }
     }
 }

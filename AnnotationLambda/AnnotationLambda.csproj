@@ -1,17 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
     <OutputPath>bin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0" />
-    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.7.0" />
-    <PackageReference Include="AWSSDK.Lambda" Version="3.3.106.4" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.109.4" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.101.100" />
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.0.0" />
+    <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="2.0.0" />
+    <PackageReference Include="AWSSDK.Lambda" Version="3.7.0.15" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.0.17" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.7.1.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Cloud\Cloud.csproj" />

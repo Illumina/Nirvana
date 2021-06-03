@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Nirvana;
+using UnitTests.TestUtilities;
 using Xunit;
 
 namespace UnitTests.Nirvana
@@ -12,7 +13,7 @@ namespace UnitTests.Nirvana
         public void GetFiles_FromDirectory_AsExpected()
         {
             var files = new AnnotationFiles();
-            var saDirectory = TestUtilities.Resources.MockSaFiles;
+            var saDirectory = Resources.MockSaFiles;
             files.AddFiles(saDirectory);
 
             var expectedNsaFiles = new List<(string, string)>

@@ -60,7 +60,7 @@ namespace SAUtils.NsaConcatenator
 
             foreach (var fileName in filePaths)
             {
-                nsaReaders.Add(new NsaReader(FileUtilities.GetReadStream(fileName), FileUtilities.GetReadStream(fileName + SaCommon.IndexSufix)));
+                nsaReaders.Add(new NsaReader(FileUtilities.GetReadStream(fileName), FileUtilities.GetReadStream(fileName + SaCommon.IndexSuffix)));
             }
 
             Console.WriteLine($"Merging {nsaReaders.Count} NSA files...");
@@ -68,7 +68,7 @@ namespace SAUtils.NsaConcatenator
             var (version, jsonKey, matchByAllele, isArray, isPositional, assembly) = GetIndexFields(nsaReaders);
 
             using (var nsaStream = FileUtilities.GetCreateStream(outFilePrefix + SaCommon.SaFileSuffix))
-            using (var indexStream = FileUtilities.GetCreateStream(outFilePrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix))
+            using (var indexStream = FileUtilities.GetCreateStream(outFilePrefix + SaCommon.SaFileSuffix + SaCommon.IndexSuffix))
             using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, null, jsonKey, matchByAllele, isArray, SaCommon.SchemaVersion, isPositional, true, false, SaCommon.DefaultBlockSize, assembly))
             {
                 var chromIndices = GetChromIndices(nsaReaders);

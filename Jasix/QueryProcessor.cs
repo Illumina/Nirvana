@@ -55,28 +55,34 @@ namespace Jasix
 		public void PrintHeaderOnly()
 		{
 
-		    string headerString = GetHeader();
-			_writer.WriteLine("{" + headerString+"}");
+		    string headerString = "{"+GetHeader()+"}";
+			Utilities.PrintJsonEntry(headerString, false, _writer);
+			
 		}
 
 		public void PrintSection(string section)
 		{
 			_writer.WriteLine("[");
+			var needComma = false;
 			foreach (var line in GetSectionLines(section))
 			{
-				_writer.WriteLine(line);
+				Utilities.PrintJsonEntry(line.TrimEnd(','), needComma,_writer);
+				needComma = true;
 			}
 			_writer.WriteLine("]");
 		}
 
 		public int ProcessQuery(IEnumerable<string> queryStrings, bool printHeader = false)
 		{
-			_writer.Write("{");
+			
 			if (printHeader)
 			{
-			    string headerString = GetHeader();
-				_writer.Write(headerString + ",");
+				string headerString = "{" +GetHeader() +"}";
+				Utilities.PrintJsonEntry(headerString, false, _writer);
+				_writer.WriteLine(",");
 			}
+			else _writer.Write("{");
+			
 			Utilities.PrintQuerySectionOpening(JasixCommons.PositionsSectionTag, _writer);
 
 		    var count = 0;

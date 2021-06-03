@@ -46,8 +46,8 @@ namespace AnnotationLambda
 
                 snsTopicArn = LambdaUtilities.GetEnvironmentVariable(LambdaUtilities.SnsTopicKey);
 
-                string vcfUrl = config.vcfUrl;
-
+                string vcfUrl       = config.vcfUrl;
+                int    variantCount = 0;
                 using (var annotationResources = GetAnnotationResources(config))
                 {
                     if (annotationResources.InputStartVirtualPosition == -1) return GetSuccessOutput(result);
@@ -60,7 +60,7 @@ namespace AnnotationLambda
                     }
 
                     Logger.WriteLine("Scan for positions to preload complete.");
-
+                    
                     using (var aes = new AesCryptoServiceProvider())
                     {
                         FileMetadata jsonMetadata, jasixMetadata;
@@ -84,7 +84,7 @@ namespace AnnotationLambda
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))
                             {
-                                StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true);
+                                variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true).variantCount;
                             }
 
                             Logger.WriteLine("Annotation done.");
@@ -107,6 +107,7 @@ namespace AnnotationLambda
                 LambdaUtilities.DeleteTempOutput();
                 if (string.IsNullOrEmpty(result.filePath)) throw new FileNotFoundException();
 
+                result.variantCount = variantCount;
                 return GetSuccessOutput(result);
             }
             catch (Exception exception)
@@ -155,7 +156,9 @@ namespace AnnotationLambda
             var genomeAssembly      = GenomeAssemblyHelper.Convert(annotationConfig.genomeAssembly);
             string cachePathPrefix  = LambdaUrlHelper.GetCacheFolder().UrlCombine(genomeAssembly.ToString()).UrlCombine(LambdaUrlHelper.DefaultCacheSource);
             string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
-            string saManifestUrl    = LambdaUtilities.GetManifestUrl(annotationConfig.supplementaryAnnotations ?? "latest", genomeAssembly);
+            // SaVersion will be provided as an environment variable. Defaults to "latest"
+            string saVersion = Environment.GetEnvironmentVariable("SaVersion");
+            string saManifestUrl    = LambdaUtilities.GetManifestUrl(string.IsNullOrEmpty(saVersion)? "latest": saVersion, genomeAssembly);
             var metrics = new PerformanceMetrics();
 
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,

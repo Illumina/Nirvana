@@ -1,9 +1,9 @@
-﻿using Genome;
+﻿using Variants;
 
 namespace VariantAnnotation.Interface.Providers
 {
     public interface IMitoHeteroplasmyProvider : IProvider
     {
-        double?[] GetVrfPercentiles(IChromosome chrome, int position, string[] altAllele, double[] vrfs);
+        double?[] GetVrfPercentiles(IVariant[] variants, double[] vrfs);
     }
 }

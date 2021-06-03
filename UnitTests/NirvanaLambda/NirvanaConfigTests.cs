@@ -51,8 +51,7 @@ namespace UnitTests.NirvanaLambda
                 accessKey = "1234567",
                 secretKey = "show me the money",
                 sessionToken = "a token"
-            },
-            supplementaryAnnotations = "latest"
+            }
         };
     }
 }

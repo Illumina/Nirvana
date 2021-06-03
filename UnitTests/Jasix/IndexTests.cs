@@ -226,14 +226,14 @@ namespace UnitTests.Jasix
         [Fact]
         public void GetHeaderOnly()
         {
-            var readStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz")), CompressionMode.Decompress);
+            var readStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz")),
+                CompressionMode.Decompress);
             var indexStream = ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz.jsi"));
 
             var outStream = new MemoryStream();
             using (var writer = new StreamWriter(outStream, Encoding.UTF8, 512, true))
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream, writer))
             {
-                writer.NewLine = "\r\n";
                 qp.PrintHeaderOnly();
             }
 
@@ -241,8 +241,10 @@ namespace UnitTests.Jasix
             outStream.Position = 0;
             using (var reader = new StreamReader(outStream))
             {
-                string headerLine = reader.ReadToEnd();
-                Assert.Equal("{\"header\":{\"annotator\":\"Nirvana 2.0.9.0\",\"creationTime\":\"2018-04-30 17:17:23\",\"genomeAssembly\":\"GRCh37\",\"schemaVersion\":6,\"dataVersion\":\"91.26.45\",\"dataSources\":[{\"name\":\"VEP\",\"version\":\"91\",\"description\":\"Ensembl\",\"releaseDate\":\"2018-03-05\"},{\"name\":\"ClinVar\",\"version\":\"20180129\",\"description\":\"A freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence\",\"releaseDate\":\"2018-01-29\"},{\"name\":\"COSMIC\",\"version\":\"84\",\"description\":\"somatic mutation and related details and information relating to human cancers\",\"releaseDate\":\"2018-02-13\"},{\"name\":\"dbSNP\",\"version\":\"150\",\"description\":\"Identifiers for observed variants\",\"releaseDate\":\"2017-04-03\"},{\"name\":\"gnomAD_exome\",\"version\":\"2.0.2\",\"description\":\"Exome allele frequencies from Genome Aggregation Database (gnomAD)\",\"releaseDate\":\"2017-10-05\"},{\"name\":\"gnomAD\",\"version\":\"2.0.2\",\"description\":\"Whole genome allele frequencies from Genome Aggregation Database (gnomAD)\",\"releaseDate\":\"2017-10-05\"},{\"name\":\"MITOMAP\",\"version\":\"20180228\",\"description\":\"Small variants in the MITOMAP human mitochondrial genome database\",\"releaseDate\":\"2018-02-28\"},{\"name\":\"1000 Genomes Project\",\"version\":\"Phase 3 v5a\",\"description\":\"A public catalogue of human variation and genotype data\",\"releaseDate\":\"2013-05-27\"},{\"name\":\"TOPMed\",\"version\":\"freeze_5\",\"description\":\"Allele frequencies from TOPMed data lifted over using dbSNP ids.\",\"releaseDate\":\"2017-08-28\"},{\"name\":\"ClinGen\",\"version\":\"20160414\",\"releaseDate\":\"2016-04-14\"},{\"name\":\"DGV\",\"version\":\"20160515\",\"description\":\"Provides a comprehensive summary of structural variation in the human genome\",\"releaseDate\":\"2016-05-15\"},{\"name\":\"MITOMAP\",\"version\":\"20180228\",\"description\":\"Large structural variants in the MITOMAP human mitochondrial genome database\",\"releaseDate\":\"2018-02-28\"},{\"name\":\"ExAC\",\"version\":\"0.3.1\",\"description\":\"Gene scores from the ExAC project\",\"releaseDate\":\"2016-03-16\"},{\"name\":\"OMIM\",\"version\":\"20180213\",\"description\":\"An Online Catalog of Human Genes and Genetic Disorders\",\"releaseDate\":\"2018-02-13\"},{\"name\":\"phyloP\",\"version\":\"hg19\",\"description\":\"46 way conservation score between humans and 45 other vertebrates\",\"releaseDate\":\"2009-11-10\"}]}}\r\n", headerLine);
+                string actualHeaderLine = reader.ReadToEnd().Replace("\r\n", "\n");
+                Assert.Equal(
+                    "{\n  \"header\": {\n    \"annotator\": \"Nirvana 2.0.9.0\",\n    \"creationTime\": \"2018-04-30 17:17:23\",\n    \"genomeAssembly\": \"GRCh37\",\n    \"schemaVersion\": 6,\n    \"dataVersion\": \"91.26.45\",\n    \"dataSources\": [\n      {\n        \"name\": \"VEP\",\n        \"version\": \"91\",\n        \"description\": \"Ensembl\",\n        \"releaseDate\": \"2018-03-05\"\n      },\n      {\n        \"name\": \"ClinVar\",\n        \"version\": \"20180129\",\n        \"description\": \"A freely accessible, public archive of reports of the relationships among human variations and phenotypes, with supporting evidence\",\n        \"releaseDate\": \"2018-01-29\"\n      },\n      {\n        \"name\": \"COSMIC\",\n        \"version\": \"84\",\n        \"description\": \"somatic mutation and related details and information relating to human cancers\",\n        \"releaseDate\": \"2018-02-13\"\n      },\n      {\n        \"name\": \"dbSNP\",\n        \"version\": \"150\",\n        \"description\": \"Identifiers for observed variants\",\n        \"releaseDate\": \"2017-04-03\"\n      },\n      {\n        \"name\": \"gnomAD_exome\",\n        \"version\": \"2.0.2\",\n        \"description\": \"Exome allele frequencies from Genome Aggregation Database (gnomAD)\",\n        \"releaseDate\": \"2017-10-05\"\n      },\n      {\n        \"name\": \"gnomAD\",\n        \"version\": \"2.0.2\",\n        \"description\": \"Whole genome allele frequencies from Genome Aggregation Database (gnomAD)\",\n        \"releaseDate\": \"2017-10-05\"\n      },\n      {\n        \"name\": \"MITOMAP\",\n        \"version\": \"20180228\",\n        \"description\": \"Small variants in the MITOMAP human mitochondrial genome database\",\n        \"releaseDate\": \"2018-02-28\"\n      },\n      {\n        \"name\": \"1000 Genomes Project\",\n        \"version\": \"Phase 3 v5a\",\n        \"description\": \"A public catalogue of human variation and genotype data\",\n        \"releaseDate\": \"2013-05-27\"\n      },\n      {\n        \"name\": \"TOPMed\",\n        \"version\": \"freeze_5\",\n        \"description\": \"Allele frequencies from TOPMed data lifted over using dbSNP ids.\",\n        \"releaseDate\": \"2017-08-28\"\n      },\n      {\n        \"name\": \"ClinGen\",\n        \"version\": \"20160414\",\n        \"releaseDate\": \"2016-04-14\"\n      },\n      {\n        \"name\": \"DGV\",\n        \"version\": \"20160515\",\n        \"description\": \"Provides a comprehensive summary of structural variation in the human genome\",\n        \"releaseDate\": \"2016-05-15\"\n      },\n      {\n        \"name\": \"MITOMAP\",\n        \"version\": \"20180228\",\n        \"description\": \"Large structural variants in the MITOMAP human mitochondrial genome database\",\n        \"releaseDate\": \"2018-02-28\"\n      },\n      {\n        \"name\": \"ExAC\",\n        \"version\": \"0.3.1\",\n        \"description\": \"Gene scores from the ExAC project\",\n        \"releaseDate\": \"2016-03-16\"\n      },\n      {\n        \"name\": \"OMIM\",\n        \"version\": \"20180213\",\n        \"description\": \"An Online Catalog of Human Genes and Genetic Disorders\",\n        \"releaseDate\": \"2018-02-13\"\n      },\n      {\n        \"name\": \"phyloP\",\n        \"version\": \"hg19\",\n        \"description\": \"46 way conservation score between humans and 45 other vertebrates\",\n        \"releaseDate\": \"2009-11-10\"\n      }\n    ]\n  }\n}",
+                    actualHeaderLine);
             }
         }
 
@@ -272,7 +274,7 @@ namespace UnitTests.Jasix
                     line = reader.ReadLine();
                 }
                 
-                Assert.Equal(127, count);
+                Assert.Equal(4382, count);
             }
         }
 

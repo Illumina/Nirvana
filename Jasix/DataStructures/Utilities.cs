@@ -49,7 +49,7 @@ namespace Jasix.DataStructures
 	    public static void PrintJsonEntry(string entry, bool needComma, StreamWriter writer)
 	    {
 		    if (needComma)
-			    writer.Write("," + Environment.NewLine);
+			    writer.Write("," + writer.NewLine);
 		    var jObject = JObject.Parse(entry);
 			writer.Write(jObject.ToString());
 		}

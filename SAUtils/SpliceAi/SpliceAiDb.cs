@@ -104,7 +104,7 @@ namespace SAUtils.SpliceAi
                 GZipUtilities.GetAppropriateReadStream(_inputFile), 
                 referenceProvider, spliceIntervals, spliceAiToNirvanaGeneSymbols))
             using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             using (var nsaWriter   = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.SpliceAiTag, true, true, SaCommon.SchemaVersion, false))
             {
                 nsaWriter.Write(spliceAiParser.GetItems());

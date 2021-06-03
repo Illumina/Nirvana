@@ -63,7 +63,7 @@ namespace SAUtils.RefMinorDb
 
             using (var refMinorReader = new RefMinorReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.RefMinorFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.RefMinorFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.RefMinorFileSuffix + SaCommon.IndexSuffix)))
             using (var writer = new RefMinorDbWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.SchemaVersion))
             {
                 writer.Write(refMinorReader.GetItems());

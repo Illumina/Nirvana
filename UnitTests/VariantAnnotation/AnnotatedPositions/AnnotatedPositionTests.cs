@@ -133,8 +133,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         {
             var vcfFields = new string[8];
             vcfFields[0] = originalChromosomeName;
-
-            var infoData = new InfoData(null, null, null, null, null, null, null, null, null, null, null, null, null);
+            InfoData infoData = new InfoDataBuilder().Create();
 
             return new Position(ChromosomeUtilities.Chr1, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);

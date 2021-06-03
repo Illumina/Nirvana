@@ -20,13 +20,13 @@ namespace CacheUtils.TranscriptCache
 
         public static IntervalArray<T>[] ToIntervalArrays<T>(this IEnumerable<T> items, int numRefSeqs) where T : IChromosomeInterval
         {
-            var intervalArrays = new IntervalArray<T>[numRefSeqs];
-            var itemsByRef     = items.GetMultiValueDict(x => x.Chromosome.Index);
+            var                         intervalArrays = new IntervalArray<T>[numRefSeqs];
+            Dictionary<ushort, List<T>> itemsByRef     = items.GetMultiValueDict(x => x.Chromosome.Index);
 
             foreach (ushort refIndex in itemsByRef.Keys.OrderBy(x => x))
             {
-                var unsortedItems = itemsByRef[refIndex];
-                var intervals     = unsortedItems.OrderBy(x => x.Start).ThenBy(x => x.End).ToIntervals(unsortedItems.Count);
+                List<T>       unsortedItems = itemsByRef[refIndex];
+                Interval<T>[] intervals     = unsortedItems.OrderBy(x => x.Start).ThenBy(x => x.End).ToIntervals(unsortedItems.Count);
                 intervalArrays[refIndex] = new IntervalArray<T>(intervals);
             }
 

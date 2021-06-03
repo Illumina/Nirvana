@@ -46,7 +46,7 @@ namespace Vcf.VariantCreator
                 if (isDecomposed && isRecomposed) throw new InvalidDataException("A variant can't be both decomposed and recomposed");
 
                 (int shiftedStart, string shiftedRef, string shiftedAlt) =
-                    VariantUtils.TrimAndLeftAlign(start, refAllele, altAllele, _sequence);
+                    _vidCreator.Normalize(_sequence, start, refAllele, altAllele);
 
                 if (variantCategory == VariantCategory.SmallVariant || variantCategory == VariantCategory.Reference)
                     end = shiftedStart + shiftedRef.Length - 1;
@@ -58,7 +58,7 @@ namespace Vcf.VariantCreator
             return variants.Count == 0 ? null : variants.ToArray();
         }
 
-        private static VariantCategory GetVariantCategory(string firstAltAllele, string svType)
+        internal static VariantCategory GetVariantCategory(string firstAltAllele, string svType)
         {
             bool isSymbolicAllele = IsSymbolicAllele(firstAltAllele);
 
@@ -66,7 +66,7 @@ namespace Vcf.VariantCreator
             if (!isSymbolicAllele) return VariantCategory.SmallVariant;
             if (firstAltAllele == "<ROH>") return VariantCategory.ROH;
             if (firstAltAllele.StartsWith("<STR")) return VariantCategory.RepeatExpansion;
-            return svType == "CNV" ? VariantCategory.CNV : VariantCategory.SV;
+            return svType == "CNV" || svType == "LOH" ? VariantCategory.CNV : VariantCategory.SV;
         }
 
         private static bool IsBreakend(string altAllele) => altAllele.Contains("[") || altAllele.Contains("]");

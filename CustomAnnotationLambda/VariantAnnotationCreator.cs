@@ -24,8 +24,9 @@ namespace CustomAnnotationLambda
             string inputBaseName   = inputFileName.TrimEndFromFirst(".tsv");
             string nsaFileName     = inputBaseName + SaCommon.SaFileSuffix;
             string localNsaPath    = Path.Combine(tempPath, nsaFileName);
-            string localIndexPath  = localNsaPath + SaCommon.IndexSufix;
+            string localIndexPath  = localNsaPath + SaCommon.IndexSuffix;
             string localSchemaPath = localNsaPath + SaCommon.JsonSchemaSuffix;
+            int    variantCount    = 0;
 
             var outputFiles = new List<string>();
             using (var aes = new AesCryptoServiceProvider())
@@ -55,25 +56,30 @@ namespace CustomAnnotationLambda
                 using (var schemaCryptoStream = new CryptoStream(schemaStream, aes.CreateEncryptor(), CryptoStreamMode.Write))
                 using (var schemaMd5Stream    = new MD5Stream(schemaCryptoStream))
                 {
-                    genomeAssembly = parser.Assembly;
+                    genomeAssembly        = parser.Assembly;
                     result.genomeAssembly = genomeAssembly.ToString();
-                    reportFor = parser.ReportFor;
+                    reportFor             = parser.ReportFor;
+                    result.jwtFields      = config.jwtFields;
 
-                    using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, inputFileName, parser.SequenceProvider, out version))
+                    using (var nsaWriter    = CaUtilities.GetNsaWriter(nsaMd5Stream, indexMd5Stream, parser, inputFileName, parser.SequenceProvider, out version, config.skipRefBaseValidation))
                     using (var schemaWriter = new StreamWriter(schemaMd5Stream))
                     {
                         (jsonTag, nsaItemsCount, intervalJsonSchema, intervals) = CaUtilities.WriteSmallVariants(parser, nsaWriter, schemaWriter);
                     }
+
+                    variantCount += nsaItemsCount;
+                    variantCount += intervals?.Count ?? 0;
 
                     nsaMetadata    = nsaMd5Stream.GetFileMetadata();
                     indexMetadata  = indexMd5Stream.GetFileMetadata();
                     schemaMetadata = schemaMd5Stream.GetFileMetadata();
                 }
 
+                result.variantCount = variantCount;
                 if (nsaItemsCount > 0)
                 {
                     string nsaS3Path    = string.Join('/', config.outputDir.path.Trim('/'), nsaFileName);
-                    string indexS3Path  = nsaS3Path + SaCommon.IndexSufix;
+                    string indexS3Path  = nsaS3Path + SaCommon.IndexSuffix;
                     string schemaS3Path = nsaS3Path + SaCommon.JsonSchemaSuffix;
 
                     s3Client.DecryptUpload(config.outputDir.bucketName, nsaS3Path, localNsaPath, aes, nsaMetadata);
@@ -83,7 +89,7 @@ namespace CustomAnnotationLambda
                         schemaMetadata);
 
                     outputFiles.Add(nsaFileName);
-                    outputFiles.Add(nsaFileName + SaCommon.IndexSufix);
+                    outputFiles.Add(nsaFileName + SaCommon.IndexSuffix);
                     outputFiles.Add(nsaFileName + SaCommon.JsonSchemaSuffix);
                 }
 

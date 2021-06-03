@@ -56,7 +56,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Single(samples);
 
@@ -74,7 +74,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\tT,A\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(2), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(2), null, null);
 
             Assert.Single(samples);
 
@@ -93,7 +93,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\tGT:GQ:GQX:DP:DPF:FT\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(2), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(2), null, null);
 
             Assert.Single(samples);
 
@@ -113,7 +113,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\tGT:GQ:GQX:DP:DPF:AD\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null, null);
 
             Assert.Single(samples);
 
@@ -135,7 +135,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Single(samples);
 
@@ -159,7 +159,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Single(samples);
 
@@ -175,7 +175,7 @@ namespace UnitTests.Vcf.Samples.Legacy
                 "chr1\t115251293\t.\tGA\tG\t100\tSB;LowVariantFreq\tDP=7882\tGT:GQ:AD:VF:NL:SB:GQX\t0/1:100:7588,294:0:20:-100.0000:100";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null, null);
 
             var sample = samples[0];
             var observedTotalDepth = sample.TotalDepth;
@@ -198,7 +198,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             string vcfLine = $"chr1\t5592503\t.\tC\t{altAllele}\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Single(samples);
 
@@ -222,7 +222,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             var vcfLine = $"chr1\t5592503\t.\t{refAllele}\t{altAllele}\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(altAllele.Split(',').Length), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(altAllele.Split(',').Length), null, null);
 
             Assert.Single(samples);
             var sample = samples[0];
@@ -240,7 +240,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             var vcfLine = $"chr1\t5592503\t.\tA\tC\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null, null);
 
             Assert.Single(samples);
             var sample = samples[0];
@@ -273,7 +273,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             const string vcfLine = "1	9314202	Canvas:GAIN:1:9314202:9404148	N	<CNV>	36	PASS	SVTYPE=CNV;END=9404148;ensembl_gene_id=ENSG00000049239,ENSG00000252841,ENSG00000171621	RC:BC:CN:MCC	.	151:108:6:4";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1),null, null);
 
             Assert.Equal(2, samples.Length);
 
@@ -290,7 +290,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             const string vcfLine = "chrX	2735147	.	G	A	38.25	VQSRTrancheSNP99.90to100.00	AC=3;AF=0.500;AN=6;BaseQRankSum=-0.602;DP=56;Dels=0.00;FS=30.019;HaplotypeScore=7.7259;MLEAC=3;MLEAF=0.500;MQ=41.18;MQ0=0;MQRankSum=0.098;QD=1.06;ReadPosRankSum=0.266;SB=-8.681e-03;VQSLOD=-6.0901;culprit=QD	GT:AD:DP:GQ:PL	0:7,0:7:3:0,3,39	./.	0/1:14,3:17:35:35,0,35	1/1:9,10:19:3:41,3,0";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Equal(4, samples.Length);
 
@@ -316,7 +316,7 @@ namespace UnitTests.Vcf.Samples.Legacy
             var vcfLine = $"chr1\t5592503\t.\tC\tT\t900.00\tPASS\t.\t{formatCol}\t{sampleCol}";
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Single(samples);
 
@@ -339,7 +339,7 @@ namespace UnitTests.Vcf.Samples.Legacy
 
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Equal(2, samples.Length);
             var sample1 = samples[0];
@@ -358,7 +358,7 @@ namespace UnitTests.Vcf.Samples.Legacy
 
             var vcfColumns = vcfLine.Split('\t');
 
-            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null);
+            var samples = vcfColumns.ToSamples(new FormatIndices(), GetSimplePositionUsingAlleleNum(1), null, null);
 
             Assert.Single(samples);
             var sample = samples[0];

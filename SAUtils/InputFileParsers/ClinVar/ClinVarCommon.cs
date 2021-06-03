@@ -29,7 +29,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             "conflicting data from submitters",
             "other",
             "association not found",
-            
+            "confers sensitivity",
             "no interpretation for the single variant",// observed in VCV XML only
             
             "conflicting interpretations of pathogenicity"// observed in VCV XML only

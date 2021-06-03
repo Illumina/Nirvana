@@ -351,43 +351,43 @@ namespace SAUtils.gnomAD
 					_acAll = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-                case "AC_male":
+                case "AC-XY":
                     _acMale = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-                case "AC_female":
+                case "AC-XX":
                     _acFemale = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-                case "AC_afr":
+                case "AC-afr":
 					_acAfr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_amr":
+				case "AC-amr":
 					_acAmr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_eas":
+				case "AC-eas":
 					_acEas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_fin":
+				case "AC-fin":
 					_acFin = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_nfe":
+				case "AC-nfe":
 					_acNfe = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_oth":
+				case "AC-oth":
 					_acOth = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-				case "AC_asj":
+				case "AC-asj":
 					_acAsj = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 					break;
 
-			    case "AC_sas":
+			    case "AC-sas":
 			        _acSas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
 			        break;
 
@@ -395,43 +395,43 @@ namespace SAUtils.gnomAD
 			        _anAll = Convert.ToInt32(value);
 			        break;
 
-                case "AN_male":
+                case "AN-XY":
                     _anMale = Convert.ToInt32(value);
                     break;
 
-                case "AN_female":
+                case "AN-XX":
                     _anFemale = Convert.ToInt32(value);
                     break;
 
-				case "AN_afr":
+				case "AN-afr":
 					_anAfr = Convert.ToInt32(value);
 					break;
 
-				case "AN_amr":
+				case "AN-amr":
 					_anAmr = Convert.ToInt32(value);
 					break;
 
-				case "AN_eas":
+				case "AN-eas":
 					_anEas = Convert.ToInt32(value);
 					break;
 
-				case "AN_fin":
+				case "AN-fin":
 					_anFin = Convert.ToInt32(value);
 					break;
 
-				case "AN_nfe":
+				case "AN-nfe":
 					_anNfe = Convert.ToInt32(value);
 					break;
 
-				case "AN_oth":
+				case "AN-oth":
 					_anOth = Convert.ToInt32(value);
 					break;
 
-				case "AN_asj":
+				case "AN-asj":
 					_anAsj = Convert.ToInt32(value);
 					break;
 
-			    case "AN_sas":
+			    case "AN-sas":
 			        _anSas = Convert.ToInt32(value);
 			        break;
 
@@ -439,55 +439,55 @@ namespace SAUtils.gnomAD
 			        _hcAll = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-                case "nhomalt_male":
+                case "nhomalt-XY":
                     _hcMale = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
-                case "nhomalt_female":
+                case "nhomalt-XX":
                     _hcFemale = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-                case "nhomalt_afr":
+                case "nhomalt-afr":
 			        _hcAfr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_amr":
+			    case "nhomalt-amr":
 			        _hcAmr = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_eas":
+			    case "nhomalt-eas":
 			        _hcEas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_fin":
+			    case "nhomalt-fin":
 			        _hcFin = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_nfe":
+			    case "nhomalt-nfe":
 			        _hcNfe = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_oth":
+			    case "nhomalt-oth":
 			        _hcOth = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_asj":
+			    case "nhomalt-asj":
 			        _hcAsj = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-			    case "nhomalt_sas":
+			    case "nhomalt-sas":
 			        _hcSas = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
                 // controls
-                case "controls_AN":
+                case "AN-controls_and_biobanks":
                     _control_anAll = Convert.ToInt32(value);
                     break;
 
-                case "controls_AC":
+                case "AC-controls_and_biobanks":
                     _control_acAll = value.OptimizedSplit(',').Select(val => Convert.ToInt32(val)).ToArray();
                     break;
 
-                case "DP":
+                case "VarDP":
 					_totalDepth = Convert.ToInt32(value);
 					break;
 			}

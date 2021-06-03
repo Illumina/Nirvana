@@ -87,21 +87,22 @@ namespace Vcf
             
             if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
 
-            var infoData      = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
-            int end           = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
-            double? quality   = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
-            string[] filters  = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
-            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, mitoHeteroplasmyProvider, enableDq);
-
+            var       infoData              = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            int       end                   = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
+            double?   quality               = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
+            string[]  filters               = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
+            
             IVariant[] variants = variantFactory.CreateVariants(simplePosition.Chromosome, simplePosition.Start, end,
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed, simplePosition.LinkedVids, globalMajorAllele);
+
+            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, variants, mitoHeteroplasmyProvider, enableDq);
 
             return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
                 altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed);
         }
-
+        
         private static IPosition GetReferencePosition(ISimplePosition simplePosition) =>
             new Position(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start,
                 simplePosition.RefAllele, simplePosition.AltAlleles, null, null, null, null, null,

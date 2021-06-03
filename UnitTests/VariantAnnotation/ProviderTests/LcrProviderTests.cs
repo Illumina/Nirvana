@@ -30,7 +30,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
                     new LcrInterval(ChromosomeUtilities.Chr1, 600, 650),
                     new LcrInterval(ChromosomeUtilities.Chr2, 100, 150),
                     new LcrInterval(ChromosomeUtilities.Chr2, 300, 450),
-                    new LcrInterval(ChromosomeUtilities.Chr2, 600, 650),
+                    new LcrInterval(ChromosomeUtilities.Chr2, 600, 650)
                 });
             }
 

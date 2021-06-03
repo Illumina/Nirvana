@@ -12,10 +12,11 @@ namespace Cloud.Messages.Nirvana
         public string vcfUrl;
         public string tabixUrl;
         public S3Path outputDir;
-        public string supplementaryAnnotations;
         // ReSharper disable once UnassignedField.Global
         public List<SaUrls> customAnnotations;
-        public string customStrUrl;
+        public string       customStrUrl;
+        public JwtFields    jwtFields;
+        
         // ReSharper restore InconsistentNaming
 
         internal void CheckRequiredFieldsNotNull()

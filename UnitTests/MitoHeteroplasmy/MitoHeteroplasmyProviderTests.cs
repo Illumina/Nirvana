@@ -1,5 +1,6 @@
 ﻿using MitoHeteroplasmy;
 using UnitTests.TestUtilities;
+using Variants;
 using Xunit;
 
 namespace UnitTests.MitoHeteroplasmy
@@ -22,11 +23,17 @@ namespace UnitTests.MitoHeteroplasmy
         {
             var provider = GetProvider();
 
-            var chrom = ChromosomeUtilities.ChrM;
             var position = 1;
-            var altAlleles = new[] { "C", "G", "T" };
 
-            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.2, 0.15, 0.02 });
+            IVariant[] variants          = {
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "C", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
+            };
+            var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 0.2, 0.15, 0.02 });
 
             Assert.Equal(3, percentilesSample.Length);
             Assert.True(percentilesSample[0].HasValue);
@@ -41,11 +48,15 @@ namespace UnitTests.MitoHeteroplasmy
         {
             var provider = GetProvider();
 
-            var chrom = ChromosomeUtilities.ChrM;
             var position = 1;
-            var altAlleles = new[] { "T", "ACC" };
-
-            var percentiles = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.24, 0.12 });
+            
+            IVariant[] variants = {
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "ACC", VariantType.insertion,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
+            };
+            var percentiles = provider.GetVrfPercentiles(variants, new[] { 0.24, 0.12 });
 
             Assert.Null(percentiles);
         }
@@ -54,12 +65,15 @@ namespace UnitTests.MitoHeteroplasmy
         public void GetVrfPercentiles_ProperRounding()
         {
             var provider = GetProvider();
+            var position = 2;
+            
+            IVariant[] variants = {
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
+            };
 
-            var chrom      = ChromosomeUtilities.ChrM;
-            var position   = 2;
-            var altAlleles = new[] { "T" };
 
-            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.0014 });
+            var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 0.0014 });
             
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
@@ -68,13 +82,15 @@ namespace UnitTests.MitoHeteroplasmy
         [Fact]
         public void GetVrfPercentiles_zero()
         {
-            var provider = GetProvider();
-
-            var chrom      = ChromosomeUtilities.ChrM;
+            var provider   = GetProvider();
             var position   = 1;
-            var altAlleles = new[] { "G" };
+            
+            IVariant[] variants = {
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
+            };
 
-            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.0034 });
+            var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 0.0034 });
             
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
@@ -84,13 +100,15 @@ namespace UnitTests.MitoHeteroplasmy
         [Fact]
         public void GetVrfPercentiles_100()
         {
-            var provider = GetProvider();
-
-            var chrom      = ChromosomeUtilities.ChrM;
+            var provider   = GetProvider();
             var position   = 2;
-            var altAlleles = new[] { "T" };
 
-            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 0.0034 });
+            IVariant[] variants = {
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
+            };
+            
+            var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 0.0034 });
             
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
@@ -102,12 +120,13 @@ namespace UnitTests.MitoHeteroplasmy
         {
             var provider = new MitoHeteroplasmyProvider();
             provider.Add(750, "G", new[] { 0.0,0.001,0.002,0.991,0.994,0.995,0.996,0.997,0.998,0.999 }, new[] { 24,4,2,3,2,1,1,4,3,2460});
-            
-            var chrom      = ChromosomeUtilities.ChrM;
             var position   = 750;
-            var altAlleles = new[] { "G" };
-
-            var percentilesSample = provider.GetVrfPercentiles(chrom, position, altAlleles, new[] { 1.0 });
+            
+            IVariant[] variants = {
+                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
+                    null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
+            };
+            var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 1.0 });
             
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);

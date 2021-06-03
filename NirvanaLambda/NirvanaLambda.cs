@@ -130,8 +130,11 @@ namespace NirvanaLambda
 
             return new NirvanaResult
             {
-                id     = config.id,
-                status = status
+                id           = config.id,
+                status       = status,
+                variantCount = 0,
+                jwtFields    =  config.jwtFields
+
             };
         }
 
@@ -161,7 +164,8 @@ namespace NirvanaLambda
             (ErrorCategory? errorCategory, string errorMessage) = GetMostSevereErrorCategoryAndMessage(processedAnnotationResults);
             if (errorCategory != null) return GetNirvanaFailResult(runLog, config, errorCategory.Value, errorMessage, null, snsTopicArn);
 
-            string[] fileNames = processedAnnotationResults.Select(x => x.FileName).ToArray();
+            string[] fileNames    = processedAnnotationResults.Select(x => x.FileName).ToArray();
+            int      variantCount = processedAnnotationResults.Sum(x => x.VariantCount);
 
             return new NirvanaResult
             {
@@ -172,7 +176,10 @@ namespace NirvanaLambda
                     bucketName = config.outputDir.bucketName,
                     outputDir  = config.outputDir.path,
                     files      = fileNames
-                }
+                },
+                variantCount    = variantCount,
+                jwtFields =  config.jwtFields
+
             };
         }
 
@@ -225,7 +232,6 @@ namespace NirvanaLambda
             tabixUrl                 = config.tabixUrl,
             outputDir                = config.outputDir,
             outputPrefix             = GetIndexedPrefix(config.vcfUrl, jobIndex),
-            supplementaryAnnotations = config.supplementaryAnnotations,
             customAnnotations        = config.customAnnotations,
             customStrUrl             = config.customStrUrl,
             annotationRange          = annotationRange

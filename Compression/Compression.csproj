@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
@@ -10,9 +10,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Packages\BlockCompression\BlockCompression.dll" Link="BlockCompression.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Packages\BlockCompression\BlockCompression.pdb" Link="BlockCompression.pdb">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Packages\BlockCompression\libBlockCompression.so" Link="libBlockCompression.so">

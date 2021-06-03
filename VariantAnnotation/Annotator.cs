@@ -16,14 +16,14 @@ namespace VariantAnnotation
 {
     public sealed class Annotator : IAnnotator
     {
-        private readonly IAnnotationProvider _saProvider;
-        private readonly IAnnotationProvider _taProvider;
-        private readonly IAnnotationProvider _lcrProvider;
-        private readonly ISequenceProvider _sequenceProvider;
-        private readonly IAnnotationProvider _conservationProvider;        
-        private readonly IGeneAnnotationProvider _geneAnnotationProvider;
+        private readonly IAnnotationProvider      _saProvider;
+        private readonly IAnnotationProvider      _taProvider;
+        private readonly IAnnotationProvider      _lcrProvider;
+        private readonly ISequenceProvider        _sequenceProvider;
+        private readonly IAnnotationProvider      _conservationProvider;        
+        private readonly IGeneAnnotationProvider  _geneAnnotationProvider;
         private readonly IRepeatExpansionProvider _repeatExpansionProvider;
-        private readonly HashSet<string> _affectedGenes;
+        private readonly HashSet<string>          _affectedGenes;
 
         private bool _annotateMito;
         public GenomeAssembly Assembly { get; }
@@ -84,11 +84,11 @@ namespace VariantAnnotation
                 ) return annotatedPosition;
 
             _sequenceProvider?.Annotate(annotatedPosition);
-            _saProvider?.Annotate(annotatedPosition);
             _lcrProvider?.Annotate(annotatedPosition);
             _repeatExpansionProvider?.Annotate(annotatedPosition);
             _conservationProvider?.Annotate(annotatedPosition);
             _taProvider.Annotate(annotatedPosition);
+            _saProvider?.Annotate(annotatedPosition); // needs to come after _taProvider for gene fusions
 
             TrackAffectedGenes(annotatedPosition);
             return annotatedPosition;

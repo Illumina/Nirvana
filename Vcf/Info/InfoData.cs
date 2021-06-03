@@ -2,39 +2,51 @@
 
 namespace Vcf.Info
 {
-    public sealed class InfoData : IInfoData
-    {
-        public int[]   CiEnd                     { get; }
-        public int[]   CiPos                     { get; }
-        public int?    End                       { get; }
-        public double? RecalibratedQuality       { get; }
-        public int?    JointSomaticNormalQuality { get; }
-        public int?    RefRepeatCount            { get; }
-        public string  RepeatUnit                { get; }
-        public double? StrandBias                { get; }
-        public int?    SvLength                  { get; }
-        public string  SvType                    { get; }
-        public double? FisherStrandBias          { get; }
-        public double? MappingQuality            { get; }
-        public string  BreakendEventId           { get; }
+    public sealed record InfoData(string BreakendEventId, int[] CiEnd, int[] CiPos, int? End, double? FisherStrandBias, bool IsImprecise, bool IsInv3,
+        bool IsInv5, int? JointSomaticNormalQuality, double? MappingQuality, double? RecalibratedQuality, int? RefRepeatCount, string RepeatUnit,
+        double? StrandBias, int? SvLength, string SvType) : IInfoData;
 
-        public InfoData(int[] ciEnd, int[] ciPos, int? end, double? recalibratedQuality, int? jointSomaticNormalQuality,
-            int? refRepeatCount, string repeatUnit, double? strandBias, int? svLength, string svType, double? fisherStrandBias, 
-            double? mappingQuality, string breakendEventId)
+    public sealed class InfoDataBuilder
+    {
+        public string  BreakendEventId;
+        public int[]   CiEnd;
+        public int[]   CiPos;
+        public int?    End;
+        public double? FisherStrandBias;
+        public bool    IsImprecise;
+        public bool    IsInv3;
+        public bool    IsInv5;
+        public int?    JointSomaticNormalQuality;
+        public double? MappingQuality;
+        public double? RecalibratedQuality;
+        public int?    RefRepeatCount;
+        public string  RepeatUnit;
+        public double? StrandBias;
+        public int?    SvLength;
+        public string  SvType;
+
+        public InfoData Create() =>
+            new(BreakendEventId, CiEnd, CiPos, End, FisherStrandBias, IsImprecise, IsInv3, IsInv5, JointSomaticNormalQuality, MappingQuality,
+                RecalibratedQuality, RefRepeatCount, RepeatUnit, StrandBias, SvLength, SvType);
+
+        public void Reset()
         {
-            CiEnd                     = ciEnd;
-            CiPos                     = ciPos;
-            End                       = end;
-            RecalibratedQuality       = recalibratedQuality;
-            JointSomaticNormalQuality = jointSomaticNormalQuality;
-            RefRepeatCount            = refRepeatCount;
-            RepeatUnit                = repeatUnit;
-            StrandBias                = strandBias;
-            SvLength                  = svLength;
-            SvType                    = svType;
-            FisherStrandBias          = fisherStrandBias;
-            MappingQuality            = mappingQuality;
-            BreakendEventId           = breakendEventId;
+            BreakendEventId           = null;
+            CiEnd                     = null;
+            CiPos                     = null;
+            End                       = null;
+            FisherStrandBias          = null;
+            IsImprecise               = false;
+            IsInv3                    = false;
+            IsInv5                    = false;
+            JointSomaticNormalQuality = null;
+            MappingQuality            = null;
+            RecalibratedQuality       = null;
+            RefRepeatCount            = null;
+            RepeatUnit                = null;
+            StrandBias                = null;
+            SvLength                  = null;
+            SvType                    = null;
         }
     }
 }

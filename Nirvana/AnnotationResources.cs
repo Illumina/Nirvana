@@ -114,13 +114,8 @@ namespace Nirvana
 
         public void GetVariantPositions(Stream vcfStream, GenomicRange genomicRange)
         {
-            if (vcfStream == null)
-            {
-                _variantPositions = null;
-                return;
-            }
-
-            vcfStream.Position = Tabix.VirtualPosition.From(InputStartVirtualPosition).BlockOffset;
+            if(genomicRange != null)
+                vcfStream.Position = Tabix.VirtualPosition.From(InputStartVirtualPosition).BlockOffset;
             int numPositions;
             
             Metrics.SaPositionScan.Start();

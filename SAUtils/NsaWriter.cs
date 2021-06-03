@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using CommandLine.Utilities;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
@@ -107,6 +108,16 @@ namespace SAUtils
                 // Once a position has been seen in the stream, we can safely write all positions before that.
                 var writeToPos = saItem.Position;
                 
+                // if variant is in par region, we allow N's in ref
+                if (RegionUtilities.OverlapsParRegion(saItem, _refProvider.Assembly)
+                    && !string.IsNullOrEmpty(saItem.RefAllele) 
+                    && saItem.RefAllele.All(x=> x=='N' || x=='n'))
+                {
+                    itemsMinHeap.Add(saItem);
+                    // in order to allow room for left shifted variants, we hold off on removing them from the heap
+                    WriteUptoPosition(itemsMinHeap, writeToPos - VariantUtils.MaxUpstreamLength);
+                    continue;
+                }
                 string refSequence = _refProvider.Sequence.Substring(saItem.Position - 1, saItem.RefAllele.Length);
                 if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
                 {

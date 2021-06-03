@@ -1,9 +1,0 @@
-{
-  "profiles": {
-    "Jasix": {
-      "commandName": "Project",
-      "commandLineArgs": " --in clinvar.json.gz -s genes",
-      "workingDirectory": "/Users/rroy1/development/TestDatasets"
-    }
-  }
-}

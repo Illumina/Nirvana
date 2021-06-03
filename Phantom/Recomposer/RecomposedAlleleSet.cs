@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Genome;
 using VariantAnnotation.Interface.IO;
+using Variants;
 using Vcf;
+using Vcf.VariantCreator;
 
 namespace Phantom.Recomposer
 {
@@ -59,6 +61,7 @@ namespace Phantom.Recomposer
 
                 var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
                 var position = SimplePosition.GetSimplePosition(chromosome, variantSite.Start, vcfFields, new NullVcfFilter(), true);
+                if (position.AltAlleles.Any(x=> SmallVariantCreator.GetVariantType(position.RefAllele, x) != VariantType.MNV)) continue;
                 for (var i = 0; i < allLinkedVids.Count; i++) position.LinkedVids[i] = allLinkedVids[i];
 
                 yield return position;

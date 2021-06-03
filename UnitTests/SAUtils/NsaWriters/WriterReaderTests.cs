@@ -119,6 +119,18 @@ namespace UnitTests.SAUtils.NsaWriters
 
             return items;
         }
+        
+        private static IEnumerable<DbSnpItem> GetParRegionItems(int count)
+        {
+            var items    = new List<DbSnpItem>();
+            var position = 10_010;
+            for (int i = 0; i < count; i++, position += 2)
+            {
+                items.Add(new DbSnpItem(ChromosomeUtilities.ChrY, position, position, "N", "C"));
+            }
+
+            return items;
+        }
 
         private static ISequenceProvider GetAllASequenceProvider()
         {
@@ -146,7 +158,7 @@ namespace UnitTests.SAUtils.NsaWriters
 
                 using (var saReader = new NsaReader(saStream, indexStream, 1024))
                 {
-                    saReader.PreLoad(ChromosomeUtilities.Chr1, GetPositions(50, 1000));
+                    saReader.PreLoad(ChromosomeUtilities.Chr1, GetAlternatePositions(50, 1000));
                     var annotations = new List<(string refAllele, string altAllele, string annotation)>();
                     
                     saReader.GetAnnotation(90, annotations);
@@ -167,7 +179,38 @@ namespace UnitTests.SAUtils.NsaWriters
             }
         }
 
-        private static List<int> GetPositions(int start, int count)
+        [Fact]
+        public void WriteParRegion()
+        {
+            var version = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks, "description");
+
+            var count = 1000;
+            using (var saStream = new MemoryStream())
+            using (var indexStream = new MemoryStream())
+            {
+                using (var saWriter = new NsaWriter(saStream, indexStream, version, GetAllASequenceProvider(), "dbsnp",
+                    true, true, SaCommon.SchemaVersion, false, true, false, 1024, GenomeAssembly.GRCh37, true)) {
+                    saWriter.Write(GetParRegionItems(count));
+                }
+                saStream.Position    = 0;
+                indexStream.Position = 0;
+
+                using (var saReader = new NsaReader(saStream, indexStream, 1024))
+                {
+                    saReader.PreLoad(ChromosomeUtilities.ChrY, GetAlternatePositions(10_010, 1000));
+                    var annotations = new List<(string refAllele, string altAllele, string annotation)>();
+                    
+                    var position = 10_010;
+                    for (int i = 0; i < count; i++, position += 2)
+                    {
+                        saReader.GetAnnotation(position, annotations);
+                        Assert.True(annotations.Count == 1); //before any SA existed
+                    }
+                }
+            }
+        }
+
+        private static List<int> GetAlternatePositions(int start, int count)
         {
             var positions = new List<int>();
             for (var i = 0; i < count; i++, start += 2)

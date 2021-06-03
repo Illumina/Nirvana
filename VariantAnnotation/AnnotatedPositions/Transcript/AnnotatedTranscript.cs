@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using VariantAnnotation.Algorithms;
+using VariantAnnotation.GeneFusions.SA;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO;
 
@@ -24,7 +25,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public bool? CompleteOverlap { get; }
         public List<double> ConservationScores { get; set; }
 
-        private IAnnotatedGeneFusion _geneFusion;
+        private List<IAnnotatedGeneFusion> _geneFusions;
 
         public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPosition mappedPosition, string hgvsCoding,
@@ -43,12 +44,6 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             PolyPhen            = polyphen;
             Consequences        = consequences;
             CompleteOverlap     = completeOverlap;
-        }
-
-        public void AddGeneFusion(IAnnotatedGeneFusion geneFusion)
-        {
-            _geneFusion = geneFusion;
-            Consequences.Add(ConsequenceTag.unidirectional_gene_fusion);
         }
 
         public void SerializeJson(StringBuilder sb)
@@ -82,7 +77,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             jsonObject.AddStringValue("hgvsc", HgvsCoding);
             jsonObject.AddStringValue("hgvsp", HgvsProtein);
 
-            jsonObject.AddObjectValue("geneFusion", _geneFusion);
+            if (_geneFusions != null) jsonObject.AddObjectValues("geneFusions", _geneFusions);
 
             jsonObject.AddBoolValue("isCanonical", Transcript.IsCanonical);
 
@@ -143,6 +138,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         {
             if (start == -1 && end == -1) return null;
             return GetRangeString(start, end) + "/" + total;
+        }
+
+        public void AddGeneFusions(IAnnotatedGeneFusion[] geneFusions)
+        {
+            _geneFusions ??= new List<IAnnotatedGeneFusion>();
+            _geneFusions.AddRange(geneFusions);
+            Consequences.Add(ConsequenceTag.unidirectional_gene_fusion);
+        }
+
+        public void AddGeneFusionPairs(HashSet<IGeneFusionPair> fusionPairs)
+        {
+            if (_geneFusions == null) return;
+            foreach (IAnnotatedGeneFusion gf in _geneFusions)
+                fusionPairs.Add(new GeneFusionPair(gf.FusionKey, gf.FirstGeneSymbol, gf.FirstGeneKey, gf.SecondGeneSymbol, gf.SecondGeneKey));
         }
     }
 }

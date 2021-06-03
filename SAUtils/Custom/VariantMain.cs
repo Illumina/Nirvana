@@ -18,6 +18,7 @@ namespace SAUtils.Custom
         private static string _inputFile;
         private static string _compressedReference;
         private static string _outputDirectory;
+        private static bool   _skipRefBaseValidation;
         
         public static ExitCodes Run(string command, string[] commandArgs)
         {
@@ -37,6 +38,11 @@ namespace SAUtils.Custom
                     "out|o=",
                     "output directory",
                     v => _outputDirectory = v
+                },
+                {
+                    "skip-ref",
+                    "skip ref base validation",
+                    v => _skipRefBaseValidation = v != null
                 }
             };
 
@@ -65,7 +71,7 @@ namespace SAUtils.Custom
             DataSourceVersion    version;
             string               outputPrefix      = GetOutputPrefix(_inputFile);
             string               nsaFileName       = Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix);
-            string               nsaIndexFileName  = nsaFileName + SaCommon.IndexSufix;
+            string               nsaIndexFileName  = nsaFileName + SaCommon.IndexSuffix;
             string               nsaSchemaFileName = nsaFileName + SaCommon.JsonSchemaSuffix;
             ReportFor            reportFor;
 
@@ -74,7 +80,7 @@ namespace SAUtils.Custom
             using (var parser = VariantAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream   = FileUtilities.GetCreateStream(nsaFileName))
             using (var indexStream = FileUtilities.GetCreateStream(nsaIndexFileName))       
-            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser,  CaUtilities.GetInputFileName(_inputFile),referenceProvider, out version))
+            using (var nsaWriter = CaUtilities.GetNsaWriter(nsaStream, indexStream, parser,  CaUtilities.GetInputFileName(_inputFile),referenceProvider, out version, _skipRefBaseValidation))
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(nsaSchemaFileName))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {

@@ -4,27 +4,28 @@ using VariantAnnotation.IO;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
-    public sealed class AnnotatedGeneFusion : IAnnotatedGeneFusion
+    // ReSharper disable InconsistentNaming
+    public sealed record AnnotatedGeneFusion(ITranscript transcript, int? exon, int? intron, string hgvsr, bool isInFrame, ulong FusionKey,
+        string FirstGeneSymbol, uint FirstGeneKey, string SecondGeneSymbol, uint SecondGeneKey) : IAnnotatedGeneFusion
     {
-        public int? Exon { get; }
-        public int? Intron { get; }
-        public IGeneFusion[] GeneFusions { get; }
-
-        public AnnotatedGeneFusion(int? exon, int? intron, IGeneFusion[] geneFusions)
-        {
-            Exon        = exon;
-            Intron      = intron;
-            GeneFusions = geneFusions;
-        }
+        // ReSharper restore InconsistentNaming
 
         public void SerializeJson(StringBuilder sb)
         {
-            var jsonObject = new JsonObject(sb);
+            string geneId = transcript.Source == Source.Ensembl
+                ? transcript.Gene.EnsemblId.ToString()
+                : transcript.Gene.EntrezGeneId.ToString();
 
+            var jsonObject = new JsonObject(sb);
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddIntValue("exon", Exon);
-            jsonObject.AddIntValue("intron", Intron);
-            jsonObject.AddObjectValues("fusions", GeneFusions);
+            jsonObject.AddStringValue("transcript", transcript.Id.WithVersion);
+            jsonObject.AddStringValue("bioType",    AnnotatedTranscript.GetBioType(transcript.BioType));
+            jsonObject.AddIntValue("exon",   exon);
+            jsonObject.AddIntValue("intron", intron);
+            jsonObject.AddStringValue("geneId", geneId);
+            jsonObject.AddStringValue("hgnc",   transcript.Gene.Symbol);
+            jsonObject.AddStringValue("hgvsr",  hgvsr);
+            jsonObject.AddBoolValue("inFrame", isInFrame);
             sb.Append(JsonObject.CloseBrace);
         }
     }

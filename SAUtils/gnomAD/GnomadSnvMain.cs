@@ -74,12 +74,12 @@ namespace SAUtils.gnomAD
         {
             //clearing temp directory
             if (!Directory.Exists(_tempDirectory)) Directory.CreateDirectory(_tempDirectory);
-            Console.WriteLine($"Cleaning {SaCommon.SaFileSuffix} and {SaCommon.IndexSufix} files from temp directory {_tempDirectory}");
+            Console.WriteLine($"Cleaning {SaCommon.SaFileSuffix} and {SaCommon.IndexSuffix} files from temp directory {_tempDirectory}");
             foreach (var file in Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}"))
             {
                 File.Delete(file);
             }
-            foreach (var file in Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}{SaCommon.IndexSufix}"))
+            foreach (var file in Directory.GetFiles(_tempDirectory, $"*{SaCommon.SaFileSuffix}{SaCommon.IndexSuffix}"))
             {
                 File.Delete(file);
             }
@@ -88,7 +88,7 @@ namespace SAUtils.gnomAD
 
             var genomeFiles = GetVcfFiles(_genomeDirectory);
             var exomeFiles = GetVcfFiles(_exomeDirectory);
-            const int degOfParalleleism = 4; //hard coding since we are IO bound and stressing the disk doesn't help
+            const int degOfParalleleism = 12; //hard coding since we are IO bound and stressing the disk doesn't help
             Console.WriteLine($"Creating merged gnomAD database file from {genomeFiles.Length + exomeFiles.Length} input files. Degree of parallelism {degOfParalleleism}");
 
             Parallel.ForEach(
@@ -113,7 +113,7 @@ namespace SAUtils.gnomAD
             using (var exomeReader = GetExomeReader(exomeFiles, genomeFile))
             using (var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference)))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_tempDirectory, outName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_tempDirectory, outName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_tempDirectory, outName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.GnomadTag, true, false, SaCommon.SchemaVersion, false))
             using (var reader = GZipUtilities.GetAppropriateStreamReader(genomeFile))
             {

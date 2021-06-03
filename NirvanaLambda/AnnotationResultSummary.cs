@@ -6,8 +6,9 @@ namespace NirvanaLambda
 {
     public sealed class AnnotationResultSummary
     {
-        public string ErrorMessage;
-        public string FileName;
+        public string         ErrorMessage;
+        public string         FileName;
+        public int            VariantCount;
         public ErrorCategory? ErrorCategory;
 
         public static AnnotationResultSummary Create(AnnotationResult annotationResult, ErrorCategory? errorCategory, string errorMessage)
@@ -18,7 +19,8 @@ namespace NirvanaLambda
             {
                 ErrorCategory = errorCategory,
                 ErrorMessage  = errorMessage,
-                FileName      = fileName
+                FileName      = fileName,
+                VariantCount  =  annotationResult?.variantCount ?? 0
             };
         }
     }
