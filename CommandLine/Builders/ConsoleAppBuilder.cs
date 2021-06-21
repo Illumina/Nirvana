@@ -101,7 +101,7 @@ namespace CommandLine.Builders
         public IConsoleAppHelpMenu ShowHelpMenu(string description, string commandLineExample)
         {
             // ReSharper disable once InvertIf
-            if (_data.ShowHelpMenu || _data.Errors.Count > 0)
+            if (!_data.DisableOutput && (_data.ShowHelpMenu || _data.Errors.Count > 0))
             {
                 Help.Show(_data.Ops, commandLineExample, description);
                 Console.WriteLine($"\n{_data.VersionProvider.DataVersion}\n");
@@ -122,9 +122,9 @@ namespace CommandLine.Builders
             // ReSharper disable once InvertIf
             if (_data.Errors.Count > 0)
             {
-                Console.WriteLine("\nSome problems were encountered when parsing the command line options:");
+                Console.Error.WriteLine("\nSome problems were encountered when parsing the command line options:");
                 PrintErrors();
-                Console.WriteLine("\nFor a complete list of command line options, type \"dotnet {0} -h\"", CommandLineUtilities.CommandFileName);
+                Console.Error.WriteLine("\nFor a complete list of command line options, type \"dotnet {0} -h\"", CommandLineUtilities.CommandFileName);
             }
 
             return new ConsoleAppErrors(_data);
@@ -134,11 +134,11 @@ namespace CommandLine.Builders
         {
             foreach (string error in _data.Errors)
             {
-                Console.Write("- ");
+                Console.Error.Write("- ");
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("ERROR: ");
+                Console.Error.Write("ERROR: ");
                 Console.ResetColor();
-                Console.WriteLine(error);
+                Console.Error.WriteLine(error);
             }
         }
     }
