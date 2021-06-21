@@ -92,7 +92,7 @@ namespace Compression.FileHandling
 
         #endregion
 
-        public BlockGZipStream(Stream stream, CompressionMode compressionMode, bool leaveStreamOpen = false, int compressionLevel = 1)
+        public BlockGZipStream(Stream stream, CompressionMode compressionMode, bool leaveStreamOpen = false, int compressionLevel = 5)
         {
             _filePath        = "(stream)";
             _leaveStreamOpen = leaveStreamOpen;

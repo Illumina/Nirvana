@@ -15,6 +15,8 @@ namespace SAUtils.Custom
         private static string _inputFile;
         private static string _universalGeneArchivePath;
         private static string _outputDirectory;
+        private static bool   _skipGeneValidation;
+
         public static ExitCodes Run(string command, string[] commandArgs)
         {
             var ops = new OptionSet
@@ -28,6 +30,11 @@ namespace SAUtils.Custom
                     "in|i=",
                     "custom TSV file path",
                     v => _inputFile = v
+                },
+                {
+                    "skip-validation",
+                    "skips gene name validation",
+                    v => _skipGeneValidation = v != null
                 },
                 {
                     "out|o=",
@@ -66,7 +73,7 @@ namespace SAUtils.Custom
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(ngaSchemaFilePath))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
-                ngaWriter.Write(parser.GetItems());
+                ngaWriter.Write(parser.GetItems(_skipGeneValidation));
                 if(parser.GetUnknownGenes().Count > 0)
                     throw new UserErrorException($"{GeneAnnotationsParser.UnknownGeneIdsErrorMessage} {string.Join(',',parser.GetUnknownGenes())}.");
                 schemaWriter.Write(parser.JsonSchema);
