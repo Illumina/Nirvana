@@ -18,8 +18,8 @@ namespace IO
             {
                 var request = WebRequest.CreateHttp(_url);
                 request.AddRange(position);
-                request.Timeout                             = 3000;
-                request.ReadWriteTimeout                    = 5000;
+                request.Timeout                             = 10_000;
+                request.ReadWriteTimeout                    = 15_000;
                 var response = (HttpWebResponse)request.GetResponse();
                 var stream   = response.GetResponseStream();
                 return (response, stream);

@@ -13,6 +13,7 @@ namespace IO
     {
         private static readonly string[] AuthenticationErrorCodes   = { "InvalidAccessKeyId", "SignatureDoesNotMatch" };
         private static readonly string[] ResourceNotExistErrorCodes = { "NoSuchKey", "NoSuchBucket" };
+        private const           int      MaxRetryCount              = 10;
         
         public static long GetLength(string url)
         {
@@ -27,7 +28,7 @@ namespace IO
         {
             var exceptions = new List<Exception>();
 
-            for (var retryCounter = 0; retryCounter < 3; retryCounter++)
+            for (var retryCounter = 0; retryCounter < MaxRetryCount; retryCounter++)
             {
                 try
                 {
