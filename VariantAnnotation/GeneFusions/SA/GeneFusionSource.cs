@@ -29,7 +29,7 @@ namespace VariantAnnotation.GeneFusions.SA
         Pseudogene,
         Readthrough,
         Robinson_prostate_cancers,
-        TCGA_Normal,
+        TumorFusions_normal,
         TCGA_oesophageal_carcinomas,
         TCGA_Tumor,
 
@@ -42,7 +42,8 @@ namespace VariantAnnotation.GeneFusions.SA
         Mitelman_DB,
         OncoKB,
         PCAWG,
-        TumorFusions,        // tcga.txt
+        TCGA,                // tcga.txt
+        TumorFusions_tumor,  // tcga-cancer.txt
         TCGA_Gao,            // tcga2.txt
         TCGA_Vellichirammal, // tcga3.txt
         TICdb

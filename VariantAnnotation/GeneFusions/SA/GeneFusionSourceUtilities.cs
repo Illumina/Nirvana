@@ -37,13 +37,14 @@ namespace VariantAnnotation.GeneFusions.SA
                 GeneFusionSource.OneK_Genomes_Project        => "1000 Genomes Project",
                 GeneFusionSource.PCAWG                       => "PCAWG",
                 GeneFusionSource.Robinson_prostate_cancers   => "Robinson prostate cancers",
+                GeneFusionSource.TCGA                        => "TCGA",
                 GeneFusionSource.TCGA_Gao                    => "TCGA Gao",
-                GeneFusionSource.TCGA_Normal                 => "TCGA normal",
                 GeneFusionSource.TCGA_oesophageal_carcinomas => "TCGA oesophageal carcinomas",
                 GeneFusionSource.TCGA_Tumor                  => "TCGA tumor",
                 GeneFusionSource.TCGA_Vellichirammal         => "TCGA Vellichirammal",
                 GeneFusionSource.TICdb                       => "TICdb",
-                GeneFusionSource.TumorFusions                => "TumorFusions",
+                GeneFusionSource.TumorFusions_tumor          => "TumorFusions tumor",
+                GeneFusionSource.TumorFusions_normal         => "TumorFusions normal",
                 _                                            => throw new NotImplementedException($"Found an unexpected gene fusion source: {source}")
             };
         }

@@ -20,7 +20,7 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
         [InlineData(GeneFusionSource.Human_Protein_Atlas,         "Human Protein Atlas")]
         [InlineData(GeneFusionSource.NonTumorCellLines,           "non-tumor cell lines")]
         [InlineData(GeneFusionSource.Robinson_prostate_cancers,   "Robinson prostate cancers")]
-        [InlineData(GeneFusionSource.TCGA_Normal,                 "TCGA normal")]
+        [InlineData(GeneFusionSource.TumorFusions_normal,         "TumorFusions normal")]
         [InlineData(GeneFusionSource.TCGA_oesophageal_carcinomas, "TCGA oesophageal carcinomas")]
         [InlineData(GeneFusionSource.TCGA_Tumor,                  "TCGA tumor")]
         public void Convert_ExpectedResults(GeneFusionSource source, string expectedResult)
@@ -28,14 +28,11 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
             string actualResult = GeneFusionSourceUtilities.Convert(source);
             Assert.Equal(expectedResult, actualResult);
         }
-        
+
         [Fact]
         public void Convert_UnknownSource_ThrowException()
         {
-            Assert.Throws<NotImplementedException>(delegate
-            {
-                GeneFusionSourceUtilities.Convert(GeneFusionSource.None);
-            });
+            Assert.Throws<NotImplementedException>(delegate { GeneFusionSourceUtilities.Convert(GeneFusionSource.None); });
         }
     }
 }

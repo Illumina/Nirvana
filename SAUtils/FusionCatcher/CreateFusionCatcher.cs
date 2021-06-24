@@ -75,7 +75,7 @@ namespace SAUtils.FusionCatcher
                 geneKeyToFusion, knownGenes);
             FusionCatcherDataSource.Parse(GetStream("non-tumor_cells.txt"), GeneFusionSource.NonTumorCellLines, CollectionType.Germline,
                 geneKeyToFusion, knownGenes);
-            FusionCatcherDataSource.Parse(GetStream("tcga-normal.txt"), GeneFusionSource.TCGA_Normal, CollectionType.Germline, geneKeyToFusion,
+            FusionCatcherDataSource.Parse(GetStream("tcga-normal.txt"), GeneFusionSource.TumorFusions_normal, CollectionType.Germline, geneKeyToFusion,
                 knownGenes);
 
             // somatic fusions
@@ -101,14 +101,14 @@ namespace SAUtils.FusionCatcher
                 knownGenes);
             FusionCatcherDataSource.Parse(GetStream("oesophagus.txt"), GeneFusionSource.TCGA_oesophageal_carcinomas, CollectionType.Somatic,
                 geneKeyToFusion, knownGenes);
-            FusionCatcherDataSource.Parse(GetStream("oncokb.txt"), GeneFusionSource.OncoKB, CollectionType.Somatic, geneKeyToFusion, knownGenes);
+            // FusionCatcherDataSource.Parse(GetStream("oncokb.txt"), GeneFusionSource.OncoKB, CollectionType.Somatic, geneKeyToFusion, knownGenes);
             FusionCatcherDataSource.Parse(GetStream("pancreases.txt"), GeneFusionSource.Bailey_pancreatic_cancers, CollectionType.Somatic,
                 geneKeyToFusion, knownGenes);
             FusionCatcherDataSource.Parse(GetStream("pcawg.txt"), GeneFusionSource.PCAWG, CollectionType.Somatic, geneKeyToFusion, knownGenes);
             FusionCatcherDataSource.Parse(GetStream("prostate_cancer.txt"), GeneFusionSource.Robinson_prostate_cancers, CollectionType.Somatic,
                 geneKeyToFusion, knownGenes);
-            FusionCatcherDataSource.Parse(GetStream("tcga.txt"), GeneFusionSource.TumorFusions, CollectionType.Somatic, geneKeyToFusion, knownGenes);
-            FusionCatcherDataSource.Parse(GetStream("tcga-cancer.txt"), GeneFusionSource.TCGA_Tumor, CollectionType.Somatic, geneKeyToFusion,
+            FusionCatcherDataSource.Parse(GetStream("tcga.txt"), GeneFusionSource.TCGA, CollectionType.Somatic, geneKeyToFusion, knownGenes);
+            FusionCatcherDataSource.Parse(GetStream("tcga-cancer.txt"), GeneFusionSource.TumorFusions_tumor, CollectionType.Somatic, geneKeyToFusion,
                 knownGenes);
             FusionCatcherDataSource.Parse(GetStream("tcga2.txt"), GeneFusionSource.TCGA_Gao, CollectionType.Somatic, geneKeyToFusion, knownGenes);
             FusionCatcherDataSource.Parse(GetStream("tcga3.txt"), GeneFusionSource.TCGA_Vellichirammal, CollectionType.Somatic, geneKeyToFusion,
