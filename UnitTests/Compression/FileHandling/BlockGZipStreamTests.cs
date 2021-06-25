@@ -33,7 +33,7 @@ namespace UnitTests.Compression.FileHandling
             // compress the data
             long observedPosition;
 
-            using (var writer = new BlockGZipStream(FileUtilities.GetCreateStream(randomPath), CompressionMode.Compress))
+            using (var writer = new BlockGZipStream(FileUtilities.GetCreateStream(randomPath), CompressionMode.Compress, false, 1))
             {
                 writer.Write(_expectedDecompressedBuffer, 0, _expectedDecompressedBuffer.Length);
                 observedPosition = writer.Position;

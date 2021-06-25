@@ -17,7 +17,7 @@ namespace UnitTests.Compression.FileHandling
 
             using (var ms = new MemoryStream())
             {
-                using (var stream = new BlockGZipStream(ms, CompressionMode.Compress, true))
+                using (var stream = new BlockGZipStream(ms, CompressionMode.Compress, true, 1))
                 using (var writer = new BgzipTextWriter(stream))
                 {
                     writer.Flush();

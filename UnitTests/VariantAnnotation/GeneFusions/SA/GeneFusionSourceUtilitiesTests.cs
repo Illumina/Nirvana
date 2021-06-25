@@ -1,5 +1,4 @@
-﻿using System;
-using VariantAnnotation.GeneFusions.SA;
+﻿using VariantAnnotation.GeneFusions.SA;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.GeneFusions.SA
@@ -30,9 +29,10 @@ namespace UnitTests.VariantAnnotation.GeneFusions.SA
         }
 
         [Fact]
-        public void Convert_UnknownSource_ThrowException()
+        public void Convert_UnknownSource_ReturnsNull()
         {
-            Assert.Throws<NotImplementedException>(delegate { GeneFusionSourceUtilities.Convert(GeneFusionSource.None); });
+            string actualResult = GeneFusionSourceUtilities.Convert(GeneFusionSource.None);
+            Assert.Null(actualResult);
         }
     }
 }

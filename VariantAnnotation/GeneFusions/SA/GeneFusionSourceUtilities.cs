@@ -45,7 +45,7 @@ namespace VariantAnnotation.GeneFusions.SA
                 GeneFusionSource.TICdb                       => "TICdb",
                 GeneFusionSource.TumorFusions_tumor          => "TumorFusions tumor",
                 GeneFusionSource.TumorFusions_normal         => "TumorFusions normal",
-                _                                            => throw new NotImplementedException($"Found an unexpected gene fusion source: {source}")
+                _                                            => null
             };
         }
     }

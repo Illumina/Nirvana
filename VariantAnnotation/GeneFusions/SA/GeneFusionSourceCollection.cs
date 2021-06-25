@@ -126,7 +126,11 @@ namespace VariantAnnotation.GeneFusions.SA
         private static void AddGeneFusionSource(string description, GeneFusionSource[] sources, List<string> entries, JsonObject jsonObject)
         {
             entries.Clear();
-            foreach (GeneFusionSource source in sources) entries.Add(GeneFusionSourceUtilities.Convert(source));
+            foreach (GeneFusionSource source in sources)
+            {
+                string sourceString = GeneFusionSourceUtilities.Convert(source);
+                if (sourceString != null) entries.Add(sourceString);
+            }
             jsonObject.AddStringValues(description, entries);
         }
 
