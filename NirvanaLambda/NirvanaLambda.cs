@@ -68,7 +68,7 @@ namespace NirvanaLambda
                 if (!_supportedAssemblies.Contains(genomeAssembly))
                     throw new UserErrorException($"Unsupported assembly: {config.genomeAssembly}");
 
-                IEnumerable<AnnotationRange> annotationRanges = GetAnnotationRanges(config, genomeAssembly);
+                AnnotationRange[] annotationRanges = GetAnnotationRanges(config, genomeAssembly);
                 result = GetNirvanaResult(annotationRanges, config, annotationLambdaArn, context, runLog, snsTopicArn);
             }
             catch (Exception exception)
@@ -80,35 +80,31 @@ namespace NirvanaLambda
 
             return result;
         }
-
         
-        private static IEnumerable<AnnotationRange> GetAnnotationRanges(NirvanaConfig config, GenomeAssembly genomeAssembly)
+        private static AnnotationRange[] GetAnnotationRanges(NirvanaConfig config, GenomeAssembly genomeAssembly)
         {
             string cachePathPrefix = LambdaUtilities.GetCachePathPrefix(genomeAssembly);
 
-            IntervalForest<IGene> geneIntervalForest;
-            IDictionary<string, IChromosome> refNameToChromosome;
-            List<long> blockOffsets;
+            using Stream tabixStream      = PersistentStreamUtils.GetReadStream(config.tabixUrl);
+            using var    tabixReader      = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress));
+            using Stream referenceStream  = PersistentStreamUtils.GetReadStream(LambdaUrlHelper.GetRefUrl(genomeAssembly));
+            using var    sequenceProvider = new ReferenceSequenceProvider(referenceStream);
+            
+            long         vcfSize          = HttpUtilities.GetLength(config.vcfUrl);
+            int          numPartitions    = Math.Max(Math.Min((int) ((vcfSize - 1) / MinPartitionSize + 1), MaxNumPartitions), MinNumPartitions);
 
-            using (var tabixStream      = PersistentStreamUtils.GetReadStream(config.tabixUrl))
-            using (var tabixReader      = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress)))
-            using (var referenceStream  = PersistentStreamUtils.GetReadStream(LambdaUrlHelper.GetRefUrl(genomeAssembly)))
-            using (var sequenceProvider = new ReferenceSequenceProvider(referenceStream))
-            using (var taProvider       = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider, null))
-            {
-                long vcfSize = HttpUtilities.GetLength(config.vcfUrl);
-                int numPartitions = Math.Max(Math.Min((int)((vcfSize - 1) / MinPartitionSize + 1), MaxNumPartitions), MinNumPartitions);
+            Tabix.Index tabixIndex   = Reader.Read(tabixReader, sequenceProvider.RefNameToChromosome);
+            List<long>  blockOffsets = PartitionUtilities.GetFileOffsets(config.vcfUrl, numPartitions, tabixIndex);
+            
+            // stop early if we're going to annotate the entire file
+            if (blockOffsets.Count == 1 && blockOffsets[0] == 0) return null;
 
-                var tabixIndex = Reader.Read(tabixReader, sequenceProvider.RefNameToChromosome);
-                blockOffsets   = PartitionUtilities.GetFileOffsets(config.vcfUrl, numPartitions, tabixIndex);
+            using var                        taProvider               = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider, null);
+            IntervalArray<ITranscript>[]     transcriptIntervalArrays = taProvider.TranscriptIntervalArrays;
+            IntervalForest<IGene>            geneIntervalForest       = GeneForestGenerator.GetGeneForest(transcriptIntervalArrays);
+            IDictionary<string, IChromosome> refNameToChromosome      = sequenceProvider.RefNameToChromosome;
 
-                IntervalArray<ITranscript>[] transcriptIntervalArrays = taProvider.TranscriptIntervalArrays;
-                geneIntervalForest  = GeneForestGenerator.GetGeneForest(transcriptIntervalArrays);
-                refNameToChromosome = sequenceProvider.RefNameToChromosome;
-            }
-
-            IEnumerable<AnnotationRange> annotationRanges = PartitionUtilities.GenerateAnnotationRanges(blockOffsets, config.vcfUrl, geneIntervalForest, refNameToChromosome);
-            return annotationRanges;
+            return PartitionUtilities.GenerateAnnotationRanges(blockOffsets, config.vcfUrl, geneIntervalForest, refNameToChromosome);
         }
 
         private static NirvanaResult HandleException(StringBuilder runLog, NirvanaConfig config, Exception e, string snsTopicArn)
@@ -156,7 +152,7 @@ namespace NirvanaLambda
             }
         }
 
-        private NirvanaResult GetNirvanaResult(IEnumerable<AnnotationRange> annotationRanges, NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, StringBuilder runLog, string snsTopicArn)
+        private NirvanaResult GetNirvanaResult(AnnotationRange[] annotationRanges, NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, StringBuilder runLog, string snsTopicArn)
         {
             Task<AnnotationResultSummary>[] annotationTasks = CallAnnotationLambdas(config, annotationLambdaArn, context, annotationRanges);
             AnnotationResultSummary[] processedAnnotationResults = Task.WhenAll(annotationTasks).Result;
@@ -202,9 +198,10 @@ namespace NirvanaLambda
             return (mostSevereError, errorMessage);
         }
 
-        private static Task<AnnotationResultSummary>[] CallAnnotationLambdas(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, IEnumerable<AnnotationRange> annotationRanges) =>
-            annotationRanges?.Select((x, i) => RunAnnotationJob(config, annotationLambdaArn, context, x, i + 1)).ToArray() 
-            ?? new[] { RunAnnotationJob(config, annotationLambdaArn, context, null, 1) };
+        private static Task<AnnotationResultSummary>[] CallAnnotationLambdas(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context,
+            IEnumerable<AnnotationRange> annotationRanges) =>
+            annotationRanges?.Select((x, i) => RunAnnotationJob(config, annotationLambdaArn, context, x, i + 1)).ToArray() ??
+            new[] {RunAnnotationJob(config, annotationLambdaArn, context, null, 1)};
 
         private static Task<AnnotationResultSummary> RunAnnotationJob(NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, AnnotationRange range, int jobIndex)
         {

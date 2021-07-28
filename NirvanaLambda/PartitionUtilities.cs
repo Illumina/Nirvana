@@ -62,8 +62,12 @@ namespace NirvanaLambda
             return offsets;
         }
 
-        private static long[] GetAllLinearFileOffsets(Tabix.Index tabixIndex) =>
-        MergeConsecutiveEqualValues(tabixIndex.ReferenceSequences.SelectMany(x => x.LinearFileOffsets.Select(y => VirtualPosition.From((long)y).FileOffset))).ToArray();
+        private static long[] GetAllLinearFileOffsets(Tabix.Index tabixIndex)
+        {
+            if (tabixIndex.ReferenceSequences.Length == 0) return new long[] {0};
+            return MergeConsecutiveEqualValues(
+                tabixIndex.ReferenceSequences.SelectMany(x => x.LinearFileOffsets.Select(y => VirtualPosition.From((long) y).FileOffset))).ToArray();
+        }
 
         public static IEnumerable<T> MergeConsecutiveEqualValues<T>(IEnumerable<T> values)
         {
@@ -79,8 +83,8 @@ namespace NirvanaLambda
             }
         }
 
-        public static IEnumerable<AnnotationRange> GenerateAnnotationRanges(List<long> blockBasedOffsets, string vcfUrl, IntervalForest<IGene> geneIntervalForest,
-            IDictionary<string, IChromosome> refNameToChromosome)
+        public static AnnotationRange[] GenerateAnnotationRanges(List<long> blockBasedOffsets, string vcfUrl,
+            IntervalForest<IGene> geneIntervalForest, IDictionary<string, IChromosome> refNameToChromosome)
         {
             // There may be less intervals for annotation Lambda after the adjustment
             AnnotationPosition[] adjustedStarts = AdjustPartitionGenomicStarts(blockBasedOffsets, vcfUrl, geneIntervalForest, refNameToChromosome);
@@ -110,15 +114,23 @@ namespace NirvanaLambda
             return adjustedStarts;
         }
 
-        private static IEnumerable<AnnotationRange> GetRanges(IList<AnnotationPosition> adjustedStarts)
+        private static AnnotationRange[] GetRanges(AnnotationPosition[] adjustedStarts)
         {
-            for (var i = 0; i < adjustedStarts.Count - 1; i++)
+            int numStarts = adjustedStarts.Length;
+            int lastIndex = numStarts - 1;
+
+            if (numStarts == 1) return null;
+
+            var ranges = new AnnotationRange[numStarts];
+            
+            for (var i = 0; i < lastIndex; i++)
                 //The end position in an annotation range can be smaller than 1, which indicate it ends at the end of previous chromosome
-                yield return new AnnotationRange(adjustedStarts[i], new AnnotationPosition(adjustedStarts[i + 1].Chromosome, adjustedStarts[i + 1].Position - 1));
+                ranges[i] = new AnnotationRange(adjustedStarts[i], new AnnotationPosition(adjustedStarts[i + 1].Chromosome, adjustedStarts[i + 1].Position - 1));
 
-            yield return new AnnotationRange(adjustedStarts[adjustedStarts.Count - 1], null);
+            ranges[lastIndex] = new AnnotationRange(adjustedStarts[lastIndex], null);
+
+            return ranges;
         }
-
 
         private static AnnotationPosition GetFirstGenomicPosition(Stream vcfStream, bool isFirstBlock)
         {

@@ -56,7 +56,8 @@ namespace AnnotationLambda
 
                     using (var preloadVcfStream = PersistentStreamUtils.GetReadStream(vcfUrl, fileOffset))
                     {
-                        annotationResources.GetVariantPositions(new BlockGZipStream(preloadVcfStream, CompressionMode.Decompress), config.annotationRange.ToGenomicRange(annotationResources.SequenceProvider.RefNameToChromosome));
+                        var annotationRange = config.annotationRange?.ToGenomicRange(annotationResources.SequenceProvider.RefNameToChromosome);
+                        annotationResources.GetVariantPositions(new BlockGZipStream(preloadVcfStream, CompressionMode.Decompress), annotationRange);
                     }
 
                     Logger.WriteLine("Scan for positions to preload complete.");
