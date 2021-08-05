@@ -1,4 +1,4 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
+﻿using VariantAnnotation.AnnotatedPositions.AminoAcids;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
@@ -19,14 +19,14 @@ namespace VariantAnnotation.AnnotatedPositions
             // insertion past the last AA
             if (end > peptideSeq.Length) return null;
 
-            var leftFlankingAa = AminoAcids.ConvertAminoAcidToAbbreviation(peptideSeq[start - 1]);
+            var leftFlankingAa = AminoAcidAbbreviation.GetThreeLetterAbbreviation(peptideSeq[start - 1]);
             if (altAbbreviation.StartsWith("Ter"))
             {
-                var refAminoAcid = AminoAcids.ConvertAminoAcidToAbbreviation(peptideSeq[start]);
+                var refAminoAcid = AminoAcidAbbreviation.GetThreeLetterAbbreviation(peptideSeq[start]);
                 return $"{proteinId}:p.({refAminoAcid}{end}Ter)";
             }
 
-            var rightFlankingAa = end > peptideSeq.Length ? "Ter" : AminoAcids.ConvertAminoAcidToAbbreviation(peptideSeq[end - 1]);
+            var rightFlankingAa = end > peptideSeq.Length ? "Ter" : AminoAcidAbbreviation.GetThreeLetterAbbreviation(peptideSeq[end - 1]);
 
             return $"{proteinId}:p.({leftFlankingAa}{start}_{rightFlankingAa}{end}ins{altAbbreviation})";
         }
@@ -56,10 +56,7 @@ namespace VariantAnnotation.AnnotatedPositions
         }
 
 
-        public static string GetStartLostNotation(string proteinId, int start, int end, string refAbbreviation)
-        {
-            return $"{proteinId}:p.?";
-        }
+        public static string GetStartLostNotation(string proteinId, string refAbbreviation) => $"{proteinId}:p.{refAbbreviation.Substring(0, 3)}1?";
 
         public static string GetSilentNotation(string hgvscNotation, int start, string refAbbreviation, bool isStopRetained)
         {

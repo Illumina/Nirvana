@@ -2,8 +2,8 @@
 using Genome;
 using Intervals;
 using OptimizedCore;
+using VariantAnnotation.AnnotatedPositions.AminoAcids;
 using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches.Utilities;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -11,37 +11,30 @@ namespace VariantAnnotation.AnnotatedPositions
 {
     public static class HgvsUtilities
     {
-        public static void ShiftAndRotateAlleles(ref int start, ref string refAminoAcids, ref string altAminoAcids, string peptideSeq)
+        public static void ShiftAndRotateAlleles(ref int start, ref string refAminoAcids, ref string altAminoAcids,
+            string peptideSeq)
         {
-            var trimmedAlleles = BiDirectionalTrimmer.Trim(start, refAminoAcids, altAminoAcids);
-
-            start         = trimmedAlleles.Start;
-            refAminoAcids = trimmedAlleles.RefAllele;
-            altAminoAcids = trimmedAlleles.AltAllele;
-
-            var rotatedAlleles = Rotate3Prime(refAminoAcids, altAminoAcids, start, peptideSeq);
-
-            start         = rotatedAlleles.Start;
-            refAminoAcids = rotatedAlleles.RefAminoAcids;
-            altAminoAcids = rotatedAlleles.AltAminoAcids;
+            (start, refAminoAcids, altAminoAcids) = BiDirectionalTrimmer.Trim(start, refAminoAcids, altAminoAcids);
+            (start, refAminoAcids, altAminoAcids) = Rotate3Prime(refAminoAcids, altAminoAcids, start, peptideSeq);
         }
 
-        internal static (int Start, string RefAminoAcids, string AltAminoAcids) Rotate3Prime(string refAminoAcids, string altAminoAcids, int start, string peptides)
+        internal static (int Start, string RefAminoAcids, string AltAminoAcids) Rotate3Prime(string refAminoAcids,
+            string altAminoAcids, int start, string peptides)
         {
             if (!(string.IsNullOrEmpty(refAminoAcids) || string.IsNullOrEmpty(altAminoAcids)))
                 return (start, refAminoAcids, altAminoAcids);
 
-            var isInsertion = !string.IsNullOrEmpty(altAminoAcids);
+            bool isInsertion = !string.IsNullOrEmpty(altAminoAcids);
 
             // ReSharper disable once PossibleNullReferenceException
-            var end = start + refAminoAcids.Length - 1;
+            int end = start + refAminoAcids.Length - 1;
 
             // for insertion, the reference bases will be empty string. The shift should happen on the alternate allele
-            var rotatingPeptides = isInsertion ? altAminoAcids : refAminoAcids;
-            var numBases = rotatingPeptides.Length;
+            string rotatingPeptides = isInsertion ? altAminoAcids : refAminoAcids;
+            int    numBases         = rotatingPeptides.Length;
 
-            var downstreamPeptides = peptides.Length >= end ? peptides.Substring(end) : null;
-            var combinedSequence   = rotatingPeptides + downstreamPeptides;
+            string downstreamPeptides = peptides.Length >= end ? peptides.Substring(end) : null;
+            string combinedSequence   = rotatingPeptides + downstreamPeptides;
 
             int shiftStart, shiftEnd;
             var hasShifted = false;
@@ -56,7 +49,7 @@ namespace VariantAnnotation.AnnotatedPositions
             if (hasShifted) rotatingPeptides = combinedSequence.Substring(shiftStart, numBases);
 
             if (isInsertion) altAminoAcids = rotatingPeptides;
-            else refAminoAcids = rotatingPeptides;
+            else refAminoAcids             = rotatingPeptides;
 
             return (start, refAminoAcids, altAminoAcids);
         }
@@ -68,26 +61,27 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             if (altAminoAcids == null || transcriptPeptides == null) return false;
 
-            var testAminoAcidPos = start - altAminoAcids.Length - 1;
+            int testAminoAcidPos = start - altAminoAcids.Length - 1;
             if (testAminoAcidPos < 0) return false;
 
-            var precedingAminoAcids = testAminoAcidPos + altAminoAcids.Length <= transcriptPeptides.Length
+            string precedingAminoAcids = testAminoAcidPos + altAminoAcids.Length <= transcriptPeptides.Length
                 ? transcriptPeptides.Substring(testAminoAcidPos, altAminoAcids.Length)
                 : "";
 
-            return testAminoAcidPos >= 0 && precedingAminoAcids == altAminoAcids;
+            return precedingAminoAcids == altAminoAcids;
         }
 
         /// <summary>
         /// returns the number of amino acids until the next stop codon is encountered [TranscriptVariationAllele.pm:1531 _stop_loss_extra_AA]
         /// </summary>
-        public static int GetNumAminoAcidsUntilStopCodon(string altCds, string peptideSeq, int refVarPos, bool isFrameshift)
+        public static int GetNumAminoAcidsUntilStopCodon(string altCds, string peptideSeq, int refVarPos,
+            bool isFrameshift)
         {
-            var numExtraAminoAcids = -1;
-            var refLen = peptideSeq.Length;
+            int numExtraAminoAcids = -1;
+            int refLen             = peptideSeq.Length;
 
             // find the number of residues that are translated until a termination codon is encountered
-            var terPos = altCds.IndexOf('*');
+            int terPos = altCds.IndexOf('*');
             if (terPos != -1)
             {
                 numExtraAminoAcids = terPos + 1 - (isFrameshift ? refVarPos : refLen + 1);
@@ -97,16 +91,17 @@ namespace VariantAnnotation.AnnotatedPositions
             return numExtraAminoAcids > 0 ? numExtraAminoAcids : -1;
         }
 
-        public static (int Start, char RefAminoAcid, char AltAminoAcid) GetChangesAfterFrameshift(int start, string peptideSeq, string altPeptideSeq)
+        public static (int Start, char RefAminoAcid, char AltAminoAcid) GetChangesAfterFrameshift(int start,
+            string peptideSeq, string altPeptideSeq)
         {
             start = Math.Min(start, peptideSeq.Length);
 
             // for deletions at the end of peptide sequence
-            if (start > altPeptideSeq.Length) return (start, peptideSeq[start - 1], '?');
+            if (start > altPeptideSeq.Length) return (start, peptideSeq[start - 1], 'X');
 
-            var refPeptideSeq = peptideSeq + "*";
-            char refAminoAcid = refPeptideSeq[start - 1];
-            char altAminoAcid = altPeptideSeq[start - 1];
+            string refPeptideSeq = peptideSeq + "*";
+            char   refAminoAcid  = refPeptideSeq[start - 1];
+            char   altAminoAcid  = altPeptideSeq[start - 1];
 
             while (start <= altPeptideSeq.Length && start <= refPeptideSeq.Length)
             {
@@ -125,39 +120,40 @@ namespace VariantAnnotation.AnnotatedPositions
         /// returns the translated coding sequence including the variant and the 3' UTR
         /// </summary>
         public static string GetAltPeptideSequence(ISequence refSequence, int cdsBegin, int cdsEnd,
-            string trancriptAltAllele, ITranscript transcript, bool isMitochondrial)
+            string transcriptAltAllele, ITranscript transcript, AminoAcid aminoAcids, int aaStart)
         {
-            string altCds = TranscriptUtilities.GetAlternateCds(refSequence, cdsBegin,
-                cdsEnd, trancriptAltAllele, transcript.TranscriptRegions,
-                transcript.Gene.OnReverseStrand, transcript.StartExonPhase,
+            string altCds = TranscriptUtilities.GetAlternateCds(refSequence, cdsBegin, cdsEnd, transcriptAltAllele,
+                transcript.TranscriptRegions, transcript.Gene.OnReverseStrand, transcript.StartExonPhase,
                 transcript.Translation.CodingRegion.CdnaStart);
-
-            var aminoAcids = new AminoAcids(isMitochondrial);
-            return aminoAcids.TranslateBases(altCds, true);
+            
+            return aminoAcids.TranslateBases(altCds, transcript.AminoAcidEdits, aaStart, true);
         }
 
-        public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int position, int regionIndex, bool isRegionStart)
+        public static PositionOffset GetCdnaPositionOffset(ITranscript transcript, int position, int regionIndex,
+            bool isRegionStart)
         {
-            
             if (!transcript.Overlaps(position, position)) return null;
 
-            var region            = transcript.TranscriptRegions[regionIndex];
+            var region = transcript.TranscriptRegions[regionIndex];
             int codingRegionStart = transcript.Translation?.CodingRegion.CdnaStart ?? -1;
-            int codingRegionEnd   = transcript.Translation?.CodingRegion.CdnaEnd ?? -1;
+            int codingRegionEnd = transcript.Translation?.CodingRegion.CdnaEnd ?? -1;
             var po = GetPositionAndOffset(position, region, transcript.Gene.OnReverseStrand, isRegionStart);
             if (po.Position == -1) return null;
 
-            var cdnaCoord = GetCdnaCoord(po.Position, po.Offset, codingRegionStart, codingRegionEnd);
-            string offset = po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0");
-            string value  = cdnaCoord.HasNoPosition ? "*" + po.Offset : cdnaCoord.CdnaCoord + offset;
+            var    cdnaCoord = GetCdnaCoord(po.Position, codingRegionStart, codingRegionEnd);
+            string offset    = po.Offset == 0 ? "" : po.Offset.ToString("+0;-0;+0");
+            string value     = cdnaCoord.CdnaCoord + offset;
 
             return new PositionOffset(po.Position, po.Offset, value, cdnaCoord.HasStopCodonNotation);
         }
 
-        private static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region, bool onReverseStrand, bool isRegionStart)
+        private static (int Position, int Offset) GetPositionAndOffset(int position, ITranscriptRegion region,
+            bool onReverseStrand, bool isRegionStart)
         {
             int cdsPos = -1;
             int offset = -1;
+
+            // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
             switch (region.Type)
             {
                 case TranscriptRegionType.Exon:
@@ -172,42 +168,14 @@ namespace VariantAnnotation.AnnotatedPositions
                     break;
             }
 
-            //var rnaEditOffset = GetRnaEditOffset(cdsPos, rnaEdits);
-            //cdsPos -= rnaEditOffset;
             return (cdsPos, offset);
-            
-        }
-
-        public static int GetRnaEditOffset(int position, IRnaEdit[] rnaEdits)
-        {
-            var rnaEditOffset = 0;
-            if (rnaEdits == null) return rnaEditOffset;
-
-            RnaEditUtilities.SetTypesAndSort(rnaEdits);
-
-            foreach (var rnaEdit in rnaEdits)
-            {
-                if (rnaEdit.Start > position) break;
-                
-                switch (rnaEdit.Type)
-                {
-                    case VariantType.insertion:
-                        rnaEditOffset += rnaEdit.Bases.Length;
-                        break;
-                    case VariantType.deletion:
-                        rnaEditOffset -= rnaEdit.End - rnaEdit.Start + 1;
-                        break;
-                }
-            }
-
-            return rnaEditOffset;
         }
 
         private static (int Position, int Offset) GetIntronPositionAndOffset(int position, ITranscriptRegion region,
             bool onReverseStrand)
         {
-            int leftDist  = position - region.Start + 1;
-            int rightDist = region.End - position + 1;
+            int leftDist  = position   - region.Start + 1;
+            int rightDist = region.End - position     + 1;
 
             int offset = Math.Min(leftDist, rightDist);
             if (!onReverseStrand && rightDist < leftDist || onReverseStrand && rightDist > leftDist) offset = -offset;
@@ -228,32 +196,23 @@ namespace VariantAnnotation.AnnotatedPositions
             return (cdnaPosition, offset);
         }
 
-        private static (int Position, int Offset) GetGapPositionAndOffset(ITranscriptRegion region, bool isRegionStart)
-        {
-            return isRegionStart ? (region.CdnaEnd, 0) : (region.CdnaStart, 0);
-        }
+        private static (int Position, int Offset)
+            GetGapPositionAndOffset(ITranscriptRegion region, bool isRegionStart) =>
+            isRegionStart ? (region.CdnaEnd, 0) : (region.CdnaStart, 0);
 
-        private static (string CdnaCoord, bool HasStopCodonNotation, bool HasNoPosition) GetCdnaCoord(int position,
-            int offset, int codingRegionStart, int codingRegionEnd)
+        private static (string CdnaCoord, bool HasStopCodonNotation) GetCdnaCoord(int position, int codingRegionStart,
+            int codingRegionEnd)
         {
-            string cdnaCoord          = null;
-            bool hasStopCodonNotation = false;
-            bool hasNoPosition        = false;
+            string cdnaCoord            = null;
+            var    hasStopCodonNotation = false;
 
             if (codingRegionEnd != -1)
             {
-                
                 if (position > codingRegionEnd)
                 {
-                    cdnaCoord = "*" + (position - codingRegionEnd);
+                    cdnaCoord            = "*" + (position - codingRegionEnd);
                     hasStopCodonNotation = true;
                 }
-                // else if (offset != 0 && position == codingRegionEnd)
-                // {
-                //     cdnaCoord = "*";
-                //     hasStopCodonNotation = true;
-                //     hasNoPosition = true;
-                // }
             }
 
             if (!hasStopCodonNotation && codingRegionStart != -1)
@@ -262,7 +221,17 @@ namespace VariantAnnotation.AnnotatedPositions
             }
 
             if (cdnaCoord == null) cdnaCoord = position.ToString();
-            return (cdnaCoord, hasStopCodonNotation, hasNoPosition);
+            return (cdnaCoord, hasStopCodonNotation);
+        }
+
+        public static string AdjustTranscriptRefAllele(string transcriptRefAllele, int coveredCdnaStart,
+            int coveredCdnaEnd, ISequence cdnaSequence)
+        {
+            if (coveredCdnaStart == -1 || coveredCdnaEnd == -1 || cdnaSequence == null) return transcriptRefAllele;
+            
+            return coveredCdnaEnd < coveredCdnaStart
+                ? string.Empty
+                : cdnaSequence.Substring(coveredCdnaStart - 1, coveredCdnaEnd - coveredCdnaStart + 1);
         }
 
         public static string GetTranscriptAllele(string variantAllele, bool onReverseStrand) =>
@@ -290,7 +259,7 @@ namespace VariantAnnotation.AnnotatedPositions
                     sb.Append(coordinates + "del");
                     break;
                 case GenomicChange.Inversion:
-                    sb.Append(coordinates + "inv" + referenceBases);
+                    sb.Append(coordinates + "inv");
                     break;
                 case GenomicChange.Duplication:
                     sb.Append(coordinates + "dup");
@@ -303,11 +272,12 @@ namespace VariantAnnotation.AnnotatedPositions
                     else
                     {
                         sb.Append(start + referenceBases + '>' + alternateBases);
-                    } 
+                    }
+
                     break;
                 case GenomicChange.DelIns:
-                    // NOTE: change to delins, now use del--ins-- to reduce anavarin differences
-                    sb.Append(coordinates + "delins" + alternateBases); 
+                    // NOTE: change to delins, now use del--ins-- to reduce Anavrin differences
+                    sb.Append(coordinates + "delins" + alternateBases);
                     break;
                 case GenomicChange.Insertion:
                     sb.Append(coordinates + "ins" + alternateBases);
@@ -320,11 +290,12 @@ namespace VariantAnnotation.AnnotatedPositions
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        public static bool IsDuplicateWithinInterval(ISequence refSequence, ISimpleVariant variant, IInterval interval, bool onReverseStrand)
+        public static bool IsDuplicateWithinInterval(ISequence refSequence, ISimpleVariant variant, IInterval interval,
+            bool onReverseStrand)
         {
             if (variant.Type != VariantType.insertion) return false;
 
-            int altAlleleLen = variant.AltAllele.Length;
+            int    altAlleleLen = variant.AltAllele.Length;
             string compareRegion;
 
             if (onReverseStrand)
@@ -336,7 +307,6 @@ namespace VariantAnnotation.AnnotatedPositions
             {
                 if (variant.Start - altAlleleLen < interval.Start) return false;
                 compareRegion = refSequence.Substring(variant.End - altAlleleLen, altAlleleLen);
-
             }
 
             return compareRegion == variant.AltAllele;

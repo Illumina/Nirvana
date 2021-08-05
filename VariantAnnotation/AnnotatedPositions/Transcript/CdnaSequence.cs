@@ -29,6 +29,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             _sequence = GetCdnaSequence();
         }
 
+        public string Sequence => _sequence;
+
         public string GetCdnaSequence()
         {
             if (_sequence != null) return _sequence;

@@ -20,10 +20,10 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         int SiftIndex { get; }
         int PolyPhenIndex { get; }
 
-        ITranslation Translation { get; }
-        IInterval[] MicroRnas { get; }
-        int[] Selenocysteines { get; }
-        IRnaEdit[] RnaEdits { get; }
+        ITranslation    Translation    { get; }
+        IInterval[]     MicroRnas      { get; }
+        IRnaEdit[]      RnaEdits       { get; }
+        AminoAcidEdit[] AminoAcidEdits { get; }
 
         bool CdsStartNotFound { get; }
         bool CdsEndNotFound { get; }

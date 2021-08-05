@@ -1,42 +1,44 @@
 ﻿using System;
-using Genome;
-using VariantAnnotation.TranscriptAnnotation;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public static class Codons
     {
-        public static SequenceChange GetCodons(string transcriptAlternateAllele,
-            int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, ISequence codingSequence)
+        private static readonly (string, string) EmptyTuple = (string.Empty, string.Empty);
+
+        public static (string ReferenceCodons, string AlternateCodons) GetCodons(string transcriptAlternateAllele,
+            int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, ReadOnlySpan<char> codingSequence)
         {
-            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return new SequenceChange("", "");
+            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return EmptyTuple;
 
             // current implementation of GetCoveredCdsAndProteinPositions may return negative cdsStart and cdsEnd beyond the CDS region
-            if (cdsStart < 1) cdsStart = 1;
+            if (cdsStart < 1) cdsStart                 = 1;
             if (cdsEnd > codingSequence.Length) cdsEnd = codingSequence.Length;
 
             int aminoAcidStart = Math.Max(proteinBegin * 3 - 2, 1);
-            int aminoAcidEnd = Math.Min(proteinEnd * 3, codingSequence.Length);
+            int aminoAcidEnd   = Math.Min(proteinEnd * 3, codingSequence.Length);
 
-            var transcriptReferenceAllele = cdsEnd >= cdsStart ? codingSequence.Substring(cdsStart - 1, cdsEnd - cdsStart + 1) : "";
+            string transcriptReferenceAllele = cdsEnd >= cdsStart
+                ? codingSequence.Slice(cdsStart - 1, cdsEnd - cdsStart + 1).ToString()
+                : "";
 
             int prefixStartIndex = aminoAcidStart - 1;
-            int prefixLen = cdsStart - aminoAcidStart;
+            int prefixLen        = cdsStart       - aminoAcidStart;
 
             int suffixStartIndex = cdsEnd;
-            int suffixLen = aminoAcidEnd - cdsEnd;
+            int suffixLen        = aminoAcidEnd - cdsEnd;
 
             string prefix = prefixStartIndex + prefixLen < codingSequence.Length
-                ? codingSequence.Substring(prefixStartIndex, prefixLen).ToLower()
+                ? codingSequence.Slice(prefixStartIndex, prefixLen).ToString().ToLower()
                 : "AAA";
 
             string suffix = suffixLen > 0
-                ? codingSequence.Substring(suffixStartIndex, suffixLen).ToLower()
+                ? codingSequence.Slice(suffixStartIndex, suffixLen).ToString().ToLower()
                 : "";
 
-            var refCodons = GetCodon(transcriptReferenceAllele, prefix, suffix);
-            var altCodons = GetCodon(transcriptAlternateAllele, prefix, suffix);
-            return new SequenceChange(refCodons, altCodons);
+            string refCodons = GetCodon(transcriptReferenceAllele, prefix, suffix);
+            string altCodons = GetCodon(transcriptAlternateAllele, prefix, suffix);
+            return (refCodons, altCodons);
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using System;
+using Genome;
 using Intervals;
 
 namespace VariantAnnotation.Sequence
@@ -23,6 +24,8 @@ namespace VariantAnnotation.Sequence
             _convertNumberToBase = bases.ToCharArray();
             _decompressBuffer    = new char[1024];
         }
+
+        public string Sequence => throw new NotImplementedException();
 
         private static (int BaseIndex, int Shift) GetBaseIndexAndShift(int referencePosition)
         {

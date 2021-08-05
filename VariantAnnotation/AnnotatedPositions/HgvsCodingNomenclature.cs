@@ -9,7 +9,7 @@ namespace VariantAnnotation.AnnotatedPositions
     public static class HgvsCodingNomenclature
     {
         public static string GetHgvscAnnotation(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,
-            int regionStart, int regionEnd, string transcriptRef = null, string transcriptAlt = null)
+            int regionStart, int regionEnd, string transcriptRef, string transcriptAlt)
         {
             // sanity check: don't try to handle odd characters, make sure this is not a reference allele, 
             //               and make sure that we have protein coordinates

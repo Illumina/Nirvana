@@ -79,11 +79,7 @@ namespace CacheUtils.IntermediateIO
             mt.NewStartExonPhase = mt.StartExonPhase < 0 ? (byte)0 : (byte)mt.StartExonPhase;
 
             if (mt.CodingRegion == null) return;
-
-            var codingSequence = new CodingSequence(_sequence, mt.CodingRegion, mt.TranscriptRegions,
-                mt.Gene.OnReverseStrand, mt.NewStartExonPhase, mt.RnaEdits);
-
-            mt.CdsLength = codingSequence.GetCodingSequence().Length;
+            mt.CdsLength = mt.CodingRegion.CdnaEnd - mt.CodingRegion.CdnaStart + 1;
 
             mt.CodingRegion = new CodingRegion(mt.CodingRegion.Start, mt.CodingRegion.End,
                 mt.CodingRegion.CdnaStart, mt.CodingRegion.CdnaEnd, mt.CdsLength);

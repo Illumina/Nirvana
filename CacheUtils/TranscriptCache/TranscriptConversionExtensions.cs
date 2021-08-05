@@ -28,7 +28,7 @@ namespace CacheUtils.TranscriptCache
             return new Transcript(mt.Chromosome, mt.Start, mt.End, CompactId.Convert(mt.Id, mt.Version), translation,
                 mt.BioType, mt.UpdatedGene, mt.TotalExonLength, mt.NewStartExonPhase, mt.IsCanonical,
                 mt.TranscriptRegions, (ushort) mt.Exons.Length, sortedMicroRnas, mt.SiftIndex, mt.PolyPhenIndex,
-                mt.Source, mt.CdsStartNotFound, mt.CdsEndNotFound, mt.SelenocysteinePositions, mt.RnaEdits);
+                mt.Source, mt.CdsStartNotFound, mt.CdsEndNotFound, mt.RnaEdits);
         }
 
         private static ITranslation GetTranslation(ICodingRegion oldCodingRegion, int cdsLength, CompactId proteinId,

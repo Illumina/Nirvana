@@ -1,6 +1,4 @@
-﻿using System;
-using Intervals;
-using VariantAnnotation.Algorithms;
+﻿using VariantAnnotation.Algorithms;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
@@ -17,21 +15,35 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         public static (int CdnaStart, int CdnaEnd) GetCdnaPositions(ITranscriptRegion startRegion,
-            ITranscriptRegion endRegion, IInterval variant, bool onReverseStrand, bool isInsertion)
+            ITranscriptRegion endRegion, int start, int end, bool onReverseStrand)
         {
-            int cdnaStart = GetCdnaPosition(startRegion, variant.Start, onReverseStrand);
-            int cdnaEnd   = GetCdnaPosition(endRegion, variant.End, onReverseStrand);
-
-            if (FoundExonEndpointInsertion(isInsertion, cdnaStart, cdnaEnd, startRegion, endRegion))
-            {
-                (cdnaStart, cdnaEnd) = FixExonEndpointInsertion(cdnaStart, cdnaEnd, onReverseStrand, startRegion,
-                    endRegion, variant);
-            }
-
+            int cdnaStart = GetCdnaPosition(startRegion, start, onReverseStrand);
+            int cdnaEnd   = GetCdnaPosition(endRegion,   end,   onReverseStrand);
             return (cdnaStart, cdnaEnd);
         }
 
-        private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition,  bool onReverseStrand)
+        public static (int CdnaStart, int CdnaEnd) GetInsertionCdnaPositions(ITranscriptRegion startRegion,
+            ITranscriptRegion endRegion, int start, int end, bool onReverseStrand)
+        {
+            int cdnaStart, cdnaEnd;
+
+            if (onReverseStrand)
+            {
+                cdnaStart = GetCdnaPosition(startRegion, start, true);
+                if (cdnaStart != -1) return (cdnaStart, cdnaStart + 1);
+
+                cdnaEnd = GetCdnaPosition(endRegion, end, true);
+                return cdnaEnd != -1 ? (cdnaEnd - 1, cdnaEnd) : (-1, -1);
+            }
+
+            cdnaEnd = GetCdnaPosition(endRegion, end, false);
+            if (cdnaEnd != -1) return (cdnaEnd + 1, cdnaEnd);
+
+            cdnaStart = GetCdnaPosition(startRegion, start, false);
+            return cdnaStart != -1 ? (cdnaStart, cdnaStart - 1) : (-1, -1);
+        }
+
+        private static int GetCdnaPosition(ITranscriptRegion region, int variantPosition, bool onReverseStrand)
         {
             if (region == null || region.Type != TranscriptRegionType.Exon) return -1;
 
@@ -86,17 +98,20 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return isStart ? region.CdnaEnd : region.CdnaStart;
         }
 
-        public static (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) GetCoveredCdsAndProteinPositions(int coveredCdnaStart, int coveredCdnaEnd,
-            byte startExonPhase, ICodingRegion codingRegion)
+        public static (int CdsStart, int CdsEnd, int ProteinStart, int ProteinEnd) GetCoveredCdsAndProteinPositions(
+            int coveredCdnaStart, int coveredCdnaEnd, byte startExonPhase, ICodingRegion codingRegion)
         {
-            if (codingRegion == null || 
-                coveredCdnaEnd < codingRegion.CdnaStart || 
-                coveredCdnaStart > codingRegion.CdnaEnd ||
+            if (codingRegion     == null                  ||
+                coveredCdnaEnd   < codingRegion.CdnaStart ||
+                coveredCdnaStart > codingRegion.CdnaEnd   ||
                 coveredCdnaStart == -1 && coveredCdnaEnd == -1) return (-1, -1, -1, -1);
 
-            int beginOffset = startExonPhase - codingRegion.CdnaStart + 1;
-            int start = Math.Max(coveredCdnaStart + beginOffset, 1 + startExonPhase);
-            int end   = Math.Min(coveredCdnaEnd + beginOffset, codingRegion.Length + startExonPhase);
+            if (coveredCdnaStart < codingRegion.CdnaStart) coveredCdnaStart = codingRegion.CdnaStart;
+            if (coveredCdnaEnd   > codingRegion.CdnaEnd)   coveredCdnaEnd   = codingRegion.CdnaEnd;
+
+            int offset = startExonPhase - codingRegion.CdnaStart + 1;
+            int start  = coveredCdnaStart + offset;
+            int end    = coveredCdnaEnd   + offset;
 
             return (start, end, GetProteinPosition(start), GetProteinPosition(end));
         }
@@ -130,43 +145,11 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             return cdnaPosition - codingRegion.CdnaStart + startExonPhase + 1;
         }
 
-        /// <summary>
-        /// Fixes the missing cDNA coordinate for situations where an insertion occurs on either the first or last
-        /// base of an exon
-        /// </summary>
-        internal static (int CdnaStart, int CdnaEnd) FixExonEndpointInsertion(int cdnaStart, int cdnaEnd,
-            bool onReverseStrand, ITranscriptRegion startRegion, ITranscriptRegion endRegion, IInterval variant)
+        // this is used to get CDS coordinates past the last CDS position
+        public static int GetExtendedCdsPosition(int cdnaStart, int cdnaPosition, byte startExonPhase)
         {
-            (ITranscriptRegion intron, ITranscriptRegion exon) = startRegion.Type == TranscriptRegionType.Exon
-                ? (endRegion, startRegion)
-                : (startRegion, endRegion);
-
-            bool matchExonStart = variant.Start == exon.Start;
-
-            int cdnaPos = !onReverseStrand && matchExonStart || onReverseStrand && !matchExonStart
-                ? intron.CdnaStart
-                : intron.CdnaEnd;
-
-            if (cdnaStart == -1) cdnaStart = cdnaPos;
-            else cdnaEnd = cdnaPos;
-
-            return (cdnaStart, cdnaEnd);
-        }
-
-        /// <summary>
-        /// Identifies when an insertion on an exon boundary needs special attention. Here we're looking for one
-        /// intron & one exon where one cDNA coordinate is defined, but the other isn't.
-        /// </summary>
-        internal static bool FoundExonEndpointInsertion(bool isInsertion, int cdnaStart, int cdnaEnd,
-            ITranscriptRegion startRegion, ITranscriptRegion endRegion)
-        {
-            bool isCdnaStartUndef = cdnaStart         == -1;
-            bool isCdnaEndUndef   = cdnaEnd           == -1;
-            bool isStartExon      = startRegion?.Type == TranscriptRegionType.Exon;
-            bool isEndExon        = endRegion?.Type   == TranscriptRegionType.Exon;
-
-            return isInsertion && startRegion != null && endRegion != null && isStartExon ^ isEndExon &&
-                   isCdnaStartUndef ^ isCdnaEndUndef;
+            if (cdnaPosition < cdnaStart) return -1;
+            return cdnaPosition - cdnaStart + startExonPhase + 1;
         }
     }
 }

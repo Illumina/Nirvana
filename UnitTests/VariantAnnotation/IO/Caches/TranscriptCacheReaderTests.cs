@@ -6,12 +6,14 @@ using CacheUtils.TranscriptCache;
 using Genome;
 using Intervals;
 using IO;
+using Moq;
 using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
+using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.Caches;
 using Xunit;
 
@@ -63,6 +65,8 @@ namespace UnitTests.VariantAnnotation.IO.Caches
         public void TranscriptCacheReader_EndToEnd()
         {
             TranscriptCacheData observedCache;
+            var mockSequenceProvider = new Mock<ISequenceProvider>();
+            mockSequenceProvider.Setup(x => x.Assembly).Returns(GenomeAssembly.GRCh38);
 
             using (var ms = new MemoryStream())
             {
@@ -76,7 +80,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
                 using (var reader = new TranscriptCacheReader(ms))
                 {
                     // SET-362 DEBUG: Remove the null arguments in the future
-                    observedCache = reader.Read(null, ChromosomeUtilities.RefIndexToChromosome);
+                    observedCache = reader.Read(mockSequenceProvider.Object, ChromosomeUtilities.RefIndexToChromosome);
                 }
             }
 
@@ -196,7 +200,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             return new ITranscript[]
             {
                 new Transcript(chromosome, 120, 180, CompactId.Convert("789"), null, BioType.IG_D_gene, genes[0], 0, 0,
-                    false, regions, 0, mirnas, -1, -1, Source.None, false, false, null, null)
+                    false, regions, 0, mirnas, -1, -1, Source.None, false, false, null)
             };
         }
     }

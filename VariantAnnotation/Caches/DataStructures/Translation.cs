@@ -1,4 +1,5 @@
 ﻿using IO;
+using VariantAnnotation.AnnotatedPositions.AminoAcids;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
@@ -19,10 +20,11 @@ namespace VariantAnnotation.Caches.DataStructures
 
         public static ITranslation Read(BufferedBinaryReader reader, string[] peptideSeqs)
         {
-            var codingRegion = DataStructures.CodingRegion.Read(reader);
-            var proteinId    = CompactId.Read(reader);
-            var peptideIndex = reader.ReadOptInt32();
-            var peptideSeq   = peptideIndex == -1 ? null : peptideSeqs[peptideIndex];
+            var    codingRegion = DataStructures.CodingRegion.Read(reader);
+            var    proteinId = CompactId.Read(reader);
+            int    peptideIndex = reader.ReadOptInt32();
+            string peptideSeq = peptideIndex == -1 ? null : peptideSeqs[peptideIndex];
+            if (!peptideSeq.EndsWith(AminoAcidCommon.StopCodon)) peptideSeq += AminoAcidCommon.StopCodon;
 
             return new Translation(codingRegion, proteinId, peptideSeq);
         }

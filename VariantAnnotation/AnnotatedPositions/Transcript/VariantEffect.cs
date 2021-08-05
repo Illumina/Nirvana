@@ -1,5 +1,6 @@
 ﻿using System;
 using OptimizedCore;
+using VariantAnnotation.AnnotatedPositions.AminoAcids;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -249,12 +250,12 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
         private bool IsTruncatedByStop()
         {
-            if (_alternateAminoAcids != null && _alternateAminoAcids.Contains(AminoAcids.StopCodon))
+            if (_alternateAminoAcids != null && _alternateAminoAcids.Contains(AminoAcidCommon.StopCodon))
             {
-                var stopPos = _alternateAminoAcids.IndexOf(AminoAcids.StopCodon, StringComparison.Ordinal);
-                var altAminoAcidesBeforeStop = _alternateAminoAcids.Substring(0, stopPos);
-                if (_alternateAminoAcids.OptimizedStartsWith(AminoAcids.StopCodonChar) ||
-                    _referenceAminoAcids.StartsWith(altAminoAcidesBeforeStop))
+                int    stopPos = _alternateAminoAcids.IndexOf(AminoAcidCommon.StopCodon, StringComparison.Ordinal);
+                string altAminoAcidsBeforeStop = _alternateAminoAcids.Substring(0, stopPos);
+                if (_alternateAminoAcids.OptimizedStartsWith(AminoAcidCommon.StopCodon) ||
+                    _referenceAminoAcids.StartsWith(altAminoAcidsBeforeStop))
                     return true;
             }
             return false;
@@ -414,8 +415,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
             bool result = !IsStopRetained() &&
-                     (string.IsNullOrEmpty(_referenceAminoAcids) || !_referenceAminoAcids.Contains(AminoAcids.StopCodon)) &&
-                          !string.IsNullOrEmpty(_alternateAminoAcids) && _alternateAminoAcids.Contains(AminoAcids.StopCodon);
+                     (string.IsNullOrEmpty(_referenceAminoAcids) || !_referenceAminoAcids.Contains(AminoAcidCommon.StopCodon)) &&
+                          !string.IsNullOrEmpty(_alternateAminoAcids) && _alternateAminoAcids.Contains(AminoAcidCommon.StopCodon);
 
             _cache.Add(ct, result);
             return result;
@@ -431,8 +432,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             bool result = false;
             if (!string.IsNullOrEmpty(_coveredReferenceAminoAcids) && _coveredAlternateAminoAcids != null)
-                result = _coveredReferenceAminoAcids.Contains(AminoAcids.StopCodon) &&
-                         !_coveredAlternateAminoAcids.Contains(AminoAcids.StopCodon);
+                result = _coveredReferenceAminoAcids.Contains(AminoAcidCommon.StopCodon) &&
+                         !_coveredAlternateAminoAcids.Contains(AminoAcidCommon.StopCodon);
 
             _cache.Add(ct, result);
             return result;
@@ -446,14 +447,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             const ConsequenceTag ct = ConsequenceTag.stop_retained_variant;
             if (_cache.Contains(ct)) return _cache.Get(ct);
 
-            var alternateAminoAcids = TrimPeptides(_alternateAminoAcids);
+            string alternateAminoAcids = TrimPeptides(_alternateAminoAcids);
 
             bool result = !string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
                      _referenceAminoAcids == alternateAminoAcids &&
-                     _referenceAminoAcids.Contains(AminoAcids.StopCodon) ||
+                     _referenceAminoAcids.Contains(AminoAcidCommon.StopCodon) ||
                      string.IsNullOrEmpty(_referenceAminoAcids) && alternateAminoAcids != null &&
                      _proteinBegin == _transcript.Translation?.PeptideSeq.Length + 1 &&
-                     alternateAminoAcids == AminoAcids.StopCodon;
+                     alternateAminoAcids.StartsWith(AminoAcidCommon.StopCodon);
 
             _cache.Add(ct, result);
             return result;
@@ -483,8 +484,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private static string TrimPeptides(string alternateAminoAcids)
         {
             if (string.IsNullOrEmpty(alternateAminoAcids)) return null;
-            if (!alternateAminoAcids.Contains(AminoAcids.StopCodon)) return alternateAminoAcids;
-            var pos = alternateAminoAcids.IndexOf(AminoAcids.StopCodon, StringComparison.Ordinal);
+            if (!alternateAminoAcids.Contains(AminoAcidCommon.StopCodon)) return alternateAminoAcids;
+            var pos = alternateAminoAcids.IndexOf(AminoAcidCommon.StopCodon, StringComparison.Ordinal);
             return pos < 0 ? alternateAminoAcids : alternateAminoAcids.Substring(0, pos + 1);
         }
 

@@ -117,11 +117,11 @@ namespace UnitTests.VariantAnnotation.Caches
             return new ITranscript[]
             {
                 new Transcript(ChromosomeUtilities.Chr11, 11000, 12000, CompactId.Empty, null, BioType.other, null, 0, 0,
-                    false, null, 0, null, 0, 0, Source.None, false, false, null, null),
+                    false, null, 0, null, 0, 0, Source.None, false, false, null),
                 new Transcript(ChromosomeUtilities.Chr1, 120, 180, CompactId.Empty, null, BioType.other, null, 0, 0,
-                    false, null, 0, null, 0, 0, Source.None, false, false, null, null),
+                    false, null, 0, null, 0, 0, Source.None, false, false, null),
                 new Transcript(ChromosomeUtilities.Chr1, 300, 320, CompactId.Empty, null, BioType.other, null, 0, 0,
-                    false, null, 0, null, 0, 0, Source.None, false, false, null, null)
+                    false, null, 0, null, 0, 0, Source.None, false, false, null)
             };
         }
     }

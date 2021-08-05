@@ -15,7 +15,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         {
             ICodingRegion expectedCodingRegion = new CodingRegion(100, 200, 300, 400, 101);
             const string expectedProteinId         = "ENSP00000446475.7";
-            const string expectedPeptideSeq        = "VEIDSD";
+            const string expectedPeptideSeq        = "VEIDSD*";
 
             string[] peptideSeqs = { expectedPeptideSeq };
 

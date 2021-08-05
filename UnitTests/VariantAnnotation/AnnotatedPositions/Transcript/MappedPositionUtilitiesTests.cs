@@ -154,9 +154,9 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void GetCdnaPosition_Forward_Insertion()
         {
-            var variant  = new Interval(ForwardVariantStart, ForwardVariantEnd);
-            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(_forwardTranscriptRegions[4],
-                _forwardTranscriptRegions[4], variant, false, true);
+            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetInsertionCdnaPositions(
+                _forwardTranscriptRegions[4], _forwardTranscriptRegions[4], ForwardVariantStart, ForwardVariantEnd,
+                false);
 
             Assert.Equal(486, cdnaStart);
             Assert.Equal(485, cdnaEnd);
@@ -165,8 +165,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         [Fact]
         public void GetCdnaPosition_Reverse_Deletion()
         {
-            var variant  = new Interval(ReverseVariantStart, ReverseVariantEnd);
-            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(_reverseTranscriptRegions[6], _reverseTranscriptRegions[7], variant, true, false);
+            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetCdnaPositions(_reverseTranscriptRegions[6], _reverseTranscriptRegions[7], ReverseVariantStart, ReverseVariantEnd, true);
 
             Assert.Equal(123, cdnaStart);
             Assert.Equal(-1, cdnaEnd);
@@ -176,8 +175,8 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdnaPosition_Snv_AfterOutFrameRnaEditDeletion()
         {
             // NM_001317107.1
-            var variant = new Interval(22138550, 22138550);
-            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm1317107[0], _regionsNm1317107[0], variant, true, false);
+            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm1317107[0], _regionsNm1317107[0],
+                22138550, 22138550, true);
 
             Assert.Equal(681, observed.CdnaStart);
         }
@@ -186,8 +185,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdnaPosition_Snv_AfterInframeRnaEditInsertion()
         {
             // NM_000682.6
-            var variant = new Interval(96780984, 96780984);
-            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm682[0], _regionsNm682[0], variant, true, false);
+            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm682[0], _regionsNm682[0], 96780984, 96780984, true);
 
             Assert.Equal(1010, observed.CdnaStart);
         }
@@ -196,8 +194,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         public void GetCdnaPosition_Snv_AfterOutframeRnaEditInsertion()
         {
             // NM_033517.1
-            var variant = new Interval(51135986, 51135986);
-            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm33517[20], _regionsNm33517[20], variant, false, false);
+            var observed = MappedPositionUtilities.GetCdnaPositions(_regionsNm33517[20], _regionsNm33517[20], 51135986, 51135986, false);
 
             Assert.Equal(1343, observed.CdnaStart);
         }
@@ -302,7 +299,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             var regions = new ITranscriptRegion[]
             {
                 new TranscriptRegion(TranscriptRegionType.Exon,   2, 25398208, 25398329, 167, 288),
-                new TranscriptRegion(TranscriptRegionType.Intron, 1, 25398330, 25403697, 166, 167),
+                new TranscriptRegion(TranscriptRegionType.Intron, 1, 25398330, 25403697, 166, 167)
             };
 
             // ENST00000556131
@@ -473,95 +470,65 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
         }
 
         [Fact]
-        public void FoundExonEndpointInsertion_NotInsertion_ReturnFalse()
-        {
-            Assert.False(MappedPositionUtilities.FoundExonEndpointInsertion(false, -1, 100, _exon, _intron));
-        }
-
-        [Fact]
-        public void FoundExonEndpointInsertion_BothExons_ReturnFalse()
-        {
-            Assert.False(MappedPositionUtilities.FoundExonEndpointInsertion(true, -1, 100, _exon, _exon));
-        }
-
-        [Fact]
-        public void FoundExonEndpointInsertion_BothIntrons_ReturnFalse()
-        {
-            Assert.False(MappedPositionUtilities.FoundExonEndpointInsertion(true, -1, 100, _intron, _intron));
-        }
-
-        [Fact]
-        public void FoundExonEndpointInsertion_BothDefinedCdnaPositions_ReturnFalse()
-        {
-            Assert.False(MappedPositionUtilities.FoundExonEndpointInsertion(true, 100, 110, _exon, _intron));
-        }
-
-        [Fact]
-        public void FoundExonEndpointInsertion_BothUndefinedCdnaPositions_ReturnFalse()
-        {
-            Assert.False(MappedPositionUtilities.FoundExonEndpointInsertion(true, -1, -1, _exon, _intron));
-        }
-
-        [Fact]
-        public void FoundExonEndpointInsertion_UndefinedRegion_ReturnFalse()
-        {
-            Assert.False(MappedPositionUtilities.FoundExonEndpointInsertion(true, -1, -1, null, _intron));
-        }
-
-        [Fact]
-        public void FoundExonEndpointInsertion_OneIntron_OneExon_OneUndefinedPosition_ReturnTrue()
-        {
-            Assert.True(MappedPositionUtilities.FoundExonEndpointInsertion(true, 108, -1, _exon, _intron));
-        }
-
-        [Fact]
-        public void FixExonEndpointInsertion_VariantEnd_ExonEnd_Reverse()
+        public void GetInsertionCdnaPositions_ExonEndpointInsertion_UndefinedCdnaStart_Reverse()
         {
             var startRegion = new TranscriptRegion(TranscriptRegionType.Intron, 7, 243736351, 243776972, 762, 763);
-            var endRegion   = new TranscriptRegion(TranscriptRegionType.Exon, 8, 243736228, 243736350, 763, 885);
+            var endRegion   = new TranscriptRegion(TranscriptRegionType.Exon,   8, 243736228, 243736350, 763, 885);
 
-            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.FixExonEndpointInsertion(-1, 763, true, startRegion, endRegion,
-                new Interval(243736351, 243736350));
+            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetInsertionCdnaPositions(startRegion, endRegion,
+                243736351, 243736350, true);
 
             Assert.Equal(762, cdnaStart);
             Assert.Equal(763, cdnaEnd);
         }
 
         [Fact]
-        public void FixExonEndpointInsertion_VariantStart_ExonStart_Reverse()
+        public void GetInsertionCdnaPositions_ExonEndpointInsertion_NotObserved_UndefinedCdnaEnd_Reverse()
         {
-            // N.B. this configuration has never been spotted in the wild
-            var startRegion = new TranscriptRegion(TranscriptRegionType.Exon, 2, 2000, 2199, 1, 200);
+            var startRegion = new TranscriptRegion(TranscriptRegionType.Exon,   2, 2000, 2199, 1,   200);
             var endRegion   = new TranscriptRegion(TranscriptRegionType.Intron, 2, 1999, 1000, 200, 201);
 
-            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.FixExonEndpointInsertion(200, -1, true, startRegion, endRegion,
-                new Interval(2000, 1999));
+            (int cdnaStart, int cdnaEnd) =
+                MappedPositionUtilities.GetInsertionCdnaPositions(startRegion, endRegion, 2000, 1999, true);
 
             Assert.Equal(200, cdnaStart);
             Assert.Equal(201, cdnaEnd);
         }
+        
+        [Fact]
+        public void GetInsertionCdnaPositions_ExonEndpointInsertion_UndefinedCdnaEnd_Reverse()
+        {
+            var startRegion = new TranscriptRegion(TranscriptRegionType.Exon,   3, 1333613, 1333722, 396, 505);
+            var endRegion   = new TranscriptRegion(TranscriptRegionType.Intron, 3, 1330895, 1333612, 505, 506);
+
+            (int cdnaStart, int cdnaEnd) =
+                MappedPositionUtilities.GetInsertionCdnaPositions(startRegion, endRegion, 1333613, 1333612, true);
+
+            Assert.Equal(505, cdnaStart);
+            Assert.Equal(506, cdnaEnd);
+        }
 
         [Fact]
-        public void FixExonEndpointInsertion_VariantEnd_ExonEnd_Forward()
+        public void GetInsertionCdnaPositions_ExonEndpointInsertion_UndefinedCdnaStart_Forward()
         {
             var startRegion = new TranscriptRegion(TranscriptRegionType.Intron, 16, 89521770, 89528546, 3071, 3072);
             var endRegion   = new TranscriptRegion(TranscriptRegionType.Exon,   16, 89521614, 89521769, 2916, 3071);
 
-            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.FixExonEndpointInsertion(-1, 3071, false, startRegion, endRegion,
-                new Interval(89521770, 89521769));
+            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetInsertionCdnaPositions(startRegion, endRegion,
+                89521770, 89521769, false);
 
             Assert.Equal(3072, cdnaStart);
             Assert.Equal(3071, cdnaEnd);
         }
 
         [Fact]
-        public void FixExonEndpointInsertion_VariantStart_ExonStart_Forward()
+        public void GetInsertionCdnaPositions_ExonEndpointInsertion_UndefinedCdnaEnd_Forward()
         {
             var startRegion = new TranscriptRegion(TranscriptRegionType.Exon,   2, 99459243, 99459360, 108, 225);
             var endRegion   = new TranscriptRegion(TranscriptRegionType.Intron, 1, 99456512, 99459242, 107, 108);
 
-            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.FixExonEndpointInsertion(108, -1, false, startRegion, endRegion,
-                new Interval(99459243, 99459242));
+            (int cdnaStart, int cdnaEnd) = MappedPositionUtilities.GetInsertionCdnaPositions(startRegion, endRegion,
+                99459243, 99459242, false);
 
             Assert.Equal(108, cdnaStart);
             Assert.Equal(107, cdnaEnd);

@@ -1,35 +1,51 @@
-﻿namespace Variants
+﻿using System;
+
+namespace Variants
 {
     public static class BiDirectionalTrimmer
     {
-        public static (int Start, string RefAllele, string AltAllele) Trim(int start, string refAllele, string altAllele)
+        public static (int Start, string RefAllele, string AltAllele) Trim(int start, string refAllele,
+            string altAllele)
         {
             // do not trim if ref and alt are same
             if (refAllele == altAllele) return (start, refAllele, altAllele);
 
-            if (refAllele == null) refAllele = "";
-            if (altAllele == null) altAllele = "";
+            refAllele ??= "";
+            altAllele ??= "";
+
+            int refLen     = refAllele.Length;
+            int altLen     = altAllele.Length;
+            int origRefLen = refLen;
+
+            ReadOnlySpan<char> refSpan = refAllele.AsSpan();
+            ReadOnlySpan<char> altSpan = altAllele.AsSpan();
 
             // trimming at the start
-            var i = 0;
-            while (i < refAllele.Length && i < altAllele.Length && refAllele[i] == altAllele[i]) i++;
+            var offset = 0;
+            while (offset < refLen && offset < altLen && refSpan[offset] == altSpan[offset]) offset++;
 
-            if (i > 0)
+            if (offset > 0)
             {
-                start += i;
-                altAllele = altAllele.Substring(i);
-                refAllele = refAllele.Substring(i);
+                start   += offset;
+                refSpan =  refSpan.Slice(offset);
+                altSpan =  altSpan.Slice(offset);
+                refLen  =  refSpan.Length;
+                altLen  =  altSpan.Length;
             }
 
             // trimming at the end
-            var j = 0;
-            while (j < refAllele.Length && j < altAllele.Length &&
-                   refAllele[refAllele.Length - j - 1] == altAllele[altAllele.Length - j - 1]) j++;
+            while (refLen > 0 && altLen > 0 && refSpan[refLen - 1] == altSpan[altLen - 1])
+            {
+                refLen--;
+                altLen--;
+            }
 
-            if (j <= 0) return (start, refAllele, altAllele);
+            // nothing to trim
+            if (refLen == origRefLen) return (start, refAllele, altAllele);
 
-            altAllele = altAllele.Substring(0, altAllele.Length - j);
-            refAllele = refAllele.Substring(0, refAllele.Length - j);
+            refAllele = new string(refSpan.Slice(0, refLen));
+            altAllele = new string(altSpan.Slice(0, altLen));
+
             return (start, refAllele, altAllele);
         }
     }

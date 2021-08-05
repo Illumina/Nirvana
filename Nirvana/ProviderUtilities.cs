@@ -162,12 +162,10 @@ namespace Nirvana
          {
             var benchmark = new Benchmark();
             var provider = new TranscriptAnnotationProvider(path, sequenceProvider);
-            var wallTimeSpan = benchmark.GetElapsedTime();
-            Console.WriteLine("Cache Time: {0} ms", wallTimeSpan.TotalMilliseconds);
+            Console.WriteLine("Cache Time: {0}\n", Benchmark.ToHumanReadable(benchmark.GetElapsedTime()));
             return provider;
         }
 
-        
         private static NsaReader GetNsaReader(Stream dataStream, Stream indexStream) =>
             new NsaReader(new ExtendedBinaryReader(dataStream), indexStream);
 

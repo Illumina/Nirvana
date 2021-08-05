@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -19,7 +18,7 @@ namespace VariantAnnotation.Caches.Utilities
 
             return VariantType.unknown;
         }
-        
+
         public static void SetTypesAndSort(IRnaEdit[] rnaEdits)
         {
             if (rnaEdits == null) return;
@@ -31,7 +30,5 @@ namespace VariantAnnotation.Caches.Utilities
 
             Array.Sort(rnaEdits);
         }
-
-        
     }
 }

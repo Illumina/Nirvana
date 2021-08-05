@@ -17,6 +17,8 @@ namespace UnitTests.TestDataStructures
             _zeroBasedStartOffset = zeroBasedStartOffset;
             _sequence = s;
         }
+        
+        public string Sequence => _sequence;
 
         public string Substring(int offset, int length)
         {

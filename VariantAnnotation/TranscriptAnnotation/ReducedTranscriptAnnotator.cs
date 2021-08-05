@@ -37,8 +37,8 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             var (exonStart, exonEnd, intronStart, intronEnd) = regions.GetExonsAndIntrons(startIndex, endIndex);
 
-            return new MappedPosition(-1, -1, -1, -1, -1, -1, exonStart, exonEnd, intronStart, intronEnd, startIndex,
-                endIndex);
+            return new MappedPosition(-1, -1, -1, -1, -1, -1, -1, -1, exonStart, exonEnd, intronStart, intronEnd,
+                startIndex, endIndex);
         }
 
         private static IEnumerable<ConsequenceTag> GetConsequences(IInterval transcript, ISimpleVariant variant,

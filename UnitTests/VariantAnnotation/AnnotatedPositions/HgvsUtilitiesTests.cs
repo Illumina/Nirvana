@@ -2,6 +2,7 @@
 using Moq;
 using UnitTests.TestDataStructures;
 using VariantAnnotation.AnnotatedPositions;
+using VariantAnnotation.AnnotatedPositions.AminoAcids;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Xunit;
@@ -169,16 +170,17 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetAltPeptideSequence_Genomic()
         {
-            var refSequence                  = GetGenomicRefSequence();
-            var transcript                   = GetGenomicTranscript();
-            const int cdsBegin               = 112;
-            const int cdsEnd                 = 121;
+            var          refSequence         = GetGenomicRefSequence();
+            var          transcript          = GetGenomicTranscript();
+            const int    cdsBegin            = 112;
+            const int    cdsEnd              = 121;
+            const int    aaBegin             = 38;
             const string transcriptAltAllele = "";
 
             const string expectedResult = "RHRNRNTQTETNTETQRHRNTQKHRNKHRDTETHRNTETNTETQKHTETQKQTQRHRNTQKHTDRNKHRNTETQKYRNTQKHRNKHRDTETQKHSDAETQQHKHRNTETHRNRNTETNTETQTHRHRETQKHTETLKHSGRCPGCRGSIA";
             var observedResult =
                 HgvsUtilities.GetAltPeptideSequence(refSequence, cdsBegin, cdsEnd, transcriptAltAllele, transcript,
-                    false);
+                    AminoAcidCommon.StandardAminoAcids, aaBegin);
 
             Assert.Equal(expectedResult, observedResult);
         }

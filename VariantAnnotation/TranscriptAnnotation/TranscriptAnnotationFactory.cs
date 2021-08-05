@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Genome;
 using Intervals;
-using VariantAnnotation.AnnotatedPositions.Transcript;
+using VariantAnnotation.AnnotatedPositions.AminoAcids;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
 using VariantAnnotation.Interface.Intervals;
@@ -11,9 +11,6 @@ namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class TranscriptAnnotationFactory
     {
-        private static readonly AminoAcids AminoAcidsProvider     = new AminoAcids(false);
-        private static readonly AminoAcids MitoAminoAcidsProvider = new AminoAcids(true);
-
         public static IList<IAnnotatedTranscript> GetAnnotatedTranscripts(IVariant variant,
             ITranscript[] transcriptCandidates, ISequence compressedSequence, IPredictionCache siftCache,
             IPredictionCache polyphenCache, ITranscript[] geneFusionCandidates = null)
@@ -53,11 +50,11 @@ namespace VariantAnnotation.TranscriptAnnotation
                     annotatedTranscript = ReducedTranscriptAnnotator.GetCompleteOverlapTranscript(transcript);
                     break;
                 case Status.FullAnnotation:
-                    var acidsProvider = variant.Chromosome.UcscName == "chrM"
-                        ? MitoAminoAcidsProvider
-                        : AminoAcidsProvider;
+                    var aminoAcids = variant.Chromosome.UcscName == "chrM"
+                        ? AminoAcidCommon.MitochondrialAminoAcids
+                        : AminoAcidCommon.StandardAminoAcids;
                     annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant,
-                        compressedSequence, siftCache, polyphenCache, acidsProvider);
+                        compressedSequence, siftCache, polyphenCache, aminoAcids);
                     break;
             }
 

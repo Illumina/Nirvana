@@ -5,5 +5,6 @@
 	    int Length { get; }
         Band[] CytogeneticBands { get; }
         string Substring(int offset, int length);
+        string Sequence { get; }
 	}
 }

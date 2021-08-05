@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using IO;
-using VariantAnnotation.AnnotatedPositions.Transcript;
+using VariantAnnotation.AnnotatedPositions.AminoAcids;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
@@ -24,7 +24,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public Entry GetPrediction(char newAminoAcid, int aaPosition)
         {
             // sanity check: skip stop codons
-            if (newAminoAcid == AminoAcids.StopCodonChar || newAminoAcid == 'X') return null;
+            if (newAminoAcid == AminoAcidCommon.StopCodon || newAminoAcid == 'X') return null;
 
             int index = GetIndex(newAminoAcid, aaPosition);
 

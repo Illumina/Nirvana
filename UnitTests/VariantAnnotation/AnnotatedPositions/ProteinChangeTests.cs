@@ -66,7 +66,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
 			Assert.Equal(ProteinChange.Extension, proteinChange);
 		}
-
+		
 		[Fact]
 		public void Duplication()
 		{

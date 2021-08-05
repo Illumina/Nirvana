@@ -1,72 +1,68 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Buffers;
 
 namespace Genome
 {
-	public static class SequenceUtilities
-	{
-		#region members
+    public static class SequenceUtilities
+    {
+        private static readonly char[] ReverseComplementLookupTable;
 
-		private static readonly char[] ReverseComplementLookupTable;
-		private static readonly HashSet<char> CanonicalBases;
+        static SequenceUtilities()
+        {
+            // initialize the reverse complement code
+            const string forwardBases = "ABCDGHKMRTVYabcdghkmrtvy";
+            const string reverseBases = "TVGHCDMKYABRTVGHCDMKYABR";
+            ReverseComplementLookupTable = new char[256];
 
-		#endregion
+            for (var i = 0; i < 256; i++) ReverseComplementLookupTable[i] = 'N';
+            for (var i = 0; i < forwardBases.Length; i++)
+            {
+                ReverseComplementLookupTable[forwardBases[i]] = reverseBases[i];
+            }
+        }
 
-		static SequenceUtilities()
-		{
-			// initialize the reverse complement code
-			const string forwardBases = "ABCDGHKMRTVYabcdghkmrtvy";
-			const string reverseBases = "TVGHCDMKYABRTVGHCDMKYABR";
-			ReverseComplementLookupTable = new char[256];
+        public static unsafe string GetReverseComplement(string bases)
+        {
+            if (bases == null) return null;
+            if (bases == string.Empty) return string.Empty;
 
-			for (var i = 0; i < 256; i++) ReverseComplementLookupTable[i] = 'N';
-			for (var i = 0; i < forwardBases.Length; i++)
-			{
-				ReverseComplementLookupTable[forwardBases[i]] = reverseBases[i];
-			}
+            ArrayPool<char> charPool = ArrayPool<char>.Shared;
+            int             numBases = bases.Length;
 
-			CanonicalBases = new HashSet<char> { 'A', 'C', 'G', 'T', '-' };
-		}
+            char[] reverseChars = charPool.Rent(numBases);
 
-		/// <summary>
-		/// returns the reverse complement of the given bases
-		/// </summary>
-		public static string GetReverseComplement(string bases)
-		{
-			// sanity check
-			if (bases == null) return null;
+            fixed (char* pBases = bases)
+            fixed (char* pReverseChars = reverseChars)
+            {
+                char* pIn  = pBases;
+                char* pOut = pReverseChars + numBases - 1;
 
-			int numBases = bases.Length;
-			var reverseChars = new char[numBases];
+                for (var i = 0; i < numBases; i++)
+                {
+                    *pOut = ReverseComplementLookupTable[*pIn];
+                    pOut--;
+                    pIn++;
+                }
+            }
 
-			for (var i = 0; i < numBases; ++i)
-			{
-				reverseChars[i] = ReverseComplementLookupTable[bases[numBases - i - 1]];
-			}
+            var reverseString = new string(reverseChars, 0, numBases);
+            charPool.Return(reverseChars);
 
-			return new string(reverseChars);
-		}
+            return reverseString;
+        }
 
-		/// <summary>
-		/// returns true if we have a base other than the 4 standard bases: A, C, G, and T
-		/// </summary>
-		public static bool HasNonCanonicalBase(string bases)
-		{
-		    return !string.IsNullOrEmpty(bases) && bases.Any(c => !CanonicalBases.Contains(c));
-		}
+        public static bool HasNonCanonicalBase(string bases)
+        {
+            if (bases == null) return false;
+            ReadOnlySpan<char> baseSpan = bases.AsSpan();
 
-		/// <summary>
-		/// returns the correct start value when retrieving a substring of a substring
-		/// where the top level might be reverse complemented
-		/// </summary>
-		public static string GetSubSubstring(int seqStart, int seqEnd, bool seqOnReverseStrand, int subStart, int subEnd, ISequence cs)
-		{
-			int start = seqOnReverseStrand ? seqEnd - subEnd : seqStart + subStart;
+            foreach (char b in baseSpan)
+            {
+                if (b == 'A' || b == 'C' || b == 'G' || b == 'T' || b == '-') continue;
+                return true;
+            }
 
-			string precedingBases = cs.Substring(start - 1, subEnd - subStart + 1);
-			if (seqOnReverseStrand) precedingBases = GetReverseComplement(precedingBases);
-
-			return precedingBases;
-		}
-	}
+            return false;
+        }
+    }
 }
