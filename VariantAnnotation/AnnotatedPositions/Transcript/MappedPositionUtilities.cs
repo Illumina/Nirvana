@@ -1,5 +1,4 @@
-﻿using VariantAnnotation.Algorithms;
-using VariantAnnotation.Caches.DataStructures;
+﻿using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.AnnotatedPositions.Transcript
@@ -62,7 +61,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             // exon case
             if (cdnaStart != -1 && cdnaEnd != -1) return (cdnaStart, cdnaEnd);
 
-            if (onReverseStrand) Swap.Int(ref startRegionIndex, ref endRegionIndex);
+            if (onReverseStrand) (startRegionIndex, endRegionIndex) = (endRegionIndex, startRegionIndex);
 
             var startRegion = regions.GetCoveredRegion(startRegionIndex);
             var endRegion   = regions.GetCoveredRegion(endRegionIndex);

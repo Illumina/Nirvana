@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO;
 
@@ -122,9 +121,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         private static string GetRangeString(int start, int end)
         {
             if (start == -1 && end == -1) return null;
-            if (start == -1) return "?-" + end;
-            if (end == -1) return start + "-?";
-            if (start > end) Swap.Int(ref start, ref end);
+            if (start == -1) return "?-"  + end;
+            if (end   == -1) return start + "-?";
+            if (start > end) (start, end) = (end, start);
             return start == end ? start.ToString(CultureInfo.InvariantCulture) : start + "-" + end;
         }
 

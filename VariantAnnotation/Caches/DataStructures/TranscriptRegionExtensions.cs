@@ -1,5 +1,4 @@
-﻿using VariantAnnotation.Algorithms;
-using VariantAnnotation.Interface.AnnotatedPositions;
+﻿using VariantAnnotation.Interface.AnnotatedPositions;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
@@ -45,7 +44,7 @@ namespace VariantAnnotation.Caches.DataStructures
             var startId = regionStart == -1 ? -1 : regions[regionStart].Id;
             var endId   = regionEnd   == -1 ? -1 : regions[regionEnd].Id;
 
-            if (endId < startId) Swap.Int(ref startId, ref endId);
+            if (endId < startId) (startId, endId) = (endId, startId);
             return (startId, endId);
         }
 

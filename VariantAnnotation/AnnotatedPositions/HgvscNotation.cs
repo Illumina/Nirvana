@@ -59,9 +59,7 @@
             if (_start.Position <= _end.Position &&
                 (_start.Position != _end.Position || _start.Offset <= _end.Offset)) return;
 
-            var temp = _start;
-            _start   = _end;
-            _end     = temp;
+            (_start, _end) = (_end, _start);
         }
 
         public override string ToString()

@@ -339,7 +339,7 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             ArrayPool<char>    charPool   = ArrayPool<char>.Shared;
             ReadOnlySpan<char> beforeSpan = cdsSpan.Slice(0, cdsBegin - 1);
-            ReadOnlySpan<char> afterSpan  = cdsSpan.Slice(cdsEnd);
+            ReadOnlySpan<char> afterSpan  = cdsEnd < cdsSpan.Length ? cdsSpan.Slice(cdsEnd) : "";
 
             ReadOnlySpan<char> altAlleleSpan = altAllele.AsSpan();
             int                altAlleleLen  = altAllele.Length;

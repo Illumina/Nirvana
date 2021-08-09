@@ -51,9 +51,7 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (onReverseStrand)
             {
-                var tmp = startPositionOffset;
-                startPositionOffset = endPositionOffset;
-                endPositionOffset = tmp;
+                (startPositionOffset, endPositionOffset) = (endPositionOffset, startPositionOffset);
             }
 
             if (startPositionOffset == null && variant.Type == VariantType.insertion)

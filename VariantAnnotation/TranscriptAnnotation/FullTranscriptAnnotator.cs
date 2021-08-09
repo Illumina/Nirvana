@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Genome;
 using Intervals;
-using VariantAnnotation.Algorithms;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.AminoAcids;
 using VariantAnnotation.AnnotatedPositions.Consequence;
@@ -24,7 +23,8 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             var cdnaSequence = GetCdnaSequence(transcript, refSequence);
             ReadOnlySpan<char> extendedCds =
-                GetExtendedCodingSequence(cdnaSequence, transcript.Translation?.CodingRegion);
+                GetExtendedCodingSequence(cdnaSequence, transcript.Translation?.CodingRegion,
+                    transcript.StartExonPhase);
 
             var leftAnnotation = AnnotateTranscript(transcript, leftShiftedVariant, aminoAcids, cdnaSequence, extendedCds);
 
@@ -45,11 +45,6 @@ namespace VariantAnnotation.TranscriptAnnotation
                 rightAnnotation.Position.ExtendedCdsEnd, rightAnnotation.Position.ProteinStart, rightAnnotation.RefAminoAcids,
                 rightAnnotation.AltAminoAcids, rightAnnotation.TranscriptAltAllele,
                 leftShiftedVariant.Type == VariantType.reference, aminoAcids);
-            
-            // string hgvsProtein = HgvsProteinNomenclature.GetHgvsProteinAnnotation(transcript,
-            //     rightAnnotation.RefAminoAcids, rightAnnotation.AltAminoAcids, rightAnnotation.TranscriptAltAllele,
-            //     rightAnnotation.Position, rightAnnotation.VariantEffect, rightShiftedVariant, refSequence, hgvsCoding,
-            //     aminoAcids);
 
             (PredictionScore sift, PredictionScore polyPhen) = GetPredictionScores(leftAnnotation.Position, leftAnnotation.RefAminoAcids,
                 leftAnnotation.AltAminoAcids, siftCache, polyphenCache, transcript.SiftIndex, transcript.PolyPhenIndex);
@@ -59,10 +54,26 @@ namespace VariantAnnotation.TranscriptAnnotation
                 sift, polyPhen, consequences, null, false);
         }
 
-        private static ReadOnlySpan<char> GetExtendedCodingSequence(ISequence cdnaSequence, ICodingRegion codingRegion)
+        private static ReadOnlySpan<char> GetExtendedCodingSequence(ISequence cdnaSequence, ICodingRegion codingRegion,
+            byte startExonPhase)
         {
             ReadOnlySpan<char> cdnaSpan = cdnaSequence.Sequence.AsSpan();
-            return codingRegion == null ? cdnaSpan : cdnaSpan.Slice(codingRegion.CdnaStart - 1);
+            if (codingRegion == null) return cdnaSpan;
+
+            // use the cDNA bases to fill in the start exon phase
+            int start = codingRegion.CdnaStart - 1 - startExonPhase;
+            if (start >= 0) return cdnaSpan.Slice(start);
+
+            int                numPaddingBases = -start;
+            var                buffer          = new char[cdnaSequence.Length + numPaddingBases];
+            Span<char>         bufferSpan      = buffer.AsSpan();
+            ReadOnlySpan<char> paddingSpan     = new string('N', numPaddingBases).AsSpan();
+            
+            paddingSpan.CopyTo(bufferSpan);
+            bufferSpan = bufferSpan.Slice(paddingSpan.Length);
+            cdnaSpan.CopyTo(bufferSpan);
+
+            return buffer.AsSpan();
         }
 
         private static (VariantEffect VariantEffect, IMappedPosition Position, string RefAminoAcids, string
@@ -176,7 +187,7 @@ namespace VariantAnnotation.TranscriptAnnotation
                     onReverseStrand)
                 : MappedPositionUtilities.GetCdnaPositions(startRegion, endRegion, variant.Start, variant.End,
                     onReverseStrand);
-            if (onReverseStrand) Swap.Int(ref cdnaStart, ref cdnaEnd);
+            if (onReverseStrand) (cdnaStart, cdnaEnd) = (cdnaEnd, cdnaStart);
 
             (int cdsStart, int cdsEnd) = MappedPositionUtilities.GetCdsPositions(codingRegion, cdnaStart, cdnaEnd,
                 startExonPhase, isInsertion);

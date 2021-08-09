@@ -9,14 +9,16 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         public static (string ReferenceCodons, string AlternateCodons) GetCodons(string transcriptAlternateAllele,
             int cdsStart, int cdsEnd, int proteinBegin, int proteinEnd, ReadOnlySpan<char> codingSequence)
         {
-            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1) return EmptyTuple;
+            int  cdsLength = codingSequence.Length;
+            bool pastCds   = cdsStart > cdsLength && cdsEnd > cdsLength;
+            if (cdsStart == -1 || cdsEnd == -1 || proteinBegin == -1 || proteinEnd == -1 || pastCds) return EmptyTuple;
 
             // current implementation of GetCoveredCdsAndProteinPositions may return negative cdsStart and cdsEnd beyond the CDS region
-            if (cdsStart < 1) cdsStart                 = 1;
-            if (cdsEnd > codingSequence.Length) cdsEnd = codingSequence.Length;
+            if (cdsStart < 1) cdsStart       = 1;
+            if (cdsEnd   > cdsLength) cdsEnd = cdsLength;
 
             int aminoAcidStart = Math.Max(proteinBegin * 3 - 2, 1);
-            int aminoAcidEnd   = Math.Min(proteinEnd * 3, codingSequence.Length);
+            int aminoAcidEnd   = Math.Min(proteinEnd * 3, cdsLength);
 
             string transcriptReferenceAllele = cdsEnd >= cdsStart
                 ? codingSequence.Slice(cdsStart - 1, cdsEnd - cdsStart + 1).ToString()
@@ -28,7 +30,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             int suffixStartIndex = cdsEnd;
             int suffixLen        = aminoAcidEnd - cdsEnd;
 
-            string prefix = prefixStartIndex + prefixLen < codingSequence.Length
+            string prefix = prefixStartIndex + prefixLen < cdsLength
                 ? codingSequence.Slice(prefixStartIndex, prefixLen).ToString().ToLower()
                 : "AAA";
 

@@ -294,7 +294,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var observedHgvsc =
                 HgvsCodingNomenclature.GetHgvscAnnotation(_forwardTranscript, variant, null, 2, 3, null, null);
 
-            Assert.Equal("ENST00000343938.4:c.120_122+2invATGTC", observedHgvsc);
+            Assert.Equal("ENST00000343938.4:c.120_122+2inv", observedHgvsc);
         }
 
         [Fact]
