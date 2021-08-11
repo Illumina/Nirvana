@@ -152,7 +152,7 @@ namespace NirvanaLambda
             }
         }
 
-        private NirvanaResult GetNirvanaResult(AnnotationRange[] annotationRanges, NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, StringBuilder runLog, string snsTopicArn)
+        private static NirvanaResult GetNirvanaResult(AnnotationRange[] annotationRanges, NirvanaConfig config, string annotationLambdaArn, ILambdaContext context, StringBuilder runLog, string snsTopicArn)
         {
             Task<AnnotationResultSummary>[] annotationTasks = CallAnnotationLambdas(config, annotationLambdaArn, context, annotationRanges);
             AnnotationResultSummary[] processedAnnotationResults = Task.WhenAll(annotationTasks).Result;

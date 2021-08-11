@@ -71,7 +71,7 @@ namespace SAUtils.DataStructures
         
 		public string GetJsonString()
 		{
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
 			var jsonObject = new JsonObject(sb);
 		    jsonObject.AddStringValue("ancestralAllele", AncestralAllele);
             jsonObject.AddStringValue("allAf", ComputingUtilities.ComputeFrequency(AllAlleleNumber, AllAlleleCount), false);
@@ -95,7 +95,7 @@ namespace SAUtils.DataStructures
 			jsonObject.AddIntValue("eurAc", EurAlleleCount);
 			jsonObject.AddIntValue("sasAc", SasAlleleCount);
 
-		    return StringBuilderCache.GetStringAndRelease(sb);
+		    return StringBuilderPool.GetStringAndReturn(sb);
 		}
         
     }

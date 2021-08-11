@@ -139,7 +139,7 @@ namespace SAUtils.Omim
 
         private static string GetMimNumbersString(IList<string> allMimNumbers, int startIndex, int endIndex)
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var needComma = false;
             for (int i = startIndex; i <= endIndex; i++)
             {
@@ -149,12 +149,12 @@ namespace SAUtils.Omim
                 needComma = true;
             }
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         private static string GetApiQueryUrl(string baseAddress, string handler, params (string, string)[] keyValueTuples)
         {
-            var sb = StringBuilderCache.Acquire(100);
+            var sb = StringBuilderPool.Get();
             sb.Append(baseAddress);
             sb.Append(handler);
             sb.Append('?');
@@ -170,7 +170,7 @@ namespace SAUtils.Omim
                 needAmpersand = true;
             }
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public void Dispose()

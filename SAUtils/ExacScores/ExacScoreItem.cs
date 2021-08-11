@@ -22,7 +22,7 @@ namespace SAUtils.ExacScores
         
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -31,7 +31,7 @@ namespace SAUtils.ExacScores
             jsonObject.AddDoubleValue("pNull", _pNull, "0.00e0");
             sb.Append(JsonObject.CloseBrace);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
 
         }
     }

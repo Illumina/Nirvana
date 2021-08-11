@@ -1,5 +1,6 @@
 ﻿using Genome;
 using VariantAnnotation.Interface.IO;
+using VariantAnnotation.Pools;
 using Variants;
 
 namespace Vcf.VariantCreator
@@ -15,7 +16,7 @@ namespace Vcf.VariantCreator
                 ? AnnotationBehavior.NonInformativeAlleles
                 : AnnotationBehavior.SmallVariants;
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, isRefMinor, isDecomposed,
+            return VariantPool.Get(chromosome, start, end, refAllele, altAllele, variantType, vid, isRefMinor, isDecomposed,
                 isRecomposed, linkedVids, annotationBehavior, false);
         }
 

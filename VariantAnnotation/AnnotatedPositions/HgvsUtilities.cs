@@ -200,7 +200,7 @@ namespace VariantAnnotation.AnnotatedPositions
         public static string FormatDnaNotation(string start, string end, string referenceId, string referenceBases,
             string alternateBases, GenomicChange type, char notationType)
         {
-            StringBuilder sb = StringBuilderCache.Acquire();
+            StringBuilder sb = StringBuilderPool.Get();
 
             // all start with transcript name & numbering type
             sb.Append(referenceId + ':' + notationType + '.');
@@ -248,7 +248,7 @@ namespace VariantAnnotation.AnnotatedPositions
                     throw new InvalidOperationException("Unhandled genomic change found: " + type);
             }
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public static bool IsDuplicateWithinInterval(ISequence refSequence, ISimpleVariant variant, IInterval interval, bool onReverseStrand)

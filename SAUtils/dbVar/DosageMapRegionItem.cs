@@ -24,7 +24,7 @@ namespace SAUtils.dbVar
         
         public string GetJsonString()
         {
-            var sb= StringBuilderCache.Acquire();
+            var sb= StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
@@ -33,7 +33,7 @@ namespace SAUtils.dbVar
             jsonObject.AddStringValue("haploinsufficiency", Data.ScoreToDescription[_hiScore]);
             jsonObject.AddStringValue("triplosensitivity", Data.ScoreToDescription[_tsScore]);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
     }
 }

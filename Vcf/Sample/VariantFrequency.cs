@@ -5,10 +5,9 @@
         public static double[] GetVariantFrequencies(double? vfField, int[] alleleDepths, int numAltAlleles)
         {
             // use VF
-            double[] vf = GetVariantFrequenciesUsingVf(vfField, numAltAlleles > 1);
+            double[] vf = GetVariantFrequenciesUsingVf(vfField, numAltAlleles > 1) ?? GetVariantFrequenciesUsingAlleleDepths(alleleDepths, numAltAlleles);
 
             // use allele depths
-            if (vf == null) vf = GetVariantFrequenciesUsingAlleleDepths(alleleDepths, numAltAlleles);
 
             return vf;
         }

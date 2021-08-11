@@ -21,7 +21,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             };
 
             var rnaEdits = new IRnaEdit[] { new RnaEdit(107,107,"t") };
-            const byte startExonPhase = 0;
 
             var codingSequence = new CdnaSequence(genomicSeq, codingRegion, regions, false, rnaEdits);
 
@@ -48,7 +47,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new RnaEdit(500, 500, "T"),
                 new RnaEdit(737, 737, "T")
             };
-            const byte startExonPhase = 0;
 
             var codingSequence = new CdnaSequence(genomicSeq, codingRegion, regions, false, rnaEdits);
             
@@ -73,7 +71,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
             {
                 new RnaEdit(999, 998, "AGAGGAGGA")
             };
-            const byte startExonPhase  = 0;
             const bool onReverseStrand = true;
             var        codingSequence  = new CdnaSequence(genomicSeq, codingRegion, regions, onReverseStrand, rnaEdits);
 
@@ -107,7 +104,6 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions.Transcript
                 new RnaEdit(670, 671, "")
             };
 
-            const byte startExonPhase = 0;
             var        codingSequence = new CdnaSequence(genomicSeq, codingRegion, regions, true, rnaEdits);
 
             var expectedCodingSeq = "ATGGAAGAGGCCATCCTACTCAATCAAACTTCTTTAGTGACATATTTTCGGCTTAGAGGTTTATCTGTAAATCATAAGGCACGGATAGCTATGTTTTCCATGTTCCTCATTTTTTATGTCCTGACACTGATTGGGAATGTTCTCATTGTCATAACTATTATCTATGACCACCGGCTCCATACTCCCATGTATTTCTTCCTCAGCAACCTGTCCTTTATTGATGTCTGCCACTCCACTGTCACTGTCCCCAAGATGCTGAGAGACGTGTGGTCAGAGGAAAAGCTCATCTCTTTTGATGCCTGTGTGACCCAGATGTTCTTCCTGCACCTCTTTGCCTGCACAGAGATCTTCCTCCTCACCGTCATGGCCTATGATCGGTATGTGGCCATCTGTAAACCCCTGCAGTACATGATAGTGATGAACTGGAAGGTATGTGTGCTGCTGGCTGTGGCCCTCTGGACAGGAGGGACCATCCACTCCATAGCCCTCACCTCCCTTACCATCAAGCTGCCCTACTGTGGTCCTGATGAGATTGACAACTTCTTCTGTGATGTACCTCAGGTGATCAAGCTGGCCTGCATTGACACCCACGTCATTGAGATCCTCATTGTCTCCAACAGTGGATTGATCTCCGTGGTCTGTTTTGTGGTCCTGGTGGTGTCCTACGCAGTCATCCTGGTGAGTCTGAGGCAGCAGATCTCCAAGGGCAAGCGGAAGGCCCTGTCCACCTGTGCAGCCCATCTCACTGTAGTTACACTGTTCCTGGGACACTGCATCTTCATCTATTCCCGCCCATCCACCAGCCTCCCAGAGGACAAGGTAGTATCTGTGTTTTTCACTGCAGTCACCCCCCTGCTGAACCCCATTATCTATACCCTTAGGAATGAAGAAATGAAGAGTGCCTTAAACAAGTTAGTGGGGAGAAAAGAGAGAAAAGAAGAAAAATGA";

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Compression.FileHandling;
 using Jasix;
 using Jasix.DataStructures;
@@ -60,7 +61,7 @@ namespace VariantAnnotation.IO
             
             BeginSection(JasixCommons.HeaderSectionTag);
 
-            var sb         = StringBuilderCache.Acquire();
+            var sb         = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append($"{{\"{JasixCommons.HeaderSectionTag}\":{{");
@@ -75,7 +76,7 @@ namespace VariantAnnotation.IO
             if (sampleNames != null) jsonObject.AddStringValues("samples", sampleNames);
             sb.Append($"}},\"{JasixCommons.PositionsSectionTag}\":[\n");
 
-            _writer.Write(StringBuilderCache.GetStringAndRelease(sb));
+            _writer.Write(StringBuilderPool.GetStringAndReturn(sb));
             if(_bgzipTextWriter != null) EndSection(JasixCommons.HeaderSectionTag);
         }
 
@@ -119,6 +120,20 @@ namespace VariantAnnotation.IO
             _firstEntry = false;
             _writer.Write(entry);
         }
+        
+        public void WritePosition(IPosition position, StringBuilder sb)
+        {
+            if (sb == null || sb.Length == 0) return;
+            _jasixIndexCreator?.Add(position, _bgzipTextWriter.Position);
+            if (_firstEntry)
+            {
+                BeginSection(JasixCommons.PositionsSectionTag);
+            }
+            else _writer.WriteLine(",");
+
+            _firstEntry = false;
+            _writer.Write(sb);
+        }
 
         public void WriteGenes(IEnumerable<string> annotatedGenes)
         {
@@ -131,7 +146,7 @@ namespace VariantAnnotation.IO
             _writer.Write($",\"{JasixCommons.GenesSectionTag}\":[\n");
             BeginSection(JasixCommons.GenesSectionTag);
 
-            var sb= StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var firstGeneEntry = true;
 
             foreach (string jsonString in annotatedGenes)
@@ -141,10 +156,11 @@ namespace VariantAnnotation.IO
                 firstGeneEntry = false;
             }
 
-            _writer.Write(sb.ToString());
+            var json = StringBuilderPool.GetStringAndReturn(sb);
+            _writer.Write(json);
+
             EndSection(JasixCommons.GenesSectionTag);
             
-            StringBuilderCache.GetStringAndRelease(sb);
             _writer.WriteLine();
             _writer.Write("]");
         }

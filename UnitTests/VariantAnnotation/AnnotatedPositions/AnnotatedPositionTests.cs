@@ -1,11 +1,12 @@
 ﻿using Moq;
+using OptimizedCore;
 using UnitTests.SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation;
-using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Pools;
 using Variants;
 using Vcf;
 using Vcf.Info;
@@ -27,9 +28,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
 
             var position          = GetPosition(originalChromosomeName, variants, samples);
-            var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
-
-            string observedResult = annotatedPosition.GetJsonString();
+            var annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
+            
+            var    sb             = annotatedPosition.GetJsonStringBuilder();
+            var    observedResult = sb.ToString();
+            StringBuilderPool.Return(sb);
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedPositionPool.Return(annotatedPosition);
 
             Assert.NotNull(observedResult);
             Assert.Contains($"\"chromosome\":\"{originalChromosomeName}\"", observedResult);
@@ -40,11 +45,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         {
             const string originalChromosomeName = "originalChr1";
 
-            var position = GetPosition(originalChromosomeName, null, null);
-            var annotatedPosition = new AnnotatedPosition(position, null);
+            var position          = GetPosition(originalChromosomeName, null, null);
+            var annotatedPosition = AnnotatedPositionPool.Get(position, null);
 
-            string observedResult = annotatedPosition.GetJsonString();
-            Assert.Null(observedResult);
+            var sb= annotatedPosition.GetJsonStringBuilder();
+            AnnotatedPositionPool.Return(annotatedPosition);
+            
+            Assert.Null(sb);
         }
         
         //21    9411410    .    C    T    9.51    DRAGENSnpHardQUAL    AC=2;AF=1.000;AN=2;DP=2;FS=0.000;MQ=100.00;QD=9.51;SOR=1.609    GT:AD:AF:DP:GQ:FT:F1R2:F2R1:PL:GP:PP    ./.:.:.:0:0:.:.:.    ./.:.:.:0:0:.:.:.    1/1:0,1:1.000:1:3:PASS:0,1:0,0:45,3,0:1.0415e+01,3.4301e+00,3.4199e+00:45,3,0
@@ -61,9 +68,12 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             IVariant[]          variants          = GetVariants();
             IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
-            var                 annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+            var                 annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
 
-            string observedResult = annotatedPosition.GetJsonString();
+            var sb             = annotatedPosition.GetJsonStringBuilder();
+            var observedResult = sb.ToString();
+            StringBuilderPool.Return(sb);
+            AnnotatedPositionPool.Return(annotatedPosition);
 
             Assert.NotNull(observedResult);
             Assert.Contains("\"fisherStrandBias\":0", observedResult);
@@ -80,11 +90,14 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
 
-            IVariant[] variants = GetVariants();
+            IVariant[]          variants          = GetVariants();
             IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
-            var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+            var                 annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
 
-            string observedResult = annotatedPosition.GetJsonString();
+            var sb             = annotatedPosition.GetJsonStringBuilder();
+            var observedResult = sb.ToString();
+            StringBuilderPool.Return(sb);
+            AnnotatedPositionPool.Return(annotatedPosition);
 
             Assert.NotNull(observedResult);
             Assert.Contains("\"jointSomaticNormalQuality\":16", observedResult);
@@ -106,9 +119,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
 
             IVariant[]          variants          = GetVariants();
             IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
-            var                 annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+            var                 annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
 
-            string observedResult = annotatedPosition.GetJsonString();
+            var sb             = annotatedPosition.GetJsonStringBuilder();
+            var observedResult = sb.ToString();
+            StringBuilderPool.Return(sb);
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedPositionPool.Return(annotatedPosition);
 
             Assert.NotNull(observedResult);
             Assert.Contains("\"breakendEventId\":\"MantaBND:2312:0:1:0:0:0:0\"", observedResult);
@@ -135,7 +152,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             vcfFields[0] = originalChromosomeName;
             InfoData infoData = new InfoDataBuilder().Create();
 
-            return new Position(ChromosomeUtilities.Chr1, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
+            return PositionPool.Get(ChromosomeUtilities.Chr1, 949523, 949523, "C", new[] {"T"}, null, null, variants, samples, infoData,
                 vcfFields, new[] { false }, false);
         }
     }

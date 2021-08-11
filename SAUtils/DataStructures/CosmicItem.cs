@@ -75,7 +75,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
 
             var jsonObject = new JsonObject(sb);
 
@@ -88,7 +88,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddStringValue("cancerTypesAndCounts", GetJsonStringFromDict("cancerType",GetCancerTypeCounts()), false);
             jsonObject.AddStringValue("cancerSitesAndCounts", GetJsonStringFromDict("cancerSite",GetTissueCounts()), false);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         internal IDictionary<string,int> GetTissueCounts()
@@ -136,7 +136,7 @@ namespace SAUtils.DataStructures
         {
             if (dictionary == null) return null;
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             sb.Append(JsonObject.OpenBracket);
 
             bool isFirstItem = true;
@@ -155,7 +155,7 @@ namespace SAUtils.DataStructures
 
             sb.Append(JsonObject.CloseBracket);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
        

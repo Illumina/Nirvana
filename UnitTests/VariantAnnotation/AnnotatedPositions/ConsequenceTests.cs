@@ -3,6 +3,7 @@ using Moq;
 using VariantAnnotation.AnnotatedPositions.Consequence;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Pools;
 using Variants;
 using Xunit;
 
@@ -295,7 +296,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             IFeatureVariantEffects featureVariantEffects = GetFeatureVariantEffects(isAblation, isAmplification, isTruncation, isElongation,
                 isFivePrimeDuplicatedTranscript, isThreePrimeDuplicatedTranscript);
 
-            var variant = new Variant(null, 0, 0, null, null, variantType, null, false, false, false, null, AnnotationBehavior.StructuralVariants,
+            var variant = VariantPool.Get(null, 0, 0, null, null, variantType, null, false, false, false, null, AnnotationBehavior.StructuralVariants,
                 true);
 
             var consequence = new Consequences(variantType, null, featureVariantEffects);
@@ -303,6 +304,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             ConsequenceTag[] observedResults = consequence.GetConsequences().ToArray();
 
             Assert.Equal(expectedResults, observedResults);
+            VariantPool.Return(variant);
         }
 
         private static IFeatureVariantEffects GetFeatureVariantEffects(bool isAblation,   bool isAmplification,

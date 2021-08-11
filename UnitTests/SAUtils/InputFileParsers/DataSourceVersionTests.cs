@@ -25,10 +25,10 @@ namespace UnitTests.SAUtils.InputFileParsers
 			Assert.True(string.IsNullOrEmpty(version.Description));
 			Assert.Contains("dataSource=dbSNP", version.ToString());//vcf output
 
-			var sb = StringBuilderCache.Acquire();
+			var sb = StringBuilderPool.Get();
 			version.SerializeJson(sb);
 			
-			Assert.Contains("name\":\"dbSNP", StringBuilderCache.GetStringAndRelease(sb));//json output
+			Assert.Contains("name\":\"dbSNP", StringBuilderPool.GetStringAndReturn(sb));//json output
 		}
 
 		[Fact]

@@ -7,11 +7,11 @@ namespace SAUtils
 {
     public static class RegionUtilities
     {
-        public static IInterval Grch37Par1 = new Interval(10_001, 2_649_520);
-        public static IInterval Grch37Par2 = new Interval(59034050, 59363566);
-        
-        public static IInterval Grch38Par1 = new Interval(10_001, 2781479);
-        public static IInterval Grch38Par2 = new Interval(56887903, 57217415);
+        private static readonly IInterval Grch37Par1 = new Interval(10_001,     2_649_520);
+        private static readonly IInterval Grch37Par2 = new Interval(59_034_050, 59_363_566);
+
+        private static readonly IInterval Grch38Par1 = new Interval(10_001,     2_781_479);
+        private static readonly IInterval Grch38Par2 = new Interval(56_887_903, 57_217_415);
         
 
         public static bool OverlapsParRegion(ISupplementaryDataItem variant, GenomeAssembly assembly)

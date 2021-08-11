@@ -67,7 +67,7 @@ namespace UnitTests.IO
         public void TestFlakyConnection()
         {
             // pStream attempts to connect at construction time. It should succeed at the third attempt
-            var pStream = new PersistentStream(GetWebRequest_connect_on_third(),0);
+            new PersistentStream(GetWebRequest_connect_on_third(), 0);
             // no exception thrown means this test succeeded
         }
 

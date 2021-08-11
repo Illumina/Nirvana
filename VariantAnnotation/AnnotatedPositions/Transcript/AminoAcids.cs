@@ -195,14 +195,14 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             if (string.IsNullOrEmpty(aminoAcids)) return "";
             if (aminoAcids.Length == 1) return ConvertAminoAcidToAbbreviation(aminoAcids[0]);
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
 
             foreach (var aminoAcid in aminoAcids)
             {
                 sb.Append(ConvertAminoAcidToAbbreviation(aminoAcid));
             }
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         /// <summary>

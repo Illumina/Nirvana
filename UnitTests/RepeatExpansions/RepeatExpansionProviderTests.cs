@@ -5,6 +5,7 @@ using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.IO;
+using VariantAnnotation.Pools;
 using Variants;
 using Vcf;
 using Xunit;
@@ -27,7 +28,7 @@ namespace UnitTests.RepeatExpansions
         [Fact]
         public void Annotate_NotRepeatExpansion_NullPhenotypes()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr3, Start, End, "A", "C", VariantType.SNV, null, false, false, false, null, 
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr3, Start, End, "A", "C", VariantType.SNV, null, false, false, false, null, 
                 AnnotationBehavior.SmallVariants, false);
 
             var annotatedPosition = GetAnnotatedPosition(variant);
@@ -35,6 +36,11 @@ namespace UnitTests.RepeatExpansions
             
             var firstVariant = annotatedPosition.AnnotatedVariants[0];
             Assert.Null(firstVariant.RepeatExpansionPhenotypes);
+            
+            VariantPool.Return(variant);
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedVariantPool.Return((AnnotatedVariant)firstVariant);
+            AnnotatedPositionPool.Return((AnnotatedPosition) annotatedPosition);
         }
 
         [Fact]
@@ -47,6 +53,10 @@ namespace UnitTests.RepeatExpansions
 
             var firstVariant = annotatedPosition.AnnotatedVariants[0];
             Assert.Null(firstVariant.RepeatExpansionPhenotypes);
+            
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedVariantPool.Return((AnnotatedVariant)firstVariant);
+            AnnotatedPositionPool.Return((AnnotatedPosition) annotatedPosition);
         }
 
         [Fact]
@@ -59,6 +69,10 @@ namespace UnitTests.RepeatExpansions
 
             var firstVariant = annotatedPosition.AnnotatedVariants[0];
             Assert.NotNull(firstVariant);
+            
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedVariantPool.Return((AnnotatedVariant)firstVariant);
+            AnnotatedPositionPool.Return((AnnotatedPosition) annotatedPosition);
         }
 
         [Fact]
@@ -72,7 +86,7 @@ namespace UnitTests.RepeatExpansions
             var firstVariant = annotatedPosition.AnnotatedVariants[0];
             Assert.NotNull(firstVariant.RepeatExpansionPhenotypes);
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddObjectValue(firstVariant.RepeatExpansionPhenotypes.JsonKey,
@@ -81,18 +95,22 @@ namespace UnitTests.RepeatExpansions
             const string expectedJson = "\"repeatExpansionPhenotypes\":[{\"phenotype\":\"Spinocerebellar ataxia 7\",\"omimId\":164500,\"classifications\":[\"Normal\"],\"percentile\":6.33}]";
             string observedJson = sb.ToString();
             Assert.Equal(expectedJson, observedJson);
+            
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedVariantPool.Return((AnnotatedVariant)firstVariant);
+            AnnotatedPositionPool.Return((AnnotatedPosition) annotatedPosition);
         }
 
         private static IAnnotatedPosition GetAnnotatedPosition(IVariant variant)
         {
             IVariant[] variants = { variant };
-            var position = new Position(ChromosomeUtilities.Chr3, Start, End, null, null, null, null, variants, null, null, null, null,
+            var position = PositionPool.Get(ChromosomeUtilities.Chr3, Start, End, null, null, null, null, variants, null, null, null, null,
                 false);
 
-            var annotatedVariant = new AnnotatedVariant(variant);
+            var                 annotatedVariant  = AnnotatedVariantPool.Get(variant);
             IAnnotatedVariant[] annotatedVariants = { annotatedVariant };
 
-            return new AnnotatedPosition(position, annotatedVariants);
+            return AnnotatedPositionPool.Get(position, annotatedVariants);
         }
     }
 }

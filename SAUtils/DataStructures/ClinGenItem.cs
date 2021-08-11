@@ -58,7 +58,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
@@ -73,7 +73,7 @@ namespace SAUtils.DataStructures
             if (ObservedLosses>0) jsonObject.AddIntValue("observedLosses", ObservedLosses);
             jsonObject.AddBoolValue("validated",Validated);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         

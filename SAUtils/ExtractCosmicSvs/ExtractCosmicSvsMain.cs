@@ -65,7 +65,7 @@ namespace SAUtils.ExtractCosmicSvs
             var cnvStream = _cnvTsv==null? null: GZipUtilities.GetAppropriateReadStream(_cnvTsv);
             var breakendStream = _breakendTsv == null ? null : GZipUtilities.GetAppropriateReadStream(_breakendTsv);
 
-            using (var cosmicSvExtractor = new CosmicSvReader(cnvStream, breakendStream, version, _outputDir,
+            using (new CosmicSvReader(cnvStream, breakendStream, version, _outputDir,
                 referenceProvider.Assembly, referenceProvider.RefNameToChromosome))
             {
                 //cosmicSvExtractor.CreateTsv();

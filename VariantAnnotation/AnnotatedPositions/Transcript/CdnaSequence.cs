@@ -33,7 +33,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
         {
             if (_sequence != null) return _sequence;
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             
             foreach (var region in _regions)
             {
@@ -50,7 +50,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 
             ApplyRnaEdits(sb);
 
-            _sequence = StringBuilderCache.GetStringAndRelease(sb);
+            _sequence = StringBuilderPool.GetStringAndReturn(sb);
             return _sequence;
         }
 

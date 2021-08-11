@@ -28,7 +28,7 @@ namespace SAUtils.ClinGen
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -38,7 +38,7 @@ namespace SAUtils.ClinGen
             jsonObject.AddStringValue("classificationDate", _classificationDate);
             sb.Append(JsonObject.CloseBrace);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public int CompareDate(GeneDiseaseValidityItem other)

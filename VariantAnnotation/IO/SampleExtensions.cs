@@ -7,7 +7,7 @@ namespace VariantAnnotation.IO
     {
         public static string GetJsonString(this ISample sample)
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             // data section
@@ -37,7 +37,7 @@ namespace VariantAnnotation.IO
             jsonObject.AddIntValue("binCount",                      sample.BinCount);
 
             sb.Append(JsonObject.CloseBrace);
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using UnitTests.TestUtilities;
+using VariantAnnotation.Pools;
 using Variants;
 using Xunit;
 
@@ -21,7 +22,7 @@ namespace UnitTests.Variants
             var expectedLinkedVids         = new[] { "1:102:T:G" };
             var expectedBehavior           = AnnotationBehavior.SmallVariants;
 
-            var variant                    = new Variant(ChromosomeUtilities.Chr1, expectedStart, expectedEnd, expectedRef, expectedAlt,
+            var variant                    = VariantPool.Get(ChromosomeUtilities.Chr1, expectedStart, expectedEnd, expectedRef, expectedAlt,
                 expectedType, expectedVid, expectedRefMinor, expectedDecomposed, expectedRecomposed, expectedLinkedVids,
                 expectedBehavior, false);
 
@@ -37,6 +38,8 @@ namespace UnitTests.Variants
             Assert.Equal(expectedRecomposed, variant.IsRecomposed);
             Assert.Equal(expectedLinkedVids, variant.LinkedVids);
             Assert.Equal(expectedBehavior,   variant.Behavior);
+            
+            VariantPool.Return(variant);
         }
     }
 }

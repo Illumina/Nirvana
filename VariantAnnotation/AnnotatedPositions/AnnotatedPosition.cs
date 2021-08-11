@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
@@ -10,22 +11,24 @@ namespace VariantAnnotation.AnnotatedPositions
 {
     public sealed class AnnotatedPosition : IAnnotatedPosition
     {
-        public IPosition Position { get; }
-        public string CytogeneticBand { get; set; }
-        public IAnnotatedVariant[] AnnotatedVariants { get; }
+        public IPosition                       Position               { get; private set; }
+        public string                          CytogeneticBand        { get; set; }
+        public IAnnotatedVariant[]             AnnotatedVariants      { get; private set; }
         public IList<ISupplementaryAnnotation> SupplementaryIntervals { get; } = new List<ISupplementaryAnnotation>();
 
-        public AnnotatedPosition(IPosition position, IAnnotatedVariant[] annotatedVariants)
+        public void Initialize(IPosition position, IAnnotatedVariant[] annotatedVariants)
         {
             Position          = position;
             AnnotatedVariants = annotatedVariants;
+            SupplementaryIntervals.Clear();
         }
 
-        public string GetJsonString()
+   
+        public StringBuilder GetJsonStringBuilder()
         {
             if (AnnotatedVariants == null || AnnotatedVariants.Length == 0) return null;
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -70,15 +73,22 @@ namespace VariantAnnotation.AnnotatedPositions
                 AddSuppIntervalToJsonObject(jsonObject);
             }
 
-			jsonObject.AddStringValues("variants", AnnotatedVariants.Select(v => v.GetJsonString(originalChromName)), false);
+            
+			var variantStringBuilders = AnnotatedVariants.Select(v => v.GetJsonStringBuilder(originalChromName)).ToArray();
+            jsonObject.AddStringValues("variants", variantStringBuilders , false);
 
+            foreach (StringBuilder builder in variantStringBuilders)
+            {
+                StringBuilderPool.Return(builder);
+            }
 			sb.Append(JsonObject.CloseBrace);
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return sb;
         }
-
         private void AddSuppIntervalToJsonObject(JsonObject jsonObject)
         {
             foreach (var si in SupplementaryIntervals) jsonObject.AddObjectValue(si.JsonKey, si);
         }
+
+        
     }
 }

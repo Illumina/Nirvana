@@ -4,6 +4,7 @@ using VariantAnnotation.AnnotatedPositions.Consequence;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Pools;
 using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
@@ -17,7 +18,7 @@ namespace VariantAnnotation.TranscriptAnnotation
 
             List<ConsequenceTag> consequences = GetConsequences(transcript, transcript.Gene.OnReverseStrand, variant);
 
-            return new AnnotatedTranscript(transcript, null, null, null, null, mappedPosition, null, null, null, null,
+            return AnnotatedTranscriptPool.Get(transcript, null, null, null, null, mappedPosition, null, null, null, null,
                 consequences, completeOverlap);
         }
 

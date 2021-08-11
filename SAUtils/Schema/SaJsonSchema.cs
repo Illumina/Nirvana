@@ -214,12 +214,12 @@ namespace SAUtils.Schema
             if (values.Count != Keys.Count(x => !NonSaKeys.Contains(x)))
                 throw new UserErrorException("Please provide one and only one value for each JSON key.");
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             _jsonStringGenerationAction(jsonObject, values);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         internal void OutputKeyAnnotation(string key)

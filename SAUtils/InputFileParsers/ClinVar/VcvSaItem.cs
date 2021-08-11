@@ -36,7 +36,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         public string GetJsonString()
         {
-            var sb= StringBuilderCache.Acquire();
+            var sb= StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("id", $"{_accession}.{_version}");
@@ -46,7 +46,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             jsonObject.AddStringValue("altAllele", ClinVarCommon.NormalizeAllele(AltAllele));
             jsonObject.AddStringValue("lastUpdatedDate", _lastUpdatedDate.ToString("yyyy-MM-dd"));
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public int CompareTo(VcvSaItem other)

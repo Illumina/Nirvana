@@ -80,7 +80,7 @@ namespace AnnotationLambda
                         using (var jasixMd5Stream = new MD5Stream(jasixCryptoStream))
                         {
                             IVcfFilter vcfFilter = config.annotationRange == null
-                                ? new NullVcfFilter() as IVcfFilter
+                                ? new NullVcfFilter()
                                 : new VcfFilter(config.annotationRange.ToGenomicRange(annotationResources.SequenceProvider.RefNameToChromosome));
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))

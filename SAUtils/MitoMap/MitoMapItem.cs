@@ -89,7 +89,7 @@ namespace SAUtils.MitoMap
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             if (string.IsNullOrEmpty(RefAllele)) RefAllele = "-";
@@ -105,7 +105,7 @@ namespace SAUtils.MitoMap
             jsonObject.AddStringValue("scorePercentile", _scorePercentile, false);
             jsonObject.AddIntValue("numGenBankFullLengthSeqs", _numGenBankFullLengthSeqs);
             jsonObject.AddStringValues("pubMedIds", _pubMedIds);
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
         
         public static Dictionary<(string, string), MitoMapItem> AggregatedMutationsSamePosition(IEnumerable<MitoMapItem> mitoMapMutItems)

@@ -8,6 +8,7 @@ using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Caches;
+using VariantAnnotation.Pools;
 using Variants;
 
 namespace VariantAnnotation.TranscriptAnnotation
@@ -42,7 +43,7 @@ namespace VariantAnnotation.TranscriptAnnotation
             var predictionScores = GetPredictionScores(leftAnnotation.Position, leftAnnotation.RefAminoAcids,
                 leftAnnotation.AltAminoAcids, siftCache, polyphenCache, transcript.SiftIndex, transcript.PolyPhenIndex);
 
-            return new AnnotatedTranscript(transcript, leftAnnotation.RefAminoAcids, leftAnnotation.AltAminoAcids,
+            return AnnotatedTranscriptPool.Get(transcript, leftAnnotation.RefAminoAcids, leftAnnotation.AltAminoAcids,
                 leftAnnotation.RefCodons, leftAnnotation.AltCodons, leftAnnotation.Position, hgvsCoding, hgvsProtein,
                 predictionScores.Sift, predictionScores.PolyPhen, consequences, false);
         }

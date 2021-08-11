@@ -44,7 +44,7 @@ namespace SAUtils.DataStructures
         
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
@@ -62,7 +62,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddDoubleValue("easAf", _easAlleleFrequency, "0.######");
             jsonObject.AddDoubleValue("sasAf", _sasAlleleFrequency, "0.######");
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
     }
 }

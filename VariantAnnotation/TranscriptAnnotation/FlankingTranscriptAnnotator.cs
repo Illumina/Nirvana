@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using VariantAnnotation.AnnotatedPositions.Consequence;
-using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Pools;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {
@@ -11,7 +11,7 @@ namespace VariantAnnotation.TranscriptAnnotation
         {
             bool                 isDownStream = variantEnd < transcript.Start == transcript.Gene.OnReverseStrand;
             List<ConsequenceTag> consequences = Consequences.DetermineFlankingVariantEffects(isDownStream);
-            return new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null, consequences, false);
+            return AnnotatedTranscriptPool.Get(transcript, null, null, null, null, null, null, null, null, null, consequences, false);
         }
     }
 }

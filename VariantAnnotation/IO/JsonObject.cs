@@ -145,6 +145,38 @@ namespace VariantAnnotation.IO
 
             return true;
         }
+        
+        public bool AddStringValues(string description, IEnumerable<StringBuilder> sbs, bool useQuote = true)
+        {
+            if (sbs == null) return false;
+
+            var validEntries = new List<StringBuilder>();
+            foreach (var sb in sbs)
+                if (sb.Length > 0 && sb[0] != '.') validEntries.Add(sb);
+                
+
+            if (validEntries.Count == 0) return false;
+
+            if (_needsComma) _sb.Append(Comma);
+            AddKey(description);
+            _sb.Append(OpenBracket);
+
+            var needsComma = false;
+
+            foreach (var value in validEntries)
+            {
+                if (needsComma) _sb.Append(Comma);
+                if (useQuote) _sb.Append(DoubleQuote);
+                _sb.Append(value);
+                if (useQuote) _sb.Append(DoubleQuote);
+                needsComma = true;
+            }
+
+            _sb.Append(CloseBracket);
+            _needsComma = true;
+
+            return true;
+        }
 
         public void AddObjectValue<T>(string description, T value) where T : IJsonSerializer
         {

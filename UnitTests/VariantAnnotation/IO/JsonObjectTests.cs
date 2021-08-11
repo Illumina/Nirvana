@@ -11,14 +11,14 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void ProcessBoolValue_True_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             json.AddBoolValue("test1", true);
             json.AddBoolValue("test2", true);
 
             const string expectedResult = "\"test1\":true,\"test2\":true";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -27,13 +27,13 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddBoolValue_True_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddBoolValue("test1", true);
             json.AddBoolValue("test2", true);
 
             const string expectedResult = "\"test1\":true,\"test2\":true";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -41,13 +41,13 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddIntValue_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddIntValue("test1", 5);
             json.AddIntValue("test2", 7);
 
             const string expectedResult = "\"test1\":5,\"test2\":7";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -55,11 +55,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddIntValue_NullInt()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddIntValue("test1", null);
 
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }
@@ -67,13 +67,13 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddDoubleValue_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddDoubleValue("test1", 5.7);
             json.AddDoubleValue("test2", 7.9);
 
             const string expectedResult = "\"test1\":5.7,\"test2\":7.9";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -81,11 +81,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddDoubleValue_NullInt()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddDoubleValue("test1", null);
 
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }
@@ -93,13 +93,13 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddStringValue_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddStringValue("test1", "bob");
             json.AddStringValue("test2", "jane", false);
 
             const string expectedResult = "\"test1\":\"bob\",\"test2\":jane";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -107,11 +107,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddStringValue_NullInt()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
             json.AddStringValue("test1", null);
 
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }
@@ -119,7 +119,7 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddStringValues_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             var strings = new[] { "A", "B", "C" };
@@ -129,7 +129,7 @@ namespace UnitTests.VariantAnnotation.IO
             json.AddStringValues("test2", strings2, false);
 
             const string expectedResult = "\"test1\":[\"A\",\"B\",\"C\"],\"test2\":[D,E,F]";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -137,11 +137,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddStringValues_NullArray()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
-            json.AddStringValues("test1", null);
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            json.AddStringValues("test1", (string[])null);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }
@@ -149,7 +149,7 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddIntValues_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             var ints = new[] { 1, 2, 3 };
@@ -159,7 +159,7 @@ namespace UnitTests.VariantAnnotation.IO
             json.AddIntValues("test2", ints2);
 
             const string expectedResult = "\"test1\":[1,2,3],\"test2\":[4,5,6]";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -167,11 +167,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddIntValues_NullArray()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             json.AddIntValues("test1", null);
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }
@@ -179,7 +179,7 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddObjectValues_TwoTimes()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             var points = new Point[2];
@@ -193,7 +193,7 @@ namespace UnitTests.VariantAnnotation.IO
             json.AddObjectValues("test2", points2);
 
             const string expectedResult = "\"test1\":[{\"X\":1,\"Y\":2},{\"X\":3,\"Y\":4}],\"test2\":[{\"X\":5,\"Y\":6}]";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
         }
@@ -201,11 +201,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddObjectValues_NullArray()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             json.AddObjectValues("test1", null as Point[]);
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }
@@ -213,11 +213,11 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void AddStringValues_EmptyArray()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var json = new JsonObject(sb);
 
             json.AddStringValues("test1", new string[0]);
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
+            var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(string.Empty, observedResult);
         }

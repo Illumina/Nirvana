@@ -4,21 +4,21 @@ namespace Variants
 {
     public sealed class Variant : IVariant
     {
-        public IChromosome Chromosome { get; }
-        public int Start { get; }
-        public int End { get; }
-        public string RefAllele { get; }
-        public string AltAllele { get; }
-        public VariantType Type { get; }
-        public string VariantId { get; }
-        public bool IsRefMinor { get; }
-        public bool IsRecomposed { get; }
-        public bool IsDecomposed { get; }
-        public string[] LinkedVids { get; }
-        public AnnotationBehavior Behavior { get; }
-        public bool IsStructuralVariant { get; }
-
-        public Variant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        public IChromosome        Chromosome          { get; private set; }
+        public int                Start               { get; private set;}
+        public int                End                 { get; private set;}
+        public string             RefAllele           { get; private set;}
+        public string             AltAllele           { get; private set;}
+        public VariantType        Type                { get; private set;}
+        public string             VariantId           { get; private set;}
+        public bool               IsRefMinor          { get; private set;}
+        public bool               IsRecomposed        { get; private set;}
+        public bool               IsDecomposed        { get; private set;}
+        public string[]           LinkedVids          { get; private set;}
+        public AnnotationBehavior Behavior            { get; private set;}
+        public bool               IsStructuralVariant { get; private set;}
+        
+        public void Initialize(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
             VariantType variantType, string variantId, bool isRefMinor, bool isDecomposed, bool isRecomposed,
             string[] linkedVids, AnnotationBehavior behavior, bool isStructuralVariant)
         {

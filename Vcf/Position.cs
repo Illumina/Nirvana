@@ -13,25 +13,25 @@ namespace Vcf
 {
     public sealed class Position : IPosition
     {
-        public IChromosome Chromosome { get; }
-        public int Start { get; }
-        public int End { get; }        
-        public string RefAllele { get; }
-        public string[] AltAlleles { get; }
-        public double? Quality { get; }
-        public string[] Filters { get; }
-        public IVariant[] Variants { get; }
-        public ISample[] Samples { get; }
-        public IInfoData InfoData { get; }
-        public bool HasStructuralVariant { get; }
-        public bool HasShortTandemRepeat { get; }
-        public string[] VcfFields { get; }
-        public bool[] IsDecomposed { get; }
-        public bool IsRecomposed { get; }
-        public string[] Vids { get; }
-        public List<string>[] LinkedVids { get; }
-
-        public Position(IChromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
+        public IChromosome    Chromosome           { get; private set;}
+        public int            Start                { get; private set;}
+        public int            End                  { get; private set;}        
+        public string         RefAllele            { get; private set;}
+        public string[]       AltAlleles           { get; private set;}
+        public double?        Quality              { get; private set;}
+        public string[]       Filters              { get; private set;}
+        public IVariant[]     Variants             { get; private set;}
+        public ISample[]      Samples              { get; private set;}
+        public IInfoData      InfoData             { get; private set;}
+        public bool           HasStructuralVariant { get; private set;}
+        public bool           HasShortTandemRepeat { get; private set;}
+        public string[]       VcfFields            { get; private set;}
+        public bool[]         IsDecomposed         { get; private set;}
+        public bool           IsRecomposed         { get; private set;}
+        public string[]       Vids                 { get; private set;}
+        public List<string>[] LinkedVids           { get; private set;}
+        
+        public void Initialize(IChromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
             double? quality, string[] filters, IVariant[] variants, ISample[] samples, IInfoData infoData,
             string[] vcfFields, bool[] isDecomposed, bool isRecomposed)
         {
@@ -50,6 +50,8 @@ namespace Vcf
             IsRecomposed = isRecomposed;
 
             (HasStructuralVariant, HasShortTandemRepeat) = CheckVariants(variants);
+            Vids                                         = null;
+            LinkedVids                                   = null;
         }
 
         private static (bool HasStructuralVariant, bool HasShortTandemRepeat) CheckVariants(IVariant[] variants)
@@ -98,13 +100,13 @@ namespace Vcf
 
             ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, variants, mitoHeteroplasmyProvider, enableDq);
 
-            return new Position(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
+            return PositionPool.Get(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
                 altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed);
         }
         
         private static IPosition GetReferencePosition(ISimplePosition simplePosition) =>
-            new Position(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start,
+            PositionPool.Get(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start,
                 simplePosition.RefAllele, simplePosition.AltAlleles, null, null, null, null, null,
                 simplePosition.VcfFields, simplePosition.IsDecomposed, simplePosition.IsRecomposed);
 

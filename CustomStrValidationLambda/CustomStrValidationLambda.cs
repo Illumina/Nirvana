@@ -63,7 +63,7 @@ namespace CustomStrValidationLambda
             }
         }
 
-        private ValidationResult HandleException(string id, Exception exception, string snsTopicArn)
+        private static ValidationResult HandleException(string id, Exception exception, string snsTopicArn)
         {
             Logger.Log(exception);
 

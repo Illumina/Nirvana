@@ -1,6 +1,7 @@
 ﻿using MitoHeteroplasmy;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
+using VariantAnnotation.Pools;
 using Variants;
 using Vcf;
 using Vcf.Sample;
@@ -188,9 +189,9 @@ namespace UnitTests.Vcf.Samples
             var simplePosition = new SimplePosition(ChromosomeUtilities.ChrM, 1, "A", new[] { "C", "T"});
             IVariant[] variants =
             {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "A", "C", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "A", "C", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
-                new Variant(ChromosomeUtilities.ChrM, position, position, "A", "T", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "A", "T", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
             
@@ -200,6 +201,9 @@ namespace UnitTests.Vcf.Samples
 
             Assert.Equal(new[] { 15 / 100.0, 85 / 100.0 }, sample.VariantFrequencies);
             Assert.Equal(new[] { "14.29", "null" }, sample.HeteroplasmyPercentile);
+            
+            VariantPool.Return((Variant)variants[0]);
+            VariantPool.Return((Variant)variants[1]);
         }
     }
 }

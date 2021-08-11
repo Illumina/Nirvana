@@ -1,4 +1,5 @@
 ﻿using Genome;
+using VariantAnnotation.Pools;
 using Variants;
 
 namespace Vcf.VariantCreator
@@ -8,7 +9,7 @@ namespace Vcf.VariantCreator
         public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string vid)
         {
             var variantType = GetVariantType(altAllele);
-            return new Variant(chromosome, start + 1, end, refAllele, altAllele, variantType, vid, false, false, false,
+            return VariantPool.Get(chromosome, start + 1, end, refAllele, altAllele, variantType, vid, false, false, false,
                 null, AnnotationBehavior.StructuralVariants, true);
         }
 

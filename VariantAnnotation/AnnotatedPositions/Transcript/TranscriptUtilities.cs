@@ -41,7 +41,7 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 	    /// </summary>
 	    private static string GetSplicedSequence(ISequence refSequence, ITranscriptRegion[] regions, bool onReverseStrand)
 	    {
-		    var sb = StringBuilderCache.Acquire();
+		    var sb = StringBuilderPool.Get();
 
 		    foreach (var region in regions)
 		    {
@@ -58,8 +58,8 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 			    sb.Append(refSequence.Substring(region.Start - 1, exonLength));
 		    }
 
-	        var results = StringBuilderCache.GetStringAndRelease(sb);
-		    return onReverseStrand ? SequenceUtilities.GetReverseComplement(results) : results;
+	        var results    = StringBuilderPool.GetStringAndReturn(sb);
+	        return onReverseStrand ? SequenceUtilities.GetReverseComplement(results) : results;
 	    }
     }
 }

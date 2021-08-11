@@ -12,6 +12,7 @@ using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using Nirvana;
+using OptimizedCore;
 using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
@@ -129,8 +130,10 @@ namespace SingleAnnotationLambda
         {
             if (preloadRequired) resources.SingleVariantPreLoad(position);
             IAnnotatedPosition annotatedPosition = resources.Annotator.Annotate(position);
-            string json = annotatedPosition?.GetJsonString();
-
+            var                sb                = annotatedPosition?.GetJsonStringBuilder();
+            if (sb == null) throw new UserErrorException("No variant is provided for annotation");
+            
+            string json = StringBuilderPool.GetStringAndReturn(sb);
             if (json == null) throw new UserErrorException("No variant is provided for annotation");
 
             var outputJsonStream = new MemoryStream();

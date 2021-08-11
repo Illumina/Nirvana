@@ -1,5 +1,5 @@
-﻿using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Interface.AnnotatedPositions;
+﻿using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Pools;
 
 namespace VariantAnnotation.TranscriptAnnotation
 {
@@ -7,7 +7,7 @@ namespace VariantAnnotation.TranscriptAnnotation
     {
         public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript)
         {
-            return transcript.IsCanonical ? new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null,
+            return transcript.IsCanonical ? AnnotatedTranscriptPool.Get(transcript, null, null, null, null, null, null, null, null, null,
                 null, null) : null;
         }
     }

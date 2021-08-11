@@ -23,7 +23,7 @@ namespace SAUtils.MitoMap
         
         public string GetJsonString()
         {
-            var sb= StringBuilderCache.Acquire();
+            var sb= StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             // data section
@@ -32,7 +32,7 @@ namespace SAUtils.MitoMap
             jsonObject.AddIntValue("end", End);
             jsonObject.AddStringValue("variantType", VariantType.ToString());
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
     }

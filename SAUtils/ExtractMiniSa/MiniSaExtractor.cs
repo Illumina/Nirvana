@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using IO;
-using VariantAnnotation.Providers;
 
 namespace SAUtils.ExtractMiniSa
 {
@@ -24,7 +22,7 @@ namespace SAUtils.ExtractMiniSa
             _end    = end;
             _saPath = saPath;
 
-            var refChromDict = new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
+            //new ReferenceSequenceProvider(FileUtilities.GetReadStream(compressedRefFile)).RefNameToChromosome;
 
             //string referenceName = GetReferenceName(saPath, refChromDict);
             //_miniSaPath = GetMiniSaPath(referenceName, begin, end, datasourceName, outputDir);

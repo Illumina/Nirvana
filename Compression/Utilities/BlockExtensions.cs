@@ -16,9 +16,9 @@ namespace Compression.Utilities
 
             byte[] compressedBuffer   = bytePool.Rent(compressedSize);
             byte[] uncompressedBuffer = bytePool.Rent(uncompressedSize);
-            int    numRead            = reader.Read(compressedBuffer, 0, compressedSize);
+            reader.Read(compressedBuffer, 0, compressedSize);
 
-            int len = Zstd.Decompress(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedBuffer.Length);
+            Zstd.Decompress(compressedBuffer, compressedSize, uncompressedBuffer, uncompressedBuffer.Length);
 
             bytePool.Return(compressedBuffer);
             return uncompressedBuffer;

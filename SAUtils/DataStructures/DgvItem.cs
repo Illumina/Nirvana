@@ -44,7 +44,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
@@ -58,7 +58,7 @@ namespace SAUtils.DataStructures
             if (ObservedLosses != 0) jsonObject.AddIntValue("observedLosses", ObservedLosses);
             jsonObject.AddDoubleValue("variantFreqAll", VariantFreqAll, "0.#####");
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public override bool Equals(object obj)

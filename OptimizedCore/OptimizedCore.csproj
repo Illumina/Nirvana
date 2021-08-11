@@ -5,5 +5,8 @@
     <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.0-preview.6.21355.2" />
+  </ItemGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using Genome;
 using Moq;
+using OptimizedCore;
 using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
+using VariantAnnotation.Pools;
 using VariantAnnotation.Providers;
 using Variants;
 using Vcf.VariantCreator;
@@ -83,8 +85,9 @@ namespace UnitTests.VariantAnnotation.ProviderTests
                 VariantType type = SmallVariantCreator.GetVariantType(refAllele, altAllele);
                 int end = start + altAllele.Length - 1;
 
-                annotatedVariants.Add(new AnnotatedVariant(new Variant(chrom, start, end, refAllele, altAllele, type, null, false, false, false,
-                    null, AnnotationBehavior.SmallVariants, false)));
+                var variant = VariantPool.Get(chrom, start, end, refAllele, altAllele, type, null, false, false, false,
+                    null, AnnotationBehavior.SmallVariants, false);
+                annotatedVariants.Add(AnnotatedVariantPool.Get(variant));
             }
 
             position.SetupGet(x => x.AnnotatedVariants).Returns(annotatedVariants.ToArray);
@@ -99,8 +102,13 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             var position = GetPosition(ChromosomeUtilities.Chr1, 100, "A", new []{"T"});
 
             provider.Annotate(position);
-            var jsonString = position.AnnotatedVariants[0].GetJsonString("chr1");
+            var sb         = position.AnnotatedVariants[0].GetJsonStringBuilder("chr1");
+            var jsonString = sb.ToString();
+            StringBuilderPool.Return(sb);
+
             Assert.Equal("{\"chromosome\":\"chr1\",\"begin\":100,\"end\":100,\"refAllele\":\"A\",\"altAllele\":\"T\",\"variantType\":\"SNV\",\"dbSnp\":[\"rs100\"]}", jsonString);
+            VariantPool.Return((Variant)position.AnnotatedVariants[0].Variant);
+            AnnotatedVariantPool.Return((AnnotatedVariant) position.AnnotatedVariants[0]);
         }
 
         [Fact]
@@ -110,8 +118,13 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             var position = GetPosition(ChromosomeUtilities.Chr1, 100, "A", new[] { "T" });
 
             provider.Annotate(position);
-            var jsonString = position.AnnotatedVariants[0].GetJsonString("chr1");
+            var sb         = position.AnnotatedVariants[0].GetJsonStringBuilder("chr1");
+            var jsonString = sb.ToString();
+            StringBuilderPool.Return(sb);
+
             Assert.Equal("{\"chromosome\":\"chr1\",\"begin\":100,\"end\":100,\"refAllele\":\"A\",\"altAllele\":\"T\",\"variantType\":\"SNV\",\"clinvar\":[{RCV00001,\"isAlleleSpecific\":true},{RCV00002}]}", jsonString);
+            VariantPool.Return((Variant)position.AnnotatedVariants[0].Variant);
+            AnnotatedVariantPool.Return((AnnotatedVariant) position.AnnotatedVariants[0]);
         }
     }
 }

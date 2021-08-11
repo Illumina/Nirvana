@@ -181,7 +181,7 @@ namespace UnitTests.Vcf
                 observedResult = vcfReader.GetNextPosition();
             }
 
-            var expectedResult = new Position(ChromosomeUtilities.Chr1, 13133, 13133, "T", new[] { "C" }, 36, new[] { "PASS" }, null,
+            var expectedResult = PositionPool.Get(ChromosomeUtilities.Chr1, 13133, 13133, "T", new[] { "C" }, 36, new[] { "PASS" }, null,
                 null, null, vcfLine.Split('\t'), new[] { false }, false);
 
             Assert.NotNull(observedResult);
@@ -190,6 +190,8 @@ namespace UnitTests.Vcf
             Assert.Equal(expectedResult.Filters, observedResult.Filters);
             Assert.Equal(expectedResult.Quality, observedResult.Quality);
             Assert.Equal(expectedResult.VcfFields, observedResult.VcfFields);
+            
+            PositionPool.Return(expectedResult);
         }
 
         [Fact]

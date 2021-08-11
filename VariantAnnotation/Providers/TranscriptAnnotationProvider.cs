@@ -94,11 +94,11 @@ namespace VariantAnnotation.Providers
 
         private static string GetAssemblyErrorMessage(GenomeAssembly cacheAssembly, GenomeAssembly refAssembly)
         {
-            StringBuilder sb = StringBuilderCache.Acquire();
+            StringBuilder sb = StringBuilderPool.Get();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
             sb.AppendLine($"- Using {refAssembly}: Reference sequence provider");
             sb.AppendLine($"- Using {cacheAssembly}: Transcript annotation provider");
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)

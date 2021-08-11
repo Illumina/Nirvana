@@ -25,7 +25,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -33,7 +33,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddDoubleValue("globalMinorAlleleFrequency", _frequency, "0.#######");
             sb.Append(JsonObject.CloseBrace);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
         
     }

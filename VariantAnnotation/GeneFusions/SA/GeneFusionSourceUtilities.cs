@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace VariantAnnotation.GeneFusions.SA
+﻿namespace VariantAnnotation.GeneFusions.SA
 {
     public static class GeneFusionSourceUtilities
     {

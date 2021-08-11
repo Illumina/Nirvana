@@ -38,7 +38,7 @@ namespace UnitTests.VariantAnnotation.IO
                 {
                     writer.WritePosition(position1.Object, "{\"test\":\"good\"}");
                     writer.WritePosition(position2.Object, "{\"crash\":\"bad\"}");
-                    writer.WritePosition(null, null);
+                    writer.WritePosition(null, (string)null);
                 }
 
                 observedResult = Encoding.UTF8.GetString(ms.ToArray());

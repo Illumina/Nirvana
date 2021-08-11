@@ -7,6 +7,7 @@ using SAUtils.DataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
+using VariantAnnotation.Pools;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Variants;
@@ -42,7 +43,9 @@ namespace UnitTests.SAUtils.NsaWriters
                 saStream.Position = 0;
 
                 var siReader = NsiReader.Read(saStream);
-                var annotations = siReader.GetAnnotation(new Variant(ChromosomeUtilities.Chr1, 100, 14590, "", "<DEL>", VariantType.deletion, "1:100:14590:del", false, false, false, null, null, true)).ToArray();
+                var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 100, 14590, "", "<DEL>", VariantType.deletion, "1:100:14590:del", false, false,
+                    false, null, null, true);
+                var annotations = siReader.GetAnnotation(variant).ToArray();
 
                 string[] expected = {
                     "\"chromosome\":\"1\",\"begin\":145,\"end\":2743,\"variantType\":\"copy_number_gain\",\"id\":\"cg1\",\"clinicalInterpretation\":\"likely benign\",\"phenotypes\":[\"phenotype1\",\"phenotype2\"],\"phenotypeIds\":[\"pid1\",\"pid2\"],\"observedGains\":3,\"validated\":true,\"reciprocalOverlap\":0.17935,\"annotationOverlap\":1",
@@ -51,6 +54,7 @@ namespace UnitTests.SAUtils.NsaWriters
 
                 Assert.Equal(2, annotations.Length);
                 Assert.Equal(expected, annotations);
+                VariantPool.Return(variant);
             }
         }
     }

@@ -4,12 +4,12 @@ using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 using RepeatExpansions;
-using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Pools;
 using Variants;
 
 namespace VariantAnnotation
@@ -66,17 +66,18 @@ namespace VariantAnnotation
 
         private static string GetAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
             foreach ((GenomeAssembly genomeAssembly, List<string> dataSources) in assemblies) sb.AppendLine($"- Using {genomeAssembly}: {string.Join(", ", dataSources)}");
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public IAnnotatedPosition Annotate(IPosition position)
         {
             if (position == null) return null;
             IAnnotatedVariant[] annotatedVariants = GetAnnotatedVariants(position.Variants);
-            var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+            //var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
+            var annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
 
             if (annotatedPosition.AnnotatedVariants == null
                 || annotatedPosition.AnnotatedVariants.Length == 0
@@ -132,7 +133,7 @@ namespace VariantAnnotation
             if (variants?[0].Behavior == null) return null;
             int numVariants = variants.Length;
             var annotatedVariants = new IAnnotatedVariant[numVariants];
-            for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(variants[i]);
+            for (var i = 0; i < numVariants; i++) annotatedVariants[i] = AnnotatedVariantPool.Get(variants[i]);
             return annotatedVariants;
         }
 

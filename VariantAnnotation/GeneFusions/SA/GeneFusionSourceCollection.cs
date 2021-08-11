@@ -89,14 +89,14 @@ namespace VariantAnnotation.GeneFusions.SA
         // ReSharper disable once ParameterTypeCanBeEnumerable.Global
         public string GetJsonEntry(IGeneFusionPair geneFusionPair, uint[] oncogeneKeys)
         {
-            StringBuilder sb         = StringBuilderCache.Acquire();
+            StringBuilder sb         = StringBuilderPool.Get();
             var           jsonObject = new JsonObject(sb);
             var           entries    = new List<string>();
 
             AddGenes(geneFusionPair, oncogeneKeys, jsonObject);
             if (_germlineSources != null) AddGeneFusionSource("germlineSources", _germlineSources, entries, jsonObject);
             if (_somaticSources  != null) AddGeneFusionSource("somaticSources",  _somaticSources,  entries, jsonObject);
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         private void AddGenes(IGeneFusionPair geneFusionPair, uint[] oncogeneKeys, JsonObject jsonObject)

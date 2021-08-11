@@ -39,31 +39,48 @@ namespace Compression.FileHandling
             if (string.IsNullOrEmpty(value)) return;
             var lineBytes = Encoding.UTF8.GetBytes(value);
 
-            if (lineBytes.Length <= BufferSize - _bufferIndex)
+            WriteBytes(lineBytes, lineBytes.Length);
+        }
+
+        private readonly char[] _charBuffer = new char[8 *1024 *1024];
+        private readonly byte[] _byteBuffer = new byte[16 *1024 *1024];
+        
+        public override void Write(StringBuilder sb)
+        {
+            if (sb == null || sb.Length == 0) return;
+            sb.CopyTo(0, _charBuffer, 0, sb.Length);
+            var length = Encoding.UTF8.GetBytes(_charBuffer, 0, sb.Length, _byteBuffer, 0);
+
+            WriteBytes(_byteBuffer, length);
+        }
+
+        private void WriteBytes(byte[] lineBytes, int length)
+        {
+            if (length <= BufferSize - _bufferIndex)
             {
-                Array.Copy(lineBytes, 0, _buffer, _bufferIndex, lineBytes.Length);
-                _bufferIndex += lineBytes.Length;
+                Array.Copy(lineBytes, 0, _buffer, _bufferIndex, length);
+                _bufferIndex += length;
             }
             else
             {
                 // fill up the buffer
                 Array.Copy(lineBytes, 0, _buffer, _bufferIndex, BufferSize - _bufferIndex);
-                int lineIndex = BufferSize - _bufferIndex;
+                int lineIndex = BufferSize                                 - _bufferIndex;
 
                 // write it out to the stream
                 _stream.Write(_buffer, 0, BufferSize);
                 _bufferIndex = 0;
 
-                while (lineIndex + BufferSize <= lineBytes.Length)
+                while (lineIndex + BufferSize <= length)
                 {
                     _stream.Write(lineBytes, lineIndex, BufferSize);
                     lineIndex += BufferSize;
                 }
 
                 // the leftover bytes should be saved in buffer
-                if (lineIndex >= lineBytes.Length) return;
-                Array.Copy(lineBytes, lineIndex, _buffer, 0, lineBytes.Length - lineIndex);
-                _bufferIndex = lineBytes.Length - lineIndex;
+                if (lineIndex >= length) return;
+                Array.Copy(lineBytes, lineIndex, _buffer, 0, length - lineIndex);
+                _bufferIndex = length - lineIndex;
             }
         }
 

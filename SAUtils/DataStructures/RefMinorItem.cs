@@ -22,12 +22,12 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddBoolValue("isReferenceMinor", true);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
     }
 }

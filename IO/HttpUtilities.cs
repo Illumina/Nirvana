@@ -73,8 +73,7 @@ namespace IO
 
         public static bool IsWebProtocolErrorException(Exception exception)
         {
-            if (!(exception is WebException)) return false;
-            var webException = (WebException)exception;
+            if (exception is not WebException webException) return false;
 
             return webException.Status == WebExceptionStatus.ProtocolError;
         }

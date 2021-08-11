@@ -38,7 +38,7 @@ namespace SAUtils.ExtractCosmicSvs
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
 
             var jsonObject = new JsonObject(sb);
 

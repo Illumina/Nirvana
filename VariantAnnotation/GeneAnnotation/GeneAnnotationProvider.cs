@@ -20,7 +20,7 @@ namespace VariantAnnotation.GeneAnnotation
 
         public string Annotate(string geneName)
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -34,11 +34,15 @@ namespace VariantAnnotation.GeneAnnotation
                 if (!string.IsNullOrEmpty(jsonString)) hasAnnotation = true;
             }
 
-            if (!hasAnnotation) return null;
+            if (!hasAnnotation)
+            {
+                StringBuilderPool.GetStringAndReturn(sb);
+                return null;
+            }
 
             sb.Append(JsonObject.CloseBrace);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public GeneAnnotationProvider(IEnumerable<Stream> dbStreams)

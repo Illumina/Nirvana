@@ -20,7 +20,6 @@ namespace SAUtils.gnomAD
 
         public static ExitCodes Run(string command, string[] commandArgs)
         {
-            var creator = new GnomadSnvMain();
             var ops = new OptionSet
             {
                 {

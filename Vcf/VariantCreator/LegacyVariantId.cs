@@ -169,13 +169,13 @@ namespace Vcf.VariantCreator
 
             using (var md5Hash = MD5.Create())
             {
-                var md5Builder = StringBuilderCache.Acquire();
+                var md5Builder = StringBuilderPool.Get();
                 byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(altAllele));
 
                 md5Builder.Clear();
                 foreach (byte b in data) md5Builder.Append(b.ToString("x2"));
 
-                insAltAllele = StringBuilderCache.GetStringAndRelease(md5Builder);
+                insAltAllele = StringBuilderPool.GetStringAndReturn(md5Builder);
             }
 
             return insAltAllele;

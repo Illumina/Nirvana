@@ -5,13 +5,19 @@ using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using MitoHeteroplasmy;
+using OptimizedCore;
 using VariantAnnotation;
+using VariantAnnotation.AnnotatedPositions;
+using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface;
+using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
+using VariantAnnotation.Pools;
 using VariantAnnotation.Utilities;
+using Variants;
 using Vcf;
 
 namespace Nirvana
@@ -61,8 +67,11 @@ namespace Nirvana
 
                         var annotatedPosition = position.Variants != null ? annotationResources.Annotator.Annotate(position) : null;
 
-                        string json = annotatedPosition?.GetJsonString();
-                        if (json != null) jsonWriter.WritePosition(annotatedPosition.Position, json);
+                        var jsb = annotatedPosition?.GetJsonStringBuilder();
+                        if (jsb != null) jsonWriter.WritePosition(annotatedPosition.Position, jsb);
+                        StringBuilderPool.Return(jsb);
+                        
+                        ReturnPoolObjects(annotatedPosition);
 
                         numVariants++;
                         variantCount += position.Variants?.Length ?? 0;
@@ -84,6 +93,28 @@ namespace Nirvana
             metrics.ShowSummaryTable();
 
             return (variantCount, ExitCodes.Success);
+        }
+
+        private static void ReturnPoolObjects(IAnnotatedPosition annotatedPosition)
+        {
+            if (annotatedPosition?.AnnotatedVariants != null)
+                foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
+                {
+                    if (annotatedVariant.Transcripts != null)
+                    {
+                        foreach (IAnnotatedTranscript annotatedTranscript in annotatedVariant.Transcripts)
+                        {
+                            AnnotatedTranscriptPool.Return((AnnotatedTranscript) annotatedTranscript);
+                        }
+                    }
+
+                    var variant = annotatedVariant.Variant;
+                    if (variant is Variant) VariantPool.Return((Variant) annotatedVariant.Variant);
+                    AnnotatedVariantPool.Return((AnnotatedVariant) annotatedVariant);
+                }
+
+            PositionPool.Return((Position) annotatedPosition?.Position);
+            AnnotatedPositionPool.Return((AnnotatedPosition) annotatedPosition);
         }
 
         private static void CheckGenomeAssembly(IAnnotationResources annotationResources, VcfReader vcfReader)

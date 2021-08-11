@@ -10,6 +10,7 @@ using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.GeneFusions.Calling;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Pools;
 using Variants;
 using Xunit;
 
@@ -528,7 +529,7 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Calling
             var expectedFirstGeneSymbol  = "B";
             var expectedSecondGeneSymbol = "A";
 
-            (ulong actualFusionKey, string actualFirstGeneSymbol, uint actualFirstGeneKey, string actualSecondGeneSymbol, uint actualSecondGeneKey) =
+            (ulong _, string actualFirstGeneSymbol, uint _, string actualSecondGeneSymbol, uint _) =
                 GeneFusionCaller.GetGeneAndFusionKeys(a, b);
 
             Assert.Equal(expectedFirstGeneSymbol,  actualFirstGeneSymbol);
@@ -543,7 +544,7 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Calling
 
             var expectedFirstGeneSymbol  = "A";
             var expectedSecondGeneSymbol = "B";
-            (ulong actualFusionKey, string actualFirstGeneSymbol, uint actualFirstGeneKey, string actualSecondGeneSymbol, uint actualSecondGeneKey) =
+            (ulong _, string actualFirstGeneSymbol, uint _, string actualSecondGeneSymbol, uint _) =
                 GeneFusionCaller.GetGeneAndFusionKeys(a, b);
 
             Assert.Equal(expectedFirstGeneSymbol,  actualFirstGeneSymbol);
@@ -568,6 +569,10 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Calling
             var sb = new StringBuilder();
             annotatedVariant.Transcripts[0].SerializeJson(sb);
             var json = sb.ToString();
+            
+            VariantPool.Return((Variant)annotatedVariant.Variant);
+            AnnotatedTranscriptPool.Return((AnnotatedTranscript) annotatedVariant.Transcripts[0]);
+            AnnotatedVariantPool.Return((AnnotatedVariant)annotatedVariant);
 
             Assert.Contains(expectedConsequences,   json);
             Assert.Contains(expectedGeneFusionJson, json);
@@ -575,13 +580,13 @@ namespace UnitTests.VariantAnnotation.GeneFusions.Calling
 
         private IAnnotatedVariant[] GetAnnotatedVariants()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr1, 84298558, 84298558, "A", "A]chr2:130509234]", VariantType.translocation_breakend,
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 84298558, 84298558, "A", "A]chr2:130509234]", VariantType.translocation_breakend,
                 "1-84298558-A-A]chr2:130509234]", false, false, false, null, AnnotationBehavior.StructuralVariants, true);
 
-            var annotatedTranscript = new AnnotatedTranscript(Transcripts.ENST00000370673, null, null, null, null, null, null, null, null, null,
+            var annotatedTranscript = AnnotatedTranscriptPool.Get(Transcripts.ENST00000370673, null, null, null, null, null, null, null, null, null,
                 new List<ConsequenceTag>(), null);
             
-            var annotatedVariant = new AnnotatedVariant(variant);
+            var annotatedVariant = AnnotatedVariantPool.Get(variant);
             annotatedVariant.Transcripts.Add(annotatedTranscript);
             
             return new IAnnotatedVariant[] {annotatedVariant};

@@ -256,7 +256,7 @@ namespace SAUtils.DataStructures
         
 		public string GetJsonString()
 		{
-			var sb = StringBuilderCache.Acquire();
+			var sb = StringBuilderPool.Get();
 			var jsonObject = new JsonObject(sb);
 			jsonObject.AddIntValue("coverage", Coverage);
 		    if (HasFailedFilters) jsonObject.AddBoolValue("failedFilter", true);
@@ -323,7 +323,7 @@ namespace SAUtils.DataStructures
             jsonObject.AddIntValue("controlsAllAn", ControlsAllAlleleNumber);
             jsonObject.AddIntValue("controlsAllAc", ControlsAllAlleleCount);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
 		}
 
         public static int CompareTo(GnomadItem item, GnomadItem other)

@@ -28,7 +28,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         
         public string GetJsonString()
         {
-            var sb         = StringBuilderCache.Acquire();
+            var sb         = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("id", $"{Accession}.{Version}");
@@ -36,7 +36,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             jsonObject.AddStringValue("lastUpdatedDate", LastUpdatedDate.ToString("yyyy-MM-dd"));
             jsonObject.AddStringValues("significance", Significances);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public int CompareTo(int vcvId)

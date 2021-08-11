@@ -31,7 +31,7 @@ namespace SAUtils.DataStructures
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -44,7 +44,7 @@ namespace SAUtils.DataStructures
                 JsonSchema.CountKeyIfAdded(jsonObject.AddObjectValues("phenotypes", _phenotypes), "phenotypes");
             sb.Append(JsonObject.CloseBrace);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         public sealed class Phenotype : IJsonSerializer

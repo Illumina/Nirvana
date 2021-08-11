@@ -4,6 +4,7 @@ using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Pools;
 using VariantAnnotation.TranscriptAnnotation;
 using Variants;
 using Xunit;
@@ -54,7 +55,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
         [Fact]
         public void GetHgvsProteinAnnotation_substitution()
         {
-            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262295, 1262295, "A", "C", VariantType.SNV, "1:1262295:A>C", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant     = VariantPool.Get(ChromosomeUtilities.Chr1, 1262295, 1262295, "A", "C", VariantType.SNV, "1:1262295:A>C", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -63,12 +64,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Asp2Ala)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_insertion()
         {
-            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262297, 1262296, "", "TTC", VariantType.insertion, "1:1262295:T>TTTC", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant     = VariantPool.Get(ChromosomeUtilities.Chr1, 1262297, 1262296, "", "TTC", VariantType.insertion, "1:1262295:T>TTTC", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -77,12 +79,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Asp2_Asp3insPhe)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_duplication_right_shifted()
         {
-            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262297, 1262296, "", "GAC", VariantType.insertion, "1:1262295:T>GAC", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant     = VariantPool.Get(ChromosomeUtilities.Chr1, 1262297, 1262296, "", "GAC", VariantType.insertion, "1:1262295:T>GAC", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -91,12 +94,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Asp3dup)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_deletion()
         {
-            var variant     = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262302, "TCG", "", VariantType.deletion, "1:1262300:1262302", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant     = VariantPool.Get(ChromosomeUtilities.Chr1, 1262300, 1262302, "TCG", "", VariantType.deletion, "1:1262300:1262302", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -105,12 +109,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Ser4del)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_delIns()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262305, "TCGGAG", "GAGACA", VariantType.indel, "1:1262300:1262305", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 1262300, 1262305, "TCGGAG", "GAGACA", VariantType.indel, "1:1262300:1262305", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
@@ -119,12 +124,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Ser4_Glu5delinsGluThr)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_no_change()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262302, "TCG", "AGT", VariantType.indel, "1:1262300:1262302", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 1262300, 1262302, "TCG", "AGT", VariantType.indel, "1:1262300:1262302", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -133,12 +139,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:c.10_12delinsAGT(p.(Ser4=))", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_frameshift()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr1, 1262300, 1262301, "TC", "", VariantType.deletion, "1:1262300:1262301", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 1262300, 1262301, "TC", "", VariantType.deletion, "1:1262300:1262301", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -147,12 +154,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Ser4GlyfsTer19)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_frameshift_stop_gain()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr1, 1262313, 1262312, "", "GA", VariantType.insertion, "1:1262333:1262332", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 1262313, 1262312, "", "GA", VariantType.insertion, "1:1262333:1262332", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -161,12 +169,13 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Phe8Ter)", hgvspNotation);
+            VariantPool.Return(variant);
         }
 
         [Fact]
         public void GetHgvsProteinAnnotation_extension()
         {
-            var variant = new Variant(ChromosomeUtilities.Chr1, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, AnnotationBehavior.SmallVariants, false);
+            var variant = VariantPool.Get(ChromosomeUtilities.Chr1, 1263141, 1263143, "TAG", "", VariantType.deletion, "1:1263141:1263143", false, false, false, null, AnnotationBehavior.SmallVariants, false);
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
@@ -175,6 +184,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
             Assert.Equal("ENST00000343938.4:p.(Ter215GlyextTer43)", hgvspNotation);
+            VariantPool.Return(variant);
         }
     }
 }

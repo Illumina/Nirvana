@@ -11,14 +11,14 @@ namespace UnitTests.OptimizedCore
             const string expectedString  = "ABC123";
             const string expectedString2 = "The quick brown fox jumps over the lazy dog.";
 
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             sb.Append(expectedString);
-            Assert.Equal(expectedString, StringBuilderCache.GetStringAndRelease(sb));
+            Assert.Equal(expectedString, StringBuilderPool.GetStringAndReturn(sb));
 
             // acquire an existing string builder
-            sb = StringBuilderCache.Acquire();
+            sb = StringBuilderPool.Get();
             sb.Append(expectedString2);
-            Assert.Equal(expectedString2, StringBuilderCache.GetStringAndRelease(sb));
+            Assert.Equal(expectedString2, StringBuilderPool.GetStringAndReturn(sb));
         }
     }
 }

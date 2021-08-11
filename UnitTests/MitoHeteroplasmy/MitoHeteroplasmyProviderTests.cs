@@ -1,5 +1,6 @@
 ﻿using MitoHeteroplasmy;
 using UnitTests.TestUtilities;
+using VariantAnnotation.Pools;
 using Variants;
 using Xunit;
 
@@ -26,11 +27,11 @@ namespace UnitTests.MitoHeteroplasmy
             var position = 1;
 
             IVariant[] variants          = {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "C", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "C", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
             var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 0.2, 0.15, 0.02 });
@@ -41,6 +42,11 @@ namespace UnitTests.MitoHeteroplasmy
             Assert.True(percentilesSample[1].HasValue);
             Assert.Equal(100 / 3.0, percentilesSample[1].Value, 3);
             Assert.Null(percentilesSample[2]);
+
+            foreach (IVariant variant in variants)
+            {
+                VariantPool.Return((Variant) variant);
+            }
         }
 
         [Fact]
@@ -51,14 +57,18 @@ namespace UnitTests.MitoHeteroplasmy
             var position = 1;
             
             IVariant[] variants = {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false),
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "ACC", VariantType.insertion,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "ACC", VariantType.insertion,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
             var percentiles = provider.GetVrfPercentiles(variants, new[] { 0.24, 0.12 });
 
             Assert.Null(percentiles);
+            foreach (IVariant variant in variants)
+            {
+                VariantPool.Return((Variant) variant);
+            }
         }
 
         [Fact]
@@ -68,7 +78,7 @@ namespace UnitTests.MitoHeteroplasmy
             var position = 2;
             
             IVariant[] variants = {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
 
@@ -78,6 +88,10 @@ namespace UnitTests.MitoHeteroplasmy
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
             Assert.Equal(52.22, percentilesSample[0].Value, 2);
+            foreach (IVariant variant in variants)
+            {
+                VariantPool.Return((Variant) variant);
+            }
         }
         [Fact]
         public void GetVrfPercentiles_zero()
@@ -86,7 +100,7 @@ namespace UnitTests.MitoHeteroplasmy
             var position   = 1;
             
             IVariant[] variants = {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
 
@@ -95,6 +109,10 @@ namespace UnitTests.MitoHeteroplasmy
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
             Assert.Equal(0, percentilesSample[0].Value, 2);
+            foreach (IVariant variant in variants)
+            {
+                VariantPool.Return((Variant) variant);
+            }
         }
         
         [Fact]
@@ -104,7 +122,7 @@ namespace UnitTests.MitoHeteroplasmy
             var position   = 2;
 
             IVariant[] variants = {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "T", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
             
@@ -113,6 +131,10 @@ namespace UnitTests.MitoHeteroplasmy
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
             Assert.Equal(100, percentilesSample[0].Value, 2);
+            foreach (IVariant variant in variants)
+            {
+                VariantPool.Return((Variant) variant);
+            }
         }
 
         [Fact]
@@ -123,7 +145,7 @@ namespace UnitTests.MitoHeteroplasmy
             var position   = 750;
             
             IVariant[] variants = {
-                new Variant(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
+                VariantPool.Get(ChromosomeUtilities.ChrM, position, position, "N", "G", VariantType.SNV,
                     null, false, false, false, null, AnnotationBehavior.SmallVariants, false)
             };
             var percentilesSample = provider.GetVrfPercentiles(variants, new[] { 1.0 });
@@ -131,6 +153,10 @@ namespace UnitTests.MitoHeteroplasmy
             Assert.Single(percentilesSample);
             Assert.True(percentilesSample[0].HasValue);
             Assert.Equal(1.76, percentilesSample[0].Value, 2);
+            foreach (IVariant variant in variants)
+            {
+                VariantPool.Return((Variant) variant);
+            }
         }
     }
 }

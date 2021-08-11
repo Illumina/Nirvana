@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Text;
 using OptimizedCore;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.SA;
@@ -9,7 +10,7 @@ namespace VariantAnnotation.AnnotatedPositions
 {
     public sealed class AnnotatedVariant : IAnnotatedVariant
     {
-        public IVariant                          Variant                   { get; }
+        public IVariant                          Variant                   { get; private set; }
         public string                            HgvsgNotation             { get; set; }
         public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions         { get; } = new List<IAnnotatedRegulatoryRegion>();
         public IList<IAnnotatedTranscript>       Transcripts               { get; } = new List<IAnnotatedTranscript>();
@@ -18,11 +19,22 @@ namespace VariantAnnotation.AnnotatedPositions
         public double?                           PhylopScore               { get; set; }
         
         public bool InLowComplexityRegion { get; set; }
-        public AnnotatedVariant(IVariant variant) => Variant = variant;
-
-        public string GetJsonString(string originalChromName)
+        
+        public void Initialize(IVariant variant)
         {
-            var sb = StringBuilderCache.Acquire();
+            Variant       = variant;
+            HgvsgNotation = null;
+            RegulatoryRegions.Clear();
+            Transcripts.Clear();
+            SaList.Clear();
+            RepeatExpansionPhenotypes = null;
+            PhylopScore               = null;
+        }
+
+        
+        public StringBuilder GetJsonStringBuilder(string originalChromName)
+        {
+            var sb         = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             // data section
@@ -61,7 +73,7 @@ namespace VariantAnnotation.AnnotatedPositions
             if (Transcripts?.Count > 0) jsonObject.AddObjectValues("transcripts", Transcripts);
 
             sb.Append(JsonObject.CloseBrace);
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return sb;
         }
     }
 }

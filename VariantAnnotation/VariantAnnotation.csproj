@@ -23,6 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />
+    <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="6.0.0-preview.6.21355.2" />
   </ItemGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
 </Project>

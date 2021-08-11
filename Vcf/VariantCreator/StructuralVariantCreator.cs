@@ -1,4 +1,5 @@
 ﻿using Genome;
+using VariantAnnotation.Pools;
 using Variants;
 
 namespace Vcf.VariantCreator
@@ -14,7 +15,7 @@ namespace Vcf.VariantCreator
 
             if (variantType != VariantType.translocation_breakend) start++;
 
-            return new Variant(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
+            return VariantPool.Get(chromosome, start, end, refAllele, altAllele, variantType, vid, false, false, false,
                 null, behavior, true);
         }
                 

@@ -30,7 +30,7 @@ namespace SAUtils.GnomadGeneScores
 
         public string GetJsonString()
         {
-            var sb = StringBuilderCache.Acquire();
+            var sb = StringBuilderPool.Get();
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
@@ -42,7 +42,7 @@ namespace SAUtils.GnomadGeneScores
             jsonObject.AddDoubleValue("loeuf", _loeuf, "0.00e0");
             sb.Append(JsonObject.CloseBrace);
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
 
         }
 

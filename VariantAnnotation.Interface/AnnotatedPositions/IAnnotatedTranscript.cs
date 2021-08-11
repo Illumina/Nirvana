@@ -21,5 +21,10 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
 
         void AddGeneFusions(IAnnotatedGeneFusion[] geneFusions);
         void AddGeneFusionPairs(HashSet<IGeneFusionPair> geneKeys);
+
+        public void Initialize(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
+            string referenceCodons, string alternateCodons, IMappedPosition mappedPosition, string hgvsCoding,
+            string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
+            List<ConsequenceTag> consequences, bool? completeOverlap);
     }
 }

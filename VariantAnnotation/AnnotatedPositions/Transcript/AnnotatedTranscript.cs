@@ -11,23 +11,23 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
 {
     public sealed class AnnotatedTranscript : IAnnotatedTranscript
     {
-        public ITranscript Transcript { get; }
-        public string ReferenceAminoAcids { get; }
-        public string AlternateAminoAcids { get; }
-        public string ReferenceCodons { get; }
-        public string AlternateCodons { get; }
-        public IMappedPosition MappedPosition { get; }
-        public string HgvsCoding { get; }
-        public string HgvsProtein { get; }
-        public PredictionScore Sift { get; }
-        public PredictionScore PolyPhen { get; }
-        public List<ConsequenceTag> Consequences { get; }
-        public bool? CompleteOverlap { get; }
-        public List<double> ConservationScores { get; set; }
+        public ITranscript          Transcript          { get; private set; }
+        public string               ReferenceAminoAcids { get; private set;}
+        public string               AlternateAminoAcids { get; private set;}
+        public string               ReferenceCodons     { get; private set;}
+        public string               AlternateCodons     { get; private set;}
+        public IMappedPosition      MappedPosition      { get; private set;}
+        public string               HgvsCoding          { get; private set;}
+        public string               HgvsProtein         { get; private set;}
+        public PredictionScore      Sift                { get; private set;}
+        public PredictionScore      PolyPhen            { get; private set;}
+        public List<ConsequenceTag> Consequences        { get; private set;}
+        public bool?                CompleteOverlap     { get; private set;}
+        public List<double>         ConservationScores  { get; set; }
 
         private List<IAnnotatedGeneFusion> _geneFusions;
-
-        public AnnotatedTranscript(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
+        
+        public void Initialize(ITranscript transcript, string referenceAminoAcids, string alternateAminoAcids,
             string referenceCodons, string alternateCodons, IMappedPosition mappedPosition, string hgvsCoding,
             string hgvsProtein, PredictionScore sift, PredictionScore polyphen,
             List<ConsequenceTag> consequences, bool? completeOverlap)
@@ -44,8 +44,9 @@ namespace VariantAnnotation.AnnotatedPositions.Transcript
             PolyPhen            = polyphen;
             Consequences        = consequences;
             CompleteOverlap     = completeOverlap;
+            _geneFusions        = null;
         }
-
+        
         public void SerializeJson(StringBuilder sb)
         {
             var jsonObject = new JsonObject(sb);

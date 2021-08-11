@@ -664,7 +664,7 @@ namespace CommandLine.NDesk.Options
         {
             if (description == null) return string.Empty;
 
-            StringBuilder sb = StringBuilderCache.Acquire(description.Length);
+            StringBuilder sb = StringBuilderPool.Get();
             int start        = -1;
 
             for (var position = 0; position < description.Length; ++position)
@@ -672,7 +672,7 @@ namespace CommandLine.NDesk.Options
                 position = ParseDescription(description, position, sb, ref start);
             }
 
-            return StringBuilderCache.GetStringAndRelease(sb);
+            return StringBuilderPool.GetStringAndReturn(sb);
         }
 
         private static int ParseDescription(string description, int position, StringBuilder sb, ref int start)
