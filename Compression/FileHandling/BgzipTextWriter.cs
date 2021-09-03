@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Buffers;
 using System.IO;
 using System.Text;
+using OptimizedCore;
 
 namespace Compression.FileHandling
 {
@@ -9,6 +11,11 @@ namespace Compression.FileHandling
         private readonly BlockGZipStream _stream;
         private readonly byte[] _buffer;
         private int _bufferIndex;
+        
+        private const int             CharBufferSize = 8 * 1024 * 1024;
+        private       char[]          _charBuffer;
+        private       byte[]          _byteBuffer;
+
         private const int BufferSize = BlockGZipStream.BlockGZipFormatCommon.BlockSize;
 
         private static readonly UTF8Encoding Utf8WithoutBom = new UTF8Encoding(false);
@@ -19,6 +26,9 @@ namespace Compression.FileHandling
         {
             _buffer = new byte[BufferSize];
             _stream = stream;
+
+            _charBuffer = ExpandableArray<char>.Get(CharBufferSize);
+            _byteBuffer = ExpandableArray<byte>.Get(CharBufferSize * 2);
         }
 
         public override void Flush()
@@ -42,12 +52,16 @@ namespace Compression.FileHandling
             WriteBytes(lineBytes, lineBytes.Length);
         }
 
-        private readonly char[] _charBuffer = new char[8 *1024 *1024];
-        private readonly byte[] _byteBuffer = new byte[16 *1024 *1024];
-        
         public override void Write(StringBuilder sb)
         {
             if (sb == null || sb.Length == 0) return;
+            
+            if (sb.Length > _charBuffer.Length)
+            {
+                _charBuffer = ExpandableArray<char>.Resize(_charBuffer, sb.Length * 2);
+                _byteBuffer = ExpandableArray<byte>.Resize(_byteBuffer, _charBuffer.Length     * 2);
+            }
+
             sb.CopyTo(0, _charBuffer, 0, sb.Length);
             var length = Encoding.UTF8.GetBytes(_charBuffer, 0, sb.Length, _byteBuffer, 0);
 
@@ -88,6 +102,8 @@ namespace Compression.FileHandling
         {
             Flush();
             _stream.Dispose();
+            ExpandableArray<char>.Return(_charBuffer);
+            ExpandableArray<byte>.Return(_byteBuffer);
         }
     }
 }
