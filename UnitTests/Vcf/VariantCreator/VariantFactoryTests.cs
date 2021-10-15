@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using CacheUtils.TranscriptCache;
+using ErrorHandling.Exceptions;
 using Genome;
 using Moq;
 using OptimizedCore;
@@ -393,6 +394,16 @@ namespace UnitTests.Vcf.VariantCreator
             Assert.Equal(VariantType.short_tandem_repeat_variation, variant.Type);
             Assert.Equal(63912685,                                  variant.Start);
             Assert.Equal(63912714,                                  variant.End);
+        }
+        
+        [Fact]
+        public void STR_without_num_throws_user_error()
+        {
+            var vcfLine =
+                "chr3	63912684	STR	G	<STR>	.	PASS	END=63912714;REF=10;RL=30;RU=GCA;VARID=ATXN7;REPID=ATXN7	GT:SO:REPCN:REPCI:ADSP:ADFL:ADIR:LC	0/1:SPANNING/SPANNING:10/12:10-10/12-12:9/3:8/11:0/0:26.270270"; 
+            
+            Assert.Throws<UserErrorException>(()=>ParseVcfLine(vcfLine));
+            
         }
 
         [Fact]

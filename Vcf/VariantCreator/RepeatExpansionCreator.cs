@@ -1,4 +1,5 @@
-﻿using Genome;
+﻿using ErrorHandling.Exceptions;
+using Genome;
 using OptimizedCore;
 using Variants;
 
@@ -9,7 +10,7 @@ namespace Vcf.VariantCreator
         public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, int? refRepeatCount, string vid)
         {
             (int repeatCount, bool foundError) = altAllele.Trim('<', '>').Substring(3).OptimizedParseInt32();
-            if (foundError) return null;
+            if (foundError) throw new UserErrorException($"Invalid alt allele ({altAllele}) found at {chromosome.UcscName}:{start}");
 
             start++;
 
