@@ -77,8 +77,9 @@ namespace Jasix
 			
 			if (printHeader)
 			{
-				string headerString = "{" +GetHeader() +"}";
-				Utilities.PrintJsonEntry(headerString, false, _writer);
+				_writer.Write("{\n\"header\":");
+				var headerContent = GetHeader().Split(':',2)[1];
+				Utilities.PrintJsonEntry(headerContent, false, _writer);
 				_writer.WriteLine(",");
 			}
 			else _writer.Write("{");
