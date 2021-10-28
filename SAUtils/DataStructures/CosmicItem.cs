@@ -32,12 +32,11 @@ namespace SAUtils.DataStructures
             Chromosome      = chromosome;
             Position        = position;
             Id              = id;
-            RefAllele = refAllele;
-            AltAllele = altAllele;
+            RefAllele       = refAllele;
+            AltAllele       = altAllele;
             Gene            = gene;
             Studies         = studies;
             SampleCount     = sampleCount;
-
         }
 
         public sealed class CosmicStudy : IEquatable<CosmicStudy>
@@ -104,7 +103,7 @@ namespace SAUtils.DataStructures
             var tissueCounts = new Dictionary<string, int>();
             foreach (var study in Studies)
             {
-                if (study.Sites == null) return null;
+                if (study.Sites == null) continue;
 
                 foreach (var site in study.Sites)
                 {
@@ -125,7 +124,8 @@ namespace SAUtils.DataStructures
             var cancerTypeCounts = new Dictionary<string, int>();
             foreach (var study in Studies)
             {
-                if (study.Histologies == null) return null;
+                if (study.Histologies == null) continue;
+
                 foreach (var histology in study.Histologies)
                 {
                     if (cancerTypeCounts.TryGetValue(histology, out _))
@@ -145,7 +145,8 @@ namespace SAUtils.DataStructures
             var tierCounts = new Dictionary<string, int>();
             foreach (var study in Studies)
             {
-                if (study.Tiers == null) return null;
+                if (study.Tiers == null) continue;
+
                 foreach (var tier in study.Tiers)
                 {
                     if (tierCounts.TryGetValue(tier, out _))
