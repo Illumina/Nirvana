@@ -47,14 +47,19 @@ namespace SAUtils.DataStructures
             public string Id { get; }
             public IEnumerable<string> Histologies { get; }
             public IEnumerable<string> Sites { get; }
+            public IEnumerable<string> Tiers { get; }
 
             #endregion
 
-            public CosmicStudy(string studyId, IEnumerable<string> histologies, IEnumerable<string> sites)
+            public CosmicStudy(string studyId,
+                               IEnumerable<string> histologies,
+                               IEnumerable<string> sites,
+                               IEnumerable<string> tiers)
             {
                 Id          = studyId;
                 Sites       = sites;
                 Histologies = histologies;
+                Tiers       = tiers;
             }
 
             public bool Equals(CosmicStudy other)
@@ -62,7 +67,8 @@ namespace SAUtils.DataStructures
                 if (other == null) return false;
                 return Id.Equals(other.Id)
                     && Histologies.SequenceEqual(other.Histologies)
-                    && Sites.SequenceEqual(other.Sites);
+                    && Sites.SequenceEqual(other.Sites)
+                    && Tiers.SequenceEqual(other.Tiers);
             }
 
             public override int GetHashCode()
@@ -87,6 +93,7 @@ namespace SAUtils.DataStructures
 
             jsonObject.AddStringValue("cancerTypesAndCounts", GetJsonStringFromDict("cancerType",GetCancerTypeCounts()), false);
             jsonObject.AddStringValue("cancerSitesAndCounts", GetJsonStringFromDict("cancerSite",GetTissueCounts()), false);
+            jsonObject.AddStringValue("tiers", GetJsonStringFromDict("tier",GetTierCounts()), false);
 
             return StringBuilderPool.GetStringAndReturn(sb);
         }
@@ -130,6 +137,26 @@ namespace SAUtils.DataStructures
             }
 
             return cancerTypeCounts;
+        }
+
+        internal IDictionary<string,int> GetTierCounts()
+        {
+            if (Studies == null) return null;
+            var tierCounts = new Dictionary<string, int>();
+            foreach (var study in Studies)
+            {
+                if (study.Tiers == null) return null;
+                foreach (var tier in study.Tiers)
+                {
+                    if (tierCounts.TryGetValue(tier, out _))
+                    {
+                        tierCounts[tier]++;
+                    }
+                    else tierCounts[tier] = 1;
+                }
+            }
+
+            return tierCounts;
         }
 
         private static string GetJsonStringFromDict(string dataType, IDictionary<string, int> dictionary)

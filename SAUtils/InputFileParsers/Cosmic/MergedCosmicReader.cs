@@ -23,6 +23,7 @@ namespace SAUtils.InputFileParsers.Cosmic
         private int _primarySiteIndex      = -1;
         private int _primaryHistologyIndex = -1;
         private int _studyIdIndex          = -1;
+        private int _tierIndex             = -1;
 
         private const string StudyIdTag = "ID_tumour";
 
@@ -82,10 +83,11 @@ namespace SAUtils.InputFileParsers.Cosmic
             string studyId     = columns[_studyIdIndex];
             var sites          = GetSites(columns);
             var histologies    = GetHistologies(columns);
+            var tiers          = GetTiers(columns);
             
             if (string.IsNullOrEmpty(mutationId)) return;
 
-            var study = new CosmicItem.CosmicStudy(studyId, histologies, sites);
+            var study = new CosmicItem.CosmicStudy(studyId, histologies, sites, tiers);
             if (_studies.TryGetValue(mutationId, out var studySet))
                 studySet.Add(study);
             else _studies[mutationId] = new HashSet<CosmicItem.CosmicStudy> { study };
@@ -110,6 +112,16 @@ namespace SAUtils.InputFileParsers.Cosmic
             return sites.ToList();
         }
 
+        private IList<string> GetTiers(string[] columns)
+        {
+            var tiers = new HashSet<string>();
+
+            var tier = columns[_tierIndex];
+            TryAddValue(tier, tiers);
+
+            return tiers.ToList();
+        }
+
         private static void TryAddValue(string value, ISet<string> sites)
         {
            if (!string.IsNullOrEmpty(value) && value != "NS")
@@ -126,6 +138,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             _studyIdIndex          = -1;
             _primarySiteIndex      = -1;
             _primaryHistologyIndex = -1;
+            _tierIndex             = -1;
 
             var columns = headerLine.OptimizedSplit('\t');
             for (int i = 0; i < columns.Length; i++)
@@ -144,6 +157,9 @@ namespace SAUtils.InputFileParsers.Cosmic
                     case "Primary histology":
                         _primaryHistologyIndex = i;
                         break;
+                    case "Tier":
+                        _tierIndex = i;
+                        break;
                 }
             }
 
@@ -155,6 +171,8 @@ namespace SAUtils.InputFileParsers.Cosmic
                 throw new InvalidDataException("Column for primary site could not be detected");
             if (_primaryHistologyIndex == -1)
                 throw new InvalidDataException("Column for primary histology could not be detected");
+            if (_tierIndex == -1)
+                throw new InvalidDataException("Column for tier could not be decteded");
         }
 
         private const int MaxVariantLength= 1000;
