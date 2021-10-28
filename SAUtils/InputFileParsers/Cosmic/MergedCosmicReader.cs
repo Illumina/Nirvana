@@ -19,17 +19,17 @@ namespace SAUtils.InputFileParsers.Cosmic
         private string _geneName;
         private int? _sampleCount;
 
-        private int _mutationIdIndex       = -1;
+        private int _cosmicIdIndex         = -1;
         private int _primarySiteIndex      = -1;
         private int _primaryHistologyIndex = -1;
-        private int _studyIdIndex          = -1;
+        private int _tumorIdIndex          = -1;
         private int _tierIndex             = -1;
 
-        private const string StudyIdTag = "ID_tumour";
+        private const string TumorIdTag = "ID_tumour";
 
         private readonly IDictionary<string, IChromosome> _refChromDict;
         private readonly ISequenceProvider _sequenceProvider;
-        private readonly Dictionary<string, HashSet<CosmicItem.CosmicStudy>> _studies;
+        private readonly Dictionary<string, HashSet<CosmicItem.CosmicTumor>> _tumors;
 
         public MergedCosmicReader(string vcfFile, string tsvFile, ISequenceProvider sequenceProvider)
         {
@@ -37,12 +37,12 @@ namespace SAUtils.InputFileParsers.Cosmic
             _tsvFileReader = GZipUtilities.GetAppropriateStreamReader(tsvFile);
             _sequenceProvider = sequenceProvider;
             _refChromDict  = _sequenceProvider.RefNameToChromosome;
-            _studies       = new Dictionary<string, HashSet<CosmicItem.CosmicStudy>>();
+            _tumors = new Dictionary<string, HashSet<CosmicItem.CosmicTumor>>();
         }
         
         public IEnumerable<CosmicItem> GetItems()
         {
-            // taking up all studies in to the dictionary
+            // taking up all tumors in to the dictionary
             using (_tsvFileReader)
             {
                 string line;
@@ -50,7 +50,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 {
                     if (IsHeaderLine(line))
                         GetColumnIndexes(line); // the first line is supposed to be a the header line
-                    else AddCosmicStudy(line);
+                    else AddCosmicTumor(line);
                 }
             }
 
@@ -75,22 +75,22 @@ namespace SAUtils.InputFileParsers.Cosmic
             }
         }
 
-        private void AddCosmicStudy(string line)
+        private void AddCosmicTumor(string line)
         {
             var columns = line.OptimizedSplit('\t');
 
-            string mutationId  = columns[_mutationIdIndex];
-            string studyId     = columns[_studyIdIndex];
+            string cosmicId    = columns[_cosmicIdIndex];
+            string tumorId     = columns[_tumorIdIndex];
             var sites          = GetSites(columns);
             var histologies    = GetHistologies(columns);
             var tiers          = GetTiers(columns);
             
-            if (string.IsNullOrEmpty(mutationId)) return;
+            if (string.IsNullOrEmpty(cosmicId)) return;
 
-            var study = new CosmicItem.CosmicStudy(studyId, histologies, sites, tiers);
-            if (_studies.TryGetValue(mutationId, out var studySet))
-                studySet.Add(study);
-            else _studies[mutationId] = new HashSet<CosmicItem.CosmicStudy> { study };
+            var tumor = new CosmicItem.CosmicTumor(tumorId, histologies, sites, tiers);
+            if (_tumors.TryGetValue(cosmicId, out var tumorSet))
+                tumorSet.Add(tumor);
+            else _tumors[cosmicId] = new HashSet<CosmicItem.CosmicTumor> { tumor };
         }
 
         private IList<string> GetHistologies(string[] columns)
@@ -128,14 +128,14 @@ namespace SAUtils.InputFileParsers.Cosmic
                 sites.Add(value);
         }
 
-        private static bool IsHeaderLine(string line) => line.Contains(StudyIdTag);
+        private static bool IsHeaderLine(string line) => line.Contains(TumorIdTag);
 
         private void GetColumnIndexes(string headerLine)
         {
             //Gene name       Accession Number        Gene CDS length HGNC ID Sample name     ID_sample       ID_tumour       Primary site    Site subtype 1  Site subtype 2  Site subtype 3  Primary histology       Histology subtype 1     Histology subtype 2     Histology subtype 3     Genome-wide screen      GENOMIC_MUTATION_ID     LEGACY_MUTATION_ID      MUTATION_ID     Mutation CDS    Mutation AA     Mutation Description    Mutation zygosity       LOH     GRCh    Mutation genome position        Mutation strand SNP     Resistance Mutation     FATHMM prediction       FATHMM score    Mutation somatic status Pubmed_PMID     ID_STUDY        Sample Type     Tumour origin   Age     Tier    HGVSP   HGVSC   HGVSG
 
-            _mutationIdIndex       = -1;
-            _studyIdIndex          = -1;
+            _cosmicIdIndex         = -1;
+            _tumorIdIndex          = -1;
             _primarySiteIndex      = -1;
             _primaryHistologyIndex = -1;
             _tierIndex             = -1;
@@ -146,10 +146,10 @@ namespace SAUtils.InputFileParsers.Cosmic
                 switch (columns[i])
                 {
                     case "GENOMIC_MUTATION_ID":
-                        _mutationIdIndex = i;
+                        _cosmicIdIndex = i;
                         break;
-                    case StudyIdTag:
-                        _studyIdIndex = i;
+                    case TumorIdTag:
+                        _tumorIdIndex = i;
                         break;
                     case "Primary site":
                         _primarySiteIndex = i;
@@ -163,10 +163,10 @@ namespace SAUtils.InputFileParsers.Cosmic
                 }
             }
 
-            if (_mutationIdIndex == -1)
+            if (_cosmicIdIndex == -1)
                 throw new InvalidDataException("Column for mutation Id could not be detected");
-            if (_studyIdIndex == -1)
-                throw new InvalidDataException("Column for study Id could not be detected");
+            if (_tumorIdIndex == -1)
+                throw new InvalidDataException("Column for tumor Id could not be detected");
             if (_primarySiteIndex == -1)
                 throw new InvalidDataException("Column for primary site could not be detected");
             if (_primaryHistologyIndex == -1)
@@ -203,7 +203,7 @@ namespace SAUtils.InputFileParsers.Cosmic
                 var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
                     altAllele, _sequenceProvider.Sequence);
 
-                cosmicItems.Add(_studies.TryGetValue(cosmicId, out var studies)
+                cosmicItems.Add(_tumors.TryGetValue(cosmicId, out var studies)
                     ? new CosmicItem(chromosome, shiftedPos, cosmicId, shiftedRef, shiftedAlt, _geneName, studies,
                         _sampleCount)
                     : new CosmicItem(chromosome, shiftedPos, cosmicId, shiftedRef, shiftedAlt, _geneName, null,

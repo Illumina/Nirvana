@@ -18,7 +18,7 @@ namespace SAUtils.DataStructures
         private string Id { get; }
         private string Gene { get; }
         private int? SampleCount { get; }
-        public HashSet<CosmicStudy> Studies { get; }
+        public HashSet<CosmicTumor> Tumors { get; }
 
         public CosmicItem(
             IChromosome chromosome,
@@ -27,7 +27,7 @@ namespace SAUtils.DataStructures
             string refAllele,
             string altAllele,
             string gene,
-            HashSet<CosmicStudy> studies, int? sampleCount)
+            HashSet<CosmicTumor> tumors, int? sampleCount)
         {
             Chromosome      = chromosome;
             Position        = position;
@@ -35,11 +35,11 @@ namespace SAUtils.DataStructures
             RefAllele       = refAllele;
             AltAllele       = altAllele;
             Gene            = gene;
-            Studies         = studies;
+            Tumors          = tumors;
             SampleCount     = sampleCount;
         }
 
-        public sealed class CosmicStudy : IEquatable<CosmicStudy>
+        public sealed class CosmicTumor : IEquatable<CosmicTumor>
         {
             #region members
 
@@ -50,18 +50,18 @@ namespace SAUtils.DataStructures
 
             #endregion
 
-            public CosmicStudy(string studyId,
+            public CosmicTumor(string tumorId,
                                IEnumerable<string> histologies,
                                IEnumerable<string> sites,
                                IEnumerable<string> tiers)
             {
-                Id          = studyId;
+                Id          = tumorId;
                 Sites       = sites;
                 Histologies = histologies;
                 Tiers       = tiers;
             }
 
-            public bool Equals(CosmicStudy other)
+            public bool Equals(CosmicTumor other)
             {
                 if (other == null) return false;
                 return Id.Equals(other.Id)
@@ -99,13 +99,13 @@ namespace SAUtils.DataStructures
 
         internal IDictionary<string,int> GetTissueCounts()
         {
-            if (Studies == null) return null;
+            if (Tumors == null) return null;
             var tissueCounts = new Dictionary<string, int>();
-            foreach (var study in Studies)
+            foreach (var tumor in Tumors)
             {
-                if (study.Sites == null) continue;
+                if (tumor.Sites == null) continue;
 
-                foreach (var site in study.Sites)
+                foreach (var site in tumor.Sites)
                 {
                     if (tissueCounts.TryGetValue(site, out _))
                     {
@@ -120,13 +120,13 @@ namespace SAUtils.DataStructures
 
         internal IDictionary<string,int> GetCancerTypeCounts()
         {
-            if (Studies == null) return null;
+            if (Tumors == null) return null;
             var cancerTypeCounts = new Dictionary<string, int>();
-            foreach (var study in Studies)
+            foreach (var tumor in Tumors)
             {
-                if (study.Histologies == null) continue;
+                if (tumor.Histologies == null) continue;
 
-                foreach (var histology in study.Histologies)
+                foreach (var histology in tumor.Histologies)
                 {
                     if (cancerTypeCounts.TryGetValue(histology, out _))
                     {
@@ -141,13 +141,13 @@ namespace SAUtils.DataStructures
 
         internal IDictionary<string,int> GetTierCounts()
         {
-            if (Studies == null) return null;
+            if (Tumors == null) return null;
             var tierCounts = new Dictionary<string, int>();
-            foreach (var study in Studies)
+            foreach (var tumor in Tumors)
             {
-                if (study.Tiers == null) continue;
+                if (tumor.Tiers == null) continue;
 
-                foreach (var tier in study.Tiers)
+                foreach (var tier in tumor.Tiers)
                 {
                     if (tierCounts.TryGetValue(tier, out _))
                     {
