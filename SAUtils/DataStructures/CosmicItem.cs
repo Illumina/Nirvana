@@ -93,7 +93,7 @@ namespace SAUtils.DataStructures
 
             jsonObject.AddStringValue("cancerTypesAndCounts", GetJsonStringFromDict("cancerType",GetCancerTypeCounts()), false);
             jsonObject.AddStringValue("cancerSitesAndCounts", GetJsonStringFromDict("cancerSite",GetTissueCounts()), false);
-            jsonObject.AddStringValue("tierCounts", GetJsonStringFromDict("tier",GetTierCounts()), false);
+            jsonObject.AddStringValue("tiersAndCounts", GetJsonStringFromDict("tier",GetTierCounts()), false);
 
             return StringBuilderPool.GetStringAndReturn(sb);
         }
