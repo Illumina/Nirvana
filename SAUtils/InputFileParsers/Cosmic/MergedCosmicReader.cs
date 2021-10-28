@@ -164,7 +164,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             }
 
             if (_cosmicIdIndex == -1)
-                throw new InvalidDataException("Column for mutation Id could not be detected");
+                throw new InvalidDataException("Column for Cosmic Id could not be detected");
             if (_tumorIdIndex == -1)
                 throw new InvalidDataException("Column for tumor Id could not be detected");
             if (_primarySiteIndex == -1)
