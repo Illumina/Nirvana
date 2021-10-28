@@ -24,7 +24,7 @@ namespace SAUtils.InputFileParsers.Cosmic
         private int _primaryHistologyIndex = -1;
         private int _studyIdIndex          = -1;
 
-        private const string StudyIdTag = "ID_STUDY";
+        private const string StudyIdTag = "ID_tumour";
 
         private readonly IDictionary<string, IChromosome> _refChromDict;
         private readonly ISequenceProvider _sequenceProvider;
@@ -120,7 +120,7 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private void GetColumnIndexes(string headerLine)
         {
-            //Gene name       Accession Number        Gene CDS length HGNC ID Sample name     ID_sample       ID_tumour       Primary site    Site subtype 1  Site subtype 2  Site subtype 3  Primary histology       Histology subtype 1     Histology subtype 2     Histology subtype 3     Genome-wide screen      Mutation ID     Mutation CDS    Mutation AA     Mutation Description    Mutation zygosity       LOH     GRCh    Mutation genome position        Mutation strand SNP     FATHMM prediction       FATHMM score    Mutation somatic status Pubmed_PMID     ID_STUDY        Sample source   Tumour origin   Age
+            //Gene name       Accession Number        Gene CDS length HGNC ID Sample name     ID_sample       ID_tumour       Primary site    Site subtype 1  Site subtype 2  Site subtype 3  Primary histology       Histology subtype 1     Histology subtype 2     Histology subtype 3     Genome-wide screen      GENOMIC_MUTATION_ID     LEGACY_MUTATION_ID      MUTATION_ID     Mutation CDS    Mutation AA     Mutation Description    Mutation zygosity       LOH     GRCh    Mutation genome position        Mutation strand SNP     Resistance Mutation     FATHMM prediction       FATHMM score    Mutation somatic status Pubmed_PMID     ID_STUDY        Sample Type     Tumour origin   Age     Tier    HGVSP   HGVSC   HGVSG
 
             _mutationIdIndex       = -1;
             _studyIdIndex          = -1;
@@ -132,7 +132,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             {
                 switch (columns[i])
                 {
-                    case "Mutation ID":
+                    case "GENOMIC_MUTATION_ID":
                         _mutationIdIndex = i;
                         break;
                     case StudyIdTag:
