@@ -70,6 +70,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             Assert.Equal(1, cancerTypeCounts["histology subtype 2"]);
         }
 
+        [Fact]
                 public void GetTierCount_same_study()
         {
             var cosmicItem = new CosmicItem(ChromosomeUtilities.Chr1, 100, "rs101", "A", "C", "GENE0", new HashSet<CosmicItem.CosmicStudy>
