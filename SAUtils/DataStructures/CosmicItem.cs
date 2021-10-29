@@ -40,6 +40,12 @@ namespace SAUtils.DataStructures
             SampleCount     = sampleCount;
         }
 
+        public override int GetHashCode()
+        {
+            var hashCode = Id?.GetHashCode() ?? 0;
+            return hashCode;
+        }
+
         public sealed class CosmicTumor : IEquatable<CosmicTumor>
         {
             #region members
