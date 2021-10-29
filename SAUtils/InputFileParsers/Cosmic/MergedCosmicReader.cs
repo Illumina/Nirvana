@@ -81,51 +81,23 @@ namespace SAUtils.InputFileParsers.Cosmic
 
             string cosmicId    = columns[_cosmicIdIndex];
             string tumorId     = columns[_tumorIdIndex];
-            var sites          = GetSites(columns);
-            var histologies    = GetHistologies(columns);
-            var tiers          = GetTiers(columns);
-            
+            string site        = GetString(columns[_primarySiteIndex]);
+            string histology   = GetString(columns[_primaryHistologyIndex]);
+            string tier        = GetString(columns[_tierIndex]);
+
             if (string.IsNullOrEmpty(cosmicId)) return;
 
-            var tumor = new CosmicItem.CosmicTumor(tumorId, histologies, sites, tiers);
+            var tumor = new CosmicItem.CosmicTumor(tumorId, histology, site, tier);
             if (_tumors.TryGetValue(cosmicId, out var tumorSet))
                 tumorSet.Add(tumor);
             else _tumors[cosmicId] = new HashSet<CosmicItem.CosmicTumor> { tumor };
         }
 
-        private IList<string> GetHistologies(string[] columns)
+        private string GetString(string value)
         {
-            var histologies = new HashSet<string>();
-            var primaryHistology = columns[_primaryHistologyIndex].Replace('_', ' ');
-            TryAddValue(primaryHistology, histologies);
-
-            return histologies.ToList();
-        }
-
-        private IList<string> GetSites(string[] columns)
-        {
-            var sites = new HashSet<string>();
-
-            var primarySite = columns[_primarySiteIndex].Replace('_', ' ');
-            TryAddValue(primarySite, sites);
-
-            return sites.ToList();
-        }
-
-        private IList<string> GetTiers(string[] columns)
-        {
-            var tiers = new HashSet<string>();
-
-            var tier = columns[_tierIndex];
-            TryAddValue(tier, tiers);
-
-            return tiers.ToList();
-        }
-
-        private static void TryAddValue(string value, ISet<string> sites)
-        {
-           if (!string.IsNullOrEmpty(value) && value != "NS")
-                sites.Add(value);
+            if (string.IsNullOrEmpty(value) || value == "NS")
+                return null;
+            return value;
         }
 
         private static bool IsHeaderLine(string line) => line.Contains(TumorIdTag);

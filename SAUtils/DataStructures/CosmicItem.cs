@@ -27,7 +27,8 @@ namespace SAUtils.DataStructures
             string refAllele,
             string altAllele,
             string gene,
-            HashSet<CosmicTumor> tumors, int? sampleCount)
+            HashSet<CosmicTumor> tumors,
+            int? sampleCount)
         {
             Chromosome      = chromosome;
             Position        = position;
@@ -44,36 +45,36 @@ namespace SAUtils.DataStructures
             #region members
 
             public string Id { get; }
-            public IEnumerable<string> Histologies { get; }
-            public IEnumerable<string> Sites { get; }
-            public IEnumerable<string> Tiers { get; }
+            public string Histology { get; }
+            public string Site { get; }
+            public string Tier { get; }
 
             #endregion
 
             public CosmicTumor(string tumorId,
-                               IEnumerable<string> histologies,
-                               IEnumerable<string> sites,
-                               IEnumerable<string> tiers)
+                               string histology,
+                               string site,
+                               string tier)
             {
-                Id          = tumorId;
-                Sites       = sites;
-                Histologies = histologies;
-                Tiers       = tiers;
+                Id         = tumorId;
+                Site       = site;
+                Histology  = histology;
+                Tier       = tier;
             }
 
             public bool Equals(CosmicTumor other)
             {
                 if (other == null) return false;
                 return Id.Equals(other.Id)
-                    && Histologies.SequenceEqual(other.Histologies)
-                    && Sites.SequenceEqual(other.Sites)
-                    && Tiers.SequenceEqual(other.Tiers);
+                    && Histology.Equals(other.Histology)
+                    && Site.Equals(other.Site)
+                    && Tier.Equals(other.Tier);
             }
 
             public override int GetHashCode()
             {
                 var hashCode = Id?.GetHashCode() ?? 0;
-                //hashCode ^= Histologies.GetHashCode() ^ Sites.GetHashCode();
+                //hashCode ^= Histology.GetHashCode() ^ Site.GetHashCode();
                 return hashCode;
             }
         }
@@ -90,9 +91,9 @@ namespace SAUtils.DataStructures
             jsonObject.AddStringValue("gene", Gene);
             jsonObject.AddIntValue("sampleCount", SampleCount);
 
-            jsonObject.AddStringValue("cancerTypesAndCounts", GetJsonStringFromDict("cancerType",GetCancerTypeCounts()), false);
-            jsonObject.AddStringValue("cancerSitesAndCounts", GetJsonStringFromDict("cancerSite",GetTissueCounts()), false);
-            jsonObject.AddStringValue("tiersAndCounts", GetJsonStringFromDict("tier",GetTierCounts()), false);
+            jsonObject.AddStringValue("cancerTypesAndCounts", GetJsonStringFromDict("cancerType", GetCancerTypeCounts()), false);
+            jsonObject.AddStringValue("cancerSitesAndCounts", GetJsonStringFromDict("cancerSite", GetTissueCounts()), false);
+            jsonObject.AddStringValue("tiersAndCounts", GetJsonStringFromDict("tier", GetTierCounts()), false);
 
             return StringBuilderPool.GetStringAndReturn(sb);
         }
@@ -103,16 +104,13 @@ namespace SAUtils.DataStructures
             var tissueCounts = new Dictionary<string, int>();
             foreach (var tumor in Tumors)
             {
-                if (tumor.Sites == null) continue;
+                if (string.IsNullOrEmpty(tumor.Site)) continue;
 
-                foreach (var site in tumor.Sites)
+                if (tissueCounts.TryGetValue(tumor.Site, out _))
                 {
-                    if (tissueCounts.TryGetValue(site, out _))
-                    {
-                        tissueCounts[site]++;
-                    }
-                    else tissueCounts[site] = 1;
+                    tissueCounts[tumor.Site]++;
                 }
+                else tissueCounts[tumor.Site] = 1;
             }
 
             return tissueCounts; 
@@ -121,22 +119,19 @@ namespace SAUtils.DataStructures
         internal IDictionary<string,int> GetCancerTypeCounts()
         {
             if (Tumors == null) return null;
-            var cancerTypeCounts = new Dictionary<string, int>();
+            var histologyCounts = new Dictionary<string, int>();
             foreach (var tumor in Tumors)
             {
-                if (tumor.Histologies == null) continue;
+                if (string.IsNullOrEmpty(tumor.Histology)) continue;
 
-                foreach (var histology in tumor.Histologies)
+                if (histologyCounts.TryGetValue(tumor.Histology, out _))
                 {
-                    if (cancerTypeCounts.TryGetValue(histology, out _))
-                    {
-                        cancerTypeCounts[histology]++;
-                    }
-                    else cancerTypeCounts[histology] = 1;
+                    histologyCounts[tumor.Histology]++;
                 }
+                else histologyCounts[tumor.Histology] = 1;
             }
 
-            return cancerTypeCounts;
+            return histologyCounts; 
         }
 
         internal IDictionary<string,int> GetTierCounts()
@@ -145,19 +140,16 @@ namespace SAUtils.DataStructures
             var tierCounts = new Dictionary<string, int>();
             foreach (var tumor in Tumors)
             {
-                if (tumor.Tiers == null) continue;
+                if (string.IsNullOrEmpty(tumor.Tier)) continue;
 
-                foreach (var tier in tumor.Tiers)
+                if (tierCounts.TryGetValue(tumor.Tier, out _))
                 {
-                    if (tierCounts.TryGetValue(tier, out _))
-                    {
-                        tierCounts[tier]++;
-                    }
-                    else tierCounts[tier] = 1;
+                    tierCounts[tumor.Tier]++;
                 }
+                else tierCounts[tumor.Tier] = 1;
             }
 
-            return tierCounts;
+            return tierCounts; 
         }
 
         private static string GetJsonStringFromDict(string dataType, IDictionary<string, int> dictionary)

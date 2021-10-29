@@ -19,13 +19,13 @@ namespace UnitTests.SAUtils.InputFileParsers
             var tumors = cosmicItem.Tumors.ToList();
 
             Assert.Equal("2205513", tumors[0].Id);
-            Assert.Equal(new[] { "haematopoietic and lymphoid tissue" }, tumors[0].Sites);
-            Assert.Equal(new[] { "haematopoietic neoplasm" }, tumors[0].Histologies);
+            Assert.Equal("haematopoietic and lymphoid tissue" , tumors[0].Site);
+            Assert.Equal("haematopoietic neoplasm", tumors[0].Histology);
             //Assert.Equal(new [] { "haematopoietic neoplasm", "acute myeloid leukaemia" }, tumor.Histologies);
 
             Assert.Equal("2205513", tumors[1].Id);
-            Assert.Equal(new[] { "haematopoietic;lymphoid tissue" }, tumors[1].Sites);
-            Assert.Equal(new[] { "haematopoietic neoplasm" }, tumors[1].Histologies);
+            Assert.Equal("haematopoietic;lymphoid tissue", tumors[1].Site);
+            Assert.Equal("haematopoietic neoplasm", tumors[1].Histology);
             //Assert.Equal(new[] { "haematopoietic_neoplasm", "acute_myeloid_leukaemia" }, tumor.Histologies);
         }
 
