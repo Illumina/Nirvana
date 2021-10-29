@@ -97,7 +97,7 @@ namespace SAUtils.InputFileParsers.Cosmic
         {
             if (string.IsNullOrEmpty(value) || value == "NS")
                 return null;
-            value = value.Replace('_', ' ')
+            value = value.Replace('_', ' ');
             return value;
         }
 
