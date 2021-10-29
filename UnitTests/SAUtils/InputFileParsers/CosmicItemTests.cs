@@ -148,7 +148,7 @@ namespace UnitTests.SAUtils.InputFileParsers
                 new CosmicItem.CosmicTumor("104", "primary histology 1", "primarySite 1", "tier 1"),
                 new CosmicItem.CosmicTumor("105", "primary histology 1", "primarySite 0", "tier 1"),
                 new CosmicItem.CosmicTumor("106", "primary histology 1", "primarySite 1", "tier 1"),
-                new CosmicItem.CosmicTumor("107", "primary histology 1", "primarySite 0", "tier 1")
+                new CosmicItem.CosmicTumor("107", "primary histology 1", "primarySite 0", "tier 1"),
                 new CosmicItem.CosmicTumor("108", "primary histology 2", "primarySite 2", "tier 1")
             }, 8);
 
