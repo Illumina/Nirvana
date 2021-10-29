@@ -65,10 +65,19 @@ namespace SAUtils.DataStructures
             public bool Equals(CosmicTumor other)
             {
                 if (other == null) return false;
+
                 return Id.Equals(other.Id)
-                    && Histology.Equals(other.Histology)
-                    && Site.Equals(other.Site)
-                    && Tier.Equals(other.Tier);
+                    && StringsEqual(Histology, other.Histology)
+                    && StringsEqual(Site, other.Site)
+                    && StringsEqual(Tier, other.Tier);
+            }
+
+            private static bool StringsEqual(string s1, string s2)
+            {
+                if (s1 == null && s2 != null) return false;
+                if (s1 != null && s2 == null) return false;
+                if (s1 == null && s2 == null) return true;
+                return s1.Equals(s2);
             }
 
             public override int GetHashCode()
