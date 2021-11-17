@@ -59,7 +59,7 @@ namespace UnitTests.IO
         public void ValidateUrl_valid()
         {
             HttpUtilities.ValidateUrl(
-                    "https://ilmn-nirvana.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/6/OMIM_20191004.nga", false);
+                    "https://nirvana-annotations.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/6/OMIM_20191004.nga", false);
         }
 
     }
