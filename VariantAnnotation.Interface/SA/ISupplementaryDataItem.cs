@@ -9,5 +9,6 @@ namespace VariantAnnotation.Interface.SA
         string      RefAllele  { get; set; }
         string      AltAllele  { get; set; }
         string      GetJsonString();
+        string      InputLine { get; }
     }
 }

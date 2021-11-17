@@ -307,7 +307,8 @@ namespace SAUtils.gnomAD
                     GetCount(_control_acAll, i),
                     hasFailedFilters,
                     _isLowComplexityRegion,
-                    type)
+                    type,
+					line)
 					);
 			}
 			return gnomadItemsList;

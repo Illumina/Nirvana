@@ -11,6 +11,6 @@
     "function-timeout"     : 420,
     "function-runtime"     : "dotnetcore3.1",
     "tracing-mode"         : "PassThrough",
-    "environment-variables" : "\"SnsTopicArn\"=\"arn:aws:sns:us-west-2:670055277015:illumina-olympia-dev-annotation-sns-topic\";\"NirvanaDataUrlBase\"=\"http://ilmn-nirvana.s3.us-west-2.amazonaws.com/\"",
+    "environment-variables" : "\"SnsTopicArn\"=\"arn:aws:sns:us-west-2:670055277015:illumina-olympia-dev-annotation-sns-topic\";\"NirvanaDataUrlBase\"=\"http://nirvana-annotations.s3.us-west-2.amazonaws.com/\"",
     "function-description"  : ""
 }

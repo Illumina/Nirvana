@@ -89,12 +89,14 @@ namespace SAUtils.DataStructures
             int? controlsAllAlleleCount,
             bool hasFailedFilters,
             bool isLcr,
-            GnomadDataType dataType)
+            GnomadDataType dataType,
+            string inputLine)
         {
             Chromosome = chromosome;
-            Position = position;
-            RefAllele = refAllele;
-            AltAllele = alternateAllele;
+            Position   = position;
+            RefAllele  = refAllele;
+            AltAllele  = alternateAllele;
+            InputLine  = inputLine;
 
             Depth = depth;
             if (depth!=null && allAlleleNumber!=null && allAlleleNumber.Value > 0)
@@ -325,6 +327,8 @@ namespace SAUtils.DataStructures
 
             return StringBuilderPool.GetStringAndReturn(sb);
 		}
+
+        public string InputLine { get;}
 
         public static int CompareTo(GnomadItem item, GnomadItem other)
         {

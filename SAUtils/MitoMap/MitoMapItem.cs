@@ -107,7 +107,9 @@ namespace SAUtils.MitoMap
             jsonObject.AddStringValues("pubMedIds", _pubMedIds);
             return StringBuilderPool.GetStringAndReturn(sb);
         }
-        
+
+        public string InputLine { get; set; }
+
         public static Dictionary<(string, string), MitoMapItem> AggregatedMutationsSamePosition(IEnumerable<MitoMapItem> mitoMapMutItems)
         {
             var aggregatedMutations = new Dictionary<(string, string), MitoMapItem>();

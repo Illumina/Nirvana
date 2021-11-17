@@ -11,9 +11,10 @@ namespace SAUtils.DataStructures
     public sealed class CosmicItem : ISupplementaryDataItem
     {
         public IChromosome Chromosome { get; }
-        public int Position { get; set; }
-        public string RefAllele { get; set; }
-        public string AltAllele { get; set; }
+        public int         Position   { get; set; }
+        public string      RefAllele  { get; set; }
+        public string      AltAllele  { get; set; }
+        public string      InputLine  { get; }
 
         private string Id { get; }
         private string Gene { get; }

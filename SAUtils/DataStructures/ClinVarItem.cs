@@ -12,9 +12,10 @@ namespace SAUtils.DataStructures
     public sealed class ClinVarItem : ISupplementaryDataItem, IComparable<ClinVarItem>
     {
         public IChromosome Chromosome { get; }
-        public int Position { get; set; }
-        public string RefAllele { get; set; }
-        public string AltAllele { get; set; }
+        public int         Position   { get; set; }
+        public string      RefAllele  { get; set; }
+        public string      AltAllele  { get; set; }
+        public string      InputLine  { get; }
 
         public  int                        Stop             { get; }
         public  string                     VariantType      { get; }
@@ -52,7 +53,7 @@ namespace SAUtils.DataStructures
             string[] significances,
             IEnumerable<long> pubmedIds = null,
             long lastUpdatedDate = long.MinValue
-            )
+        )
         {
             Chromosome       = chromosome;
             Position         = position;

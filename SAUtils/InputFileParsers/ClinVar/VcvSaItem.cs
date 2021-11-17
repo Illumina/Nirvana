@@ -49,6 +49,8 @@ namespace SAUtils.InputFileParsers.ClinVar
             return StringBuilderPool.GetStringAndReturn(sb);
         }
 
+        public string InputLine { get; set; }
+
         public int CompareTo(VcvSaItem other)
         {
             return Chromosome.Index != other.Chromosome.Index

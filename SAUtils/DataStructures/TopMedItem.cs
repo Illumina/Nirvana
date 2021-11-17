@@ -46,6 +46,6 @@ namespace SAUtils.DataStructures
             return sb.ToString();
         }
 
-        
+        public string InputLine { get; set; }
     }
 }

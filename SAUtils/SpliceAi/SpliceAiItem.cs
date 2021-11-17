@@ -98,5 +98,7 @@ namespace SAUtils.SpliceAi
 
             return StringBuilderPool.GetStringAndReturn(sb);
         }
+
+        public string InputLine { get; set; }
     }
 }

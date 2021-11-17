@@ -31,5 +31,7 @@ namespace SAUtils.PrimateAi
             jsonObject.AddDoubleValue("scorePercentile", ScorePercentile, "0.##");
             return StringBuilderPool.GetStringAndReturn(sb);
         }
+
+        public string InputLine { get; set; }
     }
 }

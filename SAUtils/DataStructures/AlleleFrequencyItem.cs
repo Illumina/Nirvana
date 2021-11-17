@@ -13,19 +13,21 @@ namespace SAUtils.DataStructures
 
         public readonly double AltFrequency;
 
-        public AlleleFrequencyItem(IChromosome chromosome, int position, string refAllele, string altAllele, double altFrequency)
+        public AlleleFrequencyItem(IChromosome chromosome, int position, string refAllele, string altAllele, double altFrequency, string inputLine)
         {
-            Chromosome      = chromosome;
-            Position        = position;
-            AltFrequency    = altFrequency;
-            RefAllele = refAllele;
-            AltAllele = altAllele;
+            Chromosome   = chromosome;
+            Position     = position;
+            AltFrequency = altFrequency;
+            RefAllele    = refAllele;
+            AltAllele    = altAllele;
+            InputLine    = inputLine;
         }
 
         public string GetJsonString()
         {
             throw new NotImplementedException();
         }
-        
+
+        public string InputLine { get; }
     }
 }

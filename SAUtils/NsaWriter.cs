@@ -36,7 +36,8 @@ namespace SAUtils
         private readonly bool _leaveOpen;
         private int _count;
 
-        
+        private HashSet<ushort> _completedChromosomes = new HashSet<ushort>();
+
         public NsaWriter(Stream nsaStream, Stream indexStream, IDataSourceVersion version, ISequenceProvider refProvider, string jsonKey, bool matchByAllele, bool isArray, int schemaVersion, bool isPositional, bool skipIncorrectRefEntries= true, bool throwErrorOnConflicts = false, int blockSize = SaCommon.DefaultBlockSize, GenomeAssembly assembly= GenomeAssembly.Unknown, bool leaveOpen=false)
         {
             _stream                  = nsaStream;
@@ -92,6 +93,7 @@ namespace SAUtils
                 {
                     if (chromIndex != ushort.MaxValue)
                     {
+                        _completedChromosomes.Add(chromIndex); // this chrom is done
                         //flushing out the remaining items in buffer
                         WriteUptoPosition(itemsMinHeap, int.MaxValue);
                         Flush(chromIndex);
@@ -101,6 +103,13 @@ namespace SAUtils
                     chromIndex = saItem.Chromosome.Index;
                     currentEnsemblName = saItem.Chromosome.EnsemblName;
                     _refProvider.LoadChromosome(saItem.Chromosome);
+                }
+
+                if (_completedChromosomes.Contains(saItem.Chromosome.Index))
+                {
+                    throw new UserErrorException(
+                        $"The input file is not sorted by chromosomes. {saItem.Chromosome.UcscName} is observed in multiple segments." +
+                        $"\nInput Line:\n{saItem.InputLine}");
                 }
 
                 // the items come in sorted order of the pre-trimmed position. 
@@ -122,7 +131,8 @@ namespace SAUtils
                 if (!string.IsNullOrEmpty(saItem.RefAllele) && saItem.RefAllele != refSequence)
                 {
                     if (_skipIncorrectRefEntries) continue;
-                    throw new UserErrorException($"The provided reference allele {saItem.RefAllele} at {saItem.Chromosome.UcscName}:{saItem.Position} is different from {refSequence} in the reference genome sequence.");
+                    throw new UserErrorException($"The provided reference allele {saItem.RefAllele} at {saItem.Chromosome.UcscName}:{saItem.Position} is different from {refSequence} in the reference genome sequence." +
+                                                 $"\nInput Line:\n {saItem.InputLine}");
                 }
 
                 itemsMinHeap.Add(saItem);

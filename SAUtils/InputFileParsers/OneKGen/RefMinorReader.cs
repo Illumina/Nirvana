@@ -87,7 +87,7 @@ namespace SAUtils.InputFileParsers.OneKGen
                 var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
                     altAlleles[i], _sequenceProvider.Sequence);
 
-                items.Add(new AlleleFrequencyItem(chromosome, shiftedPos,shiftedRef, shiftedAlt, frequency));
+                items.Add(new AlleleFrequencyItem(chromosome, shiftedPos,shiftedRef, shiftedAlt, frequency, vcfLine));
             }
 
             return items.Count>0? items: null;

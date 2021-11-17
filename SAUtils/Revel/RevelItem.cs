@@ -21,5 +21,6 @@ namespace SAUtils.Revel
         }
         
         public string GetJsonString() => $"\"score\":{_score}";
+        public string InputLine       { get; set; }
     }
 }

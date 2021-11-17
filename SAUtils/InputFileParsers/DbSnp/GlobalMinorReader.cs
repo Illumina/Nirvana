@@ -69,7 +69,7 @@ namespace SAUtils.InputFileParsers.DbSnp
             var frequencyItems = new List<AlleleFrequencyItem>();
             foreach ((string allele, double frequency) in alleleFrequencies)
             {
-                frequencyItems.Add(new AlleleFrequencyItem(chromosome, position, refAllele, allele, frequency));
+                frequencyItems.Add(new AlleleFrequencyItem(chromosome, position, refAllele, allele, frequency, vcfline));
             }
 
             return frequencyItems;

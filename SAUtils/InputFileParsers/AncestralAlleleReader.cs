@@ -81,7 +81,7 @@ namespace SAUtils.InputFileParsers
             {
                 var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
                     altAllele, _sequenceProvider.Sequence);
-                ancestralAlleleItems.Add(new AncestralAlleleItem(chromosome, shiftedPos, shiftedRef, shiftedAlt, _ancestralAllele));
+                ancestralAlleleItems.Add(new AncestralAlleleItem(chromosome, shiftedPos, shiftedRef, shiftedAlt, _ancestralAllele, vcfLine));
             }
 
             return ancestralAlleleItems;

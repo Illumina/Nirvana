@@ -83,7 +83,8 @@ namespace SAUtils.gnomAD
                 
                 item.HasFailedFilters,
                 item.IsLowComplexityRegion,
-                item.DataType)
+                item.DataType,
+                item.InputLine)
             ;
         }
 
@@ -142,7 +143,8 @@ namespace SAUtils.gnomAD
                 
                 item1.HasFailedFilters || item2.HasFailedFilters,
                 item1.IsLowComplexityRegion || item2.IsLowComplexityRegion,
-                item1.DataType
+                item1.DataType,
+                item1.InputLine +'\n'+ item2.InputLine
                 );
         }
     }
