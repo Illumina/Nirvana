@@ -221,17 +221,18 @@ namespace NirvanaLambda
             return ar.End == null ? ret : $"{ret}{ar.End?.Chromosome}:{ar.End?.Position}";
         }
 
-        private static AnnotationConfig GetAnnotationConfig(NirvanaConfig config, AnnotationRange annotationRange, int jobIndex) => new AnnotationConfig
+        private static AnnotationConfig GetAnnotationConfig(NirvanaConfig config, AnnotationRange annotationRange, int jobIndex) => new()
         {
-            id                       = config.id + $"_job{jobIndex}",
-            genomeAssembly           = config.genomeAssembly,
-            vcfUrl                   = config.vcfUrl,
-            tabixUrl                 = config.tabixUrl,
-            outputDir                = config.outputDir,
-            outputPrefix             = GetIndexedPrefix(config.vcfUrl, jobIndex),
-            customAnnotations        = config.customAnnotations,
-            customStrUrl             = config.customStrUrl,
-            annotationRange          = annotationRange
+            id                = config.id + $"_job{jobIndex}",
+            genomeAssembly    = config.genomeAssembly,
+            vcfUrl            = config.vcfUrl,
+            tabixUrl          = config.tabixUrl,
+            outputDir         = config.outputDir,
+            outputPrefix      = GetIndexedPrefix(config.vcfUrl, jobIndex),
+            customAnnotations = config.customAnnotations,
+            desiredVcfInfo    =  config.desiredVcfInfo,
+            customStrUrl      = config.customStrUrl,
+            annotationRange   = annotationRange
         };
 
         internal static string GetIndexedPrefix(string inputVcfPath, int jobIndex) =>

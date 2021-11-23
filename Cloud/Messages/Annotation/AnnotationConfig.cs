@@ -13,6 +13,7 @@ namespace Cloud.Messages.Annotation
         public S3Path          outputDir;
         public string          outputPrefix;
         public List<SaUrls>    customAnnotations;
+        public List<string>    desiredVcfInfo;
         public string          customStrUrl;
         public AnnotationRange annotationRange;
         // ReSharper restore NotAccessedField.Global

@@ -30,10 +30,11 @@ namespace UnitTests.TestUtilities
             return annotatedPosition;
         }
 
-	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory)
+	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, 
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, HashSet<string> customInfoKeys=null)
 	    {
 	        var simplePosition = GetSimplePosition(vcfLine, sequenceProvider.RefNameToChromosome);
-	        return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory);
+	        return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory, false, customInfoKeys);
 	    }
 
         internal static SimplePosition GetSimplePosition(string vcfLine,

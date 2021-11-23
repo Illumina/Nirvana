@@ -35,11 +35,13 @@ namespace Vcf
         private readonly HashSet<string> _observedReferenceNames = new HashSet<string>();
         private string _currentReferenceName;
 
-        public string[] GetSampleNames() => _sampleNames;
-        public readonly bool EnableDq;
+        public          string[]        GetSampleNames() => _sampleNames;
+        public readonly bool            EnableDq;
+        public readonly HashSet<string> CustomInfoKeys;
 
         private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false)
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, HashSet<string> customInfoKeys=null)
         {
             _headerReader             = headerReader;
             _reader                   = vcfLineReader;
@@ -50,13 +52,15 @@ namespace Vcf
             _refNameToChromosome      = sequenceProvider.RefNameToChromosome;
             _mitoHeteroplasmyProvider = mitoHeteroplasmyProvider;
             EnableDq                  = enableDq;
-            
+            CustomInfoKeys            = customInfoKeys;
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq=false)
+            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, HashSet<string> customInfoKeys=null)
         {
-            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, vidCreator, mitoHeteroplasmyProvider, enableDq);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, 
+                vidCreator, mitoHeteroplasmyProvider, enableDq, customInfoKeys);
             vcfReader.ParseHeader();
             vcfReader.SetRecomposer(recomposer);
             return vcfReader;
@@ -192,7 +196,7 @@ namespace Vcf
             _currentReferenceName = referenceName;
         }
 
-        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, EnableDq);
+        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, EnableDq, CustomInfoKeys);
 
         public void Dispose() => _reader?.Dispose();
     }

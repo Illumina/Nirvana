@@ -85,7 +85,9 @@ namespace AnnotationLambda
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))
                             {
-                                variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true).variantCount;
+                                variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, 
+                                    jasixMd5Stream, annotationResources, vcfFilter, true, false,
+                                    config.desiredVcfInfo== null? null: new HashSet<string>(config.desiredVcfInfo)).variantCount;
                             }
 
                             Logger.WriteLine("Annotation done.");

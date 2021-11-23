@@ -71,7 +71,8 @@ namespace Vcf
             return (hasStructuralVariant, hasShortTandemRepeat);
         }
 
-        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, bool enableDq = false)
+        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, 
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, bool enableDq = false, HashSet<string> customInfoKeys=null)
         {
             if (simplePosition == null) return null;
 
@@ -89,7 +90,7 @@ namespace Vcf
             
             if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
 
-            var       infoData              = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            var       infoData              = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex],customInfoKeys);
             int       end                   = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
             double?   quality               = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
             string[]  filters               = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');

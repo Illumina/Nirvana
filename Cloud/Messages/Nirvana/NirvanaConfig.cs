@@ -14,6 +14,7 @@ namespace Cloud.Messages.Nirvana
         public S3Path outputDir;
         // ReSharper disable once UnassignedField.Global
         public List<SaUrls> customAnnotations;
+        public List<string> desiredVcfInfo;
         public string       customStrUrl;
         public JwtFields    jwtFields;
         
