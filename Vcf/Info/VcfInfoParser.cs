@@ -73,6 +73,9 @@ namespace Vcf.Info
                     case "INV5":
                         Builder.IsInv5 = true;
                         break;
+                    case "LOD":
+                        Builder.LogOddsRatio = Convert.ToDouble(value);
+                        break;
                 }
 
                 if (customInfoKeys != null && customInfoKeys.Contains(key))

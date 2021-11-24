@@ -25,7 +25,7 @@ namespace Vcf.Sample
         public bool?    IsLossOfHeterozygosity       { get; }
         public string[] HeteroplasmyPercentile       { get; }
         public int?     BinCount                     { get; }
-
+        
         public static readonly Sample EmptySample =
             new Sample(null, null, null, null,
                 false, null, null, false, null, 

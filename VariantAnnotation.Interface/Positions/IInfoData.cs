@@ -21,7 +21,8 @@ namespace VariantAnnotation.Interface.Positions
         bool                  IsImprecise               { get; }
         ICustomInfoData CustomKeyValues{ get; }
         // for old version of Manta, but still required by Encore
-        bool IsInv3 { get; }
-        bool IsInv5 { get; }
+        bool    IsInv3 { get; }
+        bool    IsInv5 { get; }
+        double? LogOddsRatio    { get; }
     }
 }

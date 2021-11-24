@@ -23,5 +23,6 @@
         bool?    IsLossOfHeterozygosity       { get; }
         string[] HeteroplasmyPercentile       { get; }
         int?     BinCount                     { get; }
+        
     }
 }

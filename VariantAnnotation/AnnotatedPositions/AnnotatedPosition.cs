@@ -65,6 +65,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData?.RecalibratedQuality);
 
             jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
+            jsonObject.AddDoubleValue("logOddsRatio", Position.InfoData?.LogOddsRatio, "0.###");
             
             //adding object of custom vcf info fields
             if (Position.InfoData!=null && !Position.InfoData.CustomKeyValues.IsEmpty())

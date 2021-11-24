@@ -5,8 +5,8 @@ namespace Vcf.Info
 {
     public sealed record InfoData(string BreakendEventId, int[] CiEnd, int[] CiPos, int? End, double? FisherStrandBias, bool IsImprecise, bool IsInv3,
         bool IsInv5, int? JointSomaticNormalQuality, double? MappingQuality, double? RecalibratedQuality, int? RefRepeatCount, string RepeatUnit,
-        double? StrandBias, int? SvLength, string SvType, ICustomInfoData CustomKeyValues) : IInfoData;
-
+        double? StrandBias, int? SvLength, string SvType, double? LogOddsRatio, ICustomInfoData CustomKeyValues) : IInfoData;
+    
     public sealed class InfoDataBuilder
     {
         public string         BreakendEventId;
@@ -25,11 +25,12 @@ namespace Vcf.Info
         public double?        StrandBias;
         public int?           SvLength;
         public string         SvType;
+        public double? LogOddsRatio;
         public ICustomInfoData CustomInfoData=new CustomInfoData();
 
         public InfoData Create() =>
             new(BreakendEventId, CiEnd, CiPos, End, FisherStrandBias, IsImprecise, IsInv3, IsInv5, JointSomaticNormalQuality, MappingQuality,
-                RecalibratedQuality, RefRepeatCount, RepeatUnit, StrandBias, SvLength, SvType, CustomInfoData);
+                RecalibratedQuality, RefRepeatCount, RepeatUnit, StrandBias, SvLength, SvType, LogOddsRatio, CustomInfoData);
 
         public void Reset()
         {
@@ -49,6 +50,7 @@ namespace Vcf.Info
             StrandBias                = null;
             SvLength                  = null;
             SvType                    = null;
+            LogOddsRatio              = null;
             CustomInfoData.Clear();
         }
     }
