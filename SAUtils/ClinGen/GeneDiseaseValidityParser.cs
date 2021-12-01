@@ -20,7 +20,8 @@ namespace SAUtils.ClinGen
             "moderate",
             "definitive",
             "strong",
-            "refuted"
+            "refuted",
+            "no known disease relationship"
         };
 
         public GeneDiseaseValidityParser(Stream stream, Dictionary<int, string> hgncIdToSymbols)
