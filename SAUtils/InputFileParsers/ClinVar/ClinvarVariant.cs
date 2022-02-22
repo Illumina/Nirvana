@@ -5,7 +5,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 {
     public sealed class ClinvarVariant
     {
-        public readonly IChromosome Chromosome;
+        public readonly Chromosome Chromosome;
         public int Start { get; }
         public readonly int Stop;
         public readonly string ReferenceAllele;
@@ -13,7 +13,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         public string VariantType;
         public readonly List<string> AllelicOmimIds;
 
-        public ClinvarVariant(IChromosome chr, int start, int stop, string refAllele, string altAllele, List<string> allilicOmimIds =null)
+        public ClinvarVariant(Chromosome chr, int start, int stop, string refAllele, string altAllele, List<string> allilicOmimIds =null)
         {
             Chromosome      = chr;
             Start           = start;

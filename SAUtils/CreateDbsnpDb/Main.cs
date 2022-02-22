@@ -62,7 +62,7 @@ namespace SAUtils.CreateDbsnpDb
             string outFileName = $"{version.Name}_{version.Version}";
             using (var dbSnpReader = new DbSnpReader(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             {
                 var nsaWriter = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream),  version, referenceProvider, SaCommon.DbsnpTag, true, true, SaCommon.SchemaVersion, false);
                 nsaWriter.Write(dbSnpReader.GetItems());

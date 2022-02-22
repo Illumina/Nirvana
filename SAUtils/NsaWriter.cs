@@ -9,9 +9,9 @@ using SAUtils.DataStructures;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Variants;
+using Versioning;
 
 namespace SAUtils
 {

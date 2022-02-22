@@ -9,7 +9,7 @@ namespace Vcf.VariantCreator
     {
         public static readonly AnnotationBehavior RepeatExpansionBehavior = new AnnotationBehavior(false, false, true, false, true);
 
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
+        public static IVariant Create(Chromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
         {
             start++;//for the padding base
             if (infoData.RefRepeatCount == 0) return null;

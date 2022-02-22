@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
+using Cache.Data;
 using Intervals;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;
-using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
@@ -10,32 +11,33 @@ namespace VariantAnnotation.TranscriptAnnotation
 {
     public static class ReducedTranscriptAnnotator
     {
-        public static IAnnotatedTranscript GetAnnotatedTranscript(ITranscript transcript, IVariant variant, ITranscript[] geneFusionCandidates)
+        public static AnnotatedTranscript GetAnnotatedTranscript(Transcript transcript, IVariant variant, HashSet<Transcript> geneFusionCandidates)
         {
             var annotation   = AnnotateTranscript(transcript, variant, geneFusionCandidates);
             var consequences = GetConsequences(transcript, variant, annotation.GeneFusion != null);
 
-            return new AnnotatedTranscript(transcript, null, null, null, null, annotation.Position, null, null, null,
-                null, consequences, annotation.GeneFusion, false);
+            return new AnnotatedTranscript(transcript, null, null, null, null, annotation.Position, null, null,
+                consequences, annotation.GeneFusion, false);
         }
 
-        public static IAnnotatedTranscript GetCompleteOverlapTranscript(ITranscript transcript) =>
-            new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null, null, null, true);
+        public static AnnotatedTranscript GetCompleteOverlapTranscript(Transcript transcript) =>
+            new AnnotatedTranscript(transcript, null, null, null, null, null, null, null, null, null, true);
 
         private static (IMappedPosition Position, IGeneFusionAnnotation GeneFusion)
-            AnnotateTranscript(ITranscript transcript, IVariant variant, ITranscript[] geneFusionCandidates)
+            AnnotateTranscript(Transcript transcript, IVariant variant, HashSet<Transcript> geneFusionCandidates)
         {
             var position = GetMappedPosition(transcript.TranscriptRegions, variant);
             var geneFusionAnnotation = GeneFusionUtilities.GetGeneFusionAnnotation(variant.BreakEnds, transcript, geneFusionCandidates);
             return (position, geneFusionAnnotation);
         }
 
-        private static IMappedPosition GetMappedPosition(ITranscriptRegion[] regions, IInterval variant)
+        private static IMappedPosition GetMappedPosition(TranscriptRegion[] regions, IInterval variant)
         {
-            var (startIndex, _) = MappedPositionUtilities.FindRegion(regions, variant.Start);
-            var (endIndex, _)   = MappedPositionUtilities.FindRegion(regions, variant.End);
+            (int startIndex, _) = MappedPositionUtilities.FindRegion(regions, variant.Start);
+            (int endIndex, _)   = MappedPositionUtilities.FindRegion(regions, variant.End);
 
-            var (exonStart, exonEnd, intronStart, intronEnd) = regions.GetExonsAndIntrons(startIndex, endIndex);
+            (int exonStart, int exonEnd, int intronStart, int intronEnd) =
+                regions.GetExonsAndIntrons(startIndex, endIndex);
 
             return new MappedPosition(-1, -1, -1, -1, -1, -1, -1, -1, exonStart, exonEnd, intronStart, intronEnd,
                 startIndex, endIndex);

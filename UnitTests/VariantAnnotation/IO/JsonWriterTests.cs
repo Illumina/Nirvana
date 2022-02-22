@@ -4,9 +4,8 @@ using System.Text;
 using Moq;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
-using VariantAnnotation.Providers;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO
@@ -16,7 +15,7 @@ namespace UnitTests.VariantAnnotation.IO
         [Fact]
         public void WriteJsonEntry_Nominal()
         {
-            var dataSourceVersions = new List<IDataSourceVersion> { new DataSourceVersion("nirvana", "2.0", 100) };
+            var dataSourceVersions = new List<IDataSourceVersion> { new DataSourceVersion("nirvana", null, "2.0", 100) };
             var sampleNames = new[] { "NA12878" };
 
             var position1 = new Mock<IPosition>();

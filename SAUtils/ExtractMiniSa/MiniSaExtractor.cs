@@ -44,7 +44,7 @@ namespace SAUtils.ExtractMiniSa
             return miniSaPath;
         }
 
-        //private static string GetReferenceName(string saPath, IDictionary<string, IChromosome> refChromDict)
+        //private static string GetReferenceName(string saPath, Dictionary<string, Chromosome> refChromDict)
         //{
         //    ISupplementaryAnnotationHeader header;
 
@@ -113,7 +113,7 @@ namespace SAUtils.ExtractMiniSa
         }
 
         private List<ISupplementaryInterval> GetIntervals(string description,
-            IEnumerable<Interval<ISupplementaryInterval>> intervals)
+            IEnumerable<IntervalArray<ISupplementaryInterval>.Interval> intervals)
         {
             var miniIntervals  = new List<ISupplementaryInterval>();
             var targetInterval = new Interval(_begin, _end);
@@ -124,7 +124,7 @@ namespace SAUtils.ExtractMiniSa
             {
                 foreach (var interval in allIntervals)
                 {
-                    if (targetInterval.Overlaps(interval.Begin, interval.End)) miniIntervals.Add(interval.Value);
+                    if (targetInterval.Overlaps(interval.Start, interval.End)) miniIntervals.Add(interval.Value);
                 }
             }
 

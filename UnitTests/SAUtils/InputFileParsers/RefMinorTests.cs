@@ -9,8 +9,8 @@ using SAUtils.RefMinorDb;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers
@@ -60,7 +60,7 @@ namespace UnitTests.SAUtils.InputFileParsers
         [Fact]
         public void LoopBack()
         {
-            var version = new DataSourceVersion("onekgen", "v0.3", DateTime.Now.Ticks);
+            var version = new DataSourceVersion("onekgen", null, "v0.3", DateTime.Now.Ticks);
             using (var reader = new RefMinorReader(new StreamReader(GetStream()), GetSequenceProvider()))
             using (var stream = new MemoryStream())
             using (var indexStream = new MemoryStream())

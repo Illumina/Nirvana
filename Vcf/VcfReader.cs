@@ -13,14 +13,14 @@ using Vcf.VariantCreator;
 
 namespace Vcf
 {
-    public sealed class VcfReader : IVcfReader
+    public sealed class VcfReader : IDisposable
     {
         private readonly StreamReader _headerReader;
         private readonly StreamReader _reader;
         private IRecomposer _recomposer;
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly IVcfFilter _vcfFilter;
         public bool IsRcrsMitochondrion { get; private set; }
         public string VcfLine { get; private set; }
@@ -99,7 +99,7 @@ namespace Vcf
             var chromAndLengthInfo = GetChromAndLengthInfo(line);
             if (chromAndLengthInfo.Length == 0) return;
 
-            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out IChromosome chromosome)) return;
+            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out Chromosome chromosome)) return;
             if (!int.TryParse(chromAndLengthInfo[1], out int length)) return;
 
             var assemblyThisChrom = ContigInfo.GetGenomeAssembly(chromosome, length);
@@ -168,7 +168,7 @@ namespace Vcf
             return _queuedPositions.Count == 0 ? null : _queuedPositions.Dequeue();
         }
 
-        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _variantFactory);
+        public Position GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _variantFactory);
 
         public void Dispose() => _reader?.Dispose();
     }

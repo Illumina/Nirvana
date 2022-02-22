@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Text;
+using JSON;
 using OptimizedCore;
 using SAUtils.Schema;
-using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.IO;
 
 namespace SAUtils.DataStructures
 {

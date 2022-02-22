@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -14,7 +13,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
         private readonly IVariantEffect _variantEffect;
         private readonly IFeatureVariantEffects _featureEffect;
 
-        private readonly ImmutableArray<(Func<bool>, ConsequenceTag)> _tier3Consequences;
+        private readonly (Func<bool>, ConsequenceTag)[] _tier3Consequences;
 
         public Consequences(IVariantEffect variantEffect = null, IFeatureVariantEffects featureEffect = null)
         {
@@ -22,7 +21,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
             _variantEffect = variantEffect;
             _featureEffect = featureEffect;
 
-            _tier3Consequences = new List<(Func<bool>, ConsequenceTag)>
+            _tier3Consequences = new (Func<bool>, ConsequenceTag)[]
             {
                 (() => _variantEffect.IsSpliceDonorVariant(),                     ConsequenceTag.splice_donor_variant),
                 (() => _variantEffect.IsSpliceAcceptorVariant(),                  ConsequenceTag.splice_acceptor_variant),
@@ -48,7 +47,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
                 (() => _variantEffect.IsNonCodingTranscriptVariant(),             ConsequenceTag.non_coding_transcript_variant),
                 (() => _featureEffect.Elongation(),                               ConsequenceTag.feature_elongation),
                 (() => _featureEffect.Truncation(),                               ConsequenceTag.transcript_truncation)
-            }.ToImmutableArray();
+            };
         }
 
         public void DetermineFlankingVariantEffects(bool isDownstreamVariant)
@@ -137,9 +136,9 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
 
         private void GetTier3Types()
         {
-            foreach ((var consequenceTest, ConsequenceTag consequenceTag) in _tier3Consequences)
+            foreach ((Func<bool> hasVariantEffect, ConsequenceTag consequenceTag) in _tier3Consequences)
             {
-                if (consequenceTest()) _consequences.Add(consequenceTag);
+                if (hasVariantEffect()) _consequences.Add(consequenceTag);
             }
         }
 

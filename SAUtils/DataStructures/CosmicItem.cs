@@ -10,7 +10,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class CosmicItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -21,7 +21,7 @@ namespace SAUtils.DataStructures
         public HashSet<CosmicStudy> Studies { get; }
 
         public CosmicItem(
-            IChromosome chromosome,
+            Chromosome chromosome,
             int position,
             string id,
             string refAllele,

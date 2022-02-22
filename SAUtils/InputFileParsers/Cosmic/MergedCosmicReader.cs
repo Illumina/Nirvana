@@ -34,7 +34,7 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private const string StudyIdTag = "ID_STUDY";
 
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
         private readonly ISequenceProvider _sequenceProvider;
         private readonly Dictionary<string, HashSet<CosmicItem.CosmicStudy>> _studies;
 
@@ -98,7 +98,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             else _studies[mutationId] = new HashSet<CosmicItem.CosmicStudy> { study };
         }
 
-        private IList<string> GetHistologies(string[] columns)
+        private List<string> GetHistologies(string[] columns)
         {
             var histologies = new HashSet<string>();
             var primaryHistology = columns[_primaryHistologyIndex].Replace('_', ' ');
@@ -110,7 +110,7 @@ namespace SAUtils.InputFileParsers.Cosmic
             return histologies.ToList();
         }
 
-        private IList<string> GetSites(string[] columns)
+        private List<string> GetSites(string[] columns)
         {
             var sites = new HashSet<string>();
 

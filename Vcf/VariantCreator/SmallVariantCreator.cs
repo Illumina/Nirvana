@@ -11,7 +11,7 @@ namespace Vcf.VariantCreator
     {
         public static readonly AnnotationBehavior SmallVariantBehavior = new AnnotationBehavior(true, false, false, true, false);
 
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed)
+        public static IVariant Create(Chromosome chromosome, int start, string refAllele, string altAllele, bool isDecomposedVar, bool isRecomposed)
         {
             if (isDecomposedVar && isRecomposed) throw new InvalidConstraintException("A variant can't be both decomposed and recomposed");
             (start, refAllele, altAllele) = BiDirectionalTrimmer.Trim(start, refAllele, altAllele);

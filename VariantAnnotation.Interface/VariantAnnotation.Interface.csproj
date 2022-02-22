@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
   </PropertyGroup>
   <ItemGroup>
@@ -8,6 +8,7 @@
     <ProjectReference Include="..\IO\IO.csproj" />
     <ProjectReference Include="..\Genome\Genome.csproj" />
     <ProjectReference Include="..\Variants\Variants.csproj" />
+    <ProjectReference Include="..\Versioning\Versioning.csproj" />
   </ItemGroup>
   <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
 </Project>

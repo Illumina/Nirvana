@@ -1,11 +1,9 @@
 ﻿using System.Linq;
+using Cache.Data;
 using Moq;
 using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches.DataStructures;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Caches;
 using Variants;
 using Xunit;
 
@@ -28,10 +26,10 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Equal(expectedConsequence, consequences[0]);
         }
 
-        private IRegulatoryRegion GetRegulatoryRegion()
+        private RegulatoryRegion GetRegulatoryRegion()
         {
-            return new RegulatoryRegion(ChromosomeUtilities.Chr1, 948000, 950401, CompactId.Convert("ENSR00001037666"),
-                RegulatoryRegionType.promoter);
+            return new RegulatoryRegion(ChromosomeUtilities.Chr1, 948000, 950401, "ENSR00001037666", BioType.promoter,
+                null, null, null);
         }
 
         private static IVariant GetVariant()

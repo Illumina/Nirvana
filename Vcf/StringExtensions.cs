@@ -10,7 +10,7 @@ namespace Vcf
         public static int? GetNullableInt(this string str)
         {
             (int number, bool foundError) = str.OptimizedParseInt32();
-            return foundError ? null : (int?) number;
+            return foundError ? null : number;
         }
 
         public static T? GetNullableValue<T>(this string str, TryParse<T> parseFunc) where T : struct

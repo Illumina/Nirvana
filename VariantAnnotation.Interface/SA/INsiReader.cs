@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Genome;
-using VariantAnnotation.Interface.Providers;
 using Variants;
+using Versioning;
 
 namespace VariantAnnotation.Interface.SA
 {

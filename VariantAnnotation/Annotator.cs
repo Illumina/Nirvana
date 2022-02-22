@@ -4,40 +4,37 @@ using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.Plugins;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.Providers;
 using Variants;
+using Vcf;
 
 namespace VariantAnnotation
 {
-    public sealed class Annotator : IAnnotator
+    public sealed class Annotator
     {
-        private readonly IAnnotationProvider _saProviders;
-        private readonly IAnnotationProvider _taProvider;
-        private readonly ISequenceProvider _sequenceProvider;
-        private readonly IAnnotationProvider _conservationProvider;        
-        private readonly IGeneAnnotationProvider _geneAnnotationProvider;
-        private readonly IEnumerable<IPlugin> _plugins;
-        private readonly HashSet<string> _affectedGenes;
+        private readonly ISaAnnotationProvider     _saProvider;
+        private readonly IAnnotationProvider       _taProvider;
+        private readonly ReferenceSequenceProvider _sequenceProvider;
+        private readonly IAnnotationProvider       _conservationProvider;
+        private readonly IGeneAnnotationProvider   _geneAnnotationProvider;
+        private readonly HashSet<string>           _affectedGenes;
 
-        private bool _annotateMito;
-        public GenomeAssembly Assembly { get; }        
+        private bool           _annotateMito;
+        public  GenomeAssembly Assembly { get; }
 
-        public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider,
-            IAnnotationProvider saProviders, IAnnotationProvider conservationProvider,
-            IGeneAnnotationProvider geneAnnotationProvider, IEnumerable<IPlugin> plugins = null)
+        public Annotator(IAnnotationProvider taProvider, ReferenceSequenceProvider sequenceProvider,
+            ISaAnnotationProvider saProvider, IAnnotationProvider conservationProvider,
+            IGeneAnnotationProvider geneAnnotationProvider)
         {
-            _saProviders            = saProviders;
+            _saProvider             = saProvider;
             _taProvider             = taProvider;
             _sequenceProvider       = sequenceProvider;
             _conservationProvider   = conservationProvider;
             _geneAnnotationProvider = geneAnnotationProvider;
             _affectedGenes          = new HashSet<string>();
-            _plugins                = plugins;
             Assembly                = GetAssembly();
         }
 
@@ -45,14 +42,13 @@ namespace VariantAnnotation
         {
             var assemblies = new Dictionary<GenomeAssembly, List<string>>();
             AddAssembly(assemblies, _taProvider);
-            AddAssembly(assemblies, _saProviders);
+            AddAssembly(assemblies, _saProvider);
             AddAssembly(assemblies, _sequenceProvider);
             AddAssembly(assemblies, _conservationProvider);
 
             if (assemblies.Count == 0) return GenomeAssembly.Unknown;
             if (assemblies.Count != 1) throw new UserErrorException(GetAssemblyErrorMessage(assemblies));
 
-            CheckPluginAssemblyConsistency(assemblies.First().Key);
             return assemblies.First().Key;
         }
 
@@ -60,50 +56,39 @@ namespace VariantAnnotation
         {
             if (provider == null) return;
             if (assemblies.TryGetValue(provider.Assembly, out var assemblyList)) assemblyList.Add(provider.Name);
-            else assemblies[provider.Assembly] = new List<string> { provider.Name };
+            else assemblies[provider.Assembly] = new List<string> {provider.Name};
         }
 
         private static string GetAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
         {
             var sb = StringBuilderCache.Acquire();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
-            foreach (var assembly in assemblies) sb.AppendLine($"- Using {assembly.Key}: {string.Join(", ", assembly.Value)}");
+            foreach (var assembly in assemblies)
+                sb.AppendLine($"- Using {assembly.Key}: {string.Join(", ", assembly.Value)}");
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        private void CheckPluginAssemblyConsistency(GenomeAssembly systemAssembly)
-        {
-            if (_plugins == null || !_plugins.Any()) return;
-
-            foreach (var plugin in _plugins)
-            {
-                if (plugin.Assembly == systemAssembly || plugin.Assembly == GenomeAssembly.Unknown) continue;
-                throw new UserErrorException($"At least one plugin does not have the same genome assembly ({plugin.Assembly}) as the system genome assembly ({systemAssembly})");
-            }
-        }
-
-        public IAnnotatedPosition Annotate(IPosition position)
+        public AnnotatedPosition Annotate(Position position)
         {
             if (position == null) return null;
-            var annotatedVariants = GetAnnotatedVariants(position.Variants);
+            AnnotatedVariant[] annotatedVariants = GetAnnotatedVariants(position.Variants);
             var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
 
-            if (annotatedPosition.AnnotatedVariants == null
-                || annotatedPosition.AnnotatedVariants.Length == 0
-                || position.Chromosome.UcscName == "chrM" && !_annotateMito
-                ) return annotatedPosition;
+            if (annotatedPosition.AnnotatedVariants        == null ||
+                annotatedPosition.AnnotatedVariants.Length == 0    ||
+                position.Chromosome.UcscName == "chrM" &&
+                !_annotateMito) return annotatedPosition;
 
             _sequenceProvider?.Annotate(annotatedPosition);
-            _saProviders?.Annotate(annotatedPosition);
+            _saProvider?.Annotate(annotatedPosition);
             _conservationProvider?.Annotate(annotatedPosition);
             _taProvider.Annotate(annotatedPosition);
-            _plugins?.Annotate(annotatedPosition, _sequenceProvider?.Sequence);
 
             TrackAffectedGenes(annotatedPosition);
             return annotatedPosition;
         }
 
-        private void TrackAffectedGenes(IAnnotatedPosition annotatedPosition)
+        private void TrackAffectedGenes(AnnotatedPosition annotatedPosition)
         {
             if (_geneAnnotationProvider == null) return;
 
@@ -113,7 +98,7 @@ namespace VariantAnnotation
             }
         }
 
-        private void AddGenesFromTranscripts(IList<IAnnotatedTranscript> transcripts)
+        private void AddGenesFromTranscripts(List<AnnotatedTranscript> transcripts)
         {
             foreach (var transcript in transcripts)
             {
@@ -122,7 +107,7 @@ namespace VariantAnnotation
             }
         }
 
-        private static bool IsFlankingTranscript(IAnnotatedTranscript transcript)
+        private static bool IsFlankingTranscript(AnnotatedTranscript transcript)
         {
             if (transcript.Consequences == null) return false;
 
@@ -136,11 +121,12 @@ namespace VariantAnnotation
             return false;
         }
 
-        internal static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
+        internal static AnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
         {
             if (variants?[0].Behavior == null) return null;
-            int numVariants = variants.Length;
-            var annotatedVariants = new IAnnotatedVariant[numVariants];
+            
+            int numVariants                                            = variants.Length;
+            var annotatedVariants                                      = new AnnotatedVariant[numVariants];
             for (var i = 0; i < numVariants; i++) annotatedVariants[i] = new AnnotatedVariant(variants[i]);
             return annotatedVariants;
         }
@@ -160,15 +146,5 @@ namespace VariantAnnotation
         }
 
         public void EnableMitochondrialAnnotation() => _annotateMito = true;
-    }
-
-    internal static class PluginExtensions
-    {
-        public static void Annotate(this IEnumerable<IPlugin> plugins, IAnnotatedPosition annotatedPosition,
-            ISequence sequence)
-        {
-            if (sequence == null) return;
-            foreach (var plugin in plugins) plugin.Annotate(annotatedPosition, sequence);
-        }
     }
 }

@@ -9,7 +9,7 @@ namespace VariantAnnotation.NSA
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         private readonly string _jsonString;
 
         [Obsolete("Constructors should have parameters. Factory methods can use readers.")]

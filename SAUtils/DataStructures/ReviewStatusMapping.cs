@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 
 namespace SAUtils.DataStructures
 {
@@ -7,7 +6,7 @@ namespace SAUtils.DataStructures
     {
         private const string DefaultReviewStatus = "no assertion provided";
 
-        private static readonly ImmutableDictionary<string, ReviewStatus> StringToReviewStatus = new Dictionary<string, ReviewStatus>
+        private static readonly Dictionary<string, ReviewStatus> StringToReviewStatus = new Dictionary<string, ReviewStatus>
         {
             ["no_assertion"] = ReviewStatus.no_assertion,
             ["no_criteria"] = ReviewStatus.no_criteria,
@@ -25,7 +24,7 @@ namespace SAUtils.DataStructures
             ["classified by multiple submitters"] = ReviewStatus.multiple_submitters,
             ["criteria provided, multiple submitters, no conflicts"] = ReviewStatus.multiple_submitters_no_conflict,
             ["criteria provided, single submitter"] = ReviewStatus.single_submitter
-        }.ToImmutableDictionary();
+        };
 
         private static readonly Dictionary<ReviewStatus, string> ReviewStatusToString = new Dictionary<ReviewStatus, string>
         {

@@ -6,8 +6,8 @@ using SAUtils.InputFileParsers;
 using SAUtils.PhyloP;
 using UnitTests.TestUtilities;
 using VariantAnnotation.PhyloP;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils
@@ -18,7 +18,7 @@ namespace UnitTests.SAUtils
         public void LoopbackTest()
         {
             var wigFixFile = Resources.TopPath("mini.WigFix");
-            var version = new DataSourceVersion("phylop", "0", DateTime.Now.Ticks, "unit test");
+            var version = new DataSourceVersion("phylop", "unit test", "0", DateTime.Now.Ticks);
             
             using(var reader      = new PhylopParser(FileUtilities.GetReadStream(wigFixFile),GenomeAssembly.GRCh37, ChromosomeUtilities.RefNameToChromosome))
             using (var npdStream  = new MemoryStream())

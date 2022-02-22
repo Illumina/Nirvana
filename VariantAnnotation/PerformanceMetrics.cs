@@ -31,7 +31,7 @@ namespace VariantAnnotation
             _logger.WriteLine(divider);
         }
 
-        public void StartAnnotatingReference(IChromosome chromosome)
+        public void StartAnnotatingReference(Chromosome chromosome)
         {
             if (_hasStartedAnnotation) ShowAnnotationTime();
 

@@ -1,17 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Cache.Data;
+using JSON;
 using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.IO;
+using JsonObject = VariantAnnotation.IO.JsonObject;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
-    public sealed class AnnotatedRegulatoryRegion : IAnnotatedRegulatoryRegion
+    public sealed class AnnotatedRegulatoryRegion : IJsonSerializer
     {
-        public IRegulatoryRegion RegulatoryRegion { get; }
+        public RegulatoryRegion RegulatoryRegion { get; }
         public IEnumerable<ConsequenceTag> Consequences { get; }
 
-        public AnnotatedRegulatoryRegion(IRegulatoryRegion regulatoryRegion, List<ConsequenceTag> consequences)
+        public AnnotatedRegulatoryRegion(RegulatoryRegion regulatoryRegion, List<ConsequenceTag> consequences)
         {
             RegulatoryRegion = regulatoryRegion;
             Consequences     = consequences;
@@ -22,8 +24,8 @@ namespace VariantAnnotation.AnnotatedPositions
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddStringValue("id", RegulatoryRegion.Id.WithoutVersion);
-            jsonObject.AddStringValue("type", RegulatoryRegion.Type.ToString());
+            jsonObject.AddStringValue("id", RegulatoryRegion.Id);
+            jsonObject.AddStringValue("type", RegulatoryRegion.BioType.ToString());
             jsonObject.AddStringValues("consequence", Consequences?.Select(ConsequenceUtil.GetConsequence));
             sb.Append(JsonObject.CloseBrace);
         }

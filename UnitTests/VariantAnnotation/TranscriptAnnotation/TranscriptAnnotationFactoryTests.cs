@@ -1,7 +1,10 @@
-﻿using Genome;
+﻿using System.Collections.Generic;
+using Cache.Data;
+using Genome;
 using Intervals;
 using Moq;
-using VariantAnnotation.Interface.AnnotatedPositions;
+using UnitTests.MockedData;
+using UnitTests.TestUtilities;
 using VariantAnnotation.TranscriptAnnotation;
 using Variants;
 using Xunit;
@@ -77,34 +80,25 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
         [Fact]
         public void GetAnnotatedTranscripts_ReturnEmptyList()
         {
-            var variant     = new Mock<IVariant>();
-            var transcript1 = new Mock<ITranscript>();
-            var transcript2 = new Mock<ITranscript>();
+            var variant = new Mock<IVariant>();
 
-            var transcripts = new[] { transcript1.Object, transcript2.Object };
+            var transcript1 = new Transcript(ChromosomeUtilities.Chr1, 108455, 118455, string.Empty, BioType.mRNA, true,
+                Source.Ensembl, Genes.MED8, TranscriptRegions.NM_001025366_2, string.Empty, null);
+
+            var transcript2 = new Transcript(ChromosomeUtilities.Chr1, 128460, 129489, string.Empty, BioType.mRNA, true,
+                Source.Ensembl, Genes.MED8, TranscriptRegions.NM_001025366_2, string.Empty, null);
+
+            List<Transcript> transcripts = new() {transcript1, transcript2};
 
             variant.SetupGet(x => x.Behavior).Returns(new AnnotationBehavior(true, false, false, true, false));
             variant.SetupGet(x => x.Start).Returns(123456);
             variant.SetupGet(x => x.End).Returns(123456);
 
-            transcript1.SetupGet(x => x.Start).Returns(108455);
-            transcript1.SetupGet(x => x.End).Returns(118455);
-
-            transcript1.SetupGet(x => x.Gene.Start).Returns(108455);
-            transcript1.SetupGet(x => x.Gene.End).Returns(118455);
-
-            transcript2.SetupGet(x => x.Start).Returns(128460);
-            transcript2.SetupGet(x => x.End).Returns(129489);
-
-            transcript2.SetupGet(x => x.Gene.Start).Returns(128460);
-            transcript2.SetupGet(x => x.Gene.End).Returns(129489);
-
             var compressedSequence = new Mock<ISequence>();
 
             var observedAnnotatedTranscripts =
                 TranscriptAnnotationFactory.GetAnnotatedTranscripts(variant.Object, transcripts,
-                    compressedSequence.Object, null, null);
-
+                    compressedSequence.Object, null);
             Assert.Empty(observedAnnotatedTranscripts);
         }
     }

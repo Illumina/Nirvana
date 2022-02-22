@@ -6,10 +6,9 @@ using ErrorHandling.Exceptions;
 using Genome;
 using IO;
 using VariantAnnotation;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
 using VariantAnnotation.IO.VcfWriter;
 using VariantAnnotation.Logger;
@@ -45,7 +44,7 @@ namespace Nirvana
                     SetMitochondrialAnnotationBehavior(annotationResources, vcfReader);
 
                     int previousChromIndex = -1;
-                    IPosition position;
+                    Position position;
 
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
@@ -90,13 +89,13 @@ namespace Nirvana
                 annotationResources.Annotator.EnableMitochondrialAnnotation();
         }
 
-        private static void GenerateOutput(VcfConversion vcfConversion, JsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, IPosition position, IAnnotatedPosition annotatedPosition, string json)
+        private static void GenerateOutput(VcfConversion vcfConversion, JsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, Position position, AnnotatedPosition annotatedPosition, string json)
         {
             if (json != null) WriteAnnotatedPosition(annotatedPosition, jsonWriter, vcfWriter, gvcfWriter, json, vcfConversion);
             else gvcfWriter?.Write(string.Join("\t", position.VcfFields));
         }
 
-        private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
+        private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, AnnotationResources annotationResources,
             IVcfFilter vcfFilter)
         {
             var vcfReader = FileUtilities.GetStreamReader(vcfStream);
@@ -113,7 +112,7 @@ namespace Nirvana
             return Create(headerReader, vcfReader, annotationResources.SequenceProvider, annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter);
         }
 
-        public static void WriteAnnotatedPosition(IAnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput, VcfConversion vcfConversion)
+        public static void WriteAnnotatedPosition(AnnotatedPosition annotatedPosition, IJsonWriter jsonWriter, LiteVcfWriter vcfWriter, LiteVcfWriter gvcfWriter, string jsonOutput, VcfConversion vcfConversion)
         {
             jsonWriter.WriteJsonEntry(annotatedPosition.Position, jsonOutput);
 
@@ -124,7 +123,7 @@ namespace Nirvana
             gvcfWriter?.Write(vcfLine);
         }
 
-        private static int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome,
+        private static int UpdatePerformanceMetrics(int previousChromIndex, Chromosome chromosome,
             PerformanceMetrics metrics)
         {
             // ReSharper disable once InvertIf

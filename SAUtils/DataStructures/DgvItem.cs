@@ -8,7 +8,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class DgvItem : ISuppIntervalItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }
 
@@ -25,7 +25,7 @@ namespace SAUtils.DataStructures
         private double? VariantFreqAll { get; }
 
         
-        public DgvItem(string id, IChromosome chromosome, int start, int end, int sampleSize, int observedGains, int observedLosses,
+        public DgvItem(string id, Chromosome chromosome, int start, int end, int sampleSize, int observedGains, int observedLosses,
             VariantType variantType)
         {
             Id             = id;

@@ -14,9 +14,9 @@ namespace SAUtils.InputFileParsers.DbSnp
     {
         // Key in VCF info field of the allele frequencies subfield.
 	    private readonly Stream _stream;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
 
-        public GlobalMinorReader(Stream stream, IDictionary<string, IChromosome> refChromDict)
+        public GlobalMinorReader(Stream stream, Dictionary<string, Chromosome> refChromDict)
         {
             _stream = stream;
             _refChromDict = refChromDict;

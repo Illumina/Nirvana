@@ -1,12 +1,10 @@
-﻿using Moq;
+﻿using Cache.Data;
 using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.AminoAcids;
-using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.TranscriptAnnotation;
 using Variants;
+using Vcf.VariantCreator;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.AnnotatedPositions
@@ -15,41 +13,27 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
     {
         public const string Enst00000343938GenomicSequence = "GAGGGCGGGGCGAGGGCGGGGCGGTGGGCGGGGACGGGGCCCGCACGGCGGCTACGGCCTAGGTGAGCGGCTCGGACTCGGCGGCCGCACCTGCCCAACCCAACCCGCACGGTCCGGAAGTCGCCGAGGGGCCGGGAGCGGGAGGGGACGTCGTCCTAGAGGGCCGGAGCGGGCGGGCGGCCGAGGACCCGGCTCCCGCGCAGGACGGAGCCGTGGCTCAGGTCGGCCCCTCCCCAACACCACCCCGGGCCTCCGCCCCTTCCTGGGCCTCTCGGTGGAGCAGGGACCCGAACCGGTGCCCATCCAGTCCGGTGCCATCTGAAGCCCCCTTCCCAGGTGAGACTCGTAGCGCTCGCTCGACAGGGTCTGGTCCCACCCACAAGGCCTGGGGCGCCGTGGGGCCCCGTCTCCTGCTGGCCCCCCAGCCTGCTGTCAGCCCCCGTGCTCTGTGCTCAGGCCGCCCTCGCGCCCGGCCCTGACCTTGGGCCGTTGGGCTGCCCTGGGAAAGGCCTGGAGGTGTCCTGGGTCACCTTCCTGGGCTGGCAAGCTGCCTGCCTCCTGCACAGCCACTGCCCTTCCTGTTGTTACCGAGCCACCAGCCACAGCTCTGAGAAGCTCCTGGCAGCTTCTGTTTGCCACTGGCTCGAATCTGGGCAGGAAGGCAAGGCCCGCAGAATATCTGGTGACCAAGAAGGAAACCCCAGAGCCTCAGAGACCATCTTCTCAGTGGACAAAATTAAGGCCCGAGGAGGGGAGGGGCGTGCTGGAAGTCTATGGGACTGCATCTTTCTGAGGCCCAGGAGCAGCCATCCCCCACACCTGAAGCCCGGTGAGCTCACATCTGGGGCCTCCGCCTGGTGCCAAGCATGCAACCCAACCTGTGGGGCCTGCAACGCCAGGCTTCAGCACCCTGCAGGCACCAGTGCTCCAGCAGCCTGGGCCACGGGCTGGGCAGGGCTTGCAGCCCATGATCCCTAGTGATGAAGGGCCCAGTCCTAGGGTGCTGAGCAACCTGCCCACCTGCTCCTGGCCAGGAGCTCTCACCACGGCTGGGTGCCCTTCCCCCTCCCCCACCGATGGAGTCCCTGCAGCCAGGGAGGCCAGGACAGGGCTCCCAGCACCAACCGGCCTAGGAACCCCCAGGCCCTCTTCCTGGTCGAGGTGGAATGCAGCTGACTCTCAGGTTCCCCAGAGCAGGTGCGGGCCCGTGGGGCACCCGGGGAGACAGGGCAAGGGTGCTTGGCAACACTCACACAAAGCATGGGTGCCTGGATGTCTGTGGATCTGTGGAGTGACTATGTGAATGCCAGCAGAATCCAAAGCAGGGCCTGGGCCACTCGTGGAAGGCTCCCTAGGGCTAGTACAAGAGCCTCGTGGCAATCTTCTGAGTGGTAAAACCCATCTGTGTGGGACATGGAGTTTCAGCAACAGGAGTGAAAACACGTGTCCATCCATCCAGCAAGTGCCAGCCCTACAGCCTCTTTTCTGCTTTTGGGGATGTAGCAGTGAGGAAGATGGGGCAGCCTGCCCGGCAGCATCCCCCCACCCCCGGCCCCACCTGTCTCTGCTTTCTGCTGTGTCTGTTTTCTTGTCTAGGACTTCAGAACTTCCTGTCTTTGTTGTCATCTGACCCCACCCCAGATGGCTGCTCGCACTCCCCATGCACCCAGATAGATGGCTAGGATGGTGCTTGGCTCTCGGCAGGGGCTTAGTATTTCTCCAGCTGGTAAAAGCAGATACAGCATCTAGAGAGAGAAACAAAAACAAGAAAGCACCAGCAGAGACACCTGCTGCAGACAGCGGGGCCTAGTGGTCTGATAAAGCCAGAGGGGGCCACTCTCGGGGTCAGGGACTGACACGGAGTCAGTGGCCTGATCCACAGGAGGGGCTGTGCCAAGGTCCCTGAATGCGCAATCCTGATGAAGGGTGGGTCAGGGTGGTGTGCCTGAGAGCCTGCGGCTTGGCTGGGAGCAGAGCCAGGCAGCTCCTGGGAGGAAGCTCCATGAGGGGCATGAGTGTTCAGTGAGCGGCAATGGGATCGCAGCTATTTTGTTCCCCTCCACACACAGAAAATGAGCCACAGAGCAAGCTGACCCCAGCGACACAGCCCCCCAGCCCTACTGTATTTCCGTTCCTATCAAAAAATGGATGACTCGGAGACAGGTTTCAATCTGAAAGTCGTCCTGGTCAGTTTCAAGCAGTGTCTCGATGAGAAGGAAGAGGTCTTGCTGGACCCCTACATTGCCAGCTGGAAGGGCCTGGTCAGGTGCGTGTGCCAGGGCTGCCTCCTGAGGTGGGCGCTCCCCTGGCCCGAGTCCCATATGTGGCATCTGCCTCCCGACTGCCTGTCCCCACCAGCTTTGCTGCCCGTTTCCAGATGGGTGTGAGCCCCCGCAGGCTGGGCAGCGTCCCCTGCACCCCAGGCGGGCTGCCCCAGGCCTGGGCGAGGACTCGAGCCCCGCTCCCTTCCACAGGTTTCTGAACAGCCTGGGCACCATCTTCTCATTCATCTCCAAGGACGTGGTCTCCAAGCTGCGGATCATGGAGCGCCTCAGGGGCGGCCCGCAGAGCGAGCACTACCGCAGCCTGCAGGCCATGGTGGCCCACGAGCTGAGCAACCGGCTGGTGGACCTGGAGCGCCGCTCCCACCACCCGGAGTCTGGCTGCCGGACGGTGCTGCGCCTGCACCGCGCCCTGCACTGGCTGCAGCTGTTCCTGGAGGGCCTGCGTACCAGCCCCGAGGACGCACGCACCTCCGCGCTCTGCGCCGACTCCTACAACGCCTCGCTGGCCGCCTACCACCCCTGGGTCGTGCGCCGCGCCGTCACCGTGGCCTTCTGCACGCTGCCCACACGCGAGGTCTTCCTGGAGGCCATGAACGTGGGGCCCCCGGAGCAGGCCGTGCAGATGCTAGGCGAGGCCCTCCCCTTCATCCAGCGTGTCTACAACGTCTCCCAGAAGCTCTACGCCGAGCACTCCCTGCTGGACCTGCCCTAGGGGCGGGAAGCCAGGGCCGCACCGGCTTTCCTGCTGCAGATCTGGGCTGCGGTGGCCAGGGCCGTGAGTCCCGTGGCAGAGCCTTCTGGGCGCTGCGGGAACAGGAGATCCTCTGTCGCCCCTGTGAGCTGAGCTGGTTAGGAACCACAGACTGTGACAGAGAAGGTGGCGACCAGCCCAGAAGAGGCCCACCCTCTCGGTCCGGAACAAGACGCCTCGGCCACGGCTCCCCCTCGGCCTATTACACGCGTGCGCAGCCAGGCCTCGCCAGGGTGCGGTGCAGAGCAGAGCAGGCAGGGGTGGGGGCCGGGCCTGCAAGAGCCCGAAAGGTCGCCACCCCCTAGCCTGTGGGGTGCATCTGCGAACCAGGGTGAAGTCACAGGTCCCGGGGTGTGGAGGCTCCATCCTTTCTCCTTTCTGCCAGCCGATGTGTCCTCATCTCAGGCCCGTGCCTGGGACCCCGTGTCTGCCCAGGTGGGCAGCCTTGAGCCCAGGGGACTCAGTGCCCTCCATGCCCTGGCTGGCAGAAACCCTCAACAGCAGTCTGGGCACTGTGGGGCTCTCCCCGCCTCTCCTGCCTTGTTTGCCCCTCAGCGTGCCAGGCAGACTGGGGGCAGGACAGCCGGAAGCTGAGACCAAGGCTCCTCACAGAAGGGCCCAGGAAGTCCCCGCCCTTGGGACAGCCTCCTCCGTAGCCCCTGCACGGCACCAGTTCCCCGAGGGACGCAGCAGGCCGCCTCCCGCAGCGGCCGTGGGTCTGCACAGCCCAGCCCAGCCCAAGGCCCCCAGGAGCTGGGACTCTGCTACACCCAGTGAAATGCTGTGTCCCTTCTCCCCCGTGCCCCTTGATGCCCCCTCCCCACAGTGCTCAGGAGACCCGTGGGGCACGGAACAGGAGGGTCTGGACCCTGTGGCCCAGCCAAAGGCTACCAGACAGCCACAACCAGCCCAGCCACCATCCAGTGCCTGGGGCCTGGCCACTGGCTCTTCACAGTGGACCCCAGCACCTCGGGGTGGCAGAGGGACGGCCCCCACGGCCCAGCAGACATGCGAGCTTCCAGAGTGCAATCTATGTGATGTCTTCCAACGTTAATAAATCACACAGCCTCCCAGGAGGGAGACGCTGGGGTGCAC";
 
-        public static ITranscript GetMockedTranscriptOnForwardStrand()
+        public static Transcript GetMockedTranscriptOnForwardStrand()
         {
-            var mockedTranscript = new Mock<ITranscript>(); //get info from ENST00000343938.4
-            const int start      = 1260147;
-            const int end        = 1264277;
-
-            var transcriptRegions = new ITranscriptRegion[]
+            var transcriptRegions = new TranscriptRegion[]
             {
-                new TranscriptRegion(TranscriptRegionType.Exon, 1, 1260147, 1260482, 1, 336),
-                new TranscriptRegion(TranscriptRegionType.Intron, 1, 1260483, 1262215, 336, 337),
-                new TranscriptRegion(TranscriptRegionType.Exon, 2, 1262216, 1262412, 337, 533),
-                new TranscriptRegion(TranscriptRegionType.Intron, 2, 1262413, 1262620, 533,534),
-                new TranscriptRegion(TranscriptRegionType.Exon, 3, 1262621, 1264277, 534, 2190)
+                new(1260147, 1260482, 1, 336, TranscriptRegionType.Exon, 1, null),
+                new(1260483, 1262215, 336, 337, TranscriptRegionType.Intron, 1, null),
+                new(1262216, 1262412, 337, 533, TranscriptRegionType.Exon, 2, null),
+                new(1262413, 1262620, 533, 534, TranscriptRegionType.Intron, 2, null),
+                new(1262621, 1264277, 534, 2190, TranscriptRegionType.Exon, 3, null)
             };
 
-            var translation = new Mock<ITranslation>();
-            translation.SetupGet(x => x.CodingRegion).Returns(new CodingRegion(1262291, 1263143, 412, 1056, 645));
-            translation.SetupGet(x => x.ProteinId).Returns(CompactId.Convert("ENST00000343938", 4));
-            translation.SetupGet(x => x.PeptideSeq).Returns("MDDSETGFNLKVVLVSFKQCLDEKEEVLLDPYIASWKGLVRFLNSLGTIFSFISKDVVSKLRIMERLRGGPQSEHYRSLQAMVAHELSNRLVDLERRSHHPESGCRTVLRLHRALHWLQLFLEGLRTSPEDARTSALCADSYNASLAAYHPWVVRRAVTVAFCTLPTREVFLEAMNVGPPEQAVQMLGEALPFIQRVYNVSQKLYAEHSLLDLP");
+            var codingRegion = new CodingRegion(1262291, 1263143, 412, 1056, "ENSP00000343890.4",
+                "MDDSETGFNLKVVLVSFKQCLDEKEEVLLDPYIASWKGLVRFLNSLGTIFSFISKDVVSKLRIMERLRGGPQSEHYRSLQAMVAHELSNRLVDLERRSHHPESGCRTVLRLHRALHWLQLFLEGLRTSPEDARTSALCADSYNASLAAYHPWVVRRAVTVAFCTLPTREVFLEAMNVGPPEQAVQMLGEALPFIQRVYNVSQKLYAEHSLLDLP*",
+                0, 0, 0, null, null);
 
-            var gene = new Mock<IGene>();
-            gene.SetupGet(x => x.OnReverseStrand).Returns(false);
-            gene.SetupGet(x => x.EnsemblId).Returns(CompactId.Convert("ENSG00000224051 "));
+            var gene = new Gene("80772", "ENSG00000224051", false, 28116) {Symbol = "CPTP"};
 
-            mockedTranscript.SetupGet(x => x.Id).Returns(CompactId.Convert("ENST00000343938", 4));
-            mockedTranscript.SetupGet(x => x.Source).Returns(Source.Ensembl);
-            mockedTranscript.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
-            mockedTranscript.SetupGet(x => x.Start).Returns(start);
-            mockedTranscript.SetupGet(x => x.End).Returns(end);
-            mockedTranscript.SetupGet(x => x.Gene).Returns(gene.Object);
-            mockedTranscript.SetupGet(x => x.TranscriptRegions).Returns(transcriptRegions);
-            mockedTranscript.SetupGet(x => x.Translation).Returns(translation.Object);
-            mockedTranscript.SetupGet(x => x.TotalExonLength).Returns(2190);
-
-            return mockedTranscript.Object;
+            return new Transcript(ChromosomeUtilities.Chr1, 1260147, 1264277, "ENST00000343938.4", BioType.mRNA, true,
+                Source.Ensembl, gene, transcriptRegions,
+                "GAGGGCGGGGCGAGGGCGGGGCGGTGGGCGGGGACGGGGCCCGCACGGCGGCTACGGCCTAGGTGAGCGGCTCGGACTCGGCGGCCGCACCTGCCCAACCCAACCCGCACGGTCCGGAAGTCGCCGAGGGGCCGGGAGCGGGAGGGGACGTCGTCCTAGAGGGCCGGAGCGGGCGGGCGGCCGAGGACCCGGCTCCCGCGCAGGACGGAGCCGTGGCTCAGGTCGGCCCCTCCCCAACACCACCCCGGGCCTCCGCCCCTTCCTGGGCCTCTCGGTGGAGCAGGGACCCGAACCGGTGCCCATCCAGTCCGGTGCCATCTGAAGCCCCCTTCCCAGAAAATGAGCCACAGAGCAAGCTGACCCCAGCGACACAGCCCCCCAGCCCTACTGTATTTCCGTTCCTATCAAAAAATGGATGACTCGGAGACAGGTTTCAATCTGAAAGTCGTCCTGGTCAGTTTCAAGCAGTGTCTCGATGAGAAGGAAGAGGTCTTGCTGGACCCCTACATTGCCAGCTGGAAGGGCCTGGTCAGGTTTCTGAACAGCCTGGGCACCATCTTCTCATTCATCTCCAAGGACGTGGTCTCCAAGCTGCGGATCATGGAGCGCCTCAGGGGCGGCCCGCAGAGCGAGCACTACCGCAGCCTGCAGGCCATGGTGGCCCACGAGCTGAGCAACCGGCTGGTGGACCTGGAGCGCCGCTCCCACCACCCGGAGTCTGGCTGCCGGACGGTGCTGCGCCTGCACCGCGCCCTGCACTGGCTGCAGCTGTTCCTGGAGGGCCTGCGTACCAGCCCCGAGGACGCACGCACCTCCGCGCTCTGCGCCGACTCCTACAACGCCTCGCTGGCCGCCTACCACCCCTGGGTCGTGCGCCGCGCCGTCACCGTGGCCTTCTGCACGCTGCCCACACGCGAGGTCTTCCTGGAGGCCATGAACGTGGGGCCCCCGGAGCAGGCCGTGCAGATGCTAGGCGAGGCCCTCCCCTTCATCCAGCGTGTCTACAACGTCTCCCAGAAGCTCTACGCCGAGCACTCCCTGCTGGACCTGCCCTAGGGGCGGGAAGCCAGGGCCGCACCGGCTTTCCTGCTGCAGATCTGGGCTGCGGTGGCCAGGGCCGTGAGTCCCGTGGCAGAGCCTTCTGGGCGCTGCGGGAACAGGAGATCCTCTGTCGCCCCTGTGAGCTGAGCTGGTTAGGAACCACAGACTGTGACAGAGAAGGTGGCGACCAGCCCAGAAGAGGCCCACCCTCTCGGTCCGGAACAAGACGCCTCGGCCACGGCTCCCCCTCGGCCTATTACACGCGTGCGCAGCCAGGCCTCGCCAGGGTGCGGTGCAGAGCAGAGCAGGCAGGGGTGGGGGCCGGGCCTGCAAGAGCCCGAAAGGTCGCCACCCCCTAGCCTGTGGGGTGCATCTGCGAACCAGGGTGAAGTCACAGGTCCCGGGGTGTGGAGGCTCCATCCTTTCTCCTTTCTGCCAGCCGATGTGTCCTCATCTCAGGCCCGTGCCTGGGACCCCGTGTCTGCCCAGGTGGGCAGCCTTGAGCCCAGGGGACTCAGTGCCCTCCATGCCCTGGCTGGCAGAAACCCTCAACAGCAGTCTGGGCACTGTGGGGCTCTCCCCGCCTCTCCTGCCTTGTTTGCCCCTCAGCGTGCCAGGCAGACTGGGGGCAGGACAGCCGGAAGCTGAGACCAAGGCTCCTCACAGAAGGGCCCAGGAAGTCCCCGCCCTTGGGACAGCCTCCTCCGTAGCCCCTGCACGGCACCAGTTCCCCGAGGGACGCAGCAGGCCGCCTCCCGCAGCGGCCGTGGGTCTGCACAGCCCAGCCCAGCCCAAGGCCCCCAGGAGCTGGGACTCTGCTACACCCAGTGAAATGCTGTGTCCCTTCTCCCCCGTGCCCCTTGATGCCCCCTCCCCACAGTGCTCAGGAGACCCGTGGGGCACGGAACAGGAGGGTCTGGACCCTGTGGCCCAGCCAAAGGCTACCAGACAGCCACAACCAGCCCAGCCACCATCCAGTGCCTGGGGCCTGGCCACTGGCTCTTCACAGTGGACCCCAGCACCTCGGGGTGGCAGAGGGACGGCCCCCACGGCCCAGCAGACATGCGAGCTTCCAGAGTGCAATCTATGTGATGTCTTCCAACGTTAATAAATCACACAGCCTCCCAGGAGGGAGACGCTGGGGTGCAC",
+                codingRegion);
         }
 
         [Fact]
@@ -59,11 +43,29 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Asp2Ala)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Asp2Ala)", hgvspNotation);
+        }
+        
+        [Fact]
+        public void GetHgvsProteinAnnotation_PartialCdsBug_NeedCdsOffset()
+        {
+            var variant = new Variant(ChromosomeUtilities.Chr3, 72427537, 72427538, "CA", "", VariantType.deletion,
+                "3-72427536-TCA-T", false, false, false, null, null, SmallVariantCreator.SmallVariantBehavior);
+
+            var refSequence = new SimpleSequence(
+                "TATATAATTTTATATTTATATATATATAGTTATATCAAAACTGATAGTACATAGTATAACTGGAAGAAAGAACTAAACTTAAAAGGATATGCTGAAAGGATGGAGTTTGTGAACACAATAAATAAAAGTTCCCTCCCCCTCCCAGCCCTCCCCACCGGCAACAAAACAAAAACAAAAAACCAGTTGTAATGTACATGGAAAATTGTGCACAGCAGATTTTTTTTTTTTTATAAAAAGTAGATTCAGGAGCACATCCAATTATAAATGATTGTTAGGAAAATCATATAAAACAATGGAATACATAAAAGTGTCAAGAGTAATCGTCAGGGTGCGAAATTCCTTGGTGGCCAGATGCCCATGGCAAGCAGAAATTATCCTGGCAGCATCACTAAGAGGTCGATGTCCACAGAAGATTCTCCAGGGATGCAAGCAGCATGGGCAGGTGGAGGTTTTGAATTTCATACCCTGATTCATAGTTTTCACAATTCCATGTGCAATTT",
+                72427036);
+
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(MockedData.Transcripts.NM_012234_6, variant, refSequence,
+                AminoAcidCommon.StandardAminoAcids);
+
+            string hgvspNotation = annotatedTranscript.HgvsProtein;
+
+            Assert.Equal("NP_036366.3:p.(Ter229LysextTer6)", hgvspNotation);
         }
 
         [Fact]
@@ -73,11 +75,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Asp2_Asp3insPhe)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Asp2_Asp3insPhe)", hgvspNotation);
         }
 
         [Fact]
@@ -87,11 +89,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Asp3dup)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Asp3dup)", hgvspNotation);
         }
 
         [Fact]
@@ -101,11 +103,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Ser4del)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Ser4del)", hgvspNotation);
         }
 
         [Fact]
@@ -115,11 +117,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Ser4_Glu5delinsGluThr)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Ser4_Glu5delinsGluThr)", hgvspNotation);
         }
 
         [Fact]
@@ -129,7 +131,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
@@ -143,11 +145,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Ser4GlyfsTer19)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Ser4GlyfsTer19)", hgvspNotation);
         }
 
         [Fact]
@@ -157,11 +159,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Phe8Ter)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Phe8Ter)", hgvspNotation);
         }
 
         [Fact]
@@ -171,11 +173,11 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refSequence = new SimpleSequence(Enst00000343938GenomicSequence, 1260147 - 1);
             var transcript  = GetMockedTranscriptOnForwardStrand();
 
-            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, null, null, AminoAcidCommon.StandardAminoAcids);
+            var annotatedTranscript = FullTranscriptAnnotator.GetAnnotatedTranscript(transcript, variant, refSequence, AminoAcidCommon.StandardAminoAcids);
 
             var hgvspNotation = annotatedTranscript.HgvsProtein;
 
-            Assert.Equal("ENST00000343938.4:p.(Ter215GlyextTer43)", hgvspNotation);
+            Assert.Equal("ENSP00000343890.4:p.(Ter215GlyextTer43)", hgvspNotation);
         }
     }
 }

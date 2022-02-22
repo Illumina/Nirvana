@@ -23,7 +23,7 @@ namespace SAUtils.DataStructures
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
 
 
         private string Id { get; }
@@ -38,7 +38,7 @@ namespace SAUtils.DataStructures
         private bool Validated { get; }
 
 
-        public ClinGenItem(string id, IChromosome chromosome, int start, int end, VariantType variantType, int observedGains, int observedLosses,
+        public ClinGenItem(string id, Chromosome chromosome, int start, int end, VariantType variantType, int observedGains, int observedLosses,
             ClinicalInterpretation clinicalInterpretation, bool validated, HashSet<string> phenotypes = null, HashSet<string> phenotypeIds = null)
         {
             Id                     = id;

@@ -5,14 +5,14 @@ namespace SAUtils.DataStructures
 {
 	public sealed class DbSnpItem: ISupplementaryDataItem
 	{
-	    public IChromosome Chromosome { get; }
+	    public Chromosome Chromosome { get; }
 	    public int Position { get; set; }
 	    public string RefAllele { get; set; }
 	    public string AltAllele { get; set; }
 
         public long RsId { get; }
 	    
-	    public DbSnpItem(IChromosome chromosome,
+	    public DbSnpItem(Chromosome chromosome,
 			int position,
 			long rsId,
 			string refAllele,

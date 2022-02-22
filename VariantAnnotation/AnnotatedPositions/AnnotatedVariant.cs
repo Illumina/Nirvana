@@ -7,16 +7,15 @@ using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
-    public sealed class AnnotatedVariant : IAnnotatedVariant
+    public sealed class AnnotatedVariant
     {
-        public IVariant Variant { get; }
-        public string HgvsgNotation { get; set; }
-        public IList<IAnnotatedRegulatoryRegion> RegulatoryRegions { get; } = new List<IAnnotatedRegulatoryRegion>();
-        public IList<IAnnotatedTranscript> Transcripts { get; } = new List<IAnnotatedTranscript>();
-        public IList<IAnnotatedSaDataSource> SupplementaryAnnotations { get; } = new List<IAnnotatedSaDataSource>();
-        public IList<ISupplementaryAnnotation> SaList { get; } = new List<ISupplementaryAnnotation>();
-        public double? PhylopScore { get; set; }
-        public IList<IPluginData> PluginDataSet { get; } = new List<IPluginData>();
+        public IVariant                        Variant                  { get; }
+        public string                          HgvsgNotation            { get; set; }
+        public List<AnnotatedRegulatoryRegion> RegulatoryRegions        { get; } = new();
+        public List<AnnotatedTranscript>       Transcripts              { get; } = new();
+        public List<IAnnotatedSaDataSource>    SupplementaryAnnotations { get; } = new();
+        public List<ISupplementaryAnnotation>  SaList                   { get; } = new();
+        public double?                         PhylopScore              { get; set; }
 
         public AnnotatedVariant(IVariant variant) => Variant = variant;
 
@@ -53,11 +52,6 @@ namespace VariantAnnotation.AnnotatedPositions
             foreach (ISupplementaryAnnotation saItem in SaList)
             {
                 jsonObject.AddObjectValue(saItem.JsonKey, saItem);
-            }
-
-            foreach (var pluginData in PluginDataSet)
-            {
-                jsonObject.AddStringValue(pluginData.Name, pluginData.GetJsonString(), false);
             }
 
             if (Transcripts?.Count > 0) jsonObject.AddObjectValues("transcripts", Transcripts);

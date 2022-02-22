@@ -8,12 +8,12 @@ namespace SAUtils.DataStructures
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public VariantType VariantType { get; }
 
         private readonly string _jsonString;
 
-        public MitoMapSvItem(IChromosome chromosome, int start, int end, VariantType variantType, string jsonString)
+        public MitoMapSvItem(Chromosome chromosome, int start, int end, VariantType variantType, string jsonString)
         {
             Chromosome = chromosome;
             Start = start;

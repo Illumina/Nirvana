@@ -2,7 +2,7 @@
 using System.IO;
 using IO;
 using OptimizedCore;
-using VariantAnnotation.Providers;
+using Versioning;
 
 namespace SAUtils.InputFileParsers
 {
@@ -92,7 +92,7 @@ namespace SAUtils.InputFileParsers
                 Console.ResetColor();
             }
 
-            return new DataSourceVersion(name, version, DateTime.Parse(date).Ticks, description);
+            return new DataSourceVersion(name, description, version, DateTime.Parse(date).Ticks);
         }
     }
 }

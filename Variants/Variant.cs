@@ -4,7 +4,7 @@ namespace Variants
 {
     public sealed class Variant : IVariant
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }
         public string RefAllele { get; }
@@ -18,7 +18,7 @@ namespace Variants
 	    public IBreakEnd[] BreakEnds { get; }
 	    public AnnotationBehavior Behavior { get; }
 
-        public Variant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        public Variant(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             VariantType variantType, string variantId, bool isRefMinor, bool isDecomposed, bool isRecomposed, string[] linkedVids, IBreakEnd[] breakEnds,
             AnnotationBehavior behavior)
         {

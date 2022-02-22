@@ -208,6 +208,7 @@ namespace UnitTests.Jasix
             using (var writer = new StreamWriter(outStream, Encoding.UTF8, 512, true))
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream, writer))
             {
+                writer.NewLine = "\r\n";
                 qp.PrintChromosomeList();
             }
 
@@ -230,6 +231,7 @@ namespace UnitTests.Jasix
             using (var writer = new StreamWriter(outStream, Encoding.UTF8, 512, true))
             using (var qp = new QueryProcessor(new StreamReader(readStream), indexStream, writer))
             {
+                writer.NewLine = "\r\n";
                 qp.PrintHeaderOnly();
             }
 

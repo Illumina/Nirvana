@@ -1,7 +1,6 @@
 ﻿using System.Text;
+using JSON;
 using OptimizedCore;
-using VariantAnnotation.Interface.IO;
-using VariantAnnotation.IO;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO
@@ -141,36 +140,6 @@ namespace UnitTests.VariantAnnotation.IO
             var json = new JsonObject(sb);
 
             json.AddStringValues("test1", null);
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
-
-            Assert.Equal(string.Empty, observedResult);
-        }
-
-        [Fact]
-        public void AddIntValues_TwoTimes()
-        {
-            var sb = StringBuilderCache.Acquire();
-            var json = new JsonObject(sb);
-
-            var ints = new[] { 1, 2, 3 };
-            var ints2 = new[] { 4, 5, 6 };
-
-            json.AddIntValues("test1", ints);
-            json.AddIntValues("test2", ints2);
-
-            const string expectedResult = "\"test1\":[1,2,3],\"test2\":[4,5,6]";
-            var observedResult = StringBuilderCache.GetStringAndRelease(sb);
-
-            Assert.Equal(expectedResult, observedResult);
-        }
-
-        [Fact]
-        public void AddIntValues_NullArray()
-        {
-            var sb = StringBuilderCache.Acquire();
-            var json = new JsonObject(sb);
-
-            json.AddIntValues("test1", null);
             var observedResult = StringBuilderCache.GetStringAndRelease(sb);
 
             Assert.Equal(string.Empty, observedResult);

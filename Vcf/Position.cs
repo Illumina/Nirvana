@@ -12,7 +12,7 @@ namespace Vcf
 {
     public sealed class Position : IPosition
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }        
         public string RefAllele { get; }
@@ -26,7 +26,7 @@ namespace Vcf
         public bool[] IsDecomposed { get; }
         public bool IsRecomposed { get; }
 
-        public Position(IChromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
+        public Position(Chromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
             double? quality, string[] filters, IVariant[] variants, ISample[] samples, IInfoData infoData,
             string[] vcfFields, bool[] isDecomposed, bool isRecomposed)
         {
@@ -45,7 +45,7 @@ namespace Vcf
             IsRecomposed = isRecomposed;
         }
 
-        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, VariantFactory variantFactory)
+        public static Position ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, VariantFactory variantFactory)
         {
             if (simplePosition == null) return null;
             
@@ -76,7 +76,7 @@ namespace Vcf
                 simplePosition.IsRecomposed);
         }
 
-        private static IPosition GetReferencePosition(ISimplePosition simplePosition)
+        private static Position GetReferencePosition(ISimplePosition simplePosition)
         {
             return new Position(simplePosition.Chromosome, simplePosition.Start, simplePosition.Start, simplePosition.RefAllele,
                 simplePosition.AltAlleles, null, null, null, null, null, simplePosition.VcfFields, simplePosition.IsDecomposed,

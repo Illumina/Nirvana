@@ -104,7 +104,7 @@ namespace Vcf.Sample
         {
             if (s == null) return null;
             (int number, bool foundError) = s.OptimizedParseInt32();
-            return foundError ? null : (int?)number;
+            return foundError ? null : number;
         }
 
         private static int[] GetIntegers(string s)

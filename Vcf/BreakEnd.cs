@@ -8,7 +8,7 @@ namespace Vcf
         public IBreakEndPiece Piece1 { get; }
         public IBreakEndPiece Piece2 { get; }
 
-        public BreakEnd(IChromosome chromosome, IChromosome chromosome2, int position, int position2, bool isSuffix,
+        public BreakEnd(Chromosome chromosome, Chromosome chromosome2, int position, int position2, bool isSuffix,
             bool isSuffix2)
         {
             char orientation1 = isSuffix ? '-' : '+';
@@ -23,12 +23,12 @@ namespace Vcf
 
     public sealed class BreakEndPiece : IBreakEndPiece
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; }
         public bool IsSuffix { get; }
         public char Orientation { get; }
 
-        public BreakEndPiece(IChromosome chromosome, int position, bool isSuffix, char orientation)
+        public BreakEndPiece(Chromosome chromosome, int position, bool isSuffix, char orientation)
         {
             Chromosome  = chromosome;
             Position    = position;

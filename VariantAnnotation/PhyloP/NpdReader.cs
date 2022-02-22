@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
 using Genome;
 using IO;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 
 namespace VariantAnnotation.PhyloP
 {
@@ -18,7 +17,7 @@ namespace VariantAnnotation.PhyloP
         private readonly byte[] _scores;
         private readonly Zstandard _zstd;
 
-        private readonly ImmutableDictionary<byte, double> _scoreMap;
+        private readonly Dictionary<byte, double> _scoreMap;
 
         private readonly NpdIndex _index;
         public GenomeAssembly Assembly { get; }
@@ -41,14 +40,14 @@ namespace VariantAnnotation.PhyloP
                 scoreMap.Add(code, score);
             }
 
-            _scoreMap = scoreMap.ToImmutableDictionary();
+            _scoreMap = scoreMap;
             _zstd = new Zstandard();
             _scores = new byte[NpdIndex.MaxChromLength];
         }
 
-        private IChromosome _chromosome;
+        private Chromosome _chromosome;
         private int _lastPhylopPosition;
-        private void PreLoad(IChromosome chrom)
+        private void PreLoad(Chromosome chrom)
         {
             _chromosome = chrom;
             (long startLocation, int numBytes) = _index.GetFileRange(chrom.Index);
@@ -60,7 +59,7 @@ namespace VariantAnnotation.PhyloP
             
         }
 
-        public double? GetAnnotation(IChromosome chromosome, int position)
+        public double? GetAnnotation(Chromosome chromosome, int position)
         {
             if (_chromosome==null || chromosome.Index != _chromosome.Index) PreLoad(chromosome);
 

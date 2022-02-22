@@ -20,7 +20,7 @@ namespace SAUtils.CreateMitoMapDb
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly VariantAligner _variantAligner;
-        private readonly IChromosome _chromosome;
+        private readonly Chromosome _chromosome;
 
 
         private readonly HashSet<string> _mitoMapSvDataTypes = new HashSet<string>

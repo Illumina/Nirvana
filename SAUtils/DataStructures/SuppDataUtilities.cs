@@ -54,7 +54,7 @@ namespace SAUtils.DataStructures
             return values;
         }
 
-        public static ISupplementaryDataItem GetPositionalAnnotation(IList<ISupplementaryDataItem> saItems)
+        public static ISupplementaryDataItem GetPositionalAnnotation(List<ISupplementaryDataItem> saItems)
         {
             // all items in the list are assumed to be objects of the same implementation
             var firstItem = saItems[0];
@@ -70,7 +70,7 @@ namespace SAUtils.DataStructures
             return null;
         }
 
-        private static ISupplementaryDataItem GetConsensus(IList<ISupplementaryDataItem> saItems)
+        private static ISupplementaryDataItem GetConsensus(List<ISupplementaryDataItem> saItems)
         {
             //check consistancy
             string ancestralAllele = null;
@@ -88,7 +88,7 @@ namespace SAUtils.DataStructures
         }
 
         
-        private static ISupplementaryDataItem GetGlobalMinor(IList<ISupplementaryDataItem> saItems)
+        private static ISupplementaryDataItem GetGlobalMinor(List<ISupplementaryDataItem> saItems)
         {
             var alleleFreqDict = new Dictionary<string, double>();
 

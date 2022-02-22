@@ -35,18 +35,5 @@ namespace UnitTests.Intervals
             bool observedResult = interval1.Contains(interval2);
             Assert.True(observedResult);
         }
-
-        [Theory]
-        [InlineData(1, 3, 5, 7, -1, -1)]
-        [InlineData(1, 7, 5, 7, 5, 7)]
-        public void Intersects_TwoIntervals(int start1, int end1, int start2, int end2, int expectedStart,
-            int expectedEnd)
-        {
-            var interval         = new Interval(start1, end1);
-            var interval2        = new Interval(start2, end2);
-            var observedInterval = interval.Intersects(interval2);
-            Assert.Equal(expectedStart, observedInterval.Start);
-            Assert.Equal(expectedEnd, observedInterval.End);
-        }
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using Genome;
-using Nirvana;
 using UnitTests.SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
+using VariantAnnotation;
 using Xunit;
 
 namespace UnitTests.Nirvana

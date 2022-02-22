@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using OptimizedCore;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
@@ -9,14 +8,14 @@ using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
-    public sealed class AnnotatedPosition : IAnnotatedPosition
+    public sealed class AnnotatedPosition
     {
         public IPosition Position { get; }
         public string CytogeneticBand { get; set; }
-        public IAnnotatedVariant[] AnnotatedVariants { get; }
-        public IList<ISupplementaryAnnotation> SupplementaryIntervals { get; } = new List<ISupplementaryAnnotation>();
+        public AnnotatedVariant[] AnnotatedVariants { get; }
+        public List<ISupplementaryAnnotation> SupplementaryIntervals { get; } = new List<ISupplementaryAnnotation>();
 
-        public AnnotatedPosition(IPosition position, IAnnotatedVariant[] annotatedVariants)
+        public AnnotatedPosition(IPosition position, AnnotatedVariant[] annotatedVariants)
         {
             Position          = position;
             AnnotatedVariants = annotatedVariants;
@@ -77,7 +76,7 @@ namespace VariantAnnotation.AnnotatedPositions
             return StringBuilderCache.GetStringAndRelease(sb);
         }
 
-        private static bool IsStructVariant(IAnnotatedVariant annotatedVariant) =>
+        private static bool IsStructVariant(AnnotatedVariant annotatedVariant) =>
             annotatedVariant.Variant.Behavior.StructuralVariantConsequence;
 
         private bool IsShortTandemRepeat()

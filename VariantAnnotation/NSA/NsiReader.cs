@@ -5,12 +5,11 @@ using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
 using IO;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Variants;
+using Versioning;
 
 namespace VariantAnnotation.NSA
 {
@@ -20,7 +19,7 @@ namespace VariantAnnotation.NSA
         public IDataSourceVersion Version { get; }
         public string JsonKey { get; }
         public ReportFor ReportFor { get; }
-        private readonly Dictionary<ushort, IntervalArray<string>> _intervalArrays;
+        private readonly Dictionary<ushort, OldIntervalArray<string>> _intervalArrays;
 
         private const int MaxStreamLength = 10 * 1048576;
 
@@ -48,18 +47,18 @@ namespace VariantAnnotation.NSA
 
                 
                 int count = memReader.ReadOptInt32();
-                var suppIntervals = new Dictionary<ushort, List<Interval<string>>>();
+                var suppIntervals = new Dictionary<ushort, List<OldIntervalArray<string>.Interval>>();
                 for (var i = 0; i < count; i++)
                 {
                     var saInterval = new SuppInterval(memReader);
-                    if (suppIntervals.TryGetValue(saInterval.Chromosome.Index, out var intervals)) intervals.Add(new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()));
-                    else suppIntervals[saInterval.Chromosome.Index] = new List<Interval<string>> { new Interval<string>(saInterval.Start, saInterval.End, saInterval.GetJsonString()) };
+                    if (suppIntervals.TryGetValue(saInterval.Chromosome.Index, out var intervals)) intervals.Add(new OldIntervalArray<string>.Interval(saInterval.Start, saInterval.End, saInterval.GetJsonString()));
+                    else suppIntervals[saInterval.Chromosome.Index] = new List<OldIntervalArray<string>.Interval> { new(saInterval.Start, saInterval.End, saInterval.GetJsonString()) };
                 }
 
-                _intervalArrays = new Dictionary<ushort, IntervalArray<string>>(suppIntervals.Count);
-                foreach ((ushort chromIndex, List<Interval<string>> intervals) in suppIntervals)
+                _intervalArrays = new Dictionary<ushort, OldIntervalArray<string>>(suppIntervals.Count);
+                foreach ((ushort chromIndex, List<OldIntervalArray<string>.Interval> intervals) in suppIntervals)
                 {
-                    _intervalArrays[chromIndex] = new IntervalArray<string>(intervals.ToArray());
+                    _intervalArrays[chromIndex] = new OldIntervalArray<string>(intervals.ToArray());
                 }
             }
             

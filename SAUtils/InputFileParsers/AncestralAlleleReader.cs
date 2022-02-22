@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers
     public sealed class AncestralAlleleReader:IDisposable
     {
         private readonly StreamReader _streamReader;
-        private readonly IDictionary<string, IChromosome> _refNameDictionary;
+        private readonly Dictionary<string, Chromosome> _refNameDictionary;
         private readonly ISequenceProvider _sequenceProvider;
 
         private string _ancestralAllele;

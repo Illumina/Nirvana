@@ -208,7 +208,7 @@ namespace UnitTests.Vcf
             var refMinorProvider = new Mock<IRefMinorProvider>();
             //refMinorProvider.Setup(x => x.GetGlobalMajorAllele(chromosome, 13133)).Returns(null);
 
-            var refNameToChromosome = new Dictionary<string, IChromosome> { ["chr1"] = ChromosomeUtilities.Chr1 };
+            var refNameToChromosome = new Dictionary<string, Chromosome> { ["chr1"] = ChromosomeUtilities.Chr1 };
             var seqProvider = ParserTestUtils.GetSequenceProvider(13133, "T", 'A', refNameToChromosome);
             IPosition observedResult;
             using (var reader = FileUtilities.GetStreamReader(_ms))

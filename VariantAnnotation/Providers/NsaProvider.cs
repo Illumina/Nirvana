@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CommandLine.Utilities;
 using ErrorHandling.Exceptions;
 using Genome;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using Variants;
+using Versioning;
 
 namespace VariantAnnotation.Providers
 {
-    public sealed class NsaProvider : IAnnotationProvider
+    public sealed class NsaProvider : ISaAnnotationProvider
     {
         public string Name => "Supplementary annotation provider";
         public GenomeAssembly Assembly { get; }
@@ -57,14 +56,14 @@ namespace VariantAnnotation.Providers
             Assembly = distinctAssemblies[0];
         }
 
-        public void Annotate(IAnnotatedPosition annotatedPosition)
+        public void Annotate(AnnotatedPosition annotatedPosition)
         {
             if (_nsaReaders != null) AddSmallVariantAnnotations(annotatedPosition);
 
             if (_nsiReaders != null) GetStructuralVariantAnnotations(annotatedPosition);
         }
 
-        private void GetStructuralVariantAnnotations(IAnnotatedPosition annotatedPosition)
+        private void GetStructuralVariantAnnotations(AnnotatedPosition annotatedPosition)
         {
             var needSaIntervals = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaInterval);
             var needSmallAnnotation = annotatedPosition.AnnotatedVariants.Any(x => x.Variant.Behavior.NeedSaPosition);
@@ -83,7 +82,7 @@ namespace VariantAnnotation.Providers
 
         }
 
-        private void AddSmallVariantAnnotations(IAnnotatedPosition annotatedPosition)
+        private void AddSmallVariantAnnotations(AnnotatedPosition annotatedPosition)
         {
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
@@ -96,7 +95,7 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        private void AddLargeAnnotationsToSmallVariants(IAnnotatedVariant annotatedVariant)
+        private void AddLargeAnnotationsToSmallVariants(AnnotatedVariant annotatedVariant)
         {
             foreach (INsiReader nsiReader in _nsiReaders)
             {
@@ -109,7 +108,7 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        private void AddSmallAnnotations(IAnnotatedVariant annotatedVariant)
+        private void AddSmallAnnotations(AnnotatedVariant annotatedVariant)
         {
             foreach (INsaReader nsaReader in _nsaReaders)
             {
@@ -129,12 +128,12 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        private void AddPositionalAnnotation(IEnumerable<string> annotations, IAnnotatedVariant annotatedVariant, INsiReader nsiReader)
+        private void AddPositionalAnnotation(IEnumerable<string> annotations, AnnotatedVariant annotatedVariant, INsiReader nsiReader)
         {
             annotatedVariant.SaList.Add(new SupplementaryAnnotation(nsiReader.JsonKey, true, true, null, annotations));
         }
 
-        private static void AddPositionalAnnotation(IEnumerable<(string refAllele, string altAllele, string annotation)> annotations, IAnnotatedVariant annotatedVariant,
+        private static void AddPositionalAnnotation(IEnumerable<(string refAllele, string altAllele, string annotation)> annotations, AnnotatedVariant annotatedVariant,
             INsaReader nsaReader)
         {
             //e.g. ancestral allele, global minor allele
@@ -144,7 +143,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static void AddNonAlleleSpecificAnnotations(IEnumerable<(string refAllele, string altAllele, string annotation)> annotations, IVariant variant,
-            IAnnotatedVariant annotatedVariant, INsaReader nsaReader)
+            AnnotatedVariant annotatedVariant, INsaReader nsaReader)
         {
             var jsonStrings = new List<string>();
             foreach ((string refAllele, string altAllele, string jsonString) in annotations)
@@ -160,7 +159,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static void AddAlleleSpecificAnnotation(INsaReader nsaReader, IEnumerable<(string refAllele, string altAllele, string annotation)> annotations,
-            IAnnotatedVariant annotatedVariant, IVariant variant)
+            AnnotatedVariant annotatedVariant, IVariant variant)
         {
             if (nsaReader.IsArray)
             {
@@ -185,20 +184,18 @@ namespace VariantAnnotation.Providers
                 }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions)
+        public void PreLoad(Chromosome chromosome, List<int> positions)
         {
-            var benchmark = new Benchmark();
-            Console.Write("Pre-loading SA....");
+            // var benchmark = new Benchmark();
+            // Console.Write("Pre-loading SA....");
 
             foreach (INsaReader nsaReader in _nsaReaders)
             {
                 nsaReader.PreLoad(chromosome, positions);
             }
 
-            var totalTime = benchmark.GetElapsedTime();
-            //var rate = totalBytes * 1.0 / (totalTime.TotalSeconds * 1_000_000);// MB/sec
-            Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");//. Data rate {rate:#.##} MB/sec");
-            //Console.WriteLine($"No of http stream sources created {HttpStreamSource.Count}");
+            // var totalTime = benchmark.GetElapsedTime();
+            // Console.WriteLine($"{Benchmark.ToHumanReadable(totalTime)}");//. Data rate {rate:#.##} MB/sec");
         }
     }
 }

@@ -64,7 +64,7 @@ namespace SAUtils.CreateOneKgDb
             string outFileName = $"{version.Name}_{version.Version}".Replace(' ','_');
             using (var oneKGenReader = new OneKGenReader(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             using (var writer = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.OneKgenTag, true, false, SaCommon.SchemaVersion, false))
             {
                 writer.Write(oneKGenReader.GetItems());

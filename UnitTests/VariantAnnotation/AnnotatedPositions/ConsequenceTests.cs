@@ -1,6 +1,6 @@
 ﻿using Moq;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.AnnotatedPositions.Consequence;
-using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 using Xunit;
@@ -82,8 +82,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             cache.Add(ConsequenceTag.intron_variant, true);
             cache.Add(ConsequenceTag.NMD_transcript_variant, true);
             cache.Add(ConsequenceTag.non_coding_transcript_variant, true);
-
-
+            
             var simpleVariant = new Mock<ISimpleVariant>();
             simpleVariant.SetupGet(x => x.RefAllele).Returns("G");
             simpleVariant.SetupGet(x => x.AltAllele).Returns("C");

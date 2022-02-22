@@ -47,7 +47,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
         private readonly string _fileName;
 		private readonly ISequenceProvider _sequenceProvider;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
 
         private string _lastClinvarAccession;
         #endregion
@@ -541,7 +541,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 
 
-        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, IChromosome> refChromDict)
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, Dictionary<string, Chromosome> refChromDict)
         {
 		    if (xElement == null ) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />

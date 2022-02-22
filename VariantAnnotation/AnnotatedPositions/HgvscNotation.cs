@@ -1,20 +1,6 @@
 ﻿namespace VariantAnnotation.AnnotatedPositions
 {
-    public sealed class PositionOffset
-    {
-        public readonly int Position;
-        public readonly int Offset;
-        public readonly string Value;
-        public readonly bool HasStopCodonNotation;
-
-        public PositionOffset(int position, int offset, string value, bool hasStopCodonNotation)
-        {
-            Position             = position;
-            Offset               = offset;
-            Value                = value;
-            HasStopCodonNotation = hasStopCodonNotation;
-        }
-    }
+    public sealed record PositionOffset(int Position, int Offset, string Value, bool HasStopCodonNotation);
 
     public sealed class HgvscNotation
     {
@@ -33,11 +19,12 @@
         private const char CodingType    = 'c';
         private const char NonCodingType = 'n';
 
-        public HgvscNotation(string referenceBases, string alternateBases, string transcriptId, GenomicChange changeType, PositionOffset start, PositionOffset end, bool isCoding)
+        public HgvscNotation(string referenceBases, string alternateBases, string transcriptId,
+            GenomicChange changeType, PositionOffset start, PositionOffset end, bool isCoding)
         {
             _transcriptId = transcriptId;
             _start        = start;
-            _end          = end;            
+            _end          = end;
             _type         = changeType;
 
             SwapEndpoints();
@@ -48,12 +35,6 @@
             _transcriptType = isCoding ? CodingType : NonCodingType;
         }
 
-        /// <summary>
-        /// HGVS aligns changes 3' 
-        /// e.g. given a ATG/- deletion in C[ATG]ATGT, we want to move to: CATG[ATG]T
-        ///      given a   A/- deletion in  TA[A]AAAA, we want to move to:  TAAAAA[A]
-        ///      given a  AA/- deletion in  TA[AA]AAA, we want to move to:  TAAAA[AA]
-        /// </summary>
         private void SwapEndpoints()
         {
             if (_start.Position <= _end.Position &&

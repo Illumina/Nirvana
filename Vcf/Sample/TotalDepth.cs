@@ -34,7 +34,7 @@ namespace Vcf.Sample
             if (intermediateSampleFields.FormatIndices.DPI == null || intermediateSampleFields.SampleColumns.Length <= intermediateSampleFields.FormatIndices.DPI.Value) return null;
             string depth = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.DPI.Value];
             (int number, bool foundError) = depth.OptimizedParseInt32();
-            return foundError ? null : (int?)number;
+            return foundError ? null : number;
         }
 
         private static int? GetTotalDepthUsingDp(IntermediateSampleFields intermediateSampleFields)
@@ -42,7 +42,7 @@ namespace Vcf.Sample
             if (intermediateSampleFields.FormatIndices.DP == null || intermediateSampleFields.SampleColumns.Length <= intermediateSampleFields.FormatIndices.DP.Value) return null;
             string depth = intermediateSampleFields.SampleColumns[intermediateSampleFields.FormatIndices.DP.Value];
             (int number, bool foundError) = depth.OptimizedParseInt32();
-            return foundError ? null : (int?)number;
+            return foundError ? null : number;
         }
     }
 }

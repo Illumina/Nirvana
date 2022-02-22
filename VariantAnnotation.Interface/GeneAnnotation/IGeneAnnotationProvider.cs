@@ -2,7 +2,7 @@
 
 namespace VariantAnnotation.Interface.GeneAnnotation
 {
-    public interface IGeneAnnotationProvider:IProvider
+    public interface IGeneAnnotationProvider : IProvider
     {
         string Annotate(string geneName);
     }

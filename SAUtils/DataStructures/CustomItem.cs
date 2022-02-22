@@ -9,7 +9,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class CustomItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -18,7 +18,7 @@ namespace SAUtils.DataStructures
         private readonly SaJsonSchema _jsonSchema;
         private readonly string _inputLine;
 
-        public CustomItem(IChromosome chromosome, int start, string refAllele, string altAllele, string[][] values, SaJsonSchema jsonSchema, string inputLine)
+        public CustomItem(Chromosome chromosome, int start, string refAllele, string altAllele, string[][] values, SaJsonSchema jsonSchema, string inputLine)
         {
             Chromosome = chromosome;
             Position = start;

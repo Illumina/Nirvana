@@ -1,6 +1,6 @@
 ﻿namespace Genome
 {
-	public struct Band
+	public readonly struct Band
 	{
 		public readonly int Begin;
 		public readonly int End;

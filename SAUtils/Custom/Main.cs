@@ -12,6 +12,7 @@ using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 
 namespace SAUtils.Custom
 {
@@ -70,11 +71,11 @@ namespace SAUtils.Custom
 
             using (var customReader = CustomAnnotationsParser.Create(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider.RefNameToChromosome))
             using (var nsaStream   = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))            
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outputPrefix + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))            
             using (var nsaWriter = new NsaWriter(
                                 new ExtendedBinaryWriter(nsaStream),
                                 new ExtendedBinaryWriter(indexStream),
-                                version = new DataSourceVersion(customReader.JsonTag, GetInputFileName(_inputFile), DateTime.Now.Ticks),
+                                version = new DataSourceVersion(customReader.JsonTag, null, GetInputFileName(_inputFile), DateTime.Now.Ticks),
                                 referenceProvider,
                                 customReader.JsonTag,
                                 false,  // match by allele

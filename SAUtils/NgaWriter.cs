@@ -4,7 +4,7 @@ using System.IO;
 using Compression.Algorithms;
 using IO;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Providers;
+using Versioning;
 
 namespace SAUtils
 {

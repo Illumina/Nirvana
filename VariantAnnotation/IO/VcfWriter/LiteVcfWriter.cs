@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using OptimizedCore;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Providers;
+using Versioning;
 
 namespace VariantAnnotation.IO.VcfWriter
 {
@@ -54,8 +53,8 @@ namespace VariantAnnotation.IO.VcfWriter
         }
 
         public LiteVcfWriter(StreamWriter vcfWriter, IEnumerable<string> headerLines,
-            IAnnotationResources annotationResources) : this(vcfWriter, headerLines,
-            annotationResources.AnnotatorVersionTag, annotationResources.VepDataVersion,
+            AnnotationResources annotationResources) : this(vcfWriter, headerLines,
+            annotationResources.AnnotatorVersionTag, annotationResources.DataVersion,
             annotationResources.DataSourceVersions)
         { }
 

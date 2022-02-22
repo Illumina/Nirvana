@@ -7,7 +7,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class GlobalMinorItem:ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -15,7 +15,7 @@ namespace SAUtils.DataStructures
         private readonly string _allele;
         private readonly double _frequency;
 
-        public GlobalMinorItem(IChromosome chromosome, int position, string allele, double frequency)
+        public GlobalMinorItem(Chromosome chromosome, int position, string allele, double frequency)
         {
             Chromosome = chromosome;
             Position   = position;

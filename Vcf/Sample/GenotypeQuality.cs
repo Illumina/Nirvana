@@ -17,7 +17,7 @@ namespace Vcf.Sample
             string gq = intermediateSampleFields.SampleColumns[gqIndex];
 
             (int number, bool foundError) = gq.OptimizedParseInt32();
-            return foundError ? null : (int?)number;
+            return foundError ? null : number;
         }
     }
 }

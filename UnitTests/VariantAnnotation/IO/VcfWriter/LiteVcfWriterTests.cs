@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using IO;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO.VcfWriter;
-using VariantAnnotation.Providers;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.IO.VcfWriter
@@ -48,10 +47,11 @@ namespace UnitTests.VariantAnnotation.IO.VcfWriter
 
             var dataSourceVersions = new IDataSourceVersion[]
             {
-                new DataSourceVersion("VEP", "84", DateTime.Parse("2017/7/21").Ticks, "RefSeq"),
-                new DataSourceVersion("1000 Genomes Project", "v5", DateTime.Parse("2017/7/21").Ticks),
-                new DataSourceVersion("dbSNP", "72", DateTime.Parse("2017/8/15").Ticks),
-                new DataSourceVersion("dummy", "2", DateTime.Parse("2017/9/15").Ticks) //should not showing in output
+                new DataSourceVersion("VEP", "RefSeq", "84", DateTime.Parse("2017/7/21").Ticks),
+                new DataSourceVersion("1000 Genomes Project", null, "v5", DateTime.Parse("2017/7/21").Ticks),
+                new DataSourceVersion("dbSNP", null, "72", DateTime.Parse("2017/8/15").Ticks),
+                new DataSourceVersion("dummy", null, "2",
+                    DateTime.Parse("2017/9/15").Ticks) //should not show in output
             };
 
             const string vcfLine = "1       10167   .       C       A       4       LowGQXHetSNP    SNVSB=0.0;SNVHPOL=3;CSQT=1|DDX11L1|ENST00000456328.2|upstream_gene_variant,1|WASH7P|ENST00000438504.2|downstream_gene_variant,1|DDX11L1|NR_046018.2|upstream_gene_variant,1|WASH7P|NR_024540.1|downstream_gene_variant;CSQR=1|ENSR00001576074|regulatory_region_variant,1|ENSR00001576074|regulatory_region_variant     GT:GQ:GQX:DP:DPF:AD     0/1:34:8:3:0:2,1";

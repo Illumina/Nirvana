@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using VariantAnnotation.Interface.IO;
+using JSON;
 
 namespace VariantAnnotation.IO
 {

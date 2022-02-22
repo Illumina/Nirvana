@@ -10,7 +10,7 @@ namespace Vcf.VariantCreator
 		public static readonly AnnotationBehavior CnvBehavior = new AnnotationBehavior(false, true, true, false, true);
 	    private const string CnvTag = "<CNV>";
 
-		public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
+		public static IVariant Create(Chromosome chromosome, int start, string refAllele, string altAllele, IInfoData infoData)
 		{
 			start++;
 
@@ -35,7 +35,7 @@ namespace Vcf.VariantCreator
 	        if (altAllele == CnvTag) return null;
 
 	        (int number, bool foundError) = altAllele.Trim('<', '>').Substring(2).OptimizedParseInt32();
-	        return foundError ? null : (int?)number;
+	        return foundError ? null : number;
         }
 
 	    private static string GetVid(string ensemblName, int start, int end, int? copyNumber)

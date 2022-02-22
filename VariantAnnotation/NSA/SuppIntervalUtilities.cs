@@ -1,7 +1,7 @@
 ﻿using System;
 using Genome;
+using Intervals;
 using Variants;
-using static Intervals.Utilities;
 
 namespace VariantAnnotation.NSA
 {
@@ -15,7 +15,7 @@ namespace VariantAnnotation.NSA
             //skip for break-ends
             if (variant.Type == VariantType.translocation_breakend) return (null, null);
 
-            if (!Overlaps(saInterval.Start, saInterval.End, variant.Start, variant.End)) return (null, null);
+            if (!IntervalUtilities.Overlaps(saInterval.Start, saInterval.End, variant.Start, variant.End)) return (null, null);
 
             var overlapSize = (double) (Math.Min(saInterval.End, variant.End) - Math.Max(saInterval.Start, variant.Start) + 1);
             int annoSize = saInterval.End - saInterval.Start + 1;

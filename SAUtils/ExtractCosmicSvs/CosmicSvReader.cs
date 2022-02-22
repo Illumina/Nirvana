@@ -2,27 +2,28 @@
 using System.Collections.Generic;
 using System.IO;
 using Genome;
-using VariantAnnotation.Providers;
+using Versioning;
 
 namespace SAUtils.ExtractCosmicSvs
 {
-    public sealed class CosmicSvReader:IDisposable
+    public sealed class CosmicSvReader : IDisposable
     {
-        private readonly Stream _cnvStream;
-        private readonly Stream _breakendStream;
-        private readonly DataSourceVersion _version;
-        private readonly string _outputDirectory;
-        private readonly GenomeAssembly _genomeAssembly;
-        private readonly IDictionary<string, IChromosome> _refNameToChorm;
+        private readonly Stream                         _cnvStream;
+        private readonly Stream                         _breakendStream;
+        private readonly DataSourceVersion              _version;
+        private readonly string                         _outputDirectory;
+        private readonly GenomeAssembly                 _genomeAssembly;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
 
-        public CosmicSvReader(Stream cnvStream, Stream breakendStream, DataSourceVersion version, string outputDir, GenomeAssembly assembly, IDictionary<string, IChromosome> refNameToChromosome)
+        public CosmicSvReader(Stream cnvStream, Stream breakendStream, DataSourceVersion version, string outputDir,
+            GenomeAssembly assembly, Dictionary<string, Chromosome> refNameToChromosome)
         {
-            _cnvStream       = cnvStream;
-            _breakendStream  = breakendStream;
-            _version         = version;
-            _outputDirectory = outputDir;
-            _genomeAssembly  = assembly;
-            _refNameToChorm  = refNameToChromosome;
+            _cnvStream           = cnvStream;
+            _breakendStream      = breakendStream;
+            _version             = version;
+            _outputDirectory     = outputDir;
+            _genomeAssembly      = assembly;
+            _refNameToChromosome = refNameToChromosome;
         }
 
         //public void CreateTsv()

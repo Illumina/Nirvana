@@ -63,7 +63,7 @@ namespace SAUtils.PhyloP
 
             using (var phylopParser = new PhylopParser(GZipUtilities.GetAppropriateReadStream(_inputFile), referenceProvider.Assembly, referenceProvider.RefNameToChromosome))
             using (var nsaStream    = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.PhylopFileSuffix)))
-            using (var indexStream  = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.PhylopFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream  = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.PhylopFileSuffix + SaCommon.IndexSuffix)))
             using (var writer       = new NpdWriter(nsaStream, indexStream, version, referenceProvider.Assembly, SaCommon.PhylopTag, SaCommon.SchemaVersion))
             {
                 writer.Write(phylopParser.GetItems());

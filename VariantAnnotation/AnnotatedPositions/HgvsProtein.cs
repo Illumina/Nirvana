@@ -2,7 +2,6 @@
 using System.Buffers;
 using Genome;
 using VariantAnnotation.AnnotatedPositions.AminoAcids;
-using VariantAnnotation.AnnotatedPositions.Transcript;
 using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
@@ -339,7 +338,7 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             ArrayPool<char>    charPool   = ArrayPool<char>.Shared;
             ReadOnlySpan<char> beforeSpan = cdsSpan.Slice(0, cdsBegin - 1);
-            ReadOnlySpan<char> afterSpan  = cdsEnd < cdsSpan.Length ? cdsSpan.Slice(cdsEnd) : "";
+            ReadOnlySpan<char> afterSpan  = cdsSpan.Slice(cdsEnd);
 
             ReadOnlySpan<char> altAlleleSpan = altAllele.AsSpan();
             int                altAlleleLen  = altAllele.Length;
@@ -367,7 +366,7 @@ namespace VariantAnnotation.AnnotatedPositions
         {
             ReadOnlySpan<char> aaSpan       = aaSequence.AsSpan().Slice(aaBegin - 1);
             int                termCodonPos = aaSpan.IndexOf(AminoAcidCommon.StopCodon);
-            return termCodonPos == -1 ? (int?) null : termCodonPos;
+            return termCodonPos == -1 ? null : termCodonPos;
         }
 
         // according to https://varnomen.hgvs.org/recommendations/checklist/#:~:text=The%203'%20rule, this should be

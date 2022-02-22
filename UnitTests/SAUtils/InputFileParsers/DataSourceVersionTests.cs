@@ -3,7 +3,7 @@ using IO;
 using OptimizedCore;
 using SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Providers;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils.InputFileParsers

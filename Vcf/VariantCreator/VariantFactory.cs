@@ -13,7 +13,7 @@ namespace Vcf.VariantCreator
 {
     public sealed class VariantFactory
     {
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly ISequenceProvider _sequenceProvider;
         private const string StrPrefix = "<STR";
 
@@ -38,7 +38,7 @@ namespace Vcf.VariantCreator
             altAllele.OptimizedStartsWith('<') && altAllele.OptimizedEndsWith('>') &&
             !VcfCommon.NonInformativeAltAllele.Contains(altAllele);
 
-        public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
+        public IVariant[] CreateVariants(Chromosome chromosome, int start, int end, string refAllele,
             string[] altAlleles, IInfoData infoData, bool[] isDecomposed, bool isRecomposed, string globalMajorAllele)
         {
             string firstAltAllele = altAlleles[0];
@@ -80,7 +80,7 @@ namespace Vcf.VariantCreator
             return informativeAltAlleles;
         }
 
-        private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        private IVariant GetVariant(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             IInfoData infoData, VariantCategory category, bool isDecomposedVar, bool isRecomposed, string globalMajorAllele)
         {
             switch (category)
@@ -103,7 +103,7 @@ namespace Vcf.VariantCreator
             }
         }
 
-        internal IBreakEnd[] GetTranslocationBreakends(IChromosome chromosome1, string refAllele, string altAllele, int position1)
+        internal IBreakEnd[] GetTranslocationBreakends(Chromosome chromosome1, string refAllele, string altAllele, int position1)
         {
             var breakendInfo = ParseBreakendAltAllele(refAllele, altAllele);
             return new IBreakEnd[] { new BreakEnd(chromosome1, breakendInfo.Chromosome2, position1, breakendInfo.Position2, breakendInfo.IsSuffix1, breakendInfo.IsSuffix2) };
@@ -161,7 +161,7 @@ namespace Vcf.VariantCreator
         /// <summary>
 		/// parses the alternate allele
 		/// </summary>
-		private (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(string refAllele, string altAllele)
+		private (Chromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(string refAllele, string altAllele)
         {
             string referenceName2;
             int position2;

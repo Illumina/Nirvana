@@ -1,10 +1,10 @@
-﻿using VariantAnnotation.Interface.AnnotatedPositions;
+﻿using Cache.Data;
 
 namespace VariantAnnotation.Caches.DataStructures
 {
     public static class TranscriptRegionExtensions
     {
-        public static int BinarySearch(this ITranscriptRegion[] regions, int position)
+        public static int BinarySearch(this TranscriptRegion[] regions, int position)
         {
             var begin = 0;
             var end   = regions.Length - 1;
@@ -23,7 +23,7 @@ namespace VariantAnnotation.Caches.DataStructures
         }
 
         public static (int ExonStart, int ExonEnd, int IntronStart, int IntronEnd) GetExonsAndIntrons(
-            this ITranscriptRegion[] regions, int startIndex, int endIndex)
+            this TranscriptRegion[] regions, int startIndex, int endIndex)
         {
             int affectedStartIndex = GetAffectedRegionIndex(startIndex);
             int affectedEndIndex   = GetAffectedRegionIndex(endIndex);
@@ -34,7 +34,7 @@ namespace VariantAnnotation.Caches.DataStructures
             return (exons.Start, exons.End, introns.Start, introns.End);
         }
 
-        private static (int Start, int End) FindDesiredRegionIds(this ITranscriptRegion[] regions,
+        private static (int Start, int End) FindDesiredRegionIds(this TranscriptRegion[] regions,
             TranscriptRegionType desiredType, int startIndex, int endIndex)
         {
             var regionStart   = FindFirst(regions, desiredType, startIndex, endIndex);
@@ -48,14 +48,14 @@ namespace VariantAnnotation.Caches.DataStructures
             return (startId, endId);
         }
 
-        private static int FindFirst(ITranscriptRegion[] regions, TranscriptRegionType desiredType, int startIndex,
+        private static int FindFirst(TranscriptRegion[] regions, TranscriptRegionType desiredType, int startIndex,
             int endIndex)
         {
             for (int i = startIndex; i <= endIndex; i++) if (regions[i].Type == desiredType) return i;
             return -1;
         }
 
-        private static int FindLast(ITranscriptRegion[] regions, TranscriptRegionType desiredType, int startIndex,
+        private static int FindLast(TranscriptRegion[] regions, TranscriptRegionType desiredType, int startIndex,
             int endIndex)
         {
             for (int i = endIndex; i >= startIndex; i--) if (regions[i].Type == desiredType) return i;

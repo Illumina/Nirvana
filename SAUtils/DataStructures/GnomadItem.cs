@@ -10,7 +10,7 @@ namespace SAUtils.DataStructures
     public sealed class GnomadItem : ISupplementaryDataItem
     {
         #region members
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -49,7 +49,7 @@ namespace SAUtils.DataStructures
 
         #endregion
 
-        public GnomadItem(IChromosome chromosome,
+        public GnomadItem(Chromosome chromosome,
             int position,
             string refAllele,
             string alternateAllele,

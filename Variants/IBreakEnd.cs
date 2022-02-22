@@ -10,7 +10,7 @@ namespace Variants
 
     public interface IBreakEndPiece
     {
-        IChromosome Chromosome { get; }
+        Chromosome Chromosome { get; }
         int Position { get; }
         // true means from position to end, false means from 1 to position
         bool IsSuffix { get; }

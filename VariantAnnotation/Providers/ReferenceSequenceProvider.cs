@@ -2,34 +2,33 @@
 using System.IO;
 using Genome;
 using Intervals;
+using ReferenceSequence.IO;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Sequence;
+using Versioning;
 
 namespace VariantAnnotation.Providers
 {
     public sealed class ReferenceSequenceProvider : ISequenceProvider
     {
-        public IDictionary<string, IChromosome> RefNameToChromosome => _sequenceReader.RefNameToChromosome;
-        public IDictionary<ushort, IChromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
-        public GenomeAssembly Assembly => _sequenceReader.Assembly;
-        public ISequence Sequence { get; }
+        public Dictionary<string, Chromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
+        public Chromosome[]                   Chromosomes          => _sequenceReader.Chromosomes;
+        public GenomeAssembly                 Assembly             => _sequenceReader.Assembly;
+        public ISequence                      Sequence             { get; }
 
         public string Name { get; } = "Reference sequence provider";
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; } = null;
 
-        private IChromosome _currentChromosome;
+        private          Chromosome               _currentChromosome = Chromosome.GetEmpty("bob");
         private readonly CompressedSequenceReader _sequenceReader;
 
         public ReferenceSequenceProvider(Stream stream)
         {
-            _currentChromosome = new EmptyChromosome(string.Empty);
-            _sequenceReader    = new CompressedSequenceReader(stream);
-            Sequence           = _sequenceReader.Sequence;
+            _sequenceReader = new CompressedSequenceReader(stream);
+            Sequence        = _sequenceReader.Sequence;
         }
 
-        public void Annotate(IAnnotatedPosition annotatedPosition)
+        public void Annotate(AnnotatedPosition annotatedPosition)
         {
             if (annotatedPosition.AnnotatedVariants == null) return;
 
@@ -43,9 +42,7 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions) => throw new System.NotImplementedException();
-
-        public void LoadChromosome(IChromosome chromosome)
+        public void LoadChromosome(Chromosome chromosome)
         {
             if (chromosome.Index == _currentChromosome.Index) return;
             _sequenceReader.GetCompressedSequence(chromosome);

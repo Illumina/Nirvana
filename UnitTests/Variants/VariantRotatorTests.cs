@@ -1,8 +1,7 @@
 ﻿using Genome;
-using Moq;
+using Intervals;
 using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 using Xunit;
 
@@ -19,14 +18,10 @@ namespace UnitTests.Variants
         public void Right_Deletion_ForwardStrand()
         {
             // chr1	966391	.	ATG	A	2694.00	PASS	.
-            var variant = GetDeletion();
+            var       variant            = GetDeletion();
+            IInterval transcriptInterval = new Interval(966300, 966405);
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Start).Returns(966300);
-            transcript.SetupGet(x => x.End).Returns(966405);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
-
-            var rotatedVariant = VariantRotator.Right(variant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            var rotatedVariant = VariantRotator.Right(variant, transcriptInterval, _refSequence, false);
 
             Assert.False(ReferenceEquals(variant, rotatedVariant));
             Assert.Equal(966400, rotatedVariant.Start);
@@ -38,12 +33,8 @@ namespace UnitTests.Variants
         {
             var variant = new SimpleVariant(ChromosomeUtilities.Chr1, 966399, 966401, "TG", "", VariantType.deletion);
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Start).Returns(966300);
-            transcript.SetupGet(x => x.End).Returns(966405);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
-
-            var rotatedVariant = VariantRotator.Right(variant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            IInterval transcriptInterval = new Interval(966300, 966405);
+            var       rotatedVariant     = VariantRotator.Right(variant, transcriptInterval, _refSequence, true);
 
             Assert.False(ReferenceEquals(variant, rotatedVariant));
             Assert.Equal(966393, rotatedVariant.Start);
@@ -55,12 +46,8 @@ namespace UnitTests.Variants
         {
             var variant = GetInsertion();
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Start).Returns(966300);
-            transcript.SetupGet(x => x.End).Returns(966405);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
-
-            var rotated = VariantRotator.Right(variant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
+            IInterval transcriptInterval = new Interval(966300, 966405);
+            var       rotated            = VariantRotator.Right(variant, transcriptInterval, _refSequence, false);
 
             Assert.False(ReferenceEquals(variant, rotated));
             Assert.Equal(966403, rotated.Start);
@@ -78,7 +65,8 @@ namespace UnitTests.Variants
         [Fact]
         public void Right_Identity_WhenNotInsertionOrDeletion()
         {
-            var originalVariant = new SimpleVariant(ChromosomeUtilities.Chr1, 966392, 966392, "T", "A", VariantType.SNV);
+            var originalVariant =
+                new SimpleVariant(ChromosomeUtilities.Chr1, 966392, 966392, "T", "A", VariantType.SNV);
             var rotated = VariantRotator.Right(originalVariant, null, _refSequence, false);
             Assert.True(ReferenceEquals(originalVariant, rotated));
         }
@@ -88,11 +76,9 @@ namespace UnitTests.Variants
         {
             var originalVariant = GetDeletion();
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Start).Returns(966397);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
+            IInterval transcriptInterval = new Interval(966397, 966405);
+            var       rotated = VariantRotator.Right(originalVariant, transcriptInterval, _refSequence, false);
 
-            var rotated = VariantRotator.Right(originalVariant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
             Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
@@ -101,11 +87,9 @@ namespace UnitTests.Variants
         {
             var originalVariant = GetDeletion();
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.End).Returns(966390);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(true);
+            IInterval transcriptInterval = new Interval(966380, 966390);
+            var       rotated = VariantRotator.Right(originalVariant, transcriptInterval, _refSequence, true);
 
-            var rotated = VariantRotator.Right(originalVariant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
             Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
@@ -114,11 +98,9 @@ namespace UnitTests.Variants
         {
             var originalVariant = GetInsertion();
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.End).Returns(966392);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
+            IInterval transcriptInterval = new Interval(966380, 966392);
+            var       rotated = VariantRotator.Right(originalVariant, transcriptInterval, _refSequence, false);
 
-            var rotated = VariantRotator.Right(originalVariant, transcript.Object, _refSequence, transcript.Object.Gene.OnReverseStrand);
             Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
@@ -131,12 +113,9 @@ namespace UnitTests.Variants
                 new string('A', VariantRotator.MaxDownstreamLength) + "GAGAGTTAGGTA" +
                 new string('A', VariantRotator.MaxDownstreamLength), 965891);
 
-            var transcript = new Mock<ITranscript>();
-            transcript.SetupGet(x => x.Start).Returns(966300);
-            transcript.SetupGet(x => x.End).Returns(966405);
-            transcript.SetupGet(x => x.Gene.OnReverseStrand).Returns(false);
+            IInterval transcriptInterval = new Interval(966300, 966405);
+            var       rotated = VariantRotator.Right(originalVariant, transcriptInterval, refSequence, false);
 
-            var rotated = VariantRotator.Right(originalVariant, transcript.Object, refSequence, transcript.Object.Gene.OnReverseStrand);
             Assert.True(ReferenceEquals(originalVariant, rotated));
         }
 
@@ -152,7 +131,8 @@ namespace UnitTests.Variants
         [InlineData(508, "GTT", 504, "TGT")]
         public void Left_align_deletions(int position, string refAllele, int rotatedPos, string rotatedRef)
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
+            var reference =
+                new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, refAllele, "", reference);
 
@@ -166,15 +146,13 @@ namespace UnitTests.Variants
         [InlineData(508, "GTT", 504, "TGT")]
         public void Left_align_insertion(int position, string altAllele, int rotatedPos, string rotatedAlt)
         {
-            var reference = new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
+            var reference =
+                new SimpleSequence(new string('A', VariantUtils.MaxUpstreamLength) + "ATGTGTTGTTATTCTGTGTGCAT");
 
             var rotatedVariant = VariantUtils.TrimAndLeftAlign(position, "", altAllele, reference);
 
             Assert.Equal(rotatedPos, rotatedVariant.start);
             Assert.Equal(rotatedAlt, rotatedVariant.altAllele);
         }
-
     }
-
-
 }

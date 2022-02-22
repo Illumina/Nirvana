@@ -33,12 +33,6 @@ namespace Cloud
                 throw new UserErrorException($"Path {path} doesn't exist.");
         }
 
-        public void CheckBucketAndFileExist(AmazonS3Client s3Client)
-        {
-            CheckBucketExist(s3Client);
-            CheckFileExist(s3Client);
-        }
-
 
         private static bool CheckUrlExist(string url)
         {

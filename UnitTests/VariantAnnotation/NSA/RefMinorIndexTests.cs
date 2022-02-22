@@ -3,8 +3,8 @@ using System.IO;
 using Genome;
 using IO;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.NSA
@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.NSA
             using (var stream = new MemoryStream())
             using(var writer = new ExtendedBinaryWriter(stream))
             {
-                var index = new RefMinorIndex(writer, GenomeAssembly.GRCh37, new DataSourceVersion("name", "1",  DateTime.Now.Ticks), SaCommon.SchemaVersion );
+                var index = new RefMinorIndex(writer, GenomeAssembly.GRCh37, new DataSourceVersion("name", null, "1",  DateTime.Now.Ticks), SaCommon.SchemaVersion );
 
                 index.Add(0, 100);
                 index.Add(0, 105);
@@ -37,7 +37,7 @@ namespace UnitTests.VariantAnnotation.NSA
             using (var stream = new MemoryStream())
             using (var writer = new ExtendedBinaryWriter(stream))
             {
-                var index = new RefMinorIndex(writer, GenomeAssembly.GRCh37, new DataSourceVersion("name", "1", DateTime.Now.Ticks), SaCommon.SchemaVersion);
+                var index = new RefMinorIndex(writer, GenomeAssembly.GRCh37, new DataSourceVersion("name", null, "1", DateTime.Now.Ticks), SaCommon.SchemaVersion);
 
                 index.Add(0, 100);
                 index.Add(0, 105);
@@ -73,7 +73,7 @@ namespace UnitTests.VariantAnnotation.NSA
             var stream = new MemoryStream();
             using (var writer = new ExtendedBinaryWriter(stream))
             {
-                var index = new RefMinorIndex(writer, GenomeAssembly.GRCh37, new DataSourceVersion("name", "1", DateTime.Now.Ticks), SaCommon.SchemaVersion);
+                var index = new RefMinorIndex(writer, GenomeAssembly.GRCh37, new DataSourceVersion("name", null, "1", DateTime.Now.Ticks), SaCommon.SchemaVersion);
 
                 index.Add(0, 100);
                 index.Add(0, 105);

@@ -4,12 +4,12 @@ using Genome;
 using Moq;
 using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.Providers;
 using Variants;
+using Vcf;
 using Vcf.VariantCreator;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils
@@ -30,7 +30,7 @@ namespace UnitTests.SAUtils
             dbsnpReader.SetupGet(x => x.IsArray).Returns(true);
             dbsnpReader.SetupGet(x => x.JsonKey).Returns("dbSnp");
             dbsnpReader.SetupGet(x => x.Version)
-                .Returns(new DataSourceVersion("dbsnp", "v1", DateTime.Now.Ticks, "dummy db snp"));
+                .Returns(new DataSourceVersion("dbsnp", "dummy db snp", "v1", DateTime.Now.Ticks));
             dbsnpReader.SetupSequence(x => x.GetAnnotation(ChromosomeUtilities.Chr1, 100)).Returns(chrom1Pos100Annotations);
 
             var provider = new NsaProvider(new[] {dbsnpReader.Object}, null);
@@ -52,7 +52,7 @@ namespace UnitTests.SAUtils
             clinvarReader.SetupGet(x => x.IsArray).Returns(true);
             clinvarReader.SetupGet(x => x.JsonKey).Returns("clinvar");
             clinvarReader.SetupGet(x => x.Version)
-                .Returns(new DataSourceVersion("clinvar", "v1", DateTime.Now.Ticks, "dummy clinvar data"));
+                .Returns(new DataSourceVersion("clinvar", "dummy clinvar data", "v1", DateTime.Now.Ticks));
             clinvarReader.SetupSequence(x => x.GetAnnotation(ChromosomeUtilities.Chr1, 100)).Returns(chrom1Pos100Annotations);
 
             var provider = new NsaProvider(new[] { clinvarReader.Object }, null);
@@ -60,24 +60,25 @@ namespace UnitTests.SAUtils
             return provider;
         }
 
-        private IAnnotatedPosition GetPosition(IChromosome chrom, int start, string refAllele, string[] altAlleles)
+        private static AnnotatedPosition GetPosition(Chromosome chrom, int start, string refAllele, string[] altAlleles)
         {
-            var position = new Mock<IAnnotatedPosition>();
-            var annotatedVariants = new List<IAnnotatedVariant>();
+            var annotatedVariants = new List<AnnotatedVariant>();
+
             foreach (string altAllele in altAlleles)
             {
                 VariantType type = SmallVariantCreator.GetVariantType(refAllele, altAllele);
-                int end = start + altAllele.Length - 1;
+                int         end  = start + altAllele.Length - 1;
 
-                annotatedVariants.Add(new AnnotatedVariant(new Variant(chrom, start, end, refAllele, altAllele, type, null, false, false, false,
+                annotatedVariants.Add(new AnnotatedVariant(new Variant(chrom, start, end, refAllele, altAllele, type,
+                    null, false, false, false,
                     null, null, SmallVariantCreator.SmallVariantBehavior)));
-
             }
 
-            position.SetupGet(x => x.AnnotatedVariants).Returns(annotatedVariants.ToArray);
-            return position.Object;
-        }
+            var position = new Position(chrom, start, start + refAllele.Length - 1, refAllele, altAlleles, null, null,
+                null, null, null, null, null, false);
 
+            return new AnnotatedPosition(position, annotatedVariants.ToArray());
+        }
 
         [Fact]
         public void Annotate_alleleSpecific()

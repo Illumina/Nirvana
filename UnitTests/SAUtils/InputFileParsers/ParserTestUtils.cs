@@ -8,7 +8,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 {
     public static class ParserTestUtils
     {
-        public static ISequenceProvider GetSequenceProvider(int position, string refAllele, char upstreamBase, IDictionary<string, IChromosome> refChromDict)
+        public static ISequenceProvider GetSequenceProvider(int position, string refAllele, char upstreamBase, Dictionary<string, Chromosome> refChromDict)
         {
             var sequence = new SimpleSequence(new string(upstreamBase, VariantUtils.MaxUpstreamLength) + refAllele, position - 1 - VariantUtils.MaxUpstreamLength);
 

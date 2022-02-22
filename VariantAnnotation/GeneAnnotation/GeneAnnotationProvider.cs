@@ -4,9 +4,9 @@ using System.Linq;
 using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.IO;
 using VariantAnnotation.NSA;
+using Versioning;
 
 namespace VariantAnnotation.GeneAnnotation
 {

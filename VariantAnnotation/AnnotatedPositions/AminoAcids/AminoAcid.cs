@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Buffers;
-using VariantAnnotation.Interface.AnnotatedPositions;
+using Cache.Data;
 
 namespace VariantAnnotation.AnnotatedPositions.AminoAcids
 {
@@ -55,9 +55,16 @@ namespace VariantAnnotation.AnnotatedPositions.AminoAcids
             var offset = 0;
             for (var i = 0; i < numAminoAcids; i++, offset += 3)
             {
-                ReadOnlySpan<char> span    = upperCdsSpan.Slice(offset, 3);
-                int                triplet = (span[0] << 16) | (span[1] << 8) | span[2];
-                aaSpan[i] = BinarySearch(triplet);
+                ReadOnlySpan<char> span      = upperCdsSpan.Slice(offset, 3);
+                int                triplet   = (span[0] << 16) | (span[1] << 8) | span[2];
+                char               aminoAcid = BinarySearch(triplet);
+                aaSpan[i] = aminoAcid;
+
+                if (aminoAcid != '*') continue;
+
+                aaSpan = aaSpan.Slice(0, i + 1);
+                addX   = false;
+                break;
             }
 
             if (addX) aaSpan[numAminoAcids] = 'X';
@@ -136,8 +143,5 @@ namespace VariantAnnotation.AnnotatedPositions.AminoAcids
 
             return 'X';
         }
-
-        public static string AddUnknownAminoAcid(string aminoAcids) =>
-            aminoAcids.StartsWith(AminoAcidCommon.StopCodon) ? aminoAcids : aminoAcids + 'X';
     }
 }

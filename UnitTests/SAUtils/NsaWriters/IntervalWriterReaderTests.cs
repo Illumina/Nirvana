@@ -8,9 +8,9 @@ using SAUtils.DataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 using Variants;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils.NsaWriters
@@ -31,7 +31,7 @@ namespace UnitTests.SAUtils.NsaWriters
         [Fact]
         public void Readback_clingen()
         {
-            var version = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks, "description");
+            var version = new DataSourceVersion("source1", "description", "v1", DateTime.Now.Ticks);
 
             using (var saStream = new MemoryStream())
             {

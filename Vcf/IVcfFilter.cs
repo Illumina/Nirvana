@@ -9,6 +9,6 @@ namespace Vcf
 
         string GetNextLine(StreamReader reader);
 
-        bool PassedTheEnd(IChromosome chromosome, int position);
+        bool PassedTheEnd(Chromosome chromosome, int position);
     }
 }

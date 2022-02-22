@@ -1,6 +1,4 @@
-﻿using UnitTests.TestUtilities;
-using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches.DataStructures;
+﻿using Cache.Data;
 
 // ReSharper disable StringLiteralTypo
 // ReSharper disable IdentifierTypo
@@ -9,22 +7,15 @@ namespace UnitTests.MockedData
 {
     public static class Genes
     {
-        public static readonly Gene MED8 = new Gene(ChromosomeUtilities.Chr1, 43383908, 43389812, true, "MED8", 19971,
-            CompactId.Convert("112950"), CompactId.Convert("ENSG00000159479"));
+        public static readonly Gene MED8   = new("112950", "ENSG00000159479", true, 19971) {Symbol  = "MED8"};
+        public static readonly Gene SAMD13 = new("148418", "ENSG00000203943", false, 24582) {Symbol = "SAMD13"};
+        public static readonly Gene POTEI  = new("653269", "ENSG00000196834", true, 37093) {Symbol  = "POTEI"};
+        public static readonly Gene PTPN18 = new("26469", "ENSG00000072135", false, 9649) {Symbol   = "PTPN18"};
 
-        public static readonly Gene SAMD13 = new Gene(ChromosomeUtilities.Chr1, 84298366, 84389957, false, "SAMD13",
-            24582, CompactId.Convert("148418"), CompactId.Convert("ENSG00000203943"));
+        public static readonly Gene AL078459_1 = new(string.Empty, "ENSG00000223653", false, null)
+            {Symbol = "AL078459.1"};
 
-        public static readonly Gene POTEI = new Gene(ChromosomeUtilities.Chr2, 130459455, 131626428, true, "POTEI",
-            37093, CompactId.Convert("653269"), CompactId.Convert("ENSG00000196834"));
-
-        public static readonly Gene PTPN18 = new Gene(ChromosomeUtilities.Chr2, 130356007, 130375409, false, "PTPN18",
-            9649, CompactId.Convert("26469"), CompactId.Convert("ENSG00000072135"));
-
-        public static readonly Gene AL078459_1 = new Gene(ChromosomeUtilities.Chr1, 85276715, 85448124, false,
-            "AL078459.1", -1, CompactId.Empty, CompactId.Convert("ENSG00000223653"));
-
-        public static readonly Gene VEGFA = new Gene(ChromosomeUtilities.Chr6, 43737921, 43754224, false, "VEGFA",
-            12680, CompactId.Convert("7422"), CompactId.Convert("ENSG00000112715"));
+        public static readonly Gene VEGFA = new("7422", "ENSG00000112715", false, 12680) {Symbol = "VEGFA"};
+        public static readonly Gene RYBP  = new("23429", "ENSG00000163602", true, 10480) {Symbol = "RYBP"};
     }
 }

@@ -4,9 +4,8 @@ using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
 using IO;
-using VariantAnnotation.Interface.Providers;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 
 namespace VariantAnnotation.NSA
 {

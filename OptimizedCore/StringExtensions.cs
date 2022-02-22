@@ -101,22 +101,5 @@ namespace OptimizedCore
             foreach (char c in s) if (!char.IsWhiteSpace(c)) return false;
             return true;
         }
-
-        public static string TrimEnd(this string s, string value) => 
-            !s.EndsWith(value) 
-            ? s 
-            : s.Remove(s.Length - value.Length);
-
-        public static string TrimEndFromFirst(this string s, string value)
-        {
-            int extPos = s.IndexOf(value, StringComparison.Ordinal);
-            return extPos == -1 ? s : s.Substring(0, extPos);
-        }
-
-        public static string TrimStartToLast(this string s, string value)
-        {
-            int extPos = s.LastIndexOf(value, StringComparison.Ordinal);
-            return extPos == -1 ? s : s.Substring(extPos + value.Length);
-        }
     }
 }

@@ -7,13 +7,13 @@ namespace SAUtils.DataStructures
 {
     public sealed class RefMinorItem:ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
         public string GlobalMajor { get; }
 
-        public RefMinorItem(IChromosome chromosome, int position, string globalMajor)
+        public RefMinorItem(Chromosome chromosome, int position, string globalMajor)
         {
             Chromosome = chromosome;
             Position = position;

@@ -13,7 +13,7 @@ namespace Jasix.DataStructures
 		public string chromosome;	    
 		public int position;
 		public string refAllele;
-		public IList<string> altAlleles;
+		public List<string> altAlleles;
 		public int svEnd;
 
 		// ReSharper restore UnassignedField.Global

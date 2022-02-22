@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Genome;
-using VariantAnnotation.Interface.Providers;
+using Versioning;
 
 namespace VariantAnnotation.Interface.SA
 {
@@ -13,7 +13,7 @@ namespace VariantAnnotation.Interface.SA
         bool IsArray { get; }
         bool IsPositional { get; }
 
-        IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position);
-        void PreLoad(IChromosome chrom, List<int> positions);
+        IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(Chromosome chrom, int position);
+        void PreLoad(Chromosome chrom, List<int> positions);
     }
 }

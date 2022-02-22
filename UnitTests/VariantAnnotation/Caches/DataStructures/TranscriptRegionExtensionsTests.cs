@@ -1,32 +1,32 @@
-﻿using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.AnnotatedPositions;
+﻿using Cache.Data;
+using VariantAnnotation.Caches.DataStructures;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches.DataStructures
 {
     public sealed class TranscriptRegionExtensionsTests
     {
-        private readonly ITranscriptRegion[] _forwardTranscriptRegions;
-        private readonly ITranscriptRegion[] _reverseTranscriptRegions;
+        private readonly TranscriptRegion[] _forwardTranscriptRegions;
+        private readonly TranscriptRegion[] _reverseTranscriptRegions;
 
         public TranscriptRegionExtensionsTests()
         {
-            _forwardTranscriptRegions = new ITranscriptRegion[]
+            _forwardTranscriptRegions = new TranscriptRegion[]
             {
-                new TranscriptRegion(TranscriptRegionType.Exon, 1,   77997792, 77998025, 1, 234),
-                new TranscriptRegion(TranscriptRegionType.Intron, 1, 77998026, 78001531, 234, 235),
-                new TranscriptRegion(TranscriptRegionType.Exon, 2,   78001532, 78001723, 235, 426),
-                new TranscriptRegion(TranscriptRegionType.Intron, 2, 78001724, 78024286, 426, 427),
-                new TranscriptRegion(TranscriptRegionType.Exon, 3,   78024287, 78024416, 427, 556)
+                new(77997792, 77998025, 1, 234, TranscriptRegionType.Exon, 1, null),
+                new(77998026, 78001531, 234, 235, TranscriptRegionType.Intron, 1, null),
+                new(78001532, 78001723, 235, 426, TranscriptRegionType.Exon, 2, null),
+                new(78001724, 78024286, 426, 427, TranscriptRegionType.Intron, 2, null),
+                new(78024287, 78024416, 427, 556, TranscriptRegionType.Exon, 3, null)
             };
 
-            _reverseTranscriptRegions = new ITranscriptRegion[]
+            _reverseTranscriptRegions = new TranscriptRegion[]
             {
-                new TranscriptRegion(TranscriptRegionType.Exon, 3,   312957, 313157, 136, 336),
-                new TranscriptRegion(TranscriptRegionType.Intron, 2, 313158, 313873, 135, 136),
-                new TranscriptRegion(TranscriptRegionType.Exon, 2,   313874, 313892, 117, 135),
-                new TranscriptRegion(TranscriptRegionType.Intron, 1, 313893, 314242, 116, 117),
-                new TranscriptRegion(TranscriptRegionType.Exon, 1,   314243, 314358, 1, 116)
+                new(312957, 313157, 136, 336, TranscriptRegionType.Exon, 3, null),
+                new(313158, 313873, 135, 136, TranscriptRegionType.Intron, 2, null),
+                new(313874, 313892, 117, 135, TranscriptRegionType.Exon, 2, null),
+                new(313893, 314242, 116, 117, TranscriptRegionType.Intron, 1, null),
+                new(314243, 314358, 1, 116, TranscriptRegionType.Exon, 1, null)
             };
         }
 

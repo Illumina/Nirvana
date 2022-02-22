@@ -1,128 +1,124 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using CacheUtils.TranscriptCache;
-using Genome;
+using Cache.Data;
+using Cache.IO;
+using Intervals;
+using UnitTests.MockedData;
 using UnitTests.TestUtilities;
-using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Caches;
-using VariantAnnotation.Caches.DataStructures;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Caches;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.VariantAnnotation.Caches
 {
     public sealed class TranscriptCacheTests
     {
-        private readonly ITranscriptCache _cache;
-        private readonly IEnumerable<IDataSourceVersion> _expectedDataSourceVersions;
-        private const GenomeAssembly ExpectedAssembly = GenomeAssembly.hg19;
+        private readonly TranscriptCache    _cache;
+        private readonly IDataSourceVersion _expectedDataSourceVersion;
 
         public TranscriptCacheTests()
         {
-            _expectedDataSourceVersions        = GetDataSourceVersions();
-            var transcriptIntervalArrays       = GetTranscripts().ToIntervalArrays(11);
-            var regulatoryRegionIntervalArrays = GetRegulatoryRegions().ToIntervalArrays(11);
+            _expectedDataSourceVersion =
+                new DataSourceVersion("VEP", Source.RefSeq.ToString(), "87", DateTime.Now.Ticks);
 
-            _cache = new TranscriptCache(_expectedDataSourceVersions, ExpectedAssembly, transcriptIntervalArrays,
-                regulatoryRegionIntervalArrays);
-        }
+            var referenceCaches = new ReferenceCache[20];
 
-        [Fact]
-        public void GetOverlappingFlankingTranscripts_TwoOverlaps()
-        {
-            var interval = new ChromosomeInterval(ChromosomeUtilities.Chr1, 100, 200);
-            ITranscript[] overlappingTranscripts = _cache.TranscriptIntervalForest.GetAllFlankingValues(interval);
-
-            Assert.NotNull(overlappingTranscripts);
-            Assert.Equal(2, overlappingTranscripts.Length);
-        }
-
-        [Fact]
-        public void GetOverlappingFlankingTranscripts_NoOverlaps()
-        {
-            var interval = new ChromosomeInterval(ChromosomeUtilities.Chr11, 5000, 5001);
-            ITranscript[] overlappingTranscripts = _cache.TranscriptIntervalForest.GetAllFlankingValues(interval);
-
-            Assert.Null(overlappingTranscripts);
-        }
-
-        [Fact]
-        public void GetOverlappingRegulatoryRegions_OneOverlap()
-        {
-            var overlappingRegulatoryRegions =
-                _cache.RegulatoryIntervalForest.GetAllOverlappingValues(ChromosomeUtilities.Chr1.Index, 100, 200);
-
-            Assert.NotNull(overlappingRegulatoryRegions);
-            Assert.Single(overlappingRegulatoryRegions);
-        }
-
-        [Fact]
-        public void GetOverlappingRegulatoryRegions_NoOverlaps()
-        {
-            var overlappingRegulatoryRegions =
-                _cache.RegulatoryIntervalForest.GetAllOverlappingValues(ChromosomeUtilities.Chr1.Index, 5000, 5001);
-
-            Assert.Null(overlappingRegulatoryRegions);
-        }
-
-        [Fact]
-        public void Assembly_Get()
-        {
-            var observedAssembly = _cache.Assembly;
-            Assert.Equal(ExpectedAssembly, observedAssembly);
-        }
-
-        [Fact]
-        public void DataSourceVersions_Get()
-        {
-            var observedDataSourceVersions = _cache.DataSourceVersions.ToArray();
-            Assert.Single(observedDataSourceVersions);
-
-            var expectedDataSourceVersion = _expectedDataSourceVersions.ToArray()[0];
-            var observedDataSourceVersion = observedDataSourceVersions[0];
-            Assert.Equal(expectedDataSourceVersion.Name, observedDataSourceVersion.Name);
-        }
-
-        [Fact]
-        private IEnumerable<IDataSourceVersion> GetDataSourceVersions()
-        {
-            return new List<IDataSourceVersion>
+            var chr1Transcripts = new Transcript[]
             {
-                new DataSourceVersion("VEP", "87", DateTime.Now.Ticks, Source.BothRefSeqAndEnsembl.ToString())
+                new(ChromosomeUtilities.Chr1, 120, 180, "ABC", BioType.mRNA, false, Source.RefSeq, Genes.MED8,
+                    TranscriptRegions.ENST00000290663, "ACGT", CodingRegions.ENST00000290663),
+                new(ChromosomeUtilities.Chr1, 300, 320, "ABC", BioType.mRNA, false, Source.RefSeq, Genes.MED8,
+                    TranscriptRegions.ENST00000290663, "ACGT", CodingRegions.ENST00000290663)
             };
-        }
 
-        private IRegulatoryRegion[] GetRegulatoryRegions()
-        {
-            var regulatoryRegions = new IRegulatoryRegion[3];
-
-            regulatoryRegions[0] = new RegulatoryRegion(ChromosomeUtilities.Chr11, 11000, 12000, CompactId.Empty,
-                RegulatoryRegionType.promoter);
-
-            regulatoryRegions[1] = new RegulatoryRegion(ChromosomeUtilities.Chr1, 120, 180, CompactId.Empty,
-                RegulatoryRegionType.promoter);
-
-            regulatoryRegions[2] = new RegulatoryRegion(ChromosomeUtilities.Chr1, 300, 320, CompactId.Empty,
-                RegulatoryRegionType.promoter);
-
-            return regulatoryRegions;
-        }
-
-        private ITranscript[] GetTranscripts()
-        {
-            return new ITranscript[]
+            var chr1RegulatoryRegions = new RegulatoryRegion[]
             {
-                new Transcript(ChromosomeUtilities.Chr11, 11000, 12000, CompactId.Empty, null, BioType.other, null, 0, 0,
-                    false, null, 0, null, 0, 0, Source.None, false, false, null),
-                new Transcript(ChromosomeUtilities.Chr1, 120, 180, CompactId.Empty, null, BioType.other, null, 0, 0,
-                    false, null, 0, null, 0, 0, Source.None, false, false, null),
-                new Transcript(ChromosomeUtilities.Chr1, 300, 320, CompactId.Empty, null, BioType.other, null, 0, 0,
-                    false, null, 0, null, 0, 0, Source.None, false, false, null)
+                new(ChromosomeUtilities.Chr1, 120, 180, string.Empty, BioType.promoter, null, null, null),
+                new(ChromosomeUtilities.Chr1, 300, 320, string.Empty, BioType.promoter, null, null, null)
             };
+
+            var chromosome = ChromosomeUtilities.Chr1;
+            var chr1CacheBins = new CacheBin[1];
+            chr1CacheBins[0] = new CacheBin(0, 0, null, null, null, null, chr1Transcripts, chr1RegulatoryRegions);
+            referenceCaches[chromosome.Index] = new ReferenceCache(chromosome, chr1CacheBins);
+
+            var chr11Transcripts = new Transcript[]
+            {
+                new(ChromosomeUtilities.Chr11, 11000, 12000, "ABC", BioType.mRNA, false, Source.RefSeq, Genes.MED8,
+                    TranscriptRegions.ENST00000290663, "ACGT", CodingRegions.ENST00000290663)
+            };
+
+            var chr11RegulatoryRegions = new RegulatoryRegion[]
+            {
+                new(ChromosomeUtilities.Chr11, 11000, 12000, string.Empty, BioType.promoter, null, null, null)
+            };
+
+            chromosome = ChromosomeUtilities.Chr11;
+            var chr11CacheBins = new CacheBin[1];
+            chr11CacheBins[0] = new CacheBin(0, 0, null, null, null, null, chr11Transcripts, chr11RegulatoryRegions);
+            referenceCaches[chromosome.Index] = new ReferenceCache(chromosome, chr11CacheBins);
+
+            _cache = new TranscriptCache(referenceCaches, _expectedDataSourceVersion);
+        }
+
+        [Fact]
+        public void AddTranscripts_TwoTranscripts()
+        {
+            ushort    refIndex = ChromosomeUtilities.Chr1.Index;
+            IInterval variant  = new Interval(100, 200);
+
+            (int start, int end) = TranscriptAnnotationProvider.GetFlankingRegion(variant);
+
+            List<Transcript> transcripts = new();
+            _cache.AddTranscripts(refIndex, start, end, transcripts);
+
+            Assert.Equal(2, transcripts.Count);
+        }
+
+        [Fact]
+        public void AddTranscripts_NoTranscripts()
+        {
+            ushort    refIndex = ChromosomeUtilities.Chr11.Index;
+            IInterval variant  = new Interval(5000, 5001);
+            (int start, int end) = TranscriptAnnotationProvider.GetFlankingRegion(variant);
+
+            List<Transcript> transcripts = new();
+            _cache.AddTranscripts(refIndex, start, end, transcripts);
+
+            Assert.Empty(transcripts);
+        }
+
+        [Fact]
+        public void AddRegulatoryRegions_OneRegulatoryRegion()
+        {
+            ushort    refIndex = ChromosomeUtilities.Chr1.Index;
+            const int start    = 100;
+            const int end      = 200;
+
+            List<RegulatoryRegion> regulatoryRegions = new();
+            _cache.AddRegulatoryRegions(refIndex, start, end, regulatoryRegions);
+
+            Assert.Single(regulatoryRegions);
+        }
+
+        [Fact]
+        public void AddRegulatoryRegions_NoRegulatoryRegions()
+        {
+            ushort    refIndex = ChromosomeUtilities.Chr11.Index;
+            const int start    = 5000;
+            const int end      = 5001;
+
+            List<RegulatoryRegion> regulatoryRegions = new();
+            _cache.AddRegulatoryRegions(refIndex, start, end, regulatoryRegions);
+
+            Assert.Empty(regulatoryRegions);
+        }
+
+        [Fact]
+        public void DataSourceVersion_ExpectedResults()
+        {
+            IDataSourceVersion actual = _cache.DataSourceVersion;
+            Assert.Equal(_expectedDataSourceVersion, actual);
         }
     }
 }

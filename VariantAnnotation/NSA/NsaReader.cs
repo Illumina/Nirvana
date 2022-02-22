@@ -4,9 +4,9 @@ using Compression.Algorithms;
 using ErrorHandling.Exceptions;
 using Genome;
 using IO;
-using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.SA;
+using Versioning;
 
 namespace VariantAnnotation.NSA
 {
@@ -55,7 +55,7 @@ namespace VariantAnnotation.NSA
             if (_index.SchemaVersion != SaCommon.SchemaVersion) throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion} for {JsonKey}");
         }
 
-        public void PreLoad(IChromosome chrom, List<int> positions)
+        public void PreLoad(Chromosome chrom, List<int> positions)
         {
             if (positions == null || positions.Count == 0) return;
 
@@ -117,7 +117,7 @@ namespace VariantAnnotation.NSA
             }
         }
 
-        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(IChromosome chrom, int position)
+        public IEnumerable<(string refAllele, string altAllele, string annotation)> GetAnnotation(Chromosome chrom, int position)
         {
             if (_annotations == null) return null;
             var index = BinarySearch(position);

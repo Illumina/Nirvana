@@ -5,13 +5,13 @@ namespace SAUtils.DataStructures
 {
     public sealed class AncestralAlleleItem: ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
         public readonly string AncestralAllele;
 
-        public AncestralAlleleItem(IChromosome chromosome, int position, string refAllele, string altAllele, string ancestralAllele)
+        public AncestralAlleleItem(Chromosome chromosome, int position, string refAllele, string altAllele, string ancestralAllele)
         {
             Chromosome = chromosome;
             Position = position;

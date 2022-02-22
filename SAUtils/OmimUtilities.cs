@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using CacheUtils.Genes.DataStructures;
-using CacheUtils.Genes.IO;
 using Compression.Utilities;
+using Genome;
 using OptimizedCore;
+using ReferenceSequence.Utilities;
 using SAUtils.DataStructures;
+using SAUtils.Omim;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.SA;
-using VariantAnnotation.Sequence;
 
 namespace SAUtils
 {
@@ -84,7 +84,8 @@ namespace SAUtils
         }
         public static (Dictionary<string, string> EntrezGeneIdToSymbol, Dictionary<string, string> EnsemblIdToSymbol) ParseUniversalGeneArchive(string inputReferencePath, string universalGeneArchivePath)
         {
-            var (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(inputReferencePath);
+            Dictionary<string, Chromosome> refNameToChromosome =
+                SequenceHelper.GetRefNameToChromosome(inputReferencePath);
 
             UgaGene[] genes;
 

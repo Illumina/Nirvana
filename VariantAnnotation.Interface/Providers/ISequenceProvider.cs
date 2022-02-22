@@ -3,11 +3,11 @@ using Genome;
 
 namespace VariantAnnotation.Interface.Providers
 {
-    public interface ISequenceProvider : IAnnotationProvider
+    public interface ISequenceProvider : IProvider
     {
-        ISequence Sequence { get; }
-        IDictionary<string, IChromosome> RefNameToChromosome { get; }
-	    IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
-        void LoadChromosome(IChromosome chromosome);
+        ISequence                      Sequence            { get; }
+        Dictionary<string, Chromosome> RefNameToChromosome { get; }
+        Chromosome[]                   Chromosomes         { get; }
+        void LoadChromosome(Chromosome chromosome);
     }
 }

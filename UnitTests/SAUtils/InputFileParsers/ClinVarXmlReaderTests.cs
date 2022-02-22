@@ -732,7 +732,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in clinvarItems)
             {
-                Assert.Equal(2, clinVarItem.OmimIds.Count());
+                Assert.Equal(2, clinVarItem.OmimIds.Length);
             }
         }
 
@@ -750,7 +750,7 @@ namespace UnitTests.SAUtils.InputFileParsers
 
             foreach (var clinVarItem in clinvarItems)
             {
-                Assert.Equal(2, clinVarItem.OmimIds.Count());
+                Assert.Equal(2, clinVarItem.OmimIds.Length);
             }
         }
 

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using Genome;
-using VariantAnnotation.Interface.AnnotatedPositions;
-using VariantAnnotation.Interface.Providers;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.PhyloP;
 using Variants;
+using Versioning;
 
 namespace VariantAnnotation.Providers
 {
@@ -13,30 +12,24 @@ namespace VariantAnnotation.Providers
     {
         private readonly NpdReader _phylopReader;
 
-        public string Name { get; }
-        public GenomeAssembly Assembly => _phylopReader.Assembly;
+        public string                          Name               => "Conservation score provider";
+        public GenomeAssembly                  Assembly           => _phylopReader.Assembly;
         public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
 
         public ConservationScoreProvider(Stream dbStream, Stream indexStream)
         {
-            _phylopReader = new NpdReader(dbStream, indexStream);
-            Name = "Conservation score provider";
-            DataSourceVersions = new[] { _phylopReader.Version };
+            _phylopReader      = new NpdReader(dbStream, indexStream);
+            DataSourceVersions = new[] {_phylopReader.Version};
         }
 
-        public void Annotate(IAnnotatedPosition annotatedPosition)
+        public void Annotate(AnnotatedPosition annotatedPosition)
         {
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (annotatedVariant.Variant.Type != VariantType.SNV) continue;
-                annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome, annotatedVariant.Variant.Start);
+                annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome,
+                    annotatedVariant.Variant.Start);
             }
         }
-
-        public void PreLoad(IChromosome chromosome, List<int> positions)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

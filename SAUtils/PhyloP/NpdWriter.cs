@@ -7,7 +7,7 @@ using Genome;
 using IO;
 using SAUtils.DataStructures;
 using VariantAnnotation.PhyloP;
-using VariantAnnotation.Providers;
+using Versioning;
 
 namespace SAUtils.PhyloP
 {

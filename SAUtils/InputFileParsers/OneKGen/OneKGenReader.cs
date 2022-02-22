@@ -12,11 +12,11 @@ using Variants;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {
-    public sealed class OneKGenReader :IDisposable
-    {
-        private readonly Stream _stream;
-        private readonly IDictionary<string,IChromosome> _refNameDictionary;
-        private readonly ISequenceProvider _sequenceProvider;
+	public sealed class OneKGenReader : IDisposable
+	{
+		private readonly Stream                         _stream;
+		private readonly Dictionary<string, Chromosome> _refNameDictionary;
+		private readonly ISequenceProvider              _sequenceProvider;
 
         private  string _ancestralAllele;
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using ErrorHandling.Exceptions;
 
 namespace ErrorHandling
@@ -8,7 +7,7 @@ namespace ErrorHandling
     public static class ExceptionUtilities
     {
         // define which exceptions should not include a full stack trace
-        public static readonly ImmutableHashSet<Type> UserFriendlyExceptions = new HashSet<Type>
+        public static readonly HashSet<Type> UserFriendlyExceptions = new HashSet<Type>
         {
             typeof(UserErrorException),
             typeof(FileNotSortedException),
@@ -17,7 +16,7 @@ namespace ErrorHandling
             typeof(ProcessLockedFileException),
             typeof(OutOfMemoryException),
             typeof(MissingCompressionLibraryException)
-        }.ToImmutableHashSet();
+        };
 
         public static bool HasException<T>(Exception e)
         {

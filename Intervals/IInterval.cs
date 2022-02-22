@@ -1,8 +1,7 @@
-﻿namespace Intervals
+﻿namespace Intervals;
+
+public interface IInterval
 {
-    public interface IInterval
-    {
-        int Start { get; }
-        int End { get; }
-    }
+    int Start { get; }
+    int End   { get; }
 }

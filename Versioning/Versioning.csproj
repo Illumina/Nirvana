@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <OutputPath>..\bin\$(Configuration)</OutputPath>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IO\IO.csproj" />
+    <ProjectReference Include="..\JSON\JSON.csproj" />
+  </ItemGroup>
+  <Import Project="..\VariantAnnotation\CommonAssemblyInfo.props" />
+</Project>

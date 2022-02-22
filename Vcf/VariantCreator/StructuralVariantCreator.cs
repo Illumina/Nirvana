@@ -12,7 +12,7 @@ namespace Vcf.VariantCreator
         public static readonly AnnotationBehavior StructuralVariantBehavior =
             new AnnotationBehavior(false, true, true, false, true);
 
-        public static IVariant Create(IChromosome chromosome, int start, string refAllele, string altAllele,
+        public static IVariant Create(Chromosome chromosome, int start, string refAllele, string altAllele,
             IBreakEnd[] breakEnds, IInfoData infoData)
         {
             var svType = infoData?.SvType ?? VariantType.unknown;

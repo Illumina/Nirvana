@@ -1,30 +1,26 @@
-﻿using Genome;
+﻿using System.IO;
+using Cache.Data;
+using Genome;
 using Intervals;
-using VariantAnnotation.AnnotatedPositions.Transcript;
-using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
 namespace VariantAnnotation.AnnotatedPositions
 {
     public static class HgvsCodingNomenclature
     {
-        public static string GetHgvscAnnotation(ITranscript transcript, ISimpleVariant variant, ISequence refSequence,
+        public static string GetHgvscAnnotation(Transcript transcript, ISimpleVariant variant, ISequence refSequence,
             int regionStart, int regionEnd, string transcriptRef, string transcriptAlt)
         {
             // sanity check: don't try to handle odd characters, make sure this is not a reference allele, 
             //               and make sure that we have protein coordinates
-            if (variant.Type == VariantType.reference || SequenceUtilities.HasNonCanonicalBase(variant.AltAllele)) return null;
-            
-            // do not report HGVSc notation when variant lands inside gap region
-            if (regionStart > -1 && regionEnd > -1)
-            {
-                var startRegion = transcript.TranscriptRegions[regionStart];
-                var endRegion = transcript.TranscriptRegions[regionEnd];
-                if (startRegion.Id == endRegion.Id && startRegion.Type == TranscriptRegionType.Gap &&
-                    endRegion.Type == TranscriptRegionType.Gap) return null;
-            }
+            if (variant.Type == VariantType.reference ||
+                SequenceUtilities.HasNonCanonicalBase(variant.AltAllele)) return null;
 
+            // do not report HGVSc notation when variant lands inside gap region
             bool onReverseStrand = transcript.Gene.OnReverseStrand;
+
+            if (IsVariantInRnaEditDeletion(variant, onReverseStrand, regionStart, regionEnd,
+                    transcript.TranscriptRegions)) return null;
 
             string refAllele = string.IsNullOrEmpty(transcriptRef)
                 ? onReverseStrand ? SequenceUtilities.GetReverseComplement(variant.RefAllele) : variant.RefAllele
@@ -41,13 +37,14 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (genomicChange == GenomicChange.Duplication)
             {
-                (variantStart, variantEnd, refAllele, regionStart, regionEnd) = transcript.TranscriptRegions.ShiftDuplication(variantStart, altAllele, onReverseStrand);
+                (variantStart, variantEnd, refAllele, regionStart, regionEnd) =
+                    transcript.TranscriptRegions.ShiftDuplication(variantStart, altAllele, onReverseStrand);
             }
 
-            var startPositionOffset = HgvsUtilities.GetCdnaPositionOffset(transcript, variantStart, regionStart, true);
+            var startPositionOffset = HgvsUtilities.GetPositionOffset(transcript, variantStart, regionStart);
             var endPositionOffset = variantStart == variantEnd
                 ? startPositionOffset
-                : HgvsUtilities.GetCdnaPositionOffset(transcript, variantEnd, regionEnd, false);
+                : HgvsUtilities.GetPositionOffset(transcript, variantEnd, regionEnd);
 
             if (onReverseStrand)
             {
@@ -56,28 +53,55 @@ namespace VariantAnnotation.AnnotatedPositions
 
             if (startPositionOffset == null && variant.Type == VariantType.insertion)
             {
-                startPositionOffset= new PositionOffset( endPositionOffset.Position+1, endPositionOffset.Offset, $"{endPositionOffset.Position + 1}", endPositionOffset.HasStopCodonNotation);
+                startPositionOffset = new PositionOffset(endPositionOffset.Position + 1, endPositionOffset.Offset,
+                    $"{endPositionOffset.Position + 1}", endPositionOffset.HasStopCodonNotation);
             }
 
             // sanity check: make sure we have coordinates
             if (startPositionOffset == null || endPositionOffset == null) return null;
 
-            var hgvsNotation = new HgvscNotation(refAllele, altAllele, transcript.Id.WithVersion, genomicChange,
-                startPositionOffset, endPositionOffset, transcript.Translation != null);
+            var hgvsNotation = new HgvscNotation(refAllele, altAllele, transcript.Id, genomicChange,
+                startPositionOffset, endPositionOffset, transcript.CodingRegion != null);
 
             // generic formatting
             return hgvsNotation.ToString();
         }
 
-        /// <summary>
-        /// Adjust positions by alt allele length
-        /// </summary>
+        private static bool IsVariantInRnaEditDeletion(IInterval variant, bool onReverseStrand, int regionStart,
+            int regionEnd, TranscriptRegion[] transcriptRegions)
+        {
+            if (regionStart == -1 || regionEnd == -1 || regionStart != regionEnd) return false;
+
+            var region = transcriptRegions[regionStart];
+            if (region.CigarOps == null) return false;
+
+            CigarOp startOp = FindCigarOp(variant.Start, region, onReverseStrand);
+            CigarOp endOp   = FindCigarOp(variant.End,   region, onReverseStrand);
+
+            return startOp == endOp && startOp.Type == CigarType.Deletion;
+        }
+
+        private static CigarOp FindCigarOp(int position, TranscriptRegion region, bool onReverseStrand)
+        {
+            int remainingBases = (onReverseStrand ? region.End - position : position - region.Start) + 1;
+
+            foreach (var cigarOp in region.CigarOps!)
+            {
+                bool lastCigarOp = cigarOp.Length >= remainingBases;
+                if (lastCigarOp) return cigarOp;
+                remainingBases -= cigarOp.Length;
+            }
+
+            throw new InvalidDataException(
+                $"Unable to find CigarOp for position {position} in region {region.Start}-{region.End}");
+        }
+
         internal static (int Start, int End, string RefAllele, int RegionStart, int RegionEnd) ShiftDuplication(
-            this ITranscriptRegion[] regions, int start, string altAllele, bool onReverseStrand)
+            this TranscriptRegion[] regions, int start, string altAllele, bool onReverseStrand)
         {
             int incrementLength = altAllele.Length;
-            int dupStart = onReverseStrand ? start + incrementLength - 1    : start - incrementLength;
-            int dupEnd   = onReverseStrand ? dupStart - incrementLength + 1 : dupStart + incrementLength - 1;
+            int dupStart        = onReverseStrand ? start    + incrementLength - 1 : start - incrementLength;
+            int dupEnd          = onReverseStrand ? dupStart - incrementLength + 1 : dupStart + incrementLength - 1;
 
             (int regionStart, _) = MappedPositionUtilities.FindRegion(regions, dupStart);
             (int regionEnd, _)   = MappedPositionUtilities.FindRegion(regions, dupEnd);
@@ -85,7 +109,8 @@ namespace VariantAnnotation.AnnotatedPositions
             return (dupStart, dupEnd, altAllele, regionStart, regionEnd);
         }
 
-        public static GenomicChange GetGenomicChange(IInterval interval, bool onReverseStrand, ISequence refSequence, ISimpleVariant variant)
+        public static GenomicChange GetGenomicChange(IInterval interval, bool onReverseStrand, ISequence refSequence,
+            ISimpleVariant variant)
         {
             // length of the reference allele. Negative lengths make no sense
             int refLength = variant.End - variant.Start + 1;
@@ -115,7 +140,8 @@ namespace VariantAnnotation.AnnotatedPositions
 
             // If this is an insertion, we should check if the preceding reference nucleotides
             // match the insertion. In that case it should be annotated as a multiplication.
-            bool isGenomicDuplicate = HgvsUtilities.IsDuplicateWithinInterval(refSequence, variant, interval, onReverseStrand);
+            bool isGenomicDuplicate =
+                HgvsUtilities.IsDuplicateWithinInterval(refSequence, variant, interval, onReverseStrand);
 
             return isGenomicDuplicate ? GenomicChange.Duplication : GenomicChange.Insertion;
         }

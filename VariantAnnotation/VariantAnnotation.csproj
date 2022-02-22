@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
-    <DebugType>Full</DebugType>
-    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cache\Cache.csproj" />
+    <ProjectReference Include="..\Cloud\Cloud.csproj" />
     <ProjectReference Include="..\CommandLine\CommandLine.csproj" />
     <ProjectReference Include="..\Compression\Compression.csproj" />
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />
@@ -13,8 +13,10 @@
     <ProjectReference Include="..\IO\IO.csproj" />
     <ProjectReference Include="..\Jasix\Jasix.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
+    <ProjectReference Include="..\ReferenceSequence\ReferenceSequence.csproj" />
     <ProjectReference Include="..\VariantAnnotation.Interface\VariantAnnotation.Interface.csproj" />
     <ProjectReference Include="..\Variants\Variants.csproj" />
+    <ProjectReference Include="..\Vcf\Vcf.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Composition" Version="1.0.31" />

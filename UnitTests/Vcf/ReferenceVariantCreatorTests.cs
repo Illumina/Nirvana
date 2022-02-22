@@ -1,5 +1,4 @@
-﻿using Genome;
-using Moq;
+﻿using UnitTests.TestUtilities;
 using Vcf.VariantCreator;
 using Xunit;
 
@@ -10,9 +9,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void ReferenceVariant_have_annotationBehaviorNull()
         {
-            var chrom = new Mock<IChromosome>();
-            chrom.Setup(x => x.EnsemblName).Returns("1");
-	        var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 101, "A", ".", null);
+	        var variant = ReferenceVariantCreator.Create(ChromosomeUtilities.Chr1, 100, 101, "A", ".", null);
             Assert.False(variant.IsRefMinor);
             Assert.Null(variant.Behavior);
         }
@@ -20,9 +17,7 @@ namespace UnitTests.Vcf
         [Fact]
         public void RefMinorSite_have_correct_behavior()
         {
-            var chrom = new Mock<IChromosome>();
-            chrom.Setup(x => x.EnsemblName).Returns("1");
-            var variant = ReferenceVariantCreator.Create(chrom.Object, 100, 100, "A", ".", "T");
+            var variant = ReferenceVariantCreator.Create(ChromosomeUtilities.Chr1, 100, 100, "A", ".", "T");
 			Assert.True(variant.IsRefMinor);
             Assert.NotNull(variant.Behavior);
             Assert.True(variant.Behavior.NeedFlankingTranscript);
@@ -31,11 +26,11 @@ namespace UnitTests.Vcf
             Assert.False(variant.Behavior.ReducedTranscriptAnnotation);
             Assert.False(variant.Behavior.StructuralVariantConsequence);
 
-	        var variant2 = ReferenceVariantCreator.Create(chrom.Object, 101, 101, "A", ".", null);
+	        var variant2 = ReferenceVariantCreator.Create(ChromosomeUtilities.Chr1, 101, 101, "A", ".", null);
 			Assert.False(variant2.IsRefMinor);
             Assert.Null(variant2.Behavior);
 
-	        var variant3 = ReferenceVariantCreator.Create(chrom.Object, 100, 110, "A", ".", null);
+	        var variant3 = ReferenceVariantCreator.Create(ChromosomeUtilities.Chr1, 100, 110, "A", ".", null);
 			Assert.False(variant3.IsRefMinor);
             Assert.Null(variant3.Behavior);
         }

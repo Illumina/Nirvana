@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using OptimizedCore;
+using VariantAnnotation.AnnotatedPositions;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.Interface.IO;
 
@@ -21,7 +22,7 @@ namespace VariantAnnotation.IO.VcfWriter
         private readonly List<string> _csqtStrings     = new List<string>();
         private readonly List<string> _csqrStrings     = new List<string>();
 
-        public string Convert(IAnnotatedPosition annotatedPosition)
+        public string Convert(AnnotatedPosition annotatedPosition)
         {
             _sb.Clear();
 
@@ -58,7 +59,7 @@ namespace VariantAnnotation.IO.VcfWriter
             return _sb.ToString();
         }
 
-        private static string ExtractDbId(IAnnotatedPosition annotatedPosition)
+        private static string ExtractDbId(AnnotatedPosition annotatedPosition)
         {
             var dbSnp = new VcfField();
 
@@ -90,7 +91,7 @@ namespace VariantAnnotation.IO.VcfWriter
         }
 
 
-        private void AddInfoField(IAnnotatedPosition annotatedPosition, StringBuilder sb)
+        private void AddInfoField(AnnotatedPosition annotatedPosition, StringBuilder sb)
         {
             var infoEntries = new VcfField();
             string infoField = annotatedPosition.Position.InfoData.UpdatedInfoField;
@@ -124,7 +125,7 @@ namespace VariantAnnotation.IO.VcfWriter
             }
         }
 
-        private static void ExtractInfo(IAnnotatedPosition annotatedPosition, VcfField infoEntries)
+        private static void ExtractInfo(AnnotatedPosition annotatedPosition, VcfField infoEntries)
         {
             var alleleFreq1000G = new VcfInfoKeyValue("AF1000G");
             var ancestralAllele = new VcfPositionalInfo("AA");
@@ -168,7 +169,7 @@ namespace VariantAnnotation.IO.VcfWriter
             infoEntries.Add(phyloP.GetString());
         }
 
-        private static void ProcessSaAnnotations(VcfInfoKeyValue alleleFreq1000G, VcfPositionalInfo ancestralAllele, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, IAnnotatedVariant annotatedVariant, int genotypeIndex)
+        private static void ProcessSaAnnotations(VcfInfoKeyValue alleleFreq1000G, VcfPositionalInfo ancestralAllele, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, AnnotatedVariant annotatedVariant, int genotypeIndex)
         {
             foreach (var sa in annotatedVariant.SupplementaryAnnotations)
             {
@@ -209,7 +210,7 @@ namespace VariantAnnotation.IO.VcfWriter
             }
         }
 
-        private static void UpdateSaAnnoInfo(IAnnotatedPosition annotatedPosition, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, Dictionary<string, bool> isSaArrayInfo)
+        private static void UpdateSaAnnoInfo(AnnotatedPosition annotatedPosition, Dictionary<string, VcfInfoKeyValue> suppAnnotationSources, Dictionary<string, bool> isSaArrayInfo)
         {
             foreach (var alternateAllele in annotatedPosition.AnnotatedVariants)
             {
@@ -224,7 +225,7 @@ namespace VariantAnnotation.IO.VcfWriter
             }
         }
 
-        private static int[] GetInputGenotypeIndex(string[] positionAltAlleles, IAnnotatedVariant[] annotatedPositionAnnotatedVariants)
+        private static int[] GetInputGenotypeIndex(string[] positionAltAlleles, AnnotatedVariant[] annotatedPositionAnnotatedVariants)
         {
 
             int numAnnotatedVar = annotatedPositionAnnotatedVariants.Length;
@@ -312,7 +313,7 @@ namespace VariantAnnotation.IO.VcfWriter
             return _csqInfoBuilder.ToString();
         }
 
-        private static void ExtractCsqs(IAnnotatedPosition unifiedJson, List<CsqEntry> csqs)
+        private static void ExtractCsqs(AnnotatedPosition unifiedJson, List<CsqEntry> csqs)
         {
             for (int i = 0; i < unifiedJson.AnnotatedVariants.Length; i++)
             {
@@ -324,7 +325,7 @@ namespace VariantAnnotation.IO.VcfWriter
                         .Select(transcript => new CsqEntry
                         {
                             Allele      = genotypeIndex.ToString(),
-                            Feature     = transcript.Transcript.Id.WithVersion,
+                            Feature     = transcript.Transcript.Id,
                             FeatureType = CsqCommon.TranscriptFeatureType,
                             Symbol      = transcript.Transcript.Gene.Symbol,
                             Consequence = transcript.Consequences == null ? null : string.Join("&", transcript.Consequences.Select(ConsequenceUtil.GetConsequence))
@@ -334,7 +335,7 @@ namespace VariantAnnotation.IO.VcfWriter
                 {
                     Allele      = genotypeIndex.ToString(),
                     Consequence = string.Join("&", regulatoryRegion.Consequences.Select(ConsequenceUtil.GetConsequence)),
-                    Feature     = regulatoryRegion.RegulatoryRegion.Id.WithoutVersion,
+                    Feature     = regulatoryRegion.RegulatoryRegion.Id,
                     FeatureType = CsqCommon.RegulatoryFeatureType
                 }));
             }

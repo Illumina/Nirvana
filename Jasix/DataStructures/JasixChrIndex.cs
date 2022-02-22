@@ -8,17 +8,17 @@ namespace Jasix.DataStructures
 {
     public sealed class JasixChrIndex
     {
-        public readonly string ReferenceSequence;
-        private readonly List<JasixNode> _nodes;
-	    private JasixNode _currentNode;
-		private readonly List<Interval<long>> _largeVariants;
-        private IntervalArray<long> _intervalArray;
+	    public readonly  string                                ReferenceSequence;
+	    private readonly List<JasixNode>                       _nodes;
+	    private          JasixNode                             _currentNode;
+	    private readonly List<OldIntervalArray<long>.Interval> _largeVariants;
+	    private          OldIntervalArray<long>                _intervalArray;
 
         public JasixChrIndex(string refName)
         {
             ReferenceSequence = refName;
             _nodes            = new List<JasixNode>();
-            _largeVariants    = new List<Interval<long>>();
+            _largeVariants    = new List<OldIntervalArray<long>.Interval>();
             _intervalArray    = null;
         }
 
@@ -35,16 +35,16 @@ namespace Jasix.DataStructures
             for (var i = 0; i < intervalCount; i++)
                 _largeVariants.Add(ReadInterval(reader));
 
-            _intervalArray = new IntervalArray<long>(_largeVariants.ToArray());
+            _intervalArray = new OldIntervalArray<long>(_largeVariants.ToArray());
         }
 
-        private static Interval<long> ReadInterval(ExtendedBinaryReader reader)
+        private static OldIntervalArray<long>.Interval ReadInterval(ExtendedBinaryReader reader)
         {
             int begin    = reader.ReadOptInt32();
             int end      = reader.ReadOptInt32();
             long position = reader.ReadOptInt64();
 
-            return new Interval<long>(begin, end, position);
+            return new OldIntervalArray<long>.Interval(begin, end, position);
         }
 
         public void Write(IExtendedBinaryWriter writer)
@@ -68,7 +68,7 @@ namespace Jasix.DataStructures
 	        }
 		}
 
-        private static void WriteInterval(Interval<long> interval, IExtendedBinaryWriter writer)
+        private static void WriteInterval(OldIntervalArray<long>.Interval interval, IExtendedBinaryWriter writer)
         {
             writer.WriteOpt(interval.Begin);
             writer.WriteOpt(interval.End);
@@ -82,7 +82,7 @@ namespace Jasix.DataStructures
 
 			if (Utilities.IsLargeVariant(begin,end))
             {
-                _largeVariants.Add(new Interval<long>(begin, end, filePosition));
+                _largeVariants.Add(new OldIntervalArray<long>.Interval(begin, end, filePosition));
                 end = begin;// large variants will be recorded as snvs so that we can query for all entries from a given position
             }
 
@@ -102,7 +102,7 @@ namespace Jasix.DataStructures
 			if (_currentNode != null)
 		        _nodes.Add(_currentNode);
 	        if (_largeVariants.Count != 0)
-		        _intervalArray = new IntervalArray<long>(_largeVariants.ToArray());
+		        _intervalArray = new OldIntervalArray<long>(_largeVariants.ToArray());
 		}
 
 

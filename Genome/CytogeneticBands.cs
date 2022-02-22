@@ -2,7 +2,7 @@
 {
     public static class CytogeneticBands
     {
-        public static string Find(this Band[] bands, IChromosome chromosome, int start, int end)
+        public static string Find(this Band[] bands, Chromosome chromosome, int start, int end)
         {
             string startCytogeneticBand = bands.GetCytogeneticBand(start);
             if (startCytogeneticBand == null) return null;

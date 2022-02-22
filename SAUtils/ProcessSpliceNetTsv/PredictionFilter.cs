@@ -58,7 +58,7 @@ namespace SAUtils.ProcessSpliceNetTsv
 
         private static IntervalForest<byte> GetIntronFlankingRegions(string gffFile1, string gffFile2)
         {
-            var flankingRegions = new IntervalArray<byte>[NumChrs];
+            var flankingRegions = new OldIntervalArray<byte>[NumChrs];
             var flankingRegionStarts1 = GetIntronFlankingRegionStarts(gffFile1);
             var flankingRegionStarts2 = GetIntronFlankingRegionStarts(gffFile2);
             for (var i = 0; i < NumChrs; i++)
@@ -66,12 +66,12 @@ namespace SAUtils.ProcessSpliceNetTsv
                 var allStartsThisChr = new HashSet<int>(flankingRegionStarts1[i]);
                 allStartsThisChr.UnionWith(flankingRegionStarts2[i]);
                 var intervals = GetIntervals(allStartsThisChr, _intronBoundaryDistanceCutoff * 2);
-                flankingRegions[i] = new IntervalArray<byte>(intervals.ToArray());
+                flankingRegions[i] = new OldIntervalArray<byte>(intervals.ToArray());
             }
             return new IntervalForest<byte>(flankingRegions);
         }
 
-        private static IEnumerable<Interval<byte>> GetIntervals(IEnumerable<int> starts, int size) => starts.Select(x => new Interval<byte>(x, x + size - 1, 0));
+        private static IEnumerable<OldIntervalArray<byte>.Interval> GetIntervals(IEnumerable<int> starts, int size) => starts.Select(x => new OldIntervalArray<byte>.Interval(x, x + size - 1, 0));
 
         private static HashSet<int>[] GetIntronFlankingRegionStarts(string gffFile)
         {

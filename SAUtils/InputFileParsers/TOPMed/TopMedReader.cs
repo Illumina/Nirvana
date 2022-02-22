@@ -13,7 +13,7 @@ namespace SAUtils.InputFileParsers.TOPMed
     public sealed class TopMedReader : IDisposable
     {
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
         private readonly ISequenceProvider _sequenceProvider;
 
         private int? _alleleNum;

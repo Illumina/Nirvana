@@ -2,19 +2,24 @@
 {
     public static class SaCommon
     {
-        public const int DefaultBlockSize      = 8 * 1024 * 1024;
-        public const ushort DataVersion        = 50;
-        public const ushort SchemaVersion      = 22;
+        public const int    DefaultBlockSize = 8 * 1024 * 1024;
+        public const ushort DataVersion      = 50;
+        public const ushort SchemaVersion    = 22;
+        public const ushort PsaSchemaVersion = 0;
 
-        public const double RefMinorThreshold  = 0.95;
+        public const double RefMinorThreshold = 0.95;
+        public const uint   GuardInt          = 4041327495;
+        public const string PsaIdentifier     = "ProteinSupplementaryAnnotations";
 
-        public const string IndexSufix         = ".idx";
+        public const string IndexSuffix        = ".idx";
         public const string SaFileSuffix       = ".nsa";
         public const string PhylopFileSuffix   = ".npd";
         public const string RefMinorFileSuffix = ".rma";
         public const string SiFileSuffix       = ".nsi";
         public const string NgaFileSuffix      = ".nga";
         public const string JsonSchemaSuffix   = ".schema";
+        public const string PsaFileSuffix      = ".psa";
+
 
         public const string DbsnpTag           = "dbsnp";
         public const string GlobalAlleleTag    = "globalAllele";
@@ -34,5 +39,8 @@
         public const string PhylopTag          = "phylopScore";
         public const string OmimTag            = "omim";
         public const string ExacScoreTag       = "exac";
+        
+        public const string SiftTag           = "sift";
+        public const string PolyPhenTag       = "polyphen";
     }
 }

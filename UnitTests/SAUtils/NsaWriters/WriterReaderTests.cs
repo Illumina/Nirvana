@@ -14,15 +14,15 @@ using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils.NsaWriters
 {
     public sealed class WriterReaderTests
     {
-        private static ClinVarItem GetClinVarItem(IChromosome chromosome,
+        private static ClinVarItem GetClinVarItem(Chromosome chromosome,
             int position,
             int stop,
             string referenceAllele,
@@ -75,7 +75,7 @@ namespace UnitTests.SAUtils.NsaWriters
             var sequence = new SimpleSequence(new string('A', 99)+"TAGTCGGTTAA" + new string('A', 89)+"GCCCAT");
             
             //return seqProvider.Object;
-            var refNameToChrom = new Dictionary<string, IChromosome>
+            var refNameToChrom = new Dictionary<string, Chromosome>
             {
                 { "1", ChromosomeUtilities.Chr1},
                 {"2", ChromosomeUtilities.Chr2 }
@@ -87,7 +87,7 @@ namespace UnitTests.SAUtils.NsaWriters
         [Fact]
         public void Write_clinvar_basic()
         {
-            var version = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks, "description");
+            var version = new DataSourceVersion("source1", "description", "v1", DateTime.Now.Ticks);
 
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
@@ -154,7 +154,7 @@ namespace UnitTests.SAUtils.NsaWriters
         [Fact]
         public void Preload()
         {
-            var version = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks, "description");
+            var version = new DataSourceVersion("source1", "description", "v1", DateTime.Now.Ticks);
 
             using (var saStream = new MemoryStream())
             using (var indexStream = new MemoryStream())
@@ -209,9 +209,9 @@ namespace UnitTests.SAUtils.NsaWriters
             using (var saWriter = new NsaWriter(
                 new ExtendedBinaryWriter(saStream),
                 new ExtendedBinaryWriter(indexStream),
-                new DataSourceVersion("customeSa", "test", DateTime.Now.Ticks),
+                new DataSourceVersion("customSa", null, "test", DateTime.Now.Ticks),
                 GetSequenceProvider(),
-                "customeSa", false, true, SaCommon.SchemaVersion, false, false))
+                "customSa", false, true, SaCommon.SchemaVersion, false, false))
             {
                 saWriter.Write(new[] { customItem });
             }

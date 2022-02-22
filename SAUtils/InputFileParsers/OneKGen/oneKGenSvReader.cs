@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 		#region members
 
 		private readonly StreamReader _reader;
-	    private readonly IDictionary<string, IChromosome> _refNameDict;
+	    private readonly Dictionary<string, Chromosome> _refNameDict;
 
 	    private string _svType;
 	    private int? _svEnd;
@@ -31,7 +31,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 
         #endregion
 
-        public OneKGenSvReader(StreamReader reader, IDictionary<string, IChromosome> refNameDict)
+        public OneKGenSvReader(StreamReader reader, Dictionary<string, Chromosome> refNameDict)
 		{
 			_reader = reader;
 		    _refNameDict  = refNameDict;

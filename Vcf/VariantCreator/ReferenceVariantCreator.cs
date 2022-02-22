@@ -27,7 +27,7 @@ namespace Vcf.VariantCreator
         private static VariantType DetermineVariantType(bool isRefMinor) => isRefMinor ? VariantType.SNV : VariantType.reference;
 
 
-        public static IVariant Create(IChromosome chromosome, int start, int end, string refallele, string altAllele,
+        public static IVariant Create(Chromosome chromosome, int start, int end, string refallele, string altAllele,
             string refMinorGlobalMajorAllele)
         {
             bool isRefMinor = end == start && refMinorGlobalMajorAllele != null;

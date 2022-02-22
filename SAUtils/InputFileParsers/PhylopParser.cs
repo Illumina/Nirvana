@@ -12,9 +12,9 @@ namespace SAUtils.InputFileParsers
     {
         private readonly Stream _stream;
         private readonly GenomeAssembly _assembly;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
 
-        public PhylopParser(Stream stream, GenomeAssembly assembly, IDictionary<string, IChromosome> refChromDict)
+        public PhylopParser(Stream stream, GenomeAssembly assembly, Dictionary<string, Chromosome> refChromDict)
         {
             _stream = stream;
             _assembly = assembly;
@@ -25,7 +25,7 @@ namespace SAUtils.InputFileParsers
         {
             using (var reader = FileUtilities.GetStreamReader(_stream))
             {
-                IChromosome chrom = null;
+                Chromosome chrom = null;
                 int position = 0;
                 int step = 0;
                 string line;
@@ -53,14 +53,13 @@ namespace SAUtils.InputFileParsers
             }
         }
 
-        private (IChromosome chrom, int position, int step) StartNewInterval(string line)
+        private (Chromosome chrom, int position, int step) StartNewInterval(string line)
         {
             var words = line.Split();
             string chromName = words[1].OptimizedKeyValue().Value;
 
-            var chrom = _refChromDict.TryGetValue(chromName, out var chromosome)? chromosome: new EmptyChromosome(chromName);
-            if (chrom.Index == ushort.MaxValue) return (chrom, 0, 0);
-
+            if(!_refChromDict.TryGetValue(chromName, out var chrom)) return (chrom, 0, 0);
+            
             int position = int.Parse(words[2].OptimizedKeyValue().Value);
             int step = short.Parse(words[3].OptimizedKeyValue().Value);
 

@@ -12,7 +12,7 @@ namespace UnitTests.Intervals
         [InlineData(20, true)]
         public void Contains(int position, bool expectedResult)
         {
-            var interval = new Interval<int>(10, 20, 3);
+            var  interval       = new IntervalArray<int>.Interval(10, 20, 3, -1);
             bool observedResult = interval.Contains(position);
             Assert.Equal(expectedResult, observedResult);
         }

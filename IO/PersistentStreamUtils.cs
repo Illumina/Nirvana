@@ -1,7 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using Amazon.S3;
-using Amazon.S3.Model;
 
 namespace IO
 {
@@ -25,19 +23,6 @@ namespace IO
             var connector = ConnectUtilities.GetS3ConnectFunc(bucketName, fileName, s3Client);
             var stream = ConnectUtilities.ConnectWithRetries(connector, position, MaxRetryCount);
             return new PersistentStream(stream, connector, position);
-        }
-
-        public static long GetLength(AmazonS3Client s3Client, string bucketName, string fileName)
-        {
-            var metadataRequest = new GetObjectMetadataRequest
-            {
-                BucketName = bucketName,
-                Key = fileName.TrimStart('/')
-            };
-
-            var getMetadataResponse = s3Client.GetObjectMetadataAsync(metadataRequest).Result;
-
-            return getMetadataResponse.ContentLength;
         }
 
         public static IEnumerable<Stream> GetStreams(IEnumerable<string> locations)

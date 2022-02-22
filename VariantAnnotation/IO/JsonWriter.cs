@@ -4,19 +4,18 @@ using Compression.FileHandling;
 using Jasix;
 using Jasix.DataStructures;
 using OptimizedCore;
-using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
-using VariantAnnotation.Interface.Providers;
+using Versioning;
 
 namespace VariantAnnotation.IO
 {
     public sealed class JsonWriter : IJsonWriter
     {
         private readonly StreamWriter _writer;
-        private bool _firstEntry;
-        private bool _positionFieldClosed;
-        private bool _leaveOpen;
+        private          bool         _firstEntry;
+        private          bool         _positionFieldClosed;
+        private readonly bool         _leaveOpen;
 
         private readonly BgzipTextWriter _bgzipTextWriter;
         private readonly OnTheFlyIndexCreator _jasixIndexCreator;
@@ -26,7 +25,7 @@ namespace VariantAnnotation.IO
         {
         }
 
-        public JsonWriter(Stream jsonStream, Stream indexStream, IAnnotationResources annotationResources, string creationTime, string[] sampleNames, bool leaveOpen) : this(jsonStream, indexStream, annotationResources.AnnotatorVersionTag, creationTime, annotationResources.VepDataVersion, annotationResources.DataSourceVersions, annotationResources.SequenceProvider.Assembly.ToString(), sampleNames, leaveOpen)
+        public JsonWriter(Stream jsonStream, Stream indexStream, AnnotationResources annotationResources, string creationTime, string[] sampleNames, bool leaveOpen) : this(jsonStream, indexStream, annotationResources.AnnotatorVersionTag, creationTime, annotationResources.DataVersion, annotationResources.DataSourceVersions, annotationResources.SequenceProvider.Assembly.ToString(), sampleNames, leaveOpen)
         {
         }
 

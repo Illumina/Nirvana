@@ -6,8 +6,8 @@ using SAUtils.DataStructures;
 using SAUtils.InputFileParsers.OMIM;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.NSA;
-using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
+using Versioning;
 using Xunit;
 
 namespace UnitTests.SAUtils
@@ -47,7 +47,7 @@ namespace UnitTests.SAUtils
         public void ReadBackGeneAnnotations()
         {
             var writeStream = new MemoryStream();
-            var version     = new DataSourceVersion("source1", "v1", DateTime.Now.Ticks);
+            var version     = new DataSourceVersion("source1", null, "v1", DateTime.Now.Ticks);
             var ngaWriter   = new NgaWriter(writeStream, version, "mimo", SaCommon.SchemaVersion, true);
             
             ngaWriter.Write(GetGeneAnnotations());

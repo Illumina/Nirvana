@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using SAUtils.DataStructures;
 using UnitTests.TestUtilities;
 using Xunit;
@@ -18,7 +17,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             }, 1);
 
             var counts = cosmicItem.GetTissueCounts();
-            Assert.Equal(2, counts.Count());
+            Assert.Equal(2, counts.Count);
             Assert.Equal(1, counts["primarySite 0"]);
             Assert.Equal(1, counts["site subtype 1"]);
         }
@@ -33,7 +32,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             }, 1);
 
             var counts = cosmicItem.GetTissueCounts();
-            Assert.Equal(3, counts.Count());
+            Assert.Equal(3, counts.Count);
             Assert.Equal(2, counts["primarySite 0"]);
             Assert.Equal(1, counts["site subtype 1"]);
             Assert.Equal(1, counts["site subtype 2"]);
@@ -49,7 +48,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             }, 1);
 
             var cancerTypeCounts = cosmicItem.GetCancerTypeCounts();
-            Assert.Equal(2, cancerTypeCounts.Count());
+            Assert.Equal(2, cancerTypeCounts.Count);
             Assert.Equal(1, cancerTypeCounts["primary histology 0"]);
             Assert.Equal(1, cancerTypeCounts["histology subtype 1"]);
         }
@@ -65,7 +64,7 @@ namespace UnitTests.SAUtils.InputFileParsers
             }, 1);
 
             var cancerTypeCounts = cosmicItem.GetCancerTypeCounts();
-            Assert.Equal(3, cancerTypeCounts.Count());
+            Assert.Equal(3, cancerTypeCounts.Count);
             Assert.Equal(2, cancerTypeCounts["primary histology 0"]);
             Assert.Equal(1, cancerTypeCounts["histology subtype 1"]);
             Assert.Equal(1, cancerTypeCounts["histology subtype 2"]);

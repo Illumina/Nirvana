@@ -132,21 +132,6 @@ namespace UnitTests.IO
             Assert.Equal(expectedResult, observedResult);
         }
 
-        [Fact]
-        public void ReadOptArray_ThreeElements()
-        {
-            var expectedValues = new[] { "Huey", "Duey", "Louie" };
-            var observedValues = GetObservedValue(writer => writer.WriteOptArray(expectedValues, writer.WriteOptAscii), reader => reader.ReadOptArray(reader.ReadAsciiString));
-            Assert.Equal(expectedValues, observedValues);
-        }
-
-        [Fact]
-        public void ReadOptArray_NoElements()
-        {
-            var observedValues = GetObservedValue(writer => writer.WriteOptArray(null as string[], writer.WriteOptAscii), reader => reader.ReadOptArray(reader.ReadAsciiString));
-            Assert.Null(observedValues);
-        }
-
         private static T GetObservedValue<T>(Action<ExtendedBinaryWriter> writeMethod, Func<ExtendedBinaryReader, T> readMethod)
         {
             T observedValue;

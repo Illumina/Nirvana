@@ -62,7 +62,7 @@ namespace SAUtils.MakeAaDb
             string outFileName = $"{version.Name}_{version.Version}_ancestralAlleles".Replace(' ','_');
             using (var ancestralAlleleReader = new AncestralAlleleReader(GZipUtilities.GetAppropriateStreamReader(_inputFile), referenceProvider))
             using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
-            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSufix)))
+            using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             using (var writer = new NsaWriter(new ExtendedBinaryWriter(nsaStream), new ExtendedBinaryWriter(indexStream), version, referenceProvider, SaCommon.AncestralAlleleTag, true, false, SaCommon.SchemaVersion, true))
             {
                 writer.Write(ancestralAlleleReader.GetItems());

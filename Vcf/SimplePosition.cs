@@ -10,14 +10,14 @@ namespace Vcf
     {
         public int Start { get; }
         public int End { get; private set; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public string RefAllele { get; }
         public string[] AltAlleles { get; }
         public string[] VcfFields { get; private set; }
         public bool[] IsDecomposed { get; private set; }
         public bool IsRecomposed { get; private set; }
 
-        private SimplePosition(IChromosome chromosome, int start, string refAllele, string[] altAlleles)
+        private SimplePosition(Chromosome chromosome, int start, string refAllele, string[] altAlleles)
         {
             Chromosome = chromosome;
             Start      = start;
@@ -25,7 +25,7 @@ namespace Vcf
             AltAlleles = altAlleles;
         }
 
-        public static SimplePosition GetSimplePosition(string[] vcfFields, IVcfFilter vcfFilter, IDictionary<string, IChromosome> refNameToChromosome, bool isRecomposed = false)
+        public static SimplePosition GetSimplePosition(string[] vcfFields, IVcfFilter vcfFilter, Dictionary<string, Chromosome> refNameToChromosome, bool isRecomposed = false)
         {
 
             var simplePosition = new SimplePosition(
@@ -44,9 +44,9 @@ namespace Vcf
         }
 
         public static SimplePosition GetSimplePosition(string vcfLine, IVcfFilter vcfFilter,
-            IDictionary<string, IChromosome> refNameToChromosome) => vcfLine == null ? null :
+            Dictionary<string, Chromosome> refNameToChromosome) => vcfLine == null ? null :
             GetSimplePosition(vcfLine.OptimizedSplit('\t'), vcfFilter, refNameToChromosome);
 
-        public static SimplePosition GetSimplePosition(string vcfLine, IDictionary<string, IChromosome> refNameToChromosome) => GetSimplePosition(vcfLine, new NullVcfFilter(), refNameToChromosome);
+        public static SimplePosition GetSimplePosition(string vcfLine, Dictionary<string, Chromosome> refNameToChromosome) => GetSimplePosition(vcfLine, new NullVcfFilter(), refNameToChromosome);
     }
 }

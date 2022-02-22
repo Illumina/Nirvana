@@ -7,7 +7,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class OneKGenItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -28,7 +28,7 @@ namespace SAUtils.DataStructures
         private int? EasAlleleCount { get; }
         private int? SasAlleleCount { get; }
 
-        public OneKGenItem(IChromosome chromosome,
+        public OneKGenItem(Chromosome chromosome,
             int position,
             string refAllele,
             string alternateAllele,
