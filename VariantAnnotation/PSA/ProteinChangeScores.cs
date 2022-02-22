@@ -1,83 +1,121 @@
 using System;
 using System.Collections.Generic;
 using IO;
-using VariantAnnotation.Interface.SA;
 
 namespace VariantAnnotation.PSA;
 
 public sealed class ProteinChangeScores
 {
-    public readonly IList<string> TranscriptIds;
-    public readonly short[,]      Scores;
-    public readonly int           ProteinLength;
-    public readonly string        PeptideSequence;
-    public          bool          HasInvalidRef { get; private set; }
+    public readonly string         TranscriptId;
+    public readonly List<ushort[]> Scores;
+    public readonly List<byte[]>   PredictionBytes;
+    public          int            ProteinLength; // needed for early termination of GetScore while reading
 
-    public const int    NumAminoAcids = 27;
-    public const string AllAminoAcids = "ABCDEFGHIJKLMNOPQRSTUVWXYZ*";
+    public static int    NumAminoAcids => AllAminoAcids.Length;
+    public const  string AllAminoAcids = "ABCDEFGHIJKLMNOPQRSTUVWXYZ*";
+    public const  ushort NullScore     = 1001;
 
-    public ProteinChangeScores(IList<string> transcriptIds, string peptideSequence)
+    public static readonly Dictionary<string, byte> PredictionToByte = new()
     {
-        TranscriptIds   = transcriptIds;
-        PeptideSequence = peptideSequence;
-        ProteinLength   = peptideSequence.Length;
+        {"benign", 0},
+        {"possibly damaging", 1},
+        {"probably damaging", 2},
+        {"deleterious", 3},
+        {"deleterious - low confidence", 4},
+        {"tolerated", 5},
+        {"tolerated - low confidence", 6}
+    };
 
-        Scores = new short [ProteinLength, NumAminoAcids];
+    public static readonly string[] BytesToPredictions =
+    {
+        "benign", "possibly damaging", "probably damaging", "deleterious",
+        "deleterious - low confidence", "tolerated", "tolerated - low confidence"
+    };
+
+    public ProteinChangeScores(string transcriptId)
+    {
+        TranscriptId    = transcriptId;
+        Scores          = new List<ushort[]>();
+        PredictionBytes = new List<byte[]>();
     }
 
     // this private constructor is only used by the read method. No Peptide sequence available.
-    private ProteinChangeScores(IList<string> transcriptIds, short[,] scores)
+    private ProteinChangeScores(string transcriptId, List<ushort[]> scores, List<byte[]> predictionBytes)
     {
-        TranscriptIds = transcriptIds;
-        ProteinLength = scores.GetLength(0);
-        Scores        = scores;
+        TranscriptId    = transcriptId;
+        Scores          = scores;
+        PredictionBytes = predictionBytes;
+        ProteinLength   = scores.Count;
     }
 
-    public bool AddScore(IProteinSuppDataItem item)
+    private static ushort[] GetFilledArray(int length, ushort fillValue)
     {
-        if (item.Position < 1 || item.Position > ProteinLength) return false;
-        if (PeptideSequence[item.Position - 1] != item.RefAllele)
+        var array = new ushort[length];
+        Array.Fill(array, fillValue);
+
+        return array;
+    }
+
+    public bool AddScore(PsaDataItem item)
+    {
+        if (item.Position < 1) return false;
+
+        var index = GetIndex(item.AltAllele);
+        if (index < 0) return false;
+
+        while (Scores.Count < item.Position)
         {
-            HasInvalidRef = true;
-            return false;
+            Scores.Add(GetFilledArray(NumAminoAcids, NullScore));
+            PredictionBytes.Add(new byte[NumAminoAcids]);
         }
 
-        int index = GetIndex(item.AltAllele);
-        if (index < 0) return false;
-        Scores[item.Position - 1, index] = item.Score;
+        var i = item.Position - 1;
+        Scores[i][index] = item.Score;
+        var predictionByte = PredictionToByte[item.Prediction];
+        PredictionBytes[i][index] = predictionByte;
         return true;
     }
 
-    public short GetScore(int position, char altAllele)
+    public (ushort, string)? GetScoreAndPrediction(int position, char altAllele)
     {
         if (position < 1 || position > ProteinLength)
             throw new IndexOutOfRangeException("Protein position out of score matrix range");
-        int alleleIndex = GetIndex(altAllele);
-        return Scores[position - 1, alleleIndex];
+
+        var alleleIndex = GetIndex(altAllele);
+        var score       = Scores[position - 1][alleleIndex];
+        if (score == NullScore) return null;
+        var predictionByte = PredictionBytes[position - 1][alleleIndex];
+        return (score, BytesToPredictions[predictionByte]);
     }
 
     public void Write(ExtendedBinaryWriter writer)
     {
-        writer.WriteOpt(TranscriptIds.Count);
-        foreach (string transcriptId in TranscriptIds)
-        {
-            writer.WriteOptAscii(transcriptId);
-        }
-
+        writer.WriteOptAscii(TranscriptId);
+        ProteinLength = Scores.Count;
         writer.WriteOpt(ProteinLength);
+
         for (var i = 0; i < ProteinLength; i++)
         {
-            for (var j = 0; j < NumAminoAcids; j++)
+            for (int j = 0; j < NumAminoAcids; j++)
             {
-                writer.Write(Scores[i, j]);
+                writer.WriteOpt(Scores[i][j]);
+            }
+        }
+
+        //write predictions
+        for (var i = 0; i < ProteinLength; i++)
+        {
+            for (int j = 0; j < NumAminoAcids; j++)
+            {
+                writer.Write(PredictionBytes[i][j]);
             }
         }
     }
 
-    private static int GetIndex(char allele)
+    private int GetIndex(char allele)
     {
         // standardizing to upper case letters for amino acids
-        if (char.IsLower(allele)) allele = char.ToUpper(allele);
+        if (char.IsLower(allele)) allele = Char.ToUpper(allele);
 
         if (allele == '*') return NumAminoAcids - 1;
         return allele - 'A';
@@ -85,24 +123,30 @@ public sealed class ProteinChangeScores
 
     public static ProteinChangeScores Read(ExtendedBinaryReader reader)
     {
-        int count         = reader.ReadOptInt32();
-        var transcriptIds = new string [count];
-        for (var i = 0; i < count; i++)
-        {
-            transcriptIds[i] = reader.ReadAsciiString();
-        }
+        var transcriptId = reader.ReadAsciiString();
 
-        int length = reader.ReadOptInt32();
+        var length = reader.ReadOptInt32();
 
-        var scores = new short[length, NumAminoAcids];
+        var scores = new List<ushort[]>(length);
         for (var i = 0; i < length; i++)
         {
-            for (var j = 0; j < NumAminoAcids; j++)
+            scores.Add(GetFilledArray(NumAminoAcids, NullScore));
+            for (int j = 0; j < NumAminoAcids; j++)
             {
-                scores[i, j] = reader.ReadInt16();
+                scores[i][j] = reader.ReadOptUInt16();
             }
         }
 
-        return new ProteinChangeScores(transcriptIds, scores);
+        var predictionBytes = new List<byte[]>(length);
+        for (var i = 0; i < length; i++)
+        {
+            predictionBytes.Add(new byte[NumAminoAcids]);
+            for (int j = 0; j < NumAminoAcids; j++)
+            {
+                predictionBytes[i][j] = reader.ReadByte();
+            }
+        }
+
+        return new ProteinChangeScores(transcriptId, scores, predictionBytes);
     }
 }

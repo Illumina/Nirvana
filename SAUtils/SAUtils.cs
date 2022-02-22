@@ -6,6 +6,7 @@ using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.ProcessSpliceNetTsv;
+using SAUtils.Psa;
 using VariantAnnotation.Interface;
 
 namespace SAUtils
@@ -38,7 +39,8 @@ namespace SAUtils
                 ["remapWithDbsnp"]     = new TopLevelOption("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
                 ["filterSpliceNetTsv"] = new TopLevelOption("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run),
                 ["mitomapVarDb"]       = new TopLevelOption("create MITOMAP small variants database", SmallVarDb.Run),
-                ["mitomapSvDb"]        = new TopLevelOption("create MITOMAP structural variants database", StructVarDb.Run)
+                ["mitomapSvDb"]        = new TopLevelOption("create MITOMAP structural variants database", StructVarDb.Run),
+                ["psa"]                = new("create SIFT/PolyPhen database from VEP export", PsaMain.Run)
             };
 
             var exitCode = new TopLevelAppBuilder(args, ops)

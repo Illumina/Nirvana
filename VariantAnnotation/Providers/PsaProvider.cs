@@ -31,27 +31,24 @@ namespace VariantAnnotation.Providers
             HashSet<GenomeAssembly> assemblies = psaReaders.Select(x => x.Header.Assembly).ToHashSet();
             if (assemblies.Count == 1) return assemblies.First();
 
-            throw new UserErrorException("Multiple genome assemblies detected in PSA files.");
+            throw new UserErrorException($"Multiple genome assemblies detected in PSA files.");
         }
 
         public void Annotate(AnnotatedTranscript annotatedTranscript, int position, char altAllele)
         {
             var    transcript = annotatedTranscript.Transcript;
             ushort chrIndex   = transcript.Chromosome.Index;
-            string geneId     = transcript.Gene.EnsemblId;
 
             string transcriptId = transcript.Id;
 
             foreach (PsaReader psaReader in _psaReaders)
             {
-                var score = psaReader.GetScore(chrIndex, geneId, transcriptId, position, altAllele);
-                if (score == null) continue;
-                var jsonKey    = psaReader.Header.JsonKey;
-                var prediction = PsaUtilities.GetPrediction(jsonKey, score.Value);
+                var scorePrediction = psaReader.GetScore(chrIndex, transcriptId, position, altAllele);
+                if (scorePrediction.score == null) continue;
+                
+                var predictionScore = new PredictionScore(scorePrediction.prediction, scorePrediction.score.Value);
 
-                var predictionScore = new PredictionScore(prediction, score.Value);
-
-                switch (jsonKey)
+                switch (psaReader.Header.JsonKey)
                 {
                     case SaCommon.SiftTag:
                         annotatedTranscript.AddSift(predictionScore);

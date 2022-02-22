@@ -1,48 +1,13 @@
 using System;
-using IO;
-using VariantAnnotation.SA;
 
 namespace VariantAnnotation.PSA;
 
 public static class PsaUtilities
 {
-    // public static string GetGeneId(Gene gene)
-    // {
-    //     string geneId = (gene.EnsemblId?.WithoutVersion ?? gene.EntrezGeneId?.WithoutVersion) ??
-    //         gene.Symbol;
-    //     return geneId;
-    // }
+    private const int MaxIntScore = 1000;
 
-    public static void CheckGuardInt(ExtendedBinaryReader reader, string fileSection)
-    {
-        uint guardInt = reader.ReadUInt32();
-        if (guardInt != SaCommon.GuardInt)
-            throw new DataMisalignedException(
-                $"Failed to find GuardInt ({SaCommon.GuardInt}) at the end of {fileSection}.");
-    }
+    public static ushort GetUshortScore(double score) =>
+        (ushort) Math.Round(score * MaxIntScore, MidpointRounding.AwayFromZero);
 
-    public static short GetShortScore(double score)
-    {
-        return (short) Math.Round(score * 1000, MidpointRounding.AwayFromZero);
-    }
-
-    public static double GetDoubleScore(short score)
-    {
-        return 1.0 * score / 1000;
-    }
-
-
-    public static string GetPrediction(string jsonKey, double score)
-    {
-        switch (jsonKey)
-        {
-            case SaCommon.SiftTag:
-                return score < 0.05 ? "deleterious" : "tolerated";
-            case SaCommon.PolyPhenTag:
-                if (score > 0.908) return "probably damaging";
-                return 0.446 < score ? "possibly damaging" : "benign";
-        }
-
-        return "unknown";
-    }
+    public static double GetDoubleScore(ushort score) => 1.0 * score / MaxIntScore;
 }

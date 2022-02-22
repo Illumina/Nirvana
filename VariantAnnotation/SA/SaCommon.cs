@@ -1,4 +1,7 @@
-﻿namespace VariantAnnotation.SA
+﻿using System;
+using IO;
+
+namespace VariantAnnotation.SA
 {
     public static class SaCommon
     {
@@ -39,8 +42,15 @@
         public const string PhylopTag          = "phylopScore";
         public const string OmimTag            = "omim";
         public const string ExacScoreTag       = "exac";
-        
-        public const string SiftTag           = "sift";
-        public const string PolyPhenTag       = "polyphen";
+
+        public const string SiftTag     = "sift";
+        public const string PolyPhenTag = "polyphen";
+
+        public static void CheckGuardInt(ExtendedBinaryReader reader, string fileSection)
+        {
+            var guardInt = reader.ReadUInt32();
+            if (guardInt != GuardInt)
+                throw new DataMisalignedException($"Failed to find GuardInt ({GuardInt}) at the end of {fileSection}.");
+        }
     }
 }

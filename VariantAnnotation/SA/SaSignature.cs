@@ -1,18 +1,17 @@
 using System;
 using IO;
-using VariantAnnotation.PSA;
 
 namespace VariantAnnotation.SA
 {
-    public record SaSignature(string Identifier, int MagicNumber)
+    public sealed record SaSignature(string Identifier, int MagicNumber)
     {
-        private static readonly Random _random = new Random();
+        private static readonly Random Random = new();
         public                  string Identifier  { get; } = Identifier;
         public                  int    MagicNumber { get; } = MagicNumber;
 
         public static SaSignature Generate(string identifier)
         {
-            var magicNumber = _random.Next(1_000_000, int.MaxValue);
+            var magicNumber = Random.Next(1_000_000, int.MaxValue);
             return new SaSignature(identifier, magicNumber);
         }
 
@@ -21,12 +20,11 @@ namespace VariantAnnotation.SA
             writer.Write(SaCommon.GuardInt);
             writer.WriteOptAscii(Identifier);
             writer.WriteOpt(MagicNumber);
-            
         }
-        
+
         public static SaSignature Read(ExtendedBinaryReader reader)
         {
-            PsaUtilities.CheckGuardInt(reader, "SaSignature");
+            SaCommon.CheckGuardInt(reader, "SaSignature");
             var identifier  = reader.ReadAsciiString();
             var magicNumber = reader.ReadOptInt32();
 

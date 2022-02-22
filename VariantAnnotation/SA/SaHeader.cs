@@ -1,24 +1,24 @@
 using Genome;
 using IO;
-using VariantAnnotation.PSA;
 using Versioning;
 
 namespace VariantAnnotation.SA
 {
-    public sealed record SaHeader(string JsonKey, GenomeAssembly Assembly, IDataSourceVersion Version, int SchemaVersion)
+    public sealed record SaHeader(string JsonKey, GenomeAssembly Assembly, IDataSourceVersion Version,
+        int SchemaVersion)
     {
         public void Write(ExtendedBinaryWriter writer)
         {
             writer.Write(SaCommon.GuardInt);
             writer.WriteOptAscii(JsonKey);
-            writer.Write((byte)Assembly);
+            writer.Write((byte) Assembly);
             writer.WriteOpt(SchemaVersion);
             Version.Write(writer);
         }
 
         public static SaHeader Read(ExtendedBinaryReader reader)
         {
-            PsaUtilities.CheckGuardInt(reader, "SaHeader");
+            SaCommon.CheckGuardInt(reader, "SaHeader");
             var jsonKey       = reader.ReadAsciiString();
             var assembly      = (GenomeAssembly) reader.ReadByte();
             var schemaVersion = reader.ReadOptInt32();

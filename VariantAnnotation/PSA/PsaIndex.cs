@@ -2,44 +2,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using IO;
-using VariantAnnotation.Algorithms;
 using VariantAnnotation.SA;
 
 namespace VariantAnnotation.PSA;
 
 public sealed class PsaIndex
 {
-    private readonly Dictionary<ushort, List<PsaIndexBlock>> _geneIndexBlocks;
-    public readonly  SaHeader                                Header;
-    private readonly SaSignature                             _signature;
+    public readonly  SaHeader                                                 Header;
+    private readonly SaSignature                                              _signature;
+    private readonly Dictionary<ushort, List<(string id, long fileLocation)>> _transcriptBlockLocations;
 
     public PsaIndex(SaHeader header, SaSignature signature,
-        Dictionary<ushort, List<PsaIndexBlock>> geneIndexBlocks = null)
+        Dictionary<ushort, List<(string id, long fileLocation)>> transcriptBlockLocations = null)
     {
-        Header           = header;
-        _signature       = signature;
-        _geneIndexBlocks = geneIndexBlocks ?? new Dictionary<ushort, List<PsaIndexBlock>>();
-    }
-
-    public void Write(ExtendedBinaryWriter writer)
-    {
-        _signature.Write(writer);
-        Header.Write(writer);
-
-        writer.WriteOpt(_geneIndexBlocks.Count);
-        foreach ((ushort index, List<PsaIndexBlock> indexBlocks) in _geneIndexBlocks)
-        {
-            writer.Write(SaCommon.GuardInt);
-            writer.WriteOpt(index);
-            writer.WriteOpt(indexBlocks.Count);
-            foreach (PsaIndexBlock indexBlock in indexBlocks.OrderBy(x => x.GeneName))
-            {
-                indexBlock.Write(writer);
-            }
-        }
-
-        writer.Write(SaCommon.GuardInt);
-        writer.Flush();
+        Header     = header;
+        _signature = signature;
+        _transcriptBlockLocations =
+            transcriptBlockLocations ?? new Dictionary<ushort, List<(string id, long fileLocation)>>();
     }
 
     public static PsaIndex Read(ExtendedBinaryReader reader)
@@ -47,45 +26,87 @@ public sealed class PsaIndex
         var signature = SaSignature.Read(reader);
         var header    = SaHeader.Read(reader);
 
-        int chromCount      = reader.ReadOptInt32();
-        var geneIndexBlocks = new Dictionary<ushort, List<PsaIndexBlock>>(chromCount);
+        var chromCount               = reader.ReadOptInt32();
+        var transcriptBlockLocations = new Dictionary<ushort, List<(string id, long fileLocation)>>(chromCount);
 
-        for (var i = 0; i < chromCount; i++)
+        for (int i = 0; i < chromCount; i++)
         {
-            PsaUtilities.CheckGuardInt(reader, "chromosome blocks");
-            ushort index       = reader.ReadOptUInt16();
-            int    blockCount  = reader.ReadOptInt32();
-            var    indexBlocks = new List<PsaIndexBlock>(blockCount);
-            for (var j = 0; j < blockCount; j++)
+            SaCommon.CheckGuardInt(reader, "chromosome blocks");
+            var index               = reader.ReadOptUInt16();
+            var transcriptCount     = reader.ReadOptInt32();
+            var transcriptLocations = new List<(string id, long location)>(transcriptCount);
+            for (int j = 0; j < transcriptCount; j++)
             {
-                var block = PsaIndexBlock.Read(reader);
-                indexBlocks.Add(block);
+                var transcriptId = reader.ReadAsciiString();
+                var fileLocation = reader.ReadOptInt64();
+                transcriptLocations.Add((transcriptId, fileLocation));
             }
 
-            geneIndexBlocks.Add(index, indexBlocks);
+            transcriptBlockLocations.Add(index, transcriptLocations);
         }
 
-        PsaUtilities.CheckGuardInt(reader, "end of chrom blocks");
+        SaCommon.CheckGuardInt(reader, "end of chrom blocks");
 
-        return new PsaIndex(header, signature, geneIndexBlocks);
+        return new PsaIndex(header, signature, transcriptBlockLocations);
     }
 
-    public long GetGeneBlockPosition(ushort index, string geneName)
+    public void Write(ExtendedBinaryWriter writer)
     {
-        if (!_geneIndexBlocks.TryGetValue(index, out List<PsaIndexBlock> geneBlocks)) return -1;
+        _signature.Write(writer);
+        Header.Write(writer);
 
-        int i = Search.BinarySearch(geneBlocks, geneName);
-        if (i < 0) return -1;
+        var chromCount = _transcriptBlockLocations.Count;
+        writer.WriteOpt(chromCount);
 
-        return geneBlocks[i].FilePosition;
+        foreach (var (chrIndex, transcriptLocations) in _transcriptBlockLocations)
+        {
+            writer.Write(SaCommon.GuardInt);
+            writer.WriteOpt(chrIndex);
+            writer.WriteOpt(transcriptLocations.Count);
+
+            foreach (var (id, location) in transcriptLocations.OrderBy(x => x.id))
+            {
+                writer.WriteOptAscii(id);
+                writer.WriteOpt(location);
+            }
+        }
+
+        writer.Write(SaCommon.GuardInt);
+        writer.Flush();
     }
 
-    public void AddGeneBlock(ushort chromIndex, string geneName, int start, int end, long filePosition)
+    public void Add(ushort chrIndex, string transcriptId, long fileLocation)
     {
-        if (!_geneIndexBlocks.ContainsKey(chromIndex))
-            _geneIndexBlocks.Add(chromIndex, new List<PsaIndexBlock>());
+        if (!_transcriptBlockLocations.ContainsKey(chrIndex))
+            _transcriptBlockLocations[chrIndex] = new List<(string id, long fileLocation)>();
+        _transcriptBlockLocations[chrIndex].Add((transcriptId, fileLocation));
+    }
 
-        _geneIndexBlocks[chromIndex].Add(new PsaIndexBlock(geneName, start, end, filePosition));
+    public long GetFileLocation(ushort chrIndex, string transcriptId)
+    {
+        if (!_transcriptBlockLocations.ContainsKey(chrIndex)) return -1;
+        var transcriptLocations = _transcriptBlockLocations[chrIndex];
+
+        var index = BinarySearch(transcriptLocations, transcriptId);
+        return index < 0 ? -1 : transcriptLocations[index].fileLocation;
+    }
+
+    private int BinarySearch(List<(string id, long fileLocation)> items, string value)
+    {
+        var begin = 0;
+        int end   = items.Count - 1;
+
+        while (begin <= end)
+        {
+            int index = begin + (end - begin >> 1);
+
+            int ret = string.Compare(items[index].id, value, StringComparison.Ordinal);
+            if (ret == 0) return index;
+            if (ret < 0) begin = index + 1;
+            else end           = index - 1;
+        }
+
+        return ~begin;
     }
 
     public void ValidateSignature(SaSignature signature)
@@ -95,9 +116,9 @@ public sealed class PsaIndex
                 $"The PsaIndex does not contain expected identifier: {SaCommon.PsaIdentifier}");
 
         if (_signature != signature)
-            throw new DataMisalignedException("The index and .psa file signatures do not match.\n" +
-                $"Index signature: {_signature}\n"                                                 +
-                $".psa signature: {signature}"                                                     +
-                "This index file is not the one corresponding to this .psa file.");
+            throw new DataMisalignedException($"The index and .psa file signatures do not match.\n" +
+                $"Index signature: {_signature}\n"                                                  +
+                $".psa signature: {signature}"                                                      +
+                $"This index file is not the one corresponding to this .psa file.");
     }
 }
