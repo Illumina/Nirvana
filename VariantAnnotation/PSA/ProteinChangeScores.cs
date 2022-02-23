@@ -78,8 +78,7 @@ public sealed class ProteinChangeScores
 
     public (ushort, string)? GetScoreAndPrediction(int position, char altAllele)
     {
-        if (position < 1 || position > ProteinLength)
-            throw new IndexOutOfRangeException("Protein position out of score matrix range");
+        if (position < 1 || position > ProteinLength) return null;
 
         var alleleIndex = GetIndex(altAllele);
         var score       = Scores[position - 1][alleleIndex];
