@@ -106,7 +106,7 @@ namespace VariantAnnotation.Providers
 
             string refAa = annotatedTranscript.ReferenceAminoAcids;
             string altAa = annotatedTranscript.AlternateAminoAcids;
-            if (refAa.Length != 1 || altAa.Length != 1) return;
+            if (refAa == null || altAa == null || refAa.Length != 1 || altAa.Length != 1) return;
 
             _psaProvider.Annotate(annotatedTranscript, annotatedTranscript.MappedPosition.ProteinStart,
                 annotatedTranscript.AlternateAminoAcids[0]);
