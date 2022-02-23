@@ -81,6 +81,7 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedVariants)
             {
                 var variant = annotatedVariant.Variant;
+                if (variant.Chromosome.IsEmpty) continue;
 
                 GetGeneFusionCandidates(variant.BreakEnds);
                 GetFlankingTranscripts(variant);
@@ -120,6 +121,7 @@ namespace VariantAnnotation.Providers
 
             foreach (var breakEnd in breakEnds)
             {
+                if (breakEnd.Piece2.Chromosome.IsEmpty) continue;
                 GetGeneFusionTranscripts(breakEnd.Piece2.Chromosome.Index, breakEnd.Piece2.Position);
                 if (_geneFusionTranscripts.Count == 0) continue;
 
@@ -173,9 +175,11 @@ namespace VariantAnnotation.Providers
         {
             foreach (var annotatedVariant in annotatedVariants)
             {
+                var variant = annotatedVariant.Variant;
+                if (variant.Chromosome.IsEmpty) continue;
+
                 // In case of insertions, the base(s) are assumed to be inserted at the end position
                 // if this is an insertion just before the beginning of the regulatory element, this takes care of it
-                var variant      = annotatedVariant.Variant;
                 int variantBegin = variant.Type == VariantType.insertion ? variant.End : variant.Start;
 
                 if (SkipLargeVariants(variantBegin, variant.End)) continue;
