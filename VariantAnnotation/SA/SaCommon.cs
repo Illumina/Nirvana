@@ -3,7 +3,7 @@
     public static class SaCommon
     {
         public const int    DefaultBlockSize = 8 * 1024 * 1024;
-        public const ushort DataVersion      = 63;
+        public const ushort DataVersion      = 64;
         public const ushort SchemaVersion    = 22;
         public const ushort NsiSchemaVersion = 22;
 
