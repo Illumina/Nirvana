@@ -7,10 +7,11 @@ using IO;
 using SAUtils.GenericScore;
 using SAUtils.GenericScore.GenericScoreParser;
 using SAUtils.InputFileParsers;
+using VariantAnnotation.GenericScore;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.Revel
+namespace SAUtils.Dann
 {
     public static class Create
     {
@@ -29,7 +30,7 @@ namespace SAUtils.Revel
                 },
                 {
                     "in|i=",
-                    "input REVEL file path",
+                    "input DANN file path",
                     v => _inputFile = v
                 },
                 {
@@ -44,11 +45,11 @@ namespace SAUtils.Revel
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
-                .CheckInputFilenameExists(_inputFile,           "input REVEL file Path",                   "--in")
+                .CheckInputFilenameExists(_inputFile,           "input DANN file Path",                    "--in")
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
-                .ShowHelpMenu("Create a supplementary database from REVEL input file ", commandLineExample)
+                .ShowHelpMenu("Create a supplementary database from DANN input file ", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 
@@ -59,24 +60,32 @@ namespace SAUtils.Revel
         {
             var nucleotides = new[] {"A", "C", "G", "T"};
 
-            var revelParserSettings = new ParserSettings(
-                new ColumnPositions(0, 1, 2, 3, 6, null),
+            var dannParserSettings = new ParserSettings(
+                new ColumnPositions(0, 2, 3, 4, 5, null),
                 nucleotides,
                 GenericScoreParser.MaxRepresentativeScores
+            );
+
+            var dannWriterSettings = new WriterSettings(
+                1_000_000,
+                nucleotides,
+                new ScoreEncoder(2, 1.0),
+                new ScoreJsonEncoder(SaCommon.DannTag, SaCommon.Score),
+                new SaItemValidator()
             );
 
             var version     = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
             var outFileName = $"{version.Name}_{version.Version}";
             using (var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference)))
             using (var streamReader = GZipUtilities.GetAppropriateStreamReader(_inputFile))
-            using (var revelParser = new GenericScoreParser(revelParserSettings, streamReader, referenceProvider.RefNameToChromosome))
-            using (var nsaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix)))
+            using (var dannParser = new GenericScoreParser(dannParserSettings, streamReader, referenceProvider.RefNameToChromosome))
+            using (var saStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GsaFileSuffix)))
             using (var indexStream =
-                   FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
-            using (var nsaWriter = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.RevelTag, true, false,
-                       SaCommon.SchemaVersion, false))
+                   FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GsaFileSuffix + SaCommon.IndexSuffix)))
+            using (var saWriter = new ScoreFileWriter(dannWriterSettings, saStream, indexStream, version, referenceProvider,
+                       SaCommon.SchemaVersion, skipIncorrectRefEntries: true, leaveOpen: false))
             {
-                nsaWriter.Write(revelParser.GetItems());
+                saWriter.Write(dannParser.GetItems());
             }
 
             return ExitCodes.Success;

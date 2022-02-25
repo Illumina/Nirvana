@@ -67,6 +67,7 @@ namespace SAUtils
                 ["RefMinor"]       = new("create Reference Minor database from 1000 Genome ", RefMinorDb.Main.Run),
                 ["RemapWithDbsnp"] = new("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
                 ["Revel"]          = new("create REVEL database", Revel.Create.Run),
+                ["Dann"]           = new("create DANN database", Dann.Create.Run),
                 ["SpliceAi"]       = new("create SpliceAI database", SpliceAiDb.Run),
                 ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run)
             };

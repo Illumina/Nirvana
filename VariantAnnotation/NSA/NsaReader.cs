@@ -143,7 +143,6 @@ namespace VariantAnnotation.NSA
                 string annotation = _annotationReader.ReadString();
                 annotations.Add((refAllele ?? "", altAllele ?? "", annotation));
             }
-            
         }
 
         public void GetAnnotation(int position, List<(string refAllele, string altAllele, string annotation)> annotations)

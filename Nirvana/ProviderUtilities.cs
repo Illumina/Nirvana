@@ -4,6 +4,7 @@ using System.Linq;
 using IO;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.GeneFusions.IO;
+using VariantAnnotation.GenericScore;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
@@ -64,6 +65,26 @@ namespace Nirvana
                 readers.Add(new NsaReader(PersistentStreamUtils.GetReadStream(nsaPath), PersistentStreamUtils.GetReadStream(idxPath)));
             return readers.SortByJsonKey();
         }
+
+        public static IAnnotationProvider GetGsaProvider(AnnotationFiles files)
+        {
+            if (files?.GsaFiles == null || files.GsaFiles.Count == 0) return null;
+
+            List<(string Gsa, string Idx)> filePaths = files.GsaFiles;
+
+            var readers = new ScoreReader[filePaths.Count];
+
+            var i = 0;
+            foreach ((string gsaPath, string idxPath) in filePaths)
+            {
+                readers[i] = ScoreReader.Read(PersistentStreamUtils.GetReadStream(gsaPath), PersistentStreamUtils.GetReadStream(idxPath));
+                i++;
+            }
+
+            readers = readers.SortByJsonKey();
+            return new ScoreProvider(readers);
+        }
+
 
         private static INsiReader[] GetNsiReaders(IReadOnlyCollection<string> filePaths)
         {

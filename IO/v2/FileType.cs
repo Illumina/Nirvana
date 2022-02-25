@@ -19,6 +19,8 @@
         SaGenes        = 4000,
         FusionCatcher  = 4100,
         GeneFusionJson = 4101,
-        PhyloP         = 5000
+        PhyloP         = 5000,
+        GsaWriter      = 6000,
+        GsaIndex       = 6500,
     }
 }

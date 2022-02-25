@@ -60,7 +60,7 @@ namespace UnitTests.TestUtilities
             var conservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider,
-                conservationProvider, lcrProvider, null, null);
+                conservationProvider, lcrProvider, null, null, null);
             return (annotator,sequenceProvider);
         }
     }

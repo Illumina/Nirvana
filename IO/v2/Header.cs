@@ -5,14 +5,15 @@ namespace IO.v2
     /// <summary>
     /// Common header for all our Nirvana file formats 
     /// </summary>
-    public record Header(FileType FileType, ushort FileFormatVersion)
+    public sealed record Header(FileType FileType, ushort FileFormatVersion)
     {
         // see http://www.libpng.org/pub/png/spec/1.2/PNG-Rationale.html#R.PNG-file-signature
-        
+
         // decimal            137  78  73  82  13  10   26  10
         // hexadecimal         89  4E  49  52  0d  0a   1a  0a
         // ASCII C notation  \211   N   I   R  \r  \n \032  \n
         private const ulong NirvanaSignature = 727905342105144969;
+        public const  uint  NirvanaFooter    = 4283582798; // N I R 0xFF
 
         public static Header Read(BinaryReader reader)
         {
@@ -25,7 +26,7 @@ namespace IO.v2
 
             return new Header(fileType, fileFormatVersion);
         }
-        
+
         public void Write(BinaryWriter writer)
         {
             writer.Write(NirvanaSignature);

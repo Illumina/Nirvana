@@ -9,7 +9,7 @@ using Xunit;
 
 namespace UnitTests.VariantAnnotation.NSA
 {
-    public sealed class ChunkedIndexTests
+    public sealed class NsaIndexTests
     {
         [Fact]
         public void Query_chunks_in_same_chrom()

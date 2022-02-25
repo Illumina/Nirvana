@@ -11,6 +11,7 @@ namespace Nirvana
     public sealed class AnnotationFiles
     {
         public List<(string Nsa, string Idx)> NsaFiles                { get; } = new();
+        public List<(string Gsa, string Idx)> GsaFiles                { get; } = new();
         public List<string>                   NsiFiles                { get; } = new();
         public List<string>                   NgaFiles                { get; } = new();
         public List<string>                   GeneFusionSourceFiles   { get; } = new();
@@ -29,6 +30,9 @@ namespace Nirvana
                 {
                     case SaCommon.SaFileSuffix:
                         NsaFiles.Add((filePath, filePath + SaCommon.IndexSuffix));
+                        break;
+                    case SaCommon.GsaFileSuffix:
+                        GsaFiles.Add((filePath, filePath + SaCommon.IndexSuffix));
                         break;
                     case SaCommon.IntervalFileSuffix:
                         NsiFiles.Add(filePath);

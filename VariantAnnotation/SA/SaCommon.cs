@@ -15,6 +15,7 @@
 
         public const string IndexSuffix            = ".idx";
         public const string SaFileSuffix           = ".nsa";
+        public const string GsaFileSuffix          = ".gsa";
         public const string PhylopFileSuffix       = ".npd";
         public const string RefMinorFileSuffix     = ".rma";
         public const string IntervalFileSuffix     = ".nsi";
@@ -49,6 +50,8 @@
         public const string PrimateAiTag           = "primateAI";
         public const string MitoHeteroplasmyTag    = "heteroplasmy";
         public const string RevelTag               = "revel";
+        public const string DannTag                = "dann";
         public const string LowComplexityRegionTag = "lowComplexityRegion";
+        public const string Score                  = "score";
     }
 }
