@@ -1,6 +1,6 @@
 using System.IO;
 using System.Linq;
-using SAUtils.dbVar;
+using SAUtils.ClinGen;
 using UnitTests.TestUtilities;
 using Xunit;
 

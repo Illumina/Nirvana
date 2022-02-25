@@ -3,11 +3,12 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.dbVar
+namespace SAUtils.ClinGen
 {
     public static class DosageSensitivity
     {
@@ -47,13 +48,19 @@ namespace SAUtils.dbVar
 
         private static ExitCodes ProgramExecution()
         {
-            var dosageSensitivityVersion = DataSourceVersionReader.GetSourceVersion(_dosageSensitivityFile + ".version");
+            var versionFileNames = Directory.GetFiles(".", "*.version");
+            if (versionFileNames.Length != 1)
+            {
+                throw new UserErrorException($"Multiple version files found in directory: {Directory.GetCurrentDirectory()}");
+            }
 
-            string outFileName = $"{dosageSensitivityVersion.Name.Replace(' ','_')}_{dosageSensitivityVersion.Version}";
+            var sourceVersion = DataSourceVersionReader.GetSourceVersion(versionFileNames[0]);
+
+            string outFileName = $"{sourceVersion.Name.Replace(' ','_')}_{sourceVersion.Version}";
 
             using (var dosageSensitivityParser= new DosageSensitivityParser(GZipUtilities.GetAppropriateReadStream(_dosageSensitivityFile)))
             using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix)))
-            using (var ngaWriter = new NgaWriter(stream, dosageSensitivityVersion, SaCommon.DosageSensitivityTag, SaCommon.SchemaVersion, false))
+            using (var ngaWriter = new NgaWriter(stream, sourceVersion, SaCommon.DosageSensitivityTag, SaCommon.SchemaVersion, false))
             {
                 ngaWriter.Write(dosageSensitivityParser.GetItems());
             }

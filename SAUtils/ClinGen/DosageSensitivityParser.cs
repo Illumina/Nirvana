@@ -4,7 +4,7 @@ using System.IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 
-namespace SAUtils.dbVar
+namespace SAUtils.ClinGen
 {
     public sealed class DosageSensitivityParser:IDisposable
     {
@@ -32,7 +32,8 @@ namespace SAUtils.dbVar
         public Dictionary<string, List<ISuppGeneItem>> GetItems()
         {
             var geneAnnotations = new Dictionary<string, List<ISuppGeneItem>>();
-
+            var duplicateGenes  = new HashSet<string>();
+            
             using (var reader = new StreamReader(_stream))
             {
                 string line;
@@ -46,9 +47,20 @@ namespace SAUtils.dbVar
                     {
                         if (MissingIndices()) throw new InvalidDataException("Column indices not set!!");
                         var geneAnnotation = GetGeneAndScores(line);
-                        geneAnnotations.Add(geneAnnotation.GeneSymbol, new List<ISuppGeneItem> { geneAnnotation });
+                        bool isDuplicate = geneAnnotations.TryAdd(geneAnnotation.GeneSymbol, new List<ISuppGeneItem> { geneAnnotation });
+                        if (!isDuplicate)
+                        {
+                            duplicateGenes.Add(geneAnnotation.GeneSymbol);
+                            if (geneAnnotation.GetJsonString() != geneAnnotations[geneAnnotation.GeneSymbol][0].GetJsonString())
+                            {
+                                Console.WriteLine(geneAnnotation.GetJsonString());
+                                Console.WriteLine(geneAnnotations[geneAnnotation.GeneSymbol][0].GetJsonString());
+                                throw new DataMisalignedException($"Duplicate gene entries have conflicting informatioin.");
+                            }
+                        }
                     }
                 }
+                Console.WriteLine($"WARNING: Duplicate entries found for genes:{string.Join(',', duplicateGenes)}. But the contents were identical.");
             }
 
             return geneAnnotations;

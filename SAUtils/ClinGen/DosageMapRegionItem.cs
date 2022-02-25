@@ -3,7 +3,7 @@ using OptimizedCore;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
 
-namespace SAUtils.dbVar
+namespace SAUtils.ClinGen
 {
     public sealed class DosageMapRegionItem : ISuppIntervalItem
     {

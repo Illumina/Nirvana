@@ -4,7 +4,7 @@ using System.IO;
 using Genome;
 using OptimizedCore;
 
-namespace SAUtils.dbVar
+namespace SAUtils.ClinGen
 {
     public sealed class DosageMapRegionParser : IDisposable
     {

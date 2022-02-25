@@ -5,7 +5,6 @@ using SAUtils.ClinGen;
 using SAUtils.CosmicGeneFusions;
 using SAUtils.CreateClinvarDb;
 using SAUtils.DbSnpRemapper;
-using SAUtils.dbVar;
 using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;

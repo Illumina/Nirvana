@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using SAUtils.dbVar;
+using SAUtils.ClinGen;
 using Xunit;
 
 namespace UnitTests.SAUtils.DbVar
@@ -20,6 +20,7 @@ namespace UnitTests.SAUtils.DbVar
             writer.WriteLine("AAGAB\t79719\t15q23\tchr15:67493013-67547536\t3\tSufficient evidence for dosage pathogenicity\t23064416\t23000146\t\t0\tNo evidence available\t\t\t\t2013-02-28\t148600\t");
             writer.WriteLine("AARS\t16\t16q22.1\tchr16:70286297-70323412\t0\tNo evidence available\t\t\t\t0\tNo evidence available\t\t\t\t2018-01-11\t\t");
             writer.WriteLine("AARS2\t57505\t6p21.1\tchr6:44266463-44281063\t30\tGene associated with autosomal recessive phenotype\t\t\t\tNot yet evaluated\tNot yet evaluated\t\t\t\t2016-08-22\t\t");
+            writer.WriteLine("RSPH1\t89765\t21q22.3\tchr21:42472486-42496246\t30\tGene associated with autosomal recessive phenotype\t\t\t\t\t\t\tNot yet evaluated\tNot yet evaluated\t\t\t\t\t\t\t2016-08-22\t615481\t");
 
             writer.Flush();
 
@@ -34,11 +35,12 @@ namespace UnitTests.SAUtils.DbVar
             {
                 var items = dbVarReader.GetItems();
 
-                Assert.Equal(4, items.Count);
+                Assert.Equal(5, items.Count);
                 Assert.Equal("{\"haploinsufficiency\":\"gene associated with autosomal recessive phenotype\",\"triplosensitivity\":\"no evidence to suggest that dosage sensitivity is associated with clinical phenotype\"}", items["A4GALT"][0].GetJsonString());
                 Assert.Equal("{\"haploinsufficiency\":\"sufficient evidence suggesting dosage sensitivity is associated with clinical phenotype\",\"triplosensitivity\":\"no evidence to suggest that dosage sensitivity is associated with clinical phenotype\"}", items["AAGAB"][0].GetJsonString());
                 Assert.Equal("{\"haploinsufficiency\":\"no evidence to suggest that dosage sensitivity is associated with clinical phenotype\",\"triplosensitivity\":\"no evidence to suggest that dosage sensitivity is associated with clinical phenotype\"}", items["AARS"][0].GetJsonString());
-                Assert.Equal("{\"haploinsufficiency\":\"gene associated with autosomal recessive phenotype\"}", items["AARS2"][0].GetJsonString());
+                Assert.Equal("{\"haploinsufficiency\":\"gene associated with autosomal recessive phenotype\",\"triplosensitivity\":\"Not yet evaluated\"}", items["AARS2"][0].GetJsonString());
+                Assert.Equal("{\"haploinsufficiency\":\"gene associated with autosomal recessive phenotype\",\"triplosensitivity\":\"Not yet evaluated\"}", items["RSPH1"][0].GetJsonString());
             }
         }
     }

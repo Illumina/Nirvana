@@ -3,6 +3,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using ErrorHandling.Exceptions;
 using IO;
 using SAUtils.InputFileParsers;
 using VariantAnnotation.Interface.SA;
@@ -10,7 +11,7 @@ using VariantAnnotation.NSA;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.dbVar
+namespace SAUtils.ClinGen
 {
     public static class DosageMapRegions
     {
@@ -55,12 +56,19 @@ namespace SAUtils.dbVar
 
         private static ExitCodes ProgramExecution()
         {
-            var dosageMapRegionVersion = DataSourceVersionReader.GetSourceVersion(_dosageMapRegionFile + ".version");
-            string outFileName =  $"{dosageMapRegionVersion.Name.Replace(' ', '_')}_{dosageMapRegionVersion.Version}";
-            var referenceProvider = new ReferenceSequenceProvider(GZipUtilities.GetAppropriateReadStream(_inputReferencePath));
+            var versionFileNames = Directory.GetFiles(".", "*.version");
+            if (versionFileNames.Length != 1)
+            {
+                throw new UserErrorException($"Multiple version files found in directory: {Directory.GetCurrentDirectory()}");
+            }
+            
+
+            var    sourceVersion = DataSourceVersionReader.GetSourceVersion(versionFileNames[0]);
+            string outFileName            =  $"{sourceVersion.Name.Replace(' ', '_')}_{sourceVersion.Version}";
+            var    referenceProvider      = new ReferenceSequenceProvider(GZipUtilities.GetAppropriateReadStream(_inputReferencePath));
             using (var dosageSensitivityParser = new DosageMapRegionParser(GZipUtilities.GetAppropriateReadStream(_dosageMapRegionFile), referenceProvider.RefNameToChromosome))
             using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.IntervalFileSuffix)))
-            using (var nsiWriter = new NsiWriter(stream, dosageMapRegionVersion, referenceProvider.Assembly, SaCommon.DosageSensitivityTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
+            using (var nsiWriter = new NsiWriter(stream, sourceVersion, referenceProvider.Assembly, SaCommon.DosageSensitivityTag, ReportFor.StructuralVariants, SaCommon.SchemaVersion))
             {
                 nsiWriter.Write(dosageSensitivityParser.GetItems());
             }
