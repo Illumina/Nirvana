@@ -13,7 +13,8 @@ using VariantAnnotation.Providers;
 using Variants;
 using Vcf.VariantCreator;
 using Xunit;
-
+using VariantAnnotation.SA;
+    
 namespace UnitTests.VariantAnnotation.ProviderTests
 {
     public sealed class NsaProviderTests
@@ -76,6 +77,35 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             return provider;
         }
 
+        private static IAnnotationProvider GetGmeProvider()
+        {
+            var chrom1Post69134Annotations = new List<(string refAllele, string altAllele, string annotation)>
+            {
+                ("A", "G", "\"allAc\":10,\"allAn\":202,\"allAf\":0.0495,\"failedFilter\":true")
+            };
+
+            var gmeReader = new Mock<INsaReader>();
+            gmeReader.SetupGet(x => x.Assembly).Returns(GenomeAssembly.GRCh37);
+            gmeReader.SetupGet(x => x.MatchByAllele).Returns(true);
+            gmeReader.SetupGet(x => x.IsArray).Returns(false);
+            gmeReader.SetupGet(x => x.JsonKey).Returns(SaCommon.GmeTag);
+            gmeReader.SetupGet(x => x.Version)
+                .Returns(new DataSourceVersion(SaCommon.GmeTag, "v1", DateTime.Now.Ticks, "dummy gme data"));
+            
+            //dbsnpReader.SetupSequence(x => x.GetAnnotation(100)).Returns(chrom1Pos100Annotations);
+            //List<(string refAllele, string altAllele, string annotation)> annotations=null;
+            gmeReader.Setup(x =>
+                    x.GetAnnotation(It.IsAny<int>(), It.IsAny<List<(string refAllele, string altAllele, string annotation)>>() ))
+                .Callback((int position, List<(string refAllele, string altAllele, string annotation)> annotations) =>
+                {
+                    annotations.Clear();
+                    annotations.AddRange(chrom1Post69134Annotations);
+                });
+            var provider = new NsaProvider(new[] {gmeReader.Object}, null, null);
+
+            return provider;
+        }
+
         private static IAnnotatedPosition GetPosition(IChromosome chrom, int start, string refAllele, string[] altAlleles)
         {
             var position = new Mock<IAnnotatedPosition>();
@@ -107,6 +137,22 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             StringBuilderPool.Return(sb);
 
             Assert.Equal("{\"chromosome\":\"chr1\",\"begin\":100,\"end\":100,\"refAllele\":\"A\",\"altAllele\":\"T\",\"variantType\":\"SNV\",\"dbSnp\":[\"rs100\"]}", jsonString);
+            VariantPool.Return((Variant)position.AnnotatedVariants[0].Variant);
+            AnnotatedVariantPool.Return((AnnotatedVariant) position.AnnotatedVariants[0]);
+        }
+        
+        [Fact]
+        public void Annotate_gme()
+        {
+            var provider = GetGmeProvider();
+            var position = GetPosition(ChromosomeUtilities.Chr1, 69134, "A", new []{"G"});
+
+            provider.Annotate(position);
+            var sb         = position.AnnotatedVariants[0].GetJsonStringBuilder("chr1");
+            var jsonString = sb.ToString();
+            StringBuilderPool.Return(sb);
+
+            Assert.Equal("{\"chromosome\":\"chr1\",\"begin\":69134,\"end\":69134,\"refAllele\":\"A\",\"altAllele\":\"G\",\"variantType\":\"SNV\",\"gmeVariome\":{\"allAc\":10,\"allAn\":202,\"allAf\":0.0495,\"failedFilter\":true}}", jsonString);
             VariantPool.Return((Variant)position.AnnotatedVariants[0].Variant);
             AnnotatedVariantPool.Return((AnnotatedVariant) position.AnnotatedVariants[0]);
         }

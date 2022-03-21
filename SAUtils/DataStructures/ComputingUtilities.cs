@@ -11,7 +11,7 @@ namespace SAUtils.DataStructures
                 ? ((double)alleleCount / alleleNumber.Value).ToString(JsonCommon.FrequencyRoundingFormat)
                 : null;
         }
-
+        
         public static int GetCoverage(double depth, double allAlleleNumber)
         {
             return (int) Math.Round(depth / allAlleleNumber, 0, MidpointRounding.AwayFromZero);

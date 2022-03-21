@@ -69,7 +69,8 @@ namespace SAUtils
                 ["Revel"]          = new("create REVEL database", Revel.Create.Run),
                 ["Dann"]           = new("create DANN database", Dann.Create.Run),
                 ["SpliceAi"]       = new("create SpliceAI database", SpliceAiDb.Run),
-                ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run)
+                ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run),
+                ["Gme"]            = new("create GME Variome database", CreateGmeDb.Main.Run)
             };
 
             ExitCodes exitCode = new TopLevelAppBuilder(args, ops)
