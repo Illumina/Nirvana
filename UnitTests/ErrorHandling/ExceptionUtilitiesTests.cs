@@ -30,10 +30,10 @@ namespace UnitTests.ErrorHandling
         }
     }
 
-    public sealed class MockHttpWebResponse : HttpWebResponse
+    public sealed class MockHttpWebResponse : WebResponse
     {
         private readonly Stream _stream;
-        public override HttpStatusCode StatusCode { get; }
+        public HttpStatusCode StatusCode { get; }
 
         public MockHttpWebResponse(Stream stream, HttpStatusCode statusCode)
         {

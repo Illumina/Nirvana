@@ -1,18 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <OutputPath>..\bin\$(Configuration)</OutputPath>
-    <LangVersion>latest</LangVersion>
+
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <Import Project="..\CommonAssemblyInfo.props" />
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.7.0.16" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.0.17" />
-    <PackageReference Include="IsExternalInit" Version="1.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="AWSSDK.Core" Version="3.7.8.5" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.8.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ErrorHandling\ErrorHandling.csproj" />

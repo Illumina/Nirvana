@@ -41,8 +41,13 @@ namespace RepeatExpansions
 
         private string GetJson(double percentile, IEnumerable<string> classifications)
         {
-            string joined = string.Join(",", classifications.Select(classification => "\"" + classification + "\""));
-            return $"{{\"phenotype\":\"{_phenotype}\",\"omimId\":{_omimId},\"classifications\":[{joined}],\"percentile\":{percentile:0.00}}}";
+            // in net6.0, the compiler gets confused if you have }}}. Should the first two }s be a closing brace or the second? This results in a bug.
+            // we can circumvent it by taking the leading and trailing parenthesis out of the main expression and adding them separately
+            const char openCurly  = '{';
+            const char closeCurly = '}';
+            string     joined     = string.Join(",", classifications.Select(classification => "\"" + classification + "\""));
+            return $"{openCurly}\"phenotype\":\"{_phenotype}\",\"omimId\":{_omimId},\"classifications\":[{joined}],\"percentile\":{percentile:0.00}{closeCurly}";
+
         }
 
         private IEnumerable<string> GetClassifications(int repeatNumber)

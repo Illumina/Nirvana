@@ -57,7 +57,7 @@ namespace SAUtils.ExtractCosmicSvs
         {
             foreach (var kvp in dictionary)
             {
-                yield return $"{{\"{kvp.Key.Replace('_', ' ')}\":{kvp.Value}}}";
+                yield return $"{JsonObject.OpenBrace}\"{kvp.Key.Replace('_', ' ')}\":{kvp.Value}{JsonObject.CloseBrace}";
             }
         }
 
