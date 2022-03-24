@@ -14,7 +14,7 @@ namespace VariantAnnotation.Providers
             _reader = new RefMinorDbReader(dbStream, indexStream);
         }
 
-        public string GetGlobalMajorAllele(IChromosome chromosome, int pos) => _reader.GetGlobalMajorAllele(chromosome, pos);
+        public string GetGlobalMajorAllele(Chromosome chromosome, int pos) => _reader.GetGlobalMajorAllele(chromosome, pos);
 
         public void Dispose()
         {

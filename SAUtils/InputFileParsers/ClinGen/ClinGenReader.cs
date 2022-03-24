@@ -13,11 +13,11 @@ namespace SAUtils.InputFileParsers.ClinGen
         #region members
 
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, IChromosome> _refNameDict;
+        private readonly IDictionary<string, Chromosome> _refNameDict;
 
         #endregion
         
-        public ClinGenReader(StreamReader reader, IDictionary<string, IChromosome> refNameDict)
+        public ClinGenReader(StreamReader reader, IDictionary<string, Chromosome> refNameDict)
         {
             _reader = reader;
             _refNameDict = refNameDict;

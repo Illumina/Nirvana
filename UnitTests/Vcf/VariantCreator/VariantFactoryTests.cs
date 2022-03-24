@@ -59,7 +59,7 @@ namespace UnitTests.Vcf.VariantCreator
         private IPosition ParseVcfLine(string vcfLine)
         {
             string[]    vcfFields  = vcfLine.OptimizedSplit('\t');
-            IChromosome chromosome = ReferenceNameUtilities.GetChromosome(ChromosomeUtilities.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
+            Chromosome chromosome = ReferenceNameUtilities.GetChromosome(ChromosomeUtilities.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
 
             (int start, bool foundError) = vcfFields[VcfCommon.PosIndex].OptimizedParseInt32();
             if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {vcfFields[VcfCommon.PosIndex]}");

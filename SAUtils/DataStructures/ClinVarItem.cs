@@ -11,7 +11,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class ClinVarItem : ISupplementaryDataItem, IComparable<ClinVarItem>
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int         Position   { get; set; }
         public string      RefAllele  { get; set; }
         public string      AltAllele  { get; set; }
@@ -35,7 +35,7 @@ namespace SAUtils.DataStructures
 
         public SaJsonSchema JsonSchema { get; }
 
-        public ClinVarItem(IChromosome chromosome,
+        public ClinVarItem(Chromosome chromosome,
             int position,
             int stop,
             string refAllele,

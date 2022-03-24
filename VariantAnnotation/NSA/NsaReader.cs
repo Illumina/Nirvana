@@ -69,7 +69,7 @@ namespace VariantAnnotation.NSA
             _annotationReader = new ExtendedBinaryReader(_annotationStream);
         }
 
-        public void PreLoad(IChromosome chrom, List<int> positions)
+        public void PreLoad(Chromosome chrom, List<int> positions)
         {
             if (positions == null || positions.Count == 0) return;
 

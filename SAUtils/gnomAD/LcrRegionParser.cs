@@ -64,7 +64,7 @@ namespace SAUtils.gnomAD
             return IsNRegion(chromosome, start, end) ? null : new LcrInterval(chromosome, start, end);
         }
 
-        private bool IsNRegion(IChromosome chrom, int start, int end)
+        private bool IsNRegion(Chromosome chrom, int start, int end)
         {
             if (_refProvider == null) return false;
             

@@ -34,7 +34,7 @@ namespace SAUtils.MitoMap
 
     public sealed class MitoMapItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -48,7 +48,7 @@ namespace SAUtils.MitoMap
         private readonly int _numGenBankFullLengthSeqs;
         private readonly List<string> _pubMedIds;
 
-        public MitoMapItem(IChromosome chromosome, int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, ISequenceProvider sequenceProvider, int numGenBankFullLengthSeqs, List<string> pubMedIds)
+        public MitoMapItem(Chromosome chromosome, int posi, string refAllele, string altAllele, List<string> diseases, bool? homoplasmy, bool? heteroplasmy, string status, string clinicalSignificance, string scorePercentile, ISequenceProvider sequenceProvider, int numGenBankFullLengthSeqs, List<string> pubMedIds)
         {
             Chromosome = chromosome;
             Position = posi;

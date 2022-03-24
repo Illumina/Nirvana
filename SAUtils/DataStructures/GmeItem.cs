@@ -12,14 +12,14 @@ namespace SAUtils.DataStructures
         private readonly double? _alleleFreq;
         private readonly bool    _failedFilter;
 
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int         Position   { get; set; }
         public string      RefAllele  { get; set; }
         public string      AltAllele  { get; set; }
 
 
 
-        public GmeItem(IChromosome chrom, int position, string refAllele, string altAllele, 
+        public GmeItem(Chromosome chrom, int position, string refAllele, string altAllele, 
             int? alleleCount, int? alleleNum, double? alleleFreq, bool failedFilter)
         {
             Chromosome    = chrom;

@@ -17,7 +17,7 @@ namespace UnitTests.Tabix
         {
             var chr2 = new Chromosome("chr2", "2", 1);
 
-            var refNameToChromosome = new Dictionary<string, IChromosome>
+            var refNameToChromosome = new Dictionary<string, Chromosome>
             {
                 [chr2.EnsemblName] = chr2,
                 [chr2.UcscName]    = chr2

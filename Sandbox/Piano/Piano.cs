@@ -81,7 +81,7 @@ namespace Piano
             return ExitCodes.Success;
         }
 
-        private int UpdatePerformanceMetrics(int previousChromIndex, IChromosome chromosome)
+        private int UpdatePerformanceMetrics(int previousChromIndex, Chromosome chromosome)
         {
             if (chromosome.Index != previousChromIndex)
             {

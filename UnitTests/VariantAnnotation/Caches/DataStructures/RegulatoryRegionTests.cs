@@ -17,13 +17,13 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void RegulatoryRegion_EndToEnd()
         {
-            IChromosome expectedChromosome          = ChromosomeUtilities.Chr1;
+            Chromosome expectedChromosome          = ChromosomeUtilities.Chr1;
             const int expectedStart                 = int.MaxValue;
             const int expectedEnd                   = int.MinValue;
             const string expectedId                 = "ENST00000540021";
             const RegulatoryRegionType expectedType = RegulatoryRegionType.open_chromatin_region;
 
-            var indexToChromosome = new Dictionary<ushort, IChromosome>
+            var indexToChromosome = new Dictionary<ushort, Chromosome>
             {
                 [expectedChromosome.Index] = expectedChromosome
             };

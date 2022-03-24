@@ -13,7 +13,7 @@ namespace SAUtils.InputFileParsers.Gme
     public sealed class GmeParser : IDisposable
     {
         private readonly StreamReader                     _reader;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly IDictionary<string, Chromosome> _refChromDict;
         private readonly ISequenceProvider                _sequenceProvider;
         
         private int?    _alleleCount;

@@ -51,9 +51,9 @@ namespace VariantAnnotation.PhyloP
             _scores = new byte[NpdIndex.MaxChromLength];
         }
 
-        private IChromosome _chromosome;
+        private Chromosome _chromosome;
         private int _lastPhylopPosition;
-        private void PreLoad(IChromosome chrom)
+        private void PreLoad(Chromosome chrom)
         {
             _chromosome = chrom;
             (long startLocation, int numBytes) = _index.GetFileRange(chrom.Index);
@@ -69,7 +69,7 @@ namespace VariantAnnotation.PhyloP
             
         }
 
-        public double? GetAnnotation(IChromosome chromosome, int position)
+        public double? GetAnnotation(Chromosome chromosome, int position)
         {
             if (_chromosome==null || chromosome.Index != _chromosome.Index) PreLoad(chromosome);
 

@@ -7,10 +7,10 @@ namespace SAUtils.gnomAD
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public string GetJsonString() => string.Empty;
 
-        public LcrInterval(IChromosome chromosome, int start, int end)
+        public LcrInterval(Chromosome chromosome, int start, int end)
         {
             Chromosome = chromosome;
             Start = start;

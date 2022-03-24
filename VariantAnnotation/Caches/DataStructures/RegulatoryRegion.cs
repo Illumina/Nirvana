@@ -11,11 +11,11 @@ namespace VariantAnnotation.Caches.DataStructures
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public ICompactId Id { get; }
         public RegulatoryRegionType Type { get; }
 
-        public RegulatoryRegion(IChromosome chromosome, int start, int end, CompactId id, RegulatoryRegionType type)
+        public RegulatoryRegion(Chromosome chromosome, int start, int end, CompactId id, RegulatoryRegionType type)
         {
             Id         = id;
             Type       = type;
@@ -24,7 +24,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Chromosome = chromosome;
         }
 
-        public static IRegulatoryRegion Read(IBufferedBinaryReader reader, IDictionary<ushort, IChromosome> chromosomeIndexDictionary)
+        public static IRegulatoryRegion Read(IBufferedBinaryReader reader, IDictionary<ushort, Chromosome> chromosomeIndexDictionary)
         {
             var refIndex = reader.ReadOptUInt16();
             int start    = reader.ReadOptInt32();

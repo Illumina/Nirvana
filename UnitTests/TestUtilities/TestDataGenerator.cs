@@ -15,13 +15,13 @@ namespace UnitTests.TestUtilities
     public static class TestDataGenerator
     {
         public static void GenerateTestData(
-            Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup,
+            Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup,
             List<GenericScoreItem> saItems,
             Func<int, int, double> scoreFunc,
             ISequenceProvider sequenceProvider
         )
         {
-            foreach ((IChromosome chromosome, List<Dictionary<string, object>> chromosomeTests) in testSetup)
+            foreach ((Chromosome chromosome, List<Dictionary<string, object>> chromosomeTests) in testSetup)
             {
                 foreach (Dictionary<string, object> chromosomeTest in chromosomeTests)
                 {
@@ -43,7 +43,7 @@ namespace UnitTests.TestUtilities
         }
 
         public static void GenerateRandomScoreData(
-            Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup,
+            Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup,
             List<GenericScoreItem> saItems,
             ISequenceProvider sequenceProvider
         )
@@ -59,7 +59,7 @@ namespace UnitTests.TestUtilities
         }
 
         public static ScoreReader GetScoreReaderWithRandomData(
-            Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup
+            Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup
         )
         {
             string[] nucleotides = {"A", "C", "G", "T"};
@@ -106,14 +106,14 @@ namespace UnitTests.TestUtilities
             MemoryStream writeStream,
             DataSourceVersion
             version,
-            Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup
-            ) GetRandomSingleChromosomeData(IChromosome chromosome, int startPosition, int endPosition)
+            Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup
+            ) GetRandomSingleChromosomeData(Chromosome chromosome, int startPosition, int endPosition)
         {
             const int blockLength = 10_000;
 
             string[] nucleotides = {"A", "C", "G", "T"};
 
-            var testSetup = new Dictionary<IChromosome, List<Dictionary<string, object>>>
+            var testSetup = new Dictionary<Chromosome, List<Dictionary<string, object>>>
             {
                 {
                     chromosome, new List<Dictionary<string, object>>

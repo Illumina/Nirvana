@@ -37,7 +37,7 @@ namespace Tabix
             return false;
         }
 
-        private bool HasVariantsInBin(IChromosome chromosome, int begin, int end, BgzfBlock block, Interval[] intervals)
+        private bool HasVariantsInBin(Chromosome chromosome, int begin, int end, BgzfBlock block, Interval[] intervals)
         {
             (long minVirtualOffset, long maxVirtualOffset) = SearchUtilities.GetMinMaxVirtualFileOffset(intervals);
 

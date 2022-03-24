@@ -20,7 +20,7 @@ namespace ReferenceSequence.Commands
         private static ExitCodes ProgramExecution()
         {
             var testSeqChromosome = new Chromosome("chrTestSeq", "TestSeq", null, null, 1, 0);
-            var chromosomes       = new List<IChromosome> {testSeqChromosome};
+            var chromosomes       = new List<Chromosome> {testSeqChromosome};
             
             Console.Write("- creating FASTA sequence... ");
             var fastaSequence = new FastaSequence(testSeqChromosome, "NNATGTTTCCACTTTCTCCTCATTAGANNNTAACGAATGGGTGATTTCCCTAN");
@@ -38,7 +38,7 @@ namespace ReferenceSequence.Commands
             return ExitCodes.Success;
         }
 
-        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, IReadOnlyCollection<IChromosome> chromosomes, Creation.ReferenceSequence referenceSequence)
+        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, IReadOnlyCollection<Chromosome> chromosomes, Creation.ReferenceSequence referenceSequence)
         {
             using (var writer = new ReferenceSequenceWriter(FileUtilities.GetCreateStream(_outputCompressedPath),
                 chromosomes, genomeAssembly, 0))

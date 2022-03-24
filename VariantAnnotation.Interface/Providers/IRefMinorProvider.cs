@@ -5,6 +5,6 @@ namespace VariantAnnotation.Interface.Providers
 {
     public interface IRefMinorProvider:IDisposable
     {
-        string GetGlobalMajorAllele(IChromosome chromosome, int pos);
+        string GetGlobalMajorAllele(Chromosome chromosome, int pos);
     }
 }

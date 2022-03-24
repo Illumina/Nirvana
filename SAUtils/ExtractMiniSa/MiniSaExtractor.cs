@@ -40,7 +40,7 @@ namespace SAUtils.ExtractMiniSa
             return miniSaPath;
         }
 
-        //private static string GetReferenceName(string saPath, IDictionary<string, IChromosome> refChromDict)
+        //private static string GetReferenceName(string saPath, IDictionary<string, Chromosome> refChromDict)
         //{
         //    ISupplementaryAnnotationHeader header;
 

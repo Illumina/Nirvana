@@ -189,7 +189,7 @@ namespace UnitTests.VariantAnnotation.IO.Caches
             });
         }
 
-        private static ITranscript[] GetTranscripts(IChromosome chromosome, IGene[] genes, ITranscriptRegion[] regions,
+        private static ITranscript[] GetTranscripts(Chromosome chromosome, IGene[] genes, ITranscriptRegion[] regions,
             IInterval[] mirnas)
         {
             return new ITranscript[]

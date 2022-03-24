@@ -38,7 +38,7 @@ namespace UnitTests.TestUtilities
 	    }
 
         internal static SimplePosition GetSimplePosition(string vcfLine,
-            IDictionary<string, IChromosome> refNameToChromosome)
+            IDictionary<string, Chromosome> refNameToChromosome)
         {
             string[] vcfFields = vcfLine.OptimizedSplit('\t');
             var chromosome     = ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);

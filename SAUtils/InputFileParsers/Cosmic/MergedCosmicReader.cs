@@ -26,7 +26,7 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private const string StudyIdTag = "ID_STUDY";
 
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly IDictionary<string, Chromosome> _refChromDict;
         private readonly ISequenceProvider _sequenceProvider;
         private readonly Dictionary<string, HashSet<CosmicItem.CosmicStudy>> _studies;
 

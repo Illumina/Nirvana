@@ -4,7 +4,7 @@ namespace Variants
 {
     public sealed class Variant : IVariant
     {
-        public IChromosome        Chromosome          { get; private set; }
+        public Chromosome        Chromosome          { get; private set; }
         public int                Start               { get; private set;}
         public int                End                 { get; private set;}
         public string             RefAllele           { get; private set;}
@@ -18,7 +18,7 @@ namespace Variants
         public AnnotationBehavior Behavior            { get; private set;}
         public bool               IsStructuralVariant { get; private set;}
         
-        public void Initialize(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        public void Initialize(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             VariantType variantType, string variantId, bool isRefMinor, bool isDecomposed, bool isRecomposed,
             string[] linkedVids, AnnotationBehavior behavior, bool isStructuralVariant)
         {

@@ -11,7 +11,7 @@ namespace SAUtils.ExtractCosmicSvs
     public sealed class CosmicCnvItem
     {
         public readonly int CNVId;
-        private readonly IChromosome _chromosome;
+        private readonly Chromosome _chromosome;
         private readonly VariantType _cnvType;
         private readonly int _copyNumber;
         private readonly int _studyId;
@@ -20,7 +20,7 @@ namespace SAUtils.ExtractCosmicSvs
         private readonly Dictionary<string, int> _tissueTypes;
         public int TissueTypeCount => _tissueTypes.Count;
 
-        public CosmicCnvItem(int cnvId, IChromosome chromosome, int start, int end, VariantType cnvType, int copyNumber, Dictionary<string, int> cancerTypes, Dictionary<string, int> tissueTypes, int studyId)
+        public CosmicCnvItem(int cnvId, Chromosome chromosome, int start, int end, VariantType cnvType, int copyNumber, Dictionary<string, int> cancerTypes, Dictionary<string, int> tissueTypes, int studyId)
         {
             CNVId        = cnvId;
             _chromosome  = chromosome;

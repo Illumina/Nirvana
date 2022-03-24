@@ -11,7 +11,7 @@ namespace Phantom.Recomposer
     public sealed class PositionBuffer : IPositionBuffer
     {
         private ICodonInfoProvider CodonInfoProvider { get; }
-        public IChromosome CurrentChromosome { get; private set; }
+        public Chromosome CurrentChromosome { get; private set; }
         private BufferedPositions BufferedPositions { get; set; }
         private IIntervalForest<IGene> GeneIntervalForest { get; } // used to find overlap genes for now
 
@@ -19,7 +19,7 @@ namespace Phantom.Recomposer
         {
             CodonInfoProvider  = codonInfoProvider;
             GeneIntervalForest = geneIntervalForest;
-            CurrentChromosome  = new EmptyChromosome(string.Empty);
+            CurrentChromosome  = Chromosome.GetEmptyChromosome(string.Empty);
             BufferedPositions  = BufferedPositions.CreateEmptyBufferedPositions();
         }
 

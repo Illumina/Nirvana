@@ -9,7 +9,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 {
     public sealed class VcvSaItem: ISupplementaryDataItem, IComparable<VcvSaItem>
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int         Position   { get; set; }
         public string      RefAllele  { get; set; }
         public string      AltAllele  { get; set; }
@@ -20,7 +20,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private readonly ClinVarCommon.ReviewStatus _reviewStatus;
         private readonly IEnumerable<string> _significances;
 
-        public VcvSaItem(IChromosome chromosome, int position, string refAllele, string altAllele, string accession, string version, DateTime lastUpdatedDate, ClinVarCommon.ReviewStatus reviewStatus, IEnumerable<string> significances)
+        public VcvSaItem(Chromosome chromosome, int position, string refAllele, string altAllele, string accession, string version, DateTime lastUpdatedDate, ClinVarCommon.ReviewStatus reviewStatus, IEnumerable<string> significances)
         {
             Chromosome = chromosome;
             Position   = position;

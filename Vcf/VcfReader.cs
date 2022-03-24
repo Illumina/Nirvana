@@ -21,7 +21,7 @@ namespace Vcf
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly ISequenceProvider _sequenceProvider;
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
         private readonly IVcfFilter _vcfFilter;
         private readonly IMitoHeteroplasmyProvider _mitoHeteroplasmyProvider;
         public bool IsRcrsMitochondrion { get; private set; }
@@ -90,7 +90,7 @@ namespace Vcf
             string[] chromAndLengthInfo = GetChromAndLengthInfo(line);
             if (chromAndLengthInfo.Length == 0) return;
 
-            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out IChromosome chromosome)) return;
+            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out Chromosome chromosome)) return;
             if (!int.TryParse(chromAndLengthInfo[1], out int length)) return;
 
             var assemblyThisChrom = ContigInfo.GetGenomeAssembly(chromosome, length);

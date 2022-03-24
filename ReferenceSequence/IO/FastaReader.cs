@@ -18,7 +18,7 @@ namespace ReferenceSequence.IO
         // >ref|NC_000013.11| Homo sapiens chromosome 13, GRCh38.p12 Primary Assembly
         private static readonly Regex NcbiRegex2 = new Regex("^>ref\\|([^|]+)\\|", RegexOptions.Compiled);
 
-        internal static void AddReferenceSequences(Stream stream, IDictionary<string, IChromosome> refNameToChromosome, List<FastaSequence> references)
+        internal static void AddReferenceSequences(Stream stream, IDictionary<string, Chromosome> refNameToChromosome, List<FastaSequence> references)
         {
             var sb = new StringBuilder();
 
@@ -63,7 +63,7 @@ namespace ReferenceSequence.IO
             return sb.ToString();
         }
 
-        private static IChromosome GetChromosome(IDictionary<string, IChromosome> refNameToChromosome, string name)
+        private static Chromosome GetChromosome(IDictionary<string, Chromosome> refNameToChromosome, string name)
         {
             var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, name);
 

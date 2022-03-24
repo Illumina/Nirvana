@@ -32,7 +32,7 @@ namespace SAUtils.FusionCatcher
             var knownGenes      = new HashSet<string>();
             var oncoGenes       = new HashSet<uint>();
 
-            IDictionary<ushort, IChromosome> refIndexToChromosome = GetReferences(_reference38Path);
+            IDictionary<ushort, Chromosome> refIndexToChromosome = GetReferences(_reference38Path);
 
             AddGenes(_transcriptCache37Path, refIndexToChromosome, knownGenes, "GRCh37");
             AddGenes(_transcriptCache38Path, refIndexToChromosome, knownGenes, "GRCh38");
@@ -128,7 +128,7 @@ namespace SAUtils.FusionCatcher
             return ExitCodes.Success;
         }
         
-        private static IDictionary<ushort, IChromosome> GetReferences(string referencePath)
+        private static IDictionary<ushort, Chromosome> GetReferences(string referencePath)
         {
             Console.Write("- loading reference sequence... ");
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(referencePath));
@@ -137,7 +137,7 @@ namespace SAUtils.FusionCatcher
             return sequenceProvider.RefIndexToChromosome;
         }
 
-        private static void AddGenes(string cachePath, IDictionary<ushort, IChromosome> refIndexToChromosome, ISet<string> knownGenes,
+        private static void AddGenes(string cachePath, IDictionary<ushort, Chromosome> refIndexToChromosome, ISet<string> knownGenes,
             string description)
         {
             Console.Write($"- loading known genes ({description})... ");

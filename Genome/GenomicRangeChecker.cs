@@ -10,7 +10,7 @@
             _genomicRange = genomicRange;
         }
 
-        public bool OutOfRange(IChromosome chromosome, int position)
+        public bool OutOfRange(Chromosome chromosome, int position)
         {
             if (_genomicRange?.End == null) return false;
 

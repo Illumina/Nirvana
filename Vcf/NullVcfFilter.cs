@@ -13,6 +13,6 @@ namespace Vcf
 
         public string GetNextLine(StreamReader reader) => reader.ReadLine();
 
-        public bool PassedTheEnd(IChromosome chromosome, int position) => false;
+        public bool PassedTheEnd(Chromosome chromosome, int position) => false;
     }
 }

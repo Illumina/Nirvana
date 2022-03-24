@@ -50,6 +50,6 @@ namespace Vcf
             return bufferedLine;
         }
 
-        public bool PassedTheEnd(IChromosome chromosome, int position) => _genomicRangeChecker.OutOfRange(chromosome, position);
+        public bool PassedTheEnd(Chromosome chromosome, int position) => _genomicRangeChecker.OutOfRange(chromosome, position);
     }
 }

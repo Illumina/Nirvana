@@ -10,14 +10,14 @@ namespace VariantAnnotation.Caches.DataStructures
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public bool OnReverseStrand { get; }
         public string Symbol { get; }
         public ICompactId EntrezGeneId { get; }
         public ICompactId EnsemblId { get; }
         public int HgncId { get; }
 
-        public Gene(IChromosome chromosome, int start, int end, bool onReverseStrand, string symbol, int hgncId,
+        public Gene(Chromosome chromosome, int start, int end, bool onReverseStrand, string symbol, int hgncId,
             CompactId entrezGeneId, CompactId ensemblId)
         {
             OnReverseStrand = onReverseStrand;
@@ -30,7 +30,7 @@ namespace VariantAnnotation.Caches.DataStructures
 	        Chromosome		= chromosome;
         }
 
-        public static IGene Read(IBufferedBinaryReader reader, IDictionary<ushort, IChromosome> indexToChromosome)
+        public static IGene Read(IBufferedBinaryReader reader, IDictionary<ushort, Chromosome> indexToChromosome)
         {
             ushort referenceIndex = reader.ReadOptUInt16();
             int start             = reader.ReadOptInt32();

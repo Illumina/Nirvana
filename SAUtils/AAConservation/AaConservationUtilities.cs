@@ -8,7 +8,7 @@ namespace SAUtils.AAConservation
 {
     public static class AaConservationUtilities
     {
-        public static TranscriptCacheData GetTranscriptData(IDictionary<ushort, IChromosome> refIndexToChromosome, string transcriptCachePrefix)
+        public static TranscriptCacheData GetTranscriptData(IDictionary<ushort, Chromosome> refIndexToChromosome, string transcriptCachePrefix)
         {
             using var transcriptCacheReader = new TranscriptCacheReader(
                 FileUtilities.GetReadStream(CacheConstants.TranscriptPath(transcriptCachePrefix)));

@@ -6,14 +6,14 @@ namespace SAUtils.GenericScore.GenericScoreParser
 {
     public sealed class GenericScoreItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int         Position   { get; set; }
         public string      RefAllele  { get; set; }
         public string      AltAllele  { get; set; }
 
         public readonly double Score;
 
-        public GenericScoreItem(IChromosome chromosome, int position, string refAllele, string altAllele, double score)
+        public GenericScoreItem(Chromosome chromosome, int position, string refAllele, string altAllele, double score)
         {
             Chromosome = chromosome;
             Position   = position;

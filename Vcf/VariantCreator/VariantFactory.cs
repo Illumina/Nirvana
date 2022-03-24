@@ -23,7 +23,7 @@ namespace Vcf.VariantCreator
             _vidCreator = vidCreator;
         }
 
-        public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
+        public IVariant[] CreateVariants(Chromosome chromosome, int start, int end, string refAllele,
             string[] altAlleles, IInfoData infoData, bool[] isDecomposedByAllele, bool isRecomposed, List<string>[] linkedVids, string globalMajorAllele)
         {
             bool isReference = globalMajorAllele != null;
@@ -74,7 +74,7 @@ namespace Vcf.VariantCreator
         private static bool IsSymbolicAllele(string altAllele) =>
             altAllele.OptimizedStartsWith('<') && altAllele.OptimizedEndsWith('>') && !VcfCommon.IsNonInformativeAltAllele(altAllele);
 
-        private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        private IVariant GetVariant(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             IInfoData infoData, VariantCategory category, bool isDecomposed, bool isRecomposed, string[] linkedVids)
         {
             string vid = _vidCreator.Create(_sequence, category, infoData.SvType, chromosome, start, end, refAllele, altAllele, infoData.RepeatUnit);

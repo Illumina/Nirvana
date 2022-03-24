@@ -30,7 +30,7 @@ namespace UnitTests.Vcf.VariantCreator
         private IPosition ParseVcfLine(string vcfLine)
         {
             string[] vcfFields = vcfLine.OptimizedSplit('\t');
-            IChromosome chromosome =
+            Chromosome chromosome =
                 ReferenceNameUtilities.GetChromosome(ChromosomeUtilities.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
 
             (int start, bool foundError) = vcfFields[VcfCommon.PosIndex].OptimizedParseInt32();

@@ -10,10 +10,10 @@ namespace SAUtils.MitoMap
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         private VariantType VariantType { get; }
 
-        public MitoMapSvItem(IChromosome chromosome, int start, int end, VariantType variantType)
+        public MitoMapSvItem(Chromosome chromosome, int start, int end, VariantType variantType)
         {
             Chromosome = chromosome;
             Start = start;

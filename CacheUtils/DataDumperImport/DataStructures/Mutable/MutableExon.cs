@@ -6,12 +6,12 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 {
     public sealed class MutableExon : IEquatable<MutableExon>, IInterval
     {
-        private readonly IChromosome _chromosome;
+        private readonly Chromosome _chromosome;
         public readonly int Phase;
         public int Start { get; }
         public int End { get; }
 
-        public MutableExon(IChromosome chromosome, int start, int end, int phase)
+        public MutableExon(Chromosome chromosome, int start, int end, int phase)
         {
             _chromosome = chromosome;
             Start       = start;

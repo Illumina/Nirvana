@@ -6,7 +6,7 @@ namespace Vcf.VariantCreator
 {
     public sealed class VariantId : IVariantIdCreator
     {
-        public string Create(ISequence sequence, VariantCategory category, string svType, IChromosome chromosome, int start, int end,
+        public string Create(ISequence sequence, VariantCategory category, string svType, Chromosome chromosome, int start, int end,
             string refAllele, string altAllele, string repeatUnit)
         {
             if (altAllele == ".") altAllele = refAllele;

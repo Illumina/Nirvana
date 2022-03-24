@@ -6,7 +6,7 @@ namespace VariantAnnotation.NSA
 {
     public static class SuppIntervalUtilities
     {
-        public static (double? ReciprocalOverlap, double? AnnotationOverlap) GetOverlapFractions( IChromosomeInterval saInterval, ISimpleVariant variant)
+        public static (double? ReciprocalOverlap, double? AnnotationOverlap) GetOverlapFractions( ChromosomeInterval saInterval, ISimpleVariant variant)
         {
             if (saInterval.Chromosome.Index != variant.Chromosome.Index) return (null, null);
 

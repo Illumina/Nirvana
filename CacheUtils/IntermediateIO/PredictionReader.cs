@@ -10,10 +10,10 @@ namespace CacheUtils.IntermediateIO
 {
     public sealed class PredictionReader : IDisposable
     {
-        private readonly IDictionary<ushort, IChromosome> _refIndexToChromosome;
+        private readonly IDictionary<ushort, Chromosome> _refIndexToChromosome;
         private readonly StreamReader _reader;
 
-        public PredictionReader(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome,
+        public PredictionReader(Stream stream, IDictionary<ushort, Chromosome> refIndexToChromosome,
             IntermediateIoCommon.FileType expectedFileType)
         {
             _refIndexToChromosome = refIndexToChromosome;
@@ -21,7 +21,7 @@ namespace CacheUtils.IntermediateIO
             IntermediateIoCommon.ReadHeader(_reader, expectedFileType);
         }
 
-        public (string[] PredictionData, Dictionary<int, int> TranscriptToPredictionIndex, IChromosome Chromosome)
+        public (string[] PredictionData, Dictionary<int, int> TranscriptToPredictionIndex, Chromosome Chromosome)
             GetPredictionData()
         {
             var chromosomeHeader            = GetChromosomeHeader();
@@ -39,7 +39,7 @@ namespace CacheUtils.IntermediateIO
             return (predictionData, transcriptToPredictionIndex, chromosomeHeader.Chromosome);
         }
 
-        private (IChromosome Chromosome, int NumPredictions) GetChromosomeHeader()
+        private (Chromosome Chromosome, int NumPredictions) GetChromosomeHeader()
         {
             string line = _reader.ReadLine();
             var cols = line?.OptimizedSplit('\t');

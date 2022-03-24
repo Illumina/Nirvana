@@ -7,7 +7,7 @@ namespace RepeatExpansions
 {
     public sealed class RepeatExpansionPhenotype
     {
-        public readonly IChromosomeInterval ChromosomeInterval;
+        public readonly ChromosomeInterval ChromosomeInterval;
 
         // used directly in JSON output
         private readonly string _phenotype;
@@ -19,7 +19,7 @@ namespace RepeatExpansions
         private readonly string[] _classifications;
         private readonly Interval[] _classificationRanges;
 
-        public RepeatExpansionPhenotype(IChromosomeInterval chromosomeInterval, string phenotype, string omimId,
+        public RepeatExpansionPhenotype(ChromosomeInterval chromosomeInterval, string phenotype, string omimId,
             int[] repeatNumbers, double[] percentiles, string[] classifications, Interval[] classificationRanges)
         {
             ChromosomeInterval    = chromosomeInterval;

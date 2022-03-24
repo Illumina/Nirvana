@@ -8,7 +8,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 {
     public sealed class MutableTranscript : IEquatable<MutableTranscript>
     {
-        public readonly IChromosome Chromosome;
+        public readonly Chromosome Chromosome;
         public readonly int Start;
         public readonly int End;
         public readonly string Id;
@@ -49,7 +49,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public int SiftIndex     = -1;
         public int PolyPhenIndex = -1;
 
-        public MutableTranscript(IChromosome chromosome, int start, int end, string id, byte version, string ccdsId,
+        public MutableTranscript(Chromosome chromosome, int start, int end, string id, byte version, string ccdsId,
             string refSeqId, BioType bioType, bool isCanonical, ICodingRegion codingRegion, string proteinId,
             byte proteinVersion, string peptideSequence, Source source, MutableGene gene, MutableExon[] exons,
             int startExonPhase, int totalExonLength, IInterval[] introns, MutableTranscriptRegion[] cdnaMaps,

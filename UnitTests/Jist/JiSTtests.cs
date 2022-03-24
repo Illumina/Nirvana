@@ -23,7 +23,7 @@ namespace UnitTests.Jist
         private const string NirvanaGenes = JsonStitcher.GeneHeaderLine;
         private const string NirvanaFooter = JsonStitcher.FooterLine;
 
-        private static (Stream jsonStream, Stream jasixStream) GetJsonStreams(IChromosome chromosome, bool withGenes)
+        private static (Stream jsonStream, Stream jasixStream) GetJsonStreams(Chromosome chromosome, bool withGenes)
         {
             var jsonStream  = new MemoryStream();
             var jasixStream = new MemoryStream();

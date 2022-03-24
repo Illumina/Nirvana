@@ -29,7 +29,7 @@ namespace VariantAnnotation.IO.Caches
         /// <summary>
         /// parses the database cache file and populates the specified lists and interval trees
         /// </summary>
-        public TranscriptCacheData Read(IDictionary<ushort, IChromosome> refIndexToChromosome)
+        public TranscriptCacheData Read(IDictionary<ushort, Chromosome> refIndexToChromosome)
         {
             var genes             = ReadItems(_reader,     () => Gene.Read(_reader, refIndexToChromosome));
             var transcriptRegions = ReadItems(_reader,     () => TranscriptRegion.Read(_reader));

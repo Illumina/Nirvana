@@ -12,7 +12,7 @@ namespace SAUtils.GenericScore.GenericScoreParser
         private readonly ParserSettings _parserSettings;
 
         private readonly StreamReader                     _reader;
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
         private readonly IDictionary<string, double>      _representativeScores;
 
         private readonly Action<string, double, IDictionary<string, double>> _updateRepresentativeScores;
@@ -20,7 +20,7 @@ namespace SAUtils.GenericScore.GenericScoreParser
         public GenericScoreParser(
             ParserSettings parserSettings,
             StreamReader reader,
-            IDictionary<string, IChromosome> refNameToChromosome
+            IDictionary<string, Chromosome> refNameToChromosome
         )
         {
             _reader               = reader;
@@ -39,7 +39,7 @@ namespace SAUtils.GenericScore.GenericScoreParser
         {
             string      line;
             int         currentPosition   = -1;
-            IChromosome currentChromosome = null;
+            Chromosome currentChromosome = null;
             string      refAllele         = null;
 
             ColumnPositions columnPositions = _parserSettings.ColumnPositions;
@@ -77,7 +77,7 @@ namespace SAUtils.GenericScore.GenericScoreParser
                 yield return scoreItem;
         }
 
-        private IEnumerable<GenericScoreItem> GetItemsAtOnePosition(IChromosome currentChromosome, int currentPosition, string refAllele)
+        private IEnumerable<GenericScoreItem> GetItemsAtOnePosition(Chromosome currentChromosome, int currentPosition, string refAllele)
         {
             if (currentChromosome == null) yield break;
             foreach (string altAllele in _parserSettings.PossibleAlleles)

@@ -12,9 +12,9 @@ namespace ReferenceSequence.IO
         private const int EnsemblIndex = 1;
         private const int UcscIndex    = 2;
 
-        public static List<IChromosome> GetReferenceNames(Stream stream)
+        public static List<Chromosome> GetReferenceNames(Stream stream)
         {
-            var names = new List<IChromosome>();
+            var names = new List<Chromosome>();
 
             using (var reader = new StreamReader(stream))
             {

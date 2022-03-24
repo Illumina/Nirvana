@@ -167,7 +167,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
         private static CacheHeader CloneHeader(CacheHeader header) =>
             new CacheHeader(CloneBaseHeader(header), header.Custom);
 
-        private static (Prediction[] Predictions, int Offset) CombinePredictions(IChromosome chromosome,
+        private static (Prediction[] Predictions, int Offset) CombinePredictions(Chromosome chromosome,
             string description, PredictionCacheReader reader, PredictionCacheReader reader2)
         {
             Logger.Write($"- load {description} predictions... ");
@@ -197,7 +197,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
         }
 
         private static (TranscriptCacheData Cache, TranscriptCacheData Cache2) LoadTranscriptCaches(
-            string transcriptPath, string transcriptPath2, IDictionary<ushort, IChromosome> refIndexToChromosome)
+            string transcriptPath, string transcriptPath2, IDictionary<ushort, Chromosome> refIndexToChromosome)
         {
             TranscriptCacheData cache;
             TranscriptCacheData cache2;

@@ -33,7 +33,7 @@ namespace Piano
         }
 
         private static TranscriptCache InitiateCache(Stream stream,
-            IDictionary<ushort, IChromosome> chromosomeIndexDictionary, GenomeAssembly genomeAssembly, ushort numRefSeq)
+            IDictionary<ushort, Chromosome> chromosomeIndexDictionary, GenomeAssembly genomeAssembly, ushort numRefSeq)
         {
             TranscriptCache cache;
             using (var reader = new TranscriptCacheReader(stream, genomeAssembly, numRefSeq)) cache = reader.Read(chromosomeIndexDictionary);

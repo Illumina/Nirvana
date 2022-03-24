@@ -7,13 +7,13 @@ namespace SAUtils.ClinGen
 {
     public sealed class DosageMapRegionItem : ISuppIntervalItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End   { get; }
         private readonly int _hiScore;
         private readonly int _tsScore;
         
-        public DosageMapRegionItem(IChromosome chromosome, int start, int end, int hiScore, int tsScore)
+        public DosageMapRegionItem(Chromosome chromosome, int start, int end, int hiScore, int tsScore)
         {
             Chromosome = chromosome;
             Start = start;

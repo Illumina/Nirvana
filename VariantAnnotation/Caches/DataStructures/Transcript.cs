@@ -12,7 +12,7 @@ namespace VariantAnnotation.Caches.DataStructures
 {
     public sealed class Transcript : ITranscript
     {
-        public IChromosome         Chromosome        { get; }
+        public Chromosome         Chromosome        { get; }
         public int                 Start             { get; }
         public int                 End               { get; }
         public ICompactId          Id                { get; }
@@ -35,7 +35,7 @@ namespace VariantAnnotation.Caches.DataStructures
         public ISequence           CodingSequence    { get; set; }
         public ISequence           CdnaSequence    { get; set; }
 
-        public Transcript(IChromosome chromosome, int start, int end, ICompactId id, ITranslation translation,
+        public Transcript(Chromosome chromosome, int start, int end, ICompactId id, ITranslation translation,
             BioType bioType, IGene gene, int totalExonLength, byte startExonPhase, bool isCanonical,
             ITranscriptRegion[] transcriptRegions, ushort numExons, IInterval[] microRnas, int siftIndex,
             int polyPhenIndex, Source source, bool cdsStartNotFound, bool cdsEndNotFound, int[] selenocysteines,
@@ -64,7 +64,7 @@ namespace VariantAnnotation.Caches.DataStructures
         }
 
         public static ITranscript Read(BufferedBinaryReader reader,
-            IDictionary<ushort, IChromosome> chromosomeIndexDictionary, IGene[] cacheGenes,
+            IDictionary<ushort, Chromosome> chromosomeIndexDictionary, IGene[] cacheGenes,
             ITranscriptRegion[] cacheTranscriptRegions, IInterval[] cacheMirnas, string[] cachePeptideSeqs)
         {
             // transcript

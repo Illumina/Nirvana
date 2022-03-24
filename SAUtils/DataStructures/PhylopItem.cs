@@ -5,11 +5,11 @@ namespace SAUtils.DataStructures
 {
     public sealed class PhylopItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; }
         public double Score { get; }
 
-        public PhylopItem(IChromosome chromosome, int position, double score)
+        public PhylopItem(Chromosome chromosome, int position, double score)
         {
             Chromosome = chromosome;
             Position   = position;

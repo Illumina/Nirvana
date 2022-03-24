@@ -9,7 +9,7 @@ namespace VariantAnnotation.Pools
         private static readonly ObjectPool<Variant> Pool = 
             new DefaultObjectPool<Variant>(new DefaultPooledObjectPolicy<Variant>(), 8);
         
-        public static Variant Get(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        public static Variant Get(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             VariantType variantType, string variantId, bool isRefMinor, bool isDecomposed, bool isRecomposed,
             string[] linkedVids, AnnotationBehavior behavior, bool isStructuralVariant)
         {

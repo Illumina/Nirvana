@@ -77,7 +77,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             return provider;
         }
 
-        private static IAnnotationProvider GetGmeProvider()
+private static IAnnotationProvider GetGmeProvider()
         {
             var chrom1Post69134Annotations = new List<(string refAllele, string altAllele, string annotation)>
             {
@@ -106,7 +106,8 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             return provider;
         }
 
-        private static IAnnotatedPosition GetPosition(IChromosome chrom, int start, string refAllele, string[] altAlleles)
+private static IAnnotatedPosition GetPosition(Chromosome chrom, int start, string refAllele, string[] altAlleles)
+        
         {
             var position = new Mock<IAnnotatedPosition>();
             var annotatedVariants = new List<IAnnotatedVariant>();

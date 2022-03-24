@@ -6,7 +6,7 @@ namespace Vcf.VariantCreator
 {
     public static class StructuralVariantCreator
     {
-        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string svType, string vid)
+        public static IVariant Create(Chromosome chromosome, int start, int end, string refAllele, string altAllele, string svType, string vid)
         {
             VariantType variantType = GetVariantType(altAllele, svType);
             AnnotationBehavior behavior = variantType == VariantType.translocation_breakend

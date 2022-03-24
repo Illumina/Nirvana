@@ -6,7 +6,7 @@ namespace Vcf.VariantCreator
 {
     public static class ReferenceVariantCreator
     {
-        public static IVariant[] Create(IVariantIdCreator vidCreator, ISequence sequence, IChromosome chromosome, int start, int end,
+        public static IVariant[] Create(IVariantIdCreator vidCreator, ISequence sequence, Chromosome chromosome, int start, int end,
             string refAllele, string altAllele, string globalMajorAllele)
         {
             bool isRefMinor = end == start && globalMajorAllele != null;

@@ -102,7 +102,7 @@ namespace NirvanaLambda
             using var                        taProvider               = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider, null);
             IntervalArray<ITranscript>[]     transcriptIntervalArrays = taProvider.TranscriptIntervalArrays;
             IntervalForest<IGene>            geneIntervalForest       = GeneForestGenerator.GetGeneForest(transcriptIntervalArrays);
-            IDictionary<string, IChromosome> refNameToChromosome      = sequenceProvider.RefNameToChromosome;
+            IDictionary<string, Chromosome> refNameToChromosome      = sequenceProvider.RefNameToChromosome;
 
             return PartitionUtilities.GenerateAnnotationRanges(blockOffsets, config.vcfUrl, geneIntervalForest, refNameToChromosome);
         }

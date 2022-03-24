@@ -3,19 +3,29 @@ using IO;
 
 namespace Genome
 {
-    public sealed class Chromosome : IChromosome, IComparable<IChromosome>
+    
+    public sealed class Chromosome : IComparable<Chromosome>
     {
-        public string UcscName { get; }
-        public string EnsemblName { get; }
-        public string RefSeqAccession { get; }
+        public string UcscName         { get; }
+        public string EnsemblName      { get; }
+        public string RefSeqAccession  { get; }
         public string GenBankAccession { get; }
-        public int FlankingLength { get; }
-        public int Length { get; }
-        public ushort Index { get; }
+        public int    FlankingLength   { get; private set; }
+        public int    Length           { get; }
+        public ushort Index            { get; }
 
         public const ushort UnknownReferenceIndex = ushort.MaxValue;
         public const int ShortFlankingLength = 100;
 
+        public static Chromosome GetEmptyChromosome(string name)
+        {
+             return  new Chromosome(name, name, name, name, 0, ushort.MaxValue)
+            {
+                FlankingLength = ShortFlankingLength
+            };
+        }
+
+        
         public Chromosome(string ucscName, string ensemblName, string refSeqAccession, string genBankAccession,
             int length, ushort index)
         {
@@ -43,7 +53,7 @@ namespace Genome
             writer.WriteOpt(Index);
         }
 
-        public static IChromosome Read(ExtendedBinaryReader reader)
+        public static Chromosome Read(ExtendedBinaryReader reader)
         {
             string ucscName         = reader.ReadAsciiString();
             string ensemblName      = reader.ReadAsciiString();
@@ -55,8 +65,13 @@ namespace Genome
             return new Chromosome(ucscName, ensemblName, refseqAccession, genBankAccession, length, refIndex);
         }
 
-        public bool Equals(IChromosome other) => Index == other.Index && Length == other.Length;
+        public bool Equals(Chromosome other) => Index == other.Index && Length == other.Length;
 
-        public int CompareTo(IChromosome other) => Index == other.Index ? Length.CompareTo(other.Length) : Index.CompareTo(other.Index);
+        public int CompareTo(Chromosome other) => Index == other.Index ? Length.CompareTo(other.Length) : Index.CompareTo(other.Index);
+
+        public override int GetHashCode()
+        {
+            return UcscName.GetHashCode() ^ Length ^ Index;
+        }
     }
 }

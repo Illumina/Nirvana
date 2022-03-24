@@ -13,9 +13,9 @@ namespace SAUtils.ExtractCosmicSvs
         private readonly DataSourceVersion _version;
         private readonly string _outputDirectory;
         private readonly GenomeAssembly _genomeAssembly;
-        private readonly IDictionary<string, IChromosome> _refNameToChorm;
+        private readonly IDictionary<string, Chromosome> _refNameToChorm;
 
-        public CosmicSvReader(Stream cnvStream, Stream breakendStream, DataSourceVersion version, string outputDir, GenomeAssembly assembly, IDictionary<string, IChromosome> refNameToChromosome)
+        public CosmicSvReader(Stream cnvStream, Stream breakendStream, DataSourceVersion version, string outputDir, GenomeAssembly assembly, IDictionary<string, Chromosome> refNameToChromosome)
         {
             _cnvStream       = cnvStream;
             _breakendStream  = breakendStream;

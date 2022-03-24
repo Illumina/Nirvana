@@ -13,7 +13,7 @@ namespace Vcf
 {
     public sealed class Position : IPosition
     {
-        public IChromosome    Chromosome           { get; private set;}
+        public Chromosome    Chromosome           { get; private set;}
         public int            Start                { get; private set;}
         public int            End                  { get; private set;}        
         public string         RefAllele            { get; private set;}
@@ -31,7 +31,7 @@ namespace Vcf
         public string[]       Vids                 { get; private set;}
         public List<string>[] LinkedVids           { get; private set;}
         
-        public void Initialize(IChromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
+        public void Initialize(Chromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
             double? quality, string[] filters, IVariant[] variants, ISample[] samples, IInfoData infoData,
             string[] vcfFields, bool[] isDecomposed, bool isRecomposed)
         {

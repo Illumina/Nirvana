@@ -27,7 +27,7 @@ namespace CacheUtils.Commands.GFF
             Source transcriptSource = ParseVepCacheDirectoryMain.GetSource(_transcriptSource);
             string cachePath        = CacheConstants.TranscriptPath(_inputPrefix);
 
-            IDictionary<ushort, IChromosome> refIndexToChromosome =
+            IDictionary<ushort, Chromosome> refIndexToChromosome =
                 SequenceHelper.GetDictionaries(_compressedReferencePath).refIndexToChromosome;
             
             TranscriptCacheData     cache            = TranscriptCacheHelper.GetCache(cachePath, refIndexToChromosome);

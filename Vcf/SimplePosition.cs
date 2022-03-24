@@ -10,7 +10,7 @@ namespace Vcf
     {
         public int Start { get; }
         public int End { get; private set; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public string RefAllele { get; }
         public string[] AltAlleles { get; }
         public string[] VcfFields { get; private set; }
@@ -19,7 +19,7 @@ namespace Vcf
         public string[] Vids { get; private set; }
         public List<string>[] LinkedVids { get; private set; }
 
-        internal SimplePosition(IChromosome chromosome, int start, string refAllele, string[] altAlleles)
+        internal SimplePosition(Chromosome chromosome, int start, string refAllele, string[] altAlleles)
         {
             Chromosome = chromosome;
             Start      = start;
@@ -27,7 +27,7 @@ namespace Vcf
             AltAlleles = altAlleles;
         }
 
-        public static SimplePosition GetSimplePosition(IChromosome chromosome, int position, string[] vcfFields, IVcfFilter vcfFilter, bool isRecomposed = false)
+        public static SimplePosition GetSimplePosition(Chromosome chromosome, int position, string[] vcfFields, IVcfFilter vcfFilter, bool isRecomposed = false)
         {
             if (vcfFilter.PassedTheEnd(chromosome, position)) return null;
 

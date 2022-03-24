@@ -145,7 +145,7 @@ namespace AnnotationLambda
             return result;
         }
 
-        internal static long GetTabixVirtualPosition(AnnotationRange annotationRange, Stream stream, IDictionary<string, IChromosome> refNameToChromosome)
+        internal static long GetTabixVirtualPosition(AnnotationRange annotationRange, Stream stream, IDictionary<string, Chromosome> refNameToChromosome)
         {
             // process the entire file if no range specified
             if (annotationRange == null) return 0;

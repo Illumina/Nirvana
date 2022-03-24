@@ -24,7 +24,7 @@ namespace Nirvana
 {
     public sealed class AnnotationResources : IAnnotationResources
     {
-        private ImmutableDictionary<IChromosome, List<int>> _variantPositions;
+        private ImmutableDictionary<Chromosome, List<int>> _variantPositions;
 
         public          ISequenceProvider             SequenceProvider             { get; }
         public          ITranscriptAnnotationProvider TranscriptAnnotationProvider { get; }
@@ -111,7 +111,7 @@ namespace Nirvana
         }
 
         private static IRepeatExpansionProvider GetRepeatExpansionProvider(GenomeAssembly genomeAssembly,
-            IDictionary<string, IChromosome> refNameToChromosome, int numRefSeqs, string customStrTsvPath)
+            IDictionary<string, Chromosome> refNameToChromosome, int numRefSeqs, string customStrTsvPath)
         {
             if (genomeAssembly != GenomeAssembly.GRCh37 && genomeAssembly != GenomeAssembly.GRCh38) return null;
             return new RepeatExpansionProvider(genomeAssembly, refNameToChromosome, numRefSeqs, customStrTsvPath);
@@ -128,7 +128,7 @@ namespace Nirvana
 
         public void SingleVariantPreLoad(IPosition position)
         {
-            var chromToPositions = new Dictionary<IChromosome, List<int>>();
+            var chromToPositions = new Dictionary<Chromosome, List<int>>();
             PreLoadUtilities.TryAddPosition(chromToPositions, position.Chromosome, position.Start, position.RefAllele,
                 position.VcfFields[VcfCommon.AltIndex], SequenceProvider.Sequence);
             _variantPositions = chromToPositions.ToImmutableDictionary();
@@ -146,7 +146,7 @@ namespace Nirvana
             Metrics.ShowSaPositionScanLoad(numPositions);
         }
 
-        public void PreLoad(IChromosome chromosome)
+        public void PreLoad(Chromosome chromosome)
         {
             SequenceProvider.LoadChromosome(chromosome);
 

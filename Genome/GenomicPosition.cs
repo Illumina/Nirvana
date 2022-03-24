@@ -2,10 +2,10 @@
 {
     public struct GenomicPosition
     {
-        public readonly IChromosome Chromosome;
+        public readonly Chromosome Chromosome;
         public readonly int Position;
 
-        public GenomicPosition(IChromosome chromosome, int position)
+        public GenomicPosition(Chromosome chromosome, int position)
         {
             Chromosome = chromosome;
             Position = position;

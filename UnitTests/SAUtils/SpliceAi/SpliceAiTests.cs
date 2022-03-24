@@ -163,7 +163,7 @@ namespace UnitTests.SAUtils.SpliceAi
             stream.Position = 0;
             return stream;
         }
-        private static Stream GetMultiChromosomeStream()
+        private static Stream GetMultChromosomeStream()
         {
             var stream = new MemoryStream();
             var writer = new StreamWriter(stream);
@@ -186,7 +186,7 @@ namespace UnitTests.SAUtils.SpliceAi
         [Fact]
         public void Check_multi_chromosome_gene_update()
         {
-            using (var spliceParser = new SpliceAiParser(GetMultiChromosomeStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
+            using (var spliceParser = new SpliceAiParser(GetMultChromosomeStream(), GetSequenceProvider(), GetSpliceIntervals(), GetSpliceToNirvanaGenes()))
             {
                 var spliceItems = spliceParser.GetItems().ToList();
 
@@ -354,7 +354,7 @@ namespace UnitTests.SAUtils.SpliceAi
             return ms;
         }
 
-        private static ITranscript[] GetTranscripts(IChromosome chromosome, IGene[] genes, ITranscriptRegion[] regions,
+        private static ITranscript[] GetTranscripts(Chromosome chromosome, IGene[] genes, ITranscriptRegion[] regions,
             IInterval[] mirnas)
         {
             return new ITranscript[]

@@ -23,7 +23,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
 
             string[] nucleotides = {"A", "C", "G", "T"};
 
-            var testSetup = new Dictionary<IChromosome, List<Dictionary<string, object>>>
+            var testSetup = new Dictionary<Chromosome, List<Dictionary<string, object>>>
             {
                 // Normal Chromosome
                 {
@@ -148,7 +148,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             double    tol         = Math.Pow(10, -places);
 
             string[] nucleotides = {"A", "C", "G", "T"};
-            var testSetup = new Dictionary<IChromosome, List<Dictionary<string, object>>>
+            var testSetup = new Dictionary<Chromosome, List<Dictionary<string, object>>>
             {
                 {
                     ChromosomeUtilities.Chr1, new List<Dictionary<string, object>>
@@ -213,11 +213,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             }
         }
 
-        private static void AssertTestData(Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup, ScoreReader scoreReader,
+        private static void AssertTestData(Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup, ScoreReader scoreReader,
             int blockLength,
             int places, double tol)
         {
-            foreach ((IChromosome chromosome, List<Dictionary<string, object>> chromosomeTests) in testSetup)
+            foreach ((Chromosome chromosome, List<Dictionary<string, object>> chromosomeTests) in testSetup)
             {
                 foreach (Dictionary<string, object> chromosomeTest in chromosomeTests)
                 {

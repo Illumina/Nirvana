@@ -13,7 +13,7 @@ namespace VariantAnnotation
         public readonly TimeKeeper Preload        = new TimeKeeper();
         public readonly TimeKeeper SaPositionScan = new TimeKeeper();
 
-        public void ShowAnnotationEntry(IChromosome chromosome, int numVariants)
+        public void ShowAnnotationEntry(Chromosome chromosome, int numVariants)
         {
             Annotation.Stop();
             

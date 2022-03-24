@@ -13,11 +13,11 @@ namespace Vcf.VariantCreator
 {
     public sealed class LegacyVariantId : IVariantIdCreator
     {
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
 
-        public LegacyVariantId(IDictionary<string, IChromosome> refNameToChromosome) => _refNameToChromosome = refNameToChromosome;
+        public LegacyVariantId(IDictionary<string, Chromosome> refNameToChromosome) => _refNameToChromosome = refNameToChromosome;
 
-        public string Create(ISequence sequence, VariantCategory category, string svType, IChromosome chromosome, int start, int end,
+        public string Create(ISequence sequence, VariantCategory category, string svType, Chromosome chromosome, int start, int end,
             string refAllele, string altAllele, string repeatUnit)
         {
             switch (category)
@@ -46,7 +46,7 @@ namespace Vcf.VariantCreator
             return BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
         }
 
-        private static string GetSvVid(IDictionary<string, IChromosome> refNameToChromosome, string svType, IChromosome chromosome, int start, int end, string refAllele, string altAllele)
+        private static string GetSvVid(IDictionary<string, Chromosome> refNameToChromosome, string svType, Chromosome chromosome, int start, int end, string refAllele, string altAllele)
         {
             var variantType = StructuralVariantCreator.GetVariantType(altAllele, svType);
 
@@ -65,7 +65,7 @@ namespace Vcf.VariantCreator
                     return $"{chromosome.EnsemblName}:{start + 1}:{end}:TDUP";
 
                 case VariantType.translocation_breakend:
-                    (IChromosome chromosome2, int position2, bool isSuffix1, bool isSuffix2) = ParseBreakendAltAllele(refNameToChromosome, refAllele, altAllele);
+                    (Chromosome chromosome2, int position2, bool isSuffix1, bool isSuffix2) = ParseBreakendAltAllele(refNameToChromosome, refAllele, altAllele);
                     char orientation1 = isSuffix1 ? '-' : '+';
                     char orientation2 = isSuffix2 ? '+' : '-';
                     return $"{chromosome.EnsemblName}:{start}:{orientation1}:{chromosome2.EnsemblName}:{position2}:{orientation2}";
@@ -81,8 +81,8 @@ namespace Vcf.VariantCreator
             }
         }
 
-        private static (IChromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(
-            IDictionary<string, IChromosome> refNameToChromosome, string refAllele, string altAllele)
+        private static (Chromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(
+            IDictionary<string, Chromosome> refNameToChromosome, string refAllele, string altAllele)
         {
             string referenceName2;
             int    position2;
@@ -122,7 +122,7 @@ namespace Vcf.VariantCreator
             }
         }
 
-        private static string GetCnvVid(IChromosome chromosome, int start, int end, string altAllele)
+        private static string GetCnvVid(Chromosome chromosome, int start, int end, string altAllele)
         {
             start++;
             
@@ -141,7 +141,7 @@ namespace Vcf.VariantCreator
             return $"{chromosome.EnsemblName}:{start}:{end}:{trimmedAltAllele}";
         }
 
-        internal static string GetSmallVariantVid(IChromosome chromosome, int start, int end, string altAllele, VariantType variantType)
+        internal static string GetSmallVariantVid(Chromosome chromosome, int start, int end, string altAllele, VariantType variantType)
         {
             switch (variantType)
             {
@@ -181,7 +181,7 @@ namespace Vcf.VariantCreator
             return insAltAllele;
         }
 
-        private static string GetRepeatExpansionVid(IChromosome chromosome, int start, int end, string altAllele,
+        private static string GetRepeatExpansionVid(Chromosome chromosome, int start, int end, string altAllele,
             string repeatUnit)
         {
             string repeatCount = altAllele.Trim('<', '>').Substring(3);

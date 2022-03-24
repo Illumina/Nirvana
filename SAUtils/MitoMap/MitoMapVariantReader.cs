@@ -21,7 +21,7 @@ namespace SAUtils.MitoMap
         private readonly string _dataType;
         private readonly ReferenceSequenceProvider _sequenceProvider;
         private readonly VariantAligner _variantAligner;
-        private readonly IChromosome _chromosome;
+        private readonly Chromosome _chromosome;
         private readonly MitoMapInputDb _mitoMapInputDb;
 
         private static readonly Dictionary<string, int[]> MitoMapMutationColumnDefinitions = new Dictionary<string, int[]>
@@ -98,7 +98,7 @@ namespace SAUtils.MitoMap
         }
 
         internal static List<MitoMapItem> ParseLine(string line, string dataType, ISequenceProvider sequenceProvider,
-            VariantAligner variantAligner, IChromosome chromosome, MitoMapInputDb mitoMapInputDb)
+            VariantAligner variantAligner, Chromosome chromosome, MitoMapInputDb mitoMapInputDb)
         {
             // line validation
             if (!(line.OptimizedStartsWith('[') && line.EndsWith("],")))
@@ -119,7 +119,7 @@ namespace SAUtils.MitoMap
         }
 
         private static List<MitoMapItem> ExtractVariantItemFromDeletionsSingle(List<string> info,
-            ISequenceProvider sequenceProvider, VariantAligner variantAligner, IChromosome chromosome,
+            ISequenceProvider sequenceProvider, VariantAligner variantAligner, Chromosome chromosome,
             MitoMapInputDb mitoMapInputDb)
         {
             var junctions = info[0].OptimizedSplit(':').Select(int.Parse).ToList();
@@ -140,7 +140,7 @@ namespace SAUtils.MitoMap
 
         // extract small variant from this file
         private static List<MitoMapItem> ExtractVariantItemFromInsertionsSimple(List<string> info,
-            ISequenceProvider sequenceProvider, VariantAligner variantAligner, IChromosome chromosome,
+            ISequenceProvider sequenceProvider, VariantAligner variantAligner, Chromosome chromosome,
             MitoMapInputDb mitoMapInputDb)
         {
             var altAlleleInfo = info[2];
@@ -172,7 +172,7 @@ namespace SAUtils.MitoMap
         }
 
         private static List<MitoMapItem> ExtractVariantItem(List<string> info, string dataType,
-            ISequenceProvider sequenceProvider, VariantAligner variantAligner, IChromosome chromosome,
+            ISequenceProvider sequenceProvider, VariantAligner variantAligner, Chromosome chromosome,
             MitoMapInputDb mitoMapInputDb)
         {
             int[] fields = MitoMapMutationColumnDefinitions[dataType];

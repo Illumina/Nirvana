@@ -83,7 +83,7 @@ namespace UnitTests.Nirvana
             //we only need the sequence provider for variant rotation. 
             var seqProvider = ParserTestUtils.GetSequenceProvider(10329, "AC", 'A', ChromosomeUtilities.RefNameToChromosome);
             var refMinorProvider = ParserTestUtils.GetRefMinorProvider(
-                new List<(IChromosome chrom, int position, string globalMinor)>
+                new List<(Chromosome chrom, int position, string globalMinor)>
                 {
                     (ChromosomeUtilities.Chr1, 10275, "A" )
                 }

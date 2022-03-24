@@ -7,7 +7,7 @@ namespace Vcf.VariantCreator
 {
     public static class SmallVariantCreator
     {
-        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        public static IVariant Create(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             bool isDecomposed, bool isRecomposed, string[] linkedVids, string vid, bool isRefMinor)
         {
             var variantType = GetVariantType(refAllele, altAllele);

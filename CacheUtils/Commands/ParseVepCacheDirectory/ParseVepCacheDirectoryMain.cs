@@ -121,7 +121,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         private static void WritePredictions(PredictionWriter writer, IReadOnlyList<MutableTranscript> transcripts,
-            Func<MutableTranscript, string> predictionFunc, IChromosome chromosome)
+            Func<MutableTranscript, string> predictionFunc, Chromosome chromosome)
         {
             var predictionDict = new Dictionary<string, List<int>>(StringComparer.Ordinal);
 

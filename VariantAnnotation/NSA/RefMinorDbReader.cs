@@ -28,9 +28,9 @@ namespace VariantAnnotation.NSA
                 throw new UserErrorException($"SA schema version mismatch. Expected {SaCommon.SchemaVersion}, observed {_index.SchemaVersion}");            
         }
 
-        private IChromosome _chromosome;
+        private Chromosome _chromosome;
 
-        private void PreLoad(IChromosome chrom)
+        private void PreLoad(Chromosome chrom)
         {
             _annotations.Clear();
             _chromosome = chrom;
@@ -54,7 +54,7 @@ namespace VariantAnnotation.NSA
 
         }
 
-        public string GetGlobalMajorAllele(IChromosome chromosome, int position)
+        public string GetGlobalMajorAllele(Chromosome chromosome, int position)
         {
             if (_chromosome == null || chromosome.Index != _chromosome.Index)
                 PreLoad(chromosome);

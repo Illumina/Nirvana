@@ -10,7 +10,7 @@ namespace SAUtils.DataStructures
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         private VariantType VariantType { get; }
 
         private readonly int? _allAlleleNumber;
@@ -22,7 +22,7 @@ namespace SAUtils.DataStructures
         private readonly double? _eurAlleleFrequency;
         private readonly double? _sasAlleleFrequency;
 
-        public OnekGenSvItem(IChromosome chromosome, int start, int end, VariantType variantType, string id, int? allAlleleNumber, int? allAlleleCount, double? allAlleleFrequency, double? afrAlleleFrequency, double? amrAlleleFrequency, double? easAlleleFrequency, double? eurAlleleFrequency, double? sasAlleleFrequency)
+        public OnekGenSvItem(Chromosome chromosome, int start, int end, VariantType variantType, string id, int? allAlleleNumber, int? allAlleleCount, double? allAlleleFrequency, double? afrAlleleFrequency, double? amrAlleleFrequency, double? easAlleleFrequency, double? eurAlleleFrequency, double? sasAlleleFrequency)
         {
             Chromosome = chromosome;
             Start = start;

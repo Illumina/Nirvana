@@ -35,7 +35,7 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions)
+        public void PreLoad(Chromosome chromosome, List<int> positions)
         {
             throw new System.NotImplementedException();
         }

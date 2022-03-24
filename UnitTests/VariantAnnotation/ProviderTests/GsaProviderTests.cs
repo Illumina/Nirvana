@@ -23,9 +23,9 @@ namespace UnitTests.VariantAnnotation.ProviderTests
 {
     public sealed class GsaProviderTests
     {
-        private static (ScoreReader, Dictionary<IChromosome, List<Dictionary<string, object>>>) GetScoreReaderWithData()
+        private static (ScoreReader, Dictionary<Chromosome, List<Dictionary<string, object>>>) GetScoreReaderWithData()
         {
-            var testSetup = new Dictionary<IChromosome, List<Dictionary<string, object>>>
+            var testSetup = new Dictionary<Chromosome, List<Dictionary<string, object>>>
             {
                 {
                     ChromosomeUtilities.Chr1, new List<Dictionary<string, object>>
@@ -52,15 +52,15 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             return (TestDataGenerator.GetScoreReaderWithRandomData(testSetup), testSetup);
         }
 
-        private static (ScoreProvider provider, Dictionary<IChromosome, List<Dictionary<string, object>>> providerTestData) GetScoreProvider()
+        private static (ScoreProvider provider, Dictionary<Chromosome, List<Dictionary<string, object>>> providerTestData) GetScoreProvider()
         {
-            (ScoreReader scoreReader, Dictionary<IChromosome, List<Dictionary<string, object>>> testData) = GetScoreReaderWithData();
+            (ScoreReader scoreReader, Dictionary<Chromosome, List<Dictionary<string, object>>> testData) = GetScoreReaderWithData();
 
             var provider = new ScoreProvider(new[] {scoreReader});
             return (provider, testData);
         }
 
-        private static IAnnotatedPosition GetPosition(IChromosome chrom, int start, string refAllele, string[] altAlleles)
+        private static IAnnotatedPosition GetPosition(Chromosome chrom, int start, string refAllele, string[] altAlleles)
         {
             var position          = new Mock<IAnnotatedPosition>();
             var annotatedVariants = new List<IAnnotatedVariant>();
@@ -81,9 +81,9 @@ namespace UnitTests.VariantAnnotation.ProviderTests
         [Fact]
         public void TestAnnotateUsingScoreProvider()
         {
-            (IAnnotationProvider provider, Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup) = GetScoreProvider();
+            (IAnnotationProvider provider, Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup) = GetScoreProvider();
 
-            foreach ((IChromosome chromosome, List<Dictionary<string, object>> chromosomeTests) in testSetup)
+            foreach ((Chromosome chromosome, List<Dictionary<string, object>> chromosomeTests) in testSetup)
             {
                 foreach (Dictionary<string, object> chromosomeTest in chromosomeTests)
                 {
@@ -118,7 +118,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
         [Fact]
         private void TestUnknownPosition()
         {
-            (IAnnotationProvider provider, Dictionary<IChromosome, List<Dictionary<string, object>>> testSetup) = GetScoreProvider();
+            (IAnnotationProvider provider, Dictionary<Chromosome, List<Dictionary<string, object>>> testSetup) = GetScoreProvider();
             IAnnotatedPosition position = GetPosition(ChromosomeUtilities.Chr1, 5_000, "T", new[] {"A"});
             provider.Annotate(position);
             Assert.Empty(position.AnnotatedVariants[0].SaList);

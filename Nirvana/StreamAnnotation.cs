@@ -32,7 +32,7 @@ namespace Nirvana
             var metrics = annotationResources.Metrics;
             PerformanceMetrics.ShowAnnotationHeader();
 
-            IChromosome               currentChromosome        = new EmptyChromosome("dummy");
+            Chromosome                currentChromosome        = Chromosome.GetEmptyChromosome("dummy");
             int                       numVariants              = 0;
             int                       variantCount             = 0;
             IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
@@ -48,7 +48,7 @@ namespace Nirvana
 
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
-                        IChromosome chromosome = position.Chromosome;
+                        Chromosome chromosome = position.Chromosome;
                         if (ignoreEmptyChromosome && chromosome.IsEmpty()) continue;
                         
                         if (chromosome.Index != currentChromosome.Index)

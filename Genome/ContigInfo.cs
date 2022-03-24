@@ -78,7 +78,7 @@ namespace Genome
             return chromLengthToAssembly;
         }
 
-        public static GenomeAssembly GetGenomeAssembly(IChromosome chromosome, int length)
+        public static GenomeAssembly GetGenomeAssembly(Chromosome chromosome, int length)
         {
             if (!ChromLengthToAssembly.TryGetValue(chromosome.EnsemblName, out var lengthToAssembly))
                 return GenomeAssembly.Unknown;

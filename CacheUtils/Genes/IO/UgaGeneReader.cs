@@ -11,10 +11,10 @@ namespace CacheUtils.Genes.IO
 {
     public sealed class UgaGeneReader : IDisposable
     {
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
         private readonly StreamReader _reader;
 
-        public UgaGeneReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome, bool leaveOpen = false)
+        public UgaGeneReader(Stream stream, IDictionary<string, Chromosome> refNameToChromosome, bool leaveOpen = false)
         {
             _refNameToChromosome = refNameToChromosome;
             _reader = FileUtilities.GetStreamReader(stream, leaveOpen);
@@ -46,7 +46,7 @@ namespace CacheUtils.Genes.IO
             if (cols.Length != 11) throw new InvalidDataException($"Expected 11 columns, but found {cols.Length} columns.");
 
             string ucscRefName   = cols[0];
-            var chromosome       = _refNameToChromosome == null ? new EmptyChromosome(ucscRefName) : ReferenceNameUtilities.GetChromosome(_refNameToChromosome, ucscRefName);
+            var chromosome       = _refNameToChromosome == null ? Chromosome.GetEmptyChromosome(ucscRefName) : ReferenceNameUtilities.GetChromosome(_refNameToChromosome, ucscRefName);
             string symbol        = cols[2];
             int start37          = int.Parse(cols[3]);
             int end37            = int.Parse(cols[4]);
