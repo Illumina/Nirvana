@@ -84,7 +84,7 @@ namespace NirvanaLambda
         }
 
         public static AnnotationRange[] GenerateAnnotationRanges(List<long> blockBasedOffsets, string vcfUrl,
-            IntervalForest<IGene> geneIntervalForest, IDictionary<string, Chromosome> refNameToChromosome)
+            IntervalForest<IGene> geneIntervalForest, Dictionary<string, Chromosome> refNameToChromosome)
         {
             // There may be less intervals for annotation Lambda after the adjustment
             AnnotationPosition[] adjustedStarts = AdjustPartitionGenomicStarts(blockBasedOffsets, vcfUrl, geneIntervalForest, refNameToChromosome);
@@ -94,7 +94,7 @@ namespace NirvanaLambda
 
 
         private static AnnotationPosition[] AdjustPartitionGenomicStarts(IReadOnlyList<long> blockBasedOffsets, string vcfUrl,
-            IIntervalForest<IGene> geneIntervalForest, IDictionary<string, Chromosome> refNameToChromosome)
+            IIntervalForest<IGene> geneIntervalForest, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var allAdjustedStarts = new AnnotationPosition[blockBasedOffsets.Count];
 
@@ -158,7 +158,7 @@ namespace NirvanaLambda
             }
         }
 
-        private static AnnotationPosition FindProperStartPosition(AnnotationPosition genomicPosition, IIntervalForest<IGene> geneIntervalForest, IDictionary<string, Chromosome> refNameToChromosome)
+        private static AnnotationPosition FindProperStartPosition(AnnotationPosition genomicPosition, IIntervalForest<IGene> geneIntervalForest, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var chromosome = ReferenceNameUtilities.GetChromosome(refNameToChromosome, genomicPosition.Chromosome);
 

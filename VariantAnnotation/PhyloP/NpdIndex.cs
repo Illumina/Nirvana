@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using Genome;
 using IO;
@@ -16,7 +15,7 @@ namespace VariantAnnotation.PhyloP
         public readonly GenomeAssembly Assembly;
         public readonly int SchemaVersion;
         private readonly string _jsonKey;
-        public readonly ImmutableDictionary<double, byte> ScoreMap;
+        public readonly Dictionary<double, byte> ScoreMap;
 
         public const int MaxChromLength = 250_000_000;
 
@@ -95,7 +94,7 @@ namespace VariantAnnotation.PhyloP
                 scoreMap.Add(score, code);
             }
 
-            ScoreMap = scoreMap.ToImmutableDictionary();
+            ScoreMap = scoreMap;
 
         }
     }

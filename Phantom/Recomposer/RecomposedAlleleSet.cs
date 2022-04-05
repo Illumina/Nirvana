@@ -25,7 +25,7 @@ namespace Phantom.Recomposer
             RecomposedAlleles = new Dictionary<VariantSite, VariantInfo>();
         }
 
-        public IEnumerable<SimplePosition> GetRecomposedPositions(IDictionary<string, Chromosome> refNameToChromosome)
+        public IEnumerable<SimplePosition> GetRecomposedPositions(Dictionary<string, Chromosome> refNameToChromosome)
         {
             foreach (var variantSite in RecomposedAlleles.Keys.OrderBy(x => x))
             {

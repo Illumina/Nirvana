@@ -13,9 +13,9 @@ namespace Vcf.VariantCreator
 {
     public sealed class LegacyVariantId : IVariantIdCreator
     {
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
 
-        public LegacyVariantId(IDictionary<string, Chromosome> refNameToChromosome) => _refNameToChromosome = refNameToChromosome;
+        public LegacyVariantId(Dictionary<string, Chromosome> refNameToChromosome) => _refNameToChromosome = refNameToChromosome;
 
         public string Create(ISequence sequence, VariantCategory category, string svType, Chromosome chromosome, int start, int end,
             string refAllele, string altAllele, string repeatUnit)
@@ -46,7 +46,7 @@ namespace Vcf.VariantCreator
             return BiDirectionalTrimmer.Trim(start, refAllele, altAllele);
         }
 
-        private static string GetSvVid(IDictionary<string, Chromosome> refNameToChromosome, string svType, Chromosome chromosome, int start, int end, string refAllele, string altAllele)
+        private static string GetSvVid(Dictionary<string, Chromosome> refNameToChromosome, string svType, Chromosome chromosome, int start, int end, string refAllele, string altAllele)
         {
             var variantType = StructuralVariantCreator.GetVariantType(altAllele, svType);
 
@@ -82,7 +82,7 @@ namespace Vcf.VariantCreator
         }
 
         private static (Chromosome Chromosome2, int Position2, bool IsSuffix1, bool IsSuffix2) ParseBreakendAltAllele(
-            IDictionary<string, Chromosome> refNameToChromosome, string refAllele, string altAllele)
+            Dictionary<string, Chromosome> refNameToChromosome, string refAllele, string altAllele)
         {
             string referenceName2;
             int    position2;

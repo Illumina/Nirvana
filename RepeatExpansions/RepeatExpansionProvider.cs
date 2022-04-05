@@ -14,7 +14,7 @@ namespace RepeatExpansions
     {
         private readonly Matcher _matcher;
 
-        public RepeatExpansionProvider(GenomeAssembly genomeAssembly, IDictionary<string, Chromosome> refNameToChromosome, 
+        public RepeatExpansionProvider(GenomeAssembly genomeAssembly, Dictionary<string, Chromosome> refNameToChromosome, 
             int numRefSeqs, string customTsvPath)
         {
             using ( Stream stream = GetTsvStream(genomeAssembly, customTsvPath))

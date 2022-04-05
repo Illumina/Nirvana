@@ -22,7 +22,7 @@ namespace SAUtils.GeneIdentifiers
         public static (Dictionary<string, string> EntrezGeneIdToSymbol, Dictionary<string, string> EnsemblIdToSymbol) ParseUniversalGeneArchive(string inputReferencePath, string universalGeneArchivePath)
         {
 
-            IDictionary<string, Chromosome> refNameToChromosome;
+            Dictionary<string, Chromosome> refNameToChromosome;
             if (inputReferencePath == null) refNameToChromosome = null;
             else (_, refNameToChromosome, _) = SequenceHelper.GetDictionaries(inputReferencePath);
 

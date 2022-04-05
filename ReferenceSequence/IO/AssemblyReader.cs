@@ -14,7 +14,7 @@ namespace ReferenceSequence.IO
         private const int LengthIndex           = 8;
         private const int UcscIndex             = 9;
 
-        public static List<Chromosome> GetChromosomes(Stream stream, IDictionary<string, Chromosome> oldRefNameToChromosome, int oldNumRefSeqs)
+        public static List<Chromosome> GetChromosomes(Stream stream, Dictionary<string, Chromosome> oldRefNameToChromosome, int oldNumRefSeqs)
         {
             var nextRefIndex = (ushort)oldNumRefSeqs;
             var chromosomes  = new List<Chromosome>();
@@ -45,7 +45,7 @@ namespace ReferenceSequence.IO
 
         private static string Sanitize(this string s) => s == "na" ? null : s;
 
-        private static ushort GetRefIndex(IDictionary<string, Chromosome> refNameToChromosome, string ensemblName, string ucscName, string genBankAccession, string refSeqAccession, ref ushort nextRefIndex)
+        private static ushort GetRefIndex(Dictionary<string, Chromosome> refNameToChromosome, string ensemblName, string ucscName, string genBankAccession, string refSeqAccession, ref ushort nextRefIndex)
         {
             if (!string.IsNullOrEmpty(ensemblName)      && refNameToChromosome.TryGetValue(ensemblName, out var chromosome))  return chromosome.Index;
             if (!string.IsNullOrEmpty(ucscName)         && refNameToChromosome.TryGetValue(ucscName, out chromosome))         return chromosome.Index;

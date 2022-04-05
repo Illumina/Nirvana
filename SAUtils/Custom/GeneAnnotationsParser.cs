@@ -142,7 +142,7 @@ namespace SAUtils.Custom
         }
 
         
-        private void AddItem(string line, IDictionary<string, List<ISuppGeneItem>> geneAnnotations, bool skipGeneIdValidation, StreamWriter logWriter)
+        private void AddItem(string line, Dictionary<string, List<ISuppGeneItem>> geneAnnotations, bool skipGeneIdValidation, StreamWriter logWriter)
         {
             var splits = line.OptimizedSplit('\t');
             if (splits.Length != _tags.Length)

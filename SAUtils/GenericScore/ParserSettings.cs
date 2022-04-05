@@ -7,11 +7,11 @@ namespace SAUtils.GenericScore
     {
         public readonly ColumnPositions                                     ColumnPositions;
         public readonly string[]                                            PossibleAlleles;
-        public readonly Action<string, double, IDictionary<string, double>> ConflictResolutionFunction;
+        public readonly Action<string, double, Dictionary<string, double>> ConflictResolutionFunction;
 
         public ParserSettings(
             ColumnPositions columnPositions,
-            string[] possibleAlleles, Action<string, double, IDictionary<string, double>> conflictResolutionFunction)
+            string[] possibleAlleles, Action<string, double, Dictionary<string, double>> conflictResolutionFunction)
         {
             ColumnPositions            = columnPositions;
             PossibleAlleles            = possibleAlleles;

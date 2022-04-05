@@ -10,7 +10,7 @@ namespace CacheUtils.Genes.IO
 {
     public sealed class HgncReader : IDisposable
     {
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly StreamReader _reader;
 
         private const int HgncIdIndex    = 0;
@@ -19,7 +19,7 @@ namespace CacheUtils.Genes.IO
         private const int EntrezIdIndex  = 18;
         private const int EnsemblIdIndex = 19;
 
-        public HgncReader(Stream stream, IDictionary<string, Chromosome> refNameToChromosome)
+        public HgncReader(Stream stream, Dictionary<string, Chromosome> refNameToChromosome)
         {
             _refNameToChromosome = refNameToChromosome;
             _reader = FileUtilities.GetStreamReader(stream);

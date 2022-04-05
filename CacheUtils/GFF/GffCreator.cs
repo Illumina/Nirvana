@@ -8,12 +8,12 @@ namespace CacheUtils.GFF
 {
     public sealed class GffCreator
     {
-        private readonly IDictionary<IGene, int> _geneToInternalId;
+        private readonly Dictionary<IGene, int> _geneToInternalId;
         private readonly Source _source;
         private readonly GffWriter _writer;
         private readonly HashSet<int> _observedGenes;
 
-        public GffCreator(GffWriter writer, IDictionary<IGene, int> geneToInternalId, Source source)
+        public GffCreator(GffWriter writer, Dictionary<IGene, int> geneToInternalId, Source source)
         {
             _writer           = writer;
             _geneToInternalId = geneToInternalId;

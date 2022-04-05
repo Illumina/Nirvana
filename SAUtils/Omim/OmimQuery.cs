@@ -44,7 +44,7 @@ namespace SAUtils.Omim
 
         private static string GetMimTitlesUrl(string apiKey) => $"{OmimDownloadBaseUrl}{apiKey}/{MimTitlesFileName}";
 
-        private IList<string> GetMimsToDownload()
+        private List<string> GetMimsToDownload()
         {
             var mims = new List<string>();
             using (var response = _httpClient.GetAsync(_mimTitlesUrl).Result)
@@ -137,7 +137,7 @@ namespace SAUtils.Omim
             return responseContent.Substring(_jsonPrefix.Length, entriesStringLength);
         }
 
-        private static string GetMimNumbersString(IList<string> allMimNumbers, int startIndex, int endIndex)
+        private static string GetMimNumbersString(List<string> allMimNumbers, int startIndex, int endIndex)
         {
             var sb = StringBuilderPool.Get();
             var needComma = false;

@@ -41,10 +41,10 @@ namespace SAUtils.Omim
             
         }
 
-        private static IDictionary<int, string> GetPhenotypeDescriptions(EntryRoot entryRoot)
+        private static Dictionary<int, string> GetPhenotypeDescriptions(EntryRoot entryRoot)
         {
             
-            IDictionary<int, string> phenotypeToDescription = new Dictionary<int, string>();
+            Dictionary<int, string> phenotypeToDescription = new Dictionary<int, string>();
 
             foreach (var entry in entryRoot.omim.entryList)
             {
@@ -60,7 +60,7 @@ namespace SAUtils.Omim
             return phenotypeToDescription;
         }
 
-        private IDictionary<int, string> GetMimNumberToGeneSymbol()
+        private Dictionary<int, string> GetMimNumberToGeneSymbol()
         {
             var mimNumberToGeneSymbol = new Dictionary<int, string>();
             using (var stream = new FileStream(_mimToGeneSymbolFile, FileMode.Open))
@@ -91,7 +91,7 @@ namespace SAUtils.Omim
             return entryQueryResponse;
         }
 
-        private IEnumerable<OmimItem> GetOmimItems(EntryRoot entryRoot, IDictionary<int, string> mimToGeneSymbol, IDictionary<int, string> phenotypeDescriptions)
+        private IEnumerable<OmimItem> GetOmimItems(EntryRoot entryRoot, Dictionary<int, string> mimToGeneSymbol, Dictionary<int, string> phenotypeDescriptions)
         {
             foreach (var entry in entryRoot.omim.entryList)
             {

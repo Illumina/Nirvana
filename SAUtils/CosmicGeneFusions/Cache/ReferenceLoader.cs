@@ -7,7 +7,7 @@ namespace SAUtils.CosmicGeneFusions.Cache
 {
     public static class ReferenceLoader
     {
-        public static IDictionary<ushort, Chromosome> GetRefIndexToChromosome(string referencePath)
+        public static Dictionary<ushort, Chromosome> GetRefIndexToChromosome(string referencePath)
         {
             var sequenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(referencePath));
             return sequenceProvider.RefIndexToChromosome;

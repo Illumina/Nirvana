@@ -6,7 +6,7 @@ namespace ReferenceSequence.Creation
 {
     internal static class ReferenceDictionaryUtils
     {
-        internal static IDictionary<string, Chromosome> GetRefNameToChromosome(IEnumerable<Chromosome> chromosomes)
+        internal static Dictionary<string, Chromosome> GetRefNameToChromosome(IEnumerable<Chromosome> chromosomes)
         {
             var refNameToChromosome = new Dictionary<string, Chromosome>();
 

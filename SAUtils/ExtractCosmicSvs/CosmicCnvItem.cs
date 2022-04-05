@@ -53,7 +53,7 @@ namespace SAUtils.ExtractCosmicSvs
             return sb.ToString();
         }
 
-        private static IEnumerable<string> GetJsonStrings(IDictionary<string, int> dictionary)
+        private static IEnumerable<string> GetJsonStrings(Dictionary<string, int> dictionary)
         {
             foreach (var kvp in dictionary)
             {
@@ -77,7 +77,7 @@ namespace SAUtils.ExtractCosmicSvs
 
         }
 
-        private static void MergeCounts(IDictionary<string, int> countDict1, IDictionary<string, int> countDict2)
+        private static void MergeCounts(Dictionary<string, int> countDict1, Dictionary<string, int> countDict2)
         {
             foreach (var kvp in countDict2)
             {

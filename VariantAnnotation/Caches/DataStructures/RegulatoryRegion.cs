@@ -24,7 +24,7 @@ namespace VariantAnnotation.Caches.DataStructures
             Chromosome = chromosome;
         }
 
-        public static IRegulatoryRegion Read(IBufferedBinaryReader reader, IDictionary<ushort, Chromosome> chromosomeIndexDictionary)
+        public static IRegulatoryRegion Read(IBufferedBinaryReader reader, Dictionary<ushort, Chromosome> chromosomeIndexDictionary)
         {
             var refIndex = reader.ReadOptUInt16();
             int start    = reader.ReadOptInt32();

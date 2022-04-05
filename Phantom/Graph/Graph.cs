@@ -70,7 +70,7 @@ namespace Phantom.Graph
             return vertexToComponent;
         }
 
-        private void FindComponentMembers(T vertex, int componentIndex, IDictionary<T, int> vertexToComponent)
+        private void FindComponentMembers(T vertex, int componentIndex, Dictionary<T, int> vertexToComponent)
         {
             foreach (var neighbor in GetNeighbors(vertex))
             {

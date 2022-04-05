@@ -71,7 +71,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static (TranscriptCache Cache, IntervalArray<ITranscript>[] TranscriptIntervalArrays, ushort VepVersion) InitiateCache(Stream stream,
-            IDictionary<ushort, Chromosome> refIndexToChromosome, GenomeAssembly refAssembly)
+            Dictionary<ushort, Chromosome> refIndexToChromosome, GenomeAssembly refAssembly)
         {
             using var reader     = new TranscriptCacheReader(stream);
             ushort    vepVersion = reader.Header.Custom.VepVersion;

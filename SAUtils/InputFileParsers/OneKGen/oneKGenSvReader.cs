@@ -18,7 +18,7 @@ namespace SAUtils.InputFileParsers.OneKGen
         private const int InfoIndex = 5;
 
         private readonly StreamReader _reader;
-	    private readonly IDictionary<string, Chromosome> _refNameDict;
+	    private readonly Dictionary<string, Chromosome> _refNameDict;
 
 	    private string _svType;
 
@@ -32,7 +32,7 @@ namespace SAUtils.InputFileParsers.OneKGen
 	    private double? _sasAlleleFrequency;
 
 
-        public OneKGenSvReader(StreamReader reader, IDictionary<string, Chromosome> refNameDict)
+        public OneKGenSvReader(StreamReader reader, Dictionary<string, Chromosome> refNameDict)
 		{
 			_reader = reader;
 		    _refNameDict  = refNameDict;

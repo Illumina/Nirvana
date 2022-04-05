@@ -21,7 +21,7 @@ namespace Vcf
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly ISequenceProvider _sequenceProvider;
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly IVcfFilter _vcfFilter;
         private readonly IMitoHeteroplasmyProvider _mitoHeteroplasmyProvider;
         public bool IsRcrsMitochondrion { get; private set; }

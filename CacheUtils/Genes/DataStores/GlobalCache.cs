@@ -22,7 +22,7 @@ namespace CacheUtils.Genes.DataStores
         }
 
         public static GlobalCache Create(string refSeqCachePath, string ensemblCachePath,
-            IDictionary<ushort, Chromosome> refIndexToChromosome, IDictionary<string, Chromosome> refNameToChromosome38)
+            Dictionary<ushort, Chromosome> refIndexToChromosome, Dictionary<string, Chromosome> refNameToChromosome38)
         {
             var ensemblGenesByRef = FlattenGenes(LoadGenes(GZipUtilities.GetAppropriateReadStream(ensemblCachePath), refIndexToChromosome, refNameToChromosome38));
             var refSeqGenesByRef  = FlattenGenes(LoadGenes(GZipUtilities.GetAppropriateReadStream(refSeqCachePath),  refIndexToChromosome, refNameToChromosome38));
@@ -44,8 +44,8 @@ namespace CacheUtils.Genes.DataStores
         }
 
         private static IEnumerable<MutableGene> LoadGenes(Stream stream,
-            IDictionary<ushort, Chromosome> refIndexToChromosome,
-            IDictionary<string, Chromosome> refNameToChromosome38)
+            Dictionary<ushort, Chromosome> refIndexToChromosome,
+            Dictionary<string, Chromosome> refNameToChromosome38)
         {
             var geneDict = new Dictionary<string, MutableGene>();
 

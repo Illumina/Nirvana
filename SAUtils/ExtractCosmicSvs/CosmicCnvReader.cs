@@ -11,7 +11,7 @@ namespace SAUtils.ExtractCosmicSvs
     public sealed class CosmicCnvReader:IDisposable
     {
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, Chromosome> _refToChrom;
+        private readonly Dictionary<string, Chromosome> _refToChrom;
         private readonly GenomeAssembly _assembly;
 
         private int _idIndex                    = -1;  
@@ -33,7 +33,7 @@ namespace SAUtils.ExtractCosmicSvs
 
         //CNV_ID  ID_GENE gene_name       ID_SAMPLE       ID_TUMOUR       Primary site    Site subtype 1  Site subtype 2  Site subtype 3  Primary histology       Histology subtype 1     Histology subtype 2     Histology subtype 3     SAMPLE_NAME     TOTAL_CN        MINOR_ALLELE    MUT_TYPE        ID_STUDY        GRCh    Chromosome:G_Start..G_Stop
 
-        public CosmicCnvReader(Stream cnvStream, IDictionary<string, Chromosome> refNameToChorm, GenomeAssembly assembly)
+        public CosmicCnvReader(Stream cnvStream, Dictionary<string, Chromosome> refNameToChorm, GenomeAssembly assembly)
         {
             _reader     = FileUtilities.GetStreamReader(cnvStream);
             _refToChrom = refNameToChorm; 
@@ -213,7 +213,7 @@ namespace SAUtils.ExtractCosmicSvs
             return (chrom, int.Parse(splits[1]), int.Parse(splits[3]));
         }
 
-        private static void TryAddValue(IDictionary<string, int> cancerTypes, string type)
+        private static void TryAddValue(Dictionary<string, int> cancerTypes, string type)
         {
             if (string.IsNullOrEmpty(type) || type == "NS") return;
             cancerTypes[type] = 1; // we don't care about overriding the old count since this is for one study. So counts should not add up

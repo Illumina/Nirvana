@@ -15,7 +15,7 @@ namespace Cloud.Messages.Annotation
             End   = end;
         }
 
-        public GenomicRange ToGenomicRange(IDictionary<string, Chromosome> refNameToChromosome)
+        public GenomicRange ToGenomicRange(Dictionary<string, Chromosome> refNameToChromosome)
         {
             var startGenomicPosition = new GenomicPosition(ReferenceNameUtilities.GetChromosome(refNameToChromosome, Start.Chromosome), Start.Position);
 

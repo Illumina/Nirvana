@@ -5,7 +5,7 @@ namespace Genome
 {
     public static class ReferenceNameUtilities
     {
-        public static Chromosome GetChromosome(IDictionary<string, Chromosome> refNameToChromosome,
+        public static Chromosome GetChromosome(Dictionary<string, Chromosome> refNameToChromosome,
             string referenceName)
         {
             if (referenceName == null) return Chromosome.GetEmptyChromosome(string.Empty);
@@ -15,7 +15,7 @@ namespace Genome
                 : chromosome;
         }
 
-        public static Chromosome GetChromosome(IDictionary<ushort, Chromosome> refIndexToChromosome, ushort referenceIndex)
+        public static Chromosome GetChromosome(Dictionary<ushort, Chromosome> refIndexToChromosome, ushort referenceIndex)
         {
             if (!refIndexToChromosome.TryGetValue(referenceIndex, out Chromosome chromosome))
             {

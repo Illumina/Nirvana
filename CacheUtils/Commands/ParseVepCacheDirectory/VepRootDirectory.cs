@@ -8,9 +8,9 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
 {
     public sealed class VepRootDirectory
     {
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
 
-        public VepRootDirectory(IDictionary<string, Chromosome> refNameToChromosome)
+        public VepRootDirectory(Dictionary<string, Chromosome> refNameToChromosome)
         {
             _refNameToChromosome = refNameToChromosome;
         }

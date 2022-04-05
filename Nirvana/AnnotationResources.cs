@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using Cloud.Messages;
@@ -24,7 +23,7 @@ namespace Nirvana
 {
     public sealed class AnnotationResources : IAnnotationResources
     {
-        private ImmutableDictionary<Chromosome, List<int>> _variantPositions;
+        private Dictionary<Chromosome, List<int>> _variantPositions;
 
         public          ISequenceProvider             SequenceProvider             { get; }
         public          ITranscriptAnnotationProvider TranscriptAnnotationProvider { get; }
@@ -111,7 +110,7 @@ namespace Nirvana
         }
 
         private static IRepeatExpansionProvider GetRepeatExpansionProvider(GenomeAssembly genomeAssembly,
-            IDictionary<string, Chromosome> refNameToChromosome, int numRefSeqs, string customStrTsvPath)
+            Dictionary<string, Chromosome> refNameToChromosome, int numRefSeqs, string customStrTsvPath)
         {
             if (genomeAssembly != GenomeAssembly.GRCh37 && genomeAssembly != GenomeAssembly.GRCh38) return null;
             return new RepeatExpansionProvider(genomeAssembly, refNameToChromosome, numRefSeqs, customStrTsvPath);
@@ -131,7 +130,7 @@ namespace Nirvana
             var chromToPositions = new Dictionary<Chromosome, List<int>>();
             PreLoadUtilities.TryAddPosition(chromToPositions, position.Chromosome, position.Start, position.RefAllele,
                 position.VcfFields[VcfCommon.AltIndex], SequenceProvider.Sequence);
-            _variantPositions = chromToPositions.ToImmutableDictionary();
+            _variantPositions = chromToPositions;
             PreLoad(position.Chromosome);
         }
 

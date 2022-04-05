@@ -64,7 +64,7 @@ namespace VariantAnnotation.Caches.DataStructures
         }
 
         public static ITranscript Read(BufferedBinaryReader reader,
-            IDictionary<ushort, Chromosome> chromosomeIndexDictionary, IGene[] cacheGenes,
+            Dictionary<ushort, Chromosome> chromosomeIndexDictionary, IGene[] cacheGenes,
             ITranscriptRegion[] cacheTranscriptRegions, IInterval[] cacheMirnas, string[] cachePeptideSeqs)
         {
             // transcript

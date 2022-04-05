@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Linq;
 
 namespace SAUtils.InputFileParsers.ClinVar
@@ -48,7 +47,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             no_interpretation_single
             // ReSharper restore InconsistentNaming
         }
-        public static readonly ImmutableDictionary<string, ReviewStatus> ReviewStatusNameMapping = new Dictionary<string, ReviewStatus>
+        public static readonly Dictionary<string, ReviewStatus> ReviewStatusNameMapping = new Dictionary<string, ReviewStatus>
         {
             ["no_assertion"] = ReviewStatus.no_assertion,
             ["no_criteria"]  = ReviewStatus.no_criteria,
@@ -67,7 +66,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             ["criteria provided, multiple submitters, no conflicts"] = ReviewStatus.multiple_submitters_no_conflict,
             ["criteria provided, single submitter"]                  = ReviewStatus.single_submitter,
             ["no interpretation for the single variant"]  = ReviewStatus.no_interpretation_single
-        }.ToImmutableDictionary();
+        };
 
         public static readonly Dictionary<ReviewStatus, string> ReviewStatusStrings = new Dictionary<ReviewStatus, string>
         {

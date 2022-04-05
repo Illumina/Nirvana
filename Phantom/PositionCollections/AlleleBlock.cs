@@ -63,7 +63,7 @@ namespace Phantom.PositionCollections
         }
 
         private static void AddAlleleIndexBlocks(GenotypeBlock genotypeBlock, List<int> sampleIndexes, int[] starts,
-            List<int> functionBlockRanges, IDictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele, Graph<AlleleBlock> alleleIndexBlockGraph)
+            List<int> functionBlockRanges, Dictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele, Graph<AlleleBlock> alleleIndexBlockGraph)
         {
             int startPosition = genotypeBlock.PosIndex;
             int ploidy = genotypeBlock.Genotypes[0].AlleleIndexes.Length;
@@ -118,7 +118,7 @@ namespace Phantom.PositionCollections
 
         private static bool IsRefPosition(int[] genotypeIndexes) => genotypeIndexes.All(x => x == 0);
 
-        private static void UpdateBlockToSampleAlleleMapping(AlleleBlock alleleBlock, List<SampleHaplotype> currentSampleAlleles, IDictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele)
+        private static void UpdateBlockToSampleAlleleMapping(AlleleBlock alleleBlock, List<SampleHaplotype> currentSampleAlleles, Dictionary<AlleleBlock, List<SampleHaplotype>> alleleIndexBlockToSampleAllele)
         {
             if (alleleIndexBlockToSampleAllele.TryGetValue(alleleBlock, out var sampleAlleles))
             {

@@ -45,7 +45,7 @@ namespace Phantom.CodonInformation
             return boundaryInfo;
         }
 
-        private static void SetOrUpdateBoundaryInfo(IDictionary<int, BoundaryStatus> boundaryInfo, string propertyName, int position, int i)
+        private static void SetOrUpdateBoundaryInfo(Dictionary<int, BoundaryStatus> boundaryInfo, string propertyName, int position, int i)
         {
             var property = typeof(BoundaryStatus).GetProperty(propertyName);
             List<int> propertyValue;
@@ -65,7 +65,7 @@ namespace Phantom.CodonInformation
 
 
         private static int ProcessBoundary(KeyValuePair<int, BoundaryStatus> boundary, int startPosition,
-            IDictionary<int, bool> inCodingRegion, IReadOnlyList<List<IInterval>> transcriptIntervals)
+            Dictionary<int, bool> inCodingRegion, IReadOnlyList<List<IInterval>> transcriptIntervals)
         {
 
             int thisPosition = boundary.Key;

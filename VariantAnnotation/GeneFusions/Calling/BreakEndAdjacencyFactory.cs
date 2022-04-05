@@ -13,18 +13,18 @@ namespace VariantAnnotation.GeneFusions.Calling
         private static readonly Regex  ForwardRegex   = new(@"\w+([\[\]])(.+):(\d+)([\[\]])", RegexOptions.Compiled);
         private static readonly Regex  ReverseRegex   = new(@"([\[\]])(.+):(\d+)([\[\]])\w+", RegexOptions.Compiled);
 
-        public static BreakEndAdjacency[] CreateAdjacencies(ISimpleVariant variant, IDictionary<string, Chromosome> refNameToChromosome, bool isInv3,
+        public static BreakEndAdjacency[] CreateAdjacencies(ISimpleVariant variant, Dictionary<string, Chromosome> refNameToChromosome, bool isInv3,
             bool isInv5) => variant.Type == VariantType.translocation_breakend
             ? CreateFromTranslocation(variant, refNameToChromosome)
             : CreateFromSymbolicAllele(variant, variant.Type, isInv3, isInv5);
         
         public static BreakEndAdjacency[] CreateFromTranslocation(ISimpleVariant variant,
-            IDictionary<string, Chromosome> refNameToChromosome) => variant.AltAllele.StartsWith(variant.RefAllele)
+            Dictionary<string, Chromosome> refNameToChromosome) => variant.AltAllele.StartsWith(variant.RefAllele)
             ? ConvertTranslocation(variant, ForwardRegex, false, 4, refNameToChromosome)
             : ConvertTranslocation(variant, ReverseRegex, true,  1, refNameToChromosome);
 
         private static BreakEndAdjacency[] ConvertTranslocation(ISimpleVariant variant, Regex regex,
-            bool onReverseStrand, int partnerBracketIndex, IDictionary<string, Chromosome> refNameToChromosome)
+            bool onReverseStrand, int partnerBracketIndex, Dictionary<string, Chromosome> refNameToChromosome)
         {
             Match match = regex.Match(variant.AltAllele);
             if (!match.Success)

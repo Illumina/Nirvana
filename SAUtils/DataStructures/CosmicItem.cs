@@ -92,7 +92,7 @@ namespace SAUtils.DataStructures
             return StringBuilderPool.GetStringAndReturn(sb);
         }
 
-        internal IDictionary<string,int> GetTissueCounts()
+        internal Dictionary<string,int> GetTissueCounts()
         {
             if (Studies == null) return null;
             var tissueCounts = new Dictionary<string, int>();
@@ -113,7 +113,7 @@ namespace SAUtils.DataStructures
             return tissueCounts; 
         }
 
-        internal IDictionary<string,int> GetCancerTypeCounts()
+        internal Dictionary<string,int> GetCancerTypeCounts()
         {
             if (Studies == null) return null;
             var cancerTypeCounts = new Dictionary<string, int>();
@@ -133,7 +133,7 @@ namespace SAUtils.DataStructures
             return cancerTypeCounts;
         }
 
-        private static string GetJsonStringFromDict(string dataType, IDictionary<string, int> dictionary)
+        private static string GetJsonStringFromDict(string dataType, Dictionary<string, int> dictionary)
         {
             if (dictionary == null) return null;
 

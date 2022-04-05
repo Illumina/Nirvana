@@ -9,7 +9,7 @@ namespace CacheUtils.Genes.IO
 {
     public sealed class RefSeqGffReader : IDisposable
     {
-        private readonly IDictionary<string, Chromosome> _accessionIdToChromosome;
+        private readonly Dictionary<string, Chromosome> _accessionIdToChromosome;
         private readonly StreamReader _reader;
 
         private const int AccessionIndex   = 0;
@@ -19,7 +19,7 @@ namespace CacheUtils.Genes.IO
         private const int StrandIndex      = 6;
         private const int InfoIndex        = 8;
 
-        public RefSeqGffReader(StreamReader reader, IDictionary<string, Chromosome> accessionIdToChromosome)
+        public RefSeqGffReader(StreamReader reader, Dictionary<string, Chromosome> accessionIdToChromosome)
         {
             _accessionIdToChromosome = accessionIdToChromosome;
             _reader = reader;
@@ -68,7 +68,7 @@ namespace CacheUtils.Genes.IO
             }
         }
 
-        internal static Chromosome GetChromosome(string referenceName, IDictionary<string, Chromosome> refNameToChromosome)
+        internal static Chromosome GetChromosome(string referenceName, Dictionary<string, Chromosome> refNameToChromosome)
         {
             refNameToChromosome.TryGetValue(referenceName, out var chromosome);
             return chromosome;

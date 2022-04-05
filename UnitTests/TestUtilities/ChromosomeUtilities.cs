@@ -33,7 +33,7 @@ namespace UnitTests.TestUtilities
 
         public static readonly Chromosome Bob = new Chromosome("bob", "bob", "", "", 1, Chromosome.UnknownReferenceIndex);
 
-        public static readonly IDictionary<string, Chromosome> RefNameToChromosome = new Dictionary<string, Chromosome>();
+        public static readonly Dictionary<string, Chromosome> RefNameToChromosome = new Dictionary<string, Chromosome>();
         public static readonly Dictionary<ushort, Chromosome> RefIndexToChromosome = new Dictionary<ushort, Chromosome>();
 
         static ChromosomeUtilities()

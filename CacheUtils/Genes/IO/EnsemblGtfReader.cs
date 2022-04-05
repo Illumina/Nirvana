@@ -10,7 +10,7 @@ namespace CacheUtils.Genes.IO
 {
     public sealed class EnsemblGtfReader : IDisposable
     {
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly StreamReader _reader;
 
         private const int ChromosomeIndex  = 0;
@@ -19,7 +19,7 @@ namespace CacheUtils.Genes.IO
         private const int EndIndex         = 4;
         private const int InfoIndex        = 8;
 
-        public EnsemblGtfReader(StreamReader reader, IDictionary<string, Chromosome> refNameToChromosome)
+        public EnsemblGtfReader(StreamReader reader, Dictionary<string, Chromosome> refNameToChromosome)
         {
             _refNameToChromosome = refNameToChromosome;
             _reader = reader;

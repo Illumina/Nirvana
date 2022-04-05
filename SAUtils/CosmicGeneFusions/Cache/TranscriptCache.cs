@@ -15,7 +15,7 @@ namespace SAUtils.CosmicGeneFusions.Cache
 
         public TranscriptCache(Dictionary<string, ITranscript> idToTranscript) => _idToTranscript = idToTranscript;
 
-        public static TranscriptCache Create(Stream stream, IDictionary<ushort, Chromosome> refIndexToChromosome)
+        public static TranscriptCache Create(Stream stream, Dictionary<ushort, Chromosome> refIndexToChromosome)
         {
             using var           reader    = new TranscriptCacheReader(stream);
             TranscriptCacheData cacheData = reader.Read(refIndexToChromosome);

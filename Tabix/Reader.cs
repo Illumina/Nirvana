@@ -10,7 +10,7 @@ namespace Tabix
     public static class Reader
     {
         // ReSharper disable once MemberCanBePrivate.Global
-        public static Index Read(BinaryReader reader, IDictionary<string, Chromosome> refNameToChromosome)
+        public static Index Read(BinaryReader reader, Dictionary<string, Chromosome> refNameToChromosome)
         {
             int magic = reader.ReadInt32();
             if (magic != Constants.TabixMagic) throw new InvalidDataException("This does not seem to be a tabix file. Did you use a GZipStream?");
@@ -43,7 +43,7 @@ namespace Tabix
                 numLinesToSkip, referenceSequences, refNameToTabixIndex);
         }
 
-        public static Index GetTabixIndex(Stream tabixStream, IDictionary<string, Chromosome> refNameToChromosome)
+        public static Index GetTabixIndex(Stream tabixStream, Dictionary<string, Chromosome> refNameToChromosome)
         {
             using (var binaryReader = new BinaryReader(new BlockGZipStream(tabixStream, CompressionMode.Decompress)))
             {

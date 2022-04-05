@@ -62,7 +62,7 @@ namespace Jasix.DataStructures
         public static int GetJsonEntryEnd(JsonSchema jsonEntry)
         {
             if (jsonEntry.svEnd > 0) return jsonEntry.svEnd;
-            IList<string> altAlleles = jsonEntry.altAlleles;
+            List<string> altAlleles = jsonEntry.altAlleles;
             int altAlleleOffset = altAlleles != null && altAlleles.All(IsNucleotideAllele) && altAlleles.Any(x => x.Length > 1) ? 1 : 0;
 
             return Math.Max(jsonEntry.refAllele.Length - 1, altAlleleOffset) + jsonEntry.position;

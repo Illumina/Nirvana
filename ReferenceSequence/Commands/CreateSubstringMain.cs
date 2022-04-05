@@ -37,7 +37,7 @@ namespace ReferenceSequence.Commands
             int numRefSeqs  = chromosomes.Count;
             Console.WriteLine($"{numRefSeqs} references found.");
 
-            IDictionary<string, Chromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
+            Dictionary<string, Chromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
 
             Console.Write("- reading FASTA file... ");
             var fastaSequence = GetFastaSequence(_fastaPath, refNameToChromosome);
@@ -60,7 +60,7 @@ namespace ReferenceSequence.Commands
             return ExitCodes.Success;
         }
 
-        private static List<Band> GetCytogeneticBands(ushort refIndex, int numRefSeqs, IDictionary<string, Chromosome> refNameToChromosome)
+        private static List<Band> GetCytogeneticBands(ushort refIndex, int numRefSeqs, Dictionary<string, Chromosome> refNameToChromosome)
         {
             List<Band> chrBands = CytogeneticBandsReader.GetCytogeneticBands(FileUtilities.GetReadStream(_cytogeneticBandPath), numRefSeqs, refNameToChromosome)[refIndex];
 
@@ -87,7 +87,7 @@ namespace ReferenceSequence.Commands
             return new Creation.ReferenceSequence(buffer, maskedEntries, bands, _beginPosition - 1, fastaSequence.Bases.Length);
         }
 
-        private static FastaSequence GetFastaSequence(string fastaPath, IDictionary<string, Chromosome> refNameToChromosome)
+        private static FastaSequence GetFastaSequence(string fastaPath, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var references = new List<FastaSequence>();
             FastaReader.AddReferenceSequences(new GZipStream(FileUtilities.GetReadStream(fastaPath), CompressionMode.Decompress), refNameToChromosome, references);

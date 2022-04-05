@@ -12,15 +12,15 @@ namespace SAUtils.GenericScore.GenericScoreParser
         private readonly ParserSettings _parserSettings;
 
         private readonly StreamReader                     _reader;
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
-        private readonly IDictionary<string, double>      _representativeScores;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, double>      _representativeScores;
 
-        private readonly Action<string, double, IDictionary<string, double>> _updateRepresentativeScores;
+        private readonly Action<string, double, Dictionary<string, double>> _updateRepresentativeScores;
 
         public GenericScoreParser(
             ParserSettings parserSettings,
             StreamReader reader,
-            IDictionary<string, Chromosome> refNameToChromosome
+            Dictionary<string, Chromosome> refNameToChromosome
         )
         {
             _reader               = reader;
@@ -89,13 +89,13 @@ namespace SAUtils.GenericScore.GenericScoreParser
             }
         }
 
-        public static void MaxRepresentativeScores(string altAllele, double score, IDictionary<string, double> highestScores)
+        public static void MaxRepresentativeScores(string altAllele, double score, Dictionary<string, double> highestScores)
         {
             if (double.IsNaN(highestScores[altAllele]) || highestScores[altAllele] < score)
                 highestScores[altAllele] = score;
         }
 
-        public static void MinRepresentativeScores(string altAllele, double score, IDictionary<string, double> highestScores)
+        public static void MinRepresentativeScores(string altAllele, double score, Dictionary<string, double> highestScores)
         {
             if (double.IsNaN(highestScores[altAllele]) || highestScores[altAllele] > score)
                 highestScores[altAllele] = score;

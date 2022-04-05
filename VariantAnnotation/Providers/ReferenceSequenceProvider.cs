@@ -11,8 +11,8 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ReferenceSequenceProvider : ISequenceProvider
     {
-        public IDictionary<string, Chromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
-        public IDictionary<ushort, Chromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
+        public Dictionary<string, Chromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
+        public Dictionary<ushort, Chromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
         public GenomeAssembly                   Assembly             => _sequenceReader.Assembly;
         public string                           Name                 => "Reference sequence provider";
         public IEnumerable<IDataSourceVersion>  DataSourceVersions   => null;

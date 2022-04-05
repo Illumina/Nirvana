@@ -11,10 +11,10 @@ namespace CacheUtils.Genes.IO
 {
     public sealed class UgaGeneReader : IDisposable
     {
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly StreamReader _reader;
 
-        public UgaGeneReader(Stream stream, IDictionary<string, Chromosome> refNameToChromosome, bool leaveOpen = false)
+        public UgaGeneReader(Stream stream, Dictionary<string, Chromosome> refNameToChromosome, bool leaveOpen = false)
         {
             _refNameToChromosome = refNameToChromosome;
             _reader = FileUtilities.GetStreamReader(stream, leaveOpen);

@@ -9,7 +9,7 @@ namespace SAUtils.ClinGen
     public sealed class DosageMapRegionParser : IDisposable
     {
         private readonly Stream _stream;
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
 
         private const string GenomicLocation = "Genomic Location";
         private const string HaploInsufficiencyScoreTag = "Haploinsufficiency Score";
@@ -18,7 +18,7 @@ namespace SAUtils.ClinGen
         private int _genomicLocationIndex = -1;
         private int _haploInsufficiencyScoreIndex = -1;
         private int _triploSensitivityScoreIndex  = -1;
-        public DosageMapRegionParser(Stream stream, IDictionary<string, Chromosome> refNameToChromosome)
+        public DosageMapRegionParser(Stream stream, Dictionary<string, Chromosome> refNameToChromosome)
         {
             _stream = stream;
             _refNameToChromosome = refNameToChromosome;
@@ -49,7 +49,7 @@ namespace SAUtils.ClinGen
             }
         }
 
-        private DosageMapRegionItem GetDosageMapRegionItem(string line, IDictionary<string, Chromosome> refNameToChromosome)
+        private DosageMapRegionItem GetDosageMapRegionItem(string line, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var fields = line.OptimizedSplit('\t');
             string genomicLocation = fields[_genomicLocationIndex];

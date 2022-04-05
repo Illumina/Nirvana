@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using Compression.Algorithms;
 using ErrorHandling.Exceptions;
@@ -18,7 +17,7 @@ namespace VariantAnnotation.PhyloP
         private readonly byte[] _scores;
         private readonly Zstandard _zstd;
 
-        private readonly ImmutableDictionary<byte, double> _scoreMap;
+        private readonly Dictionary<byte, double> _scoreMap;
 
         private readonly NpdIndex _index;
         public GenomeAssembly Assembly { get; }
@@ -46,7 +45,7 @@ namespace VariantAnnotation.PhyloP
                 scoreMap.Add(code, score);
             }
 
-            _scoreMap = scoreMap.ToImmutableDictionary();
+            _scoreMap = scoreMap;
             _zstd = new Zstandard();
             _scores = new byte[NpdIndex.MaxChromLength];
         }

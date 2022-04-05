@@ -42,12 +42,12 @@ namespace UnitTests.TestDataStructures
         }
 
         public ISequence Sequence { get; }
-        public IDictionary<string, Chromosome> RefNameToChromosome { get; }
-        public IDictionary<ushort, Chromosome> RefIndexToChromosome { get; }
+        public Dictionary<string, Chromosome> RefNameToChromosome { get; }
+        public Dictionary<ushort, Chromosome> RefIndexToChromosome { get; }
         public void LoadChromosome(Chromosome chromosome) { }
 
         public SimpleSequenceProvider(GenomeAssembly assembly, ISequence sequence,
-            IDictionary<string, Chromosome> refNameToChromosome)
+            Dictionary<string, Chromosome> refNameToChromosome)
         {
             Assembly            = assembly;
             Sequence            = sequence;

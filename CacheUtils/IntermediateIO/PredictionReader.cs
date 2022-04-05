@@ -10,10 +10,10 @@ namespace CacheUtils.IntermediateIO
 {
     public sealed class PredictionReader : IDisposable
     {
-        private readonly IDictionary<ushort, Chromosome> _refIndexToChromosome;
+        private readonly Dictionary<ushort, Chromosome> _refIndexToChromosome;
         private readonly StreamReader _reader;
 
-        public PredictionReader(Stream stream, IDictionary<ushort, Chromosome> refIndexToChromosome,
+        public PredictionReader(Stream stream, Dictionary<ushort, Chromosome> refIndexToChromosome,
             IntermediateIoCommon.FileType expectedFileType)
         {
             _refIndexToChromosome = refIndexToChromosome;

@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using Genome;
 using OptimizedCore;
@@ -11,7 +10,7 @@ namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static (ImmutableDictionary<Chromosome, List<int>> PositionsByChromosome, int Count) GetPositions(Stream vcfStream, GenomicRange genomicRange,
+        public static (Dictionary<Chromosome, List<int>> PositionsByChromosome, int Count) GetPositions(Stream vcfStream, GenomicRange genomicRange,
             ISequenceProvider sequenceProvider, IRefMinorProvider refMinorProvider)
         {
             var positionsByChromosome = new Dictionary<Chromosome, List<int>>();
@@ -54,7 +53,7 @@ namespace Nirvana
             
             int count = SortPositionsAndGetCount(positionsByChromosome);
 
-            return (positionsByChromosome.ToImmutableDictionary(), count);
+            return (positionsByChromosome, count);
         }
 
         private static bool IsRefMinor(IRefMinorProvider refMinorProvider, Chromosome chrom, int position)

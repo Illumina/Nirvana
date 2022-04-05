@@ -13,10 +13,10 @@ namespace CacheUtils.IntermediateIO
 {
     internal sealed class RegulatoryRegionReader : IDisposable
     {
-        private readonly IDictionary<ushort, Chromosome> _refIndexToChromosome;
+        private readonly Dictionary<ushort, Chromosome> _refIndexToChromosome;
         private readonly StreamReader _reader;
 
-        internal RegulatoryRegionReader(Stream stream, IDictionary<ushort, Chromosome> refIndexToChromosome)
+        internal RegulatoryRegionReader(Stream stream, Dictionary<ushort, Chromosome> refIndexToChromosome)
         {
             _refIndexToChromosome = refIndexToChromosome;
             _reader = FileUtilities.GetStreamReader(stream);

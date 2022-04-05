@@ -27,7 +27,7 @@ namespace SAUtils.CosmicGeneFusions
         private static ExitCodes ProgramExecution()
         {
             Console.Write("- loading reference sequence... ");
-            IDictionary<ushort, Chromosome> refIndexToChromosome = ReferenceLoader.GetRefIndexToChromosome(_referencePath);
+            Dictionary<ushort, Chromosome> refIndexToChromosome = ReferenceLoader.GetRefIndexToChromosome(_referencePath);
             Console.WriteLine("finished.");
 
             Console.Write("- loading transcript cache... ");

@@ -15,7 +15,7 @@ namespace SAUtils.InputFileParsers.OneKGen
     public sealed class OneKGenReader :IDisposable
     {
         private readonly Stream _stream;
-        private readonly IDictionary<string,Chromosome> _refNameDictionary;
+        private readonly Dictionary<string,Chromosome> _refNameDictionary;
         private readonly ISequenceProvider _sequenceProvider;
 
         private  string _ancestralAllele;

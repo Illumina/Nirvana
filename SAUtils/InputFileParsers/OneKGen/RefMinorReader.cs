@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers.OneKGen
     public sealed class RefMinorReader:IDisposable
     {
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, Chromosome> _refNameDictionary;
+        private readonly Dictionary<string, Chromosome> _refNameDictionary;
         private readonly ISequenceProvider _sequenceProvider;
 
         private int? _allAlleleNumber;

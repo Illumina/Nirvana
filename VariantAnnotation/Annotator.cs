@@ -66,7 +66,7 @@ namespace VariantAnnotation
             return assemblies.First().Key;
         }
 
-        private static void AddAssembly(IDictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
+        private static void AddAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
         {
             if (provider == null) return;
             if (assemblies.TryGetValue(provider.Assembly, out List<string> assemblyList)) assemblyList.Add(provider.Name);

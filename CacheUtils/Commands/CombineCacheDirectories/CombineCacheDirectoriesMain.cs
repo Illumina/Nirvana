@@ -197,7 +197,7 @@ namespace CacheUtils.Commands.CombineCacheDirectories
         }
 
         private static (TranscriptCacheData Cache, TranscriptCacheData Cache2) LoadTranscriptCaches(
-            string transcriptPath, string transcriptPath2, IDictionary<ushort, Chromosome> refIndexToChromosome)
+            string transcriptPath, string transcriptPath2, Dictionary<ushort, Chromosome> refIndexToChromosome)
         {
             TranscriptCacheData cache;
             TranscriptCacheData cache2;

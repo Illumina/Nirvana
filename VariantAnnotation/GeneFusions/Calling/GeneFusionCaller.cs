@@ -11,10 +11,10 @@ namespace VariantAnnotation.GeneFusions.Calling
 {
     public sealed class GeneFusionCaller
     {
-        private readonly IDictionary<string, Chromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly IIntervalForest<ITranscript>     _transcriptIntervalForest;
 
-        public GeneFusionCaller(IDictionary<string, Chromosome> refNameToChromosome, IIntervalForest<ITranscript> transcriptIntervalForest)
+        public GeneFusionCaller(Dictionary<string, Chromosome> refNameToChromosome, IIntervalForest<ITranscript> transcriptIntervalForest)
         {
             _refNameToChromosome      = refNameToChromosome;
             _transcriptIntervalForest = transcriptIntervalForest;

@@ -20,7 +20,7 @@ namespace CacheUtils.Genes.DataStores
             EntrezGeneIdToSymbol = entrezGeneIdToSymbol;
         }
 
-        public static RefSeqGff Create(string gcfGffPath, string refGffPath, IDictionary<string, Chromosome> accessionToChromosome)
+        public static RefSeqGff Create(string gcfGffPath, string refGffPath, Dictionary<string, Chromosome> accessionToChromosome)
         {
             var refSeqGenes = LoadRefSeqGffGenes(GZipUtilities.GetAppropriateStreamReader(gcfGffPath),
                 GZipUtilities.GetAppropriateStreamReader(refGffPath), accessionToChromosome);
@@ -35,7 +35,7 @@ namespace CacheUtils.Genes.DataStores
             return new RefSeqGff(entrezGeneIdToGene, entrezGeneIdToSymbol);
         }
 
-        private static List<RefSeqGene> LoadRefSeqGffGenes(StreamReader gcfGffReader, StreamReader refGffReader, IDictionary<string, Chromosome> accessionToChromosome)
+        private static List<RefSeqGene> LoadRefSeqGffGenes(StreamReader gcfGffReader, StreamReader refGffReader, Dictionary<string, Chromosome> accessionToChromosome)
         {
             var refSeqGenes = new List<RefSeqGene>();
 
@@ -45,7 +45,7 @@ namespace CacheUtils.Genes.DataStores
             return refSeqGenes.OrderBy(x => x.Chromosome.Index).ThenBy(x => x.Start).ThenBy(x => x.End).ToList();
         }
 
-        private static void LoadRefSeqGff(StreamReader streamReader, List<RefSeqGene> refSeqGenes, IDictionary<string, Chromosome> accessionToChromosome)
+        private static void LoadRefSeqGff(StreamReader streamReader, List<RefSeqGene> refSeqGenes, Dictionary<string, Chromosome> accessionToChromosome)
         {
             using (var reader = new RefSeqGffReader(streamReader, accessionToChromosome))
             {

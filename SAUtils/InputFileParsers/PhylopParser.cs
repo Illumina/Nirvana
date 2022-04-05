@@ -12,9 +12,9 @@ namespace SAUtils.InputFileParsers
     {
         private readonly Stream _stream;
         private readonly GenomeAssembly _assembly;
-        private readonly IDictionary<string, Chromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
 
-        public PhylopParser(Stream stream, GenomeAssembly assembly, IDictionary<string, Chromosome> refChromDict)
+        public PhylopParser(Stream stream, GenomeAssembly assembly, Dictionary<string, Chromosome> refChromDict)
         {
             _stream = stream;
             _assembly = assembly;

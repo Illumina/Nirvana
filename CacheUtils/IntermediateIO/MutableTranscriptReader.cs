@@ -16,13 +16,13 @@ namespace CacheUtils.IntermediateIO
 {
     internal sealed class MutableTranscriptReader : IDisposable
     {
-        private readonly IDictionary<ushort, Chromosome> _refIndexToChromosome;
+        private readonly Dictionary<ushort, Chromosome> _refIndexToChromosome;
         private readonly StreamReader _reader;
         public readonly IntermediateIoHeader Header;
 
         private readonly ISequence _sequence = new NSequence();
 
-        internal MutableTranscriptReader(Stream stream, IDictionary<ushort, Chromosome> refIndexToChromosome)
+        internal MutableTranscriptReader(Stream stream, Dictionary<ushort, Chromosome> refIndexToChromosome)
         {
             _refIndexToChromosome = refIndexToChromosome;
             _reader = FileUtilities.GetStreamReader(stream);

@@ -87,7 +87,7 @@ namespace SAUtils.GeneIdentifiers
             return mostFrequentSymbol.Key;
         }
 
-        private static void AddSymbol(IDictionary<string, int> symbolCounts, string geneSymbol)
+        private static void AddSymbol(Dictionary<string, int> symbolCounts, string geneSymbol)
         {
             if (symbolCounts.TryGetValue(geneSymbol, out int counts)) symbolCounts[geneSymbol] = counts + 1;
             else symbolCounts[geneSymbol] = 1;

@@ -43,7 +43,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private readonly Stream _rcvStream;
         private readonly Stream _vcvStream;
 		private readonly ISequenceProvider _sequenceProvider;
-        private readonly IDictionary<string, Chromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
 
         private string _lastClinvarAccession;
         #endregion
@@ -605,7 +605,7 @@ namespace SAUtils.InputFileParsers.ClinVar
         private const string VcfAltAlleleTag = "alternateAlleleVCF";
         
 
-        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, IDictionary<string, Chromosome> refChromDict, string variantId)
+        private static ClinvarVariant GetClinvarVariant(XElement xElement, GenomeAssembly genomeAssembly, Dictionary<string, Chromosome> refChromDict, string variantId)
         {
 		    if (xElement == null ) return null;
 			//<SequenceLocation Assembly="GRCh38" Chr="17" Accession="NC_000017.11" start="43082402" stop="43082402" variantLength="1" referenceAllele="A" alternateAllele="C" />

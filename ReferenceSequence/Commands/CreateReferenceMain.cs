@@ -33,7 +33,7 @@ namespace ReferenceSequence.Commands
             List<Chromosome> oldChromosomes = ReferenceNamesReader.GetReferenceNames(FileUtilities.GetReadStream(_referenceNamesPath));
             Console.WriteLine("finished.");
 
-            IDictionary<string, Chromosome> oldRefNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(oldChromosomes);
+            Dictionary<string, Chromosome> oldRefNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(oldChromosomes);
 
             Console.Write("- reading the genome assembly report... ");
             List<Chromosome> chromosomes = AssemblyReader.GetChromosomes(FileUtilities.GetReadStream(_genomeAssemblyReportPath), oldRefNameToChromosome, oldChromosomes.Count);
@@ -44,7 +44,7 @@ namespace ReferenceSequence.Commands
             CheckReferenceIndexContiguity(chromosomes, oldChromosomes);
             Console.WriteLine("contiguous.");
 
-            IDictionary<string, Chromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
+            Dictionary<string, Chromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
 
             Console.Write("- reading cytogenetic bands... ");
             List<Band>[] cytogeneticBandsByRef = CytogeneticBandsReader.GetCytogeneticBands(FileUtilities.GetReadStream(_cytogeneticBandPath),
@@ -105,7 +105,7 @@ namespace ReferenceSequence.Commands
             }
         }
 
-        private static List<FastaSequence> GetFastaSequences(string fastaPrefix, IDictionary<string, Chromosome> refNameToChromosome)
+        private static List<FastaSequence> GetFastaSequences(string fastaPrefix, Dictionary<string, Chromosome> refNameToChromosome)
         {
             string directory = Path.GetDirectoryName(fastaPrefix);
             string prefix    = Path.GetFileName(fastaPrefix);

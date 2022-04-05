@@ -6,7 +6,7 @@ namespace ReferenceSequence.IO
 {
     public static class CytogeneticBandsReader
     {
-        public static List<Band>[] GetCytogeneticBands(Stream stream, int numRefSeqs, IDictionary<string, Chromosome> refNameToChromosome)
+        public static List<Band>[] GetCytogeneticBands(Stream stream, int numRefSeqs, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var bandLists = new List<Band>[numRefSeqs];
             for (var i = 0; i < numRefSeqs; i++) bandLists[i] = new List<Band>();
