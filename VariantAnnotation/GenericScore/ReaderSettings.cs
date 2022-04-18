@@ -1,22 +1,30 @@
+using System;
 using IO;
 
 namespace VariantAnnotation.GenericScore
 {
     public sealed class ReaderSettings
     {
-        public readonly ScoreEncoder     ScoreEncoder;
+        public readonly bool             IsPositional;
+        public readonly EncoderType      EncoderType;
+        public readonly IScoreEncoder    ScoreEncoder;
         public readonly ScoreJsonEncoder ScoreJsonEncoder;
         public readonly string[]         Nucleotides;
         public readonly int              BlockLength;
-        public          ushort           BytesRequired => ScoreEncoder.BytesRequired;
+
+        public ushort BytesRequired => ScoreEncoder.BytesRequired;
 
         public ReaderSettings(
-            ScoreEncoder scoreEncoder,
+            bool isPositional,
+            EncoderType encoderType,
+            IScoreEncoder scoreEncoder,
             ScoreJsonEncoder scoreJsonEncoder,
             string[] nucleotides,
             int blockLength
         )
         {
+            IsPositional     = isPositional;
+            EncoderType      = encoderType;
             ScoreEncoder     = scoreEncoder;
             ScoreJsonEncoder = scoreJsonEncoder;
             BlockLength      = blockLength;
@@ -26,7 +34,15 @@ namespace VariantAnnotation.GenericScore
 
         public static ReaderSettings Read(ExtendedBinaryReader reader)
         {
-            ScoreEncoder     scoreEncoder     = ScoreEncoder.Read(reader);
+            bool isPositional = reader.ReadBoolean();
+            var  encoderType  = (EncoderType) reader.ReadByte();
+            IScoreEncoder scoreEncoder = encoderType switch
+            {
+                EncoderType.ZeroToOne => ZeroToOneScoreEncoder.Read(reader),
+                EncoderType.Generic   => GenericScoreEncoder.Read(reader),
+                _                     => throw new Exception("Unknown score encoder")
+            };
+
             ScoreJsonEncoder scoreJsonEncoder = ScoreJsonEncoder.Read(reader);
 
             byte nucleotideCount = reader.ReadByte();
@@ -41,6 +57,8 @@ namespace VariantAnnotation.GenericScore
             int blockLength = reader.ReadOptInt32();
 
             return new ReaderSettings(
+                isPositional,
+                encoderType,
                 scoreEncoder,
                 scoreJsonEncoder,
                 nucleotides,
@@ -50,6 +68,8 @@ namespace VariantAnnotation.GenericScore
 
         public void Write(ExtendedBinaryWriter writer)
         {
+            writer.Write(IsPositional);
+            writer.Write((byte) EncoderType);
             ScoreEncoder.Write(writer);
             ScoreJsonEncoder.Write(writer);
 

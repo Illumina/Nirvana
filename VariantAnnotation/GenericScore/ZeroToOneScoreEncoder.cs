@@ -4,16 +4,16 @@ using IO;
 
 namespace VariantAnnotation.GenericScore
 {
-    public sealed class ScoreEncoder
+    public sealed class ZeroToOneScoreEncoder : IScoreEncoder
     {
         private readonly byte[] _encodedArray;
         private readonly int    _numberOfDigits;
         private readonly uint   _maxNumber;
         private readonly double _maxScore;
 
-        public readonly ushort BytesRequired;
+        public ushort BytesRequired { get; }
 
-        public ScoreEncoder(int numberOfDigits, double maxScore)
+        public ZeroToOneScoreEncoder(int numberOfDigits, double maxScore)
         {
             _numberOfDigits = numberOfDigits;
             _maxScore       = maxScore;
@@ -30,9 +30,9 @@ namespace VariantAnnotation.GenericScore
             writer.Write(_maxScore);
         }
 
-        public static ScoreEncoder Read(ExtendedBinaryReader reader)
+        public static ZeroToOneScoreEncoder Read(ExtendedBinaryReader reader)
         {
-            return new ScoreEncoder(reader.ReadOptInt32(), reader.ReadDouble());
+            return new ZeroToOneScoreEncoder(reader.ReadOptInt32(), reader.ReadDouble());
         }
 
         public byte[] EncodeToBytes(double number)
@@ -46,16 +46,9 @@ namespace VariantAnnotation.GenericScore
 
             uint transformedNumber = TransformToUint(number);
 
-            int i;
-
-            for (i = 0; transformedNumber >= 256U; i++)
-            {
-                _encodedArray[i]  =   (byte) (transformedNumber | 256U);
-                transformedNumber >>= 8;
-            }
-
-            _encodedArray[i] = (byte) transformedNumber;
-
+            // BitConverter is used as a convenient means of transforming the number into bytes
+            // Only the `BytesRequred` portion is saved, because the converted bytes will not exceed it.
+            Array.Copy(BitConverter.GetBytes(transformedNumber), _encodedArray, BytesRequired);
             return _encodedArray;
         }
 
@@ -67,6 +60,7 @@ namespace VariantAnnotation.GenericScore
             var count = 0;
             var shift = 0;
 
+            // because a variable lenght enodedarray is received, the BitConverter cannot be used directly
             foreach (byte b in encodedArray)
             {
                 count |= (b & byte.MaxValue) << shift;
@@ -82,9 +76,9 @@ namespace VariantAnnotation.GenericScore
             return (uint) Math.Round(number * _maxNumber / _maxScore);
         }
 
-        private double TransformToDouble(uint number)
+        private double TransformToDouble(uint encodedNumber)
         {
-            return number * _maxScore / _maxNumber;
+            return encodedNumber * _maxScore / _maxNumber;
         }
     }
 }

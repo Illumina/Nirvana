@@ -9,6 +9,7 @@ using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.FusionCatcher;
+using SAUtils.GERP;
 using SAUtils.gnomAD;
 using SAUtils.GnomadGeneScores;
 using SAUtils.MitoHeteroplasmy;
@@ -38,6 +39,7 @@ namespace SAUtils
                 ["CosmicFusion"]       = new("create COSMIC gene fusion database", CreateCosmicGeneFusions.Run),
                 ["CustomGene"]         = new("create custom gene annotation database", Custom.GeneMain.Run),
                 ["CustomVar"]          = new("create custom variant annotation database", Custom.VariantMain.Run),
+                ["Dann"]               = new("create DANN database", Dann.Create.Run),
                 ["Dbsnp"]              = new("create dbSNP database", CreateDbsnpDb.Main.Run),
                 ["Dgv"]                = new("create DGV database", makeDgvDb.Main.Run),
                 ["DiseaseValidity"]    = new("create disease validity database", GeneDiseaseValidity.Run),
@@ -49,6 +51,7 @@ namespace SAUtils
                 ["ExtractMiniXml"]     = new("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
                 ["FilterSpliceNetTsv"] = new("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run),
                 ["FusionCatcher"]      = new("create FusionCatcher database", CreateFusionCatcher.Run),
+                ["Gerp"]               = new("create GERP conservation database", GerpMain.Run),
                 ["GlobalMinor"]        = new("create global minor allele database", CreateGlobalAllelesDb.Main.Run),
                 ["Gnomad"]             = new("create gnomAD database", GnomadSnvMain.Run),
                 ["Gnomad-lcr"]         = new("create gnomAD low complexity region database", LcrRegionsMain.Run),
@@ -67,7 +70,6 @@ namespace SAUtils
                 ["RefMinor"]       = new("create Reference Minor database from 1000 Genome ", RefMinorDb.Main.Run),
                 ["RemapWithDbsnp"] = new("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
                 ["Revel"]          = new("create REVEL database", Revel.Create.Run),
-                ["Dann"]           = new("create DANN database", Dann.Create.Run),
                 ["SpliceAi"]       = new("create SpliceAI database", SpliceAiDb.Run),
                 ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run),
                 ["Gme"]            = new("create GME Variome database", CreateGmeDb.Main.Run)

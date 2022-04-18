@@ -149,7 +149,9 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var header      = new Header(FileType.GsaIndex, 1);
 
             var readerSettings = new ReaderSettings(
-                new ScoreEncoder(2, 1),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
                 new[] {"A", "C", "G", "T"},
                 25
@@ -176,7 +178,9 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var header      = new Header(FileType.GsaWriter, 1);
 
             var readerSettings = new ReaderSettings(
-                new ScoreEncoder(2, 1),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
                 new[] {"A", "C", "G", "T"},
                 25

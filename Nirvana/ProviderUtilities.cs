@@ -25,11 +25,13 @@ namespace Nirvana
                 ? null
                 : new ProteinConservationProvider(PersistentStreamUtils.GetReadStream(files.ProteinConservationFile));
 
-        public static IAnnotationProvider GetConservationProvider(AnnotationFiles files) =>
-            files == null || files.ConservationFile == default
-                ? null
-                : new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(files.ConservationFile.Npd),
-                    PersistentStreamUtils.GetReadStream(files.ConservationFile.Idx));
+        public static IAnnotationProvider GetConservationProvider(AnnotationFiles files)
+        {
+            if (files == null || files.PhylopFile == default) return null;
+            return new ConservationScoreProvider()
+                .AddPhylopReader(PersistentStreamUtils.GetReadStream(files.PhylopFile.Npd),
+                    PersistentStreamUtils.GetReadStream(files.PhylopFile.Idx));
+        }
 
         public static IAnnotationProvider GetLcrProvider(AnnotationFiles files) =>
             files?.LowComplexityRegionFile == null

@@ -54,7 +54,7 @@ namespace UnitTests.TestUtilities
 
         public static ISequenceProvider GetSequenceProvider()
         {
-            var sequence = new SimpleSequence(new string('A', 99) + "TAGTCGGTTAA" + new string('A', 89) + "GCCCAT");
+            var sequence = new SimpleSequence(new string('A', 1_000_000));
             return new SimpleSequenceProvider(GenomeAssembly.GRCh37, sequence, ChromosomeUtilities.RefNameToChromosome);
         }
 
@@ -71,9 +71,11 @@ namespace UnitTests.TestUtilities
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
-                new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
+                new ScoreJsonEncoder("TestKey", null),
+                new SaItemValidator(true, true)
             );
 
             // Scoring function to fill random scores
@@ -136,9 +138,11 @@ namespace UnitTests.TestUtilities
             var writerSettings = new WriterSettings(
                 blockLength,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             return (saItems, writerSettings, indexStream, writeStream, version, testSetup);

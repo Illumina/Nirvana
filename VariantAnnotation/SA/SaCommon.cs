@@ -51,8 +51,9 @@
         public const string MitoHeteroplasmyTag    = "heteroplasmy";
         public const string RevelTag               = "revel";
         public const string DannTag                = "dann";
+        public const string GerpTag                = "gerp";
         public const string LowComplexityRegionTag = "lowComplexityRegion";
+        public const string Score                  = "Score";
         public const string GmeTag                 = "gmeVariome";
-        public const string Score                  = "score";
     }
 }

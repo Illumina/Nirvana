@@ -9,70 +9,73 @@ using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.NSA;
 using Variants;
 
-namespace VariantAnnotation.Providers
+namespace VariantAnnotation.Providers;
+
+public sealed class ScoreProvider : IAnnotationProvider
 {
-    public sealed class ScoreProvider : IAnnotationProvider
+    public string                          Name               => "Supplementary annotation provider";
+    public GenomeAssembly                  Assembly           { get; }
+    public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
+
+    private readonly ScoreReader[] _scoreReaders;
+
+    public ScoreProvider(ScoreReader[] scoreReaders)
     {
-        public string                          Name               => "Supplementary annotation provider";
-        public GenomeAssembly                  Assembly           { get; }
-        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
+        _scoreReaders                  = scoreReaders;
+        (Assembly, DataSourceVersions) = GetReadersMetadata();
+    }
 
-        private readonly ScoreReader[] _scoreReaders;
-
-        public ScoreProvider(ScoreReader[] scoreReaders)
+    public void Annotate(IAnnotatedPosition annotatedPosition)
+    {
+        foreach (ScoreReader scoreReader in _scoreReaders)
         {
-            _scoreReaders                  = scoreReaders;
-            (Assembly, DataSourceVersions) = GetReadersMetadata();
-        }
-
-        public void Annotate(IAnnotatedPosition annotatedPosition)
-        {
-            foreach (ScoreReader scoreReader in _scoreReaders)
+            foreach (IAnnotatedVariant annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
-                foreach (IAnnotatedVariant annotatedVariant in annotatedPosition.AnnotatedVariants)
-                {
-                    IVariant    variant    = annotatedVariant.Variant;
-                    Chromosome chromosome = variant.Chromosome;
-                    string      jsonString = scoreReader.GetAnnotationJson(chromosome.Index, variant.Start, variant.AltAllele);
+                IVariant variant = annotatedVariant.Variant;
+                    
+                // Score provider is only limited to SNV type calls
+                if (variant.Type != VariantType.SNV) continue;
+                    
+                Chromosome chromosome = variant.Chromosome;
+                string     jsonString = scoreReader.GetAnnotationJson(chromosome.Index, variant.Start, variant.AltAllele);
 
-                    if (jsonString == null) continue;
+                if (jsonString == null) continue;
 
-                    annotatedVariant.SaList.Add(new SupplementaryAnnotation(
-                        scoreReader.JsonKey,
-                        false,
-                        false,
-                        jsonString,
-                        null
-                    ));
-                }
+                annotatedVariant.SaList.Add(new SupplementaryAnnotation(
+                    scoreReader.JsonKey,
+                    false,
+                    true,
+                    jsonString,
+                    null
+                ));
             }
         }
+    }
 
-        private (GenomeAssembly Assembly, IEnumerable<IDataSourceVersion> Versions) GetReadersMetadata()
+    private (GenomeAssembly Assembly, IEnumerable<IDataSourceVersion> Versions) GetReadersMetadata()
+    {
+        HashSet<GenomeAssembly>  assemblies = new();
+        List<IDataSourceVersion> versions   = new();
+        var                      sb         = new StringBuilder();
+
+        foreach (ScoreReader reader in _scoreReaders)
         {
-            HashSet<GenomeAssembly>  assemblies = new();
-            List<IDataSourceVersion> versions   = new();
-            var                      sb         = new StringBuilder();
-
-            foreach (ScoreReader reader in _scoreReaders)
-            {
-                if (reader.Assembly != GenomeAssembly.rCRS && reader.Assembly != GenomeAssembly.Unknown) assemblies.Add(reader.Assembly);
-                versions.Add(reader.Version);
-                sb.AppendLine($"{reader.Version}, Assembly: {reader.Assembly}");
-            }
-
-            if (assemblies.Count == 1) return (assemblies.First(), versions);
-
-            throw new UserErrorException($"Multiple genome assemblies detected in Supplementary annotation directory.\n{sb}");
+            if (reader.Assembly != GenomeAssembly.rCRS && reader.Assembly != GenomeAssembly.Unknown) assemblies.Add(reader.Assembly);
+            versions.Add(reader.Version);
+            sb.AppendLine($"{reader.Version}, Assembly: {reader.Assembly}");
         }
 
+        if (assemblies.Count == 1) return (assemblies.First(), versions);
 
-        public void PreLoad(Chromosome chromosome, List<int> positions)
-        {
-        }
+        throw new UserErrorException($"Multiple genome assemblies detected in Supplementary annotation directory.\n{sb}");
+    }
 
-        public void Dispose()
-        {
-        }
+
+    public void PreLoad(Chromosome chromosome, List<int> positions)
+    {
+    }
+
+    public void Dispose()
+    {
     }
 }

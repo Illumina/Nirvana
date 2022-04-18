@@ -101,9 +101,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 blockLength,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             // Scoring function to fill random scores
@@ -179,9 +181,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             // Scoring function to fill scores from position

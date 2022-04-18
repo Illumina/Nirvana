@@ -110,6 +110,9 @@ namespace VariantAnnotation.GenericScore
 
         public double GetScore(ushort chromosomeIndex, int position, string allele)
         {
+            if (_index.ReaderSettings.IsPositional)
+                allele = "N";
+                
             if (!GetUncompressedBlock(chromosomeIndex, position)) return double.NaN;
 
             (_, int localBlockIndex) = _index.PositionToBlockLocation(chromosomeIndex, position);

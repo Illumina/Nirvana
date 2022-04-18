@@ -29,9 +29,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             using (var saStream = new MemoryStream())
@@ -80,9 +82,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             var count = 1000;
@@ -126,9 +130,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             var position = 10_010;
@@ -173,9 +179,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             var position = 10_010;
@@ -212,9 +220,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             var position = 10_010;
@@ -255,9 +265,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 10_000,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, true)
             );
 
             var position = 10_010;
@@ -369,7 +381,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
         public void WrongRefAllele_ThrowUserException()
         {
             var saItem = new GenericScoreItem(ChromosomeUtilities.Chr1, 100, "C", "T", 0.9);
-            Assert.Throws<UserErrorException>(() => WriteCustomSaItem(saItem, false));
+            Assert.Throws<InvalidDataException>(() => WriteCustomSaItem(saItem, false));
             WriteCustomSaItem(saItem, true);
         }
 
@@ -383,9 +395,11 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var writerSettings = new WriterSettings(
                 blockLength,
                 nucleotides,
-                new ScoreEncoder(2, 1.0),
+                false,
+                EncoderType.ZeroToOne,
+                new ZeroToOneScoreEncoder(2, 1.0),
                 new ScoreJsonEncoder("TestKey", "TestSubKey"),
-                new SaItemValidator()
+                new SaItemValidator(true, !skipIncorrectRefEntries)
             );
 
             using (var writeStream = new MemoryStream())
@@ -434,7 +448,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             var sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, sequence, ChromosomeUtilities.RefNameToChromosome);
 
             var parserSettings = new ParserSettings(
-                new ColumnPositions(0, 2, 3, 4, 5, null),
+                new ColumnIndex(0, 2, 3, 4, 5, null),
                 new[] {"A", "C", "G", "T"},
                 GenericScoreParser.MaxRepresentativeScores
             );

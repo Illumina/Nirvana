@@ -60,7 +60,7 @@ namespace SAUtils.Revel
             var nucleotides = new[] {"A", "C", "G", "T"};
 
             var revelParserSettings = new ParserSettings(
-                new ColumnPositions(0, 1, 2, 3, 6, null),
+                new ColumnIndex(0, 1, 2, 3, 6, null),
                 nucleotides,
                 GenericScoreParser.MaxRepresentativeScores
             );

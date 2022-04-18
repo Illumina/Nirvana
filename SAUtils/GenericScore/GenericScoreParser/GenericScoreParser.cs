@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using ErrorHandling.Exceptions;
 using Genome;
 using OptimizedCore;
 
@@ -42,7 +43,7 @@ namespace SAUtils.GenericScore.GenericScoreParser
             Chromosome currentChromosome = null;
             string      refAllele         = null;
 
-            ColumnPositions columnPositions = _parserSettings.ColumnPositions;
+            ColumnIndex columnIndex = _parserSettings.ColumnIndex;
 
             while ((line = _reader.ReadLine()) != null)
             {
@@ -50,8 +51,8 @@ namespace SAUtils.GenericScore.GenericScoreParser
 
                 string[] fields = line.OptimizedSplit('\t');
 
-                if (!_refNameToChromosome.TryGetValue(fields[columnPositions.Chromosome], out var chromosome)) continue;
-                int position = int.Parse(fields[columnPositions.Position]);
+                if (!_refNameToChromosome.TryGetValue(fields[columnIndex.Chromosome], out var chromosome)) continue;
+                int position = int.Parse(fields[columnIndex.Position]);
 
                 if (chromosome != currentChromosome || position != currentPosition)
                 {
@@ -62,12 +63,14 @@ namespace SAUtils.GenericScore.GenericScoreParser
                 currentChromosome = chromosome;
                 currentPosition   = position;
 
-                refAllele = fields[columnPositions.RefAllele];
-                string altAllele = fields[columnPositions.AltAllele];
-                if (refAllele.Length != 1 || altAllele.Length != 1)
-                    throw new InvalidDataException($"Only SNV is expected in the input file. Exception found: {line}");
+                // add null checks for alleles
+                refAllele = columnIndex.RefAllele == null ? null : fields[columnIndex.RefAllele.Value];
+                string altAllele = columnIndex.AltAllele == null ? null : fields[columnIndex.AltAllele.Value];
 
-                if (double.TryParse(fields[columnPositions.Score], NumberStyles.Number, CultureInfo.InvariantCulture, out double score))
+                // set saItem.AltAllele to 'N' if positional
+                if (_parserSettings.IsPositional) altAllele = "N";
+
+                if (double.TryParse(fields[columnIndex.Score], NumberStyles.Number | NumberStyles.AllowExponent, CultureInfo.InvariantCulture, out double score))
                 {
                     _updateRepresentativeScores(altAllele, score, _representativeScores);
                 }
@@ -82,7 +85,7 @@ namespace SAUtils.GenericScore.GenericScoreParser
             if (currentChromosome == null) yield break;
             foreach (string altAllele in _parserSettings.PossibleAlleles)
             {
-                var score = _representativeScores[altAllele];
+                double score = _representativeScores[altAllele];
                 if (double.IsNaN(score)) continue;
                 yield return new GenericScoreItem(currentChromosome, currentPosition, refAllele, altAllele, score);
                 _representativeScores[altAllele] = double.NaN;
@@ -93,6 +96,14 @@ namespace SAUtils.GenericScore.GenericScoreParser
         {
             if (double.IsNaN(highestScores[altAllele]) || highestScores[altAllele] < score)
                 highestScores[altAllele] = score;
+        }
+
+        public static void NonConflictingScore(string altAllele, double score, Dictionary<string, double> highestScores)
+        {
+            if (!double.IsNaN(highestScores[altAllele]))
+                throw new UserErrorException("Multiple scores oberved.");
+
+            highestScores[altAllele] = score;
         }
 
         public static void MinRepresentativeScores(string altAllele, double score, Dictionary<string, double> highestScores)

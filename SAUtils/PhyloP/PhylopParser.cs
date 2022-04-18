@@ -6,7 +6,7 @@ using IO;
 using OptimizedCore;
 using SAUtils.DataStructures;
 
-namespace SAUtils.InputFileParsers
+namespace SAUtils.PhyloP
 {
     public sealed class PhylopParser : IDisposable
     {

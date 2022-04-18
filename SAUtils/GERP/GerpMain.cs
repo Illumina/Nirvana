@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -11,9 +11,9 @@ using VariantAnnotation.GenericScore;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
 
-namespace SAUtils.Dann
+namespace SAUtils.GERP
 {
-    public static class Create
+    public class GerpMain
     {
         private static string _inputFile;
         private static string _compressedReference;
@@ -30,7 +30,7 @@ namespace SAUtils.Dann
                 },
                 {
                     "in|i=",
-                    "input DANN file path",
+                    "input file path",
                     v => _inputFile = v
                 },
                 {
@@ -40,16 +40,17 @@ namespace SAUtils.Dann
                 }
             };
 
-            var commandLineExample = $"{command} [options]";
+            string commandLineExample = $"{command} [options]";
 
             var exitCode = new ConsoleAppBuilder(commandArgs, ops)
                 .Parse()
                 .CheckInputFilenameExists(_compressedReference, "compressed reference sequence file name", "--ref")
-                .CheckInputFilenameExists(_inputFile,           "input DANN file Path",                    "--in")
+                .HasRequiredParameter(_inputFile, "GERP wiggle or TSV file", "--in")
+                .CheckInputFilenameExists(_inputFile, "GERP wiggle or TSV file", "--in")
                 .HasRequiredParameter(_outputDirectory, "output directory", "--out")
                 .CheckDirectoryExists(_outputDirectory, "output directory", "--out")
                 .SkipBanner()
-                .ShowHelpMenu("Create a supplementary database from DANN input file ", commandLineExample)
+                .ShowHelpMenu("create Ancestral allele database from 1000Genomes data", commandLineExample)
                 .ShowErrors()
                 .Execute(ProgramExecution);
 
@@ -58,36 +59,42 @@ namespace SAUtils.Dann
 
         private static ExitCodes ProgramExecution()
         {
-            var nucleotides = new[] {"A", "C", "G", "T"};
+            var               referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference));
+            DataSourceVersion version           = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
+            var               outFileName       = $"{version.Name}_{version.Version}";
 
-            var dannParserSettings = new ParserSettings(
-                new ColumnIndex(0, 2, 3, 4, 5, null),
+            var nucleotides = new[] {"N"};
+
+            var  wigColumnIndex = new ColumnIndex(0, 2, null, null, 3, null);
+            var  tsvColumnIndex = new ColumnIndex(0, 1, null, null, 2, null);
+            bool isWig          = _inputFile.EndsWith("wig.gz");
+
+            var parserSettings = new ParserSettings(
+                isWig ? wigColumnIndex : tsvColumnIndex,
                 nucleotides,
-                GenericScoreParser.MaxRepresentativeScores
+                GenericScoreParser.NonConflictingScore
             );
 
-            var dannWriterSettings = new WriterSettings(
+            var writerSettings = new WriterSettings(
                 1_000_000,
                 nucleotides,
-                false,
-                EncoderType.ZeroToOne,
-                new ZeroToOneScoreEncoder(2, 1.0),
-                new ScoreJsonEncoder(SaCommon.DannTag + SaCommon.Score, null),
-                new SaItemValidator(true, false)
+                true,
+                EncoderType.Generic,
+                new GenericScoreEncoder(),
+                new ScoreJsonEncoder(SaCommon.GerpTag + SaCommon.Score, null),
+                new SaItemValidator(null, null)
             );
 
-            DataSourceVersion version     = DataSourceVersionReader.GetSourceVersion(_inputFile + ".version");
-            var               outFileName = $"{version.Name}_{version.Version}";
-            using (var referenceProvider = new ReferenceSequenceProvider(FileUtilities.GetReadStream(_compressedReference)))
-            using (var streamReader = GZipUtilities.GetAppropriateStreamReader(_inputFile))
-            using (var dannParser = new GenericScoreParser(dannParserSettings, streamReader, referenceProvider.RefNameToChromosome))
+
+            using (var streamReader = new StreamReader(GZipUtilities.GetAppropriateReadStream(_inputFile)))
+            using (var parser = new GenericScoreParser(parserSettings, streamReader, referenceProvider.RefNameToChromosome))
             using (var saStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GsaFileSuffix)))
             using (var indexStream =
                    FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GsaFileSuffix + SaCommon.IndexSuffix)))
-            using (var saWriter = new ScoreFileWriter(dannWriterSettings, saStream, indexStream, version, referenceProvider,
+            using (var saWriter = new ScoreFileWriter(writerSettings, saStream, indexStream, version, referenceProvider,
                        SaCommon.SchemaVersion, skipIncorrectRefEntries: true, leaveOpen: false))
             {
-                saWriter.Write(dannParser.GetItems());
+                saWriter.Write(parser.GetItems());
             }
 
             return ExitCodes.Success;

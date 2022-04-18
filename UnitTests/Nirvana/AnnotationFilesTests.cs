@@ -40,7 +40,7 @@ namespace UnitTests.Nirvana
 
             Assert.Equal(expectedNsaFiles, files.NsaFiles.OrderBy(x=> x.Nsa));
             Assert.Equal(expectedNsiFiles, files.NsiFiles.OrderBy(x=>x));
-            Assert.Equal(expectedConservationFile, files.ConservationFile);
+            Assert.Equal(expectedConservationFile, files.PhylopFile);
             Assert.Equal(expectedNgaFiles, files.NgaFiles.OrderBy(x=>x));
             Assert.Equal(expectedRefMinorFile, files.RefMinorFile);
         }
@@ -54,7 +54,7 @@ namespace UnitTests.Nirvana
             Assert.Empty(files.NsaFiles);
             Assert.Empty(files.NsiFiles);
             Assert.Empty(files.NgaFiles);
-            Assert.Equal(default, files.ConservationFile);
+            Assert.Equal(default, files.PhylopFile);
             Assert.Equal(default, files.RefMinorFile);
         }
     }

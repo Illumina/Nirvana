@@ -11,7 +11,9 @@ namespace SAUtils.GenericScore
         public readonly Header IndexHeader = new(FileType.GsaIndex, 1);
         public readonly int    FilePairId  = new Random().Next(1_000_000, int.MaxValue);
 
-        public readonly ScoreEncoder     ScoreEncoder;
+        public readonly bool             IsPositional;
+        public readonly EncoderType      EncoderType;
+        public readonly IScoreEncoder    ScoreEncoder;
         public readonly SaItemValidator  SaItemValidator;
         public readonly string[]         Nucleotides;
         public readonly int              BlockLength;
@@ -20,13 +22,17 @@ namespace SAUtils.GenericScore
         public WriterSettings(
             int blockLength,
             string[] nucleotides,
-            ScoreEncoder scoreEncoder,
+            bool isPositional,
+            EncoderType encoderType,
+            IScoreEncoder scoreEncoder,
             ScoreJsonEncoder scoreJsonEncoder,
             SaItemValidator saItemValidator
         )
         {
             BlockLength      = blockLength;
             Nucleotides      = nucleotides;
+            IsPositional     = isPositional;
+            EncoderType      = encoderType;
             ScoreEncoder     = scoreEncoder;
             ScoreJsonEncoder = scoreJsonEncoder;
             SaItemValidator  = saItemValidator;

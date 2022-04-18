@@ -15,7 +15,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             const int    numberOfDigits = 3;
             const double maxScore       = 1.0;
 
-            var scoreEncoder = new ScoreEncoder(numberOfDigits, maxScore);
+            var scoreEncoder = new ZeroToOneScoreEncoder(numberOfDigits, maxScore);
 
             var stream = new MemoryStream();
             var writer = new ExtendedBinaryWriter(stream, System.Text.Encoding.Default);
@@ -24,7 +24,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             stream.Position = 0;
             var reader = new ExtendedBinaryReader(stream);
 
-            var deserializedScoreEncoder = ScoreEncoder.Read(reader);
+            var deserializedScoreEncoder = ZeroToOneScoreEncoder.Read(reader);
             stream.Close();
 
             var testData = new List<(double inputNumber, double expectedResult)>
@@ -69,7 +69,7 @@ namespace UnitTests.VariantAnnotation.ScoreFile
             };
 
             // Test encoder and its deserialized version
-            foreach (ScoreEncoder encoder in new[] {scoreEncoder, deserializedScoreEncoder})
+            foreach (ZeroToOneScoreEncoder encoder in new[] {scoreEncoder, deserializedScoreEncoder})
             {
                 foreach ((double inputNumber, double expectedOutput)in testData)
                 {
@@ -99,12 +99,12 @@ namespace UnitTests.VariantAnnotation.ScoreFile
 
             foreach ((int numberOfDigits, double maxScore, int expectedBytesRequired) in testData)
             {
-                var scoreEncoder = new ScoreEncoder(numberOfDigits, maxScore);
+                var scoreEncoder = new ZeroToOneScoreEncoder(numberOfDigits, maxScore);
                 Assert.Equal(expectedBytesRequired, scoreEncoder.BytesRequired);
             }
         }
 
-        private static double EncodeDecode(ScoreEncoder encoder, double number)
+        private static double EncodeDecode(ZeroToOneScoreEncoder encoder, double number)
         {
             return encoder.DecodeFromBytes(encoder.EncodeToBytes(number));
         }

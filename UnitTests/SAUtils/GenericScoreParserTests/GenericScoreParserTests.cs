@@ -11,7 +11,7 @@ namespace UnitTests.SAUtils.GenericScoreParserTests
     public sealed class GenericScoreParserTests
     {
         private ParserSettings _parserSettings = new(
-            new ColumnPositions(0, 2, 3, 4, 5, null),
+            new ColumnIndex(0, 2, 3, 4, 5, null),
             new[] {"A", "C", "G", "T"},
             GenericScoreParser.MaxRepresentativeScores
         );
@@ -35,23 +35,6 @@ namespace UnitTests.SAUtils.GenericScoreParserTests
         }
 
         [Fact]
-        public void TestSnv()
-        {
-            var writer = new StreamWriter(new MemoryStream());
-            writer.WriteLine("#chr\tpos\tref\talt\tscore");
-            writer.WriteLine("1\t10003\t10003\tAA\tGG\t0.5");
-            writer.WriteLine("1\t10003\t10003\tAA\tGG\t0.1");
-            writer.Flush();
-            writer.BaseStream.Position = 0;
-
-            using (var streamReader = new StreamReader(writer.BaseStream))
-            using (var reader = new GenericScoreParser(_parserSettings, streamReader, ChromosomeUtilities.RefNameToChromosome))
-            {
-                Assert.Throws<InvalidDataException>(() => reader.GetItems().ToArray());
-            }
-        }
-
-        [Fact]
         public void TestMaxScore()
         {
             var writer = new StreamWriter(new MemoryStream());
@@ -62,7 +45,7 @@ namespace UnitTests.SAUtils.GenericScoreParserTests
 
             writer.BaseStream.Position = 0;
             _parserSettings = new ParserSettings(
-                new ColumnPositions(0, 2, 3, 4, 5, null),
+                new ColumnIndex(0, 2, 3, 4, 5, null),
                 new[] {"A", "C", "G", "T"},
                 GenericScoreParser.MaxRepresentativeScores
             );
@@ -87,7 +70,7 @@ namespace UnitTests.SAUtils.GenericScoreParserTests
 
             writer.BaseStream.Position = 0;
             _parserSettings = new ParserSettings(
-                new ColumnPositions(0, 2, 3, 4, 5, null),
+                new ColumnIndex(0, 2, 3, 4, 5, null),
                 new[] {"A", "C", "G", "T"},
                 GenericScoreParser.MinRepresentativeScores
             );
@@ -97,6 +80,28 @@ namespace UnitTests.SAUtils.GenericScoreParserTests
                 GenericScoreItem[] genericScoreItems = reader.GetItems().ToArray();
                 Assert.Single(genericScoreItems);
                 Assert.Equal(0.1, genericScoreItems[0].Score);
+            }
+        }
+
+        [Fact]
+        public void TestNonConflictingScores()
+        {
+            var writer = new StreamWriter(new MemoryStream());
+            writer.WriteLine("#chr\tpos\tref\talt\tscore");
+            writer.WriteLine("1\t10003\t10003\tA\tG\t0.1");
+            writer.WriteLine("1\t10003\t10003\tA\tG\t0.5");
+            writer.Flush();
+
+            writer.BaseStream.Position = 0;
+            _parserSettings = new ParserSettings(
+                new ColumnIndex(0, 2, 3, 4, 5, null),
+                new[] {"A", "C", "G", "T"},
+                GenericScoreParser.NonConflictingScore
+            );
+            using (var streamReader = new StreamReader(writer.BaseStream))
+            using (var reader = new GenericScoreParser(_parserSettings, streamReader, ChromosomeUtilities.RefNameToChromosome))
+            {
+                Assert.Throws<UserErrorException>(() => reader.GetItems().ToArray());
             }
         }
     }

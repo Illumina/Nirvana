@@ -41,6 +41,8 @@ namespace SAUtils.GenericScore
             _writerSettings          = writerSettings;
 
             var readerSettings = new ReaderSettings(
+                _writerSettings.IsPositional,
+                _writerSettings.EncoderType,
                 _writerSettings.ScoreEncoder,
                 _writerSettings.ScoreJsonEncoder,
                 _writerSettings.Nucleotides,
@@ -96,7 +98,7 @@ namespace SAUtils.GenericScore
                     previousPosition                              = chromosomeStartingPosition;
                 }
 
-                if (!_writerSettings.SaItemValidator.Validate(saItem, _skipIncorrectRefEntries, _refProvider))
+                if (!_writerSettings.SaItemValidator.Validate(saItem, _refProvider))
                 {
                     _index.TrackUnmatchedReferencePositions();
                     continue;

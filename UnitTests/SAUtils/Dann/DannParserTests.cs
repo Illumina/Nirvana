@@ -37,15 +37,15 @@ namespace UnitTests.SAUtils.Dann
             var nucleotides = new[] {"A", "C", "G", "T"};
 
             var dannParserSettings = new ParserSettings(
-                new ColumnPositions(0, 2, 3, 4, 5, null),
+                new ColumnIndex(0, 2, 3, 4, 5, null),
                 nucleotides,
                 GenericScoreParser.MaxRepresentativeScores
             );
 
             using (var streamReader = new StreamReader(GetStream()))
-            using (var reader = new GenericScoreParser(dannParserSettings, streamReader, ChromosomeUtilities.RefNameToChromosome))
+            using (var scoreParser = new GenericScoreParser(dannParserSettings, streamReader, ChromosomeUtilities.RefNameToChromosome))
             {
-                var dannItems = reader.GetItems().ToArray();
+                GenericScoreItem[] dannItems = scoreParser.GetItems().ToArray();
                 Assert.Equal(7, dannItems.Length);
 
                 Assert.Equal(10001,              dannItems[0].Position);

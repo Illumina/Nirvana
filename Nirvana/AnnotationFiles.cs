@@ -16,7 +16,7 @@ namespace Nirvana
         public List<string>                   NgaFiles                { get; } = new();
         public List<string>                   GeneFusionSourceFiles   { get; } = new();
         public List<string>                   GeneFusionJsonFiles     { get; } = new();
-        public (string Npd, string Idx)       ConservationFile        { get; private set; }
+        public (string Npd, string Idx)       PhylopFile              { get; private set; }
         public string                         LowComplexityRegionFile { get; private set; }
         public string                         ProteinConservationFile { get; private set; }
         public (string Rma, string Idx)       RefMinorFile            { get; private set; }
@@ -41,7 +41,7 @@ namespace Nirvana
                         NgaFiles.Add(filePath);
                         break;
                     case SaCommon.PhylopFileSuffix:
-                        ConservationFile = (filePath, filePath + SaCommon.IndexSuffix);
+                        PhylopFile = (filePath, filePath + SaCommon.IndexSuffix);
                         break;
                     case ProteinConservationCommon.FileSuffix:
                         ProteinConservationFile = filePath;

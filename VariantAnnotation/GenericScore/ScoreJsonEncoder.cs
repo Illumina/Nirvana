@@ -7,7 +7,13 @@ namespace VariantAnnotation.GenericScore
         public readonly  string JsonKey;
         private readonly string _jsonSubKey;
 
-        public string JsonRepresentation<T>(T data) => $"\"{_jsonSubKey}\":{data}";
+        public string JsonRepresentation<T>(T data)
+        {
+            if (_jsonSubKey != null)
+                return $"\"{_jsonSubKey}\":{data}";
+            
+            return data.ToString();
+        }
 
         public ScoreJsonEncoder(string jsonKey, string jsonSubKey)
         {

@@ -206,7 +206,6 @@ namespace VariantAnnotation.GenericScore
             return chromosomeBlock.Get(blockNumber) != null ? chromosomeBlock.Get(blockNumber).FilePosition : -1;
         }
 
-
         /// <summary>
         /// Returns the block number which would contain the position
         /// Because each block is of a known size, (e.g. 10_000)
@@ -222,7 +221,7 @@ namespace VariantAnnotation.GenericScore
             // Position is less than start position
             if (position < chromosomeBlock.StartingPosition) return -1;
 
-            var blockNumber = (int) ((position - chromosomeBlock.StartingPosition) * _nucleotideCount / _blockLength);
+            (int blockNumber, _) = PositionToBlockLocation(position, (int) chromosomeBlock.StartingPosition);
 
             // Position is outside the last block
             if (blockNumber >= chromosomeBlock.BlockCount) return -1;
@@ -232,7 +231,7 @@ namespace VariantAnnotation.GenericScore
 
         public int GetBlockNumber(ushort chromosomeIndex, int position)
         {
-            if (_chromosomeBlocks == null || !_chromosomeBlocks.TryGetValue(chromosomeIndex, out var chromosomeBlock)) return -1;
+            if (_chromosomeBlocks == null || !_chromosomeBlocks.TryGetValue(chromosomeIndex, out ChromosomeBlock chromosomeBlock)) return -1;
             return GetBlockNumber(chromosomeBlock, position);
         }
 
@@ -267,7 +266,7 @@ namespace VariantAnnotation.GenericScore
             return (deltaPosition / _blockLength, deltaPosition % _blockLength);
         }
 
-        public (int blockNumber, int localBlockIndex) PositionToBlockLocation(ChromosomeBlock chromosomeBlock, int position)
+        private (int blockNumber, int localBlockIndex) PositionToBlockLocation(ChromosomeBlock chromosomeBlock, int position)
         {
             return PositionToBlockLocation(position, (int) chromosomeBlock.StartingPosition);
         }
