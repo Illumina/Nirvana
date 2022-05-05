@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using VariantAnnotation.Interface.IO;
@@ -85,7 +86,7 @@ namespace VariantAnnotation.IO
 
             if (_needsComma) _sb.Append(Comma);
             AddKey(description);
-            _sb.Append(d.Value.ToString(format));
+            _sb.Append(d.Value.ToString(format, CultureInfo.InvariantCulture));
             _needsComma = true;
 
             return true;
