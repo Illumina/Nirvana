@@ -1,10 +1,7 @@
-﻿using System;
-using Cloud;
-using Cloud.Utilities;
+﻿using Cloud;
 using Genome;
 using IO;
 using ReferenceSequence;
-using VariantAnnotation.SA;
 using Xunit;
 
 namespace UnitTests.Cloud
@@ -22,14 +19,6 @@ namespace UnitTests.Cloud
         public void GetS3RefLocation_AsExpected()
         {
             Assert.Equal(LambdaUrlHelper.GetRefPrefix("whatever") + "GRCh37" + LambdaUrlHelper.RefSuffix, LambdaUrlHelper.GetRefUrl(GenomeAssembly.GRCh37, "whatever"));
-        }
-        
-        [Fact]
-        public void GetS3_SaManifest_Location_AsExpected()
-        {
-            Environment.SetEnvironmentVariable("NirvanaDataUrlBase", "http://nirvana-annotations.s3.us-west-2.amazonaws.com/");
-            var saManifestUrl = LambdaUtilities.GetManifestUrl("latest", GenomeAssembly.GRCh38, SaCommon.SchemaVersion);
-            HttpUtilities.ValidateUrl(saManifestUrl);
         }
     }
 }

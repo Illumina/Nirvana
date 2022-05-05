@@ -9,8 +9,7 @@ namespace Cloud
     {
         public const string UrlBaseEnvironmentVariableName = "NirvanaDataUrlBase";
 
-        public const string S3CacheFolderBase    = "ab0cf104f39708eabd07b8cb67e149ba-Cache";
-        public const string S3ManifestFolderBase = "a9f54ea6ac0548696c97a3ee64bc39ec2e71b84b-SaManifest";
+        public const string S3CacheFolderBase = "ab0cf104f39708eabd07b8cb67e149ba-Cache";
         public static readonly string S3CacheFolder =
             $"{S3CacheFolderBase}/{CacheConstants.DataVersion}/";
 
@@ -27,8 +26,6 @@ namespace Cloud
         public static string GetBaseUrl(string baseUrl = null) =>
             baseUrl ?? LambdaUtilities.GetEnvironmentVariable(UrlBaseEnvironmentVariableName);
 
-        public static string GetManifestBaseUrl(string baseUrl = null) => GetBaseUrl(baseUrl) + S3ManifestFolderBase;
-        
         public static string GetCacheFolder(string baseUrl = null) => GetBaseUrl(baseUrl)     + S3CacheFolder;
         public static string GetUgaUrl(string      baseUrl = null) => GetCacheFolder(baseUrl) + UgaFileName;
         public static string GetRefPrefix(string   baseUrl = null) => GetBaseUrl(baseUrl)     + S3RefPrefix;
