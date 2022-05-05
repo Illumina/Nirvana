@@ -50,7 +50,7 @@ namespace GeneAnnotationLambda
                 config.Validate();
                 // SaVersion will be provided as an environment variable. Defaults to "latest"
                 string saVersion      = Environment.GetEnvironmentVariable("SaVersion");
-                string saManifestUrl  = LambdaUtilities.GetManifestUrl(saVersion, GenomeAssembly.GRCh38);
+                string saManifestUrl  = LambdaUtilities.GetManifestUrl(saVersion, GenomeAssembly.GRCh38, SaCommon.SchemaVersion);
                 string result         = GetGeneAnnotation(config, saManifestUrl, _saPathPrefix);
                 
                 return LambdaResponse.Create(config.id, LambdaUrlHelper.SuccessMessage, result);
