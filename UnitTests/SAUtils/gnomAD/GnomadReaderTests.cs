@@ -5,6 +5,7 @@ using Genome;
 using SAUtils;
 using SAUtils.DataStructures;
 using SAUtils.gnomAD;
+using SAUtils.ParseUtils;
 using UnitTests.TestDataStructures;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.SA;

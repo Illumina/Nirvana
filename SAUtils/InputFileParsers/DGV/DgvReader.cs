@@ -4,6 +4,7 @@ using System.IO;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
+using SAUtils.ParseUtils;
 
 namespace SAUtils.InputFileParsers.DGV
 {

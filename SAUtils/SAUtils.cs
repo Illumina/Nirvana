@@ -56,6 +56,7 @@ namespace SAUtils
                 ["Gnomad"]             = new("create gnomAD database", GnomadSnvMain.Run),
                 ["Gnomad-lcr"]         = new("create gnomAD low complexity region database", LcrRegionsMain.Run),
                 ["GnomadGeneScores"]   = new("create gnomAD gene scores database", GnomadGenesMain.Run),
+                ["GnomadSV"]           = new("create gnomAD structural variant database", GnomadSvMain.Run),
                 ["Index"]              = new("edit an index file", UpdateIndex.Run),
                 ["MitoHet"]            = new("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
                 ["MitomapSvDb"]        = new("create MITOMAP structural variants database", StructVarDb.Run),

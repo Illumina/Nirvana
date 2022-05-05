@@ -5,6 +5,7 @@ using System.Linq;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
+using SAUtils.ParseUtils;
 
 namespace SAUtils.InputFileParsers.OneKGen
 {

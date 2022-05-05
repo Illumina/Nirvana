@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using SAUtils.DataStructures;
+using SAUtils.ParseUtils;
 using VariantAnnotation.Interface.Providers;
 using Variants;
 
