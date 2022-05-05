@@ -87,7 +87,8 @@ namespace AnnotationLambda
                             {
                                 variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, 
                                     jasixMd5Stream, annotationResources, vcfFilter, true, false,
-                                    config.desiredVcfInfo== null? null: new HashSet<string>(config.desiredVcfInfo)).variantCount;
+                                    config.desiredVcfInfo == null? null: new HashSet<string>(config.desiredVcfInfo),
+                                    config.desiredVcfSampleInfo == null? null: new HashSet<string>(config.desiredVcfSampleInfo)).variantCount;
                             }
 
                             Logger.WriteLine("Annotation done.");

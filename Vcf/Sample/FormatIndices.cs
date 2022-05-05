@@ -1,4 +1,5 @@
-﻿using OptimizedCore;
+﻿using System.Collections.Generic;
+using OptimizedCore;
 
 namespace Vcf.Sample
 {
@@ -37,6 +38,9 @@ namespace Vcf.Sample
         // ReSharper restore InconsistentNaming
 
         internal int NumColumns;
+        
+        // custom fields
+        internal readonly Dictionary<string, int?> CustomFields;
 
         private void Clear()
         {
@@ -69,7 +73,24 @@ namespace Vcf.Sample
             GQX = null;
             DPI = null;
             DQ  = null;
+            
+            // custom fields
+            if (CustomFields == null) return;
+            foreach (var field in CustomFields.Keys)
+            {
+                CustomFields[field] = null;
+            }
 
+        }
+
+        public FormatIndices(HashSet<string> customFields=null)
+        {
+            if (customFields == null) return;
+            CustomFields = new();
+            foreach (var field in customFields)
+            {
+                CustomFields[field] = null;
+            }
         }
 
         internal void Set(string formatColumn)
@@ -84,7 +105,8 @@ namespace Vcf.Sample
             for (var index = 0; index < NumColumns; index++)
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
-                switch (formatCols[index])
+                var formatKey = formatCols[index];
+                switch (formatKey)
                 {
                     case "AD":
                         AD = index;
@@ -167,6 +189,10 @@ namespace Vcf.Sample
                         break;
                     case "DQ":
                         DQ = index;
+                        break;
+                    default:
+                        if(CustomFields!=null && CustomFields.ContainsKey(formatKey))
+                            CustomFields[formatKey] = index;
                         break;
                 }
             }

@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using CacheUtils.TranscriptCache;
 using ErrorHandling.Exceptions;
 using Genome;
@@ -53,7 +54,7 @@ namespace UnitTests.Vcf.VariantCreator
                 "CTCTTTTTTGCAAACACCAACACAATTTGGGCTCCATTTATAAGGCATCTGCTGCACCAACCCTCTTTCTTGGTGCTTACTGGACCTGCTCAGGGTTAATTTCTAACTCAAAGAACCTAACTTGGAGTAACTCCGTACCACCAGCAAAGCGACTGGCTTTGGGGAATGACATTTACAATGTATCCACTGTTATTTGGTCACCCAGCAAACTGTCATTTTTCAGAAACCAGGGCTGTCTCACAAACTGGCTTTCAATAAGGTGGGTTGCTTAGCAACTGCCAAGGAATTAAGAAGACAGAATAAGGTATCCGCCAGAGATATTTTATGACCAAAATGAGCTGCACTCATGTGTCTGGTTGTGTTCAAGGTAACCAAGTAAGAGATAACACCCGACTATTTTTGCATCATGAGGAAAAATACTTGGCTTCTGCCCAGAAGGGCAATTATCTCAAAGTCTTGGCAGGCCCCATGGTATGAGAAATGGTAACTGATATGGGGGT");
 
             _sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, _sequenceMock.Object, ChromosomeUtilities.RefNameToChromosome);
-            _variantFactory   = new VariantFactory(_sequenceMock.Object, _vidCreator);
+            _variantFactory   = new VariantFactory(_sequenceMock.Object, _vidCreator, new HashSet<string>(){"CF"});
         }
 
         private IPosition ParseVcfLine(string vcfLine)
@@ -462,6 +463,25 @@ namespace UnitTests.Vcf.VariantCreator
             Assert.Equal(VariantType.copy_number_loss,        variant.Type);
             Assert.Equal(110541590,                           variant.Start);
             Assert.Equal(110548681,                           variant.End);
+        }
+
+        [Fact]
+        public void ToPosition_CustomSampleInfoFields()
+        {
+            IPosition position = ParseVcfLine(
+                "chr7	110541589	CNV_DEL	N	<DEL>	27	cnvLength	SVTYPE=CNV;END=110548681;REFLEN=7092	GT:SM:CN:BC:PE:CF	0/1:0.443182:1:7:19,17:0.1,1.2");
+            IVariant[] variants = position.Variants;
+            Assert.NotNull(variants);
+
+            IVariant variant = variants[0];
+            Assert.Equal("7-110541589-110548681-T-<DEL>-CNV", variant.VariantId);
+            Assert.Equal(VariantType.copy_number_loss,        variant.Type);
+            Assert.Equal(110541590,                           variant.Start);
+            Assert.Equal(110548681,                           variant.End);
+
+            Assert.NotNull(position.Samples);
+            var sample = position.Samples[0];
+            Assert.Contains("{\"CF\":\"0.1,1.2\"}", sample.CustomFields.ToString()!);
         }
 
         [Fact]

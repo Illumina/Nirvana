@@ -1,4 +1,6 @@
-﻿using VariantAnnotation.Interface.Positions;
+﻿using System.Collections.Generic;
+using VariantAnnotation.Interface.Positions;
+using Vcf.Info;
 
 namespace Vcf.Sample
 {
@@ -26,6 +28,8 @@ namespace Vcf.Sample
         public string[] HeteroplasmyPercentile       { get; }
         public int?     BinCount                     { get; }
         
+        public ICustomFields CustomFields { get; }
+
         public static readonly Sample EmptySample =
             new Sample(null, null, null, null,
                 false, null, null, false, null, 
@@ -37,7 +41,7 @@ namespace Vcf.Sample
             string[] diseaseAffectedStatuses, bool failedFilter, string genotype, int? genotypeQuality, bool isDeNovo, double? deNovoQuality,
             float? likelihoodRatioQualityScore, int[] pairedEndReadCounts, int[] repeatUnitCounts,
             int[] splitReadCounts, int? totalDepth, double[] variantFrequencies, int? minorHaplotypeCopyNumber, double? somaticQuality, 
-            bool? isLossOfHeterozygosity, string[] heteroplasmyPercentile, int? binCount)
+            bool? isLossOfHeterozygosity, string[] heteroplasmyPercentile, int? binCount, ICustomFields customFields=null)
         {
             AlleleDepths                 = alleleDepths;
             ArtifactAdjustedQualityScore = artifactAdjustedQualityScore;
@@ -59,6 +63,7 @@ namespace Vcf.Sample
             MinorHaplotypeCopyNumber     = minorHaplotypeCopyNumber;
             SomaticQuality               = somaticQuality;
             BinCount                     = binCount;
+            CustomFields                 = customFields;
 
             IsEmpty = AlleleDepths                 == null &&
                       ArtifactAdjustedQualityScore == null &&
@@ -79,7 +84,8 @@ namespace Vcf.Sample
                       DeNovoQuality                == null &&
                       BinCount                     == null &&
                       !FailedFilter                        &&
-                      !IsDeNovo;
+                      !IsDeNovo &&
+                      (CustomFields == null || CustomFields.IsEmpty());
         }
     }
 }

@@ -36,6 +36,9 @@ namespace VariantAnnotation.IO
             jsonObject.AddStringValues("heteroplasmyPercentile",      sample.HeteroplasmyPercentile, false);
             jsonObject.AddIntValue("binCount",                      sample.BinCount);
             
+            if(sample.CustomFields != null && !sample.CustomFields.IsEmpty())
+                jsonObject.AddObjectValue("vcfSampleInfo", sample.CustomFields);
+            
             sb.Append(JsonObject.CloseBrace);
             return StringBuilderPool.GetStringAndReturn(sb);
         }

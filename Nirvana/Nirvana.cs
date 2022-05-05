@@ -25,6 +25,7 @@ namespace Nirvana
         private static          string       _outputFileName;
         private static          string       _customStrTsv;
         private static          string       _customInfoKeysString;
+        private static          string       _customSampleInfoKeysString;
         
         private static          bool         _forceMitochondrialAnnotation;
         private static          bool         _disableRecomposition;
@@ -41,11 +42,15 @@ namespace Nirvana
                 null: 
                 new HashSet<string>(_customInfoKeysString.OptimizedSplit(','));
 
+            var customSampleInfoKeys = string.IsNullOrEmpty(_customSampleInfoKeysString) ?
+                null: 
+                new HashSet<string>(_customSampleInfoKeysString.OptimizedSplit(','));
+
             using (var inputVcfStream        = _vcfPath        == "-"  ? Console.OpenStandardInput() : GZipUtilities.GetAppropriateReadStream(_vcfPath))
             using (var outputJsonStream      = _outputFileName == "-"  ? Console.OpenStandardOutput() : new BlockGZipStream(FileUtilities.GetCreateStream(_outputFileName + ".json.gz"), CompressionMode.Compress))
             using (var outputJsonIndexStream = jasixFileName   == null ? null : FileUtilities.GetCreateStream(jasixFileName))
                 return StreamAnnotation.Annotate(null, inputVcfStream, outputJsonStream, outputJsonIndexStream, annotationResources, 
-                    new NullVcfFilter(), false, _enableDq, customInfoKeys).exitCode;
+                    new NullVcfFilter(), false, _enableDq, customInfoKeys, customSampleInfoKeys).exitCode;
         }
 
         private static AnnotationResources GetAnnotationResources()
@@ -125,6 +130,11 @@ namespace Nirvana
                     "vcf-info=",
                     "additional vcf info field keys (comma separated) desired in the output",
                     v => _customInfoKeysString = v
+                },
+                {
+                    "vcf-sample-info=",
+                    "additional vcf format field keys (comma separated) desired in the output",
+                    v => _customSampleInfoKeysString = v
                 }
             };
 

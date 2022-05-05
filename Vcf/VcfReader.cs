@@ -41,11 +41,12 @@ namespace Vcf
 
         private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
             IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
-            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, HashSet<string> customInfoKeys=null)
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, 
+            HashSet<string> customInfoKeys=null , HashSet<string> customSampleInfoKeys=null)
         {
             _headerReader             = headerReader;
             _reader                   = vcfLineReader;
-            _variantFactory           = new VariantFactory(sequenceProvider.Sequence, vidCreator);
+            _variantFactory           = new VariantFactory(sequenceProvider.Sequence, vidCreator, customSampleInfoKeys);
             _sequenceProvider         = sequenceProvider;
             _refMinorProvider         = refMinorProvider;
             _vcfFilter                = vcfFilter;
@@ -57,10 +58,11 @@ namespace Vcf
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
             IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
-            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, HashSet<string> customInfoKeys=null)
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, 
+            HashSet<string> customInfoKeys=null, HashSet<string> customSampleInfoKeys=null)
         {
             var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, 
-                vidCreator, mitoHeteroplasmyProvider, enableDq, customInfoKeys);
+                vidCreator, mitoHeteroplasmyProvider, enableDq, customInfoKeys, customSampleInfoKeys);
             vcfReader.ParseHeader();
             vcfReader.SetRecomposer(recomposer);
             return vcfReader;
@@ -196,7 +198,9 @@ namespace Vcf
             _currentReferenceName = referenceName;
         }
 
-        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, EnableDq, CustomInfoKeys);
+        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), 
+            _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, 
+            EnableDq, CustomInfoKeys);
 
         public void Dispose() => _reader?.Dispose();
     }

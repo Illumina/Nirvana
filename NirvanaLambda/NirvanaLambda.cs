@@ -230,7 +230,8 @@ namespace NirvanaLambda
             outputDir         = config.outputDir,
             outputPrefix      = GetIndexedPrefix(config.vcfUrl, jobIndex),
             customAnnotations = config.customAnnotations,
-            desiredVcfInfo    =  config.desiredVcfInfo,
+            desiredVcfInfo    = config.desiredVcfInfo,
+            desiredVcfSampleInfo     = config.desiredVcfSampleInfo,
             customStrUrl      = config.customStrUrl,
             annotationRange   = annotationRange
         };

@@ -80,7 +80,7 @@ namespace Vcf.Info
 
                 if (customInfoKeys != null && customInfoKeys.Contains(key))
                 {
-                    Builder.CustomInfoData.Add(key, value);
+                    Builder.CustomFields.Add(key, value);
                 }
             }
 

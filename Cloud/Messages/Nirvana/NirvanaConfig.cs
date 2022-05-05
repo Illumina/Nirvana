@@ -15,6 +15,7 @@ namespace Cloud.Messages.Nirvana
         // ReSharper disable once UnassignedField.Global
         public List<SaUrls> customAnnotations;
         public List<string> desiredVcfInfo;
+        public List<string> desiredVcfSampleInfo;
         public string       customStrUrl;
         public JwtFields    jwtFields;
         

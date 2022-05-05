@@ -3,7 +3,7 @@ using VariantAnnotation.Interface.IO;
 
 namespace VariantAnnotation.Interface.Positions
 {
-    public interface ICustomInfoData: IJsonSerializer
+    public interface ICustomFields: IJsonSerializer
     {
         void Add(string key, string value);
         void Clear();

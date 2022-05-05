@@ -72,7 +72,8 @@ namespace Vcf
         }
 
         public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, 
-            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, bool enableDq = false, HashSet<string> customInfoKeys=null)
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, bool enableDq = false, 
+            HashSet<string> customInfoKeys=null)
         {
             if (simplePosition == null) return null;
 
@@ -99,7 +100,8 @@ namespace Vcf
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed, simplePosition.LinkedVids, globalMajorAllele);
 
-            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, variants, mitoHeteroplasmyProvider, enableDq);
+            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, variants, mitoHeteroplasmyProvider, 
+                enableDq);
 
             return PositionPool.Get(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
                 altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,

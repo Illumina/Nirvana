@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Text;
+using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.IO;
 
 namespace Vcf.Info
 {
-    public sealed class CustomInfoData:ICustomInfoData
+    public sealed class CustomFields:ICustomFields
     {
         private readonly Dictionary<string, string> _keyValues=new ();
 
@@ -33,6 +34,15 @@ namespace Vcf.Info
                 jsonObject.AddStringValue(key, value);
             }
             sb.Append(JsonObject.CloseBrace);
+        }
+
+        public override string ToString()
+        {
+            var sb = StringBuilderPool.Get();
+            SerializeJson(sb);
+            var s = sb.ToString();
+            StringBuilderPool.Return(sb);
+            return s;
         }
     }
 }
