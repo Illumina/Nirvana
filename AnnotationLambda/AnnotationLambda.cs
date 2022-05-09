@@ -18,6 +18,7 @@ using Nirvana;
 using Vcf;
 using Tabix;
 using VariantAnnotation;
+using VariantAnnotation.SA;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -162,7 +163,7 @@ namespace AnnotationLambda
             string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
             // SaVersion will be provided as an environment variable. Defaults to "latest"
             string saVersion = Environment.GetEnvironmentVariable("SaVersion");
-            string saManifestUrl    = LambdaUtilities.GetManifestUrl(string.IsNullOrEmpty(saVersion)? "latest": saVersion, genomeAssembly);
+            string saManifestUrl    = LambdaUtilities.GetManifestUrl(string.IsNullOrEmpty(saVersion)? "latest": saVersion, genomeAssembly, SaCommon.SchemaVersion);
             var metrics = new PerformanceMetrics();
 
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,
