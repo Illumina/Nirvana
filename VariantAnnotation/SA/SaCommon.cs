@@ -3,7 +3,7 @@
     public static class SaCommon
     {
         public const int    DefaultBlockSize = 8 * 1024 * 1024;
-        public const ushort DataVersion      = 65;
+        public const ushort DataVersion      = 66;
         public const ushort SchemaVersion    = 22;
         public const ushort NsiSchemaVersion = 22;
 
@@ -53,8 +53,9 @@
         public const string RevelTag                = "revel";
         public const string DannTag                 = "dann";
         public const string GerpTag                = "gerp";
-        public const string LowComplexityRegionTag  = "lowComplexityRegion";
+        public const string LowComplexityRegionTag = "lowComplexityRegion";
+        public const string GmeTag                 = "gmeVariome";
+        public const string DecipherTag            = "decipher";
         public const string Score                  = "Score";
-        public const string GmeTag                  = "gmeVariome";
-        }
+    }
 }

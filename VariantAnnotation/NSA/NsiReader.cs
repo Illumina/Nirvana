@@ -103,7 +103,7 @@ namespace VariantAnnotation.NSA
                   _intervalForest.GetAllOverlappingIntervals(variant.Chromosome.Index, start, end);
               
             if (overlappingSvs == null) return null;
-            
+
             var jsonStrings = new List<string>();
             foreach (var interval in overlappingSvs)
             {
