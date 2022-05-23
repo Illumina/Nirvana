@@ -7,19 +7,19 @@ namespace SAUtils.ClinGen
 {
     public sealed class DosageMapRegionItem : ISuppIntervalItem
     {
-        public Chromosome Chromosome { get; }
-        public int Start { get; }
-        public int End   { get; }
-        private readonly int _hiScore;
-        private readonly int _tsScore;
+        public          Chromosome Chromosome { get; }
+        public          int        Start      { get; }
+        public          int        End        { get; }
+        public readonly int        HiScore;
+        public readonly int        TsScore;
         
         public DosageMapRegionItem(Chromosome chromosome, int start, int end, int hiScore, int tsScore)
         {
             Chromosome = chromosome;
-            Start = start;
-            End = end;
-            _hiScore   = hiScore;
-            _tsScore   = tsScore;
+            Start      = start;
+            End        = end;
+            HiScore    = hiScore;
+            TsScore    = tsScore;
         }
         
         public string GetJsonString()
@@ -30,8 +30,8 @@ namespace SAUtils.ClinGen
             jsonObject.AddStringValue("chromosome", Chromosome.EnsemblName);
             jsonObject.AddIntValue("begin", Start);
             jsonObject.AddIntValue("end", End);
-            jsonObject.AddStringValue("haploinsufficiency", Data.ScoreToDescription[_hiScore]);
-            jsonObject.AddStringValue("triplosensitivity", Data.ScoreToDescription[_tsScore]);
+            jsonObject.AddStringValue("haploinsufficiency", Data.ScoreToDescription[HiScore]);
+            jsonObject.AddStringValue("triplosensitivity",  Data.ScoreToDescription[TsScore]);
 
             return StringBuilderPool.GetStringAndReturn(sb);
         }

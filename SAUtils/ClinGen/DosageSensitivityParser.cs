@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
+using VariantAnnotation.IO;
+using Newtonsoft.Json.Linq;
+using SAUtils.DataStructures;
 
 namespace SAUtils.ClinGen
 {
@@ -62,7 +65,7 @@ namespace SAUtils.ClinGen
                 }
                 Console.WriteLine($"WARNING: Duplicate entries found for genes:{string.Join(',', duplicateGenes)}. But the contents were identical.");
             }
-
+            ReportStatistics(geneAnnotations);
             return geneAnnotations;
         }
 
@@ -98,6 +101,31 @@ namespace SAUtils.ClinGen
             _geneIdIndex                        = Array.IndexOf(cols, GeneIdTag);
             _haploInsufficiencyScoreIndex       = Array.IndexOf(cols, HaploInsufficiencyScoreTag);
             _triploSensitivityScoreIndex        = Array.IndexOf(cols, TriploSensitivityScoreTag);
+        }
+        
+        private void ReportStatistics(Dictionary<string, List<ISuppGeneItem>> items)
+        {
+            var       genes       = new List<string>(items.Keys);
+            var       description = new List<string>(Data.ScoreToDescription.Values);
+            KeyCounts hiScore     = new KeyCounts(description);
+            KeyCounts tsScore     = new KeyCounts(description);
+            foreach (string gene in genes)
+            {
+                var item = (DosageSensitivityItem) items[gene][0];
+                hiScore.Increment(Data.ScoreToDescription[item.HiScore]);
+                tsScore.Increment(Data.ScoreToDescription[item.TsScore]);
+            }
+                
+            var sb = StringBuilderPool.Get();
+            var jo = new JsonObject(sb);
+            sb.Append(JsonObject.OpenBrace);
+
+            jo.AddIntValue("geneCount", items.Count);
+            jo.AddObjectValue("haploinsufficiency", hiScore);
+            jo.AddObjectValue("triplosensitivity", tsScore);
+            sb.Append(JsonObject.CloseBrace);
+
+            Console.WriteLine(JObject.Parse(StringBuilderPool.GetStringAndReturn(sb))); 
         }
     }
 }

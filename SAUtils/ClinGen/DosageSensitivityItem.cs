@@ -7,19 +7,19 @@ namespace SAUtils.ClinGen
 {
     public sealed class DosageSensitivityItem : ISuppGeneItem
     {
-        public string GeneSymbol { get; }
-        private readonly int _hiScore;
-        private readonly int _tsScore;
+        public          string GeneSymbol { get; }
+        public readonly int    HiScore;
+        public readonly int    TsScore;
 
         public DosageSensitivityItem(string geneSymbol, int hiScore, int tsScore)
         {
-            GeneSymbol     = geneSymbol;
-            _hiScore       = hiScore;
-            _tsScore       = tsScore;
+            GeneSymbol = geneSymbol;
+            HiScore    = hiScore;
+            TsScore    = tsScore;
 
-            if (!Data.ScoreToDescription.ContainsKey(_hiScore) || !Data.ScoreToDescription.ContainsKey(_tsScore))
+            if (!Data.ScoreToDescription.ContainsKey(HiScore) || !Data.ScoreToDescription.ContainsKey(TsScore))
             {
-                throw new InvalidDataException($"Unexpected score ({_hiScore}, {_tsScore}) observed for gene: {geneSymbol}");
+                throw new InvalidDataException($"Unexpected score ({HiScore}, {TsScore}) observed for gene: {geneSymbol}");
             }
         }
 
@@ -29,8 +29,8 @@ namespace SAUtils.ClinGen
             var jsonObject = new JsonObject(sb);
 
             sb.Append(JsonObject.OpenBrace);
-            jsonObject.AddStringValue("haploinsufficiency", Data.ScoreToDescription[_hiScore]);
-            jsonObject.AddStringValue("triplosensitivity", Data.ScoreToDescription[_tsScore]);
+            jsonObject.AddStringValue("haploinsufficiency", Data.ScoreToDescription[HiScore]);
+            jsonObject.AddStringValue("triplosensitivity",  Data.ScoreToDescription[TsScore]);
             sb.Append(JsonObject.CloseBrace);
 
             return StringBuilderPool.GetStringAndReturn(sb);
