@@ -524,6 +524,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             var sequenceMock = new Mock<ISequence>();
             sequenceMock.Setup(x => x.Substring(12783, 0)).Returns("");
+            sequenceMock.Setup(x => x.Substring(12733, 50)).Returns("ACGTA");
             sequenceMock.Setup(x => x.Substring(12283, 500)).Returns("ACGTA");
             return sequenceMock.Object;
         }

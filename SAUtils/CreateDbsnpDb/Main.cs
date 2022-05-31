@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
@@ -65,7 +66,8 @@ namespace SAUtils.CreateDbsnpDb
             using (var indexStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.SaFileSuffix + SaCommon.IndexSuffix)))
             using (var nsaWriter   = new NsaWriter(nsaStream, indexStream, version, referenceProvider, SaCommon.DbsnpTag, true, true, SaCommon.SchemaVersion, false))
             {
-                nsaWriter.Write(dbSnpReader.GetItems());
+                var count = nsaWriter.Write(dbSnpReader.GetItems());
+                Console.WriteLine($"{{\n \"totalCount\":{count} \n}}");
             }
 
             return ExitCodes.Success;

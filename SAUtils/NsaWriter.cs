@@ -144,8 +144,8 @@ namespace SAUtils
             WriteUptoPosition(itemsMinHeap, int.MaxValue);
             Flush(chromIndex);
             Console.WriteLine($"Chromosome {currentEnsemblName} completed in {Benchmark.ToHumanReadable(benchmark.GetElapsedTime())}");
-            
-            
+
+            Console.WriteLine($"Maximum bp shifted for any variant:{VariantUtils.MaxShiftLength}");
             return _count;
         }
 
