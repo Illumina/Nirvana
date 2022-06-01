@@ -1,8 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using ErrorHandling;
 using IO;
+using Newtonsoft.Json.Linq;
+using SAUtils.DataStructures;
+using VariantAnnotation.Interface.SA;
 using VariantAnnotation.SA;
 
 namespace SAUtils.Omim
@@ -63,10 +68,13 @@ namespace SAUtils.Omim
             using (var saJsonSchemaStream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix + SaCommon.JsonSchemaSuffix)))
             using (var schemaWriter = new StreamWriter(saJsonSchemaStream))
             {
-                var omimItems = omimParser.GetItems();
-                var geneToItems = OmimUtilities.GetGeneToOmimEntriesAndSchema(omimItems);
+                IEnumerable<OmimItem>                           omimItems   = omimParser.GetItems();
+                Dictionary<string, List<ISuppGeneItem>> geneToItems = OmimUtilities.GetGeneToOmimEntriesAndSchema(omimItems);
                 ngaWriter.Write(geneToItems);
                 schemaWriter.Write(omimSchema);
+                
+                JObject jo = JObject.Parse(omimParser.OmimStats.ToString());
+                Console.WriteLine(jo); //pretty printing json
             }
 
             return ExitCodes.Success;

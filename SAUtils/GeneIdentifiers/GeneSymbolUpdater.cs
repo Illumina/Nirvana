@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Newtonsoft.Json.Linq;
+using OptimizedCore;
+using VariantAnnotation.IO;
 
 namespace SAUtils.GeneIdentifiers
 {
@@ -104,14 +108,22 @@ namespace SAUtils.GeneIdentifiers
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Gene Symbol Update Statistics");
             Console.ResetColor();
-
             Console.WriteLine("============================================");
-            Console.WriteLine($"# of gene symbols already up-to-date:   {_numGeneSymbolsUpToDate:N0}");
-            Console.WriteLine($"# of gene symbols updated:              {_numGeneSymbolsUpdated:N0}");
-            Console.WriteLine($"# of genes where both IDs are null:     {_numGenesWhereBothIdsAreNull:N0}");
-            Console.WriteLine($"# of gene symbols not in cache:         {_numGeneSymbolsNotInCache:N0}");
-            Console.WriteLine($"# of resolved gene symbol conflicts:    {_numResolvedGeneSymbolConflicts:N0}");
-            Console.WriteLine($"# of unresolved gene symbol conflicts:  {_numUnresolvedGeneSymbolConflicts:N0}");
+
+            StringBuilder sb = StringBuilderPool.Get();
+            var jo = new JsonObject(sb);
+            sb.Append(JsonObject.OpenBrace);
+
+            jo.AddIntValue("NumGeneSymbolsUpToDate",           _numGeneSymbolsUpToDate);
+            jo.AddIntValue("NumGeneSymbolsUpdated",            _numGeneSymbolsUpdated);
+            jo.AddIntValue("NumGenesWhereBothIdsAreNull",      _numGenesWhereBothIdsAreNull);
+            jo.AddIntValue("NumGeneSymbolsNotInCache",         _numGeneSymbolsNotInCache);
+            jo.AddIntValue("NumResolvedGeneSymbolConflicts",   _numResolvedGeneSymbolConflicts);
+            jo.AddIntValue("NumUnresolvedGeneSymbolConflicts", _numUnresolvedGeneSymbolConflicts);
+
+            sb.Append(JsonObject.CloseBrace);
+
+            Console.WriteLine(JObject.Parse(sb.ToString())); //pretty printing json
         }
     }
 }

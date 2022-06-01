@@ -68,6 +68,19 @@ namespace VariantAnnotation.IO
 
             return true;
         }
+        
+        public bool AddUIntValue(string description, uint? i)
+        {
+            if (i == null) return false;
+
+            if (_needsComma) _sb.Append(Comma);
+            AddKey(description);
+
+            _sb.Append(i);
+            _needsComma = true;
+
+            return true;
+        }
 
         public void AddIntValues(string description, int[] values)
         {
