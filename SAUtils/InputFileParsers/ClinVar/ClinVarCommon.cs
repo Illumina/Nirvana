@@ -31,7 +31,9 @@ namespace SAUtils.InputFileParsers.ClinVar
             "confers sensitivity",
             "no interpretation for the single variant",// observed in VCV XML only
             
-            "conflicting interpretations of pathogenicity"// observed in VCV XML only
+            "conflicting interpretations of pathogenicity", // observed in VCV XML only
+            "established risk allele", // observed in VCV XML only
+            "likely risk allele"                            // observed in VCV XML only
         };
         public enum ReviewStatus
         {
@@ -83,13 +85,13 @@ namespace SAUtils.InputFileParsers.ClinVar
         
         public static string[] GetSignificances(string description, string explanation)
         {
-            if(string.IsNullOrEmpty(explanation)) return description?.ToLower().Split('/', ',').Select(x=>x.Trim()).ToArray();
+            if(string.IsNullOrEmpty(explanation)) return description?.ToLower().Split('/', ',', ';').Select(x=>x.Trim()).ToArray();
             //<Explanation DataSource="ClinVar" Type="public">Pathogenic(1);Uncertain significance(1)</Explanation>
             var significances =new List<string>();
             foreach (var significance in explanation.ToLower().Split('/',';'))
             {
                 var openParenthesisIndex = significance.IndexOf('(');
-                significances.Add(openParenthesisIndex < 0 ? significance : significance.Substring(0, openParenthesisIndex));
+                significances.Add(openParenthesisIndex < 0 ? significance.Trim() : significance.Substring(0, openParenthesisIndex).Trim());
             }
 
             return significances.ToArray();

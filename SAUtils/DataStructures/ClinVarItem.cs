@@ -9,7 +9,7 @@ using VariantAnnotation.Interface.SA;
 
 namespace SAUtils.DataStructures
 {
-    public sealed class ClinVarItem : ISupplementaryDataItem, IComparable<ClinVarItem>
+    public sealed class ClinVarItem : IClinVarSaItem
     {
         public Chromosome Chromosome { get; }
         public int         Position   { get; set; }
@@ -23,7 +23,7 @@ namespace SAUtils.DataStructures
         public  string                     VariationId      { get; set; }
         public  IEnumerable<string>        AlleleOrigins    { get; }
         public  IEnumerable<string>        Phenotypes       { get; }
-        public  string[]                   Significances    { get; }
+        public  IEnumerable<string>        Significances    { get; }
         public  ClinVarCommon.ReviewStatus ReviewStatus     { get; }
         private string                     IsAlleleSpecific { get; }
         public  IEnumerable<string>        MedGenIds        { get; }
@@ -50,7 +50,7 @@ namespace SAUtils.DataStructures
             IEnumerable<string> omimIds,
             IEnumerable<string> orphanetIds,
             IEnumerable<string> phenotypes,
-            string[] significances,
+            IEnumerable<string> significances,
             IEnumerable<long> pubmedIds = null,
             long lastUpdatedDate = long.MinValue
         )
@@ -97,7 +97,7 @@ namespace SAUtils.DataStructures
                 MedGenIds?.ToArray(),
                 OmimIds?.ToArray(),
                 OrphanetIds?.ToArray(),
-                Significances,
+                Significances?.ToArray(),
                 new[] {new DateTime(LastUpdatedDate).ToString("yyyy-MM-dd")},
                 PubmedIds?.OrderBy(x => x).Select(x => x.ToString()).ToArray()
             };
@@ -105,7 +105,7 @@ namespace SAUtils.DataStructures
             return values;
         }
 
-        public int CompareTo(ClinVarItem other)
+        public int CompareTo(IClinVarSaItem other)
         {
             return Chromosome.Index != other.Chromosome.Index
                 ? Chromosome.Index.CompareTo(other.Chromosome.Index)

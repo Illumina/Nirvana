@@ -5,6 +5,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Genome;
+using Newtonsoft.Json.Linq;
+using SAUtils.CreateClinvarDb;
 using SAUtils.DataStructures;
 using SAUtils.Schema;
 using VariantAnnotation.Interface.Providers;
@@ -14,7 +16,7 @@ using Vcf.VariantCreator;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-    public sealed class ClinVarReader :IDisposable
+    public sealed class ClinVarParser :IDisposable
     {
         #region members
 
@@ -90,7 +92,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 		}
 
 		// constructor
-        public ClinVarReader(Stream rcvStream, Stream vcvStream, ISequenceProvider sequenceProvider)
+        public ClinVarParser(Stream rcvStream, Stream vcvStream, ISequenceProvider sequenceProvider)
         {
 	        _rcvStream        = rcvStream;
 	        _vcvStream        = vcvStream;
@@ -106,14 +108,11 @@ namespace SAUtils.InputFileParsers.ClinVar
 	        Console.WriteLine($"Found {_vcvItems.Count} VCV records");
 	        
 	        var unknownVcvs = new HashSet<int>();
-	        foreach (var clinVarItem in GetRcvItems())
+	        var vcvSaItems  = new HashSet<VcvSaItem >();
+	        var rcvItems    = GetRcvItems();
+	        
+	        foreach (var clinVarItem in rcvItems)
 	        {
-		        if (string.IsNullOrEmpty(clinVarItem.VariationId))
-		        {
-			        yield return clinVarItem;
-			        continue;
-		        }
-		        
 		        var vcvId = int.Parse(clinVarItem.VariationId);
 		        var vcvIndex = SuppDataUtilities.BinarySearch(_vcvItems, vcvId);
 		        
@@ -123,23 +122,43 @@ namespace SAUtils.InputFileParsers.ClinVar
 			        unknownVcvs.Add(vcvId);
 			        //remove the VariationId
 			        clinVarItem.VariationId = null;
-			        yield return clinVarItem;
 			        continue;
 		        }
 
 		        var vcvItem = _vcvItems[vcvIndex];
-		        yield return new VcvSaItem(clinVarItem.Chromosome, clinVarItem.Position, clinVarItem.RefAllele, clinVarItem.AltAllele,
-			        vcvItem.Accession, vcvItem.Version, vcvItem.LastUpdatedDate, vcvItem.ReviewStatus, vcvItem.Significances);
+		        vcvSaItems.Add(new VcvSaItem(clinVarItem.Chromosome, clinVarItem.Position, clinVarItem.RefAllele, clinVarItem.AltAllele,
+			        vcvItem.Accession, vcvItem.Version, vcvItem.LastUpdatedDate, vcvItem.ReviewStatus, vcvItem.Significances));
 
 		        clinVarItem.VariationId = $"{vcvItem.Accession}.{vcvItem.Version}";
-		        yield return clinVarItem;
 	        }
+
+	        var allItems = new List<IClinVarSaItem>(rcvItems);
+	        allItems.AddRange(vcvSaItems);
+	        allItems.Sort();
+	        ReportStatistics(allItems);
 
 	        Console.WriteLine($"{unknownVcvs.Count} unknown VCVs found in RCVs.");
 	        Console.WriteLine($"{string.Join(',', unknownVcvs)}");
+
+	        return allItems;
         }
 
-        public IEnumerable<ClinVarItem> GetRcvItems()
+        private void ReportStatistics(List<IClinVarSaItem> items)
+        {
+	        Console.WriteLine($"{_invalidRefAlleleCount} entries were skipped due to invalid ref allele.");
+	        Console.WriteLine($"{_aluCount} ALU entries found.");
+	        Console.WriteLine($"{_microsatelliteCount} Microsatellite entries found.");
+	        Console.WriteLine($"{_variationCount} Variation entries found.");
+
+	        var stats = new ClinVarStats();
+	        stats.GetClinvarSaItemsStats(items);
+
+	        var jo = JObject.Parse(stats.ToString());
+	        Console.WriteLine(jo);//pretty printing json
+        }
+
+        
+        public List<ClinVarItem> GetRcvItems()
         {
 	        var clinVarItems = new List<ClinVarItem>();
 
@@ -172,7 +191,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 
 		    var validItems = GetValidItems(clinVarItems);
 
-		    return validItems.Distinct();
+		    return validItems.Distinct().ToList();
 
         }
 
@@ -184,6 +203,7 @@ namespace SAUtils.InputFileParsers.ClinVar
 	        return items;
         }
 
+        private int _invalidRefAlleleCount = 0;
         private List<ClinVarItem> GetValidItems(List<ClinVarItem> clinVarItems)
         {
             var shiftedItems = new List<ClinVarItem>();
@@ -191,7 +211,11 @@ namespace SAUtils.InputFileParsers.ClinVar
             {
                 _sequenceProvider.LoadChromosome(item.Chromosome);
 
-                if (!ValidateRefAllele(item)) continue;
+                if (!ValidateRefAllele(item))
+                {
+	                _invalidRefAlleleCount++;
+	                continue;
+                }
 
                 string refAllele= item.RefAllele, altAllele= item.AltAllele;
                 if (string.IsNullOrEmpty(item.RefAllele) && item.VariantType == "Deletion")
@@ -214,7 +238,17 @@ namespace SAUtils.InputFileParsers.ClinVar
                     refAllele,
                     altAllele,
                     item.JsonSchema,
-                    item.AlleleOrigins, item.VariantType, item.Id,item.VariationId, item.ReviewStatus, item.MedGenIds, item.OmimIds, item.OrphanetIds, item.Phenotypes, item.Significances, item.PubmedIds, item.LastUpdatedDate));
+                    item.AlleleOrigins, 
+                    item.VariantType, 
+                    item.Id,item.VariationId, 
+                    item.ReviewStatus, 
+                    item.MedGenIds, 
+                    item.OmimIds, 
+                    item.OrphanetIds, 
+                    item.Phenotypes, 
+                    item.Significances, 
+                    item.PubmedIds, 
+                    item.LastUpdatedDate));
             }
 
             shiftedItems.Sort();
@@ -291,8 +325,23 @@ namespace SAUtils.InputFileParsers.ClinVar
                 ParseClinvarAssertion(element);
         }
 
-        private static bool IsInvalidVariant(ClinvarVariant variant)
+        private int _aluCount            = 0;
+        private int _microsatelliteCount = 0;
+        private int _variationCount      = 0;
+        private bool IsInvalidVariant(ClinvarVariant variant)
         {
+	        switch (variant.VariantType)
+	        {
+		        case "ALU":
+			        _aluCount++;
+			        break;
+		        case "Microsatellite":
+			        _microsatelliteCount++;
+			        break;
+		        case "Variation":
+			        _variationCount++;
+			        break;
+	        }
             if (variant.VariantType == "ALU") return true;
             return variant.Chromosome == null
                    || (variant.VariantType == "Microsatellite" || variant.VariantType == "Variation" )

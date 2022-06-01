@@ -59,7 +59,7 @@ namespace SAUtils.InputFileParsers.ClinVar
             var accession  = xElement.Attribute(AccessionTag)?.Value;
             var version    = xElement.Attribute(VersionTag)?.Value;
             var dateString       = xElement.Attribute(DateTag)?.Value;
-            var date        = ClinVarReader.ParseDate(dateString);
+            var date        = ClinVarParser.ParseDate(dateString);
 
             var interpretationRecord = xElement.Element(InterpretedRecordTag);
             var includedRecord = xElement.Element(IncludedRecordTag);

@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ReleaseSet xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Dated="2016-07-04" Type="full"
+            xsi:noNamespaceSchemaLocation="http://ftp.ncbi.nlm.nih.gov/pub/clinvar/xsd_public/clinvar_public_1.35.xsd">
+
+    <ClinVarSet ID="92830100">
+        <RecordStatus>current</RecordStatus>
+        <Title>NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=) AND not provided</Title>
+        <ReferenceClinVarAssertion DateCreated="2019-02-17" DateLastUpdated="2022-04-21" ID="1735041">
+            <ClinVarAccession Acc="RCV000757616" Version="4" Type="RCV" DateUpdated="2022-04-23"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2017-07-03">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Likely benign</Description>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData ID="96097922">
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant" ID="618791" Acc="VCV000618791" Version="5">
+                <Measure Type="single nucleotide variant" ID="609439">
+                    <Name>
+                        <ElementValue Type="Preferred">NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=)</ElementValue>
+                    </Name>
+                    <CanonicalSPDI>NC_000001.11:9715629:G:A</CanonicalSPDI>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_191t1" Change="c.231G&gt;A" Type="HGVS, coding, LRG">LRG_191t1:c.231G&gt;A</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001350234" Version="2" Change="c.231G&gt;A"
+                                   Type="HGVS, coding, RefSeq">NM_001350234.2:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001350235" Version="1" Change="c.231G&gt;A"
+                                   Type="HGVS, coding, RefSeq">NM_001350235.1:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_005026" Version="5" Change="c.231G&gt;A" Type="HGVS, coding, RefSeq"
+                                   MANESelect="true">NM_005026.5:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_191" Change="g.68899G&gt;A" Type="HGVS, genomic, LRG">LRG_191:g.68899G&gt;A</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NG_023434" Version="1" Change="g.68899G&gt;A"
+                                   Type="HGVS, genomic, RefSeqGene">NG_023434.1:g.68899G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000001" Version="11" Change="g.9715630G&gt;A"
+                                   Type="HGVS, genomic, top level" integerValue="38">NC_000001.11:g.9715630G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000001" Version="10" Change="g.9775688G&gt;A"
+                                   Type="HGVS, genomic, top level, previous" integerValue="37">NC_000001.10:g.9775688G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_005026" Version="3" Change="c.231G&gt;A" Type="HGVS, previous">
+                            NM_005026.3:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="HGVS, protein">p.Ala77Ala</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001337163" Version="1" Change="p.Ala77=" Type="HGVS, protein, RefSeq">
+                            NP_001337163.1:p.Ala77=
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001337164" Version="1" Change="p.Ala77=" Type="HGVS, protein, RefSeq">
+                            NP_001337164.1:p.Ala77=
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_005017" Version="3" Change="p.Ala77=" Type="HGVS, protein, RefSeq">
+                            NP_005017.3:p.Ala77=
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
+                        <XRef ID="SO:0001819" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001350234.2:c.231G&gt;A" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
+                        <XRef ID="SO:0001819" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001350235.1:c.231G&gt;A" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
+                        <XRef ID="SO:0001819" DB="Sequence Ontology"/>
+                        <XRef ID="NM_005026.5:c.231G&gt;A" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AlleleFrequencyList>
+                        <AlleleFrequency Value="0.00007" Source="Exome Aggregation Consortium (ExAC)"/>
+                        <AlleleFrequency Value="0.00006" Source="The Genome Aggregation Database (gnomAD)"/>
+                        <AlleleFrequency Value="0.00007" Source="The Genome Aggregation Database (gnomAD)"/>
+                        <AlleleFrequency Value="0.00006" Source="The Genome Aggregation Database (gnomAD), exomes"/>
+                        <AlleleFrequency Value="0.00008" Source="Trans-Omics for Precision Medicine (TOPMed)"/>
+                        <AlleleFrequency Value="0.00006" Source="Trans-Omics for Precision Medicine (TOPMed)"/>
+                    </AlleleFrequencyList>
+                    <CytogeneticLocation>1p36.22</CytogeneticLocation>
+                    <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                      AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="9715630"
+                                      stop="9715630" display_start="9715630" display_stop="9715630" variantLength="1"
+                                      positionVCF="9715630" referenceAlleleVCF="G" alternateAlleleVCF="A"/>
+                    <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                      AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="9775688"
+                                      stop="9775688" display_start="9775688" display_stop="9775688" variantLength="1"
+                                      positionVCF="9775688" referenceAlleleVCF="G" alternateAlleleVCF="A"/>
+                    <MeasureRelationship Type="within single gene">
+                        <Name>
+                            <ElementValue Type="Preferred">phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic
+                                subunit delta
+                            </ElementValue>
+                        </Name>
+                        <Symbol>
+                            <ElementValue Type="Preferred">PIK3CD</ElementValue>
+                        </Symbol>
+                        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                          AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="9627258"
+                                          stop="9729114" display_start="9627258" display_stop="9729114" Strand="+"/>
+                        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                          AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="9711789"
+                                          stop="9789171" display_start="9711789" display_stop="9789171"
+                                          variantLength="77383" Strand="+"/>
+                        <XRef ID="5293" DB="Gene"/>
+                        <XRef Type="MIM" ID="602839" DB="OMIM"/>
+                        <XRef ID="HGNC:8977" DB="HGNC"/>
+                    </MeasureRelationship>
+                    <XRef ID="164534" DB="ARUP Laboratories, Molecular Genetics and Genomics,ARUP Laboratories"/>
+                    <XRef Type="rs" ID="756139699" DB="dbSNP"/>
+                </Measure>
+                <Name>
+                    <ElementValue Type="Preferred">NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=)</ElementValue>
+                </Name>
+                <Name>
+                    <ElementValue Type="Preferred">NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=)</ElementValue>
+                </Name>
+            </MeasureSet>
+            <TraitSet Type="Disease" ID="9460">
+                <Trait ID="17556" Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">not provided</ElementValue>
+                        <XRef ID="13DG0619"
+                              DB="Developmental Genetics Unit,King Faisal Specialist Hospital &amp; Research Centre"/>
+                    </Name>
+                    <Name>
+                        <ElementValue Type="Alternate">none provided</ElementValue>
+                    </Name>
+                    <AttributeSet>
+                        <Attribute Type="public definition">The term 'not provided' is registered in MedGen to support
+                            identification of submissions to ClinVar for which no condition was named when assessing the
+                            variant. 'not provided' differs from 'not specified', which is used when a variant is
+                            asserted to be benign, likely benign, or of uncertain significance for conditions that have
+                            not been specified.
+                        </Attribute>
+                    </AttributeSet>
+                    <XRef ID="CN517202" DB="MedGen"/>
+                </Trait>
+            </TraitSet>
+        </ReferenceClinVarAssertion>
+        <ClinVarAssertion ID="1732522" SubmissionName="SUB4618058">
+            <ClinVarSubmissionID localKey="164534|Not Provided" submittedAssembly="GRCh37"
+                                 submitter="ARUP Laboratories, Molecular Genetics and Genomics,ARUP Laboratories"
+                                 submitterDate="2018-10-10"/>
+            <ClinVarAccession Acc="SCV000885910" Version="1" Type="SCV" OrgID="25969" OrganizationCategory="laboratory"
+                              OrgType="primary" DateUpdated="2022-01-26"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2017-07-03">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Likely benign</Description>
+                <Comment>The c.231G&gt;A variant (rs756139699) does not alter the amino acid sequence of the PIK3CD
+                    protein and computational splice site prediction algorithms do not predict a change in the nearest
+                    splice site or creation of a cryptic splice site. This variant has not been reported in association
+                    with primary antibody deficiency in medical literature or in gene specific variation databases. This
+                    variant is listed in the genome Aggregation Database (gnomAD) with an overall population frequency
+                    of 0.006 percent (identified on 17 out of 276,374 chromosomes). Based on these observations, the
+                    c.231G&gt;A variant is likely to be benign.
+                </Comment>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ExternalID DB="Molecular Genetics" ID="164534"/>
+            <AttributeSet>
+                <Attribute Type="AssertionMethod">ARUP Molecular Germline Variant Investigation Process</Attribute>
+                <Citation>
+                    <URL>
+                        https://submit.ncbi.nlm.nih.gov/ft/byid/w2yp3qyt/arup_molecular_germline_variant_investigation_process.pdf
+                    </URL>
+                </Citation>
+            </AttributeSet>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <Name>
+                        <ElementValue Type="Alternate">p.Ala77Ala</ElementValue>
+                    </Name>
+                    <AttributeSet>
+                        <Attribute Type="HGVS">NM_005026.3:c.231G&gt;A</Attribute>
+                    </AttributeSet>
+                    <SequenceLocation Assembly="GRCh37" Chr="1" alternateAllele="A" referenceAllele="G" start="9775688"
+                                      stop="9775688" variantLength="1"/>
+                    <XRef DB="dbSNP" ID="756139699" Type="rsNumber"/>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">Not Provided</ElementValue>
+                    </Name>
+                </Trait>
+            </TraitSet>
+        </ClinVarAssertion>
+    </ClinVarSet>
+    <ClinVarSet ID="93549412">
+        <RecordStatus>current</RecordStatus>
+        <Title>NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=) AND Immunodeficiency 14</Title>
+        <ReferenceClinVarAssertion DateCreated="2021-06-06" DateLastUpdated="2022-04-21" ID="3353263">
+            <ClinVarAccession Acc="RCV001488431" Version="1" Type="RCV" DateUpdated="2022-04-23"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2020-08-22">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Likely benign</Description>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData ID="95936168">
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant" ID="618791" Acc="VCV000618791" Version="5">
+                <Measure Type="single nucleotide variant" ID="609439">
+                    <Name>
+                        <ElementValue Type="Preferred">NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=)</ElementValue>
+                    </Name>
+                    <CanonicalSPDI>NC_000001.11:9715629:G:A</CanonicalSPDI>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_191t1" Change="c.231G&gt;A" Type="HGVS, coding, LRG">LRG_191t1:c.231G&gt;A</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001350234" Version="2" Change="c.231G&gt;A"
+                                   Type="HGVS, coding, RefSeq">NM_001350234.2:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_001350235" Version="1" Change="c.231G&gt;A"
+                                   Type="HGVS, coding, RefSeq">NM_001350235.1:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_005026" Version="5" Change="c.231G&gt;A" Type="HGVS, coding, RefSeq"
+                                   MANESelect="true">NM_005026.5:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="LRG_191" Change="g.68899G&gt;A" Type="HGVS, genomic, LRG">LRG_191:g.68899G&gt;A</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NG_023434" Version="1" Change="g.68899G&gt;A"
+                                   Type="HGVS, genomic, RefSeqGene">NG_023434.1:g.68899G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000001" Version="11" Change="g.9715630G&gt;A"
+                                   Type="HGVS, genomic, top level" integerValue="38">NC_000001.11:g.9715630G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NC_000001" Version="10" Change="g.9775688G&gt;A"
+                                   Type="HGVS, genomic, top level, previous" integerValue="37">NC_000001.10:g.9775688G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NM_005026" Version="3" Change="c.231G&gt;A" Type="HGVS, previous">
+                            NM_005026.3:c.231G&gt;A
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="HGVS, protein">p.Ala77Ala</Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001337163" Version="1" Change="p.Ala77=" Type="HGVS, protein, RefSeq">
+                            NP_001337163.1:p.Ala77=
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_001337164" Version="1" Change="p.Ala77=" Type="HGVS, protein, RefSeq">
+                            NP_001337164.1:p.Ala77=
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Accession="NP_005017" Version="3" Change="p.Ala77=" Type="HGVS, protein, RefSeq">
+                            NP_005017.3:p.Ala77=
+                        </Attribute>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
+                        <XRef ID="SO:0001819" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001350234.2:c.231G&gt;A" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
+                        <XRef ID="SO:0001819" DB="Sequence Ontology"/>
+                        <XRef ID="NM_001350235.1:c.231G&gt;A" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AttributeSet>
+                        <Attribute Type="MolecularConsequence">synonymous variant</Attribute>
+                        <XRef ID="SO:0001819" DB="Sequence Ontology"/>
+                        <XRef ID="NM_005026.5:c.231G&gt;A" DB="RefSeq"/>
+                    </AttributeSet>
+                    <AlleleFrequencyList>
+                        <AlleleFrequency Value="0.00007" Source="Exome Aggregation Consortium (ExAC)"/>
+                        <AlleleFrequency Value="0.00006" Source="The Genome Aggregation Database (gnomAD)"/>
+                        <AlleleFrequency Value="0.00007" Source="The Genome Aggregation Database (gnomAD)"/>
+                        <AlleleFrequency Value="0.00006" Source="The Genome Aggregation Database (gnomAD), exomes"/>
+                        <AlleleFrequency Value="0.00008" Source="Trans-Omics for Precision Medicine (TOPMed)"/>
+                        <AlleleFrequency Value="0.00006" Source="Trans-Omics for Precision Medicine (TOPMed)"/>
+                    </AlleleFrequencyList>
+                    <CytogeneticLocation>1p36.22</CytogeneticLocation>
+                    <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                      AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="9715630"
+                                      stop="9715630" display_start="9715630" display_stop="9715630" variantLength="1"
+                                      positionVCF="9715630" referenceAlleleVCF="G" alternateAlleleVCF="A"/>
+                    <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                      AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="9775688"
+                                      stop="9775688" display_start="9775688" display_stop="9775688" variantLength="1"
+                                      positionVCF="9775688" referenceAlleleVCF="G" alternateAlleleVCF="A"/>
+                    <MeasureRelationship Type="within single gene">
+                        <Name>
+                            <ElementValue Type="Preferred">phosphatidylinositol-4,5-bisphosphate 3-kinase catalytic
+                                subunit delta
+                            </ElementValue>
+                        </Name>
+                        <Symbol>
+                            <ElementValue Type="Preferred">PIK3CD</ElementValue>
+                        </Symbol>
+                        <SequenceLocation Assembly="GRCh38" AssemblyAccessionVersion="GCF_000001405.38"
+                                          AssemblyStatus="current" Chr="1" Accession="NC_000001.11" start="9627258"
+                                          stop="9729114" display_start="9627258" display_stop="9729114" Strand="+"/>
+                        <SequenceLocation Assembly="GRCh37" AssemblyAccessionVersion="GCF_000001405.25"
+                                          AssemblyStatus="previous" Chr="1" Accession="NC_000001.10" start="9711789"
+                                          stop="9789171" display_start="9711789" display_stop="9789171"
+                                          variantLength="77383" Strand="+"/>
+                        <XRef ID="5293" DB="Gene"/>
+                        <XRef Type="MIM" ID="602839" DB="OMIM"/>
+                        <XRef ID="HGNC:8977" DB="HGNC"/>
+                    </MeasureRelationship>
+                    <XRef ID="164534" DB="ARUP Laboratories, Molecular Genetics and Genomics,ARUP Laboratories"/>
+                    <XRef Type="rs" ID="756139699" DB="dbSNP"/>
+                </Measure>
+                <Name>
+                    <ElementValue Type="Preferred">NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=)</ElementValue>
+                </Name>
+                <Name>
+                    <ElementValue Type="Preferred">NM_005026.5(PIK3CD):c.231G&gt;A (p.Ala77=)</ElementValue>
+                </Name>
+            </MeasureSet>
+            <TraitSet Type="Disease" ID="12475">
+                <Trait ID="18461" Type="Disease">
+                    <Name>
+                        <ElementValue Type="Preferred">Immunodeficiency 14</ElementValue>
+                        <XRef ID="MONDO:0014222" DB="MONDO"/>
+                    </Name>
+                    <Name>
+                        <ElementValue Type="Alternate">p110-DELTA-ACTIVATING MUTATION CAUSING SENESCENT T CELLS,
+                            LYMPHADENOPATHY, AND IMMUNODEFICIENCY
+                        </ElementValue>
+                        <XRef Type="MIM" ID="615513" DB="OMIM"/>
+                    </Name>
+                    <Name>
+                        <ElementValue Type="Alternate">IMMUNODEFICIENCY 14A, AUTOSOMAL DOMINANT</ElementValue>
+                        <XRef Type="MIM" ID="615513" DB="OMIM"/>
+                        <XRef Type="Allelic variant" ID="602839.0001" DB="OMIM"/>
+                        <XRef Type="Allelic variant" ID="602839.0002" DB="OMIM"/>
+                        <XRef Type="Allelic variant" ID="602839.0003" DB="OMIM"/>
+                        <XRef Type="Allelic variant" ID="602839.0004" DB="OMIM"/>
+                    </Name>
+                    <Symbol>
+                        <ElementValue Type="Preferred">IMD14A</ElementValue>
+                        <XRef Type="MIM" ID="615513" DB="OMIM"/>
+                    </Symbol>
+                    <Symbol>
+                        <ElementValue Type="Alternate">PASLI</ElementValue>
+                        <XRef Type="MIM" ID="615513" DB="OMIM"/>
+                    </Symbol>
+                    <XRef ID="MONDO:0014222" DB="MONDO"/>
+                    <XRef ID="C3714976" DB="MedGen"/>
+                    <XRef ID="397596" DB="Orphanet"/>
+                    <XRef Type="MIM" ID="615513" DB="OMIM"/>
+                </Trait>
+            </TraitSet>
+        </ReferenceClinVarAssertion>
+        <ClinVarAssertion ID="3295756" SubmissionName="SUB8755776">
+            <ClinVarSubmissionID localKey="3436669|MedGen:C3714976" submittedAssembly="GRCh37" submitter="Invitae"
+                                 submitterDate="2021-01-07"/>
+            <ClinVarAccession Acc="SCV001692948" Version="1" Type="SCV" OrgID="500031" OrganizationCategory="laboratory"
+                              OrgType="primary" DateUpdated="2021-06-08"/>
+            <RecordStatus>current</RecordStatus>
+            <ClinicalSignificance DateLastEvaluated="2020-08-22">
+                <ReviewStatus>criteria provided, single submitter</ReviewStatus>
+                <Description>Likely benign</Description>
+            </ClinicalSignificance>
+            <Assertion Type="variation to disease"/>
+            <ExternalID DB="Invitae" ID="3436669"/>
+            <AttributeSet>
+                <Attribute Type="AssertionMethod">Invitae Variant Classification Sherloc (09022015)</Attribute>
+                <Citation>
+                    <ID Source="PubMed">28492532</ID>
+                </Citation>
+            </AttributeSet>
+            <ObservedIn>
+                <Sample>
+                    <Origin>germline</Origin>
+                    <Species TaxonomyId="9606">human</Species>
+                    <AffectedStatus>unknown</AffectedStatus>
+                </Sample>
+                <Method>
+                    <MethodType>clinical testing</MethodType>
+                </Method>
+                <ObservedData>
+                    <Attribute Type="Description">not provided</Attribute>
+                </ObservedData>
+            </ObservedIn>
+            <MeasureSet Type="Variant">
+                <Measure Type="Variation">
+                    <AttributeSet>
+                        <Attribute Type="HGVS">NC_000001.10:g.9775688G&gt;A</Attribute>
+                    </AttributeSet>
+                    <MeasureRelationship Type="variant in gene">
+                        <Symbol>
+                            <ElementValue Type="Preferred">PIK3CD</ElementValue>
+                        </Symbol>
+                    </MeasureRelationship>
+                </Measure>
+            </MeasureSet>
+            <TraitSet Type="Disease">
+                <Trait Type="Disease">
+                    <XRef DB="MedGen" ID="C3714976" Type="CUI"/>
+                </Trait>
+            </TraitSet>
+        </ClinVarAssertion>
+    </ClinVarSet>
+
+</ReleaseSet>
