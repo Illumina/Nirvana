@@ -148,7 +148,7 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator, 
+                annotationResources.RefMinorProvider, vcfFilter, annotationResources.VidCreator, 
                 mitoHeteroplasmyProvider, enableDq, customInfoKeys, customSampleInfoKeys);
         }
     }

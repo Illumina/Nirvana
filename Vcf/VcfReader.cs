@@ -6,7 +6,6 @@ using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Vcf.VariantCreator;
@@ -17,7 +16,6 @@ namespace Vcf
     {
         private readonly StreamReader _headerReader;
         private readonly StreamReader _reader;
-        private IRecomposer _recomposer;
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly ISequenceProvider _sequenceProvider;
@@ -39,10 +37,18 @@ namespace Vcf
         public readonly bool            EnableDq;
         public readonly HashSet<string> CustomInfoKeys;
 
-        private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
-            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, 
-            HashSet<string> customInfoKeys=null , HashSet<string> customSampleInfoKeys=null)
+        private VcfReader(
+            StreamReader headerReader,
+            StreamReader vcfLineReader,
+            ISequenceProvider sequenceProvider,
+            IRefMinorProvider refMinorProvider,
+            IVcfFilter vcfFilter,
+            IVariantIdCreator vidCreator,
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider,
+            bool enableDq = false,
+            HashSet<string> customInfoKeys = null,
+            HashSet<string> customSampleInfoKeys=null
+        )
         {
             _headerReader             = headerReader;
             _reader                   = vcfLineReader;
@@ -57,19 +63,16 @@ namespace Vcf
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
             IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, 
             HashSet<string> customInfoKeys=null, HashSet<string> customSampleInfoKeys=null)
         {
             var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, 
                 vidCreator, mitoHeteroplasmyProvider, enableDq, customInfoKeys, customSampleInfoKeys);
             vcfReader.ParseHeader();
-            vcfReader.SetRecomposer(recomposer);
             return vcfReader;
         }
-
-        private void SetRecomposer(IRecomposer recomposer) => _recomposer = _sampleNames == null ? new NullRecomposer() : recomposer;
-
+        
         private void ParseHeader()
         {
             _headerLines = new List<string>();
@@ -145,9 +148,7 @@ namespace Vcf
             while (_queuedPositions.Count == 0)
             {
                 VcfLine = _vcfFilter.GetNextLine(_reader);
-
-                SimplePosition vcfPosition = null;
-
+                
                 if (VcfLine != null) 
                 {
                     string[] vcfFields = VcfLine.OptimizedSplit('\t');
@@ -162,11 +163,8 @@ namespace Vcf
                         int sampleCount = _sampleNames?.Length ?? 0;
                         throw new UserErrorException($"Inconsistent number of sample fields in line:\n{VcfLine}\nExpected number of sample fields: {sampleCount}");
                     }
-                    vcfPosition = SimplePosition.GetSimplePosition(chromosome, start, vcfFields, _vcfFilter);
+                    _queuedPositions.Enqueue(SimplePosition.GetSimplePosition(chromosome, start, vcfFields, _vcfFilter));
                 }
-
-                IEnumerable<ISimplePosition> simplePositions = _recomposer.ProcessSimplePosition(vcfPosition);
-                foreach (var simplePosition in simplePositions) _queuedPositions.Enqueue(simplePosition);
 
                 if (VcfLine == null) break;
             }

@@ -172,7 +172,6 @@ namespace AnnotationLambda
                 annotationConfig.customStrUrl, 
                 false, 
                 false, 
-                false, 
                 metrics);
 
             using (var tabixStream = PersistentStreamUtils.GetReadStream(annotationConfig.tabixUrl))

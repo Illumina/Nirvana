@@ -47,7 +47,6 @@ namespace Vcf
             InfoData     = infoData;
             VcfFields    = vcfFields;
             IsDecomposed = isDecomposed;
-            IsRecomposed = isRecomposed;
 
             (HasStructuralVariant, HasShortTandemRepeat) = CheckVariants(variants);
             Vids                                         = null;

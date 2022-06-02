@@ -27,7 +27,7 @@ namespace Vcf
             AltAlleles = altAlleles;
         }
 
-        public static SimplePosition GetSimplePosition(Chromosome chromosome, int position, string[] vcfFields, IVcfFilter vcfFilter, bool isRecomposed = false)
+        public static SimplePosition GetSimplePosition(Chromosome chromosome, int position, string[] vcfFields, IVcfFilter vcfFilter)
         {
             if (vcfFilter.PassedTheEnd(chromosome, position)) return null;
 
@@ -40,7 +40,6 @@ namespace Vcf
             {
                 End          = altAlleleField.OptimizedStartsWith('<') || altAlleleField == "*" ? -1 : position + refAllele.Length - 1,
                 VcfFields    = vcfFields,
-                IsRecomposed = isRecomposed,
                 IsDecomposed = new bool[numAltAlleles],
                 Vids         = new string[numAltAlleles],
                 LinkedVids   = new List<string>[numAltAlleles]

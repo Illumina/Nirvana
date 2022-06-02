@@ -33,7 +33,6 @@
     <ProjectReference Include="..\NirvanaLambda\NirvanaLambda.csproj" />
     <ProjectReference Include="..\Nirvana\Nirvana.csproj" />
     <ProjectReference Include="..\OptimizedCore\OptimizedCore.csproj" />
-    <ProjectReference Include="..\Phantom\Phantom.csproj" />
     <ProjectReference Include="..\ReferenceSequence\ReferenceSequence.csproj" />
     <ProjectReference Include="..\SAUtils\SAUtils.csproj" />
     <ProjectReference Include="..\SingleAnnotationLambda\SingleAnnotationLambda.csproj" />

@@ -28,7 +28,6 @@ namespace Nirvana
         private static          string       _customSampleInfoKeysString;
         
         private static          bool         _forceMitochondrialAnnotation;
-        private static          bool         _disableRecomposition;
         private static          bool         _useLegacyVids;
         private static          bool         _enableDq;
         
@@ -59,8 +58,7 @@ namespace Nirvana
             var metrics = new PerformanceMetrics();
             
             var annotationResources = new AnnotationResources(_refSequencePath, _inputCachePrefix, 
-                SupplementaryAnnotationDirectories, null, _customStrTsv,
-                _disableRecomposition, _forceMitochondrialAnnotation, _useLegacyVids, metrics);
+                SupplementaryAnnotationDirectories, null, _customStrTsv, _forceMitochondrialAnnotation, _useLegacyVids, metrics);
             
             if (SupplementaryAnnotationDirectories.Count == 0) return annotationResources;
 
@@ -105,11 +103,6 @@ namespace Nirvana
                     "force-mt",
                     "forces to annotate mitochondrial variants",
                     v => _forceMitochondrialAnnotation = v != null
-                },
-                {
-                    "disable-recomposition",
-                    "don't recompose function relevant variants",
-                    v => _disableRecomposition = v != null
                 },
                 {
                     "legacy-vids",

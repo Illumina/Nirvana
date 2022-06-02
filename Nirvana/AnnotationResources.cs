@@ -11,12 +11,10 @@ using VariantAnnotation;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Providers;
 using VariantAnnotation.SA;
-using Vcf;
 using Vcf.VariantCreator;
 
 namespace Nirvana
@@ -36,7 +34,6 @@ namespace Nirvana
         public          IGeneAnnotationProvider       GeneAnnotationProvider       { get; }
         public          IMitoHeteroplasmyProvider     MitoHeteroplasmyProvider     { get; }
         public          IAnnotator                    Annotator                    { get; }
-        public          IRecomposer                   Recomposer                   { get; }
         public          IVariantIdCreator             VidCreator                   { get; }
         public          List<IDataSourceVersion>      DataSourceVersions           { get; }
         public          string                        VepDataVersion               { get; }
@@ -46,7 +43,7 @@ namespace Nirvana
         public readonly PerformanceMetrics            Metrics;
 
         public AnnotationResources(string refSequencePath, string inputCachePrefix, List<string> saDirectoryPaths, List<SaUrls> customAnnotations,
-            string customStrTsvPath, bool disableRecomposition, bool forceMitochondrialAnnotation, bool useLegacyVids, PerformanceMetrics metrics)
+            string customStrTsvPath, bool forceMitochondrialAnnotation, bool useLegacyVids, PerformanceMetrics metrics)
         {
             Metrics = metrics;
             PerformanceMetrics.ShowInitializationHeader();
@@ -91,9 +88,6 @@ namespace Nirvana
             if (useLegacyVids) VidCreator = new LegacyVariantId(SequenceProvider.RefNameToChromosome);
             else VidCreator               = new VariantId();
 
-            Recomposer = disableRecomposition
-                ? new NullRecomposer()
-                : Phantom.Recomposer.Recomposer.Create(SequenceProvider, TranscriptAnnotationProvider, VidCreator);
             DataSourceVersions = GetDataSourceVersions(
                     TranscriptAnnotationProvider,
                     SaProvider,
@@ -104,6 +98,7 @@ namespace Nirvana
                     MitoHeteroplasmyProvider
                 )
                 .ToList();
+            
             VepDataVersion = TranscriptAnnotationProvider.VepVersion + "." + CacheConstants.DataVersion + "." + SaCommon.DataVersion;
 
             ForceMitochondrialAnnotation = forceMitochondrialAnnotation;
