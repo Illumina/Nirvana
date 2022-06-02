@@ -138,13 +138,15 @@ namespace Jasix
 			foreach (long location in locations)
 			{
 				RepositionReader(location);
-
 				string line;
-				if ((line = _jsonReader.ReadLine()) == null) continue;
-				line = line.TrimEnd(',');
-
-				yield return line;
-
+				while ((line = _jsonReader.ReadLine()) != null)
+				{
+					if (!line.OptimizedStartsWith(',')) { //buffer starts with ',\n', skip this first line
+						line = line.TrimEnd(',');					      
+						yield return line;
+						break;
+					}
+				}
 			}
 		}
 
