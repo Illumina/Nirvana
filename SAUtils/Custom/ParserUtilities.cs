@@ -175,7 +175,6 @@ namespace SAUtils.Custom
                    || value.Equals(SaCommon.CosmicTag)
                    || value.Equals(SaCommon.CosmicCnvTag)
                    || value.Equals(SaCommon.DgvTag)
-                   || value.Equals(SaCommon.ExacScoreTag)
                    || value.Equals(SaCommon.GnomadTag)
                    || value.Equals(SaCommon.GnomadExomeTag)
                    || value.Equals(SaCommon.MitoMapTag)

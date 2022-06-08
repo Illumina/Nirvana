@@ -42,7 +42,6 @@
         public const string TopMedTag               = "topmed";
         public const string PhylopTag               = "phylopScore";
         public const string OmimTag                 = "omim";
-        public const string ExacScoreTag            = "exac";
         public const string GnomadGeneScoreTag      = "gnomAD";
         public const string GnomadStructuralVariant = "gnomAD-preview";
         public const string DosageSensitivityTag    = "clingenDosageSensitivityMap";

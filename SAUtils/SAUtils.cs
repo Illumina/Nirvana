@@ -46,7 +46,6 @@ namespace SAUtils
                 ["DosageMapRegions"]   = new("create dosage map regions", DosageMapRegions.Run),
                 ["DosageSensitivity"]  = new("create dosage sensitivity database", DosageSensitivity.Run),
                 ["DownloadOmim"]       = new("download OMIM database", Omim.Downloader.Run),
-                ["ExacScores"]         = new("create ExAC gene scores database", ExacScores.Main.Run),
                 ["ExtractMiniSA"]      = new("extracts mini SA", ExtractMiniSaMain.Run),
                 ["ExtractMiniXml"]     = new("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
                 ["FilterSpliceNetTsv"] = new("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run),
