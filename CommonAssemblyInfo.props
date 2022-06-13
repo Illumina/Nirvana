@@ -2,9 +2,9 @@
   <PropertyGroup>
     <Company>Illumina</Company>
     <Copyright>© 2022 Illumina, Inc.</Copyright>
-    <FileVersion>3.18.0</FileVersion>
-    <AssemblyVersion>3.18.0</AssemblyVersion>
-    <Version>3.18.0</Version>
+    <FileVersion>3.18.1</FileVersion>
+    <AssemblyVersion>3.18.1</AssemblyVersion>
+    <Version>3.18.1</Version>
     <Authors>Stromberg, Roy, Platzer, Siddiqui, Ouyang, et al</Authors>
   </PropertyGroup>
 </Project>
