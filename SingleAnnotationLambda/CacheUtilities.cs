@@ -20,14 +20,13 @@ namespace SingleAnnotationLambda
         public static string GetCachePathPrefix(int vepVersion, GenomeAssembly genomeAssembly)
         {
             string suffix = $"{genomeAssembly}/{LambdaUrlHelper.DefaultCacheSource}";
-
-            //LambdaUrlHelper.GetBaseUrl() + 
+            
             switch (vepVersion)
             {
                 case 84:
-                    return UrlCombine($"{LambdaUrlHelper.GetBaseUrl()+LambdaUrlHelper.S3CacheFolderBase}/26/VEP84/", suffix);
+                    return UrlCombine($"{LambdaUrlHelper.GetBaseUrl() +LambdaUrlHelper.S3CacheFolderBase}/26/VEP84/", suffix);
                 default:
-                    return UrlCombine($"{LambdaUrlHelper.GetBaseUrl()+LambdaUrlHelper.S3CacheFolder}", suffix);
+                    return UrlCombine($"{LambdaUrlHelper.GetCacheFolder()}", suffix);
             }
             
         }

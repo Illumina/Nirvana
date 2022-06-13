@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using Cloud;
+using Cloud.Utilities;
+using Genome;
 using Microsoft.Extensions.Configuration;
 
 namespace Downloader
@@ -21,33 +25,36 @@ namespace Downloader
                 hostName = dataSource["HostName"];
                 if (string.IsNullOrEmpty(hostName))
                     throw new InvalidDataException($"Could not find the HostName entry in the {appSettingsFilename} file.");
+                // this env variable will over-ride the configuration in cloud
+                Environment.SetEnvironmentVariable(LambdaUrlHelper.UrlBaseEnvironmentVariableName, $"http://{hostName}/");
             }
 
-            string cacheDir = dataSource["CacheDirectory"];
+            var    cloudConfiguration = new Cloud.Configuration();
+            string cacheDir           = cloudConfiguration.CacheDirectory;
             if (string.IsNullOrEmpty(cacheDir))
-                throw new InvalidDataException($"Could not find the CacheDirectory entry in the {appSettingsFilename} file.");
+                throw new InvalidDataException($"Could not find the CacheDirectory entry in the Cloud.appsettings.json file.");
 
-            string referencesDir = dataSource["ReferencesDirectory"];
+            string referencesDir = cloudConfiguration.ReferencesDirectory;
             if (string.IsNullOrEmpty(referencesDir))
-                throw new InvalidDataException($"Could not find the ReferencesDirectory entry in the {appSettingsFilename} file.");
+                throw new InvalidDataException($"Could not find the ReferencesDirectory entry in the Cloud.appsettings.json file.");
 
-            string manifestGRCh37;
-            string manifestGRCh38;
+            string manifestGRCh37 ;
+            string manifestGRCh38 ;
             
             if (string.IsNullOrEmpty(manifestPrefix))
             {
-                manifestGRCh37 = dataSource["ManifestGRCh37"];
+                manifestGRCh37 = LambdaUtilities.GetManifestUrl(dataSource["ManifestGRCh37"], GenomeAssembly.GRCh37);
                 if (string.IsNullOrEmpty(manifestGRCh37))
                     throw new InvalidDataException($"Could not find the ManifestGRCh37 entry in the {appSettingsFilename} file.");
 
-                manifestGRCh38 = dataSource["ManifestGRCh38"];
+                manifestGRCh38 = LambdaUtilities.GetManifestUrl(dataSource["ManifestGRCh38"], GenomeAssembly.GRCh38);
                 if (string.IsNullOrEmpty(manifestGRCh38))
                     throw new InvalidDataException($"Could not find the ManifestGRCh38 entry in the {appSettingsFilename} file.");
             }
             else
             {
-                manifestGRCh37 = $"{manifestPrefix}_GRCh37.txt";
-                manifestGRCh38 = $"{manifestPrefix}_GRCh38.txt";
+                manifestGRCh37 = LambdaUtilities.GetManifestUrl($"{manifestPrefix}", GenomeAssembly.GRCh37);
+                manifestGRCh38 = LambdaUtilities.GetManifestUrl($"{manifestPrefix}", GenomeAssembly.GRCh38);
             }
 
             return (hostName, '/' + cacheDir, '/' + referencesDir, manifestGRCh37, manifestGRCh38);

@@ -13,6 +13,7 @@ namespace Downloader.FileExtensions
             NeedsIndexSet.Add(".nsa");
             NeedsIndexSet.Add(".npd");
             NeedsIndexSet.Add(".rma");
+            NeedsIndexSet.Add(".gsa");
         }
         
         public static void AddSupplementaryAnnotationFiles(this List<RemoteFile> files,

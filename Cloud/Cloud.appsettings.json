@@ -1,0 +1,8 @@
+{
+    "DataSource": {
+        "BaseUrl": "http://nirvana-annotations.s3.us-west-2.amazonaws.com/",
+        "CacheDirectory": "ab0cf104f39708eabd07b8cb67e149ba-Cache",
+        "ReferencesDirectory": "d95867deadfe690e40f42068d6b59df8-References",
+        "ManifestDirectory": "a9f54ea6ac0548696c97a3ee64bc39ec2e71b84b-SaManifest"
+    }
+}
