@@ -150,7 +150,7 @@ namespace SAUtils.DataStructures
             return histologyCounts; 
         }
 
-        internal IDictionary<string,int> GetTierCounts()
+        internal Dictionary<string,int> GetTierCounts()
         {
             if (Tumors == null) return null;
             var tierCounts = new Dictionary<string, int>();
