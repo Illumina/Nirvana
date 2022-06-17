@@ -18,6 +18,7 @@ using Nirvana;
 using Vcf;
 using Tabix;
 using VariantAnnotation;
+using VariantAnnotation.SA;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
@@ -85,7 +86,10 @@ namespace AnnotationLambda
 
                             using (var jsonCompressStream = new BlockGZipStream(jsonMd5Stream, CompressionMode.Compress))
                             {
-                                variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, jasixMd5Stream, annotationResources, vcfFilter, true).variantCount;
+                                variantCount = StreamAnnotation.Annotate(headerStream, inputVcfStream, jsonCompressStream, 
+                                    jasixMd5Stream, annotationResources, vcfFilter, true, false,
+                                    config.desiredVcfInfo == null? null: new HashSet<string>(config.desiredVcfInfo),
+                                    config.desiredVcfSampleInfo == null? null: new HashSet<string>(config.desiredVcfSampleInfo)).variantCount;
                             }
 
                             Logger.WriteLine("Annotation done.");
@@ -143,7 +147,7 @@ namespace AnnotationLambda
             return result;
         }
 
-        internal static long GetTabixVirtualPosition(AnnotationRange annotationRange, Stream stream, IDictionary<string, IChromosome> refNameToChromosome)
+        internal static long GetTabixVirtualPosition(AnnotationRange annotationRange, Stream stream, Dictionary<string, Chromosome> refNameToChromosome)
         {
             // process the entire file if no range specified
             if (annotationRange == null) return 0;
@@ -159,14 +163,13 @@ namespace AnnotationLambda
             string nirvanaS3Ref     = LambdaUrlHelper.GetRefUrl(genomeAssembly);
             // SaVersion will be provided as an environment variable. Defaults to "latest"
             string saVersion = Environment.GetEnvironmentVariable("SaVersion");
-            string saManifestUrl    = LambdaUtilities.GetManifestUrl(string.IsNullOrEmpty(saVersion)? "latest": saVersion, genomeAssembly);
+            string saManifestUrl    = LambdaUtilities.GetManifestUrl(string.IsNullOrEmpty(saVersion)? "latest": saVersion, genomeAssembly, SaCommon.SchemaVersion);
             var metrics = new PerformanceMetrics();
 
             var annotationResources = new AnnotationResources(nirvanaS3Ref, cachePathPrefix,
                 saManifestUrl == null? null: new List<string> {saManifestUrl}, 
                 annotationConfig.customAnnotations, 
                 annotationConfig.customStrUrl, 
-                false, 
                 false, 
                 false, 
                 metrics);

@@ -4,10 +4,11 @@ namespace VariantAnnotation.Interface.SA
 {
     public interface ISupplementaryDataItem
     {
-        IChromosome Chromosome { get; }
+        Chromosome Chromosome { get; }
         int         Position   { get; set; }
         string      RefAllele  { get; set; }
         string      AltAllele  { get; set; }
         string      GetJsonString();
+        string      InputLine { get; }
     }
 }

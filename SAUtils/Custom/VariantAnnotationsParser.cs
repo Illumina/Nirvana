@@ -39,7 +39,7 @@ namespace SAUtils.Custom
         private int _endColumnIndex = -1;
         private readonly HashSet<GenomeAssembly> _allowedGenomeAssemblies = new HashSet<GenomeAssembly> { GenomeAssembly.GRCh37, GenomeAssembly.GRCh38, GenomeAssembly.SARSCoV2 };
         private readonly List<CustomInterval> _intervals;
-        private (IChromosome Chromesome, int Position) _previousPosition = (null, 0);
+        private (Chromosome Chromesome, int Position) _previousPosition = (null, 0);
         private Action<string, string>[] _annotationValidators;
 
         private SaJsonValueType _primaryType;
@@ -290,7 +290,7 @@ namespace SAUtils.Custom
 
         private bool IsInterval(string[] splits) => _endColumnIndex != -1 && !AllowedValues.IsEmptyValue(splits[_endColumnIndex]);
 
-        private void CheckAnnotationSorted(IChromosome chrom, int position, string line)
+        private void CheckAnnotationSorted(Chromosome chrom, int position, string line)
         {
             if (chrom != _previousPosition.Chromesome)
             {

@@ -23,7 +23,7 @@ namespace CacheUtils.Genes.DataStores
         }
 
         public static AssemblyDataStore Create(string description, FilePaths.AssemblySpecificPaths paths,
-            IDictionary<string, IChromosome> refNameToChromosome, bool useGrch37)
+            Dictionary<string, Chromosome> refNameToChromosome, bool useGrch37)
         {
             string ensemblGtfPath      = useGrch37 ? ExternalFiles.EnsemblGtfFile37.FilePath      : ExternalFiles.EnsemblGtfFile38.FilePath;
             string refseqGffPath       = useGrch37 ? ExternalFiles.RefSeqGffFile37.FilePath       : ExternalFiles.RefSeqGffFile38.FilePath;

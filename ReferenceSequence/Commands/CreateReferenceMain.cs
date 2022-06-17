@@ -30,13 +30,13 @@ namespace ReferenceSequence.Commands
             var genomeAssembly = GenomeAssemblyHelper.Convert(_genomeAssembly);
 
             Console.Write("- loading previous reference names... ");
-            List<IChromosome> oldChromosomes = ReferenceNamesReader.GetReferenceNames(FileUtilities.GetReadStream(_referenceNamesPath));
+            List<Chromosome> oldChromosomes = ReferenceNamesReader.GetReferenceNames(FileUtilities.GetReadStream(_referenceNamesPath));
             Console.WriteLine("finished.");
 
-            IDictionary<string, IChromosome> oldRefNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(oldChromosomes);
+            Dictionary<string, Chromosome> oldRefNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(oldChromosomes);
 
             Console.Write("- reading the genome assembly report... ");
-            List<IChromosome> chromosomes = AssemblyReader.GetChromosomes(FileUtilities.GetReadStream(_genomeAssemblyReportPath), oldRefNameToChromosome, oldChromosomes.Count);
+            List<Chromosome> chromosomes = AssemblyReader.GetChromosomes(FileUtilities.GetReadStream(_genomeAssemblyReportPath), oldRefNameToChromosome, oldChromosomes.Count);
             int numRefSeqs  = chromosomes.Count;
             Console.WriteLine($"{numRefSeqs} references found.");
 
@@ -44,7 +44,7 @@ namespace ReferenceSequence.Commands
             CheckReferenceIndexContiguity(chromosomes, oldChromosomes);
             Console.WriteLine("contiguous.");
 
-            IDictionary<string, IChromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
+            Dictionary<string, Chromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
 
             Console.Write("- reading cytogenetic bands... ");
             List<Band>[] cytogeneticBandsByRef = CytogeneticBandsReader.GetCytogeneticBands(FileUtilities.GetReadStream(_cytogeneticBandPath),
@@ -105,7 +105,7 @@ namespace ReferenceSequence.Commands
             }
         }
 
-        private static List<FastaSequence> GetFastaSequences(string fastaPrefix, IDictionary<string, IChromosome> refNameToChromosome)
+        private static List<FastaSequence> GetFastaSequences(string fastaPrefix, Dictionary<string, Chromosome> refNameToChromosome)
         {
             string directory = Path.GetDirectoryName(fastaPrefix);
             string prefix    = Path.GetFileName(fastaPrefix);
@@ -123,7 +123,7 @@ namespace ReferenceSequence.Commands
             return references.OrderBy(x => x.Chromosome.Index).ToList();
         }
 
-        private static void CheckReferenceIndexContiguity(IEnumerable<IChromosome> chromosomes, IReadOnlyList<IChromosome> oldChromosomes)
+        private static void CheckReferenceIndexContiguity(IEnumerable<Chromosome> chromosomes, IReadOnlyList<Chromosome> oldChromosomes)
         {
             ushort testRefIndex = 0;
 
@@ -142,7 +142,7 @@ namespace ReferenceSequence.Commands
         }
 
         private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, byte patchLevel,
-            IReadOnlyCollection<IChromosome> chromosomes, List<Creation.ReferenceSequence> referenceSequences)
+            IReadOnlyCollection<Chromosome> chromosomes, List<Creation.ReferenceSequence> referenceSequences)
         {
             using (var writer = new ReferenceSequenceWriter(FileUtilities.GetCreateStream(_outputCompressedPath),
                 chromosomes, genomeAssembly, patchLevel))

@@ -69,14 +69,14 @@ namespace CacheUtils.Commands.ExtractTranscripts
             Logger.WriteLine("finished.");
         }
 
-        private static string GetOutputStub(IChromosome chromosome, Source source) => Path.Combine(_outputDirectory,
+        private static string GetOutputStub(Chromosome chromosome, Source source) => Path.Combine(_outputDirectory,
             $"{chromosome.UcscName}_{_referencePosition}_{_referenceEndPosition}_{GetSource(source)}");
 
         private static string GetSource(Source source) =>
             source != Source.BothRefSeqAndEnsembl ? source.ToString() : "Both";
 
         private static (PredictionCacheStaging Staging, Prediction[] Predictions) GetPredictionStaging(
-            string description, IEnumerable<ITranscript> transcripts, IChromosome chromosome, IReadOnlyList<Prediction> oldPredictions,
+            string description, IEnumerable<ITranscript> transcripts, Chromosome chromosome, IReadOnlyList<Prediction> oldPredictions,
             PredictionCacheReader reader, Func<ITranscript, int> indexFunc, int numRefSeqs)
         {
             Logger.Write($"- retrieving {description} predictions... ");
@@ -89,7 +89,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
             return (staging, predictionsPerRef[chromosome.Index]);
         }
 
-        private static Prediction[][] GetPredictions(ICollection<int> indexSet, IChromosome chromosome, int numRefSeqs,
+        private static Prediction[][] GetPredictions(ICollection<int> indexSet, Chromosome chromosome, int numRefSeqs,
             IReadOnlyList<Prediction> oldPredictions)
         {
             var refPredictions = new Prediction[indexSet.Count];
@@ -115,7 +115,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
         }
 
         private static IntervalArray<IRegulatoryRegion>[] GetRegulatoryRegionIntervalArrays(
-            ITranscriptCache cache, IChromosomeInterval interval, int numRefSeqs)
+            ITranscriptCache cache, ChromosomeInterval interval, int numRefSeqs)
         {
             Logger.Write("- retrieving regulatory regions... ");
             var regulatoryIntervalForest = cache.RegulatoryIntervalForest;
@@ -126,7 +126,7 @@ namespace CacheUtils.Commands.ExtractTranscripts
             return regulatoryRegions.ToIntervalArrays(numRefSeqs);
         }
 
-        private static List<ITranscript> GetTranscripts(DataBundle bundle, IChromosomeInterval interval)
+        private static List<ITranscript> GetTranscripts(DataBundle bundle, ChromosomeInterval interval)
         {
             Logger.Write("- retrieving transcripts... ");
             var transcripts = TranscriptCacheUtilities.GetTranscripts(bundle, interval);

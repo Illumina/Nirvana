@@ -160,7 +160,7 @@ namespace UnitTests.Jasix
         }
 
         [Fact]
-        public void IndexCreation_multiChromosome()
+        public void IndexCreation_multChromosome()
         {
             var jsonStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("cosmicv72.indels.json.gz")), CompressionMode.Decompress);
 

@@ -68,7 +68,7 @@ namespace SAUtils.InputFileParsers.DbSnp
                 var (shiftedPos, shiftedRef, shiftedAlt) =
                     VariantUtils.TrimAndLeftAlign(position, refAllele, altAllele, _sequenceProvider.Sequence);
 
-                yield return new DbSnpItem(chromosome, shiftedPos, dbSnpId, shiftedRef, shiftedAlt);
+                yield return new DbSnpItem(chromosome, shiftedPos, dbSnpId, shiftedRef, shiftedAlt, vcfLine);
             }
 	        
         }

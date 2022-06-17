@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using ErrorHandling.Exceptions;
 using IO;
 using VariantAnnotation.GeneAnnotation;
 using VariantAnnotation.GeneFusions.IO;
+using VariantAnnotation.GenericScore;
 using VariantAnnotation.Interface.GeneAnnotation;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
@@ -24,22 +27,43 @@ namespace Nirvana
                 ? null
                 : new ProteinConservationProvider(PersistentStreamUtils.GetReadStream(files.ProteinConservationFile));
 
-        public static IAnnotationProvider GetConservationProvider(AnnotationFiles files) =>
-            files == null || files.ConservationFile == default
-                ? null
-                : new ConservationScoreProvider(PersistentStreamUtils.GetReadStream(files.ConservationFile.Npd),
-                    PersistentStreamUtils.GetReadStream(files.ConservationFile.Idx));
+        public static IAnnotationProvider GetConservationProvider(AnnotationFiles files)
+        {
+            if (files == null || files.PhylopFile == default) return null;
+            (Stream phylopStream, Stream indexStream) = GetDataAndIndexStreams(files.PhylopFile.Npd, files.PhylopFile.Idx);
+            return new ConservationScoreProvider()
+                .AddPhylopReader(phylopStream, indexStream);
+        }
+
+        private static (Stream, Stream) GetDataAndIndexStreams(string dataFilePath, string indexPath)
+        {
+            var dataStream = PersistentStreamUtils.GetReadStream(dataFilePath);
+            var indexStream = PersistentStreamUtils.GetReadStream(indexPath);
+            if (dataStream == null)
+            {
+                throw new UserErrorException($"Unable to open data file {dataFilePath}");
+            }
+
+            if (indexStream == null)
+            {
+                throw new UserErrorException($"Unable to open index file {indexPath}");
+            }
+
+            return (dataStream, indexStream);
+        }
 
         public static IAnnotationProvider GetLcrProvider(AnnotationFiles files) =>
             files?.LowComplexityRegionFile == null
                 ? null
                 : new LcrProvider(PersistentStreamUtils.GetReadStream(files.LowComplexityRegionFile));
 
-        public static IRefMinorProvider GetRefMinorProvider(AnnotationFiles files) =>
-            files == null || files.RefMinorFile == default
-                ? null
-                : new RefMinorProvider(PersistentStreamUtils.GetReadStream(files.RefMinorFile.Rma),
+        public static IRefMinorProvider GetRefMinorProvider(AnnotationFiles files)
+        {
+            if( files == null || files.RefMinorFile == default) return null;
+            
+            return new RefMinorProvider(PersistentStreamUtils.GetReadStream(files.RefMinorFile.Rma),
                     PersistentStreamUtils.GetReadStream(files.RefMinorFile.Idx));
+        }
 
         public static IGeneAnnotationProvider GetGeneAnnotationProvider(AnnotationFiles files) => files?.NsiFiles == null
             ? null
@@ -61,9 +85,33 @@ namespace Nirvana
         {
             var readers = new List<INsaReader>(filePaths.Count);
             foreach ((string nsaPath, string idxPath) in filePaths)
-                readers.Add(new NsaReader(PersistentStreamUtils.GetReadStream(nsaPath), PersistentStreamUtils.GetReadStream(idxPath)));
+            {
+                var (nsaStream, idxStream) = GetDataAndIndexStreams(nsaPath, idxPath);
+                readers.Add(new NsaReader(nsaStream, idxStream));
+            }
             return readers.SortByJsonKey();
         }
+
+        public static IAnnotationProvider GetGsaProvider(AnnotationFiles files)
+        {
+            if (files?.GsaFiles == null || files.GsaFiles.Count == 0) return null;
+
+            List<(string Gsa, string Idx)> filePaths = files.GsaFiles;
+
+            var readers = new ScoreReader[filePaths.Count];
+
+            var i = 0;
+            foreach ((string gsaPath, string idxPath) in filePaths)
+            {
+                var (gsaStream, idxStream) = GetDataAndIndexStreams(gsaPath, idxPath);
+                readers[i] = ScoreReader.Read(gsaStream, idxStream);
+                i++;
+            }
+
+            readers = readers.SortByJsonKey();
+            return new ScoreProvider(readers);
+        }
+
 
         private static INsiReader[] GetNsiReaders(IReadOnlyCollection<string> filePaths)
         {

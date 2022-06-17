@@ -11,8 +11,8 @@ namespace ReferenceSequence.IO
 {
     public sealed class CompressedSequenceReader : IDisposable
     {
-        public readonly Dictionary<string, IChromosome> RefNameToChromosome  = new Dictionary<string, IChromosome>();
-        public readonly Dictionary<ushort, IChromosome> RefIndexToChromosome = new Dictionary<ushort, IChromosome>();
+        public readonly Dictionary<string, Chromosome> RefNameToChromosome  = new Dictionary<string, Chromosome>();
+        public readonly Dictionary<ushort, Chromosome> RefIndexToChromosome = new Dictionary<ushort, Chromosome>();
         private readonly Dictionary<ushort, int> _refIndexToIndex            = new Dictionary<ushort, int>();
 
         private readonly IndexEntry[] _indexEntries;
@@ -56,7 +56,7 @@ namespace ReferenceSequence.IO
             }
         }
 
-        public void GetCompressedSequence(IChromosome chromosome)
+        public void GetCompressedSequence(Chromosome chromosome)
         {
             if (chromosome.IsEmpty() || !_refIndexToIndex.TryGetValue(chromosome.Index, out int index))
             {
@@ -171,7 +171,7 @@ namespace ReferenceSequence.IO
             return indexEntries;
         }
 
-        private void AddReferenceName(IChromosome chromosome)
+        private void AddReferenceName(Chromosome chromosome)
         {
             if (!string.IsNullOrEmpty(chromosome.UcscName))         RefNameToChromosome[chromosome.UcscName]         = chromosome;
             if (!string.IsNullOrEmpty(chromosome.EnsemblName))      RefNameToChromosome[chromosome.EnsemblName]      = chromosome;

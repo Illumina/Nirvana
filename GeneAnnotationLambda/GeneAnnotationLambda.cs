@@ -29,8 +29,7 @@ namespace GeneAnnotationLambda
     public class GeneAnnotationLambda
     {
         private readonly string _saPathPrefix = LambdaUrlHelper.GetBaseUrl();
-        private readonly string _saManifestUrl = LambdaUtilities.GetManifestUrl(null, GenomeAssembly.GRCh37);
-
+        
         // ReSharper disable once UnusedMember.Global
         public Stream Run(GeneConfig config, ILambdaContext context)
         {
@@ -49,7 +48,10 @@ namespace GeneAnnotationLambda
                 snsTopicArn = LambdaUtilities.GetEnvironmentVariable(LambdaUtilities.SnsTopicKey);
 
                 config.Validate();
-                string result = GetGeneAnnotation(config, _saManifestUrl, _saPathPrefix);
+                // SaVersion will be provided as an environment variable. Defaults to "latest"
+                string saVersion     = Environment.GetEnvironmentVariable("SaVersion");
+                string saManifestUrl = LambdaUtilities.GetManifestUrl(saVersion, GenomeAssembly.GRCh38, SaCommon.SchemaVersion);
+                string result        = GetGeneAnnotation(config, saManifestUrl, _saPathPrefix);
                 
                 return LambdaResponse.Create(config.id, LambdaUrlHelper.SuccessMessage, result);
             }

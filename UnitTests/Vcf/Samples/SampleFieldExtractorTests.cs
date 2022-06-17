@@ -1,4 +1,5 @@
-﻿using MitoHeteroplasmy;
+﻿using System.Collections.Generic;
+using MitoHeteroplasmy;
 using UnitTests.TestUtilities;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Pools;
@@ -65,6 +66,34 @@ namespace UnitTests.Vcf.Samples
             Assert.Equal("0|1", sample.Genotype);
             Assert.Equal(3, sample.CopyNumber);
             Assert.Equal(1, sample.MinorHaplotypeCopyNumber);
+        }
+
+        [Fact]
+        public void ExtractSample_Custom_format()
+        {
+            var formatIndices = new FormatIndices(new HashSet<string>(){"CUST"});
+            formatIndices.Set("GT:CN:MCN:CUST");
+            var sample = SampleFieldExtractor.ExtractSample("0|1:3:1:4.5", formatIndices, GetSimplePositionUsingAlleleNum(1), null, null);
+
+            Assert.Equal("0|1", sample.Genotype);
+            Assert.Equal(3,     sample.CopyNumber);
+            Assert.Equal(1,     sample.MinorHaplotypeCopyNumber);
+            Assert.NotNull(sample.CustomFields);
+            Assert.Contains("\"CUST\":\"4.5\"", sample.CustomFields.ToString());
+        }
+        
+        [Fact]
+        public void ExtractSample_Custom_format_empty()
+        {
+            var formatIndices = new FormatIndices(new HashSet<string>(){"CUST"});
+            formatIndices.Set("GT:CN:MCN");
+            var sample = SampleFieldExtractor.ExtractSample("0|1:3:1", formatIndices, GetSimplePositionUsingAlleleNum(1), null, null);
+
+            Assert.Equal("0|1", sample.Genotype);
+            Assert.Equal(3,     sample.CopyNumber);
+            Assert.Equal(1,     sample.MinorHaplotypeCopyNumber);
+            Assert.NotNull(sample.CustomFields);
+            Assert.True(sample.CustomFields.IsEmpty());
         }
 
         [Theory]
@@ -155,6 +184,45 @@ namespace UnitTests.Vcf.Samples
             Assert.Equal("./1", samples[3].Genotype);
             Assert.Equal(3, samples[3].CopyNumber);
             Assert.True(samples[3].FailedFilter);
+        }
+
+        [Fact]
+        public void ToSamples_Custom()
+        {
+            var formatIndices = new FormatIndices(new HashSet<string>(){"CF"});
+
+            string[] cols = {
+                "chr1",
+                "125068769",
+                "DRAGEN:GAIN:125068770-125075279",
+                "N",
+                "<DUP>",
+                ".",
+                "SampleFT",
+                "SVTYPE=CNV;END=125075279;REFLEN=6510",
+                "GT:AD:DST:RPL:LC:SM:CN:BC:QS:CF:FT:DN",
+                "0/1:30,20:-:35.8981:45.810811:.:.:.:.:4.5",
+                "./1:.:.:.:.:1.24763:3:4:5:1.2:cnvLength:.",
+                "./.:.:.:.:.:1.17879:2:4:8:2.3:cnvLength:.",
+                "./1:.:.:.:.:1.26335:3:4:6:3.4:cnvLength:Inherited"
+            };
+
+            ISample[] samples = cols.ToSamples(formatIndices, GetSimplePositionUsingAlleleNum(1), null, null);
+
+            Assert.Equal(4, samples.Length);
+
+            Assert.NotNull(samples[0].CustomFields);
+            Assert.Contains("\"CF\":\"4.5\"", samples[0].CustomFields.ToString());
+            
+            Assert.NotNull(samples[1].CustomFields);
+            Assert.Contains("\"CF\":\"1.2\"", samples[1].CustomFields.ToString());
+
+            Assert.NotNull(samples[2].CustomFields);
+            Assert.Contains("\"CF\":\"2.3\"", samples[2].CustomFields.ToString());
+
+            Assert.NotNull(samples[3].CustomFields);
+            Assert.Contains("\"CF\":\"3.4\"", samples[3].CustomFields.ToString());
+
         }
 
         [Fact]

@@ -27,7 +27,7 @@ namespace SAUtils.InputFileParsers.Cosmic
 
         private const string TumorIdTag = "ID_tumour";
 
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
         private readonly ISequenceProvider _sequenceProvider;
         private readonly Dictionary<string, HashSet<CosmicItem.CosmicTumor>> _tumors;
 

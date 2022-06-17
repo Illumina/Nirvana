@@ -7,7 +7,7 @@ namespace SAUtils.SpliceAi
 {
     public sealed class SpliceAiItem:ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
@@ -25,7 +25,7 @@ namespace SAUtils.SpliceAi
         private readonly int _donorGainPosition;
         private readonly int _donorLossPosition;
 
-        public SpliceAiItem(IChromosome chromosome, int position, string refAllele, string altAllele, string hgnc,
+        public SpliceAiItem(Chromosome chromosome, int position, string refAllele, string altAllele, string hgnc,
             double acceptorGainScore, double acceptorLossScore, double donorGainScore, double donorLossScore,
             int acceptorGainPosition, int acceptorLossPosition, int donorGainPosition, int donorLossPosition,
             bool isSpliceAdjacent)
@@ -98,5 +98,7 @@ namespace SAUtils.SpliceAi
 
             return StringBuilderPool.GetStringAndReturn(sb);
         }
+
+        public string InputLine { get; set; }
     }
 }

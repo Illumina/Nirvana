@@ -27,11 +27,11 @@ namespace CacheUtils.Commands.GFF
             Source transcriptSource = ParseVepCacheDirectoryMain.GetSource(_transcriptSource);
             string cachePath        = CacheConstants.TranscriptPath(_inputPrefix);
 
-            IDictionary<ushort, IChromosome> refIndexToChromosome =
+            Dictionary<ushort, Chromosome> refIndexToChromosome =
                 SequenceHelper.GetDictionaries(_compressedReferencePath).refIndexToChromosome;
             
             TranscriptCacheData     cache            = TranscriptCacheHelper.GetCache(cachePath, refIndexToChromosome);
-            IDictionary<IGene, int> geneToInternalId = InternalGenes.CreateDictionary(cache.Genes);
+            Dictionary<IGene, int> geneToInternalId = InternalGenes.CreateDictionary(cache.Genes);
 
             using (var writer = new GffWriter(GZipUtilities.GetStreamWriter(_outputFileName)))
             {

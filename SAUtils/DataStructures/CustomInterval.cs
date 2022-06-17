@@ -9,7 +9,7 @@ namespace SAUtils.DataStructures
 {
     public sealed class CustomInterval : ISuppIntervalItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }
         private VariantType VariantType { get; }
@@ -21,7 +21,7 @@ namespace SAUtils.DataStructures
         /// <summary>
         /// constructor
         /// </summary>
-        public CustomInterval(IChromosome chromosome, int start, int end, List<string[]> values, SaJsonSchema jsonSchema, string inputLine)
+        public CustomInterval(Chromosome chromosome, int start, int end, List<string[]> values, SaJsonSchema jsonSchema, string inputLine)
         {
             Chromosome      = chromosome;
             Start           = start;

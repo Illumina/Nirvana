@@ -1,4 +1,7 @@
-﻿using System.Text;
+﻿using System.Globalization;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using OptimizedCore;
 using VariantAnnotation.Interface.IO;
 using VariantAnnotation.IO;
@@ -76,6 +79,33 @@ namespace UnitTests.VariantAnnotation.IO
             var observedResult = StringBuilderPool.GetStringAndReturn(sb);
 
             Assert.Equal(expectedResult, observedResult);
+        }
+        
+        public static string GetJsonDoubleString()
+        {
+            var defaultCulture = Thread.CurrentThread.CurrentCulture;
+            var newCulture     = CultureInfo.CreateSpecificCulture("fr-FR");
+            Thread.CurrentThread.CurrentCulture = newCulture;
+            
+            var sb   = StringBuilderPool.Get();
+            var json = new JsonObject(sb);
+            json.AddDoubleValue("test1", 5.7);
+            json.AddDoubleValue("test2", 7.9);
+
+            var result = StringBuilderPool.GetStringAndReturn(sb);
+            Thread.CurrentThread.CurrentCulture = defaultCulture;
+            
+            return result;
+        }
+        [Fact]
+        public void AddDoubleValue_InvariantCulture()
+        {
+            var task           = Task<string>.Factory.StartNew(GetJsonDoubleString);
+            var observedResult = task.Result;
+            
+            const string expectedResult = "\"test1\":5.7,\"test2\":7.9";
+            Assert.Equal(expectedResult, observedResult);
+
         }
 
         [Fact]

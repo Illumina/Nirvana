@@ -60,7 +60,7 @@ namespace SAUtils.DataStructures
             return min;
         }
 
-        private static void SwapItems(IList<T> list, int i, int j)
+        private static void SwapItems(List<T> list, int i, int j)
         {
             var temp = list[i];
             list[i] = list[j];

@@ -11,11 +11,12 @@ namespace Nirvana
     public sealed class AnnotationFiles
     {
         public List<(string Nsa, string Idx)> NsaFiles                { get; } = new();
+        public List<(string Gsa, string Idx)> GsaFiles                { get; } = new();
         public List<string>                   NsiFiles                { get; } = new();
         public List<string>                   NgaFiles                { get; } = new();
         public List<string>                   GeneFusionSourceFiles   { get; } = new();
         public List<string>                   GeneFusionJsonFiles     { get; } = new();
-        public (string Npd, string Idx)       ConservationFile        { get; private set; }
+        public (string Npd, string Idx)       PhylopFile              { get; private set; }
         public string                         LowComplexityRegionFile { get; private set; }
         public string                         ProteinConservationFile { get; private set; }
         public (string Rma, string Idx)       RefMinorFile            { get; private set; }
@@ -30,6 +31,9 @@ namespace Nirvana
                     case SaCommon.SaFileSuffix:
                         NsaFiles.Add((filePath, filePath + SaCommon.IndexSuffix));
                         break;
+                    case SaCommon.GsaFileSuffix:
+                        GsaFiles.Add((filePath, filePath + SaCommon.IndexSuffix));
+                        break;
                     case SaCommon.IntervalFileSuffix:
                         NsiFiles.Add(filePath);
                         break;
@@ -37,7 +41,7 @@ namespace Nirvana
                         NgaFiles.Add(filePath);
                         break;
                     case SaCommon.PhylopFileSuffix:
-                        ConservationFile = (filePath, filePath + SaCommon.IndexSuffix);
+                        PhylopFile = (filePath, filePath + SaCommon.IndexSuffix);
                         break;
                     case ProteinConservationCommon.FileSuffix:
                         ProteinConservationFile = filePath;

@@ -236,13 +236,36 @@ namespace UnitTests.SAUtils.CustomAnnotations
                                 "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\tscore\n" +
                                 "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n" +
                                 "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\n" +
-                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.0\n" +
                                 "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n" +
                                 "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n" +
                                 "chr1\t46993\tA\t<DEL>\t50879\t50\t250\t0.001\tfalse\tbenign\t\tthree";
-            using (var custParser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            using (var parser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
             {
-                Assert.Throws<UserErrorException>(()=>custParser.GetItems().ToArray());
+                Assert.Throws<UserErrorException>(()=> parser.GetItems().ToArray());
+            }
+        }
+        
+        [Fact]
+        public void GetItems_missing_scores()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n"                                                                   +
+                                "#assembly=GRCh38\n"                                                                               +
+                                "#matchVariantsBy=allele\n"                                                                        +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\tscore\n"   +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\n"                                           +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\n"                        +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t.\n"                                     +
+                                "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\n"                                        +
+                                "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\n";
+                                
+            using (var parser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                var items = parser.GetItems().ToArray();
+                
+                Assert.DoesNotContain("anyNumber", items[0].GetJsonString());
+                Assert.Contains("anyNumber", items[1].GetJsonString());
             }
         }
 
@@ -267,6 +290,31 @@ namespace UnitTests.SAUtils.CustomAnnotations
                 Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUS\",\"anyNumber\":1.000,\"customFilter\":\"good variant\"", items[0].GetJsonString());
                 Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"anyNumber\":3,\"customFilter\":\"bad variant\"", items[1].GetJsonString());
                 Assert.Equal("\"refAllele\":\"T\",\"altAllele\":\"C\",\"allAc\":10,\"allAn\":1000,\"allAf\":0.01,\"anyNumber\":100.1234567,\"customFilter\":\"ugly variant\"", items[2].GetJsonString());
+            }
+        }
+        
+        [Fact]
+        public void GetItems_missing_filter()
+        {
+            const string text = "#title=IcslAlleleFrequencies\n" +
+                                "#assembly=GRCh38\n" +
+                                "#matchVariantsBy=allele\n" +
+                                "#CHROM\tPOS\tREF\tALT\tEND\tallAc\tallAn\tallAf\tfailedFilter\tpathogenicity\tnotes\tanyNumber\tcustomFilter\n" +
+                                "#categories\t.\t.\t.\t.\tAlleleCount\tAlleleNumber\tAlleleFrequency\t.\tPrediction\t.\t.\tFilter\n" +
+                                "#descriptions\t.\t.\t.\t.\tALL\tALL\tALL\t.\t.\t.\t.\t.\n" +
+                                "#type\t.\t.\t.\t.\tnumber\tnumber\tnumber\tbool\tstring\tstring\tnumber\tstring\n" +
+                                "chr1\t12783\tG\tA\t.\t20\t125568\t0.000159\ttrue\tVUS\t\t1.000\tgood variant\n" +
+                                "chr1\t13302\tC\tA\t.\t53\t8928\t0.001421\tfalse\t.\t\t3\tbad variant\n" +
+                                "chr1\t18972\tT\tC\t.\t10\t1000\t0.01\tfalse\t.\t\t100.1234567\tugly variant\n" +
+                                "chr1\t46993\tA\tG\t.\t50\t250\t0.001\tfalse\tbenign\t\t3.1415926\t.";
+            using (var custParser = VariantAnnotationsParser.Create(GetReadStream(text), SequenceProvider))
+            {
+                var items = custParser.GetItems().ToArray();
+                Assert.Equal(4, items.Length);
+                Assert.Equal("\"refAllele\":\"G\",\"altAllele\":\"A\",\"allAc\":20,\"allAn\":125568,\"allAf\":0.000159,\"failedFilter\":true,\"pathogenicity\":\"VUS\",\"anyNumber\":1.000,\"customFilter\":\"good variant\"", items[0].GetJsonString());
+                Assert.Equal("\"refAllele\":\"C\",\"altAllele\":\"A\",\"allAc\":53,\"allAn\":8928,\"allAf\":0.001421,\"anyNumber\":3,\"customFilter\":\"bad variant\"", items[1].GetJsonString());
+                Assert.Equal("\"refAllele\":\"T\",\"altAllele\":\"C\",\"allAc\":10,\"allAn\":1000,\"allAf\":0.01,\"anyNumber\":100.1234567,\"customFilter\":\"ugly variant\"", items[2].GetJsonString());
+                Assert.DoesNotContain("customFilter",items[3].GetJsonString());
             }
         }
 
@@ -476,6 +524,7 @@ namespace UnitTests.SAUtils.CustomAnnotations
         {
             var sequenceMock = new Mock<ISequence>();
             sequenceMock.Setup(x => x.Substring(12783, 0)).Returns("");
+            sequenceMock.Setup(x => x.Substring(12733, 50)).Returns("ACGTA");
             sequenceMock.Setup(x => x.Substring(12283, 500)).Returns("ACGTA");
             return sequenceMock.Object;
         }

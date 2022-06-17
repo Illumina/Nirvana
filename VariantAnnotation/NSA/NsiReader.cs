@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -9,6 +10,7 @@ using ErrorHandling.Exceptions;
 using Genome;
 using Intervals;
 using IO;
+using VariantAnnotation.Algorithms;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Interface.SA;
 using VariantAnnotation.IO;
@@ -92,11 +94,16 @@ namespace VariantAnnotation.NSA
 
         public IEnumerable<string> GetAnnotation(IVariant variant)
         {
+            var start = variant.Start;
+            var end   = variant.End;
+
+            // for insertions, the end position is one past the last base
+            if (end < start) Swap.Int(ref start, ref end);
             var overlappingSvs =
-                  _intervalForest.GetAllOverlappingIntervals(variant.Chromosome.Index, variant.Start, variant.End);
+                  _intervalForest.GetAllOverlappingIntervals(variant.Chromosome.Index, start, end);
               
             if (overlappingSvs == null) return null;
-            
+
             var jsonStrings = new List<string>();
             foreach (var interval in overlappingSvs)
             {

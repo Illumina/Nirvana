@@ -103,7 +103,7 @@ namespace SAUtils.RefMinorDb
             
         }
 
-        private static ISupplementaryDataItem GetRefMinorItem(IList<ISupplementaryDataItem> saItems)
+        private static ISupplementaryDataItem GetRefMinorItem(List<ISupplementaryDataItem> saItems)
         {
             var totalAltAlleleFreq = 0.0;
             var alleleFrequencies = new Dictionary<string, double>();

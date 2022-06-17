@@ -6,7 +6,6 @@ using Genome;
 using OptimizedCore;
 using VariantAnnotation.Interface;
 using VariantAnnotation.Interface.IO;
-using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using Vcf.VariantCreator;
@@ -17,11 +16,10 @@ namespace Vcf
     {
         private readonly StreamReader _headerReader;
         private readonly StreamReader _reader;
-        private IRecomposer _recomposer;
         private readonly VariantFactory _variantFactory;
         private readonly IRefMinorProvider _refMinorProvider;
         private readonly ISequenceProvider _sequenceProvider;
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly IVcfFilter _vcfFilter;
         private readonly IMitoHeteroplasmyProvider _mitoHeteroplasmyProvider;
         public bool IsRcrsMitochondrion { get; private set; }
@@ -35,35 +33,46 @@ namespace Vcf
         private readonly HashSet<string> _observedReferenceNames = new HashSet<string>();
         private string _currentReferenceName;
 
-        public string[] GetSampleNames() => _sampleNames;
-        public readonly bool EnableDq;
+        public          string[]        GetSampleNames() => _sampleNames;
+        public readonly bool            EnableDq;
+        public readonly HashSet<string> CustomInfoKeys;
 
-        private VcfReader(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false)
+        private VcfReader(
+            StreamReader headerReader,
+            StreamReader vcfLineReader,
+            ISequenceProvider sequenceProvider,
+            IRefMinorProvider refMinorProvider,
+            IVcfFilter vcfFilter,
+            IVariantIdCreator vidCreator,
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider,
+            bool enableDq = false,
+            HashSet<string> customInfoKeys = null,
+            HashSet<string> customSampleInfoKeys=null
+        )
         {
             _headerReader             = headerReader;
             _reader                   = vcfLineReader;
-            _variantFactory           = new VariantFactory(sequenceProvider.Sequence, vidCreator);
+            _variantFactory           = new VariantFactory(sequenceProvider.Sequence, vidCreator, customSampleInfoKeys);
             _sequenceProvider         = sequenceProvider;
             _refMinorProvider         = refMinorProvider;
             _vcfFilter                = vcfFilter;
             _refNameToChromosome      = sequenceProvider.RefNameToChromosome;
             _mitoHeteroplasmyProvider = mitoHeteroplasmyProvider;
             EnableDq                  = enableDq;
-            
+            CustomInfoKeys            = customInfoKeys;
         }
 
         public static VcfReader Create(StreamReader headerReader, StreamReader vcfLineReader, ISequenceProvider sequenceProvider,
-            IRefMinorProvider refMinorProvider, IRecomposer recomposer, IVcfFilter vcfFilter, IVariantIdCreator vidCreator, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq=false)
+            IRefMinorProvider refMinorProvider, IVcfFilter vcfFilter, IVariantIdCreator vidCreator,
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, 
+            HashSet<string> customInfoKeys=null, HashSet<string> customSampleInfoKeys=null)
         {
-            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, vidCreator, mitoHeteroplasmyProvider, enableDq);
+            var vcfReader = new VcfReader(headerReader, vcfLineReader, sequenceProvider, refMinorProvider, vcfFilter, 
+                vidCreator, mitoHeteroplasmyProvider, enableDq, customInfoKeys, customSampleInfoKeys);
             vcfReader.ParseHeader();
-            vcfReader.SetRecomposer(recomposer);
             return vcfReader;
         }
-
-        private void SetRecomposer(IRecomposer recomposer) => _recomposer = _sampleNames == null ? new NullRecomposer() : recomposer;
-
+        
         private void ParseHeader()
         {
             _headerLines = new List<string>();
@@ -86,7 +95,7 @@ namespace Vcf
             string[] chromAndLengthInfo = GetChromAndLengthInfo(line);
             if (chromAndLengthInfo.Length == 0) return;
 
-            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out IChromosome chromosome)) return;
+            if (!_refNameToChromosome.TryGetValue(chromAndLengthInfo[0], out Chromosome chromosome)) return;
             if (!int.TryParse(chromAndLengthInfo[1], out int length)) return;
 
             var assemblyThisChrom = ContigInfo.GetGenomeAssembly(chromosome, length);
@@ -139,9 +148,7 @@ namespace Vcf
             while (_queuedPositions.Count == 0)
             {
                 VcfLine = _vcfFilter.GetNextLine(_reader);
-
-                SimplePosition vcfPosition = null;
-
+                
                 if (VcfLine != null) 
                 {
                     string[] vcfFields = VcfLine.OptimizedSplit('\t');
@@ -156,11 +163,8 @@ namespace Vcf
                         int sampleCount = _sampleNames?.Length ?? 0;
                         throw new UserErrorException($"Inconsistent number of sample fields in line:\n{VcfLine}\nExpected number of sample fields: {sampleCount}");
                     }
-                    vcfPosition = SimplePosition.GetSimplePosition(chromosome, start, vcfFields, _vcfFilter);
+                    _queuedPositions.Enqueue(SimplePosition.GetSimplePosition(chromosome, start, vcfFields, _vcfFilter));
                 }
-
-                IEnumerable<ISimplePosition> simplePositions = _recomposer.ProcessSimplePosition(vcfPosition);
-                foreach (var simplePosition in simplePositions) _queuedPositions.Enqueue(simplePosition);
 
                 if (VcfLine == null) break;
             }
@@ -192,7 +196,9 @@ namespace Vcf
             _currentReferenceName = referenceName;
         }
 
-        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, EnableDq);
+        public IPosition GetNextPosition() => Position.ToPosition(GetNextSimplePosition(), 
+            _refMinorProvider, _sequenceProvider, _mitoHeteroplasmyProvider, _variantFactory, 
+            EnableDq, CustomInfoKeys);
 
         public void Dispose() => _reader?.Dispose();
     }

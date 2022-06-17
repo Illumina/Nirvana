@@ -24,7 +24,7 @@ namespace RepeatExpansions.IO
         private const int MinNumberOfColumns  = 9;
 
         public static IIntervalForest<RepeatExpansionPhenotype> Load(Stream stream, GenomeAssembly desiredGenomeAssembly,
-            IDictionary<string, IChromosome> refNameToChromosome, int numRefSeqs)
+            Dictionary<string, Chromosome> refNameToChromosome, int numRefSeqs)
         {
             var intervalLists = new List<Interval<RepeatExpansionPhenotype>>[numRefSeqs];
             for (var i = 0; i < numRefSeqs; i++) intervalLists[i] = new List<Interval<RepeatExpansionPhenotype>>();
@@ -66,7 +66,7 @@ namespace RepeatExpansions.IO
             return new IntervalForest<RepeatExpansionPhenotype>(refIntervalArrays);
         }
 
-        private static (ushort RefIndex, Interval<RepeatExpansionPhenotype> Interval) GetPhenotype(string line, IDictionary<string, IChromosome> refNameToChromosome)
+        private static (ushort RefIndex, Interval<RepeatExpansionPhenotype> Interval) GetPhenotype(string line, Dictionary<string, Chromosome> refNameToChromosome)
         {
             string[] cols = line.OptimizedSplit('\t');
             if (cols.Length < MinNumberOfColumns) throw new InvalidDataException($"Expected at least {MinNumberOfColumns} columns in the STR data file, but found only {cols.Length}.");

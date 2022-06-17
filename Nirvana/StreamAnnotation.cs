@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using ErrorHandling;
 using ErrorHandling.Exceptions;
@@ -26,16 +27,16 @@ namespace Nirvana
     {
         public static (int variantCount, ExitCodes exitCode) Annotate(Stream headerStream, Stream inputVcfStream, Stream outputJsonStream,
             Stream outputJsonIndexStream, AnnotationResources annotationResources, IVcfFilter vcfFilter,
-            bool ignoreEmptyChromosome, bool enableDq=false)
+            bool ignoreEmptyChromosome, bool enableDq = false, HashSet<string> customInfoKeys=null, HashSet<string> customSampleInfoKeys=null)
         {
             var metrics = annotationResources.Metrics;
             PerformanceMetrics.ShowAnnotationHeader();
 
-            IChromosome               currentChromosome        = new EmptyChromosome("dummy");
+            Chromosome                currentChromosome        = Chromosome.GetEmptyChromosome("dummy");
             int                       numVariants              = 0;
             int                       variantCount             = 0;
             IMitoHeteroplasmyProvider mitoHeteroplasmyProvider = MitoHeteroplasmyReader.GetProvider();
-            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider, enableDq))
+            using (var vcfReader  = GetVcfReader(headerStream, inputVcfStream, annotationResources, vcfFilter, mitoHeteroplasmyProvider, enableDq, customInfoKeys, customSampleInfoKeys))
             using (var jsonWriter = new JsonWriter(outputJsonStream, outputJsonIndexStream, annotationResources, Date.CurrentTimeStamp, vcfReader.GetSampleNames(), false))
             {
                 try
@@ -47,7 +48,7 @@ namespace Nirvana
 
                     while ((position = vcfReader.GetNextPosition()) != null)
                     {
-                        IChromosome chromosome = position.Chromosome;
+                        Chromosome chromosome = position.Chromosome;
                         if (ignoreEmptyChromosome && chromosome.IsEmpty()) continue;
                         
                         if (chromosome.Index != currentChromosome.Index)
@@ -132,7 +133,8 @@ namespace Nirvana
         }
 
         private static VcfReader GetVcfReader(Stream headerStream, Stream vcfStream, IAnnotationResources annotationResources,
-            IVcfFilter vcfFilter, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq=false)
+            IVcfFilter vcfFilter, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, bool enableDq = false, 
+            HashSet<string> customInfoKeys=null , HashSet<string> customSampleInfoKeys=null)
         {
             var vcfReader = FileUtilities.GetStreamReader(vcfStream);
 
@@ -146,7 +148,8 @@ namespace Nirvana
             }
 
             return VcfReader.Create(headerReader, vcfReader, annotationResources.SequenceProvider,
-                annotationResources.RefMinorProvider, annotationResources.Recomposer, vcfFilter, annotationResources.VidCreator, mitoHeteroplasmyProvider, enableDq);
+                annotationResources.RefMinorProvider, vcfFilter, annotationResources.VidCreator, 
+                mitoHeteroplasmyProvider, enableDq, customInfoKeys, customSampleInfoKeys);
         }
     }
 }

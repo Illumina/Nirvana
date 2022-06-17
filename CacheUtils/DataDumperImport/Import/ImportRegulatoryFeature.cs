@@ -41,7 +41,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// parses the relevant data from each regulatory element
         /// </summary>
-        public static IRegulatoryRegion Parse(ObjectValueNode objectValue, IChromosome chromosome)
+        public static IRegulatoryRegion Parse(ObjectValueNode objectValue, Chromosome chromosome)
         {
             int start       = -1;
             int end         = -1;

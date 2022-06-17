@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers.OneKGen
     public sealed class RefMinorReader:IDisposable
     {
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, IChromosome> _refNameDictionary;
+        private readonly Dictionary<string, Chromosome> _refNameDictionary;
         private readonly ISequenceProvider _sequenceProvider;
 
         private int? _allAlleleNumber;
@@ -87,7 +87,7 @@ namespace SAUtils.InputFileParsers.OneKGen
                 var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
                     altAlleles[i], _sequenceProvider.Sequence);
 
-                items.Add(new AlleleFrequencyItem(chromosome, shiftedPos,shiftedRef, shiftedAlt, frequency));
+                items.Add(new AlleleFrequencyItem(chromosome, shiftedPos,shiftedRef, shiftedAlt, frequency, vcfLine));
             }
 
             return items.Count>0? items: null;

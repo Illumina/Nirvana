@@ -1,16 +1,39 @@
-﻿using Genome;
+﻿using System;
+using Genome;
 
 namespace Variants
 {
     public static class VariantUtils
     {
-        public const int MaxUpstreamLength = 500;
+        public const  int MaxUpstreamLength = 500;
+        public static int MaxShiftLength    = 0;
+
+        public static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele, string altAllele,
+            ISequence refSequence)
+        {
+            var initialStart = start;
+            var (newStart, newRefAllele, newAltAllele) = TrimAndLeftAlign(start, refAllele, altAllele, refSequence, 50);
+
+            while (newStart != start)
+            {
+                start     = newStart;
+                refAllele = newRefAllele;
+                altAllele = newAltAllele;
+
+                (newStart, newRefAllele, newAltAllele) = TrimAndLeftAlign(start, refAllele, altAllele, refSequence, 50);
+            }
+
+            // keeping track of maximum bases shifted
+            if (MaxShiftLength < Math.Abs(initialStart - newStart)) MaxShiftLength = Math.Abs(initialStart - newStart);
+            
+            return (newStart, newRefAllele, newAltAllele);
+        }
 
         /// <summary>
         /// Left aligns the variant using base rotation
         /// </summary>
         /// <returns>Tuple of new position, ref and alt allele</returns>
-        public static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele, string altAllele, ISequence refSequence, int maxUpstreamLength = MaxUpstreamLength)
+        private static (int start, string refAllele, string altAllele) TrimAndLeftAlign(int start, string refAllele, string altAllele, ISequence refSequence, int maxUpstreamLength)
         {
             if (IsStructuralVariant(altAllele)) return (start, refAllele, altAllele);
 

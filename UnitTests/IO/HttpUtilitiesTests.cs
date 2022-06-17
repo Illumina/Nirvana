@@ -44,7 +44,7 @@ namespace UnitTests.IO
         {
             Assert.Throws<UserErrorException>(() =>
                 HttpUtilities.ValidateUrl(
-                    "https://ilmn-nirvana.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/0/OMIM_20191004.nga"));
+                    "https://nirvana-annotations.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/0/OMIM_20191004.nga"));
         }
 
         [Fact]
@@ -52,14 +52,14 @@ namespace UnitTests.IO
         {
             Assert.Throws<DeploymentErrorException>(() =>
                 HttpUtilities.ValidateUrl(
-                    "https://ilmn-nirvana.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/0/OMIM_20191004.nga", false));
+                    "https://nirvana-annotations.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/0/OMIM_20191004.nga", false));
         }
 
         [Fact]
         public void ValidateUrl_valid()
         {
             HttpUtilities.ValidateUrl(
-                    "https://ilmn-nirvana.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/6/OMIM_20191004.nga", false);
+                    "https://nirvana-annotations.s3.us-west-2.amazonaws.com/645778a7d475ac437d15765ef3c6f50c-OMIM/6/OMIM_20191004.nga", false);
         }
 
     }

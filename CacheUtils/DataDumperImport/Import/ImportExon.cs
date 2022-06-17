@@ -27,7 +27,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// returns a new exon given an ObjectValue
         /// </summary>
-        public static MutableExon Parse(ObjectValueNode objectValue, IChromosome currentChromosome)
+        public static MutableExon Parse(ObjectValueNode objectValue, Chromosome currentChromosome)
         {
             int start = -1;
             int end   = -1;
@@ -68,7 +68,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// returns an array of exons given a list of ObjectValues (AbstractData)
         /// </summary>
-        public static MutableExon[] ParseList(IImportNode importNode, IChromosome chromosome)
+        public static MutableExon[] ParseList(IImportNode importNode, Chromosome chromosome)
         {
             var listMembers = importNode.GetListMembers();
             if (listMembers == null) throw new InvalidDataException("Encountered an exon node that could not be converted to a member list.");

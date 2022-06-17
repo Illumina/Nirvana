@@ -7,7 +7,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
 {
     public sealed class MutableGene : IEquatable<MutableGene>, IFlatGene<MutableGene>
     {
-        public IChromosome Chromosome { get; set; }
+        public Chromosome Chromosome { get; set; }
         public int Start { get; set; }
         public int End { get; set; }
         public bool OnReverseStrand { get; }
@@ -16,7 +16,7 @@ namespace CacheUtils.DataDumperImport.DataStructures.Mutable
         public int HgncId { get; set; }
         public GeneSymbolSource SymbolSource { get; set; }
 
-        public MutableGene(IChromosome chromosome, int start, int end, bool onReverseStrand, string symbol,
+        public MutableGene(Chromosome chromosome, int start, int end, bool onReverseStrand, string symbol,
             GeneSymbolSource symbolSource, string geneId, int hgncId)
         {
             Chromosome      = chromosome;

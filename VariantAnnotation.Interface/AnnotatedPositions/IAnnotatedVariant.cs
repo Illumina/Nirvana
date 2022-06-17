@@ -14,6 +14,7 @@ namespace VariantAnnotation.Interface.AnnotatedPositions
         IList<ISupplementaryAnnotation>   SaList                    { get; }
         ISupplementaryAnnotation          RepeatExpansionPhenotypes { get; set; }
 		double?                           PhylopScore               { get; set; }
+		double?                           GerpScore               { get; set; }
 		bool                              InLowComplexityRegion     { get; set; }
         StringBuilder                     GetJsonStringBuilder(string originalChromName);
     }	

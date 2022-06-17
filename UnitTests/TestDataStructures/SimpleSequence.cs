@@ -36,18 +36,18 @@ namespace UnitTests.TestDataStructures
             throw new System.NotImplementedException();
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions)
+        public void PreLoad(Chromosome chromosome, List<int> positions)
         {
             throw new System.NotImplementedException();
         }
 
         public ISequence Sequence { get; }
-        public IDictionary<string, IChromosome> RefNameToChromosome { get; }
-        public IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
-        public void LoadChromosome(IChromosome chromosome) { }
+        public Dictionary<string, Chromosome> RefNameToChromosome { get; }
+        public Dictionary<ushort, Chromosome> RefIndexToChromosome { get; }
+        public void LoadChromosome(Chromosome chromosome) { }
 
         public SimpleSequenceProvider(GenomeAssembly assembly, ISequence sequence,
-            IDictionary<string, IChromosome> refNameToChromosome)
+            Dictionary<string, Chromosome> refNameToChromosome)
         {
             Assembly            = assembly;
             Sequence            = sequence;

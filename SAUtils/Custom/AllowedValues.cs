@@ -37,6 +37,8 @@ namespace SAUtils.Custom
 
         public static void ValidateScoreValue(string value, string line)
         {
+            // empty (.) implies unknown score
+            if (IsEmptyValue(value)) return;
             if (double.TryParse(value, out _)) return;
             
             var e = new UserErrorException(

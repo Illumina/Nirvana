@@ -1,9 +1,11 @@
-﻿using Moq;
+﻿using System.Collections.Generic;
+using Moq;
 using OptimizedCore;
 using UnitTests.SAUtils.InputFileParsers;
 using UnitTests.TestUtilities;
 using VariantAnnotation;
 using VariantAnnotation.Interface.AnnotatedPositions;
+using VariantAnnotation.Interface.IO;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 using VariantAnnotation.Pools;
@@ -87,7 +89,7 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             var refMinorProvider = new Mock<IRefMinorProvider>();
             var seqProvider = ParserTestUtils.GetSequenceProvider(13813, "T", 'C', ChromosomeUtilities.RefNameToChromosome);
             var variantFactory = new VariantFactory(seqProvider.Sequence, new VariantId());
-
+            
             var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
 
             IVariant[]          variants          = GetVariants();
@@ -106,6 +108,38 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.Contains("\"fisherStrandBias\":12.123", observedResult);
         }
         
+        [Fact]
+        public void GetJsonString_custom_info()
+        {
+            const string vcfLine = "chr1	13813	.	T	G	.	LowQscore	SOMATIC;QSS=33;TQSS=1;NT=ref;QSS_NT=16;TQSS_NT=1;SGT=TT->GT;DP=266;MQ=23.89;MQ0=59;ALTPOS=69;ALTMAP=37;ReadPosRankSum=1.22;SNVSB=5.92;PNOISE=0.00;PNOISE2=0.00;VQSR=1.93;FS=12.123";
+
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            var seqProvider      = ParserTestUtils.GetSequenceProvider(13813, "T", 'C', ChromosomeUtilities.RefNameToChromosome);
+            var variantFactory   = new VariantFactory(seqProvider.Sequence, new VariantId());
+
+            var customInfoKeys = new HashSet<string>() {"SGT","SOMATIC" };
+
+            var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory, customInfoKeys);
+
+            IVariant[]          variants          = GetVariants();
+            IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
+            var                 annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
+
+            var sb             = annotatedPosition.GetJsonStringBuilder();
+            var observedResult = sb.ToString();
+            StringBuilderPool.Return(sb);
+            AnnotatedPositionPool.Return(annotatedPosition);
+
+            Assert.NotNull(observedResult);
+            Assert.Contains("\"jointSomaticNormalQuality\":16", observedResult);
+            Assert.Contains("\"recalibratedQuality\":1.93",     observedResult);
+            Assert.Contains("\"mappingQuality\":23.89",         observedResult);
+            Assert.Contains("\"fisherStrandBias\":12.123",      observedResult);
+            Assert.Contains("vcfInfo",                         observedResult);
+            Assert.Contains("\"SGT\":\"TT->GT\"",               observedResult);
+            Assert.Contains("\"SOMATIC\":\"true\"",             observedResult);
+        }
+
         [Fact]
         public void GetJsonString_BreakEndEventId()
         {
@@ -130,7 +164,32 @@ namespace UnitTests.VariantAnnotation.AnnotatedPositions
             Assert.NotNull(observedResult);
             Assert.Contains("\"breakendEventId\":\"MantaBND:2312:0:1:0:0:0:0\"", observedResult);
         }
+        
+        [Fact]
+        public void GetJsonString_LogOddsRatio()
+        {
+            const string vcfLine = "1\t38432782\tMantaBND:2312:0:1:0:0:0:0\tG\tG]6:28863899]\t971\tPASS\tSVTYPE=BND;LOD=3.1456;MATEID=MantaBND:2312:0:1:0:0:0:1;EVENT=MantaBND:2312:0:1:0:0:0:0;JUNCTION_QUAL=716;BND_DEPTH=52;MATE_BND_DEPTH=56";
 
+            var refMinorProvider = new Mock<IRefMinorProvider>();
+            var seqProvider      = ParserTestUtils.GetSequenceProvider(38432782, "G", 'C', ChromosomeUtilities.RefNameToChromosome);
+            var variantFactory   = new VariantFactory(seqProvider.Sequence, new VariantId());
+
+            var position = AnnotationUtilities.ParseVcfLine(vcfLine, refMinorProvider.Object, seqProvider, null, variantFactory);
+
+            IVariant[]          variants          = GetVariants();
+            IAnnotatedVariant[] annotatedVariants = Annotator.GetAnnotatedVariants(variants);
+            var                 annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
+
+            var sb             = annotatedPosition.GetJsonStringBuilder();
+            var observedResult = sb.ToString();
+            StringBuilderPool.Return(sb);
+            PositionPool.Return((Position)annotatedPosition.Position);
+            AnnotatedPositionPool.Return(annotatedPosition);
+
+            Assert.NotNull(observedResult);
+            Assert.Contains("\"logOddsRatio\":3.146", observedResult);
+        }
+        
         private static ISample[] GetSamples() => new ISample[] { Sample.EmptySample };
 
         private static IVariant[] GetVariants()

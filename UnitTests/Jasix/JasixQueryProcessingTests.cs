@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using Jasix;
@@ -6,6 +7,7 @@ using Jasix.DataStructures;
 using Xunit;
 using Compression.FileHandling;
 using IO;
+using Newtonsoft.Json.Linq;
 using UnitTests.TestUtilities;
 
 namespace UnitTests.Jasix
@@ -159,6 +161,25 @@ namespace UnitTests.Jasix
             }
         }
 
+        [Fact]
+        public void Query_with_header()
+        {
+            var readStream = new BlockGZipStream(ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz")), CompressionMode.Decompress);
+            var indexStream = ResourceUtilities.GetReadStream(Resources.TopPath("Clinvar20150901.json.gz.jsi"));
+
+            using( var stream = new MemoryStream())
+            using (var writer = new StreamWriter(stream))
+            using (var qp = new QueryProcessor(FileUtilities.GetStreamReader(readStream), indexStream, writer))
+            {
+                qp.ProcessQuery(new[] {"chr1"}, true);
+                writer.Flush();
+                
+                var jsonString = System.Text.Encoding.UTF8.GetString(stream.ToArray(), 0, (int) stream.Length);
+                Assert.NotEmpty(jsonString);
+                var jObject = JObject.Parse(jsonString);
+                Assert.NotNull(jObject);
+            }
+        }
 
         [Fact]
         public void Report_overlapping_small_and_extending_large_variants()

@@ -30,10 +30,10 @@ namespace Cloud.Utilities
             foreach (string tempFile in files) File.Delete(tempFile);
         }
 
-        public static string GetManifestUrl(string version, GenomeAssembly genomeAssembly, string baseUrl = null)
+        public static string GetManifestUrl(string version, GenomeAssembly genomeAssembly, int saSchemaVersion = LambdaUrlHelper.SaSchemaVersion)
         {
             if (string.IsNullOrEmpty(version)) version = "latest";
-            string s3BaseUrl = LambdaUrlHelper.GetBaseUrl(baseUrl);
+            string s3BaseUrl                           = LambdaUrlHelper.GetManifestBaseUrl() +$"/{saSchemaVersion}/";
             switch (version)
             {
                 case "latest":
@@ -47,10 +47,9 @@ namespace Cloud.Utilities
             }
         }
 
-        
-        public static string GetCachePathPrefix(GenomeAssembly genomeAssembly, string baseUrl=null)
+        public static string GetCachePathPrefix(GenomeAssembly genomeAssembly)
         {
-            return LambdaUrlHelper.GetCacheFolder(baseUrl).UrlCombine(genomeAssembly.ToString())
+            return LambdaUrlHelper.GetCacheFolder().UrlCombine(genomeAssembly.ToString())
                 .UrlCombine(LambdaUrlHelper.DefaultCacheSource);
         }
     }

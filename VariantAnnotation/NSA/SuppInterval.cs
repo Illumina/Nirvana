@@ -8,10 +8,10 @@ namespace VariantAnnotation.NSA
     {
         public int Start { get; }
         public int End { get; }
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         private readonly string _jsonString;
 
-        private SuppInterval(IChromosome chromosome, int start, int end, string jsonString)
+        private SuppInterval(Chromosome chromosome, int start, int end, string jsonString)
         {
             Chromosome  = chromosome;
             Start       = start;

@@ -6,7 +6,7 @@ namespace Vcf.VariantCreator
 {
     public static class CnvCreator
     {
-        public static IVariant Create(IChromosome chromosome, int start, int end, string refAllele, string altAllele, string vid)
+        public static IVariant Create(Chromosome chromosome, int start, int end, string refAllele, string altAllele, string vid)
         {
             var variantType = GetVariantType(altAllele);
             return VariantPool.Get(chromosome, start + 1, end, refAllele, altAllele, variantType, vid, false, false, false,

@@ -43,7 +43,7 @@ namespace SingleAnnotationLambda
 
         private static IPosition ToPosition(string[] vcfFields, ISequenceProvider sequenceProvider, IRefMinorProvider refMinorProvider)
         {
-            IChromosome chromosome = ReferenceNameUtilities.GetChromosome(sequenceProvider.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
+            Chromosome chromosome = ReferenceNameUtilities.GetChromosome(sequenceProvider.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
 
             sequenceProvider.LoadChromosome(chromosome);
 

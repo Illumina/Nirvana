@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.IO;
 using Genome;
 using OptimizedCore;
@@ -11,10 +10,10 @@ namespace Nirvana
 {
     public static class PreLoadUtilities
     {
-        public static (ImmutableDictionary<IChromosome, List<int>> PositionsByChromosome, int Count) GetPositions(Stream vcfStream, GenomicRange genomicRange,
+        public static (Dictionary<Chromosome, List<int>> PositionsByChromosome, int Count) GetPositions(Stream vcfStream, GenomicRange genomicRange,
             ISequenceProvider sequenceProvider, IRefMinorProvider refMinorProvider)
         {
-            var positionsByChromosome = new Dictionary<IChromosome, List<int>>();
+            var positionsByChromosome = new Dictionary<Chromosome, List<int>>();
             var rangeChecker          = new GenomicRangeChecker(genomicRange);
             var refNameToChrom        = sequenceProvider.RefNameToChromosome;
 
@@ -22,7 +21,7 @@ namespace Nirvana
             {
                 string      line;
                 string      currentReferenceName = "";
-                IChromosome chromosome           = null;
+                Chromosome chromosome           = null;
                 
                 while ((line = reader.ReadLine()) != null)
                 {
@@ -54,16 +53,16 @@ namespace Nirvana
             
             int count = SortPositionsAndGetCount(positionsByChromosome);
 
-            return (positionsByChromosome.ToImmutableDictionary(), count);
+            return (positionsByChromosome, count);
         }
 
-        private static bool IsRefMinor(IRefMinorProvider refMinorProvider, IChromosome chrom, int position)
+        private static bool IsRefMinor(IRefMinorProvider refMinorProvider, Chromosome chrom, int position)
         {
             if (refMinorProvider == null) return false;
             return !string.IsNullOrEmpty(refMinorProvider.GetGlobalMajorAllele(chrom, position));
         }
 
-        public static void TryAddPosition(Dictionary<IChromosome, List<int>> chromPositions, IChromosome chromosome,
+        public static void TryAddPosition(Dictionary<Chromosome, List<int>> chromPositions, Chromosome chromosome,
             int position, string refAllele, string altAllele, ISequence refSequence)
         {
             if (!chromPositions.ContainsKey(chromosome)) chromPositions.Add(chromosome, new List<int>(16 * 1024));
@@ -78,7 +77,7 @@ namespace Nirvana
             }
         }
 
-        private static int SortPositionsAndGetCount(Dictionary<IChromosome, List<int>> positionsByChromosome)
+        private static int SortPositionsAndGetCount(Dictionary<Chromosome, List<int>> positionsByChromosome)
         {
             var count = 0;
 

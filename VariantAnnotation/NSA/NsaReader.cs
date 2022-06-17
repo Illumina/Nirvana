@@ -69,7 +69,7 @@ namespace VariantAnnotation.NSA
             _annotationReader = new ExtendedBinaryReader(_annotationStream);
         }
 
-        public void PreLoad(IChromosome chrom, List<int> positions)
+        public void PreLoad(Chromosome chrom, List<int> positions)
         {
             if (positions == null || positions.Count == 0) return;
 
@@ -143,7 +143,6 @@ namespace VariantAnnotation.NSA
                 string annotation = _annotationReader.ReadString();
                 annotations.Add((refAllele ?? "", altAllele ?? "", annotation));
             }
-            
         }
 
         public void GetAnnotation(int position, List<(string refAllele, string altAllele, string annotation)> annotations)

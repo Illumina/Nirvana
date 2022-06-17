@@ -32,12 +32,12 @@ namespace ReferenceSequence.Commands
             var genomeAssembly = GenomeAssemblyHelper.Convert(_genomeAssembly);
 
             Console.Write("- reading the genome assembly report... ");
-            var dummyRefNameToChromosome = new Dictionary<string, IChromosome>();
-            List<IChromosome> chromosomes = AssemblyReader.GetChromosomes(FileUtilities.GetReadStream(_genomeAssemblyReportPath), dummyRefNameToChromosome, 0);
+            var dummyRefNameToChromosome = new Dictionary<string, Chromosome>();
+            List<Chromosome> chromosomes = AssemblyReader.GetChromosomes(FileUtilities.GetReadStream(_genomeAssemblyReportPath), dummyRefNameToChromosome, 0);
             int numRefSeqs  = chromosomes.Count;
             Console.WriteLine($"{numRefSeqs} references found.");
 
-            IDictionary<string, IChromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
+            Dictionary<string, Chromosome> refNameToChromosome = ReferenceDictionaryUtils.GetRefNameToChromosome(chromosomes);
 
             Console.Write("- reading FASTA file... ");
             var fastaSequence = GetFastaSequence(_fastaPath, refNameToChromosome);
@@ -52,7 +52,7 @@ namespace ReferenceSequence.Commands
             Console.WriteLine("finished.");
 
             Console.Write("- creating reference sequence file... ");
-            var minimalChromosomes = new List<IChromosome> { fastaSequence.Chromosome };
+            var minimalChromosomes = new List<Chromosome> { fastaSequence.Chromosome };
             CreateReferenceSequenceFile(genomeAssembly, minimalChromosomes, referenceSequence);
             long fileSize = new FileInfo(_outputCompressedPath).Length;
             Console.WriteLine($"{fileSize:N0} bytes");
@@ -60,7 +60,7 @@ namespace ReferenceSequence.Commands
             return ExitCodes.Success;
         }
 
-        private static List<Band> GetCytogeneticBands(ushort refIndex, int numRefSeqs, IDictionary<string, IChromosome> refNameToChromosome)
+        private static List<Band> GetCytogeneticBands(ushort refIndex, int numRefSeqs, Dictionary<string, Chromosome> refNameToChromosome)
         {
             List<Band> chrBands = CytogeneticBandsReader.GetCytogeneticBands(FileUtilities.GetReadStream(_cytogeneticBandPath), numRefSeqs, refNameToChromosome)[refIndex];
 
@@ -71,7 +71,7 @@ namespace ReferenceSequence.Commands
                 .ToList();
         }
 
-        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, IReadOnlyCollection<IChromosome> chromosomes, Creation.ReferenceSequence referenceSequence)
+        private static void CreateReferenceSequenceFile(GenomeAssembly genomeAssembly, IReadOnlyCollection<Chromosome> chromosomes, Creation.ReferenceSequence referenceSequence)
         {
             using (var writer = new ReferenceSequenceWriter(FileUtilities.GetCreateStream(_outputCompressedPath),
                 chromosomes, genomeAssembly, 0))
@@ -87,7 +87,7 @@ namespace ReferenceSequence.Commands
             return new Creation.ReferenceSequence(buffer, maskedEntries, bands, _beginPosition - 1, fastaSequence.Bases.Length);
         }
 
-        private static FastaSequence GetFastaSequence(string fastaPath, IDictionary<string, IChromosome> refNameToChromosome)
+        private static FastaSequence GetFastaSequence(string fastaPath, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var references = new List<FastaSequence>();
             FastaReader.AddReferenceSequences(new GZipStream(FileUtilities.GetReadStream(fastaPath), CompressionMode.Decompress), refNameToChromosome, references);

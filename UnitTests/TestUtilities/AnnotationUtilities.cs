@@ -30,14 +30,15 @@ namespace UnitTests.TestUtilities
             return annotatedPosition;
         }
 
-	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory)
+	    internal static IPosition ParseVcfLine(string vcfLine, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, 
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, HashSet<string> customInfoKeys=null)
 	    {
 	        var simplePosition = GetSimplePosition(vcfLine, sequenceProvider.RefNameToChromosome);
-	        return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory);
+	        return Position.ToPosition(simplePosition, refMinorProvider, sequenceProvider, mitoHeteroplasmyProvider, variantFactory, false, customInfoKeys);
 	    }
 
         internal static SimplePosition GetSimplePosition(string vcfLine,
-            IDictionary<string, IChromosome> refNameToChromosome)
+            Dictionary<string, Chromosome> refNameToChromosome)
         {
             string[] vcfFields = vcfLine.OptimizedSplit('\t');
             var chromosome     = ReferenceNameUtilities.GetChromosome(refNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
@@ -59,7 +60,7 @@ namespace UnitTests.TestUtilities
             var conservationProvider         = ProviderUtilities.GetConservationProvider(annotationFiles);
 
             var annotator = new Annotator(transcriptAnnotationProvider, sequenceProvider, saProvider,
-                conservationProvider, lcrProvider, null, null);
+                conservationProvider, lcrProvider, null, null, null);
             return (annotator,sequenceProvider);
         }
     }

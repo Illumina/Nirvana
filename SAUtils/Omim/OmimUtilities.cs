@@ -13,7 +13,7 @@ namespace SAUtils.Omim
     public static class OmimUtilities
     {
         public static OmimItem.Phenotype GetPhenotype(PhenotypeMap phenotypeMap,
-            IDictionary<int, string> phenotypeDescriptions, SaJsonSchema jsonSchema)
+            Dictionary<int, string> phenotypeDescriptions, SaJsonSchema jsonSchema)
         {
             var phenotypeItem = phenotypeMap.phenotypeMap;
             var mimNumber = phenotypeItem.phenotypeMimNumber;

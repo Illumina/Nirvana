@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using VariantAnnotation.Interface.GeneAnnotation;
-using VariantAnnotation.Interface.Phantom;
 using VariantAnnotation.Interface.Positions;
 using VariantAnnotation.Interface.Providers;
 
@@ -17,7 +16,6 @@ namespace VariantAnnotation.Interface
         IGeneAnnotationProvider GeneAnnotationProvider { get; }
         IMitoHeteroplasmyProvider MitoHeteroplasmyProvider { get; }
         IAnnotator Annotator { get; }
-        IRecomposer Recomposer { get; }
         IVariantIdCreator VidCreator { get; }
         List<IDataSourceVersion> DataSourceVersions { get; }
         string VepDataVersion { get; }

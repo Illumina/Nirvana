@@ -7,7 +7,7 @@ namespace CacheUtils.Genes.DataStructures
 {
     public sealed class UgaGene
     {
-        public readonly IChromosome Chromosome;
+        public readonly Chromosome Chromosome;
         public readonly IInterval GRCh37;
         public readonly IInterval GRCh38;
         public readonly bool OnReverseStrand;
@@ -17,7 +17,7 @@ namespace CacheUtils.Genes.DataStructures
         public string EntrezGeneId { get; }
         public string EnsemblId { get; }
 
-        public UgaGene(IChromosome chromosome, IInterval grch37, IInterval grch38, bool onReverseStrand,
+        public UgaGene(Chromosome chromosome, IInterval grch37, IInterval grch38, bool onReverseStrand,
             string entrezGeneId, string ensemblId, string symbol, int hgncId)
         {
             Chromosome       = chromosome;

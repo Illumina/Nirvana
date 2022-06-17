@@ -92,6 +92,7 @@ namespace NirvanaLambda
 
             var config = new AmazonLambdaConfig
             {
+                ResignRetries = true,
                 Timeout = TimeSpan.FromMilliseconds(_annotationTimeOut)
             };
 

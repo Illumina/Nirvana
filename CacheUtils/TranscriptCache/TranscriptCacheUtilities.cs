@@ -10,7 +10,7 @@ namespace CacheUtils.TranscriptCache
 {
     public static class TranscriptCacheUtilities
     {
-        public static List<ITranscript> GetTranscripts(DataBundle bundle, IChromosomeInterval interval)
+        public static List<ITranscript> GetTranscripts(DataBundle bundle, ChromosomeInterval interval)
         {
             ITranscript[] overlappingTranscripts =
                 bundle.TranscriptCache.TranscriptIntervalForest.GetAllOverlappingValues(interval.Chromosome.Index,

@@ -39,7 +39,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             return stream;
         }
 
-        private IAnnotatedVariant GetAnnotatedVariant(IChromosome chromosome, int start, int end)
+        private IAnnotatedVariant GetAnnotatedVariant(Chromosome chromosome, int start, int end)
         {
             var annoVariant = new Mock<IAnnotatedVariant>();
             annoVariant.SetupGet(x => x.Variant.Chromosome).Returns(chromosome);
@@ -49,7 +49,7 @@ namespace UnitTests.VariantAnnotation.ProviderTests
             return annoVariant.Object;
         }
 
-        private IAnnotatedPosition GetAnnotatedPosition(IChromosome chromosome, int start, int end)
+        private IAnnotatedPosition GetAnnotatedPosition(Chromosome chromosome, int start, int end)
         {
             var annoPosition = new Mock<IAnnotatedPosition>();
             annoPosition.SetupGet(x => x.AnnotatedVariants).Returns(

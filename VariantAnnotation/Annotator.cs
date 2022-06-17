@@ -17,22 +17,30 @@ namespace VariantAnnotation
     public sealed class Annotator : IAnnotator
     {
         private readonly IAnnotationProvider      _saProvider;
+        private readonly IAnnotationProvider      _gsaProvider;
         private readonly IAnnotationProvider      _taProvider;
         private readonly IAnnotationProvider      _lcrProvider;
         private readonly ISequenceProvider        _sequenceProvider;
-        private readonly IAnnotationProvider      _conservationProvider;        
+        private readonly IAnnotationProvider      _conservationProvider;
         private readonly IGeneAnnotationProvider  _geneAnnotationProvider;
         private readonly IRepeatExpansionProvider _repeatExpansionProvider;
         private readonly HashSet<string>          _affectedGenes;
 
-        private bool _annotateMito;
-        public GenomeAssembly Assembly { get; }
+        private bool           _annotateMito;
+        public  GenomeAssembly Assembly { get; }
 
-        public Annotator(IAnnotationProvider taProvider, ISequenceProvider sequenceProvider,
-            IAnnotationProvider saProvider, IAnnotationProvider conservationProvider, IAnnotationProvider lcrProvider,
-            IGeneAnnotationProvider geneAnnotationProvider, IRepeatExpansionProvider repeatExpansionProvider)
+        public Annotator(IAnnotationProvider taProvider,
+            ISequenceProvider sequenceProvider,
+            IAnnotationProvider saProvider,
+            IAnnotationProvider conservationProvider,
+            IAnnotationProvider lcrProvider,
+            IGeneAnnotationProvider geneAnnotationProvider,
+            IRepeatExpansionProvider repeatExpansionProvider,
+            IAnnotationProvider gsaProvider
+        )
         {
             _saProvider              = saProvider;
+            _gsaProvider             = gsaProvider;
             _taProvider              = taProvider;
             _sequenceProvider        = sequenceProvider;
             _conservationProvider    = conservationProvider;
@@ -48,6 +56,7 @@ namespace VariantAnnotation
             var assemblies = new Dictionary<GenomeAssembly, List<string>>();
             AddAssembly(assemblies, _taProvider);
             AddAssembly(assemblies, _saProvider);
+            AddAssembly(assemblies, _gsaProvider);
             AddAssembly(assemblies, _sequenceProvider);
             AddAssembly(assemblies, _conservationProvider);
 
@@ -57,18 +66,19 @@ namespace VariantAnnotation
             return assemblies.First().Key;
         }
 
-        private static void AddAssembly(IDictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
+        private static void AddAssembly(Dictionary<GenomeAssembly, List<string>> assemblies, IProvider provider)
         {
             if (provider == null) return;
             if (assemblies.TryGetValue(provider.Assembly, out List<string> assemblyList)) assemblyList.Add(provider.Name);
-            else assemblies[provider.Assembly] = new List<string> { provider.Name };
+            else assemblies[provider.Assembly] = new List<string> {provider.Name};
         }
 
         private static string GetAssemblyErrorMessage(Dictionary<GenomeAssembly, List<string>> assemblies)
         {
             var sb = StringBuilderPool.Get();
             sb.AppendLine("Not all of the data sources have the same genome assembly:");
-            foreach ((GenomeAssembly genomeAssembly, List<string> dataSources) in assemblies) sb.AppendLine($"- Using {genomeAssembly}: {string.Join(", ", dataSources)}");
+            foreach ((GenomeAssembly genomeAssembly, List<string> dataSources) in assemblies)
+                sb.AppendLine($"- Using {genomeAssembly}: {string.Join(", ", dataSources)}");
             return StringBuilderPool.GetStringAndReturn(sb);
         }
 
@@ -79,10 +89,10 @@ namespace VariantAnnotation
             //var annotatedPosition = new AnnotatedPosition(position, annotatedVariants);
             var annotatedPosition = AnnotatedPositionPool.Get(position, annotatedVariants);
 
-            if (annotatedPosition.AnnotatedVariants == null
+            if (annotatedPosition.AnnotatedVariants           == null
                 || annotatedPosition.AnnotatedVariants.Length == 0
                 || position.Chromosome.UcscName == "chrM" && !_annotateMito
-                ) return annotatedPosition;
+               ) return annotatedPosition;
 
             _sequenceProvider?.Annotate(annotatedPosition);
             _lcrProvider?.Annotate(annotatedPosition);
@@ -90,6 +100,7 @@ namespace VariantAnnotation
             _conservationProvider?.Annotate(annotatedPosition);
             _taProvider.Annotate(annotatedPosition);
             _saProvider?.Annotate(annotatedPosition); // needs to come after _taProvider for gene fusions
+            _gsaProvider?.Annotate(annotatedPosition);
 
             TrackAffectedGenes(annotatedPosition);
             return annotatedPosition;
@@ -131,8 +142,8 @@ namespace VariantAnnotation
         internal static IAnnotatedVariant[] GetAnnotatedVariants(IVariant[] variants)
         {
             if (variants?[0].Behavior == null) return null;
-            int numVariants = variants.Length;
-            var annotatedVariants = new IAnnotatedVariant[numVariants];
+            int numVariants                                            = variants.Length;
+            var annotatedVariants                                      = new IAnnotatedVariant[numVariants];
             for (var i = 0; i < numVariants; i++) annotatedVariants[i] = AnnotatedVariantPool.Get(variants[i]);
             return annotatedVariants;
         }

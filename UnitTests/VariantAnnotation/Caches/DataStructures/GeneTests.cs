@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         {
             const int expectedStart           = int.MaxValue;
             const int expectedEnd             = int.MinValue;
-            IChromosome expectedChromosome    = ChromosomeUtilities.Chr1;
+            Chromosome expectedChromosome    = ChromosomeUtilities.Chr1;
             const bool expectedReverseStrand  = true;
             const string expectedSymbol       = "anavrin";
             const string expectedEntrezGeneId = "7157";

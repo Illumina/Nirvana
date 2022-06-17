@@ -10,7 +10,7 @@ namespace CacheUtils.Genes.IO
 {
     public sealed class HgncReader : IDisposable
     {
-        private readonly IDictionary<string, IChromosome> _refNameToChromosome;
+        private readonly Dictionary<string, Chromosome> _refNameToChromosome;
         private readonly StreamReader _reader;
 
         private const int HgncIdIndex    = 0;
@@ -19,7 +19,7 @@ namespace CacheUtils.Genes.IO
         private const int EntrezIdIndex  = 18;
         private const int EnsemblIdIndex = 19;
 
-        public HgncReader(Stream stream, IDictionary<string, IChromosome> refNameToChromosome)
+        public HgncReader(Stream stream, Dictionary<string, Chromosome> refNameToChromosome)
         {
             _refNameToChromosome = refNameToChromosome;
             _reader = FileUtilities.GetStreamReader(stream);
@@ -41,7 +41,7 @@ namespace CacheUtils.Genes.IO
             {
                 int hgncId             = int.Parse(cols[HgncIdIndex].Substring(5));
                 string symbol          = cols[SymbolIndex];
-                IChromosome chromosome = GetChromosome(cols[LocationIndex]);
+                Chromosome chromosome = GetChromosome(cols[LocationIndex]);
                 string entrezGeneId    = GetId(cols[EntrezIdIndex]);
                 string ensemblId       = GetId(cols[EnsemblIdIndex]);
 
@@ -69,10 +69,10 @@ namespace CacheUtils.Genes.IO
             return list.ToArray();
         }
 
-        private IChromosome GetChromosome(string cytogeneticBand)
+        private Chromosome GetChromosome(string cytogeneticBand)
         {
             int armPos = GetArmPos(cytogeneticBand);
-            if (armPos == -1) return new EmptyChromosome(cytogeneticBand);
+            if (armPos == -1) return Chromosome.GetEmptyChromosome(cytogeneticBand);
 
             string chrName = cytogeneticBand.Substring(0, armPos);
             return ReferenceNameUtilities.GetChromosome(_refNameToChromosome, chrName);

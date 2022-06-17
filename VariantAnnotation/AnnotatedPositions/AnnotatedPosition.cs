@@ -65,8 +65,15 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddDoubleValue("recalibratedQuality",    Position.InfoData?.RecalibratedQuality);
 
             jsonObject.AddStringValue("cytogeneticBand", CytogeneticBand);
+            jsonObject.AddDoubleValue("logOddsRatio", Position.InfoData?.LogOddsRatio, "0.###");
+            
+            //adding object of custom vcf info fields
+            if (Position.InfoData!=null && !Position.InfoData.CustomKeyValues.IsEmpty())
+            {
+                jsonObject.AddObjectValue("vcfInfo", Position.InfoData.CustomKeyValues);
+            }
 
-			if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
+            if (Position.Samples != null && Position.Samples.Length > 0) jsonObject.AddStringValues("samples", Position.Samples.Select(s => s.GetJsonString()), false);
 
             if (SupplementaryIntervals != null && SupplementaryIntervals.Any())
             {

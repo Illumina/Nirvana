@@ -13,7 +13,7 @@ namespace ReferenceSequence.IO
         private readonly Stream _stream;
         private readonly ExtendedBinaryWriter _writer;
 
-        internal ReferenceSequenceWriter(Stream stream, IReadOnlyCollection<IChromosome> chromosomes, GenomeAssembly genomeAssembly, byte patchLevel)
+        internal ReferenceSequenceWriter(Stream stream, IReadOnlyCollection<Chromosome> chromosomes, GenomeAssembly genomeAssembly, byte patchLevel)
         {
             _stream = stream;
             _writer = new ExtendedBinaryWriter(stream);
@@ -22,7 +22,7 @@ namespace ReferenceSequence.IO
 
         public void Dispose() => _writer.Dispose();
 
-        private void WriteHeader(GenomeAssembly genomeAssembly, byte patchLevel, IReadOnlyCollection<IChromosome> chromosomes)
+        private void WriteHeader(GenomeAssembly genomeAssembly, byte patchLevel, IReadOnlyCollection<Chromosome> chromosomes)
         {
             _writer.Write(ReferenceSequenceCommon.HeaderTag);
             _writer.Write(ReferenceSequenceCommon.HeaderVersion);

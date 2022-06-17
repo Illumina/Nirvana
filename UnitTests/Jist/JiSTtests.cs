@@ -23,7 +23,7 @@ namespace UnitTests.Jist
         private const string NirvanaGenes = JsonStitcher.GeneHeaderLine;
         private const string NirvanaFooter = JsonStitcher.FooterLine;
 
-        private static (Stream jsonStream, Stream jasixStream) GetJsonStreams(IChromosome chromosome, bool withGenes)
+        private static (Stream jsonStream, Stream jasixStream) GetJsonStreams(Chromosome chromosome, bool withGenes)
         {
             var jsonStream  = new MemoryStream();
             var jasixStream = new MemoryStream();
@@ -43,7 +43,7 @@ namespace UnitTests.Jist
                     position.SetupGet(x => x.Start).Returns(i);
                     position.SetupGet(x => x.RefAllele).Returns("A");
                     position.SetupGet(x => x.AltAlleles).Returns(new []{"T"});
-                    jsonWriter.WritePosition(position.Object, $"{{\"chromosome\":\"{chromosome.UcscName}\",\"position\":{i}}}");
+                    jsonWriter.WritePosition(position.Object, $"{JsonObject.OpenBrace}\"chromosome\":\"{chromosome.UcscName}\",\"position\":{i}{JsonObject.CloseBrace}");
                 }
 
                 if (withGenes)
@@ -237,10 +237,10 @@ namespace UnitTests.Jist
                 jasixIndex.BeginSection(JasixCommons.PositionsSectionTag, writer.Position);
                 for (int i = 100*chromNumber; i < 123*chromNumber; i++)
                 {
-                    writer.WriteLine($"{{\"chromosome\":\"chr{chromNumber}\",\"position\":{i}}},");
+                    writer.WriteLine($"{JsonObject.OpenBrace}\"chromosome\":\"chr{chromNumber}\",\"position\":{i}{JsonObject.CloseBrace},");
                     if(i%50==0) writer.Flush();//creating another block
                 }
-                writer.WriteLine($"{{\"chromosome\":\"chr{chromNumber}\",\"position\":{100*chromNumber+25}}}");
+                writer.WriteLine($"{JsonObject.OpenBrace}\"chromosome\":\"chr{chromNumber}\",\"position\":{100*chromNumber+25}{JsonObject.CloseBrace}");
                 writer.Flush();
                 jasixIndex.EndSection(JasixCommons.PositionsSectionTag, writer.Position);
                 
@@ -327,10 +327,10 @@ namespace UnitTests.Jist
                 jasixIndex.BeginSection(JasixCommons.PositionsSectionTag, writer.Position);
                 for (int i = 100 *chromNumber; i < 123 *chromNumber; i++)
                 {
-                    writer.WriteLine($"{{\"chromosome\":\"chr{chromNumber}\",\"position\":{i}}},");
+                    writer.WriteLine($"{JsonObject.OpenBrace}\"chromosome\":\"chr{chromNumber}\",\"position\":{i}{JsonObject.CloseBrace},");
                     if(i %50 ==0) writer.Flush();//creating another block
                 }
-                writer.WriteLine($"{{\"chromosome\":\"chr{chromNumber}\",\"position\":{100 *chromNumber +25}}}");
+                writer.WriteLine($"{JsonObject.OpenBrace}\"chromosome\":\"chr{chromNumber}\",\"position\":{100 *chromNumber +25}{JsonObject.CloseBrace}");
                 writer.Flush();
                 jasixIndex.EndSection(JasixCommons.PositionsSectionTag, writer.Position);
                 

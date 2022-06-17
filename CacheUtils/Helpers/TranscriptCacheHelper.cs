@@ -10,7 +10,7 @@ namespace CacheUtils.Helpers
     public static class TranscriptCacheHelper
     {
         public static TranscriptCacheData GetCache(string cachePath,
-            IDictionary<ushort, IChromosome> refIndexToChromosome)
+            Dictionary<ushort, Chromosome> refIndexToChromosome)
         {
             if (!File.Exists(cachePath)) throw new FileNotFoundException($"Could not find {cachePath}");
 

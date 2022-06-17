@@ -6,26 +6,28 @@ namespace SAUtils.DataStructures
 {
     public sealed class AlleleFrequencyItem:ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
 
         public readonly double AltFrequency;
 
-        public AlleleFrequencyItem(IChromosome chromosome, int position, string refAllele, string altAllele, double altFrequency)
+        public AlleleFrequencyItem(Chromosome chromosome, int position, string refAllele, string altAllele, double altFrequency, string inputLine)
         {
-            Chromosome      = chromosome;
-            Position        = position;
-            AltFrequency    = altFrequency;
-            RefAllele = refAllele;
-            AltAllele = altAllele;
+            Chromosome   = chromosome;
+            Position     = position;
+            AltFrequency = altFrequency;
+            RefAllele    = refAllele;
+            AltAllele    = altAllele;
+            InputLine    = inputLine;
         }
 
         public string GetJsonString()
         {
             throw new NotImplementedException();
         }
-        
+
+        public string InputLine { get; }
     }
 }

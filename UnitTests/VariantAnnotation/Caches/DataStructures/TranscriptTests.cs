@@ -17,7 +17,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
         [Fact]
         public void Transcript_EndToEnd()
         {
-            IChromosome expectedChromosome      = ChromosomeUtilities.Chr1;
+            Chromosome expectedChromosome      = ChromosomeUtilities.Chr1;
             const int expectedStart             = int.MaxValue;
             const int expectedEnd               = int.MinValue;
             const string expectedId             = "ENST00000540021";
@@ -57,7 +57,7 @@ namespace UnitTests.VariantAnnotation.Caches.DataStructures
             var microRnaIndices         = CreateIndices(expectedMicroRnas);
             var peptideIndices          = CreateIndices(peptideSeqs);
 
-            var indexToChromosome = new Dictionary<ushort, IChromosome>
+            var indexToChromosome = new Dictionary<ushort, Chromosome>
             {
                 [expectedChromosome.Index] = expectedChromosome
             };

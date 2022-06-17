@@ -8,7 +8,7 @@ namespace Tabix
     public static class BgzfBlockVcfReader
     {
         public static bool FindVariantsInBlocks(Stream stream, long beginOffset, long endOffset, BgzfBlock block,
-            IChromosome chromosome, int start, int end)
+            Chromosome chromosome, int start, int end)
         {
             stream.Position = beginOffset;
 
@@ -21,7 +21,7 @@ namespace Tabix
             return false;
         }
 
-        internal static bool HasVcfPositionsOnInterval(string s, IChromosome chromosome, int start, int end)
+        internal static bool HasVcfPositionsOnInterval(string s, Chromosome chromosome, int start, int end)
         {
             string[] rawLines = s.OptimizedSplit('\n');
 

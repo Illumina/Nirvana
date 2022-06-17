@@ -19,7 +19,7 @@ namespace CacheUtils.Genes.DataStores
             EnsemblIdToSymbol = ensemblIdToSymbol;
         }
 
-        public static EnsemblGtf Create(string filePath, IDictionary<string, IChromosome> refNameToChromosome)
+        public static EnsemblGtf Create(string filePath, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var ensemblGenes      = LoadEnsemblGenes(GZipUtilities.GetAppropriateStreamReader(filePath), refNameToChromosome);
             var ensemblIdToGene   = ensemblGenes.GetSingleValueDict(x => x.GeneId);
@@ -28,7 +28,7 @@ namespace CacheUtils.Genes.DataStores
         }
 
         private static EnsemblGene[] LoadEnsemblGenes(StreamReader streamReader,
-            IDictionary<string, IChromosome> refNameToChromosome)
+            Dictionary<string, Chromosome> refNameToChromosome)
         {
             EnsemblGene[] genes;
             using (var reader = new EnsemblGtfReader(streamReader, refNameToChromosome)) genes = reader.GetGenes();

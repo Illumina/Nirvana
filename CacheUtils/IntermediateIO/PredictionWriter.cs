@@ -17,7 +17,7 @@ namespace CacheUtils.IntermediateIO
             header.Write(_writer, fileType);
         }
 
-        internal void Write(IChromosome chromosome, Dictionary<string, List<int>> predictionDict)
+        internal void Write(Chromosome chromosome, Dictionary<string, List<int>> predictionDict)
         {
             _writer.WriteLine($"{chromosome.UcscName}\t{chromosome.Index}\t{predictionDict.Count}");
             foreach (var kvp in predictionDict) WritePrediction(kvp.Value, kvp.Key);

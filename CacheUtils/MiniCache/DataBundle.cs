@@ -21,7 +21,7 @@ namespace CacheUtils.MiniCache
         public readonly PredictionCacheReader SiftReader;
         public readonly PredictionCacheReader PolyPhenReader;
 
-        private IChromosome _currentChromosome = new EmptyChromosome(string.Empty);
+        private Chromosome _currentChromosome = Chromosome.GetEmptyChromosome(string.Empty);
 
         public Prediction[] SiftPredictions;
         public Prediction[] PolyPhenPredictions;
@@ -39,7 +39,7 @@ namespace CacheUtils.MiniCache
             PolyPhenReader      = polyPhenReader;
         }
 
-        public void Load(IChromosome chromosome)
+        public void Load(Chromosome chromosome)
         {
             if (_currentChromosome.Index == chromosome.Index) return;
             SequenceReader.GetCompressedSequence(chromosome);

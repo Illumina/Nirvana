@@ -71,7 +71,7 @@ namespace VariantAnnotation.Providers
         }
 
         private static (TranscriptCache Cache, IntervalArray<ITranscript>[] TranscriptIntervalArrays, ushort VepVersion) InitiateCache(Stream stream,
-            IDictionary<ushort, IChromosome> refIndexToChromosome, GenomeAssembly refAssembly)
+            Dictionary<ushort, Chromosome> refIndexToChromosome, GenomeAssembly refAssembly)
         {
             using var reader     = new TranscriptCacheReader(stream);
             ushort    vepVersion = reader.Header.Custom.VepVersion;
@@ -164,7 +164,7 @@ namespace VariantAnnotation.Providers
             annotatedTranscript.ConservationScores = scores;
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions) => throw new NotImplementedException();
+        public void PreLoad(Chromosome chromosome, List<int> positions) => throw new NotImplementedException();
 
         private void LoadPredictionCaches(ushort refIndex)
         {

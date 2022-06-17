@@ -251,14 +251,14 @@ namespace VariantAnnotation.Providers
                 }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions)
+        public void PreLoad(Chromosome chromosome, List<int> positions)
         {
             Task[] preloadTasks = _nsaReaders.Select(x => DoPreload(x, chromosome, positions)).ToArray();
             Task.WaitAll(preloadTasks);
             foreach (Task preloadTask in preloadTasks) preloadTask.Dispose();
         }
 
-        private static Task DoPreload(INsaReader nsaReader, IChromosome chromosome, List<int> positions) =>
+        private static Task DoPreload(INsaReader nsaReader, Chromosome chromosome, List<int> positions) =>
             Task.Run(() => { nsaReader.PreLoad(chromosome, positions); });
 
         public void Dispose()

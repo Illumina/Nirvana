@@ -11,6 +11,6 @@ namespace VariantAnnotation.Interface.SA
         bool               IsPositional  { get; }
 
         void GetAnnotation(int position, List<(string refAllele, string altAllele, string annotation)> annotations);
-        void PreLoad(IChromosome chrom, List<int> positions);
+        void PreLoad(Chromosome chrom, List<int> positions);
     }
 }

@@ -70,7 +70,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// <summary>
         /// parses the relevant data from each transcript
         /// </summary>
-        public static MutableTranscript Parse(ObjectValueNode objectValue, IChromosome chromosome, Source source)
+        public static MutableTranscript Parse(ObjectValueNode objectValue, Chromosome chromosome, Source source)
         {
             // IDs
             string transcriptId    = null;

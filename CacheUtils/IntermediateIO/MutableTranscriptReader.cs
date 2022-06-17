@@ -16,13 +16,13 @@ namespace CacheUtils.IntermediateIO
 {
     internal sealed class MutableTranscriptReader : IDisposable
     {
-        private readonly IDictionary<ushort, IChromosome> _refIndexToChromosome;
+        private readonly Dictionary<ushort, Chromosome> _refIndexToChromosome;
         private readonly StreamReader _reader;
         public readonly IntermediateIoHeader Header;
 
         private readonly ISequence _sequence = new NSequence();
 
-        internal MutableTranscriptReader(Stream stream, IDictionary<ushort, IChromosome> refIndexToChromosome)
+        internal MutableTranscriptReader(Stream stream, Dictionary<ushort, Chromosome> refIndexToChromosome)
         {
             _refIndexToChromosome = refIndexToChromosome;
             _reader = FileUtilities.GetStreamReader(stream);
@@ -166,7 +166,7 @@ namespace CacheUtils.IntermediateIO
             return intervals;
         }
 
-        private MutableExon[] ReadExons(IChromosome chromosome)
+        private MutableExon[] ReadExons(Chromosome chromosome)
         {
             var cols = GetColumns("Exons");
 
@@ -206,7 +206,7 @@ namespace CacheUtils.IntermediateIO
             return (id, version, codingRegion, peptideSeq);
         }
 
-        private MutableGene ReadGene(IChromosome chromosome)
+        private MutableGene ReadGene(Chromosome chromosome)
         {
             var cols = GetColumns("Gene");
 
@@ -221,7 +221,7 @@ namespace CacheUtils.IntermediateIO
             return new MutableGene(chromosome, start, end, onReverseStrand, symbol, symbolSource, id, hgncId);
         }
 
-        private (string Id, byte Version, IChromosome Chromosome, int Start, int End, BioType BioType, bool IsCanonical,
+        private (string Id, byte Version, Chromosome Chromosome, int Start, int End, BioType BioType, bool IsCanonical,
             int TotalExonLength, string CcdsId, string RefSeqId, Source Source, bool CdsStartNotFound, bool
             CdsEndNotFound, string TranslateableSequence, int StartExonPhase, string BamEditStatus) ReadTranscriptInfo(
                 string line)

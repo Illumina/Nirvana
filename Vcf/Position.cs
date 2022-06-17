@@ -13,7 +13,7 @@ namespace Vcf
 {
     public sealed class Position : IPosition
     {
-        public IChromosome    Chromosome           { get; private set;}
+        public Chromosome    Chromosome           { get; private set;}
         public int            Start                { get; private set;}
         public int            End                  { get; private set;}        
         public string         RefAllele            { get; private set;}
@@ -31,7 +31,7 @@ namespace Vcf
         public string[]       Vids                 { get; private set;}
         public List<string>[] LinkedVids           { get; private set;}
         
-        public void Initialize(IChromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
+        public void Initialize(Chromosome chromosome, int start, int end, string refAllele, string[] altAlleles,
             double? quality, string[] filters, IVariant[] variants, ISample[] samples, IInfoData infoData,
             string[] vcfFields, bool[] isDecomposed, bool isRecomposed)
         {
@@ -47,7 +47,6 @@ namespace Vcf
             InfoData     = infoData;
             VcfFields    = vcfFields;
             IsDecomposed = isDecomposed;
-            IsRecomposed = isRecomposed;
 
             (HasStructuralVariant, HasShortTandemRepeat) = CheckVariants(variants);
             Vids                                         = null;
@@ -71,7 +70,9 @@ namespace Vcf
             return (hasStructuralVariant, hasShortTandemRepeat);
         }
 
-        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, bool enableDq = false)
+        public static IPosition ToPosition(ISimplePosition simplePosition, IRefMinorProvider refMinorProvider, ISequenceProvider sequenceProvider, 
+            IMitoHeteroplasmyProvider mitoHeteroplasmyProvider, VariantFactory variantFactory, bool enableDq = false, 
+            HashSet<string> customInfoKeys=null)
         {
             if (simplePosition == null) return null;
 
@@ -89,7 +90,7 @@ namespace Vcf
             
             if (isReference && !isRefMinor) return GetReferencePosition(simplePosition);
 
-            var       infoData              = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex]);
+            var       infoData              = VcfInfoParser.Parse(vcfFields[VcfCommon.InfoIndex],customInfoKeys);
             int       end                   = ExtractEnd(infoData, simplePosition.Start, simplePosition.RefAllele.Length);
             double?   quality               = vcfFields[VcfCommon.QualIndex].GetNullableValue<double>(double.TryParse);
             string[]  filters               = vcfFields[VcfCommon.FilterIndex].OptimizedSplit(';');
@@ -98,7 +99,8 @@ namespace Vcf
                 simplePosition.RefAllele, altAlleles, infoData, simplePosition.IsDecomposed,
                 simplePosition.IsRecomposed, simplePosition.LinkedVids, globalMajorAllele);
 
-            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, variants, mitoHeteroplasmyProvider, enableDq);
+            ISample[] samples = vcfFields.ToSamples(variantFactory.FormatIndices, simplePosition, variants, mitoHeteroplasmyProvider, 
+                enableDq);
 
             return PositionPool.Get(simplePosition.Chromosome, simplePosition.Start, end, simplePosition.RefAllele,
                 altAlleles, quality, filters, variants, samples, infoData, vcfFields, simplePosition.IsDecomposed,

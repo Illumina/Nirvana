@@ -4,6 +4,7 @@ using System.IO;
 using Genome;
 using OptimizedCore;
 using SAUtils.DataStructures;
+using SAUtils.ParseUtils;
 
 namespace SAUtils.InputFileParsers.DGV
 {
@@ -12,12 +13,12 @@ namespace SAUtils.InputFileParsers.DGV
         #region members
 
         private readonly StreamReader _reader;
-        private readonly IDictionary<string, IChromosome> _refChromDict;
+        private readonly Dictionary<string, Chromosome> _refChromDict;
 
         #endregion
 
         // constructor
-        public DgvReader(StreamReader reader, IDictionary<string, IChromosome> refChromDict)
+        public DgvReader(StreamReader reader, Dictionary<string, Chromosome> refChromDict)
         {
             _reader = reader;
             _refChromDict = refChromDict;
@@ -26,7 +27,7 @@ namespace SAUtils.InputFileParsers.DGV
         /// <summary>
         /// returns a ClinVar object given the vcf line
         /// </summary>
-        public static DgvItem ExtractDgvItem(string line, IDictionary<string, IChromosome> refChromDict)
+        public static DgvItem ExtractDgvItem(string line, Dictionary<string, Chromosome> refChromDict)
         {
             var cols = line.OptimizedSplit('\t');
             if (cols.Length < 8) return null;

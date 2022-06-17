@@ -7,7 +7,7 @@ namespace CacheUtils.Commands.GFF
 {
     public static class InternalGenes
     {
-        public static IDictionary<IGene, int> CreateDictionary(IGene[] genes)
+        public static Dictionary<IGene, int> CreateDictionary(IGene[] genes)
         {
             var geneComparer     = new GeneComparer();
             var geneToInternalId = new Dictionary<IGene, int>(geneComparer);

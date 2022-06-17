@@ -11,8 +11,8 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ReferenceSequenceProvider : ISequenceProvider
     {
-        public IDictionary<string, IChromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
-        public IDictionary<ushort, IChromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
+        public Dictionary<string, Chromosome> RefNameToChromosome  => _sequenceReader.RefNameToChromosome;
+        public Dictionary<ushort, Chromosome> RefIndexToChromosome => _sequenceReader.RefIndexToChromosome;
         public GenomeAssembly                   Assembly             => _sequenceReader.Assembly;
         public string                           Name                 => "Reference sequence provider";
         public IEnumerable<IDataSourceVersion>  DataSourceVersions   => null;
@@ -45,12 +45,12 @@ namespace VariantAnnotation.Providers
             }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions)
+        public void PreLoad(Chromosome chromosome, List<int> positions)
         {
             throw new System.NotImplementedException();
         }
 
-        public void LoadChromosome(IChromosome chromosome)
+        public void LoadChromosome(Chromosome chromosome)
         {
             if (chromosome.Index == _currentChromosomeIndex) return;
             _sequenceReader.GetCompressedSequence(chromosome);

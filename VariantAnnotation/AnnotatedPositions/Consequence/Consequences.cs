@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using Variants;
 
@@ -15,7 +14,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
         private readonly IVariantEffect _variantEffect;
         private readonly IFeatureVariantEffects _featureEffect;
 
-        private readonly ImmutableArray<(Func<bool>, ConsequenceTag)> _tier3Consequences;
+        private readonly (Func<bool>, ConsequenceTag)[] _tier3Consequences;
 
         private static readonly HashSet<ConsequenceTag> ConsequencesThatNeedTranscriptVariant = new HashSet<ConsequenceTag>
         {
@@ -60,7 +59,7 @@ namespace VariantAnnotation.AnnotatedPositions.Consequence
                 (() => _variantEffect.IsNonCodingTranscriptVariant(),             ConsequenceTag.non_coding_transcript_variant),
                 (() => _featureEffect.Elongation(),                               ConsequenceTag.feature_elongation),
                 (() => _featureEffect.Truncation(),                               ConsequenceTag.feature_truncation)
-            }.ToImmutableArray();
+            }.ToArray();
         }
 
         public static List<ConsequenceTag> DetermineFlankingVariantEffects(bool isDownstreamVariant) => new List<ConsequenceTag>(1)

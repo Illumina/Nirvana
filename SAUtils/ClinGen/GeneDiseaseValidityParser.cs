@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using OptimizedCore;
 using VariantAnnotation.Interface.SA;
+using VariantAnnotation.IO;
+using Newtonsoft.Json.Linq;
 
 namespace SAUtils.ClinGen
 {
@@ -20,7 +22,8 @@ namespace SAUtils.ClinGen
             "moderate",
             "definitive",
             "strong",
-            "refuted"
+            "refuted",
+            "no known disease relationship"
         };
 
         public GeneDiseaseValidityParser(Stream stream, Dictionary<int, string> hgncIdToSymbols)
@@ -74,7 +77,9 @@ namespace SAUtils.ClinGen
 
             Console.WriteLine($"Number of geneIds missing from the cache:{_unknownIds.Count} ({100.0*_unknownIds.Count/_hgncIdToSymbols.Count}%)");
             
-            return GetLatestAnnotations(geneAnnotations);
+            var items = GetLatestAnnotations(geneAnnotations);
+            ReportStatistics(items);
+            return items;
         }
 
         private static Dictionary<string, List<ISuppGeneItem>> GetLatestAnnotations(Dictionary<string, Dictionary<string, GeneDiseaseValidityItem>> annotationByDiseaseIds)
@@ -128,6 +133,20 @@ namespace SAUtils.ClinGen
             return new GeneDiseaseValidityItem(geneSymbol, diseaseId, disease, classification, classificationDate);
         }
 
+        private void ReportStatistics(Dictionary<string, List<ISuppGeneItem>> items)
+        {
+            var sb = StringBuilderPool.Get();
+            var jo = new JsonObject(sb);
+            sb.Append(JsonObject.OpenBrace);
+
+            jo.AddIntValue("geneIdsCount", items.Count);
+            jo.AddIntValue("unknownGeneIdsCount", _unknownIds.Count);
+            sb.Append(JsonObject.CloseBrace);
+
+            Console.WriteLine(JObject.Parse(StringBuilderPool.GetStringAndReturn(sb))); 
+        }
+
+        
         private int _geneIdIndex = -1;
         private int _diseaseIdIndex = -1;
         private int _diseaseIndex = -1;

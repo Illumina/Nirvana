@@ -14,16 +14,17 @@ namespace Vcf.VariantCreator
     public sealed class VariantFactory
     {
         private readonly IVariantIdCreator _vidCreator;
-        private readonly ISequence _sequence;
-        public readonly FormatIndices FormatIndices = new FormatIndices();
+        private readonly ISequence         _sequence;
+        public readonly  FormatIndices     FormatIndices;
 
-        public VariantFactory(ISequence sequence, IVariantIdCreator vidCreator)
+        public VariantFactory(ISequence sequence, IVariantIdCreator vidCreator, HashSet<string> customSampleInfoKeys=null)
         {
-            _sequence   = sequence;
-            _vidCreator = vidCreator;
+            _sequence     = sequence;
+            _vidCreator   = vidCreator;
+            FormatIndices = new FormatIndices(customSampleInfoKeys);
         }
 
-        public IVariant[] CreateVariants(IChromosome chromosome, int start, int end, string refAllele,
+        public IVariant[] CreateVariants(Chromosome chromosome, int start, int end, string refAllele,
             string[] altAlleles, IInfoData infoData, bool[] isDecomposedByAllele, bool isRecomposed, List<string>[] linkedVids, string globalMajorAllele)
         {
             bool isReference = globalMajorAllele != null;
@@ -74,7 +75,7 @@ namespace Vcf.VariantCreator
         private static bool IsSymbolicAllele(string altAllele) =>
             altAllele.OptimizedStartsWith('<') && altAllele.OptimizedEndsWith('>') && !VcfCommon.IsNonInformativeAltAllele(altAllele);
 
-        private IVariant GetVariant(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        private IVariant GetVariant(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             IInfoData infoData, VariantCategory category, bool isDecomposed, bool isRecomposed, string[] linkedVids)
         {
             string vid = _vidCreator.Create(_sequence, category, infoData.SvType, chromosome, start, end, refAllele, altAllele, infoData.RepeatUnit);

@@ -42,7 +42,7 @@ namespace CacheUtils.Genes
         }
 
         private static void AddGenes(Dictionary<ushort, List<MutableGene>> source,
-            IDictionary<ushort, List<MutableGene>> target)
+            Dictionary<ushort, List<MutableGene>> target)
         {
             foreach (var kvp in source)
             {

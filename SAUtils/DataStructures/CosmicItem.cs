@@ -10,10 +10,11 @@ namespace SAUtils.DataStructures
 {
     public sealed class CosmicItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
-        public int Position { get; set; }
-        public string RefAllele { get; set; }
-        public string AltAllele { get; set; }
+        public Chromosome Chromosome { get; }
+        public int         Position   { get; set; }
+        public string      RefAllele  { get; set; }
+        public string      AltAllele  { get; set; }
+        public string      InputLine  { get; }
 
         private string Id { get; }
         private string Gene { get; }
@@ -21,7 +22,7 @@ namespace SAUtils.DataStructures
         public HashSet<CosmicTumor> Tumors { get; }
 
         public CosmicItem(
-            IChromosome chromosome,
+            Chromosome chromosome,
             int position,
             string id,
             string refAllele,
@@ -113,7 +114,7 @@ namespace SAUtils.DataStructures
             return StringBuilderPool.GetStringAndReturn(sb);
         }
 
-        internal IDictionary<string,int> GetTissueCounts()
+        internal Dictionary<string,int> GetTissueCounts()
         {
             if (Tumors == null) return null;
             var tissueCounts = new Dictionary<string, int>();
@@ -131,7 +132,7 @@ namespace SAUtils.DataStructures
             return tissueCounts; 
         }
 
-        internal IDictionary<string,int> GetCancerTypeCounts()
+        internal Dictionary<string,int> GetCancerTypeCounts()
         {
             if (Tumors == null) return null;
             var histologyCounts = new Dictionary<string, int>();
@@ -167,7 +168,7 @@ namespace SAUtils.DataStructures
             return tierCounts; 
         }
 
-        private static string GetJsonStringFromDict(string dataType, IDictionary<string, int> dictionary)
+        private static string GetJsonStringFromDict(string dataType, Dictionary<string, int> dictionary)
         {
             if (dictionary == null) return null;
 

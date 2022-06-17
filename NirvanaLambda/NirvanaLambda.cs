@@ -102,7 +102,7 @@ namespace NirvanaLambda
             using var                        taProvider               = new TranscriptAnnotationProvider(cachePathPrefix, sequenceProvider, null);
             IntervalArray<ITranscript>[]     transcriptIntervalArrays = taProvider.TranscriptIntervalArrays;
             IntervalForest<IGene>            geneIntervalForest       = GeneForestGenerator.GetGeneForest(transcriptIntervalArrays);
-            IDictionary<string, IChromosome> refNameToChromosome      = sequenceProvider.RefNameToChromosome;
+            Dictionary<string, Chromosome> refNameToChromosome      = sequenceProvider.RefNameToChromosome;
 
             return PartitionUtilities.GenerateAnnotationRanges(blockOffsets, config.vcfUrl, geneIntervalForest, refNameToChromosome);
         }
@@ -221,17 +221,19 @@ namespace NirvanaLambda
             return ar.End == null ? ret : $"{ret}{ar.End?.Chromosome}:{ar.End?.Position}";
         }
 
-        private static AnnotationConfig GetAnnotationConfig(NirvanaConfig config, AnnotationRange annotationRange, int jobIndex) => new AnnotationConfig
+        private static AnnotationConfig GetAnnotationConfig(NirvanaConfig config, AnnotationRange annotationRange, int jobIndex) => new()
         {
-            id                       = config.id + $"_job{jobIndex}",
-            genomeAssembly           = config.genomeAssembly,
-            vcfUrl                   = config.vcfUrl,
-            tabixUrl                 = config.tabixUrl,
-            outputDir                = config.outputDir,
-            outputPrefix             = GetIndexedPrefix(config.vcfUrl, jobIndex),
-            customAnnotations        = config.customAnnotations,
-            customStrUrl             = config.customStrUrl,
-            annotationRange          = annotationRange
+            id                = config.id + $"_job{jobIndex}",
+            genomeAssembly    = config.genomeAssembly,
+            vcfUrl            = config.vcfUrl,
+            tabixUrl          = config.tabixUrl,
+            outputDir         = config.outputDir,
+            outputPrefix      = GetIndexedPrefix(config.vcfUrl, jobIndex),
+            customAnnotations = config.customAnnotations,
+            desiredVcfInfo    = config.desiredVcfInfo,
+            desiredVcfSampleInfo     = config.desiredVcfSampleInfo,
+            customStrUrl      = config.customStrUrl,
+            annotationRange   = annotationRange
         };
 
         internal static string GetIndexedPrefix(string inputVcfPath, int jobIndex) =>

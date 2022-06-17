@@ -6,8 +6,8 @@ namespace VariantAnnotation.Interface.Providers
     public interface ISequenceProvider : IAnnotationProvider
     {
         ISequence Sequence { get; }
-        IDictionary<string, IChromosome> RefNameToChromosome { get; }
-        IDictionary<ushort, IChromosome> RefIndexToChromosome { get; }
-        void LoadChromosome(IChromosome chromosome);
+        Dictionary<string, Chromosome> RefNameToChromosome { get; }
+        Dictionary<ushort, Chromosome> RefIndexToChromosome { get; }
+        void LoadChromosome(Chromosome chromosome);
     }
 }

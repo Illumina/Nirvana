@@ -10,13 +10,13 @@ namespace Vcf.Info
         private static readonly InfoDataBuilder            Builder         = new();
         private static readonly Dictionary<string, string> EmptyDictionary = new();
 
-        public static IInfoData Parse(string infoField)
+        public static IInfoData Parse(string infoField, HashSet<string> customInfoKeys=null)
         {
             if (string.IsNullOrEmpty(infoField)) return null;
-
+            
             Dictionary<string, string> infoKeyValue = ExtractInfoFields(infoField);
             Builder.Reset();
-
+            
             foreach ((string key, string value) in infoKeyValue)
             {
                 // ReSharper disable once SwitchStatementMissingSomeCases
@@ -73,6 +73,14 @@ namespace Vcf.Info
                     case "INV5":
                         Builder.IsInv5 = true;
                         break;
+                    case "LOD":
+                        Builder.LogOddsRatio = Convert.ToDouble(value);
+                        break;
+                }
+
+                if (customInfoKeys != null && customInfoKeys.Contains(key))
+                {
+                    Builder.CustomFields.Add(key, value);
                 }
             }
 

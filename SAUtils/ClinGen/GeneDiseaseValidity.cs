@@ -5,6 +5,7 @@ using CommandLine.Builders;
 using CommandLine.NDesk.Options;
 using Compression.Utilities;
 using ErrorHandling;
+using ErrorHandling.Exceptions;
 using IO;
 using OptimizedCore;
 using SAUtils.InputFileParsers;
@@ -57,14 +58,20 @@ namespace SAUtils.ClinGen
 
         private static ExitCodes ProgramExecution()
         {
-            var dosageSensitivityVersion = DataSourceVersionReader.GetSourceVersion(_diseaseValidityFile + ".version");
+            var versionFileNames = Directory.GetFiles(".","*.version");
+            if (versionFileNames.Length != 1)
+            {
+                throw new UserErrorException($"Multiple version files found in directory: {Directory.GetCurrentDirectory()}");
+            }
 
-            string outFileName = $"{dosageSensitivityVersion.Name.Replace(' ', '_')}_{dosageSensitivityVersion.Version}";
+            var sourceVersion = DataSourceVersionReader.GetSourceVersion(versionFileNames[0]);
+
+            string outFileName = $"{sourceVersion.Name.Replace(' ', '_')}_{sourceVersion.Version}";
 
             // read uga file to get hgnc id to gene symbols dictionary
             using (var diseaseValidityParser = new GeneDiseaseValidityParser(GZipUtilities.GetAppropriateReadStream(_diseaseValidityFile), GetHgncIdToGeneSymbols()))
             using (var stream = FileUtilities.GetCreateStream(Path.Combine(_outputDirectory, outFileName + SaCommon.GeneFileSuffix)))
-            using (var ngaWriter = new NgaWriter(stream, dosageSensitivityVersion, SaCommon.DiseaseValidityTag, SaCommon.SchemaVersion, true))
+            using (var ngaWriter = new NgaWriter(stream, sourceVersion, SaCommon.DiseaseValidityTag, SaCommon.SchemaVersion, true))
             {
                 ngaWriter.Write(diseaseValidityParser.GetItems());
             }

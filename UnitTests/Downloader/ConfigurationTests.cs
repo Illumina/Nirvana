@@ -1,4 +1,5 @@
 ﻿using Downloader;
+using VariantAnnotation.SA;
 using Xunit;
 
 namespace UnitTests.Downloader
@@ -28,9 +29,10 @@ namespace UnitTests.Downloader
         [Fact]
         public void Load_OverrideManifest()
         {
+            var config = new global::Cloud.Configuration();
             (string _, string _, string _, string manifestGRCh37, string manifestGRCh38) = Configuration.Load(null, "Schema23");
-            Assert.Equal("Schema23_GRCh37.txt", manifestGRCh37);
-            Assert.Equal("Schema23_GRCh38.txt", manifestGRCh38);
+            Assert.Equal($"http://annotations.nirvana.illumina.com/{config.ManifestDirectory}/{SaCommon.SchemaVersion}/Schema23_SA_GRCh37.txt", manifestGRCh37);
+            Assert.Equal($"http://annotations.nirvana.illumina.com/{config.ManifestDirectory}/{SaCommon.SchemaVersion}/Schema23_SA_GRCh38.txt", manifestGRCh38);
         }
     }
 }

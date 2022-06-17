@@ -11,17 +11,24 @@ namespace VariantAnnotation.Providers
 {
     public sealed class ConservationScoreProvider : IAnnotationProvider
     {
-        private readonly NpdReader _phylopReader;
+        private NpdReader _phylopReader;
 
-        public string Name { get; }
-        public GenomeAssembly Assembly => _phylopReader.Assembly;
-        public IEnumerable<IDataSourceVersion> DataSourceVersions { get; }
+        public           string                          Name               { get; }
+        public           GenomeAssembly                  Assembly           => _phylopReader.Assembly;
+        public           IEnumerable<IDataSourceVersion> DataSourceVersions => _versions;
+        private readonly List<IDataSourceVersion>        _versions = new();
 
-        public ConservationScoreProvider(Stream dbStream, Stream indexStream)
+        public ConservationScoreProvider()
         {
-            _phylopReader = new NpdReader(dbStream, indexStream);
             Name = "Conservation score provider";
-            DataSourceVersions = new[] { _phylopReader.Version };
+        }
+
+        public ConservationScoreProvider AddPhylopReader(Stream dbStream, Stream indexStream)
+        {
+            if (dbStream == null || indexStream == null) return this;
+            _phylopReader = new NpdReader(dbStream, indexStream);
+            _versions.Add(_phylopReader.Version);
+            return this;
         }
 
         public void Annotate(IAnnotatedPosition annotatedPosition)
@@ -29,11 +36,12 @@ namespace VariantAnnotation.Providers
             foreach (var annotatedVariant in annotatedPosition.AnnotatedVariants)
             {
                 if (annotatedVariant.Variant.Type != VariantType.SNV) continue;
-                annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome, annotatedVariant.Variant.Start);
+                if (_phylopReader != null)
+                    annotatedVariant.PhylopScore = _phylopReader.GetAnnotation(annotatedPosition.Position.Chromosome, annotatedVariant.Variant.Start);
             }
         }
 
-        public void PreLoad(IChromosome chromosome, List<int> positions)
+        public void PreLoad(Chromosome chromosome, List<int> positions)
         {
             throw new NotImplementedException();
         }

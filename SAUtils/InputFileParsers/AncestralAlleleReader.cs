@@ -14,7 +14,7 @@ namespace SAUtils.InputFileParsers
     public sealed class AncestralAlleleReader:IDisposable
     {
         private readonly StreamReader _streamReader;
-        private readonly IDictionary<string, IChromosome> _refNameDictionary;
+        private readonly Dictionary<string, Chromosome> _refNameDictionary;
         private readonly ISequenceProvider _sequenceProvider;
 
         private string _ancestralAllele;
@@ -81,7 +81,7 @@ namespace SAUtils.InputFileParsers
             {
                 var (shiftedPos, shiftedRef, shiftedAlt) = VariantUtils.TrimAndLeftAlign(position, refAllele,
                     altAllele, _sequenceProvider.Sequence);
-                ancestralAlleleItems.Add(new AncestralAlleleItem(chromosome, shiftedPos, shiftedRef, shiftedAlt, _ancestralAllele));
+                ancestralAlleleItems.Add(new AncestralAlleleItem(chromosome, shiftedPos, shiftedRef, shiftedAlt, _ancestralAllele, vcfLine));
             }
 
             return ancestralAlleleItems;

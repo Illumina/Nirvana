@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using CacheUtils.TranscriptCache;
+using ErrorHandling.Exceptions;
 using Genome;
 using Moq;
 using OptimizedCore;
@@ -48,17 +50,28 @@ namespace UnitTests.Vcf.VariantCreator
             _sequenceMock.Setup(x => x.Substring(106500158, 1)).Returns("T");
             _sequenceMock.Setup(x => x.Substring(106500159, 1)).Returns("T");
             _sequenceMock.Setup(x => x.Substring(106500159, 2)).Returns("TA");
+            _sequenceMock.Setup(x => x.Substring(106500159-50, 50)).Returns(
+                "AAAGTCTTGGCAGGCCCCATGGTATGAGAAATGGTAACTGATATGGGGGT");
+            _sequenceMock.Setup(x => x.Substring(23102861, 63)).Returns(
+                "GGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGC");
+            _sequenceMock.Setup(x => x.Substring(23102861 -50, 50)).Returns(
+                "GCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGC");
+            _sequenceMock.Setup(x => x.Substring(23102861 -50, 63)).Returns(
+                "GCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGG");
+            _sequenceMock.Setup(x => x.Substring(23102861 -100, 50)).Returns(
+                "CAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGG");
+            
             _sequenceMock.Setup(x => x.Substring(106499659, 500)).Returns(
                 "CTCTTTTTTGCAAACACCAACACAATTTGGGCTCCATTTATAAGGCATCTGCTGCACCAACCCTCTTTCTTGGTGCTTACTGGACCTGCTCAGGGTTAATTTCTAACTCAAAGAACCTAACTTGGAGTAACTCCGTACCACCAGCAAAGCGACTGGCTTTGGGGAATGACATTTACAATGTATCCACTGTTATTTGGTCACCCAGCAAACTGTCATTTTTCAGAAACCAGGGCTGTCTCACAAACTGGCTTTCAATAAGGTGGGTTGCTTAGCAACTGCCAAGGAATTAAGAAGACAGAATAAGGTATCCGCCAGAGATATTTTATGACCAAAATGAGCTGCACTCATGTGTCTGGTTGTGTTCAAGGTAACCAAGTAAGAGATAACACCCGACTATTTTTGCATCATGAGGAAAAATACTTGGCTTCTGCCCAGAAGGGCAATTATCTCAAAGTCTTGGCAGGCCCCATGGTATGAGAAATGGTAACTGATATGGGGGT");
 
             _sequenceProvider = new SimpleSequenceProvider(GenomeAssembly.GRCh38, _sequenceMock.Object, ChromosomeUtilities.RefNameToChromosome);
-            _variantFactory   = new VariantFactory(_sequenceMock.Object, _vidCreator);
+            _variantFactory   = new VariantFactory(_sequenceMock.Object, _vidCreator, new HashSet<string>(){"CF"});
         }
 
         private IPosition ParseVcfLine(string vcfLine)
         {
             string[]    vcfFields  = vcfLine.OptimizedSplit('\t');
-            IChromosome chromosome = ReferenceNameUtilities.GetChromosome(ChromosomeUtilities.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
+            Chromosome chromosome = ReferenceNameUtilities.GetChromosome(ChromosomeUtilities.RefNameToChromosome, vcfFields[VcfCommon.ChromIndex]);
 
             (int start, bool foundError) = vcfFields[VcfCommon.PosIndex].OptimizedParseInt32();
             if (foundError) throw new InvalidDataException($"Unable to convert the VCF position to an integer: {vcfFields[VcfCommon.PosIndex]}");
@@ -394,6 +407,16 @@ namespace UnitTests.Vcf.VariantCreator
             Assert.Equal(63912685,                                  variant.Start);
             Assert.Equal(63912714,                                  variant.End);
         }
+        
+        [Fact]
+        public void STR_without_num_throws_user_error()
+        {
+            var vcfLine =
+                "chr3	63912684	STR	G	<STR>	.	PASS	END=63912714;REF=10;RL=30;RU=GCA;VARID=ATXN7;REPID=ATXN7	GT:SO:REPCN:REPCI:ADSP:ADFL:ADIR:LC	0/1:SPANNING/SPANNING:10/12:10-10/12-12:9/3:8/11:0/0:26.270270"; 
+            
+            Assert.Throws<UserErrorException>(()=>ParseVcfLine(vcfLine));
+            
+        }
 
         [Fact]
         public void ToPosition_indel()
@@ -454,6 +477,25 @@ namespace UnitTests.Vcf.VariantCreator
         }
 
         [Fact]
+        public void ToPosition_CustomSampleInfoFields()
+        {
+            IPosition position = ParseVcfLine(
+                "chr7	110541589	CNV_DEL	N	<DEL>	27	cnvLength	SVTYPE=CNV;END=110548681;REFLEN=7092	GT:SM:CN:BC:PE:CF	0/1:0.443182:1:7:19,17:0.1,1.2");
+            IVariant[] variants = position.Variants;
+            Assert.NotNull(variants);
+
+            IVariant variant = variants[0];
+            Assert.Equal("7-110541589-110548681-T-<DEL>-CNV", variant.VariantId);
+            Assert.Equal(VariantType.copy_number_loss,        variant.Type);
+            Assert.Equal(110541590,                           variant.Start);
+            Assert.Equal(110548681,                           variant.End);
+
+            Assert.NotNull(position.Samples);
+            var sample = position.Samples[0];
+            Assert.Contains("{\"CF\":\"0.1,1.2\"}", sample.CustomFields.ToString()!);
+        }
+
+        [Fact]
         public void ToPosition_ROH()
         {
             IPosition  position = ParseVcfLine("chr22	36690136	ROH	N	<ROH>	.	.	END=36788158;SVTYPE=ROH	.	.");
@@ -486,6 +528,22 @@ namespace UnitTests.Vcf.VariantCreator
             Assert.Equal(VariantType.deletion, variant.Type);
             Assert.Equal(106500160,            variant.Start);
             Assert.Equal(106500161,            variant.End);
+        }
+        
+        [Fact]
+        public void ToPosition_Giant_dbsnp155_variant()
+        {
+            IPosition  position = ParseVcfLine("15\t23102333\trs1894384199\tATGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGC\tATGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGCGGGAGCAGGAGGGGCAGGTGC\t.\t.\tR5;VC=INDEL;GNO;INT;FREQ=GnomAD:.,1,1.068e-05;RS=1894384199;SSR=0;GENEINFO=LOC283683:283683|LOC729900:729900");
+            IVariant[] variants = position.Variants;
+            Assert.NotNull(variants);
+
+            IVariant variant = variants[0];
+            //this variant shifts more than what is shown here. Due to mocking limitations, we limit it to 2 iterations of 
+            // left rotation of 50bp each
+            Assert.Equal(VariantType.deletion, variant.Type);
+            Assert.Equal(23102762,             variant.Start);
+            Assert.Equal(23102824,             variant.End);
+
         }
     }
 }

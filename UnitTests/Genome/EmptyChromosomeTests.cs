@@ -6,8 +6,8 @@ namespace UnitTests.Genome
 {
     public sealed class EmptyChromosomeTests
     {
-        private readonly IChromosome _emptyChromosome  = new EmptyChromosome("chr1");
-        private readonly IChromosome _emptyChromosome2 = new EmptyChromosome("chr1");
+        private readonly Chromosome _emptyChromosome  = Chromosome.GetEmptyChromosome("chr1");
+        private readonly Chromosome _emptyChromosome2 = Chromosome.GetEmptyChromosome("chr1");
 
         [Fact]
         public void Equals_True()

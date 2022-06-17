@@ -5,11 +5,11 @@ using SAUtils.ClinGen;
 using SAUtils.CosmicGeneFusions;
 using SAUtils.CreateClinvarDb;
 using SAUtils.DbSnpRemapper;
-using SAUtils.dbVar;
 using SAUtils.ExtractCosmicSvs;
 using SAUtils.ExtractMiniSa;
 using SAUtils.ExtractMiniXml;
 using SAUtils.FusionCatcher;
+using SAUtils.GERP;
 using SAUtils.gnomAD;
 using SAUtils.GnomadGeneScores;
 using SAUtils.MitoHeteroplasmy;
@@ -39,21 +39,23 @@ namespace SAUtils
                 ["CosmicFusion"]       = new("create COSMIC gene fusion database", CreateCosmicGeneFusions.Run),
                 ["CustomGene"]         = new("create custom gene annotation database", Custom.GeneMain.Run),
                 ["CustomVar"]          = new("create custom variant annotation database", Custom.VariantMain.Run),
+                ["Dann"]               = new("create DANN database", Dann.Create.Run),
                 ["Dbsnp"]              = new("create dbSNP database", CreateDbsnpDb.Main.Run),
                 ["Dgv"]                = new("create DGV database", makeDgvDb.Main.Run),
                 ["DiseaseValidity"]    = new("create disease validity database", GeneDiseaseValidity.Run),
                 ["DosageMapRegions"]   = new("create dosage map regions", DosageMapRegions.Run),
                 ["DosageSensitivity"]  = new("create dosage sensitivity database", DosageSensitivity.Run),
                 ["DownloadOmim"]       = new("download OMIM database", Omim.Downloader.Run),
-                ["ExacScores"]         = new("create ExAC gene scores database", ExacScores.Main.Run),
                 ["ExtractMiniSA"]      = new("extracts mini SA", ExtractMiniSaMain.Run),
                 ["ExtractMiniXml"]     = new("extracts mini XML (ClinVar)", ExtractMiniXmlMain.Run),
                 ["FilterSpliceNetTsv"] = new("filter SpliceNet predictions", SpliceNetPredictionFilterMain.Run),
                 ["FusionCatcher"]      = new("create FusionCatcher database", CreateFusionCatcher.Run),
+                ["Gerp"]               = new("create GERP conservation database", GerpMain.Run),
                 ["GlobalMinor"]        = new("create global minor allele database", CreateGlobalAllelesDb.Main.Run),
                 ["Gnomad"]             = new("create gnomAD database", GnomadSnvMain.Run),
                 ["Gnomad-lcr"]         = new("create gnomAD low complexity region database", LcrRegionsMain.Run),
                 ["GnomadGeneScores"]   = new("create gnomAD gene scores database", GnomadGenesMain.Run),
+                ["GnomadSV"]           = new("create gnomAD structural variant database", GnomadSvMain.Run),
                 ["Index"]              = new("edit an index file", UpdateIndex.Run),
                 ["MitoHet"]            = new("create mitochondrial Heteroplasmy database", MitoHeteroplasmyDb.Run),
                 ["MitomapSvDb"]        = new("create MITOMAP structural variants database", StructVarDb.Run),
@@ -69,7 +71,9 @@ namespace SAUtils
                 ["RemapWithDbsnp"] = new("remap a VCF file given source and destination rsID mappings", DbSnpRemapperMain.Run),
                 ["Revel"]          = new("create REVEL database", Revel.Create.Run),
                 ["SpliceAi"]       = new("create SpliceAI database", SpliceAiDb.Run),
-                ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run)
+                ["TopMed"]         = new("create TOPMed database", CreateTopMedDb.Main.Run),
+                ["Gme"]            = new("create GME Variome database", CreateGmeDb.Main.Run),
+                ["Decipher"]       = new("create Decipher database", CreateDecipherDb.Main.Run)
             };
 
             ExitCodes exitCode = new TopLevelAppBuilder(args, ops)

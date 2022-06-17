@@ -2,6 +2,7 @@
 using Genome;
 using Intervals;
 using Moq;
+using UnitTests.TestUtilities;
 using VariantAnnotation.AnnotatedPositions.Transcript;
 using VariantAnnotation.Interface.AnnotatedPositions;
 using VariantAnnotation.TranscriptAnnotation;
@@ -75,8 +76,10 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
 
             ITranscript[] transcripts = { transcript1.Object, transcript2.Object };
 
+            var chromosome = ChromosomeUtilities.Chr1;
             variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.SmallVariants);
-            variant.SetupGet(x => x.Chromosome.FlankingLength).Returns(Chromosome.ShortFlankingLength);
+            variant.SetupGet(x => x.Chromosome).Returns(chromosome);
+            //variant.SetupGet(x => x.Chromosome.FlankingLength).Returns(Chromosome.ShortFlankingLength);
             variant.SetupGet(x => x.Start).Returns(123456);
             variant.SetupGet(x => x.End).Returns(123456);
 
@@ -110,8 +113,8 @@ namespace UnitTests.VariantAnnotation.TranscriptAnnotation
 
             ITranscript[] transcripts = { transcript1.Object, transcript2.Object };
 
+            variant.SetupGet(x => x.Chromosome).Returns(ChromosomeUtilities.Chr1);
             variant.SetupGet(x => x.Behavior).Returns(AnnotationBehavior.RunsOfHomozygosity);
-            variant.SetupGet(x => x.Chromosome.FlankingLength).Returns(Chromosome.ShortFlankingLength);
             variant.SetupGet(x => x.Start).Returns(10000);
             variant.SetupGet(x => x.End).Returns(20000);
 

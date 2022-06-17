@@ -25,14 +25,14 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
         }
 
         public (List<IRegulatoryRegion> RegulatoryRegions, List<MutableTranscript> Transcripts) ParseDumpDirectory(
-            IChromosome chromosome, string dirPath)
+            Chromosome chromosome, string dirPath)
         {
             var regulatoryRegions = ParseRegulatoryFiles(chromosome, dirPath);
             var transcripts       = ParseTranscriptFiles(chromosome, dirPath);
             return (regulatoryRegions, transcripts);
         }
 
-        private static List<IRegulatoryRegion> ParseRegulatoryFiles(IChromosome chromosome, string dirPath)
+        private static List<IRegulatoryRegion> ParseRegulatoryFiles(Chromosome chromosome, string dirPath)
         {
             var regulatoryRegions = new List<IRegulatoryRegion>();
             var files = FileUtilities.GetFileNamesInDir(dirPath, "*_reg_regulatory_regions_data_dumper.txt.gz")
@@ -46,7 +46,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return regulatoryRegions;
         }
 
-        private List<MutableTranscript> ParseTranscriptFiles(IChromosome chromosome, string dirPath)
+        private List<MutableTranscript> ParseTranscriptFiles(Chromosome chromosome, string dirPath)
         {
             var transcripts = new List<MutableTranscript>();
             var files = FileUtilities.GetFileNamesInDir(dirPath, "*_transcripts_data_dumper.txt.gz").ToArray();
@@ -59,7 +59,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             return transcripts;
         }
 
-        private static void ParseRegulatoryDumpFile(IChromosome chromosome, string filePath,
+        private static void ParseRegulatoryDumpFile(Chromosome chromosome, string filePath,
             ICollection<IRegulatoryRegion> regulatoryRegions)
         {
             Console.WriteLine("- processing {0}", Path.GetFileName(filePath));
@@ -88,7 +88,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             }
         }
 
-        private void ParseTranscriptDumpFile(IChromosome chromosome, string filePath,
+        private void ParseTranscriptDumpFile(Chromosome chromosome, string filePath,
             ICollection<MutableTranscript> transcripts)
         {
             Console.WriteLine("- processing {0}", Path.GetFileName(filePath));
@@ -111,7 +111,7 @@ namespace CacheUtils.Commands.ParseVepCacheDirectory
             }
         }
 
-        private static void ParseRegulatoryRegions(IChromosome chromosome, IImportNode featureGroupNode,
+        private static void ParseRegulatoryRegions(Chromosome chromosome, IImportNode featureGroupNode,
             ICollection<IRegulatoryRegion> regulatoryRegions)
         {
             if (!(featureGroupNode is ListObjectKeyValueNode regulatoryFeatureNodes)) return;

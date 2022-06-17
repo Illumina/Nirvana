@@ -114,7 +114,7 @@ namespace UnitTests.SAUtils.NsaWriters
             var position = 100;
             for (int i = 0; i < count; i++, position += 5)
             {
-                items.Add(new DbSnpItem(ChromosomeUtilities.Chr1, position, position, "A", "C"));
+                items.Add(new DbSnpItem(ChromosomeUtilities.Chr1, position, position, "A", "C", null));
             }
 
             return items;
@@ -126,7 +126,7 @@ namespace UnitTests.SAUtils.NsaWriters
             var position = 10_010;
             for (int i = 0; i < count; i++, position += 2)
             {
-                items.Add(new DbSnpItem(ChromosomeUtilities.ChrY, position, position, "N", "C"));
+                items.Add(new DbSnpItem(ChromosomeUtilities.ChrY, position, position, "N", "C", null));
             }
 
             return items;

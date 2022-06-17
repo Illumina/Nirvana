@@ -7,13 +7,13 @@ namespace SAUtils.PrimateAi
 {
     public sealed class PrimateAiItem : ISupplementaryDataItem
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Position { get; set; }
         public string RefAllele { get; set; }
         public string AltAllele { get; set; }
         private string Hgnc { get; }
         public double ScorePercentile { get; }
-        public PrimateAiItem(IChromosome chromosome, int position, string refAllele, string altAllele, string hgnc,
+        public PrimateAiItem(Chromosome chromosome, int position, string refAllele, string altAllele, string hgnc,
             double percentile)
         {
             Chromosome      = chromosome;
@@ -31,5 +31,7 @@ namespace SAUtils.PrimateAi
             jsonObject.AddDoubleValue("scorePercentile", ScorePercentile, "0.##");
             return StringBuilderPool.GetStringAndReturn(sb);
         }
+
+        public string InputLine { get; set; }
     }
 }

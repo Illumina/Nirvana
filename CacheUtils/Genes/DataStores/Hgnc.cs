@@ -21,14 +21,14 @@ namespace CacheUtils.Genes.DataStores
             HgncIdToSymbol = hgncIdToSymbol;
         }
 
-        public static Hgnc Create(string filePath, IDictionary<string, IChromosome> refNameToChromosome)
+        public static Hgnc Create(string filePath, Dictionary<string, Chromosome> refNameToChromosome)
         {
             var hgncGenes      = LoadHgncGenes(FileUtilities.GetReadStream(filePath), refNameToChromosome);
             var hgncIdToSymbol = hgncGenes.GetKeyValueDict(x => x.HgncId, x => x.Symbol);
             return new Hgnc(hgncGenes, hgncIdToSymbol);
         }
 
-        private static HgncGene[] LoadHgncGenes(Stream stream, IDictionary<string, IChromosome> refNameToChromosome)
+        private static HgncGene[] LoadHgncGenes(Stream stream, Dictionary<string, Chromosome> refNameToChromosome)
         {
             HgncGene[] genes;
             using (var reader = new HgncReader(stream, refNameToChromosome)) genes = reader.GetGenes();

@@ -17,6 +17,7 @@ namespace VariantAnnotation.AnnotatedPositions
         public IList<ISupplementaryAnnotation>   SaList                    { get; } = new List<ISupplementaryAnnotation>();
         public ISupplementaryAnnotation          RepeatExpansionPhenotypes { get; set; }
         public double?                           PhylopScore               { get; set; }
+        public double?                           GerpScore               { get; set; }
         
         public bool InLowComplexityRegion { get; set; }
         
@@ -29,6 +30,7 @@ namespace VariantAnnotation.AnnotatedPositions
             SaList.Clear();
             RepeatExpansionPhenotypes = null;
             PhylopScore               = null;
+            GerpScore                 = null;
         }
 
         
@@ -59,6 +61,7 @@ namespace VariantAnnotation.AnnotatedPositions
             jsonObject.AddStringValue("hgvsg", HgvsgNotation);
 
             jsonObject.AddDoubleValue("phylopScore", PhylopScore);
+            jsonObject.AddDoubleValue("gerpScore", GerpScore);
             jsonObject.AddBoolValue("inLowComplexityRegion", InLowComplexityRegion);
 
             if (RegulatoryRegions?.Count > 0) jsonObject.AddObjectValues("regulatoryRegions", RegulatoryRegions);

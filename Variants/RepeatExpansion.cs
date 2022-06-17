@@ -4,7 +4,7 @@ namespace Variants
 {
     public sealed class RepeatExpansion : IVariant
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; }
         public string RefAllele { get; }
@@ -22,7 +22,7 @@ namespace Variants
         public readonly int RepeatCount;
         public readonly int? RefRepeatCount;
 
-        public RepeatExpansion(IChromosome chromosome, int start, int end, string refAllele, string altAllele,
+        public RepeatExpansion(Chromosome chromosome, int start, int end, string refAllele, string altAllele,
             string variantId, int repeatCount, int? refRepeatCount)
         {
             Chromosome     = chromosome;

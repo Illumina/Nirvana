@@ -7,20 +7,21 @@ using VariantAnnotation.IO;
 
 namespace SAUtils.InputFileParsers.ClinVar
 {
-    public sealed class VcvSaItem: ISupplementaryDataItem, IComparable<VcvSaItem>
+    public sealed class VcvSaItem: IClinVarSaItem, IEquatable<VcvSaItem>
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int         Position   { get; set; }
         public string      RefAllele  { get; set; }
         public string      AltAllele  { get; set; }
 
-        private readonly string       _accession;
-        private readonly string       _version;
-        private readonly DateTime     _lastUpdatedDate;
-        private readonly ClinVarCommon.ReviewStatus _reviewStatus;
-        private readonly IEnumerable<string> _significances;
+        private readonly string                     _accession;
+        private readonly string                     _version;
+        private readonly DateTime                   _lastUpdatedDate;
+        public           ClinVarCommon.ReviewStatus ReviewStatus  { get; }
+        public           IEnumerable<string>        Significances { get; }
+        public           string                     Id            => $"{_accession}.{_version}";
 
-        public VcvSaItem(IChromosome chromosome, int position, string refAllele, string altAllele, string accession, string version, DateTime lastUpdatedDate, ClinVarCommon.ReviewStatus reviewStatus, IEnumerable<string> significances)
+        public VcvSaItem(Chromosome chromosome, int position, string refAllele, string altAllele, string accession, string version, DateTime lastUpdatedDate, ClinVarCommon.ReviewStatus reviewStatus, IEnumerable<string> significances)
         {
             Chromosome = chromosome;
             Position   = position;
@@ -30,8 +31,8 @@ namespace SAUtils.InputFileParsers.ClinVar
             _accession       = accession;
             _version         = version;
             _lastUpdatedDate = lastUpdatedDate;
-            _reviewStatus    = reviewStatus;
-            _significances   = significances;
+            ReviewStatus    = reviewStatus;
+            Significances   = significances;
         }
 
         public string GetJsonString()
@@ -40,8 +41,8 @@ namespace SAUtils.InputFileParsers.ClinVar
             var jsonObject = new JsonObject(sb);
 
             jsonObject.AddStringValue("id", $"{_accession}.{_version}");
-            jsonObject.AddStringValue("reviewStatus", ClinVarCommon.ReviewStatusStrings[_reviewStatus]);
-            jsonObject.AddStringValues("significance", _significances);
+            jsonObject.AddStringValue("reviewStatus", ClinVarCommon.ReviewStatusStrings[ReviewStatus]);
+            jsonObject.AddStringValues("significance", Significances);
             jsonObject.AddStringValue("refAllele", ClinVarCommon.NormalizeAllele(RefAllele));
             jsonObject.AddStringValue("altAllele", ClinVarCommon.NormalizeAllele(AltAllele));
             jsonObject.AddStringValue("lastUpdatedDate", _lastUpdatedDate.ToString("yyyy-MM-dd"));
@@ -49,11 +50,25 @@ namespace SAUtils.InputFileParsers.ClinVar
             return StringBuilderPool.GetStringAndReturn(sb);
         }
 
-        public int CompareTo(VcvSaItem other)
+        public string InputLine { get; set; }
+
+        public int CompareTo(IClinVarSaItem other)
         {
             return Chromosome.Index != other.Chromosome.Index
                 ? Chromosome.Index.CompareTo(other.Chromosome.Index)
                 : Position.CompareTo(other.Position);
+        }
+
+
+        public bool Equals(VcvSaItem other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return _accession == other._accession && _version == other._version;
+        }
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(_accession, _version);
         }
     }
 }

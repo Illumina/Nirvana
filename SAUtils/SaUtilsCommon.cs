@@ -6,7 +6,7 @@ namespace SAUtils
     {
         public static bool IsNumberNullOrZero(int? item)
         {
-            return item == null || item.Value == 0;
+            return item is null or 0;
         }
 
         /// <summary>
@@ -34,6 +34,11 @@ namespace SAUtils
             return firstBaseIndex > 0 && firstBaseIndex < saAltAllele.Length
                 ? saAltAllele.Substring(firstBaseIndex)
                 : saAltAllele;
+        }
+
+        public static bool HasFailedFilters(string filters)
+        {
+            return !(filters.Equals("PASS") || filters.Equals("."));
         }
     }
 }

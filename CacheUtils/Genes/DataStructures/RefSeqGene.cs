@@ -5,7 +5,7 @@ namespace CacheUtils.Genes.DataStructures
 {
     public sealed class RefSeqGene : IFlatGene<RefSeqGene>
     {
-        public IChromosome Chromosome { get; }
+        public Chromosome Chromosome { get; }
         public int Start { get; }
         public int End { get; set; }
         private bool OnReverseStrand { get; }
@@ -13,7 +13,7 @@ namespace CacheUtils.Genes.DataStructures
         public string Symbol { get; }
         private int HgncId { get; }
 
-        public RefSeqGene(IChromosome chromosome, int start, int end, bool onReverseStrand, string entrezGeneId,
+        public RefSeqGene(Chromosome chromosome, int start, int end, bool onReverseStrand, string entrezGeneId,
             string symbol, int hgncId)
         {
             Chromosome      = chromosome;

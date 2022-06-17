@@ -1,4 +1,5 @@
-﻿using OptimizedCore;
+﻿using System;
+using OptimizedCore;
 
 namespace Vcf.Sample
 {
@@ -45,5 +46,6 @@ namespace Vcf.Sample
 
             return values;
         }
+        
     }
 }

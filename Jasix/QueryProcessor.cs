@@ -77,8 +77,9 @@ namespace Jasix
 			
 			if (printHeader)
 			{
-				string headerString = "{" +GetHeader() +"}";
-				Utilities.PrintJsonEntry(headerString, false, _writer);
+				_writer.Write("{\n\"header\":");
+				var headerContent = GetHeader().Split(':',2)[1];
+				Utilities.PrintJsonEntry(headerContent, false, _writer);
 				_writer.WriteLine(",");
 			}
 			else _writer.Write("{");
@@ -137,13 +138,15 @@ namespace Jasix
 			foreach (long location in locations)
 			{
 				RepositionReader(location);
-
 				string line;
-				if ((line = _jsonReader.ReadLine()) == null) continue;
-				line = line.TrimEnd(',');
-
-				yield return line;
-
+				while ((line = _jsonReader.ReadLine()) != null)
+				{
+					if (!line.OptimizedStartsWith(',')) { //buffer starts with ',\n', skip this first line
+						line = line.TrimEnd(',');					      
+						yield return line;
+						break;
+					}
+				}
 			}
 		}
 

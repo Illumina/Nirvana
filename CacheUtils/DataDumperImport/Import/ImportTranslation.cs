@@ -32,7 +32,7 @@ namespace CacheUtils.DataDumperImport.Import
         /// parses the relevant data from each translation object
         /// </summary>
         public static (int Start, int End, string ProteinId, byte ProteinVersion, MutableExon startExon, MutableExon
-            endExon) Parse(IImportNode importNode, IChromosome currentChromosome)
+            endExon) Parse(IImportNode importNode, Chromosome currentChromosome)
         {
             var objectValue = importNode.GetObjectValueNode();
             if (objectValue == null) throw new InvalidDataException("Encountered a translation import node that could not be converted to an object value node.");
