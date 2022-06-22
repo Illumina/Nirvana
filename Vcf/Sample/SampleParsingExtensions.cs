@@ -30,7 +30,7 @@ namespace Vcf.Sample
 
         internal static string[] GetStrings(this string s) => s?.OptimizedSplit(',');
 
-        public static int[] GetIntegers(this string s, char delimiter = ',')
+        public static int[] GetIntegers(this string s, char delimiter = ',', bool allowMissingValues=false)
         {
             if (s == null) return null;
 
@@ -40,7 +40,12 @@ namespace Vcf.Sample
             for (var i = 0; i < values.Length; i++)
             {
                 (int number, bool foundError) = cols[i].OptimizedParseInt32();
-                if (foundError) return null;
+                if (foundError)
+                {
+                    if (allowMissingValues) number = 0;
+                    else return null;
+                }
+
                 values[i] = number;
             }
 

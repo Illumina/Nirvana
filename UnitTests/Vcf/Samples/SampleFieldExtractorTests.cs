@@ -273,5 +273,30 @@ namespace UnitTests.Vcf.Samples
             VariantPool.Return((Variant)variants[0]);
             VariantPool.Return((Variant)variants[1]);
         }
+        
+        [Fact]
+        public void ExtractSample_AD_with_dots()
+        {
+            var formatIndices = new FormatIndices();
+
+            string[] cols = {
+                "chr3",
+                "183906045",
+                ".",
+                "G",
+                "T,A",
+                ".",
+                "PASS",
+                "AS_FilterStatus=SITE;AS_SB_TABLE=65,55|62,54;ECNT=1;GERMQ=16;ROQ=93;DP=447;MBQ=20,20,20;MFRL=163,152,166;MMQ=60,60,60;MPOS=39,33;POPAF=7.3,7.3;TLOD=253,344",
+                "GT:AD:AF:DP:F1R2:F2R1:SB",
+                "0/1:120,116,.:0.479,.:236:45,29,.:73,84,.:65,55,62,54",
+                "0/2:64,.,138:.,0.684:202:20,.,55:43,.,83:34,30,72,66"
+            };
+
+            ISample[] samples = cols.ToSamples(formatIndices, GetSimplePositionUsingAlleleNum(1), null, null);
+            Assert.NotNull(samples);
+            
+            Assert.Equal(3, samples[0].AlleleDepths.Length);
+        }
     }
 }

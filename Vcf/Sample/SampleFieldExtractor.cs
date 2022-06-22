@@ -50,7 +50,7 @@ namespace Vcf.Sample
                 return legacyExtractor.ExtractSample(sampleColumn);
             }
 
-            int[]    alleleDepths                 = sampleColumns.GetString(formatIndices.AD).GetIntegers();
+            int[]    alleleDepths                 = sampleColumns.GetString(formatIndices.AD).GetIntegers(',', true);
             float?   artifactAdjustedQualityScore = sampleColumns.GetString(formatIndices.AQ).GetFloat();
             int?     copyNumber                   = sampleColumns.GetString(formatIndices.CN).GetInteger();
             string[] diseaseAffectedStatuses      = sampleColumns.GetString(formatIndices.DST).GetStrings();
