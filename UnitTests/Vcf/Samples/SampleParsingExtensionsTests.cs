@@ -117,6 +117,13 @@ namespace UnitTests.Vcf.Samples
         }
 
         [Fact]
+        public void GetIntegers_NotInteger_ReturnZero()
+        {
+            int[] observedResult = "10,13,bobby".GetIntegers(',', true);
+            Assert.Equal(new []{10, 13, 0}, observedResult);
+        }
+
+        [Fact]
         public void GetIntegers_NullString_ReturnNull()
         {
             string s = null;
