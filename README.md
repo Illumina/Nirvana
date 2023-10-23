@@ -10,6 +10,6 @@ Backronym: **NI**mble and **R**obust **VA**riant a**N**not**A**tor
 <br clear=left>
 
 ## Resources
-
-* [Documentation](https://illumina.github.io/NirvanaDocumentation/)
+*Please note that our documentation site has moved.*
+* [Documentation](https://illumina.github.io/IlluminaAnnotatorDocumentation/)
 * [Release Notes](https://github.com/Illumina/Nirvana/releases)
