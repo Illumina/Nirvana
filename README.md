@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> Nirvana is no longer actively maintained as an open sourced tool. Please visit [Illumina Connected Annotations](https://developer.illumina.com/illumina-connected-annotations) for the latest version. Latest documentation can be found [here](https://illumina.github.io/IlluminaConnectedAnnotationsDocumentation/)
+
 # Nirvana
 
 Nirvana provides **clinical-grade annotation of genomic variants** (SNVs, MNVs, insertions, deletions, indels, and SVs (including CNVs). It can be run as a stand-alone package or integrated into larger software tools that require variant annotation.
